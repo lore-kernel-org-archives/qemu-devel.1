@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fgCbB-0001y9-VB
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:20:19 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fgCbc-0002Ln-Gb
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fgCbA-0000vR-CH
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:20:17 -0400
-References: <3390c4bf-ffac-3744-fd85-84f4ee8193bf@ilande.co.uk>
-	<931c2e2a-1c60-5ef3-9b9e-354b8dc67e4d@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <25c1b12e-3aca-39a3-a556-56b542342270@ilande.co.uk>
-Date: Thu, 19 Jul 2018 18:19:59 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fgCbb-0001Wl-2Q
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:20:44 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fgCba-0001WA-Oq
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:20:43 -0400
+Received: by mail-wr1-x442.google.com with SMTP id v14-v6so8825452wro.5
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 10:20:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <931c2e2a-1c60-5ef3-9b9e-354b8dc67e4d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] How to generate custom fw paths for IDE devices?
+In-Reply-To: <87zhyqc8bv.fsf@dusky.pond.sub.org>
+References: <20180706121354.2021-1-marcandre.lureau@redhat.com>
+	<20180706121354.2021-10-marcandre.lureau@redhat.com>
+	<87zhyqe1e4.fsf@dusky.pond.sub.org>
+	<CAMxuvaxL_W0_fZSfYzL9L5aGCEymcKAYSig7u84K-dzm2agPGQ@mail.gmail.com>
+	<87zhyqc8bv.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 19 Jul 2018 19:20:41 +0200
+Message-ID: <CAJ+F1CKM3_-8KeKH9f96Q0fYTZj4PdNZDi8ged7h=1ZkC0MHsw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 09/12] tests: add a few qemu-qmp tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,111 +33,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, jsnow@redhat.com, armbru@redhat.com, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On 19/07/18 09:29, Laszlo Ersek wrote:
+Hi
 
-> (updating Marcel's address to his GMail one)
-> 
-> On 07/18/18 23:13, Mark Cave-Ayland wrote:
->> Hi all,
+On Tue, Jul 17, 2018 at 3:15 PM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> Hi
 >>
->> Following on from a couple of patches I've previously posted to the
->> mailing list at
->> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08836.html I've
->> made some good progress with trying to add bootindex support to OpenBIOS
->> but I'm stuck with generating the IDE device paths from QEMU.
+>> On Tue, Jul 17, 2018 at 10:01 AM, Markus Armbruster <armbru@redhat.com> =
+wrote:
+>>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>>
+>>>> These 2 tests exhibited two qmp bugs that were fixed in 2.7
+>>>> (series from commit e64c75a9752c5d0fd64eb2e684c656a5ea7d03c6 to
+>>>> commit 1382d4abdf9619985e4078e37e49e487cea9935e)
+>>>>
+>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>> ---
+>>>>  tests/qmp-test.c | 38 ++++++++++++++++++++++++++++++++++++++
+>>>>  1 file changed, 38 insertions(+)
+>>>>
+>>>> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+>>>> index ceaf4a6789..084c5edff0 100644
+>>>> --- a/tests/qmp-test.c
+>>>> +++ b/tests/qmp-test.c
+>>>> @@ -249,7 +249,39 @@ static void test_qmp_oob(void)
+>>>>      recv_cmd_id(qts, "blocks-2");
+>>>>      recv_cmd_id(qts, "err-2");
+>>>>      cleanup_blocking_cmd();
+>>>> +}
+>>>> +
+>>>> +static void test_object_add_without_props(void)
+>>>> +{
+>>>> +    QTestState *qts;
+>>>> +    QDict *ret;
+>>>> +
+>>>> +    qts =3D qtest_init(common_args);
+>>>> +
+>>>> +    ret =3D qtest_qmp(qts, "{'execute': 'object-add',"
+>>>> +          " 'arguments': { 'qom-type': 'memory-backend-ram', 'id': 'r=
+am1' } }");
+>>>
+>>> Please break lines between arguments instead of within.  More of the
+>>> same below.
 >>
->> According to OpenBIOS the device path for a cdrom on a sun4u machine
->> should be:
+>> Sorry I am not sure I understand what you want. It's broken between
+>> argument "execute" and "arguments", how do you want to change it?
+>
+> The line is broken in the middle of the second argument to qtest_qmp().
+>
+> Line breaks I'd like better:
+>
+>     ret =3D qtest_qmp(qts,
+>                     "{'execute': 'object-add',"
+>                     " 'arguments': {'qom-type': 'memory-backend-ram',
+>                     "               'id': 'ram1'}}");
+>
+>     ret =3D qtest_qmp(qts,
+>                     "{'execute': 'object-add',"
+>                     " 'arguments': {"
+>                     "    'qom-type': 'memory-backend-ram', 'id': 'ram1'}}=
+");
+>
+>     ret =3D qtest_qmp(qts,
+>                     "{'execute': 'object-add', 'arguments':"
+>                     " {'qom-type': 'memory-backend-ram', 'id': 'ram1'}}")=
+;
+>
+
+ok (I picked the last, they all look equally bad/good to me ;)
+
+>>>> +    g_assert_nonnull(ret);
+>>>> +
+>>>> +    g_assert_cmpstr(get_error_class(ret), =3D=3D, "GenericError");
+>>>> +
+>>>> +    qobject_unref(ret);
+>>>> +    qtest_quit(qts);
+>>>> +}
+>>>> +
+>>>> +static void test_qom_set_without_value(void)
+>>>> +{
+>>>> +    QTestState *qts;
+>>>> +    QDict *ret;
+>>>> +
+>>>> +    qts =3D qtest_init(common_args);
+>>>>
+>>>> +    ret =3D qtest_qmp(qts, "{'execute': 'qom-set',"
+>>>> +              " 'arguments': { 'path': '/machine', 'property': 'rtc-t=
+ime' } }");
+>>>> +    g_assert_nonnull(ret);
+>>>> +
+>>>> +    g_assert_cmpstr(get_error_class(ret), =3D=3D, "GenericError");
+>>>> +
+>>>> +    qobject_unref(ret);
+>>>>      qtest_quit(qts);
+>>>>  }
+>>>>
+>>>> @@ -479,8 +511,13 @@ int main(int argc, char *argv[])
+>>>>
+>>>>      g_test_init(&argc, &argv, NULL);
+>>>>
+>>>> +    qtest_add_func("qmp/object-add-without-props",
+>>>> +                   test_object_add_without_props);
+>>>> +    qtest_add_func("qmp/qom-set-without-value",
+>>>> +                   test_qom_set_without_value);
+>>>>      qtest_add_func("qmp/protocol", test_qmp_protocol);
+>>>>      qtest_add_func("qmp/oob", test_qmp_oob);
+>>>> +
+>>>>      qmp_schema_init(&schema);
+>>>>      add_query_tests(&schema);
+>>>>      qtest_add_func("qmp/preconfig", test_qmp_preconfig);
+>>>> @@ -488,5 +525,6 @@ int main(int argc, char *argv[])
+>>>>      ret =3D g_test_run();
+>>>>
+>>>>      qmp_schema_cleanup(&schema);
+>>>> +
+>>>>      return ret;
+>>>>  }
+>>>
+>>> Is this hunk intentional?
+>>>
 >>
->>    /pci@1fe,0/pci@1,1/ide@3/ide1@8100/cdrom@0
+>> no
+>
+> Easy enough to drop :)
+>
+>>> Taking a step back: the test cases look good, but is this file an
+>>> appropriate home?  The file comment states it's about "QMP protocol tes=
+t
+>>> cases".  These test cases test commands, not the protocol.
 >>
->> whereas with my working patchset I'm currently generating:
+>> Actually, the tests were written to test the qapi/qmp fixes mentionned
+>> in commit message. So they were more "protocol" related than command
+>> related.
+>
+> Let's see...
+>
+> 1. test_object_add_without_props() tests the bug fixed in commit
+>    e64c75a975 "qmp: fix object-add assert() without props"
+>
+>    object-add's parameter @props is optional, qmp_object_add() fails to
+>    default it to {}, which user_creatable_add_type() requires.  This is
+>    a bug in the command handler.  It went unnoticed because object-add
+>    lacks systematic tests.  You add one test case, which is welcome, but
+>    what we really want is at systematic coverage of all paths through
+>    qmp_object_add().
+>
+>    Aside: we want that for every QMP command.  We have it for next to
+>    none of them.
+>
+>    Anyway, neither the bug nor its test are about the QMP protocol.
+
+you are right
+
+>
+> 2. test_qom_set_without_value() tests the bug fixed in commit c489780203
+>    "qapi: Fix crash when 'any' or 'null' parameter is missing"
+>
+>    The QMP input visitor neglects to check qmp_input_get_object() for
+>    failure.  The bug is *not* in qom-set; qom-set is merely part of the
+>    reproducer.  You're right, this case is 'more "protocol" related than
+>    command related.'
+>
+>    We do have tests for the QMP input visitor.  You fixed them to cover
+>    this case in the very next commit bce3035a44
+>    "tests/test-qmp-input-strict: Cover missing struct members".  That's
+>    a unit test.
+>
+>    Should we test it once more at the QMP level in a qtest?  If yes,
+>    then we should test all the errors the visitor should report once
+>    there, shouldn't we?  Mind, I'm not saying *you* should.
+>
+
+As you said commit bce3035a44 covers it at a lower/unit level. The QMP
+test is the user level, and the original reproducer. Both have values,
+even if they reach the same condition. Up to you if you prefer to drop
+it.
+
+>>>
+>>> I figure test_qom_set_without_value() belongs to qom-test.c.
+>>>
+>>> test_object_add_without_props() could go into a memory backend test
+>>> collection, or an object-add test collection.  Sadly, neither exists.
+>>> We could have a qmp command test collection as a home of last resort.
+>>> Temptation to just throw a few random test cases there instead of
+>>> covering (a set of related) commands with a proper test case collection=
+.
+>>>
+>>> As is, your patch turns qmp-test.c into such a home of last resort.  If
+>>> that's what we want, we should update the file comment.  But I think I'=
+d
+>>> rather have a separate qmp-cmd-test.c.
+>>>
+>>> Thoughts?
 >>
->>    /pci@1fe,0/pci@1,1/ide@3/drive@1
->>
->> The issue is that the drive@1 part is being generated by the IDE drive
->> device attached to the IDE bus in hw/ide/qdev.c, and so I think I need
->> to override idebus_get_fw_dev_path() to manually generate the remainder
->> of the path including both the controller and the correctly named drive
->> node.
->>
->> One option may be to consider subclassing IDEBus and overriding
->> idebus_get_fw_dev_path() there, but the cmd646 device is a child of
->> TYPE_PCI_IDE which has its own internal IDEBus and so it seems
->> overriding it is impossible.
->>
->> Can anyone point me in the right direction as to how to generate the
->> correct fw path for IDE devices in the above format for sun4u machines?
-> 
-> What prevents you from recognizing, in the guest firmware, the
-> OpenFirmware device path that is currently generated by QEMU?
+>> It's somewhat blurry lines to me, it would be simpler to just use qmp-te=
+st.
+>
+> Simpler, yes, but creating a new file isn't really hard, either.
+>
+> In current master, qmp-test.c has just under 500 lines.  It's already
+> one of the larger files in tests/.  Certainly not too big, but I'd
+> prefer to keep it focused.
+>
+> I defocused it some myself when I added the query smoke tests (commit
+> e4a426e75e tests/qmp-test: Add generic, basic test of query commands).
+> It was simpler to just use qmp-test.  I shouldn't have.
+>
+> I'll prepare a patch to split qmp-test.c into a command-independent part
+> (protocol, infrastructure) and a part about commands.
+>
 
-In a word: compatibility. With the older SPARC/PPC machines the OSs are 
-*very* picky about device names and often make assumptions about the DT 
-layout instead of parsing it properly, simply because at that time 
-no-one really thought of running the software on anything but a real 
-machine.
+Fine with me, although it could be done after this commit is applied I supp=
+ose.
 
-> I mean, the device path generated by QEMU looks technically correct; it
-> reflects how the IDE controller sits in a PCI B/D/F, and how the IDE
-> drive sits on an IDE controller. Or do you actually have an intermediate
-> IDE controller (at "address 0x8100" on the top IDE controller) in the
-> sun4u machine type? Is the address 0x8100 actually needed by the firmware?
-> 
-> If so, perhaps you could turn that intermediate IDE controller
-> ("internal IDEBus") into its own class, and chain the instance of that
-> class like the rest of the bus controllers are chained. (Just
-> speculating...)
+I will keep it in the series for now, let you decide how to handle it
 
-In the case of the IDE device, the devices represent the 
-primary/secondary interfaces and not the separate controllers: the 
-primary lives at 0x8000 and the secondary at 0x8100.
+thanks
 
-The other problem with changing this is that currently as there is no 
-bootindex support, these map to the legacy -hda and -cdrom options 
-correctly so even if I could do this, and even if all the OSs would 
-still parse the device path, it would have to be a complete cutover 
-which would likely involve me being on the receiving end of some angry 
-emails.
-
-For PPC I've been playing with the macio device because MacOS refused to 
-boot unless the nodes are named "ata-3" and "ata-4". So far I've only 
-been able to do this by implementing a "dummy" macio Bus, reworking and 
-attaching the macio-ide device to it, implementing minial Bus support, 
-and then overriding the fw path function to rewrite the device name 
-based upon its QOM type. That's a whole lot of work just to rename a 
-device from "ide" to "ata-3" in the DT.
-
-If you take a look at the function Thomas mentioned in his email 
-(https://git.qemu.org/?p=qemu.git;a=blob;f=hw/ppc/spapr.c;h=421b2dd09b515502cd11ccdd26420a8117f80cda;hb=e1ea55668ffe6ce558a063f3a9621b761738e1f2#l2866) 
-suddenly it makes sense why I had to suggest patches for naming PCI 
-devices: the SLOF/SPAPR authors decided to replace the entire 
-FwPathProvider so then all that is necessary is to rewrite the paths for 
-the relevant devices in one place; this also nicely handles the 
-difference between IDE vs. SCSI vs. USB vs. virtio DT nodes.
-
-I certainly think it's worth keeping the PCI/sysbus patches I submitted 
-to simplify the required logic, however it's clear to me that the above 
-solution from SPAPR is going to be the best way forward for PPC and 
-SPARC. Presumably this also explains why the patches didn't exist in the 
-first place because the SLOF/SPAPR folks ignored the existing 
-infrastructure and went ahead and did their own thing.
-
- From a design perspective I can completely understand why someone would 
-come up with a design with a 1:1 correspondence between qdev and fw 
-paths, but in reality it's the details that mean this just doesn't quite 
-work in real life. In particular ISTM it's a big red flag that both 
-IEEE-1275-based BIOSes, OpenBIOS and SLOF (upon which the design is 
-heavily influenced) have to ignore the infrastructure based upon qdev 
-and provide their own implementations.
-
-Are there any other similar issues around other BIOSes, e.g. s390, 
-SeaBIOS at all?
-
-
-ATB,
-
-Mark.
+--=20
+Marc-Andr=C3=A9 Lureau
