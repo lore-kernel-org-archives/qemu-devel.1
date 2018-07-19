@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgBpS-0004wo-2f
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:30:59 -0400
+	(envelope-from <armbru@redhat.com>) id 1fgBqT-0005Wk-Ri
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:32:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgBpR-0008LE-60
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:30:58 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:39706)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fgBpP-0008Ko-Tl
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:30:56 -0400
-Received: by mail-oi0-x241.google.com with SMTP id d189-v6so16080455oib.6
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 09:30:55 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fgBqO-0000Wg-Ve
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:32:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36370 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fgBqO-0000WX-Qa
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:31:56 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1532012617-16777-1-git-send-email-walling@linux.ibm.com>
+Date: Thu, 19 Jul 2018 18:31:54 +0200
+In-Reply-To: <1532012617-16777-1-git-send-email-walling@linux.ibm.com> (Collin
+	Walling's message of "Thu, 19 Jul 2018 11:03:37 -0400")
+Message-ID: <87sh4f191h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1f26dbe0-9999-f9ea-103f-d5dde6c52dc0@linaro.org>
-References: <20180716133302.25989-1-peter.maydell@linaro.org>
-	<57aa2f3f-aa32-bcdb-f971-32709e717833@linaro.org>
-	<CAFEAcA8FnSP35scTZmLG6_qFOBsu1wRC0mLq5isz+Y_r907i5w@mail.gmail.com>
-	<1f26dbe0-9999-f9ea-103f-d5dde6c52dc0@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Jul 2018 17:30:34 +0100
-Message-ID: <CAFEAcA-5bunCefm4qKANOqsz1k1vss+tt7y3Y6Gi28hjXorYYA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.0] target/arm: Correctly handle
- overlapping small MPU regions
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] monitor: print message when using 'help'
+ with an unknown command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Adithya Baglody <adithya.nagaraj.baglody@intel.com>, "patches@linaro.org" <patches@linaro.org>
+To: Collin Walling <walling@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, David Alan Gilbert <dgilbert@redhat.com>
 
-On 18 July 2018 at 05:02, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 07/17/2018 12:40 PM, Peter Maydell wrote:
->> On 17 July 2018 at 18:29, Richard Henderson
->> <richard.henderson@linaro.org> wrote:
->>> I don't understand why this is necessary in the v8m case.
->>>
->>>                AP                 APL
->>>     <----B1----|----L1-B2-A-------|---L2--->
->>>
->>>
->>> Your comment posits two regions [B1,L1] and [B2,L2], that A is not within
->>> [B1,L1] but is within [B2,L2] (otherwise we would not report a hit at all).
->>> Further, that [B1,L1] intersects [AP,APL] but does not intersect [B2,L2]
->>> (otherwise we would report a fault for overlapping regions).
->>>
->>> Surely this combination of ranges implies that [B2,L2] must itself set
->>> IS_SUBPAGE (otherwise the first region would not overlap the page of A, or
->>> would not overlap the second region).
->>
->> (a) the overlap fault is only for addresses which are actually in the
->> overlap (ie "you asked about address X and it hits in R1 and R2"); it
->> doesn't imply that other addresses which are only in R1 fault just
->> because some part of R1 overlaps with R2.
+You neglected to cc: maintainers.  Cc'ing them increases the odds your
+patch will be noticed and picked up.  You can use
+scripts/get_maintainer.pl to find maintainers.  You don't have to do
+anything for this patch; it got noticed anyway.
+
+David, this is yours :)
+
+Collin Walling <walling@linux.ibm.com> writes:
+
+> When typing 'help' followed by an unknown command, QEMU will
+> not print anything to the command line to let the user know
+> they typed a bad command. Let's fix this by printing a message
+> to the monitor when this happens. For example:
 >
-> Ah, that wasn't clear from the manual.
-
-R_DCHP is the text rule that defines this bit of behaviour
-(generate fault for "an access to an address that matches in more
-than one region"); MPUCheck() is the pseudocode function.
-
-thanks
--- PMM
+>     (qemu) help xyz
+>     unknown command: 'xyz'
+>
+> Reported-by: Stefan Zimmermann <stzi@linux.ibm.com>
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> ---
+>  monitor.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index 7af1f18..7942f9f 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1034,9 +1034,12 @@ static void help_cmd_dump(Monitor *mon, const mon_cmd_t *cmds,
+>              } else {
+>                  help_cmd_dump_one(mon, cmd, args, arg_index);
+>              }
+> -            break;
+> +            return;
+>          }
+>      }
+> +
+> +    /* Entry not found */
+> +    monitor_printf(mon, "unknown command: '%s'\n", args[arg_index]);
+>  }
+>  
+>  static void help_cmd(Monitor *mon, const char *name)
