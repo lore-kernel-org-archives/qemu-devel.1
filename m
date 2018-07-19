@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8VE-00039U-DJ
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:00:37 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8V2-00038s-3J
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8RQ-00037H-Sd
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:57:52 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:54490 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8Rs-0003MP-RL
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:57:40 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:54753 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1fg8RQ-00036J-DE
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:53:56 -0400
+	id 1fg8Rs-0003KS-Dj
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:54:24 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu, 19 Jul 2018 14:52:02 +0200
-Message-Id: <1532004727-13778-7-git-send-email-stefan.markovic@rt-rk.com>
+Date: Thu, 19 Jul 2018 14:52:06 +0200
+Message-Id: <1532004727-13778-11-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1532004727-13778-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1532004727-13778-1-git-send-email-stefan.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 06/11] target/mips: Don't update BadVAddr
- register in Debug Mode
+Subject: [Qemu-devel] [PATCH v6 10/11] linux-user: Update MIPS syscall
+ numbers up to kernel 4.18 headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +28,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-BadVAddr should not be updated if (env->hflags & MIPS_HFLAG_DM) is
-set.
+Synchronize content of linux-user/mips/syscall_nr.h and
+linux-user/mips64/syscall_nr.h with Linux kernel 4.18 headers.
+This adds 7 new syscall numbers, the last being NR_statx.
 
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/helper.c    |  4 +++-
- target/mips/op_helper.c | 12 +++++++++---
- 2 files changed, 12 insertions(+), 4 deletions(-)
+ linux-user/mips/syscall_nr.h   |  7 +++++++
+ linux-user/mips64/syscall_nr.h | 14 ++++++++++++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index 8cf91ce..e215af9 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -502,7 +502,9 @@ static void raise_mmu_exception(CPUMIPSState *env, ta=
-rget_ulong address,
-         break;
-     }
-     /* Raise exception */
--    env->CP0_BadVAddr =3D address;
-+    if (!(env->hflags & MIPS_HFLAG_DM)) {
-+        env->CP0_BadVAddr =3D address;
-+    }
-     env->CP0_Context =3D (env->CP0_Context & ~0x007fffff) |
-                        ((address >> 9) & 0x007ffff0);
-     env->CP0_EntryHi =3D (env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask)=
- |
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 41d3634..0b2663b 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -271,7 +271,9 @@ static inline hwaddr do_translate_address(CPUMIPSStat=
-e *env,
- target_ulong helper_##name(CPUMIPSState *env, target_ulong arg, int mem_=
-idx)  \
- {                                                                       =
-      \
-     if (arg & almask) {                                                 =
-      \
--        env->CP0_BadVAddr =3D arg;                                      =
-        \
-+        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
-      \
-+            env->CP0_BadVAddr =3D arg;                                  =
-        \
-+        }                                                               =
-      \
-         do_raise_exception(env, EXCP_AdEL, GETPC());                    =
-      \
-     }                                                                   =
-      \
-     env->lladdr =3D do_translate_address(env, arg, 0, GETPC());         =
-        \
-@@ -291,7 +293,9 @@ target_ulong helper_##name(CPUMIPSState *env, target_=
-ulong arg1,              \
-     target_long tmp;                                                    =
-      \
-                                                                         =
-      \
-     if (arg2 & almask) {                                                =
-      \
--        env->CP0_BadVAddr =3D arg2;                                     =
-        \
-+        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
-      \
-+            env->CP0_BadVAddr =3D arg2;                                 =
-        \
-+        }                                                               =
-      \
-         do_raise_exception(env, EXCP_AdES, GETPC());                    =
-      \
-     }                                                                   =
-      \
-     if (do_translate_address(env, arg2, 1, GETPC()) =3D=3D env->lladdr) =
-{         \
-@@ -2437,7 +2441,9 @@ void mips_cpu_do_unaligned_access(CPUState *cs, vad=
-dr addr,
-     int error_code =3D 0;
-     int excp;
-=20
--    env->CP0_BadVAddr =3D addr;
-+    if (!(env->hflags & MIPS_HFLAG_DM)) {
-+        env->CP0_BadVAddr =3D addr;
-+    }
-=20
-     if (access_type =3D=3D MMU_DATA_STORE) {
-         excp =3D EXCP_AdES;
---=20
+diff --git a/linux-user/mips/syscall_nr.h b/linux-user/mips/syscall_nr.h
+index ced3280..6bbca74 100644
+--- a/linux-user/mips/syscall_nr.h
++++ b/linux-user/mips/syscall_nr.h
+@@ -363,3 +363,10 @@
+ #define TARGET_NR_userfaultfd           (TARGET_NR_Linux + 357)
+ #define TARGET_NR_membarrier            (TARGET_NR_Linux + 358)
+ #define TARGET_NR_mlock2                (TARGET_NR_Linux + 359)
++#define TARGET_NR_copy_file_range       (TARGET_NR_Linux + 360)
++#define TARGET_NR_preadv2               (TARGET_NR_Linux + 361)
++#define TARGET_NR_pwritev2              (TARGET_NR_Linux + 362)
++#define TARGET_NR_pkey_mprotect         (TARGET_NR_Linux + 363)
++#define TARGET_NR_pkey_alloc            (TARGET_NR_Linux + 364)
++#define TARGET_NR_pkey_free             (TARGET_NR_Linux + 365)
++#define TARGET_NR_statx                 (TARGET_NR_Linux + 366)
+diff --git a/linux-user/mips64/syscall_nr.h b/linux-user/mips64/syscall_nr.h
+index 746cc26..2e44eae 100644
+--- a/linux-user/mips64/syscall_nr.h
++++ b/linux-user/mips64/syscall_nr.h
+@@ -327,6 +327,13 @@
+ #define TARGET_NR_userfaultfd           (TARGET_NR_Linux + 321)
+ #define TARGET_NR_membarrier            (TARGET_NR_Linux + 322)
+ #define TARGET_NR_mlock2                (TARGET_NR_Linux + 323)
++#define TARGET_NR_copy_file_range       (TARGET_NR_Linux + 324)
++#define TARGET_NR_preadv2               (TARGET_NR_Linux + 325)
++#define TARGET_NR_pwritev2              (TARGET_NR_Linux + 326)
++#define TARGET_NR_pkey_mprotect         (TARGET_NR_Linux + 327)
++#define TARGET_NR_pkey_alloc            (TARGET_NR_Linux + 328)
++#define TARGET_NR_pkey_free             (TARGET_NR_Linux + 329)
++#define TARGET_NR_statx                 (TARGET_NR_Linux + 330)
+ 
+ #else
+ /*
+@@ -653,4 +660,11 @@
+ #define TARGET_NR_userfaultfd           (TARGET_NR_Linux + 317)
+ #define TARGET_NR_membarrier            (TARGET_NR_Linux + 318)
+ #define TARGET_NR_mlock2                (TARGET_NR_Linux + 319)
++#define TARGET_NR_copy_file_range       (TARGET_NR_Linux + 320)
++#define TARGET_NR_preadv2               (TARGET_NR_Linux + 321)
++#define TARGET_NR_pwritev2              (TARGET_NR_Linux + 322)
++#define TARGET_NR_pkey_mprotect         (TARGET_NR_Linux + 323)
++#define TARGET_NR_pkey_alloc            (TARGET_NR_Linux + 324)
++#define TARGET_NR_pkey_free             (TARGET_NR_Linux + 325)
++#define TARGET_NR_statx                 (TARGET_NR_Linux + 326)
+ #endif
+-- 
 2.7.4
