@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fg1om-0003TT-1b
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 01:49:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1fg2cY-0004CN-B1
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 02:41:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fg1ok-0001Pm-Nb
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 01:49:36 -0400
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:43529)
+	(envelope-from <bounces@canonical.com>) id 1fg2cV-000735-6o
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 02:41:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45628)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fg1ok-0001PT-Hb
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 01:49:34 -0400
-Received: by mail-io0-x242.google.com with SMTP id y10-v6so6112170ioa.10
-	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 22:49:34 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fg2cU-00072n-Vz
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 02:40:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fg2cT-0002BE-4L
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 06:40:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1DAE02E80C7
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 06:40:57 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAOGPPbfMZRTdfiXj0ekij1bwL3JgQEF3zHGR4AKuor-MGmQGiw@mail.gmail.com>
-References: <1528212489-19137-1-git-send-email-lidongchen@tencent.com>
-	<1528212489-19137-9-git-send-email-lidongchen@tencent.com>
-	<20180627185952.GJ2423@work-vm>
-	<CAOGPPbfMZRTdfiXj0ekij1bwL3JgQEF3zHGR4AKuor-MGmQGiw@mail.gmail.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Thu, 19 Jul 2018 13:49:33 +0800
-Message-ID: <CAOGPPbcTN55ASX64rJe3iUUNmxQJvuy22Har5Lwk7qsEVBxdow@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 08/10] migration: create a dedicated
- thread to release rdma resource
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Jul 2018 06:28:53 -0000
+From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
+	<1755912@bugs.launchpad.net>
+Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153198173415.23059.6240603070496226414.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
+ SIGABRT when using option -vga qxl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,174 +38,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Aviad Yehezkel <aviadye@mellanox.com>, Gal Shachaf <galsha@mellanox.com>
-Cc: zhang.zhanghailiang@huawei.com, Juan Quintela <quintela@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Adi Dotan <adido@mellanox.com>, Lidong Chen <lidongchen@tencent.com>
+To: qemu-devel@nongnu.org
 
-On Thu, Jul 5, 2018 at 10:26 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
-> On Thu, Jun 28, 2018 at 2:59 AM, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
->> * Lidong Chen (jemmy858585@gmail.com) wrote:
->>> ibv_dereg_mr wait for a long time for big memory size virtual server.
->>>
->>> The test result is:
->>>   10GB  326ms
->>>   20GB  699ms
->>>   30GB  1021ms
->>>   40GB  1387ms
->>>   50GB  1712ms
->>>   60GB  2034ms
->>>   70GB  2457ms
->>>   80GB  2807ms
->>>   90GB  3107ms
->>>   100GB 3474ms
->>>   110GB 3735ms
->>>   120GB 4064ms
->>>   130GB 4567ms
->>>   140GB 4886ms
->>>
->>> this will cause the guest os hang for a while when migration finished.
->>> So create a dedicated thread to release rdma resource.
->>>
->>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->>> ---
->>>  migration/rdma.c | 43 +++++++++++++++++++++++++++----------------
->>>  1 file changed, 27 insertions(+), 16 deletions(-)
->>>
->>> diff --git a/migration/rdma.c b/migration/rdma.c
->>> index dfa4f77..f12e8d5 100644
->>> --- a/migration/rdma.c
->>> +++ b/migration/rdma.c
->>> @@ -2979,35 +2979,46 @@ static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
->>>      }
->>>  }
->>>
->>> -static int qio_channel_rdma_close(QIOChannel *ioc,
->>> -                                  Error **errp)
->>> +static void *qio_channel_rdma_close_thread(void *arg)
->>>  {
->>> -    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
->>> -    RDMAContext *rdmain, *rdmaout;
->>> -    trace_qemu_rdma_close();
->>> +    RDMAContext **rdma = arg;
->>> +    RDMAContext *rdmain = rdma[0];
->>> +    RDMAContext *rdmaout = rdma[1];
->>>
->>> -    rdmain = rioc->rdmain;
->>> -    if (rdmain) {
->>> -        atomic_rcu_set(&rioc->rdmain, NULL);
->>> -    }
->>> -
->>> -    rdmaout = rioc->rdmaout;
->>> -    if (rdmaout) {
->>> -        atomic_rcu_set(&rioc->rdmaout, NULL);
->>> -    }
->>> +    rcu_register_thread();
->>>
->>>      synchronize_rcu();
->>
->> * see below
->>
->>> -
->>>      if (rdmain) {
->>>          qemu_rdma_cleanup(rdmain);
->>>      }
->>> -
->>>      if (rdmaout) {
->>>          qemu_rdma_cleanup(rdmaout);
->>>      }
->>>
->>>      g_free(rdmain);
->>>      g_free(rdmaout);
->>> +    g_free(rdma);
->>> +
->>> +    rcu_unregister_thread();
->>> +    return NULL;
->>> +}
->>> +
->>> +static int qio_channel_rdma_close(QIOChannel *ioc,
->>> +                                  Error **errp)
->>> +{
->>> +    QemuThread t;
->>> +    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
->>> +    RDMAContext **rdma = g_new0(RDMAContext*, 2);
->>> +
->>> +    trace_qemu_rdma_close();
->>> +    if (rioc->rdmain || rioc->rdmaout) {
->>> +        rdma[0] =  rioc->rdmain;
->>> +        rdma[1] =  rioc->rdmaout;
->>> +        qemu_thread_create(&t, "rdma cleanup", qio_channel_rdma_close_thread,
->>> +                           rdma, QEMU_THREAD_DETACHED);
->>> +        atomic_rcu_set(&rioc->rdmain, NULL);
->>> +        atomic_rcu_set(&rioc->rdmaout, NULL);
->>
->> I'm not sure this pair is ordered with the synchronise_rcu above;
->> Doesn't that mean, on a bad day, that you could get:
->>
->>
->>     main-thread          rdma_cleanup     another-thread
->>     qmu_thread_create
->>                       synchronise_rcu
->>                                         reads rioc->rdmain
->>                                         starts doing something with rdmain
->>     atomic_rcu_set
->>                       rdma_cleanup
->>
->>
->> so the another-thread is using it during the cleanup?
->> Would just moving the atomic_rcu_sets before the qemu_thread_create
->> fix that?
-> yes, I will fix it.
->
->>
->> However, I've got other worries as well:
->>    a) qemu_rdma_cleanup does:
->>        migrate_get_current()->state == MIGRATION_STATUS_CANCELLING
->>
->>       which worries me a little if someone immediately tries to restart
->>       the migration.
+** Also affects: qemu (Ubuntu Bionic)
+   Importance: Undecided
+       Status: New
 
-Because the current qemu version don't wait for
-RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect,
-so I think it's not necessary to send RDMA_CONTROL_ERROR.
+-- =
 
-compare to send RDMA_CONTROL_ERROR, I think use cm event to notify
-peer qemu is better.
-maybe the rdma is already in error_state, and RDMA_CONTROL_ERROR
-cannot send successfully.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1755912
 
-For peer qemu, in qemu_rdma_wait_comp_channel function, it's should
-not only poll rdma->comp_channel->fd,
-it's should also poll  rdma->channel->fd.
+Title:
+  qemu-system-x86_64 crashed with SIGABRT when using option -vga qxl
 
-for the source qemu, it's fixed by this patch.
-migration: poll the cm event while wait RDMA work request completion
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Triaged
+Status in qemu source package in Bionic:
+  New
 
-and for destination qemu, it's need a new patch to fix it.
+Bug description:
+  When using qemu-system-x86_64 with the option -vga qxl, it crashes.
+  The easiest way to crash it is by trying to change the guest's
+  resolution. However, the system may randomly crash too, not happening
+  only when changing resolution. Here is the terminal output of one of
+  these random crashes:
 
-so I prefer to remove MIGRATION_STATUS_CANCELLING in qemu_rdma_cleanup function.
+  --------
 
->>
->>    b) I don't understand what happens if someone does try and restart
->>       the migration after that, but in the ~5s it takes the ibv cleanup
->>       to happen.
+  $ qemu-system-x86_64 -hda /dev/sdb -m 2048 -enable-kvm -cpu host -vga qxl=
+ -nodefaults -netdev user,id=3Dhostnet0 -device virtio-net-pci,id=3Dnet0,ne=
+tdev=3Dhostnet0
+  WARNING: Image format was not specified for '/dev/sdb' and probing guesse=
+d raw.
+           Automatically detecting the format is dangerous for raw images, =
+write operations on block 0 will be restricted.
+           Specify the 'raw' format explicitly to remove the restrictions.
 
-I prefer to add a new variable in current_migration.  if the rdma
-cleanup thread has not
-exited. it's should not start a new migration.
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-
+  channel.c:2431:display_channel_validate_surface: canvas address is
+  0x7f8eb948ab18 for 0 (and is NULL)
 
->
-> yes, I will try to fix it.
->
->>
->> Dave
->>
->>
->>> +    }
->>>
->>>      return 0;
->>>  }
->>> --
->>> 1.8.3.1
->>>
->> --
->> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  =
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-channel.c:2432:d=
+isplay_channel_validate_surface: failed on 0
+
+  (process:21313): Spice-CRITICAL **: 16:01:45.759: display-channel.c:2035:=
+display_channel_update: condition `display_channel_validate_surface(display=
+, surface_id)' failed
+  Abortado (imagem do n=C3=BAcleo gravada)
+
+  --------
+
+  I was running QEMU as a normal user which is on the groups kvm and
+  disk. Initially I supposed the problem was because I was running QEMU
+  as root, but as a normal user this happens too.
+
+  I have tested with guests with different Ubuntu version: 18.04, 17.10
+  and 16.04. It is happening with them all.
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu4
+  ProcVersionSignature: Ubuntu 4.15.0-10.11-generic 4.15.3
+  Uname: Linux 4.15.0-10-generic x86_64
+  ApportVersion: 2.20.8-0ubuntu10
+  Architecture: amd64
+  CurrentDesktop: XFCE
+  Date: Wed Mar 14 17:13:52 2018
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  InstallationDate: Installed on 2017-06-13 (273 days ago)
+  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: LENOVO 80UG
+  ProcCmdline: qemu-system-x86_64 -hda /dev/sdb -smp cpus=3D2 -m 512 -enabl=
+e-kvm -cpu host -vga qxl -nodefaults -netdev user,id=3Dhostnet0 -device vir=
+tio-net-pci,id=3Dnet0,netdev=3Dhostnet0
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.15.0-10-generic.efi.signe=
+d root=3DUUID=3D6b4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet
+  Signal: 6
+  SourcePackage: qemu
+  StacktraceTop:
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  Title: qemu-system-x86_64 crashed with SIGABRT
+  UpgradeStatus: Upgraded to bionic on 2017-10-20 (145 days ago)
+  UserGroups: adm bluetooth cdrom dialout dip disk kvm libvirt lpadmin netd=
+ev plugdev sambashare sudo
+  dmi.bios.date: 07/10/2017
+  dmi.bios.vendor: LENOVO
+  dmi.bios.version: 0XCN43WW
+  dmi.board.asset.tag: NO Asset Tag
+  dmi.board.name: Toronto 4A2
+  dmi.board.vendor: LENOVO
+  dmi.board.version: SDK0J40679 WIN
+  dmi.chassis.asset.tag: NO Asset Tag
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: LENOVO
+  dmi.chassis.version: Lenovo ideapad 310-14ISK
+  dmi.modalias: dmi:bvnLENOVO:bvr0XCN43WW:bd07/10/2017:svnLENOVO:pn80UG:pvr=
+Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
+10:cvrLenovoideapad310-14ISK:
+  dmi.product.family: IDEAPAD
+  dmi.product.name: 80UG
+  dmi.product.version: Lenovo ideapad 310-14ISK
+  dmi.sys.vendor: LENOVO
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1755912/+subscriptions
