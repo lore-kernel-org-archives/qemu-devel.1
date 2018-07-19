@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fgESz-0007as-DY
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 15:19:58 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fgFTu-0008Oo-L1
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 16:24:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fgESy-00072l-Fa
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 15:19:57 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:39236)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fgESy-00072O-6W
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 15:19:56 -0400
-Received: by mail-pg1-x541.google.com with SMTP id g2-v6so4617070pgs.6
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 12:19:56 -0700 (PDT)
-References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1532004912-13899-17-git-send-email-stefan.markovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <712c50ae-4b2e-5f00-3af6-4736eca82abe@linaro.org>
-Date: Thu, 19 Jul 2018 12:19:52 -0700
+	(envelope-from <jsnow@redhat.com>) id 1fgFTt-0005qz-Hr
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 16:24:58 -0400
+References: <20180718211256.29774-1-naravamudan@digitalocean.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <bad5d90c-9d9f-8abf-35de-9c109b7772fd@redhat.com>
+Date: Thu, 19 Jul 2018 16:24:46 -0400
 MIME-Version: 1.0
-In-Reply-To: <1532004912-13899-17-git-send-email-stefan.markovic@rt-rk.com>
+In-Reply-To: <20180718211256.29774-1-naravamudan@digitalocean.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 16/40] target/mips: Implement emulation
- of nanoMIPS ROTX instruction
+Subject: Re: [Qemu-devel] [PATCH] block/file-posix: add
+ bdrv_attach_aio_context callback for host dev and cdrom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Markovic <stefan.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
+To: Nishanth Aravamudan <naravamudan@digitalocean.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 07/19/2018 05:54 AM, Stefan Markovic wrote:
-> From: Matthew Fortune <matthew.fortune@mips.com>
+
+
+On 07/18/2018 05:12 PM, Nishanth Aravamudan via Qemu-devel wrote:
+> In ed6e2161 ("linux-aio: properly bubble up errors from initialzation"),
+> I only added a bdrv_attach_aio_context callback for the bdrv_file
+> driver. There are several other drivers that use the shared
+> aio_plug callback, though, and they will trip the assertion added to
+> aio_get_linux_aio because they did not call aio_setup_linux_aio first.
+> Add the appropriate callback definition to the affected driver
+> definitions.
 > 
-> Added a helper for ROTX based on the pseudocode from the
-> architecture spec. This instraction was not present in previous
-> MIPS instruction sets.
-> 
-> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Fixes: ed6e2161 ("linux-aio: properly bubble up errors from initialization")
+> Reported-by: Farhan Ali <alifm@linux.ibm.com>
+> Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: John Snow <jsnow@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Fam Zheng <famz@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: qemu-block@nongnu.org
+> Cc: qemu-devel@nongnu.org
 > ---
->  target/mips/helper.h    |  2 ++
->  target/mips/op_helper.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++
->  target/mips/translate.c | 15 ++++++++
->  3 files changed, 111 insertions(+)
+>  block/file-posix.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 60af4b3d51..ad299beb38 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -3158,6 +3158,7 @@ static BlockDriver bdrv_host_device = {
+>      .bdrv_refresh_limits = raw_refresh_limits,
+>      .bdrv_io_plug = raw_aio_plug,
+>      .bdrv_io_unplug = raw_aio_unplug,
+> +    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+>  
+>      .bdrv_co_truncate       = raw_co_truncate,
+>      .bdrv_getlength	= raw_getlength,
+> @@ -3280,6 +3281,7 @@ static BlockDriver bdrv_host_cdrom = {
+>      .bdrv_refresh_limits = raw_refresh_limits,
+>      .bdrv_io_plug = raw_aio_plug,
+>      .bdrv_io_unplug = raw_aio_unplug,
+> +    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+>  
+>      .bdrv_co_truncate    = raw_co_truncate,
+>      .bdrv_getlength      = raw_getlength,
+> @@ -3410,6 +3412,7 @@ static BlockDriver bdrv_host_cdrom = {
+>      .bdrv_refresh_limits = raw_refresh_limits,
+>      .bdrv_io_plug = raw_aio_plug,
+>      .bdrv_io_unplug = raw_aio_unplug,
+> +    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+>  
+>      .bdrv_co_truncate    = raw_co_truncate,
+>      .bdrv_getlength      = raw_getlength,
+> 
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Seems sane to me, at a glance.
 
-
-r~
+Reviewed-by: John Snow <jsnow@redhat.com>
