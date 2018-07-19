@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56794)
+Received: from eggs.gnu.org ([208.118.235.92]:52078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8Zu-0004ZX-Hk
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:04:01 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8ao-00051c-Of
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8XQ-0007YW-RA
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:02:42 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:58280 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8Wm-0007Ad-OL
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:03:38 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:57985 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1fg8XQ-0007Wj-4f
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:00:08 -0400
+	id 1fg8Wm-00079E-7l
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:59:28 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu, 19 Jul 2018 14:55:09 +0200
-Message-Id: <1532004912-13899-38-git-send-email-stefan.markovic@rt-rk.com>
+Date: Thu, 19 Jul 2018 14:55:04 +0200
+Message-Id: <1532004912-13899-33-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 37/40] mips_malta: Fix semihosting argument
- passing for nanoMIPS bare metal
+Subject: [Qemu-devel] [PATCH v3 32/40] elf: Add nanoMIPS specific variations
+ in ELF header fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +28,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Add nanoMIPS-related values in ELF header fields as specified in
+nanoMIPS' "ELF ABI Supplement".
+
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- hw/mips/mips_malta.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ include/elf.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index d1a7c1f..8bb1686 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -643,7 +643,12 @@ static void write_bootloader_nanomips(uint8_t *base, int64_t run_addr,
-     stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+diff --git a/include/elf.h b/include/elf.h
+index 2c4fe7a..fff5967 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -62,6 +62,24 @@ typedef int64_t  Elf64_Sxword;
+ #define EF_MIPS_NAN2008   0x00000400
+ #define EF_MIPS_ARCH      0xf0000000
  
-     /* to_here: */
--    stw_p(p++, 0x0080); stw_p(p++, 0x0002); /* li a0,2 */
-+    if (semihosting_get_argc()) {
-+        /* Preserve a0 content as arguments have been passed */
-+        stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
-+    } else {
-+        stw_p(p++, 0x0080); stw_p(p++, 0x0002); /* li a0,2 */
-+    }
-     stw_p(p++, 0xe3a0 | NM_HI1(ENVP_ADDR - 64));
-     stw_p(p++, NM_HI2(ENVP_ADDR - 64));
-                                 /* lui sp,%hi(ENVP_ADDR - 64) */
++/* nanoMIPS architecture bits, EF_NANOMIPS_ARCH */
++#define EF_NANOMIPS_ARCH_32R6 0x00000000  /* 32-bit nanoMIPS Release 6 ISA   */
++#define EF_NANOMIPS_ARCH_64R6 0x10000000  /* 62-bit nanoMIPS Release 6 ISA   */
++
++/* nanoMIPS ABI bits, EF_NANOMIPS_ABI */
++#define EF_NANOMIPS_ABI_P32   0x00001000  /* 32-bit nanoMIPS ABI             */
++#define EF_NANOMIPS_ABI_P64   0x00002000  /* 64-bit nanoMIPS ABI             */
++
++/* nanoMIPS processor specific flags, e_flags */
++#define EF_NANOMIPS_LINKRELAX 0x00000001  /* Link-time relaxation            */
++#define EF_NANOMIPS_PIC       0x00000002  /* Position independant code       */
++#define EF_NANOMIPS_32BITMODE 0x00000004  /* 32-bit object for 64-bit arch.  */
++#define EF_NANOMIPS_PID       0x00000008  /* Position independant data       */
++#define EF_NANOMIPS_PCREL     0x00000010  /* PC-relative mode                */
++#define EF_NANOMIPS_ABI       0x0000f000  /* nanoMIPS ABI                    */
++#define EF_NANOMIPS_MACH      0x00ff0000  /* Machine variant                 */
++#define EF_NANOMIPS_ARCH      0xf0000000  /* nanoMIPS architecture           */
++
+ /* MIPS machine variant */
+ #define EF_MIPS_MACH_NONE     0x00000000  /* A standard MIPS implementation  */
+ #define EF_MIPS_MACH_3900     0x00810000  /* Toshiba R3900                   */
+@@ -143,6 +161,8 @@ typedef int64_t  Elf64_Sxword;
+ 
+ #define EM_RISCV        243     /* RISC-V */
+ 
++#define EM_NANOMIPS     249     /* Wave Computing nanoMIPS */
++
+ /*
+  * This is an interim value that we will use until the committee comes
+  * up with a final number.
 -- 
 2.7.4
