@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fg6n4-0002Qm-QR
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:08:11 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fg6sA-0004WG-TH
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fg6n3-0002Mr-Oy
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:08:10 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:41317)
+	(envelope-from <richard.henderson@linaro.org>) id 1fg6s6-0004VG-V8
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:13:26 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:39494)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fg6n3-0002Mb-HY
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:08:09 -0400
-Received: by mail-oi0-x233.google.com with SMTP id k12-v6so14743542oiw.8
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 04:08:09 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fg6s6-0004Uz-Nd
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:13:22 -0400
+Received: by mail-pf0-x242.google.com with SMTP id j8-v6so3765623pff.6
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 04:13:22 -0700 (PDT)
+References: <20180718200648.22529-1-richard.henderson@linaro.org>
+	<a1b59157-55d7-5f1a-72eb-8be11d8f7829@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ab1917a5-4fcc-25a6-00da-139fe7b9e753@linaro.org>
+Date: Thu, 19 Jul 2018 04:13:18 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180703213556.20619-14-armbru@redhat.com>
-References: <20180703213556.20619-1-armbru@redhat.com>
-	<20180703213556.20619-14-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Jul 2018 12:07:48 +0100
-Message-ID: <CAFEAcA97fm3+17jjvktAXPQOj0VrVCGXPSFi8mQvU1bnnzgWZg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 13/32] qmp: Revert change to
- handle_qmp_command tracepoint
+In-Reply-To: <a1b59157-55d7-5f1a-72eb-8be11d8f7829@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user/ppc: Implement swapcontext
+ syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, alex.bennee@linaro.org, laurent@vivier.eu, david@gibson.dropbear.id.au
 
-On 3 July 2018 at 22:35, Markus Armbruster <armbru@redhat.com> wrote:
-> Commit 71da4667db6 "monitor: separate QMP parser and dispatcher" moved
-> the handle_qmp_command tracepoint from handle_qmp_command() to
-> monitor_qmp_dispatch_one().  This delays tracing from enqueue time to
-> dequeue time.  Revert that.  Dequeue remains adequately visible via
-> tracepoint monitor_qmp_cmd_in_band.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Message-Id: <20180703085358.13941-14-armbru@redhat.com>
+On 07/18/2018 03:56 PM, Philippe Mathieu-Daudé wrote:
+>> +
+>> +/* This syscall implements {get,set,swap}context for userland.  */
+> 
+> This comment confuses me because do_setcontext() is available at line 625.
 
-Hi; it looks like this revert has reintroduced(?) a coverity
-warning:
+But that's not wired up as a syscall.
 
-> ---
->  monitor.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/monitor.c b/monitor.c
-> index 3bf3e68bdc..3cc4b07788 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4184,12 +4184,6 @@ static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
->
->      g_free(req_obj);
->
-> -    if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
-> -        QString *req_json = qobject_to_json(req);
-> -        trace_handle_qmp_command(mon, qstring_get_str(req_json));
-> -        qobject_unref(req_json);
-> -    }
-> -
->      old_mon = cur_mon;
->      cur_mon = mon;
->
-> @@ -4283,6 +4277,12 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
->          qdict_del(qdict, "id");
->      } /* else will fail qmp_dispatch() */
->
-> +    if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
-> +        QString *req_json = qobject_to_json(req);
-> +        trace_handle_qmp_command(mon, qstring_get_str(req_json));
-> +        qobject_unref(req_json);
-> +    }
+>> +    /* For ppc32, ctx_size is "reserved for future use".
+>> +     * For ppc64, we do not yet support the VSX extension.
+>> +     */
+>> +    if (ctx_size < sizeof(struct target_ucontext)) {
+>> +        return -TARGET_EINVAL;
+> 
+> Shouldn't this be -TARGET_ENOMEM?
+> 
+> swapcontext(3):
+> ERRORS
+>        ENOMEM Insufficient stack space left.
 
-Coverity CID 1394216 points out that in this function a
-little earlier we did a check on "if (!req && !err)", which
-implies that we can get here with a NULL req pointer,
-which will crash in qobject_to_json().
+No.  Please compare against the syscall, not the libc interface.
 
-> +
->      /* Check against the request in general layout */
->      qdict = qmp_dispatch_check_obj(req, qmp_oob_enabled(mon), &err);
->      if (!qdict) {
-> --
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/kernel/signal_32.c#n1045
 
-thanks
--- PMM
+
+r~
