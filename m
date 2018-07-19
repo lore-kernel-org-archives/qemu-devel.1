@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8Zi-0004Rw-EF
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:04:01 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8ZK-0004Op-2w
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8XY-0007d4-GR
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:02:30 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:58358 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8Wz-0007Hb-C1
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:02:06 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:58051 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1fg8XX-0007c4-FC
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:00:15 -0400
+	id 1fg8Wy-0007Gw-Qo
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:59:41 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu, 19 Jul 2018 14:55:10 +0200
-Message-Id: <1532004912-13899-39-git-send-email-stefan.markovic@rt-rk.com>
+Date: Thu, 19 Jul 2018 14:55:06 +0200
+Message-Id: <1532004912-13899-35-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 38/40] gdbstub: Disable handling of nanoMIPS
- ISA bit in the MIPS gdbstub
+Subject: [Qemu-devel] [PATCH v3 34/40] linux-user: Don't check FCR31_NAN2008
+ bit for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +28,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: James Hogan <james.hogan@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-nanoMIPS has no ISA bit in the PC, so remove the handling of the low bit
-of the PC in the MIPS gdbstub for nanoMIPS. This prevents the PC being
-read as e.g. 0xbfc00001, and prevents writing to the PC clearing
-MIPS_HFLAG_M16.
-
-Signed-off-by: James Hogan <james.hogan@mips.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/gdbstub.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ linux-user/mips/cpu_loop.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/target/mips/gdbstub.c b/target/mips/gdbstub.c
-index 18e0e6d..559b69f 100644
---- a/target/mips/gdbstub.c
-+++ b/target/mips/gdbstub.c
-@@ -60,7 +60,8 @@ int mips_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-         return gdb_get_regl(mem_buf, (int32_t)env->CP0_Cause);
-     case 37:
-         return gdb_get_regl(mem_buf, env->active_tc.PC |
--                                     !!(env->hflags & MIPS_HFLAG_M16));
-+                                     (!(env->insn_flags & ISA_NANOMIPS32) &&
-+                                      env->hflags & MIPS_HFLAG_M16));
-     case 72:
-         return gdb_get_regl(mem_buf, 0); /* fp */
-     case 89:
-@@ -131,10 +132,12 @@ int mips_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-         break;
-     case 37:
-         env->active_tc.PC = tmp & ~(target_ulong)1;
--        if (tmp & 1) {
--            env->hflags |= MIPS_HFLAG_M16;
--        } else {
--            env->hflags &= ~(MIPS_HFLAG_M16);
-+        if (!(env->insn_flags & ISA_NANOMIPS32)) {
-+            if (tmp & 1) {
-+                env->hflags |= MIPS_HFLAG_M16;
-+            } else {
-+                env->hflags &= ~(MIPS_HFLAG_M16);
-+            }
-         }
-         break;
-     case 72: /* fp, ignored */
+diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+index 1d3dc9e..c9c20cf 100644
+--- a/linux-user/mips/cpu_loop.c
++++ b/linux-user/mips/cpu_loop.c
+@@ -747,6 +747,9 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+     if (regs->cp0_epc & 1) {
+         env->hflags |= MIPS_HFLAG_M16;
+     }
++    if (env->insn_flags & ISA_NANOMIPS32) {
++        return;
++    }
+     if (((info->elf_flags & EF_MIPS_NAN2008) != 0) !=
+         ((env->active_fpu.fcr31 & (1 << FCR31_NAN2008)) != 0)) {
+         if ((env->active_fpu.fcr31_rw_bitmask &
 -- 
 2.7.4
