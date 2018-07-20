@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgRIH-0008T6-RO
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 05:01:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fgROI-00025T-Nn
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 05:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgRIG-00073I-RI
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 05:01:45 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:32797)
+	(envelope-from <peter.maydell@linaro.org>) id 1fgROH-0000HK-RI
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 05:07:58 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42940)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fgRIG-000734-MB
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 05:01:44 -0400
-Received: by mail-oi0-x242.google.com with SMTP id l10-v6so20107541oii.0
-	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 02:01:44 -0700 (PDT)
+	id 1fgROH-0000HG-L1
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 05:07:57 -0400
+Received: by mail-oi0-x242.google.com with SMTP id n84-v6so20082715oib.9
+	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 02:07:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <055381ef-7f32-1bb3-cae5-df6bfbe2888e@gmail.com>
-References: <1531969910-32843-1-git-send-email-jia.he@hxt-semitech.com>
-	<CAFEAcA_2t5z1JBWM9o7ygcOwxnQRba0qA8vVjcoZpcGfP9XUtA@mail.gmail.com>
-	<055381ef-7f32-1bb3-cae5-df6bfbe2888e@gmail.com>
+In-Reply-To: <f6970c0f-d9d5-1d5d-7d6e-3e457f034bf2@mail.ru>
+References: <20180719121637.24576-1-jusual@mail.ru>
+	<CAFEAcA8_2hM0J38w0h0jfVMvLMceHnxgKKYeMcY-SO_Ywk0QpA@mail.gmail.com>
+	<f6970c0f-d9d5-1d5d-7d6e-3e457f034bf2@mail.ru>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jul 2018 10:01:23 +0100
-Message-ID: <CAFEAcA872HzXiFMLcbDaNRrafNLOZgut2RFXjHXCDJsavnDkxA@mail.gmail.com>
+Date: Fri, 20 Jul 2018 10:07:36 +0100
+Message-ID: <CAFEAcA-HWQG3=nfFkRiemnh0WVkP3M6YpiL1uebpTDeMoznyMg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/intc/arm_gicv3_its: downgrade
- error_report to warn_report in kvm_arm_its_reset
+Subject: Re: [Qemu-devel] [PATCH v2] nvic: Change NVIC to support ARMv6-M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jia He <hejianet@gmail.com>
-Cc: Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Jia He <jia.he@hxt-semitech.com>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
 
-On 20 July 2018 at 02:22, Jia He <hejianet@gmail.com> wrote:
-> Hi Peter=E3=80=82 Thanks for the comments
->
-> On 7/19/2018 8:41 PM, Peter Maydell Wrote:
->> On 19 July 2018 at 04:11, Jia He <hejianet@gmail.com> wrote:
->>> In scripts/arch-run.bash of kvm-unit-tests, it will check the qemu
->>> output log with:
->>> if [ -z "$(echo "$errors" | grep -vi warning)" ]; then
->>>
->>> Thus without the warning prefix, all of the test fail.
->>>
->>> Since it is not unrecoverable error in kvm_arm_its_reset for
->>> current implementation, downgrading the report from error to
->>> warn makes sense.
+On 20 July 2018 at 09:09, Julia Suvorova <jusual@mail.ru> wrote:
+> On 19.07.2018 19:25, Peter Maydell wrote:
 >>
->> I think the counterargument would be that this should report
->> an error, because you just asked the device to do something
->> that it doesn't support (ie to do a clean reset). Since the
->> device isn't going to behave correctly, the tests should fail,
->> and the way to make them pass is to upgrade to a kernel that
->> implements the device correctly (by implementing the necessary
->> feature).
+>> On 19 July 2018 at 13:16, Julia Suvorova <jusual@mail.ru> wrote:
+>>>
+>>> The differences from ARMv7-M NVIC are:
+>>>    * ARMv6-M only supports up to 32 external interrupts
+>>>     (configurable feature already). The ICTR is reserved.
+>>>    * Active Bit Register is reserved.
+>>>    * ARMv6-M supports 4 priority levels against 256 in ARMv7-M.
+>>>
+>>> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+>>> ---
+>>> v2:
+>>>      * Added num_prio_bits field
+>>>      * AIRCR.PRIGROUP is set as RAZ/WI for Baseline
 >>
->> But we could maybe move to warn_report() here -- I'm not
->> sure what our rules are for what counts as an error and
->> what counts as a warning.
-> I reviewed the other error_report in qemu. Some of them are followed
-> by exit(), but the rest are not. So it seems there is no definite
-> rules for error_report.
+>>
+>> Applied to target-arm.for-3.1, thanks.
 >
-> IMO, the best resolution is to change the output grep search criteria.
-> But it is difficult for kvm-unit-tests to identify whether it is an
-> error without exit() or a warning. The fastest resolution is moving
-> error_report to warn_report.
+>
+> It seems like you applied the first version of this patch.
+> Can you check this, please?
 
-Well, as I say, this implementation of the ITS *should* fail
-tests -- it doesn't behave to spec. The fastest resolution
-is for you to upgrade your host kernel to one that has the
-bugfix :-)
+Oops, yes, you're right (v2 didn't get into the 'patches' db
+for some reason). Now fixed.
 
 thanks
 -- PMM
