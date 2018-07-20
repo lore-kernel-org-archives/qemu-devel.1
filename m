@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fgYNt-00032m-Q4
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:36:02 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fgYOZ-0003Ok-Mx
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:36:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fgYNt-0001Ez-33
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:36:01 -0400
-References: <20180719034118.27741-1-famz@redhat.com>
-	<6757101d-316a-79f5-1dbc-4546b054c9da@redhat.com>
-	<20180720082427.GG29900@lemon.usersys.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8b2000e0-a0ed-b096-422f-ef6ac31b1578@redhat.com>
-Date: Fri, 20 Jul 2018 11:35:50 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1fgYOU-0001jr-Q5
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:36:43 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:36056)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fgYOU-0001jX-HJ
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:36:38 -0400
+Received: by mail-pl0-x242.google.com with SMTP id e11-v6so5416503plb.3
+	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 09:36:38 -0700 (PDT)
+References: <20180720153932.8507-1-peter.maydell@linaro.org>
+	<0b589622-ffaf-8ed7-c34b-77ada1d203fb@amsat.org>
+	<CAFEAcA-Mc7S775QK5dt7+eqaZD0TSZhsNLrZauSNshfbQGx9fg@mail.gmail.com>
+	<aa869c16-9577-bf7b-a5c7-b63673644a6f@linaro.org>
+	<CAFEAcA9XXPsm8V45eYyK1kNdpOjS9gmrZM2MThu1VJ07dhwEPQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <40e694c6-9757-3f9e-b8c1-9d2fdd113328@linaro.org>
+Date: Fri, 20 Jul 2018 09:36:34 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180720082427.GG29900@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFEAcA9XXPsm8V45eYyK1kNdpOjS9gmrZM2MThu1VJ07dhwEPQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Don't lock /dev/null
- and /dev/zero automatically
+Subject: Re: [Qemu-devel] [PATCH for-3.0 ?] tests/libqtest: Improve
+ kill_qemu() assert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 07/20/2018 03:24 AM, Fam Zheng wrote:
-> On Thu, 07/19 13:57, John Snow wrote:
->> Should we instead modify the test in this case to not attempt to take a
->> lock on a device we know cannot meaningfully store state, or is it your
->> preference to attempt to maintain such a list in the raw driver itself?
+On 07/20/2018 09:25 AM, Peter Maydell wrote:
+> On 20 July 2018 at 17:14, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> You already print the file, just include the line.  Perhaps
 >>
->> I guess we never want QEMU to try to lock things like /dev/zero, but I
->> don't know if there are more such pseudo-devices we should never try to
->> lock and if so, what common property unifies them such that we don't
->> have to maintain a list.
+>>   fprintf(stderr,
+>>           "%s:%d: kill_qemu tried to terminate QEMU "
+>>           "process but it dumped core with signal %s\n",
+>>           __FILE__, __LINE__, strsignal(WTERMSIG(wstatus)));
+>>   abort();
 > 
-> They are 0 sized anyway so I only expect them to be used in test cases like the
-> one we're fixing. So this really doesn't matter.  An exceptional one would be
-> /dev/nullb* but that is not used in real world either.
+> I wasn't convinced that strsignal() would be available
+> on all the host OSes we build on (we don't currently use
+> it outside linux-user/), and I definitely didn't think that
+> it merited a configure test for its presence just for a
+> test error message :-)
 
-I'm not familiar with /dev/nullb* - is that a typo?
+Hmm.  It has been in _GNU_SOURCE since the dawn of time
+and in POSIX since 2008.
 
-$ ll /dev/nullb*
-ls: cannot access '/dev/nullb*': No such file or directory
+For non-linux, I peeked at the OpenBSD man page, which says
+
+  The strsignal() function first appeared in AT&T System V
+  Release 4 UNIX and was reimplemented for NetBSD 1.0.
+
+That suggests all of the extant BSDs should have it.
+
+MinGW has had the function since 2008.
+
+What other hosts do we support?
 
 
-> 
-> I'm not trying to maintain a complete list (e.g. /dev/urandom and /dev/nullb*
-> are missing), this patch is just trying to make writing test code easier.
-
-/dev/urandom is also a character device, and also fits in my heuristic 
-that we likely only care about locking of block devices.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+r~
