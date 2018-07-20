@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fgXa2-0002D5-Bb
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:44:31 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fgXa3-0002Dn-DC
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:44:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fgXa0-0001gW-Gp
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:44:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42512 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fgXa2-0001h8-7f
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:44:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35172 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fgXa0-0001gE-Bf
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:44:28 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	id 1fgXa2-0001gu-1F
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:44:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DCE2D40704BB
-	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 15:44:27 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8D62681663E7
+	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 15:44:29 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 20 Jul 2018 17:44:24 +0200
-Message-Id: <20180720154425.31285-2-marcandre.lureau@redhat.com>
+Date: Fri, 20 Jul 2018 17:44:25 +0200
+Message-Id: <20180720154425.31285-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20180720154425.31285-1-marcandre.lureau@redhat.com>
 References: <20180720154425.31285-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/2] seccomp: use SIGSYS signal instead of
- killing the thread
+Subject: [Qemu-devel] [PATCH 2/2] RFC: seccomp: prefer SCMP_ACT_KILL_PROCESS
+ if available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +37,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pmoore@redhat.com, Eduardo Otubo <otubo@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The seccomp action SCMP_ACT_KILL results in immediate termination of
-the thread that made the bad system call. However, qemu being
-multi-threaded, it keeps running. There is no easy way for parent
-process / management layer (libvirt) to know about that situation.
+The upcoming libseccomp release should have SCMP_ACT_KILL_PROCESS
+action (https://github.com/seccomp/libseccomp/issues/96).
 
-Instead, the default SIGSYS handler when invoked with SCMP_ACT_TRAP
-will terminate the program and core dump.
+SCMP_ACT_KILL_PROCESS is preferable to immediately terminate the
+offending process, rather than having the SIGSYS handler running.
 
-This may not be the most secure solution, but probably better than
-just killing the offending thread. SCMP_ACT_KILL_PROCESS has been
-added in Linux 4.14 to improve the situation, which I propose to use
-by default if available in the next patch.
-
-Related to:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1594456
+Use SECCOMP_GET_ACTION_AVAIL to check availability of kernel support,
+as libseccomp will fallback on SCMP_ACT_KILL otherwise, and we still
+prefer SCMP_ACT_TRAP.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- qemu-seccomp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ qemu-seccomp.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
 diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index 9cd8eb9499..b117a92559 100644
+index b117a92559..505887d5af 100644
 --- a/qemu-seccomp.c
 +++ b/qemu-seccomp.c
-@@ -125,7 +125,7 @@ static int seccomp_start(uint32_t seccomp_opts)
+@@ -20,6 +20,7 @@
+ #include <sys/prctl.h>
+ #include <seccomp.h>
+ #include "sysemu/seccomp.h"
++#include <linux/seccomp.h>
+=20
+ /* For some architectures (notably ARM) cacheflush is not supported unti=
+l
+  * libseccomp 2.2.3, but configure enforces that we are using a more rec=
+ent
+@@ -107,12 +108,39 @@ static const struct QemuSeccompSyscall blacklist[] =
+=3D {
+     { SCMP_SYS(sched_get_priority_min), QEMU_SECCOMP_SET_RESOURCECTL },
+ };
+=20
++static inline int
++qemu_seccomp(unsigned int operation, unsigned int flags, void *args)
++{
++#ifdef __NR_seccomp
++    return syscall(__NR_seccomp, operation, flags, args);
++#else
++    return -1;
++#endif
++}
++
++static uint32_t qemu_seccomp_get_kill_action(void)
++{
++#if defined(SECCOMP_GET_ACTION_AVAIL) && defined(SCMP_ACT_KILL_PROCESS) =
+&& \
++    defined(SECCOMP_RET_KILL_PROCESS)
++    {
++        uint32_t action =3D SECCOMP_RET_KILL_PROCESS;
++
++        if (qemu_seccomp(SECCOMP_GET_ACTION_AVAIL, 0, &action) =3D=3D 0)=
+ {
++            return SCMP_ACT_KILL_PROCESS;
++        }
++    }
++#endif
++
++    return SCMP_ACT_TRAP;
++}
++
+=20
+ static int seccomp_start(uint32_t seccomp_opts)
+ {
+     int rc =3D 0;
+     unsigned int i =3D 0;
+     scmp_filter_ctx ctx;
++    uint32_t action =3D qemu_seccomp_get_kill_action();
+=20
+     ctx =3D seccomp_init(SCMP_ACT_ALLOW);
+     if (ctx =3D=3D NULL) {
+@@ -125,7 +153,7 @@ static int seccomp_start(uint32_t seccomp_opts)
              continue;
          }
 =20
--        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_KILL, blacklist[i].n=
+-        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_TRAP, blacklist[i].n=
 um,
-+        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_TRAP, blacklist[i].n=
-um,
++        rc =3D seccomp_rule_add_array(ctx, action, blacklist[i].num,
                                      blacklist[i].narg, blacklist[i].arg_=
 cmp);
          if (rc < 0) {
