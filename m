@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fgLb0-00030R-Fn
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:56:43 -0400
+	(envelope-from <peterx@redhat.com>) id 1fgMCC-0001dv-Kf
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 23:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fgLav-0007cz-KI
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:56:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38914 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fgMC9-0008IG-GQ
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 23:35:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48072 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fgLav-0007cN-CZ
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:56:37 -0400
-Date: Fri, 20 Jul 2018 10:56:30 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fgMC9-0008I4-Av
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 23:35:05 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A256C40711BE
+	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 03:35:04 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180720025630.GM4071@xz-mi>
-References: <20180717222721.14019.27548.stgit@gimli.home>
-	<20180718064803.GA6197@xz-mi> <20180718103133.73dc74a1@t450s.home>
-	<20180719054051.GE4071@xz-mi> <20180719090146.1f4303b6@t450s.home>
+Date: Fri, 20 Jul 2018 11:34:51 +0800
+Message-Id: <20180720033451.32710-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180719090146.1f4303b6@t450s.home>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-3.0 v5] monitor: Fix unsafe sharing of
+ @cur_mon among threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +31,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-On Thu, Jul 19, 2018 at 09:01:46AM -0600, Alex Williamson wrote:
-> On Thu, 19 Jul 2018 13:40:51 +0800
-> Peter Xu <peterx@redhat.com> wrote:
-> > On Wed, Jul 18, 2018 at 10:31:33AM -0600, Alex Williamson wrote:
-> > > On Wed, 18 Jul 2018 14:48:03 +0800
-> > > Peter Xu <peterx@redhat.com> wrote:
-> > > > I'm wondering what if want to do that somehow some day... Whether
-> > > > it'll work if we just let vfio-pci devices to register some guest
-> > > > memory invalidation hook (just like the iommu notifiers, but for guest
-> > > > memory address space instead), then we map/unmap the IOMMU pages there
-> > > > for vfio-pci device to make sure the inflated balloon pages are not
-> > > > mapped and also make sure new pages are remapped with correct HPA
-> > > > after deflated.  This is a pure question out of my curiosity, and for
-> > > > sure it makes little sense if the answer of the first question above
-> > > > is positive.  
-> > > 
-> > > This is why I mention the KVM MMU synchronization flag above.  KVM
-> > > essentially had this same problem and fixed it with with MMU notifiers
-> > > in the kernel.  They expose that KVM has the capability of handling
-> > > such a scenario via a feature flag.  We can do the same with vfio.  In
-> > > scenarios where we're able to fix this, we could expose a flag on the
-> > > container indicating support for the same sort of thing.  
-> > 
-> > Sorry I didn't really caught that point when reply.  So that's why we
-> > have had the mmu notifiers... Hmm, glad to know that.
-> > 
-> > But I would guess that if we want that notifier for vfio it should be
-> > in QEMU rather than the kernel one since kernel vfio driver should not
-> > have enough information on the GPA address space, hence it might not
-> > be able to rebuild the mapping when a new page is mapped?  While QEMU
-> > should be able to get both GPA and HVA easily when the balloon device
-> > wants to deflate a page. [1]
-> 
-> This is where the vfio IOMMU backend comes into play.  vfio devices
-> make use of MemoryListeners to register the HVA to GPA translations
-> within the AddressSpace of a device.  When we're using an IOMMU, we pin
-> those HVAs in order to make the HPA static and insert the GPA to HPA
-> mappings into the IOMMU.  When we don't have an IOMMU, the IOMMU
-> backend is storing those HVA to GPA translations so that the mediated
-> device vendor driver can make pinning requests.  The vendor driver
-> requests pinning of a given set of GPAs and the IOMMU backend pins the
-> matching HVA to provide an HPA.
-> 
-> When a page is ballooned, it's zapped from the process address space,
-> so we need to invalidate the HVA to HPA mapping.  When the page is
-> restored, we still have the correct HVA, but we need a notifier to tell
-> us to put it back into play, re-pinning and inserting the mapping into
-> the IOMMU if we have one.
-> 
-> In order for QEMU to do this, this ballooned page would need to be
-> reflected in the memory API.  This would be quite simple, inserting a
-> MemoryRegion overlapping the RAM page which is ballooned out and
-> removing it when the balloon is deflated.  But we run into the same
-> problems with mapping granularity.  In order to accommodate this new
-> overlap, the memory API would first remove the previous mapping, split
-> or truncate the region, then reinsert the result.  Just like if we tried
-> to do this in the IOMMU, it's not atomic with respect to device DMA.  In
-> order to achieve this model, the memory API would need to operate
-> entirely on page size regions.  Now imagine that every MiB of guest RAM
-> requires 256 ioctls to map (assuming 4KiB pages), 256K per GiB.  Clearly
-> we'd want to use a larger granularity for efficiency.  If we allow the
-> user to specify the granularity, perhaps abstracting that granularity
-> as the size of a DIMM, suddenly we've moved from memory ballooning to
-> memory hotplug, where the latter does make use of the memory API and
-> has none of these issues AIUI.
+@cur_mon is null unless the main thread is running monitor code, either
+HMP code within monitor_read(), or QMP code within
+monitor_qmp_dispatch().
 
-I see.  Indeed pc-dimm seems to be more suitable here.  And I think I
-better understand the awkwardness that the page granularity problem
-has brought - since we need this page granularity to happen even for
-the QEMU memory API then we'll possibly have 4k-sized memory regions
-to fill up all the RAM address space.  It sounds a hard mission.
+Use of @cur_mon outside the main thread is therefore unsafe.
 
-> 
-> > > There are a few complications to this support though.  First ballooning
-> > > works at page size granularity, but IOMMU mapping can make use of
-> > > arbitrary superpage sizes and the IOMMU API only guarantees unmap
-> > > granularity equal to the original mapping.  Therefore we cannot unmap
-> > > individual pages unless we require that all mappings through the IOMMU
-> > > API are done with page granularity, precluding the use of superpages by
-> > > the IOMMU and thereby inflicting higher IOTLB overhead.  Unlike a CPU,
-> > > we can't invalidate the mappings and fault them back in or halt the
-> > > processor to make the page table updates appear atomic.  The device is
-> > > considered always running and interfering with that would likely lead
-> > > to functional issues.  
-> > 
-> > Indeed.  Actually VT-d emulation bug was fixed just months ago where
-> > the QEMU shadow page code for the device quickly unmapped the pages
-> > and rebuilt the pages, but within the window we see DMA happened hence
-> > DMA error on missing page entries.  I wish I have had learnt that
-> > earlier from you!  Then the bug would be even more obvious to me.
-> > 
-> > And I would guess that if we want to do that in the future, the
-> > easiest way as the first step would be that we just tell vfio to avoid
-> > using huge pages when we see balloon devices.  It might be an
-> > understandable cost at least to me to use both vfio-pci and the
-> > balloon device.
-> 
-> There are a couple problem there though, first if we decide to use
-> smaller pages for any case where we have a balloon device (a device
-> that libvirt adds by default and requires manually editing the XML to
-> remove), we introduce a performance regression for pretty much every
-> existing VM as we restrict the IOMMU from making use of superpages and
-> therefore depend far more on the IOTLB.  Second, QEMU doesn't have
-> control of the mapping page size.  The vfio MAP_DMA ioctl simply takes
-> a virtual address, IOVA (GPA) and size, the IOMMU gets to map this
-> however it finds most efficient and the API requires unmapping with a
-> minimum granularity matching the original mapping.  So again, the only
-> way QEMU can get page size unmapping granularity is to perform only
-> page sized mappings.  We could add a mapping flag to specify page size
-> mapping and therefore page granularity unmapping, but that's a new
-> contract (ie. API) between the user and vfio that comes with a
-> performance penalty.  There is currently a vfio_iommu_type1 module
-> option which disables IOMMU superpage support globally, but we don't
-> have per instance control with the current APIs.
+Most of its uses are in monitor command handlers.  These run in the main
+thread.
 
-IIRC there were similar requests before to allow userspace to specify
-page sizes to be used by vfio IOMMU backends but it didn't make it at
-last.  But now I understand that this IOMMU page granularity problem
-within the vfio IOMMU backend is a separate one to be settled
-comparing to the one you mentioned in QEMU memory API.
+However, there are also uses hiding elsewhere, such as in
+error_vprintf(), and thus error_report(), making these functions unsafe
+outside the main thread.  No such unsafe uses are known at this time.
+Regardless, this is an unnecessary trap.  It's an ancient trap, though.
 
-(Though I also feel uncertain on whether libvirt should at least
- provide a simpler interface to allow the guest to disable the default
- balloon device...)
+More recently, commit cf869d53172 "qmp: support out-of-band (oob)
+execution" spiced things up: the monitor I/O thread assigns to @cur_mon
+when executing commands out-of-band.  Having two threads save, set and
+restore @cur_mon without synchronization is definitely unsafe.  We can
+end up with @cur_mon null while the main thread runs monitor code, or
+non-null while it runs non-monitor code.
 
-Thanks,
+We could fix this by making the I/O thread not mess with @cur_mon, but
+that would leave the trap armed and ready.
 
--- 
-Peter Xu
+Instead, make @cur_mon thread-local.  It's now reliably null unless the
+thread is running monitor code.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+[peterx: update subject and commit message written by Markus]
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+v5:
+- Update the subject and commit message from Markus, pick r-b.  Subject
+  was: "monitor: let cur_mon be per-thread"
+v4:
+- touch up the commit message since now we have OOB command already
+v3:
+- fix code style warning from patchew
+v2:
+- drop qemu-thread changes
+---
+ include/monitor/monitor.h | 2 +-
+ monitor.c                 | 2 +-
+ stubs/monitor.c           | 2 +-
+ tests/test-util-sockets.c | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index d6ab70cae2..2ef5e04b37 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -6,7 +6,7 @@
+ #include "qapi/qapi-types-misc.h"
+ #include "qemu/readline.h"
+=20
+-extern Monitor *cur_mon;
++extern __thread Monitor *cur_mon;
+=20
+ /* flags for monitor_init */
+ /* 0x01 unused */
+diff --git a/monitor.c b/monitor.c
+index be29634a00..f75027b09e 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -290,7 +290,7 @@ static mon_cmd_t info_cmds[];
+=20
+ QmpCommandList qmp_commands, qmp_cap_negotiation_commands;
+=20
+-Monitor *cur_mon;
++__thread Monitor *cur_mon;
+=20
+ static void monitor_command_cb(void *opaque, const char *cmdline,
+                                void *readline_opaque);
+diff --git a/stubs/monitor.c b/stubs/monitor.c
+index e018c8f594..3890771bb5 100644
+--- a/stubs/monitor.c
++++ b/stubs/monitor.c
+@@ -3,7 +3,7 @@
+ #include "qemu-common.h"
+ #include "monitor/monitor.h"
+=20
+-Monitor *cur_mon =3D NULL;
++__thread Monitor *cur_mon;
+=20
+ int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
+ {
+diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+index acadd85e8f..6195a3ac36 100644
+--- a/tests/test-util-sockets.c
++++ b/tests/test-util-sockets.c
+@@ -69,7 +69,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Er=
+ror **errp)
+  * stubs/monitor.c is defined, to make sure monitor.o is discarded
+  * otherwise we get duplicate syms at link time.
+  */
+-Monitor *cur_mon;
++__thread Monitor *cur_mon;
+ void monitor_init(Chardev *chr, int flags) {}
+=20
+=20
+--=20
+2.17.1
