@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fgQKM-0008UU-4L
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 03:59:51 -0400
+	(envelope-from <jusual@mail.ru>) id 1fgQTc-0002PW-EL
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 04:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fgQKI-00020T-T5
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 03:59:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56178 helo=mx1.redhat.com)
+	(envelope-from <jusual@mail.ru>) id 1fgQTZ-0005l0-8l
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 04:09:24 -0400
+Received: from smtp59.i.mail.ru ([217.69.128.39]:36246)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fgQKI-00020N-O1
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 03:59:46 -0400
-Date: Fri, 20 Jul 2018 15:59:37 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180720075937.GR4071@xz-mi>
-References: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
-	<20180718154200.26777-6-dplotnikov@virtuozzo.com>
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fgQTY-0005jc-Rv
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 04:09:21 -0400
+References: <20180719121637.24576-1-jusual@mail.ru>
+	<CAFEAcA8_2hM0J38w0h0jfVMvLMceHnxgKKYeMcY-SO_Ywk0QpA@mail.gmail.com>
+From: Julia Suvorova <jusual@mail.ru>
+Message-ID: <f6970c0f-d9d5-1d5d-7d6e-3e457f034bf2@mail.ru>
+Date: Fri, 20 Jul 2018 11:09:10 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180718154200.26777-6-dplotnikov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v1 05/17] ram: extend the data structures
- for background snapshotting
+In-Reply-To: <CAFEAcA8_2hM0J38w0h0jfVMvLMceHnxgKKYeMcY-SO_Ywk0QpA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] nvic: Change NVIC to support ARMv6-M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
 
-On Wed, Jul 18, 2018 at 06:41:48PM +0300, Denis Plotnikov wrote:
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
->  include/exec/ram_addr.h | 7 +++++++
->  1 file changed, 7 insertions(+)
+On 19.07.2018 19:25, Peter Maydell wrote:
+> On 19 July 2018 at 13:16, Julia Suvorova <jusual@mail.ru> wrote:
+>> The differences from ARMv7-M NVIC are:
+>>    * ARMv6-M only supports up to 32 external interrupts
+>>     (configurable feature already). The ICTR is reserved.
+>>    * Active Bit Register is reserved.
+>>    * ARMv6-M supports 4 priority levels against 256 in ARMv7-M.
+>>
+>> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+>> ---
+>> v2:
+>>      * Added num_prio_bits field
+>>      * AIRCR.PRIGROUP is set as RAZ/WI for Baseline
 > 
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index 6cbc02aa0f..5b403d537d 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -36,6 +36,8 @@ struct RAMBlock {
->      char idstr[256];
->      /* RCU-enabled, writes protected by the ramlist lock */
->      QLIST_ENTRY(RAMBlock) next;
-> +    /* blocks used for background snapshot */
-> +    QLIST_ENTRY(RAMBlock) bgs_next;
->      QLIST_HEAD(, RAMBlockNotifier) ramblock_notifiers;
->      int fd;
->      size_t page_size;
-> @@ -49,6 +51,11 @@ struct RAMBlock {
->      unsigned long *unsentmap;
->      /* bitmap of already received pages in postcopy */
->      unsigned long *receivedmap;
-> +    /* The following 2 are for background snapshot */
-> +    /* Pages currently being copied */
-> +    unsigned long *touched_map;
-> +    /* Pages has been copied already */
-> +    unsigned long *copied_map;
->  };
->  
->  static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
-> -- 
-> 2.17.0
-> 
-> 
+> Applied to target-arm.for-3.1, thanks.
 
-IMHO these new fields can be put into the patches where they are
-firstly used.  Isolating them do not really help much for anything
-AFAICT...
+It seems like you applied the first version of this patch.
+Can you check this, please?
 
-Regards,
-
--- 
-Peter Xu
+Best regards, Julia Suvorova.
