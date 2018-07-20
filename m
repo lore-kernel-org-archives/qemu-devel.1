@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fgZCy-0000gR-CI
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 13:28:49 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fgaOK-0000R9-HW
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 14:44:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fgZCu-0004Te-2C
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 13:28:48 -0400
-Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:38426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fgZCt-0004TV-Qu
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 13:28:43 -0400
-Received: by mail-pg1-x530.google.com with SMTP id k3-v6so7427866pgq.5
-	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 10:28:43 -0700 (PDT)
-References: <20180720153932.8507-1-peter.maydell@linaro.org>
-	<0b589622-ffaf-8ed7-c34b-77ada1d203fb@amsat.org>
-	<CAFEAcA-Mc7S775QK5dt7+eqaZD0TSZhsNLrZauSNshfbQGx9fg@mail.gmail.com>
-	<aa869c16-9577-bf7b-a5c7-b63673644a6f@linaro.org>
-	<CAFEAcA9XXPsm8V45eYyK1kNdpOjS9gmrZM2MThu1VJ07dhwEPQ@mail.gmail.com>
-	<40e694c6-9757-3f9e-b8c1-9d2fdd113328@linaro.org>
-	<CAFEAcA_rsE7kNO7LkQhxcsMa9718c_kMYdgYAegesLmOFWWfMg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <287d5d79-9607-9ec9-027a-d6b7dd717489@linaro.org>
-Date: Fri, 20 Jul 2018 10:28:39 -0700
+	(envelope-from <dgilbert@redhat.com>) id 1fgaOH-0004MK-FV
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 14:44:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48030 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fgaOH-0004Li-9j
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 14:44:33 -0400
+Date: Fri, 20 Jul 2018 19:44:29 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180720184429.GF2631@work-vm>
+References: <1532012617-16777-1-git-send-email-walling@linux.ibm.com>
+	<20180719191818.GD2462@work-vm>
+	<97bef638-4441-3367-6c64-9339cba3c33f@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_rsE7kNO7LkQhxcsMa9718c_kMYdgYAegesLmOFWWfMg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.0 ?] tests/libqtest: Improve
- kill_qemu() assert
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <97bef638-4441-3367-6c64-9339cba3c33f@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] monitor: print message when using 'help'
+ with an unknown command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,31 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Collin Walling <walling@linux.ibm.com>
+Cc: qemu-devel@nongnu.org
 
-On 07/20/2018 09:45 AM, Peter Maydell wrote:
->> For non-linux, I peeked at the OpenBSD man page, which says
->>
->>   The strsignal() function first appeared in AT&T System V
->>   Release 4 UNIX and was reimplemented for NetBSD 1.0.
->>
->> That suggests all of the extant BSDs should have it.
->>
->> MinGW has had the function since 2008.
->>
->> What other hosts do we support?
+* Collin Walling (walling@linux.ibm.com) wrote:
+> On 07/19/2018 03:18 PM, Dr. David Alan Gilbert wrote:
+> > * Collin Walling (walling@linux.ibm.com) wrote:
+> >> When typing 'help' followed by an unknown command, QEMU will
+> >> not print anything to the command line to let the user know
+> >> they typed a bad command. Let's fix this by printing a message
+> >> to the monitor when this happens. For example:
+> >>
+> >>     (qemu) help xyz
+> >>     unknown command: 'xyz'
+> >>
+> >> Reported-by: Stefan Zimmermann <stzi@linux.ibm.com>
+> >> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> >> ---
+> >>  monitor.c | 5 ++++-
+> >>  1 file changed, 4 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/monitor.c b/monitor.c
+> >> index 7af1f18..7942f9f 100644
+> >> --- a/monitor.c
+> >> +++ b/monitor.c
+> >> @@ -1034,9 +1034,12 @@ static void help_cmd_dump(Monitor *mon, const mon_cmd_t *cmds,
+> >>              } else {
+> >>                  help_cmd_dump_one(mon, cmd, args, arg_index);
+> >>              }
+> >> -            break;
+> >> +            return;
+> >>          }
+> >>      }
+> >> +
+> >> +    /* Entry not found */
+> >> +    monitor_printf(mon, "unknown command: '%s'\n", args[arg_index]);
+> > 
+> > Thanks, that does suffer from a similar bug to the one you fixed a
+> > few months back in  317c52cc6aa0d ('monitor: report entirety of hmp
+> > command on error'):
+> > 
+> > (qemu) help foo
+> > unknown command: 'foo'
+> > (qemu) help info foo
+> > unknown command: 'foo'
 > 
-> OSX, but that's I think OK as it inherits it from BSD.
-> The configure script also has support for Solaris-variants
-> and Haiku...
+> Yeah... my thinking was that "info" is a correct command, so let's instead only
+> report to the user just the piece that was incorrect.
+> 
+> If it makes better sense to include the whole "info foo" piece, it's certainly
+> doable... whichever makes the most sense. Thoughts?
 
-Solaris derives from SVR4, and so should have had it
-since the beginning of time; certainly OpenSolaris does:
-http://repo.or.cz/opensolaris.git/blob/HEAD:/usr/src/head/string.h#l94
-
-Haiku has it as well:
-https://git.haiku-os.org/haiku/tree/headers/posix/string.h#n75
+Yes, I'd prefer the full version; unless it makes it particularly
+complicated.
 
 
-r~
+> > 
+> > Dave
+> > (And yes, please cc me, otherwise I can miss them)
+> > 
+> 
+> Will do :)
+
+Thanks,
+
+Dave
+
+> >>  }
+> >>  
+> >>  static void help_cmd(Monitor *mon, const char *name)
+> >> -- 
+> >> 2.7.4
+> >>
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+> 
+> -- 
+> Respectfully,
+> - Collin Walling
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
