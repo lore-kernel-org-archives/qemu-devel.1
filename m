@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fgXpm-0002HY-FF
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:00:47 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fgY2x-0000P8-FR
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:14:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fgXpj-0001Jw-D2
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:00:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59066 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fgXpj-0001Hy-6d
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:00:43 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 490DA7A7E7
-	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 16:00:42 +0000 (UTC)
-Date: Fri, 20 Jul 2018 17:00:39 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180720160039.GO16700@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180720154425.31285-1-marcandre.lureau@redhat.com>
-	<20180720154425.31285-2-marcandre.lureau@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fgY2u-00073D-9R
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:14:23 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:35321)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fgY2u-00072t-1s
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:14:20 -0400
+Received: by mail-pl0-x242.google.com with SMTP id w3-v6so5393425plq.2
+	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 09:14:20 -0700 (PDT)
+References: <20180720153932.8507-1-peter.maydell@linaro.org>
+	<0b589622-ffaf-8ed7-c34b-77ada1d203fb@amsat.org>
+	<CAFEAcA-Mc7S775QK5dt7+eqaZD0TSZhsNLrZauSNshfbQGx9fg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <aa869c16-9577-bf7b-a5c7-b63673644a6f@linaro.org>
+Date: Fri, 20 Jul 2018 09:14:15 -0700
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-Mc7S775QK5dt7+eqaZD0TSZhsNLrZauSNshfbQGx9fg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180720154425.31285-2-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] seccomp: use SIGSYS signal instead of
- killing the thread
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-3.0 ?] tests/libqtest: Improve
+ kill_qemu() assert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,79 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, pmoore@redhat.com, Eduardo Otubo <otubo@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
 
-On Fri, Jul 20, 2018 at 05:44:24PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> The seccomp action SCMP_ACT_KILL results in immediate termination of
-> the thread that made the bad system call. However, qemu being
-> multi-threaded, it keeps running. There is no easy way for parent
-> process / management layer (libvirt) to know about that situation.
->=20
-> Instead, the default SIGSYS handler when invoked with SCMP_ACT_TRAP
-> will terminate the program and core dump.
->=20
-> This may not be the most secure solution, but probably better than
-> just killing the offending thread. SCMP_ACT_KILL_PROCESS has been
-> added in Linux 4.14 to improve the situation, which I propose to use
-> by default if available in the next patch.
+On 07/20/2018 08:49 AM, Peter Maydell wrote:
+> On 20 July 2018 at 16:48, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> On 07/20/2018 12:39 PM, Peter Maydell wrote:
+>>> In kill_qemu() we have an assert that checks that the QEMU process
+>>> didn't dump core:
+>>>             assert(!WCOREDUMP(wstatus));
+>>>
+>>> Unfortunately the WCOREDUMP macro here means the resulting message
+>>> is not very easy to comprehend on at least some systems:
+>>>
+>>> ahci-test: tests/libqtest.c:113: kill_qemu: Assertion `!(((__extension__ (((union { __typeof(wstatus) __in; int __i; }) { .__in = (wstatus) }).__i))) & 0x80)' failed.
+>>>
+>>> and it doesn't identify what signal the process took.
+>>>
+>>> Instead of using a raw assert, print the information in an
+>>> easier to understand way:
+>>>
+>>> /i386/ahci/sanity: libqtest.c: kill_qemu() tried to terminate QEMU process but it dumped core with signal 11
+>>
+>> Less cryptic, indeed.
+>>
+>>> ahci-test: tests/libqtest.c:118: kill_qemu: Assertion `0' failed.
+>>
+>> This file:line is not very relevant, ...
+> 
+>> ... what about directly using abort() here?
+> 
+> I did actually start with that, but decided I'd rather have
+> the file-and-line in there to direct people more quickly
+> to the immediate point where we asserted.
 
-Note that seccomp doesn't promise to protect against all  types
-of vulnerability in a program. It merely aims to stop the program
-executing designated system calls.
+You already print the file, just include the line.  Perhaps
 
-Using SCMP_ACT_TRAP still prevents syscal execution to exactly the
-same extent that SCMP_ACT_KILL does, so its security level is the
-same.
+  fprintf(stderr,
+          "%s:%d: kill_qemu tried to terminate QEMU "
+          "process but it dumped core with signal %s\n",
+          __FILE__, __LINE__, strsignal(WTERMSIG(wstatus)));
+  abort();
 
-What differs is that the userspace app has option to ignore the
-syscall and carry on instead of being killed. A malicous attacker
-would thus have option to try to influence other parts of QEMU
-todo bad stuff, but if they already have control over the userspace
-process to this extent, they can likely do such bad stuff even
-before executing the syscalls
-
-So I don't think there's any significant difference in security
-protection here.  Mostly the difference is just about what the
-crash will look like. A full process crash (from the default
-signal handler) looks better than a thread crash for the reasons
-you've explained.
-
->=20
-> Related to:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1594456
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  qemu-seccomp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-> index 9cd8eb9499..b117a92559 100644
-> --- a/qemu-seccomp.c
-> +++ b/qemu-seccomp.c
-> @@ -125,7 +125,7 @@ static int seccomp_start(uint32_t seccomp_opts)
->              continue;
->          }
-> =20
-> -        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_KILL, blacklist[i]=
-.num,
-> +        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_TRAP, blacklist[i]=
-.num,
->                                      blacklist[i].narg, blacklist[i].ar=
-g_cmp);
->          if (rc < 0) {
->              goto seccomp_return;
-
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Not that I expect the signal to ever be anything other than 11,
+and that being one of the handful that are consistent across
+pretty much all unix systems.  But still.
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+r~
+
+
+PS: The bike shed should be blue.
