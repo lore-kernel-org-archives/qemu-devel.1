@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fgNVo-0000ui-LR
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 00:59:29 -0400
+	(envelope-from <peterx@redhat.com>) id 1fgNfZ-0003bJ-Rl
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 01:09:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fgNVl-0003ia-Fz
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 00:59:28 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:37511)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fgNVl-0003hx-7m
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 00:59:25 -0400
-Received: by mail-pl0-x241.google.com with SMTP id 31-v6so4643395plc.4
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 21:59:25 -0700 (PDT)
-References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1532004912-13899-19-git-send-email-stefan.markovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <17945e3f-9caf-b153-4c45-56d005f27a72@linaro.org>
-Date: Thu, 19 Jul 2018 21:59:21 -0700
+	(envelope-from <peterx@redhat.com>) id 1fgNfW-0007WB-HL
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 01:09:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60328 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fgNfW-0007W5-DI
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 01:09:30 -0400
+Date: Fri, 20 Jul 2018 13:09:23 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180720050923.GO4071@xz-mi>
+References: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
+	<20180718154200.26777-3-dplotnikov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1532004912-13899-19-git-send-email-stefan.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 18/40] target/mips: Add emulation of
- nanoMIPS 32-bit load and store instructions
+Content-Disposition: inline
+In-Reply-To: <20180718154200.26777-3-dplotnikov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v1 02/17] bitops: add some atomic versions
+ of bitmap operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +28,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Markovic <stefan.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-On 07/19/2018 05:54 AM, Stefan Markovic wrote:
-> +        case NM_ADDIUGP_B:
-> +            gen_arith_imm(ctx, OPC_ADDIU, rt, 28, u);
-> +            break;
+On Wed, Jul 18, 2018 at 06:41:45PM +0300, Denis Plotnikov wrote:
+> 1. test bit
+> 2. test and set bit
+> 
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 
-Use gen_op_addr_add, since behaves_like('DADDIU[GP.B]').
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
->      case NM_P_LS_U12:
-> +    {
-> +        uint32_t u = extract32(ctx->opcode, 0, 12);
-> +        switch ((ctx->opcode >> 12) & 0x0f) {
-> +        case NM_P_PREFU12:
-> +            if (rt == 31) {
-> +                /* SYNCI */
-> +                /* Break the TB to be able to sync copied instructions
-> +                   immediately */
-> +                ctx->base.is_jmp = DISAS_STOP;
+Regards,
 
-I'll note for future cleanup that while this matches all of the other instances
-of SYNCI in target/mips/, this is not actually required.
-
-QEMU supports self-modifying code without any barriers or breaks whatsoever.
-(Becuase, of course, i386 as a guest requires this.)
-
-
-r~
+-- 
+Peter Xu
