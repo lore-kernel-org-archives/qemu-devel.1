@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgWyG-00063Z-C5
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:05:34 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fgXVJ-0006wu-Ag
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:39:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgWyF-0000R0-LT
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:05:28 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41509)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fgWyF-0000Ql-GS
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:05:27 -0400
-Received: by mail-oi0-x241.google.com with SMTP id k12-v6so21876969oiw.8
-	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 08:05:27 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180718061027.10980-1-sw@weilnetz.de>
-References: <20180718061027.10980-1-sw@weilnetz.de>
+	(envelope-from <pm215@archaic.org.uk>) id 1fgXVI-0007uI-AC
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:39:37 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43648)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fgXVI-0007rY-1Z
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:39:36 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jul 2018 16:05:06 +0100
-Message-ID: <CAFEAcA9GD5ApmZJUeCMfTZnQJsFaKbceP6G2Q_QXCWYm8mow2g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.0] po: Don't include comments with
- location
+Date: Fri, 20 Jul 2018 16:39:32 +0100
+Message-Id: <20180720153932.8507-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-3.0 ?] tests/libqtest: Improve kill_qemu()
+ assert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: QEMU Developer <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Alexander Shopov <ash@kambanaria.org>, Kevin Wolf <kwolf@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?B?w4Frb3MgS292w6Fjcw==?= <akoskovacs@gmx.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozancag@gmail.com>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 18 July 2018 at 07:10, Stefan Weil <sw@weilnetz.de> wrote:
-> Those comments change often when ui/gtk.c is changed and are not
-> really useful.
->
-> Add also a new translation for German (still to be done for all other
-> languages).
->
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-> ---
+In kill_qemu() we have an assert that checks that the QEMU process
+didn't dump core:
+            assert(!WCOREDUMP(wstatus));
 
-I think I agree with Philippe that we should split out the
-mechanical change from the significant one.
+Unfortunately the WCOREDUMP macro here means the resulting message
+is not very easy to comprehend on at least some systems:
 
-thanks
--- PMM
+ahci-test: tests/libqtest.c:113: kill_qemu: Assertion `!(((__extension__ (((union { __typeof(wstatus) __in; int __i; }) { .__in = (wstatus) }).__i))) & 0x80)' failed.
+
+and it doesn't identify what signal the process took.
+
+Instead of using a raw assert, print the information in an
+easier to understand way:
+
+/i386/ahci/sanity: libqtest.c: kill_qemu() tried to terminate QEMU process but it dumped core with signal 11
+ahci-test: tests/libqtest.c:118: kill_qemu: Assertion `0' failed.
+Aborted (core dumped)
+
+(Of course, the really useful information would be why the QEMU
+process dumped core in the first place, but we don't have that
+by the time the test program has picked up the exit status.)
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+In particular, the travis test config that enables gprof
+seems to (a) run into this every so often and (b) have the
+really unhelpful assertion text quoted above:
+ https://travis-ci.org/qemu/qemu/jobs/406192798
+
+Maybe for 3.0 since it's only test code.
+
+ tests/libqtest.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 098af6aec44..99341e1b47d 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -110,7 +110,13 @@ static void kill_qemu(QTestState *s)
+         pid = waitpid(s->qemu_pid, &wstatus, 0);
+ 
+         if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
+-            assert(!WCOREDUMP(wstatus));
++            if (WCOREDUMP(wstatus)) {
++                fprintf(stderr,
++                        "libqtest.c: kill_qemu() tried to terminate QEMU "
++                        "process but it dumped core with signal %d\n",
++                        WTERMSIG(wstatus));
++                assert(0);
++            }
+         }
+     }
+ }
+-- 
+2.17.1
