@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fgLJw-0007F6-OO
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:39:06 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fgLJx-0007F7-Jm
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:39:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fgLJv-00019p-A1
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:39:04 -0400
-Date: Fri, 20 Jul 2018 12:38:39 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fgLJv-00019y-Bt
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:39:05 -0400
+Date: Fri, 20 Jul 2018 12:18:50 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180720023839.GF18205@umbus.fritz.box>
+Message-ID: <20180720021850.GE18205@umbus.fritz.box>
 References: <20180706090713.15712-1-clg@kaod.org>
 	<20180706090713.15712-2-clg@kaod.org>
-	<20180706153624.77494d28@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="vA66WO2vHvL/CRSR"
+	protocol="application/pgp-signature"; boundary="so9zsI5B81VjUb/o"
 Content-Disposition: inline
-In-Reply-To: <20180706153624.77494d28@bahia.lan>
+In-Reply-To: <20180706090713.15712-2-clg@kaod.org>
 Subject: Re: [Qemu-devel] [PATCH v4 1/3] spapr: introduce a fixed IRQ number
  space
 List-Id: <qemu-devel.nongnu.org>
@@ -26,171 +25,481 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
 
---vA66WO2vHvL/CRSR
+--so9zsI5B81VjUb/o
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 06, 2018 at 03:36:24PM +0200, Greg Kurz wrote:
-> On Fri,  6 Jul 2018 11:07:11 +0200
-> C=E9dric Le Goater <clg@kaod.org> wrote:
-[snip]
-> > +/*
-> > + * The register property of a VIO device is defined in livirt using a
-> > + * base number + 0x1000 increment and in QEMU by incrementing the base
-> > + * register number 0x71000000.
-> > + *
-> > + * The formula below tries to compute a unique index number from the
-> > + * register value that will be used to define the IRQ number of the
-> > + * VIO device. A maximum of 256 (0x100) VIO devices is covered.
-> > + *
-> > + * To minimize collisions, we define two distinct ranges depending on
-> > + * the "reg" value definition:
-> > + *
-> > + *     [0x00 - 0x7f]    user/libvirt
-> > + *     [0x80 - 0xff]    QEMU VIO model
-> > + *
-> > + * Collisions will be detected when the IRQ is claimed.
-> > + */
-> > +static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
-> > +{
-> > +    if (reg >=3D SPAPR_VIO_REG_BASE) {
-> > +        return SPAPR_IRQ_VIO | (reg & 0x7f) | 0x80;
-> > +    } else {
-> > +        return SPAPR_IRQ_VIO | ((reg & 0x7f) ^ ((reg >> 12) & 0x7f));
+On Fri, Jul 06, 2018 at 11:07:11AM +0200, C=E9dric Le Goater wrote:
+> This proposal introduces a new IRQ number space layout using static
+> numbers for all devices, depending on a device index, and a bitmap
+> allocator for the MSI IRQ numbers which are negotiated by the guest at
+> runtime.
 >=20
-> Hmm... if you put a VIO net and two VIO vty in the domain XML, libvirt
-> will generate reg =3D=3D 0x1000 for the VIO net and reg =3D=3D 0x30001000=
- for the
-> second VIO vty... this will necessarily collide, won't it ?
+> As the VIO device model does not have a device index but a "reg"
+> property, we introduce a formula to compute an IRQ number from a "reg"
+> value. It should minimize most of the collisions.
+>=20
+> The previous layout is kept in pre-3.0 machines raising the
+> 'legacy_irq_allocation' machine class flag.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
+>  The new XICS layout will only be activated when a new pseries-3.1
+>  machine is introduced.
 
-Ah, drat, yeah, this will still need some tweaking.
+Looking good.  I've noted a few nits below, but they're very minor -
+I wouldn't even bother to ask for the changes if we didn't have to
+wait for 3.1 anyway.
 
-> With a 256 VIO devices limit, libvirt can only add 255 devices since
-> the nvram is created by QEMU by default (libvirt can only change its
-> reg using -global).
-
-Note that the 256 limit is basically arbitrary.  I don't think it
-exists in the code now, but it should be way more than sufficient.
-
-> As David mentioned in another mail:
->=20
-> 	VIO net devices start at reg=3D0x1000
-> 	VIO scsi devices start at reg=3D0x2000
-> 	VIO nvram devices start at reg=3D0x3000
-> 	VIO vty devices start at reg=3D0x30000000
-> 	    and increment by 0x1000 each type
->=20
->=20
-> The values for net, scsi and nvram overlap... which makes me wonder why
-> do we even care to have per-type base value !?!
-
-We don't, really, I'm not sure why it ended up like that.
-
-> Anyway, I don't think
-> it's important for what you're trying to achieve.
->=20
-> Basically libvirt can generate regs in two distinct ranges:
->=20
-> - one for scsi/net/nvram:
->=20
-> smallest possible reg: 0x1000
-> largest possible reg: 0x2000 + 254 * 0x1000 =3D 0x100000
->=20
-> ie, 254 scsi devices starting at 0x2000 and 1 nvram
->=20
-> - one for vty=20
->=20
-> smallest possible reg: 0x30000000
-> largest possible reg: 0x30000000 + 253 * 0x1000 =3D 0x300fd000
->=20
-> ie, 254 vty devices
->=20
-> Thinking about the bit shifting magic that is needed to convert
-> reg into a usable index makes my brain hurt, but I'll happily
-> review anything you propose :)
-
-Considering just the libvirt assigned addresses how about:
-
-	if (reg >=3D 0x30000000)
-		irq =3D VIO_BASE + 240 + (reg >> 12); // up to 16 vtys
-	else
-		irq =3D VIO_BASE + (reg >> 12);       // up to 238 others
-
-(+ some masking to enforce the limits).
-
-I think it's ok to overlap the "qemu" and "libvirt" ranges, since
-(with the exception of the nvram device) I don't see any natural way
-you'd get both schemes in use at once.  If the user overrides things,
-either on the qemu command line or in the libvirt XML to combine the
-two schemes, then we're back to "fix your own mess by manually
-allocating irqs as well".
-
-Note that the above formula doesn't use VIO_BASE+0 itself, so I think
-we can then factor in the qemu assigned devices with just a:
-	irq ^=3D (reg & 0xff);
 
 >=20
-> > +    }
-> > +}
-> > +
-> >  static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
-> >  {
-> >      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> > @@ -485,10 +512,18 @@ static void spapr_vio_busdev_realize(DeviceState =
-*qdev, Error **errp)
-> >      }
-> > =20
-> >      if (!dev->irq) {
-> > -        dev->irq =3D spapr_irq_findone(spapr, &local_err);
-> > -        if (local_err) {
-> > -            error_propagate(errp, local_err);
-> > -            return;
-> > +        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> > +            dev->irq =3D spapr_irq_findone(spapr, &local_err);
-> > +            if (local_err) {
-> > +                error_propagate(errp, local_err);
-> > +                return;
-> > +            }
-> > +        } else {
-> > +            dev->irq =3D spapr_vio_reg_to_irq(dev->reg);
-> > +            if (dev->irq =3D=3D SPAPR_IRQ_PCI_LSI) {
-> > +                error_setg(errp, "Too many VIO devices");
-> > +                return;
-> > +            }
-> >          }
-> >      }
-> > =20
-> > @@ -557,7 +592,7 @@ VIOsPAPRBus *spapr_vio_bus_init(void)
-> >      /* Create bus on bridge device */
-> >      qbus =3D qbus_create(TYPE_SPAPR_VIO_BUS, dev, "spapr-vio");
-> >      bus =3D SPAPR_VIO_BUS(qbus);
-> > -    bus->next_reg =3D 0x71000000;
-> > +    bus->next_reg =3D SPAPR_VIO_REG_BASE;
-> > =20
-> >      /* hcall-vio */
-> >      spapr_register_hypercall(H_VIO_SIGNAL, h_vio_signal);
-> > diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> > index bcab6323b7ed..4ab556467289 100644
-> > --- a/hw/ppc/Makefile.objs
-> > +++ b/hw/ppc/Makefile.objs
-> > @@ -4,7 +4,7 @@ obj-y +=3D ppc.o ppc_booke.o fdt.o
-> >  obj-$(CONFIG_PSERIES) +=3D spapr.o spapr_caps.o spapr_vio.o spapr_even=
-ts.o
-> >  obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o spapr_rtas.o
-> >  obj-$(CONFIG_PSERIES) +=3D spapr_pci.o spapr_rtc.o spapr_drc.o spapr_r=
-ng.o
-> > -obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o
-> > +obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o spapr_irq.o
-> >  # IBM PowerNV
-> >  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_=
-psi.o pnv_occ.o pnv_bmc.o
-> >  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+>  include/hw/ppc/spapr.h     |  5 ++++
+>  include/hw/ppc/spapr_irq.h | 32 ++++++++++++++++++++++
+>  hw/ppc/spapr.c             | 32 +++++++++++++++++++++-
+>  hw/ppc/spapr_events.c      | 12 ++++++--
+>  hw/ppc/spapr_irq.c         | 56 ++++++++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_pci.c         | 29 ++++++++++++++++----
+>  hw/ppc/spapr_vio.c         | 47 ++++++++++++++++++++++++++++----
+>  hw/ppc/Makefile.objs       |  2 +-
+>  8 files changed, 199 insertions(+), 16 deletions(-)
+>  create mode 100644 include/hw/ppc/spapr_irq.h
+>  create mode 100644 hw/ppc/spapr_irq.c
 >=20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 7e5de1a6fd42..73067f5ee8aa 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -8,6 +8,7 @@
+>  #include "hw/ppc/spapr_drc.h"
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/ppc/spapr_ovec.h"
+> +#include "hw/ppc/spapr_irq.h"
+> =20
+>  struct VIOsPAPRBus;
+>  struct sPAPRPHBState;
+> @@ -101,6 +102,8 @@ struct sPAPRMachineClass {
+>      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMB=
+s */
+>      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+>      bool pre_2_10_has_unused_icps;
+> +    bool legacy_irq_allocation;
+> +
+>      void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
+>                            uint64_t *buid, hwaddr *pio,=20
+>                            hwaddr *mmio32, hwaddr *mmio64,
+> @@ -167,6 +170,8 @@ struct sPAPRMachineState {
+>      char *kvm_type;
+> =20
+>      const char *icp_type;
+> +    int32_t irq_map_nr;
+> +    unsigned long *irq_map;
+> =20
+>      bool cmd_line_caps[SPAPR_CAP_NUM];
+>      sPAPRCapabilities def, eff, mig;
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> new file mode 100644
+> index 000000000000..6f7f50548809
+> --- /dev/null
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -0,0 +1,32 @@
+> +/*
+> + * QEMU PowerPC sPAPR IRQ backend definitions
+> + *
+> + * Copyright (c) 2018, IBM Corporation.
+> + *
+> + * This code is licensed under the GPL version 2 or later. See the
+> + * COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef HW_SPAPR_IRQ_H
+> +#define HW_SPAPR_IRQ_H
+> +
+> +/*
+> + * IRQ range offsets per device type
+> + */
+> +#define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
+> +#define SPAPR_IRQ_HOTPLUG    0x1001
+> +#define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
+> +#define SPAPR_IRQ_PCI_LSI    0x1200  /* 32+ PHBs devices */
+> +
+> +#define SPAPR_IRQ_MSI        0x1300  /* Offset of the dynamic range cove=
+red
+> +                                      * by the bitmap allocator */
+> +
+> +typedef struct sPAPRMachineState sPAPRMachineState;
+> +
+> +void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_msis);
+> +int spapr_irq_msi_alloc(sPAPRMachineState *spapr, uint32_t num, bool ali=
+gn,
+> +                        Error **errp);
+> +void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t num);
+> +void spapr_irq_msi_reset(sPAPRMachineState *spapr);
+> +
+> +#endif
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 3f5e1d3ec21a..7bc9a48abf04 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -189,6 +189,11 @@ static void xics_system_init(MachineState *machine, =
+int nr_irqs, Error **errp)
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
+>      Error *local_err =3D NULL;
+> =20
+> +    /* Initialize the MSI IRQ allocator. */
+> +    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +        spapr_irq_msi_init(spapr, XICS_IRQ_BASE + nr_irqs - SPAPR_IRQ_MS=
+I);
+> +    }
+> +
+>      if (kvm_enabled()) {
+>          if (machine_kernel_irqchip_allowed(machine) &&
+>              !xics_kvm_init(spapr, &local_err)) {
+> @@ -1636,6 +1641,10 @@ static void spapr_machine_reset(void)
+>          ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fata=
+l);
+>      }
+> =20
+> +    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +        spapr_irq_msi_reset(spapr);
+> +    }
+> +
+>      qemu_devices_reset();
+> =20
+>      /* DRC reset may cause a device to be unplugged. This will cause tro=
+ubles
+> @@ -1910,6 +1919,24 @@ static const VMStateDescription vmstate_spapr_patb=
+_entry =3D {
+>      },
+>  };
+> =20
+> +static bool spapr_irq_map_needed(void *opaque)
+> +{
+> +    sPAPRMachineState *spapr =3D opaque;
+> +
+> +    return spapr->irq_map && !bitmap_empty(spapr->irq_map, spapr->irq_ma=
+p_nr);
+> +}
+> +
+> +static const VMStateDescription vmstate_spapr_irq_map =3D {
+> +    .name =3D "spapr_irq_map",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D spapr_irq_map_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_BITMAP(irq_map, sPAPRMachineState, 0, irq_map_nr),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+>  static const VMStateDescription vmstate_spapr =3D {
+>      .name =3D "spapr",
+>      .version_id =3D 3,
+> @@ -1937,6 +1964,7 @@ static const VMStateDescription vmstate_spapr =3D {
+>          &vmstate_spapr_cap_cfpc,
+>          &vmstate_spapr_cap_sbbc,
+>          &vmstate_spapr_cap_ibs,
+> +        &vmstate_spapr_irq_map,
+>          NULL
+>      }
+>  };
+> @@ -4067,7 +4095,9 @@ static void spapr_machine_3_0_instance_options(Mach=
+ineState *machine)
+> =20
+>  static void spapr_machine_3_0_class_options(MachineClass *mc)
+>  {
+> -    /* Defaults for the latest behaviour inherited from the base class */
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> +
+> +    smc->legacy_irq_allocation =3D true;
+>  }
+> =20
+>  DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index e4f5946a2188..cab950d33446 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -709,7 +709,11 @@ void spapr_events_init(sPAPRMachineState *spapr)
+>  {
+>      int epow_irq;
+> =20
+> -    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> +    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +        epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> +    } else {
+> +        epow_irq =3D SPAPR_IRQ_EPOW;
+> +    }
+
+Nit: these can be rearranged more briefly by initializing to the fixed
+value, then overriding in the legacy case.
+
+> =20
+>      spapr_irq_claim(spapr, epow_irq, false, &error_fatal);
+> =20
+> @@ -731,7 +735,11 @@ void spapr_events_init(sPAPRMachineState *spapr)
+>      if (spapr->use_hotplug_event_source) {
+>          int hp_irq;
+> =20
+> -        hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> +        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +            hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> +        } else {
+> +            hp_irq =3D SPAPR_IRQ_HOTPLUG;
+> +        }
+
+Here too.
+
+>          spapr_irq_claim(spapr, hp_irq, false, &error_fatal);
+> =20
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> new file mode 100644
+> index 000000000000..24e9c1d4433c
+> --- /dev/null
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -0,0 +1,56 @@
+> +/*
+> + * QEMU PowerPC sPAPR IRQ interface
+> + *
+> + * Copyright (c) 2018, IBM Corporation.
+> + *
+> + * This code is licensed under the GPL version 2 or later. See the
+> + * COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/log.h"
+> +#include "qemu/error-report.h"
+> +#include "qapi/error.h"
+> +#include "hw/ppc/spapr.h"
+> +#include "hw/ppc/xics.h"
+> +
+> +void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_msis)
+> +{
+> +    spapr->irq_map_nr =3D nr_msis;
+> +    spapr->irq_map =3D bitmap_new(spapr->irq_map_nr);
+> +}
+> +
+> +int spapr_irq_msi_alloc(sPAPRMachineState *spapr, uint32_t num, bool ali=
+gn,
+> +                        Error **errp)
+> +{
+> +    int irq;
+> +
+> +    /*
+> +     * The 'align_mask' parameter of bitmap_find_next_zero_area()
+> +     * should be one less than a power of 2; 0 means no
+> +     * alignment. Adapt the 'align' value of the former allocator
+> +     * to fit the requirements of bitmap_find_next_zero_area()
+> +     */
+> +    align -=3D 1;
+> +
+> +    irq =3D bitmap_find_next_zero_area(spapr->irq_map, spapr->irq_map_nr=
+, 0, num,
+> +                                     align);
+> +    if (irq =3D=3D spapr->irq_map_nr) {
+> +        error_setg(errp, "can't find a free %d-IRQ block", num);
+> +        return -1;
+> +    }
+> +
+> +    bitmap_set(spapr->irq_map, irq, num);
+> +
+> +    return irq + SPAPR_IRQ_MSI;
+> +}
+> +
+> +void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t num)
+> +{
+> +    bitmap_clear(spapr->irq_map, irq - SPAPR_IRQ_MSI, num);
+> +}
+> +
+> +void spapr_irq_msi_reset(sPAPRMachineState *spapr)
+> +{
+> +    bitmap_clear(spapr->irq_map, 0, spapr->irq_map_nr);
+> +}
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 497b896c7d24..cba5340f4bad 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -334,6 +334,9 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+>              return;
+>          }
+> =20
+> +        if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +            spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
+> +        }
+>          spapr_irq_free(spapr, msi->first_irq, msi->num);
+>          if (msi_present(pdev)) {
+>              spapr_msi_setmsg(pdev, 0, false, 0, 0);
+> @@ -372,7 +375,13 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPA=
+PRMachineState *spapr,
+>      }
+> =20
+>      /* Allocate MSIs */
+> -    irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS_TYP=
+E_MSI, &err);
+> +    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +        irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS=
+_TYPE_MSI,
+> +                             &err);
+> +    } else {
+> +        irq =3D spapr_irq_msi_alloc(spapr, req_num,
+> +                                  ret_intr_type =3D=3D RTAS_TYPE_MSI, &e=
+rr);
+> +    }
+>      if (err) {
+>          error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+>                            config_addr);
+> @@ -392,6 +401,9 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+> =20
+>      /* Release previous MSIs */
+>      if (msi) {
+> +        if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +            spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
+> +        }
+>          spapr_irq_free(spapr, msi->first_irq, msi->num);
+>          g_hash_table_remove(phb->msi, &config_addr);
+>      }
+> @@ -1708,11 +1720,15 @@ static void spapr_phb_realize(DeviceState *dev, E=
+rror **errp)
+>          uint32_t irq;
+>          Error *local_err =3D NULL;
+> =20
+> -        irq =3D spapr_irq_findone(spapr, &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -            error_prepend(errp, "can't allocate LSIs: ");
+> -            return;
+> +        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +            irq =3D spapr_irq_findone(spapr, &local_err);
+> +            if (local_err) {
+> +                error_propagate(errp, local_err);
+> +                error_prepend(errp, "can't allocate LSIs: ");
+> +                return;
+> +            }
+> +        } else {
+> +            irq =3D SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS + i;
+
+Here again, you can use the new fixed value as the default.
+
+>          }
+> =20
+>          spapr_irq_claim(spapr, irq, true, &local_err);
+> @@ -2123,6 +2139,7 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
+>      _FDT(fdt_setprop(fdt, bus_off, "ranges", &ranges, sizeof_ranges));
+>      _FDT(fdt_setprop(fdt, bus_off, "reg", &bus_reg, sizeof(bus_reg)));
+>      _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pci-config-space-type", 0x1=
+));
+> +    /* TODO: fine tune the total count of allocatable MSIs per PHB */
+>      _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi", XICS_IRQS_S=
+PAPR));
+> =20
+>      /* Dynamic DMA window */
+> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+> index be9af71437cc..a0695200f348 100644
+> --- a/hw/ppc/spapr_vio.c
+> +++ b/hw/ppc/spapr_vio.c
+> @@ -37,12 +37,13 @@
+> =20
+>  #include "hw/ppc/spapr.h"
+>  #include "hw/ppc/spapr_vio.h"
+> -#include "hw/ppc/xics.h"
+>  #include "hw/ppc/fdt.h"
+>  #include "trace.h"
+> =20
+>  #include <libfdt.h>
+> =20
+> +#define SPAPR_VIO_REG_BASE 0x71000000
+> +
+>  static void spapr_vio_get_irq(Object *obj, Visitor *v, const char *name,
+>                                void *opaque, Error **errp)
+>  {
+> @@ -445,6 +446,32 @@ static void spapr_vio_busdev_reset(DeviceState *qdev)
+>      }
+>  }
+> =20
+> +/*
+> + * The register property of a VIO device is defined in livirt using a
+> + * base number + 0x1000 increment and in QEMU by incrementing the base
+> + * register number 0x71000000.
+> + *
+> + * The formula below tries to compute a unique index number from the
+> + * register value that will be used to define the IRQ number of the
+> + * VIO device. A maximum of 256 (0x100) VIO devices is covered.
+> + *
+> + * To minimize collisions, we define two distinct ranges depending on
+> + * the "reg" value definition:
+> + *
+> + *     [0x00 - 0x7f]    user/libvirt
+> + *     [0x80 - 0xff]    QEMU VIO model
+> + *
+> + * Collisions will be detected when the IRQ is claimed.
+> + */
+> +static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
+> +{
+> +    if (reg >=3D SPAPR_VIO_REG_BASE) {
+> +        return SPAPR_IRQ_VIO | (reg & 0x7f) | 0x80;
+> +    } else {
+> +        return SPAPR_IRQ_VIO | ((reg & 0x7f) ^ ((reg >> 12) & 0x7f));
+> +    }
+> +}
+> +
+>  static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> @@ -485,10 +512,18 @@ static void spapr_vio_busdev_realize(DeviceState *q=
+dev, Error **errp)
+>      }
+> =20
+>      if (!dev->irq) {
+> -        dev->irq =3D spapr_irq_findone(spapr, &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -            return;
+> +        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +            dev->irq =3D spapr_irq_findone(spapr, &local_err);
+> +            if (local_err) {
+> +                error_propagate(errp, local_err);
+> +                return;
+> +            }
+> +        } else {
+> +            dev->irq =3D spapr_vio_reg_to_irq(dev->reg);
+> +            if (dev->irq =3D=3D SPAPR_IRQ_PCI_LSI) {
+> +                error_setg(errp, "Too many VIO devices");
+> +                return;
+> +            }
+>          }
+>      }
+> =20
+> @@ -557,7 +592,7 @@ VIOsPAPRBus *spapr_vio_bus_init(void)
+>      /* Create bus on bridge device */
+>      qbus =3D qbus_create(TYPE_SPAPR_VIO_BUS, dev, "spapr-vio");
+>      bus =3D SPAPR_VIO_BUS(qbus);
+> -    bus->next_reg =3D 0x71000000;
+> +    bus->next_reg =3D SPAPR_VIO_REG_BASE;
+> =20
+>      /* hcall-vio */
+>      spapr_register_hypercall(H_VIO_SIGNAL, h_vio_signal);
+> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+> index bcab6323b7ed..4ab556467289 100644
+> --- a/hw/ppc/Makefile.objs
+> +++ b/hw/ppc/Makefile.objs
+> @@ -4,7 +4,7 @@ obj-y +=3D ppc.o ppc_booke.o fdt.o
+>  obj-$(CONFIG_PSERIES) +=3D spapr.o spapr_caps.o spapr_vio.o spapr_events=
+=2Eo
+>  obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o spapr_rtas.o
+>  obj-$(CONFIG_PSERIES) +=3D spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng=
+=2Eo
+> -obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o
+> +obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o spapr_irq.o
+>  # IBM PowerNV
+>  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
+i.o pnv_occ.o pnv_bmc.o
+>  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -198,24 +507,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---vA66WO2vHvL/CRSR
+--so9zsI5B81VjUb/o
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltRSy0ACgkQbDjKyiDZ
-s5I8ahAAkXpvhrgtJZ3yhMewYiX41autQadlNKAvPiqCei4loAVRy7tbA8Kg4Avq
-JawL2CfqeTzx1yYr2GY/qWmUYLaoxAupIETj2nx6RWOXAHLMvXt904UWTfEIe8bz
-iioblLScyM7X4qxsa3NpKVB4luVLUVyJSDjLQZLM1cYKQ3RUaYTOPmb0ddXclR+e
-tiaNGQm5ozp8yuqKV8H/e+JmLFxoy8jyoZ8K5xRKETx14u+RJ3D/ZGhMaveDl+xc
-7lipzOIuGxl1ajvK0WlpqepS7D0XVIxeGflB2x9zxUfkKoEaR6YqWJ1ubX6tNjvY
-ijhtuwwl5gohyC+hR9s2e6ce5XesOZXddE8Mv3fYb11vAir7XHcSTdTUvQRHBu6V
-5vRA23hmwS5HU1fe7yErlQczwDgItGsr0u7S4gIMa+H1uiBEh7Pu/yUBTUq3ktFf
-u0Dgi5Xw/emyUn723WpIwEpMChtDUwyxJ9JsSpRdn4QuRADWh1OuJUNoXZCg4yIN
-VDcnfU/1eVb/1MgsQtdFoceglqMWttyntZWId2W7Bt71j6ayy9QrrnYFv4HoOm4P
-VDwmd+Eei+HwlBh1O0nbC3zIuwbhx/WFBzr9IqVzeNZUmDb+w8zXpOIEZgQy/9F0
-SlHzOdkZM9WiQ6llABhb+O2AQdaNjN9va1DGxkOcnqJXBf8Tp50=
-=cnxF
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltRRogACgkQbDjKyiDZ
+s5KNng/8DlCeOqP1JftdWMnyOhdODvLLSoqErHbagxYYBXWt+dvXVZI+AX+WDR+J
+GhEiXwV+diQCr7YQK85BvnkIov0vM8Air2fXwEy+6y8XGdJCMcuUmD2gSFs+i6MZ
+xNreh6VUfwYUNg6hM+VhTV2ffuzp5mR8nyaU2XMah8tHYqjAPS0+nFYdZ3KgYfFH
+tcEPCrWiKSGkl5xU4ZaiAw6Dw/H3TzUucCeA7bzfzvK84+hPHfpZAK9+rryB3k3a
+EzmUSm9g5O6uQgDX5SQfHrm4/jn2NM6UnhUMW53FwFERsRP3kSnGjoT2pH9AZBH5
+s9oBimCMnbRkgoNIvIhGAX9bDlGTAFpMtRd6kXSjgbC6Z/wQkhLcbel/wHVJZc17
+NLnRaFI2uosYjMcb2sovAQTDJJ9X55yROoFDZfcjmBXKl4KLd72ljXlea3nQTn3W
+A4tt3CGuWQYDcIlj/Ha8J67uHkUz0sz8836b/GQ5N8GtzkNnCbKSaii2gT7Q1B+q
+EqcZOhO0OjVP8NzeR2D0luBrw7Jw+axSiHSbAatYBjTdbUIiZETpmTFAIbtmSO+c
+g+IvJ1hmQx/aNGTJ2MpAaGBPfo2+5XsdMXXZ/mL5MHubIdteW/Rwbk5aPE576KOU
+JWVqZUAzY2bOGuY2d5DccaEZqr2gWxWQILMRTkdaBnBYQp9zwYQ=
+=48Nq
 -----END PGP SIGNATURE-----
 
---vA66WO2vHvL/CRSR--
+--so9zsI5B81VjUb/o--
