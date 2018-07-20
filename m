@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fgbsY-0000GN-Ub
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 16:19:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1fgcE8-0005cG-NL
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 16:42:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fgbsX-00012g-F2
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 16:19:54 -0400
-References: <20180706164542.9476-1-kwolf@redhat.com>
-	<be1b9d41-1eb3-c24c-c459-cc6d6599de22@redhat.com>
-	<20180709093214.GA3511@localhost.localdomain>
+	(envelope-from <eblake@redhat.com>) id 1fgcE7-0007sx-Po
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 16:42:12 -0400
+References: <20180704112302.471456-1-vsementsov@virtuozzo.com>
+	<20180704112302.471456-3-vsementsov@virtuozzo.com>
+	<894031cf-d826-1d20-21de-a8f7af4be5fc@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <ee9f7567-71d2-385d-137a-4c462b1adb07@redhat.com>
-Date: Fri, 20 Jul 2018 15:19:46 -0500
+Message-ID: <9f971ed8-e43c-28a5-e44e-6f7f3720afed@redhat.com>
+Date: Fri, 20 Jul 2018 15:42:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180709093214.GA3511@localhost.localdomain>
+In-Reply-To: <894031cf-d826-1d20-21de-a8f7af4be5fc@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block: Fix copy-on-read crash with partial
- final cluster
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] nbd/server: send more than one extent
+ of base:allocation context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
-On 07/09/2018 04:32 AM, Kevin Wolf wrote:
-> Am 06.07.2018 um 23:20 hat Eric Blake geschrieben:
->> On 07/06/2018 11:45 AM, Kevin Wolf wrote:
->>> If the virtual disk size isn't aligned to full clusters,
->>> bdrv_co_do_copy_on_readv() may get pnum == 0 before having the full
->>> cluster completed, which will let it run into an assertion failure:
->>>
->>> qemu-io: block/io.c:1203: bdrv_co_do_copy_on_readv: Assertion `skip_bytes < pnum' failed.
->>>
->>> Check for EOF, assert that we read at least as much as the read request
->>> originally wanted to have (which is true at EOF because otherwise
->>> bdrv_check_byte_request() would already have returned an error) and
->>> return success early even though we couldn't copy the full cluster.
->>>
-
->>> +echo
->>> +echo '=== Partial final cluster ==='
->>> +echo
->>> +
->>> +_make_test_img 1024
->>> +$QEMU_IO -f $IMGFMT -C -c 'read 0 1024' "$TEST_IMG" | _filter_qemu_io
+On 07/10/2018 09:33 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 04.07.2018 14:23, Vladimir Sementsov-Ogievskiy wrote:
+>> This is necessary for efficient block-status export, for clients which
+>> support it.
 >>
->> Here, $TEST_IMG has no backing file, and does not have the final
->> cluster allocated; all we have to do is properly read all zeroes.
-> 
-> And write them back, we test that it's allocated afterwards.
-> 
->> Is it worth also explicitly testing reading of allocated data under
->> COR
-> 
-> I could add a second read of the same area, which would not only test
-> reading of allocated data, but also test whether the allocating COR
-> wrote the correct data (all zeros).
-> 
-> Do you think that would be a worthwhile addition?
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
 
-It can't hurt (we've already proven that our iotests coverage is 
-incomplete, and anything we can do to enhance it improves chances of it 
-catching unintentional regressions).
+>> +static int blockstatus_to_extents(BlockDriverState *bs, uint64_t offs=
+et,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t *bytes, N=
+BDExtent *extents,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int *nb_e=
+xtents)
+>> =C2=A0 {
+>> -=C2=A0=C2=A0=C2=A0 uint64_t remaining_bytes =3D bytes;
+>> +=C2=A0=C2=A0=C2=A0 uint64_t remaining_bytes =3D *bytes;
+>> +=C2=A0=C2=A0=C2=A0 NBDExtent *extent =3D extents, *extents_end =3D ex=
+tents + *nb_extents;
+>> +=C2=A0=C2=A0=C2=A0 bool first_extent =3D true;
+>> +=C2=A0=C2=A0=C2=A0 assert(*nb_extents);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (remaining_bytes) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t flags;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t num;
+>> @@ -1860,21 +1871,40 @@ static int=20
+>> blockstatus_to_extent_be(BlockDriverState *bs, uint64_t offset,
+>=20
+> after bdrv_block_status_above, is there a guarantee that num > 0? Shoul=
+d=20
+> we add an assertion?
 
-> 
->> and/or the case of one image with another backing image (with
->> same or differing partial cluster sizes), where COR actually has to
->> write the partial cluster?  However, the logic in the code appears to
->> cover all of those, whether or not the testsuite does as well.
-> 
-> Having a backing file is a different code path for non-zero data, but I
-> think we already test normal write/write_zeroes extensively. For zero
-> data, it doesn't make a difference whether it comes from the backing
-> file or from not having a backing file (as far as the COR logic is
-> concerned, anyway).
-> 
-> I didn't want to use a backing file because the test is 'generic', but
-> it already uses qcow2 in other cases, so if we really think this is
-> important to have, I guess I can have another case with qcow2 over
-> $IMGFMT and non-zero data.
+bdrv_block_status_above() asserts that drivers set *pnum to non-zero on=20
+success (that is, a driver's .bdrv_co_block_status must make progress or=20
+fail); however, a caller can still get *pnum =3D=3D 0 on the corner case =
+of=20
+requesting status at or beyond the end-of-file boundary (where=20
+bdrv_block_status_above() does not call into a driver's=20
+.bdrv_co_block_status callback).  Since the NBD code already validated=20
+that the client's code does not exceed EOF, and the block layer=20
+guaranteed that an in-range request made progress on success, you should=20
+be fine with an assertion that num > 0.
 
-At this point, I'm not volunteering to write such test enhancements, and 
-I don't think it's a show-stopper if 3.0 uses the test as currently in git.
-
--- 
+--=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
