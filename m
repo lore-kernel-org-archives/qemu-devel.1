@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hejianet@gmail.com>) id 1fgK80-00074Y-3E
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 21:22:41 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fgKKX-0001Tm-MQ
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 21:35:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hejianet@gmail.com>) id 1fgK7w-0007l3-Vu
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 21:22:40 -0400
-References: <1531969910-32843-1-git-send-email-jia.he@hxt-semitech.com>
-	<CAFEAcA_2t5z1JBWM9o7ygcOwxnQRba0qA8vVjcoZpcGfP9XUtA@mail.gmail.com>
-From: Jia He <hejianet@gmail.com>
-Message-ID: <055381ef-7f32-1bb3-cae5-df6bfbe2888e@gmail.com>
-Date: Fri, 20 Jul 2018 09:22:33 +0800
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fgKKW-0005qk-KX
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 21:35:37 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1532006134-7701-1-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <487a731f-9519-aea7-d70d-a8316fdca407@amsat.org>
+Date: Thu, 19 Jul 2018 22:35:25 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_2t5z1JBWM9o7ygcOwxnQRba0qA8vVjcoZpcGfP9XUtA@mail.gmail.com>
+In-Reply-To: <1532006134-7701-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/intc/arm_gicv3_its: downgrade
- error_report to warn_report in kvm_arm_its_reset
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/spitz: Move problematic
+ nand_init() code to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Jia He <jia.he@hxt-semitech.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>
+Cc: qemu-arm@nongnu.org
 
-Hi Peter。 Thanks for the comments
-
-On 7/19/2018 8:41 PM, Peter Maydell Wrote:
-> On 19 July 2018 at 04:11, Jia He <hejianet@gmail.com> wrote:
->> In scripts/arch-run.bash of kvm-unit-tests, it will check the qemu
->> output log with:
->> if [ -z "$(echo "$errors" | grep -vi warning)" ]; then
->>
->> Thus without the warning prefix, all of the test fail.
->>
->> Since it is not unrecoverable error in kvm_arm_its_reset for
->> current implementation, downgrading the report from error to
->> warn makes sense.
+On 07/19/2018 10:15 AM, Thomas Huth wrote:
+> nand_init() does not only create the NAND device, it also realizes
+> the device with qdev_init_nofail() already. So we must not call
+> nand_init() from an instance_init function like sl_nand_init(),
+> otherwise we get superfluous NAND devices in the QOM tree after
+> introspecting the 'sl-nand' device. So move the nand_init() to the
+> realize function of 'sl-nand' instead.
 > 
-> I think the counterargument would be that this should report
-> an error, because you just asked the device to do something
-> that it doesn't support (ie to do a clean reset). Since the
-> device isn't going to behave correctly, the tests should fail,
-> and the way to make them pass is to upgrade to a kernel that
-> implements the device correctly (by implementing the necessary
-> feature).
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  hw/arm/spitz.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
 > 
-> But we could maybe move to warn_report() here -- I'm not
-> sure what our rules are for what counts as an error and
-> what counts as a warning.
-I reviewed the other error_report in qemu. Some of them are followed
-by exit(), but the rest are not. So it seems there is no definite
-rules for error_report.
-
-IMO, the best resolution is to change the output grep search criteria.
-But it is difficult for kvm-unit-tests to identify whether it is an
-error without exit() or a warning. The fastest resolution is moving
-error_report to warn_report.
-
--- 
-Cheers,
-Jia
+> diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
+> index 3cc27a1..c4bc3de 100644
+> --- a/hw/arm/spitz.c
+> +++ b/hw/arm/spitz.c
+> @@ -169,16 +169,22 @@ static void sl_nand_init(Object *obj)
+>  {
+>      SLNANDState *s = SL_NAND(obj);
+>      SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+> -    DriveInfo *nand;
+>  
+>      s->ctl = 0;
+> +
+> +    memory_region_init_io(&s->iomem, obj, &sl_ops, s, "sl", 0x40);
+> +    sysbus_init_mmio(dev, &s->iomem);
+> +}
+> +
+> +static void sl_nand_realize(DeviceState *dev, Error **errp)
+> +{
+> +    SLNANDState *s = SL_NAND(dev);
+> +    DriveInfo *nand;
+> +
+>      /* FIXME use a qdev drive property instead of drive_get() */
+>      nand = drive_get(IF_MTD, 0, 0);
+>      s->nand = nand_init(nand ? blk_by_legacy_dinfo(nand) : NULL,
+>                          s->manf_id, s->chip_id);
+> -
+> -    memory_region_init_io(&s->iomem, obj, &sl_ops, s, "sl", 0x40);
+> -    sysbus_init_mmio(dev, &s->iomem);
+>  }
+>  
+>  /* Spitz Keyboard */
+> @@ -1079,6 +1085,7 @@ static void sl_nand_class_init(ObjectClass *klass, void *data)
+>  
+>      dc->vmsd = &vmstate_sl_nand_info;
+>      dc->props = sl_nand_properties;
+> +    dc->realize = sl_nand_realize;
+>      /* Reason: init() method uses drive_get() */
+>      dc->user_creatable = false;
+>  }
+> 
