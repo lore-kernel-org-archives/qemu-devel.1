@@ -1,31 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fgWPT-0002G6-8z
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 10:29:32 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fgWq3-0000SV-A7
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 10:57:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fgWPQ-0002UH-2W
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 10:29:31 -0400
-Received: from mail-bl2nam02on0103.outbound.protection.outlook.com
-	([104.47.38.103]:48544
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fgWPP-0002U4-Pu
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 10:29:27 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 20 Jul 2018 14:29:24 +0000
-Message-ID: <BN7PR08MB48685307079BF03735F5091AC6510@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1532004727-13778-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1532004727-13778-12-git-send-email-stefan.markovic@rt-rk.com>,
-	<8541a994-5ab2-49da-cbe8-a92a53075d7c@linaro.org>,
-	<BN7PR08MB4868DB73F3F048397F8C6312C6520@BN7PR08MB4868.namprd08.prod.outlook.com>
-In-Reply-To: <BN7PR08MB4868DB73F3F048397F8C6312C6520@BN7PR08MB4868.namprd08.prod.outlook.com>
-Content-Language: en-US
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 11/11] linux-user: Add availability
- control to some syscalls
+	(envelope-from <pm215@archaic.org.uk>) id 1fgWq2-00060Y-Fl
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 10:56:59 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Jul 2018 15:56:43 +0100
+Message-Id: <20180720145647.8810-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/4] target/arm: Implement tailchaining for M
+ profile cores
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,17 +18,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-> > From: Aleksandar Rikalo <arikalo@wavecomp.com>
-> >
-> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-> > ---
-> >  linux-user/strace.c  | 14 +++++++++++++-
-> >  linux-user/syscall.c | 25 +++++++++++++++++++++++++
-> >  2 files changed, 38 insertions(+), 1 deletion(-)
+Tailchaining is an optimization in handling of exception return
+for M-profile cores: if we are about to pop the exception stack
+for an exception return, but there is a pending exception which
+is higher priority than the priority we are returning to, then
+instead of unstacking and then immediately taking the exception
+and stacking registers again, we can chain to the pending
+exception without unstacking and stacking.
 
-If this patch gets a proper commit message (as described in my response):
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+For v6M and v7M it is IMPDEF whether tailchaining happens for pending
+exceptions; for v8M this is architecturally required.  Implement it
+in QEMU for all M-profile cores, since in practice v6M and v7M
+hardware implementations generally do have it.
+
+(We were already doing tailchaining for derived exceptions which
+happened during exception return, like the validity checks and
+stack access failures; these have always been required to be
+tailchained for all versions of the architecture.)
+
+The first few patches here do some minor cleanup and bug fixing
+that I noticed while working on this; patch 4 is the actual
+implementation, which turns out to be pretty trivial.
+
+thanks
+-- PMM
+
+Peter Maydell (4):
+  target/arm: Improve exception-taken logging
+  target/arm: Initialize exc_secure correctly in do_v7m_exception_exit()
+  target/arm: Restore M-profile CONTROL.SPSEL before any tailchaining
+  target/arm: Implement tailchaining for M profile cores
+
+ target/arm/helper.c | 47 ++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 36 insertions(+), 11 deletions(-)
+
+-- 
+2.17.1
