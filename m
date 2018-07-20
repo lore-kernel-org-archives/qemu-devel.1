@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fgYQM-0004J6-PH
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:38:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1fgYRs-00053P-S6
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:40:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fgYQI-00027b-Ex
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:38:34 -0400
-Resent-Message-Id: <E1fgYQI-00027b-Ex@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fgYQI-000278-3u
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:38:30 -0400
-In-Reply-To: <20180720083644.1431-1-tiwei.bie@intel.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153207674952.156.14125031656226934615@b489c0e6f1ca>
+	(envelope-from <eblake@redhat.com>) id 1fgYRo-0002kD-Fq
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:40:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37002 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fgYRo-0002k9-A9
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:40:04 -0400
+References: <1532012617-16777-1-git-send-email-walling@linux.ibm.com>
+	<87sh4f191h.fsf@dusky.pond.sub.org>
+	<2dca7714-195f-1532-a907-4e43bfd9355e@linux.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e1051e1f-f3c8-d43d-feb7-10cc27b8edc0@redhat.com>
+Date: Fri, 20 Jul 2018 11:40:02 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 20 Jul 2018 01:52:30 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] vhost: check region type before casting
+In-Reply-To: <2dca7714-195f-1532-a907-4e43bfd9355e@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] monitor: print message when using 'help'
+ with an unknown command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tiwei.bie@intel.com
-Cc: famz@redhat.com, mst@redhat.com, jasowang@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Collin Walling <walling@linux.ibm.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, David Alan Gilbert <dgilbert@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQ
-bGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJ
-ZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBp
-dApsb2NhbGx5LgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTgwNzIwMDgzNjQ0LjE0MzEt
-MS10aXdlaS5iaWVAaW50ZWwuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHZob3N0
-OiBjaGVjayByZWdpb24gdHlwZSBiZWZvcmUgY2FzdGluZwoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
-ID09PQojIS9iaW4vYmFzaApzZXQgLWUKZ2l0IHN1Ym1vZHVsZSB1cGRhdGUgLS1pbml0IGR0Ywoj
-IExldCBkb2NrZXIgdGVzdHMgZHVtcCBlbnZpcm9ubWVudCBpbmZvCmV4cG9ydCBTSE9XX0VOVj0x
-CmV4cG9ydCBKPTgKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9yYQo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NApmYXRhbDogdW5hYmxlIHRvIGFjY2VzcyAnaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
-ZXctcHJvamVjdC9xZW11Lyc6IEVuY291bnRlcmVkIGVuZCBvZiBmaWxlCmVycm9yOiBDb3VsZCBu
-b3QgZmV0Y2ggM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApUcmFjZWJh
-Y2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiL3Vzci9iaW4vcGF0Y2hldyIsIGxp
-bmUgNDQyLCBpbiB0ZXN0X29uZQogICAgZ2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8iXSwg
-clsiaGVhZCJdLCBsb2dmKQogIEZpbGUgIi91c3IvYmluL3BhdGNoZXciLCBsaW5lIDQ4LCBpbiBn
-aXRfY2xvbmVfcmVwbwogICAgc3Rkb3V0PWxvZ2YsIHN0ZGVycj1sb2dmKQogIEZpbGUgIi91c3Iv
-bGliNjQvcHl0aG9uMy42L3N1YnByb2Nlc3MucHkiLCBsaW5lIDI5MSwgaW4gY2hlY2tfY2FsbAog
-ICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxs
-ZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snZ2l0JywgJ3JlbW90ZScsICdhZGQnLCAnLWYnLCAn
-LS1taXJyb3I9ZmV0Y2gnLCAnM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NCcsICdodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUnXScgcmV0dXJuZWQg
-bm9uLXplcm8gZXhpdCBzdGF0dXMgMS4KCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 07/19/2018 11:39 AM, Collin Walling wrote:
+> On 07/19/2018 12:31 PM, Markus Armbruster wrote:
+>> You neglected to cc: maintainers.  Cc'ing them increases the odds your
+>> patch will be noticed and picked up.  You can use
+>> scripts/get_maintainer.pl to find maintainers.  You don't have to do
+>> anything for this patch; it got noticed anyway.
+>>
+>> David, this is yours :)
+> 
+> Very true. Was a minor fix that I thought I'd just toss it out there and
+> let anyone view it if they had the time. Will be more aware of who to CC
+> next time around.
+
+Or automate it: 
+https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintainer 
+suggests:
+
+git config sendemail.cccmd 'scripts/get_maintainer.pl --nogit-fallback'
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
