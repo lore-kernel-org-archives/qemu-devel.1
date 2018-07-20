@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andre.przywara@arm.com>) id 1fgXVf-0007PY-H2
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:40:00 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andre.przywara@arm.com>) id 1fgXVe-0008KV-Gi
+	(envelope-from <andre.przywara@arm.com>) id 1fgXVd-0007PV-80
 	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:39:59 -0400
-Received: from foss.arm.com ([217.140.101.70]:46176)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <andre.przywara@arm.com>) id 1fgXVa-0008Ew-4W
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:39:57 -0400
+Received: from foss.arm.com ([217.140.101.70]:46142)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andre.przywara@arm.com>) id 1fgXVe-0008JP-Ap
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:39:58 -0400
+	(envelope-from <andre.przywara@arm.com>) id 1fgXVZ-0008Ct-Ud
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:39:54 -0400
 From: Andre Przywara <andre.przywara@arm.com>
-Date: Fri, 20 Jul 2018 16:39:41 +0100
-Message-Id: <20180720153942.26821-4-andre.przywara@arm.com>
-In-Reply-To: <20180720153942.26821-1-andre.przywara@arm.com>
-References: <20180720153942.26821-1-andre.przywara@arm.com>
-Subject: [Qemu-devel] [kvm-unit-tests PATCH v2 3/4] arm/arm64: GICv2: add
- GICD_IPRIORITYR testing
+Date: Fri, 20 Jul 2018 16:39:38 +0100
+Message-Id: <20180720153942.26821-1-andre.przywara@arm.com>
+Subject: [Qemu-devel] [kvm-unit-tests PATCH v2 0/4] arm: add GICv2 MMIO tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,113 +24,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Andrew Jones <drjones@redhat.com>
 Cc: Eric Auger <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 
-Some tests for the IPRIORITY registers. The significant number of bits
-is IMPLEMENTATION DEFINED, but should be the same for every IRQ.
-Also these registers must be byte-accessible.
-Check that accesses beyond the implemented IRQ limit are actually
-read-as-zero/write-ignore.
+I found this in one my branches: this is an updated version of what I sent
+end of 2016 [1]. I tried to address all comments that Drew and Eric had at
+the time.
+Please have a look whether this makes sense.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm/gic.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+Changelog v1..v2:
+- made many functions void
+- use symbolic name for first SPI being number 32
+- add test runs with one and three vCPUs
+- use gic_version() directly
+- factor out test_byte_access()
+- drop redundant "filling priorities" test
+- dropped GICv3 test
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 23cb9a4..57a2995 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -354,6 +354,83 @@ static void test_typer_v2(uint32_t reg)
- 	       nr_gic_cpus);
- }
- 
-+#define BYTE(reg32, byte) (((reg32) >> ((byte) * 8)) & 0xff)
-+#define REPLACE_BYTE(reg32, byte, new) (((reg32) & ~(0xff << ((byte) * 8))) |\
-+					((new) << ((byte) * 8)))
-+
-+/*
-+ * Some registers are byte accessible, do a byte-wide read and write of known
-+ * content to check for this.
-+ * Apply a @mask to cater for special register properties.
-+ * @pattern contains the value already in the register.
-+ */
-+static void test_byte_access(void *base_addr, u32 pattern, u32 mask)
-+{
-+	u32 reg = readb(base_addr + 1);
-+
-+	report("byte reads successful (0x%08x => 0x%02x)",
-+	       reg == (BYTE(pattern, 1) & (mask >> 8)),
-+	       pattern & mask, reg);
-+
-+	pattern = REPLACE_BYTE(pattern, 2, 0x1f);
-+	writeb(BYTE(pattern, 2), base_addr + 2);
-+	reg = readl(base_addr);
-+	report("byte writes successful (0x%02x => 0x%08x)",
-+	       reg == (pattern & mask), BYTE(pattern, 2), reg);
-+}
-+
-+static void test_priorities(int nr_irqs, void *priptr)
-+{
-+	u32 orig_prio, reg, pri_bits;
-+	u32 pri_mask, pattern;
-+	void *first_spi = priptr + GIC_FIRST_SPI;
-+
-+	orig_prio = readl(first_spi);
-+	report_prefix_push("IPRIORITYR");
-+
-+	/*
-+	 * Determine implemented number of priority bits by writing all 1's
-+	 * and checking the number of cleared bits in the value read back.
-+	 */
-+	writel(0xffffffff, first_spi);
-+	pri_mask = readl(first_spi);
-+
-+	reg = ~pri_mask;
-+	report("consistent priority masking (0x%08x)",
-+	       (((reg >> 16) == (reg & 0xffff)) &&
-+	        ((reg & 0xff) == ((reg >> 8) & 0xff))), pri_mask);
-+
-+	reg = reg & 0xff;
-+	for (pri_bits = 8; reg & 1; reg >>= 1, pri_bits--)
-+		;
-+	report("implements at least 4 priority bits (%d)",
-+	       pri_bits >= 4, pri_bits);
-+
-+	pattern = 0;
-+	writel(pattern, first_spi);
-+	report("clearing priorities", readl(first_spi) == pattern);
-+
-+	/* setting all priorities to their max valus was tested above */
-+
-+	report("accesses beyond limit RAZ/WI",
-+	       test_readonly_32(priptr + nr_irqs, true));
-+
-+	writel(pattern, priptr + nr_irqs - 4);
-+	report("accessing last SPIs",
-+	       readl(priptr + nr_irqs - 4) == (pattern & pri_mask));
-+
-+	pattern = 0xff7fbf3f;
-+	writel(pattern, first_spi);
-+	report("priorities are preserved",
-+	       readl(first_spi) == (pattern & pri_mask));
-+
-+	/* The PRIORITY registers are byte accessible. */
-+	test_byte_access(first_spi, pattern, pri_mask);
-+
-+	report_prefix_pop();
-+	writel(orig_prio, first_spi);
-+}
-+
- static void gic_test_mmio(void)
- {
- 	u32 reg;
-@@ -388,6 +465,8 @@ static void gic_test_mmio(void)
- 	report("ICPIDR2 is read-only (0x%08x)",
- 	       test_readonly_32(idreg, false),
- 	       reg);
-+
-+	test_priorities(nr_irqs, gic_dist_base + GICD_IPRIORITYR);
- }
- 
- int main(int argc, char **argv)
+[1] https://lists.cs.columbia.edu/pipermail/kvmarm/2016-November/022352.html
+
+Original cover letter:
+======================
+The GIC spec mandates certain constraints on how to acccess the MMIO
+mapped registers, both in terms of which registers are available and also
+in terms of which bits within a register should be masked, for instance.
+Since we went through some lengths in the KVM emulation to implement this,
+it's about time to give this actually a test beyond what the kernel as a
+GIC user actually implements - for instance we ignore priorities in Linux.
+
+This series tries to attack some constraints, on a low-hanging-fruit base.
+It focusses on some generic registers and the PRIORITY and TARGETS registers
+of GICv2. GICv3 is not covered yet.
+
+This actually revealed genuine bugs in the KVM emulation in the past. KVM
+passes these tests now, but QEMU fails some UP and 3-way-SMP tests.
+
+Cheers,
+Andre.
+
+Andre Przywara (4):
+  mark exit() and abort() as non-returning functions
+  arm/arm64: GIC: basic GICv2 MMIO tests
+  arm/arm64: GICv2: add GICD_IPRIORITYR testing
+  arm/arm64: GICv2: add GICD_ITARGETSR testing
+
+ arm/gic.c         | 213 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg |  18 +++++
+ lib/arm/asm/gic.h |   5 ++
+ lib/arm/io.c      |   1 +
+ lib/libcflat.h    |   7 +-
+ lib/powerpc/io.c  |   1 +
+ lib/x86/io.c      |   1 +
+ 7 files changed, 243 insertions(+), 3 deletions(-)
+
 -- 
 2.14.4
