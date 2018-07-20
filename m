@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgSKz-0000TE-0g
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 06:08:38 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fgSk4-0005oe-DX
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 06:34:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgSKy-0000nP-1G
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 06:08:36 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:45231)
+	(envelope-from <pbonzini@redhat.com>) id 1fgSjz-00034U-Ee
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 06:34:32 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39825)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fgSKx-0000nJ-R1
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 06:08:35 -0400
-Received: by mail-oi0-x233.google.com with SMTP id q11-v6so20340372oic.12
-	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 03:08:35 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fgSjz-00034L-6z
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 06:34:27 -0400
+Received: by mail-wr1-f68.google.com with SMTP id h10-v6so10835097wre.6
+	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 03:34:27 -0700 (PDT)
+References: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
+	<20180718154200.26777-8-dplotnikov@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f24de8e1-b0fd-1640-a145-7929616418ea@redhat.com>
+Date: Fri, 20 Jul 2018 12:34:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <1532047529-17961-1-git-send-email-jasowang@redhat.com>
-References: <1532047529-17961-1-git-send-email-jasowang@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jul 2018 11:08:14 +0100
-Message-ID: <CAFEAcA8=Pd4SKgOJYa4nQVGgUsPsqSMYPHKDh4y=k6aixArN9w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] Net patches
+In-Reply-To: <20180718154200.26777-8-dplotnikov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 07/17] background snapshot: introduce
+ page buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, dgilbert@redhat.com, quintela@redhat.com
+Cc: qemu-devel@nongnu.org
 
-On 20 July 2018 at 01:45, Jason Wang <jasowang@redhat.com> wrote:
-> The following changes since commit 9f2b67e1ca43c84ed37ebd027e7e77a0f2f8ef65:
->
->   Merge remote-tracking branch 'remotes/alistair/tags/pull-riscv-pull-20180719' into staging (2018-07-19 17:21:43 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/jasowang/qemu.git tags/net-pull-request
->
-> for you to fetch changes up to 323e7c117754e4d4ce6b4282d74ad01c99d67714:
->
->   tap: fix memory leak on success to create a tap device (2018-07-20 08:30:49 +0800)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
-Applied, thanks.
+On 18/07/2018 17:41, Denis Plotnikov wrote:
+> +static void ram_page_buffer_decrease_used(void)
+> +{
+> +    qemu_event_reset(&ram_state->page_buffer.used_decreased);
+> +    atomic_dec(&ram_state->page_buffer.used);
+> +    qemu_event_set(&ram_state->page_buffer.used_decreased);
 
--- PMM
+As Peter noted, only the qemu_event_set is needed here, while...
+
+> +}
+> +
+> +static void ram_page_buffer_increase_used_wait(void)
+> +{
+> +    int used, *used_ptr;
+> +    RAMState *rs = ram_state;
+> +    used_ptr = &rs->page_buffer.used;
+> +    do {
+> +        used = atomic_read(used_ptr);
+> +        if (rs->page_buffer.capacity > used) {
+> +            if (atomic_cmpxchg(used_ptr, used, used + 1) == used) {
+> +                return;
+> +            } else {
+> +                continue;
+> +            }
+> +        } else {
+> +            qemu_event_wait(&rs->page_buffer.used_decreased);
+> +        }
+> +    } while (true);
+
+... the right idiom for using qemu_event_wait is this:
+
+   if test condition
+       reset
+       if test condition
+           wait
+
+So something like
+
+    for(;;) {
+        used = atomic_read(used_ptr);
+        if (rs->page_buffer.capacity <= used) {
+            qemu_event_reset(&rs->page_buffer.used_decreased);
+            used = atomic_read(used_ptr);
+            if (rs->page_buffer.capacity <= used) {
+                qemu_event_wait(&rs->page_buffer.used_decreased);
+                continue;
+            }
+        }
+
+        if (atomic_cmpxchg(used_ptr, used, used + 1) == used) {
+            return;
+        }
+    }
+
+Note that there must be a single thread doing the above.  Otherwise, you
+have to use mutex and condvar.
+
+Paolo
