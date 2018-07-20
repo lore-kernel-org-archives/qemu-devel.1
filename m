@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andre.przywara@arm.com>) id 1fgXVh-0007Qs-Af
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:40:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fgXYK-00014b-9M
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:42:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andre.przywara@arm.com>) id 1fgXVg-0008Nk-EY
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:40:01 -0400
-Received: from foss.arm.com ([217.140.101.70]:46194)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andre.przywara@arm.com>) id 1fgXVg-0008Mf-8Y
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:40:00 -0400
-From: Andre Przywara <andre.przywara@arm.com>
-Date: Fri, 20 Jul 2018 16:39:42 +0100
-Message-Id: <20180720153942.26821-5-andre.przywara@arm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fgXYJ-0001GC-CJ
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:42:44 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:46202)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fgXYJ-0001Fw-5n
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:42:43 -0400
+Received: by mail-oi0-x242.google.com with SMTP id y207-v6so22093555oie.13
+	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 08:42:43 -0700 (PDT)
+MIME-Version: 1.0
 In-Reply-To: <20180720153942.26821-1-andre.przywara@arm.com>
 References: <20180720153942.26821-1-andre.przywara@arm.com>
-Subject: [Qemu-devel] [kvm-unit-tests PATCH v2 4/4] arm/arm64: GICv2: add
- GICD_ITARGETSR testing
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Jul 2018 16:42:22 +0100
+Message-ID: <CAFEAcA--Uux1tTVDgR3tGZCXjQPNF4mgSnhC720Ez0AuWUQw3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v2 0/4] arm: add GICv2 MMIO
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Andrew Jones <drjones@redhat.com>, Eric Auger <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, kvm-devel <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, Luc Michel <luc.michel@greensocs.com>
 
-Some tests for the ITARGETS registers.
-Bits corresponding to non-existent CPUs must be RAZ/WI.
-These registers must be byte-accessible, also check that accesses beyond
-the implemented IRQ limit are actually read-as-zero/write-ignore.
+On 20 July 2018 at 16:39, Andre Przywara <andre.przywara@arm.com> wrote:
+> I found this in one my branches: this is an updated version of what I sent
+> end of 2016 [1]. I tried to address all comments that Drew and Eric had at
+> the time.
+> Please have a look whether this makes sense.
+>
+> Changelog v1..v2:
+> - made many functions void
+> - use symbolic name for first SPI being number 32
+> - add test runs with one and three vCPUs
+> - use gic_version() directly
+> - factor out test_byte_access()
+> - drop redundant "filling priorities" test
+> - dropped GICv3 test
+>
+> [1] https://lists.cs.columbia.edu/pipermail/kvmarm/2016-November/022352.html
+>
+> Original cover letter:
+> ======================
+> The GIC spec mandates certain constraints on how to acccess the MMIO
+> mapped registers, both in terms of which registers are available and also
+> in terms of which bits within a register should be masked, for instance.
+> Since we went through some lengths in the KVM emulation to implement this,
+> it's about time to give this actually a test beyond what the kernel as a
+> GIC user actually implements - for instance we ignore priorities in Linux.
+>
+> This series tries to attack some constraints, on a low-hanging-fruit base.
+> It focusses on some generic registers and the PRIORITY and TARGETS registers
+> of GICv2. GICv3 is not covered yet.
+>
+> This actually revealed genuine bugs in the KVM emulation in the past. KVM
+> passes these tests now, but QEMU fails some UP and 3-way-SMP tests.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm/gic.c         | 43 +++++++++++++++++++++++++++++++++++++++++++
- lib/arm/asm/gic.h |  1 +
- 2 files changed, 44 insertions(+)
+Would be interesting to see if we've fixed some of the QEMU emulation
+bugs, either already in master or in Luc's on-list patchset that adds
+support for emulation of the GICv2 virt extensions...
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 57a2995..ed5642e 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -431,6 +431,46 @@ static void test_priorities(int nr_irqs, void *priptr)
- 	writel(orig_prio, first_spi);
- }
- 
-+/* GICD_ITARGETSR is only used by GICv2. */
-+static void test_targets(int nr_irqs)
-+{
-+	void *targetsptr = gicv2_dist_base() + GICD_ITARGETSR;
-+	u32 orig_targets;
-+	u32 cpu_mask;
-+	u32 pattern, reg;
-+
-+	orig_targets = readl(targetsptr + GIC_FIRST_SPI);
-+	report_prefix_push("ITARGETSR");
-+
-+	cpu_mask = (1 << nr_cpus) - 1;
-+	cpu_mask |= cpu_mask << 8;
-+	cpu_mask |= cpu_mask << 16;
-+
-+	/* Check that bits for non implemented CPUs are RAZ/WI. */
-+	if (nr_cpus < 8) {
-+		writel(0xffffffff, targetsptr + GIC_FIRST_SPI);
-+		report("bits for %d non-existent CPUs masked",
-+		       !(readl(targetsptr + GIC_FIRST_SPI) & ~cpu_mask),
-+		       8 - nr_cpus);
-+	} else {
-+		report_skip("CPU masking (all CPUs implemented)");
-+	}
-+
-+	report("accesses beyond limit RAZ/WI",
-+	       test_readonly_32(targetsptr + nr_irqs, true));
-+
-+	pattern = 0x0103020f;
-+	writel(pattern, targetsptr + GIC_FIRST_SPI);
-+	reg = readl(targetsptr + GIC_FIRST_SPI);
-+	report("register content preserved (%08x => %08x)",
-+	       reg == (pattern & cpu_mask), pattern & cpu_mask, reg);
-+
-+	/* The TARGETS registers are byte accessible. */
-+	test_byte_access(targetsptr + GIC_FIRST_SPI, pattern, cpu_mask);
-+
-+	writel(orig_targets, targetsptr + GIC_FIRST_SPI);
-+}
-+
- static void gic_test_mmio(void)
- {
- 	u32 reg;
-@@ -467,6 +507,9 @@ static void gic_test_mmio(void)
- 	       reg);
- 
- 	test_priorities(nr_irqs, gic_dist_base + GICD_IPRIORITYR);
-+
-+	if (gic_version() == 2)
-+		test_targets(nr_irqs);
- }
- 
- int main(int argc, char **argv)
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index a469645..f6dfb90 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -20,6 +20,7 @@
- #define GICD_ISACTIVER			0x0300
- #define GICD_ICACTIVER			0x0380
- #define GICD_IPRIORITYR			0x0400
-+#define GICD_ITARGETSR			0x0800
- #define GICD_SGIR			0x0f00
- #define GICD_ICPIDR2			0x0fe8
- 
--- 
-2.14.4
+thanks
+-- PMM
