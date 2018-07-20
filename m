@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fgQwd-0001qr-TU
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 04:39:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1fgR6N-0005KG-7A
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 04:49:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fgQwc-0007My-Ex
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 04:39:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51042 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fgR6K-00020J-0P
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 04:49:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57960 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fgQwc-0007Mr-8f
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 04:39:22 -0400
-Date: Fri, 20 Jul 2018 16:39:16 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180720083915.GS4071@xz-mi>
-References: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
-	<20180718154200.26777-11-dplotnikov@virtuozzo.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fgR6J-000209-Pm
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 04:49:23 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1F06326A98
+	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 08:49:23 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180719184111.5129-1-marcandre.lureau@redhat.com>
+	<20180719184111.5129-11-marcandre.lureau@redhat.com>
+Date: Fri, 20 Jul 2018 10:49:21 +0200
+In-Reply-To: <20180719184111.5129-11-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Thu, 19 Jul 2018 20:41:03 +0200")
+Message-ID: <87fu0es35a.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180718154200.26777-11-dplotnikov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v1 10/17] background snapshots: adapt the
- page queueing code for using page copies
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 10/18] qjson: report an error if there
+ are multiple results
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,230 +36,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Jul 18, 2018 at 06:41:53PM +0300, Denis Plotnikov wrote:
-> The background snapshot uses memeory page copying to seal the page
-> memory content. The patch adapts the migration infrastructure to save
-> copies of the pages.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Again, since previous page only defined some fields that are firstly
-used in this patch, I think you can squash that into this one.
+> qobject_from_jsonv() returns a single object. Let's make sure that
+> during parsing we don't leak an intermediary object. Instead of
+> returning the last object, set a parsing error.
+>
+> Also, the lexer/parser keeps consuming all the data. There might be an
+> error set earlier. Let's keep it and not call json_parser_parse() with
+> the remaining data. Eventually, we may teach the message parser to
+> stop consuming the data.
 
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Took me a while to figure out what you mean :)
+
+qobject_from_jsonv() feeds a complete string to the JSON parser, with
+json_message_parser_feed().  This actually feeds one character after the
+other to the lexer, via json_lexer_feed_char().
+
+Whenever a character completes a token, the lexer feeds that token to
+the streamer via a callback that is always json_message_process_token().
+
+The attentive reader may wonder what it does with trailing characters
+that aren't a complete token.  More on that below.
+
+The streamer accumulates tokens, counting various parenthesis.  When all
+counts are zero or any is negative, the group is complete, and is fed to
+the parser via another callback.  That callback is parse_json() here.
+There are more elsewhere.
+
+The attentive reader may wonder what it does with trailing tokens that
+aren't a complete group.  More on that below.
+
+The callbacks all pass the tokens to json_parser_parse() to do the
+actual parsing.  Returns the abstract syntax tree as QObject on success.
+
+Note that the callback can be called any number of times.
+
+In my opinion, this is over-engineered and under-thought.  There's more
+flexibility than we're using, and the associated complexity breeds bugs.
+
+In particular, parse_json() is wrong:
+
+    s->result =3D json_parser_parse(tokens, s->ap, &s->err);
+
+If the previous call succeeded, we leak its result.  This is the leak
+you mentioned.
+
+If any previous call set an error, we pass &s->err pointing to non-null,
+which is forbidden.  If json_parser_parse() passed it to error_setg(),
+this would crash.  Since it passes it only to error_propagate(), all
+errors but the first one are ignored.  Latent crash bug.
+
+If the last call succeeds and any previous call failed, the function
+simultaneously succeeds and fails: we return both a result and set an
+error.
+
+Let's demonstrate these bugs before we fix them, by inserting the
+appended patch before this one.
+
+Are the other callbacks similarly buggy?  Turns out they're okay:
+
+* handle_qmp_command() consumes result and error on each call.
+
+* process_event() does, too.
+
+* qmp_response() treats errors as fatal, and asserts "no previous
+  response".
+
+On trailing tokens that don't form a group: they get silently ignored,
+as demonstrated by check-qjson test cases unterminated_array(),
+unterminated_array_comma(), unterminated_dict(),
+unterminated_dict_comma(), all marked BUG.
+
+On trailing characters that don't form a token: they get silently
+ignored, as demonstrated by check-qjson test cases
+unterminated_string(), unterminated_sq_string(), unterminated_escape(),
+all marked BUG, except when they aren't, as in test case
+unterminated_literal().
+
+The BUG marks are all gone at the end of this series.  I guess you're
+fixing all that :)
+
+Note that these "trailing characters / tokens are silently ignored" bugs
+*do* affect the other callbacks.  Reproducer for handle_qmp_command():
+
+    $ echo -e '{ "execute": "qmp_capabilities" }\n{ "execute": "query-name"=
+ }\n"unterminated' | socat UNIX:test-qmp STDIO
+    {"QMP": {"version": {"qemu": {"micro": 90, "minor": 12, "major": 2}, "p=
+ackage": "v3.0.0-rc1-20-g6a024cd461"}, "capabilities": ["oob"]}}
+    {"return": {}}
+    {"return": {}}
+
+Note there's no error reported for the last line.
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  migration/migration.c |  2 +-
->  migration/ram.c       | 59 ++++++++++++++++++++++++++++++++-----------
->  migration/ram.h       |  3 ++-
->  3 files changed, 47 insertions(+), 17 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 87096d23ef..131d0904e4 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1716,7 +1716,7 @@ static void migrate_handle_rp_req_pages(MigrationState *ms, const char* rbname,
->          return;
->      }
->  
-> -    if (ram_save_queue_pages(rbname, start, len)) {
-> +    if (ram_save_queue_pages(NULL, rbname, start, len, NULL)) {
->          mark_source_rp_bad(ms);
->      }
->  }
-> diff --git a/migration/ram.c b/migration/ram.c
-> index dc7dfe0726..3c4ccd85b4 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -976,7 +976,12 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
->      RAMBlock *block = pss->block;
->      ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
->  
-> -    p = block->host + offset;
-> +    if (pss->page_copy) {
-> +        p = pss->page_copy;
+>  qobject/qjson.c     | 16 +++++++++++++++-
+>  tests/check-qjson.c | 11 +++++++++++
+>  2 files changed, 26 insertions(+), 1 deletion(-)
+>
+> diff --git a/qobject/qjson.c b/qobject/qjson.c
+> index ee04e61096..8a9d116150 100644
+> --- a/qobject/qjson.c
+> +++ b/qobject/qjson.c
+> @@ -22,6 +22,7 @@
+>  #include "qapi/qmp/qlist.h"
+>  #include "qapi/qmp/qnum.h"
+>  #include "qapi/qmp/qstring.h"
+> +#include "qapi/qmp/qerror.h"
+>  #include "qemu/unicode.h"
+>=20=20
+>  typedef struct JSONParsingState
+> @@ -36,7 +37,20 @@ static void parse_json(JSONMessageParser *parser, GQue=
+ue *tokens)
+>  {
+>      JSONParsingState *s =3D container_of(parser, JSONParsingState, parse=
+r);
+>=20=20
+> -    s->result =3D json_parser_parse(tokens, s->ap, &s->err);
+> +    if (s->result || s->err) {
+> +        if (s->result) {
+> +            qobject_unref(s->result);
+> +            s->result =3D NULL;
+> +            if (!s->err) {
+
+Conditional is necessary because a previous call to json_parser_parse()
+could have set s->err already.  Without it, error_setg() would fail the
+assertion in error_setv() then.  Subtle.
+
+> +                error_setg(&s->err, QERR_JSON_PARSING);
+
+Hmm.  Is this really "Invalid JSON syntax"?  In a way, it is, because
+RFC 7159 defines JSON-text as a single value.  Still, a friendlier error
+message like "Expecting at most one JSON value" woun't hurt.
+
+What if !tokens?  That shouldn't be an error.
+
+> +            }
+> +        }
+> +        if (tokens) {
+> +            g_queue_free_full(tokens, g_free);
+
+g_queue_free_full(NULL, ...) doesn't work?!?  That would be lame.
+
+> +        }
 > +    } else {
-> +        p = block->host + offset;
+> +        s->result =3D json_parser_parse(tokens, s->ap, &s->err);
 > +    }
+>  }
+
+What about this:
+
+       JSONParsingState *s =3D container_of(parser, JSONParsingState, parse=
+r);
+       Error *err =3D NULL;
+
+       if (!tokens) {
+           return;
+       }
+       if (s->result || s->err) {
+           if (s->result) {
+               qobject_unref(s->result);
+               s->result =3D NULL;
+               error_setg(&err, "Expecting at most one JSON value");
+           }
+           g_queue_free_full(tokens, g_free);
+       } else {
+           s->result =3D json_parser_parse(tokens, s->ap, &err);
+       }
+       error_propagate(&s->err, err);
+       assert(!s->result !=3D !s->err);
+
+>=20=20
+>  QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **err=
+p)
+> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+> index da582df3e9..7d3547e0cc 100644
+> --- a/tests/check-qjson.c
+> +++ b/tests/check-qjson.c
+> @@ -1417,6 +1417,16 @@ static void limits_nesting(void)
+>      g_assert(obj =3D=3D NULL);
+>  }
+>=20=20
+> +static void multiple_objects(void)
+> +{
+> +    Error *err =3D NULL;
+> +    QObject *obj;
 > +
->      trace_ram_save_page(block->idstr, (uint64_t)offset, p);
->  
->      /* In doubt sent page as normal */
-> @@ -1003,13 +1008,18 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
->      } else {
->          pages = save_zero_page(rs, block, offset, p);
->          if (pages > 0) {
-> -            /* Must let xbzrle know, otherwise a previous (now 0'd) cached
-> -             * page would be stale
-> -             */
-> -            xbzrle_cache_zero_page(rs, current_addr);
-> -            ram_release_pages(block->idstr, offset, pages);
-> +            if (pss->page_copy) {
-> +                qemu_madvise(p, TARGET_PAGE_SIZE, MADV_DONTNEED);
-> +            } else {
-> +                /* Must let xbzrle know, otherwise a previous (now 0'd) cached
-> +                 * page would be stale
-> +                 */
-> +                xbzrle_cache_zero_page(rs, current_addr);
-> +                ram_release_pages(block->idstr, offset, pages);
-> +            }
->          } else if (!rs->ram_bulk_stage &&
-> -                   !migration_in_postcopy() && migrate_use_xbzrle()) {
-> +                   !migration_in_postcopy() && migrate_use_xbzrle() &&
-> +                   !migrate_background_snapshot()) {
->              pages = save_xbzrle_page(rs, &p, current_addr, block,
->                                       offset, last_stage);
->              if (!last_stage) {
-> @@ -1026,9 +1036,10 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
->          ram_counters.transferred +=
->              save_page_header(rs, rs->f, block, offset | RAM_SAVE_FLAG_PAGE);
->          if (send_async) {
-> -            qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE,
-> -                                  migrate_release_ram() &
-> -                                  migration_in_postcopy());
-> +            bool may_free = migrate_background_snapshot() ||
-> +                            (migrate_release_ram() &&
-> +                             migration_in_postcopy());
-> +            qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE, may_free);
->          } else {
->              qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
->          }
-> @@ -1269,7 +1280,8 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss, bool *again)
->   * @rs: current RAM state
->   * @offset: used to return the offset within the RAMBlock
->   */
-> -static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset)
-> +static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
-> +                              void **page_copy)
+> +    obj =3D qobject_from_json("{} {}", &err);
+> +    g_assert(obj =3D=3D NULL);
+> +    error_free_or_abort(&err);
+> +}
+> +
+>  int main(int argc, char **argv)
 >  {
->      RAMBlock *block = NULL;
->  
-> @@ -1279,10 +1291,14 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset)
->                                  QSIMPLEQ_FIRST(&rs->src_page_requests);
->          block = entry->rb;
->          *offset = entry->offset;
-> +        *page_copy = entry->page_copy;
->  
->          if (entry->len > TARGET_PAGE_SIZE) {
->              entry->len -= TARGET_PAGE_SIZE;
->              entry->offset += TARGET_PAGE_SIZE;
-> +            if (entry->page_copy) {
-> +                entry->page_copy += TARGET_PAGE_SIZE / sizeof(void *);
-> +            }
->          } else {
->              memory_region_unref(block->mr);
->              QSIMPLEQ_REMOVE_HEAD(&rs->src_page_requests, next_req);
-> @@ -1309,9 +1325,10 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
->      RAMBlock  *block;
->      ram_addr_t offset;
->      bool dirty;
-> +    void *page_copy;
->  
->      do {
-> -        block = unqueue_page(rs, &offset);
-> +        block = unqueue_page(rs, &offset, &page_copy);
->          /*
->           * We're sending this page, and since it's postcopy nothing else
->           * will dirty it, and we must make sure it doesn't get sent again
-> @@ -1349,6 +1366,7 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
->           */
->          pss->block = block;
->          pss->page = offset >> TARGET_PAGE_BITS;
-> +        pss->page_copy = page_copy;
->      }
->  
->      return !!block;
-> @@ -1386,17 +1404,25 @@ static void migration_page_queue_free(RAMState *rs)
->   *
->   * @rbname: Name of the RAMBLock of the request. NULL means the
->   *          same that last one.
-> + * @block: RAMBlock to use. block and rbname have mutualy exclusive
-> + *         semantic with higher priority of the block.
+>      g_test_init(&argc, &argv, NULL);
+> @@ -1454,6 +1464,7 @@ int main(int argc, char **argv)
+>      g_test_add_func("/errors/invalid_dict_comma", invalid_dict_comma);
+>      g_test_add_func("/errors/unterminated/literal", unterminated_literal=
+);
+>      g_test_add_func("/errors/limits/nesting", limits_nesting);
+> +    g_test_add_func("/errors/multiple_objects", multiple_objects);
+>=20=20
+>      return g_test_run();
+>  }
 
-If "mutual exclusive" then no priority at all?  Maybe simply:
+>From 18064b774ea7a79a9dbabe5cf75458f0326070d5 Mon Sep 17 00:00:00 2001
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri, 20 Jul 2018 10:22:41 +0200
+Subject: [PATCH] check-qjson: Cover multiple JSON objects in same string
 
-  @block: RAMBlock to use.  When @block is provided, then @rbname is ignored.
- 
->   * @start: starting address from the start of the RAMBlock
->   * @len: length (in bytes) to send
-> + * @page_copy: the address the page should be written from
+qobject_from_json() & friends misbehave when the JSON text has more
+than one JSON value.  Add test coverage to demonstrate the bugs.
 
-Maybe:
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ tests/check-qjson.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-  @page_copy: the page to copy to destination.  If not specified, will
-              use the page data specified by @start and @len.
-
->   */
-> -int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len)
-> +int ram_save_queue_pages(RAMBlock *block, const char *rbname,
-> +                         ram_addr_t start, ram_addr_t len, void *page_copy)
->  {
->      RAMBlock *ramblock;
->      RAMState *rs = ram_state;
->  
->      ram_counters.postcopy_requests++;
-> +
->      rcu_read_lock();
-> -    if (!rbname) {
-> +
-> +    if (block) {
-> +        ramblock = block;
-> +    } else if (!rbname) {
->          /* Reuse last RAMBlock */
->          ramblock = rs->last_req_rb;
->  
-> @@ -1431,6 +1457,7 @@ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len)
->      new_entry->rb = ramblock;
->      new_entry->offset = start;
->      new_entry->len = len;
-> +    new_entry->page_copy = page_copy;
->  
->      memory_region_ref(ramblock->mr);
->      qemu_mutex_lock(&rs->src_page_req_mutex);
-> @@ -1468,7 +1495,8 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->           * xbzrle can do better than compression.
->           */
->          if (migrate_use_compression() &&
-> -            (rs->ram_bulk_stage || !migrate_use_xbzrle())) {
-> +            (rs->ram_bulk_stage || !migrate_use_xbzrle()) &&
-> +            !migrate_background_snapshot()) {
-
-This seems unecessary - in the first patch you have already made sure
-that compression is not enabled during a live snapshot, so we should
-be fine since we check migrate_use_compression() first.
-
->              res = ram_save_compressed_page(rs, pss, last_stage);
->          } else {
->              res = ram_save_page(rs, pss, last_stage);
-> @@ -1706,6 +1734,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->      pss.block = rs->last_seen_block;
->      pss.page = rs->last_page;
->      pss.complete_round = false;
-> +    pss.page_copy = NULL;
->  
->      if (!pss.block) {
->          pss.block = QLIST_FIRST_RCU(&ram_list.blocks);
-> diff --git a/migration/ram.h b/migration/ram.h
-> index 4c463597a5..c3679ba65e 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -46,7 +46,8 @@ int multifd_load_setup(void);
->  int multifd_load_cleanup(Error **errp);
->  
->  uint64_t ram_pagesize_summary(void);
-> -int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
-> +int ram_save_queue_pages(RAMBlock *block, const char *rbname,
-> +                         ram_addr_t start, ram_addr_t len, void *page_copy);
->  void acct_update_position(QEMUFile *f, size_t size, bool zero);
->  void ram_debug_dump_bitmap(unsigned long *todump, bool expected,
->                             unsigned long pages);
-> -- 
-> 2.17.0
-> 
-> 
-
-Regards,
-
--- 
-Peter Xu
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index da582df3e9..c5fd439263 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -1417,6 +1417,25 @@ static void limits_nesting(void)
+     g_assert(obj =3D=3D NULL);
+ }
+=20
++static void multiple_objects(void)
++{
++    Error *err =3D NULL;
++    QObject *obj;
++
++    /* BUG this leaks the syntax tree for "false" */
++    obj =3D qobject_from_json("false true", &err);
++    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
++    g_assert(!err);
++    qobject_unref(obj);
++
++    /* BUG simultaneously succeeds and fails */
++    /* BUG calls json_parser_parse() with errp pointing to non-null */
++    obj =3D qobject_from_json("} true", &err);
++    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
++    error_free_or_abort(&err);
++    qobject_unref(obj);
++}
++
+ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -1454,6 +1473,7 @@ int main(int argc, char **argv)
+     g_test_add_func("/errors/invalid_dict_comma", invalid_dict_comma);
+     g_test_add_func("/errors/unterminated/literal", unterminated_literal);
+     g_test_add_func("/errors/limits/nesting", limits_nesting);
++    g_test_add_func("/errors/multiple_objects", multiple_objects);
+=20
+     return g_test_run();
+ }
+--=20
+2.17.1
