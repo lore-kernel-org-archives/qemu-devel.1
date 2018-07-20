@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fgYOZ-0003Ok-Mx
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:36:44 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fgYQM-0004J6-PH
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:38:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fgYOU-0001jr-Q5
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:36:43 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:36056)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fgYOU-0001jX-HJ
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:36:38 -0400
-Received: by mail-pl0-x242.google.com with SMTP id e11-v6so5416503plb.3
-	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 09:36:38 -0700 (PDT)
-References: <20180720153932.8507-1-peter.maydell@linaro.org>
-	<0b589622-ffaf-8ed7-c34b-77ada1d203fb@amsat.org>
-	<CAFEAcA-Mc7S775QK5dt7+eqaZD0TSZhsNLrZauSNshfbQGx9fg@mail.gmail.com>
-	<aa869c16-9577-bf7b-a5c7-b63673644a6f@linaro.org>
-	<CAFEAcA9XXPsm8V45eYyK1kNdpOjS9gmrZM2MThu1VJ07dhwEPQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <40e694c6-9757-3f9e-b8c1-9d2fdd113328@linaro.org>
-Date: Fri, 20 Jul 2018 09:36:34 -0700
+	(envelope-from <no-reply@patchew.org>) id 1fgYQI-00027b-Ex
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:38:34 -0400
+Resent-Message-Id: <E1fgYQI-00027b-Ex@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21144)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fgYQI-000278-3u
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:38:30 -0400
+In-Reply-To: <20180720083644.1431-1-tiwei.bie@intel.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153207674952.156.14125031656226934615@b489c0e6f1ca>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9XXPsm8V45eYyK1kNdpOjS9gmrZM2MThu1VJ07dhwEPQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.0 ?] tests/libqtest: Improve
- kill_qemu() assert
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 20 Jul 2018 01:52:30 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] vhost: check region type before casting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
+To: tiwei.bie@intel.com
+Cc: famz@redhat.com, mst@redhat.com, jasowang@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On 07/20/2018 09:25 AM, Peter Maydell wrote:
-> On 20 July 2018 at 17:14, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> You already print the file, just include the line.  Perhaps
->>
->>   fprintf(stderr,
->>           "%s:%d: kill_qemu tried to terminate QEMU "
->>           "process but it dumped core with signal %s\n",
->>           __FILE__, __LINE__, strsignal(WTERMSIG(wstatus)));
->>   abort();
-> 
-> I wasn't convinced that strsignal() would be available
-> on all the host OSes we build on (we don't currently use
-> it outside linux-user/), and I definitely didn't think that
-> it merited a configure test for its presence just for a
-> test error message :-)
-
-Hmm.  It has been in _GNU_SOURCE since the dawn of time
-and in POSIX since 2008.
-
-For non-linux, I peeked at the OpenBSD man page, which says
-
-  The strsignal() function first appeared in AT&T System V
-  Release 4 UNIX and was reimplemented for NetBSD 1.0.
-
-That suggests all of the extant BSDs should have it.
-
-MinGW has had the function since 2008.
-
-What other hosts do we support?
-
-
-r~
+SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQ
+bGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJ
+ZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBp
+dApsb2NhbGx5LgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTgwNzIwMDgzNjQ0LjE0MzEt
+MS10aXdlaS5iaWVAaW50ZWwuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHZob3N0
+OiBjaGVjayByZWdpb24gdHlwZSBiZWZvcmUgY2FzdGluZwoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaApzZXQgLWUKZ2l0IHN1Ym1vZHVsZSB1cGRhdGUgLS1pbml0IGR0Ywoj
+IExldCBkb2NrZXIgdGVzdHMgZHVtcCBlbnZpcm9ubWVudCBpbmZvCmV4cG9ydCBTSE9XX0VOVj0x
+CmV4cG9ydCBKPTgKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9yYQo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApmYXRhbDogdW5hYmxlIHRvIGFjY2VzcyAnaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11Lyc6IEVuY291bnRlcmVkIGVuZCBvZiBmaWxlCmVycm9yOiBDb3VsZCBu
+b3QgZmV0Y2ggM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApUcmFjZWJh
+Y2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiL3Vzci9iaW4vcGF0Y2hldyIsIGxp
+bmUgNDQyLCBpbiB0ZXN0X29uZQogICAgZ2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8iXSwg
+clsiaGVhZCJdLCBsb2dmKQogIEZpbGUgIi91c3IvYmluL3BhdGNoZXciLCBsaW5lIDQ4LCBpbiBn
+aXRfY2xvbmVfcmVwbwogICAgc3Rkb3V0PWxvZ2YsIHN0ZGVycj1sb2dmKQogIEZpbGUgIi91c3Iv
+bGliNjQvcHl0aG9uMy42L3N1YnByb2Nlc3MucHkiLCBsaW5lIDI5MSwgaW4gY2hlY2tfY2FsbAog
+ICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxs
+ZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snZ2l0JywgJ3JlbW90ZScsICdhZGQnLCAnLWYnLCAn
+LS1taXJyb3I9ZmV0Y2gnLCAnM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NCcsICdodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUnXScgcmV0dXJuZWQg
+bm9uLXplcm8gZXhpdCBzdGF0dXMgMS4KCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
