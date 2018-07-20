@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fgY48-00016U-Bq
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:15:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fgY4B-00018P-Lb
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:15:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fgY45-0007rR-6H
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:15:36 -0400
-Received: from mail-bl2nam02on0133.outbound.protection.outlook.com
-	([104.47.38.133]:65216
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fgY44-0007qZ-Ph
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:15:33 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 20 Jul 2018 16:15:28 +0000
-Message-ID: <BN7PR08MB48689FC1E72B07CD227864DAC6510@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1532004912-13899-15-git-send-email-stefan.markovic@rt-rk.com>,
-	<c9a8b3f6-39da-94af-32f5-3af812f3d7d8@linaro.org>
-In-Reply-To: <c9a8b3f6-39da-94af-32f5-3af812f3d7d8@linaro.org>
-Content-Language: en-US
+	(envelope-from <richard.henderson@linaro.org>) id 1fgY4A-0007ww-Q0
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:15:39 -0400
+Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:38186)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fgY4A-0007wC-Ip
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:15:38 -0400
+Received: by mail-pg1-x52f.google.com with SMTP id k3-v6so7277890pgq.5
+	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 09:15:38 -0700 (PDT)
+References: <20180720145647.8810-1-peter.maydell@linaro.org>
+	<20180720145647.8810-2-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <0b4983d9-e6e0-c97b-3868-f923bc13def5@linaro.org>
+Date: Fri, 20 Jul 2018 09:15:34 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 14/40] target/mips: Add emulation of
- misc nanoMIPS instructions (pool32axf)
+In-Reply-To: <20180720145647.8810-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] target/arm: Improve exception-taken
+ logging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-> From: Richard Henderson <richard.henderson@linaro.org>
-> Sent: Thursday, July 19, 2018 9:13 PM
->
-> >          case NM_POOL32A7:
-> > +        {
-> > +            switch ((ctx->opcode >> 3) & 0x07) {
-> > +            case NM_POOL32AXF:
-> > +                gen_pool32axf_nanomips_insn(env, ctx);
-> > +                break;
-> > +            }
-> > +        }
->
-> Bad indentation of a block that need not exist anyway.
->
-> Otherwise,
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On 07/20/2018 07:56 AM, Peter Maydell wrote:
+> Improve the exception-taken logging by logging in
+> v7m_exception_taken() the exception we're going to take
+> and whether it is secure/nonsecure.
+> 
+> This requires us to move logging at many callsites from after the
+> call to before it, so that the logging appears in a sensible order.
+> 
+> (This will make tail-chaining produce more useful logs; for the
+> current callers of v7m_exception_taken() we know which exception
+> we're going to take, so custom log messages at the callsite sufficed;
+> for tail-chaining only v7m_exception_taken() knows the exception
+> number that we're going to tail-chain to.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 17 +++++++++++------
+>  1 file changed, 11 insertions(+), 6 deletions(-)
 
-Outer braces are unnecessary. The switch is missing the default case. This =
-switch statement is amended in one of subsequent patches, and at the end it=
- contains four cases, but no default case. The missing default should be fi=
-xed in this patch.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
