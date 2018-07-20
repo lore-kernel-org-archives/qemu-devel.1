@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39435)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fgKKX-0001Tm-MQ
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 21:35:38 -0400
+	id 1fgKPT-0002Lb-2W
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 21:40:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fgKKW-0005qk-KX
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 21:35:37 -0400
+	id 1fgKPR-0007UQ-RT
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 21:40:43 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1532006134-7701-1-git-send-email-thuth@redhat.com>
+References: <20180718200648.22529-1-richard.henderson@linaro.org>
+	<a1b59157-55d7-5f1a-72eb-8be11d8f7829@amsat.org>
+	<ab1917a5-4fcc-25a6-00da-139fe7b9e753@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <487a731f-9519-aea7-d70d-a8316fdca407@amsat.org>
-Date: Thu, 19 Jul 2018 22:35:25 -0300
+Message-ID: <e9823e6b-49b8-abbd-72f4-1fbce8be5317@amsat.org>
+Date: Thu, 19 Jul 2018 22:40:29 -0300
 MIME-Version: 1.0
-In-Reply-To: <1532006134-7701-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <ab1917a5-4fcc-25a6-00da-139fe7b9e753@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/spitz: Move problematic
- nand_init() code to realize function
+Subject: Re: [Qemu-devel] [PATCH] linux-user/ppc: Implement swapcontext
+ syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>
-Cc: qemu-arm@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, alex.bennee@linaro.org, laurent@vivier.eu, david@gibson.dropbear.id.au
 
-On 07/19/2018 10:15 AM, Thomas Huth wrote:
-> nand_init() does not only create the NAND device, it also realizes
-> the device with qdev_init_nofail() already. So we must not call
-> nand_init() from an instance_init function like sl_nand_init(),
-> otherwise we get superfluous NAND devices in the QOM tree after
-> introspecting the 'sl-nand' device. So move the nand_init() to the
-> realize function of 'sl-nand' instead.
+On 07/19/2018 08:13 AM, Richard Henderson wrote:
+> On 07/18/2018 03:56 PM, Philippe Mathieu-Daudé wrote:
+>>> +
+>>> +/* This syscall implements {get,set,swap}context for userland.  */
+>>
+>> This comment confuses me because do_setcontext() is available at line 625.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> But that's not wired up as a syscall.
+> 
+>>> +    /* For ppc32, ctx_size is "reserved for future use".
+>>> +     * For ppc64, we do not yet support the VSX extension.
+>>> +     */
+>>> +    if (ctx_size < sizeof(struct target_ucontext)) {
+>>> +        return -TARGET_EINVAL;
+>>
+>> Shouldn't this be -TARGET_ENOMEM?
+>>
+>> swapcontext(3):
+>> ERRORS
+>>        ENOMEM Insufficient stack space left.
+> 
+> No.  Please compare against the syscall, not the libc interface.
+
+Thanks, I felt I was missing something with the 3rd syscall argument.
+
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/kernel/signal_32.c#n1045
+> 
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  hw/arm/spitz.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
-> index 3cc27a1..c4bc3de 100644
-> --- a/hw/arm/spitz.c
-> +++ b/hw/arm/spitz.c
-> @@ -169,16 +169,22 @@ static void sl_nand_init(Object *obj)
->  {
->      SLNANDState *s = SL_NAND(obj);
->      SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-> -    DriveInfo *nand;
->  
->      s->ctl = 0;
-> +
-> +    memory_region_init_io(&s->iomem, obj, &sl_ops, s, "sl", 0x40);
-> +    sysbus_init_mmio(dev, &s->iomem);
-> +}
-> +
-> +static void sl_nand_realize(DeviceState *dev, Error **errp)
-> +{
-> +    SLNANDState *s = SL_NAND(dev);
-> +    DriveInfo *nand;
-> +
->      /* FIXME use a qdev drive property instead of drive_get() */
->      nand = drive_get(IF_MTD, 0, 0);
->      s->nand = nand_init(nand ? blk_by_legacy_dinfo(nand) : NULL,
->                          s->manf_id, s->chip_id);
-> -
-> -    memory_region_init_io(&s->iomem, obj, &sl_ops, s, "sl", 0x40);
-> -    sysbus_init_mmio(dev, &s->iomem);
->  }
->  
->  /* Spitz Keyboard */
-> @@ -1079,6 +1085,7 @@ static void sl_nand_class_init(ObjectClass *klass, void *data)
->  
->      dc->vmsd = &vmstate_sl_nand_info;
->      dc->props = sl_nand_properties;
-> +    dc->realize = sl_nand_realize;
->      /* Reason: init() method uses drive_get() */
->      dc->user_creatable = false;
->  }
-> 
