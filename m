@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgXYK-00014b-9M
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:42:45 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fgXa2-0002D5-Bb
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:44:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgXYJ-0001GC-CJ
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:42:44 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:46202)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fgXYJ-0001Fw-5n
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:42:43 -0400
-Received: by mail-oi0-x242.google.com with SMTP id y207-v6so22093555oie.13
-	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 08:42:43 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fgXa0-0001gW-Gp
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:44:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42512 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fgXa0-0001gE-Bf
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 11:44:28 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DCE2D40704BB
+	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 15:44:27 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 20 Jul 2018 17:44:24 +0200
+Message-Id: <20180720154425.31285-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20180720154425.31285-1-marcandre.lureau@redhat.com>
+References: <20180720154425.31285-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180720153942.26821-1-andre.przywara@arm.com>
-References: <20180720153942.26821-1-andre.przywara@arm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jul 2018 16:42:22 +0100
-Message-ID: <CAFEAcA--Uux1tTVDgR3tGZCXjQPNF4mgSnhC720Ez0AuWUQw3Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v2 0/4] arm: add GICv2 MMIO
- tests
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 1/2] seccomp: use SIGSYS signal instead of
+ killing the thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Andrew Jones <drjones@redhat.com>, Eric Auger <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, kvm-devel <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, Luc Michel <luc.michel@greensocs.com>
+To: qemu-devel@nongnu.org
+Cc: pmoore@redhat.com, Eduardo Otubo <otubo@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 20 July 2018 at 16:39, Andre Przywara <andre.przywara@arm.com> wrote:
-> I found this in one my branches: this is an updated version of what I sent
-> end of 2016 [1]. I tried to address all comments that Drew and Eric had at
-> the time.
-> Please have a look whether this makes sense.
->
-> Changelog v1..v2:
-> - made many functions void
-> - use symbolic name for first SPI being number 32
-> - add test runs with one and three vCPUs
-> - use gic_version() directly
-> - factor out test_byte_access()
-> - drop redundant "filling priorities" test
-> - dropped GICv3 test
->
-> [1] https://lists.cs.columbia.edu/pipermail/kvmarm/2016-November/022352.html
->
-> Original cover letter:
-> ======================
-> The GIC spec mandates certain constraints on how to acccess the MMIO
-> mapped registers, both in terms of which registers are available and also
-> in terms of which bits within a register should be masked, for instance.
-> Since we went through some lengths in the KVM emulation to implement this,
-> it's about time to give this actually a test beyond what the kernel as a
-> GIC user actually implements - for instance we ignore priorities in Linux.
->
-> This series tries to attack some constraints, on a low-hanging-fruit base.
-> It focusses on some generic registers and the PRIORITY and TARGETS registers
-> of GICv2. GICv3 is not covered yet.
->
-> This actually revealed genuine bugs in the KVM emulation in the past. KVM
-> passes these tests now, but QEMU fails some UP and 3-way-SMP tests.
+The seccomp action SCMP_ACT_KILL results in immediate termination of
+the thread that made the bad system call. However, qemu being
+multi-threaded, it keeps running. There is no easy way for parent
+process / management layer (libvirt) to know about that situation.
 
-Would be interesting to see if we've fixed some of the QEMU emulation
-bugs, either already in master or in Luc's on-list patchset that adds
-support for emulation of the GICv2 virt extensions...
+Instead, the default SIGSYS handler when invoked with SCMP_ACT_TRAP
+will terminate the program and core dump.
 
-thanks
--- PMM
+This may not be the most secure solution, but probably better than
+just killing the offending thread. SCMP_ACT_KILL_PROCESS has been
+added in Linux 4.14 to improve the situation, which I propose to use
+by default if available in the next patch.
+
+Related to:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1594456
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qemu-seccomp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+index 9cd8eb9499..b117a92559 100644
+--- a/qemu-seccomp.c
++++ b/qemu-seccomp.c
+@@ -125,7 +125,7 @@ static int seccomp_start(uint32_t seccomp_opts)
+             continue;
+         }
+=20
+-        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_KILL, blacklist[i].n=
+um,
++        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_TRAP, blacklist[i].n=
+um,
+                                     blacklist[i].narg, blacklist[i].arg_=
+cmp);
+         if (rc < 0) {
+             goto seccomp_return;
+--=20
+2.18.0.232.gb7bd9486b0
