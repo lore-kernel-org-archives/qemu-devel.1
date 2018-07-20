@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgT7r-0002kx-F8
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 06:59:08 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fgTa9-0007uh-CR
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 07:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgT7q-0004ad-LC
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 06:59:07 -0400
-Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:41071)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fgT7q-0004aV-FY
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 06:59:06 -0400
-Received: by mail-oi0-x22b.google.com with SMTP id k12-v6so20585239oiw.8
-	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 03:59:06 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1fgTa4-0004WY-FV
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 07:28:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55334 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fgTa4-0004WD-9F
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 07:28:16 -0400
+Date: Fri, 20 Jul 2018 12:28:11 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180720112810.GB2631@work-vm>
+References: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
+	<20180718154200.26777-9-dplotnikov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20180720040337.21426-1-richard.henderson@linaro.org>
-References: <20180720040337.21426-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jul 2018 11:58:45 +0100
-Message-ID: <CAFEAcA-C1YqFydxGFhWAH0gYvr3wiPaLyNkc5NOzXu5OUQ0anA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL for-3.0 0/1] tcg-next pull
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180718154200.26777-9-dplotnikov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v1 08/17] migration: add helpers to change
+ VM memory protection rights
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +28,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: quintela@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-On 20 July 2018 at 05:03, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Just one patch for rc2, fixing a bug with an aarch64 host
-> emulating sve instructions.
->
->
-> r~
->
->
-> The following changes since commit e1ea55668ffe6ce558a063f3a9621b761738e1f2:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2018-07-19 15:38:06 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20180719
->
-> for you to fetch changes up to e65a5f227d77a5dbae7a7123c3ee915ee4bd80cf:
->
->   tcg/aarch64: limit mul_vec size (2018-07-19 09:07:31 -0700)
->
-> ----------------------------------------------------------------
-> Fix aarch64 host vector mul
->
-> ----------------------------------------------------------------
+* Denis Plotnikov (dplotnikov@virtuozzo.com) wrote:
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> ---
+>  migration/ram.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  migration/ram.h |  3 +++
+>  2 files changed, 57 insertions(+)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 27d3403435..ce3dead932 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1555,6 +1555,60 @@ void ram_block_list_destroy(void)
+>      }
+>  }
+>  
+> +static int mem_protect(void *addr, uint64_t length, int prot)
+> +{
+> +    int ret = mprotect(addr, length, prot);
+> +
+> +    if (ret < 0) {
+> +        error_report("%s: Can't change protection on ram block at %p",
+> +                     __func__, addr);
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static int ram_set_ro(void *addr, uint64_t length)
+> +{
+> +    return mem_protect(addr, length, PROT_READ);
+> +}
+> +
+> +static int ram_set_rw(void *addr, uint64_t length)
+> +{
+> +    return mem_protect(addr, length, PROT_READ | PROT_WRITE);
+> +}
+> +
+> +int ram_block_list_set_readonly(void)
+> +{
+> +    RAMBlock *block = NULL;
+> +    RamBlockList *block_list = ram_bgs_block_list_get();
+> +    int ret = 0;
+> +
+> +    QLIST_FOREACH(block, block_list, bgs_next) {
+> +        ret = ram_set_ro(block->host, block->used_length);
+> +        if (ret) {
+> +            break;
+> +        }
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +int ram_block_list_set_writable(void)
+> +{
+> +    RAMBlock *block = NULL;
+> +    RamBlockList *block_list = ram_bgs_block_list_get();
+> +    int ret = 0;
+> +
+> +    QLIST_FOREACH(block, block_list, bgs_next) {
+> +        ret = ram_set_rw(block->host, block->used_length);
+> +        if (ret) {
+> +            break;
+> +        }
+> +    }
 
-Applied, thanks.
+Do you need to keep track of who was writeable previously
+to avoid changing blocks that should be read-only, 
+Or are all RAMBlocks currently mapped rw?
 
--- PMM
+Dave
+
+> +    return ret;
+> +}
+> +
+>  static void ram_page_buffer_decrease_used(void)
+>  {
+>      qemu_event_reset(&ram_state->page_buffer.used_decreased);
+> diff --git a/migration/ram.h b/migration/ram.h
+> index 7c802c1d7f..4c463597a5 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -71,4 +71,7 @@ RAMBlock *ram_bgs_block_find(uint8_t *address, ram_addr_t *page_offset);
+>  void *ram_page_buffer_get(void);
+>  int ram_page_buffer_free(void *buffer);
+>  
+> +int ram_block_list_set_readonly(void);
+> +int ram_block_list_set_writable(void);
+> +
+>  #endif
+> -- 
+> 2.17.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
