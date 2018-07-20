@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgYE3-0007j7-BN
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:25:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1fgYMP-0001l6-BZ
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:34:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fgYE2-000598-GM
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:25:51 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44501)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fgYE2-00058n-AY
-	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:25:50 -0400
-Received: by mail-oi0-x241.google.com with SMTP id s198-v6so22327099oih.11
-	for <qemu-devel@nongnu.org>; Fri, 20 Jul 2018 09:25:50 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fgYMO-0008Fb-BH
+	for qemu-devel@nongnu.org; Fri, 20 Jul 2018 12:34:29 -0400
+References: <20180719034118.27741-1-famz@redhat.com>
+	<6757101d-316a-79f5-1dbc-4546b054c9da@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7f214e17-0daa-d865-f67e-576930e2ba87@redhat.com>
+Date: Fri, 20 Jul 2018 11:34:19 -0500
 MIME-Version: 1.0
-In-Reply-To: <aa869c16-9577-bf7b-a5c7-b63673644a6f@linaro.org>
-References: <20180720153932.8507-1-peter.maydell@linaro.org>
-	<0b589622-ffaf-8ed7-c34b-77ada1d203fb@amsat.org>
-	<CAFEAcA-Mc7S775QK5dt7+eqaZD0TSZhsNLrZauSNshfbQGx9fg@mail.gmail.com>
-	<aa869c16-9577-bf7b-a5c7-b63673644a6f@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Jul 2018 17:25:29 +0100
-Message-ID: <CAFEAcA9XXPsm8V45eYyK1kNdpOjS9gmrZM2MThu1VJ07dhwEPQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.0 ?] tests/libqtest: Improve
- kill_qemu() assert
+In-Reply-To: <6757101d-316a-79f5-1dbc-4546b054c9da@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Don't lock /dev/null
+ and /dev/zero automatically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
+To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 20 July 2018 at 17:14, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> You already print the file, just include the line.  Perhaps
->
->   fprintf(stderr,
->           "%s:%d: kill_qemu tried to terminate QEMU "
->           "process but it dumped core with signal %s\n",
->           __FILE__, __LINE__, strsignal(WTERMSIG(wstatus)));
->   abort();
+On 07/19/2018 12:57 PM, John Snow wrote:
+> 
+> Should we instead modify the test in this case to not attempt to take a
+> lock on a device we know cannot meaningfully store state, or is it your
+> preference to attempt to maintain such a list in the raw driver itself?
+> 
+> I guess we never want QEMU to try to lock things like /dev/zero, but I
+> don't know if there are more such pseudo-devices we should never try to
+> lock and if so, what common property unifies them such that we don't
+> have to maintain a list.
 
-I wasn't convinced that strsignal() would be available
-on all the host OSes we build on (we don't currently use
-it outside linux-user/), and I definitely didn't think that
-it merited a configure test for its presence just for a
-test error message :-)
+One potential common property: /dev/zero and /dev/null are character 
+devices, rather than block devices.  Character devices in general don't 
+make much sense for holding stateful images, so it may be as simple as 
+gating our locking based on fstat() distinguishing which type of file we 
+are accessing.
 
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
