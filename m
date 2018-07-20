@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fgLJx-0007F7-Jm
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:39:07 -0400
+	(envelope-from <peterx@redhat.com>) id 1fgLb0-00030R-Fn
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:56:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fgLJv-00019y-Bt
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:39:05 -0400
-Date: Fri, 20 Jul 2018 12:18:50 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180720021850.GE18205@umbus.fritz.box>
-References: <20180706090713.15712-1-clg@kaod.org>
-	<20180706090713.15712-2-clg@kaod.org>
+	(envelope-from <peterx@redhat.com>) id 1fgLav-0007cz-KI
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:56:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38914 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fgLav-0007cN-CZ
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 22:56:37 -0400
+Date: Fri, 20 Jul 2018 10:56:30 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180720025630.GM4071@xz-mi>
+References: <20180717222721.14019.27548.stgit@gimli.home>
+	<20180718064803.GA6197@xz-mi> <20180718103133.73dc74a1@t450s.home>
+	<20180719054051.GE4071@xz-mi> <20180719090146.1f4303b6@t450s.home>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="so9zsI5B81VjUb/o"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180706090713.15712-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] spapr: introduce a fixed IRQ number
- space
+In-Reply-To: <20180719090146.1f4303b6@t450s.home>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,506 +28,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
 
+On Thu, Jul 19, 2018 at 09:01:46AM -0600, Alex Williamson wrote:
+> On Thu, 19 Jul 2018 13:40:51 +0800
+> Peter Xu <peterx@redhat.com> wrote:
+> > On Wed, Jul 18, 2018 at 10:31:33AM -0600, Alex Williamson wrote:
+> > > On Wed, 18 Jul 2018 14:48:03 +0800
+> > > Peter Xu <peterx@redhat.com> wrote:
+> > > > I'm wondering what if want to do that somehow some day... Whether
+> > > > it'll work if we just let vfio-pci devices to register some guest
+> > > > memory invalidation hook (just like the iommu notifiers, but for guest
+> > > > memory address space instead), then we map/unmap the IOMMU pages there
+> > > > for vfio-pci device to make sure the inflated balloon pages are not
+> > > > mapped and also make sure new pages are remapped with correct HPA
+> > > > after deflated.  This is a pure question out of my curiosity, and for
+> > > > sure it makes little sense if the answer of the first question above
+> > > > is positive.  
+> > > 
+> > > This is why I mention the KVM MMU synchronization flag above.  KVM
+> > > essentially had this same problem and fixed it with with MMU notifiers
+> > > in the kernel.  They expose that KVM has the capability of handling
+> > > such a scenario via a feature flag.  We can do the same with vfio.  In
+> > > scenarios where we're able to fix this, we could expose a flag on the
+> > > container indicating support for the same sort of thing.  
+> > 
+> > Sorry I didn't really caught that point when reply.  So that's why we
+> > have had the mmu notifiers... Hmm, glad to know that.
+> > 
+> > But I would guess that if we want that notifier for vfio it should be
+> > in QEMU rather than the kernel one since kernel vfio driver should not
+> > have enough information on the GPA address space, hence it might not
+> > be able to rebuild the mapping when a new page is mapped?  While QEMU
+> > should be able to get both GPA and HVA easily when the balloon device
+> > wants to deflate a page. [1]
+> 
+> This is where the vfio IOMMU backend comes into play.  vfio devices
+> make use of MemoryListeners to register the HVA to GPA translations
+> within the AddressSpace of a device.  When we're using an IOMMU, we pin
+> those HVAs in order to make the HPA static and insert the GPA to HPA
+> mappings into the IOMMU.  When we don't have an IOMMU, the IOMMU
+> backend is storing those HVA to GPA translations so that the mediated
+> device vendor driver can make pinning requests.  The vendor driver
+> requests pinning of a given set of GPAs and the IOMMU backend pins the
+> matching HVA to provide an HPA.
+> 
+> When a page is ballooned, it's zapped from the process address space,
+> so we need to invalidate the HVA to HPA mapping.  When the page is
+> restored, we still have the correct HVA, but we need a notifier to tell
+> us to put it back into play, re-pinning and inserting the mapping into
+> the IOMMU if we have one.
+> 
+> In order for QEMU to do this, this ballooned page would need to be
+> reflected in the memory API.  This would be quite simple, inserting a
+> MemoryRegion overlapping the RAM page which is ballooned out and
+> removing it when the balloon is deflated.  But we run into the same
+> problems with mapping granularity.  In order to accommodate this new
+> overlap, the memory API would first remove the previous mapping, split
+> or truncate the region, then reinsert the result.  Just like if we tried
+> to do this in the IOMMU, it's not atomic with respect to device DMA.  In
+> order to achieve this model, the memory API would need to operate
+> entirely on page size regions.  Now imagine that every MiB of guest RAM
+> requires 256 ioctls to map (assuming 4KiB pages), 256K per GiB.  Clearly
+> we'd want to use a larger granularity for efficiency.  If we allow the
+> user to specify the granularity, perhaps abstracting that granularity
+> as the size of a DIMM, suddenly we've moved from memory ballooning to
+> memory hotplug, where the latter does make use of the memory API and
+> has none of these issues AIUI.
 
---so9zsI5B81VjUb/o
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I see.  Indeed pc-dimm seems to be more suitable here.  And I think I
+better understand the awkwardness that the page granularity problem
+has brought - since we need this page granularity to happen even for
+the QEMU memory API then we'll possibly have 4k-sized memory regions
+to fill up all the RAM address space.  It sounds a hard mission.
 
-On Fri, Jul 06, 2018 at 11:07:11AM +0200, C=E9dric Le Goater wrote:
-> This proposal introduces a new IRQ number space layout using static
-> numbers for all devices, depending on a device index, and a bitmap
-> allocator for the MSI IRQ numbers which are negotiated by the guest at
-> runtime.
->=20
-> As the VIO device model does not have a device index but a "reg"
-> property, we introduce a formula to compute an IRQ number from a "reg"
-> value. It should minimize most of the collisions.
->=20
-> The previous layout is kept in pre-3.0 machines raising the
-> 'legacy_irq_allocation' machine class flag.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  The new XICS layout will only be activated when a new pseries-3.1
->  machine is introduced.
+> 
+> > > There are a few complications to this support though.  First ballooning
+> > > works at page size granularity, but IOMMU mapping can make use of
+> > > arbitrary superpage sizes and the IOMMU API only guarantees unmap
+> > > granularity equal to the original mapping.  Therefore we cannot unmap
+> > > individual pages unless we require that all mappings through the IOMMU
+> > > API are done with page granularity, precluding the use of superpages by
+> > > the IOMMU and thereby inflicting higher IOTLB overhead.  Unlike a CPU,
+> > > we can't invalidate the mappings and fault them back in or halt the
+> > > processor to make the page table updates appear atomic.  The device is
+> > > considered always running and interfering with that would likely lead
+> > > to functional issues.  
+> > 
+> > Indeed.  Actually VT-d emulation bug was fixed just months ago where
+> > the QEMU shadow page code for the device quickly unmapped the pages
+> > and rebuilt the pages, but within the window we see DMA happened hence
+> > DMA error on missing page entries.  I wish I have had learnt that
+> > earlier from you!  Then the bug would be even more obvious to me.
+> > 
+> > And I would guess that if we want to do that in the future, the
+> > easiest way as the first step would be that we just tell vfio to avoid
+> > using huge pages when we see balloon devices.  It might be an
+> > understandable cost at least to me to use both vfio-pci and the
+> > balloon device.
+> 
+> There are a couple problem there though, first if we decide to use
+> smaller pages for any case where we have a balloon device (a device
+> that libvirt adds by default and requires manually editing the XML to
+> remove), we introduce a performance regression for pretty much every
+> existing VM as we restrict the IOMMU from making use of superpages and
+> therefore depend far more on the IOTLB.  Second, QEMU doesn't have
+> control of the mapping page size.  The vfio MAP_DMA ioctl simply takes
+> a virtual address, IOVA (GPA) and size, the IOMMU gets to map this
+> however it finds most efficient and the API requires unmapping with a
+> minimum granularity matching the original mapping.  So again, the only
+> way QEMU can get page size unmapping granularity is to perform only
+> page sized mappings.  We could add a mapping flag to specify page size
+> mapping and therefore page granularity unmapping, but that's a new
+> contract (ie. API) between the user and vfio that comes with a
+> performance penalty.  There is currently a vfio_iommu_type1 module
+> option which disables IOMMU superpage support globally, but we don't
+> have per instance control with the current APIs.
 
-Looking good.  I've noted a few nits below, but they're very minor -
-I wouldn't even bother to ask for the changes if we didn't have to
-wait for 3.1 anyway.
+IIRC there were similar requests before to allow userspace to specify
+page sizes to be used by vfio IOMMU backends but it didn't make it at
+last.  But now I understand that this IOMMU page granularity problem
+within the vfio IOMMU backend is a separate one to be settled
+comparing to the one you mentioned in QEMU memory API.
 
+(Though I also feel uncertain on whether libvirt should at least
+ provide a simpler interface to allow the guest to disable the default
+ balloon device...)
 
->=20
->  include/hw/ppc/spapr.h     |  5 ++++
->  include/hw/ppc/spapr_irq.h | 32 ++++++++++++++++++++++
->  hw/ppc/spapr.c             | 32 +++++++++++++++++++++-
->  hw/ppc/spapr_events.c      | 12 ++++++--
->  hw/ppc/spapr_irq.c         | 56 ++++++++++++++++++++++++++++++++++++++
->  hw/ppc/spapr_pci.c         | 29 ++++++++++++++++----
->  hw/ppc/spapr_vio.c         | 47 ++++++++++++++++++++++++++++----
->  hw/ppc/Makefile.objs       |  2 +-
->  8 files changed, 199 insertions(+), 16 deletions(-)
->  create mode 100644 include/hw/ppc/spapr_irq.h
->  create mode 100644 hw/ppc/spapr_irq.c
->=20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 7e5de1a6fd42..73067f5ee8aa 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -8,6 +8,7 @@
->  #include "hw/ppc/spapr_drc.h"
->  #include "hw/mem/pc-dimm.h"
->  #include "hw/ppc/spapr_ovec.h"
-> +#include "hw/ppc/spapr_irq.h"
-> =20
->  struct VIOsPAPRBus;
->  struct sPAPRPHBState;
-> @@ -101,6 +102,8 @@ struct sPAPRMachineClass {
->      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMB=
-s */
->      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
->      bool pre_2_10_has_unused_icps;
-> +    bool legacy_irq_allocation;
-> +
->      void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
->                            uint64_t *buid, hwaddr *pio,=20
->                            hwaddr *mmio32, hwaddr *mmio64,
-> @@ -167,6 +170,8 @@ struct sPAPRMachineState {
->      char *kvm_type;
-> =20
->      const char *icp_type;
-> +    int32_t irq_map_nr;
-> +    unsigned long *irq_map;
-> =20
->      bool cmd_line_caps[SPAPR_CAP_NUM];
->      sPAPRCapabilities def, eff, mig;
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> new file mode 100644
-> index 000000000000..6f7f50548809
-> --- /dev/null
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -0,0 +1,32 @@
-> +/*
-> + * QEMU PowerPC sPAPR IRQ backend definitions
-> + *
-> + * Copyright (c) 2018, IBM Corporation.
-> + *
-> + * This code is licensed under the GPL version 2 or later. See the
-> + * COPYING file in the top-level directory.
-> + */
-> +
-> +#ifndef HW_SPAPR_IRQ_H
-> +#define HW_SPAPR_IRQ_H
-> +
-> +/*
-> + * IRQ range offsets per device type
-> + */
-> +#define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
-> +#define SPAPR_IRQ_HOTPLUG    0x1001
-> +#define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
-> +#define SPAPR_IRQ_PCI_LSI    0x1200  /* 32+ PHBs devices */
-> +
-> +#define SPAPR_IRQ_MSI        0x1300  /* Offset of the dynamic range cove=
-red
-> +                                      * by the bitmap allocator */
-> +
-> +typedef struct sPAPRMachineState sPAPRMachineState;
-> +
-> +void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_msis);
-> +int spapr_irq_msi_alloc(sPAPRMachineState *spapr, uint32_t num, bool ali=
-gn,
-> +                        Error **errp);
-> +void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t num);
-> +void spapr_irq_msi_reset(sPAPRMachineState *spapr);
-> +
-> +#endif
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 3f5e1d3ec21a..7bc9a48abf04 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -189,6 +189,11 @@ static void xics_system_init(MachineState *machine, =
-int nr_irqs, Error **errp)
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
->      Error *local_err =3D NULL;
-> =20
-> +    /* Initialize the MSI IRQ allocator. */
-> +    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +        spapr_irq_msi_init(spapr, XICS_IRQ_BASE + nr_irqs - SPAPR_IRQ_MS=
-I);
-> +    }
-> +
->      if (kvm_enabled()) {
->          if (machine_kernel_irqchip_allowed(machine) &&
->              !xics_kvm_init(spapr, &local_err)) {
-> @@ -1636,6 +1641,10 @@ static void spapr_machine_reset(void)
->          ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fata=
-l);
->      }
-> =20
-> +    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +        spapr_irq_msi_reset(spapr);
-> +    }
-> +
->      qemu_devices_reset();
-> =20
->      /* DRC reset may cause a device to be unplugged. This will cause tro=
-ubles
-> @@ -1910,6 +1919,24 @@ static const VMStateDescription vmstate_spapr_patb=
-_entry =3D {
->      },
->  };
-> =20
-> +static bool spapr_irq_map_needed(void *opaque)
-> +{
-> +    sPAPRMachineState *spapr =3D opaque;
-> +
-> +    return spapr->irq_map && !bitmap_empty(spapr->irq_map, spapr->irq_ma=
-p_nr);
-> +}
-> +
-> +static const VMStateDescription vmstate_spapr_irq_map =3D {
-> +    .name =3D "spapr_irq_map",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .needed =3D spapr_irq_map_needed,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_BITMAP(irq_map, sPAPRMachineState, 0, irq_map_nr),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
->  static const VMStateDescription vmstate_spapr =3D {
->      .name =3D "spapr",
->      .version_id =3D 3,
-> @@ -1937,6 +1964,7 @@ static const VMStateDescription vmstate_spapr =3D {
->          &vmstate_spapr_cap_cfpc,
->          &vmstate_spapr_cap_sbbc,
->          &vmstate_spapr_cap_ibs,
-> +        &vmstate_spapr_irq_map,
->          NULL
->      }
->  };
-> @@ -4067,7 +4095,9 @@ static void spapr_machine_3_0_instance_options(Mach=
-ineState *machine)
-> =20
->  static void spapr_machine_3_0_class_options(MachineClass *mc)
->  {
-> -    /* Defaults for the latest behaviour inherited from the base class */
-> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> +
-> +    smc->legacy_irq_allocation =3D true;
->  }
-> =20
->  DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index e4f5946a2188..cab950d33446 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -709,7 +709,11 @@ void spapr_events_init(sPAPRMachineState *spapr)
->  {
->      int epow_irq;
-> =20
-> -    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
-> +    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +        epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
-> +    } else {
-> +        epow_irq =3D SPAPR_IRQ_EPOW;
-> +    }
+Thanks,
 
-Nit: these can be rearranged more briefly by initializing to the fixed
-value, then overriding in the legacy case.
-
-> =20
->      spapr_irq_claim(spapr, epow_irq, false, &error_fatal);
-> =20
-> @@ -731,7 +735,11 @@ void spapr_events_init(sPAPRMachineState *spapr)
->      if (spapr->use_hotplug_event_source) {
->          int hp_irq;
-> =20
-> -        hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
-> +        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +            hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
-> +        } else {
-> +            hp_irq =3D SPAPR_IRQ_HOTPLUG;
-> +        }
-
-Here too.
-
->          spapr_irq_claim(spapr, hp_irq, false, &error_fatal);
-> =20
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> new file mode 100644
-> index 000000000000..24e9c1d4433c
-> --- /dev/null
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -0,0 +1,56 @@
-> +/*
-> + * QEMU PowerPC sPAPR IRQ interface
-> + *
-> + * Copyright (c) 2018, IBM Corporation.
-> + *
-> + * This code is licensed under the GPL version 2 or later. See the
-> + * COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/log.h"
-> +#include "qemu/error-report.h"
-> +#include "qapi/error.h"
-> +#include "hw/ppc/spapr.h"
-> +#include "hw/ppc/xics.h"
-> +
-> +void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_msis)
-> +{
-> +    spapr->irq_map_nr =3D nr_msis;
-> +    spapr->irq_map =3D bitmap_new(spapr->irq_map_nr);
-> +}
-> +
-> +int spapr_irq_msi_alloc(sPAPRMachineState *spapr, uint32_t num, bool ali=
-gn,
-> +                        Error **errp)
-> +{
-> +    int irq;
-> +
-> +    /*
-> +     * The 'align_mask' parameter of bitmap_find_next_zero_area()
-> +     * should be one less than a power of 2; 0 means no
-> +     * alignment. Adapt the 'align' value of the former allocator
-> +     * to fit the requirements of bitmap_find_next_zero_area()
-> +     */
-> +    align -=3D 1;
-> +
-> +    irq =3D bitmap_find_next_zero_area(spapr->irq_map, spapr->irq_map_nr=
-, 0, num,
-> +                                     align);
-> +    if (irq =3D=3D spapr->irq_map_nr) {
-> +        error_setg(errp, "can't find a free %d-IRQ block", num);
-> +        return -1;
-> +    }
-> +
-> +    bitmap_set(spapr->irq_map, irq, num);
-> +
-> +    return irq + SPAPR_IRQ_MSI;
-> +}
-> +
-> +void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t num)
-> +{
-> +    bitmap_clear(spapr->irq_map, irq - SPAPR_IRQ_MSI, num);
-> +}
-> +
-> +void spapr_irq_msi_reset(sPAPRMachineState *spapr)
-> +{
-> +    bitmap_clear(spapr->irq_map, 0, spapr->irq_map_nr);
-> +}
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 497b896c7d24..cba5340f4bad 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -334,6 +334,9 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
->              return;
->          }
-> =20
-> +        if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +            spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
-> +        }
->          spapr_irq_free(spapr, msi->first_irq, msi->num);
->          if (msi_present(pdev)) {
->              spapr_msi_setmsg(pdev, 0, false, 0, 0);
-> @@ -372,7 +375,13 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPA=
-PRMachineState *spapr,
->      }
-> =20
->      /* Allocate MSIs */
-> -    irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS_TYP=
-E_MSI, &err);
-> +    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +        irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS=
-_TYPE_MSI,
-> +                             &err);
-> +    } else {
-> +        irq =3D spapr_irq_msi_alloc(spapr, req_num,
-> +                                  ret_intr_type =3D=3D RTAS_TYPE_MSI, &e=
-rr);
-> +    }
->      if (err) {
->          error_reportf_err(err, "Can't allocate MSIs for device %x: ",
->                            config_addr);
-> @@ -392,6 +401,9 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-> =20
->      /* Release previous MSIs */
->      if (msi) {
-> +        if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +            spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
-> +        }
->          spapr_irq_free(spapr, msi->first_irq, msi->num);
->          g_hash_table_remove(phb->msi, &config_addr);
->      }
-> @@ -1708,11 +1720,15 @@ static void spapr_phb_realize(DeviceState *dev, E=
-rror **errp)
->          uint32_t irq;
->          Error *local_err =3D NULL;
-> =20
-> -        irq =3D spapr_irq_findone(spapr, &local_err);
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> -            error_prepend(errp, "can't allocate LSIs: ");
-> -            return;
-> +        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +            irq =3D spapr_irq_findone(spapr, &local_err);
-> +            if (local_err) {
-> +                error_propagate(errp, local_err);
-> +                error_prepend(errp, "can't allocate LSIs: ");
-> +                return;
-> +            }
-> +        } else {
-> +            irq =3D SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS + i;
-
-Here again, you can use the new fixed value as the default.
-
->          }
-> =20
->          spapr_irq_claim(spapr, irq, true, &local_err);
-> @@ -2123,6 +2139,7 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
->      _FDT(fdt_setprop(fdt, bus_off, "ranges", &ranges, sizeof_ranges));
->      _FDT(fdt_setprop(fdt, bus_off, "reg", &bus_reg, sizeof(bus_reg)));
->      _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pci-config-space-type", 0x1=
-));
-> +    /* TODO: fine tune the total count of allocatable MSIs per PHB */
->      _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi", XICS_IRQS_S=
-PAPR));
-> =20
->      /* Dynamic DMA window */
-> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-> index be9af71437cc..a0695200f348 100644
-> --- a/hw/ppc/spapr_vio.c
-> +++ b/hw/ppc/spapr_vio.c
-> @@ -37,12 +37,13 @@
-> =20
->  #include "hw/ppc/spapr.h"
->  #include "hw/ppc/spapr_vio.h"
-> -#include "hw/ppc/xics.h"
->  #include "hw/ppc/fdt.h"
->  #include "trace.h"
-> =20
->  #include <libfdt.h>
-> =20
-> +#define SPAPR_VIO_REG_BASE 0x71000000
-> +
->  static void spapr_vio_get_irq(Object *obj, Visitor *v, const char *name,
->                                void *opaque, Error **errp)
->  {
-> @@ -445,6 +446,32 @@ static void spapr_vio_busdev_reset(DeviceState *qdev)
->      }
->  }
-> =20
-> +/*
-> + * The register property of a VIO device is defined in livirt using a
-> + * base number + 0x1000 increment and in QEMU by incrementing the base
-> + * register number 0x71000000.
-> + *
-> + * The formula below tries to compute a unique index number from the
-> + * register value that will be used to define the IRQ number of the
-> + * VIO device. A maximum of 256 (0x100) VIO devices is covered.
-> + *
-> + * To minimize collisions, we define two distinct ranges depending on
-> + * the "reg" value definition:
-> + *
-> + *     [0x00 - 0x7f]    user/libvirt
-> + *     [0x80 - 0xff]    QEMU VIO model
-> + *
-> + * Collisions will be detected when the IRQ is claimed.
-> + */
-> +static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
-> +{
-> +    if (reg >=3D SPAPR_VIO_REG_BASE) {
-> +        return SPAPR_IRQ_VIO | (reg & 0x7f) | 0x80;
-> +    } else {
-> +        return SPAPR_IRQ_VIO | ((reg & 0x7f) ^ ((reg >> 12) & 0x7f));
-> +    }
-> +}
-> +
->  static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> @@ -485,10 +512,18 @@ static void spapr_vio_busdev_realize(DeviceState *q=
-dev, Error **errp)
->      }
-> =20
->      if (!dev->irq) {
-> -        dev->irq =3D spapr_irq_findone(spapr, &local_err);
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> -            return;
-> +        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +            dev->irq =3D spapr_irq_findone(spapr, &local_err);
-> +            if (local_err) {
-> +                error_propagate(errp, local_err);
-> +                return;
-> +            }
-> +        } else {
-> +            dev->irq =3D spapr_vio_reg_to_irq(dev->reg);
-> +            if (dev->irq =3D=3D SPAPR_IRQ_PCI_LSI) {
-> +                error_setg(errp, "Too many VIO devices");
-> +                return;
-> +            }
->          }
->      }
-> =20
-> @@ -557,7 +592,7 @@ VIOsPAPRBus *spapr_vio_bus_init(void)
->      /* Create bus on bridge device */
->      qbus =3D qbus_create(TYPE_SPAPR_VIO_BUS, dev, "spapr-vio");
->      bus =3D SPAPR_VIO_BUS(qbus);
-> -    bus->next_reg =3D 0x71000000;
-> +    bus->next_reg =3D SPAPR_VIO_REG_BASE;
-> =20
->      /* hcall-vio */
->      spapr_register_hypercall(H_VIO_SIGNAL, h_vio_signal);
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index bcab6323b7ed..4ab556467289 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -4,7 +4,7 @@ obj-y +=3D ppc.o ppc_booke.o fdt.o
->  obj-$(CONFIG_PSERIES) +=3D spapr.o spapr_caps.o spapr_vio.o spapr_events=
-=2Eo
->  obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o spapr_rtas.o
->  obj-$(CONFIG_PSERIES) +=3D spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng=
-=2Eo
-> -obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o
-> +obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o spapr_irq.o
->  # IBM PowerNV
->  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
-i.o pnv_occ.o pnv_bmc.o
->  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---so9zsI5B81VjUb/o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltRRogACgkQbDjKyiDZ
-s5KNng/8DlCeOqP1JftdWMnyOhdODvLLSoqErHbagxYYBXWt+dvXVZI+AX+WDR+J
-GhEiXwV+diQCr7YQK85BvnkIov0vM8Air2fXwEy+6y8XGdJCMcuUmD2gSFs+i6MZ
-xNreh6VUfwYUNg6hM+VhTV2ffuzp5mR8nyaU2XMah8tHYqjAPS0+nFYdZ3KgYfFH
-tcEPCrWiKSGkl5xU4ZaiAw6Dw/H3TzUucCeA7bzfzvK84+hPHfpZAK9+rryB3k3a
-EzmUSm9g5O6uQgDX5SQfHrm4/jn2NM6UnhUMW53FwFERsRP3kSnGjoT2pH9AZBH5
-s9oBimCMnbRkgoNIvIhGAX9bDlGTAFpMtRd6kXSjgbC6Z/wQkhLcbel/wHVJZc17
-NLnRaFI2uosYjMcb2sovAQTDJJ9X55yROoFDZfcjmBXKl4KLd72ljXlea3nQTn3W
-A4tt3CGuWQYDcIlj/Ha8J67uHkUz0sz8836b/GQ5N8GtzkNnCbKSaii2gT7Q1B+q
-EqcZOhO0OjVP8NzeR2D0luBrw7Jw+axSiHSbAatYBjTdbUIiZETpmTFAIbtmSO+c
-g+IvJ1hmQx/aNGTJ2MpAaGBPfo2+5XsdMXXZ/mL5MHubIdteW/Rwbk5aPE576KOU
-JWVqZUAzY2bOGuY2d5DccaEZqr2gWxWQILMRTkdaBnBYQp9zwYQ=
-=48Nq
------END PGP SIGNATURE-----
-
---so9zsI5B81VjUb/o--
+-- 
+Peter Xu
