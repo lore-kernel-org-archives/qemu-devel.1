@@ -1,16 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fgoe3-0001SI-MB
-	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 05:57:48 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fgtfI-0003T0-VW
+	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 11:19:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fgoe2-0001aH-MU
-	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 05:57:47 -0400
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Sat, 21 Jul 2018 14:02:39 -0400
-Message-ID: <1532196162-29453-1-git-send-email-gengdongjiu@huawei.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fgtfF-0005IR-Sj
+	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 11:19:24 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:35910)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fgtfF-0005I8-Jq
+	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 11:19:21 -0400
+Received: by mail-pl0-x244.google.com with SMTP id e11-v6so6415898plb.3
+	for <qemu-devel@nongnu.org>; Sat, 21 Jul 2018 08:19:21 -0700 (PDT)
+References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+	<1532004912-13899-21-git-send-email-stefan.markovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b15a590d-5e2f-b6dd-d887-7d1823bd5e5c@linaro.org>
+Date: Sat, 21 Jul 2018 08:19:16 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 0/3] add support for VCPU event states
+In-Reply-To: <1532004912-13899-21-git-send-email-stefan.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 20/40] target/mips: Implement MT ASE
+ support for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,47 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: gengdongjiu@huawei.com, linuxarm@huawei.com
+To: Stefan Markovic <stefan.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-Support for KVM_GET/SET_VCPU_EVENTS to get/set the SError exception
-state, and support the state migration.
+On 07/19/2018 05:54 AM, Stefan Markovic wrote:
+> +            tcg_temp_free(t0);
+> +        }
+> +    break;
+> +    case NM_FORK:
+> +        check_insn(ctx, ASE_MT);
 
-change since v4:
-1. update the linux header files to 4.18-rc5 
+Watch the indentation.
 
-change since v3:
-1. Add a new new subsection with a suitable 'ras_needed' function
-controlling whether it is present
-2. Add a ARM_FEATURE_RAS feature bit for CPUARMState
+Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-change since v2:
-1. add header definition for arm platform
 
-change since v1:
-1. update the code to fix the build errors
-
-The related kernel change has been already applied to kvmarm/next.
-(https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/log/?h=next)
-
-Dongjiu Geng (3):
-  Update Linux headers to 4.18-rc5
-  kvm: sync linux headers
-  target: arm: Add support for VCPU event states
-
- include/standard-headers/linux/virtio_config.h | 16 +++++--
- linux-headers/asm-arm/kvm.h                    | 13 ++++++
- linux-headers/asm-arm64/kvm.h                  | 13 ++++++
- linux-headers/asm-mips/unistd.h                | 18 +++++---
- linux-headers/asm-powerpc/kvm.h                |  1 +
- linux-headers/asm-powerpc/unistd.h             |  1 +
- linux-headers/asm-s390/unistd_32.h             |  2 +
- linux-headers/asm-s390/unistd_64.h             |  2 +
- linux-headers/linux/kvm.h                      |  1 +
- target/arm/cpu.h                               |  6 +++
- target/arm/kvm64.c                             | 59 ++++++++++++++++++++++++++
- target/arm/machine.c                           | 22 ++++++++++
- 12 files changed, 144 insertions(+), 10 deletions(-)
-
--- 
-1.8.3.1
+r~
