@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fgz7P-0006oD-DL
-	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 17:08:48 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fgzBc-0007j3-OT
+	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 17:13:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fgz7O-0006ca-K0
-	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 17:08:47 -0400
-References: <20180719034118.27741-1-famz@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fgzBb-0008HV-M8
+	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 17:13:08 -0400
+References: <20180713111424.23670-1-mreitz@redhat.com>
+	<20180713111424.23670-3-mreitz@redhat.com>
+	<dbe0d208-1df1-07c4-b65f-7606596de289@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <640247eb-482c-0c27-f1f3-acea29e8cb3a@redhat.com>
-Date: Sat, 21 Jul 2018 23:08:35 +0200
+Message-ID: <3fd8d5fd-8fb9-0e4c-8bdb-ccbd64d5cf91@redhat.com>
+Date: Sat, 21 Jul 2018 23:13:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180719034118.27741-1-famz@redhat.com>
+In-Reply-To: <dbe0d208-1df1-07c4-b65f-7606596de289@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="PxWgkH6j27n1z6QPJ1AjGDiE8gjm1UJwz"
-Subject: Re: [Qemu-devel] [PATCH] block: Don't lock /dev/null and /dev/zero
- automatically
+	boundary="wWy2AdSa5b6Vx8YazDYBkCYp8SKmiErBT"
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use zero writes after source
+ backing EOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +26,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PxWgkH6j27n1z6QPJ1AjGDiE8gjm1UJwz
+--wWy2AdSa5b6Vx8YazDYBkCYp8SKmiErBT
 From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Message-ID: <640247eb-482c-0c27-f1f3-acea29e8cb3a@redhat.com>
-Subject: Re: [PATCH] block: Don't lock /dev/null and /dev/zero automatically
-References: <20180719034118.27741-1-famz@redhat.com>
-In-Reply-To: <20180719034118.27741-1-famz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <3fd8d5fd-8fb9-0e4c-8bdb-ccbd64d5cf91@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use zero writes after source
+ backing EOF
+References: <20180713111424.23670-1-mreitz@redhat.com>
+ <20180713111424.23670-3-mreitz@redhat.com>
+ <dbe0d208-1df1-07c4-b65f-7606596de289@redhat.com>
+In-Reply-To: <dbe0d208-1df1-07c4-b65f-7606596de289@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-07-19 05:41, Fam Zheng wrote:
-> On my Fedora 28, /dev/null is locked by some other process (couldn't
-> inspect it due to the current lslocks limitation), so iotests 226 fails=
-
-> with some unexpected image locking errors because it uses qemu-io to
-> open it.
+On 2018-07-20 23:22, Eric Blake wrote:
+> On 07/13/2018 06:14 AM, Max Reitz wrote:
+>> Past the end of the source backing file, we memset() buf_old to zero, =
+so
+>> it is clearly easy to use blk_pwrite_zeroes() instead of blk_pwrite()
+>> then.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 qemu-img.c | 11 +++++++++--
+>> =C2=A0 1 file changed, 9 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/qemu-img.c b/qemu-img.c
+>> index dd684d8bf0..2552e7dad6 100644
+>> --- a/qemu-img.c
+>> +++ b/qemu-img.c
+>> @@ -3403,6 +3403,8 @@ static int img_rebase(int argc, char **argv)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (off=
+set =3D 0; offset < size; offset +=3D n) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bo=
+ol buf_old_is_zero =3D false;
+>> +
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 /* How many bytes can we handle with the next read? */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 n =3D MIN(IO_BUF_SIZE, size - offset);
+>> =C2=A0 @@ -3423,6 +3425,7 @@ static int img_rebase(int argc, char **ar=
+gv)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 if (offset >=3D old_backing_size) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memset(buf_old, 0, n);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 buf_old_is_zero =3D true;
 >=20
-> Actually it's safe to not use any lock on /dev/null or /dev/zero.
+> Do we still need to spend time on the memset(), or...
 >=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/file-posix.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 } else {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (offset + n > old_backing_size) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 n =3D old_backing_=
+size - offset;
+>> @@ -3458,8 +3461,12 @@ static int img_rebase(int argc, char **argv)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (compare_buffers(buf_old + written, buf=
+_new +
+>> written,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ n - written, &pnum))
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D blk_pwrite(blk, off=
+set + written,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+buf_old + written, pnum, 0);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (buf_old_is_zero) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
+ =3D blk_pwrite_zeroes(blk, offset +
+>> written, pnum, 0);
 >=20
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 60af4b3d51..8bf034108a 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -503,7 +503,12 @@ static int raw_open_common(BlockDriverState *bs, Q=
-Dict *options,
->          s->use_lock =3D false;
->          break;
->      case ON_OFF_AUTO_AUTO:
-> -        s->use_lock =3D qemu_has_ofd_lock();
-> +        if (!strcmp(filename, "/dev/null") ||
-> +                   !strcmp(filename, "/dev/zero")) {
+> ...are we able to guarantee that old_buf will not be used when
+> buf_old_is_zero?
 
-I=E2=80=99m not sure I like a strcmp() based on filename (though it shoul=
-d work
-for all of the cases where someone would want to specify either of those
-for a qemu block device).  Isn=E2=80=99t there some specific major/minor =
-number
-we can use to check for these two files?  Or are those Linux-specific?
+It will certainly be used, as it is used in the compare_buffers() call.
 
-I could also imagine just not locking any host_device, but since people
-do use qcow2 immediately on block devices, maybe we do want to lock them.=
-
-
-Finally, if really all you are trying to do is to make test code easier,
-then I don=E2=80=99t know exactly why.  Just disabling locking in 226 sho=
-uldn=E2=80=99t
-be too hard.
+It could be optimized, but I fear that may lead down a small rabbit hole
+(we could then also get the block status of the target backing file, see
+whether it is zero, and so on).  Considering that rebase is probably not
+something many people use all the time, I think it=E2=80=99s OK to be slo=
+wer
+than possible for now.  (Until someone complains.)
 
 Max
 
-> +            s->use_lock =3D false;
-> +        } else {
-> +            s->use_lock =3D qemu_has_ofd_lock();
-> +        }
->          break;
->      default:
->          abort();
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
+ =3D blk_pwrite(blk, offset + written,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 buf_old + written, pnum, 0);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 error_report("Error while writing to COW
+>> image: %s",
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 strerror(-ret));
+>>
+>=20
+> The series seems reasonable, but is post-3.0 material, so I haven't
+> reviewed it any closer than this question.
 >=20
 
 
 
---PxWgkH6j27n1z6QPJ1AjGDiE8gjm1UJwz
+--wWy2AdSa5b6Vx8YazDYBkCYp8SKmiErBT
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltToNMACgkQ9AfbAGHV
-z0D6gggAtk/HVFVY2EYcZKIaIBaeBpkfkPVfpY0mQFv1QtIRjNcqtCePOx0o4ECT
-dJJfTFCDuz6Pt6XO8po358HFDGR20ffmCReXDVS90U6MkMkAA/jDm4Jv5UnADNuN
-HXS++7V5hJi0qIfyJpOY8/QK2UnxKpHaA0ubHJ+mBqCP5ZolUiL4bPkiFgWSSndt
-r78naTnt83bJJmnoyeJl5nxOfRQAy3lDctoOYxYxrwCI9dFCty5B36gj9OgRLJxO
-oOUgL8Yy9/rdJuSvY4bFy/Zigcykc3C2ev1TMDFZokQfF3US+EiA+DzVC2djx5mS
-5gOYRaYZ6j5LXgar4fwAjop/tF/5WQ==
-=r0iW
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltTodwACgkQ9AfbAGHV
+z0AwpAf/btCGNmDnK+AOwDnheLdTD8BkP68skKZTYEH5y9rl2HmQiTLb5aRPn1UI
+1WYZss7bYaVe0RshsQkzOo+XiMpiWIU/+Ww7HMEhDoZwfH4+gqcsJTYMH00ezv7F
+JRM4a7Ucvk6z0cYueISwapV/q9D/60mnmHgDuKKuq3ULzcDbV83Kmed1zG8XfWcr
+/SxK9XlhTcfYE47zku4pV3kGtEeWkHWE8CgAHSlsrjVyeUXcg08dly4V2jXZzsEo
+ZSCX2r1WX46RnfJ9wNgtrE61b8hNPQsCBJyTjGaBEY7SbscvLU33/fKDNiT9gjb9
+Col6QnZNatmTBl8pOWL8YXO3wcrtwg==
+=tRUi
 -----END PGP SIGNATURE-----
 
---PxWgkH6j27n1z6QPJ1AjGDiE8gjm1UJwz--
+--wWy2AdSa5b6Vx8YazDYBkCYp8SKmiErBT--
