@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fgoZO-00066z-BA
-	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 05:52:59 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1fgoZP-00068U-UL
+	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 05:53:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fgoZN-0007aB-Ak
-	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 05:52:58 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1fgoZO-0007as-L5
+	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 05:53:00 -0400
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Sat, 21 Jul 2018 13:57:43 -0400
-Message-ID: <1532195863-23945-4-git-send-email-gengdongjiu@huawei.com>
+Date: Sat, 21 Jul 2018 13:57:41 -0400
+Message-ID: <1532195863-23945-2-git-send-email-gengdongjiu@huawei.com>
 In-Reply-To: <1532195863-23945-1-git-send-email-gengdongjiu@huawei.com>
 References: <1532195863-23945-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 3/3] target: arm: Add support for VCPU event
- states
+Subject: [Qemu-devel] [PATCH v5 1/3] Update Linux headers to 4.18-rc5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,181 +24,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: gengdongjiu@huawei.com, linuxarm@huawei.com
 
-This patch extends the qemu-kvm state sync logic with support for
-KVM_GET/SET_VCPU_EVENTS, giving access to yet missing SError exception.
-And also it can support the exception state migration.
+Update our copy of the Linux headers to upstream 4.18-rc5
+(kernel commit 9d3cce1e8b8561fed5f38)
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
-change since v4:
-1. Rebase the code to latest
+ include/standard-headers/linux/virtio_config.h | 16 ++++++++++++----
+ linux-headers/asm-mips/unistd.h                | 18 ++++++++++++------
+ linux-headers/asm-powerpc/kvm.h                |  1 +
+ linux-headers/asm-powerpc/unistd.h             |  1 +
+ linux-headers/asm-s390/unistd_32.h             |  2 ++
+ linux-headers/asm-s390/unistd_64.h             |  2 ++
+ 6 files changed, 30 insertions(+), 10 deletions(-)
 
-change since v3:
-1. Add a new new subsection with a suitable 'ras_needed' function
-   controlling whether it is present
-2. Add a ARM_FEATURE_RAS feature bit for CPUARMState
-
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
- target/arm/cpu.h     |  6 ++++++
- target/arm/kvm64.c   | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- target/arm/machine.c | 22 ++++++++++++++++++++
- 3 files changed, 87 insertions(+)
-
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e310ffc..f00f0b6 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -645,6 +645,11 @@ typedef struct CPUARMState {
-     const struct arm_boot_info *boot_info;
-     /* Store GICv3CPUState to access from this struct */
-     void *gicv3state;
-+    struct {
-+        uint32_t pending;
-+        uint32_t has_esr;
-+        uint64_t esr;
-+    } serror;
- } CPUARMState;
+diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
+index b777069..0b19436 100644
+--- a/include/standard-headers/linux/virtio_config.h
++++ b/include/standard-headers/linux/virtio_config.h
+@@ -45,11 +45,14 @@
+ /* We've given up on this device. */
+ #define VIRTIO_CONFIG_S_FAILED		0x80
  
- /**
-@@ -1486,6 +1491,7 @@ enum arm_features {
-     ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
-     ARM_FEATURE_V8_FCMA, /* has complex number part of v8.3 extensions.  */
-     ARM_FEATURE_M_MAIN, /* M profile Main Extension */
-+    ARM_FEATURE_RAS_EXT, /* has RAS Extension */
- };
+-/* Some virtio feature bits (currently bits 28 through 32) are reserved for the
+- * transport being used (eg. virtio_ring), the rest are per-device feature
+- * bits. */
++/*
++ * Virtio feature bits VIRTIO_TRANSPORT_F_START through
++ * VIRTIO_TRANSPORT_F_END are reserved for the transport
++ * being used (e.g. virtio_ring, virtio_pci etc.), the
++ * rest are per-device feature bits.
++ */
+ #define VIRTIO_TRANSPORT_F_START	28
+-#define VIRTIO_TRANSPORT_F_END		34
++#define VIRTIO_TRANSPORT_F_END		38
  
- static inline int arm_feature(CPUARMState *env, int feature)
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index e0b8246..ebf7a00 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -527,6 +527,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         unset_feature(&env->features, ARM_FEATURE_PMU);
-     }
+ #ifndef VIRTIO_CONFIG_NO_LEGACY
+ /* Do we get callbacks when the ring is completely used, even if we've
+@@ -71,4 +74,9 @@
+  * this is for compatibility with legacy systems.
+  */
+ #define VIRTIO_F_IOMMU_PLATFORM		33
++
++/*
++ * Does the device support Single Root I/O Virtualization?
++ */
++#define VIRTIO_F_SR_IOV			37
+ #endif /* _LINUX_VIRTIO_CONFIG_H */
+diff --git a/linux-headers/asm-mips/unistd.h b/linux-headers/asm-mips/unistd.h
+index 9bfef7f..d4a85ef 100644
+--- a/linux-headers/asm-mips/unistd.h
++++ b/linux-headers/asm-mips/unistd.h
+@@ -388,17 +388,19 @@
+ #define __NR_pkey_alloc			(__NR_Linux + 364)
+ #define __NR_pkey_free			(__NR_Linux + 365)
+ #define __NR_statx			(__NR_Linux + 366)
++#define __NR_rseq			(__NR_Linux + 367)
++#define __NR_io_pgetevents		(__NR_Linux + 368)
  
-+    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_INJECT_SERROR_ESR)) {
-+        set_feature(&env->features, ARM_FEATURE_RAS_EXT);
-+    }
-+
-     /* Do KVM_ARM_VCPU_INIT ioctl */
-     ret = kvm_arm_vcpu_init(cs);
-     if (ret) {
-@@ -600,6 +604,50 @@ int kvm_arm_cpreg_level(uint64_t regidx)
- #define AARCH64_SIMD_CTRL_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U32 | \
-                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
  
-+static int kvm_put_vcpu_events(ARMCPU *cpu)
-+{
-+    CPUARMState *env = &cpu->env;
-+    struct kvm_vcpu_events events = {};
-+
-+    if (!kvm_has_vcpu_events()) {
-+        return 0;
-+    }
-+
-+    memset(&events, 0, sizeof(events));
-+    events.exception.serror_pending = env->serror.pending;
-+
-+    if (arm_feature(env, ARM_FEATURE_RAS_EXT)) {
-+        events.exception.serror_has_esr = env->serror.has_esr;
-+        events.exception.serror_esr = env->serror.esr;
-+    }
-+
-+    return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
-+}
-+
-+static int kvm_get_vcpu_events(ARMCPU *cpu)
-+{
-+    CPUARMState *env = &cpu->env;
-+    struct kvm_vcpu_events events;
-+    int ret;
-+
-+    if (!kvm_has_vcpu_events()) {
-+        return 0;
-+    }
-+
-+    memset(&events, 0, sizeof(events));
-+    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_VCPU_EVENTS, &events);
-+
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    env->serror.pending = events.exception.serror_pending;
-+    env->serror.has_esr = events.exception.serror_has_esr;
-+    env->serror.esr = events.exception.serror_esr;
-+
-+    return 0;
-+}
-+
- int kvm_arch_put_registers(CPUState *cs, int level)
- {
-     struct kvm_one_reg reg;
-@@ -727,6 +775,12 @@ int kvm_arch_put_registers(CPUState *cs, int level)
-         return ret;
-     }
+ /*
+  * Offset of the last Linux o32 flavoured syscall
+  */
+-#define __NR_Linux_syscalls		366
++#define __NR_Linux_syscalls		368
  
-+    ret = kvm_put_vcpu_events(cpu);
-+    if (ret) {
-+        printf("return error kvm_put_vcpu_events: %d\n", ret);
-+        return ret;
-+    }
-+
-     if (!write_list_to_kvmstate(cpu, level)) {
-         return EINVAL;
-     }
-@@ -863,6 +917,11 @@ int kvm_arch_get_registers(CPUState *cs)
-     }
-     vfp_set_fpcr(env, fpr);
+ #endif /* _MIPS_SIM == _MIPS_SIM_ABI32 */
  
-+    ret = kvm_get_vcpu_events(cpu);
-+    if (ret) {
-+        return ret;
-+    }
-+
-     if (!write_kvmstate_to_list(cpu)) {
-         return EINVAL;
-     }
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 2e28d08..ead8b2a 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -172,6 +172,27 @@ static const VMStateDescription vmstate_sve = {
- };
- #endif /* AARCH64 */
+ #define __NR_O32_Linux			4000
+-#define __NR_O32_Linux_syscalls		366
++#define __NR_O32_Linux_syscalls		368
  
-+static bool ras_needed(void *opaque)
-+{
-+    ARMCPU *cpu = opaque;
-+    CPUARMState *env = &cpu->env;
-+
-+    return arm_feature(env, ARM_FEATURE_RAS_EXT);
-+}
-+
-+static const VMStateDescription vmstate_ras = {
-+    .name = "cpu/ras",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = ras_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.serror.pending, ARMCPU),
-+        VMSTATE_UINT32(env.serror.has_esr, ARMCPU),
-+        VMSTATE_UINT64(env.serror.esr, ARMCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static bool m_needed(void *opaque)
- {
-     ARMCPU *cpu = opaque;
-@@ -723,6 +744,7 @@ const VMStateDescription vmstate_arm_cpu = {
- #ifdef TARGET_AARCH64
-         &vmstate_sve,
- #endif
-+        &vmstate_ras,
-         NULL
-     }
- };
+ #if _MIPS_SIM == _MIPS_SIM_ABI64
+ 
+@@ -733,16 +735,18 @@
+ #define __NR_pkey_alloc			(__NR_Linux + 324)
+ #define __NR_pkey_free			(__NR_Linux + 325)
+ #define __NR_statx			(__NR_Linux + 326)
++#define __NR_rseq			(__NR_Linux + 327)
++#define __NR_io_pgetevents		(__NR_Linux + 328)
+ 
+ /*
+  * Offset of the last Linux 64-bit flavoured syscall
+  */
+-#define __NR_Linux_syscalls		326
++#define __NR_Linux_syscalls		328
+ 
+ #endif /* _MIPS_SIM == _MIPS_SIM_ABI64 */
+ 
+ #define __NR_64_Linux			5000
+-#define __NR_64_Linux_syscalls		326
++#define __NR_64_Linux_syscalls		328
+ 
+ #if _MIPS_SIM == _MIPS_SIM_NABI32
+ 
+@@ -1081,15 +1085,17 @@
+ #define __NR_pkey_alloc			(__NR_Linux + 328)
+ #define __NR_pkey_free			(__NR_Linux + 329)
+ #define __NR_statx			(__NR_Linux + 330)
++#define __NR_rseq			(__NR_Linux + 331)
++#define __NR_io_pgetevents		(__NR_Linux + 332)
+ 
+ /*
+  * Offset of the last N32 flavoured syscall
+  */
+-#define __NR_Linux_syscalls		330
++#define __NR_Linux_syscalls		332
+ 
+ #endif /* _MIPS_SIM == _MIPS_SIM_NABI32 */
+ 
+ #define __NR_N32_Linux			6000
+-#define __NR_N32_Linux_syscalls		330
++#define __NR_N32_Linux_syscalls		332
+ 
+ #endif /* _ASM_UNISTD_H */
+diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
+index 833ed9a..1b32b56 100644
+--- a/linux-headers/asm-powerpc/kvm.h
++++ b/linux-headers/asm-powerpc/kvm.h
+@@ -633,6 +633,7 @@ struct kvm_ppc_cpu_char {
+ #define KVM_REG_PPC_PSSCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbd)
+ 
+ #define KVM_REG_PPC_DEC_EXPIRY	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbe)
++#define KVM_REG_PPC_ONLINE	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0xbf)
+ 
+ /* Transactional Memory checkpointed state:
+  * This is all GPRs, all VSX regs and a subset of SPRs
+diff --git a/linux-headers/asm-powerpc/unistd.h b/linux-headers/asm-powerpc/unistd.h
+index 3629858..ec3533b 100644
+--- a/linux-headers/asm-powerpc/unistd.h
++++ b/linux-headers/asm-powerpc/unistd.h
+@@ -399,5 +399,6 @@
+ #define __NR_pkey_free		385
+ #define __NR_pkey_mprotect	386
+ #define __NR_rseq		387
++#define __NR_io_pgetevents	388
+ 
+ #endif /* _ASM_POWERPC_UNISTD_H_ */
+diff --git a/linux-headers/asm-s390/unistd_32.h b/linux-headers/asm-s390/unistd_32.h
+index d0f97cd..514e302 100644
+--- a/linux-headers/asm-s390/unistd_32.h
++++ b/linux-headers/asm-s390/unistd_32.h
+@@ -361,5 +361,7 @@
+ #define __NR_statx 379
+ #define __NR_s390_sthyi 380
+ #define __NR_kexec_file_load 381
++#define __NR_io_pgetevents 382
++#define __NR_rseq 383
+ 
+ #endif /* _ASM_S390_UNISTD_32_H */
+diff --git a/linux-headers/asm-s390/unistd_64.h b/linux-headers/asm-s390/unistd_64.h
+index 23ffb97..d2b73de 100644
+--- a/linux-headers/asm-s390/unistd_64.h
++++ b/linux-headers/asm-s390/unistd_64.h
+@@ -328,5 +328,7 @@
+ #define __NR_statx 379
+ #define __NR_s390_sthyi 380
+ #define __NR_kexec_file_load 381
++#define __NR_io_pgetevents 382
++#define __NR_rseq 383
+ 
+ #endif /* _ASM_S390_UNISTD_64_H */
 -- 
 1.8.3.1
