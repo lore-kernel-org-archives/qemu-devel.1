@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fgoZO-000674-Hx
-	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 05:52:59 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1fgodz-0001Nm-9F
+	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 05:57:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fgoZN-0007aP-G6
-	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 05:52:58 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1fgody-0001Ym-8O
+	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 05:57:43 -0400
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Sat, 21 Jul 2018 13:57:42 -0400
-Message-ID: <1532195863-23945-3-git-send-email-gengdongjiu@huawei.com>
-In-Reply-To: <1532195863-23945-1-git-send-email-gengdongjiu@huawei.com>
-References: <1532195863-23945-1-git-send-email-gengdongjiu@huawei.com>
+Date: Sat, 21 Jul 2018 14:02:41 -0400
+Message-ID: <1532196162-29453-3-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1532196162-29453-1-git-send-email-gengdongjiu@huawei.com>
+References: <1532196162-29453-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 2/3] kvm: sync linux headers
+Subject: [Qemu-devel] [PATCH v6 2/3] kvm: sync linux headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,7 +27,7 @@ Cc: gengdongjiu@huawei.com, linuxarm@huawei.com
 Import KVM_CAP_ARM_INJECT_SERROR_ESR and kvm_vcpu_events
 struct definition.
 
-The related kernel change has been already applied to kvmarm/next.
+The related kernel change have been already applied to kvmarm/next.
 (https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/log/?h=next)
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
