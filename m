@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1fh4GC-0000Rw-01
-	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 22:38:12 -0400
+	(envelope-from <bounces@canonical.com>) id 1fh60e-0002my-P5
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 00:30:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1fh4G8-0002JK-P1
-	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 22:38:12 -0400
-Received: from mail-ua0-f195.google.com ([209.85.217.195]:41731)
+	(envelope-from <bounces@canonical.com>) id 1fh60c-0007FQ-0i
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 00:30:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49888)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1fh4G8-0002J1-KJ
-	for qemu-devel@nongnu.org; Sat, 21 Jul 2018 22:38:08 -0400
-Received: by mail-ua0-f195.google.com with SMTP id t14-v6so9720553uao.8
-	for <qemu-devel@nongnu.org>; Sat, 21 Jul 2018 19:38:08 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fh60b-0007FJ-QO
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 00:30:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fh60b-0007NS-1I
+	for <qemu-devel@nongnu.org>; Sun, 22 Jul 2018 04:30:13 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 065932E80C3
+	for <qemu-devel@nongnu.org>; Sun, 22 Jul 2018 04:30:13 +0000 (UTC)
 MIME-Version: 1.0
-References: <20180719034118.27741-1-famz@redhat.com>
-	<640247eb-482c-0c27-f1f3-acea29e8cb3a@redhat.com>
-In-Reply-To: <640247eb-482c-0c27-f1f3-acea29e8cb3a@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-Date: Sun, 22 Jul 2018 10:37:31 +0800
-Message-ID: <CAK1Eb9mQ8ERn5eiA6hyXotmbgTckU=TE8mNbX+zeotXXfMxmGg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] block: Don't lock /dev/null and /dev/zero
- automatically
+Date: Sun, 22 Jul 2018 04:17:22 -0000
+From: Launchpad Bug Tracker <1434779@bugs.launchpad.net>
+Reply-To: Bug 1434779 <1434779@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150321074437.16517.74688.malonedeb@gac.canonical.com>
+Message-Id: <153223304317.12964.18146271601324766099.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1434779] Re: qemu hangs on live-migration with
+ storage(virtual machine: windows Server 2008 with only one disk )
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +37,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Sun, Jul 22, 2018 at 5:08 AM Max Reitz <mreitz@redhat.com> wrote:
->
-> On 2018-07-19 05:41, Fam Zheng wrote:
-> > On my Fedora 28, /dev/null is locked by some other process (couldn't
-> > inspect it due to the current lslocks limitation), so iotests 226 fails
-> > with some unexpected image locking errors because it uses qemu-io to
-> > open it.
-> >
-> > Actually it's safe to not use any lock on /dev/null or /dev/zero.
-> >
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  block/file-posix.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/block/file-posix.c b/block/file-posix.c
-> > index 60af4b3d51..8bf034108a 100644
-> > --- a/block/file-posix.c
-> > +++ b/block/file-posix.c
-> > @@ -503,7 +503,12 @@ static int raw_open_common(BlockDriverState *bs, Q=
-Dict *options,
-> >          s->use_lock =3D false;
-> >          break;
-> >      case ON_OFF_AUTO_AUTO:
-> > -        s->use_lock =3D qemu_has_ofd_lock();
-> > +        if (!strcmp(filename, "/dev/null") ||
-> > +                   !strcmp(filename, "/dev/zero")) {
->
-> I=E2=80=99m not sure I like a strcmp() based on filename (though it shoul=
-d work
-> for all of the cases where someone would want to specify either of those
-> for a qemu block device).  Isn=E2=80=99t there some specific major/minor =
-number
-> we can use to check for these two files?  Or are those Linux-specific?
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Yeah, I guess major/minor numbers are Linux-specific.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
->
-> I could also imagine just not locking any host_device, but since people
-> do use qcow2 immediately on block devices, maybe we do want to lock them.
+-- =
 
-That's right.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1434779
 
->
-> Finally, if really all you are trying to do is to make test code easier,
-> then I don=E2=80=99t know exactly why.  Just disabling locking in 226 sho=
-uldn=E2=80=99t
-> be too hard.
+Title:
+  qemu hangs on live-migration with storage(virtual machine: windows
+  Server 2008 with only one disk )
 
-The tricky thing is in remembering to do that for future test cases.
-My machine seems to be somehow different than John's so that my 226
-cannot lock /dev/null, but I'm not sure that is the case for other
-releases, distros or system instances.
+Status in QEMU:
+  Expired
 
-Fam
+Bug description:
+  Hi,
+  We are using =E2=80=9CWindows Server 2008=E2=80=9D with qemu-kvm-2.0.1 (l=
+inux kernel:3.10.0) as a host of  a VM.
+  Using drive_mirror to do  live-migration on the same host for different d=
+isks
+  Local disk: /sf/data/local/
+  Shared disk(iscsi): /sf/other/local/    ---  the disk is busy, the IO rat=
+e is  about  30MB/s
+  qemu-system-x86_64 -k en-us -m 2048 -smp 2 -vnc :3100 -usbdevice tablet -=
+boot c -enable-kvm -drive file=3D/sf/data/local/vm-disk-1.qcow2,if=3Dnone,i=
+d=3Ddrive-ide0,cache=3Dnone,aio=3Dnative -device ide-hd,bus=3Dide.0,unit=3D=
+0,drive=3Ddrive-ide0,id=3Dide0,bootindex=3D100 =
 
->
-> Max
->
-> > +            s->use_lock =3D false;
-> > +        } else {
-> > +            s->use_lock =3D qemu_has_ofd_lock();
-> > +        }
-> >          break;
-> >      default:
-> >          abort();
-> >
->
->
+
+  Step 1:
+  Start migration: Drive_mirror -f drive-ide0  /sf/other/local/test.qcow2
+
+  Step 2:
+  When detect the migration has completed, then send cmd: block_job_complet=
+e -f drive-ide0
+
+  Step 3:
+  send cmd: info status =
+
+  What surprised me is that the qemu monitor reports can=E2=80=99t be conne=
+cted.
+
+  Then find bellows:
+  The  qemu process hangs on the mirror_run->bdrv_drain_all->aio_poll->qemu=
+_poll_ns->ppoll (),
+  None events were received and poll forever. I don=E2=80=99t know why the =
+aio can=E2=80=99t be responsed. This case is hardly to
+  be generated but it really happens sometimes . I=E2=80=99m looking forwar=
+d to getting help from you .
+  The stack capture snapshot:
+
+  =
+
+  Thanks =
+
+  MyAngle
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1434779/+subscriptions
