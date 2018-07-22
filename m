@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fhK9C-0003aC-Nl
-	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 15:36:03 -0400
+	(envelope-from <Jason@zx2c4.com>) id 1fhLGG-0001jg-Dm
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 16:47:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fhK9B-00018M-Ve
-	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 15:36:02 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33573)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fhK9B-000181-PT
-	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 15:36:01 -0400
-Received: by mail-pf1-x443.google.com with SMTP id b17-v6so495873pfi.0
-	for <qemu-devel@nongnu.org>; Sun, 22 Jul 2018 12:36:01 -0700 (PDT)
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Mon, 23 Jul 2018 03:33:50 +0800
-Message-Id: <20180722193350.6028-21-zhangckid@gmail.com>
-In-Reply-To: <20180722193350.6028-1-zhangckid@gmail.com>
-References: <20180722193350.6028-1-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V10 20/20] docs: Add COLO status diagram to
- COLO-FT.txt
+	(envelope-from <Jason@zx2c4.com>) id 1fhLGF-0003XH-Lk
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 16:47:24 -0400
+MIME-Version: 1.0
+References: <CAHmME9q8b0Nss8b7DEoGgqoCK4dEvasQN64QWx6Hio+N92wuSg@mail.gmail.com>
+	<CAHmME9qX22YP9qrHErc43Z+LUi=ichqzG+OdXqjhJv4ZrKDmWQ@mail.gmail.com>
+In-Reply-To: <CAHmME9qX22YP9qrHErc43Z+LUi=ichqzG+OdXqjhJv4ZrKDmWQ@mail.gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Sun, 22 Jul 2018 22:47:06 +0200
+Message-ID: <CAHmME9qMASSt2K4vACJTMiGNTt09upRhNFxL_y2KF1G3N1LB2g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] ARM64 STR Instruction Crash Regression in TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +22,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <chen.zhang@intel.com>
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Zhang Chen <chen.zhang@intel.com>
+Hello,
 
-This diagram make user better understand COLO.
-Suggested by Markus Armbruster.
+Gcc 7.3 compiles bash's array_flush's dual assignment using:
 
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
----
- docs/COLO-FT.txt | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+STP             X20, X20, [X20,#0x10]
 
-diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt
-index d7c7dcda8f..d5007895d1 100644
---- a/docs/COLO-FT.txt
-+++ b/docs/COLO-FT.txt
-@@ -110,6 +110,40 @@ Note:
- HeartBeat has not been implemented yet, so you need to trigger failover process
- by using 'x-colo-lost-heartbeat' command.
- 
-+== COLO operation status ==
-+
-++-----------------+
-+|                 |
-+|    Start COLO   |
-+|                 |
-++--------+--------+
-+         |
-+         |  Main qmp command:
-+         |  migrate-set-capabilities with x-colo
-+         |  migrate
-+         |
-+         v
-++--------+--------+
-+|                 |
-+|  COLO running   |
-+|                 |
-++--------+--------+
-+         |
-+         |  Main qmp command:
-+         |  x-colo-lost-heartbeat
-+         |  or
-+         |  some error happened
-+         v
-++--------+--------+
-+|                 |  send qmp event:
-+|  COLO failover  |  COLO_EXIT
-+|                 |
-++-----------------+
-+
-+COLO use the qmp command switching and report operation status.
-+The diagram just write the main qmp command, you can get the detail
-+in test procedure.
-+
- == Test procedure ==
- 1. Startup qemu
- Primary:
--- 
-2.17.1
+But gcc 8.1 compiles it as:
+
+STR             Q0, [X20,#0x10]
+
+Real processors seem okay, and qemu 2.11 seems okay. But qemu 2.12
+results in a segfaulting process. I'm pretty sure this is a TCG bug.
+
+In the attached tarball, please find kernel and run.sh. Calling
+./run.sh will start the kernel with the bad bash executable that tries
+to execute `config=({1..100000})` and crashes. Also included in there
+is the actual crashing bash binary, in case you'd like to disassemble
+a little bit.
+
+This is affecting builds on https://www.wireguard.com/build-status/ --
+as you can see, at the moment aarch64 is failing.
+
+Regards,
+Jason
+
+[ attachment: https://data.zx2c4.com/bash-qemu-arm64-crash.tar.xz ]
