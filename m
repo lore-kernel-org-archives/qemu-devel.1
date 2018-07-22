@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fhK91-0003Qa-QM
-	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 15:35:52 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fhK99-0003We-B3
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 15:36:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fhK91-00015W-10
-	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 15:35:51 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:38590)
+	(envelope-from <zhangckid@gmail.com>) id 1fhK96-00016k-7j
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 15:35:59 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:33572)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fhK90-00015O-Qi
-	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 15:35:50 -0400
-Received: by mail-pl0-x242.google.com with SMTP id b1-v6so7294661pls.5
-	for <qemu-devel@nongnu.org>; Sun, 22 Jul 2018 12:35:50 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fhK96-00016b-1t
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 15:35:56 -0400
+Received: by mail-pf1-x442.google.com with SMTP id b17-v6so495856pfi.0
+	for <qemu-devel@nongnu.org>; Sun, 22 Jul 2018 12:35:55 -0700 (PDT)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Mon, 23 Jul 2018 03:33:48 +0800
-Message-Id: <20180722193350.6028-19-zhangckid@gmail.com>
+Date: Mon, 23 Jul 2018 03:33:49 +0800
+Message-Id: <20180722193350.6028-20-zhangckid@gmail.com>
 In-Reply-To: <20180722193350.6028-1-zhangckid@gmail.com>
 References: <20180722193350.6028-1-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V10 18/20] COLO: notify net filters about
- checkpoint/failover event
+Subject: [Qemu-devel] [PATCH V10 19/20] COLO: quick failover process by kick
+ COLO thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +31,41 @@ Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.
 
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Notify all net filters about the checkpoint and failover event.
+COLO thread may sleep at qemu_sem_wait(&s->colo_checkpoint_sem),
+while failover works begin, It's better to wakeup it to quick
+the process.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/colo.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ migration/colo.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/migration/colo.c b/migration/colo.c
-index 688d6f40b2..8221a18add 100644
+index 8221a18add..e951159071 100644
 --- a/migration/colo.c
 +++ b/migration/colo.c
-@@ -31,6 +31,7 @@
- #include "qapi/qapi-events-migration.h"
- #include "qapi/qmp/qerror.h"
- #include "sysemu/cpus.h"
-+#include "net/filter.h"
+@@ -131,6 +131,11 @@ static void primary_vm_do_failover(void)
  
- static bool vmstate_loading;
- static Notifier packets_compare_notifier;
-@@ -83,6 +84,12 @@ static void secondary_vm_do_failover(void)
-         error_report_err(local_err);
-     }
+     migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
+                       MIGRATION_STATUS_COMPLETED);
++    /*
++     * kick COLO thread which might wait at
++     * qemu_sem_wait(&s->colo_checkpoint_sem).
++     */
++    colo_checkpoint_notify(migrate_get_current());
  
-+    /* Notify all filters of all NIC to do checkpoint */
-+    colo_notify_filters_event(COLO_EVENT_FAILOVER, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+
-     if (!autostart) {
-         error_report("\"-S\" qemu option will be ignored in secondary side");
-         /* recover runstate to normal migration finish state */
-@@ -781,6 +788,14 @@ void *colo_process_incoming_thread(void *opaque)
-             goto out;
-         }
+     /*
+      * Wake up COLO thread which may blocked in recv() or send(),
+@@ -539,6 +544,9 @@ static void colo_process_checkpoint(MigrationState *s)
  
-+        /* Notify all filters of all NIC to do checkpoint */
-+        colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
-+
-+        if (local_err) {
-+            qemu_mutex_unlock_iothread();
+         qemu_sem_wait(&s->colo_checkpoint_sem);
+ 
++        if (s->state != MIGRATION_STATUS_COLO) {
 +            goto out;
 +        }
-+
-         vmstate_loading = false;
-         vm_start();
-         trace_colo_vm_state_change("stop", "run");
+         ret = colo_do_checkpoint_transaction(s, bioc, fb);
+         if (ret < 0) {
+             goto out;
 -- 
 2.17.1
