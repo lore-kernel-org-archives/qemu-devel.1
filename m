@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fhF0H-0003cG-Do
-	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 10:06:30 -0400
+	(envelope-from <mst@redhat.com>) id 1fhGH3-0004WQ-J6
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 11:27:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fhF0G-0007fO-DR
-	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 10:06:29 -0400
-References: <20180719034118.27741-1-famz@redhat.com>
-	<640247eb-482c-0c27-f1f3-acea29e8cb3a@redhat.com>
-	<CAK1Eb9mQ8ERn5eiA6hyXotmbgTckU=TE8mNbX+zeotXXfMxmGg@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <46511655-713c-6537-0495-0b36384d6fb7@redhat.com>
-Date: Sun, 22 Jul 2018 16:06:18 +0200
+	(envelope-from <mst@redhat.com>) id 1fhGGz-0004ED-DW
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 11:27:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37826 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fhGGz-00047T-7S
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 11:27:49 -0400
+Date: Sun, 22 Jul 2018 18:27:43 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180722182730-mutt-send-email-mst@kernel.org>
+References: <20180720153932.8507-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAK1Eb9mQ8ERn5eiA6hyXotmbgTckU=TE8mNbX+zeotXXfMxmGg@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6A091OrccWJgjx34sutxKsopP2OLIrEM4"
-Subject: Re: [Qemu-devel] [PATCH] block: Don't lock /dev/null and /dev/zero
- automatically
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180720153932.8507-1-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 ?] tests/libqtest: Improve
+ kill_qemu() assert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,111 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6A091OrccWJgjx34sutxKsopP2OLIrEM4
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- qemu block <qemu-block@nongnu.org>
-Message-ID: <46511655-713c-6537-0495-0b36384d6fb7@redhat.com>
-Subject: Re: [PATCH] block: Don't lock /dev/null and /dev/zero automatically
-References: <20180719034118.27741-1-famz@redhat.com>
- <640247eb-482c-0c27-f1f3-acea29e8cb3a@redhat.com>
- <CAK1Eb9mQ8ERn5eiA6hyXotmbgTckU=TE8mNbX+zeotXXfMxmGg@mail.gmail.com>
-In-Reply-To: <CAK1Eb9mQ8ERn5eiA6hyXotmbgTckU=TE8mNbX+zeotXXfMxmGg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jul 20, 2018 at 04:39:32PM +0100, Peter Maydell wrote:
+> In kill_qemu() we have an assert that checks that the QEMU process
+> didn't dump core:
+>             assert(!WCOREDUMP(wstatus));
+> 
+> Unfortunately the WCOREDUMP macro here means the resulting message
+> is not very easy to comprehend on at least some systems:
+> 
+> ahci-test: tests/libqtest.c:113: kill_qemu: Assertion `!(((__extension__ (((union { __typeof(wstatus) __in; int __i; }) { .__in = (wstatus) }).__i))) & 0x80)' failed.
+> 
+> and it doesn't identify what signal the process took.
+> 
+> Instead of using a raw assert, print the information in an
+> easier to understand way:
+> 
+> /i386/ahci/sanity: libqtest.c: kill_qemu() tried to terminate QEMU process but it dumped core with signal 11
+> ahci-test: tests/libqtest.c:118: kill_qemu: Assertion `0' failed.
+> Aborted (core dumped)
+> 
+> (Of course, the really useful information would be why the QEMU
+> process dumped core in the first place, but we don't have that
+> by the time the test program has picked up the exit status.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-On 2018-07-22 04:37, Fam Zheng wrote:
-> On Sun, Jul 22, 2018 at 5:08 AM Max Reitz <mreitz@redhat.com> wrote:
->>
->> On 2018-07-19 05:41, Fam Zheng wrote:
->>> On my Fedora 28, /dev/null is locked by some other process (couldn't
->>> inspect it due to the current lslocks limitation), so iotests 226 fai=
-ls
->>> with some unexpected image locking errors because it uses qemu-io to
->>> open it.
->>>
->>> Actually it's safe to not use any lock on /dev/null or /dev/zero.
->>>
->>> Signed-off-by: Fam Zheng <famz@redhat.com>
->>> ---
->>>  block/file-posix.c | 7 ++++++-
->>>  1 file changed, 6 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/block/file-posix.c b/block/file-posix.c
->>> index 60af4b3d51..8bf034108a 100644
->>> --- a/block/file-posix.c
->>> +++ b/block/file-posix.c
->>> @@ -503,7 +503,12 @@ static int raw_open_common(BlockDriverState *bs,=
- QDict *options,
->>>          s->use_lock =3D false;
->>>          break;
->>>      case ON_OFF_AUTO_AUTO:
->>> -        s->use_lock =3D qemu_has_ofd_lock();
->>> +        if (!strcmp(filename, "/dev/null") ||
->>> +                   !strcmp(filename, "/dev/zero")) {
->>
->> I=E2=80=99m not sure I like a strcmp() based on filename (though it sh=
-ould work
->> for all of the cases where someone would want to specify either of tho=
-se
->> for a qemu block device).  Isn=E2=80=99t there some specific major/min=
-or number
->> we can use to check for these two files?  Or are those Linux-specific?=
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
->=20
-> Yeah, I guess major/minor numbers are Linux-specific.
->=20
->>
->> I could also imagine just not locking any host_device, but since peopl=
-e
->> do use qcow2 immediately on block devices, maybe we do want to lock th=
-em.
->=20
-> That's right.
->=20
->>
->> Finally, if really all you are trying to do is to make test code easie=
-r,
->> then I don=E2=80=99t know exactly why.  Just disabling locking in 226 =
-shouldn=E2=80=99t
->> be too hard.
->=20
-> The tricky thing is in remembering to do that for future test cases.
-> My machine seems to be somehow different than John's so that my 226
-> cannot lock /dev/null, but I'm not sure that is the case for other
-> releases, distros or system instances.
+Up to you whether to apply in 3.0.
 
-Usually we don=E2=80=99t need to use /dev/null, though, because null-co:/=
-/ is
-better suited for most purposes.  This is a very specific test of host
-devices.
-
-Maybe we should start a doc file with common good practices about
-writing iotests?
-
-Max
-
-
---6A091OrccWJgjx34sutxKsopP2OLIrEM4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltUj1oACgkQ9AfbAGHV
-z0BOhgf/VqnB2xgsK2GGXX9Kic1CUgqALW3IfA7t3gGG+SUNbMjGgLDWKaM7Iy+Z
-3ZHIozg3i3hucXRikfEe6/kdXIqklQT1hcOwpao3j0XKc4dAY3wLNHu9YMjLhV9Q
-7K61oaLnAcBCM644wgzBl9ESXVhx1Xelss7b8No6xNDVHgjcBbeyCyIMWUC0yJ4Z
-ykN9edGRSrTnzJTeSS556b4UXy5Pehztku/rN/xXgc+6VMcOEBt/56DvVJ/SPg0L
-5itTEU8E73yFIJTE/qlppADmVpgHr9+n6iDgfwvEJ0FR1qQPwtCsJDhZ/ljQ/usm
-G4ETil6mjaUJHVfLT/lAAUCcoBDKTg==
-=Rf8m
------END PGP SIGNATURE-----
-
---6A091OrccWJgjx34sutxKsopP2OLIrEM4--
+> ---
+> In particular, the travis test config that enables gprof
+> seems to (a) run into this every so often and (b) have the
+> really unhelpful assertion text quoted above:
+>  https://travis-ci.org/qemu/qemu/jobs/406192798
+> 
+> Maybe for 3.0 since it's only test code.
+> 
+>  tests/libqtest.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 098af6aec44..99341e1b47d 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -110,7 +110,13 @@ static void kill_qemu(QTestState *s)
+>          pid = waitpid(s->qemu_pid, &wstatus, 0);
+>  
+>          if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
+> -            assert(!WCOREDUMP(wstatus));
+> +            if (WCOREDUMP(wstatus)) {
+> +                fprintf(stderr,
+> +                        "libqtest.c: kill_qemu() tried to terminate QEMU "
+> +                        "process but it dumped core with signal %d\n",
+> +                        WTERMSIG(wstatus));
+> +                assert(0);
+> +            }
+>          }
+>      }
+>  }
+> -- 
+> 2.17.1
