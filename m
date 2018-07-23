@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhLR-0004d5-Nd
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:22:16 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhLU-0004gR-Ul
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:22:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhLQ-0005lr-PC
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:22:13 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhLS-0005n1-SF
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:22:16 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:17:46 -0500
-Message-Id: <20180723201748.25573-98-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 15:17:47 -0500
+Message-Id: <20180723201748.25573-99-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 97/99] tap: fix memory leak on success to
- create a tap device
+Subject: [Qemu-devel] [PATCH 98/99] qemu-img: avoid overflow of min_sparse
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,88 +22,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Yunjian Wang <wangyunjian@huawei.com>, Jason Wang <jasowang@redhat.com>
+Cc: qemu-stable@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
 
-From: Yunjian Wang <wangyunjian@huawei.com>
+From: Peter Lieven <pl@kamp.de>
 
-The memory leak on success to create a tap device. And the nfds and
-nvhosts may not be the same and need to be processed separately.
+the min_sparse convert parameter can overflow (e.g. -S 1024G)
+in the conversion from int64_t to int resulting in a negative
+min_sparse parameter. Avoid this by limiting the valid parameters
+to sane values. In fact anything exceeding the convert buffer size
+is also pointless. While at it also forbid values that are non
+multiple of 512 to avoid undesired behaviour. For instance, values
+between 1 and 511 were legal, but resulted in full allocation.
 
-Fixes: 07825977 ("tap: fix memory leak on failure to create a multiqueue tap device")
-Fixes: 264986e2 ("tap: multiqueue support")
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-(cherry picked from commit 323e7c117754e4d4ce6b4282d74ad01c99d67714)
+Signed-off-by: Peter Lieven <pl@kamp.de>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 6360ab278cc1ac3e1235e0755e4cba1f918e6f3c)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- net/tap.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ qemu-img.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/net/tap.c b/net/tap.c
-index 89c4e19162..e807e0ea2f 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -805,7 +805,8 @@ int net_init_tap(const Netdev *netdev, const char *name,
-     } else if (tap->has_fds) {
-         char **fds;
-         char **vhost_fds;
--        int nfds, nvhosts;
-+        int nfds = 0, nvhosts = 0;
-+        int ret = 0;
+diff --git a/qemu-img.c b/qemu-img.c
+index a8e2b53dc6..1a055b4424 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1912,6 +1912,8 @@ static int convert_do_copy(ImgConvertState *s)
+     return s->ret;
+ }
  
-         if (tap->has_ifname || tap->has_script || tap->has_downscript ||
-             tap->has_vnet_hdr || tap->has_helper || tap->has_queues ||
-@@ -825,6 +826,7 @@ int net_init_tap(const Netdev *netdev, const char *name,
-             if (nfds != nvhosts) {
-                 error_setg(errp, "The number of fds passed does not match "
-                            "the number of vhostfds passed");
-+                ret = -1;
-                 goto free_fail;
-             }
-         }
-@@ -833,6 +835,7 @@ int net_init_tap(const Netdev *netdev, const char *name,
-             fd = monitor_fd_param(cur_mon, fds[i], &err);
-             if (fd == -1) {
-                 error_propagate(errp, err);
-+                ret = -1;
-                 goto free_fail;
++#define MAX_BUF_SECTORS 32768
++
+ static int img_convert(int argc, char **argv)
+ {
+     int c, bs_i, flags, src_flags = 0;
+@@ -2008,8 +2010,12 @@ static int img_convert(int argc, char **argv)
+             int64_t sval;
+ 
+             sval = cvtnum(optarg);
+-            if (sval < 0) {
+-                error_report("Invalid minimum zero buffer size for sparse output specified");
++            if (sval < 0 || sval & (BDRV_SECTOR_SIZE - 1) ||
++                sval / BDRV_SECTOR_SIZE > MAX_BUF_SECTORS) {
++                error_report("Invalid buffer size for sparse output specified. "
++                    "Valid sizes are multiples of %llu up to %llu. Select "
++                    "0 to disable sparse detection (fully allocates output).",
++                    BDRV_SECTOR_SIZE, MAX_BUF_SECTORS * BDRV_SECTOR_SIZE);
+                 goto fail_getopt;
              }
  
-@@ -843,6 +846,7 @@ int net_init_tap(const Netdev *netdev, const char *name,
-             } else if (vnet_hdr != tap_probe_vnet_hdr(fd)) {
-                 error_setg(errp,
-                            "vnet_hdr not consistent across given tap fds");
-+                ret = -1;
-                 goto free_fail;
-             }
+@@ -2297,9 +2303,9 @@ static int img_convert(int argc, char **argv)
+     }
  
-@@ -852,21 +856,21 @@ int net_init_tap(const Netdev *netdev, const char *name,
-                              vnet_hdr, fd, &err);
-             if (err) {
-                 error_propagate(errp, err);
-+                ret = -1;
-                 goto free_fail;
-             }
-         }
--        g_free(fds);
--        g_free(vhost_fds);
--        return 0;
- 
- free_fail:
-+        for (i = 0; i < nvhosts; i++) {
-+            g_free(vhost_fds[i]);
-+        }
-         for (i = 0; i < nfds; i++) {
-             g_free(fds[i]);
--            g_free(vhost_fds[i]);
-         }
-         g_free(fds);
-         g_free(vhost_fds);
--        return -1;
-+        return ret;
-     } else if (tap->has_helper) {
-         if (tap->has_ifname || tap->has_script || tap->has_downscript ||
-             tap->has_vnet_hdr || tap->has_queues || tap->has_vhostfds) {
+     /* increase bufsectors from the default 4096 (2M) if opt_transfer
+-     * or discard_alignment of the out_bs is greater. Limit to 32768 (16MB)
+-     * as maximum. */
+-    s.buf_sectors = MIN(32768,
++     * or discard_alignment of the out_bs is greater. Limit to
++     * MAX_BUF_SECTORS as maximum which is currently 32768 (16MB). */
++    s.buf_sectors = MIN(MAX_BUF_SECTORS,
+                         MAX(s.buf_sectors,
+                             MAX(out_bs->bl.opt_transfer >> BDRV_SECTOR_BITS,
+                                 out_bs->bl.pdiscard_alignment >>
 -- 
 2.17.1
