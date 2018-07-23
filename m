@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhKm-0003wk-8Y
+	(envelope-from <flukshun@gmail.com>) id 1fhhKm-0003wj-8G
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhKk-0005PE-Fb
+	(envelope-from <flukshun@gmail.com>) id 1fhhKi-0005NQ-8q
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:31 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:17:29 -0500
-Message-Id: <20180723201748.25573-81-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 15:17:28 -0500
+Message-Id: <20180723201748.25573-80-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 80/99] target/arm: Implement FP data-processing
- (2 source) for fp16
+Subject: [Qemu-devel] [PATCH 79/99] target/arm: Introduce and use
+ read_fp_hreg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +29,94 @@ Cc: qemu-stable@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Pe
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-We missed all of the scalar fp16 binary operations.
-
 Cc: qemu-stable@nongnu.org
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 20180512003217.9105-7-richard.henderson@linaro.org
+Message-id: 20180512003217.9105-6-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit b8f5171cf01420a9f0ee895c5591e9b9914f391a)
+(cherry picked from commit 3d99d931266eaeaf7e83703a53f32232cd6faad7)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/arm/translate-a64.c | 65 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ target/arm/translate-a64.c | 30 ++++++++++++++----------------
+ 1 file changed, 14 insertions(+), 16 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index bcb3b5c5e7..5260849f03 100644
+index c5be901b5f..bcb3b5c5e7 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -5056,6 +5056,61 @@ static void handle_fp_2src_double(DisasContext *s, int opcode,
-     tcg_temp_free_i64(tcg_res);
+@@ -614,6 +614,14 @@ static TCGv_i32 read_fp_sreg(DisasContext *s, int reg)
+     return v;
  }
  
-+/* Floating-point data-processing (2 source) - half precision */
-+static void handle_fp_2src_half(DisasContext *s, int opcode,
-+                                int rd, int rn, int rm)
++static TCGv_i32 read_fp_hreg(DisasContext *s, int reg)
 +{
-+    TCGv_i32 tcg_op1;
-+    TCGv_i32 tcg_op2;
-+    TCGv_i32 tcg_res;
-+    TCGv_ptr fpst;
++    TCGv_i32 v = tcg_temp_new_i32();
 +
-+    tcg_res = tcg_temp_new_i32();
-+    fpst = get_fpstatus_ptr(true);
-+    tcg_op1 = read_fp_hreg(s, rn);
-+    tcg_op2 = read_fp_hreg(s, rm);
-+
-+    switch (opcode) {
-+    case 0x0: /* FMUL */
-+        gen_helper_advsimd_mulh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x1: /* FDIV */
-+        gen_helper_advsimd_divh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x2: /* FADD */
-+        gen_helper_advsimd_addh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x3: /* FSUB */
-+        gen_helper_advsimd_subh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x4: /* FMAX */
-+        gen_helper_advsimd_maxh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x5: /* FMIN */
-+        gen_helper_advsimd_minh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x6: /* FMAXNM */
-+        gen_helper_advsimd_maxnumh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x7: /* FMINNM */
-+        gen_helper_advsimd_minnumh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x8: /* FNMUL */
-+        gen_helper_advsimd_mulh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        tcg_gen_xori_i32(tcg_res, tcg_res, 0x8000);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    write_fp_sreg(s, rd, tcg_res);
-+
-+    tcg_temp_free_ptr(fpst);
-+    tcg_temp_free_i32(tcg_op1);
-+    tcg_temp_free_i32(tcg_op2);
-+    tcg_temp_free_i32(tcg_res);
++    tcg_gen_ld16u_i32(v, cpu_env, fp_reg_offset(s, reg, MO_16));
++    return v;
 +}
 +
- /* Floating point data-processing (2 source)
-  *   31  30  29 28       24 23  22  21 20  16 15    12 11 10 9    5 4    0
-  * +---+---+---+-----------+------+---+------+--------+-----+------+------+
-@@ -5088,6 +5143,16 @@ static void disas_fp_2src(DisasContext *s, uint32_t insn)
-         }
-         handle_fp_2src_double(s, opcode, rd, rn, rm);
-         break;
-+    case 3:
-+        if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+        if (!fp_access_check(s)) {
-+            return;
-+        }
-+        handle_fp_2src_half(s, opcode, rd, rn, rm);
-+        break;
-     default:
-         unallocated_encoding(s);
+ /* Clear the bits above an N-bit vector, for N = (is_q ? 128 : 64).
+  * If SVE is not enabled, then there are only 128 bits in the vector.
+  */
+@@ -4638,11 +4646,9 @@ static void disas_fp_csel(DisasContext *s, uint32_t insn)
+ static void handle_fp_1src_half(DisasContext *s, int opcode, int rd, int rn)
+ {
+     TCGv_ptr fpst = NULL;
+-    TCGv_i32 tcg_op = tcg_temp_new_i32();
++    TCGv_i32 tcg_op = read_fp_hreg(s, rn);
+     TCGv_i32 tcg_res = tcg_temp_new_i32();
+ 
+-    read_vec_element_i32(s, tcg_op, rn, 0, MO_16);
+-
+     switch (opcode) {
+     case 0x0: /* FMOV */
+         tcg_gen_mov_i32(tcg_res, tcg_op);
+@@ -7538,13 +7544,10 @@ static void disas_simd_scalar_three_reg_diff(DisasContext *s, uint32_t insn)
+         tcg_temp_free_i64(tcg_op2);
+         tcg_temp_free_i64(tcg_res);
+     } else {
+-        TCGv_i32 tcg_op1 = tcg_temp_new_i32();
+-        TCGv_i32 tcg_op2 = tcg_temp_new_i32();
++        TCGv_i32 tcg_op1 = read_fp_hreg(s, rn);
++        TCGv_i32 tcg_op2 = read_fp_hreg(s, rm);
+         TCGv_i64 tcg_res = tcg_temp_new_i64();
+ 
+-        read_vec_element_i32(s, tcg_op1, rn, 0, MO_16);
+-        read_vec_element_i32(s, tcg_op2, rm, 0, MO_16);
+-
+         gen_helper_neon_mull_s16(tcg_res, tcg_op1, tcg_op2);
+         gen_helper_neon_addl_saturate_s32(tcg_res, cpu_env, tcg_res, tcg_res);
+ 
+@@ -8085,13 +8088,10 @@ static void disas_simd_scalar_three_reg_same_fp16(DisasContext *s,
+ 
+     fpst = get_fpstatus_ptr(true);
+ 
+-    tcg_op1 = tcg_temp_new_i32();
+-    tcg_op2 = tcg_temp_new_i32();
++    tcg_op1 = read_fp_hreg(s, rn);
++    tcg_op2 = read_fp_hreg(s, rm);
+     tcg_res = tcg_temp_new_i32();
+ 
+-    read_vec_element_i32(s, tcg_op1, rn, 0, MO_16);
+-    read_vec_element_i32(s, tcg_op2, rm, 0, MO_16);
+-
+     switch (fpopcode) {
+     case 0x03: /* FMULX */
+         gen_helper_advsimd_mulxh(tcg_res, tcg_op1, tcg_op2, fpst);
+@@ -12010,11 +12010,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
      }
+ 
+     if (is_scalar) {
+-        TCGv_i32 tcg_op = tcg_temp_new_i32();
++        TCGv_i32 tcg_op = read_fp_hreg(s, rn);
+         TCGv_i32 tcg_res = tcg_temp_new_i32();
+ 
+-        read_vec_element_i32(s, tcg_op, rn, 0, MO_16);
+-
+         switch (fpop) {
+         case 0x1a: /* FCVTNS */
+         case 0x1b: /* FCVTMS */
 -- 
 2.17.1
