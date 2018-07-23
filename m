@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fhSVE-00034I-Oc
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1fhSVG-00034N-Od
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fhSVC-0000XV-49
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:20 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38972)
+	(envelope-from <bounces@canonical.com>) id 1fhSVE-0000Zv-A4
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39126)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fhSVB-0000Ua-So
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:18 -0400
+	id 1fhSVE-0000Yu-3Y
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:20 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fhSV9-0006wV-4n
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 04:31:15 +0000
+	id 1fhSVB-0006rX-5H
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 04:31:17 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 72DA92E80CB
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 04:31:14 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4E23D2E818B
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 04:31:16 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Jul 2018 04:17:18 -0000
+Date: Mon, 23 Jul 2018 04:17:19 -0000
 From: Launchpad Bug Tracker <1257352@bugs.launchpad.net>
 Reply-To: Bug 1257352 <1257352@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20131203160523.17652.24548.malonedeb@wampee.canonical.com>
-Message-Id: <153231943836.16639.4836560960170090654.malone@loganberry.canonical.com>
+Message-Id: <153231943983.16639.15149854647733901246.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1257352] Re: kvm hangs occasionally when
  switching out of the qemu console
@@ -39,9 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+[Expired for qemu (Ubuntu) because there has been no activity for 60
+days.]
 
-** Changed in: qemu
+** Changed in: qemu (Ubuntu)
        Status: Incomplete =3D> Expired
 
 -- =
