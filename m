@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhKK-0003Y5-KO
+	(envelope-from <flukshun@gmail.com>) id 1fhhKK-0003Y6-KP
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhKH-0005As-DX
+	(envelope-from <flukshun@gmail.com>) id 1fhhKJ-0005Ce-Dz
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:04 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:17:17 -0500
-Message-Id: <20180723201748.25573-69-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 15:17:18 -0500
+Message-Id: <20180723201748.25573-70-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 68/99] blockjob: expose error string via query
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 69/99] target/arm: Fix fp_status_f16 tininess
+ before rounding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,69 +25,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-stable@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-From: John Snow <jsnow@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-When we've reached the concluded state, we need to expose the error
-state if applicable. Add the new field.
+In commit d81ce0ef2c4f105 we added an extra float_status field
+fp_status_fp16 for Arm, but forgot to initialize it correctly
+by setting it to float_tininess_before_rounding. This currently
+will only cause problems for the new V8_FP16 feature, since the
+float-to-float conversion code doesn't use it yet. The effect
+would be that we failed to set the Underflow IEEE exception flag
+in all the cases where we should.
 
-This should be sufficient for determining if a job completed
-successfully or not after concluding; if we want to discriminate
-based on how it failed more mechanically, we can always add an
-explicit return code enumeration later.
+Add the missing initialization.
 
-I didn't bother to make it only show up if we are in the concluded
-state; I don't think it's necessary.
-
+Fixes: d81ce0ef2c4f105
 Cc: qemu-stable@nongnu.org
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-(cherry picked from commit ab9ba614556ac5b0f8d96b99e0dba19f1e28d6c2)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20180512004311.9299-16-richard.henderson@linaro.org
+(cherry picked from commit bcc531f0364796104df4443d17f99b5fb494eca2)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- blockjob.c           | 2 ++
- qapi/block-core.json | 6 +++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ target/arm/cpu.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/blockjob.c b/blockjob.c
-index 27f957e571..4de48166b2 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -831,6 +831,8 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     info->status    = job->status;
-     info->auto_finalize = job->auto_finalize;
-     info->auto_dismiss  = job->auto_dismiss;
-+    info->has_error = job->ret != 0;
-+    info->error     = job->ret ? g_strdup(strerror(-job->ret)) : NULL;
-     return info;
- }
- 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index c50517bff3..7da3bea6bc 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1172,6 +1172,9 @@
- # @auto-dismiss: Job will dismiss itself when CONCLUDED, moving to the NULL
- #                state and disappearing from the query list. (since 2.12)
- #
-+# @error: Error information if the job did not complete successfully.
-+#         Not set if the job completed successfully. (since 2.12.1)
-+#
- # Since: 1.1
- ##
- { 'struct': 'BlockJobInfo',
-@@ -1179,7 +1182,8 @@
-            'offset': 'int', 'busy': 'bool', 'paused': 'bool', 'speed': 'int',
-            'io-status': 'BlockDeviceIoStatus', 'ready': 'bool',
-            'status': 'BlockJobStatus',
--           'auto-finalize': 'bool', 'auto-dismiss': 'bool' } }
-+           'auto-finalize': 'bool', 'auto-dismiss': 'bool',
-+           '*error': 'str' } }
- 
- ##
- # @query-block-jobs:
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 022d8c5787..7ebe3fcadf 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -311,6 +311,8 @@ static void arm_cpu_reset(CPUState *s)
+                               &env->vfp.fp_status);
+     set_float_detect_tininess(float_tininess_before_rounding,
+                               &env->vfp.standard_fp_status);
++    set_float_detect_tininess(float_tininess_before_rounding,
++                              &env->vfp.fp_status_f16);
+ #ifndef CONFIG_USER_ONLY
+     if (kvm_enabled()) {
+         kvm_arm_reset_vcpu(cpu);
 -- 
 2.17.1
