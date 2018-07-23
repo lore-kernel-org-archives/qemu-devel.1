@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhaf5-0002lv-4O
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:04 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fhafR-00030j-M5
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhaf0-00051q-8a
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51378 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fhafN-0005BT-61
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41592 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhaf0-00051f-3s
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:13:58 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fhafM-0005As-VV
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:21 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C1B658790F
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:13:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-135.ams2.redhat.com
-	[10.36.116.135])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A4C92156892
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:13:57 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 23 Jul 2018 15:13:54 +0200
-Message-Id: <20180723131356.27466-1-armbru@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 402D940241CC
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:14:20 +0000 (UTC)
+Date: Mon, 23 Jul 2018 14:14:18 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180723131418.GB20596@stefanha-x1.localdomain>
+References: <20180717101944.11691-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/2] QAPI and monitor patches for 2018-07-23
- (3.0.0-rc2)
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="H+4ONPRPur6+Ovig"
+Content-Disposition: inline
+In-Reply-To: <20180717101944.11691-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] trace/simple: fix hang in child after
+ fork(2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,46 +35,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-The following changes since commit 6598f0cdad6acc6674c4f060fa46e537228c2c=
-47:
 
-  po: Don't include comments with location (2018-07-23 10:50:54 +0100)
+--H+4ONPRPur6+Ovig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-are available in the Git repository at:
+On Tue, Jul 17, 2018 at 11:19:44AM +0100, Stefan Hajnoczi wrote:
+> The simple trace backend spawns a write-out thread which is used to
+> asynchronously flush the in-memory ring buffer to disk.
+>=20
+> fork(2) does not clone all threads, only the thread that invoked
+> fork(2).  As a result there is no write-out thread in the child process!
+>=20
+> This causes a hang during shutdown when atexit(3) handler installed by
+> the simple trace backend waits for the non-existent write-out thread.
+>=20
+> This patch uses pthread_atfork(3) to terminate the write-out thread
+> before fork and restart it in both the parent and child after fork.
+> This solves a hang in qemu-iotests 147 due to qemu-nbd --fork usage.
+>=20
+> Reported-by: Cornelia Huck <cohuck@redhat.com>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> v3:
+>  * Hold trace_lock across fork() to prevent possibility of another
+>    thread holding it and disappearing [Paolo]
+>=20
+>  trace/simple.c | 80 ++++++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 71 insertions(+), 9 deletions(-)
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2018-07-23
+Thanks, applied to my tracing tree for 3.0:
+https://github.com/stefanha/qemu/commits/tracing
 
-for you to fetch changes up to 62aa1d887ff9fc76adb488d31447d126a78f4b8f:
+Stefan
 
-  monitor: Fix unsafe sharing of @cur_mon among threads (2018-07-23 14:00=
-:03 +0200)
+--H+4ONPRPur6+Ovig
+Content-Type: application/pgp-signature; name="signature.asc"
 
-----------------------------------------------------------------
-QAPI and monitor patches for 2018-07-23 (3.0.0-rc2)
+-----BEGIN PGP SIGNATURE-----
 
-This pull request consists of a late external interface tweak and a
-thread safety fix, both related to QMP out-of-band execution.
+iQEcBAEBAgAGBQJbVdSqAAoJEJykq7OBq3PIu1gH/jahwXe21Dd3IpjDFB89aDdc
+r2eFN6Sh8eSoM4XaM2ap8zVDM9JnD+8XJvRoYBWnyHNgPRu78W16AbPYZ5iZk4jr
+MBlsYda4+0mfkJI7GGLA1kKkJ9U+9XLffGyZRiG8pJfhnVwH3VIHBXFjdib/Fqvf
+/dqY+sy9tc1d7aAyuTSbArAcTx0QZAXvGPj/tQn+ZMdUldh+cGiqNZJzkt33f+fN
+yfzRSmnh5j4ySM91w8CeMTPj4lGX4C9yo0ei955/3pCeYotuKoAOTnPYQSOqM18j
+UW+DmG7NsLYzCY/UjgOlWQJmb7cYAJDzcj5abo7jh1u9gaSSFQhod4lJCOT1Ctk=
+=hsdx
+-----END PGP SIGNATURE-----
 
-----------------------------------------------------------------
-Markus Armbruster (1):
-      qapi: Make 'allow-oob' optional in SchemaInfoCommand
-
-Peter Xu (1):
-      monitor: Fix unsafe sharing of @cur_mon among threads
-
- include/monitor/monitor.h  |  2 +-
- monitor.c                  |  2 +-
- qapi/introspect.json       |  6 +++---
- scripts/qapi/introspect.py | 10 +++++-----
- stubs/monitor.c            |  2 +-
- tests/test-util-sockets.c  |  2 +-
- 6 files changed, 12 insertions(+), 12 deletions(-)
-armbru@dusky:~/work/qemu$ rm *patch
-armbru@dusky:~/work/qemu$ git-format-patch --subject-prefix PULL master
-0000-cover-letter.patch
-0001-qapi-Make-allow-oob-optional-in-SchemaInfoCommand.patch
-0002-monitor-Fix-unsafe-sharing-of-cur_mon-among-threads.patch
-
---=20
-2.17.1
+--H+4ONPRPur6+Ovig--
