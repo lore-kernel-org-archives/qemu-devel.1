@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhJf-0002tH-GO
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:20:24 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fhhJg-0002u0-1z
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:20:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhJe-0004g8-Cw
+	(envelope-from <rth7680@gmail.com>) id 1fhhJe-0004gE-EL
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:20:23 -0400
-Sender: fluxion <flukshun@gmail.com>
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:17:00 -0500
-Message-Id: <20180723201748.25573-52-mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46033)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fhhJd-0004fE-OD
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:20:22 -0400
+Received: by mail-pg1-x543.google.com with SMTP id f1-v6so1150330pgq.12
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:20:21 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180723193530.20891-1-eblake@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <24cc7019-57e1-b868-b503-6e6b603f3cb5@twiddle.net>
+Date: Mon, 23 Jul 2018 13:20:17 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 51/99] usb/dev-mtp: Fix use of uninitialized
- values
+In-Reply-To: <20180723193530.20891-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-3.0] tests/libqtest: Improve
+ kill_qemu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, mst@redhat.com, alex.bennee@linaro.org, f4bug@amsat.org
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 07/23/2018 12:35 PM, Eric Blake wrote:
+> In kill_qemu() we have an assert that checks that the QEMU process
+> didn't dump core:
+>             assert(!WCOREDUMP(wstatus));
+> 
+> Unfortunately the WCOREDUMP macro here means the resulting message
+> is not very easy to comprehend on at least some systems:
+> 
+> ahci-test: tests/libqtest.c:113: kill_qemu: Assertion `!(((__extension__ (((union { __typeof(wstatus) __in; int __i; }) { .__in = (wstatus) }).__i))) & 0x80)' failed.
+> 
+> and it doesn't identify what signal the process took.
+> 
+> Furthermore, we are NOT detecting EINTR (while EINTR shouldn't be
+> happening if we didn't install signal handlers, it's still better
+> to always be robust), and also want to log unexpected non-zero status
+> that was not accompanied by a core dump.
+> 
+> Instead of using a raw assert, print the information in an
+> easier to understand way:
+> 
+> /i386/ahci/sanity: tests/libqtest.c:119: kill_qemu() detected QEMU death with core dump from signal 11 (Segmentation fault)
+> Aborted (core dumped)
+> 
+> (Of course, the really useful information would be why the QEMU
+> process dumped core in the first place, but we don't have that
+> by the time the test program has picked up the exit status.)
+> 
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> I've taken the ideas from Peter's patch:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg04430.html
+> as well as fixing a related issue brought up last time this was touched:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05710.html
+> 
+>  tests/libqtest.c | 39 +++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 37 insertions(+), 2 deletions(-)
 
-This fixes:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-  hw/usb/dev-mtp.c:971:5: warning: 4th function call argument is an uninitialized value
-      trace_usb_mtp_op_get_partial_object(s->dev.addr, o->handle, o->path,
-                                           c->argv[1], c->argv[2]);
-                                                       ^~~~~~~~~~
-and:
 
-  hw/usb/dev-mtp.c:981:12: warning: Assigned value is garbage or undefined
-      offset = c->argv[1];
-               ^ ~~~~~~~~~~
-
-Reported-by: Clang Static Analyzer
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20180604151421.23385-3-f4bug@amsat.org
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-(cherry picked from commit 62713a2e50f653162387451034f1a2490e87be88)
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- hw/usb/dev-mtp.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 6ecf70a79b..c50d0bc15e 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -1017,12 +1017,16 @@ static MTPData *usb_mtp_get_object(MTPState *s, MTPControl *c,
- static MTPData *usb_mtp_get_partial_object(MTPState *s, MTPControl *c,
-                                            MTPObject *o)
- {
--    MTPData *d = usb_mtp_data_alloc(c);
-+    MTPData *d;
-     off_t offset;
- 
-+    if (c->argc <= 2) {
-+        return NULL;
-+    }
-     trace_usb_mtp_op_get_partial_object(s->dev.addr, o->handle, o->path,
-                                         c->argv[1], c->argv[2]);
- 
-+    d = usb_mtp_data_alloc(c);
-     d->fd = open(o->path, O_RDONLY);
-     if (d->fd == -1) {
-         usb_mtp_data_free(d);
--- 
-2.17.1
+r~
