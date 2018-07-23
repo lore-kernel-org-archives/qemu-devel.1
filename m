@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhTih-0007gC-1Q
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:49:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fhTx1-0002FY-17
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 02:04:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhTic-0003Xn-Ka
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:49:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38056 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fhTwx-0000W9-3y
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 02:04:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49900 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhTic-0003Xb-ES
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:49:14 -0400
-Date: Mon, 23 Jul 2018 13:49:03 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180723054903.GH2491@xz-mi>
-References: <20180719121520.30026-1-xiaoguangrong@tencent.com>
-	<20180719121520.30026-9-xiaoguangrong@tencent.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fhTww-0000Us-V3
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 02:04:03 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8C977401EF01
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 06:04:01 +0000 (UTC)
+Received: from [10.36.116.129] (ovpn-116-129.ams2.redhat.com [10.36.116.129])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2ADBC2026D65
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 06:04:00 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e29321cd-b679-2163-d669-e808d61f0955@redhat.com>
+Date: Mon, 23 Jul 2018 08:03:58 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180719121520.30026-9-xiaoguangrong@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] migration: do not
- flush_compressed_data at the end of each iteration
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] patchew.org updated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: qemu-devel <qemu-devel@nongnu.org>
 
-On Thu, Jul 19, 2018 at 08:15:20PM +0800, guangrong.xiao@gmail.com wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> 
-> flush_compressed_data() needs to wait all compression threads to
-> finish their work, after that all threads are free until the
-> migration feeds new request to them, reducing its call can improve
-> the throughput and use CPU resource more effectively
-> 
-> We do not need to flush all threads at the end of iteration, the
-> data can be kept locally until the memory block is changed or
-> memory migration starts over in that case we will meet a dirtied
-> page which may still exists in compression threads's ring
-> 
-> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-> ---
->  migration/ram.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 89305c7af5..fdab13821d 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -315,6 +315,8 @@ struct RAMState {
->      uint64_t iterations;
->      /* number of dirty bits in the bitmap */
->      uint64_t migration_dirty_pages;
-> +    /* last dirty_sync_count we have seen */
-> +    uint64_t dirty_sync_count;
+Hi all,
 
-Better suffix it with "_prev" as well?  So that we can quickly
-identify that it's only a cache and it can be different from the one
-in the ram_counters.
+Fam has just updated Patchew to run the latest version.  Changes include:
 
->      /* protects modification of the bitmap */
->      QemuMutex bitmap_mutex;
->      /* The RAMBlock used in the last src_page_requests */
-> @@ -2532,6 +2534,7 @@ static void ram_save_cleanup(void *opaque)
->      }
->  
->      xbzrle_cleanup();
-> +    flush_compressed_data(*rsp);
+- a new, more compact look for series visualization
 
-Could I ask why do we need this considering that we have
-compress_threads_save_cleanup() right down there?
+- each message in the series is shown in a separate page
 
->      compress_threads_save_cleanup();
->      ram_state_cleanup(rsp);
->  }
-> @@ -3203,6 +3206,17 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
->  
->      ram_control_before_iterate(f, RAM_CONTROL_ROUND);
->  
-> +    /*
-> +     * if memory migration starts over, we will meet a dirtied page which
-> +     * may still exists in compression threads's ring, so we should flush
-> +     * the compressed data to make sure the new page is not overwritten by
-> +     * the old one in the destination.
-> +     */
-> +    if (ram_counters.dirty_sync_count != rs->dirty_sync_count) {
-> +        rs->dirty_sync_count = ram_counters.dirty_sync_count;
-> +        flush_compressed_data(rs);
-> +    }
-> +
->      t0 = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
->      i = 0;
->      while ((ret = qemu_file_rate_limit(f)) == 0 ||
-> @@ -3235,7 +3249,6 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
->          }
->          i++;
->      }
-> -    flush_compressed_data(rs);
+- links to other messages in the series show whether the message has had
+replies or not
 
-This looks sane to me, but I'd like to see how other people would
-think about it too...
+- the interdiff (version comparison) functionality can detect reordered
+patches, similar to "git-tbdiff"
 
->      rcu_read_unlock();
->  
->      /*
-> -- 
-> 2.14.4
-> 
+- an initial version of the REST API (https://patchew.org/api/v1/)
 
-Regards,
+- support for colored logs (not yet useful for QEMU)
 
--- 
-Peter Xu
+- new search terms "is:pull" and "has:replies"
+
+- many bug fixes
+
+Thanks,
+
+Paolo
