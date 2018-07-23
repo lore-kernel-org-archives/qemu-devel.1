@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fhdxt-0002DK-88
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 12:45:42 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fhdy0-0002L6-U1
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 12:45:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fhdxs-0005Ai-Hs
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 12:45:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fhdxw-0005GE-LW
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 12:45:48 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 23 Jul 2018 18:45:27 +0200
-Message-Id: <20180723164530.26599-5-kwolf@redhat.com>
+Date: Mon, 23 Jul 2018 18:45:30 +0200
+Message-Id: <20180723164530.26599-8-kwolf@redhat.com>
 In-Reply-To: <20180723164530.26599-1-kwolf@redhat.com>
 References: <20180723164530.26599-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 4/7] iotests: remove LUKS support from test 226
+Subject: [Qemu-devel] [PULL 7/7] block/vvfat: Disable debug message by
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,34 +23,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-From: John Snow <jsnow@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-This test doesn't actually care about the format anyway, it just
-supports "all formats" as a convenience. LUKS however does not use a
-simple image filename which confuses this iotest.
+It's annoying to see this debug message every time you use vvfat.
+Disable it with the DLOG() macro by default, as it is done with the
+other debug messages in this file.
 
-We can simply skip the test for formats that use IMGOPTSSYNTAX for
-their filenames without missing much coverage.
-
-Signed-off-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/226 | 3 +++
- 1 file changed, 3 insertions(+)
+ block/vvfat.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/226 b/tests/qemu-iotests/226
-index 460aea2fc9..34987d43f9 100755
---- a/tests/qemu-iotests/226
-+++ b/tests/qemu-iotests/226
-@@ -41,6 +41,9 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+diff --git a/block/vvfat.c b/block/vvfat.c
+index c7d2ed2d96..fc41841a5c 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -1245,8 +1245,8 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+     s->fat2 = NULL;
+     s->downcase_short_names = 1;
  
- # Generic format, but tests file-protocol specific error handling
- _supported_fmt generic
-+if [ "$IMGOPTSSYNTAX" = "true" ]; then
-+    _unsupported_fmt $IMGFMT
-+fi
- _supported_proto file
- _supported_os Linux
+-    fprintf(stderr, "vvfat %s chs %d,%d,%d\n",
+-            dirname, cyls, heads, secs);
++    DLOG(fprintf(stderr, "vvfat %s chs %d,%d,%d\n",
++                 dirname, cyls, heads, secs));
+ 
+     s->sector_count = cyls * heads * secs - s->offset_to_bootsector;
  
 -- 
 2.13.6
