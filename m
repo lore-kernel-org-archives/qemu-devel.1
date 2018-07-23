@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fhWzo-0002kf-9m
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:19:14 -0400
+	(envelope-from <mst@redhat.com>) id 1fhX0s-0003XI-NI
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:20:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fhWzk-0007Wd-9z
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:19:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43424 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fhX0r-0008LS-8w
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:20:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47308 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fhWzk-0007WV-3Q
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:19:08 -0400
-Date: Mon, 23 Jul 2018 12:19:04 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fhX0q-0008LI-Ra
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:20:17 -0400
+Date: Mon, 23 Jul 2018 12:20:12 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180723121505-mutt-send-email-mst@kernel.org>
+Message-ID: <20180723121919-mutt-send-email-mst@kernel.org>
 References: <20180723045956.27521-1-tiwei.bie@intel.com>
 	<20180723045956.27521-4-tiwei.bie@intel.com>
 MIME-Version: 1.0
@@ -78,14 +78,6 @@ On Mon, Jul 23, 2018 at 12:59:56PM +0800, Tiwei Bie wrote:
 > +      virtio device's DMA address space for the new group if the request is
 > +      sent with a file descriptor.
 > +
-
-Should it also clear out any mappings that were set on the old fd
-before closing it?
-
-Also should we limit when can this message be received?
-If not you need to re-program mappings again whenever
-we get a new fd.
-
 > +
 >  VHOST_USER_PROTOCOL_F_REPLY_ACK:
 >  -------------------------------
@@ -132,6 +124,10 @@ we get a new fd.
 > +    if (user->vfio_group) {
 > +        vfio_put_group(user->vfio_group);
 > +        user->vfio_group = NULL;
+
+Seems to create a window where mappings are invalid
+even if the same fd is re-sent. Is that OK?
+
 > +    }
 > +
 > +    group = vfio_get_group_from_fd(groupfd, vdev->dma_as, NULL);
@@ -149,10 +145,6 @@ we get a new fd.
 > +    return 0;
 > +}
 > +
-
-What will cause propagating groups to this vfio fd?
-
-
 >  static void slave_read(void *opaque)
 >  {
 >      struct vhost_dev *dev = opaque;
