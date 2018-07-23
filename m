@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fhafR-00030j-M5
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fhatO-0000yx-LF
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:28:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fhafN-0005BT-61
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41592 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fhafM-0005As-VV
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 402D940241CC
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:14:20 +0000 (UTC)
-Date: Mon, 23 Jul 2018 14:14:18 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180723131418.GB20596@stefanha-x1.localdomain>
-References: <20180717101944.11691-1-stefanha@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1fhatN-0003LW-EF
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:28:50 -0400
+Date: Mon, 23 Jul 2018 15:28:36 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180723152836.47d3047f@redhat.com>
+In-Reply-To: <20180704124923.32483-5-drjones@redhat.com>
+References: <20180704124923.32483-1-drjones@redhat.com>
+	<20180704124923.32483-5-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="H+4ONPRPur6+Ovig"
-Content-Disposition: inline
-In-Reply-To: <20180717101944.11691-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] trace/simple: fix hang in child after
- fork(2)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 4/6] hw/arm/virt-acpi-build:
+ distinguish possible and present cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,57 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, wei@redhat.com, peter.maydell@linaro.org, eric.auger@redhat.com
 
+On Wed,  4 Jul 2018 14:49:21 +0200
+Andrew Jones <drjones@redhat.com> wrote:
 
---H+4ONPRPur6+Ovig
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Jul 17, 2018 at 11:19:44AM +0100, Stefan Hajnoczi wrote:
-> The simple trace backend spawns a write-out thread which is used to
-> asynchronously flush the in-memory ring buffer to disk.
->=20
-> fork(2) does not clone all threads, only the thread that invoked
-> fork(2).  As a result there is no write-out thread in the child process!
->=20
-> This causes a hang during shutdown when atexit(3) handler installed by
-> the simple trace backend waits for the non-existent write-out thread.
->=20
-> This patch uses pthread_atfork(3) to terminate the write-out thread
-> before fork and restart it in both the parent and child after fork.
-> This solves a hang in qemu-iotests 147 due to qemu-nbd --fork usage.
->=20
-> Reported-by: Cornelia Huck <cohuck@redhat.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> When building ACPI tables regarding CPUs we should always build
+> them for the number of possible CPUs, not the number of present
+> CPUs. We then ensure only the present CPUs are enabled.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
-> v3:
->  * Hold trace_lock across fork() to prevent possibility of another
->    thread holding it and disappearing [Paolo]
->=20
->  trace/simple.c | 80 ++++++++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 71 insertions(+), 9 deletions(-)
+>  hw/arm/virt-acpi-build.c | 20 +++++++++++++++-----
+>  1 file changed, 15 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 6ea47e258832..1d1fc824da6f 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -49,14 +49,22 @@
+>  #define ARM_SPI_BASE 32
+>  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
+>  
+> -static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
+> +static int possible_cpus(VirtMachineState *vms)
+> +{
+> +    return MACHINE_GET_CLASS(vms)->possible_cpu_arch_ids(MACHINE(vms))->len;
+> +}
+> +
+> +static void acpi_dsdt_add_cpus(Aml *scope, int possible, int present)
+>  {
+>      uint16_t i;
+>  
+> -    for (i = 0; i < smp_cpus; i++) {
+> +    for (i = 0; i < possible; i++) {
+>          Aml *dev = aml_device("C%.03X", i);
+>          aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0007")));
+>          aml_append(dev, aml_name_decl("_UID", aml_int(i)));
+> +        if (i >= present) {
 
-Thanks, applied to my tracing tree for 3.0:
-https://github.com/stefanha/qemu/commits/tracing
+acpi_dsdt_add_cpus(Aml *scope, const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine)) {
+      for (i = 0; i < possible_cpus->len; i++) {
+          ...
+          if (possible_cpus->cpus[i].cpu == NULL)
+               aml_append(dev, aml_name_decl("_STA", aml_int(0)));
+      }
+}
 
-Stefan
+would be better to be consistent with x86 variant (well I prefer using a single source for CPU enumeration whenever possible) and drop helper above.
 
---H+4ONPRPur6+Ovig
-Content-Type: application/pgp-signature; name="signature.asc"
+> +            aml_append(dev, aml_name_decl("_STA", aml_int(0)));
+> +        }
+>          aml_append(scope, dev);
+>      }
+>  }
+> @@ -650,7 +658,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>      gicd->base_address = cpu_to_le64(memmap[VIRT_GIC_DIST].base);
+>      gicd->version = vms->gic_version;
+>  
+> -    for (i = 0; i < vms->smp_cpus; i++) {
+> +    for (i = 0; i < possible_cpus(vms); i++) {
+ditto
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbVdSqAAoJEJykq7OBq3PIu1gH/jahwXe21Dd3IpjDFB89aDdc
-r2eFN6Sh8eSoM4XaM2ap8zVDM9JnD+8XJvRoYBWnyHNgPRu78W16AbPYZ5iZk4jr
-MBlsYda4+0mfkJI7GGLA1kKkJ9U+9XLffGyZRiG8pJfhnVwH3VIHBXFjdib/Fqvf
-/dqY+sy9tc1d7aAyuTSbArAcTx0QZAXvGPj/tQn+ZMdUldh+cGiqNZJzkt33f+fN
-yfzRSmnh5j4ySM91w8CeMTPj4lGX4C9yo0ei955/3pCeYotuKoAOTnPYQSOqM18j
-UW+DmG7NsLYzCY/UjgOlWQJmb7cYAJDzcj5abo7jh1u9gaSSFQhod4lJCOT1Ctk=
-=hsdx
------END PGP SIGNATURE-----
-
---H+4ONPRPur6+Ovig--
+>          AcpiMadtGenericCpuInterface *gicc = acpi_data_push(table_data,
+>                                                             sizeof(*gicc));
+>          ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(i));
+> @@ -663,7 +671,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>          gicc->cpu_interface_number = cpu_to_le32(i);
+>          gicc->arm_mpidr = cpu_to_le64(armcpu->mp_affinity);
+>          gicc->uid = cpu_to_le32(i);
+> -        gicc->flags = cpu_to_le32(ACPI_MADT_GICC_ENABLED);
+> +        if (i < vms->smp_cpus) {
+> +            gicc->flags = cpu_to_le32(ACPI_MADT_GICC_ENABLED);
+> +        }
+>  
+>          if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
+>              gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
+> @@ -763,7 +773,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>       * the RTC ACPI device at all when using UEFI.
+>       */
+>      scope = aml_scope("\\_SB");
+> -    acpi_dsdt_add_cpus(scope, vms->smp_cpus);
+> +    acpi_dsdt_add_cpus(scope, possible_cpus(vms), vms->smp_cpus);
+>      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
+>                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
+>      acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
