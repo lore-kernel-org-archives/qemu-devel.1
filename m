@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhWwc-0001dK-8c
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:15:55 -0400
+	(envelope-from <mst@redhat.com>) id 1fhWzo-0002kf-9m
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:19:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhWwX-0006LX-9I
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:15:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47204 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fhWzk-0007Wd-9z
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:19:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43424 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhWwX-0006LN-1P
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:15:49 -0400
-Date: Mon, 23 Jul 2018 17:15:41 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180723091541.GM2491@xz-mi>
-References: <20180719121520.30026-1-xiaoguangrong@tencent.com>
-	<20180719121520.30026-4-xiaoguangrong@tencent.com>
-	<20180723043634.GC2491@xz-mi>
-	<8ae4beeb-0c6d-04a1-189a-972bcf342656@gmail.com>
-	<20180723080559.GI2491@xz-mi>
-	<5c288e81-6bd0-2dea-942c-287c30f74d8a@gmail.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fhWzk-0007WV-3Q
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:19:08 -0400
+Date: Mon, 23 Jul 2018 12:19:04 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180723121505-mutt-send-email-mst@kernel.org>
+References: <20180723045956.27521-1-tiwei.bie@intel.com>
+	<20180723045956.27521-4-tiwei.bie@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5c288e81-6bd0-2dea-942c-287c30f74d8a@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] migration: show the statistics of
- compression
+In-Reply-To: <20180723045956.27521-4-tiwei.bie@intel.com>
+Subject: Re: [Qemu-devel] [RFC 3/3] vhost-user: support programming VFIO
+ group in master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,155 +28,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Tiwei Bie <tiwei.bie@intel.com>
+Cc: alex.williamson@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
 
-On Mon, Jul 23, 2018 at 04:40:29PM +0800, Xiao Guangrong wrote:
+On Mon, Jul 23, 2018 at 12:59:56PM +0800, Tiwei Bie wrote:
+> Introduce a slave message to allow slave to share its
+> VFIO group fd to master and do the IOMMU programming
+> based on virtio device's DMA address space for this
+> group in QEMU.
 > 
+> For the vhost backends which support vDPA, they could
+> leverage this message to ask master to do the IOMMU
+> programming in QEMU for the vDPA device in backend.
 > 
-> On 07/23/2018 04:05 PM, Peter Xu wrote:
-> > On Mon, Jul 23, 2018 at 03:39:18PM +0800, Xiao Guangrong wrote:
-> > > 
-> > > 
-> > > On 07/23/2018 12:36 PM, Peter Xu wrote:
-> > > > On Thu, Jul 19, 2018 at 08:15:15PM +0800, guangrong.xiao@gmail.com wrote:
-> > > > > @@ -1597,6 +1608,24 @@ static void migration_update_rates(RAMState *rs, int64_t end_time)
-> > > > >                rs->xbzrle_cache_miss_prev) / iter_count;
-> > > > >            rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
-> > > > >        }
-> > > > > +
-> > > > > +    if (migrate_use_compression()) {
-> > > > > +        uint64_t comp_pages;
-> > > > > +
-> > > > > +        compression_counters.busy_rate = (double)(compression_counters.busy -
-> > > > > +            rs->compress_thread_busy_prev) / iter_count;
-> > > > 
-> > > > Here I'm not sure it's correct...
-> > > > 
-> > > > "iter_count" stands for ramstate.iterations.  It's increased per
-> > > > ram_find_and_save_block(), so IMHO it might contain multiple guest
-> > > 
-> > > ram_find_and_save_block() returns if a page is successfully posted and
-> > > it only posts 1 page out at one time.
-> > 
-> > ram_find_and_save_block() calls ram_save_host_page(), and we should be
-> > sending multiple guest pages in ram_save_host_page() if the host page
-> > is a huge page?
-> > 
+> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> ---
+>  docs/interop/vhost-user.txt    | 16 ++++++++++++++
+>  hw/virtio/vhost-user.c         | 40 ++++++++++++++++++++++++++++++++++
+>  include/hw/virtio/vhost-user.h |  2 ++
+>  3 files changed, 58 insertions(+)
 > 
-> You're right, thank you for pointing it out.
-> 
-> So, how about introduce a filed, posted_pages, into RAMState that is used
-> to track total pages posted out.
-> 
-> Then will use this filed to replace 'iter_count' for compression and use
-> 'RAMState.posted_pages - ram_counters.duplicate' to calculate
-> xbzrle_cache_miss as the zero page is not handled by xbzrle.
-> 
-> Or introduce a new function, total_posted_pages, which returns the
-> sum of all page counts:
-> 
->    static total_posted_pages(void)
->    {
->        return ram_counters.normal + ram_counters.duplicate + compression_counters.pages
->               +  xbzrle_counters.pages;
->    }
-> 
-> that would be a bit more complexity...
+> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> index f59667f498..a57a8f9451 100644
+> --- a/docs/interop/vhost-user.txt
+> +++ b/docs/interop/vhost-user.txt
+> @@ -397,6 +397,7 @@ Protocol features
+>  #define VHOST_USER_PROTOCOL_F_CONFIG         9
+>  #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
+>  #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
+> +#define VHOST_USER_PROTOCOL_F_VFIO_GROUP     12
+>  
+>  Master message types
+>  --------------------
+> @@ -815,6 +816,21 @@ Slave message types
+>        This request should be sent only when VHOST_USER_PROTOCOL_F_HOST_NOTIFIER
+>        protocol feature has been successfully negotiated.
+>  
+> + * VHOST_USER_SLAVE_VFIO_GROUP_MSG
+> +
+> +      Id: 4
+> +      Equivalent ioctl: N/A
+> +      Slave payload: N/A
+> +      Master payload: N/A
+> +
+> +      When VHOST_USER_PROTOCOL_F_VFIO_GROUP is negotiated, vhost-user slave
+> +      could send this request to share its VFIO group fd via ancillary data
+> +      to master. After receiving this request from slave, master will close
+> +      the existing VFIO group if any and do the DMA programming based on the
+> +      virtio device's DMA address space for the new group if the request is
+> +      sent with a file descriptor.
+> +
 
-If below [1] is wrong too, then I'm thinking whether we could just
-move the rs->iterations++ from ram_save_iterate() loop to
-ram_save_host_page() loop, then we possibly fix both places...
+Should it also clear out any mappings that were set on the old fd
+before closing it?
 
-After all I don't see any other usages of rs->iterations so it seems
-fine.  Dave/Juan?
+Also should we limit when can this message be received?
+If not you need to re-program mappings again whenever
+we get a new fd.
 
-> 
-> > > 
-> > > > pages.  However compression_counters.busy should be per guest page.
-> > > > 
-> > > 
-> > > Actually, it's derived from xbzrle_counters.cache_miss_rate:
-> > >          xbzrle_counters.cache_miss_rate = (double)(xbzrle_counters.cache_miss -
-> > >              rs->xbzrle_cache_miss_prev) / iter_count;
-> > 
-> > Then this is suspecious to me too...
+> +
+>  VHOST_USER_PROTOCOL_F_REPLY_ACK:
+>  -------------------------------
+>  The original vhost-user specification only demands replies for certain
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index b041343632..db958e24c7 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -52,6 +52,7 @@ enum VhostUserProtocolFeature {
+>      VHOST_USER_PROTOCOL_F_CONFIG = 9,
+>      VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD = 10,
+>      VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
+> +    VHOST_USER_PROTOCOL_F_VFIO_GROUP = 12,
+>      VHOST_USER_PROTOCOL_F_MAX
+>  };
+>  
+> @@ -97,6 +98,7 @@ typedef enum VhostUserSlaveRequest {
+>      VHOST_USER_SLAVE_IOTLB_MSG = 1,
+>      VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
+>      VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG = 3,
+> +    VHOST_USER_SLAVE_VFIO_GROUP_MSG = 4,
+>      VHOST_USER_SLAVE_MAX
+>  }  VhostUserSlaveRequest;
+>  
+> @@ -949,6 +951,41 @@ static int vhost_user_slave_handle_vring_host_notifier(struct vhost_dev *dev,
+>      return 0;
+>  }
+>  
+> +static int vhost_user_slave_handle_vfio_group(struct vhost_dev *dev,
+> +                                              int *fd)
+> +{
+> +    struct vhost_user *u = dev->opaque;
+> +    VhostUserState *user = u->user;
+> +    VirtIODevice *vdev = dev->vdev;
+> +    int groupfd = fd[0];
+> +    VFIOGroup *group;
+> +
+> +    if (!virtio_has_feature(dev->protocol_features,
+> +                            VHOST_USER_PROTOCOL_F_VFIO_GROUP) ||
+> +        vdev == NULL) {
+> +        return -1;
+> +    }
+> +
+> +    if (user->vfio_group) {
+> +        vfio_put_group(user->vfio_group);
+> +        user->vfio_group = NULL;
+> +    }
+> +
+> +    group = vfio_get_group_from_fd(groupfd, vdev->dma_as, NULL);
+> +    if (group == NULL) {
+> +        return -1;
+> +    }
+> +
+> +    if (group->fd != groupfd) {
+> +        close(groupfd);
+> +    }
+> +
+> +    user->vfio_group = group;
+> +    fd[0] = -1;
+> +
+> +    return 0;
+> +}
+> +
 
-[1]
+What will cause propagating groups to this vfio fd?
 
-> > 
-> > > 
-> > > > > +        rs->compress_thread_busy_prev = compression_counters.busy;
-> > > > > +
-> > > > > +        comp_pages = compression_counters.pages - rs->compress_pages_prev;
-> > > > > +        if (comp_pages) {
-> > > > > +            compression_counters.compression_rate =
-> > > > > +                (double)(compression_counters.reduced_size -
-> > > > > +                rs->compress_reduced_size_prev) /
-> > > > > +                (comp_pages * TARGET_PAGE_SIZE);
-> > > > > +            rs->compress_pages_prev = compression_counters.pages;
-> > > > > +            rs->compress_reduced_size_prev = compression_counters.reduced_size;
-> > > > > +        }
-> > > > > +    }
-> > > > >    }
-> > > > >    static void migration_bitmap_sync(RAMState *rs)
-> > > > > @@ -1872,6 +1901,9 @@ static void flush_compressed_data(RAMState *rs)
-> > > > >            qemu_mutex_lock(&comp_param[idx].mutex);
-> > > > >            if (!comp_param[idx].quit) {
-> > > > >                len = qemu_put_qemu_file(rs->f, comp_param[idx].file);
-> > > > > +            /* 8 means a header with RAM_SAVE_FLAG_CONTINUE. */
-> > > > > +            compression_counters.reduced_size += TARGET_PAGE_SIZE - len + 8;
-> > > > 
-> > > > I would agree with Dave here - why we store the "reduced size" instead
-> > > > of the size of the compressed data (which I think should be len - 8)?
-> > > > 
-> > > 
-> > > len-8 is the size of data after compressed rather than the data improved
-> > > by compression that is not straightforward for the user to see how much
-> > > the improvement is by applying compression.
-> > > 
-> > > Hmm... but it is not a big deal to me... :)
-> > 
-> > Yeah it might be a personal preference indeed. :)
-> > 
-> > It's just natural to do that this way for me since AFAIU the
-> > compression ratio is defined as:
-> > 
-> >                             compressed data size
-> >    compression ratio =    ------------------------
-> >                              original data size
-> > 
-> 
-> Er, we do it as following:
->             compression_counters.compression_rate =
->                 (double)(compression_counters.reduced_size -
->                 rs->compress_reduced_size_prev) /
->                 (comp_pages * TARGET_PAGE_SIZE);
-> 
-> We use reduced_size, i.e,:
-> 
->                              original data size - compressed data size
->     compression ratio =    ------------------------
->                               original data size
-> 
-> for example, for 100 bytes raw data, if we posted 99 bytes out, then
-> the compression ration should be 1%.
 
-I think it should be 99%...
-
-> 
-> So if i understand correctly, the reduced_size is really you want? :)
-> 
-
-Here's the "offical" definition. :)
-
-https://en.wikipedia.org/wiki/Data_compression_ratio
-
-But obviously I reverted the molecular and denominator... So maybe we
-can follow what the wiki page said (then I think you'll just store the
-summation of len-8)?
-
-Regards,
-
--- 
-Peter Xu
+>  static void slave_read(void *opaque)
+>  {
+>      struct vhost_dev *dev = opaque;
+> @@ -1021,6 +1058,9 @@ static void slave_read(void *opaque)
+>          ret = vhost_user_slave_handle_vring_host_notifier(dev, &payload.area,
+>                                                            fd[0]);
+>          break;
+> +    case VHOST_USER_SLAVE_VFIO_GROUP_MSG:
+> +        ret = vhost_user_slave_handle_vfio_group(dev, fd);
+> +        break;
+>      default:
+>          error_report("Received unexpected msg type.");
+>          ret = -EINVAL;
+> diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
+> index fd660393a0..9e11473274 100644
+> --- a/include/hw/virtio/vhost-user.h
+> +++ b/include/hw/virtio/vhost-user.h
+> @@ -10,6 +10,7 @@
+>  
+>  #include "chardev/char-fe.h"
+>  #include "hw/virtio/virtio.h"
+> +#include "hw/vfio/vfio-common.h"
+>  
+>  typedef struct VhostUserHostNotifier {
+>      MemoryRegion mr;
+> @@ -20,6 +21,7 @@ typedef struct VhostUserHostNotifier {
+>  typedef struct VhostUserState {
+>      CharBackend *chr;
+>      VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
+> +    VFIOGroup *vfio_group;
+>  } VhostUserState;
+>  
+>  VhostUserState *vhost_user_init(void);
+> -- 
+> 2.18.0
