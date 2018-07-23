@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhj6y-0000Hs-NQ
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:15:25 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fhjDf-00026D-D9
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:22:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhj6v-00052S-ED
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:15:24 -0400
-Sender: fluxion <flukshun@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180723201748.25573-6-mdroth@linux.vnet.ibm.com>
-References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-	<20180723201748.25573-6-mdroth@linux.vnet.ibm.com>
-Message-ID: <153238409419.10934.1652388192245648682@sif>
-Date: Mon, 23 Jul 2018 17:14:54 -0500
-Subject: Re: [Qemu-devel] [PATCH 05/99] s390-ccw: force diag 308 subcode to
- unsigned long
+	(envelope-from <jsnow@redhat.com>) id 1fhjDe-0007vb-K4
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:22:19 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Mon, 23 Jul 2018 18:22:07 -0400
+Message-Id: <20180723222210.11077-5-jsnow@redhat.com>
+In-Reply-To: <20180723222210.11077-1-jsnow@redhat.com>
+References: <20180723222210.11077-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.0 4/7] iotests: 169: actually test block
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +20,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com, Max Reitz <mreitz@redhat.com>
 
-Quoting Michael Roth (2018-07-23 15:16:14)
-> From: Cornelia Huck <cohuck@redhat.com>
-> =
+Presently, we emulate a block migration by just using a different
+target file. Update the test to actually request a block migration.
 
-> We currently pass an integer as the subcode parameter. However,
-> the upper bits of the register containing the subcode need to
-> be 0, which is not guaranteed unless we explicitly specify the
-> subcode to be an unsigned long value.
-> =
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ tests/qemu-iotests/169 | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> Fixes: d046c51dad3 ("pc-bios/s390-ccw: Get device address via diag 308/6")
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Tested-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> (cherry picked from commit 63d8b5ace31c1e1f3996fe4cd551d6d377594d5a)
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-
-Hi Cornelia,
-
-Would you be able to do an s390 BIOS build for this one as well?
-
-> ---
->  pc-bios/s390-ccw/iplb.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> =
-
-> diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-> index 5357a36d51..ded20c834e 100644
-> --- a/pc-bios/s390-ccw/iplb.h
-> +++ b/pc-bios/s390-ccw/iplb.h
-> @@ -101,10 +101,11 @@ static inline bool manage_iplb(IplParameterBlock *i=
-plb, bool store)
->  {
->      register unsigned long addr asm("0") =3D (unsigned long) iplb;
->      register unsigned long rc asm("1") =3D 0;
-> +    unsigned long subcode =3D store ? 6 : 5;
->  =
-
->      asm volatile ("diag %0,%2,0x308\n"
->                    : "+d" (addr), "+d" (rc)
-> -                  : "d" (store ? 6 : 5)
-> +                  : "d" (subcode)
->                    : "memory", "cc");
->      return rc =3D=3D 0x01;
->  }
-> -- =
-
-> 2.17.1
->=20
+diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+index df408f8367..87edc85f43 100755
+--- a/tests/qemu-iotests/169
++++ b/tests/qemu-iotests/169
+@@ -89,6 +89,9 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+         mig_caps = [{'capability': 'events', 'state': True}]
+         if migrate_bitmaps:
+             mig_caps.append({'capability': 'dirty-bitmaps', 'state': True})
++        if not shared_storage:
++            mig_caps.append({'capability': 'block', 'state': True})
++
+ 
+         result = self.vm_a.qmp('migrate-set-capabilities',
+                                capabilities=mig_caps)
+-- 
+2.14.4
