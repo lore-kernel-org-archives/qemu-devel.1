@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhTUX-0004Dq-V0
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:34:43 -0400
+	(envelope-from <peterx@redhat.com>) id 1fhTWD-00056T-4N
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:36:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhTUU-0007Xd-O1
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:34:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37478 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fhTW9-0008CB-H6
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:36:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49184 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhTUU-0007XR-II
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:34:38 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6C35D401DEC0
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 05:34:37 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180719184111.5129-1-marcandre.lureau@redhat.com>
-	<20180719184111.5129-11-marcandre.lureau@redhat.com>
-	<87fu0es35a.fsf@dusky.pond.sub.org>
-	<CAMxuvazpf1oRMDLpPw25C99gV8YZu506LSPGR0N9mU2MeYEE-A@mail.gmail.com>
-Date: Mon, 23 Jul 2018 07:34:32 +0200
-In-Reply-To: <CAMxuvazpf1oRMDLpPw25C99gV8YZu506LSPGR0N9mU2MeYEE-A@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 20 Jul 2018
-	12:41:31 +0200")
-Message-ID: <878t62ldlj.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhTW9-0008C1-0S
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:36:21 -0400
+Date: Mon, 23 Jul 2018 13:36:02 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180723053602.GG2491@xz-mi>
+References: <20180719121520.30026-1-xiaoguangrong@tencent.com>
+	<20180719121520.30026-8-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 10/18] qjson: report an error if there
- are multiple results
+Content-Disposition: inline
+In-Reply-To: <20180719121520.30026-8-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v2 7/8] migration: hold the lock only if it
+ is really needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,268 +28,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On Thu, Jul 19, 2018 at 08:15:19PM +0800, guangrong.xiao@gmail.com wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> Try to hold src_page_req_mutex only if the queue is not
+> empty
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-> Hi
->
-> On Fri, Jul 20, 2018 at 10:49 AM, Markus Armbruster <armbru@redhat.com> w=
-rote:
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>
->>> qobject_from_jsonv() returns a single object. Let's make sure that
->>> during parsing we don't leak an intermediary object. Instead of
->>> returning the last object, set a parsing error.
->>>
->>> Also, the lexer/parser keeps consuming all the data. There might be an
->>> error set earlier. Let's keep it and not call json_parser_parse() with
->>> the remaining data. Eventually, we may teach the message parser to
->>> stop consuming the data.
->>
->> Took me a while to figure out what you mean :)
->>
->> qobject_from_jsonv() feeds a complete string to the JSON parser, with
->> json_message_parser_feed().  This actually feeds one character after the
->> other to the lexer, via json_lexer_feed_char().
->>
->> Whenever a character completes a token, the lexer feeds that token to
->> the streamer via a callback that is always json_message_process_token().
->>
->> The attentive reader may wonder what it does with trailing characters
->> that aren't a complete token.  More on that below.
->>
->> The streamer accumulates tokens, counting various parenthesis.  When all
->> counts are zero or any is negative, the group is complete, and is fed to
->> the parser via another callback.  That callback is parse_json() here.
->> There are more elsewhere.
->>
->> The attentive reader may wonder what it does with trailing tokens that
->> aren't a complete group.  More on that below.
->>
->> The callbacks all pass the tokens to json_parser_parse() to do the
->> actual parsing.  Returns the abstract syntax tree as QObject on success.
->>
->> Note that the callback can be called any number of times.
->>
->> In my opinion, this is over-engineered and under-thought.  There's more
->> flexibility than we're using, and the associated complexity breeds bugs.
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Two obvious simplifications come to mind:
-
-* Call json_message_process_token() directly.
-
-* Move the call json_parser_parse() into the streamer, and have the
-  streamer pass QObject * instead of GQueue * to its callback.
-
-I'll post patches for your consideration, but first I'll continue to
-review your series.
-
->> In particular, parse_json() is wrong:
->>
->>     s->result =3D json_parser_parse(tokens, s->ap, &s->err);
->>
->> If the previous call succeeded, we leak its result.  This is the leak
->> you mentioned.
->>
->> If any previous call set an error, we pass &s->err pointing to non-null,
->> which is forbidden.  If json_parser_parse() passed it to error_setg(),
->> this would crash.  Since it passes it only to error_propagate(), all
->> errors but the first one are ignored.  Latent crash bug.
->>
->> If the last call succeeds and any previous call failed, the function
->> simultaneously succeeds and fails: we return both a result and set an
->> error.
->>
->> Let's demonstrate these bugs before we fix them, by inserting the
->> appended patch before this one.
->>
->> Are the other callbacks similarly buggy?  Turns out they're okay:
->>
->> * handle_qmp_command() consumes result and error on each call.
->>
->> * process_event() does, too.
->>
->> * qmp_response() treats errors as fatal, and asserts "no previous
->>   response".
->>
->> On trailing tokens that don't form a group: they get silently ignored,
->> as demonstrated by check-qjson test cases unterminated_array(),
->> unterminated_array_comma(), unterminated_dict(),
->> unterminated_dict_comma(), all marked BUG.
->>
->> On trailing characters that don't form a token: they get silently
->> ignored, as demonstrated by check-qjson test cases
->> unterminated_string(), unterminated_sq_string(), unterminated_escape(),
->> all marked BUG, except when they aren't, as in test case
->> unterminated_literal().
->>
->> The BUG marks are all gone at the end of this series.  I guess you're
->> fixing all that :)
->>
->> Note that these "trailing characters / tokens are silently ignored" bugs
->> *do* affect the other callbacks.  Reproducer for handle_qmp_command():
->>
->>     $ echo -e '{ "execute": "qmp_capabilities" }\n{ "execute": "query-na=
-me" }\n"unterminated' | socat UNIX:test-qmp STDIO
->>     {"QMP": {"version": {"qemu": {"micro": 90, "minor": 12, "major": 2},=
- "package": "v3.0.0-rc1-20-g6a024cd461"}, "capabilities": ["oob"]}}
->>     {"return": {}}
->>     {"return": {}}
->>
->> Note there's no error reported for the last line.
->>
->>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>  qobject/qjson.c     | 16 +++++++++++++++-
->>>  tests/check-qjson.c | 11 +++++++++++
->>>  2 files changed, 26 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/qobject/qjson.c b/qobject/qjson.c
->>> index ee04e61096..8a9d116150 100644
->>> --- a/qobject/qjson.c
->>> +++ b/qobject/qjson.c
->>> @@ -22,6 +22,7 @@
->>>  #include "qapi/qmp/qlist.h"
->>>  #include "qapi/qmp/qnum.h"
->>>  #include "qapi/qmp/qstring.h"
->>> +#include "qapi/qmp/qerror.h"
->>>  #include "qemu/unicode.h"
->>>
->>>  typedef struct JSONParsingState
->>> @@ -36,7 +37,20 @@ static void parse_json(JSONMessageParser *parser, GQ=
-ueue *tokens)
->>>  {
->>>      JSONParsingState *s =3D container_of(parser, JSONParsingState, par=
-ser);
->>>
->>> -    s->result =3D json_parser_parse(tokens, s->ap, &s->err);
->>> +    if (s->result || s->err) {
->>> +        if (s->result) {
->>> +            qobject_unref(s->result);
->>> +            s->result =3D NULL;
->>> +            if (!s->err) {
->>
->> Conditional is necessary because a previous call to json_parser_parse()
->> could have set s->err already.  Without it, error_setg() would fail the
->> assertion in error_setv() then.  Subtle.
->>
->>> +                error_setg(&s->err, QERR_JSON_PARSING);
->>
->> Hmm.  Is this really "Invalid JSON syntax"?  In a way, it is, because
->> RFC 7159 defines JSON-text as a single value.  Still, a friendlier error
->> message like "Expecting at most one JSON value" woun't hurt.
->>
->> What if !tokens?  That shouldn't be an error.
->>
->>> +            }
->>> +        }
->>> +        if (tokens) {
->>> +            g_queue_free_full(tokens, g_free);
->>
->> g_queue_free_full(NULL, ...) doesn't work?!?  That would be lame.
->
-> It warns and return.
-
-Lame.
-
-> We could use g_clear_pointer(&tokens, g_queue_free_full)...
-
-Slightly terser, but the reader better knows g_clear_pointer().  So far,
-we don't use it.
-
->>> +        }
->>> +    } else {
->>> +        s->result =3D json_parser_parse(tokens, s->ap, &s->err);
->>> +    }
->>>  }
->>
->> What about this:
->>
->>        JSONParsingState *s =3D container_of(parser, JSONParsingState, pa=
-rser);
->>        Error *err =3D NULL;
->>
->>        if (!tokens) {
->>            return;
->>        }
->
-> I would rather leave handling of NULL tokens to json_parser_parse()
-> for consistency with other callers.
-
-Fair point.
-
-I expect the issue to evaporate when I simplify the parser interface.
-
->>        if (s->result || s->err) {
->>            if (s->result) {
->>                qobject_unref(s->result);
->>                s->result =3D NULL;
->>                error_setg(&err, "Expecting at most one JSON value");
->>            }
->>            g_queue_free_full(tokens, g_free);
->
-> missing null check
-
-@tokens can't be null here.
-
->>        } else {
->>            s->result =3D json_parser_parse(tokens, s->ap, &err);
->>        }
->>        error_propagate(&s->err, err);
->
-> how do you ensure s->err is not already set?
-
-error_propagate() is fine with that, unlike error_setg().
-
->>        assert(!s->result !=3D !s->err);
->>
->>>
->>>  QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **e=
-rrp)
->>> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
->>> index da582df3e9..7d3547e0cc 100644
->>> --- a/tests/check-qjson.c
->>> +++ b/tests/check-qjson.c
->>> @@ -1417,6 +1417,16 @@ static void limits_nesting(void)
->>>      g_assert(obj =3D=3D NULL);
->>>  }
->>>
->>> +static void multiple_objects(void)
->>> +{
->>> +    Error *err =3D NULL;
->>> +    QObject *obj;
->>> +
->>> +    obj =3D qobject_from_json("{} {}", &err);
->>> +    g_assert(obj =3D=3D NULL);
->>> +    error_free_or_abort(&err);
->>> +}
->>> +
->>>  int main(int argc, char **argv)
->>>  {
->>>      g_test_init(&argc, &argv, NULL);
->>> @@ -1454,6 +1464,7 @@ int main(int argc, char **argv)
->>>      g_test_add_func("/errors/invalid_dict_comma", invalid_dict_comma);
->>>      g_test_add_func("/errors/unterminated/literal", unterminated_liter=
-al);
->>>      g_test_add_func("/errors/limits/nesting", limits_nesting);
->>> +    g_test_add_func("/errors/multiple_objects", multiple_objects);
->>>
->>>      return g_test_run();
->>>  }
->>
->> From 18064b774ea7a79a9dbabe5cf75458f0326070d5 Mon Sep 17 00:00:00 2001
->> From: Markus Armbruster <armbru@redhat.com>
->> Date: Fri, 20 Jul 2018 10:22:41 +0200
->> Subject: [PATCH] check-qjson: Cover multiple JSON objects in same string
->>
->> qobject_from_json() & friends misbehave when the JSON text has more
->> than one JSON value.  Add test coverage to demonstrate the bugs.
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> test looks better than mine, should I include it in the series before the=
- fix?
-
-Yes, please.
+-- 
+Peter Xu
