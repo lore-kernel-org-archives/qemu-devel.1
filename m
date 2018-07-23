@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fhPvD-0000v6-DH
-	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 21:46:00 -0400
+	(envelope-from <fzheng@redhat.com>) id 1fhQ65-0004g4-BE
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 21:57:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fhPvC-0004Q5-EG
-	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 21:45:59 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37345)
+	(envelope-from <fzheng@redhat.com>) id 1fhQ62-0000da-Ax
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 21:57:13 -0400
+Received: from mail-ua0-f195.google.com ([209.85.217.195]:36284)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fhPvC-0004Pe-8b
-	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 21:45:58 -0400
-Received: by mail-pg1-x543.google.com with SMTP id n7-v6so11032232pgq.4
-	for <qemu-devel@nongnu.org>; Sun, 22 Jul 2018 18:45:58 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-References: <CAHmME9q8b0Nss8b7DEoGgqoCK4dEvasQN64QWx6Hio+N92wuSg@mail.gmail.com>
-	<CAHmME9qX22YP9qrHErc43Z+LUi=ichqzG+OdXqjhJv4ZrKDmWQ@mail.gmail.com>
-	<CAHmME9qMASSt2K4vACJTMiGNTt09upRhNFxL_y2KF1G3N1LB2g@mail.gmail.com>
-	<b20edb3f-055a-c531-da70-d20a20137ad4@linaro.org>
-Message-ID: <49659899-1c8c-f8a6-4356-07e6c6fb728d@linaro.org>
-Date: Sun, 22 Jul 2018 18:45:53 -0700
+	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1fhQ62-0000dA-5e
+	for qemu-devel@nongnu.org; Sun, 22 Jul 2018 21:57:10 -0400
+Received: by mail-ua0-f195.google.com with SMTP id y8-v6so10776436uan.3
+	for <qemu-devel@nongnu.org>; Sun, 22 Jul 2018 18:57:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b20edb3f-055a-c531-da70-d20a20137ad4@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] ARM64 STR Instruction Crash Regression in TCG
+References: <20180719034118.27741-1-famz@redhat.com>
+	<640247eb-482c-0c27-f1f3-acea29e8cb3a@redhat.com>
+	<CAK1Eb9mQ8ERn5eiA6hyXotmbgTckU=TE8mNbX+zeotXXfMxmGg@mail.gmail.com>
+	<46511655-713c-6537-0495-0b36384d6fb7@redhat.com>
+In-Reply-To: <46511655-713c-6537-0495-0b36384d6fb7@redhat.com>
+From: Fam Zheng <famz@redhat.com>
+Date: Mon, 23 Jul 2018 09:56:32 +0800
+Message-ID: <CAK1Eb9kzqTwEjkv5NN1zSYVMmg2h_6BOmxQc2Qz+-c3=_T3=7g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] block: Don't lock /dev/null and /dev/zero
+ automatically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>
 
-On 07/22/2018 02:31 PM, Richard Henderson wrote:
-> On 07/22/2018 01:47 PM, Jason A. Donenfeld wrote:
->> Hello,
->>
->> Gcc 7.3 compiles bash's array_flush's dual assignment using:
->>
->> STP             X20, X20, [X20,#0x10]
->>
->> But gcc 8.1 compiles it as:
->>
->> STR             Q0, [X20,#0x10]
->>
->> Real processors seem okay, and qemu 2.11 seems okay. But qemu 2.12
->> results in a segfaulting process. I'm pretty sure this is a TCG bug.
->>
->> In the attached tarball, please find kernel and run.sh. Calling
->> ./run.sh will start the kernel with the bad bash executable that tries
->> to execute `config=({1..100000})` and crashes. Also included in there
->> is the actual crashing bash binary, in case you'd like to disassemble
->> a little bit.
-> 
-> Interesting.  The test passes on master with --enable-debug, but fails when
-> qemu is compiled with optimization...
-> 
-> I'll dig a bit deeper.
+On Sun, Jul 22, 2018 at 10:06 PM Max Reitz <mreitz@redhat.com> wrote:
+>
+> On 2018-07-22 04:37, Fam Zheng wrote:
+> > On Sun, Jul 22, 2018 at 5:08 AM Max Reitz <mreitz@redhat.com> wrote:
+> >>
+> >> On 2018-07-19 05:41, Fam Zheng wrote:
+> >>> On my Fedora 28, /dev/null is locked by some other process (couldn't
+> >>> inspect it due to the current lslocks limitation), so iotests 226 fai=
+ls
+> >>> with some unexpected image locking errors because it uses qemu-io to
+> >>> open it.
+> >>>
+> >>> Actually it's safe to not use any lock on /dev/null or /dev/zero.
+> >>>
+> >>> Signed-off-by: Fam Zheng <famz@redhat.com>
+> >>> ---
+> >>>  block/file-posix.c | 7 ++++++-
+> >>>  1 file changed, 6 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/block/file-posix.c b/block/file-posix.c
+> >>> index 60af4b3d51..8bf034108a 100644
+> >>> --- a/block/file-posix.c
+> >>> +++ b/block/file-posix.c
+> >>> @@ -503,7 +503,12 @@ static int raw_open_common(BlockDriverState *bs,=
+ QDict *options,
+> >>>          s->use_lock =3D false;
+> >>>          break;
+> >>>      case ON_OFF_AUTO_AUTO:
+> >>> -        s->use_lock =3D qemu_has_ofd_lock();
+> >>> +        if (!strcmp(filename, "/dev/null") ||
+> >>> +                   !strcmp(filename, "/dev/zero")) {
+> >>
+> >> I=E2=80=99m not sure I like a strcmp() based on filename (though it sh=
+ould work
+> >> for all of the cases where someone would want to specify either of tho=
+se
+> >> for a qemu block device).  Isn=E2=80=99t there some specific major/min=
+or number
+> >> we can use to check for these two files?  Or are those Linux-specific?
+> >
+> > Yeah, I guess major/minor numbers are Linux-specific.
+> >
+> >>
+> >> I could also imagine just not locking any host_device, but since peopl=
+e
+> >> do use qcow2 immediately on block devices, maybe we do want to lock th=
+em.
+> >
+> > That's right.
+> >
+> >>
+> >> Finally, if really all you are trying to do is to make test code easie=
+r,
+> >> then I don=E2=80=99t know exactly why.  Just disabling locking in 226 =
+shouldn=E2=80=99t
+> >> be too hard.
+> >
+> > The tricky thing is in remembering to do that for future test cases.
+> > My machine seems to be somehow different than John's so that my 226
+> > cannot lock /dev/null, but I'm not sure that is the case for other
+> > releases, distros or system instances.
+>
+> Usually we don=E2=80=99t need to use /dev/null, though, because null-co:/=
+/ is
+> better suited for most purposes.  This is a very specific test of host
+> devices.
+>
+> Maybe we should start a doc file with common good practices about
+> writing iotests?
 
-The failing sequence is
+Yes, mentioning using pseudo devices in docs/devel/testing.rst would
+probably be a good idea. So is my understanding right that you prefer
+fixing the test case and discard this patch? If so I'll send another
+version together with the doc update.
 
-0x0045ba44:  4e080e80  dup      v0.2d, x20
-0x0045ba48:  90000340  adrp     x0, #0x4c3000
-0x0045ba4c:  91098003  add      x3, x0, #0x260
-0x0045ba50:  92800001  movn     x1, #0
-0x0045ba54:  f9413002  ldr      x2, [x0, #0x260]
-0x0045ba58:  3d800680  str      q0, [x20, #0x10]
-...
+Fam
 
-OP after optimization and liveness analysis:
- ld_i32 tmp0,env,$0xffffffffffffffdc              dead: 1
- movi_i32 tmp1,$0x0
- brcond_i32 tmp0,tmp1,lt,$L0                      dead: 0 1
-
- ---- 000000000045ba44 0000000000000000 0000000000000000
- dup_vec v128,e64,tmp2,x20
- st_vec v128,e8,tmp2,env,$0x8c0                   dead: 0
-
-...
-
- ---- 000000000045ba58 0000000000000000 0000000000000000
- movi_i64 tmp4,$0x10
- add_i64 tmp3,x20,tmp4                            dead: 1 2
- ld_i64 tmp4,env,$0x8c0
- movi_i64 tmp6,$0x8
- add_i64 tmp5,tmp3,tmp6                           dead: 2
- qemu_st_i64 tmp4,tmp3,leq,0                      dead: 0 1
- ld_i64 tmp4,env,$0x8c8                           dead: 1
- qemu_st_i64 tmp4,tmp5,leq,0                      dead: 0 1
-...
-
-0x7fffcd2e678c:  vmovq    0xe0(%r14), %xmm0
-0x7fffcd2e6795:  vpbroadcastq %xmm0, %xmm1
-0x7fffcd2e679a:  vmovdqu  %xmm1, 0x8c0(%r14)
-...
-0x7fffcd2c0e78:  vmovq    %xmm0, %r12
-0x7fffcd2c0e7d:  addq     $0x10, %r12
-
-
-The guest x20 is loaded in to xmm0 for the dup at 0x45ba44, and was reused for
-the store at 0x45ba58.  However, if the load at 0x45ba54 misses the TLB, then
-we will have a function call, which can clobber xmm0.
-
-With -O0, it just so happens that the function call does not clobber xmm0; with
-optimization enabled, the compiler's different code generation does clobber xmm0.
-
-Fix by properly considering xmm registers to be call-clobbered.  At which point
-the saved value is evicted from xmm0 naturally.  Patch posted separately.
-
-
-r~
+>
+> Max
+>
