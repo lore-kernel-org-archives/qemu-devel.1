@@ -1,15 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fhX3h-0004Qp-21
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:23:14 -0400
+	(envelope-from <berrange@redhat.com>) id 1fhXDi-0006Ys-TW
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:33:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fhX3g-0000ra-1i
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:23:13 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 23 Jul 2018 11:23:04 +0200
-Message-Id: <1532337784-334-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/intc/exynos4210_gic: Turn instance_init
- into realize function
+	(envelope-from <berrange@redhat.com>) id 1fhXDf-0004bh-OM
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:33:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53694 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fhXDf-0004bT-J9
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:33:31 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 71C96814F0A3
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 09:33:30 +0000 (UTC)
+Date: Mon, 23 Jul 2018 10:33:27 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180723093327.GE3397@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180720154425.31285-1-marcandre.lureau@redhat.com>
+	<20180720154425.31285-3-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180720154425.31285-3-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] RFC: seccomp: prefer
+ SCMP_ACT_KILL_PROCESS if available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,63 +36,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>
-Cc: qemu-arm@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, pmoore@redhat.com, Eduardo Otubo <otubo@redhat.com>
 
-The instance_init function of the "exynos4210.gic" device creates a
-new "arm_gic" device and immediately realizes it with qdev_init_nofail().
-This will leave a lot of object in the QOM tree during introspection of
-the "exynos4210.gic" device, e.g. reproducible by starting QEMU like this:
+On Fri, Jul 20, 2018 at 05:44:25PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> The upcoming libseccomp release should have SCMP_ACT_KILL_PROCESS
+> action (https://github.com/seccomp/libseccomp/issues/96).
+>=20
+> SCMP_ACT_KILL_PROCESS is preferable to immediately terminate the
+> offending process, rather than having the SIGSYS handler running.
+>=20
+> Use SECCOMP_GET_ACTION_AVAIL to check availability of kernel support,
+> as libseccomp will fallback on SCMP_ACT_KILL otherwise, and we still
+> prefer SCMP_ACT_TRAP.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  qemu-seccomp.c | 30 +++++++++++++++++++++++++++++-
+>  1 file changed, 29 insertions(+), 1 deletion(-)
 
-qemu-system-aarch64 -M none -nodefaults -nographic -monitor stdio
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-And then by running "info qom-tree" at the HMP monitor, followed by
-"device_add exynos4210.gic,help" and finally checking "info qom-tree"
-again.
 
-Also note that qdev_init_nofail() can exit QEMU in case of errors - and
-this must never happen during an instance_init function, otherwise QEMU
-could terminate unexpectedly during introspection of a device.
-
-Since most of the code that follows the qdev_init_nofail() depends on
-the realized "gicbusdev", the easiest solution to the problem is to
-turn the whole instance_init function into a realize function instead.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/intc/exynos4210_gic.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
-index b6b00a4..69f9c18 100644
---- a/hw/intc/exynos4210_gic.c
-+++ b/hw/intc/exynos4210_gic.c
-@@ -281,9 +281,9 @@ static void exynos4210_gic_set_irq(void *opaque, int irq, int level)
-     qemu_set_irq(qdev_get_gpio_in(s->gic, irq), level);
- }
- 
--static void exynos4210_gic_init(Object *obj)
-+static void exynos4210_gic_realize(DeviceState *dev, Error **errp)
- {
--    DeviceState *dev = DEVICE(obj);
-+    Object *obj = OBJECT(dev);
-     Exynos4210GicState *s = EXYNOS4210_GIC(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-     const char cpu_prefix[] = "exynos4210-gic-alias_cpu";
-@@ -347,13 +347,13 @@ static void exynos4210_gic_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->props = exynos4210_gic_properties;
-+    dc->realize = exynos4210_gic_realize;
- }
- 
- static const TypeInfo exynos4210_gic_info = {
-     .name          = TYPE_EXYNOS4210_GIC,
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(Exynos4210GicState),
--    .instance_init = exynos4210_gic_init,
-     .class_init    = exynos4210_gic_class_init,
- };
- 
--- 
-1.8.3.1
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
