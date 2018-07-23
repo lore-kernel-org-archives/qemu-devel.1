@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhLN-0004Xm-7v
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:22:10 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhLP-0004ah-Gu
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhLM-0005jl-9i
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:22:09 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhLO-0005ku-EB
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:22:11 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:17:44 -0500
-Message-Id: <20180723201748.25573-96-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 15:17:45 -0500
+Message-Id: <20180723201748.25573-97-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 95/99] virtio-rng: process pending requests on
- DRIVER_OK
+Subject: [Qemu-devel] [PATCH 96/99] target/ppc: set is_jmp on
+ ppc_tr_breakpoint_check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,61 +22,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: qemu-stable@nongnu.org, "Emilio G. Cota" <cota@braap.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Pankaj Gupta <pagupta@redhat.com>
+From: "Emilio G. Cota" <cota@braap.org>
 
-virtio-rng device causes old guest kernels(2.6.32) to hang on latest qemu.
-The driver attempts to read from the virtio-rng device too early in it's
-initialization. Qemu detects guest is not ready and returns, resulting in
-hang.
+The use of GDB breakpoints was broken by b0c2d52 ("target/ppc: convert
+to TranslatorOps", 2018-02-16).
 
-To fix handle pending requests when guest is running and driver status is
-set to 'VIRTIO_CONFIG_S_DRIVER_OK'.
+Fix it by setting is_jmp, so that we break from the translation loop
+as originally intended.
 
-CC: qemu-stable@nongnu.org
-Reported-by: Sergio lopez <slopezpa@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit 5d9c9ea22ab4f3b3ee497523e34b6f4d3281f62d)
+Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+(cherry picked from commit 2a8ceefca23bc2aaafe711f8afd7585be3c27064)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/virtio/virtio-rng.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ target/ppc/translate.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-index 289bbcac03..855f1b41d1 100644
---- a/hw/virtio/virtio-rng.c
-+++ b/hw/virtio/virtio-rng.c
-@@ -156,6 +156,19 @@ static void check_rate_limit(void *opaque)
-     vrng->activate_timer = true;
- }
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 3457d29f8e..c535cd76f2 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7296,6 +7296,7 @@ static bool ppc_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
  
-+static void virtio_rng_set_status(VirtIODevice *vdev, uint8_t status)
-+{
-+    VirtIORNG *vrng = VIRTIO_RNG(vdev);
-+
-+    if (!vdev->vm_running) {
-+        return;
-+    }
-+    vdev->status = status;
-+
-+    /* Something changed, try to process buffers */
-+    virtio_rng_process(vrng);
-+}
-+
- static void virtio_rng_device_realize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-@@ -261,6 +274,7 @@ static void virtio_rng_class_init(ObjectClass *klass, void *data)
-     vdc->realize = virtio_rng_device_realize;
-     vdc->unrealize = virtio_rng_device_unrealize;
-     vdc->get_features = get_features;
-+    vdc->set_status = virtio_rng_set_status;
- }
- 
- static const TypeInfo virtio_rng_info = {
+     gen_debug_exception(ctx);
++    dcbase->is_jmp = DISAS_NORETURN;
+     /* The address covered by the breakpoint must be included in
+        [tb->pc, tb->pc + tb->size) in order to for it to be
+        properly cleared -- thus we increment the PC here so that
 -- 
 2.17.1
