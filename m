@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhIh-0001or-DC
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:19:26 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhIh-0001oo-BU
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:19:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhIg-00037H-0N
+	(envelope-from <flukshun@gmail.com>) id 1fhhId-000354-MV
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:19:23 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:16:35 -0500
-Message-Id: <20180723201748.25573-27-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 15:16:34 -0500
+Message-Id: <20180723201748.25573-26-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 26/99] intel-iommu: remove
- IntelIOMMUNotifierNode
+Subject: [Qemu-devel] [PATCH 25/99] intel-iommu: send PSI always even if
+ across PDEs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,169 +26,118 @@ Cc: qemu-stable@nongnu.org, Peter Xu <peterx@redhat.com>, "Michael S . Tsirkin" 
 
 From: Peter Xu <peterx@redhat.com>
 
-That is not really necessary.  Removing that node struct and put the
-list entry directly into VTDAddressSpace.  It simplfies the code a lot.
-Since at it, rename the old notifiers_list into vtd_as_with_notifiers.
+SECURITY IMPLICATION: without this patch, any guest with both assigned
+device and a vIOMMU might encounter stale IO page mappings even if guest
+has already unmapped the page, which may lead to guest memory
+corruption.  The stale mappings will only be limited to the guest's own
+memory range, so it should not affect the host memory or other guests on
+the host.
+
+During IOVA page table walking, there is a special case when the PSI
+covers one whole PDE (Page Directory Entry, which contains 512 Page
+Table Entries) or more.  In the past, we skip that entry and we don't
+notify the IOMMU notifiers.  This is not correct.  We should send UNMAP
+notification to registered UNMAP notifiers in this case.
+
+For UNMAP only notifiers, this might cause IOTLBs cached in the devices
+even if they were already invalid.  For MAP/UNMAP notifiers like
+vfio-pci, this will cause stale page mappings.
+
+This special case doesn't trigger often, but it is very easy to be
+triggered by nested device assignments, since in that case we'll
+possibly map the whole L2 guest RAM region into the device's IOVA
+address space (several GBs at least), which is far bigger than normal
+kernel driver usages of the device (tens of MBs normally).
+
+Without this patch applied to L1 QEMU, nested device assignment to L2
+guests will dump some errors like:
+
+qemu-system-x86_64: VFIO_MAP_DMA: -17
+qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
+                    0x7f89a920d000) = -17 (File exists)
 
 CC: QEMU Stable <qemu-stable@nongnu.org>
+Acked-by: Jason Wang <jasowang@redhat.com>
+[peterx: rewrite the commit message]
 Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit b4a4ba0d68f50f218ee3957b6638dbee32a5eeef)
+
+(cherry picked from commit 36d2d52bdb45f5b753a61fdaf0fe7891f1f5b61d)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/i386/intel_iommu.c         | 41 ++++++++++-------------------------
- include/hw/i386/intel_iommu.h |  9 ++------
- 2 files changed, 13 insertions(+), 37 deletions(-)
+ hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
+ 1 file changed, 30 insertions(+), 12 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index b359efd6f9..3df90457f8 100644
+index fb31de9416..b359efd6f9 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -1248,10 +1248,10 @@ static void vtd_interrupt_remap_table_setup(IntelIOMMUState *s)
+@@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
  
- static void vtd_iommu_replay_all(IntelIOMMUState *s)
- {
--    IntelIOMMUNotifierNode *node;
-+    VTDAddressSpace *vtd_as;
+ typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
  
--    QLIST_FOREACH(node, &s->notifiers_list, next) {
--        memory_region_iommu_replay_all(&node->vtd_as->iommu);
-+    QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
-+        memory_region_iommu_replay_all(&vtd_as->iommu);
-     }
- }
++static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
++                             vtd_page_walk_hook hook_fn, void *private)
++{
++    assert(hook_fn);
++    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
++                            entry->addr_mask, entry->perm);
++    return hook_fn(entry, private);
++}
++
+ /**
+  * vtd_page_walk_level - walk over specific level for IOVA range
+  *
+@@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+          */
+         entry_valid = read_cur | write_cur;
  
-@@ -1372,7 +1372,6 @@ static void vtd_iotlb_global_invalidate(IntelIOMMUState *s)
- 
- static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
- {
--    IntelIOMMUNotifierNode *node;
-     VTDContextEntry ce;
-     VTDAddressSpace *vtd_as;
- 
-@@ -1381,8 +1380,7 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
-     g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_domain,
-                                 &domain_id);
- 
--    QLIST_FOREACH(node, &s->notifiers_list, next) {
--        vtd_as = node->vtd_as;
-+    QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
-         if (!vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
-                                       vtd_as->devfn, &ce) &&
-             domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
-@@ -1402,12 +1400,11 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-                                            uint16_t domain_id, hwaddr addr,
-                                            uint8_t am)
- {
--    IntelIOMMUNotifierNode *node;
-+    VTDAddressSpace *vtd_as;
-     VTDContextEntry ce;
-     int ret;
- 
--    QLIST_FOREACH(node, &(s->notifiers_list), next) {
--        VTDAddressSpace *vtd_as = node->vtd_as;
-+    QLIST_FOREACH(vtd_as, &(s->vtd_as_with_notifiers), next) {
-         ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
-                                        vtd_as->devfn, &ce);
-         if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
-@@ -2344,8 +2341,6 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
- {
-     VTDAddressSpace *vtd_as = container_of(iommu, VTDAddressSpace, iommu);
-     IntelIOMMUState *s = vtd_as->iommu_state;
--    IntelIOMMUNotifierNode *node = NULL;
--    IntelIOMMUNotifierNode *next_node = NULL;
- 
-     if (!s->caching_mode && new & IOMMU_NOTIFIER_MAP) {
-         error_report("We need to set caching-mode=1 for intel-iommu to enable "
-@@ -2354,21 +2349,9 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
-     }
- 
-     if (old == IOMMU_NOTIFIER_NONE) {
--        node = g_malloc0(sizeof(*node));
--        node->vtd_as = vtd_as;
--        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
--        return;
--    }
--
--    /* update notifier node with new flags */
--    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
--        if (node->vtd_as == vtd_as) {
--            if (new == IOMMU_NOTIFIER_NONE) {
--                QLIST_REMOVE(node, next);
--                g_free(node);
--            }
--            return;
--        }
-+        QLIST_INSERT_HEAD(&s->vtd_as_with_notifiers, vtd_as, next);
-+    } else if (new == IOMMU_NOTIFIER_NONE) {
-+        QLIST_REMOVE(vtd_as, next);
-     }
- }
- 
-@@ -2838,12 +2821,10 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
- 
- static void vtd_address_space_unmap_all(IntelIOMMUState *s)
- {
--    IntelIOMMUNotifierNode *node;
-     VTDAddressSpace *vtd_as;
-     IOMMUNotifier *n;
- 
--    QLIST_FOREACH(node, &s->notifiers_list, next) {
--        vtd_as = node->vtd_as;
-+    QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
-         IOMMU_NOTIFIER_FOREACH(n, &vtd_as->iommu) {
-             vtd_address_space_unmap(vtd_as, n);
-         }
-@@ -3088,7 +3069,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    QLIST_INIT(&s->notifiers_list);
-+    QLIST_INIT(&s->vtd_as_with_notifiers);
-     memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
-     memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
-                           "intel_iommu", DMAR_REG_SIZE);
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 45ec8919b6..032e33bcb2 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -67,7 +67,6 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
- typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
- typedef struct VTDIrq VTDIrq;
- typedef struct VTD_MSIMessage VTD_MSIMessage;
--typedef struct IntelIOMMUNotifierNode IntelIOMMUNotifierNode;
- 
- /* Context-Entry */
- struct VTDContextEntry {
-@@ -93,6 +92,7 @@ struct VTDAddressSpace {
-     MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
-     IntelIOMMUState *iommu_state;
-     VTDContextCacheEntry context_cache_entry;
-+    QLIST_ENTRY(VTDAddressSpace) next;
- };
- 
- struct VTDBus {
-@@ -253,11 +253,6 @@ struct VTD_MSIMessage {
- /* When IR is enabled, all MSI/MSI-X data bits should be zero */
- #define VTD_IR_MSI_DATA          (0)
- 
--struct IntelIOMMUNotifierNode {
--    VTDAddressSpace *vtd_as;
--    QLIST_ENTRY(IntelIOMMUNotifierNode) next;
--};
--
- /* The iommu (DMAR) device state struct */
- struct IntelIOMMUState {
-     X86IOMMUState x86_iommu;
-@@ -295,7 +290,7 @@ struct IntelIOMMUState {
-     GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus* reference */
-     VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects indexed by bus number */
-     /* list of registered notifiers */
--    QLIST_HEAD(, IntelIOMMUNotifierNode) notifiers_list;
-+    QLIST_HEAD(, VTDAddressSpace) vtd_as_with_notifiers;
- 
-     /* interrupt remapping */
-     bool intr_enabled;              /* Whether guest enabled IR */
++        entry.target_as = &address_space_memory;
++        entry.iova = iova & subpage_mask;
++        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
++        entry.addr_mask = ~subpage_mask;
++
+         if (vtd_is_last_slpte(slpte, level)) {
+-            entry.target_as = &address_space_memory;
+-            entry.iova = iova & subpage_mask;
+             /* NOTE: this is only meaningful if entry_valid == true */
+             entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
+-            entry.addr_mask = ~subpage_mask;
+-            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+             if (!entry_valid && !notify_unmap) {
+                 trace_vtd_page_walk_skip_perm(iova, iova_next);
+                 goto next;
+             }
+-            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
+-                                    entry.addr_mask, entry.perm);
+-            if (hook_fn) {
+-                ret = hook_fn(&entry, private);
+-                if (ret < 0) {
+-                    return ret;
+-                }
++            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
++            if (ret < 0) {
++                return ret;
+             }
+         } else {
+             if (!entry_valid) {
+-                trace_vtd_page_walk_skip_perm(iova, iova_next);
++                if (notify_unmap) {
++                    /*
++                     * The whole entry is invalid; unmap it all.
++                     * Translated address is meaningless, zero it.
++                     */
++                    entry.translated_addr = 0x0;
++                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
++                    if (ret < 0) {
++                        return ret;
++                    }
++                } else {
++                    trace_vtd_page_walk_skip_perm(iova, iova_next);
++                }
+                 goto next;
+             }
+             ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
 -- 
 2.17.1
