@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fhbJC-0000rE-Ob
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:55:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fhbJZ-0001Ay-FT
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:55:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fhbJB-0002Dz-IZ
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:55:30 -0400
-Date: Mon, 23 Jul 2018 14:55:19 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180723135519.GI3397@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180713071033.15938-1-kwolf@redhat.com>
-	<b444806b-61da-9930-f0cb-7610d241a16e@redhat.com>
-	<20180723135345.GF8817@localhost.localdomain>
+	(envelope-from <kwolf@redhat.com>) id 1fhbJY-0002Na-Nc
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:55:53 -0400
+Date: Mon, 23 Jul 2018 15:55:38 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180723135538.GG8817@localhost.localdomain>
+References: <20180713194100.7511-1-mreitz@redhat.com>
+	<4347078d-5854-ac6e-f0cd-7512cbd9f419@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180723135345.GF8817@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Use host_device instead of
- file in 149
+In-Reply-To: <4347078d-5854-ac6e-f0cd-7512cbd9f419@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotest: Fix filtering order in 226
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +23,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, Jul 23, 2018 at 03:53:45PM +0200, Kevin Wolf wrote:
-> Am 13.07.2018 um 20:12 hat John Snow geschrieben:
-> > 
-> > 
-> > On 07/13/2018 03:10 AM, Kevin Wolf wrote:
-> > > The test case uses block devices with driver=file, which causes the test
-> > > to fail after commit 230ff73904 added a deprecation warning for this.
-> > > Fix the test case to use driver=host_device and update the reference
-> > > output accordingly.
-> > > 
-> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > 
-> > 149         [not run] requires password-less sudo access: sudo: a
-> > password is required
-> > 
-> > Ah, this one hides from regression scripts quite well...
-> > 
-> > This test fails both before and after this patch for me, with
-> > 
-> > +Traceback (most recent call last):
-> > +  File "149", line 525, in <module>
-> > +    test_once(config, qemu_img=False)
-> > +  File "149", line 336, in test_once
-> > +    cryptsetup_open(config)
-> > +  File "149", line 200, in cryptsetup_open
-> > +    cryptsetup(args, password)
-> > +  File "149", line 124, in cryptsetup
-> > +    raise Exception(msg)
-> > +Exception: Device qiotest-145-twofish-128-xts-plain64-sha1 already exists.
-> > +Command failed with code 17: File exists
-> > 
-> > Am I missing some prerequisite, maybe?
+Am 13.07.2018 um 22:14 hat John Snow geschrieben:
 > 
-> Hm, sounds a bit like a failed first attempt that didn't clean up behind
-> itself properly? Just guessing though.
+> 
+> On 07/13/2018 03:41 PM, Max Reitz wrote:
+> > The test directory should be filtered before the image format, otherwise
+> > the test will fail if the image format is part of the test directory,
+> > like so:
+> > 
+> > [...]
+> > -can't open: Could not open 'TEST_DIR/t.IMGFMT': Is a directory
+> > +can't open: Could not open '/tmp/test-IMGFMT/t.IMGFMT': Is a directory
+> > [...]
+> > 
+> > Signed-off-by: Max Reitz <mreitz@redhat.com>
+> 
+> Too many gotchas in our test suite.
+> 
+> Thanks :(
 
-Yeah, sounds like it failed badly enough that cleanup broke.
+Maybe we should start writing tests for our tests? ;-)
 
-Can probably fix it by either rebooting, or the more nuanced:
+Thanks, applied to the block branch.
 
-  cryptsetup luksClose qiotest-145-twofish-128-xts-plain64-sha1
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Kevin
