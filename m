@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fhcV3-00045p-Bu
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:11:53 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fhcVR-0004HD-RM
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fhcV0-0000fZ-2a
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:11:49 -0400
-Received: from 5.mo3.mail-out.ovh.net ([87.98.178.36]:40717)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fhcUz-0000ek-Qy
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:11:45 -0400
-Received: from player697.ha.ovh.net (unknown [10.109.159.154])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 45C4E1C8875
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 17:11:44 +0200 (CEST)
-References: <20180710160013.26559-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <1efa0007-efeb-3ead-28ad-09479084d0ba@kaod.org>
-Date: Mon, 23 Jul 2018 17:11:31 +0200
+	(envelope-from <cohuck@redhat.com>) id 1fhcVO-0000qO-MP
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:12:13 -0400
+Date: Mon, 23 Jul 2018 17:12:06 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180723171206.476d69ef.cohuck@redhat.com>
+In-Reply-To: <1532356951-18210-1-git-send-email-thuth@redhat.com>
+References: <1532356951-18210-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180710160013.26559-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/6] accel/tcg: Support execution from MMIO
- and small MMU regions
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] hw/s390x/virtio-ccw: Consolidate calls
+ to virtio_ccw_unrealize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, "Emilio G . Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-On 07/10/2018 06:00 PM, Peter Maydell wrote:
-> This series adds support to TCG for executing from MMIO regions
-> and small MMU regions. The basic principle is that if get_page_addr_cod=
-e()
-> finds that the region is not backed by a full page of RAM then it
-> returns -1, and tb_gen_code() then generates a non-cached TB
-> containing a single instruction. Execution from these regions
-> thus performs the instruction fetch every time, ensuring that we
-> get the read-from-MMIO and check-small-MMU-region permissions
-> checks right.
->=20
-> This means that the code path for "generate bus fault for failing
-> to load an instruction" no longer goes through get_page_addr_code(),
-> but instead via each target's translate code and its calls to
-> the cpu_ld*_code() or similar functions. Patch 1 makes sure we
-> can distinguish insn fetches from data loads when generating the
-> bus fault exceptions. (Aside: I have assumed that all cpu_ld*_code()
-> loads should trigger iside faults rather than dside. Hopefully this
-> is true...)
->=20
-> Patches 2 and 3 make trivial fixes to various callers of
-> get_page_addr_code(); patch 4 does the work of generating our
-> single-insn TBs. Patch 5 can then remove all the code that
-> (mis)handles MMIO regions from get_page_addr_code(). Finally
-> patch 6 drops the target/arm workarounds for not having support
-> for executing from small MPU regions.
->=20
-> Note for the Xilinx folks: this patchset makes the mmio-exec
-> testcase for running from the SPI flash pass. Cedric: you might
-> like to test the aspeed image you had that relies on execution
-> from an MMIO region too.
+On Mon, 23 Jul 2018 16:42:31 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
+> Currently, every virtio-ccw device explicitely sets its unrealize
+> function to virtio_ccw_unrealize() in its class_init function.
+> We can simplify this by using this unrealize function in the common
+> virtio_ccw_busdev_unrealize() function if no other device unrealize
+> function has been set.
 
-For the series,
+Sounds sensible to consolidate that.
 
-Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/virtio-ccw.c | 18 +++++-------------
+>  1 file changed, 5 insertions(+), 13 deletions(-)
+> 
 
-Thanks,
+> @@ -1705,7 +1695,11 @@ static void virtio_ccw_busdev_unrealize(DeviceState *dev, Error **errp)
+>      VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+>      VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+>  
+> -    _info->unrealize(_dev, errp);
+> +    if (_info->unrealize) {
+> +        _info->unrealize(_dev, errp);
+> +    } else {
+> +        virtio_ccw_unrealize(_dev, errp);
+> +    }
 
-C.
+However, I think it is better to call virtio_ccw_unrealize()
+unconditionally here (as we want to make sure it is always invoked) and
+call ->unrealize from there if set. That also mirrors what we do for
+realize.
 
->=20
-> The diffstat is pretty satisfying for a patchset that adds
-> a feature, but it actually undersells it: this code renders the
-> hw/misc/mmio_interface.c and the mmio_ptr related code in memory.c
-> and the xilinx-spips device all obsolete, so there are another
-> couple of hundred lines of code to be deleted there. I opted not
-> to include that in this patchset, for ease of review.
->=20
-> NB: I tested this with icount, but there are potentially
-> some weird things that could happen with interactions between
-> icount's io-recompile and execution from an MMIO device
-> that returns different instructions each time it's read.
->=20
-> thanks
-> -- PMM
->=20
->=20
-> Peter Maydell (6):
->   accel/tcg: Pass read access type through to io_readx()
->   accel/tcg: Handle get_page_addr_code() returning -1 in hashtable
->     lookups
->   accel/tcg: Handle get_page_addr_code() returning -1 in
->     tb_check_watchpoint()
->   accel/tcg: tb_gen_code(): Create single-insn TB for execution from
->     non-RAM
->   accel/tcg: Return -1 for execution from MMIO regions in
->     get_page_addr_code()
->   target/arm: Allow execution from small regions
->=20
->  accel/tcg/softmmu_template.h |  11 ++--
->  include/qom/cpu.h            |   6 +++
->  accel/tcg/cpu-exec.c         |   3 ++
->  accel/tcg/cputlb.c           | 100 +++++------------------------------
->  accel/tcg/translate-all.c    |  23 +++++++-
->  memory.c                     |   3 +-
->  target/arm/helper.c          |  23 --------
->  7 files changed, 52 insertions(+), 117 deletions(-)
->=20
+>  }
+>  
+>  static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
