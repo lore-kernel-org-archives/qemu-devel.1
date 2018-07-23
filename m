@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fhgcO-0006ay-6y
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 15:35:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fhglw-0000zB-70
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 15:45:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fhgcL-0002WC-3p
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 15:35:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40350 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fhglt-00085p-2C
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 15:45:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46600)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fhgcK-0002Vp-V7
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 15:35:37 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 23 Jul 2018 14:35:30 -0500
-Message-Id: <20180723193530.20891-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-3.0] tests/libqtest: Improve kill_qemu()
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fhgls-00085i-S2
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 15:45:28 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon, 23 Jul 2018 16:45:20 -0300
+Message-Id: <20180723194521.26831-1-ehabkost@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/1] Build fix for -rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,100 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, mst@redhat.com, rth@twiddle.net, alex.bennee@linaro.org, f4bug@amsat.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-In kill_qemu() we have an assert that checks that the QEMU process
-didn't dump core:
-            assert(!WCOREDUMP(wstatus));
+The following changes since commit 9ba7dd14355bb7957680d5ef764471ab102df0=
+99:
 
-Unfortunately the WCOREDUMP macro here means the resulting message
-is not very easy to comprehend on at least some systems:
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2018-07-23'=
+ into staging (2018-07-23 15:15:46 +0100)
 
-ahci-test: tests/libqtest.c:113: kill_qemu: Assertion `!(((__extension__ (((union { __typeof(wstatus) __in; int __i; }) { .__in = (wstatus) }).__i))) & 0x80)' failed.
+are available in the Git repository at:
 
-and it doesn't identify what signal the process took.
+  git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
 
-Furthermore, we are NOT detecting EINTR (while EINTR shouldn't be
-happening if we didn't install signal handlers, it's still better
-to always be robust), and also want to log unexpected non-zero status
-that was not accompanied by a core dump.
+for you to fetch changes up to 5f00335aecafc9ad56592d943619d3252f8941f1:
 
-Instead of using a raw assert, print the information in an
-easier to understand way:
+  i386: Rename enum CacheType members (2018-07-23 12:56:19 -0300)
 
-/i386/ahci/sanity: tests/libqtest.c:119: kill_qemu() detected QEMU death with core dump from signal 11 (Segmentation fault)
-Aborted (core dumped)
+----------------------------------------------------------------
+Fix for -rc2
 
-(Of course, the really useful information would be why the QEMU
-process dumped core in the first place, but we don't have that
-by the time the test program has picked up the exit status.)
+* Fix build failure on mips host
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
+----------------------------------------------------------------
 
-I've taken the ideas from Peter's patch:
-https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg04430.html
-as well as fixing a related issue brought up last time this was touched:
-https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05710.html
+Eduardo Habkost (1):
+  i386: Rename enum CacheType members
 
- tests/libqtest.c | 39 +++++++++++++++++++++++++++++++++++++--
- 1 file changed, 37 insertions(+), 2 deletions(-)
+ target/i386/cpu.h |   4 +-
+ target/i386/cpu.c | 128 +++++++++++++++++++++++-----------------------
+ 2 files changed, 66 insertions(+), 66 deletions(-)
 
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 098af6aec44..f3dabfadd78 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -105,12 +105,47 @@ static void kill_qemu(QTestState *s)
-     if (s->qemu_pid != -1) {
-         int wstatus = 0;
-         pid_t pid;
-+        bool die = false;
-
-         kill(s->qemu_pid, SIGTERM);
-+    retry:
-         pid = waitpid(s->qemu_pid, &wstatus, 0);
-+        if (pid == -1 && errno == EINTR) {
-+            goto retry;
-+        }
-
--        if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
--            assert(!WCOREDUMP(wstatus));
-+        assert(pid == s->qemu_pid);
-+        /*
-+         * We expect qemu to exit with status 0; anything else is
-+         * fishy and should be logged.  Abort except when death by
-+         * signal is not accompanied by a coredump (as that's the only
-+         * time it was likely that the user is trying to kill the
-+         * testsuite early).
-+         */
-+        if (wstatus) {
-+            die = true;
-+            if (WIFEXITED(wstatus)) {
-+                fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
-+                        "process but encountered exit status %d\n",
-+                        __FILE__, __LINE__, WEXITSTATUS(wstatus));
-+            } else if (WIFSIGNALED(wstatus)) {
-+                int sig = WTERMSIG(wstatus);
-+                const char *signame = strsignal(sig) ?: "unknown ???";
-+
-+                if (!WCOREDUMP(wstatus)) {
-+                    die = false;
-+                    fprintf(stderr, "%s:%d: kill_qemu() ignoring QEMU death "
-+                            "by signal %d (%s)\n",
-+                            __FILE__, __LINE__, sig, signame);
-+                } else {
-+                    fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
-+                            "with core dump from signal %d (%s)\n",
-+                            __FILE__, __LINE__, sig, signame);
-+                }
-+            }
-+        }
-+        if (die) {
-+            abort();
-         }
-     }
- }
--- 
-2.14.4
+--=20
+2.18.0.rc1.1.g3f1ff2140
