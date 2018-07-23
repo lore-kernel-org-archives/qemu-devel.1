@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhIf-0001nD-NR
+	(envelope-from <flukshun@gmail.com>) id 1fhhIa-0001i5-75
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:19:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhIb-00031k-Es
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:19:21 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhIZ-0002yw-6O
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:19:16 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:16:33 -0500
-Message-Id: <20180723201748.25573-25-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 15:16:32 -0500
+Message-Id: <20180723201748.25573-24-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 24/99] hw/intc/arm_gicv3: Fix APxR<n> register
- dispatching
+Subject: [Qemu-devel] [PATCH 23/99] console: Avoid segfault in screendump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,82 +21,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, Michal Privoznik <mprivozn@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Jan Kiszka <jan.kiszka@siemens.com>
+From: Michal Privoznik <mprivozn@redhat.com>
 
-There was a nasty flip in identifying which register group an access is
-targeting. The issue caused spuriously raised priorities of the guest
-when handing CPUs over in the Jailhouse hypervisor.
+After f771c5440e04626f1 it is possible to select device and
+head which to take screendump from. And even though we check if
+provided head number falls within range, it may still happen that
+the console has no surface yet leading to SIGSEGV:
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-Message-id: 28b927d3-da58-bce4-cc13-bfec7f9b1cb9@siemens.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit 887aae10f6150dfdc71c45d7588e8efe6c144019)
+  qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 \
+    -qmp stdio \
+    -device virtio-vga,id=video0,max_outputs=4
+
+  {"execute":"qmp_capabilities"}
+  {"execute":"screendump", "arguments":{"filename":"/tmp/screen.ppm", "device":"video0", "head":1}}
+  Segmentation fault
+
+ #0  0x00005628249dda88 in ppm_save (filename=0x56282826cbc0 "/tmp/screen.ppm", ds=0x0, errp=0x7fff52a6fae0) at ui/console.c:304
+ #1  0x00005628249ddd9b in qmp_screendump (filename=0x56282826cbc0 "/tmp/screen.ppm", has_device=true, device=0x5628276902d0 "video0", has_head=true, head=1, errp=0x7fff52a6fae0) at ui/console.c:375
+ #2  0x00005628247740df in qmp_marshal_screendump (args=0x562828265e00, ret=0x7fff52a6fb68, errp=0x7fff52a6fb60) at qapi/qapi-commands-ui.c:110
+
+Here, @ds from frame #0 (or @surface from frame #1) is
+dereferenced at the very beginning of ppm_save(). And because
+it's NULL crash happens.
+
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-id: cb05bb1909daa6ba62145c0194aafa05a14ed3d1.1526569138.git.mprivozn@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit 08d9864fa4e0c616e076ca8b225d39a7ecb189af)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/intc/arm_gicv3_cpuif.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ ui/console.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index 26f5eeda94..554be25cb7 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -431,7 +431,7 @@ static uint64_t icv_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
- {
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
-     uint64_t value = cs->ich_apr[grp][regno];
+diff --git a/ui/console.c b/ui/console.c
+index 3fb2f4e09f..476bf901a4 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -370,6 +370,11 @@ void qmp_screendump(const char *filename, bool has_device, const char *device,
  
-     trace_gicv3_icv_ap_read(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
-@@ -443,7 +443,7 @@ static void icv_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
- {
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
- 
-     trace_gicv3_icv_ap_write(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
- 
-@@ -1465,7 +1465,7 @@ static uint64_t icc_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     uint64_t value;
- 
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1;
-+    int grp = (ri->crm & 1) ? GICV3_G1 : GICV3_G0;
- 
-     if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
-         return icv_ap_read(env, ri);
-@@ -1487,7 +1487,7 @@ static void icc_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     GICv3CPUState *cs = icc_cs_from_env(env);
- 
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1;
-+    int grp = (ri->crm & 1) ? GICV3_G1 : GICV3_G0;
- 
-     if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
-         icv_ap_write(env, ri, value);
-@@ -2296,7 +2296,7 @@ static uint64_t ich_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
- {
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
-     uint64_t value;
- 
-     value = cs->ich_apr[grp][regno];
-@@ -2309,7 +2309,7 @@ static void ich_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
- {
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
- 
-     trace_gicv3_ich_ap_write(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
+     graphic_hw_update(con);
+     surface = qemu_console_surface(con);
++    if (!surface) {
++        error_setg(errp, "no surface");
++        return;
++    }
++
+     ppm_save(filename, surface, errp);
+ }
  
 -- 
 2.17.1
