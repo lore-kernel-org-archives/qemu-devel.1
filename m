@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhd2I-00019i-Oz
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:46:11 -0400
+	(envelope-from <clg@kaod.org>) id 1fhd7t-0004dU-N7
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhd2E-0002GY-R2
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:46:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37780 helo=mx1.redhat.com)
+	(envelope-from <clg@kaod.org>) id 1fhd7q-0006eO-L3
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:51:57 -0400
+Received: from 4.mo4.mail-out.ovh.net ([178.32.98.131]:38834)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhd2E-0002GK-MT
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:46:06 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180720130928.6696-1-liujunjie23@huawei.com>
-	<87h8kq86f8.fsf@dusky.pond.sub.org>
-	<B526101FCAB4654DB0892B650DEFC555086C7F48@dggemm521-mbx.china.huawei.com>
-Date: Mon, 23 Jul 2018 17:46:03 +0200
-In-Reply-To: <B526101FCAB4654DB0892B650DEFC555086C7F48@dggemm521-mbx.china.huawei.com>
-	(liujunjie's message of "Mon, 23 Jul 2018 14:36:39 +0000")
-Message-ID: <87k1pm551g.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fhd7q-0006dL-Bo
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:51:54 -0400
+Received: from player738.ha.ovh.net (unknown [10.109.146.163])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id BFB5A18B66D
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 17:51:52 +0200 (CEST)
+References: <20180710160013.26559-1-peter.maydell@linaro.org>
+	<ce2458db-7b97-1672-48cf-b88c24d93157@kaod.org>
+	<CAFEAcA88a15YJ86bK+3=OMG-2=URAgfXEjFoAx603YpCsw5X2w@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <286bff36-1137-ea8f-077c-270406ef433d@kaod.org>
+Date: Mon, 23 Jul 2018 17:51:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qstring: Fix integer overflow
+In-Reply-To: <CAFEAcA88a15YJ86bK+3=OMG-2=URAgfXEjFoAx603YpCsw5X2w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/6] accel/tcg: Support execution from MMIO
+ and small MMU regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +33,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "liujunjie (A)" <liujunjie23@huawei.com>
-Cc: "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Richard Henderson <rth@twiddle.net>, "Emilio G . Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
 
-"liujunjie (A)" <liujunjie23@huawei.com> writes:
+On 07/23/2018 05:17 PM, Peter Maydell wrote:
+> On 23 July 2018 at 15:57, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>> On 07/10/2018 06:00 PM, Peter Maydell wrote:
+>>> Note for the Xilinx folks: this patchset makes the mmio-exec
+>>> testcase for running from the SPI flash pass. Cedric: you might
+>>> like to test the aspeed image you had that relies on execution
+>>> from an MMIO region too.
+>>
+>> I have added a memory region alias at 0x0 on the memory region where
+>> the first flash device is mapped and all aspeed machines, palmetto,
+>> romulus, witherspoon booted fine.
+>>
+>> More or less 4MB of data access is generated and the slowdown is hardl=
+y
+>> noticeable, around one second on a laptop.
+>>
+>> I wonder if I should add a bool option to the machine to activate
+>> or not the feature ?
+>=20
+> I would tend to go with "not" -- if we need the feature then
+> it's better to run slowly but correctly, and if we don't need
+> the feature then it doesn't cost us any speed I think.
 
-> Thanks for your reply.
->> Really?  How exactly can this happen?  Please explain step by step.
-> There exist a qemu core related to this. You have mention that "The conversion truncates when strlen(str) - 1 exceeds INT_MAX".
-> Later in function qstring_from_substr, this truncated "end" will be assigned to "qstring->length" again, which is size_t. This is the key point why qemu coredumped.
-> Because when "end" is truncated, it can be negative number. If we assign a negative number to a size_t variable, this size_t variable can become very large.
-> At last, we call g_malloc to try to alloc a large number of member which cannot success. So qemu coredump.
-> In my example, use gdb to debug function qstring_from_substr, I can get the following message.
-> (gdb) p	qstring->length
-> $4 = 18446744072383980732  (too large to allocate)
-> (gdb) p	(int) (qstring->length)
-> $5 = -1325570884
-> (gdb) p/x (int)	qstring->length
-> $6 = 0xb0fd64bc
-> (gdb) p/x qstring->length
-> $7 = 0xffffffffb0fd64bc
-> (gdb) p	end
-> $8 = <optimized out>
 
-Can you provide a stack backtrace, too?
+I have chosen a brutal activation (for the moment) :
+
+  https://github.com/legoater/qemu/commit/10b08c5e8df385bba342f02fa044091=
+6203b6fa8
+
+I will send when your patchset is committed.
+
+Images used for tests are here :=20
+
+  https://openpower.xyz/job/openbmc-build/distro=3Dubuntu,target=3Dromulu=
+s/lastSuccessfulBuild/artifact/deploy/images/romulus/flash-romulus
+
+  https://openpower.xyz/job/openbmc-build/distro=3Dubuntu,target=3Dpalmet=
+to/lastSuccessfulBuild/artifact/deploy/images/palmetto/flash-palmetto
+
+  https://openpower.xyz/job/openbmc-build/distro=3Dubuntu,target=3Dwither=
+spoon/lastSuccessfulBuild/artifact/deploy/images/witherspoon/obmc-phospho=
+r-image-witherspoon.ubi.mtd
+
+Thanks,
+
+C.=20
