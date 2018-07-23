@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fheYI-0005it-Pm
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 13:23:19 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fheo5-00023F-LM
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 13:39:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fheYH-00061k-LW
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 13:23:18 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:35046)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fheYH-00061K-Ft
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 13:23:17 -0400
-Received: by mail-pl0-x241.google.com with SMTP id w3-v6so507151plq.2
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 10:23:17 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 23 Jul 2018 10:23:11 -0700
-Message-Id: <20180723172311.11316-2-richard.henderson@linaro.org>
-In-Reply-To: <20180723172311.11316-1-richard.henderson@linaro.org>
-References: <20180723172311.11316-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL for-3.0 1/1] tcg/i386: Mark xmm registers
- call-clobbered
+	(envelope-from <amarkovic@wavecomp.com>) id 1fheo1-0005Oc-M9
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 13:39:37 -0400
+Received: from mail-co1nam05on0718.outbound.protection.outlook.com
+	([2a01:111:f400:fe50::718]:47130
+	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fheo1-0005N0-5q
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 13:39:33 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 23 Jul 2018 17:39:09 +0000
+Message-ID: <BN7PR08MB4868FFAE6CA4BF4074D7F87AC6560@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+	<1532004912-13899-33-git-send-email-stefan.markovic@rt-rk.com>,
+	<8d1a14bf-8cc5-91cb-5aed-cefeb8d97962@linaro.org>
+In-Reply-To: <8d1a14bf-8cc5-91cb-5aed-cefeb8d97962@linaro.org>
+Content-Language: en-US
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 32/40] elf: Add nanoMIPS specific
+ variations in ELF header fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-stable@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-When host vector registers and operations were introduced, I failed
-to mark the registers call clobbered as required by the ABI.
+> From: Richard Henderson <richard.henderson@linaro.org>
+> Sent: Monday, July 23, 2018 6:59 PM
+> On 07/19/2018 05:55 AM, Stefan Markovic wrote:
+> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> >
+> > Add nanoMIPS-related values in ELF header fields as specified in
+> > nanoMIPS' "ELF ABI Supplement".
+> >
+> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> > Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> > ---
+> >  include/elf.h | 20 ++++++++++++++++++++
+> >  1 file changed, 20 insertions(+)
+>
+> None of these values have made it upstream to binutils yet,
+> so I can't double-check them.  However,
+>
+> Acked-by: Richard Henderson <richard.henderson@linaro.org>
+>
+>
+> r~
 
-Fixes: 770c2fc7bb7
-Cc: qemu-stable@nongnu.org
-Reported-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/i386/tcg-target.inc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi, Richard.
 
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index e87b0d445e..a91e4f1313 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -3532,7 +3532,7 @@ static void tcg_target_init(TCGContext *s)
-         tcg_target_available_regs[TCG_TYPE_V256] = ALL_VECTOR_REGS;
-     }
- 
--    tcg_target_call_clobber_regs = 0;
-+    tcg_target_call_clobber_regs = ALL_VECTOR_REGS;
-     tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_EAX);
-     tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_EDX);
-     tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_ECX);
--- 
-2.17.1
+True, binutils headers were not updated with these ELF-related values. Howe=
+ver, there is a publicly-available document at https://codescape.mips.com/c=
+omponents/toolchain/nanomips/2018.04-02/releasenotes.html that should be th=
+e source of information for binutils headers, or any other related header i=
+n similar tools. Specifically, see Section 5.1 of that document.
+
+Regards,
+Aleksandar
