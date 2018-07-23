@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhWD9-0004E8-Oy
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 04:28:57 -0400
+	(envelope-from <peterx@redhat.com>) id 1fhWKF-0006NS-Nx
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 04:36:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhWD4-00030W-Po
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 04:28:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33128 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fhWKA-000647-ND
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 04:36:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33596 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhWD4-00030N-KT
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 04:28:50 -0400
-Date: Mon, 23 Jul 2018 16:28:38 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhWKA-00063p-H3
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 04:36:10 -0400
+Date: Mon, 23 Jul 2018 16:35:51 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180723082838.GJ2491@xz-mi>
+Message-ID: <20180723083551.GK2491@xz-mi>
 References: <20180719121520.30026-1-xiaoguangrong@tencent.com>
-	<20180719121520.30026-7-xiaoguangrong@tencent.com>
-	<20180723050325.GF2491@xz-mi>
-	<d0e8afdb-dafb-709b-15d5-7b33c086d6c7@gmail.com>
+	<20180719121520.30026-9-xiaoguangrong@tencent.com>
+	<20180723054903.GH2491@xz-mi>
+	<5447275f-fe48-ec8f-399c-1a5530417f65@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <d0e8afdb-dafb-709b-15d5-7b33c086d6c7@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/8] migration: move handle of zero page
- to the thread
+In-Reply-To: <5447275f-fe48-ec8f-399c-1a5530417f65@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] migration: do not
+ flush_compressed_data at the end of each iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +33,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Xiao Guangrong <guangrong.xiao@gmail.com>
 Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Mon, Jul 23, 2018 at 03:56:33PM +0800, Xiao Guangrong wrote:
-
-[...]
-
-> > > @@ -2249,15 +2308,8 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-> > >           return res;
+On Mon, Jul 23, 2018 at 04:05:21PM +0800, Xiao Guangrong wrote:
+> 
+> 
+> On 07/23/2018 01:49 PM, Peter Xu wrote:
+> > On Thu, Jul 19, 2018 at 08:15:20PM +0800, guangrong.xiao@gmail.com wrote:
+> > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > > 
+> > > flush_compressed_data() needs to wait all compression threads to
+> > > finish their work, after that all threads are free until the
+> > > migration feeds new request to them, reducing its call can improve
+> > > the throughput and use CPU resource more effectively
+> > > 
+> > > We do not need to flush all threads at the end of iteration, the
+> > > data can be kept locally until the memory block is changed or
+> > > memory migration starts over in that case we will meet a dirtied
+> > > page which may still exists in compression threads's ring
+> > > 
+> > > Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > > ---
+> > >   migration/ram.c | 15 ++++++++++++++-
+> > >   1 file changed, 14 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/migration/ram.c b/migration/ram.c
+> > > index 89305c7af5..fdab13821d 100644
+> > > --- a/migration/ram.c
+> > > +++ b/migration/ram.c
+> > > @@ -315,6 +315,8 @@ struct RAMState {
+> > >       uint64_t iterations;
+> > >       /* number of dirty bits in the bitmap */
+> > >       uint64_t migration_dirty_pages;
+> > > +    /* last dirty_sync_count we have seen */
+> > > +    uint64_t dirty_sync_count;
+> > 
+> > Better suffix it with "_prev" as well?  So that we can quickly
+> > identify that it's only a cache and it can be different from the one
+> > in the ram_counters.
+> 
+> Indeed, will update it.
+> 
+> > 
+> > >       /* protects modification of the bitmap */
+> > >       QemuMutex bitmap_mutex;
+> > >       /* The RAMBlock used in the last src_page_requests */
+> > > @@ -2532,6 +2534,7 @@ static void ram_save_cleanup(void *opaque)
 > > >       }
-> > > -    /*
-> > > -     * When starting the process of a new block, the first page of
-> > > -     * the block should be sent out before other pages in the same
-> > > -     * block, and all the pages in last block should have been sent
-> > > -     * out, keeping this order is important, because the 'cont' flag
-> > > -     * is used to avoid resending the block name.
-> > > -     */
-> > > -    if (block != rs->last_sent_block && save_page_use_compression(rs)) {
-> > > -            flush_compressed_data(rs);
-> > > +    if (save_compress_page(rs, block, offset)) {
-> > > +        return 1;
+> > >       xbzrle_cleanup();
+> > > +    flush_compressed_data(*rsp);
 > > 
-> > It's a bit tricky (though it seems to be a good idea too) to move the
-> > zero detect into the compression thread, though I noticed that we also
-> > do something else for zero pages:
-> > 
-> >      res = save_zero_page(rs, block, offset);
-> >      if (res > 0) {
-> >          /* Must let xbzrle know, otherwise a previous (now 0'd) cached
-> >           * page would be stale
-> >           */
-> >          if (!save_page_use_compression(rs)) {
-> >              XBZRLE_cache_lock();
-> >              xbzrle_cache_zero_page(rs, block->offset + offset);
-> >              XBZRLE_cache_unlock();
-> >          }
-> >          ram_release_pages(block->idstr, offset, res);
-> >          return res;
-> >      }
-> > 
-> > I'd guess that the xbzrle update of the zero page is not needed for
-> > compression since after all xbzrle is not enabled when compression is
+> > Could I ask why do we need this considering that we have
+> > compress_threads_save_cleanup() right down there?
 > 
-> Yup. if they are both enabled, compression works only for the first
-> iteration (i.e, ram_bulk_stage), at that point, nothing is cached
-> in xbzrle's cahe, in other words, xbzrle has posted nothing to the
-> destination.
+> Dave ask it too. :(
 > 
-> > enabled, however do we need to do ram_release_pages() somehow?
-> > 
+> "This is for the error condition, if any error occurred during live migration,
+> there is no chance to call ram_save_complete. After using the lockless
+> multithreads model, we assert all requests have been handled before destroy
+> the work threads."
 > 
-> We have done it in the thread:
-> 
-> +static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
->                                   ram_addr_t offset, uint8_t *source_buf)
->  {
-> 
-> 
-> +    if (save_zero_page_to_file(rs, f, block, offset)) {
-> +        zero_page = true;
-> +        goto exit;
-> +    }
-> ......
-> 
-> +exit:
->      ram_release_pages(block->idstr, offset & TARGET_PAGE_MASK, 1);
-> +    return zero_page;
->  }
+> That makes sure there is nothing left in the threads before doing
+> compress_threads_save_cleanup() as current behavior. For lockless
+> mutilthread model, we check if all requests are free before destroy
+> them.
 
-Ah, then it seems fine.  Though I'd suggest you comment these into the
-commit message in case people won't get it easily.
+But why do we need to explicitly flush it here?  Now in
+compress_threads_save_cleanup() we have qemu_fclose() on the buffers,
+which logically will flush the data and clean up everything too.
+Would that suffice?
 
 > 
-> However, it is not safe to do ram_release_pages in the thread as it's
-> not protected it multithreads. Fortunately, compression will be disabled
-> if it switches to post-copy, so i preferred to keep current behavior and
-> deferred to fix it after this patchset has been merged.
+> > 
+> > >       compress_threads_save_cleanup();
+> > >       ram_state_cleanup(rsp);
+> > >   }
+> > > @@ -3203,6 +3206,17 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+> > >       ram_control_before_iterate(f, RAM_CONTROL_ROUND);
+> > > +    /*
+> > > +     * if memory migration starts over, we will meet a dirtied page which
+> > > +     * may still exists in compression threads's ring, so we should flush
+> > > +     * the compressed data to make sure the new page is not overwritten by
+> > > +     * the old one in the destination.
+> > > +     */
+> > > +    if (ram_counters.dirty_sync_count != rs->dirty_sync_count) {
+> > > +        rs->dirty_sync_count = ram_counters.dirty_sync_count;
+> > > +        flush_compressed_data(rs);
+> > > +    }
+> > > +
+> > >       t0 = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> > >       i = 0;
+> > >       while ((ret = qemu_file_rate_limit(f)) == 0 ||
+> > > @@ -3235,7 +3249,6 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+> > >           }
+> > >           i++;
+> > >       }
+> > > -    flush_compressed_data(rs);
+> > 
+> > This looks sane to me, but I'd like to see how other people would
+> > think about it too...
+> 
+> Thank you a lot, Peter! :)
 
-Do you mean ram_release_pages() is not thread-safe?  Why?  I didn't
-notice it before but I feel like it is safe.
+Welcome. :)
 
 Regards,
 
