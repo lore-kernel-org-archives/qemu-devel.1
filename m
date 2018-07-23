@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fhaba-0001SW-Ec
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:10:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1fhaf5-0002lw-7n
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fhabV-0003qq-Gs
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:10:26 -0400
-Date: Mon, 23 Jul 2018 15:10:10 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180723151010.7b4bfd8c@redhat.com>
-In-Reply-To: <20180704124923.32483-4-drjones@redhat.com>
-References: <20180704124923.32483-1-drjones@redhat.com>
-	<20180704124923.32483-4-drjones@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 3/6] hw/arm/virt: DT: add cpu-map
+	(envelope-from <armbru@redhat.com>) id 1fhaf0-00051v-9Y
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50376 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhaf0-00051g-3e
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:13:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C1BA140201D5
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:13:57 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-135.ams2.redhat.com
+	[10.36.116.135])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BE722026D65
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:13:57 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon, 23 Jul 2018 15:13:55 +0200
+Message-Id: <20180723131356.27466-2-armbru@redhat.com>
+In-Reply-To: <20180723131356.27466-1-armbru@redhat.com>
+References: <20180723131356.27466-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL 1/2] qapi: Make 'allow-oob' optional in
+ SchemaInfoCommand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +34,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, eric.auger@redhat.com, wei@redhat.com
+To: qemu-devel@nongnu.org
 
-On Wed,  4 Jul 2018 14:49:20 +0200
-Andrew Jones <drjones@redhat.com> wrote:
+Making 'allow-oob' optional in SchemaInfoCommand permits omitting it
+in the common case.  Shrinks query-qmp-schema's output from 122.1KiB
+to 118.6KiB for me.
 
-> Support devicetree CPU topology descriptions.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  hw/arm/virt.c         | 35 +++++++++++++++++++++++++++++++++++
->  include/hw/arm/virt.h |  1 +
->  2 files changed, 36 insertions(+)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 880441275031..6c5fecdd61df 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -40,6 +40,7 @@
->  #include "hw/devices.h"
->  #include "net/net.h"
->  #include "sysemu/device_tree.h"
-> +#include "sysemu/cpus.h"
->  #include "sysemu/numa.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/kvm.h"
-> @@ -302,6 +303,7 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
->      int cpu;
->      int addr_cells = 1;
->      const MachineState *ms = MACHINE(vms);
-> +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
->  
->      /*
->       * From Documentation/devicetree/bindings/arm/cpus.txt
-> @@ -358,8 +360,38 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
->                  ms->possible_cpus->cpus[cs->cpu_index].props.node_id);
->          }
->  
-> +        qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle",
-> +                              qemu_fdt_alloc_phandle(vms->fdt));
-it's not obvious how this hunk is related to patch
-(also it affects ignore_cpu_topology = true which probably isn't intended)
+Note that out-of-band execution is still experimental (you have to
+configure the monitor with x-oob=on to use it).
 
->          g_free(nodename);
->      }
-> +
-> +    if (!vmc->ignore_cpu_topology) {
-> +        /* From Documentation/devicetree/bindings/arm/topology.txt
-> +         */
-> +        qemu_fdt_add_subnode(vms->fdt, "/cpus/cpu-map");
-> +
-> +        for (cpu = vms->smp_cpus - 1; cpu >= 0; cpu--) {
-I'd iterate over possible_cpus array instead
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20180718090557.17248-1-armbru@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+ qapi/introspect.json       |  6 +++---
+ scripts/qapi/introspect.py | 10 +++++-----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-> +            char *cpu_path = g_strdup_printf("/cpus/cpu@%d", cpu);
-> +            char *map_path;
-> +
-> +            if (smp_threads > 1) {
-> +                map_path = g_strdup_printf(
-> +                               "/cpus/cpu-map/%s%d/%s%d/%s%d",
-> +                               "cluster", cpu / (smp_cores * smp_threads),
-> +                               "core", (cpu / smp_threads) % smp_cores,
-> +                               "thread", cpu % smp_threads);
-> +            } else {
-> +                map_path = g_strdup_printf(
-> +                               "/cpus/cpu-map/%s%d/%s%d",
-> +                               "cluster", cpu / smp_cores,
-> +                               "core", cpu % smp_cores);
-> +            }
-not sure about direct calculation of numbers here,
-do they relate in any way to ms->possible_cpus->cpus[].props.(socket|core|thread-id) ?
-
-
-> +            qemu_fdt_add_path(vms->fdt, map_path);
-> +            qemu_fdt_setprop_phandle(vms->fdt, map_path, "cpu", cpu_path);
-> +            g_free(map_path);
-> +            g_free(cpu_path);
-> +        }
-> +    }
->  }
->  
->  static void fdt_add_its_gic_node(VirtMachineState *vms)
-> @@ -1839,7 +1871,10 @@ static void virt_3_0_instance_init(Object *obj)
->  
->  static void virt_machine_3_0_options(MachineClass *mc)
->  {
-> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-> +
->      virt_machine_3_1_options(mc);
-> +    vmc->ignore_cpu_topology = true;
->  }
->  DEFINE_VIRT_MACHINE(3, 0)
->  
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 9a870ccb6a57..deb8bee72cda 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -94,6 +94,7 @@ typedef struct MemMapEntry {
->  typedef struct {
->      MachineClass parent;
->      bool disallow_affinity_adjustment;
-> +    bool ignore_cpu_topology;
-missing doc comment for the knob
-
->      bool no_its;
->      bool no_pmu;
->      bool claim_edge_triggered_timers;
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index c7f67b7d78..137b39b992 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -259,8 +259,8 @@
+ #
+ # @ret-type: the name of the command's result type.
+ #
+-# @allow-oob: whether the command allows out-of-band execution.
+-#             (Since: 2.12)
++# @allow-oob: whether the command allows out-of-band execution,
++#             defaults to false (Since: 2.12)
+ #
+ # TODO: @success-response (currently irrelevant, because it's QGA, not QMP)
+ #
+@@ -268,7 +268,7 @@
+ ##
+ { 'struct': 'SchemaInfoCommand',
+   'data': { 'arg-type': 'str', 'ret-type': 'str',
+-            'allow-oob': 'bool' } }
++            '*allow-oob': 'bool' } }
+ 
+ ##
+ # @SchemaInfoEvent:
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 70ca5dd876..189a4edaba 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -184,11 +184,11 @@ const QLitObject %(c_name)s = %(c_string)s;
+                       success_response, boxed, allow_oob, allow_preconfig):
+         arg_type = arg_type or self._schema.the_empty_object_type
+         ret_type = ret_type or self._schema.the_empty_object_type
+-        self._gen_qlit(name, 'command',
+-                       {'arg-type': self._use_type(arg_type),
+-                        'ret-type': self._use_type(ret_type),
+-                        'allow-oob': allow_oob},
+-                       ifcond)
++        obj = {'arg-type': self._use_type(arg_type),
++               'ret-type': self._use_type(ret_type) }
++        if allow_oob:
++            obj['allow-oob'] = allow_oob
++        self._gen_qlit(name, 'command', obj, ifcond)
+ 
+     def visit_event(self, name, info, ifcond, arg_type, boxed):
+         arg_type = arg_type or self._schema.the_empty_object_type
+-- 
+2.17.1
