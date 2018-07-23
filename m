@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhaf5-0002lx-8H
+	(envelope-from <armbru@redhat.com>) id 1fhaf5-0002lv-4O
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhaf2-00052o-0F
+	(envelope-from <armbru@redhat.com>) id 1fhaf0-00051q-8a
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50382 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51378 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhaf1-00052X-RI
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:13:59 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhaf0-00051f-3s
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:13:58 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7AACA401DEA8
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:13:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C1B658790F
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:13:57 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-135.ams2.redhat.com
+	[10.36.116.135])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A4C92156892
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:13:57 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 23 Jul 2018 15:13:56 +0200
-Message-Id: <20180723131356.27466-3-armbru@redhat.com>
-In-Reply-To: <20180723131356.27466-1-armbru@redhat.com>
-References: <20180723131356.27466-1-armbru@redhat.com>
+Date: Mon, 23 Jul 2018 15:13:54 +0200
+Message-Id: <20180723131356.27466-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/2] monitor: Fix unsafe sharing of @cur_mon
- among threads
+Subject: [Qemu-devel] [PULL 0/2] QAPI and monitor patches for 2018-07-23
+ (3.0.0-rc2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,103 +36,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>
 
-From: Peter Xu <peterx@redhat.com>
+The following changes since commit 6598f0cdad6acc6674c4f060fa46e537228c2c=
+47:
 
-@cur_mon is null unless the main thread is running monitor code, either
-HMP code within monitor_read(), or QMP code within
-monitor_qmp_dispatch().
+  po: Don't include comments with location (2018-07-23 10:50:54 +0100)
 
-Use of @cur_mon outside the main thread is therefore unsafe.
+are available in the Git repository at:
 
-Most of its uses are in monitor command handlers.  These run in the main
-thread.
+  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2018-07-23
 
-However, there are also uses hiding elsewhere, such as in
-error_vprintf(), and thus error_report(), making these functions unsafe
-outside the main thread.  No such unsafe uses are known at this time.
-Regardless, this is an unnecessary trap.  It's an ancient trap, though.
+for you to fetch changes up to 62aa1d887ff9fc76adb488d31447d126a78f4b8f:
 
-More recently, commit cf869d53172 "qmp: support out-of-band (oob)
-execution" spiced things up: the monitor I/O thread assigns to @cur_mon
-when executing commands out-of-band.  Having two threads save, set and
-restore @cur_mon without synchronization is definitely unsafe.  We can
-end up with @cur_mon null while the main thread runs monitor code, or
-non-null while it runs non-monitor code.
+  monitor: Fix unsafe sharing of @cur_mon among threads (2018-07-23 14:00=
+:03 +0200)
 
-We could fix this by making the I/O thread not mess with @cur_mon, but
-that would leave the trap armed and ready.
+----------------------------------------------------------------
+QAPI and monitor patches for 2018-07-23 (3.0.0-rc2)
 
-Instead, make @cur_mon thread-local.  It's now reliably null unless the
-thread is running monitor code.
+This pull request consists of a late external interface tweak and a
+thread safety fix, both related to QMP out-of-band execution.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-[peterx: update subject and commit message written by Markus]
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180720033451.32710-1-peterx@redhat.com>
----
- include/monitor/monitor.h | 2 +-
- monitor.c                 | 2 +-
- stubs/monitor.c           | 2 +-
- tests/test-util-sockets.c | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+----------------------------------------------------------------
+Markus Armbruster (1):
+      qapi: Make 'allow-oob' optional in SchemaInfoCommand
 
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index d6ab70cae2..2ef5e04b37 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -6,7 +6,7 @@
- #include "qapi/qapi-types-misc.h"
- #include "qemu/readline.h"
-=20
--extern Monitor *cur_mon;
-+extern __thread Monitor *cur_mon;
-=20
- /* flags for monitor_init */
- /* 0x01 unused */
-diff --git a/monitor.c b/monitor.c
-index be29634a00..f75027b09e 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -290,7 +290,7 @@ static mon_cmd_t info_cmds[];
-=20
- QmpCommandList qmp_commands, qmp_cap_negotiation_commands;
-=20
--Monitor *cur_mon;
-+__thread Monitor *cur_mon;
-=20
- static void monitor_command_cb(void *opaque, const char *cmdline,
-                                void *readline_opaque);
-diff --git a/stubs/monitor.c b/stubs/monitor.c
-index e018c8f594..3890771bb5 100644
---- a/stubs/monitor.c
-+++ b/stubs/monitor.c
-@@ -3,7 +3,7 @@
- #include "qemu-common.h"
- #include "monitor/monitor.h"
-=20
--Monitor *cur_mon =3D NULL;
-+__thread Monitor *cur_mon;
-=20
- int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
- {
-diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-index acadd85e8f..6195a3ac36 100644
---- a/tests/test-util-sockets.c
-+++ b/tests/test-util-sockets.c
-@@ -69,7 +69,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Er=
-ror **errp)
-  * stubs/monitor.c is defined, to make sure monitor.o is discarded
-  * otherwise we get duplicate syms at link time.
-  */
--Monitor *cur_mon;
-+__thread Monitor *cur_mon;
- void monitor_init(Chardev *chr, int flags) {}
-=20
-=20
+Peter Xu (1):
+      monitor: Fix unsafe sharing of @cur_mon among threads
+
+ include/monitor/monitor.h  |  2 +-
+ monitor.c                  |  2 +-
+ qapi/introspect.json       |  6 +++---
+ scripts/qapi/introspect.py | 10 +++++-----
+ stubs/monitor.c            |  2 +-
+ tests/test-util-sockets.c  |  2 +-
+ 6 files changed, 12 insertions(+), 12 deletions(-)
+armbru@dusky:~/work/qemu$ rm *patch
+armbru@dusky:~/work/qemu$ git-format-patch --subject-prefix PULL master
+0000-cover-letter.patch
+0001-qapi-Make-allow-oob-optional-in-SchemaInfoCommand.patch
+0002-monitor-Fix-unsafe-sharing-of-cur_mon-among-threads.patch
+
 --=20
 2.17.1
