@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhKE-0003SC-3h
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:20:59 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhKF-0003UB-Vh
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhKC-00058Z-Sf
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:20:58 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhKE-00059m-Tq
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:20:59 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:17:15 -0500
-Message-Id: <20180723201748.25573-67-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 15:17:16 -0500
+Message-Id: <20180723201748.25573-68-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 66/99] tcg: Limit the number of ops in a TB
+Subject: [Qemu-devel] [PATCH 67/99] RISC-V: Minimal QEMU 2.12 fix for
+ sifive_u machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +22,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-stable@nongnu.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Michael Clark <mjc@sifive.com>
 
-In 6001f7729e12 we partially attempt to address the branch
-displacement overflow caused by 15fa08f845.
+The 'sifive_u' board has a bug where the ROM is
+created as RAM at the wrong address and marked
+readonly. The bug renders the board unusable.
+This is a minimal fix and allows booting Linux.
 
-However, gcc/testsuite/gcc.target/aarch64/advsimd-intrinsics/vqtbX.c
-is a testcase that contains a TB so large as to overflow anyway.
-The limit here of 8000 ops produces a maximum output TB size of
-24112 bytes on a ppc64le host with that test case.  This is still
-much less than the maximum forward branch distance of 32764 bytes.
+5aec3247c190f10654250203a1742490ae7343a2
+"RISC-V: Mark ROM read-only after copying in code"
+contains a comprehensive fix using the ROM APIs
+memory_region_init_rom and rom_add_blob_fixed_as
+which could be backported.
 
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>
 Cc: qemu-stable@nongnu.org
-Fixes: 15fa08f845 ("tcg: Dynamically allocate TCGOps")
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-(cherry picked from commit abebf92597186be2bc48d487235da28b1127860f)
+Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tcg/tcg.c | 3 +++
- tcg/tcg.h | 8 +++++++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ hw/riscv/sifive_u.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index bb24526c93..66997cc653 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -866,6 +866,7 @@ void tcg_func_start(TCGContext *s)
-     /* No temps have been previously allocated for size or locality.  */
-     memset(s->free_temps, 0, sizeof(s->free_temps));
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 1c2deefa6c..19b034449c 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -250,9 +250,9 @@ static void riscv_sifive_u_init(MachineState *machine)
  
-+    s->nb_ops = 0;
-     s->nb_labels = 0;
-     s->current_frame_offset = s->frame_start;
+     /* boot rom */
+     memory_region_init_ram(boot_rom, NULL, "riscv.sifive.u.mrom",
+-                           memmap[SIFIVE_U_MROM].base, &error_fatal);
+-    memory_region_set_readonly(boot_rom, true);
+-    memory_region_add_subregion(sys_memory, 0x0, boot_rom);
++                           memmap[SIFIVE_U_MROM].size, &error_fatal);
++    memory_region_add_subregion(sys_memory, memmap[SIFIVE_U_MROM].base,
++                                boot_rom);
  
-@@ -1983,6 +1984,7 @@ void tcg_op_remove(TCGContext *s, TCGOp *op)
- {
-     QTAILQ_REMOVE(&s->ops, op, link);
-     QTAILQ_INSERT_TAIL(&s->free_ops, op, link);
-+    s->nb_ops--;
+     if (machine->kernel_filename) {
+         load_kernel(machine->kernel_filename);
+@@ -282,6 +282,7 @@ static void riscv_sifive_u_init(MachineState *machine)
+     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+     cpu_physical_memory_write(memmap[SIFIVE_U_MROM].base +
+         sizeof(reset_vec), s->fdt, s->fdt_size);
++    memory_region_set_readonly(boot_rom, true);
  
- #ifdef CONFIG_PROFILER
-     atomic_set(&s->prof.del_op_count, s->prof.del_op_count + 1);
-@@ -2002,6 +2004,7 @@ static TCGOp *tcg_op_alloc(TCGOpcode opc)
-     }
-     memset(op, 0, offsetof(TCGOp, link));
-     op->opc = opc;
-+    s->nb_ops++;
- 
-     return op;
- }
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 30896ca304..17cf764565 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -655,6 +655,7 @@ struct TCGContext {
-     int nb_globals;
-     int nb_temps;
-     int nb_indirects;
-+    int nb_ops;
- 
-     /* goto_tb support */
-     tcg_insn_unit *code_buf;
-@@ -844,7 +845,12 @@ static inline TCGOp *tcg_last_op(void)
- /* Test for whether to terminate the TB for using too many opcodes.  */
- static inline bool tcg_op_buf_full(void)
- {
--    return false;
-+    /* This is not a hard limit, it merely stops translation when
-+     * we have produced "enough" opcodes.  We want to limit TB size
-+     * such that a RISC host can reasonably use a 16-bit signed
-+     * branch within the TB.
-+     */
-+    return tcg_ctx->nb_ops >= 8000;
- }
- 
- /* pool based memory allocation */
+     /* MMIO */
+     s->plic = sifive_plic_create(memmap[SIFIVE_U_PLIC].base,
 -- 
 2.17.1
