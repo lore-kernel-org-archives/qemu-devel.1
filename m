@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fhXDi-0006Ys-TW
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:33:36 -0400
+	(envelope-from <peterx@redhat.com>) id 1fhXKX-0007vn-GL
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:40:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fhXDf-0004bh-OM
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:33:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53694 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fhXKU-0006dI-Cj
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:40:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55834 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fhXDf-0004bT-J9
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:33:31 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 71C96814F0A3
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 09:33:30 +0000 (UTC)
-Date: Mon, 23 Jul 2018 10:33:27 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180723093327.GE3397@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180720154425.31285-1-marcandre.lureau@redhat.com>
-	<20180720154425.31285-3-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhXKU-0006cs-7v
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:40:34 -0400
+Date: Mon, 23 Jul 2018 17:40:21 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180723094021.GN2491@xz-mi>
+References: <20180719121520.30026-1-xiaoguangrong@tencent.com>
+	<20180719121520.30026-7-xiaoguangrong@tencent.com>
+	<20180723050325.GF2491@xz-mi>
+	<d0e8afdb-dafb-709b-15d5-7b33c086d6c7@gmail.com>
+	<20180723082838.GJ2491@xz-mi>
+	<bf5df13e-5b2a-ab5e-4cef-9e417b40347c@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180720154425.31285-3-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] RFC: seccomp: prefer
- SCMP_ACT_KILL_PROCESS if available
+In-Reply-To: <bf5df13e-5b2a-ab5e-4cef-9e417b40347c@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] migration: move handle of zero page
+ to the thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, pmoore@redhat.com, Eduardo Otubo <otubo@redhat.com>
+To: Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Fri, Jul 20, 2018 at 05:44:25PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> The upcoming libseccomp release should have SCMP_ACT_KILL_PROCESS
-> action (https://github.com/seccomp/libseccomp/issues/96).
->=20
-> SCMP_ACT_KILL_PROCESS is preferable to immediately terminate the
-> offending process, rather than having the SIGSYS handler running.
->=20
-> Use SECCOMP_GET_ACTION_AVAIL to check availability of kernel support,
-> as libseccomp will fallback on SCMP_ACT_KILL otherwise, and we still
-> prefer SCMP_ACT_TRAP.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  qemu-seccomp.c | 30 +++++++++++++++++++++++++++++-
->  1 file changed, 29 insertions(+), 1 deletion(-)
+On Mon, Jul 23, 2018 at 04:44:49PM +0800, Xiao Guangrong wrote:
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+[...]
 
+> > > 
+> > > However, it is not safe to do ram_release_pages in the thread as it's
+> > > not protected it multithreads. Fortunately, compression will be disabled
+> > > if it switches to post-copy, so i preferred to keep current behavior and
+> > > deferred to fix it after this patchset has been merged.
+> > 
+> > Do you mean ram_release_pages() is not thread-safe?  Why?  I didn't
+> > notice it before but I feel like it is safe.
+> 
+> bitmap_clear() called in the function is not safe.
+
+Yeah, and the funny thing is that I don't think ram_release_pages()
+should even touch the receivedmap...  It's possible that the
+release-ram feature for postcopy is broken.
+
+Never mind on that.  I'll post a patch to fix it, then I think the
+ram_release_pages() will be thread safe.
+
+Then this patch shouldn't be affected and it should be fine after that
+fix.
 
 Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+
+-- 
+Peter Xu
