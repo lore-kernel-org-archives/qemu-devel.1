@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhL5-0004HV-8j
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:52 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhL7-0004KG-P5
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhL4-0005Yg-Bm
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:51 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhL6-0005bb-Pv
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:53 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:17:37 -0500
-Message-Id: <20180723201748.25573-89-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 15:17:38 -0500
+Message-Id: <20180723201748.25573-90-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 88/99] nfs: Remove processed options from QDict
+Subject: [Qemu-devel] [PATCH 89/99] replace functions which are only
+ available in glib-2.24
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,55 +22,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>
+Cc: qemu-stable@nongnu.org, Olaf Hering <olaf@aepfle.de>, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Kevin Wolf <kwolf@redhat.com>
+From: Olaf Hering <olaf@aepfle.de>
 
-Commit c22a03454 QAPIfied option parsing in the NFS block driver, but
-forgot to remove all the options we processed. Therefore, we get an
-error in bdrv_open_inherit(), which thinks the remaining options are
-invalid. Trying to open an NFS image will result in an error like this:
+Currently the minimal supported version of glib is 2.22.
+Since testing is done with a glib that claims to be 2.22, but in fact
+has APIs from newer version of glib, this bug was not caught during
+submit of the patch referenced below.
 
-    Block protocol 'nfs' doesn't support the option 'server.host'
+Replace g_realloc_n, which is available only since 2.24, with g_renew.
 
-Remove all options from the QDict to make the NFS driver work again.
+Fixes commit 418026ca43 ("util: Introduce vfio helpers")
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Message-id: 20180516160816.26259-1-kwolf@redhat.com
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-(cherry picked from commit c82be42cc803b36fd7aed5dceec68312c7056fd5)
+Signed-off-by: Olaf Hering <olaf@aepfle.de>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+CC: qemu-stable@nongnu.org
+(cherry picked from commit d29eb678bcfbb2fbf4b79423797253ee02f5c6cf)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/nfs.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ util/vfio-helpers.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/block/nfs.c b/block/nfs.c
-index 2577df4b26..dc12d5000d 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -557,6 +557,7 @@ static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
-     BlockdevOptionsNfs *opts = NULL;
-     QObject *crumpled = NULL;
-     Visitor *v;
-+    const QDictEntry *e;
-     Error *local_err = NULL;
+diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+index 006674c916..1d9272efa4 100644
+--- a/util/vfio-helpers.c
++++ b/util/vfio-helpers.c
+@@ -522,8 +522,7 @@ static IOVAMapping *qemu_vfio_add_mapping(QEMUVFIOState *s,
  
-     crumpled = qdict_crumple(options, errp);
-@@ -573,6 +574,12 @@ static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
-         return NULL;
-     }
- 
-+    /* Remove the processed options from the QDict (the visitor processes
-+     * _all_ options in the QDict) */
-+    while ((e = qdict_first(options))) {
-+        qdict_del(options, e->key);
-+    }
-+
-     return opts;
+     assert(index >= 0);
+     s->nr_mappings++;
+-    s->mappings = g_realloc_n(s->mappings, sizeof(s->mappings[0]),
+-                              s->nr_mappings);
++    s->mappings = g_renew(IOVAMapping, s->mappings, s->nr_mappings);
+     insert = &s->mappings[index];
+     shift = s->nr_mappings - index - 1;
+     if (shift) {
+@@ -577,8 +576,7 @@ static void qemu_vfio_undo_mapping(QEMUVFIOState *s, IOVAMapping *mapping,
+     memmove(mapping, &s->mappings[index + 1],
+             sizeof(s->mappings[0]) * (s->nr_mappings - index - 1));
+     s->nr_mappings--;
+-    s->mappings = g_realloc_n(s->mappings, sizeof(s->mappings[0]),
+-                              s->nr_mappings);
++    s->mappings = g_renew(IOVAMapping, s->mappings, s->nr_mappings);
  }
  
+ /* Check if the mapping list is (ascending) ordered. */
 -- 
 2.17.1
