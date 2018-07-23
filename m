@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fhjDf-00026T-SF
+	(envelope-from <jsnow@redhat.com>) id 1fhjDg-00026y-7Y
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:22:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fhjDe-0007vh-Nv
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:22:19 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fhjDf-0007w4-5J
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:22:20 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Mon, 23 Jul 2018 18:22:09 -0400
-Message-Id: <20180723222210.11077-7-jsnow@redhat.com>
+Date: Mon, 23 Jul 2018 18:22:06 -0400
+Message-Id: <20180723222210.11077-4-jsnow@redhat.com>
 In-Reply-To: <20180723222210.11077-1-jsnow@redhat.com>
 References: <20180723222210.11077-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH for-3.0 6/7] iotests: improve 169
+Subject: [Qemu-devel] [PATCH for-3.0 3/7] block/qcow2: drop
+ dirty_bitmaps_loaded state variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +25,67 @@ Cc: Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org, "Dr. David Alan
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Before previous patch, iotest 169 was actually broken for the case
-test_persistent__not_migbitmap__offline_shared, while formally
-passing.
-
-After migration log of vm_b had message:
-
-    qemu-system-x86_64: Could not reopen qcow2 layer: Bitmap already
-    exists: bitmap0
-
-which means that invalidation failed and bs->drv = NULL.
-
-It was because we've loaded bitmap twice: on open and on invalidation.
-
-Add code to 169, to catch such fails.
+This variable doesn't work as it should, because it is actually cleared
+in qcow2_co_invalidate_cache() by memset(). Drop it, as the following
+patch will introduce new behavior.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/169 | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ block/qcow2.c | 19 ++-----------------
+ block/qcow2.h |  1 -
+ 2 files changed, 2 insertions(+), 18 deletions(-)
 
-diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
-index 87edc85f43..24027da8e1 100755
---- a/tests/qemu-iotests/169
-+++ b/tests/qemu-iotests/169
-@@ -24,6 +24,7 @@ import time
- import itertools
- import operator
- import new
-+import re
- from iotests import qemu_img
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7444133ccd..72d4e67b99 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1157,7 +1157,6 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+     uint64_t ext_end;
+     uint64_t l1_vm_state_index;
+     bool update_header = false;
+-    bool header_updated = false;
  
+     ret = bdrv_pread(bs->file, 0, &header, sizeof(header));
+     if (ret < 0) {
+@@ -1496,23 +1495,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+         s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
+     }
  
-@@ -136,6 +137,16 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+-    if (s->dirty_bitmaps_loaded) {
+-        /* It's some kind of reopen. There are no known cases where we need to
+-         * reload bitmaps in such a situation, so it's safer to skip them.
+-         *
+-         * Moreover, if we have some readonly bitmaps and we are reopening for
+-         * rw we should reopen bitmaps correspondingly.
+-         */
+-        if (bdrv_has_readonly_bitmaps(bs) &&
+-            !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE))
+-        {
+-            qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
+-        }
+-    } else {
+-        header_updated = qcow2_load_dirty_bitmaps(bs, &local_err);
+-        s->dirty_bitmaps_loaded = true;
++    if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
++        update_header = false;
+     }
+-    update_header = update_header && !header_updated;
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
+         ret = -EINVAL;
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 81b844e936..4b4e61fe61 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -295,7 +295,6 @@ typedef struct BDRVQcow2State {
+     uint32_t nb_bitmaps;
+     uint64_t bitmap_directory_size;
+     uint64_t bitmap_directory_offset;
+-    bool dirty_bitmaps_loaded;
  
-         if should_migrate:
-             self.vm_b.shutdown()
-+
-+            # catch 'Could not reopen qcow2 layer: Bitmap already exists'
-+            # possible error
-+            log = self.vm_b.get_log()
-+            log = re.sub(r'^\[I \d+\.\d+\] OPENED\n', '', log)
-+            log = re.sub(r'Receiving block device images\n', '', log)
-+            log = re.sub(r'Completed \d+ %\r?\n?', '', log)
-+            log = re.sub(r'\[I \+\d+\.\d+\] CLOSED\n?$', '', log)
-+            self.assertEqual(log, '')
-+
-             # recreate vm_b, as we don't want -incoming option (this will lead
-             # to "cat" process left alive after test finish)
-             self.vm_b = iotests.VM(path_suffix='b')
+     int flags;
+     int qcow_version;
 -- 
 2.14.4
