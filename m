@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fhSV7-00030O-Le
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:14 -0400
+	(envelope-from <bounces@canonical.com>) id 1fhSVB-00032f-AT
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fhSV6-0000O2-JS
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38636)
+	(envelope-from <bounces@canonical.com>) id 1fhSVA-0000Tj-D0
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fhSV6-0000MR-Dc
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:12 -0400
+	id 1fhSVA-0000Qv-5u
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 00:31:16 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fhSV4-0006ra-Ot
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 04:31:10 +0000
+	id 1fhSV7-0006rU-4N
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 04:31:13 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A578F2E80D4
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 04:31:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id ACFC62E8179
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 04:31:12 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Jul 2018 04:17:13 -0000
+Date: Mon, 23 Jul 2018 04:17:17 -0000
 From: Launchpad Bug Tracker <1353947@bugs.launchpad.net>
 Reply-To: Bug 1353947 <1353947@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20140807104056.23920.38524.malonedeb@wampee.canonical.com>
-Message-Id: <153231943526.16639.17946687021625046498.malone@loganberry.canonical.com>
+Message-Id: <153231943733.16639.11662821455500541861.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1353947] Re: Hypervisor with QEMU-2.0/libvirtd
  1.2.2 stack when launching VM with CirrOS or Ubuntu 12.04
@@ -39,10 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Expired for linux (Ubuntu) because there has been no activity for 60
-days.]
+[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: linux (Ubuntu)
+** Changed in: qemu
        Status: Incomplete =3D> Expired
 
 -- =
