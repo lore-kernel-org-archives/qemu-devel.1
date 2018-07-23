@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fhZrN-0001Lq-8C
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 08:22:46 -0400
+	(envelope-from <peterx@redhat.com>) id 1fha1c-0003af-An
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 08:33:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fhZrJ-00080j-Aq
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 08:22:41 -0400
-Date: Mon, 23 Jul 2018 14:22:24 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180723142224.11e912ec@redhat.com>
-In-Reply-To: <20180704124923.32483-2-drjones@redhat.com>
-References: <20180704124923.32483-1-drjones@redhat.com>
-	<20180704124923.32483-2-drjones@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/6] hw/arm/virt: Add virt-3.1 machine
- type
+	(envelope-from <peterx@redhat.com>) id 1fha1Y-0004n5-E2
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 08:33:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40360 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fha1Y-0004mh-8n
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 08:33:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 839D440241C4
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 12:33:11 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Mon, 23 Jul 2018 20:33:01 +0800
+Message-Id: <20180723123305.24792-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.0 0/4] migration: some fixes for
+ release-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, eric.auger@redhat.com, wei@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-On Wed,  4 Jul 2018 14:49:18 +0200
-Andrew Jones <drjones@redhat.com> wrote:
+The release-ram feature is broken.  Fix it up.  Meanwhile disable
+postcopy recovery when release-ram is enabled, since they cannot work
+together.  Please see the comments for more information.
 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+This patchset is for 3.0.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Please review, thanks.
 
-> ---
->  hw/arm/virt.c | 21 ++++++++++++++++-----
->  1 file changed, 16 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 281ddcdf6e26..880441275031 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1757,10 +1757,7 @@ static void machvirt_machine_init(void)
->  }
->  type_init(machvirt_machine_init);
->  
-> -#define VIRT_COMPAT_2_12 \
-> -    HW_COMPAT_2_12
-> -
-> -static void virt_3_0_instance_init(Object *obj)
-> +static void virt_3_1_instance_init(Object *obj)
->  {
->      VirtMachineState *vms = VIRT_MACHINE(obj);
->      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-> @@ -1830,10 +1827,24 @@ static void virt_3_0_instance_init(Object *obj)
->      vms->irqmap = a15irqmap;
->  }
->  
-> +static void virt_machine_3_1_options(MachineClass *mc)
-> +{
-> +}
-> +DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
-> +
-> +static void virt_3_0_instance_init(Object *obj)
-> +{
-> +    virt_3_1_instance_init(obj);
-> +}
-> +
->  static void virt_machine_3_0_options(MachineClass *mc)
->  {
-> +    virt_machine_3_1_options(mc);
->  }
-> -DEFINE_VIRT_MACHINE_AS_LATEST(3, 0)
-> +DEFINE_VIRT_MACHINE(3, 0)
-> +
-> +#define VIRT_COMPAT_2_12 \
-> +    HW_COMPAT_2_12
->  
->  static void virt_2_12_instance_init(Object *obj)
->  {
+Peter Xu (4):
+  migration: update recv bitmap only on dest vm
+  migration: disallow recovery for release-ram
+  tests: only update last_byte when at the edge
+  tests: torture release-ram in postcopy test
+
+ migration/migration.c  | 19 +++++++++++++++++++
+ migration/ram.c        | 11 +++++++++--
+ tests/migration-test.c | 16 +++++++++++-----
+ 3 files changed, 39 insertions(+), 7 deletions(-)
+
+-- 
+2.17.1
