@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fhX0s-0003XI-NI
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:20:19 -0400
+	(envelope-from <thuth@redhat.com>) id 1fhX3h-0004Qp-21
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:23:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fhX0r-0008LS-8w
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:20:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47308 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fhX0q-0008LI-Ra
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:20:17 -0400
-Date: Mon, 23 Jul 2018 12:20:12 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180723121919-mutt-send-email-mst@kernel.org>
-References: <20180723045956.27521-1-tiwei.bie@intel.com>
-	<20180723045956.27521-4-tiwei.bie@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180723045956.27521-4-tiwei.bie@intel.com>
-Subject: Re: [Qemu-devel] [RFC 3/3] vhost-user: support programming VFIO
- group in master
+	(envelope-from <thuth@redhat.com>) id 1fhX3g-0000ra-1i
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 05:23:13 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 23 Jul 2018 11:23:04 +0200
+Message-Id: <1532337784-334-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/intc/exynos4210_gic: Turn instance_init
+ into realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,155 +18,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: alex.williamson@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>
+Cc: qemu-arm@nongnu.org
 
-On Mon, Jul 23, 2018 at 12:59:56PM +0800, Tiwei Bie wrote:
-> Introduce a slave message to allow slave to share its
-> VFIO group fd to master and do the IOMMU programming
-> based on virtio device's DMA address space for this
-> group in QEMU.
-> 
-> For the vhost backends which support vDPA, they could
-> leverage this message to ask master to do the IOMMU
-> programming in QEMU for the vDPA device in backend.
-> 
-> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> ---
->  docs/interop/vhost-user.txt    | 16 ++++++++++++++
->  hw/virtio/vhost-user.c         | 40 ++++++++++++++++++++++++++++++++++
->  include/hw/virtio/vhost-user.h |  2 ++
->  3 files changed, 58 insertions(+)
-> 
-> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> index f59667f498..a57a8f9451 100644
-> --- a/docs/interop/vhost-user.txt
-> +++ b/docs/interop/vhost-user.txt
-> @@ -397,6 +397,7 @@ Protocol features
->  #define VHOST_USER_PROTOCOL_F_CONFIG         9
->  #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
->  #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
-> +#define VHOST_USER_PROTOCOL_F_VFIO_GROUP     12
->  
->  Master message types
->  --------------------
-> @@ -815,6 +816,21 @@ Slave message types
->        This request should be sent only when VHOST_USER_PROTOCOL_F_HOST_NOTIFIER
->        protocol feature has been successfully negotiated.
->  
-> + * VHOST_USER_SLAVE_VFIO_GROUP_MSG
-> +
-> +      Id: 4
-> +      Equivalent ioctl: N/A
-> +      Slave payload: N/A
-> +      Master payload: N/A
-> +
-> +      When VHOST_USER_PROTOCOL_F_VFIO_GROUP is negotiated, vhost-user slave
-> +      could send this request to share its VFIO group fd via ancillary data
-> +      to master. After receiving this request from slave, master will close
-> +      the existing VFIO group if any and do the DMA programming based on the
-> +      virtio device's DMA address space for the new group if the request is
-> +      sent with a file descriptor.
-> +
-> +
->  VHOST_USER_PROTOCOL_F_REPLY_ACK:
->  -------------------------------
->  The original vhost-user specification only demands replies for certain
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index b041343632..db958e24c7 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -52,6 +52,7 @@ enum VhostUserProtocolFeature {
->      VHOST_USER_PROTOCOL_F_CONFIG = 9,
->      VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD = 10,
->      VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
-> +    VHOST_USER_PROTOCOL_F_VFIO_GROUP = 12,
->      VHOST_USER_PROTOCOL_F_MAX
->  };
->  
-> @@ -97,6 +98,7 @@ typedef enum VhostUserSlaveRequest {
->      VHOST_USER_SLAVE_IOTLB_MSG = 1,
->      VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
->      VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG = 3,
-> +    VHOST_USER_SLAVE_VFIO_GROUP_MSG = 4,
->      VHOST_USER_SLAVE_MAX
->  }  VhostUserSlaveRequest;
->  
-> @@ -949,6 +951,41 @@ static int vhost_user_slave_handle_vring_host_notifier(struct vhost_dev *dev,
->      return 0;
->  }
->  
-> +static int vhost_user_slave_handle_vfio_group(struct vhost_dev *dev,
-> +                                              int *fd)
-> +{
-> +    struct vhost_user *u = dev->opaque;
-> +    VhostUserState *user = u->user;
-> +    VirtIODevice *vdev = dev->vdev;
-> +    int groupfd = fd[0];
-> +    VFIOGroup *group;
-> +
-> +    if (!virtio_has_feature(dev->protocol_features,
-> +                            VHOST_USER_PROTOCOL_F_VFIO_GROUP) ||
-> +        vdev == NULL) {
-> +        return -1;
-> +    }
-> +
-> +    if (user->vfio_group) {
-> +        vfio_put_group(user->vfio_group);
-> +        user->vfio_group = NULL;
+The instance_init function of the "exynos4210.gic" device creates a
+new "arm_gic" device and immediately realizes it with qdev_init_nofail().
+This will leave a lot of object in the QOM tree during introspection of
+the "exynos4210.gic" device, e.g. reproducible by starting QEMU like this:
 
-Seems to create a window where mappings are invalid
-even if the same fd is re-sent. Is that OK?
+qemu-system-aarch64 -M none -nodefaults -nographic -monitor stdio
 
-> +    }
-> +
-> +    group = vfio_get_group_from_fd(groupfd, vdev->dma_as, NULL);
-> +    if (group == NULL) {
-> +        return -1;
-> +    }
-> +
-> +    if (group->fd != groupfd) {
-> +        close(groupfd);
-> +    }
-> +
-> +    user->vfio_group = group;
-> +    fd[0] = -1;
-> +
-> +    return 0;
-> +}
-> +
->  static void slave_read(void *opaque)
->  {
->      struct vhost_dev *dev = opaque;
-> @@ -1021,6 +1058,9 @@ static void slave_read(void *opaque)
->          ret = vhost_user_slave_handle_vring_host_notifier(dev, &payload.area,
->                                                            fd[0]);
->          break;
-> +    case VHOST_USER_SLAVE_VFIO_GROUP_MSG:
-> +        ret = vhost_user_slave_handle_vfio_group(dev, fd);
-> +        break;
->      default:
->          error_report("Received unexpected msg type.");
->          ret = -EINVAL;
-> diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
-> index fd660393a0..9e11473274 100644
-> --- a/include/hw/virtio/vhost-user.h
-> +++ b/include/hw/virtio/vhost-user.h
-> @@ -10,6 +10,7 @@
->  
->  #include "chardev/char-fe.h"
->  #include "hw/virtio/virtio.h"
-> +#include "hw/vfio/vfio-common.h"
->  
->  typedef struct VhostUserHostNotifier {
->      MemoryRegion mr;
-> @@ -20,6 +21,7 @@ typedef struct VhostUserHostNotifier {
->  typedef struct VhostUserState {
->      CharBackend *chr;
->      VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
-> +    VFIOGroup *vfio_group;
->  } VhostUserState;
->  
->  VhostUserState *vhost_user_init(void);
-> -- 
-> 2.18.0
+And then by running "info qom-tree" at the HMP monitor, followed by
+"device_add exynos4210.gic,help" and finally checking "info qom-tree"
+again.
+
+Also note that qdev_init_nofail() can exit QEMU in case of errors - and
+this must never happen during an instance_init function, otherwise QEMU
+could terminate unexpectedly during introspection of a device.
+
+Since most of the code that follows the qdev_init_nofail() depends on
+the realized "gicbusdev", the easiest solution to the problem is to
+turn the whole instance_init function into a realize function instead.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/intc/exynos4210_gic.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
+index b6b00a4..69f9c18 100644
+--- a/hw/intc/exynos4210_gic.c
++++ b/hw/intc/exynos4210_gic.c
+@@ -281,9 +281,9 @@ static void exynos4210_gic_set_irq(void *opaque, int irq, int level)
+     qemu_set_irq(qdev_get_gpio_in(s->gic, irq), level);
+ }
+ 
+-static void exynos4210_gic_init(Object *obj)
++static void exynos4210_gic_realize(DeviceState *dev, Error **errp)
+ {
+-    DeviceState *dev = DEVICE(obj);
++    Object *obj = OBJECT(dev);
+     Exynos4210GicState *s = EXYNOS4210_GIC(obj);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     const char cpu_prefix[] = "exynos4210-gic-alias_cpu";
+@@ -347,13 +347,13 @@ static void exynos4210_gic_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->props = exynos4210_gic_properties;
++    dc->realize = exynos4210_gic_realize;
+ }
+ 
+ static const TypeInfo exynos4210_gic_info = {
+     .name          = TYPE_EXYNOS4210_GIC,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(Exynos4210GicState),
+-    .instance_init = exynos4210_gic_init,
+     .class_init    = exynos4210_gic_class_init,
+ };
+ 
+-- 
+1.8.3.1
