@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhJd-0002qQ-AL
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:20:22 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhJf-0002tH-GO
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhJc-0004ef-AU
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:20:21 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhJe-0004g8-Cw
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:20:23 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:16:13 -0500
-Message-Id: <20180723201748.25573-5-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 15:17:00 -0500
+Message-Id: <20180723201748.25573-52-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 04/99] nbd/client: Fix error messages during
- NBD_INFO_BLOCK_SIZE
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 51/99] usb/dev-mtp: Fix use of uninitialized
+ values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,63 +25,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Eric Blake <eblake@redhat.com>
+Cc: qemu-stable@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Eric Blake <eblake@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-A missing space makes for poor error messages, and sizes can't
-go negative.  Also, we missed diagnosing a server that sends
-a maximum block size less than the minimum.
+This fixes:
 
-Fixes: 081dd1fe
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180501154654.943782-1-eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-(cherry picked from commit e475d108f1b3d3163f0affea67cdedbe5fc9752b)
+  hw/usb/dev-mtp.c:971:5: warning: 4th function call argument is an uninitialized value
+      trace_usb_mtp_op_get_partial_object(s->dev.addr, o->handle, o->path,
+                                           c->argv[1], c->argv[2]);
+                                                       ^~~~~~~~~~
+and:
+
+  hw/usb/dev-mtp.c:981:12: warning: Assigned value is garbage or undefined
+      offset = c->argv[1];
+               ^ ~~~~~~~~~~
+
+Reported-by: Clang Static Analyzer
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20180604151421.23385-3-f4bug@amsat.org
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit 62713a2e50f653162387451034f1a2490e87be88)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- nbd/client.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ hw/usb/dev-mtp.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index b9e175d1c2..3523c863fe 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -435,8 +435,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             }
-             be32_to_cpus(&info->min_block);
-             if (!is_power_of_2(info->min_block)) {
--                error_setg(errp, "server minimum block size %" PRId32
--                           "is not a power of two", info->min_block);
-+                error_setg(errp, "server minimum block size %" PRIu32
-+                           " is not a power of two", info->min_block);
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -450,8 +450,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             be32_to_cpus(&info->opt_block);
-             if (!is_power_of_2(info->opt_block) ||
-                 info->opt_block < info->min_block) {
--                error_setg(errp, "server preferred block size %" PRId32
--                           "is not valid", info->opt_block);
-+                error_setg(errp, "server preferred block size %" PRIu32
-+                           " is not valid", info->opt_block);
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -462,6 +462,12 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-                 return -1;
-             }
-             be32_to_cpus(&info->max_block);
-+            if (info->max_block < info->min_block) {
-+                error_setg(errp, "server maximum block size %" PRIu32
-+                           " is not valid", info->max_block);
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-             trace_nbd_opt_go_info_block_size(info->min_block, info->opt_block,
-                                              info->max_block);
-             break;
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 6ecf70a79b..c50d0bc15e 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -1017,12 +1017,16 @@ static MTPData *usb_mtp_get_object(MTPState *s, MTPControl *c,
+ static MTPData *usb_mtp_get_partial_object(MTPState *s, MTPControl *c,
+                                            MTPObject *o)
+ {
+-    MTPData *d = usb_mtp_data_alloc(c);
++    MTPData *d;
+     off_t offset;
+ 
++    if (c->argc <= 2) {
++        return NULL;
++    }
+     trace_usb_mtp_op_get_partial_object(s->dev.addr, o->handle, o->path,
+                                         c->argv[1], c->argv[2]);
+ 
++    d = usb_mtp_data_alloc(c);
+     d->fd = open(o->path, O_RDONLY);
+     if (d->fd == -1) {
+         usb_mtp_data_free(d);
 -- 
 2.17.1
