@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhKz-0004AO-42
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:46 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhL3-0004Fa-Hz
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhKy-0005Vk-8V
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:45 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhL0-0005XH-Gl
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:49 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:17:34 -0500
-Message-Id: <20180723201748.25573-86-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 15:17:35 -0500
+Message-Id: <20180723201748.25573-87-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 85/99] target/arm: Fix sqrt_f16 exception
- raising
+Subject: [Qemu-devel] [PATCH 86/99] hw/isa/superio: Fix inconsistent use of
+ Chardev->be
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +25,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Alex Bennée <alex.bennee@linaro.org>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-We are meant to explicitly pass fpst, not cpu_env.
+4c3119a6e3e and cd9526ab7c0 introduced an incorrect and inconsistent
+use of Chardev->be. Also, this CharBackend member is private and is
+not supposed to be accessible.
+
+Fix it by removing the inconsistent check.
 
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 20180512003217.9105-12-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit 905edee9101c54cda5b72286b7f7607cf1c3c4d1)
+Reported-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20180515152500.19460-2-f4bug@amsat.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+(cherry picked from commit d4c8fcd91abba584f2788dfe5fba5245cea380f0)
+ Conflicts:
+	hw/isa/isa-superio.c
+* avoid context dep on 9bca0edb28
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/arm/translate-a64.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/isa/isa-superio.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index f4587c3814..618f5268cc 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -4733,7 +4733,8 @@ static void handle_fp_1src_half(DisasContext *s, int opcode, int rd, int rn)
-         tcg_gen_xori_i32(tcg_res, tcg_op, 0x8000);
-         break;
-     case 0x3: /* FSQRT */
--        gen_helper_sqrt_f16(tcg_res, tcg_op, cpu_env);
-+        fpst = get_fpstatus_ptr(true);
-+        gen_helper_sqrt_f16(tcg_res, tcg_op, fpst);
-         break;
-     case 0x8: /* FRINTN */
-     case 0x9: /* FRINTP */
+diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+index b95608a003..8ae6ea6f7b 100644
+--- a/hw/isa/isa-superio.c
++++ b/hw/isa/isa-superio.c
+@@ -43,7 +43,7 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
+         if (!k->parallel.is_enabled || k->parallel.is_enabled(sio, i)) {
+             /* FIXME use a qdev chardev prop instead of parallel_hds[] */
+             chr = parallel_hds[i];
+-            if (chr == NULL || chr->be) {
++            if (chr == NULL) {
+                 name = g_strdup_printf("discarding-parallel%d", i);
+                 chr = qemu_chr_new(name, "null");
+             } else {
+@@ -81,9 +81,9 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
+             break;
+         }
+         if (!k->serial.is_enabled || k->serial.is_enabled(sio, i)) {
+-            /* FIXME use a qdev chardev prop instead of serial_hds[] */
++            /* FIXME use a qdev chardev prop instead of serial_hd() */
+             chr = serial_hds[i];
+-            if (chr == NULL || chr->be) {
++            if (chr == NULL) {
+                 name = g_strdup_printf("discarding-serial%d", i);
+                 chr = qemu_chr_new(name, "null");
+             } else {
 -- 
 2.17.1
