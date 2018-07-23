@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhaf5-0002lw-7n
+	(envelope-from <armbru@redhat.com>) id 1fhaf5-0002lx-8H
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhaf0-00051v-9Y
+	(envelope-from <armbru@redhat.com>) id 1fhaf2-00052o-0F
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:14:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50376 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50382 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhaf0-00051g-3e
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:13:58 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhaf1-00052X-RI
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 09:13:59 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C1BA140201D5
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:13:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-135.ams2.redhat.com
-	[10.36.116.135])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BE722026D65
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:13:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7AACA401DEA8
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:13:59 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 23 Jul 2018 15:13:55 +0200
-Message-Id: <20180723131356.27466-2-armbru@redhat.com>
+Date: Mon, 23 Jul 2018 15:13:56 +0200
+Message-Id: <20180723131356.27466-3-armbru@redhat.com>
 In-Reply-To: <20180723131356.27466-1-armbru@redhat.com>
 References: <20180723131356.27466-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 1/2] qapi: Make 'allow-oob' optional in
- SchemaInfoCommand
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/2] monitor: Fix unsafe sharing of @cur_mon
+ among threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +34,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Peter Xu <peterx@redhat.com>
 
-Making 'allow-oob' optional in SchemaInfoCommand permits omitting it
-in the common case.  Shrinks query-qmp-schema's output from 122.1KiB
-to 118.6KiB for me.
+From: Peter Xu <peterx@redhat.com>
 
-Note that out-of-band execution is still experimental (you have to
-configure the monitor with x-oob=on to use it).
+@cur_mon is null unless the main thread is running monitor code, either
+HMP code within monitor_read(), or QMP code within
+monitor_qmp_dispatch().
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20180718090557.17248-1-armbru@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Use of @cur_mon outside the main thread is therefore unsafe.
+
+Most of its uses are in monitor command handlers.  These run in the main
+thread.
+
+However, there are also uses hiding elsewhere, such as in
+error_vprintf(), and thus error_report(), making these functions unsafe
+outside the main thread.  No such unsafe uses are known at this time.
+Regardless, this is an unnecessary trap.  It's an ancient trap, though.
+
+More recently, commit cf869d53172 "qmp: support out-of-band (oob)
+execution" spiced things up: the monitor I/O thread assigns to @cur_mon
+when executing commands out-of-band.  Having two threads save, set and
+restore @cur_mon without synchronization is definitely unsafe.  We can
+end up with @cur_mon null while the main thread runs monitor code, or
+non-null while it runs non-monitor code.
+
+We could fix this by making the I/O thread not mess with @cur_mon, but
+that would leave the trap armed and ready.
+
+Instead, make @cur_mon thread-local.  It's now reliably null unless the
+thread is running monitor code.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+[peterx: update subject and commit message written by Markus]
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180720033451.32710-1-peterx@redhat.com>
 ---
- qapi/introspect.json       |  6 +++---
- scripts/qapi/introspect.py | 10 +++++-----
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ include/monitor/monitor.h | 2 +-
+ monitor.c                 | 2 +-
+ stubs/monitor.c           | 2 +-
+ tests/test-util-sockets.c | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index c7f67b7d78..137b39b992 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -259,8 +259,8 @@
- #
- # @ret-type: the name of the command's result type.
- #
--# @allow-oob: whether the command allows out-of-band execution.
--#             (Since: 2.12)
-+# @allow-oob: whether the command allows out-of-band execution,
-+#             defaults to false (Since: 2.12)
- #
- # TODO: @success-response (currently irrelevant, because it's QGA, not QMP)
- #
-@@ -268,7 +268,7 @@
- ##
- { 'struct': 'SchemaInfoCommand',
-   'data': { 'arg-type': 'str', 'ret-type': 'str',
--            'allow-oob': 'bool' } }
-+            '*allow-oob': 'bool' } }
- 
- ##
- # @SchemaInfoEvent:
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index 70ca5dd876..189a4edaba 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -184,11 +184,11 @@ const QLitObject %(c_name)s = %(c_string)s;
-                       success_response, boxed, allow_oob, allow_preconfig):
-         arg_type = arg_type or self._schema.the_empty_object_type
-         ret_type = ret_type or self._schema.the_empty_object_type
--        self._gen_qlit(name, 'command',
--                       {'arg-type': self._use_type(arg_type),
--                        'ret-type': self._use_type(ret_type),
--                        'allow-oob': allow_oob},
--                       ifcond)
-+        obj = {'arg-type': self._use_type(arg_type),
-+               'ret-type': self._use_type(ret_type) }
-+        if allow_oob:
-+            obj['allow-oob'] = allow_oob
-+        self._gen_qlit(name, 'command', obj, ifcond)
- 
-     def visit_event(self, name, info, ifcond, arg_type, boxed):
-         arg_type = arg_type or self._schema.the_empty_object_type
--- 
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index d6ab70cae2..2ef5e04b37 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -6,7 +6,7 @@
+ #include "qapi/qapi-types-misc.h"
+ #include "qemu/readline.h"
+=20
+-extern Monitor *cur_mon;
++extern __thread Monitor *cur_mon;
+=20
+ /* flags for monitor_init */
+ /* 0x01 unused */
+diff --git a/monitor.c b/monitor.c
+index be29634a00..f75027b09e 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -290,7 +290,7 @@ static mon_cmd_t info_cmds[];
+=20
+ QmpCommandList qmp_commands, qmp_cap_negotiation_commands;
+=20
+-Monitor *cur_mon;
++__thread Monitor *cur_mon;
+=20
+ static void monitor_command_cb(void *opaque, const char *cmdline,
+                                void *readline_opaque);
+diff --git a/stubs/monitor.c b/stubs/monitor.c
+index e018c8f594..3890771bb5 100644
+--- a/stubs/monitor.c
++++ b/stubs/monitor.c
+@@ -3,7 +3,7 @@
+ #include "qemu-common.h"
+ #include "monitor/monitor.h"
+=20
+-Monitor *cur_mon =3D NULL;
++__thread Monitor *cur_mon;
+=20
+ int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
+ {
+diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+index acadd85e8f..6195a3ac36 100644
+--- a/tests/test-util-sockets.c
++++ b/tests/test-util-sockets.c
+@@ -69,7 +69,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Er=
+ror **errp)
+  * stubs/monitor.c is defined, to make sure monitor.o is discarded
+  * otherwise we get duplicate syms at link time.
+  */
+-Monitor *cur_mon;
++__thread Monitor *cur_mon;
+ void monitor_init(Chardev *chr, int flags) {}
+=20
+=20
+--=20
 2.17.1
