@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhTWD-00056T-4N
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:36:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1fhTih-0007gC-1Q
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:49:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhTW9-0008CB-H6
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:36:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49184 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fhTic-0003Xn-Ka
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:49:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38056 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhTW9-0008C1-0S
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:36:21 -0400
-Date: Mon, 23 Jul 2018 13:36:02 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhTic-0003Xb-ES
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:49:14 -0400
+Date: Mon, 23 Jul 2018 13:49:03 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180723053602.GG2491@xz-mi>
+Message-ID: <20180723054903.GH2491@xz-mi>
 References: <20180719121520.30026-1-xiaoguangrong@tencent.com>
-	<20180719121520.30026-8-xiaoguangrong@tencent.com>
+	<20180719121520.30026-9-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180719121520.30026-8-xiaoguangrong@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] migration: hold the lock only if it
- is really needed
+In-Reply-To: <20180719121520.30026-9-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] migration: do not
+ flush_compressed_data at the end of each iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,16 +31,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: guangrong.xiao@gmail.com
 Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Thu, Jul 19, 2018 at 08:15:19PM +0800, guangrong.xiao@gmail.com wrote:
+On Thu, Jul 19, 2018 at 08:15:20PM +0800, guangrong.xiao@gmail.com wrote:
 > From: Xiao Guangrong <xiaoguangrong@tencent.com>
 > 
-> Try to hold src_page_req_mutex only if the queue is not
-> empty
+> flush_compressed_data() needs to wait all compression threads to
+> finish their work, after that all threads are free until the
+> migration feeds new request to them, reducing its call can improve
+> the throughput and use CPU resource more effectively
 > 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> We do not need to flush all threads at the end of iteration, the
+> data can be kept locally until the memory block is changed or
+> memory migration starts over in that case we will meet a dirtied
+> page which may still exists in compression threads's ring
+> 
 > Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> ---
+>  migration/ram.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 89305c7af5..fdab13821d 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -315,6 +315,8 @@ struct RAMState {
+>      uint64_t iterations;
+>      /* number of dirty bits in the bitmap */
+>      uint64_t migration_dirty_pages;
+> +    /* last dirty_sync_count we have seen */
+> +    uint64_t dirty_sync_count;
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Better suffix it with "_prev" as well?  So that we can quickly
+identify that it's only a cache and it can be different from the one
+in the ram_counters.
+
+>      /* protects modification of the bitmap */
+>      QemuMutex bitmap_mutex;
+>      /* The RAMBlock used in the last src_page_requests */
+> @@ -2532,6 +2534,7 @@ static void ram_save_cleanup(void *opaque)
+>      }
+>  
+>      xbzrle_cleanup();
+> +    flush_compressed_data(*rsp);
+
+Could I ask why do we need this considering that we have
+compress_threads_save_cleanup() right down there?
+
+>      compress_threads_save_cleanup();
+>      ram_state_cleanup(rsp);
+>  }
+> @@ -3203,6 +3206,17 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+>  
+>      ram_control_before_iterate(f, RAM_CONTROL_ROUND);
+>  
+> +    /*
+> +     * if memory migration starts over, we will meet a dirtied page which
+> +     * may still exists in compression threads's ring, so we should flush
+> +     * the compressed data to make sure the new page is not overwritten by
+> +     * the old one in the destination.
+> +     */
+> +    if (ram_counters.dirty_sync_count != rs->dirty_sync_count) {
+> +        rs->dirty_sync_count = ram_counters.dirty_sync_count;
+> +        flush_compressed_data(rs);
+> +    }
+> +
+>      t0 = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+>      i = 0;
+>      while ((ret = qemu_file_rate_limit(f)) == 0 ||
+> @@ -3235,7 +3249,6 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+>          }
+>          i++;
+>      }
+> -    flush_compressed_data(rs);
+
+This looks sane to me, but I'd like to see how other people would
+think about it too...
+
+>      rcu_read_unlock();
+>  
+>      /*
+> -- 
+> 2.14.4
+> 
+
+Regards,
 
 -- 
 Peter Xu
