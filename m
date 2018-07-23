@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <galsha@mellanox.com>) id 1fhcEK-0005y4-6e
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 10:54:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1fhd2I-00019i-Oz
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:46:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <galsha@mellanox.com>) id 1fhcEH-00077B-47
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 10:54:32 -0400
-Received: from mail-eopbgr140078.outbound.protection.outlook.com
-	([40.107.14.78]:35803
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <galsha@mellanox.com>) id 1fhcEG-000752-KV
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 10:54:29 -0400
-From: Gal Shachaf <galsha@mellanox.com>
-Date: Mon, 23 Jul 2018 14:54:24 +0000
-Message-ID: <VI1PR0501MB2784008D66F24945AB066395B5560@VI1PR0501MB2784.eurprd05.prod.outlook.com>
-References: <1528212489-19137-1-git-send-email-lidongchen@tencent.com>
-	<1528212489-19137-9-git-send-email-lidongchen@tencent.com>
-	<20180627185952.GJ2423@work-vm>
-	<CAOGPPbfMZRTdfiXj0ekij1bwL3JgQEF3zHGR4AKuor-MGmQGiw@mail.gmail.com>
-	<CAOGPPbcTN55ASX64rJe3iUUNmxQJvuy22Har5Lwk7qsEVBxdow@mail.gmail.com>
-In-Reply-To: <CAOGPPbcTN55ASX64rJe3iUUNmxQJvuy22Har5Lwk7qsEVBxdow@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1fhd2E-0002GY-R2
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:46:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37780 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhd2E-0002GK-MT
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 11:46:06 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180720130928.6696-1-liujunjie23@huawei.com>
+	<87h8kq86f8.fsf@dusky.pond.sub.org>
+	<B526101FCAB4654DB0892B650DEFC555086C7F48@dggemm521-mbx.china.huawei.com>
+Date: Mon, 23 Jul 2018 17:46:03 +0200
+In-Reply-To: <B526101FCAB4654DB0892B650DEFC555086C7F48@dggemm521-mbx.china.huawei.com>
+	(liujunjie's message of "Mon, 23 Jul 2018 14:36:39 +0000")
+Message-ID: <87k1pm551g.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 08/10] migration: create a dedicated
- thread to release rdma resource
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qstring: Fix integer overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,106 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 858585 jemmy <jemmy858585@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Aviad Yehezkel <aviadye@mellanox.com>
-Cc: "zhang.zhanghailiang@huawei.com" <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Adi Dotan <adido@mellanox.com>, Lidong Chen <lidongchen@tencent.com>
+To: "liujunjie (A)" <liujunjie23@huawei.com>
+Cc: "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-T24gVGh1LCBKdWwgNSwgMjAxOCBhdCAxMDoyNiBQTSwgODU4NTg1IGplbW15IDxqZW1teTg1ODU4
-NUBnbWFpbC5jb20+IHdyb3RlOg0KPiBPbiBUaHUsIEp1biAyOCwgMjAxOCBhdCAyOjU5IEFNLCBE
-ci4gRGF2aWQgQWxhbiBHaWxiZXJ0IA0KPiA8ZGdpbGJlcnRAcmVkaGF0LmNvbT4gd3JvdGU6DQo+
-PiAqIExpZG9uZyBDaGVuIChqZW1teTg1ODU4NUBnbWFpbC5jb20pIHdyb3RlOg0KPj4+IGlidl9k
-ZXJlZ19tciB3YWl0IGZvciBhIGxvbmcgdGltZSBmb3IgYmlnIG1lbW9yeSBzaXplIHZpcnR1YWwg
-c2VydmVyLg0KPj4+DQo+Pj4gVGhlIHRlc3QgcmVzdWx0IGlzOg0KPj4+ICAgMTBHQiAgMzI2bXMN
-Cj4+PiAgIDIwR0IgIDY5OW1zDQo+Pj4gICAzMEdCICAxMDIxbXMNCj4+PiAgIDQwR0IgIDEzODdt
-cw0KPj4+ICAgNTBHQiAgMTcxMm1zDQo+Pj4gICA2MEdCICAyMDM0bXMNCj4+PiAgIDcwR0IgIDI0
-NTdtcw0KPj4+ICAgODBHQiAgMjgwN21zDQo+Pj4gICA5MEdCICAzMTA3bXMNCj4+PiAgIDEwMEdC
-IDM0NzRtcw0KPj4+ICAgMTEwR0IgMzczNW1zDQo+Pj4gICAxMjBHQiA0MDY0bXMNCj4+PiAgIDEz
-MEdCIDQ1Njdtcw0KPj4+ICAgMTQwR0IgNDg4Nm1zDQo+Pj4NCj4+PiB0aGlzIHdpbGwgY2F1c2Ug
-dGhlIGd1ZXN0IG9zIGhhbmcgZm9yIGEgd2hpbGUgd2hlbiBtaWdyYXRpb24gZmluaXNoZWQuDQo+
-Pj4gU28gY3JlYXRlIGEgZGVkaWNhdGVkIHRocmVhZCB0byByZWxlYXNlIHJkbWEgcmVzb3VyY2Uu
-DQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBMaWRvbmcgQ2hlbiA8bGlkb25nY2hlbkB0ZW5jZW50
-LmNvbT4NCj4+PiAtLS0NCj4+PiAgbWlncmF0aW9uL3JkbWEuYyB8IDQzICsrKysrKysrKysrKysr
-KysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0NCj4+PiAgMSBmaWxlIGNoYW5nZWQsIDI3IGlu
-c2VydGlvbnMoKyksIDE2IGRlbGV0aW9ucygtKQ0KPj4+DQo+Pj4gZGlmZiAtLWdpdCBhL21pZ3Jh
-dGlvbi9yZG1hLmMgYi9taWdyYXRpb24vcmRtYS5jIGluZGV4IA0KPj4+IGRmYTRmNzcuLmYxMmU4
-ZDUgMTAwNjQ0DQo+Pj4gLS0tIGEvbWlncmF0aW9uL3JkbWEuYw0KPj4+ICsrKyBiL21pZ3JhdGlv
-bi9yZG1hLmMNCj4+PiBAQCAtMjk3OSwzNSArMjk3OSw0NiBAQCBzdGF0aWMgdm9pZCBxaW9fY2hh
-bm5lbF9yZG1hX3NldF9haW9fZmRfaGFuZGxlcihRSU9DaGFubmVsICppb2MsDQo+Pj4gICAgICB9
-DQo+Pj4gIH0NCj4+Pg0KPj4+IC1zdGF0aWMgaW50IHFpb19jaGFubmVsX3JkbWFfY2xvc2UoUUlP
-Q2hhbm5lbCAqaW9jLA0KPj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJy
-b3IgKiplcnJwKQ0KPj4+ICtzdGF0aWMgdm9pZCAqcWlvX2NoYW5uZWxfcmRtYV9jbG9zZV90aHJl
-YWQodm9pZCAqYXJnKQ0KPj4+ICB7DQo+Pj4gLSAgICBRSU9DaGFubmVsUkRNQSAqcmlvYyA9IFFJ
-T19DSEFOTkVMX1JETUEoaW9jKTsNCj4+PiAtICAgIFJETUFDb250ZXh0ICpyZG1haW4sICpyZG1h
-b3V0Ow0KPj4+IC0gICAgdHJhY2VfcWVtdV9yZG1hX2Nsb3NlKCk7DQo+Pj4gKyAgICBSRE1BQ29u
-dGV4dCAqKnJkbWEgPSBhcmc7DQo+Pj4gKyAgICBSRE1BQ29udGV4dCAqcmRtYWluID0gcmRtYVsw
-XTsNCj4+PiArICAgIFJETUFDb250ZXh0ICpyZG1hb3V0ID0gcmRtYVsxXTsNCj4+Pg0KPj4+IC0g
-ICAgcmRtYWluID0gcmlvYy0+cmRtYWluOw0KPj4+IC0gICAgaWYgKHJkbWFpbikgew0KPj4+IC0g
-ICAgICAgIGF0b21pY19yY3Vfc2V0KCZyaW9jLT5yZG1haW4sIE5VTEwpOw0KPj4+IC0gICAgfQ0K
-Pj4+IC0NCj4+PiAtICAgIHJkbWFvdXQgPSByaW9jLT5yZG1hb3V0Ow0KPj4+IC0gICAgaWYgKHJk
-bWFvdXQpIHsNCj4+PiAtICAgICAgICBhdG9taWNfcmN1X3NldCgmcmlvYy0+cmRtYW91dCwgTlVM
-TCk7DQo+Pj4gLSAgICB9DQo+Pj4gKyAgICByY3VfcmVnaXN0ZXJfdGhyZWFkKCk7DQo+Pj4NCj4+
-PiAgICAgIHN5bmNocm9uaXplX3JjdSgpOw0KPj4NCj4+ICogc2VlIGJlbG93DQo+Pg0KPj4+IC0N
-Cj4+PiAgICAgIGlmIChyZG1haW4pIHsNCj4+PiAgICAgICAgICBxZW11X3JkbWFfY2xlYW51cChy
-ZG1haW4pOw0KPj4+ICAgICAgfQ0KPj4+IC0NCj4+PiAgICAgIGlmIChyZG1hb3V0KSB7DQo+Pj4g
-ICAgICAgICAgcWVtdV9yZG1hX2NsZWFudXAocmRtYW91dCk7DQo+Pj4gICAgICB9DQo+Pj4NCj4+
-PiAgICAgIGdfZnJlZShyZG1haW4pOw0KPj4+ICAgICAgZ19mcmVlKHJkbWFvdXQpOw0KPj4+ICsg
-ICAgZ19mcmVlKHJkbWEpOw0KPj4+ICsNCj4+PiArICAgIHJjdV91bnJlZ2lzdGVyX3RocmVhZCgp
-Ow0KPj4+ICsgICAgcmV0dXJuIE5VTEw7DQo+Pj4gK30NCj4+PiArDQo+Pj4gK3N0YXRpYyBpbnQg
-cWlvX2NoYW5uZWxfcmRtYV9jbG9zZShRSU9DaGFubmVsICppb2MsDQo+Pj4gKyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApIHsNCj4+PiArICAgIFFlbXVUaHJl
-YWQgdDsNCj4+PiArICAgIFFJT0NoYW5uZWxSRE1BICpyaW9jID0gUUlPX0NIQU5ORUxfUkRNQShp
-b2MpOw0KPj4+ICsgICAgUkRNQUNvbnRleHQgKipyZG1hID0gZ19uZXcwKFJETUFDb250ZXh0Kiwg
-Mik7DQo+Pj4gKw0KPj4+ICsgICAgdHJhY2VfcWVtdV9yZG1hX2Nsb3NlKCk7DQo+Pj4gKyAgICBp
-ZiAocmlvYy0+cmRtYWluIHx8IHJpb2MtPnJkbWFvdXQpIHsNCj4+PiArICAgICAgICByZG1hWzBd
-ID0gIHJpb2MtPnJkbWFpbjsNCj4+PiArICAgICAgICByZG1hWzFdID0gIHJpb2MtPnJkbWFvdXQ7
-DQo+Pj4gKyAgICAgICAgcWVtdV90aHJlYWRfY3JlYXRlKCZ0LCAicmRtYSBjbGVhbnVwIiwgcWlv
-X2NoYW5uZWxfcmRtYV9jbG9zZV90aHJlYWQsDQo+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHJkbWEsIFFFTVVfVEhSRUFEX0RFVEFDSEVEKTsNCj4+PiArICAgICAgICBhdG9taWNfcmN1
-X3NldCgmcmlvYy0+cmRtYWluLCBOVUxMKTsNCj4+PiArICAgICAgICBhdG9taWNfcmN1X3NldCgm
-cmlvYy0+cmRtYW91dCwgTlVMTCk7DQo+Pg0KPj4gSSdtIG5vdCBzdXJlIHRoaXMgcGFpciBpcyBv
-cmRlcmVkIHdpdGggdGhlIHN5bmNocm9uaXNlX3JjdSBhYm92ZTsgDQo+PiBEb2Vzbid0IHRoYXQg
-bWVhbiwgb24gYSBiYWQgZGF5LCB0aGF0IHlvdSBjb3VsZCBnZXQ6DQo+Pg0KPj4NCj4+ICAgICBt
-YWluLXRocmVhZCAgICAgICAgICByZG1hX2NsZWFudXAgICAgIGFub3RoZXItdGhyZWFkDQo+PiAg
-ICAgcW11X3RocmVhZF9jcmVhdGUNCj4+ICAgICAgICAgICAgICAgICAgICAgICBzeW5jaHJvbmlz
-ZV9yY3UNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByZWFkcyBy
-aW9jLT5yZG1haW4NCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBz
-dGFydHMgZG9pbmcgc29tZXRoaW5nIHdpdGggcmRtYWluDQo+PiAgICAgYXRvbWljX3JjdV9zZXQN
-Cj4+ICAgICAgICAgICAgICAgICAgICAgICByZG1hX2NsZWFudXANCj4+DQo+Pg0KPj4gc28gdGhl
-IGFub3RoZXItdGhyZWFkIGlzIHVzaW5nIGl0IGR1cmluZyB0aGUgY2xlYW51cD8NCj4+IFdvdWxk
-IGp1c3QgbW92aW5nIHRoZSBhdG9taWNfcmN1X3NldHMgYmVmb3JlIHRoZSBxZW11X3RocmVhZF9j
-cmVhdGUgDQo+PiBmaXggdGhhdD8NCj4geWVzLCBJIHdpbGwgZml4IGl0Lg0KPg0KPj4NCj4+IEhv
-d2V2ZXIsIEkndmUgZ290IG90aGVyIHdvcnJpZXMgYXMgd2VsbDoNCj4+ICAgIGEpIHFlbXVfcmRt
-YV9jbGVhbnVwIGRvZXM6DQo+PiAgICAgICAgbWlncmF0ZV9nZXRfY3VycmVudCgpLT5zdGF0ZSA9
-PSBNSUdSQVRJT05fU1RBVFVTX0NBTkNFTExJTkcNCj4+DQo+PiAgICAgICB3aGljaCB3b3JyaWVz
-IG1lIGEgbGl0dGxlIGlmIHNvbWVvbmUgaW1tZWRpYXRlbHkgdHJpZXMgdG8gcmVzdGFydA0KPj4g
-ICAgICAgdGhlIG1pZ3JhdGlvbi4NCg0KQmVjYXVzZSB0aGUgY3VycmVudCBxZW11IHZlcnNpb24g
-ZG9uJ3Qgd2FpdCBmb3IgUkRNQV9DTV9FVkVOVF9ESVNDT05ORUNURUQgZXZlbnQgYWZ0ZXIgcmRt
-YV9kaXNjb25uZWN0LCBzbyBJIHRoaW5rIGl0J3Mgbm90IG5lY2Vzc2FyeSB0byBzZW5kIFJETUFf
-Q09OVFJPTF9FUlJPUi4NCg0KY29tcGFyZSB0byBzZW5kIFJETUFfQ09OVFJPTF9FUlJPUiwgSSB0
-aGluayB1c2UgY20gZXZlbnQgdG8gbm90aWZ5IHBlZXIgcWVtdSBpcyBiZXR0ZXIuDQptYXliZSB0
-aGUgcmRtYSBpcyBhbHJlYWR5IGluIGVycm9yX3N0YXRlLCBhbmQgUkRNQV9DT05UUk9MX0VSUk9S
-IGNhbm5vdCBzZW5kIHN1Y2Nlc3NmdWxseS4NCg0KRm9yIHBlZXIgcWVtdSwgaW4gcWVtdV9yZG1h
-X3dhaXRfY29tcF9jaGFubmVsIGZ1bmN0aW9uLCBpdCdzIHNob3VsZCBub3Qgb25seSBwb2xsIHJk
-bWEtPmNvbXBfY2hhbm5lbC0+ZmQsIGl0J3Mgc2hvdWxkIGFsc28gcG9sbCAgcmRtYS0+Y2hhbm5l
-bC0+ZmQuDQpbR1NdIEkgYWdyZWUgdGhhdCB3ZSBzaG91bGQgcG9sbCBvbiBDTSBldmVudHMgaW4g
-YWRkaXRpb24gdG8gQ1EgZXZlbnRzLg0KDQpmb3IgdGhlIHNvdXJjZSBxZW11LCBpdCdzIGZpeGVk
-IGJ5IHRoaXMgcGF0Y2guDQptaWdyYXRpb246IHBvbGwgdGhlIGNtIGV2ZW50IHdoaWxlIHdhaXQg
-UkRNQSB3b3JrIHJlcXVlc3QgY29tcGxldGlvbg0KDQphbmQgZm9yIGRlc3RpbmF0aW9uIHFlbXUs
-IGl0J3MgbmVlZCBhIG5ldyBwYXRjaCB0byBmaXggaXQuDQoNCnNvIEkgcHJlZmVyIHRvIHJlbW92
-ZSBNSUdSQVRJT05fU1RBVFVTX0NBTkNFTExJTkcgaW4gcWVtdV9yZG1hX2NsZWFudXAgZnVuY3Rp
-b24uDQoNCltHU10gVGhlIGludGVudGlvbiBvZiB0aGlzIHBhdGNoIGlzIHRvIG1vdmUgdGhlIGNv
-c3RseSBpYnZfZGVyZWdfbXIgdG8gYSBzZXBhcmF0ZSB0aHJlYWQsIHNvIHdlIGRvIG5vdCBhY3R1
-YWxseSBuZWVkIHRvIGFsc28gbW92ZSB0aGUgUkRNQV9DT05UUk9MX0VSUk9SICBhbmQgcmRtYV9k
-aXNjb25uZWN0LCB0aGF0IGNvbWUgYmVmb3JlaGFuZCBpbiBxZW11X3JkbWFfY2xlYW51cCwgIHRv
-IGEgdGhyZWFkLiBJIHN1Z2dlc3QgdGhhdCB3ZSBtb3ZlIHRoZW0gb3V0IG9mIHFlbXVfcmRtYV9j
-bGVhbnVwIHRvIGEgbmV3IGZ1bmN0aW9uICJxZW11X3JkbWFfZGlzY29ubmVjdCIgYW5kIGNhbGwg
-aXQgb24gZWFjaCBSRE1BY29udGV4dCBiZWZvcmUgdGhlIHFlbXVfdGhyZWFkX2NyZWF0ZS4NCj4+
-DQo+PiAgICBiKSBJIGRvbid0IHVuZGVyc3RhbmQgd2hhdCBoYXBwZW5zIGlmIHNvbWVvbmUgZG9l
-cyB0cnkgYW5kIHJlc3RhcnQNCj4+ICAgICAgIHRoZSBtaWdyYXRpb24gYWZ0ZXIgdGhhdCwgYnV0
-IGluIHRoZSB+NXMgaXQgdGFrZXMgdGhlIGlidiBjbGVhbnVwDQo+PiAgICAgICB0byBoYXBwZW4u
-DQoNCkkgcHJlZmVyIHRvIGFkZCBhIG5ldyB2YXJpYWJsZSBpbiBjdXJyZW50X21pZ3JhdGlvbi4g
-IGlmIHRoZSByZG1hIGNsZWFudXAgdGhyZWFkIGhhcyBub3QgZXhpdGVkLiBpdCdzIHNob3VsZCBu
-b3Qgc3RhcnQgYSBuZXcgbWlncmF0aW9uLg0KW0dTXSBJIHN1cHBvcnQgdGhpcyBzdWdnZXN0aW9u
-LiANCg0KPg0KPiB5ZXMsIEkgd2lsbCB0cnkgdG8gZml4IGl0Lg0KPg0KPj4NCj4+IERhdmUNCj4+
-DQo+Pg0KPj4+ICsgICAgfQ0KPj4+DQo+Pj4gICAgICByZXR1cm4gMDsNCj4+PiAgfQ0KPj4+IC0t
-DQo+Pj4gMS44LjMuMQ0KPj4+DQo+PiAtLQ0KPj4gRHIuIERhdmlkIEFsYW4gR2lsYmVydCAvIGRn
-aWxiZXJ0QHJlZGhhdC5jb20gLyBNYW5jaGVzdGVyLCBVSw0K
+"liujunjie (A)" <liujunjie23@huawei.com> writes:
+
+> Thanks for your reply.
+>> Really?  How exactly can this happen?  Please explain step by step.
+> There exist a qemu core related to this. You have mention that "The conversion truncates when strlen(str) - 1 exceeds INT_MAX".
+> Later in function qstring_from_substr, this truncated "end" will be assigned to "qstring->length" again, which is size_t. This is the key point why qemu coredumped.
+> Because when "end" is truncated, it can be negative number. If we assign a negative number to a size_t variable, this size_t variable can become very large.
+> At last, we call g_malloc to try to alloc a large number of member which cannot success. So qemu coredump.
+> In my example, use gdb to debug function qstring_from_substr, I can get the following message.
+> (gdb) p	qstring->length
+> $4 = 18446744072383980732  (too large to allocate)
+> (gdb) p	(int) (qstring->length)
+> $5 = -1325570884
+> (gdb) p/x (int)	qstring->length
+> $6 = 0xb0fd64bc
+> (gdb) p/x qstring->length
+> $7 = 0xffffffffb0fd64bc
+> (gdb) p	end
+> $8 = <optimized out>
+
+Can you provide a stack backtrace, too?
