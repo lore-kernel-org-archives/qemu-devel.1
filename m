@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fhYpJ-0003B3-Je
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 07:16:33 -0400
+	(envelope-from <clg@kaod.org>) id 1fhZ99-0007Nt-BI
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 07:37:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fhYpI-0004UD-2v
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 07:16:29 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41748)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fhYpH-0004QU-OY
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 07:16:28 -0400
-Received: by mail-wr1-x443.google.com with SMTP id j5-v6so288585wrr.8
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 04:16:26 -0700 (PDT)
+	(envelope-from <clg@kaod.org>) id 1fhZ94-0005p4-9Z
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 07:36:59 -0400
+Received: from 10.mo5.mail-out.ovh.net ([46.105.52.148]:47091)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fhZ94-0005Oe-2E
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 07:36:54 -0400
+Received: from player696.ha.ovh.net (unknown [10.109.159.159])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 38AC11CB13C
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 13:36:45 +0200 (CEST)
+References: <153138970964.331720.14349788349972574256.stgit@bahia>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <821367d0-c3ef-43bd-071c-b2ff50dae7bd@kaod.org>
+Date: Mon, 23 Jul 2018 13:36:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180723130845.1b372220@redhat.com>
-References: <20180716125948.11666-1-marcandre.lureau@redhat.com>
-	<20180716125948.11666-6-marcandre.lureau@redhat.com>
-	<20180717095727.7b63dcd0@redhat.com>
-	<CAJ+F1CL6+jKAWJJ+mb7rC3d7+tOoXSf8aM-JhHOJMEO7GAz2BA@mail.gmail.com>
-	<20180723130845.1b372220@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 23 Jul 2018 13:16:24 +0200
-Message-ID: <CAJ+F1C+PxwjNz2o9SXnLTc0bshReJ_HUPBX1vU1kwSdqrnN5=Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 5/5] PoC: tpm: add ACPI memory clear
- interface
+In-Reply-To: <153138970964.331720.14349788349972574256.stgit@bahia>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ppc/xics: fix ICP reset path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,178 +30,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 
-Hi
+On 07/12/2018 12:01 PM, Greg Kurz wrote:
+> Recent cleanup in commit a028dd423ee6 dropped the ICPStateClass::reset
+> handler. It is now up to child ICP classes to call the DeviceClass::reset
+> handler of the parent class, thanks to device_class_set_parent_reset().
+> This is a better object programming pattern,
 
-On Mon, Jul 23, 2018 at 1:08 PM, Igor Mammedov <imammedo@redhat.com> wrote:
-> On Tue, 17 Jul 2018 17:39:12 +0200
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
->
->> Hi
->>
->> On Tue, Jul 17, 2018 at 9:57 AM, Igor Mammedov <imammedo@redhat.com> wro=
-te:
->> > On Mon, 16 Jul 2018 14:59:48 +0200
->> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
->> >
->> >> This allows to pass the last failing test from the Windows HLK TPM 2.=
-0
->> >> TCG PPI 1.3 tests.
->> >>
->> >> The interface is described in the "TCG Platform Reset Attack
->> >> Mitigation Specification", chapter 6 "ACPI _DSM Function". According
->> >> to Laszlo, it's not so easy to implement in OVMF, he suggested to do
->> >> it in qemu instead. It is relatively simple to implement in QEMU, but
->> >> make this a proof-of-concept PATCH for discussion, since this is not
->> >> a conventional approach.
->> >>
->> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> >> ---
->> >>  hw/i386/acpi-build.c | 46 ++++++++++++++++++++++++++++++++++++++++++=
-++
->> >>  hw/tpm/tpm_ppi.c     | 25 ++++++++++++++++++++++++
->> >>  docs/specs/tpm.txt   |  2 ++
->> >>  hw/tpm/trace-events  |  3 +++
->> >>  4 files changed, 76 insertions(+)
->> >>
->> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> >> index 882fc27846..7e3c217076 100644
->> >> --- a/hw/i386/acpi-build.c
->> >> +++ b/hw/i386/acpi-build.c
->> >> @@ -1824,6 +1824,13 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
->> >>      pprq =3D aml_name("PPRQ");
->> >>      pprm =3D aml_name("PPRM");
->> >>
->> >> +    aml_append(dev,
->> >> +               aml_operation_region("TPP3", AML_SYSTEM_MEMORY,
->> >> +                                    aml_int(TPM_PPI_ADDR_BASE + 0x20=
-0),
->> >> +                                    0x1));
->> >> +    field =3D aml_field("TPP3", AML_ANY_ACC, AML_NOLOCK, AML_PRESERV=
-E);
->> >                                  ^^^ AML_BYTE_ACC
->>
->> ok
->>
->>
->> >
->> >> +    aml_append(field, aml_named_field("MOVV", 8));
->> >> +    aml_append(dev, field);
->> >>      /*
->> >>       * DerefOf in Windows is broken with SYSTEM_MEMORY.  Use a dynam=
-ic
->> >>       * operation region inside of a method for getting FUNC[op].
->> >> @@ -2166,7 +2173,46 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
->> >>              aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
->> >>          }
->> >>          aml_append(method, ifctx);
->> >> +
->> >> +        ifctx =3D aml_if(
->> >> +            aml_equal(uuid,
->> >> +                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D4=
-5D")));
->> >> +        {
->> >> +            /* standard DSM query function */
->> >> +            ifctx2 =3D aml_if(aml_equal(function, zero));
->> >> +            {
->> >> +                uint8_t byte_list[1] =3D { 0x03 };
->> >> +                aml_append(ifctx2, aml_return(aml_buffer(1, byte_lis=
-t)));
->> >> +            }
->> >> +            aml_append(ifctx, ifctx2);
->> >> +
->> >> +            /*
->> >> +             * TCG Platform Reset Attack Mitigation Specification 1.=
-0 Ch.6
->> >> +             *
->> >> +             * Arg 2 (Integer): Function Index =3D 1
->> >> +             * Arg 3 (Package): Arguments =3D Package: Type: Integer
->> >> +             *                  Operation Value of the Request
->> >> +             * Returns: Type: Integer
->> >> +             *          0: Success
->> >> +             *          1: General Failure
->> >> +             */
->> >> +            ifctx2 =3D aml_if(aml_equal(function, one));
->> >> +            {
->> >> +                aml_append(ifctx2,
->> >> +                           aml_store(aml_derefof(aml_index(arguments=
-, zero)),
->> >> +                                     op));
->> >> +                {
->> >> +                    aml_append(ifctx2, aml_store(op, aml_name("MOVV"=
-)));
->> >> +
->> >> +                    /* 0: success */
->> >> +                    aml_append(ifctx2, aml_return(zero));
->> >> +                }
->> >> +            }
->> >> +            aml_append(ifctx, ifctx2);
->> >> +        }
->> >> +        aml_append(method, ifctx);
->> >>      }
->> >> +
->> >>      aml_append(dev, method);
->> >>  }
->> >>
->> >> diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
->> >> index 8b46b9dd4b..64e8d828e8 100644
->> >> --- a/hw/tpm/tpm_ppi.c
->> >> +++ b/hw/tpm/tpm_ppi.c
->> >> @@ -16,8 +16,31 @@
->> >>  #include "qapi/error.h"
->> >>  #include "cpu.h"
->> >>  #include "sysemu/memory_mapping.h"
->> >> +#include "sysemu/reset.h"
->> >>  #include "migration/vmstate.h"
->> >>  #include "tpm_ppi.h"
->> >> +#include "trace.h"
->> >> +
->> >> +static void tpm_ppi_reset(void *opaque)
->> >> +{
->> >> +    TPMPPI *tpmppi =3D opaque;
->> >> +    char *ptr =3D memory_region_get_ram_ptr(&tpmppi->ram);
->> >> +
->> >> +    if (ptr[0x200] & 0x1) {
->> >> +        GuestPhysBlockList guest_phys_blocks;
->> >> +        GuestPhysBlock *block;
->> >> +
->> >> +        guest_phys_blocks_init(&guest_phys_blocks);
->> >> +        guest_phys_blocks_append(&guest_phys_blocks);
->> >> +        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
->> >> +            trace_tpm_ppi_memset(block->host_addr,
->> >> +                             block->target_end - block->target_start=
-);
->> >> +            memset(block->host_addr, 0,
->> >> +                   block->target_end - block->target_start);
->> >> +        }
->> >> +        guest_phys_blocks_free(&guest_phys_blocks);
->> >> +    }
->> >> +}
->> >>
->> >>  bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
->> >>                    hwaddr addr, Object *obj, Error **errp)
->> >> @@ -27,5 +50,7 @@ bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegi=
-on *m,
->> >>      vmstate_register_ram(&tpmppi->ram, DEVICE(obj));
->> >>
->> >>      memory_region_add_subregion(m, addr, &tpmppi->ram);
->> >> +    qemu_register_reset(tpm_ppi_reset, tpmppi);
->> > is it necessary,
->> > shouldn't it be reset by bus initiated reset?
->>
->> There is no bus for CRB device (we could eventually move it to SYSBUS,
->> but there was some complication with piix iirc).
->>
->> Other than that, the role for BusClass.reset() isn't so clear to me,
->> but it seems to be linked with the same qemu reset handler.
->
-> I'd suggest to drop qemu_register_reset() here, export tpm_ppi_reset()
-> and call it explicitly from tpm_crb_reset() and tpm_tis_reset() if
-> ppi is enabled.
->
+I think that the device_class_set_parent* routines just obfuscate a little
+more the object programming approach of QEMU. 
 
-should be fine as well
+> but unfortunately it causes QEMU to crash during CPU hotplug:
 
-thanks
+I guess I did not try that :/ Would it be complex to add a spapr unit test 
+for CPU hotplug ? It would be useful.
+
+> (qemu) device_add host-spapr-cpu-core,id=core1,core-id=1
+> Segmentation fault (core dumped)
+> 
+> When the hotplug path tries to reset the ICP device, we end up calling:
+> 
+> static void icp_kvm_reset(DeviceState *dev)
+> {
+>     ICPStateClass *icpc = ICP_GET_CLASS(dev);
+> 
+>     icpc->parent_reset(dev);
+> 
+> but icpc->parent_reset is NULL... This happens because icp_kvm_class_init()
+> calls:
+> 
+>     device_class_set_parent_reset(dc, icp_kvm_reset,
+>                                   &icpc->parent_reset);
+> 
+> but dc->reset, ie, DeviceClass::reset for the TYPE_ICP type, is
+> itself NULL.>
+> This patch hence sets DeviceClass::reset for the TYPE_ICP type to
+> point to icp_reset(). It then registers a reset handler that calls
+> DeviceClass::reset. If the ICP subtype has configured its own reset
+> handler with device_class_set_parent_reset(), this ensures it will
+> be called first and it can then call ICPStateClass::parent_reset
+> safely. This fixes the reset path for the TYPE_KVM_ICP type, which
+> is the only subtype that defines its own reset function.
+
+So, now, isn't ICP reset called twice on KVM ? 
+
+Anyway, we can sort that out if necessary.
+
+Thanks,
+
+C.
+ 
+> Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+> Fixes: a028dd423ee6dfd091a8c63028240832bf10f671
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/intc/xics.c |   14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index b9f1a3c97214..c90c893228dc 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -291,7 +291,7 @@ static const VMStateDescription vmstate_icp_server = {
+>      },
+>  };
+>  
+> -static void icp_reset(void *dev)
+> +static void icp_reset(DeviceState *dev)
+>  {
+>      ICPState *icp = ICP(dev);
+>  
+> @@ -303,6 +303,13 @@ static void icp_reset(void *dev)
+>      qemu_set_irq(icp->output, 0);
+>  }
+>  
+> +static void icp_reset_handler(void *dev)
+> +{
+> +    DeviceClass *dc = DEVICE_GET_CLASS(dev);
+> +
+> +    dc->reset(dev);
+> +}
+> +
+>  static void icp_realize(DeviceState *dev, Error **errp)
+>  {
+>      ICPState *icp = ICP(dev);
+> @@ -345,7 +352,7 @@ static void icp_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> -    qemu_register_reset(icp_reset, dev);
+> +    qemu_register_reset(icp_reset_handler, dev);
+>      vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, icp);
+>  }
+>  
+> @@ -354,7 +361,7 @@ static void icp_unrealize(DeviceState *dev, Error **errp)
+>      ICPState *icp = ICP(dev);
+>  
+>      vmstate_unregister(NULL, &vmstate_icp_server, icp);
+> -    qemu_unregister_reset(icp_reset, dev);
+> +    qemu_unregister_reset(icp_reset_handler, dev);
+>  }
+>  
+>  static void icp_class_init(ObjectClass *klass, void *data)
+> @@ -363,6 +370,7 @@ static void icp_class_init(ObjectClass *klass, void *data)
+>  
+>      dc->realize = icp_realize;
+>      dc->unrealize = icp_unrealize;
+> +    dc->reset = icp_reset;
+>  }
+>  
+>  static const TypeInfo icp_info = {
+> 
