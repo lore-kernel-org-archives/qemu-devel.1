@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fhj40-0007a4-MO
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:12:21 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhj6y-0000Hs-NQ
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:15:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fhj3z-0003wP-Sr
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:12:20 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:46717)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fhj3z-0003wJ-M1
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:12:19 -0400
-Received: by mail-oi0-x242.google.com with SMTP id y207-v6so3975758oie.13
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 15:12:19 -0700 (PDT)
+	(envelope-from <flukshun@gmail.com>) id 1fhj6v-00052S-ED
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 18:15:24 -0400
+Sender: fluxion <flukshun@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20180723220047.31594-1-richard.henderson@linaro.org>
-References: <20180723220047.31594-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Jul 2018 23:11:58 +0100
-Message-ID: <CAFEAcA9um80RvdkaULo6z8n_sZ3=Vr+_2qROv5ABHObz6tJyng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.0?] target/arm: Add sve-max-vq cpu
- property to -cpu max
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20180723201748.25573-6-mdroth@linux.vnet.ibm.com>
+References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
+	<20180723201748.25573-6-mdroth@linux.vnet.ibm.com>
+Message-ID: <153238409419.10934.1652388192245648682@sif>
+Date: Mon, 23 Jul 2018 17:14:54 -0500
+Subject: Re: [Qemu-devel] [PATCH 05/99] s390-ccw: force diag 308 subcode to
+ unsigned long
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On 23 July 2018 at 23:00, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> This allows the default (and maximum) vector length to be set
-> from the command-line.  Which is extraordinarily helpful in
-> debuging problems depending on vector length without having to
-> bake knowledge of PR_SET_SVE_VL into every guest binary.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Quoting Michael Roth (2018-07-23 15:16:14)
+> From: Cornelia Huck <cohuck@redhat.com>
+> =
+
+> We currently pass an integer as the subcode parameter. However,
+> the upper bits of the register containing the subcode need to
+> be 0, which is not guaranteed unless we explicitly specify the
+> subcode to be an unsigned long value.
+> =
+
+> Fixes: d046c51dad3 ("pc-bios/s390-ccw: Get device address via diag 308/6")
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Tested-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> (cherry picked from commit 63d8b5ace31c1e1f3996fe4cd551d6d377594d5a)
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+
+Hi Cornelia,
+
+Would you be able to do an s390 BIOS build for this one as well?
+
 > ---
->
-> The argument for inclding this in 3.0 is that there appear to be
-> several groups experimenting with SVE and using fixed vector lengths.
-> While this is oddly against the design of SVE, it's probably going
-> to keep happening.  Plus, the wildly useful debugging aspect.
+>  pc-bios/s390-ccw/iplb.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> =
 
-...on the other hand, it's a new feature and we're about to
-cut rc2 tomorrow. I'd prefer to leave this til after 3.0 releases.
+> diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+> index 5357a36d51..ded20c834e 100644
+> --- a/pc-bios/s390-ccw/iplb.h
+> +++ b/pc-bios/s390-ccw/iplb.h
+> @@ -101,10 +101,11 @@ static inline bool manage_iplb(IplParameterBlock *i=
+plb, bool store)
+>  {
+>      register unsigned long addr asm("0") =3D (unsigned long) iplb;
+>      register unsigned long rc asm("1") =3D 0;
+> +    unsigned long subcode =3D store ? 6 : 5;
+>  =
 
-thanks
--- PMM
+>      asm volatile ("diag %0,%2,0x308\n"
+>                    : "+d" (addr), "+d" (rc)
+> -                  : "d" (store ? 6 : 5)
+> +                  : "d" (subcode)
+>                    : "memory", "cc");
+>      return rc =3D=3D 0x01;
+>  }
+> -- =
+
+> 2.17.1
+>=20
