@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhL3-0004Fj-KY
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:50 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhL5-0004HV-8j
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhhL2-0005Xu-Fz
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:49 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fhhL4-0005Yg-Bm
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 16:21:51 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 15:17:36 -0500
-Message-Id: <20180723201748.25573-88-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 15:17:37 -0500
+Message-Id: <20180723201748.25573-89-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
 References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 87/99] mux: fix ctrl-a b again
+Subject: [Qemu-devel] [PATCH 88/99] nfs: Remove processed options from QDict
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +21,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Kevin Wolf <kwolf@redhat.com>
 
-Commit fb5e19d2e1472e96d72d5e4d89c20033f8ab345c originally fixed the
-regression, but was inadvertently broken again in merge commit
-2d6752d38d8acda.
+Commit c22a03454 QAPIfied option parsing in the NFS block driver, but
+forgot to remove all the options we processed. Therefore, we get an
+error in bdrv_open_inherit(), which thinks the remaining options are
+invalid. Trying to open an NFS image will result in an error like this:
 
-Fixes:
-https://bugs.launchpad.net/qemu/+bug/1654137
+    Block protocol 'nfs' doesn't support the option 'server.host'
+
+Remove all options from the QDict to make the NFS driver work again.
 
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20180515152500.19460-3-f4bug@amsat.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit eeaa6715050ed3f9cbedd322220f31570a503217)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-id: 20180516160816.26259-1-kwolf@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+(cherry picked from commit c82be42cc803b36fd7aed5dceec68312c7056fd5)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- chardev/char-mux.c | 1 +
- tests/test-char.c  | 8 ++++++++
- 2 files changed, 9 insertions(+)
+ block/nfs.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/chardev/char-mux.c b/chardev/char-mux.c
-index 1b925c8dec..6055e76293 100644
---- a/chardev/char-mux.c
-+++ b/chardev/char-mux.c
-@@ -304,6 +304,7 @@ void mux_set_focus(Chardev *chr, int focus)
+diff --git a/block/nfs.c b/block/nfs.c
+index 2577df4b26..dc12d5000d 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -557,6 +557,7 @@ static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
+     BlockdevOptionsNfs *opts = NULL;
+     QObject *crumpled = NULL;
+     Visitor *v;
++    const QDictEntry *e;
+     Error *local_err = NULL;
+ 
+     crumpled = qdict_crumple(options, errp);
+@@ -573,6 +574,12 @@ static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
+         return NULL;
      }
  
-     d->focus = focus;
-+    chr->be = d->backends[focus];
-     mux_chr_send_event(d, d->focus, CHR_EVENT_MUX_IN);
++    /* Remove the processed options from the QDict (the visitor processes
++     * _all_ options in the QDict) */
++    while ((e = qdict_first(options))) {
++        qdict_del(options, e->key);
++    }
++
+     return opts;
  }
  
-diff --git a/tests/test-char.c b/tests/test-char.c
-index 306c728335..b81b1e8e05 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -214,6 +214,10 @@ static void char_mux_test(void)
-     g_assert_cmpint(h2.last_event, ==, -1);
- 
-     /* switch focus */
-+    qemu_chr_be_write(base, (void *)"\1b", 2);
-+    g_assert_cmpint(h1.last_event, ==, 42);
-+    g_assert_cmpint(h2.last_event, ==, CHR_EVENT_BREAK);
-+
-     qemu_chr_be_write(base, (void *)"\1c", 2);
-     g_assert_cmpint(h1.last_event, ==, CHR_EVENT_MUX_IN);
-     g_assert_cmpint(h2.last_event, ==, CHR_EVENT_MUX_OUT);
-@@ -227,6 +231,10 @@ static void char_mux_test(void)
-     g_assert_cmpstr(h1.read_buf, ==, "hello");
-     h1.read_count = 0;
- 
-+    qemu_chr_be_write(base, (void *)"\1b", 2);
-+    g_assert_cmpint(h1.last_event, ==, CHR_EVENT_BREAK);
-+    g_assert_cmpint(h2.last_event, ==, CHR_EVENT_MUX_OUT);
-+
-     /* remove first handler */
-     qemu_chr_fe_set_handlers(&chr_be1, NULL, NULL, NULL, NULL,
-                              NULL, NULL, true);
 -- 
 2.17.1
