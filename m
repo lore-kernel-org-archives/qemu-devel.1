@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fhSxa-0003lN-I6
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:00:39 -0400
+	(envelope-from <peterx@redhat.com>) id 1fhT0W-0005YZ-VR
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:03:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fhSxX-00051W-NZ
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:00:38 -0400
-Received: from mga07.intel.com ([134.134.136.100]:45043)
+	(envelope-from <peterx@redhat.com>) id 1fhT0T-0005cC-Ri
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:03:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47648 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fhSxX-0004yY-Ef
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:00:35 -0400
-From: Tiwei Bie <tiwei.bie@intel.com>
-Date: Mon, 23 Jul 2018 12:59:56 +0800
-Message-Id: <20180723045956.27521-4-tiwei.bie@intel.com>
-In-Reply-To: <20180723045956.27521-1-tiwei.bie@intel.com>
-References: <20180723045956.27521-1-tiwei.bie@intel.com>
-Subject: [Qemu-devel] [RFC 3/3] vhost-user: support programming VFIO group
- in master
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhT0T-0005c1-MQ
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 01:03:37 -0400
+Date: Mon, 23 Jul 2018 13:03:25 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180723050325.GF2491@xz-mi>
+References: <20180719121520.30026-1-xiaoguangrong@tencent.com>
+	<20180719121520.30026-7-xiaoguangrong@tencent.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180719121520.30026-7-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] migration: move handle of zero page
+ to the thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,150 +28,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, alex.williamson@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
-Cc: tiwei.bie@intel.com
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Introduce a slave message to allow slave to share its
-VFIO group fd to master and do the IOMMU programming
-based on virtio device's DMA address space for this
-group in QEMU.
+On Thu, Jul 19, 2018 at 08:15:18PM +0800, guangrong.xiao@gmail.com wrote:
 
-For the vhost backends which support vDPA, they could
-leverage this message to ask master to do the IOMMU
-programming in QEMU for the vDPA device in backend.
+[...]
 
-Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
----
- docs/interop/vhost-user.txt    | 16 ++++++++++++++
- hw/virtio/vhost-user.c         | 40 ++++++++++++++++++++++++++++++++++
- include/hw/virtio/vhost-user.h |  2 ++
- 3 files changed, 58 insertions(+)
+> @@ -1950,12 +1971,16 @@ retry:
+>              set_compress_params(&comp_param[idx], block, offset);
+>              qemu_cond_signal(&comp_param[idx].cond);
+>              qemu_mutex_unlock(&comp_param[idx].mutex);
+> -            pages = 1;
+> -            /* 8 means a header with RAM_SAVE_FLAG_CONTINUE. */
+> -            compression_counters.reduced_size += TARGET_PAGE_SIZE -
+> -                                                 bytes_xmit + 8;
+> -            compression_counters.pages++;
+>              ram_counters.transferred += bytes_xmit;
+> +            pages = 1;
 
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index f59667f498..a57a8f9451 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -397,6 +397,7 @@ Protocol features
- #define VHOST_USER_PROTOCOL_F_CONFIG         9
- #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
- #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
-+#define VHOST_USER_PROTOCOL_F_VFIO_GROUP     12
- 
- Master message types
- --------------------
-@@ -815,6 +816,21 @@ Slave message types
-       This request should be sent only when VHOST_USER_PROTOCOL_F_HOST_NOTIFIER
-       protocol feature has been successfully negotiated.
- 
-+ * VHOST_USER_SLAVE_VFIO_GROUP_MSG
-+
-+      Id: 4
-+      Equivalent ioctl: N/A
-+      Slave payload: N/A
-+      Master payload: N/A
-+
-+      When VHOST_USER_PROTOCOL_F_VFIO_GROUP is negotiated, vhost-user slave
-+      could send this request to share its VFIO group fd via ancillary data
-+      to master. After receiving this request from slave, master will close
-+      the existing VFIO group if any and do the DMA programming based on the
-+      virtio device's DMA address space for the new group if the request is
-+      sent with a file descriptor.
-+
-+
- VHOST_USER_PROTOCOL_F_REPLY_ACK:
- -------------------------------
- The original vhost-user specification only demands replies for certain
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index b041343632..db958e24c7 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -52,6 +52,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_CONFIG = 9,
-     VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD = 10,
-     VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
-+    VHOST_USER_PROTOCOL_F_VFIO_GROUP = 12,
-     VHOST_USER_PROTOCOL_F_MAX
- };
- 
-@@ -97,6 +98,7 @@ typedef enum VhostUserSlaveRequest {
-     VHOST_USER_SLAVE_IOTLB_MSG = 1,
-     VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
-     VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG = 3,
-+    VHOST_USER_SLAVE_VFIO_GROUP_MSG = 4,
-     VHOST_USER_SLAVE_MAX
- }  VhostUserSlaveRequest;
- 
-@@ -949,6 +951,41 @@ static int vhost_user_slave_handle_vring_host_notifier(struct vhost_dev *dev,
-     return 0;
- }
- 
-+static int vhost_user_slave_handle_vfio_group(struct vhost_dev *dev,
-+                                              int *fd)
-+{
-+    struct vhost_user *u = dev->opaque;
-+    VhostUserState *user = u->user;
-+    VirtIODevice *vdev = dev->vdev;
-+    int groupfd = fd[0];
-+    VFIOGroup *group;
-+
-+    if (!virtio_has_feature(dev->protocol_features,
-+                            VHOST_USER_PROTOCOL_F_VFIO_GROUP) ||
-+        vdev == NULL) {
-+        return -1;
-+    }
-+
-+    if (user->vfio_group) {
-+        vfio_put_group(user->vfio_group);
-+        user->vfio_group = NULL;
-+    }
-+
-+    group = vfio_get_group_from_fd(groupfd, vdev->dma_as, NULL);
-+    if (group == NULL) {
-+        return -1;
-+    }
-+
-+    if (group->fd != groupfd) {
-+        close(groupfd);
-+    }
-+
-+    user->vfio_group = group;
-+    fd[0] = -1;
-+
-+    return 0;
-+}
-+
- static void slave_read(void *opaque)
- {
-     struct vhost_dev *dev = opaque;
-@@ -1021,6 +1058,9 @@ static void slave_read(void *opaque)
-         ret = vhost_user_slave_handle_vring_host_notifier(dev, &payload.area,
-                                                           fd[0]);
-         break;
-+    case VHOST_USER_SLAVE_VFIO_GROUP_MSG:
-+        ret = vhost_user_slave_handle_vfio_group(dev, fd);
-+        break;
-     default:
-         error_report("Received unexpected msg type.");
-         ret = -EINVAL;
-diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
-index fd660393a0..9e11473274 100644
---- a/include/hw/virtio/vhost-user.h
-+++ b/include/hw/virtio/vhost-user.h
-@@ -10,6 +10,7 @@
- 
- #include "chardev/char-fe.h"
- #include "hw/virtio/virtio.h"
-+#include "hw/vfio/vfio-common.h"
- 
- typedef struct VhostUserHostNotifier {
-     MemoryRegion mr;
-@@ -20,6 +21,7 @@ typedef struct VhostUserHostNotifier {
- typedef struct VhostUserState {
-     CharBackend *chr;
-     VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
-+    VFIOGroup *vfio_group;
- } VhostUserState;
- 
- VhostUserState *vhost_user_init(void);
+(moving of this line seems irrelevant; meanwhile more duplicated codes
+so even better to have a helper now)
+
+> +            if (comp_param[idx].zero_page) {
+> +                ram_counters.duplicate++;
+> +            } else {
+> +                /* 8 means a header with RAM_SAVE_FLAG_CONTINUE. */
+> +                compression_counters.reduced_size += TARGET_PAGE_SIZE -
+> +                                                     bytes_xmit + 8;
+> +                compression_counters.pages++;
+> +            }
+>              break;
+>          }
+>      }
+
+[...]
+
+> @@ -2249,15 +2308,8 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
+>          return res;
+>      }
+>  
+> -    /*
+> -     * When starting the process of a new block, the first page of
+> -     * the block should be sent out before other pages in the same
+> -     * block, and all the pages in last block should have been sent
+> -     * out, keeping this order is important, because the 'cont' flag
+> -     * is used to avoid resending the block name.
+> -     */
+> -    if (block != rs->last_sent_block && save_page_use_compression(rs)) {
+> -            flush_compressed_data(rs);
+> +    if (save_compress_page(rs, block, offset)) {
+> +        return 1;
+
+It's a bit tricky (though it seems to be a good idea too) to move the
+zero detect into the compression thread, though I noticed that we also
+do something else for zero pages:
+
+    res = save_zero_page(rs, block, offset);
+    if (res > 0) {
+        /* Must let xbzrle know, otherwise a previous (now 0'd) cached
+         * page would be stale
+         */
+        if (!save_page_use_compression(rs)) {
+            XBZRLE_cache_lock();
+            xbzrle_cache_zero_page(rs, block->offset + offset);
+            XBZRLE_cache_unlock();
+        }
+        ram_release_pages(block->idstr, offset, res);
+        return res;
+    }
+
+I'd guess that the xbzrle update of the zero page is not needed for
+compression since after all xbzrle is not enabled when compression is
+enabled, however do we need to do ram_release_pages() somehow?
+
+>      }
+>  
+>      res = save_zero_page(rs, block, offset);
+> @@ -2275,18 +2327,10 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
+>      }
+>  
+>      /*
+> -     * Make sure the first page is sent out before other pages.
+> -     *
+> -     * we post it as normal page as compression will take much
+> -     * CPU resource.
+> -     */
+> -    if (block == rs->last_sent_block && save_page_use_compression(rs)) {
+> -        res = compress_page_with_multi_thread(rs, block, offset);
+> -        if (res > 0) {
+> -            return res;
+> -        }
+> -        compression_counters.busy++;
+> -    } else if (migrate_use_multifd()) {
+> +    * do not use multifd for compression as the first page in the new
+> +    * block should be posted out before sending the compressed page
+> +    */
+> +    if (!save_page_use_compression(rs) && migrate_use_multifd()) {
+>          return ram_save_multifd_page(rs, block, offset);
+>      }
+>  
+> -- 
+> 2.14.4
+> 
+
+Regards,
+
 -- 
-2.18.0
+Peter Xu
