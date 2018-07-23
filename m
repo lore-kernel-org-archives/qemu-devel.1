@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fhdj5-00047a-PL
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 12:30:24 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fhdoQ-00068m-PT
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 12:35:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fhdj4-0006ES-Tc
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 12:30:23 -0400
-Date: Mon, 23 Jul 2018 17:30:11 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180723163011.GH20596@stefanha-x1.localdomain>
-References: <20180718211256.29774-1-naravamudan@digitalocean.com>
-	<a1269390-a798-9165-aaf5-a2aa6270bd54@linux.ibm.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fhdoP-0000RM-So
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 12:35:54 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:40973)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fhdoP-0000R2-CJ
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 12:35:53 -0400
+Received: by mail-pl0-x243.google.com with SMTP id w8-v6so446736ply.8
+	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 09:35:53 -0700 (PDT)
+References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+	<1532004912-13899-26-git-send-email-stefan.markovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2372b0c5-8cd3-5e94-47c3-a368e1eb5938@linaro.org>
+Date: Mon, 23 Jul 2018 09:35:48 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="dCSxeJc5W8HZXZrD"
-Content-Disposition: inline
-In-Reply-To: <a1269390-a798-9165-aaf5-a2aa6270bd54@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] block/file-posix: add
- bdrv_attach_aio_context callback for host dev and cdrom
+In-Reply-To: <1532004912-13899-26-git-send-email-stefan.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 25/40] target/mips: Add updating CP0
+ BadInstrX register for nanoMIPs only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +32,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>
-Cc: Nishanth Aravamudan <naravamudan@digitalocean.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Stefan Markovic <stefan.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
+
+On 07/19/2018 05:54 AM, Stefan Markovic wrote:
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+> 
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  target/mips/helper.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/target/mips/helper.c b/target/mips/helper.c
+> index 5299f21..9535131 100644
+> --- a/target/mips/helper.c
+> +++ b/target/mips/helper.c
+> @@ -695,6 +695,12 @@ static inline void set_badinstr_registers(CPUMIPSState *env)
+>                  instr |= cpu_lduw_code(env, env->active_tc.PC + 2);
+>              }
+>              env->CP0_BadInstr = instr;
+> +
+> +            if ((env->insn_flags & ISA_NANOMIPS32) &&
+> +                ((instr & 0xFC000000) == 0x60000000)) {
+> +                instr = cpu_lduw_code(env, env->active_tc.PC + 4) << 16;
+> +                env->CP0_BadInstrX = instr;
+> +            }
+
+The nanomips condition has been checked just above.
+This patch should probably be merged with 24/40.
 
 
---dCSxeJc5W8HZXZrD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jul 20, 2018 at 03:11:14PM -0400, Farhan Ali wrote:
-> I am seeing another issue pop up, in a different test. Even though it's a
-> different assertion, it might be related based on the call trace.
-
-Which test case?
-
-> Stack trace of thread 276199:
-> #0  0x000003ff8473e274 raise (libc.so.6)
-> #1  0x000003ff847239a8 abort (libc.so.6)
-> #2  0x000003ff847362ce __assert_fail_base (libc.so.6)
-> #3  0x000003ff8473634c __assert_fail (libc.so.6)
-> #4  0x000002aa30aba0c4 iov_memset (qemu-system-s390x)
-> #5  0x000002aa30aba9a6 qemu_iovec_memset (qemu-system-s390x)
-> #6  0x000002aa30a23e88 qemu_laio_process_completion (qemu-system-s390x)
-
-What are the values of laiocb->qiov->size and laiocb->ret?
-
-> #7  0x000002aa30a23f68 qemu_laio_process_completions (qemu-system-s390x)
-> #8  0x000002aa30a2418e qemu_laio_process_completions_and_submit
-> (qemu-system-s390x)
-> #9  0x000002aa30a24220 qemu_laio_poll_cb (qemu-system-s390x)
-> #10 0x000002aa30ab22c4 run_poll_handlers_once (qemu-system-s390x)
-> #11 0x000002aa30ab2e78 aio_poll (qemu-system-s390x)
-> #12 0x000002aa30a29f4e bdrv_do_drained_begin (qemu-system-s390x)
-> #13 0x000002aa30a2a276 bdrv_drain (qemu-system-s390x)
-> #14 0x000002aa309d45aa bdrv_set_aio_context (qemu-system-s390x)
-> #15 0x000002aa3085acfe virtio_blk_data_plane_stop (qemu-system-s390x)
-> #16 0x000002aa3096994c virtio_bus_stop_ioeventfd.part.1 (qemu-system-s390=
-x)
-> #17 0x000002aa3087d1d6 virtio_vmstate_change (qemu-system-s390x)
-> #18 0x000002aa308e8a12 vm_state_notify (qemu-system-s390x)
-> #19 0x000002aa3080ed54 do_vm_stop (qemu-system-s390x)
-> #20 0x000002aa307bea04 main (qemu-system-s390x)
-> #21 0x000003ff84723dd2 __libc_start_main (libc.so.6)
-> #22 0x000002aa307c0414 _start (qemu-system-s390x)
->=20
->=20
-> The failing assertion is:
->=20
-> qemu-kvm: util/iov.c:78: iov_memset: Assertion `offset =3D=3D 0' failed.
-
-I wonder if the offset is beyond the end of the iovecs.
-
-Thanks,
-Stefan
-
---dCSxeJc5W8HZXZrD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbVgKTAAoJEJykq7OBq3PITBcH/0aa3mFBCw+XH3W2p8yrSe9c
-ICO9mCB8gaq06TIXXJVLLybdYc8nhfsUtRRUgjIEEk7RXzu2gCYKPs9+YCPHppdw
-dBfJYsEFef5znOtnMOSeLZrwwRx96pBesroK74Yc8Zm5D9DagL4Nrkcw7V0Imufy
-3WSe/P1DRVI9xw6pylXVtG+/RA/1l8YYrd4r6+ZEAD+TEL7q2pY76fBocxSvulBi
-RaDbTK+meE5Gl7Jd47yB4sJGveta+TxcUD9kNKWmD9UZ6wl/D+PlREAVAA6EooOi
-F7OeNtvyM7YIR5igbz4ZcvVyZctrNRYyE8XK6UMhtoIWeEH5hSY309g1fa1gQ+E=
-=Plvu
------END PGP SIGNATURE-----
-
---dCSxeJc5W8HZXZrD--
+r~
