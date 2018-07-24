@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fi3OZ-0003bo-1d
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 15:54:55 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fi3Xa-0006vO-Si
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 16:04:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fi3OY-0006h5-CU
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 15:54:55 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:40773)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fi3OY-0006gU-6E
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 15:54:54 -0400
-Received: by mail-oi0-x243.google.com with SMTP id w126-v6so9736323oie.7
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 12:54:54 -0700 (PDT)
+	(envelope-from <lbloch@janustech.com>) id 1fi3XX-0007dw-Oe
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 16:04:14 -0400
+From: Leonid Bloch <lbloch@janustech.com>
+Date: Tue, 24 Jul 2018 23:03:38 +0300
+Message-Id: <20180724200343.13733-1-lbloch@janustech.com>
 MIME-Version: 1.0
-In-Reply-To: <2b1ef4d8-c938-0e3c-2d6a-933fb1e309f7@redhat.com>
-References: <20180724142504.15092-1-stefanha@redhat.com>
-	<2b1ef4d8-c938-0e3c-2d6a-933fb1e309f7@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jul 2018 20:54:32 +0100
-Message-ID: <CAFEAcA_7q9Z80iO4R2mA1VGwSO=BgJNSrrhCNppct0iiQzT_LA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL for-3.0 0/1] Tracing patches
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 0/5] Introduction of l2-cache-full option
+ for qcow2 images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +20,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Leonid Bloch <lbloch@janustech.com>
 
-On 24 July 2018 at 16:13, Eric Blake <eblake@redhat.com> wrote:
-> On 07/24/2018 09:25 AM, Stefan Hajnoczi wrote:
->>
->> The following changes since commit
->> 768cef2974fb1fa30dd188b043ea737e13fea477:
->>
->>    Merge remote-tracking branch
->> 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2018-07-24
->> 10:37:52 +0100)
->>
->> are available in the Git repository at:
->>
->>    git://github.com/stefanha/qemu.git tags/tracing-pull-request
->>
->> for you to fetch changes up to b6ad6a528f2356b357bd1d210048dd7988dc9a7b:
->>
->>    trace/simple: fix hang in child after fork(2) (2018-07-24 14:27:51
->> +0100)
->>
->> ----------------------------------------------------------------
->> Pull request
->>
->> Fix qemu-iotests 147 when QEMU was built with ./configure
->> --enable-trace-backend=simple.
->
->
-> Design conversation ongoing under patch 1/1 - replying here to make sure
-> this doesn't get applied if we aren't ready for it yet.
+This series introduces an option to calculate and allocate
+automatically enough qcow2 L2 cache to cover the entire image.
+Using cache that covers the entire image can benefit performance,
+while having only a small memory overhead (just 1 MB for every 8 GB
+of virtual image size with the default cluster size).
 
-OK; I'll drop this pullreq from my queue. Pleas ping me again if
-the outcome is that it should be applied.
+-------------------------
+Differences from v1:
 
-thanks
--- PMM
+1) Documentation fixes in qapi/block-core.json and qemu-options.hx
+2) Removal of the patch which was made to fix the default sizes in
+   docs/qcow2-cache.txt - it is not needed, as the default sizes imply
+   also default cluster sizes.
+3) Documentation fixes in docs/qcow2-cache.txt, mentioning mutual
+   exclusivity of the options.
+4) Squashing the iotests patch into the main feature addition patch
+
+-------------------------
+Differences from v2:
+
+1) A separate patch for the grammar fix for 3.0
+2) A separate patch for existing documentation fixes for 3.0
+3) Separated back the iotests patch, because the grammar fix is separate now
+
+Leonid Bloch (5):
+  A grammar fix
+  qcow2: Options' documentation fixes
+  qcow2: Introduce an option for sufficient L2 cache for the entire
+    image
+  iotests: Add tests for the new l2-cache-full option
+  docs: Document the l2-cache-full option
+
+ block/qcow2.c              | 37 +++++++++++++++++++++++++++++--------
+ block/qcow2.h              |  1 +
+ docs/qcow2-cache.txt       | 18 ++++++++++++++----
+ qapi/block-core.json       |  8 +++++++-
+ qemu-options.hx            | 19 +++++++++++++++----
+ tests/qemu-iotests/103     |  6 ++++++
+ tests/qemu-iotests/103.out |  4 +++-
+ tests/qemu-iotests/137     |  2 ++
+ tests/qemu-iotests/137.out |  4 +++-
+ 9 files changed, 80 insertions(+), 19 deletions(-)
+
+-- 
+2.14.1
