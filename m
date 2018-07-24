@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fi3Xh-0006x4-QD
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 16:04:23 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fi3Xe-0007md-Lr
+	(envelope-from <lbloch@janustech.com>) id 1fi3Xe-0006wJ-3B
 	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 16:04:21 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <lbloch@janustech.com>) id 1fi3Xa-0007hS-VE
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 16:04:18 -0400
 From: Leonid Bloch <lbloch@janustech.com>
-Date: Tue, 24 Jul 2018 23:03:42 +0300
-Message-Id: <20180724200343.13733-5-lbloch@janustech.com>
+Date: Tue, 24 Jul 2018 23:03:40 +0300
+Message-Id: <20180724200343.13733-3-lbloch@janustech.com>
 In-Reply-To: <20180724200343.13733-1-lbloch@janustech.com>
 References: <20180724200343.13733-1-lbloch@janustech.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 4/5] iotests: Add tests for the new
- l2-cache-full option
+Subject: [Qemu-devel] [PATCH v3 2/5 for-3.0] qcow2: Options' documentation
+ fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +27,54 @@ Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redh
 
 Signed-off-by: Leonid Bloch <lbloch@janustech.com>
 ---
- tests/qemu-iotests/103     | 6 ++++++
- tests/qemu-iotests/103.out | 2 ++
- tests/qemu-iotests/137     | 2 ++
- tests/qemu-iotests/137.out | 2 ++
- 4 files changed, 12 insertions(+)
+ docs/qcow2-cache.txt |  3 +++
+ qemu-options.hx      | 15 +++++++++++----
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
-index 2841318492..a2886e8569 100755
---- a/tests/qemu-iotests/103
-+++ b/tests/qemu-iotests/103
-@@ -52,9 +52,15 @@ echo
- echo '=== Testing invalid option combinations ==='
- echo
+diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
+index 8a09a5cc5f..9d261b7da9 100644
+--- a/docs/qcow2-cache.txt
++++ b/docs/qcow2-cache.txt
+@@ -130,6 +130,9 @@ There are a few things that need to be taken into account:
+    memory as possible to the L2 cache before increasing the refcount
+    cache size.
  
-+# l2-cache-size and l2-cache-full at the same time
-+$QEMU_IO -c "open -o l2-cache-full,l2-cache-size=1M $TEST_IMG" 2>&1 |
-+    _filter_testdir | _filter_imgfmt
- # all sizes set at the same time
- $QEMU_IO -c "open -o cache-size=1.25M,l2-cache-size=1M,refcount-cache-size=0.25M $TEST_IMG" \
-     2>&1 | _filter_testdir | _filter_imgfmt
-+# cache-size may not be smaller than the full L2 size if l2-cache-full is used
-+$QEMU_IO -c "open -o l2-cache-full,cache-size=6K $TEST_IMG" 2>&1 |
-+    _filter_testdir | _filter_imgfmt
- # l2-cache-size may not exceed cache-size
- $QEMU_IO -c "open -o cache-size=1M,l2-cache-size=2M $TEST_IMG" 2>&1 \
-     | _filter_testdir | _filter_imgfmt
-diff --git a/tests/qemu-iotests/103.out b/tests/qemu-iotests/103.out
-index ab56f03a00..92afbff024 100644
---- a/tests/qemu-iotests/103.out
-+++ b/tests/qemu-iotests/103.out
-@@ -5,7 +5,9 @@ wrote 65536/65536 bytes at offset 0
++- All three "l2-cache-size", "refcount-cache-size", and "cache-size" options
++  can not be set simultaneously.
++
+ Unlike L2 tables, refcount blocks are not used during normal I/O but
+ only during allocations and internal snapshots. In most cases they are
+ accessed sequentially (even during random guest I/O) so increasing the
+diff --git a/qemu-options.hx b/qemu-options.hx
+index b1bf0f485f..ef0706c359 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -752,15 +752,22 @@ image file)
  
- === Testing invalid option combinations ===
+ @item cache-size
+ The maximum total size of the L2 table and refcount block caches in bytes
+-(default: 1048576 bytes or 8 clusters, whichever is larger)
  
-+can't open device TEST_DIR/t.IMGFMT: l2-cache-full and l2-cache-size may not be set at the same time
- can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
-+can't open device TEST_DIR/t.IMGFMT: cache-size must be greater than the full L2 cache if l2-cache-full is used
- can't open device TEST_DIR/t.IMGFMT: l2-cache-size may not exceed cache-size
- can't open device TEST_DIR/t.IMGFMT: refcount-cache-size may not exceed cache-size
- can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set the same time
-diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index 87965625d8..f460b5bfe1 100755
---- a/tests/qemu-iotests/137
-+++ b/tests/qemu-iotests/137
-@@ -106,7 +106,9 @@ echo
+ @item l2-cache-size
+-The maximum size of the L2 table cache in bytes
+-(default: 4/5 of the total cache size)
++The maximum size of the L2 table cache.
++(default: if cache-size is not defined - 1048576 bytes or 8 clusters,
++whichever is larger; if cache-size is defined and is large enough to
++accommodate enough L2 cache to cover the entire virtual size of the image plus
++the minimal amount of refcount cache - enough to cover the entire image;
++if cache-size is defined and is not large enough - as much as possible while
++leaving space for the needed refcount cache)
  
- $QEMU_IO \
-     -c "reopen -o lazy-refcounts=42" \
-+    -c "reopen -o l2-cache-full,l2-cache-size=64k" \
-     -c "reopen -o cache-size=1M,l2-cache-size=64k,refcount-cache-size=64k" \
-+    -c "reopen -o l2-cache-full,cache-size=6K" \
-     -c "reopen -o cache-size=1M,l2-cache-size=2M" \
-     -c "reopen -o cache-size=1M,refcount-cache-size=2M" \
-     -c "reopen -o l2-cache-size=256T" \
-diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
-index 6a2ffc71fd..b15dfc391a 100644
---- a/tests/qemu-iotests/137.out
-+++ b/tests/qemu-iotests/137.out
-@@ -16,7 +16,9 @@ read 33554432/33554432 bytes at offset 0
- === Try setting some invalid values ===
+ @item refcount-cache-size
+ The maximum size of the refcount block cache in bytes
+-(default: 1/5 of the total cache size)
++(default: 4 times the cluster size, or if cache-size is defined and is large
++enough to accommodate enough L2 cache to cover the entire virtual size of the
++image plus the minimal amount of refcount cache - the part of cache-size which
++is left after allocating the full L2 cache)
  
- Parameter 'lazy-refcounts' expects 'on' or 'off'
-+l2-cache-full and l2-cache-size may not be set at the same time
- cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
-+cache-size must be greater than the full L2 cache if l2-cache-full is used
- l2-cache-size may not exceed cache-size
- refcount-cache-size may not exceed cache-size
- L2 cache size too big
+ @item cache-clean-interval
+ Clean unused entries in the L2 and refcount caches. The interval is in seconds.
 -- 
 2.14.1
