@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1ik-00019v-Fb
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:07:39 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1j3-0001ND-Dp
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1if-0000IW-GI
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:07:38 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:58244 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1ix-0000WU-1u
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:07:57 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:58349 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fi1if-0000H0-7H
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:07:33 -0400
+	id 1fi1iw-0000WA-Pn
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:07:50 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 24 Jul 2018 19:32:06 +0200
-Message-Id: <1532453527-22911-55-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 24 Jul 2018 19:32:07 +0200
+Message-Id: <1532453527-22911-56-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1532453527-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1532453527-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v4 54/55] linux-user: Amend sigaction syscall
- support for nanoMIPS
+Subject: [Qemu-devel] [PATCH v4 55/55] linux-user: Add nanoMIPS linux user
+ mode configuration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +28,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Amend sigaction syscall support for nanoMIPS. This must be done
-since nanoMIPS' signal handling is different than MIPS' signal
-handling.
+Add new linux user mode configuration for nanoMIPS.
 
 Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/syscall.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ configure                               | 13 ++++++++++++-
+ default-configs/nanomips-linux-user.mak |  1 +
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+ create mode 100644 default-configs/nanomips-linux-user.mak
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 3d57966..bced9b8 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -8825,7 +8825,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-                 old_act->sa_flags = oact.sa_flags;
-                 unlock_user_struct(old_act, arg3, 1);
-             }
--#elif defined(TARGET_MIPS)
-+#elif defined(TARGET_MIPS) && !defined(TARGET_NANOMIPS)
- 	    struct target_sigaction act, oact, *pact, *old_act;
+diff --git a/configure b/configure
+index 2a7796e..86c8b28 100755
+--- a/configure
++++ b/configure
+@@ -742,6 +742,9 @@ case "$cpu" in
+     supported_cpu="yes"
+     cross_cc_mips=$host_cc
+   ;;
++  nanomips*)
++    cpu="mips"
++  ;;
+   sparc|sun4[cdmuv])
+     cpu="sparc"
+     supported_cpu="yes"
+@@ -6883,7 +6886,7 @@ target_name=$(echo $target | cut -d '-' -f 1)
+ target_bigendian="no"
  
- 	    if (arg2) {
+ case "$target_name" in
+-  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
++  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|nanomipseb|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
+   target_bigendian=yes
+   ;;
+ esac
+@@ -6999,6 +7002,11 @@ case "$target_name" in
+   moxie)
+     target_compiler=$cross_cc_moxie
+   ;;
++  nanomips|nanomipseb)
++    TARGET_ARCH=nanomips
++    TARGET_BASE_ARCH=mips
++    echo "TARGET_ABI_MIPSP32=y" >> $config_target_mak
++  ;;
+   nios2)
+     target_compiler=$cross_cc_nios2
+   ;;
+@@ -7256,6 +7264,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+   moxie*)
+     disas_config "MOXIE"
+   ;;
++  nanomips*)
++    disas_config "MIPS"
++  ;;
+   nios2)
+     disas_config "NIOS2"
+   ;;
+diff --git a/default-configs/nanomips-linux-user.mak b/default-configs/nanomips-linux-user.mak
+new file mode 100644
+index 0000000..68fc1f7
+--- /dev/null
++++ b/default-configs/nanomips-linux-user.mak
+@@ -0,0 +1 @@
++# Default configuration for nanomips-linux-user
 -- 
 2.7.4
