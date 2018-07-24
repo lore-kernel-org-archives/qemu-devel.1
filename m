@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fi1pr-0007BA-7Q
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:15:00 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fi24c-00059w-GI
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:30:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fi1pn-0000S9-6G
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:14:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36876 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fi1pn-0000Qq-1X
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:14:55 -0400
-Date: Tue, 24 Jul 2018 21:14:48 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180724211144-mutt-send-email-mst@kernel.org>
-References: <20180723193145.24705-1-ehabkost@redhat.com>
-	<20180723193145.24705-3-ehabkost@redhat.com>
-	<20180724142949.3078da82@redhat.com>
-	<20180724123916.GC3896@localhost.localdomain>
-	<20180724172844.5bea5a07@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fi24b-0006yX-M8
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:30:14 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36378)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fi24b-0006xb-5J
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:30:13 -0400
+Received: by mail-pf1-x442.google.com with SMTP id d14-v6so1047911pfo.3
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 11:30:13 -0700 (PDT)
+References: <1532451888-8958-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1532451888-8958-11-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <620a3aff-d867-7a47-7031-dfc926ce5699@linaro.org>
+Date: Tue, 24 Jul 2018 11:30:08 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180724172844.5bea5a07@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] acpi: Decouple ACPI hotplug
- callbacks from HotplugHandler
+In-Reply-To: <1532451888-8958-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 10/10] linux-user: Add preprocessor
+ availability control to some syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Ben Warren <ben@skyportsystems.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-On Tue, Jul 24, 2018 at 05:28:44PM +0200, Igor Mammedov wrote:
-> On Tue, 24 Jul 2018 09:39:16 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+On 07/24/2018 10:04 AM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> > On Tue, Jul 24, 2018 at 02:29:49PM +0200, Igor Mammedov wrote:
-> > > On Mon, 23 Jul 2018 16:31:45 -0300
-> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > >   
-> > > > The ACPI hotplug callbacks get a HotplugHandler object as
-> > > > argument.  This has two problems:
-> > > > 
-> > > > 1) The functions require a TYPE_ACPI_DEVICE_IF object, but the
-> > > >    function prototype doesn't indicate that.  It's possible to
-> > > >    pass an object that would make the function crash.
-> > > > 2) The function does not require the object to implement
-> > > >    TYPE_HOTPLUG_HANDLER at all, but the function prototype
-> > > >    imposes that for no reason.
-> > > > 
-> > > > Change the argument type to AcpiDeviceIf instead of
-> > > > HotplugHandler.  
-> > > What is the motivation for this patch,
-> > > do you actually get crashes?  
-> > 
-> > I didn't get crashes, but the idea for the change came when
-> > Michael asked me how to get the HotplugHandler object.  I was
-> > going to suggest current_machine (which is also a hotplug
-> > handler), when I noticed he actually needed an AcpiDeviceIf
-> > object.
-> > 
-> > The main motivation, however, is to simply make the function
-> > prototypes make sense.  Is there a single reason to make the ACPI
-> > functions get a HotplugHandler argument instead of AcpiDeviceIf?
-> I'd rather to keep current *_cb() functions as is,
-> as we might actually need access to hotplug handler there and in
-> that case keeping more generic hotplug handler would be better
-> and it also sort of documents better what is being passed in.
+> Add ability to target platforms to individually include user-mode
+> support for system calls from "stat" group of system calls.
 > 
-> Also we won't have to rewrite it back from AcpiDeviceIf to
-> HotplugHandler again if it's needed.
+> This change is related to new nanoMIPS platform in the sense that
+> it supports a different set of "stat" system calls than any other
+> target. nanoMIPS does not support structures stat and stat64 at
+> all. Also, support for certain number of other system calls is
+> dropped in nanoMIPS (those are most of the time obsoleted system
+> calls).
+> 
+> Without this patch, build for nanoMIPS would fail.
+> 
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  linux-user/strace.c  | 14 +++++++++++++-
+>  linux-user/syscall.c | 29 +++++++++++++++++++++++++++++
+>  2 files changed, 42 insertions(+), 1 deletion(-)
 
-Personally I think type-safety is important, changing APIs
-isn't such a big deal. So I'd rather take Eduardo's patch unless
-the patches that would need to change it back are just
-round the corner. what's the status there?
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 
--- 
-MST
+
+r~
