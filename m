@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fhvyx-0008CF-G4
+	(envelope-from <pm215@archaic.org.uk>) id 1fhvyx-0008Cw-Qe
 	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fhvyw-000394-PZ
+	(envelope-from <pm215@archaic.org.uk>) id 1fhvyw-00039O-Vx
 	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:59:59 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jul 2018 12:59:47 +0100
-Message-Id: <20180724115950.17316-3-peter.maydell@linaro.org>
+Date: Tue, 24 Jul 2018 12:59:50 +0100
+Message-Id: <20180724115950.17316-6-peter.maydell@linaro.org>
 In-Reply-To: <20180724115950.17316-1-peter.maydell@linaro.org>
 References: <20180724115950.17316-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/5] target/arm: Honour HCR_EL2.TGE and
- MDCR_EL2.TDE in debug register access checks
+Subject: [Qemu-devel] [PATCH 5/5] target/arm: Treat SCTLR_EL1.M as if it
+ were zero when HCR_EL2.TGE is set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +23,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Some debug registers can be trapped via MDCR_EL2 bits TDRA, TDOSA,
-and TDA, which we implement in the functions access_tdra(),
-access_tdosa() and access_tda(). If MDCR_EL2.TDE or HCR_EL2.TGE
-are 1, the TDRA, TDOSA and TDA bits should behave as if they were 1.
-Implement this by having the access functions check MDCR_EL2.TDE
-and HCR_EL2.TGE.
+One of the required effects of setting HCR_EL2.TGE is that when
+SCR_EL3.NS is 1 then SCTLR_EL1.M must behave as if it is zero for
+all purposes except direct reads. That is, it effectively disables
+the MMU for the NS EL0/EL1 translation regime.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ target/arm/helper.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 22d812240af..e2930e99388 100644
+index 699189ebd7b..efd258fdb59 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -444,9 +444,11 @@ static CPAccessResult access_tdosa(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    bool isread)
- {
-     int el = arm_current_el(env);
-+    bool mdcr_el2_tdosa = (env->cp15.mdcr_el2 & MDCR_TDOSA) ||
-+        (env->cp15.mdcr_el2 & MDCR_TDE) ||
-+        (env->cp15.hcr_el2 & HCR_TGE);
- 
--    if (el < 2 && (env->cp15.mdcr_el2 & MDCR_TDOSA)
--        && !arm_is_secure_below_el3(env)) {
-+    if (el < 2 && mdcr_el2_tdosa && !arm_is_secure_below_el3(env)) {
-         return CP_ACCESS_TRAP_EL2;
+@@ -8402,6 +8402,14 @@ static inline bool regime_translation_disabled(CPUARMState *env,
+     if (mmu_idx == ARMMMUIdx_S2NS) {
+         return (env->cp15.hcr_el2 & HCR_VM) == 0;
      }
-     if (el < 3 && (env->cp15.mdcr_el3 & MDCR_TDOSA)) {
-@@ -462,9 +464,11 @@ static CPAccessResult access_tdra(CPUARMState *env, const ARMCPRegInfo *ri,
-                                   bool isread)
- {
-     int el = arm_current_el(env);
-+    bool mdcr_el2_tdra = (env->cp15.mdcr_el2 & MDCR_TDRA) ||
-+        (env->cp15.mdcr_el2 & MDCR_TDE) ||
-+        (env->cp15.hcr_el2 & HCR_TGE);
++
++    if (env->cp15.hcr_el2 & HCR_TGE) {
++        /* TGE means that NS EL0/1 act as if SCTLR_EL1.M is zero */
++        if (!regime_is_secure(env, mmu_idx) && regime_el(env, mmu_idx) == 1) {
++            return true;
++        }
++    }
++
+     return (regime_sctlr(env, mmu_idx) & SCTLR_M) == 0;
+ }
  
--    if (el < 2 && (env->cp15.mdcr_el2 & MDCR_TDRA)
--        && !arm_is_secure_below_el3(env)) {
-+    if (el < 2 && mdcr_el2_tdra && !arm_is_secure_below_el3(env)) {
-         return CP_ACCESS_TRAP_EL2;
-     }
-     if (el < 3 && (env->cp15.mdcr_el3 & MDCR_TDA)) {
-@@ -480,9 +484,11 @@ static CPAccessResult access_tda(CPUARMState *env, const ARMCPRegInfo *ri,
-                                   bool isread)
- {
-     int el = arm_current_el(env);
-+    bool mdcr_el2_tda = (env->cp15.mdcr_el2 & MDCR_TDA) ||
-+        (env->cp15.mdcr_el2 & MDCR_TDE) ||
-+        (env->cp15.hcr_el2 & HCR_TGE);
- 
--    if (el < 2 && (env->cp15.mdcr_el2 & MDCR_TDA)
--        && !arm_is_secure_below_el3(env)) {
-+    if (el < 2 && mdcr_el2_tda && !arm_is_secure_below_el3(env)) {
-         return CP_ACCESS_TRAP_EL2;
-     }
-     if (el < 3 && (env->cp15.mdcr_el3 & MDCR_TDA)) {
 -- 
 2.17.1
