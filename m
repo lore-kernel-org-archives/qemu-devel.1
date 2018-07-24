@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhx2G-0005es-PF
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:07:29 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fhxCD-00015z-V2
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:17:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhx2F-00045k-PI
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:07:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59380 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhx2F-00045P-Ky
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:07:27 -0400
-Date: Tue, 24 Jul 2018 21:07:18 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180724130718.GF2479@xz-mi>
-References: <1532434585-14732-1-git-send-email-lidongchen@tencent.com>
-	<1532434585-14732-2-git-send-email-lidongchen@tencent.com>
+	(envelope-from <cohuck@redhat.com>) id 1fhxC8-0000W8-Sn
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:17:45 -0400
+Date: Tue, 24 Jul 2018 15:17:32 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180724151732.608d7183.cohuck@redhat.com>
+In-Reply-To: <1532421839-24512-1-git-send-email-thuth@redhat.com>
+References: <1532421839-24512-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1532434585-14732-2-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] migration: fix duplicate
- initialization for expected_downtime and cleanup_bh
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2] hw/s390x/virtio-ccw: Consolidate
+ calls to virtio_ccw_unrealize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +23,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-On Tue, Jul 24, 2018 at 08:16:25PM +0800, Lidong Chen wrote:
-> migrate_fd_connect duplicate initialize expected_downtime and cleanup_bh.
+On Tue, 24 Jul 2018 10:43:59 +0200
+Thomas Huth <thuth@redhat.com> wrote:
+
+> Currently, every virtio-ccw device explicitely sets its unrealize
+> function to virtio_ccw_unrealize() in its class_init function.
+> We can simplify this by using a common unrealize function, just like
+> it is already done for the realize functions.
 > 
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-
-This seems correct to me.
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  migration/migration.c | 2 --
->  1 file changed, 2 deletions(-)
+>  hw/s390x/virtio-ccw.c | 22 +++++++---------------
+>  1 file changed, 7 insertions(+), 15 deletions(-)
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index ff05422..b8c4fec 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -3032,8 +3032,6 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
->      } else {
->          /* This is a fresh new migration */
->          rate_limit = s->parameters.max_bandwidth / XFER_LIMIT_RATIO;
-> -        s->expected_downtime = s->parameters.downtime_limit;
-> -        s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
+> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> index 7ddb378..f3ad7aa 100644
+> --- a/hw/s390x/virtio-ccw.c
+> +++ b/hw/s390x/virtio-ccw.c
+> @@ -750,8 +750,9 @@ out_err:
+>      g_free(sch);
+>  }
 >  
->          /* Notify before starting migration thread */
->          notifier_list_notify(&migration_state_notifiers, s);
-> -- 
-> 1.8.3.1
-> 
-> 
+> -static void virtio_ccw_unrealize(VirtioCcwDevice *dev, Error **errp)
+> +static void virtio_ccw_device_unrealize(VirtioCcwDevice *dev, Error **errp)
+>  {
+> +    VirtIOCCWDeviceClass *dc = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+>      CcwDevice *ccw_dev = CCW_DEVICE(dev);
+>      SubchDev *sch = ccw_dev->sch;
+>  
+> @@ -764,6 +765,10 @@ static void virtio_ccw_unrealize(VirtioCcwDevice *dev, Error **errp)
+>          release_indicator(&dev->routes.adapter, dev->indicators);
+>          dev->indicators = NULL;
+>      }
+> +
+> +    if (dc->unrealize) {
+> +        dc->unrealize(dev, errp);
+> +    }
+>  }
+>  
 
-Regards,
-
--- 
-Peter Xu
+Hm... if any device type should have the need to do something in the
+unrealize path, it would probably want to do it before the common
+unrealize handling, I think. For example, it might want a valid sch.
