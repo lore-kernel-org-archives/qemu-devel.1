@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fhugZ-0004Qm-Gg
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:36:56 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fhuk7-0005iU-HM
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:40:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fhugW-00080c-FV
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:36:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49696 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fhugW-0007tc-9I
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:36:52 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 17EDF401EF05
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 10:36:46 +0000 (UTC)
-Date: Tue, 24 Jul 2018 11:36:38 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180724103638.GH19167@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180724102215.31866-1-dgilbert@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fhuk6-0001B0-Ki
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:40:35 -0400
+Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:40368)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fhuk6-0001AV-Cb
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:40:34 -0400
+Received: by mail-oi0-x234.google.com with SMTP id w126-v6so6617448oie.7
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 03:40:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180724102215.31866-1-dgilbert@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] audio/hda: Fix migration
+In-Reply-To: <20180723194521.26831-1-ehabkost@redhat.com>
+References: <20180723194521.26831-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Jul 2018 11:40:13 +0100
+Message-ID: <CAFEAcA-ot=2BVW0Pcrp5z2eTvbs7uniYyjd4PNMWZZ1CYU75Yw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] Build fix for -rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,34 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com, marcandre.lureau@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Jul 24, 2018 at 11:22:15AM +0100, Dr. David Alan Gilbert (git) wr=
-ote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Fix outgoing migration which was crashing in
-> vmstate_hda_audio_stream_buf_needed, I think the problem
-> is that we have room for upto 4 streams in the array but only
-> use 2, when we come to try and save the state of the unused
-> streams we hit st->state =3D=3D NULL.
->=20
-> Fixes: 280c1e1cdb24d80ecdfc
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hw/audio/hda-codec.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On 23 July 2018 at 20:45, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> The following changes since commit 9ba7dd14355bb7957680d5ef764471ab102df099:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2018-07-23' into staging (2018-07-23 15:15:46 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
+>
+> for you to fetch changes up to 5f00335aecafc9ad56592d943619d3252f8941f1:
+>
+>   i386: Rename enum CacheType members (2018-07-23 12:56:19 -0300)
+>
+> ----------------------------------------------------------------
+> Fix for -rc2
+>
+> * Fix build failure on mips host
+>
+Applied, thanks.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- PMM
