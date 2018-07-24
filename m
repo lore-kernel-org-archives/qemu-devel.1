@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhw6T-0006PC-ET
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:07:46 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhw70-0006j6-Ly
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:08:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhw6P-0000Fr-1L
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:07:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39322 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhw6O-0000FT-Qh
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:07:40 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180720130928.6696-1-liujunjie23@huawei.com>
-	<87h8kq86f8.fsf@dusky.pond.sub.org>
-	<B526101FCAB4654DB0892B650DEFC555086C7F48@dggemm521-mbx.china.huawei.com>
-	<87k1pm551g.fsf@dusky.pond.sub.org>
-	<B526101FCAB4654DB0892B650DEFC555086C8382@dggemm521-mbx.china.huawei.com>
-	<87r2jt40g1.fsf@dusky.pond.sub.org>
-	<87zhyh2f7v.fsf@dusky.pond.sub.org>
-	<B526101FCAB4654DB0892B650DEFC555086C86D6@dggemm521-mbx.china.huawei.com>
-Date: Tue, 24 Jul 2018 14:07:38 +0200
-In-Reply-To: <B526101FCAB4654DB0892B650DEFC555086C86D6@dggemm521-mbx.china.huawei.com>
-	(liujunjie's message of "Tue, 24 Jul 2018 09:18:52 +0000")
-Message-ID: <87sh4825x1.fsf@dusky.pond.sub.org>
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhw6x-0000T7-CL
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:08:18 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39862)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fhw6w-0000Sq-Vu
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:08:15 -0400
+Received: by mail-wm0-x242.google.com with SMTP id h20-v6so2272410wmb.4
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 05:08:14 -0700 (PDT)
+References: <20180716074038.3364-1-yuval.shaia@oracle.com>
+	<20180716074038.3364-2-yuval.shaia@oracle.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <0fef2395-433c-80ee-b5b7-6b78cb543cc8@gmail.com>
+Date: Tue, 24 Jul 2018 15:08:10 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qstring: Fix integer overflow
+In-Reply-To: <20180716074038.3364-2-yuval.shaia@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 01/13] hw/rdma: Make distinction between
+ device init and start modes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +32,382 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "liujunjie (A)" <liujunjie23@huawei.com>
-Cc: "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org
 
-"liujunjie (A)" <liujunjie23@huawei.com> writes:
+Hi Yuval,
 
-> Even using gdb command: set print elements 0, is still too large to print the whole string.
-> So I try to obtain the string in another way.
-> After several attempts(not easy in fact), I finally obtain the real length. The way is as follows:
-> (gdb) p (int *)str
-> $1 = (int *) 0x7f13a2e67010
-> (gdb) p *(char*) (0x7f13a2e67010 + 0x8B0FD63FF)@192
-> $2 = "--W\r\nffffffffffd17000: 00000000fec00000 XG-DACT-W\r\nffffffffffd18000: ", '0' <repeats 11 times>, "77000 XG-DA---W\r\nffffffffffd19000: ", '0 "78000 XG-DA---W\r\nffffffffffd1a000: ", '0' <repeats 11 times>, "79000 XG-DA---W\r\n\000\000"
-> With \000 at the end, we can find out the length is 0x8B0FD63FF + 192 - 2, that is 37329134781.
+On 07/16/2018 10:40 AM, Yuval Shaia wrote:
+> There are certain operations that are well considered as part of device
+> configuration while others are needed only when "start" command is
+> triggered by the guest driver. An example of device initialization step
+> is msix_init and example of "device start" stage is the creation of a CQ
+> completion handler thread.
+>
+> Driver expects such distinction - implement it.
+>
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> ---
+>   hw/rdma/rdma_backend.c      |  96 +++++++++++++++++++++------
+>   hw/rdma/rdma_backend.h      |   2 +
+>   hw/rdma/rdma_backend_defs.h |   3 +-
+>   hw/rdma/vmw/pvrdma_main.c   | 129 +++++++++++++++++++++---------------
+>   4 files changed, 155 insertions(+), 75 deletions(-)
+>
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index e9ced6f9ef..647e16399f 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -35,6 +35,7 @@
+>   #define VENDOR_ERR_MR_SMALL         0x208
+>   
+>   #define THR_NAME_LEN 16
+> +#define THR_POLL_TO  5000
+>   
+>   typedef struct BackendCtx {
+>       uint64_t req_id;
+> @@ -91,35 +92,82 @@ static void *comp_handler_thread(void *arg)
+>       int rc;
+>       struct ibv_cq *ev_cq;
+>       void *ev_ctx;
+> +    int flags;
+> +    GPollFD pfds[1];
+> +
+> +    /* Change to non-blocking mode */
+> +    flags = fcntl(backend_dev->channel->fd, F_GETFL);
+> +    rc = fcntl(backend_dev->channel->fd, F_SETFL, flags | O_NONBLOCK);
+> +    if (rc < 0) {
+> +        pr_dbg("Fail to change to non-blocking mode\n");
+> +        return NULL;
+> +    }
+>   
+>       pr_dbg("Starting\n");
+>   
+> +    pfds[0].fd = backend_dev->channel->fd;
+> +    pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
+> +
+> +    backend_dev->comp_thread.is_running = true;
+> +
+>       while (backend_dev->comp_thread.run) {
+> -        pr_dbg("Waiting for completion on channel %p\n", backend_dev->channel);
+> -        rc = ibv_get_cq_event(backend_dev->channel, &ev_cq, &ev_ctx);
+> -        pr_dbg("ibv_get_cq_event=%d\n", rc);
+> -        if (unlikely(rc)) {
+> -            pr_dbg("---> ibv_get_cq_event (%d)\n", rc);
+> -            continue;
+> -        }
+> +        do {
+> +            rc = qemu_poll_ns(pfds, 1, THR_POLL_TO * (int64_t)SCALE_MS);
+> +        } while (!rc && backend_dev->comp_thread.run);
+> +
+> +        if (backend_dev->comp_thread.run) {
+> +            pr_dbg("Waiting for completion on channel %p\n", backend_dev->channel);
+> +            rc = ibv_get_cq_event(backend_dev->channel, &ev_cq, &ev_ctx);
+> +            pr_dbg("ibv_get_cq_event=%d\n", rc);
+> +            if (unlikely(rc)) {
+> +                pr_dbg("---> ibv_get_cq_event (%d)\n", rc);
+> +                continue;
+> +            }
+>   
+> -        rc = ibv_req_notify_cq(ev_cq, 0);
+> -        if (unlikely(rc)) {
+> -            pr_dbg("Error %d from ibv_req_notify_cq\n", rc);
+> -        }
+> +            rc = ibv_req_notify_cq(ev_cq, 0);
+> +            if (unlikely(rc)) {
+> +                pr_dbg("Error %d from ibv_req_notify_cq\n", rc);
+> +            }
+>   
+> -        poll_cq(backend_dev->rdma_dev_res, ev_cq);
+> +            poll_cq(backend_dev->rdma_dev_res, ev_cq);
+>   
+> -        ibv_ack_cq_events(ev_cq, 1);
+> +            ibv_ack_cq_events(ev_cq, 1);
+> +        }
+>       }
+>   
+>       pr_dbg("Going down\n");
+>   
+>       /* TODO: Post cqe for all remaining buffs that were posted */
+>   
+> +    backend_dev->comp_thread.is_running = false;
+> +
+> +    qemu_thread_exit(0);
+> +
+>       return NULL;
+>   }
+>   
+> +static void stop_comp_thread(RdmaBackendDev *backend_dev)
+> +{
+> +    backend_dev->comp_thread.run = false;
+> +    while (backend_dev->comp_thread.is_running) {
+> +        pr_dbg("Waiting for thread to complete\n");
+> +        sleep(THR_POLL_TO / SCALE_US / 2);
+> +    }
+> +}
+> +
+> +static void start_comp_thread(RdmaBackendDev *backend_dev)
+> +{
+> +    char thread_name[THR_NAME_LEN] = {0};
+> +
+> +    stop_comp_thread(backend_dev);
+> +
+> +    snprintf(thread_name, sizeof(thread_name), "rdma_comp_%s",
+> +             ibv_get_device_name(backend_dev->ib_dev));
+> +    backend_dev->comp_thread.run = true;
+> +    qemu_thread_create(&backend_dev->comp_thread.thread, thread_name,
+> +                       comp_handler_thread, backend_dev, QEMU_THREAD_DETACHED);
+> +}
+> +
+>   void rdma_backend_register_comp_handler(void (*handler)(int status,
+>                                           unsigned int vendor_err, void *ctx))
+>   {
+> @@ -706,7 +754,6 @@ int rdma_backend_init(RdmaBackendDev *backend_dev,
+>       int i;
+>       int ret = 0;
+>       int num_ibv_devices;
+> -    char thread_name[THR_NAME_LEN] = {0};
+>       struct ibv_device **dev_list;
+>       struct ibv_port_attr port_attr;
+>   
+> @@ -800,11 +847,8 @@ int rdma_backend_init(RdmaBackendDev *backend_dev,
+>       pr_dbg("interface_id=0x%" PRIx64 "\n",
+>              be64_to_cpu(backend_dev->gid.global.interface_id));
+>   
+> -    snprintf(thread_name, sizeof(thread_name), "rdma_comp_%s",
+> -             ibv_get_device_name(backend_dev->ib_dev));
+> -    backend_dev->comp_thread.run = true;
+> -    qemu_thread_create(&backend_dev->comp_thread.thread, thread_name,
+> -                       comp_handler_thread, backend_dev, QEMU_THREAD_DETACHED);
+> +    backend_dev->comp_thread.run = false;
+> +    backend_dev->comp_thread.is_running = false;
+>   
+>       ah_cache_init();
+>   
+> @@ -823,8 +867,22 @@ out:
+>       return ret;
+>   }
+>   
+> +
+> +void rdma_backend_start(RdmaBackendDev *backend_dev)
+> +{
+> +    pr_dbg("Starting rdma_backend\n");
+> +    start_comp_thread(backend_dev);
+> +}
+> +
+> +void rdma_backend_stop(RdmaBackendDev *backend_dev)
+> +{
+> +    pr_dbg("Stopping rdma_backend\n");
+> +    stop_comp_thread(backend_dev);
+> +}
+> +
+>   void rdma_backend_fini(RdmaBackendDev *backend_dev)
+>   {
+> +    rdma_backend_stop(backend_dev);
+>       g_hash_table_destroy(ah_hash);
+>       ibv_destroy_comp_channel(backend_dev->channel);
+>       ibv_close_device(backend_dev->context);
+> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+> index 3cd636dd88..3049a73962 100644
+> --- a/hw/rdma/rdma_backend.h
+> +++ b/hw/rdma/rdma_backend.h
+> @@ -52,6 +52,8 @@ int rdma_backend_init(RdmaBackendDev *backend_dev,
+>                         uint8_t backend_gid_idx, struct ibv_device_attr *dev_attr,
+>                         Error **errp);
+>   void rdma_backend_fini(RdmaBackendDev *backend_dev);
+> +void rdma_backend_start(RdmaBackendDev *backend_dev);
+> +void rdma_backend_stop(RdmaBackendDev *backend_dev);
+>   void rdma_backend_register_comp_handler(void (*handler)(int status,
+>                                           unsigned int vendor_err, void *ctx));
+>   void rdma_backend_unregister_comp_handler(void);
+> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
+> index ff5cfc26eb..7404f64002 100644
+> --- a/hw/rdma/rdma_backend_defs.h
+> +++ b/hw/rdma/rdma_backend_defs.h
+> @@ -24,7 +24,8 @@ typedef struct RdmaDeviceResources RdmaDeviceResources;
+>   typedef struct RdmaBackendThread {
+>       QemuThread thread;
+>       QemuMutex mutex;
+> -    bool run;
+> +    bool run; /* Set by thread manager to let thread know it should exit */
+> +    bool is_running; /* Set by the thread to report its status */
+>   } RdmaBackendThread;
+>   
+>   typedef struct RdmaBackendDev {
+> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> index 3ed7409763..6a5073974d 100644
+> --- a/hw/rdma/vmw/pvrdma_main.c
+> +++ b/hw/rdma/vmw/pvrdma_main.c
+> @@ -286,8 +286,78 @@ static void init_ports(PVRDMADev *dev, Error **errp)
+>       }
+>   }
+>   
+> +static void uninit_msix(PCIDevice *pdev, int used_vectors)
+> +{
+> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
+> +    int i;
+> +
+> +    for (i = 0; i < used_vectors; i++) {
+> +        msix_vector_unuse(pdev, i);
+> +    }
+> +
+> +    msix_uninit(pdev, &dev->msix, &dev->msix);
+> +}
+> +
+> +static int init_msix(PCIDevice *pdev, Error **errp)
+> +{
+> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
+> +    int i;
+> +    int rc;
+> +
+> +    rc = msix_init(pdev, RDMA_MAX_INTRS, &dev->msix, RDMA_MSIX_BAR_IDX,
+> +                   RDMA_MSIX_TABLE, &dev->msix, RDMA_MSIX_BAR_IDX,
+> +                   RDMA_MSIX_PBA, 0, NULL);
+> +
+> +    if (rc < 0) {
+> +        error_setg(errp, "Failed to initialize MSI-X");
+> +        return rc;
+> +    }
+> +
+> +    for (i = 0; i < RDMA_MAX_INTRS; i++) {
+> +        rc = msix_vector_use(PCI_DEVICE(dev), i);
+> +        if (rc < 0) {
+> +            error_setg(errp, "Fail mark MSI-X vector %d", i);
+> +            uninit_msix(pdev, i);
+> +            return rc;
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+> +
 
-Awesome, thanks!
+The above functions were only moved around the same file. Right?
+I suggest keeping them as they were for easier review.
 
-37329134781 is 0x8B0FD64BD.  That's almost 35 GiB.  How on earth can
-"info tlb" print several Gigabytes?  That's a not a sane use of QMP!  No
-excuse for crashing, of course.
+> +static void pvrdma_fini(PCIDevice *pdev)
+> +{
+> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
+> +
+> +    pr_dbg("Closing device %s %x.%x\n", pdev->name, PCI_SLOT(pdev->devfn),
+> +           PCI_FUNC(pdev->devfn));
+> +
+> +    pvrdma_qp_ops_fini();
+> +
+> +    rdma_rm_fini(&dev->rdma_dev_res);
+> +
+> +    rdma_backend_fini(&dev->backend_dev);
+> +
+> +    free_dsr(dev);
+> +
+> +    if (msix_enabled(pdev)) {
+> +        uninit_msix(pdev, RDMA_MAX_INTRS);
+> +    }
+> +}
+> +
+> +static void pvrdma_stop(PVRDMADev *dev)
+> +{
+> +    rdma_backend_stop(&dev->backend_dev);
+> +}
+> +
+> +static void pvrdma_start(PVRDMADev *dev)
+> +{
+> +    rdma_backend_start(&dev->backend_dev);
+> +}
+> +
 
-> With this length, we can write a simple c code demo to reproduce the result we obtain before. Such as:
-> -----------------------------
-> #include<stdio.h>
-> int main()
-> {
->     char * tmp = "";
->     size_t a =  37329134781;
->     int end = a;
->     size_t b = end;
->     printf("%zu", b)
->     return 0;
-> }
-> -----------------------------
+You might not need the above functions for now.
 
-Yes.
+>   static void activate_device(PVRDMADev *dev)
+>   {
+> +    pvrdma_start(dev);
+>       set_reg_val(dev, PVRDMA_REG_ERR, 0);
+>       pr_dbg("Device activated\n");
+>   }
+> @@ -300,7 +370,10 @@ static int unquiesce_device(PVRDMADev *dev)
+>   
+>   static int reset_device(PVRDMADev *dev)
+>   {
+> +    pvrdma_stop(dev);
+> +
+>       pr_dbg("Device reset complete\n");
+> +
+>       return 0;
+>   }
+>   
+> @@ -469,45 +542,6 @@ static void init_regs(PCIDevice *pdev)
+>       set_reg_val(dev, PVRDMA_REG_ERR, 0xFFFF);
+>   }
+>   
+> -static void uninit_msix(PCIDevice *pdev, int used_vectors)
+> -{
+> -    PVRDMADev *dev = PVRDMA_DEV(pdev);
+> -    int i;
+> -
+> -    for (i = 0; i < used_vectors; i++) {
+> -        msix_vector_unuse(pdev, i);
+> -    }
+> -
+> -    msix_uninit(pdev, &dev->msix, &dev->msix);
+> -}
+> -
+> -static int init_msix(PCIDevice *pdev, Error **errp)
+> -{
+> -    PVRDMADev *dev = PVRDMA_DEV(pdev);
+> -    int i;
+> -    int rc;
+> -
+> -    rc = msix_init(pdev, RDMA_MAX_INTRS, &dev->msix, RDMA_MSIX_BAR_IDX,
+> -                   RDMA_MSIX_TABLE, &dev->msix, RDMA_MSIX_BAR_IDX,
+> -                   RDMA_MSIX_PBA, 0, NULL);
+> -
+> -    if (rc < 0) {
+> -        error_setg(errp, "Failed to initialize MSI-X");
+> -        return rc;
+> -    }
+> -
+> -    for (i = 0; i < RDMA_MAX_INTRS; i++) {
+> -        rc = msix_vector_use(PCI_DEVICE(dev), i);
+> -        if (rc < 0) {
+> -            error_setg(errp, "Fail mark MSI-X vercor %d", i);
+> -            uninit_msix(pdev, i);
+> -            return rc;
+> -        }
+> -    }
+> -
+> -    return 0;
+> -}
+> -
+>   static void init_dev_caps(PVRDMADev *dev)
+>   {
+>       size_t pg_tbl_bytes = TARGET_PAGE_SIZE *
+> @@ -602,22 +636,7 @@ out:
+>   
+>   static void pvrdma_exit(PCIDevice *pdev)
+>   {
+> -    PVRDMADev *dev = PVRDMA_DEV(pdev);
+> -
+> -    pr_dbg("Closing device %s %x.%x\n", pdev->name, PCI_SLOT(pdev->devfn),
+> -           PCI_FUNC(pdev->devfn));
+> -
+> -    pvrdma_qp_ops_fini();
+> -
+> -    rdma_rm_fini(&dev->rdma_dev_res);
+> -
+> -    rdma_backend_fini(&dev->backend_dev);
+> -
+> -    free_dsr(dev);
+> -
+> -    if (msix_enabled(pdev)) {
+> -        uninit_msix(pdev, RDMA_MAX_INTRS);
+> -    }
+> +    pvrdma_fini(pdev);
+>   }
+>   
+>   static void pvrdma_class_init(ObjectClass *klass, void *data)
 
-When strlen(str) exceeds INT_MAX - 1 in qstring_from_str(), the @end
-argument for qstring_from_substr() gets truncated.  This is what
-appeared to happen in your case: it got truncated to -1325570883.
 
-qstring_from_substr() has an (unstated) precondition: start >= 0 && end
->= 0 && end - start >= -1.  This precondition is violated.  end - start
-+ 1 gets sign-extended to a huge value, and g_malloc() duly fails.
 
-All callers of qstring_from_substr() outside tests pass arguments of
-type size_t or ptrdiff_t.  They'd fail just like qstring_from_str() for
-sub-strings exceeding 2 GiB.  Your patch fixes them all.  Good, I'll
-take your patch, but the commit message needs a bit of polish.  Here's
-my attempt:
+Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 
-    qstring: Fix qstring_from_substr() not to provoke int overflow
-
-    qstring_from_substr() parameters @start and @end are of type int.
-    blkdebug_parse_filename(), blkverify_parse_filename(), nbd_parse_uri(),
-    and qstring_from_str() pass @end values of type size_t or ptrdiff_t.
-    Values exceeding INT_MAX get truncated, with possibly disastrous
-    results.
-
-    Such huge substrings seem unlikely, but we found one in a core dump,
-    where "info tlb" executed via QMP's human-monitor-command apparently
-    produced 35 GiB of output.
-
-    Fix by changing the parameters size_t.
-
-If this works for you, please reply with your corrected Signed-off-by.
-
-However, please note that allocating the correct 35 GiB may not behave
-much better for you than allocating 16 EiB.  I doubt it'll succeed, and
-if it does, then memcpy() will dirty 35 GiB of virtual memory, which is
-unlikely to end well.
-
-Are you sure "info tlb" is supposed to print that much?  Or is there
-another bug still in hiding that somehow enlarged this string?
+Thanks,
+Marcel
