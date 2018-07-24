@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fhz1P-0005xC-3l
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:14:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1fhz3X-0007hN-GM
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fhz1O-0008CW-6E
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:14:43 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34836)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fhz1N-0008Bf-VT
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:14:42 -0400
-Received: by mail-oi0-x244.google.com with SMTP id i12-v6so8154627oik.2
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 08:14:41 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fhz3S-0002nA-P9
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:16:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35816 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fhz3S-0002mb-JY
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:16:50 -0400
+References: <20180724142504.15092-1-stefanha@redhat.com>
+	<20180724142504.15092-2-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f813b93d-4ed6-e059-abcf-34ea5f844ab1@redhat.com>
+Date: Tue, 24 Jul 2018 10:16:47 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180724142331.14669-1-stefanha@redhat.com>
-References: <20180724142331.14669-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jul 2018 16:14:20 +0100
-Message-ID: <CAFEAcA9imzdF+zrMU+9WVtiXvEFvNJj0+N-nc7ug1Ov9aPNKLw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL for-3.0 0/1] Block patches
+In-Reply-To: <20180724142504.15092-2-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL for-3.0 1/1] trace/simple: fix hang in child
+ after fork(2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On 24 July 2018 at 15:23, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit 768cef2974fb1fa30dd188b043ea737e13fea477:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2018-07-24 10:37:52 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 042b757cc77c9580b99ef2781cfb0a2d1bf495a6:
->
->   block/file-posix: add bdrv_attach_aio_context callback for host dev and cdrom (2018-07-24 14:27:41 +0100)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> Regression fix for host block devices with the file-posix driver when aio=native is in use.
->
-> ----------------------------------------------------------------
->
-> Nishanth Aravamudan (1):
->   block/file-posix: add bdrv_attach_aio_context callback for host dev
->     and cdrom
->
->  block/file-posix.c | 3 +++
->  1 file changed, 3 insertions(+)
->
+On 07/24/2018 09:25 AM, Stefan Hajnoczi wrote:
+> The simple trace backend spawns a write-out thread which is used to
+> asynchronously flush the in-memory ring buffer to disk.
+> 
+> fork(2) does not clone all threads, only the thread that invoked
+> fork(2).  As a result there is no write-out thread in the child process!
+> 
+> This causes a hang during shutdown when atexit(3) handler installed by
+> the simple trace backend waits for the non-existent write-out thread.
+> 
+> This patch uses pthread_atfork(3) to terminate the write-out thread
+> before fork and restart it in both the parent and child after fork.
+> This solves a hang in qemu-iotests 147 due to qemu-nbd --fork usage.
+> 
+> Reported-by: Cornelia Huck <cohuck@redhat.com>
+> Tested-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Message-id: 20180717101944.11691-1-stefanha@redhat.com
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
 
-Applied, thanks.
+> +static void restart_writeout_thread(void)
+> +{
+> +    trace_writeout_running = true;
+> +    trace_writeout_thread = trace_thread_create(writeout_thread);
+> +    if (!trace_writeout_thread) {
+> +        warn_report("unable to initialize simple trace backend");
+> +    }
+> +
+> +    /* This relies on undefined behavior in the fork() child (it's fine in the
+> +     * fork() parent).  g_mutex_unlock() on a mutex acquired by another thread
+> +     * is undefined (see glib documentation).
+> +     */
+> +    g_mutex_unlock(&trace_lock);
 
--- PMM
+Dan's point about stopping tracing prior to fork, then restarting it 
+from scratch in both the parent and in specific children, would also get 
+rid of this risky non-portable behavior of trying to manipulate a mutex 
+acquired by the parent process' thread.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
