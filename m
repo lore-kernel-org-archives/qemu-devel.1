@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fi29J-0008Sx-Rr
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:35:06 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fi29I-0002lG-PS
+	(envelope-from <dgilbert@redhat.com>) id 1fi29I-0008Rv-FC
 	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:35:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35420 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fi29I-0002km-JV
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgilbert@redhat.com>) id 1fi29H-0002jb-Jj
 	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:35:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37690 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fi29H-0002iv-Ee
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:35:03 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 24 Jul 2018 19:34:51 +0100
-Message-Id: <20180724183454.120276-5-dgilbert@redhat.com>
+Date: Tue, 24 Jul 2018 19:34:50 +0100
+Message-Id: <20180724183454.120276-4-dgilbert@redhat.com>
 In-Reply-To: <20180724183454.120276-1-dgilbert@redhat.com>
 References: <20180724183454.120276-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 4/7] migration: update recv bitmap only on dest
- vm
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 3/7] audio/hda: Fix migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +29,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: quintela@redhat.com, peterx@redhat.com, kraxel@redhat.com, lidongchen@tencent.com
 
-From: Peter Xu <peterx@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-We shouldn't update the received bitmap if we're the source VM.  This
-fixes a breakage when release-ram is enabled on postcopy.
+Fix outgoing migration which was crashing in
+vmstate_hda_audio_stream_buf_needed, I think the problem
+is that we have room for upto 4 streams in the array but only
+use 2, when we come to try and save the state of the unused
+streams we hit st->state =3D=3D NULL.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180723123305.24792-2-peterx@redhat.com>
+Fixes: 280c1e1cdb24d80ecdfc
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20180724102215.31866-1-dgilbert@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/ram.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ hw/audio/hda-codec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index fdd108475c..24dea2730c 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2827,8 +2827,15 @@ int ram_discard_range(const char *rbname, uint64_t start, size_t length)
-         goto err;
-     }
- 
--    bitmap_clear(rb->receivedmap, start >> qemu_target_page_bits(),
--                 length >> qemu_target_page_bits());
-+    /*
-+     * On source VM, we don't need to update the received bitmap since
-+     * we don't even have one.
-+     */
-+    if (rb->receivedmap) {
-+        bitmap_clear(rb->receivedmap, start >> qemu_target_page_bits(),
-+                     length >> qemu_target_page_bits());
-+    }
-+
-     ret = ram_block_discard_range(rb, start, length);
- 
- err:
--- 
+diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
+index 2b58c3505b..617a1c1016 100644
+--- a/hw/audio/hda-codec.c
++++ b/hw/audio/hda-codec.c
+@@ -786,7 +786,7 @@ static void hda_audio_reset(DeviceState *dev)
+ static bool vmstate_hda_audio_stream_buf_needed(void *opaque)
+ {
+     HDAAudioStream *st =3D opaque;
+-    return st->state->use_timer;
++    return st->state && st->state->use_timer;
+ }
+=20
+ static const VMStateDescription vmstate_hda_audio_stream_buf =3D {
+--=20
 2.17.1
