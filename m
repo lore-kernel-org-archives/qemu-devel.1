@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhwKi-0007S2-9i
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:22:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fhwMH-0008TN-5d
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:24:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhwKd-0008Qe-Da
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:22:28 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33981)
+	(envelope-from <peter.maydell@linaro.org>) id 1fhwMG-0000UY-9i
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:24:05 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:43348)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fhwKd-0008QL-54
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:22:23 -0400
-Received: by mail-wr1-x441.google.com with SMTP id c13-v6so3956462wrt.1
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 05:22:23 -0700 (PDT)
-References: <20180716074038.3364-1-yuval.shaia@oracle.com>
-	<20180716074038.3364-13-yuval.shaia@oracle.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <7ec58359-daf7-0f5b-7cb8-0a4d7032fd29@gmail.com>
-Date: Tue, 24 Jul 2018 15:22:19 +0300
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fhwMG-0000UL-2i
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:24:04 -0400
+Received: by mail-oi0-x241.google.com with SMTP id b15-v6so7069555oib.10
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 05:24:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180716074038.3364-13-yuval.shaia@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 12/13] hw/rdma: Bugfix: Support non-aligned
- buffers
+In-Reply-To: <20180710160013.26559-1-peter.maydell@linaro.org>
+References: <20180710160013.26559-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Jul 2018 13:23:43 +0100
+Message-ID: <CAFEAcA8t3+4A442TakdmcvYSh5s1iV80oJhJnsmjdzG19PTZXg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/6] accel/tcg: Support
+ execution from MMIO and small MMU regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, "Emilio G . Cota" <cota@braap.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+On 10 July 2018 at 17:00, Peter Maydell <peter.maydell@linaro.org> wrote:
+> This series adds support to TCG for executing from MMIO regions
+> and small MMU regions. The basic principle is that if get_page_addr_code()
+> finds that the region is not backed by a full page of RAM then it
+> returns -1, and tb_gen_code() then generates a non-cached TB
+> containing a single instruction. Execution from these regions
+> thus performs the instruction fetch every time, ensuring that we
+> get the read-from-MMIO and check-small-MMU-region permissions
+> checks right.
 
+Hi; this series has been reviewed, and I propose to put it into
+my target-arm.for-3.1 queue, unless anybody has a preference for
+it going into master via some other route.
 
-On 07/16/2018 10:40 AM, Yuval Shaia wrote:
-> RDMA applications can provide non-aligned buffers to be registered. In
-> such case the DMA address passed by driver is pointing to the beginning
-> of the physical address of the mapped page so we can't distinguish
-> between two addresses from the same page.
->
-> Fix it by keeping the offset of the virtual address in mr->virt.
->
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> ---
->   hw/rdma/rdma_rm.c        | 2 ++
->   hw/rdma/vmw/pvrdma_cmd.c | 1 +
->   2 files changed, 3 insertions(+)
->
-> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-> index 859c900003..8d59a42cd1 100644
-> --- a/hw/rdma/rdma_rm.c
-> +++ b/hw/rdma/rdma_rm.c
-> @@ -166,6 +166,7 @@ int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
->           mr->virt = host_virt;
->           mr->start = guest_start;
->           mr->length = guest_length;
-> +        mr->virt += (mr->start & (TARGET_PAGE_SIZE - 1));
->   
->           ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, mr->virt,
->                                        mr->length, access_flags);
-> @@ -203,6 +204,7 @@ void rdma_rm_dealloc_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle)
->           rdma_backend_destroy_mr(&mr->backend_mr);
->           pr_dbg("start=0x%" PRIx64 "\n", mr->start);
->           if (mr->start) {
-> +            mr->virt -= (mr->start & (TARGET_PAGE_SIZE - 1));
->               munmap(mr->virt, mr->length);
->           }
->           res_tbl_dealloc(&dev_res->mr_tbl, mr_handle);
-> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-> index bb898265a3..4ff242e793 100644
-> --- a/hw/rdma/vmw/pvrdma_cmd.c
-> +++ b/hw/rdma/vmw/pvrdma_cmd.c
-> @@ -59,6 +59,7 @@ static void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma,
->       }
->   
->       host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
-> +    pr_dbg("mremap %p -> %p\n", curr_page, host_virt);
->       if (host_virt == MAP_FAILED) {
->           host_virt = NULL;
->           error_report("PVRDMA: Failed to remap memory for host_virt");
-
-Nice catch!
-
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
-
-Thanks,
-Marcel
+thanks
+-- PMM
