@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhw70-0006j6-Ly
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:08:20 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhw8r-000075-Pp
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:10:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhw6x-0000T7-CL
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:08:18 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39862)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhw8l-0001Ry-Nk
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:10:13 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:53189)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fhw6w-0000Sq-Vu
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:08:15 -0400
-Received: by mail-wm0-x242.google.com with SMTP id h20-v6so2272410wmb.4
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 05:08:14 -0700 (PDT)
+	id 1fhw8l-0001Rh-Fb
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:10:07 -0400
+Received: by mail-wm0-x229.google.com with SMTP id o11-v6so2275626wmh.2
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 05:10:07 -0700 (PDT)
 References: <20180716074038.3364-1-yuval.shaia@oracle.com>
-	<20180716074038.3364-2-yuval.shaia@oracle.com>
+	<20180716074038.3364-4-yuval.shaia@oracle.com>
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <0fef2395-433c-80ee-b5b7-6b78cb543cc8@gmail.com>
-Date: Tue, 24 Jul 2018 15:08:10 +0300
+Message-ID: <ee321356-c7bb-2c19-707d-76c4be91b145@gmail.com>
+Date: Tue, 24 Jul 2018 15:10:04 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180716074038.3364-2-yuval.shaia@oracle.com>
+In-Reply-To: <20180716074038.3364-4-yuval.shaia@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 01/13] hw/rdma: Make distinction between
- device init and start modes
+Subject: Re: [Qemu-devel] [PATCH 03/13] hw/rdma: Modify debug macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,377 +33,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org
 
-Hi Yuval,
+
 
 On 07/16/2018 10:40 AM, Yuval Shaia wrote:
-> There are certain operations that are well considered as part of device
-> configuration while others are needed only when "start" command is
-> triggered by the guest driver. An example of device initialization step
-> is msix_init and example of "device start" stage is the creation of a CQ
-> completion handler thread.
->
-> Driver expects such distinction - implement it.
+> - Add line counter to ease navigation in log
+> - Print rdma instead of pvrdma
 >
 > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 > ---
->   hw/rdma/rdma_backend.c      |  96 +++++++++++++++++++++------
->   hw/rdma/rdma_backend.h      |   2 +
->   hw/rdma/rdma_backend_defs.h |   3 +-
->   hw/rdma/vmw/pvrdma_main.c   | 129 +++++++++++++++++++++---------------
->   4 files changed, 155 insertions(+), 75 deletions(-)
+>   hw/rdma/rdma_utils.c      |  4 ++++
+>   hw/rdma/rdma_utils.h      | 16 ++++++++++++----
+>   hw/rdma/vmw/pvrdma_main.c |  2 ++
+>   3 files changed, 18 insertions(+), 4 deletions(-)
 >
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index e9ced6f9ef..647e16399f 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -35,6 +35,7 @@
->   #define VENDOR_ERR_MR_SMALL         0x208
+> diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
+> index d713f635f1..dc23f158f3 100644
+> --- a/hw/rdma/rdma_utils.c
+> +++ b/hw/rdma/rdma_utils.c
+> @@ -15,6 +15,10 @@
 >   
->   #define THR_NAME_LEN 16
-> +#define THR_POLL_TO  5000
+>   #include "rdma_utils.h"
 >   
->   typedef struct BackendCtx {
->       uint64_t req_id;
-> @@ -91,35 +92,82 @@ static void *comp_handler_thread(void *arg)
->       int rc;
->       struct ibv_cq *ev_cq;
->       void *ev_ctx;
-> +    int flags;
-> +    GPollFD pfds[1];
+> +#ifdef PVRDMA_DEBUG
+> +unsigned long pr_dbg_cnt;
+> +#endif
 > +
-> +    /* Change to non-blocking mode */
-> +    flags = fcntl(backend_dev->channel->fd, F_GETFL);
-> +    rc = fcntl(backend_dev->channel->fd, F_SETFL, flags | O_NONBLOCK);
-> +    if (rc < 0) {
-> +        pr_dbg("Fail to change to non-blocking mode\n");
-> +        return NULL;
-> +    }
->   
->       pr_dbg("Starting\n");
->   
-> +    pfds[0].fd = backend_dev->channel->fd;
-> +    pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-> +
-> +    backend_dev->comp_thread.is_running = true;
-> +
->       while (backend_dev->comp_thread.run) {
-> -        pr_dbg("Waiting for completion on channel %p\n", backend_dev->channel);
-> -        rc = ibv_get_cq_event(backend_dev->channel, &ev_cq, &ev_ctx);
-> -        pr_dbg("ibv_get_cq_event=%d\n", rc);
-> -        if (unlikely(rc)) {
-> -            pr_dbg("---> ibv_get_cq_event (%d)\n", rc);
-> -            continue;
-> -        }
-> +        do {
-> +            rc = qemu_poll_ns(pfds, 1, THR_POLL_TO * (int64_t)SCALE_MS);
-> +        } while (!rc && backend_dev->comp_thread.run);
-> +
-> +        if (backend_dev->comp_thread.run) {
-> +            pr_dbg("Waiting for completion on channel %p\n", backend_dev->channel);
-> +            rc = ibv_get_cq_event(backend_dev->channel, &ev_cq, &ev_ctx);
-> +            pr_dbg("ibv_get_cq_event=%d\n", rc);
-> +            if (unlikely(rc)) {
-> +                pr_dbg("---> ibv_get_cq_event (%d)\n", rc);
-> +                continue;
-> +            }
->   
-> -        rc = ibv_req_notify_cq(ev_cq, 0);
-> -        if (unlikely(rc)) {
-> -            pr_dbg("Error %d from ibv_req_notify_cq\n", rc);
-> -        }
-> +            rc = ibv_req_notify_cq(ev_cq, 0);
-> +            if (unlikely(rc)) {
-> +                pr_dbg("Error %d from ibv_req_notify_cq\n", rc);
-> +            }
->   
-> -        poll_cq(backend_dev->rdma_dev_res, ev_cq);
-> +            poll_cq(backend_dev->rdma_dev_res, ev_cq);
->   
-> -        ibv_ack_cq_events(ev_cq, 1);
-> +            ibv_ack_cq_events(ev_cq, 1);
-> +        }
->       }
->   
->       pr_dbg("Going down\n");
->   
->       /* TODO: Post cqe for all remaining buffs that were posted */
->   
-> +    backend_dev->comp_thread.is_running = false;
-> +
-> +    qemu_thread_exit(0);
-> +
->       return NULL;
->   }
->   
-> +static void stop_comp_thread(RdmaBackendDev *backend_dev)
-> +{
-> +    backend_dev->comp_thread.run = false;
-> +    while (backend_dev->comp_thread.is_running) {
-> +        pr_dbg("Waiting for thread to complete\n");
-> +        sleep(THR_POLL_TO / SCALE_US / 2);
-> +    }
-> +}
-> +
-> +static void start_comp_thread(RdmaBackendDev *backend_dev)
-> +{
-> +    char thread_name[THR_NAME_LEN] = {0};
-> +
-> +    stop_comp_thread(backend_dev);
-> +
-> +    snprintf(thread_name, sizeof(thread_name), "rdma_comp_%s",
-> +             ibv_get_device_name(backend_dev->ib_dev));
-> +    backend_dev->comp_thread.run = true;
-> +    qemu_thread_create(&backend_dev->comp_thread.thread, thread_name,
-> +                       comp_handler_thread, backend_dev, QEMU_THREAD_DETACHED);
-> +}
-> +
->   void rdma_backend_register_comp_handler(void (*handler)(int status,
->                                           unsigned int vendor_err, void *ctx))
+>   void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen)
 >   {
-> @@ -706,7 +754,6 @@ int rdma_backend_init(RdmaBackendDev *backend_dev,
->       int i;
->       int ret = 0;
->       int num_ibv_devices;
-> -    char thread_name[THR_NAME_LEN] = {0};
->       struct ibv_device **dev_list;
->       struct ibv_port_attr port_attr;
+>       void *p;
+> diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
+> index 3dc07891bc..04c7c2ef5b 100644
+> --- a/hw/rdma/rdma_utils.h
+> +++ b/hw/rdma/rdma_utils.h
+> @@ -22,18 +22,26 @@
+>   #include "sysemu/dma.h"
 >   
-> @@ -800,11 +847,8 @@ int rdma_backend_init(RdmaBackendDev *backend_dev,
->       pr_dbg("interface_id=0x%" PRIx64 "\n",
->              be64_to_cpu(backend_dev->gid.global.interface_id));
+>   #define pr_info(fmt, ...) \
+> -    fprintf(stdout, "%s: %-20s (%3d): " fmt, "pvrdma",  __func__, __LINE__,\
+> +    fprintf(stdout, "%s: %-20s (%3d): " fmt, "rdma",  __func__, __LINE__,\
+>              ## __VA_ARGS__)
 >   
-> -    snprintf(thread_name, sizeof(thread_name), "rdma_comp_%s",
-> -             ibv_get_device_name(backend_dev->ib_dev));
-> -    backend_dev->comp_thread.run = true;
-> -    qemu_thread_create(&backend_dev->comp_thread.thread, thread_name,
-> -                       comp_handler_thread, backend_dev, QEMU_THREAD_DETACHED);
-> +    backend_dev->comp_thread.run = false;
-> +    backend_dev->comp_thread.is_running = false;
+>   #define pr_err(fmt, ...) \
+> -    fprintf(stderr, "%s: Error at %-20s (%3d): " fmt, "pvrdma", __func__, \
+> +    fprintf(stderr, "%s: Error at %-20s (%3d): " fmt, "rdma", __func__, \
+>           __LINE__, ## __VA_ARGS__)
 >   
->       ah_cache_init();
->   
-> @@ -823,8 +867,22 @@ out:
->       return ret;
->   }
->   
+>   #ifdef PVRDMA_DEBUG
+> +extern unsigned long pr_dbg_cnt;
 > +
-> +void rdma_backend_start(RdmaBackendDev *backend_dev)
-> +{
-> +    pr_dbg("Starting rdma_backend\n");
-> +    start_comp_thread(backend_dev);
+> +#define init_pr_dbg(void) \
+> +{ \
+> +    pr_dbg_cnt = 0; \
 > +}
 > +
-> +void rdma_backend_stop(RdmaBackendDev *backend_dev)
-> +{
-> +    pr_dbg("Stopping rdma_backend\n");
-> +    stop_comp_thread(backend_dev);
-> +}
-> +
->   void rdma_backend_fini(RdmaBackendDev *backend_dev)
->   {
-> +    rdma_backend_stop(backend_dev);
->       g_hash_table_destroy(ah_hash);
->       ibv_destroy_comp_channel(backend_dev->channel);
->       ibv_close_device(backend_dev->context);
-> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-> index 3cd636dd88..3049a73962 100644
-> --- a/hw/rdma/rdma_backend.h
-> +++ b/hw/rdma/rdma_backend.h
-> @@ -52,6 +52,8 @@ int rdma_backend_init(RdmaBackendDev *backend_dev,
->                         uint8_t backend_gid_idx, struct ibv_device_attr *dev_attr,
->                         Error **errp);
->   void rdma_backend_fini(RdmaBackendDev *backend_dev);
-> +void rdma_backend_start(RdmaBackendDev *backend_dev);
-> +void rdma_backend_stop(RdmaBackendDev *backend_dev);
->   void rdma_backend_register_comp_handler(void (*handler)(int status,
->                                           unsigned int vendor_err, void *ctx));
->   void rdma_backend_unregister_comp_handler(void);
-> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-> index ff5cfc26eb..7404f64002 100644
-> --- a/hw/rdma/rdma_backend_defs.h
-> +++ b/hw/rdma/rdma_backend_defs.h
-> @@ -24,7 +24,8 @@ typedef struct RdmaDeviceResources RdmaDeviceResources;
->   typedef struct RdmaBackendThread {
->       QemuThread thread;
->       QemuMutex mutex;
-> -    bool run;
-> +    bool run; /* Set by thread manager to let thread know it should exit */
-> +    bool is_running; /* Set by the thread to report its status */
->   } RdmaBackendThread;
+>   #define pr_dbg(fmt, ...) \
+> -    fprintf(stdout, "%s: %-20s (%3d): " fmt, "pvrdma", __func__, __LINE__,\
+> -           ## __VA_ARGS__)
+> +    fprintf(stdout, "%lx %ld: %-20s (%3d): " fmt, pthread_self(), pr_dbg_cnt++, \
+> +            __func__, __LINE__, ## __VA_ARGS__)
+>   #else
+> +#define init_pr_dbg(void)
+>   #define pr_dbg(fmt, ...)
+>   #endif
 >   
->   typedef struct RdmaBackendDev {
 > diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> index 3ed7409763..6a5073974d 100644
+> index 6a5073974d..1b1330e113 100644
 > --- a/hw/rdma/vmw/pvrdma_main.c
 > +++ b/hw/rdma/vmw/pvrdma_main.c
-> @@ -286,8 +286,78 @@ static void init_ports(PVRDMADev *dev, Error **errp)
->       }
->   }
+> @@ -577,6 +577,8 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+>       Object *memdev_root;
+>       bool ram_shared = false;
 >   
-> +static void uninit_msix(PCIDevice *pdev, int used_vectors)
-> +{
-> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
-> +    int i;
+> +    init_pr_dbg();
 > +
-> +    for (i = 0; i < used_vectors; i++) {
-> +        msix_vector_unuse(pdev, i);
-> +    }
-> +
-> +    msix_uninit(pdev, &dev->msix, &dev->msix);
-> +}
-> +
-> +static int init_msix(PCIDevice *pdev, Error **errp)
-> +{
-> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
-> +    int i;
-> +    int rc;
-> +
-> +    rc = msix_init(pdev, RDMA_MAX_INTRS, &dev->msix, RDMA_MSIX_BAR_IDX,
-> +                   RDMA_MSIX_TABLE, &dev->msix, RDMA_MSIX_BAR_IDX,
-> +                   RDMA_MSIX_PBA, 0, NULL);
-> +
-> +    if (rc < 0) {
-> +        error_setg(errp, "Failed to initialize MSI-X");
-> +        return rc;
-> +    }
-> +
-> +    for (i = 0; i < RDMA_MAX_INTRS; i++) {
-> +        rc = msix_vector_use(PCI_DEVICE(dev), i);
-> +        if (rc < 0) {
-> +            error_setg(errp, "Fail mark MSI-X vector %d", i);
-> +            uninit_msix(pdev, i);
-> +            return rc;
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-
-The above functions were only moved around the same file. Right?
-I suggest keeping them as they were for easier review.
-
-> +static void pvrdma_fini(PCIDevice *pdev)
-> +{
-> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
-> +
-> +    pr_dbg("Closing device %s %x.%x\n", pdev->name, PCI_SLOT(pdev->devfn),
-> +           PCI_FUNC(pdev->devfn));
-> +
-> +    pvrdma_qp_ops_fini();
-> +
-> +    rdma_rm_fini(&dev->rdma_dev_res);
-> +
-> +    rdma_backend_fini(&dev->backend_dev);
-> +
-> +    free_dsr(dev);
-> +
-> +    if (msix_enabled(pdev)) {
-> +        uninit_msix(pdev, RDMA_MAX_INTRS);
-> +    }
-> +}
-> +
-> +static void pvrdma_stop(PVRDMADev *dev)
-> +{
-> +    rdma_backend_stop(&dev->backend_dev);
-> +}
-> +
-> +static void pvrdma_start(PVRDMADev *dev)
-> +{
-> +    rdma_backend_start(&dev->backend_dev);
-> +}
-> +
-
-You might not need the above functions for now.
-
->   static void activate_device(PVRDMADev *dev)
->   {
-> +    pvrdma_start(dev);
->       set_reg_val(dev, PVRDMA_REG_ERR, 0);
->       pr_dbg("Device activated\n");
->   }
-> @@ -300,7 +370,10 @@ static int unquiesce_device(PVRDMADev *dev)
+>       pr_dbg("Initializing device %s %x.%x\n", pdev->name,
+>              PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn));
 >   
->   static int reset_device(PVRDMADev *dev)
->   {
-> +    pvrdma_stop(dev);
-> +
->       pr_dbg("Device reset complete\n");
-> +
->       return 0;
->   }
->   
-> @@ -469,45 +542,6 @@ static void init_regs(PCIDevice *pdev)
->       set_reg_val(dev, PVRDMA_REG_ERR, 0xFFFF);
->   }
->   
-> -static void uninit_msix(PCIDevice *pdev, int used_vectors)
-> -{
-> -    PVRDMADev *dev = PVRDMA_DEV(pdev);
-> -    int i;
-> -
-> -    for (i = 0; i < used_vectors; i++) {
-> -        msix_vector_unuse(pdev, i);
-> -    }
-> -
-> -    msix_uninit(pdev, &dev->msix, &dev->msix);
-> -}
-> -
-> -static int init_msix(PCIDevice *pdev, Error **errp)
-> -{
-> -    PVRDMADev *dev = PVRDMA_DEV(pdev);
-> -    int i;
-> -    int rc;
-> -
-> -    rc = msix_init(pdev, RDMA_MAX_INTRS, &dev->msix, RDMA_MSIX_BAR_IDX,
-> -                   RDMA_MSIX_TABLE, &dev->msix, RDMA_MSIX_BAR_IDX,
-> -                   RDMA_MSIX_PBA, 0, NULL);
-> -
-> -    if (rc < 0) {
-> -        error_setg(errp, "Failed to initialize MSI-X");
-> -        return rc;
-> -    }
-> -
-> -    for (i = 0; i < RDMA_MAX_INTRS; i++) {
-> -        rc = msix_vector_use(PCI_DEVICE(dev), i);
-> -        if (rc < 0) {
-> -            error_setg(errp, "Fail mark MSI-X vercor %d", i);
-> -            uninit_msix(pdev, i);
-> -            return rc;
-> -        }
-> -    }
-> -
-> -    return 0;
-> -}
-> -
->   static void init_dev_caps(PVRDMADev *dev)
->   {
->       size_t pg_tbl_bytes = TARGET_PAGE_SIZE *
-> @@ -602,22 +636,7 @@ out:
->   
->   static void pvrdma_exit(PCIDevice *pdev)
->   {
-> -    PVRDMADev *dev = PVRDMA_DEV(pdev);
-> -
-> -    pr_dbg("Closing device %s %x.%x\n", pdev->name, PCI_SLOT(pdev->devfn),
-> -           PCI_FUNC(pdev->devfn));
-> -
-> -    pvrdma_qp_ops_fini();
-> -
-> -    rdma_rm_fini(&dev->rdma_dev_res);
-> -
-> -    rdma_backend_fini(&dev->backend_dev);
-> -
-> -    free_dsr(dev);
-> -
-> -    if (msix_enabled(pdev)) {
-> -        uninit_msix(pdev, RDMA_MAX_INTRS);
-> -    }
-> +    pvrdma_fini(pdev);
->   }
->   
->   static void pvrdma_class_init(ObjectClass *klass, void *data)
-
 
 
 Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
