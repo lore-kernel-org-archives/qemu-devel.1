@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhkr7-0002RM-UL
+	(envelope-from <flukshun@gmail.com>) id 1fhkr8-0002Ri-GA
 	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 20:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fhkr4-0005B5-Pf
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 20:07:09 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:44349)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1fhkr4-0005Ar-KD
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 20:07:06 -0400
-Received: by mail-oi0-x244.google.com with SMTP id s198-v6so4378267oih.11
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 17:07:06 -0700 (PDT)
+	(envelope-from <flukshun@gmail.com>) id 1fhkr7-0005Bs-Ey
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 20:07:10 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 23 Jul 2018 19:01:25 -0500
-Message-Id: <20180724000126.21787-2-mdroth@linux.vnet.ibm.com>
+Date: Mon, 23 Jul 2018 19:01:26 -0500
+Message-Id: <20180724000126.21787-3-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180724000126.21787-1-mdroth@linux.vnet.ibm.com>
 References: <20180724000126.21787-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL for-3.0 1/2] qga-win: Handle fstrim for OSes
- lower than Win8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL for-3.0 2/2] qga: process_event() simplification
+ and leak fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +25,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Sameeh Jubran <sjubran@redhat.com>
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-stable@nongnu.org
 
-From: Sameeh Jubran <sjubran@redhat.com>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-The defrag.exe tool which is used for executing the fstrim command
-on Windows doesn't support retrim for OSes lower than Win8. This
-commit handles this case and returns a suitable error.
+json_parser_parse_err() may return something else than a QDict, in
+which case we loose the object. Let's keep track of the original
+object to avoid leaks.
 
-Output of fstrim before this commit:
-{"execute":"guest-fstrim"}
-{"return": {"paths": [{"path": "C:\\", "error": "An invalid command line option
-was specified. (0x89000008)"}, {"path": "F:\\", "error": "An invalid command
-line option was specified. (0x89000008)"}, {"path": "S:\\", "error": "An
-invalid command line option was specified. (0x89000008)"}]}}
+When an error occurs, "qdict" contains the response, but we still
+check the "execute" key there. Untangle a bit this code, by having a
+clear error path.
 
-Reported on:
-https://bugzilla.redhat.com/show_bug.cgi?id=1594113
-
-Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
-* use alternative version query code proposed by Sameeh
-* fix up version check logic
-* avoid CamelCase variable names when possible
+CC: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-win32.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ qga/main.c | 54 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 27 insertions(+), 27 deletions(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 318d760a74..98d9735389 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -865,6 +865,19 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum, Error **errp)
-     GuestFilesystemTrimResponse *resp;
-     HANDLE handle;
-     WCHAR guid[MAX_PATH] = L"";
-+    OSVERSIONINFO osvi;
-+    BOOL win8_or_later;
-+
-+    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-+    GetVersionEx(&osvi);
-+    win8_or_later = (osvi.dwMajorVersion > 6 ||
-+                          ((osvi.dwMajorVersion == 6) &&
-+                           (osvi.dwMinorVersion >= 2)));
-+    if (!win8_or_later) {
-+        error_setg(errp, "fstrim is only supported for Win8+");
-+        return NULL;
-+    }
+diff --git a/qga/main.c b/qga/main.c
+index 537cc0e162..87372d40ef 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -600,42 +600,42 @@ static void process_command(GAState *s, QDict *req)
+ static void process_event(JSONMessageParser *parser, GQueue *tokens)
+ {
+     GAState *s = container_of(parser, GAState, parser);
+-    QDict *qdict;
++    QObject *obj;
++    QDict *req, *rsp;
+     Error *err = NULL;
+     int ret;
  
-     handle = FindFirstVolumeW(guid, ARRAYSIZE(guid));
-     if (handle == INVALID_HANDLE_VALUE) {
+     g_assert(s && parser);
+ 
+     g_debug("process_event: called");
+-    qdict = qobject_to(QDict, json_parser_parse_err(tokens, NULL, &err));
+-    if (err || !qdict) {
+-        qobject_unref(qdict);
+-        if (!err) {
+-            g_warning("failed to parse event: unknown error");
+-            error_setg(&err, QERR_JSON_PARSING);
+-        } else {
+-            g_warning("failed to parse event: %s", error_get_pretty(err));
+-        }
+-        qdict = qmp_error_response(err);
++    obj = json_parser_parse_err(tokens, NULL, &err);
++    if (err) {
++        goto err;
+     }
+-
+-    /* handle host->guest commands */
+-    if (qdict_haskey(qdict, "execute")) {
+-        process_command(s, qdict);
+-    } else {
+-        if (!qdict_haskey(qdict, "error")) {
+-            qobject_unref(qdict);
+-            g_warning("unrecognized payload format");
+-            error_setg(&err, QERR_UNSUPPORTED);
+-            qdict = qmp_error_response(err);
+-        }
+-        ret = send_response(s, qdict);
+-        if (ret < 0) {
+-            g_warning("error sending error response: %s", strerror(-ret));
+-        }
++    req = qobject_to(QDict, obj);
++    if (!req) {
++        error_setg(&err, QERR_JSON_PARSING);
++        goto err;
++    }
++    if (!qdict_haskey(req, "execute")) {
++        g_warning("unrecognized payload format");
++        error_setg(&err, QERR_UNSUPPORTED);
++        goto err;
+     }
+ 
+-    qobject_unref(qdict);
++    process_command(s, req);
++    qobject_unref(obj);
++    return;
++
++err:
++    g_warning("failed to parse event: %s", error_get_pretty(err));
++    rsp = qmp_error_response(err);
++    ret = send_response(s, rsp);
++    if (ret < 0) {
++        g_warning("error sending error response: %s", strerror(-ret));
++    }
++    qobject_unref(rsp);
++    qobject_unref(obj);
+ }
+ 
+ /* false return signals GAChannel to close the current client connection */
 -- 
 2.17.1
