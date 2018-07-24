@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fhsvQ-000548-Cw
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 04:44:09 -0400
+	(envelope-from <armbru@redhat.com>) id 1fhsy2-0006IK-Ap
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 04:46:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fhsvN-0006cQ-BR
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 04:44:08 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 24 Jul 2018 10:43:59 +0200
-Message-Id: <1532421839-24512-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH v2] hw/s390x/virtio-ccw: Consolidate calls
- to virtio_ccw_unrealize()
+	(envelope-from <armbru@redhat.com>) id 1fhsxz-00006a-9B
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 04:46:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51164 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhsxz-00006T-37
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 04:46:47 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180720130928.6696-1-liujunjie23@huawei.com>
+	<87h8kq86f8.fsf@dusky.pond.sub.org>
+	<B526101FCAB4654DB0892B650DEFC555086C7F48@dggemm521-mbx.china.huawei.com>
+	<87k1pm551g.fsf@dusky.pond.sub.org>
+	<B526101FCAB4654DB0892B650DEFC555086C8382@dggemm521-mbx.china.huawei.com>
+	<87r2jt40g1.fsf@dusky.pond.sub.org>
+Date: Tue, 24 Jul 2018 10:46:44 +0200
+In-Reply-To: <87r2jt40g1.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Tue, 24 Jul 2018 08:22:54 +0200")
+Message-ID: <87zhyh2f7v.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qstring: Fix integer overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,151 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "liujunjie (A)" <liujunjie23@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Currently, every virtio-ccw device explicitely sets its unrealize
-function to virtio_ccw_unrealize() in its class_init function.
-We can simplify this by using a common unrealize function, just like
-it is already done for the realize functions.
+Markus Armbruster <armbru@redhat.com> writes:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/s390x/virtio-ccw.c | 22 +++++++---------------
- 1 file changed, 7 insertions(+), 15 deletions(-)
+> "liujunjie (A)" <liujunjie23@huawei.com> writes:
+>
+>> The stack backtrace is as follows:
+>> (gdb) bt
+>> #0  0x00007f1dc3c7b091 in _g_log_abort () from /usr/lib64/libglib-2.0.so.0
+>> #1  0x00007f1dc3c7c0bd in g_log_default_handler () from /usr/lib64/libglib-2.0.so.0
+>> #2  0x00007f1dc3c7c341 in g_logv () from /usr/lib64/libglib-2.0.so.0
+>> #3  0x00007f1dc3c7c5cf in g_log () from /usr/lib64/libglib-2.0.so.0
+>> #4  0x00007f1dc3c7ac4c in g_malloc () from /usr/lib64/libglib-2.0.so.0
+>> #5  0x00000000008300b7 in qstring_from_substr (
+>>     str=0x7f13a2e67010 "00000000777b8000: 0000000003083000 ----A--U-\r\n00000000777b9000: 0000000005984000 ----A--U-\r\n00000000777ba000: 0000000005985000 ----A--U-\r\n00000000777bb000: 0000000003086000 ----A--U-\r\n00000000777bc000"..., start=start@entry=0, end=<optimized out>) at qobject/qstring.c:51
+>> #6  0x0000000000830113 in qstring_from_str (str=<optimized out>) at qobject/qstring.c:66
+>> #7  0x000000000082be98 in qobject_output_type_str (v=<optimized out>, name=0x89703b "unused", obj=0x7ffff0135f98, errp=<optimized out>)
+>>     at qapi/qobject_output_visitor.c:172
+>> #8  0x0000000000829d2c in visit_type_str (v=v@entry=0x4d9d940, name=name@entry=0x89703b "unused", obj=obj@entry=0x7ffff0135f98, errp=errp@entry=0x7ffff0135fa8)
+>>     at qapi/qapi_visit_core.c:291
+>> #9  0x0000000000576135 in qmp_marshal_output_str (
+>>     ret_in=0x7f13a2e67010 "00000000777b8000: 0000000003083000 ----A--U-\r\n00000000777b9000: 0000000005984000 ----A--U-\r\n00000000777ba000: 0000000005985000 ----A--U-\r\n00000000777bb000: 0000000003086000 ----A--U-\r\n00000000777bc000"..., ret_out=ret_out@entry=0x7ffff0136068, errp=errp@entry=0x7ffff0135fe8) at qmp-marshal.c:2022
+>> #10 0x00000000005762cb in qmp_marshal_human_monitor_command (args=<optimized out>, ret=0x7ffff0136068, errp=0x7ffff0136060) at qmp-marshal.c:2059
+>> #11 0x000000000082c897 in do_qmp_dispatch (request=request@entry=0x1fcda50, errp=errp@entry=0x7ffff01360b8) at qapi/qmp_dispatch.c:114
+>> #12 0x000000000082caeb in qmp_dispatch (request=request@entry=0x1fcda50) at qapi/qmp_dispatch.c:141
+>> #13 0x000000000045e0d2 in handle_qmp_command (parser=<optimized out>, tokens=<optimized out>) at /usr/src/debug/qemu-kvm-2.8.1/monitor.c:3907
+> [...]
+>
+> The code is trying to marshall the return value of
+> qmp_human_monitor_command().  It's @ret_in in qmp_marshal_output_str()
+> (frame#9, abbreviated by GDB), and @str in qstring_from_substr()
+> (frame#5).  Also @str in qstring_from_str() (frame#6), but GDB can't see
+> it there.  Sadly, GDB can't see shows qstring_from_substr()'s @end,
+> either.  However, you previously examined qstring->length there:
+>
+>>> > (gdb) p/x qstring->length
+>>> > $7 = 0xffffffffb0fd64bc
+>>> > (gdb) p	end
+>>> > $8 = <optimized out>
+>
+> We know
+>
+>     qstring->length = end - start + 1;
+>
+> If GDB shows the true value (always in doubt for optimized code), then
+> @end must be qstring->length - 1, because @start is zero.  But that's
+> not plausible at all!  It's almost 16 exabyte.
+>
+> I suspect GDB is lying to you.  Please show us the complete string, like
+> this:
+>
+>     (gdb) set print elements unlimited
+>     (gdb) print str
 
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 7ddb378..f3ad7aa 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -750,8 +750,9 @@ out_err:
-     g_free(sch);
- }
- 
--static void virtio_ccw_unrealize(VirtioCcwDevice *dev, Error **errp)
-+static void virtio_ccw_device_unrealize(VirtioCcwDevice *dev, Error **errp)
- {
-+    VirtIOCCWDeviceClass *dc = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
-     CcwDevice *ccw_dev = CCW_DEVICE(dev);
-     SubchDev *sch = ccw_dev->sch;
- 
-@@ -764,6 +765,10 @@ static void virtio_ccw_unrealize(VirtioCcwDevice *dev, Error **errp)
-         release_indicator(&dev->routes.adapter, dev->indicators);
-         dev->indicators = NULL;
-     }
-+
-+    if (dc->unrealize) {
-+        dc->unrealize(dev, errp);
-+    }
- }
- 
- static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
-@@ -1349,7 +1354,6 @@ static void virtio_ccw_net_class_init(ObjectClass *klass, void *data)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
-     k->realize = virtio_ccw_net_realize;
--    k->unrealize = virtio_ccw_unrealize;
-     dc->props = virtio_ccw_net_properties;
-     set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
- }
-@@ -1376,7 +1380,6 @@ static void virtio_ccw_blk_class_init(ObjectClass *klass, void *data)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
-     k->realize = virtio_ccw_blk_realize;
--    k->unrealize = virtio_ccw_unrealize;
-     dc->props = virtio_ccw_blk_properties;
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
- }
-@@ -1403,7 +1406,6 @@ static void virtio_ccw_serial_class_init(ObjectClass *klass, void *data)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
-     k->realize = virtio_ccw_serial_realize;
--    k->unrealize = virtio_ccw_unrealize;
-     dc->props = virtio_ccw_serial_properties;
-     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
- }
-@@ -1430,7 +1432,6 @@ static void virtio_ccw_balloon_class_init(ObjectClass *klass, void *data)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
-     k->realize = virtio_ccw_balloon_realize;
--    k->unrealize = virtio_ccw_unrealize;
-     dc->props = virtio_ccw_balloon_properties;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
- }
-@@ -1457,7 +1458,6 @@ static void virtio_ccw_scsi_class_init(ObjectClass *klass, void *data)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
-     k->realize = virtio_ccw_scsi_realize;
--    k->unrealize = virtio_ccw_unrealize;
-     dc->props = virtio_ccw_scsi_properties;
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
- }
-@@ -1483,7 +1483,6 @@ static void vhost_ccw_scsi_class_init(ObjectClass *klass, void *data)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
-     k->realize = vhost_ccw_scsi_realize;
--    k->unrealize = virtio_ccw_unrealize;
-     dc->props = vhost_ccw_scsi_properties;
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
- }
-@@ -1519,7 +1518,6 @@ static void virtio_ccw_rng_class_init(ObjectClass *klass, void *data)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
-     k->realize = virtio_ccw_rng_realize;
--    k->unrealize = virtio_ccw_unrealize;
-     dc->props = virtio_ccw_rng_properties;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
- }
-@@ -1556,7 +1554,6 @@ static void virtio_ccw_crypto_class_init(ObjectClass *klass, void *data)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
-     k->realize = virtio_ccw_crypto_realize;
--    k->unrealize = virtio_ccw_unrealize;
-     dc->props = virtio_ccw_crypto_properties;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
- }
-@@ -1593,7 +1590,6 @@ static void virtio_ccw_gpu_class_init(ObjectClass *klass, void *data)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
-     k->realize = virtio_ccw_gpu_realize;
--    k->unrealize = virtio_ccw_unrealize;
-     dc->props = virtio_ccw_gpu_properties;
-     dc->hotpluggable = false;
-     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-@@ -1621,7 +1617,6 @@ static void virtio_ccw_input_class_init(ObjectClass *klass, void *data)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
-     k->realize = virtio_ccw_input_realize;
--    k->unrealize = virtio_ccw_unrealize;
-     dc->props = virtio_ccw_input_properties;
-     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
- }
-@@ -1703,9 +1698,8 @@ static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
- static void virtio_ccw_busdev_unrealize(DeviceState *dev, Error **errp)
- {
-     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
--    VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
- 
--    _info->unrealize(_dev, errp);
-+    virtio_ccw_device_unrealize(_dev, errp);
- }
- 
- static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
-@@ -1801,7 +1795,6 @@ static void virtio_ccw_9p_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
--    k->unrealize = virtio_ccw_unrealize;
-     k->realize = virtio_ccw_9p_realize;
-     dc->props = virtio_ccw_9p_properties;
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-@@ -1847,7 +1840,6 @@ static void vhost_vsock_ccw_class_init(ObjectClass *klass, void *data)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
- 
-     k->realize = vhost_vsock_ccw_realize;
--    k->unrealize = virtio_ccw_unrealize;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-     dc->props = vhost_vsock_ccw_properties;
- }
--- 
-1.8.3.1
+Actually, I'm interested only in the true length of @str, and the print
+is just a simple way to find it.  No need to post the output of print if
+it's inconveniently long.
