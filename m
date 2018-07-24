@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fhz8Q-0002dq-Nn
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:21:59 -0400
+	(envelope-from <eblake@redhat.com>) id 1fhz91-000345-T4
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:22:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fhz8P-0007rv-JB
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:21:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1fhz90-0008Mw-V7
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:22:35 -0400
 References: <20180724121753.5753-1-lbloch@janustech.com>
-	<20180724121753.5753-4-lbloch@janustech.com>
+	<20180724121753.5753-3-lbloch@janustech.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <8b2636b3-6871-c68a-f103-0f2f150d3e7e@redhat.com>
-Date: Tue, 24 Jul 2018 10:21:50 -0500
+Message-ID: <ca726bf0-2ae9-ab90-5b42-61a9637ed1e5@redhat.com>
+Date: Tue, 24 Jul 2018 10:22:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180724121753.5753-4-lbloch@janustech.com>
+In-Reply-To: <20180724121753.5753-3-lbloch@janustech.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] docs: Document the l2-cache-full option
+Subject: Re: [Qemu-devel] [PATCH 2/4 for-3.0] docs: Fix an inaccuracy due to
+ recent changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +31,30 @@ Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redh
 On 07/24/2018 07:17 AM, Leonid Bloch wrote:
 > Signed-off-by: Leonid Bloch <lbloch@janustech.com>
 > ---
->   docs/qcow2-cache.txt | 12 ++++++++----
->   1 file changed, 8 insertions(+), 4 deletions(-)
+>   docs/qcow2-cache.txt | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+
+Updating the subject line, since this doc fix is appropriate for 3.0, if 
+it is correct.
+
 > 
 > diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
-> index a0a1267482..43c0faaddb 100644
+> index 8a09a5cc5f..a0a1267482 100644
 > --- a/docs/qcow2-cache.txt
 > +++ b/docs/qcow2-cache.txt
-> @@ -110,11 +110,12 @@ How to configure the cache sizes
->   Cache sizes can be configured using the -drive option in the
->   command-line, or the 'blockdev-add' QMP command.
+> @@ -97,9 +97,9 @@ need:
+>      l2_cache_size = disk_size_GB * 131072
+>      refcount_cache_size = disk_size_GB * 32768
 >   
-> -There are three options available, and all of them take bytes:
-> +There are four options available:
+> -QEMU has a default L2 cache of 1MB (1048576 bytes) and a refcount
+> -cache of 256KB (262144 bytes), so using the formulas we've just seen
+> -we have
+> +QEMU has a default L2 cache of 1MB (1048576 bytes) or 8 clusters (whichever
+> +is larger) and a refcount cache of 256KB (262144 bytes), so using the
+> +formulas we've just seen we have (assuming the L2 cache is 1MB):
 >   
-> -"l2-cache-size":         maximum size of the L2 table cache
-> -"refcount-cache-size":   maximum size of the refcount block cache
-> -"cache-size":            maximum size of both caches combined
-> +"l2-cache-size":         maximum size of the L2 table cache (bytes, K, M)
-> +"refcount-cache-size":   maximum size of the refcount block cache (bytes, K, M)
-> +"cache-size":            maximum size of both caches combined (bytes, K, M)
-> +"l2-cache-full":         make the L2 cache cover the full image (boolean)
->   
->   There are a few things that need to be taken into account:
->   
-
-Worth mentioning that the first three can be combined (although usually 
-you'll never specify more than 2; as specifying all 3 requires that you 
-perform the correct addition), but that the third is mutually exclusive?
-
-> @@ -130,6 +131,9 @@ There are a few things that need to be taken into account:
->      memory as possible to the L2 cache before increasing the refcount
->      cache size.
->   
-> +- If "l2-cache-full" is specified, QEMU will assign enough memory
-> +  to the L2 cache to cover the entire size of the image.
-> +
->   Unlike L2 tables, refcount blocks are not used during normal I/O but
->   only during allocations and internal snapshots. In most cases they are
->   accessed sequentially (even during random guest I/O) so increasing the
+>      1048576 / 131072 = 8 GB of virtual disk covered by that cache
+>       262144 /  32768 = 8 GB
 > 
 
 -- 
