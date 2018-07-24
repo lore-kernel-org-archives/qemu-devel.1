@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fi5UH-0003Jg-GF
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:08:59 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fi5YW-00054O-5d
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:13:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fi5UE-0003U6-7Y
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:08:57 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35692
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fi5YT-0001b7-0R
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:13:20 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:57825
+	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1fi5UE-0003T6-0G
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:08:54 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w6OM8aOZ132264
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 18:08:52 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2kea81mu7s-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 18:08:52 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 24 Jul 2018 18:08:51 -0400
-Content-Type: text/plain; charset="utf-8"
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1fi5YS-0001UX-OH
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:13:16 -0400
+References: <201807230206.02284.randrianasulu@gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <51adf87b-89f3-fa17-9685-e7ea863800be@ilande.co.uk>
+Date: Tue, 24 Jul 2018 23:12:57 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 24 Jul 2018 17:08:39 -0500
-Message-Id: <153247011984.11309.9687749051366741435@sif>
-Subject: [Qemu-devel] [ANNOUNCE] QEMU 3.0.0-rc2 is now available
+In-Reply-To: <201807230206.02284.randrianasulu@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] qemu-system-ppc -M mac99 and -soundhw es1370
+ doesn't start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,133 +30,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Andrew Randrianasulu <randrianasulu@gmail.com>, qemu-devel@nongnu.org
 
-Hello,
+On 23/07/18 00:06, Andrew Randrianasulu wrote:
 
-On behalf of the QEMU Team, I'd like to announce the availability of the
-third release candidate for the QEMU 3.0 release.  This release is meant
-for testing purposes and should not be used in a production environment.
+> Hello!
+> 
+> Currently I'm trying pre-releases of qemu, for avoiding situation when release
+> was too bugged (2.12, for my taste ..qemu-system-alpha was broken,
+> qemu-system-x86_64 -M q35 was broken ..)
+> 
+> using
+> qemu-system-ppc --version
+> QEMU emulator version 2.12.91 (v3.0.0-rc1-17-g5b3ecd3d94-dirty)
+> Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+> 
+> I can't start qemu-system-ppc with -M mac99 and -soundhw es1370:
 
-  http://download.qemu-project.org/qemu-3.0.0-rc2.tar.xz
-  http://download.qemu-project.org/qemu-3.0.0-rc2.tar.xz.sig
+I'm actually surprised that this could ever work at all, since -soundhw 
+is a legacy PC option and certainly isn't included in regular testing of 
+the PPC Mac machines.
 
-You can help improve the quality of the QEMU 3.0 release by testing this
-release and reporting bugs on Launchpad:
+The confusion comes from the fact that the mac99 machine has multiple 
+PCI buses, and my guess is that recent fixes the 3.0 dev cycle could 
+have broken an assumption in the old option code.
 
-  https://bugs.launchpad.net/qemu/
+In theory you should be able to get the correct configuration with 
+something like this:
 
-The release plan, as well a documented known issues for release
-candidates, are available at:
+./qemu-system-ppc -monitor stdio -device ES1370 -M mac99
 
-  http://wiki.qemu.org/Planning/3.0
+But I'm afraid this configuration is effectively unsupported.
 
-Please add entries to the ChangeLog for the 3.0 release below:
+> qemu-system-ppc -monitor stdio -soundhw es1370 -vga std -M mac99
+> QEMU 2.12.91 monitor - type 'help' for more information
+> (qemu) qemu-system-ppc: PCI bus not available for es1370
+> 
+> qemu-system-ppc64 starts fine:
+> emu-system-ppc64 -monitor stdio -soundhw es1370 -vga std -M mac99
+> QEMU 2.12.91 monitor - type 'help' for more information
+> (qemu) info pci
+>    Bus  0, device  11, function 0:
+>      Host bridge: PCI device 106b:004b
+>        id ""
+>    Bus  0, device  12, function 0:
+>      Class 65280: PCI device 106b:0022
+>        BAR0: 32 bit memory at 0x80000000 [0x8007ffff].
+>        id ""
+>    Bus  0, device  13, function 0:
+>      USB controller: PCI device 106b:003f
+>        IRQ 28.
+>        BAR0: 32 bit memory at 0x80080000 [0x800800ff].
+>        id ""
+>    Bus  0, device  14, function 0:
+>      VGA controller: PCI device 1234:1111
+>        BAR0: 32 bit prefetchable memory at 0x81000000 [0x81ffffff].
+>        BAR2: 32 bit memory at 0x82000000 [0x82000fff].
+>        BAR6: 32 bit memory at 0x82010000 [0x8201ffff].
+>        id ""
+>    Bus  0, device  15, function 0:
+>      Ethernet controller: PCI device 10ec:8029
+>        IRQ 30.
+>        BAR0: I/O at 0x1000 [0x10ff].
+>        BAR6: 32 bit memory at 0x82040000 [0x8207ffff].
+>        id ""
+>    Bus  0, device  16, function 0:
+>      Audio controller: PCI device 1274:5000
+>        IRQ 27.
+>        BAR0: I/O at 0x1100 [0x11ff].
+>        id ""
+> (qemu)
+> 
+> Note, I'm using 32-bit qemu build, configured like this:
+> setarch
+> i486 ./configure --prefix=/usr --disable-gtk --enable-virglrenderer --enable-sdl
+> \ --with-sdlabi=2.0 --audio-drv-list=alsa,oss --host-cc=/opt/gcc49/bin/gcc
+> \ --enable-opengl --extra-cflags="-I/usr/X11R7/include -O3 -march=i686
+> \ -mtune=native -m32 -Wno-maybe-uninitialized -Wno-nested-externs
+> \ -Wno-implicit-function-declaration" --disable-werror
+> 
+> for qemu-system-ppc -M mac99 'info pci' shows:
+> 
+> qemu-system-ppc -monitor stdio -vga std -M mac99
+> QEMU 2.12.91 monitor - type 'help' for more information
+> (qemu) info pci
+>    Bus  0, device  11, function 0:
+>      Host bridge: PCI device 106b:001f
+>        id ""
+>    Bus  0, device  12, function 0:
+>      Class 65280: PCI device 106b:0022
+>        BAR0: 32 bit memory at 0x80000000 [0x8007ffff].
+>        id ""
+>    Bus  0, device  13, function 0:
+>      USB controller: PCI device 106b:003f
+>        IRQ 28.
+>        BAR0: 32 bit memory at 0x80080000 [0x800800ff].
+>        id ""
+>    Bus  0, device  14, function 0:
+>      VGA controller: PCI device 1234:1111
+>        BAR0: 32 bit prefetchable memory at 0x81000000 [0x81ffffff].
+>        BAR2: 32 bit memory at 0x82000000 [0x82000fff].
+>        BAR6: 32 bit memory at 0x82010000 [0x8201ffff].
+>        id ""
+>    Bus  0, device  15, function 0:
+>      Ethernet controller: PCI device 10ec:8029
+>        IRQ 30.
+>        BAR0: I/O at 0x1000 [0x10ff].
+>        BAR6: 32 bit memory at 0x82040000 [0x8207ffff].
+>        id ""
+>    Bus  0, device  14, function 0:
+>      Host bridge: PCI device 106b:001e
+>        id ""
+>    Bus  0, device  11, function 0:
+>      Host bridge: PCI device 106b:0020
+>        id ""
+> (qemu)
+> 
+> Last two devices seems strange .....
+> 
+> Also, mouse seems to be confused, try  finnix-ppc-110.iso (it enables gpm on
+> startup, start like qemu-system-ppc -monitor stdio -M mac99 -cdrom
+> ~/finnix-ppc-110.iso and try to move mouse inside qemu window. It feels like
+> keyboard got some mouseclicks too? or mouse movement generates mouse button
+> clicks, too) or http://cdimage.ubuntu.com/lubuntu/releases/16.04/release/ ->
+> [   ]  lubuntu-16.04-desktop-powerpc.iso   (but you must wait for nearly 10 min
+> until it finishes booting)
 
-  http://wiki.qemu.org/ChangeLog/3.0
+Is this a regression? Certainly it's not an image that is part of my 
+regular test suite. And what is your host platform? Does a 64-bit build 
+make any difference? What about using GTK and/or VNC instead of SDL? 
+Does disabling the sound hardware change the responsiveness?
 
-Thank you to everyone involved!
 
-Changes since rc1:
+ATB,
 
-18a398f6a3: Update version for v3.0.0-rc2 release (Peter Maydell)
-db0a8c70f2: tests: fix TLS handshake failure with TLS 1.3 (Daniel P. Berran=
-g=C3=A9)
-68db13183f: tests: use error_abort in places expecting errors (Daniel P. Be=
-rrang=C3=A9)
-977a7204ab: tests: don't silence error reporting for all tests (Daniel P. B=
-errang=C3=A9)
-dbddad7026: tests: call qcrypto_init instead of gnutls_global_init (Daniel =
-P. Berrang=C3=A9)
-4b3fb65db9: migration: fix duplicate initialization for expected_downtime a=
-nd cleanup_bh (Lidong Chen)
-829db8b497: tests: only update last_byte when at the edge (Peter Xu)
-97ca211c62: migration: disallow recovery for release-ram (Peter Xu)
-814bb08f17: migration: update recv bitmap only on dest vm (Peter Xu)
-67fa1f5700: audio/hda: Fix migration (Dr. David Alan Gilbert)
-57225e5f32: migrate: Fix cancelling state warning (Dr. David Alan Gilbert)
-4fcefd44a0: migration: fix potential overflow in multifd send (Peter Xu)
-042b757cc7: block/file-posix: add bdrv_attach_aio_context callback for host=
- dev and cdrom (Nishanth Aravamudan)
-1a3bdc6111: tests/tcg: remove runcom test (Alex Benn=C3=A9e)
-15352decf8: docker: perform basic binfmt_misc validation in docker.py (Alex=
- Benn=C3=A9e)
-f7b446b5de: docker: ignore distro versioning of debootstrap (Alex Benn=C3=
-=A9e)
-11cc24a126: docker: add commentary to debian-bootstrap.docker (Alex Benn=C3=
-=A9e)
-571fef5e07: docker: Update debootstrap script after Debian migration from A=
-lioth to Salsa (Philippe Mathieu-Daud=C3=A9)
-d19f5fc041: docker: report hint when docker.py check fails (Alex Benn=C3=A9=
-e)
-2796346069: docker: drop QEMU_TARGET check, fallback in EXECUTABLE not set =
-(Alex Benn=C3=A9e)
-ff1a390296: docker: add expansion for docker-test-FOO to Makefile.include (=
-Alex Benn=C3=A9e)
-d984f24c77: docker: add test-unit runner (Alex Benn=C3=A9e)
-77b08f73c8: docker: Makefile.include don't include partial images (Alex Ben=
-n=C3=A9e)
-56c115a953: docker: gracefully skip check_qemu (Alex Benn=C3=A9e)
-3f9747a738: docker: move make check into check_qemu helper (Alex Benn=C3=A9=
-e)
-e4ce964d94: docker: split configure_qemu from build_qemu (Alex Benn=C3=A9e)
-43e1b2ffec: docker: fail more gracefully on docker.py check (Alex Benn=C3=
-=A9e)
-be5e1f527a: docker: par down QEMU_CONFIGURE_OPTS in debian-tricore-cross (A=
-lex Benn=C3=A9e)
-e043d73212: docker: base debian-tricore on qemu:debian9 (Alex Benn=C3=A9e)
-1818d50179: tests/.gitignore: don't ignore docker tests (Alex Benn=C3=A9e)
-1a5182c0d2: target/arm: Escalate to correct HardFault when AIRCR.BFHFNMINS =
-is set (Peter Maydell)
-042374c92e: hw/intc/arm_gicv3: Check correct HCR_EL2 bit when routing IRQ (=
-Peter Maydell)
-0c6c439554: ui/cocoa.m: prevent stuck command key when going into full scre=
-en mode (John Arbuckle)
-ae7da1e5f6: qga: process_event() simplification and leak fix (Marc-Andr=C3=
-=A9 Lureau)
-c5840b905e: qga-win: Handle fstrim for OSes lower than Win8 (Sameeh Jubran)
-672189cd58: tcg/i386: Mark xmm registers call-clobbered (Richard Henderson)
-5f00335aec: i386: Rename enum CacheType members (Eduardo Habkost)
-3e31b4e170: block/vvfat: Disable debug message by default (Thomas Huth)
-092b9c408f: iotests: Disallow compat=3D0.10 in 223 (Max Reitz)
-d6e4ca9021: iotest: Fix filtering order in 226 (Max Reitz)
-e05eb9f29b: iotests: remove LUKS support from test 226 (John Snow)
-6360ab278c: qemu-img: avoid overflow of min_sparse parameter (Peter Lieven)
-50d6a8a352: block: Fix typos in comments (found by codespell) (Stefan Weil)
-4e04f3d91a: qemu-iotests: Use host_device instead of file in 149 (Kevin Wol=
-f)
-1ddc9b98c3: hw/intc/exynos4210_gic: Turn instance_init into realize functio=
-n (Thomas Huth)
-07bc425ea3: hw/arm/spitz: Move problematic nand_init() code to realize func=
-tion (Thomas Huth)
-9d2b5a58f8: target/arm: Correctly handle overlapping small MPU regions (Pet=
-er Maydell)
-03a31776e8: hw/sd/bcm2835_sdhost: Fix PIO mode writes (Guenter Roeck)
-7b6d7b84da: hw/microblaze/xlnx-zynqmp-pmu: Fix introspection problem in 'xl=
-nx, zynqmp-pmu-soc' (Thomas Huth)
-62aa1d887f: monitor: Fix unsafe sharing of @cur_mon among threads (Peter Xu)
-25b1ef31db: qapi: Make 'allow-oob' optional in SchemaInfoCommand (Markus Ar=
-mbruster)
-6598f0cdad: po: Don't include comments with location (Stefan Weil)
-fa97e38eed: linux-user/ppc: Implement swapcontext syscall (Richard Henderso=
-n)
-33143c446e: linux-user: fix ELF load alignment error (Laurent Vivier)
-323e7c1177: tap: fix memory leak on success to create a tap device (Yunjian=
- Wang)
-4712c158c5: e1000e: Prevent MSI/MSI-X storms (Jan Kiszka)
-e65a5f227d: tcg/aarch64: limit mul_vec size (Alex Benn=C3=A9e)
-8ff62f6aa0: spike: Fix crash when introspecting the device (Alistair Franci=
-s)
-5657c3f53c: riscv_hart: Fix crash when introspecting the device (Alistair F=
-rancis)
-a993cb150f: virt: Fix crash when introspecting the device (Alistair Francis)
-4eea9d7deb: sifive_u: Fix crash when introspecting the device (Alistair Fra=
-ncis)
-54f3141a58: sifive_e: Fix crash when introspecting the device (Alistair Fra=
-ncis)
-db817b8c50: tracing: Use double-dash spelling for trace option (Yaowei Bai)
-6fccbb475b: throttle-groups: fix hang when group member leaves (Stefan Hajn=
-oczi)
-677ff32db1: s390x/cpumodel: fix segmentation fault when baselining models (=
-David Hildenbrand)
+Mark.
