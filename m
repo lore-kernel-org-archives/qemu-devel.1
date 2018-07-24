@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1W9-00052T-Is
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:54:42 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1Wm-00066g-8r
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:55:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1W8-0003hJ-OR
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:54:37 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:53165 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1Wh-0004HQ-6L
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:55:16 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:53250 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fi1W8-0003ff-Gb
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:54:36 -0400
+	id 1fi1Wg-0004DO-Qz
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:55:11 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 24 Jul 2018 19:31:38 +0200
-Message-Id: <1532453527-22911-27-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 24 Jul 2018 19:31:39 +0200
+Message-Id: <1532453527-22911-28-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1532453527-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1532453527-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v4 26/55] target/mips: Add updating BadInstr,
- BadInstrP, BadInstrX for nanoMIPS
+Subject: [Qemu-devel] [PATCH v4 27/55] target/mips: Implement CP0 Config0.WR
+ bit functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +28,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Update BadInstr, BadInstrP,and BadInstrX registers for nanoMIPS.
-The same support for pre-nanoMIPS remains unimplemented.
+Add testing Config0.WR bit into watch exception handling logic.
 
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/helper.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ target/mips/helper.c    | 12 +++++++++++-
+ target/mips/translate.c | 22 ++++++++++++++++------
+ 2 files changed, 27 insertions(+), 7 deletions(-)
 
 diff --git a/target/mips/helper.c b/target/mips/helper.c
-index e215af9..b25e000 100644
+index b25e000..a576fa4 100644
 --- a/target/mips/helper.c
 +++ b/target/mips/helper.c
-@@ -682,6 +682,31 @@ static void set_hflags_for_handler (CPUMIPSState *env)
- 
- static inline void set_badinstr_registers(CPUMIPSState *env)
- {
-+    if (env->insn_flags & ISA_NANOMIPS32) {
-+        if (env->CP0_Config3 & (1 << CP0C3_BI)) {
-+            uint32_t instr = (cpu_lduw_code(env, env->active_tc.PC)) << 16;
-+            if ((instr & 0x10000000) == 0) {
-+                instr |= cpu_lduw_code(env, env->active_tc.PC + 2);
-+            }
-+            env->CP0_BadInstr = instr;
+@@ -747,6 +747,14 @@ void mips_cpu_do_interrupt(CPUState *cs)
+         (env->hflags & MIPS_HFLAG_DM)) {
+         cs->exception_index = EXCP_DINT;
+     }
 +
-+            if ((instr & 0xFC000000) == 0x60000000) {
-+                instr = cpu_lduw_code(env, env->active_tc.PC + 4) << 16;
-+                env->CP0_BadInstrX = instr;
-+            }
-+        }
-+        if ((env->CP0_Config3 & (1 << CP0C3_BP)) &&
-+            (env->hflags & MIPS_HFLAG_BMASK)) {
-+            if (!(env->hflags & MIPS_HFLAG_B16)) {
-+                env->CP0_BadInstrP = cpu_ldl_code(env, env->active_tc.PC - 4);
-+            } else {
-+                env->CP0_BadInstrP =
-+                    (cpu_lduw_code(env, env->active_tc.PC - 2)) << 16;
-+            }
-+        }
-+        return;
++    if ((cs->exception_index == EXCP_DWATCH ||
++        cs->exception_index == EXCP_DFWATCH ||
++        cs->exception_index == EXCP_IWATCH) &&
++        (env->CP0_Config1 & (1 << CP0C1_WR))) {
++        cs->exception_index = EXCP_NONE;
 +    }
 +
-     if (env->hflags & MIPS_HFLAG_M16) {
-         /* TODO: add BadInstr support for microMIPS */
-         return;
+     offset = 0x180;
+     switch (cs->exception_index) {
+     case EXCP_DSS:
+@@ -797,7 +805,9 @@ void mips_cpu_do_interrupt(CPUState *cs)
+         break;
+     case EXCP_SRESET:
+         env->CP0_Status |= (1 << CP0St_SR);
+-        memset(env->CP0_WatchLo, 0, sizeof(env->CP0_WatchLo));
++        if (env->CP0_Config1 & (1 << CP0C1_WR)) {
++            memset(env->CP0_WatchLo, 0, sizeof(env->CP0_WatchLo));
++        }
+         goto set_error_EPC;
+     case EXCP_NMI:
+         env->CP0_Status |= (1 << CP0St_NMI);
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index cf28c60..68f1879 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -5622,6 +5622,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(mfc0_watchlo, arg, sel);
+             rn = "WatchLo";
+             break;
+@@ -5639,6 +5640,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(mfc0_watchhi, arg, sel);
+             rn = "WatchHi";
+             break;
+@@ -6321,6 +6323,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchlo, arg, sel);
+             rn = "WatchLo";
+             break;
+@@ -6338,6 +6341,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchhi, arg, sel);
+             rn = "WatchHi";
+             break;
+@@ -7024,6 +7028,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(dmfc0_watchlo, arg, sel);
+             rn = "WatchLo";
+             break;
+@@ -7041,6 +7046,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(mfc0_watchhi, arg, sel);
+             rn = "WatchHi";
+             break;
+@@ -7705,6 +7711,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchlo, arg, sel);
+             rn = "WatchLo";
+             break;
+@@ -7722,6 +7729,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchhi, arg, sel);
+             rn = "WatchHi";
+             break;
+@@ -25285,14 +25293,16 @@ void cpu_state_reset(CPUMIPSState *env)
+        no performance counters. */
+     env->CP0_IntCtl = 0xe0000000;
+     {
+-        int i;
++        if (env->CP0_Config1 & (1 << CP0C1_WR)) {
++            int i;
+ 
+-        for (i = 0; i < 7; i++) {
+-            env->CP0_WatchLo[i] = 0;
+-            env->CP0_WatchHi[i] = 0x80000000;
++            for (i = 0; i < 7; i++) {
++                env->CP0_WatchLo[i] = 0;
++                env->CP0_WatchHi[i] = 0x80000000;
++            }
++            env->CP0_WatchLo[7] = 0;
++            env->CP0_WatchHi[7] = 0;
+         }
+-        env->CP0_WatchLo[7] = 0;
+-        env->CP0_WatchHi[7] = 0;
+     }
+     /* Count register increments in debug mode, EJTAG version 1 */
+     env->CP0_Debug = (1 << CP0DB_CNT) | (0x1 << CP0DB_VER);
 -- 
 2.7.4
