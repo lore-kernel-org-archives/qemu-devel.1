@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhqir-0006T8-Hs
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 02:23:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1fhqwI-0002JF-4v
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 02:36:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fhqin-0001Wz-H0
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 02:23:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42438 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fhqwF-0006o9-29
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 02:36:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47462 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhqin-0001Wh-Br
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 02:22:57 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhqwE-0006np-RO
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 02:36:50 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20180720130928.6696-1-liujunjie23@huawei.com>
-	<87h8kq86f8.fsf@dusky.pond.sub.org>
-	<B526101FCAB4654DB0892B650DEFC555086C7F48@dggemm521-mbx.china.huawei.com>
-	<87k1pm551g.fsf@dusky.pond.sub.org>
-	<B526101FCAB4654DB0892B650DEFC555086C8382@dggemm521-mbx.china.huawei.com>
-Date: Tue, 24 Jul 2018 08:22:54 +0200
-In-Reply-To: <B526101FCAB4654DB0892B650DEFC555086C8382@dggemm521-mbx.china.huawei.com>
-	(liujunjie's message of "Tue, 24 Jul 2018 01:08:21 +0000")
-Message-ID: <87r2jt40g1.fsf@dusky.pond.sub.org>
+References: <20180723193530.20891-1-eblake@redhat.com>
+Date: Tue, 24 Jul 2018 08:36:46 +0200
+In-Reply-To: <20180723193530.20891-1-eblake@redhat.com> (Eric Blake's message
+	of "Mon, 23 Jul 2018 14:35:30 -0500")
+Message-ID: <87in553zsx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qstring: Fix integer overflow
+Subject: Re: [Qemu-devel] [PATCH v2 for-3.0] tests/libqtest: Improve
+ kill_qemu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +27,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "liujunjie (A)" <liujunjie23@huawei.com>
-Cc: "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, rth@twiddle.net, alex.bennee@linaro.org, f4bug@amsat.org, mst@redhat.com
 
-"liujunjie (A)" <liujunjie23@huawei.com> writes:
+Eric Blake <eblake@redhat.com> writes:
 
-> The stack backtrace is as follows:
-> (gdb) bt
-> #0  0x00007f1dc3c7b091 in _g_log_abort () from /usr/lib64/libglib-2.0.so.0
-> #1  0x00007f1dc3c7c0bd in g_log_default_handler () from /usr/lib64/libglib-2.0.so.0
-> #2  0x00007f1dc3c7c341 in g_logv () from /usr/lib64/libglib-2.0.so.0
-> #3  0x00007f1dc3c7c5cf in g_log () from /usr/lib64/libglib-2.0.so.0
-> #4  0x00007f1dc3c7ac4c in g_malloc () from /usr/lib64/libglib-2.0.so.0
-> #5  0x00000000008300b7 in qstring_from_substr (
->     str=0x7f13a2e67010 "00000000777b8000: 0000000003083000 ----A--U-\r\n00000000777b9000: 0000000005984000 ----A--U-\r\n00000000777ba000: 0000000005985000 ----A--U-\r\n00000000777bb000: 0000000003086000 ----A--U-\r\n00000000777bc000"..., start=start@entry=0, end=<optimized out>) at qobject/qstring.c:51
-> #6  0x0000000000830113 in qstring_from_str (str=<optimized out>) at qobject/qstring.c:66
-> #7  0x000000000082be98 in qobject_output_type_str (v=<optimized out>, name=0x89703b "unused", obj=0x7ffff0135f98, errp=<optimized out>)
->     at qapi/qobject_output_visitor.c:172
-> #8  0x0000000000829d2c in visit_type_str (v=v@entry=0x4d9d940, name=name@entry=0x89703b "unused", obj=obj@entry=0x7ffff0135f98, errp=errp@entry=0x7ffff0135fa8)
->     at qapi/qapi_visit_core.c:291
-> #9  0x0000000000576135 in qmp_marshal_output_str (
->     ret_in=0x7f13a2e67010 "00000000777b8000: 0000000003083000 ----A--U-\r\n00000000777b9000: 0000000005984000 ----A--U-\r\n00000000777ba000: 0000000005985000 ----A--U-\r\n00000000777bb000: 0000000003086000 ----A--U-\r\n00000000777bc000"..., ret_out=ret_out@entry=0x7ffff0136068, errp=errp@entry=0x7ffff0135fe8) at qmp-marshal.c:2022
-> #10 0x00000000005762cb in qmp_marshal_human_monitor_command (args=<optimized out>, ret=0x7ffff0136068, errp=0x7ffff0136060) at qmp-marshal.c:2059
-> #11 0x000000000082c897 in do_qmp_dispatch (request=request@entry=0x1fcda50, errp=errp@entry=0x7ffff01360b8) at qapi/qmp_dispatch.c:114
-> #12 0x000000000082caeb in qmp_dispatch (request=request@entry=0x1fcda50) at qapi/qmp_dispatch.c:141
-> #13 0x000000000045e0d2 in handle_qmp_command (parser=<optimized out>, tokens=<optimized out>) at /usr/src/debug/qemu-kvm-2.8.1/monitor.c:3907
-[...]
+> In kill_qemu() we have an assert that checks that the QEMU process
+> didn't dump core:
+>             assert(!WCOREDUMP(wstatus));
+>
+> Unfortunately the WCOREDUMP macro here means the resulting message
+> is not very easy to comprehend on at least some systems:
+>
+> ahci-test: tests/libqtest.c:113: kill_qemu: Assertion `!(((__extension__ (((union { __typeof(wstatus) __in; int __i; }) { .__in = (wstatus) }).__i))) & 0x80)' failed.
+>
+> and it doesn't identify what signal the process took.
+>
+> Furthermore, we are NOT detecting EINTR (while EINTR shouldn't be
+> happening if we didn't install signal handlers, it's still better
+> to always be robust), and also want to log unexpected non-zero status
+> that was not accompanied by a core dump.
+>
+> Instead of using a raw assert, print the information in an
+> easier to understand way:
+>
+> /i386/ahci/sanity: tests/libqtest.c:119: kill_qemu() detected QEMU death with core dump from signal 11 (Segmentation fault)
+> Aborted (core dumped)
+>
+> (Of course, the really useful information would be why the QEMU
+> process dumped core in the first place, but we don't have that
+> by the time the test program has picked up the exit status.)
+>
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>
+> I've taken the ideas from Peter's patch:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg04430.html
+> as well as fixing a related issue brought up last time this was touched:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05710.html
+>
+>  tests/libqtest.c | 39 +++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 37 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 098af6aec44..f3dabfadd78 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -105,12 +105,47 @@ static void kill_qemu(QTestState *s)
+>      if (s->qemu_pid != -1) {
+>          int wstatus = 0;
+>          pid_t pid;
+> +        bool die = false;
+>
+>          kill(s->qemu_pid, SIGTERM);
+> +    retry:
+>          pid = waitpid(s->qemu_pid, &wstatus, 0);
+> +        if (pid == -1 && errno == EINTR) {
+> +            goto retry;
+> +        }
+>
+> -        if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
+> -            assert(!WCOREDUMP(wstatus));
+> +        assert(pid == s->qemu_pid);
+> +        /*
+> +         * We expect qemu to exit with status 0; anything else is
+> +         * fishy and should be logged.  Abort except when death by
+> +         * signal is not accompanied by a coredump (as that's the only
+> +         * time it was likely that the user is trying to kill the
+> +         * testsuite early).
+> +         */
+> +        if (wstatus) {
+> +            die = true;
+> +            if (WIFEXITED(wstatus)) {
+> +                fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
+> +                        "process but encountered exit status %d\n",
+> +                        __FILE__, __LINE__, WEXITSTATUS(wstatus));
+> +            } else if (WIFSIGNALED(wstatus)) {
+> +                int sig = WTERMSIG(wstatus);
+> +                const char *signame = strsignal(sig) ?: "unknown ???";
+> +
+> +                if (!WCOREDUMP(wstatus)) {
+> +                    die = false;
 
-The code is trying to marshall the return value of
-qmp_human_monitor_command().  It's @ret_in in qmp_marshal_output_str()
-(frame#9, abbreviated by GDB), and @str in qstring_from_substr()
-(frame#5).  Also @str in qstring_from_str() (frame#6), but GDB can't see
-it there.  Sadly, GDB can't see shows qstring_from_substr()'s @end,
-either.  However, you previously examined qstring->length there:
+Does WCOREDUMP(wstatus) depend on the user's ulimit -c?
 
->> > (gdb) p/x qstring->length
->> > $7 = 0xffffffffb0fd64bc
->> > (gdb) p	end
->> > $8 = <optimized out>
+What higher level kind of QEMU termination are you trying to detect
+here?
 
-We know
-
-    qstring->length = end - start + 1;
-
-If GDB shows the true value (always in doubt for optimized code), then
-@end must be qstring->length - 1, because @start is zero.  But that's
-not plausible at all!  It's almost 16 exabyte.
-
-I suspect GDB is lying to you.  Please show us the complete string, like
-this:
-
-    (gdb) set print elements unlimited
-    (gdb) print str
+> +                    fprintf(stderr, "%s:%d: kill_qemu() ignoring QEMU death "
+> +                            "by signal %d (%s)\n",
+> +                            __FILE__, __LINE__, sig, signame);
+> +                } else {
+> +                    fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
+> +                            "with core dump from signal %d (%s)\n",
+> +                            __FILE__, __LINE__, sig, signame);
+> +                }
+> +            }
+> +        }
+> +        if (die) {
+> +            abort();
+>          }
+>      }
+>  }
