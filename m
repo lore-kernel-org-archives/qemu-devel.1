@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fhzib-0000dy-AR
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:59:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1fhzih-0000jz-3Q
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:59:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fhziW-0001f4-Fq
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:59:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47772 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fhzif-0001mp-Ir
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:59:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59714 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fhziW-0001eO-B0
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:59:16 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fhzif-0001mT-Ee
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:59:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A06E0402332F
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 15:59:15 +0000 (UTC)
-Date: Tue, 24 Jul 2018 16:59:12 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180724155912.GB48553@work-vm>
-References: <20180720034713.11711-1-peterx@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 035D07DAC2
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 15:59:25 +0000 (UTC)
+References: <20180716073226.21127-1-armbru@redhat.com>
+	<20180716073226.21127-3-armbru@redhat.com>
+	<20180716093944.GL5616@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1bcea184-c059-8bf9-81fc-257ae601824f@redhat.com>
+Date: Tue, 24 Jul 2018 10:59:22 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180720034713.11711-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: fix potential overflow in
- multifd send
+In-Reply-To: <20180716093944.GL5616@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 2/2] MAINTAINERS: New section
+ "Incompatible changes", copy libvir-list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +36,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: libvir-list@redhat.com, thuth@redhat.com, cohuck@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> I would guess it won't happen normally, but this should ease Coverity.
-> 
-> >>>     CID 1394385:  Integer handling issues  (OVERFLOW_BEFORE_WIDEN)
-> >>>     Potentially overflowing expression "pages->used * 8192U" with type "unsigned int" (32 bits, unsigned) is evaluated using 32-bit arithmetic, and then used in a context that expects an expression of type "uint64_t" (64 bits, unsigned).
-> 854         transferred = pages->used * TARGET_PAGE_SIZE + p->packet_len;
-> 
-> Fixes: CID 1394385
-> CC: Juan Quintela <quintela@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 07/16/2018 04:39 AM, Daniel P. Berrang=C3=A9 wrote:
 
-Queued
+>=20
+> Note, that libvir-list requires senders to be subscribed before mails a=
+re
+> delivered, otherwise they go into moderation queue. My normal approach.=
+ as
+> the person moderating, is to whitelist all human senders who get modera=
+ted,
+> so it is only a one-time pain point per person.
 
-> ---
->  migration/ram.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 52dd678092..fdd108475c 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -851,7 +851,7 @@ static void multifd_send_pages(void)
->      p->pages->block = NULL;
->      multifd_send_state->pages = p->pages;
->      p->pages = pages;
-> -    transferred = pages->used * TARGET_PAGE_SIZE + p->packet_len;
-> +    transferred = ((uint64_t) pages->used) * TARGET_PAGE_SIZE + p->packet_len;
->      ram_counters.multifd_bytes += transferred;
->      ram_counters.transferred += transferred;;
->      qemu_mutex_unlock(&p->mutex);
-> -- 
-> 2.17.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Actually, the list bot is even more stupid than that - a first-time=20
+poster that subscribes first is STILL moderated (and sometimes you can=20
+see evidence of that when someone posts 2 or 3 nearly identical messages=20
+in a short time - first before subscribing, then again after, thinking=20
+that subscribing will make a difference). Whitelisting happens=20
+independently from subscription.
+
+>=20
+> Thankyou spammers :-(
+
+But also a hearty thank you to all list moderators that reduce the=20
+amount of spam actually making it to the list.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
