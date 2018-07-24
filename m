@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fhzV7-00055b-8r
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:45:26 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fhzYp-0006Vs-RZ
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fhzV6-0000h4-BV
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:45:25 -0400
-References: <20180724153616.32352-1-peter.maydell@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a69b9ba5-1973-0d37-0cb9-0de4e4f21a91@redhat.com>
-Date: Tue, 24 Jul 2018 17:45:16 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1fhzYm-0002tI-PP
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:49:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43478)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fhzYm-0002sg-HE
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 11:49:12 -0400
+Date: Tue, 24 Jul 2018 12:48:59 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180724154859.GH3896@localhost.localdomain>
+References: <20180723193145.24705-1-ehabkost@redhat.com>
+	<20180723193145.24705-3-ehabkost@redhat.com>
+	<20180724142949.3078da82@redhat.com>
+	<20180724123916.GC3896@localhost.localdomain>
+	<20180724172844.5bea5a07@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180724153616.32352-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.0] hw/misc/tz-mpc: Zero the LUT on
- initialization, not just reset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180724172844.5bea5a07@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] acpi: Decouple ACPI hotplug
+ callbacks from HotplugHandler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +31,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 24.07.2018 17:36, Peter Maydell wrote:
-> In the tz-mpc device we allocate a data block for the LUT,
-> which we then clear to zero in the device's reset method.
-> This is conceptually fine, but unfortunately results in a
-> valgrind complaint about use of uninitialized data on startup:
+On Tue, Jul 24, 2018 at 05:28:44PM +0200, Igor Mammedov wrote:
+> On Tue, 24 Jul 2018 09:39:16 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> ==30906== Conditional jump or move depends on uninitialised value(s)
-> ==30906==    at 0x503609: tz_mpc_translate (tz-mpc.c:439)
-> ==30906==    by 0x3F3D90: address_space_translate_iommu (exec.c:511)
-> ==30906==    by 0x3F3FF8: flatview_do_translate (exec.c:584)
-> ==30906==    by 0x3F4292: flatview_translate (exec.c:644)
-> ==30906==    by 0x3F2120: address_space_translate (memory.h:1962)
-> ==30906==    by 0x3FB753: address_space_ldl_internal (memory_ldst.inc.c:36)
-> ==30906==    by 0x3FB8A6: address_space_ldl (memory_ldst.inc.c:80)
-> ==30906==    by 0x619037: ldl_phys (memory_ldst_phys.inc.h:25)
-> ==30906==    by 0x61985D: arm_cpu_reset (cpu.c:255)
-> ==30906==    by 0x98791B: cpu_reset (cpu.c:249)
-> ==30906==    by 0x57FFDB: armv7m_reset (armv7m.c:265)
-> ==30906==    by 0x7B1775: qemu_devices_reset (reset.c:69)
-> 
-> This is because of a reset ordering problem -- the TZ MPC
-> resets after the CPU, but an M-profile CPU's reset function
-> includes memory loads to get the initial PC and SP, which
-> then go through an MPC that hasn't yet been reset.
-> 
-> The simplest fix for this is to zero the LUT when we
-> initialize the data, which will result in the MPC's
-> translate function giving the right answers for these
-> early memory accesses.
+> > On Tue, Jul 24, 2018 at 02:29:49PM +0200, Igor Mammedov wrote:
+> > > On Mon, 23 Jul 2018 16:31:45 -0300
+> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > >   
+> > > > The ACPI hotplug callbacks get a HotplugHandler object as
+> > > > argument.  This has two problems:
+> > > > 
+> > > > 1) The functions require a TYPE_ACPI_DEVICE_IF object, but the
+> > > >    function prototype doesn't indicate that.  It's possible to
+> > > >    pass an object that would make the function crash.
+> > > > 2) The function does not require the object to implement
+> > > >    TYPE_HOTPLUG_HANDLER at all, but the function prototype
+> > > >    imposes that for no reason.
+> > > > 
+> > > > Change the argument type to AcpiDeviceIf instead of
+> > > > HotplugHandler.  
+> > > What is the motivation for this patch,
+> > > do you actually get crashes?  
+> > 
+> > I didn't get crashes, but the idea for the change came when
+> > Michael asked me how to get the HotplugHandler object.  I was
+> > going to suggest current_machine (which is also a hotplug
+> > handler), when I noticed he actually needed an AcpiDeviceIf
+> > object.
+> > 
+> > The main motivation, however, is to simply make the function
+> > prototypes make sense.  Is there a single reason to make the ACPI
+> > functions get a HotplugHandler argument instead of AcpiDeviceIf?
+> I'd rather to keep current *_cb() functions as is,
+> as we might actually need access to hotplug handler there and in
+> that case keeping more generic hotplug handler would be better
+> and it also sort of documents better what is being passed in.
 
-Thanks, that fixes the issue, indeed:
+I think it doesn't document what is being passed in at all.  The
+function looks like it requires only a HotplugHandler object, but
+it actually requires an AcpiDeviceIf object.
 
-Tested-by: Thomas Huth <thuth@redhat.com>
+
+> 
+> Also we won't have to rewrite it back from AcpiDeviceIf to
+> HotplugHandler again if it's needed.
+> 
+
+My main problem is: today there's a hard requirement that
+HotplugHandler and AcpiDeviceIf must be the same object, but it's
+not documented anywhere.
+
+The proposal in this patch is to remove that requirement, and
+make the callbacks just require an AcpiDeviceIf object.
+
+If you plan to keep that requirement, that may be OK, but the
+requirement needs to be documented somehow.  How do you think the
+requirement can be enforced and/or documented?
+
+-- 
+Eduardo
