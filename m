@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fhzlo-0003dA-91
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 12:02:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1fhzpo-0006yp-Nr
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 12:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fhzli-0004r0-OG
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 12:02:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48430 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fhzpk-0000Yi-31
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 12:06:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60710 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fhzli-0004qr-Ig
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 12:02:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fhzpj-0000XK-Sf
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 12:06:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1E18140201BD
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 16:02:34 +0000 (UTC)
-Date: Tue, 24 Jul 2018 17:02:27 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180724160227.GD48553@work-vm>
-References: <20180724102215.31866-1-dgilbert@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 0A2BF7C6CA
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 16:06:43 +0000 (UTC)
+References: <20180720034713.11711-1-peterx@redhat.com>
+	<20180724155912.GB48553@work-vm>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b4a02331-1d06-4200-7918-ac2732845f2a@redhat.com>
+Date: Tue, 24 Jul 2018 11:06:42 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180724102215.31866-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] audio/hda: Fix migration
+In-Reply-To: <20180724155912.GB48553@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] migration: fix potential overflow in
+ multifd send
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +35,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kraxel@redhat.com, berrange@redhat.com, quintela@redhat.com, marcandre.lureau@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-* Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Fix outgoing migration which was crashing in
-> vmstate_hda_audio_stream_buf_needed, I think the problem
-> is that we have room for upto 4 streams in the array but only
-> use 2, when we come to try and save the state of the unused
-> streams we hit st->state == NULL.
-> 
-> Fixes: 280c1e1cdb24d80ecdfc
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 07/24/2018 10:59 AM, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+>> I would guess it won't happen normally, but this should ease Coverity.
+>>
 
-Queued via migration
+>> +++ b/migration/ram.c
+>> @@ -851,7 +851,7 @@ static void multifd_send_pages(void)
+>>       p->pages->block = NULL;
+>>       multifd_send_state->pages = p->pages;
+>>       p->pages = pages;
+>> -    transferred = pages->used * TARGET_PAGE_SIZE + p->packet_len;
+>> +    transferred = ((uint64_t) pages->used) * TARGET_PAGE_SIZE + p->packet_len;
 
-> ---
->  hw/audio/hda-codec.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
-> index 2b58c3505b..617a1c1016 100644
-> --- a/hw/audio/hda-codec.c
-> +++ b/hw/audio/hda-codec.c
-> @@ -786,7 +786,7 @@ static void hda_audio_reset(DeviceState *dev)
->  static bool vmstate_hda_audio_stream_buf_needed(void *opaque)
->  {
->      HDAAudioStream *st = opaque;
-> -    return st->state->use_timer;
-> +    return st->state && st->state->use_timer;
->  }
->  
->  static const VMStateDescription vmstate_hda_audio_stream_buf = {
-> -- 
-> 2.17.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The outer () are not strictly necessary, as casts bind tighter than 
+multiply.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
