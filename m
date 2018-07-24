@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fi3Xf-0006wP-W2
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 16:04:23 -0400
+	(envelope-from <maran.wilson@oracle.com>) id 1fi43T-0000oJ-0b
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 16:37:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fi3Xc-0007jF-PI
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 16:04:20 -0400
-From: Leonid Bloch <lbloch@janustech.com>
-Date: Tue, 24 Jul 2018 23:03:41 +0300
-Message-Id: <20180724200343.13733-4-lbloch@janustech.com>
-In-Reply-To: <20180724200343.13733-1-lbloch@janustech.com>
-References: <20180724200343.13733-1-lbloch@janustech.com>
+	(envelope-from <maran.wilson@oracle.com>) id 1fi43R-0004zN-Tl
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 16:37:11 -0400
+References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
+	<20180227104708.GA11391@cbox>
+	<ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
+	<20180227124604.GA2373@cbox>
+	<20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
+From: Maran Wilson <maran.wilson@oracle.com>
+Message-ID: <b589d714-4f12-e450-7ca5-e55fed4d1705@oracle.com>
+Date: Tue, 24 Jul 2018 11:35:31 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 3/5] qcow2: Introduce an option for
- sufficient L2 cache for the entire image
+In-Reply-To: <20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] VCPU hotplug on KVM/ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,177 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Leonid Bloch <lbloch@janustech.com>
+To: kvmarm@lists.cs.columbia.edu, bthakur@codeaurora.org
+Cc: Andrew Jones <drjones@redhat.com>, Christoffer Dall <cdall@kernel.org>, Christoffer Dall <cdall@cs.columbia.edu>, qemu-devel@nongnu.org, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm@nongnu.org, imammedo@redhat.com, peter.maydell@linaro.org, david@redhat.com, marc.zyngier@arm.com
 
-An option "l2-cache-full" is introduced to automatically set the qcow2
-L2 cache to a sufficient value for covering the entire image. The memory
-overhead when using this option is not big (1 MB for each 8 GB of
-virtual image size with the default cluster size) and it can noticeably
-improve performance when using large images with frequent I/O.
-Previously, for this functionality the correct L2 cache size needed to
-be calculated manually or with a script, and then this size needed to be
-passed to the "l2-cache-size" option. Now it is sufficient to just pass
-the boolean "l2-cache-full" option.
+It's been a few months since this email thread died off. Has anyone 
+started working on a potential solution that would allow VCPU hotplug on 
+KVM/ARM ? Or is this a project that is still waiting for an owner who 
+has the time and inclination to get started?
 
-Signed-off-by: Leonid Bloch <lbloch@janustech.com>
----
- block/qcow2.c        | 35 ++++++++++++++++++++++++++++-------
- block/qcow2.h        |  1 +
- qapi/block-core.json |  8 +++++++-
- qemu-options.hx      |  6 +++++-
- 4 files changed, 41 insertions(+), 9 deletions(-)
+Thanks,
+-Maran
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index ec9e6238a0..101b8b474b 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -695,6 +695,11 @@ static QemuOptsList qcow2_runtime_opts = {
-             .type = QEMU_OPT_SIZE,
-             .help = "Maximum L2 table cache size",
-         },
-+        {
-+            .name = QCOW2_OPT_L2_CACHE_FULL,
-+            .type = QEMU_OPT_BOOL,
-+            .help = "Create full coverage of the image with the L2 cache",
-+        },
-         {
-             .name = QCOW2_OPT_L2_CACHE_ENTRY_SIZE,
-             .type = QEMU_OPT_SIZE,
-@@ -779,10 +784,12 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t combined_cache_size;
-     bool l2_cache_size_set, refcount_cache_size_set, combined_cache_size_set;
-+    bool l2_cache_full_set;
-     int min_refcount_cache = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
- 
-     combined_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_CACHE_SIZE);
-     l2_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_L2_CACHE_SIZE);
-+    l2_cache_full_set = qemu_opt_get(opts, QCOW2_OPT_L2_CACHE_FULL);
-     refcount_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_REFCOUNT_CACHE_SIZE);
- 
-     combined_cache_size = qemu_opt_get_size(opts, QCOW2_OPT_CACHE_SIZE, 0);
-@@ -793,6 +800,17 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-     *l2_cache_entry_size = qemu_opt_get_size(
-         opts, QCOW2_OPT_L2_CACHE_ENTRY_SIZE, s->cluster_size);
- 
-+    uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
-+    uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
-+
-+    if (l2_cache_size_set && l2_cache_full_set) {
-+        error_setg(errp, QCOW2_OPT_L2_CACHE_SIZE " and "
-+                   QCOW2_OPT_L2_CACHE_FULL " may not be set at the same time");
-+        return;
-+    } else if (l2_cache_full_set) {
-+        *l2_cache_size = max_l2_cache;
-+    }
-+
-     if (combined_cache_size_set) {
-         if (l2_cache_size_set && refcount_cache_size_set) {
-             error_setg(errp, QCOW2_OPT_CACHE_SIZE ", " QCOW2_OPT_L2_CACHE_SIZE
-@@ -800,8 +818,14 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-                        "at the same time");
-             return;
-         } else if (*l2_cache_size > combined_cache_size) {
--            error_setg(errp, QCOW2_OPT_L2_CACHE_SIZE " may not exceed "
--                       QCOW2_OPT_CACHE_SIZE);
-+            if (l2_cache_full_set) {
-+                error_setg(errp, QCOW2_OPT_CACHE_SIZE " must be greater than "
-+                           "the full L2 cache if " QCOW2_OPT_L2_CACHE_FULL
-+                           " is used");
-+            } else {
-+                error_setg(errp, QCOW2_OPT_L2_CACHE_SIZE " may not exceed "
-+                           QCOW2_OPT_CACHE_SIZE);
-+            }
-             return;
-         } else if (*refcount_cache_size > combined_cache_size) {
-             error_setg(errp, QCOW2_OPT_REFCOUNT_CACHE_SIZE " may not exceed "
-@@ -809,14 +833,11 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-             return;
-         }
- 
--        if (l2_cache_size_set) {
-+        if (l2_cache_size_set || l2_cache_full_set) {
-             *refcount_cache_size = combined_cache_size - *l2_cache_size;
-         } else if (refcount_cache_size_set) {
-             *l2_cache_size = combined_cache_size - *refcount_cache_size;
-         } else {
--            uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
--            uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
--
-             /* Assign as much memory as possible to the L2 cache, and
-              * use the remainder for the refcount cache */
-             if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
-@@ -829,7 +850,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-             }
-         }
-     } else {
--        if (!l2_cache_size_set) {
-+        if (!l2_cache_size_set && !l2_cache_full_set) {
-             *l2_cache_size = MAX(DEFAULT_L2_CACHE_BYTE_SIZE,
-                                  (uint64_t)DEFAULT_L2_CACHE_CLUSTERS
-                                  * s->cluster_size);
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 81b844e936..151e014bd8 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -97,6 +97,7 @@
- #define QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY "overlap-check.bitmap-directory"
- #define QCOW2_OPT_CACHE_SIZE "cache-size"
- #define QCOW2_OPT_L2_CACHE_SIZE "l2-cache-size"
-+#define QCOW2_OPT_L2_CACHE_FULL "l2-cache-full"
- #define QCOW2_OPT_L2_CACHE_ENTRY_SIZE "l2-cache-entry-size"
- #define QCOW2_OPT_REFCOUNT_CACHE_SIZE "refcount-cache-size"
- #define QCOW2_OPT_CACHE_CLEAN_INTERVAL "cache-clean-interval"
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d40d5ecc3b..c584059e23 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2812,7 +2812,12 @@
- #                         refcount block caches in bytes (since 2.2)
- #
- # @l2-cache-size:         the maximum size of the L2 table cache in
--#                         bytes (since 2.2)
-+#                         bytes (mutually exclusive with l2-cache-full)
-+#                         (since 2.2)
-+#
-+# @l2-cache-full:         make the L2 table cache large enough to cover the
-+#                         entire image (mutually exclusive with l2-cache-size)
-+#                         (since 3.1)
- #
- # @l2-cache-entry-size:   the size of each entry in the L2 cache in
- #                         bytes. It must be a power of two between 512
-@@ -2840,6 +2845,7 @@
-             '*overlap-check': 'Qcow2OverlapChecks',
-             '*cache-size': 'int',
-             '*l2-cache-size': 'int',
-+            '*l2-cache-full': 'bool',
-             '*l2-cache-entry-size': 'int',
-             '*refcount-cache-size': 'int',
-             '*cache-clean-interval': 'int',
-diff --git a/qemu-options.hx b/qemu-options.hx
-index ef0706c359..6d417cb267 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -754,7 +754,7 @@ image file)
- The maximum total size of the L2 table and refcount block caches in bytes
- 
- @item l2-cache-size
--The maximum size of the L2 table cache.
-+The maximum size of the L2 table cache. (Mutually exclusive with l2-cache-full)
- (default: if cache-size is not defined - 1048576 bytes or 8 clusters,
- whichever is larger; if cache-size is defined and is large enough to
- accommodate enough L2 cache to cover the entire virtual size of the image plus
-@@ -762,6 +762,10 @@ the minimal amount of refcount cache - enough to cover the entire image;
- if cache-size is defined and is not large enough - as much as possible while
- leaving space for the needed refcount cache)
- 
-+@item l2-cache-full
-+Make the L2 table cache large enough to cover the entire image (mutually
-+exclusive with l2-cache-size) (on/off; default: off)
-+
- @item refcount-cache-size
- The maximum size of the refcount block cache in bytes
- (default: 4 times the cluster size, or if cache-size is defined and is large
--- 
-2.14.1
+On 2/27/2018 5:21 AM, Andrew Jones wrote:
+> On Tue, Feb 27, 2018 at 01:46:04PM +0100, Christoffer Dall wrote:
+>> On Tue, Feb 27, 2018 at 05:34:28PM +0530, bthakur@codeaurora.org wrote:
+>>> Hi Christoffer,
+>>>
+>>> Thanks for your reply.
+>>>
+>>> On 2018-02-27 16:17, Christoffer Dall wrote:
+>>>> Hi Bhupinder,
+>>>>
+>>>> On Tue, Feb 27, 2018 at 03:01:17PM +0530, bthakur@codeaurora.org wrote:
+>>>>> I hope it is the right forum to post my query.
+>>>>>
+>>>>>
+>>>>>
+>>>>> I am currently looking at the possibility of adding a new VCPU to a
+>>>>> running
+>>>>> guest VM in KVM/ARM. I see that currently, it is not allowed to add a
+>>>>> new
+>>>>> VCPU to a guest VM, if it is already initialized. The first check in
+>>>>> kvm_arch_vcpu_create() returns failure if it is already initialized.
+>>>>>
+>>>> This would require a major rework of a lot of logic surrounding the GIC
+>>>> and other parts of KVM initialization.
+>>>>
+>>>>>
+>>>>> There was some work done in QEMU to add support for VCPU hotplug:
+>>>>> https://lists.gnu.org/archive/html/qemu-arm/2017-05/msg00404.html
+>>>>>
+>>>>>
+>>>>>
+>>>>> But I am looking at the KVM side for enabling adding a new VCPU. If you
+>>>>> can
+>>>>> point me to any relevant work/resources, which I can refer to then it
+>>>>> will
+>>>>> help me.
+>>>>>
+>>>> I don't have any specific pointers, but I was always told that the way
+>>>> we were going to do CPU hotplug would be to instantiate a large number
+>>>> of VCPUs, and hotplug would be equivalent to turning on a VCPU which was
+>>>> previously powered off.
+>>>>
+>>>> Is this not still a feasible solution?
+>>> It should be a feasible solution provided the guest VM is not able to
+>>> control the onlining/offlining of VCPUs. It should be controlled by the
+>>> Host.
+>>>
+>> KVM could simply refuse to turn on some of the CPUs unless given
+>> permission from host userspace.
+>>
+>>>> How does VCPU hotplug work on x86?
+>>> On x86, you can add a vcpu through libvirt setvcpu command and it shows up
+>>> in the guest VM as a new CPU if you do lscpu.
+>>>
+>> Sure, but what is the mechanism, does x86 qemu actually call
+>> KVM_CREATE_VCPU, or is this also a question of turning on already
+>> created vcpus ?
+>>
+> CC'ing Igor and qemu-devel
+>
+> drew
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
