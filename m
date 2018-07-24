@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1Pn-00061u-Ft
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:48:05 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1Q9-0006Ef-5K
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:48:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1Pm-0005Aw-1d
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:48:03 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:48178 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fi1Q7-0005cf-Pq
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:48:25 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49354 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fi1Pl-0005A2-MC
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:48:01 -0400
+	id 1fi1Q7-0005af-EY
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 13:48:23 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 24 Jul 2018 19:31:24 +0200
-Message-Id: <1532453527-22911-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 24 Jul 2018 19:31:25 +0200
+Message-Id: <1532453527-22911-14-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1532453527-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1532453527-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v4 12/55] target/mips: Add emulation of
- nanoMIPS FP instructions
+Subject: [Qemu-devel] [PATCH v4 13/55] target/mips: Add emulation of misc
+ nanoMIPS instructions (pool32a0)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,334 +30,223 @@ Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aur
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add emulation of basic floating point arithmetic for nanoMIPS.
+Add emulation of nanoMIPS instructions that are situated in pool32a0.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 300 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 300 insertions(+)
+ target/mips/translate.c | 190 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 190 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f5f722d..90b1a1d 100644
+index 90b1a1d..e5ebdb9 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16590,6 +16590,305 @@ static void gen_pool16c_nanomips_insn(DisasContext *ctx)
+@@ -16590,6 +16590,186 @@ static void gen_pool16c_nanomips_insn(DisasContext *ctx)
      }
  }
  
-+static void gen_pool32f_nanomips_insn(DisasContext *ctx)
++static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
 +{
-+    int rt, rs, rd;
++    int rt = (ctx->opcode >> 21) & 0x1f;
++    int rs = (ctx->opcode >> 16) & 0x1f;
++    int rd = (ctx->opcode >> 11) & 0x1f;
 +
-+    rt = extract32(ctx->opcode, 21, 5);
-+    rs = extract32(ctx->opcode, 16, 5);
-+    rd = extract32(ctx->opcode, 11, 5);
-+
-+    if (!(ctx->CP0_Config1 & (1 << CP0C1_FP))) {
-+        generate_exception_end(ctx, EXCP_RI);
-+        return;
-+    }
-+    check_cp1_enabled(ctx);
-+    switch (extract32(ctx->opcode, 0, 3)) {
-+    case NM_POOL32F_0:
-+        switch (extract32(ctx->opcode, 3, 7)) {
-+        case NM_RINT_S:
-+            gen_farith(ctx, OPC_RINT_S, 0, rt, rs, 0);
++    switch ((ctx->opcode >> 3) & 0x7f) {
++    case NM_P_TRAP:
++        switch ((ctx->opcode >> 10) & 0x1) {
++        case NM_TEQ:
++            gen_trap(ctx, OPC_TEQ, rs, rt, -1);
 +            break;
-+        case NM_RINT_D:
-+            gen_farith(ctx, OPC_RINT_D, 0, rt, rs, 0);
-+            break;
-+        case NM_CLASS_S:
-+            gen_farith(ctx, OPC_CLASS_S, 0, rt, rs, 0);
-+            break;
-+        case NM_CLASS_D:
-+            gen_farith(ctx, OPC_CLASS_D, 0, rt, rs, 0);
-+            break;
-+        case NM_ADD_S:
-+            gen_farith(ctx, OPC_ADD_S, rt, rs, rd, 0);
-+            break;
-+        case NM_ADD_D:
-+            gen_farith(ctx, OPC_ADD_D, rt, rs, rd, 0);
-+            break;
-+        case NM_SUB_S:
-+            gen_farith(ctx, OPC_SUB_S, rt, rs, rd, 0);
-+            break;
-+        case NM_SUB_D:
-+            gen_farith(ctx, OPC_SUB_D, rt, rs, rd, 0);
-+            break;
-+        case NM_MUL_S:
-+            gen_farith(ctx, OPC_MUL_S, rt, rs, rd, 0);
-+            break;
-+        case NM_MUL_D:
-+            gen_farith(ctx, OPC_MUL_D, rt, rs, rd, 0);
-+            break;
-+        case NM_DIV_S:
-+            gen_farith(ctx, OPC_DIV_S, rt, rs, rd, 0);
-+            break;
-+        case NM_DIV_D:
-+            gen_farith(ctx, OPC_DIV_D, rt, rs, rd, 0);
-+            break;
-+        case NM_SELEQZ_S:
-+            gen_sel_s(ctx, OPC_SELEQZ_S, rd, rt, rs);
-+            break;
-+        case NM_SELEQZ_D:
-+            gen_sel_d(ctx, OPC_SELEQZ_D, rd, rt, rs);
-+            break;
-+        case NM_SELNEZ_S:
-+            gen_sel_s(ctx, OPC_SELNEZ_S, rd, rt, rs);
-+            break;
-+        case NM_SELNEZ_D:
-+            gen_sel_d(ctx, OPC_SELNEZ_D, rd, rt, rs);
-+            break;
-+        case NM_SEL_S:
-+            gen_sel_s(ctx, OPC_SEL_S, rd, rt, rs);
-+            break;
-+        case NM_SEL_D:
-+            gen_sel_d(ctx, OPC_SEL_D, rd, rt, rs);
-+            break;
-+        case NM_MADDF_S:
-+            gen_farith(ctx, OPC_MADDF_S, rt, rs, rd, 0);
-+            break;
-+        case NM_MADDF_D:
-+            gen_farith(ctx, OPC_MADDF_D, rt, rs, rd, 0);
-+            break;
-+        case NM_MSUBF_S:
-+            gen_farith(ctx, OPC_MSUBF_S, rt, rs, rd, 0);
-+            break;
-+        case NM_MSUBF_D:
-+            gen_farith(ctx, OPC_MSUBF_D, rt, rs, rd, 0);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
++        case NM_TNE:
++            gen_trap(ctx, OPC_TNE, rs, rt, -1);
 +            break;
 +        }
 +        break;
-+    case NM_POOL32F_3:
-+        switch (extract32(ctx->opcode, 3, 3)) {
-+        case NM_MIN_FMT:
-+            switch (extract32(ctx->opcode, 9, 1)) {
-+            case FMT_SDPS_S:
-+                gen_farith(ctx, OPC_MIN_S, rt, rs, rd, 0);
-+                break;
-+            case FMT_SDPS_D:
-+                gen_farith(ctx, OPC_MIN_D, rt, rs, rd, 0);
-+                break;
-+            }
++    case NM_RDHWR:
++        gen_rdhwr(ctx, rt, rs, extract32(ctx->opcode, 11, 3));
++        break;
++    case NM_SEB:
++        gen_bshfl(ctx, OPC_SEB, rs, rt);
++        break;
++    case NM_SEH:
++        gen_bshfl(ctx, OPC_SEH, rs, rt);
++        break;
++    case NM_SLLV:
++        gen_shift(ctx, OPC_SLLV, rd, rt, rs);
++        break;
++    case NM_SRLV:
++        gen_shift(ctx, OPC_SRLV, rd, rt, rs);
++        break;
++    case NM_SRAV:
++        gen_shift(ctx, OPC_SRAV, rd, rt, rs);
++        break;
++    case NM_ROTRV:
++        gen_shift(ctx, OPC_ROTRV, rd, rt, rs);
++        break;
++    case NM_ADD:
++        gen_arith(ctx, OPC_ADD, rd, rs, rt);
++        break;
++    case NM_ADDU:
++        gen_arith(ctx, OPC_ADDU, rd, rs, rt);
++        break;
++    case NM_SUB:
++        gen_arith(ctx, OPC_SUB, rd, rs, rt);
++        break;
++    case NM_SUBU:
++        gen_arith(ctx, OPC_SUBU, rd, rs, rt);
++        break;
++    case NM_P_CMOVE:
++        switch ((ctx->opcode >> 10) & 1) {
++        case NM_MOVZ:
++            gen_cond_move(ctx, OPC_MOVZ, rd, rs, rt);
 +            break;
-+        case NM_MAX_FMT:
-+            switch (extract32(ctx->opcode, 9, 1)) {
-+            case FMT_SDPS_S:
-+                gen_farith(ctx, OPC_MAX_S, rt, rs, rd, 0);
-+                break;
-+            case FMT_SDPS_D:
-+                gen_farith(ctx, OPC_MAX_D, rt, rs, rd, 0);
-+                break;
-+            }
++        case NM_MOVN:
++            gen_cond_move(ctx, OPC_MOVN, rd, rs, rt);
 +            break;
-+        case NM_MINA_FMT:
-+            switch (extract32(ctx->opcode, 9, 1)) {
-+            case FMT_SDPS_S:
-+                gen_farith(ctx, OPC_MINA_S, rt, rs, rd, 0);
++        }
++        break;
++    case NM_AND:
++        gen_logic(ctx, OPC_AND, rd, rs, rt);
++        break;
++    case NM_OR:
++        gen_logic(ctx, OPC_OR, rd, rs, rt);
++        break;
++    case NM_NOR:
++        gen_logic(ctx, OPC_NOR, rd, rs, rt);
++        break;
++    case NM_XOR:
++        gen_logic(ctx, OPC_XOR, rd, rs, rt);
++        break;
++    case NM_SLT:
++        gen_slt(ctx, OPC_SLT, rd, rs, rt);
++        break;
++    case NM_P_SLTU:
++        if (rd == 0) {
++            /* P_DVP */
++#ifndef CONFIG_USER_ONLY
++            TCGv t0 = tcg_temp_new();
++            switch ((ctx->opcode >> 10) & 1) {
++            case NM_DVP:
++                if (ctx->vp) {
++                    check_cp0_enabled(ctx);
++                    gen_helper_dvp(t0, cpu_env);
++                    gen_store_gpr(t0, rt);
++                }
 +                break;
-+            case FMT_SDPS_D:
-+                gen_farith(ctx, OPC_MINA_D, rt, rs, rd, 0);
-+                break;
-+            }
-+            break;
-+        case NM_MAXA_FMT:
-+            switch (extract32(ctx->opcode, 9, 1)) {
-+            case FMT_SDPS_S:
-+                gen_farith(ctx, OPC_MAXA_S, rt, rs, rd, 0);
-+                break;
-+            case FMT_SDPS_D:
-+                gen_farith(ctx, OPC_MAXA_D, rt, rs, rd, 0);
-+                break;
-+            }
-+            break;
-+        case NM_POOL32FXF:
-+            switch (extract32(ctx->opcode, 6, 8)) {
-+            case NM_CFC1:
-+                gen_cp1(ctx, OPC_CFC1, rt, rs);
-+                break;
-+            case NM_CTC1:
-+                gen_cp1(ctx, OPC_CTC1, rt, rs);
-+                break;
-+            case NM_MFC1:
-+                gen_cp1(ctx, OPC_MFC1, rt, rs);
-+                break;
-+            case NM_MTC1:
-+                gen_cp1(ctx, OPC_MTC1, rt, rs);
-+                break;
-+            case NM_MFHC1:
-+                gen_cp1(ctx, OPC_MFHC1, rt, rs);
-+                break;
-+            case NM_MTHC1:
-+                gen_cp1(ctx, OPC_MTHC1, rt, rs);
-+                break;
-+            case NM_CVT_S_PL:
-+                gen_farith(ctx, OPC_CVT_S_PL, -1, rs, rt, 0);
-+                break;
-+            case NM_CVT_S_PU:
-+                gen_farith(ctx, OPC_CVT_S_PU, -1, rs, rt, 0);
-+                break;
-+            default:
-+                switch (extract32(ctx->opcode, 6, 9)) {
-+                case NM_CVT_L_S:
-+                    gen_farith(ctx, OPC_CVT_L_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_CVT_L_D:
-+                    gen_farith(ctx, OPC_CVT_L_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_CVT_W_S:
-+                    gen_farith(ctx, OPC_CVT_W_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_CVT_W_D:
-+                    gen_farith(ctx, OPC_CVT_W_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_RSQRT_S:
-+                    gen_farith(ctx, OPC_RSQRT_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_RSQRT_D:
-+                    gen_farith(ctx, OPC_RSQRT_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_SQRT_S:
-+                    gen_farith(ctx, OPC_SQRT_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_SQRT_D:
-+                    gen_farith(ctx, OPC_SQRT_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_RECIP_S:
-+                    gen_farith(ctx, OPC_RECIP_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_RECIP_D:
-+                    gen_farith(ctx, OPC_RECIP_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_FLOOR_L_S:
-+                    gen_farith(ctx, OPC_FLOOR_L_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_FLOOR_L_D:
-+                    gen_farith(ctx, OPC_FLOOR_L_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_FLOOR_W_S:
-+                    gen_farith(ctx, OPC_FLOOR_W_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_FLOOR_W_D:
-+                    gen_farith(ctx, OPC_FLOOR_W_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_CEIL_L_S:
-+                    gen_farith(ctx, OPC_CEIL_L_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_CEIL_L_D:
-+                    gen_farith(ctx, OPC_CEIL_L_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_CEIL_W_S:
-+                    gen_farith(ctx, OPC_CEIL_W_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_CEIL_W_D:
-+                    gen_farith(ctx, OPC_CEIL_W_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_TRUNC_L_S:
-+                    gen_farith(ctx, OPC_TRUNC_L_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_TRUNC_L_D:
-+                    gen_farith(ctx, OPC_TRUNC_L_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_TRUNC_W_S:
-+                    gen_farith(ctx, OPC_TRUNC_W_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_TRUNC_W_D:
-+                    gen_farith(ctx, OPC_TRUNC_W_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_ROUND_L_S:
-+                    gen_farith(ctx, OPC_ROUND_L_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_ROUND_L_D:
-+                    gen_farith(ctx, OPC_ROUND_L_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_ROUND_W_S:
-+                    gen_farith(ctx, OPC_ROUND_W_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_ROUND_W_D:
-+                    gen_farith(ctx, OPC_ROUND_W_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_MOV_S:
-+                    gen_farith(ctx, OPC_MOV_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_MOV_D:
-+                    gen_farith(ctx, OPC_MOV_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_ABS_S:
-+                    gen_farith(ctx, OPC_ABS_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_ABS_D:
-+                    gen_farith(ctx, OPC_ABS_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_NEG_S:
-+                    gen_farith(ctx, OPC_NEG_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_NEG_D:
-+                    gen_farith(ctx, OPC_NEG_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_CVT_D_S:
-+                    gen_farith(ctx, OPC_CVT_D_S, -1, rs, rt, 0);
-+                    break;
-+                case NM_CVT_D_W:
-+                    gen_farith(ctx, OPC_CVT_D_W, -1, rs, rt, 0);
-+                    break;
-+                case NM_CVT_D_L:
-+                    gen_farith(ctx, OPC_CVT_D_L, -1, rs, rt, 0);
-+                    break;
-+                case NM_CVT_S_D:
-+                    gen_farith(ctx, OPC_CVT_S_D, -1, rs, rt, 0);
-+                    break;
-+                case NM_CVT_S_W:
-+                    gen_farith(ctx, OPC_CVT_S_W, -1, rs, rt, 0);
-+                    break;
-+                case NM_CVT_S_L:
-+                    gen_farith(ctx, OPC_CVT_S_L, -1, rs, rt, 0);
-+                    break;
-+                default:
-+                    generate_exception_end(ctx, EXCP_RI);
-+                    break;
++            case NM_EVP:
++                if (ctx->vp) {
++                    check_cp0_enabled(ctx);
++                    gen_helper_evp(t0, cpu_env);
++                    gen_store_gpr(t0, rt);
 +                }
 +                break;
 +            }
-+            break;
++            tcg_temp_free(t0);
++#endif
++        } else {
++            gen_slt(ctx, OPC_SLTU, rd, rs, rt);
 +        }
 +        break;
-+    case NM_POOL32F_5:
-+        switch (extract32(ctx->opcode, 3, 3)) {
-+        case NM_CMP_CONDN_S:
-+            gen_r6_cmp_s(ctx, extract32(ctx->opcode, 6, 5), rt, rs, rd);
-+            break;
-+        case NM_CMP_CONDN_D:
-+            gen_r6_cmp_d(ctx, extract32(ctx->opcode, 6, 5), rt, rs, rd);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
++    case NM_SOV:
++    {
++        TCGv t0 = tcg_temp_local_new();
++        TCGv t1 = tcg_temp_new();
++        TCGv t2 = tcg_temp_new();
++        TCGLabel *l1 = gen_new_label();
++
++        gen_load_gpr(t1, rs);
++        gen_load_gpr(t2, rt);
++        tcg_gen_add_tl(t0, t1, t2);
++        tcg_gen_ext32s_tl(t0, t0);
++        tcg_gen_xor_tl(t1, t1, t2);
++        tcg_gen_xor_tl(t2, t0, t2);
++        tcg_gen_andc_tl(t1, t2, t1);
++
++        tcg_gen_movi_tl(t0, 0);
++        tcg_gen_brcondi_tl(TCG_COND_GE, t1, 0, l1);
++        /* operands of same sign, result different sign */
++
++        tcg_gen_movi_tl(t0, 1);
++        gen_set_label(l1);
++        gen_store_gpr(t0, rd);
++
++        tcg_temp_free(t0);
++        tcg_temp_free(t1);
++        tcg_temp_free(t2);
++    }
++        break;
++    case NM_MUL:
++        gen_r6_muldiv(ctx, R6_OPC_MUL, rd, rs, rt);
++        break;
++    case NM_MUH:
++        gen_r6_muldiv(ctx, R6_OPC_MUH, rd, rs, rt);
++        break;
++    case NM_MULU:
++        gen_r6_muldiv(ctx, R6_OPC_MULU, rd, rs, rt);
++        break;
++    case NM_MUHU:
++        gen_r6_muldiv(ctx, R6_OPC_MUHU, rd, rs, rt);
++        break;
++    case NM_DIV:
++        gen_r6_muldiv(ctx, R6_OPC_DIV, rd, rs, rt);
++        break;
++    case NM_MOD:
++        gen_r6_muldiv(ctx, R6_OPC_MOD, rd, rs, rt);
++        break;
++    case NM_DIVU:
++        gen_r6_muldiv(ctx, R6_OPC_DIVU, rd, rs, rt);
++        break;
++    case NM_MODU:
++        gen_r6_muldiv(ctx, R6_OPC_MODU, rd, rs, rt);
++        break;
++#ifndef CONFIG_USER_ONLY
++    case NM_MFC0:
++        check_cp0_enabled(ctx);
++        if (rt == 0) {
++            /* Treat as NOP. */
 +            break;
 +        }
++        gen_mfc0(ctx, cpu_gpr[rt], rs, (ctx->opcode >> 11) & 0x7);
 +        break;
++    case NM_MTC0:
++        check_cp0_enabled(ctx);
++        {
++            TCGv t0 = tcg_temp_new();
++
++            gen_load_gpr(t0, rt);
++            gen_mtc0(ctx, t0, rs, (ctx->opcode >> 11) & 0x7);
++            tcg_temp_free(t0);
++        }
++        break;
++#endif
 +    default:
 +        generate_exception_end(ctx, EXCP_RI);
 +        break;
 +    }
 +}
 +
- static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+ static void gen_pool32f_nanomips_insn(DisasContext *ctx)
  {
-     uint16_t insn;
-@@ -16889,6 +17188,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+     int rt, rs, rd;
+@@ -16954,6 +17134,16 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
          }
          break;
-     case NM_POOL32F:
-+        gen_pool32f_nanomips_insn(ctx);
+     case NM_POOL32A:
++        switch (ctx->opcode & 0x07) {
++        case NM_POOL32A0:
++            gen_pool32a0_nanomips_insn(ctx);
++            break;
++        case NM_POOL32A7:
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
          break;
-     case NM_POOL32S:
-         break;
+     case NM_P_GP_W:
+         switch (ctx->opcode & 0x03) {
 -- 
 2.7.4
