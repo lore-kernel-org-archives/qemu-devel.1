@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jandryuk@gmail.com>) id 1fhwKB-0007AR-44
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:21:56 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhwKi-0007S2-9i
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:22:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jandryuk@gmail.com>) id 1fhwKA-0008Ia-6u
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:21:55 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhwKd-0008Qe-Da
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:22:28 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33981)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fhwKd-0008QL-54
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:22:23 -0400
+Received: by mail-wr1-x441.google.com with SMTP id c13-v6so3956462wrt.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 05:22:23 -0700 (PDT)
+References: <20180716074038.3364-1-yuval.shaia@oracle.com>
+	<20180716074038.3364-13-yuval.shaia@oracle.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <7ec58359-daf7-0f5b-7cb8-0a4d7032fd29@gmail.com>
+Date: Tue, 24 Jul 2018 15:22:19 +0300
 MIME-Version: 1.0
-From: Jason Andryuk <jandryuk@gmail.com>
-Date: Tue, 24 Jul 2018 08:21:49 -0400
-Message-ID: <CAKf6xpvjRO05BAoVaw9vQZ56q84pTNXRa9ugJ2dGtQaTTEmYWw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Stable 2.12.1 Request: "ccid-card-passthru: fix
- regression in realize()"
+In-Reply-To: <20180716074038.3364-13-yuval.shaia@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 12/13] hw/rdma: Bugfix: Support non-aligned
+ buffers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,53 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-stable@nongnu.org, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, f4bug@amsat.org, Gerd Hoffmann <kraxel@redhat.com>
+To: Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org
 
-I'd like to request this commit for QEMU 2.12.1 stable backport:
 
-commit e58d64a16abc "ccid-card-passthru: fix regression in realize()"
 
-The patch fixes a VM start failure which I experience on 2.12.0.
-Patch inlined below
+On 07/16/2018 10:40 AM, Yuval Shaia wrote:
+> RDMA applications can provide non-aligned buffers to be registered. In
+> such case the DMA address passed by driver is pointing to the beginning
+> of the physical address of the mapped page so we can't distinguish
+> between two addresses from the same page.
+>
+> Fix it by keeping the offset of the virtual address in mr->virt.
+>
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> ---
+>   hw/rdma/rdma_rm.c        | 2 ++
+>   hw/rdma/vmw/pvrdma_cmd.c | 1 +
+>   2 files changed, 3 insertions(+)
+>
+> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> index 859c900003..8d59a42cd1 100644
+> --- a/hw/rdma/rdma_rm.c
+> +++ b/hw/rdma/rdma_rm.c
+> @@ -166,6 +166,7 @@ int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
+>           mr->virt = host_virt;
+>           mr->start = guest_start;
+>           mr->length = guest_length;
+> +        mr->virt += (mr->start & (TARGET_PAGE_SIZE - 1));
+>   
+>           ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, mr->virt,
+>                                        mr->length, access_flags);
+> @@ -203,6 +204,7 @@ void rdma_rm_dealloc_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle)
+>           rdma_backend_destroy_mr(&mr->backend_mr);
+>           pr_dbg("start=0x%" PRIx64 "\n", mr->start);
+>           if (mr->start) {
+> +            mr->virt -= (mr->start & (TARGET_PAGE_SIZE - 1));
+>               munmap(mr->virt, mr->length);
+>           }
+>           res_tbl_dealloc(&dev_res->mr_tbl, mr_handle);
+> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+> index bb898265a3..4ff242e793 100644
+> --- a/hw/rdma/vmw/pvrdma_cmd.c
+> +++ b/hw/rdma/vmw/pvrdma_cmd.c
+> @@ -59,6 +59,7 @@ static void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma,
+>       }
+>   
+>       host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
+> +    pr_dbg("mremap %p -> %p\n", curr_page, host_virt);
+>       if (host_virt == MAP_FAILED) {
+>           host_virt = NULL;
+>           error_report("PVRDMA: Failed to remap memory for host_virt");
+
+Nice catch!
+
+Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 
 Thanks,
-Jason
-
->From e58d64a16abc2304c4dcb644411eb9580bf63b1e Mon Sep 17 00:00:00 2001
-From: =3D?UTF-8?q?Marc-Andr=3DC3=3DA9=3D20Lureau?=3D <marcandre.lureau@redh=
-at.com>
-Date: Tue, 15 May 2018 17:30:39 +0200
-Subject: [PATCH] ccid-card-passthru: fix regression in realize()
-MIME-Version: 1.0
-Content-Type: text/plain; charset=3DUTF-8
-Content-Transfer-Encoding: 8bit
-
-Since cc847bfd16d894fd8c1a2ce25f31772f6cdbbc74, CCID card-passthru
-fails to intialize, because it changed a debug line to an error,
-probably by mistake. Change it back to a DPRINTF debug.
-
-(solves Boxes creating VM with smartcard passthru failing to start)
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 20180515153039.27514-1-marcandre.lureau@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/usb/ccid-card-passthru.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
-index 7684db0cb3..25fb19b0d7 100644
---- a/hw/usb/ccid-card-passthru.c
-+++ b/hw/usb/ccid-card-passthru.c
-@@ -345,7 +345,7 @@ static void passthru_realize(CCIDCardState *base,
-Error **errp)
-     card->vscard_in_pos =3D 0;
-     card->vscard_in_hdr =3D 0;
-     if (qemu_chr_fe_backend_connected(&card->cs)) {
--        error_setg(errp, "ccid-card-passthru: initing chardev");
-+        DPRINTF(card, D_INFO, "ccid-card-passthru: initing chardev");
-         qemu_chr_fe_set_handlers(&card->cs,
-             ccid_card_vscard_can_read,
-             ccid_card_vscard_read,
+Marcel
