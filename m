@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fhwGv-00052T-Q5
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:18:34 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fhwH0-00056A-6o
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:18:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fhwGu-0006HA-JC
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:18:33 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fhwGx-0006JB-20
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:18:38 -0400
 From: Leonid Bloch <lbloch@janustech.com>
-Date: Tue, 24 Jul 2018 15:17:51 +0300
-Message-Id: <20180724121753.5753-3-lbloch@janustech.com>
+Date: Tue, 24 Jul 2018 15:17:52 +0300
+Message-Id: <20180724121753.5753-4-lbloch@janustech.com>
 In-Reply-To: <20180724121753.5753-1-lbloch@janustech.com>
 References: <20180724121753.5753-1-lbloch@janustech.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 2/4] docs: Fix an inaccuracy due to recent
- changes
+Subject: [Qemu-devel] [PATCH 3/4] docs: Document the l2-cache-full option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +26,39 @@ Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redh
 
 Signed-off-by: Leonid Bloch <lbloch@janustech.com>
 ---
- docs/qcow2-cache.txt | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ docs/qcow2-cache.txt | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
-index 8a09a5cc5f..a0a1267482 100644
+index a0a1267482..43c0faaddb 100644
 --- a/docs/qcow2-cache.txt
 +++ b/docs/qcow2-cache.txt
-@@ -97,9 +97,9 @@ need:
-    l2_cache_size = disk_size_GB * 131072
-    refcount_cache_size = disk_size_GB * 32768
+@@ -110,11 +110,12 @@ How to configure the cache sizes
+ Cache sizes can be configured using the -drive option in the
+ command-line, or the 'blockdev-add' QMP command.
  
--QEMU has a default L2 cache of 1MB (1048576 bytes) and a refcount
--cache of 256KB (262144 bytes), so using the formulas we've just seen
--we have
-+QEMU has a default L2 cache of 1MB (1048576 bytes) or 8 clusters (whichever
-+is larger) and a refcount cache of 256KB (262144 bytes), so using the
-+formulas we've just seen we have (assuming the L2 cache is 1MB):
+-There are three options available, and all of them take bytes:
++There are four options available:
  
-    1048576 / 131072 = 8 GB of virtual disk covered by that cache
-     262144 /  32768 = 8 GB
+-"l2-cache-size":         maximum size of the L2 table cache
+-"refcount-cache-size":   maximum size of the refcount block cache
+-"cache-size":            maximum size of both caches combined
++"l2-cache-size":         maximum size of the L2 table cache (bytes, K, M)
++"refcount-cache-size":   maximum size of the refcount block cache (bytes, K, M)
++"cache-size":            maximum size of both caches combined (bytes, K, M)
++"l2-cache-full":         make the L2 cache cover the full image (boolean)
+ 
+ There are a few things that need to be taken into account:
+ 
+@@ -130,6 +131,9 @@ There are a few things that need to be taken into account:
+    memory as possible to the L2 cache before increasing the refcount
+    cache size.
+ 
++- If "l2-cache-full" is specified, QEMU will assign enough memory
++  to the L2 cache to cover the entire size of the image.
++
+ Unlike L2 tables, refcount blocks are not used during normal I/O but
+ only during allocations and internal snapshots. In most cases they are
+ accessed sequentially (even during random guest I/O) so increasing the
 -- 
 2.14.1
