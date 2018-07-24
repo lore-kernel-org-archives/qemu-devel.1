@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhw8r-000075-Pp
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:10:14 -0400
+	(envelope-from <yasmins@linux.ibm.com>) id 1fhwBl-0001v8-GF
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:13:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhw8l-0001Ry-Nk
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:10:13 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:53189)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fhw8l-0001Rh-Fb
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:10:07 -0400
-Received: by mail-wm0-x229.google.com with SMTP id o11-v6so2275626wmh.2
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 05:10:07 -0700 (PDT)
-References: <20180716074038.3364-1-yuval.shaia@oracle.com>
-	<20180716074038.3364-4-yuval.shaia@oracle.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <ee321356-c7bb-2c19-707d-76c4be91b145@gmail.com>
-Date: Tue, 24 Jul 2018 15:10:04 +0300
-MIME-Version: 1.0
-In-Reply-To: <20180716074038.3364-4-yuval.shaia@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 03/13] hw/rdma: Modify debug macros
+	(envelope-from <yasmins@linux.ibm.com>) id 1fhwBi-0003CA-Ps
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:13:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40296
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yasmins@linux.ibm.com>)
+	id 1fhwBi-0003BK-KC
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:13:10 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6OC9VHJ052486
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 08:13:09 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ke34na6kd-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 08:13:08 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <yasmins@linux.ibm.com>;
+	Tue, 24 Jul 2018 08:13:08 -0400
+From: Yasmin Beatriz <yasmins@linux.ibm.com>
+Date: Tue, 24 Jul 2018 12:13:04 +0000
+Message-Id: <1532434384-12355-1-git-send-email-yasmins@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH] target/ppc: simplify bcdadd/sub functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,87 +36,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
 
+After solving a corner case in bcdsub, this patch simplifies the logic
+of both bcdadd/sub instructions by removing some unnecessary local flags.
 
+Signed-off-by: Yasmin Beatriz <yasmins@linux.ibm.com>
+---
+ target/ppc/int_helper.c | 33 +++++++++------------------------
+ 1 file changed, 9 insertions(+), 24 deletions(-)
 
-On 07/16/2018 10:40 AM, Yuval Shaia wrote:
-> - Add line counter to ease navigation in log
-> - Print rdma instead of pvrdma
->
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> ---
->   hw/rdma/rdma_utils.c      |  4 ++++
->   hw/rdma/rdma_utils.h      | 16 ++++++++++++----
->   hw/rdma/vmw/pvrdma_main.c |  2 ++
->   3 files changed, 18 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
-> index d713f635f1..dc23f158f3 100644
-> --- a/hw/rdma/rdma_utils.c
-> +++ b/hw/rdma/rdma_utils.c
-> @@ -15,6 +15,10 @@
->   
->   #include "rdma_utils.h"
->   
-> +#ifdef PVRDMA_DEBUG
-> +unsigned long pr_dbg_cnt;
-> +#endif
-> +
->   void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen)
->   {
->       void *p;
-> diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-> index 3dc07891bc..04c7c2ef5b 100644
-> --- a/hw/rdma/rdma_utils.h
-> +++ b/hw/rdma/rdma_utils.h
-> @@ -22,18 +22,26 @@
->   #include "sysemu/dma.h"
->   
->   #define pr_info(fmt, ...) \
-> -    fprintf(stdout, "%s: %-20s (%3d): " fmt, "pvrdma",  __func__, __LINE__,\
-> +    fprintf(stdout, "%s: %-20s (%3d): " fmt, "rdma",  __func__, __LINE__,\
->              ## __VA_ARGS__)
->   
->   #define pr_err(fmt, ...) \
-> -    fprintf(stderr, "%s: Error at %-20s (%3d): " fmt, "pvrdma", __func__, \
-> +    fprintf(stderr, "%s: Error at %-20s (%3d): " fmt, "rdma", __func__, \
->           __LINE__, ## __VA_ARGS__)
->   
->   #ifdef PVRDMA_DEBUG
-> +extern unsigned long pr_dbg_cnt;
-> +
-> +#define init_pr_dbg(void) \
-> +{ \
-> +    pr_dbg_cnt = 0; \
-> +}
-> +
->   #define pr_dbg(fmt, ...) \
-> -    fprintf(stdout, "%s: %-20s (%3d): " fmt, "pvrdma", __func__, __LINE__,\
-> -           ## __VA_ARGS__)
-> +    fprintf(stdout, "%lx %ld: %-20s (%3d): " fmt, pthread_self(), pr_dbg_cnt++, \
-> +            __func__, __LINE__, ## __VA_ARGS__)
->   #else
-> +#define init_pr_dbg(void)
->   #define pr_dbg(fmt, ...)
->   #endif
->   
-> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> index 6a5073974d..1b1330e113 100644
-> --- a/hw/rdma/vmw/pvrdma_main.c
-> +++ b/hw/rdma/vmw/pvrdma_main.c
-> @@ -577,6 +577,8 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
->       Object *memdev_root;
->       bool ram_shared = false;
->   
-> +    init_pr_dbg();
-> +
->       pr_dbg("Initializing device %s %x.%x\n", pdev->name,
->              PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn));
->   
-
-
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
-
-Thanks,
-Marcel
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index fa18e6e..b8ac4bb 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -2671,16 +2671,14 @@ static int bcd_cmp_mag(ppc_avr_t *a, ppc_avr_t *b)
+     return 0;
+ }
+ 
+-static int bcd_add_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
++static void bcd_add_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
+                        int *overflow)
+ {
+     int carry = 0;
+     int i;
+-    int is_zero = 1;
+     for (i = 1; i <= 31; i++) {
+         uint8_t digit = bcd_get_digit(a, i, invalid) +
+                         bcd_get_digit(b, i, invalid) + carry;
+-        is_zero &= (digit == 0);
+         if (digit > 9) {
+             carry = 1;
+             digit -= 10;
+@@ -2689,26 +2687,20 @@ static int bcd_add_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
+         }
+ 
+         bcd_put_digit(t, digit, i);
+-
+-        if (unlikely(*invalid)) {
+-            return -1;
+-        }
+     }
+ 
+     *overflow = carry;
+-    return is_zero;
+ }
+ 
+-static int bcd_sub_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
++static void bcd_sub_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
+                        int *overflow)
+ {
+     int carry = 0;
+     int i;
+-    int is_zero = 1;
++
+     for (i = 1; i <= 31; i++) {
+         uint8_t digit = bcd_get_digit(a, i, invalid) -
+                         bcd_get_digit(b, i, invalid) + carry;
+-        is_zero &= (digit == 0);
+         if (digit & 0x80) {
+             carry = -1;
+             digit += 10;
+@@ -2717,14 +2709,9 @@ static int bcd_sub_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
+         }
+ 
+         bcd_put_digit(t, digit, i);
+-
+-        if (unlikely(*invalid)) {
+-            return -1;
+-        }
+     }
+ 
+     *overflow = carry;
+-    return is_zero;
+ }
+ 
+ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
+@@ -2734,25 +2721,25 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
+     int sgnb = bcd_get_sgn(b);
+     int invalid = (sgna == 0) || (sgnb == 0);
+     int overflow = 0;
+-    int zero = 0;
+     uint32_t cr = 0;
+     ppc_avr_t result = { .u64 = { 0, 0 } };
+ 
+     if (!invalid) {
+         if (sgna == sgnb) {
+             result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgna, ps);
+-            zero = bcd_add_mag(&result, a, b, &invalid, &overflow);
+-            cr = (sgna > 0) ? CRF_GT : CRF_LT;
++            bcd_add_mag(&result, a, b, &invalid, &overflow);
++            cr = bcd_cmp_zero(&result);
+         } else if (bcd_cmp_mag(a, b) > 0) {
+             result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgna, ps);
+-            zero = bcd_sub_mag(&result, a, b, &invalid, &overflow);
++            bcd_sub_mag(&result, a, b, &invalid, &overflow);
+             cr = (sgna > 0) ? CRF_GT : CRF_LT;
+         } else if (bcd_cmp_mag(a, b) == 0) {
+             result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(0, ps);
+-            zero = bcd_sub_mag(&result, b, a, &invalid, &overflow);
++            bcd_sub_mag(&result, b, a, &invalid, &overflow);
++            cr = CRF_EQ;
+         } else {
+             result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgnb, ps);
+-            zero = bcd_sub_mag(&result, b, a, &invalid, &overflow);
++            bcd_sub_mag(&result, b, a, &invalid, &overflow);
+             cr = (sgnb > 0) ? CRF_GT : CRF_LT;
+         }
+     }
+@@ -2762,8 +2749,6 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
+         cr = CRF_SO;
+     } else if (overflow) {
+         cr |= CRF_SO;
+-    } else if (zero) {
+-        cr = CRF_EQ;
+     }
+ 
+     *r = result;
+-- 
+1.8.3.1
