@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fhxNa-0003tp-5Z
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:29:31 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fhxNl-00042r-Tb
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:29:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fhxNW-00059q-5L
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:29:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52938 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fhxNW-00059g-0e
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:29:26 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4D0134B8C7
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 13:29:25 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180724102215.31866-1-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Tue, 24 Jul 2018 11:22:15 +0100")
-References: <20180724102215.31866-1-dgilbert@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 24 Jul 2018 15:29:18 +0200
-Message-ID: <87tvoog3td.fsf@secure.mitica>
+	(envelope-from <rth7680@gmail.com>) id 1fhxNl-0005JN-2m
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:29:41 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180713150945.12348-1-peter.maydell@linaro.org>
+	<5c3ec438-2265-94b4-4f35-71a79d838518@twiddle.net>
+	<CAFEAcA8fFxKEbwC=rfp28cTMUT2eQVzGS8qc5tLowK3XYwEvrg@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <4b9f5913-ded1-c71f-9e57-70ad4f9f554b@twiddle.net>
+Date: Tue, 24 Jul 2018 06:29:36 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] audio/hda: Fix migration
+In-Reply-To: <CAFEAcA8fFxKEbwC=rfp28cTMUT2eQVzGS8qc5tLowK3XYwEvrg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] accel/tcg: Check whether TLB entry is RAM
+ consistently with how we set it up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,19 +27,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com, berrange@redhat.com, marcandre.lureau@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Fix outgoing migration which was crashing in
-> vmstate_hda_audio_stream_buf_needed, I think the problem
-> is that we have room for upto 4 streams in the array but only
-> use 2, when we come to try and save the state of the unused
-> streams we hit st->state == NULL.
->
-> Fixes: 280c1e1cdb24d80ecdfc
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 07/24/2018 05:26 AM, Peter Maydell wrote:
+> On 15 July 2018 at 01:37, Richard Henderson <rth@twiddle.net> wrote:
+>> On 07/13/2018 10:09 AM, Peter Maydell wrote:
+>>> @@ -939,29 +935,21 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+>>>          }
+>>>          assert(tlb_hit(env->tlb_table[mmu_idx][index].addr_code, addr));
+>>>      }
+>>> +    assert(tlb_hit(env->tlb_table[mmu_idx][index].addr_code, addr));
+>>
+>> Don't duplicate the assert; just move it.  Otherwise,
+>>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> I propose to put this patch into my target-arm.for-3.1 branch
+> (with the duplicated assert deleted), unless you have another
+> preference.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+That's fine by me.
+
+
+r~
