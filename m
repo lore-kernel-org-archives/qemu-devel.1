@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhwxp-0004dA-Vr
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:02:59 -0400
+	(envelope-from <peterx@redhat.com>) id 1fhx2G-0005es-PF
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:07:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhwxk-0001yj-1Y
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:02:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41540 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fhx2F-00045k-PI
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:07:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59380 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhwxj-0001yd-TC
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:02:47 -0400
-Date: Tue, 24 Jul 2018 21:02:40 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhx2F-00045P-Ky
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:07:27 -0400
+Date: Tue, 24 Jul 2018 21:07:18 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180724130240.GE2479@xz-mi>
+Message-ID: <20180724130718.GF2479@xz-mi>
 References: <1532434585-14732-1-git-send-email-lidongchen@tencent.com>
+	<1532434585-14732-2-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1532434585-14732-1-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] migration: fix the Unknown ending
- state error log
+In-Reply-To: <1532434585-14732-2-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] migration: fix duplicate
+ initialization for expected_downtime and cleanup_bh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +31,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Lidong Chen <jemmy858585@gmail.com>
 Cc: quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-On Tue, Jul 24, 2018 at 08:16:24PM +0800, Lidong Chen wrote:
-> When cancelling migration, the state is MIGRATION_STATUS_CANCELLING.
-> The state change to MIGRATION_STATUS_CANCELLED when cleanup_bh is scheduled.
-> So when migration_iteration_finish is invoked, the state should be
-> MIGRATION_STATUS_CANCELLING.
+On Tue, Jul 24, 2018 at 08:16:25PM +0800, Lidong Chen wrote:
+> migrate_fd_connect duplicate initialize expected_downtime and cleanup_bh.
 > 
 > Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 
-Thanks, Lidong.  Dave just posted the same patch some days ago:
+This seems correct to me.
 
-  [PATCH] migrate: Fix cancelling state warning
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
 > ---
->  migration/migration.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  migration/migration.c | 2 --
+>  1 file changed, 2 deletions(-)
 > 
 > diff --git a/migration/migration.c b/migration/migration.c
-> index 8d56d56..ff05422 100644
+> index ff05422..b8c4fec 100644
 > --- a/migration/migration.c
 > +++ b/migration/migration.c
-> @@ -2876,7 +2876,7 @@ static void migration_iteration_finish(MigrationState *s)
->          s->vm_was_running = true;
->          /* Fallthrough */
->      case MIGRATION_STATUS_FAILED:
-> -    case MIGRATION_STATUS_CANCELLED:
-> +    case MIGRATION_STATUS_CANCELLING:
->          if (s->vm_was_running) {
->              vm_start();
->          } else {
+> @@ -3032,8 +3032,6 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
+>      } else {
+>          /* This is a fresh new migration */
+>          rate_limit = s->parameters.max_bandwidth / XFER_LIMIT_RATIO;
+> -        s->expected_downtime = s->parameters.downtime_limit;
+> -        s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
+>  
+>          /* Notify before starting migration thread */
+>          notifier_list_notify(&migration_state_notifiers, s);
 > -- 
 > 1.8.3.1
 > 
