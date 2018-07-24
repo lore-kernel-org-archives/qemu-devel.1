@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fhv1o-0007R3-Ad
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:58:56 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fhv3D-0000ic-4H
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:00:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fhv1n-0000li-E6
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:58:52 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:54857)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fhv1n-0000lJ-7L
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:58:51 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id c14-v6so2072213wmb.4
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 03:58:51 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 24 Jul 2018 11:51:08 +0100
-Message-Id: <20180724105109.8392-17-alex.bennee@linaro.org>
-In-Reply-To: <20180724105109.8392-1-alex.bennee@linaro.org>
-References: <20180724105109.8392-1-alex.bennee@linaro.org>
+	(envelope-from <amarkovic@wavecomp.com>) id 1fhv37-00027J-68
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:00:19 -0400
+Received: from mail-co1nam03on0123.outbound.protection.outlook.com
+	([104.47.40.123]:20682
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fhv36-00026T-QZ
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:00:13 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 24 Jul 2018 11:00:09 +0000
+Message-ID: <BN7PR08MB4868B6EB81067D0990BE30ECC6550@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+	<1532004912-13899-6-git-send-email-stefan.markovic@rt-rk.com>,
+	<270ed7c2-9f82-d49d-a745-c43e003b3aa9@linaro.org>
+In-Reply-To: <270ed7c2-9f82-d49d-a745-c43e003b3aa9@linaro.org>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 16/17] docker: perform basic binfmt_misc
- validation in docker.py
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 05/40] target/mips: Add nanoMIPS
+ decoding and extraction utilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-Setting up binfmt_misc is outside of the scope of the docker.py script
-but we can at least validate it with any given executable so we have a
-more useful error message than the sed line of deboostrap failing
-cryptically.
+> From: Richard Henderson <richard.henderson@linaro.org>
+> Sent: Thursday, July 19, 2018 6:57 PM
+>
+> I think it's worth spending one line to document the pseudocode function =
+from
+> which each of these come.  E.g.
+>
+> /* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr4.zero').  *=
+/
+>
+> Which is certainly more accurate than the comment that is there currently=
+.
+>
+> Otherwise,
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>
+>
+> r~
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reported-by: Richard Henderson <richard.henderson@linaro.org>
+Hello, Richard
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 2f81c6b13b..d3006d4dae 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -112,6 +112,31 @@ def _copy_binary_with_libs(src, dest_dir):
-             so_path = os.path.dirname(l)
-             _copy_with_mkdir(l , dest_dir, so_path)
- 
-+
-+def _check_binfmt_misc(executable):
-+    """Check binfmt_misc has entry for executable in the right place.
-+
-+    The details of setting up binfmt_misc are outside the scope of
-+    this script but we should at least fail early with a useful
-+    message if it won't work."""
-+
-+    binary = os.path.basename(executable)
-+    binfmt_entry = "/proc/sys/fs/binfmt_misc/%s" % (binary)
-+
-+    if not os.path.exists(binfmt_entry):
-+        print ("No binfmt_misc entry for %s" % (binary))
-+        return False
-+
-+    with open(binfmt_entry) as x: entry = x.read()
-+
-+    qpath = "/usr/bin/%s" % (binary)
-+    if not re.search("interpreter %s\n" % (qpath), entry):
-+        print ("binfmt_misc for %s does not point to %s" % (binary, qpath))
-+        return False
-+
-+    return True
-+
-+
- def _read_qemu_dockerfile(img_name):
-     # special case for Debian linux-user images
-     if img_name.startswith("debian") and img_name.endswith("user"):
-@@ -315,6 +340,11 @@ class BuildCommand(SubCommand):
-             # Create a docker context directory for the build
-             docker_dir = tempfile.mkdtemp(prefix="docker_build")
- 
-+            # Validate binfmt_misc will work
-+            if args.include_executable:
-+                if not _check_binfmt_misc(args.include_executable):
-+                    return 1
-+
-             # Is there a .pre file to run in the build context?
-             docker_pre = os.path.splitext(args.dockerfile)[0]+".pre"
-             if os.path.exists(docker_pre):
--- 
-2.17.1
+The comments will be fixed in v4. Also, the fourth decode_gpr_XXX function =
+will be moved to this patch (from one of remaining patches with decoding lo=
+gic). These functions will be all marked inline. This also means that the c=
+ompiler will not complain about "unused functions".
+
+Aleksandar
