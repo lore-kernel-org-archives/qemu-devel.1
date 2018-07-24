@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1fhsCZ-0004Q5-NE
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 03:57:49 -0400
+	(envelope-from <thuth@redhat.com>) id 1fhsvQ-000548-Cw
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 04:44:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1fhsCV-00073A-LR
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 03:57:47 -0400
-Received: from mail-ua0-f194.google.com ([209.85.217.194]:36441)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1fhsCV-000731-FU
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 03:57:43 -0400
-Received: by mail-ua0-f194.google.com with SMTP id c12-v6so1773868uan.3
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 00:57:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20180717195553.9111-1-alex.bennee@linaro.org>
-	<87o9eytgju.fsf@linaro.org>
-In-Reply-To: <87o9eytgju.fsf@linaro.org>
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 24 Jul 2018 15:57:06 +0800
-Message-ID: <CAK1Eb9=_s=9U+0SXhDEcNaN_RAkN5+sBTo4OtfnqcJYJv=4q-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 for 3.0 00/18] docker fixes (and one tcg
- test tweak)
+	(envelope-from <thuth@redhat.com>) id 1fhsvN-0006cQ-BR
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 04:44:08 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 24 Jul 2018 10:43:59 +0200
+Message-Id: <1532421839-24512-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH v2] hw/s390x/virtio-ccw: Consolidate calls
+ to virtio_ccw_unrealize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +18,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: cota@braap.org, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, balrogg@gmail.com, aurelien@aurel32.net, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-On Mon, Jul 23, 2018 at 6:03 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->
->
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->
-> > Hi,
-> >
-> > I've missed the boat for today's rc1 but I'd like to get this merged
-> > before rc2. The new docker.py change is technically new functionality
-> > but I'm counting it as a usability bug fix as it replaces a random
-> > back trace failure with a preemptive failure and message mentioning
-> > binfmt_misc configuration. This would have saved Richard a lot of head
-> > scratching as he tried to setup a powerpc-user setup to test his
-> > setcontext fix (he had a custom binfmt_misc pointing to his src tree).
-> >
-> > Finally we also drop the runcom test. It was cute that it got
-> > resurrected but it is ultimately a pointless test for something I'm
-> > sure no one actually uses.
-> >
-> > There will be a follow-up RFC series after this that cleans-up some of
-> > the rough edges when your host is not an x86_64 box but that series
-> > won't be targeting the 3.0 release.
-> >
-> > : The following patches need review
-> > : patch docker/disable debian powerpc user cross.patch
-> > : patch docker/drop QEMU_TARGET check fallback in EXECUTABLE.patch
-> > : patch docker/Update debootstrap script after Debian migrat.patch
-> > : patch docker/ignore distro versioning of debootstrap.patch
-> > : patch docker/perform basic binfmt_misc validation in docke.patch
-> > : patch tests/tcg remove runcom test.patch
->
-> Ping?
+Currently, every virtio-ccw device explicitely sets its unrealize
+function to virtio_ccw_unrealize() in its class_init function.
+We can simplify this by using a common unrealize function, just like
+it is already done for the realize functions.
 
-I had questions about patch 13 and 17. Otherwise looks good.
-=E2=80=8B Maybe you can drop them for now (including patch 9) and send the =
-PULL for
-the rest.=E2=80=8B
-I don't know if we can catch up -rc2 but I guess the testing fixes are
-fairly safe to sneak in. :)
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/s390x/virtio-ccw.c | 22 +++++++---------------
+ 1 file changed, 7 insertions(+), 15 deletions(-)
 
-(My development machine is affected by
-an
- office power outage, and I was
-=E2=80=8B also=E2=80=8B
- busy with upgrading patchew.org. Sorry for the
-=E2=80=8B =E2=80=8B
-late reply
-!)
-
-Fam
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 7ddb378..f3ad7aa 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -750,8 +750,9 @@ out_err:
+     g_free(sch);
+ }
+ 
+-static void virtio_ccw_unrealize(VirtioCcwDevice *dev, Error **errp)
++static void virtio_ccw_device_unrealize(VirtioCcwDevice *dev, Error **errp)
+ {
++    VirtIOCCWDeviceClass *dc = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
+     SubchDev *sch = ccw_dev->sch;
+ 
+@@ -764,6 +765,10 @@ static void virtio_ccw_unrealize(VirtioCcwDevice *dev, Error **errp)
+         release_indicator(&dev->routes.adapter, dev->indicators);
+         dev->indicators = NULL;
+     }
++
++    if (dc->unrealize) {
++        dc->unrealize(dev, errp);
++    }
+ }
+ 
+ static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+@@ -1349,7 +1354,6 @@ static void virtio_ccw_net_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_net_realize;
+-    k->unrealize = virtio_ccw_unrealize;
+     dc->props = virtio_ccw_net_properties;
+     set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
+ }
+@@ -1376,7 +1380,6 @@ static void virtio_ccw_blk_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_blk_realize;
+-    k->unrealize = virtio_ccw_unrealize;
+     dc->props = virtio_ccw_blk_properties;
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+ }
+@@ -1403,7 +1406,6 @@ static void virtio_ccw_serial_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_serial_realize;
+-    k->unrealize = virtio_ccw_unrealize;
+     dc->props = virtio_ccw_serial_properties;
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+ }
+@@ -1430,7 +1432,6 @@ static void virtio_ccw_balloon_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_balloon_realize;
+-    k->unrealize = virtio_ccw_unrealize;
+     dc->props = virtio_ccw_balloon_properties;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+ }
+@@ -1457,7 +1458,6 @@ static void virtio_ccw_scsi_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_scsi_realize;
+-    k->unrealize = virtio_ccw_unrealize;
+     dc->props = virtio_ccw_scsi_properties;
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+ }
+@@ -1483,7 +1483,6 @@ static void vhost_ccw_scsi_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = vhost_ccw_scsi_realize;
+-    k->unrealize = virtio_ccw_unrealize;
+     dc->props = vhost_ccw_scsi_properties;
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+ }
+@@ -1519,7 +1518,6 @@ static void virtio_ccw_rng_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_rng_realize;
+-    k->unrealize = virtio_ccw_unrealize;
+     dc->props = virtio_ccw_rng_properties;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+ }
+@@ -1556,7 +1554,6 @@ static void virtio_ccw_crypto_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_crypto_realize;
+-    k->unrealize = virtio_ccw_unrealize;
+     dc->props = virtio_ccw_crypto_properties;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+ }
+@@ -1593,7 +1590,6 @@ static void virtio_ccw_gpu_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_gpu_realize;
+-    k->unrealize = virtio_ccw_unrealize;
+     dc->props = virtio_ccw_gpu_properties;
+     dc->hotpluggable = false;
+     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+@@ -1621,7 +1617,6 @@ static void virtio_ccw_input_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_input_realize;
+-    k->unrealize = virtio_ccw_unrealize;
+     dc->props = virtio_ccw_input_properties;
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+ }
+@@ -1703,9 +1698,8 @@ static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
+ static void virtio_ccw_busdev_unrealize(DeviceState *dev, Error **errp)
+ {
+     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+-    VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+ 
+-    _info->unrealize(_dev, errp);
++    virtio_ccw_device_unrealize(_dev, errp);
+ }
+ 
+ static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
+@@ -1801,7 +1795,6 @@ static void virtio_ccw_9p_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+-    k->unrealize = virtio_ccw_unrealize;
+     k->realize = virtio_ccw_9p_realize;
+     dc->props = virtio_ccw_9p_properties;
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+@@ -1847,7 +1840,6 @@ static void vhost_vsock_ccw_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = vhost_vsock_ccw_realize;
+-    k->unrealize = virtio_ccw_unrealize;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     dc->props = vhost_vsock_ccw_properties;
+ }
+-- 
+1.8.3.1
