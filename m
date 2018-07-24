@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1fi43T-0000oJ-0b
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 16:37:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1fi4QM-000138-SD
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 17:00:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1fi43R-0004zN-Tl
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 16:37:11 -0400
-References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
-	<20180227104708.GA11391@cbox>
-	<ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
-	<20180227124604.GA2373@cbox>
-	<20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
-From: Maran Wilson <maran.wilson@oracle.com>
-Message-ID: <b589d714-4f12-e450-7ca5-e55fed4d1705@oracle.com>
-Date: Tue, 24 Jul 2018 11:35:31 -0700
+	(envelope-from <eblake@redhat.com>) id 1fi4QM-0007TK-3T
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 17:00:50 -0400
+References: <20180724200343.13733-1-lbloch@janustech.com>
+	<20180724200343.13733-2-lbloch@janustech.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3edeb663-8e53-ec83-bc19-45a5804d6be3@redhat.com>
+Date: Tue, 24 Jul 2018 16:00:42 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
+In-Reply-To: <20180724200343.13733-2-lbloch@janustech.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] VCPU hotplug on KVM/ARM
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/5 for-3.0] A grammar fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kvmarm@lists.cs.columbia.edu, bthakur@codeaurora.org
-Cc: Andrew Jones <drjones@redhat.com>, Christoffer Dall <cdall@kernel.org>, Christoffer Dall <cdall@cs.columbia.edu>, qemu-devel@nongnu.org, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm@nongnu.org, imammedo@redhat.com, peter.maydell@linaro.org, david@redhat.com, marc.zyngier@arm.com
+To: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-It's been a few months since this email thread died off. Has anyone 
-started working on a potential solution that would allow VCPU hotplug on 
-KVM/ARM ? Or is this a project that is still waiting for an owner who 
-has the time and inclination to get started?
+On 07/24/2018 03:03 PM, Leonid Bloch wrote:
 
-Thanks,
--Maran
+Subject line is rather vague; at a bare minimum, mentioning 'qcow2:' 
+might be helpful. But the maintainer can improve that. My suggestion:
 
-On 2/27/2018 5:21 AM, Andrew Jones wrote:
-> On Tue, Feb 27, 2018 at 01:46:04PM +0100, Christoffer Dall wrote:
->> On Tue, Feb 27, 2018 at 05:34:28PM +0530, bthakur@codeaurora.org wrote:
->>> Hi Christoffer,
->>>
->>> Thanks for your reply.
->>>
->>> On 2018-02-27 16:17, Christoffer Dall wrote:
->>>> Hi Bhupinder,
->>>>
->>>> On Tue, Feb 27, 2018 at 03:01:17PM +0530, bthakur@codeaurora.org wrote:
->>>>> I hope it is the right forum to post my query.
->>>>>
->>>>>
->>>>>
->>>>> I am currently looking at the possibility of adding a new VCPU to a
->>>>> running
->>>>> guest VM in KVM/ARM. I see that currently, it is not allowed to add a
->>>>> new
->>>>> VCPU to a guest VM, if it is already initialized. The first check in
->>>>> kvm_arch_vcpu_create() returns failure if it is already initialized.
->>>>>
->>>> This would require a major rework of a lot of logic surrounding the GIC
->>>> and other parts of KVM initialization.
->>>>
->>>>>
->>>>> There was some work done in QEMU to add support for VCPU hotplug:
->>>>> https://lists.gnu.org/archive/html/qemu-arm/2017-05/msg00404.html
->>>>>
->>>>>
->>>>>
->>>>> But I am looking at the KVM side for enabling adding a new VCPU. If you
->>>>> can
->>>>> point me to any relevant work/resources, which I can refer to then it
->>>>> will
->>>>> help me.
->>>>>
->>>> I don't have any specific pointers, but I was always told that the way
->>>> we were going to do CPU hotplug would be to instantiate a large number
->>>> of VCPUs, and hotplug would be equivalent to turning on a VCPU which was
->>>> previously powered off.
->>>>
->>>> Is this not still a feasible solution?
->>> It should be a feasible solution provided the guest VM is not able to
->>> control the onlining/offlining of VCPUs. It should be controlled by the
->>> Host.
->>>
->> KVM could simply refuse to turn on some of the CPUs unless given
->> permission from host userspace.
->>
->>>> How does VCPU hotplug work on x86?
->>> On x86, you can add a vcpu through libvirt setvcpu command and it shows up
->>> in the guest VM as a new CPU if you do lscpu.
->>>
->> Sure, but what is the mechanism, does x86 qemu actually call
->> KVM_CREATE_VCPU, or is this also a question of turning on already
->> created vcpus ?
->>
-> CC'ing Igor and qemu-devel
->
-> drew
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+qcow2: grammar fix for conflicting cache sizing
+
+> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+> ---
+>   block/qcow2.c              | 2 +-
+>   tests/qemu-iotests/103.out | 2 +-
+>   tests/qemu-iotests/137.out | 2 +-
+>   3 files changed, 3 insertions(+), 3 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+> 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 6162ed8be2..ec9e6238a0 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -797,7 +797,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+>           if (l2_cache_size_set && refcount_cache_size_set) {
+>               error_setg(errp, QCOW2_OPT_CACHE_SIZE ", " QCOW2_OPT_L2_CACHE_SIZE
+>                          " and " QCOW2_OPT_REFCOUNT_CACHE_SIZE " may not be set "
+> -                       "the same time");
+> +                       "at the same time");
+>               return;
+>           } else if (*l2_cache_size > combined_cache_size) {
+>               error_setg(errp, QCOW2_OPT_L2_CACHE_SIZE " may not exceed "
+> diff --git a/tests/qemu-iotests/103.out b/tests/qemu-iotests/103.out
+> index bd45d3875a..ab56f03a00 100644
+> --- a/tests/qemu-iotests/103.out
+> +++ b/tests/qemu-iotests/103.out
+> @@ -5,7 +5,7 @@ wrote 65536/65536 bytes at offset 0
+>   
+>   === Testing invalid option combinations ===
+>   
+> -can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set the same time
+> +can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
+>   can't open device TEST_DIR/t.IMGFMT: l2-cache-size may not exceed cache-size
+>   can't open device TEST_DIR/t.IMGFMT: refcount-cache-size may not exceed cache-size
+>   can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set the same time
+> diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
+> index 96724a6c33..6a2ffc71fd 100644
+> --- a/tests/qemu-iotests/137.out
+> +++ b/tests/qemu-iotests/137.out
+> @@ -16,7 +16,7 @@ read 33554432/33554432 bytes at offset 0
+>   === Try setting some invalid values ===
+>   
+>   Parameter 'lazy-refcounts' expects 'on' or 'off'
+> -cache-size, l2-cache-size and refcount-cache-size may not be set the same time
+> +cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
+>   l2-cache-size may not exceed cache-size
+>   refcount-cache-size may not exceed cache-size
+>   L2 cache size too big
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
