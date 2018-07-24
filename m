@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fhy85-0004ye-7J
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:17:37 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fhyE5-0006Nv-79
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:23:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fhy84-0004LX-1h
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:17:32 -0400
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:43002)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fhy83-0004LL-JY
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:17:31 -0400
-Received: by mail-oi0-x22e.google.com with SMTP id n84-v6so7741182oib.9
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 07:17:31 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180724105109.8392-1-alex.bennee@linaro.org>
-References: <20180724105109.8392-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jul 2018 15:17:10 +0100
-Message-ID: <CAFEAcA9sVXEpzGwq1ciq0S5RU6gQRN_H3Z27jyfQjjsgyDaTPQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL for 3.0 00/17] docker fixes and tcg test
- tweak
+	(envelope-from <stefanha@redhat.com>) id 1fhyE4-0007rd-8B
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:23:45 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 24 Jul 2018 15:23:30 +0100
+Message-Id: <20180724142331.14669-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL for-3.0 0/1] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +17,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Max Reitz <mreitz@redhat.com>
 
-On 24 July 2018 at 11:50, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> The following changes since commit 768cef2974fb1fa30dd188b043ea737e13fea4=
-77:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-reque=
-st' into staging (2018-07-24 10:37:52 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-docker-fixes-for-3.0-2407=
-18-1
->
-> for you to fetch changes up to 1a3bdc6111482fbb41eacacf850002e4589a81ef:
->
->   tests/tcg: remove runcom test (2018-07-24 11:45:25 +0100)
->
-> ----------------------------------------------------------------
-> docker fixes & tcg test tweak
->
->   - graceful handling of testing under cross-compile
->   - fixes for debootstrap handling
->   - more helpful errors (binfmt_misc/EXECUTABLE missing)
->   - drop runcom TCG test
->
+The following changes since commit 768cef2974fb1fa30dd188b043ea737e13fea477:
 
-Applied, thanks.
+  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2018-07-24 10:37:52 +0100)
 
--- PMM
+are available in the Git repository at:
+
+  git://github.com/stefanha/qemu.git tags/block-pull-request
+
+for you to fetch changes up to 042b757cc77c9580b99ef2781cfb0a2d1bf495a6:
+
+  block/file-posix: add bdrv_attach_aio_context callback for host dev and cdrom (2018-07-24 14:27:41 +0100)
+
+----------------------------------------------------------------
+Pull request
+
+Regression fix for host block devices with the file-posix driver when aio=native is in use.
+
+----------------------------------------------------------------
+
+Nishanth Aravamudan (1):
+  block/file-posix: add bdrv_attach_aio_context callback for host dev
+    and cdrom
+
+ block/file-posix.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+-- 
+2.17.1
