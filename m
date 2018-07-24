@@ -1,29 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhwIK-0006Gh-Ci
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:20:01 -0400
+	(envelope-from <jandryuk@gmail.com>) id 1fhwKB-0007AR-44
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:21:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fhwIH-0007G0-7u
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:20:00 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:55326)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fhwIG-0007FR-VU
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:19:57 -0400
-Received: by mail-wm0-x242.google.com with SMTP id f21-v6so2310095wmc.5
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 05:19:56 -0700 (PDT)
-References: <20180716074038.3364-1-yuval.shaia@oracle.com>
-	<20180716074038.3364-8-yuval.shaia@oracle.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <42b81675-ea89-e9e9-f84c-ad723372fc1c@gmail.com>
-Date: Tue, 24 Jul 2018 15:19:52 +0300
+	(envelope-from <jandryuk@gmail.com>) id 1fhwKA-0008Ia-6u
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:21:55 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180716074038.3364-8-yuval.shaia@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 07/13] hw/rdma: Do not allocate memory for
- non-dma MR
+From: Jason Andryuk <jandryuk@gmail.com>
+Date: Tue, 24 Jul 2018 08:21:49 -0400
+Message-ID: <CAKf6xpvjRO05BAoVaw9vQZ56q84pTNXRa9ugJ2dGtQaTTEmYWw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] Stable 2.12.1 Request: "ccid-card-passthru: fix
+ regression in realize()"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,114 +21,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org
+To: qemu-stable@nongnu.org, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, f4bug@amsat.org, Gerd Hoffmann <kraxel@redhat.com>
 
+I'd like to request this commit for QEMU 2.12.1 stable backport:
 
-Hi Yuval,
+commit e58d64a16abc "ccid-card-passthru: fix regression in realize()"
 
-On 07/16/2018 10:40 AM, Yuval Shaia wrote:
-> There is no use in the memory allocated for non-dma MR (one with
-> host_virt equals to NULL).
-
-No need for the (one with...)
-
-> Delete the code that allocates it.
->
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> ---
->   hw/rdma/rdma_rm.c | 52 +++++++++++++++++++----------------------------
->   1 file changed, 21 insertions(+), 31 deletions(-)
->
-> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-> index 7403d24674..bf4a5c71b4 100644
-> --- a/hw/rdma/rdma_rm.c
-> +++ b/hw/rdma/rdma_rm.c
-> @@ -144,8 +144,6 @@ int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
->       RdmaRmMR *mr;
->       int ret = 0;
->       RdmaRmPD *pd;
-> -    void *addr;
-> -    size_t length;
->   
->       pd = rdma_rm_get_pd(dev_res, pd_handle);
->       if (!pd) {
-> @@ -158,40 +156,29 @@ int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
->           pr_dbg("Failed to allocate obj in table\n");
->           return -ENOMEM;
->       }
-> +    pr_dbg("mr_handle=%d\n", *mr_handle);
->   
-> -    if (!host_virt) {
-> -        /* TODO: This is my guess but not so sure that this needs to be
-> -         * done */
-> -        length = TARGET_PAGE_SIZE;
-> -        addr = g_malloc(length);
-> -    } else {
-> +    pr_dbg("host_virt=0x%p\n", host_virt);
-> +    pr_dbg("guest_start=0x%" PRIx64 "\n", guest_start);
-> +    pr_dbg("length=%zu\n", guest_length);
-> +
-> +    if (host_virt) {
->           mr->virt = host_virt;
-> -        pr_dbg("host_virt=0x%p\n", mr->virt);
-> -        mr->length = guest_length;
-> -        pr_dbg("length=%zu\n", guest_length);
->           mr->start = guest_start;
-> -        pr_dbg("guest_start=0x%" PRIx64 "\n", mr->start);
-> -
-> -        length = mr->length;
-> -        addr = mr->virt;
-> -    }
-> +        mr->length = guest_length;
->   
-> -    ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, addr, length,
-> -                                 access_flags);
-> -    if (ret) {
-> -        pr_dbg("Fail in rdma_backend_create_mr, err=%d\n", ret);
-> -        ret = -EIO;
-> -        goto out_dealloc_mr;
-> +        ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, mr->virt,
-> +                                     mr->length, access_flags);
-> +        if (ret) {
-> +            pr_dbg("Fail in rdma_backend_create_mr, err=%d\n", ret);
-> +            ret = -EIO;
-> +            goto out_dealloc_mr;
-> +        }
->       }
->   
-> -    if (!host_virt) {
-> -        *lkey = mr->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
-> -        *rkey = mr->rkey = rdma_backend_mr_rkey(&mr->backend_mr);
-> -    } else {
-> -        /* We keep mr_handle in lkey so send and recv get get mr ptr */
-> -        *lkey = *mr_handle;
-> -        *rkey = -1;
-> -    }
-> +    /* We keep mr_handle in lkey so send and recv get get mr ptr */
-> +    *lkey = *mr_handle;
-> +    *rkey = -1;
->   
-
-Before this change rkey whould get a value when !host_virt.
-But I suppose is OK since Remote DMA operations are not implemented yet.
-
->       mr->pd_handle = pd_handle;
->   
-> @@ -214,7 +201,10 @@ void rdma_rm_dealloc_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle)
->   
->       if (mr) {
->           rdma_backend_destroy_mr(&mr->backend_mr);
-> -        munmap(mr->virt, mr->length);
-> +        pr_dbg("start=0x%" PRIx64 "\n", mr->start);
-> +        if (mr->start) {
-
-When is the mr->start inited?
+The patch fixes a VM start failure which I experience on 2.12.0.
+Patch inlined below
 
 Thanks,
-Marcel
+Jason
 
-> +            munmap(mr->virt, mr->length);
-> +        }
->           res_tbl_dealloc(&dev_res->mr_tbl, mr_handle);
->       }
->   }
+>From e58d64a16abc2304c4dcb644411eb9580bf63b1e Mon Sep 17 00:00:00 2001
+From: =3D?UTF-8?q?Marc-Andr=3DC3=3DA9=3D20Lureau?=3D <marcandre.lureau@redh=
+at.com>
+Date: Tue, 15 May 2018 17:30:39 +0200
+Subject: [PATCH] ccid-card-passthru: fix regression in realize()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=3DUTF-8
+Content-Transfer-Encoding: 8bit
+
+Since cc847bfd16d894fd8c1a2ce25f31772f6cdbbc74, CCID card-passthru
+fails to intialize, because it changed a debug line to an error,
+probably by mistake. Change it back to a DPRINTF debug.
+
+(solves Boxes creating VM with smartcard passthru failing to start)
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-id: 20180515153039.27514-1-marcandre.lureau@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/ccid-card-passthru.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
+index 7684db0cb3..25fb19b0d7 100644
+--- a/hw/usb/ccid-card-passthru.c
++++ b/hw/usb/ccid-card-passthru.c
+@@ -345,7 +345,7 @@ static void passthru_realize(CCIDCardState *base,
+Error **errp)
+     card->vscard_in_pos =3D 0;
+     card->vscard_in_hdr =3D 0;
+     if (qemu_chr_fe_backend_connected(&card->cs)) {
+-        error_setg(errp, "ccid-card-passthru: initing chardev");
++        DPRINTF(card, D_INFO, "ccid-card-passthru: initing chardev");
+         qemu_chr_fe_set_handlers(&card->cs,
+             ccid_card_vscard_can_read,
+             ccid_card_vscard_read,
