@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fi29Q-00007q-Kc
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:35:15 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fi2Pk-0001Uz-Vl
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:52:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fi29N-0002rG-L2
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:35:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37826 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fi29N-0002qr-Fc
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:35:09 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 24 Jul 2018 19:34:54 +0100
-Message-Id: <20180724183454.120276-8-dgilbert@redhat.com>
-In-Reply-To: <20180724183454.120276-1-dgilbert@redhat.com>
-References: <20180724183454.120276-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 7/7] migration: fix duplicate initialization for
- expected_downtime and cleanup_bh
+	(envelope-from <richard.henderson@linaro.org>) id 1fi2Pk-00032T-67
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:52:05 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44151)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fi2Pj-0002zB-SY
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 14:52:04 -0400
+Received: by mail-pg1-x541.google.com with SMTP id r1-v6so3506195pgp.11
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 11:52:03 -0700 (PDT)
+References: <20180724115950.17316-1-peter.maydell@linaro.org>
+	<20180724115950.17316-6-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d9a84683-1b25-be79-74f0-d2fb68b20a97@linaro.org>
+Date: Tue, 24 Jul 2018 11:51:59 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180724115950.17316-6-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/5] target/arm: Treat SCTLR_EL1.M as if it
+ were zero when HCR_EL2.TGE is set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: quintela@redhat.com, peterx@redhat.com, kraxel@redhat.com, lidongchen@tencent.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-From: Lidong Chen <jemmy858585@gmail.com>
+On 07/24/2018 04:59 AM, Peter Maydell wrote:
+> One of the required effects of setting HCR_EL2.TGE is that when
+> SCR_EL3.NS is 1 then SCTLR_EL1.M must behave as if it is zero for
+> all purposes except direct reads. That is, it effectively disables
+> the MMU for the NS EL0/EL1 translation regime.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 
-migrate_fd_connect duplicate initialize expected_downtime and cleanup_bh.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-Message-Id: <1532434585-14732-2-git-send-email-lidongchen@tencent.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.c | 2 --
- 1 file changed, 2 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index bfc4d09aae..b7d9854bda 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -3052,8 +3052,6 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
-     } else {
-         /* This is a fresh new migration */
-         rate_limit = s->parameters.max_bandwidth / XFER_LIMIT_RATIO;
--        s->expected_downtime = s->parameters.downtime_limit;
--        s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
- 
-         /* Notify before starting migration thread */
-         notifier_list_notify(&migration_state_notifiers, s);
--- 
-2.17.1
+r~
