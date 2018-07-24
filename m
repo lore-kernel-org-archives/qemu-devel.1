@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fhwP2-0001a5-BP
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:26:57 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fhwPW-0001oW-Bs
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:27:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fhwP1-000283-Gb
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:26:56 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:32956)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fhwP1-00027e-An
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:26:55 -0400
-Received: by mail-oi0-x242.google.com with SMTP id l10-v6so7122574oii.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 05:26:55 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1fhwPR-0002GA-Dq
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:27:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50340 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fhwPR-0002Fc-6C
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:27:21 -0400
+Date: Tue, 24 Jul 2018 14:27:17 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180724142717.48dd52e4@redhat.com>
+In-Reply-To: <20180723193145.24705-2-ehabkost@redhat.com>
+References: <20180723193145.24705-1-ehabkost@redhat.com>
+	<20180723193145.24705-2-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5c3ec438-2265-94b4-4f35-71a79d838518@twiddle.net>
-References: <20180713150945.12348-1-peter.maydell@linaro.org>
-	<5c3ec438-2265-94b4-4f35-71a79d838518@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jul 2018 13:26:34 +0100
-Message-ID: <CAFEAcA8fFxKEbwC=rfp28cTMUT2eQVzGS8qc5tLowK3XYwEvrg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] accel/tcg: Check whether TLB entry is RAM
- consistently with how we set it up
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1 1/2] acpi: Improve
+ acpi_send_event() type safety
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +28,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 15 July 2018 at 01:37, Richard Henderson <rth@twiddle.net> wrote:
-> On 07/13/2018 10:09 AM, Peter Maydell wrote:
->> @@ -939,29 +935,21 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
->>          }
->>          assert(tlb_hit(env->tlb_table[mmu_idx][index].addr_code, addr));
->>      }
->> +    assert(tlb_hit(env->tlb_table[mmu_idx][index].addr_code, addr));
->
-> Don't duplicate the assert; just move it.  Otherwise,
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On Mon, 23 Jul 2018 16:31:44 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-I propose to put this patch into my target-arm.for-3.1 branch
-(with the duplicated assert deleted), unless you have another
-preference.
+> acpi_send_event() requires an object that implements
+> TYPE_ACPI_DEVICE_IF.  Indicate that in the function prototype.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+It's not like acpi_send_event would ever need access to more
+than AcpiDeviceIf, so it's fine to make it more strict.
 
-thanks
--- PMM
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+PS:
+checkpatch is not happy with this patch
+
+> ---
+>  include/hw/acpi/acpi_dev_interface.h | 2 +-
+>  hw/acpi/acpi_interface.c             | 5 ++---
+>  hw/acpi/cpu.c                        | 4 ++--
+>  hw/acpi/cpu_hotplug.c                | 2 +-
+>  hw/acpi/memory_hotplug.c             | 4 ++--
+>  hw/acpi/nvdimm.c                     | 2 +-
+>  hw/acpi/pcihp.c                      | 4 ++--
+>  hw/acpi/vmgenid.c                    | 2 +-
+>  8 files changed, 12 insertions(+), 13 deletions(-)
+> 
+> diff --git a/include/hw/acpi/acpi_dev_interface.h b/include/hw/acpi/acpi_dev_interface.h
+> index dabf4c4fc9..bab71f9d60 100644
+> --- a/include/hw/acpi/acpi_dev_interface.h
+> +++ b/include/hw/acpi/acpi_dev_interface.h
+> @@ -31,7 +31,7 @@ typedef struct AcpiDeviceIf {
+>      Object Parent;
+>  } AcpiDeviceIf;
+>  
+> -void acpi_send_event(DeviceState *dev, AcpiEventStatusBits event);
+> +void acpi_send_event(AcpiDeviceIf *dev, AcpiEventStatusBits event);
+>  
+>  /**
+>   * AcpiDeviceIfClass:
+> diff --git a/hw/acpi/acpi_interface.c b/hw/acpi/acpi_interface.c
+> index 6583917b8e..f9b538293e 100644
+> --- a/hw/acpi/acpi_interface.c
+> +++ b/hw/acpi/acpi_interface.c
+> @@ -2,12 +2,11 @@
+>  #include "hw/acpi/acpi_dev_interface.h"
+>  #include "qemu/module.h"
+>  
+> -void acpi_send_event(DeviceState *dev, AcpiEventStatusBits event)
+> +void acpi_send_event(AcpiDeviceIf *dev, AcpiEventStatusBits event)
+>  {
+>      AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(dev);
+>      if (adevc->send_event) {
+> -        AcpiDeviceIf *adev = ACPI_DEVICE_IF(dev);
+> -        adevc->send_event(adev, event);
+> +        adevc->send_event(dev, event);
+>      }
+>  }
+>  
+> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> index 5ae595ecbe..2eb9b5a032 100644
+> --- a/hw/acpi/cpu.c
+> +++ b/hw/acpi/cpu.c
+> @@ -233,7 +233,7 @@ void acpi_cpu_plug_cb(HotplugHandler *hotplug_dev,
+>      cdev->cpu = CPU(dev);
+>      if (dev->hotplugged) {
+>          cdev->is_inserting = true;
+> -        acpi_send_event(DEVICE(hotplug_dev), ACPI_CPU_HOTPLUG_STATUS);
+> +        acpi_send_event(ACPI_DEVICE_IF(hotplug_dev), ACPI_CPU_HOTPLUG_STATUS);
+>      }
+>  }
+>  
+> @@ -249,7 +249,7 @@ void acpi_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
+>      }
+>  
+>      cdev->is_removing = true;
+> -    acpi_send_event(DEVICE(hotplug_dev), ACPI_CPU_HOTPLUG_STATUS);
+> +    acpi_send_event(ACPI_DEVICE_IF(hotplug_dev), ACPI_CPU_HOTPLUG_STATUS);
+>  }
+>  
+>  void acpi_cpu_unplug_cb(CPUHotplugState *cpu_st,
+> diff --git a/hw/acpi/cpu_hotplug.c b/hw/acpi/cpu_hotplug.c
+> index 5243918125..5a1599796b 100644
+> --- a/hw/acpi/cpu_hotplug.c
+> +++ b/hw/acpi/cpu_hotplug.c
+> @@ -79,7 +79,7 @@ void legacy_acpi_cpu_plug_cb(HotplugHandler *hotplug_dev,
+>      if (*errp != NULL) {
+>          return;
+>      }
+> -    acpi_send_event(DEVICE(hotplug_dev), ACPI_CPU_HOTPLUG_STATUS);
+> +    acpi_send_event(ACPI_DEVICE_IF(hotplug_dev), ACPI_CPU_HOTPLUG_STATUS);
+>  }
+>  
+>  void legacy_acpi_cpu_hotplug_init(MemoryRegion *parent, Object *owner,
+> diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+> index 0ff1712c4c..24b2aa0301 100644
+> --- a/hw/acpi/memory_hotplug.c
+> +++ b/hw/acpi/memory_hotplug.c
+> @@ -280,7 +280,7 @@ void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
+>      mdev->is_enabled = true;
+>      if (dev->hotplugged) {
+>          mdev->is_inserting = true;
+> -        acpi_send_event(DEVICE(hotplug_dev), ACPI_MEMORY_HOTPLUG_STATUS);
+> +        acpi_send_event(ACPI_DEVICE_IF(hotplug_dev), ACPI_MEMORY_HOTPLUG_STATUS);
+>      }
+>  }
+>  
+> @@ -296,7 +296,7 @@ void acpi_memory_unplug_request_cb(HotplugHandler *hotplug_dev,
+>      }
+>  
+>      mdev->is_removing = true;
+> -    acpi_send_event(DEVICE(hotplug_dev), ACPI_MEMORY_HOTPLUG_STATUS);
+> +    acpi_send_event(ACPI_DEVICE_IF(hotplug_dev), ACPI_MEMORY_HOTPLUG_STATUS);
+>  }
+>  
+>  void acpi_memory_unplug_cb(MemHotplugState *mem_st,
+> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+> index 27eeb6609f..bdc373696d 100644
+> --- a/hw/acpi/nvdimm.c
+> +++ b/hw/acpi/nvdimm.c
+> @@ -921,7 +921,7 @@ static const MemoryRegionOps nvdimm_dsm_ops = {
+>  void nvdimm_acpi_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev)
+>  {
+>      if (dev->hotplugged) {
+> -        acpi_send_event(DEVICE(hotplug_dev), ACPI_NVDIMM_HOTPLUG_STATUS);
+> +        acpi_send_event(ACPI_DEVICE_IF(hotplug_dev), ACPI_NVDIMM_HOTPLUG_STATUS);
+>      }
+>  }
+>  
+> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+> index 80d42e12ff..b3bb11dac5 100644
+> --- a/hw/acpi/pcihp.c
+> +++ b/hw/acpi/pcihp.c
+> @@ -237,7 +237,7 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
+>      }
+>  
+>      s->acpi_pcihp_pci_status[bsel].up |= (1U << slot);
+> -    acpi_send_event(DEVICE(hotplug_dev), ACPI_PCI_HOTPLUG_STATUS);
+> +    acpi_send_event(ACPI_DEVICE_IF(hotplug_dev), ACPI_PCI_HOTPLUG_STATUS);
+>  }
+>  
+>  void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
+> @@ -253,7 +253,7 @@ void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
+>      }
+>  
+>      s->acpi_pcihp_pci_status[bsel].down |= (1U << slot);
+> -    acpi_send_event(DEVICE(hotplug_dev), ACPI_PCI_HOTPLUG_STATUS);
+> +    acpi_send_event(ACPI_DEVICE_IF(hotplug_dev), ACPI_PCI_HOTPLUG_STATUS);
+>  }
+>  
+>  static uint64_t pci_read(void *opaque, hwaddr addr, unsigned int size)
+> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> index d78b579a20..74caedde79 100644
+> --- a/hw/acpi/vmgenid.c
+> +++ b/hw/acpi/vmgenid.c
+> @@ -158,7 +158,7 @@ static void vmgenid_update_guest(VmGenIdState *vms)
+>              cpu_physical_memory_write(vmgenid_addr, guid_le.data,
+>                                        sizeof(guid_le.data));
+>              /* Send _GPE.E05 event */
+> -            acpi_send_event(DEVICE(obj), ACPI_VMGENID_CHANGE_STATUS);
+> +            acpi_send_event(ACPI_DEVICE_IF(obj), ACPI_VMGENID_CHANGE_STATUS);
+>          }
+>      }
+>  }
