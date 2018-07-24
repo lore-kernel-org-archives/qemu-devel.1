@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fhoDE-0001DP-Jg
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 23:42:13 -0400
+	(envelope-from <benh@kernel.crashing.org>) id 1fhoKp-00032k-5B
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 23:50:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fhoDA-0000Ov-L7
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 23:42:12 -0400
-Date: Tue, 24 Jul 2018 12:14:56 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180724021456.GF6830@umbus.fritz.box>
+	(envelope-from <benh@kernel.crashing.org>) id 1fhoKl-0002rR-7Y
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 23:50:03 -0400
+Message-ID: <f8268fd70e4e91bc6333402ac48598d39a42e38e.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Tue, 24 Jul 2018 13:49:32 +1000
+In-Reply-To: <20180724021456.GF6830@umbus.fritz.box>
 References: <20180628083633.12413-1-clg@kaod.org>
 	<20180628083633.12413-2-clg@kaod.org>
 	<20180718061230.GE2102@umbus.fritz.box>
 	<bc6c5befa0a24b35f439419d6dea493dc19035b9.camel@kernel.crashing.org>
 	<20180723041614.GD6830@umbus.fritz.box>
 	<3692f644f72a1af49b7d5988d6b8482ea2f1e271.camel@kernel.crashing.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="TeJTyD9hb8KJN2Jy"
-Content-Disposition: inline
-In-Reply-To: <3692f644f72a1af49b7d5988d6b8482ea2f1e271.camel@kernel.crashing.org>
+	<20180724021456.GF6830@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v2 1/2] ppc/pnv: Add model for Power8 PHB3
  PCIe Host bridge
 List-Id: <qemu-devel.nongnu.org>
@@ -29,73 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Andrea Bolognani <abologna@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Andrea Bolognani <abologna@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
+On Tue, 2018-07-24 at 12:14 +1000, David Gibson wrote:
+> > I don't know, is there much shared logic ? And the shared bits are the
+> > subclassing, that's handled that way...
+> > 
+> > This is really a different piece of HW, a separate ICS implementation,
+> > that has its own quirks, is configured via different registers, does
+> > EOI differently etc...
+> > 
+> > Even the resend stuff is done differently, the resend bitmap is
+> > actually SW visible via an IODA table.
+> > 
+> > I mean, we could (maybe we do these days not sure) have an ICS
+> > superclass wrapper on the actual icp_irq() but that's really all there
+> > is to it I think.
+> 
+> Hm, yeah, fair enough.  I realized what I was suggesting would
+> actually need another layer of qirqs than we have, so it's not a good
+> idea after all.  Ok, I'm happy proceeding with exposing icp_irq().
 
---TeJTyD9hb8KJN2Jy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The only idea I have if you want to keep icp_* private is to put a
+'helper' in the ICS superclass that the subclass uses to encapsulate
+the ICP call, but at this point it's just churn.
 
-On Tue, Jul 24, 2018 at 09:55:53AM +1000, Benjamin Herrenschmidt wrote:
-> On Mon, 2018-07-23 at 14:16 +1000, David Gibson wrote:
-> > >=20
-> > > Now, this is an ICS subclass, so why shouldn't it directly poke at the
-> > > target ICP ?
-> >=20
-> > That's ok in theory, but causing it to expose the icp interface to a
-> > new module isn't great.
-> >=20
-> > > It's an alternate to the normal ICS since it behaves a bit
-> > > differently (PQ bits & all).
-> >=20
-> > AFAICT the PQ bits are effectively another filtering layer on top of
-> > the same ICS logic as elsewhere.  I think it's better if we can share
-> > that shared logic, rather than replicating it.
->=20
-> I don't know, is there much shared logic ? And the shared bits are the
-> subclassing, that's handled that way...
->=20
-> This is really a different piece of HW, a separate ICS implementation,
-> that has its own quirks, is configured via different registers, does
-> EOI differently etc...
->=20
-> Even the resend stuff is done differently, the resend bitmap is
-> actually SW visible via an IODA table.
->=20
-> I mean, we could (maybe we do these days not sure) have an ICS
-> superclass wrapper on the actual icp_irq() but that's really all there
-> is to it I think.
+But yeah you really don't want a layer of qirqs, it wouldn't work any
+way, it's really an ICS, it will send messages to the ICP with a XIRR
+value in them etc... just like an ICS, it's not somethign you want
+qirq's for .
 
-Hm, yeah, fair enough.  I realized what I was suggesting would
-actually need another layer of qirqs than we have, so it's not a good
-idea after all.  Ok, I'm happy proceeding with exposing icp_irq().
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---TeJTyD9hb8KJN2Jy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltWi50ACgkQbDjKyiDZ
-s5Ld8g//ZegA0/oB9hdcQeUlLF0LyVdr97tvWZ1tI0mEX1C5yRb+6Kn+6SiS8EXR
-TWSRwkSVrNqHxCWzqFifz9ak1yEo6hl/fXnSbLo7V1lHghIOlzsX1fIe6+HShPj/
-u4RQ0oo52+7TZ9ToskWM+rbdsQ+T1xyRaANcgrp73CkrkBumQxlctWx28EQKpcGB
-5mkAgek6PysMhM0uPr6QkJHsrXK7+mNEHyhtqkHvKj/Dhk5humvgeif/6UARzYJU
-K99kR/GW2vEUwIA02YADUyz3QFI9gWF2WYPI5DarVD07M0MFvZNsZ2EkRgzQJDCd
-nJNZwlnfZ6PjHZVUBgTbGiVxNQCF4HIH37KcS76YicXo/a00PgKLyDQhnjmuQg2k
-aOJBtSJQ1Wp1XdIYDatNDOhbO34P08zFyapYU/EVq061HlLvbH3iU9k83ibbtLKb
-jxrhyx+nwYhKKdwISfgtRBYrJcXPC7sBfx+6omZXuwbtFeD8yDZPELXDa+3B4WhG
-r8ptDByvaHmF7FchMs3DBIoNPIojp3yLu7I71HECRc/TkdEjYCPqkPj90+JExHpG
-5sdkDNY6TaJzWTVPSCv4J5hl5M31Bse5Cd4pczqD3ZM87Kbk5LWob7qUrBLKzRgV
-Y3FGoJD7cJJv5r7Zh7kr7MCLHoMcuDxpIEFlA55jlKUBPcxolHQ=
-=RHjw
------END PGP SIGNATURE-----
-
---TeJTyD9hb8KJN2Jy--
+Cheers,
+Ben.
