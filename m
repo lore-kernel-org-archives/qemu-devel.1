@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1fhlxm-0008Pq-Qb
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 21:18:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fhmDW-0003v5-N6
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 21:34:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1fhlxh-0006yg-T1
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 21:18:06 -0400
-Received: from mail-ua0-f196.google.com ([209.85.217.196]:34034)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1fhlxh-0006yS-NA
-	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 21:18:01 -0400
-Received: by mail-ua0-f196.google.com with SMTP id r10-v6so1712022uao.1
-	for <qemu-devel@nongnu.org>; Mon, 23 Jul 2018 18:18:01 -0700 (PDT)
+	(envelope-from <dgibson@ozlabs.org>) id 1fhmDS-0005tT-Mk
+	for qemu-devel@nongnu.org; Mon, 23 Jul 2018 21:34:22 -0400
+Date: Tue, 24 Jul 2018 11:29:48 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180724012948.GE6830@umbus.fritz.box>
+References: <20180628083633.12413-1-clg@kaod.org>
+	<20180628083633.12413-2-clg@kaod.org>
+	<20180718061230.GE2102@umbus.fritz.box>
+	<16c7eb37-ddd4-17aa-c5cb-ffe05cc13c15@kaod.org>
 MIME-Version: 1.0
-References: <20180719034118.27741-1-famz@redhat.com>
-	<640247eb-482c-0c27-f1f3-acea29e8cb3a@redhat.com>
-	<CAK1Eb9mQ8ERn5eiA6hyXotmbgTckU=TE8mNbX+zeotXXfMxmGg@mail.gmail.com>
-	<46511655-713c-6537-0495-0b36384d6fb7@redhat.com>
-	<CAK1Eb9kzqTwEjkv5NN1zSYVMmg2h_6BOmxQc2Qz+-c3=_T3=7g@mail.gmail.com>
-	<88ac3a1a-0eae-5356-d53c-ced561a5b890@redhat.com>
-In-Reply-To: <88ac3a1a-0eae-5356-d53c-ced561a5b890@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 24 Jul 2018 09:17:24 +0800
-Message-ID: <CAK1Eb9nL5DY1WMbies-10hkzuWTfQQGR29EnKuJfeT098UziNQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] block: Don't lock /dev/null and /dev/zero
- automatically
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="vmttodhTwj0NAgWp"
+Content-Disposition: inline
+In-Reply-To: <16c7eb37-ddd4-17aa-c5cb-ffe05cc13c15@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] ppc/pnv: Add model for Power8 PHB3
+ PCIe Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,93 +27,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Andrea Bolognani <abologna@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Mon, Jul 23, 2018 at 10:37 PM Max Reitz <mreitz@redhat.com> wrote:
->
-> On 2018-07-23 03:56, Fam Zheng wrote:
-> > On Sun, Jul 22, 2018 at 10:06 PM Max Reitz <mreitz@redhat.com> wrote:
-> >>
-> >> On 2018-07-22 04:37, Fam Zheng wrote:
-> >>> On Sun, Jul 22, 2018 at 5:08 AM Max Reitz <mreitz@redhat.com> wrote:
-> >>>>
-> >>>> On 2018-07-19 05:41, Fam Zheng wrote:
-> >>>>> On my Fedora 28, /dev/null is locked by some other process (couldn'=
-t
-> >>>>> inspect it due to the current lslocks limitation), so iotests 226 f=
-ails
-> >>>>> with some unexpected image locking errors because it uses qemu-io t=
-o
-> >>>>> open it.
-> >>>>>
-> >>>>> Actually it's safe to not use any lock on /dev/null or /dev/zero.
-> >>>>>
-> >>>>> Signed-off-by: Fam Zheng <famz@redhat.com>
-> >>>>> ---
-> >>>>>  block/file-posix.c | 7 ++++++-
-> >>>>>  1 file changed, 6 insertions(+), 1 deletion(-)
-> >>>>>
-> >>>>> diff --git a/block/file-posix.c b/block/file-posix.c
-> >>>>> index 60af4b3d51..8bf034108a 100644
-> >>>>> --- a/block/file-posix.c
-> >>>>> +++ b/block/file-posix.c
-> >>>>> @@ -503,7 +503,12 @@ static int raw_open_common(BlockDriverState *b=
-s, QDict *options,
-> >>>>>          s->use_lock =3D false;
-> >>>>>          break;
-> >>>>>      case ON_OFF_AUTO_AUTO:
-> >>>>> -        s->use_lock =3D qemu_has_ofd_lock();
-> >>>>> +        if (!strcmp(filename, "/dev/null") ||
-> >>>>> +                   !strcmp(filename, "/dev/zero")) {
-> >>>>
-> >>>> I=E2=80=99m not sure I like a strcmp() based on filename (though it =
-should work
-> >>>> for all of the cases where someone would want to specify either of t=
-hose
-> >>>> for a qemu block device).  Isn=E2=80=99t there some specific major/m=
-inor number
-> >>>> we can use to check for these two files?  Or are those Linux-specifi=
-c?
-> >>>
-> >>> Yeah, I guess major/minor numbers are Linux-specific.
-> >>>
-> >>>>
-> >>>> I could also imagine just not locking any host_device, but since peo=
-ple
-> >>>> do use qcow2 immediately on block devices, maybe we do want to lock =
-them.
-> >>>
-> >>> That's right.
-> >>>
-> >>>>
-> >>>> Finally, if really all you are trying to do is to make test code eas=
-ier,
-> >>>> then I don=E2=80=99t know exactly why.  Just disabling locking in 22=
-6 shouldn=E2=80=99t
-> >>>> be too hard.
-> >>>
-> >>> The tricky thing is in remembering to do that for future test cases.
-> >>> My machine seems to be somehow different than John's so that my 226
-> >>> cannot lock /dev/null, but I'm not sure that is the case for other
-> >>> releases, distros or system instances.
-> >>
-> >> Usually we don=E2=80=99t need to use /dev/null, though, because null-c=
-o:// is
-> >> better suited for most purposes.  This is a very specific test of host
-> >> devices.
-> >>
-> >> Maybe we should start a doc file with common good practices about
-> >> writing iotests?
-> >
-> > Yes, mentioning using pseudo devices in docs/devel/testing.rst would
-> > probably be a good idea. So is my understanding right that you prefer
-> > fixing the test case and discard this patch? If so I'll send another
-> > version together with the doc update.
->
-> I personally would prefer fixing the test and not modifying the code,
-> yes.  But I'm aware that it is a personal opinion.
 
-Sure, and you are the maintainer, so why not follow what you think. :)
+--vmttodhTwj0NAgWp
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fam
+On Mon, Jul 23, 2018 at 11:37:06PM +0200, C=E9dric Le Goater wrote:
+> On 07/18/2018 08:12 AM, David Gibson wrote:
+> >> +static void pnv_phb3_get_phb_id(Object *obj, Visitor *v, const char *=
+name,
+> >> +                              void *opaque, Error **errp)
+> >> +{
+> >> +    Property *prop =3D opaque;
+> >> +    uint32_t *ptr =3D qdev_get_prop_ptr(DEVICE(obj), prop);
+> >> +
+> >> +    visit_type_uint32(v, name, ptr, errp);
+> >> +}
+> >> +
+> >> +static void pnv_phb3_set_phb_id(Object *obj, Visitor *v, const char *=
+name,
+> >> +                              void *opaque, Error **errp)
+> >> +{
+> >> +    PnvPHB3 *phb =3D PNV_PHB3(obj);
+> >> +    uint32_t phb_id;
+> >> +    Error *local_err =3D NULL;
+> >> +
+> >> +    visit_type_uint32(v, name, &phb_id, &local_err);
+> >> +    if (local_err) {
+> >> +        error_propagate(errp, local_err);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    /*
+> >> +     * Limit to a maximum of 6 PHBs per chip
+> >> +     */
+> >> +    if (phb_id >=3D PNV8_CHIP_PHB3_MAX) {
+> >> +        error_setg(errp, "invalid PHB index: '%d'", phb_id);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    phb->phb_id =3D phb_id;
+> >> +}
+> >> +
+> >> +static const PropertyInfo pnv_phb3_phb_id_propinfo =3D {
+> >> +    .name =3D "irq",
+> >> +    .get =3D pnv_phb3_get_phb_id,
+> >> +    .set =3D pnv_phb3_set_phb_id,
+> >> +};
+> > Can't you use a static DeviceProps style property for this, which is a
+> > bit simpler?
+>=20
+> yes but we will need these ops for user creatable devices. This is where
+> we will check the chip id.
+
+Why?  Can't we check that during realize()?  That's a common pattern
+for static properties.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--vmttodhTwj0NAgWp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltWgQkACgkQbDjKyiDZ
+s5KPzRAAhWSTict/GE3eJMrkvMVVuf03Bo5QoTpK1Q6yoSNs7z9Ju3iXTN9NibH0
+2K9qGFr+3bqJe1IS0NwcPAl3tqCrmvm3hMk96PGVr64vM/6KRdgpOb1Run1C2aDz
+cpc8L2lZ17BZmV0HAI2HXaYgj5Btkl3Ge69p7H/qBY48LilOE/AsF30RHDhe/Ld/
+zdhUJIpp5vQc4KoDhLSk1RP+cl/Jf5/CYt4et9fWC1BpK48L2i9g8/Ji9cINe3iA
+imsIXS0s7KEVKObOl7a+S78d54R7RfQ5R/QHhAOUqz5p1ryheiyeIiTTedpM7zTe
+5fuo+/hhlHbWA6uOjBAnm6IxQb65ddFp/xbpY7G+4B0ulGgF4T08TXubODKY92NK
+WfMkR2PsEHSPD7sjM8H6VrUMEpXDhn/sgiKbxYwgF0HvhntJVp2aIGEhSy9ykecN
+KaGcaiJ1nbimL/hP+B1re94qFa5PACN/HHWdB63SGjIygdvsduYWGeYYKZvNNkSA
+/ajmrDY00Ra3tThr8/QEoTXAxV0l5eTkOftYycidjl0lokGvRCSvt4wAJ7IapYG0
+nJuGQWSxUlmZqbnwr6bbZJFuMrdLS9UGkXgodiSM1MLzJ6m8DrSNErOLB2dXSPN7
++MSff3CABE1worWy+MtJNlhMQmNklhmDRp7BSGAa01qhvhECobM=
+=jpmY
+-----END PGP SIGNATURE-----
+
+--vmttodhTwj0NAgWp--
