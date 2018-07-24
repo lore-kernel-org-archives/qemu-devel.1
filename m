@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fhvzC-00007A-6k
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:23 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fhvzJ-0000GF-68
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fhvz6-0003Jp-4L
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48770 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fhvz5-0003Jb-Vj
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:08 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7F240805A530
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 12:00:07 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 24 Jul 2018 14:00:03 +0200
-Message-Id: <20180724120003.27053-2-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] i386: implement MSR_SMI_COUNT for TCG
+	(envelope-from <stefanha@redhat.com>) id 1fhvzA-0003PO-UA
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:21 -0400
+Date: Tue, 24 Jul 2018 13:00:05 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180724120005.GD2988@stefanha-x1.localdomain>
+References: <20180723222210.11077-1-jsnow@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jL2BoiuKMElzg3CS"
+Content-Disposition: inline
+In-Reply-To: <20180723222210.11077-1-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 0/7] fix persistent bitmaps
+ migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com, Max Reitz <mreitz@redhat.com>
 
-This is trivial, so just do it.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/misc_helper.c | 3 +++
- target/i386/smm_helper.c  | 1 +
- 2 files changed, 4 insertions(+)
+--jL2BoiuKMElzg3CS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
-index 628f64aad5..78f2020ef2 100644
---- a/target/i386/misc_helper.c
-+++ b/target/i386/misc_helper.c
-@@ -447,6 +447,9 @@ void helper_rdmsr(CPUX86State *env)
-         val = env->tsc_aux;
-         break;
- #endif
-+    case MSR_SMI_COUNT:
-+        val = env->msr_smi_count;
-+        break;
-     case MSR_MTRRphysBase(0):
-     case MSR_MTRRphysBase(1):
-     case MSR_MTRRphysBase(2):
-diff --git a/target/i386/smm_helper.c b/target/i386/smm_helper.c
-index 90621e5977..c1c34a75db 100644
---- a/target/i386/smm_helper.c
-+++ b/target/i386/smm_helper.c
-@@ -54,6 +54,7 @@ void do_smm_enter(X86CPU *cpu)
-     qemu_log_mask(CPU_LOG_INT, "SMM: enter\n");
-     log_cpu_state_mask(CPU_LOG_INT, CPU(cpu), CPU_DUMP_CCOP);
- 
-+    env->msr_smi_count++;
-     env->hflags |= HF_SMM_MASK;
-     if (env->hflags2 & HF2_NMI_MASK) {
-         env->hflags2 |= HF2_SMM_INSIDE_NMI_MASK;
--- 
-2.17.1
+On Mon, Jul 23, 2018 at 06:22:03PM -0400, John Snow wrote:
+> This is an updated version of Vladimir's proposal for fixing the
+> handling around migration and persistent dirty bitmaps.
+>=20
+> Patches 1, 4, 6, and 7 update the testing for this feature.
+> Patch 2 touches up an error message.
+> Patch 3 removes dead code.
+> Patch 5 contains the real fix.
+>=20
+> v2:
+>  - Add a new patch 4 as a prerequisite for what's now patch 5
+>  - Rework the fix to be (hopefully) cleaner, see patch 5 notes
+>  - Adjust error message in patch 2 (Eric)
+>  - Adjust test logic slightly (patches 6, 7) to deal with changes
+>    in patch 5.
+>=20
+> John Snow (2):
+>   iotests: 169: actually test block migration
+>   dirty-bitmaps: clean-up bitmaps loading and migration logic
+>=20
+> Vladimir Sementsov-Ogievskiy (5):
+>   iotests: 169: drop deprecated 'autoload' parameter
+>   block/qcow2: improve error message in qcow2_inactivate
+>   block/qcow2: drop dirty_bitmaps_loaded state variable
+>   iotests: improve 169
+>   iotests: 169: add cases for source vm resuming
+>=20
+>  block.c                        |  4 ---
+>  block/dirty-bitmap.c           | 20 ------------
+>  block/qcow2-bitmap.c           | 16 +++++++++
+>  block/qcow2.c                  | 26 ++++-----------
+>  block/qcow2.h                  |  1 -
+>  include/block/dirty-bitmap.h   |  2 +-
+>  migration/block-dirty-bitmap.c | 11 ++++---
+>  tests/qemu-iotests/169         | 74 ++++++++++++++++++++++++++++++++++++=
+++++--
+>  tests/qemu-iotests/169.out     |  4 +--
+>  9 files changed, 103 insertions(+), 55 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--jL2BoiuKMElzg3CS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbVxTFAAoJEJykq7OBq3PIq+QH/1zuGQHhPzLJ4H8nEEuVvY07
+zESKDReGU1GuHFvw0StoodVGwOQYoz5h2XXRakS9D3anXMUVMDXjjHSMJuldhzLw
+jGGf5R4dP31e8hfClQVeJ5akTEA07L6HMHCc4u0zzNMkLco15LCu38qHa/rnKn+5
+VRmG2oJpL4pqKJhMQ72/ix77nbHF8wglLFKnlHXNzLiuhDCbW3hB7KBHgHpkMv05
+4ZwiBHCQqN1XhMqFOWmJP3koHn7YQUfLGggMsqAQK3u/lIWUaM32vfQYrC36dIBj
+p7T0DWNDeVwEApcUWg6fD3lYsULZ1z65dPV18Rf682jtTzwW5OYqX+8ixH0QJ18=
+=0xX7
+-----END PGP SIGNATURE-----
+
+--jL2BoiuKMElzg3CS--
