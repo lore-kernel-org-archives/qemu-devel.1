@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fi6ME-0005JF-51
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 19:04:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1fi6jc-00027o-WE
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 19:28:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fi6MD-00083X-4Z
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 19:04:42 -0400
-References: <20180724221750.16282-1-lbloch@janustech.com>
-	<0e4edd44-ee9a-9846-b19b-547888bba6a7@janustech.com>
-	<7ae44fed-2ba3-0557-251c-18e1f8fd461a@redhat.com>
-From: Leonid Bloch <lbloch@janustech.com>
-Message-ID: <b033d2f9-3ed1-1f34-0813-07d7a5a24a61@janustech.com>
-Date: Wed, 25 Jul 2018 02:04:05 +0300
-In-Reply-To: <7ae44fed-2ba3-0557-251c-18e1f8fd461a@redhat.com>
-Content-Language: en-GB-large
+	(envelope-from <bounces@canonical.com>) id 1fi6jY-00065F-V5
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 19:28:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53786)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fi6jY-00064g-O1
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 19:28:48 -0400
+Received: from chaenomeles.canonical.com ([91.189.89.119])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fi6jX-0006ay-CW
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 23:28:47 +0000
+Received: from chaenomeles.canonical.com (localhost [IPv6:::1])
+	by chaenomeles.canonical.com (Postfix) with ESMTPS id 48789681C09
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 23:28:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Subject: Re: [Qemu-devel] [PATCH v4 0/4] Introduction of l2-cache-full
- option for qcow2 images
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 24 Jul 2018 23:28:47 -0000
+From: Launchpad Bug Tracker <1783422@bugs.launchpad.net>
+Reply-To: Bug 1783422 <1783422@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153247232146.31708.16928869218429719038.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153247492703.32215.3342726685556574819.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1783422] [NEW] qemu_clock_get_ns does not take
+ into account icount_time_shift
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
-   Thanks for the review and for the comments, Eric!
-   One quick remark: I do usually leave blank lines around inline replies,
-   but this time Thunderbird made it look as if there are blank lines when
-   I was writing, when apparently there were not. :]
-   Leonid.
+You have been subscribed to a public bug:
 
-   On 07/25/2018 01:44 AM, Eric Blake wrote:
+Hello,
 
-     On 07/24/2018 05:20 PM, Leonid Bloch wrote:
-     meta-comment: a hint for more effective emails below
+If you check the qemu/util/qemu-timer.c you will find the following
+function:
 
-     -------------------------
-     Differences from v2:
-     1) A separate patch for the grammar fix for 3.0
-     2) A separate patch for existing documentation fixes for 3.0
-     3) Separated back the iotests patch, because the grammar fix is
-     separate now
-     -------------------------
-     Differences from v2:
+597: int64_t qemu_clock_get_ns(QEMUClockType type)
+598: {
+....
+602:    switch (type) {
+....
+606:    case QEMU_CLOCK_VIRTUAL:
+607:        if (use_icount) {
+608:            return cpu_get_icount(); =
 
-     * from v3
 
-     1) Grammar change commit message fix
 
-     Visually, it's hard to pick out an inline reply prefixed with "*"
-     amid a bunch of lines prefixed with ">", with no other hinting.
-     (Actually, I'm finding it easier to read your email in my reply
-     window, where thunderbird chose to use ">>" for double-quoted lines
-     vs. "> *" for the single quoted line, which has a distinct
-     whitespace change in column 2 that the original email window did
-     not.  But then again, I've been bitten by Thunderbird displaying
-     quoting differently to me than it renders to the end recipient, so I
-     don't know if "> *" will still have a space by the time you see this
-     reply of mine).
-     I find that it is much more legible to always include a blank line
-     around both ends of any text I type, as the eye is much quicker at
-     picking out the absence of any character in column 1 than it is on
-     deciphering which marks in column 1 serve as the indicator of
-     transitions between quoted vs. new content in the thread.
+Now on line 606, in case we requested QEMU_CLOCK_VIRTUAL, and we are using =
+icount, the value of cpu_get_icount(); will be returned.
 
-     2) Rewording the documentation more concisely
-     3) Squashing the l2-cache-full docs commit to the one that
-     introduces this
-         feature
+However if I understand correctly, in order to convert icount to ns, you
+must use take into account the icount shift -- as defined in the
+documentation: "The virtual cpu will execute one instruction every 2^N
+ns of virtual time.".
 
-     Also, when replying to an archived list, it's okay to trim quoted
-     text down to just the context relevant to the reply, to let the
-     reader quickly reach the new content, rather than preserving the
-     entire original email and forcing the reader to scroll through a
-     wall of text just to locate the added thoughts. (Yes, some mail
-     clients do a better job of coloring quoted text differently, and/or
-     collapsing quoted material, so that not every reader has to scroll,
-     but not everyone agrees on the ideal mail client). This email wasn't
-     too bad, but you'll find instances of me making these same
-     metacomments on other emails over the years if you search the
-     archives :)
-     Finally, thanks for contributing, and for your rapid turnaround
-     incorporating suggestions from my earlier reviews!  I know that
-     sometimes when I make observations about making the review process
-     more efficient for everyone involved, it makes me come across as a
-     curmudgeonly old miser. In my efforts to be terse, I often forget to
-     also be human and compliment contributors for making an effort in
-     the first place, regardless of whether future efforts can be made
-     even more efficient.
+Therefor, the correct value to return would be
+cpu_icount_to_ns(cpu_get_icount()), where cpu_icount_to_ns is defined in
+cpus.c:
+
+296: int64_t cpu_icount_to_ns(int64_t icount)
+297: {
+298:    return icount << icount_time_shift;
+299: }
+
+Best Regards,
+Humberto "SilverOne" Carvalho
+
+** Affects: qemu
+     Importance: Undecided
+         Status: Incomplete
+
+-- =
+
+qemu_clock_get_ns does not take into account icount_time_shift
+https://bugs.launchpad.net/bugs/1783422
+You received this bug notification because you are a member of qemu-devel-m=
+l, which is subscribed to QEMU.
