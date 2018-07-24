@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fi5ft-0000Mq-Pb
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:21:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1fi62N-0007pP-CL
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fi5fs-0001AR-SD
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:20:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1fi62M-0004K0-AK
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:44:11 -0400
 References: <20180724221750.16282-1-lbloch@janustech.com>
-From: Leonid Bloch <lbloch@janustech.com>
-Message-ID: <0e4edd44-ee9a-9846-b19b-547888bba6a7@janustech.com>
-Date: Wed, 25 Jul 2018 01:20:34 +0300
-In-Reply-To: <20180724221750.16282-1-lbloch@janustech.com>
-Content-Language: en-GB-large
+	<0e4edd44-ee9a-9846-b19b-547888bba6a7@janustech.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7ae44fed-2ba3-0557-251c-18e1f8fd461a@redhat.com>
+Date: Tue, 24 Jul 2018 17:44:03 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <0e4edd44-ee9a-9846-b19b-547888bba6a7@janustech.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v4 0/4] Introduction of l2-cache-full
  option for qcow2 images
 List-Id: <qemu-devel.nongnu.org>
@@ -23,59 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-   On 07/25/2018 01:17 AM, Leonid Bloch wrote:
+On 07/24/2018 05:20 PM, Leonid Bloch wrote:
 
-This series introduces an option to calculate and allocate
-automatically enough qcow2 L2 cache to cover the entire image.
-Using cache that covers the entire image can benefit performance,
-while having only a small memory overhead (just 1 MB for every 8 GB
-of virtual image size with the default cluster size).
+meta-comment: a hint for more effective emails below
 
--------------------------
-Differences from v1:
+>> -------------------------
+>> Differences from v2:
+>>
+>> 1) A separate patch for the grammar fix for 3.0
+>> 2) A separate patch for existing documentation fixes for 3.0
+>> 3) Separated back the iotests patch, because the grammar fix is separate now
+>>
+>> -------------------------
+>> Differences from v2:
+> * from v3
+>> 1) Grammar change commit message fix
 
-1) Documentation fixes in qapi/block-core.json and qemu-options.hx
-2) Removal of the patch which was made to fix the default sizes in
-   docs/qcow2-cache.txt - it is not needed, as the default sizes imply
-   also default cluster sizes.
-3) Documentation fixes in docs/qcow2-cache.txt, mentioning mutual
-   exclusivity of the options.
-4) Squashing the iotests patch into the main feature addition patch
+Visually, it's hard to pick out an inline reply prefixed with "*" amid a 
+bunch of lines prefixed with ">", with no other hinting. (Actually, I'm 
+finding it easier to read your email in my reply window, where 
+thunderbird chose to use ">>" for double-quoted lines vs. "> *" for the 
+single quoted line, which has a distinct whitespace change in column 2 
+that the original email window did not.  But then again, I've been 
+bitten by Thunderbird displaying quoting differently to me than it 
+renders to the end recipient, so I don't know if "> *" will still have a 
+space by the time you see this reply of mine).
 
--------------------------
-Differences from v2:
+I find that it is much more legible to always include a blank line 
+around both ends of any text I type, as the eye is much quicker at 
+picking out the absence of any character in column 1 than it is on 
+deciphering which marks in column 1 serve as the indicator of 
+transitions between quoted vs. new content in the thread.
 
-1) A separate patch for the grammar fix for 3.0
-2) A separate patch for existing documentation fixes for 3.0
-3) Separated back the iotests patch, because the grammar fix is separate now
+>> 2) Rewording the documentation more concisely
+>> 3) Squashing the l2-cache-full docs commit to the one that introduces this
+>>     feature
 
--------------------------
-Differences from v2:
+Also, when replying to an archived list, it's okay to trim quoted text 
+down to just the context relevant to the reply, to let the reader 
+quickly reach the new content, rather than preserving the entire 
+original email and forcing the reader to scroll through a wall of text 
+just to locate the added thoughts. (Yes, some mail clients do a better 
+job of coloring quoted text differently, and/or collapsing quoted 
+material, so that not every reader has to scroll, but not everyone 
+agrees on the ideal mail client). This email wasn't too bad, but you'll 
+find instances of me making these same metacomments on other emails over 
+the years if you search the archives :)
 
-   * from v3
+Finally, thanks for contributing, and for your rapid turnaround 
+incorporating suggestions from my earlier reviews!  I know that 
+sometimes when I make observations about making the review process more 
+efficient for everyone involved, it makes me come across as a 
+curmudgeonly old miser. In my efforts to be terse, I often forget to 
+also be human and compliment contributors for making an effort in the 
+first place, regardless of whether future efforts can be made even more 
+efficient.
 
-1) Grammar change commit message fix
-2) Rewording the documentation more concisely
-3) Squashing the l2-cache-full docs commit to the one that introduces this
-   feature
-
-Leonid Bloch (4):
-  qcow2: A grammar fix in conflicting cache sizing error message
-  qcow2: Options' documentation fixes
-  qcow2: Introduce an option for sufficient L2 cache for the entire
-    image
-  iotests: Add tests for the new l2-cache-full option
-
- block/qcow2.c              | 37 +++++++++++++++++++++++++++++--------
- block/qcow2.h              |  1 +
- docs/qcow2-cache.txt       | 18 ++++++++++++++----
- qapi/block-core.json       |  8 +++++++-
- qemu-options.hx            | 14 ++++++++++----
- tests/qemu-iotests/103     |  6 ++++++
- tests/qemu-iotests/103.out |  4 +++-
- tests/qemu-iotests/137     |  2 ++
- tests/qemu-iotests/137.out |  4 +++-
- 9 files changed, 75 insertions(+), 19 deletions(-)
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
