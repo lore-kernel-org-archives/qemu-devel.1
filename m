@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fhyfq-0003Re-D4
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:52:31 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fhyhy-0004ai-J9
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:54:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fhyfp-0004RX-J8
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:52:26 -0400
-References: <20180724121753.5753-1-lbloch@janustech.com>
-	<20180724121753.5753-2-lbloch@janustech.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8966138a-1663-fdcf-e49e-df7e9c802c3e@redhat.com>
-Date: Tue, 24 Jul 2018 09:52:17 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1fhyhv-0005FK-9e
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:54:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56708 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fhyhv-0005F5-27
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:54:35 -0400
+Date: Tue, 24 Jul 2018 15:54:30 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180724145429.GD2374@work-vm>
+References: <20180722193350.6028-1-zhangckid@gmail.com>
+	<20180722193350.6028-11-zhangckid@gmail.com>
+	<0f358f05-46c7-cb77-c9fd-1d6673493df4@redhat.com>
+	<CAK3tnvJ1OnLBkFH3wD7GdT3pEK7_Wb5pw=8ig_9Ytv4=3fmX7A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180724121753.5753-2-lbloch@janustech.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] qcow2: Introduce an option for
- sufficient L2 cache for the entire image
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK3tnvJ1OnLBkFH3wD7GdT3pEK7_Wb5pw=8ig_9Ytv4=3fmX7A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V10 10/20] qmp event: Add COLO_EXIT event
+ to notify users while exited COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Zhang Chen <zhangckid@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On 07/24/2018 07:17 AM, Leonid Bloch wrote:
-> An option "l2-cache-full" is introduced to automatically set the qcow2
-> L2 cache to a sufficient value for covering the entire image. The memory
-> overhead when using this option is not big (1 MB for each 8 GB of
-> virtual image size with the default cluster size) and it can noticeably
-> improve performance when using large images with frequent I/O.
-> Previously, for this functionality the correct L2 cache size needed to
-> be calculated manually or with a script, and then this size needed to be
-> passed to the "l2-cache-size" option. Now it is sufficient to just pass
-> the boolean "l2-cache-full" option.
+* Zhang Chen (zhangckid@gmail.com) wrote:
+> On Tue, Jul 24, 2018 at 2:41 AM, Eric Blake <eblake@redhat.com> wrote:
 > 
-> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
-> ---
+> > On 07/22/2018 02:33 PM, Zhang Chen wrote:
+> >
+> >> From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> >>
+> >> If some errors happen during VM's COLO FT stage, it's important to
+> >> notify the users of this event. Together with 'x-colo-lost-heartbeat',
+> >> Users can intervene in COLO's failover work immediately.
+> >> If users don't want to get involved in COLO's failover verdict,
+> >> it is still necessary to notify users that we exited COLO mode.
+> >>
+> >> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> >> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> >> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> >> Reviewed-by: Eric Blake <eblake@redhat.com>
+> >> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> >> ---
+> >>   migration/colo.c    | 31 +++++++++++++++++++++++++++++++
+> >>   qapi/migration.json | 38 ++++++++++++++++++++++++++++++++++++++
+> >>   2 files changed, 69 insertions(+)
+> >>
+> >
+> > At this point in the release cycle, this series feels like enough of a new
+> > feature (rather than a bug fix) that it is probably not appropriate for
+> > 3.0, which means...
+> >
+> >
+> > +++ b/qapi/migration.json
+> >> @@ -900,6 +900,44 @@
+> >>   { 'enum': 'FailoverStatus',
+> >>     'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
+> >>   +##
+> >> +# @COLO_EXIT:
+> >> +#
+> >> +# Emitted when VM finishes COLO mode due to some errors happening or
+> >> +# at the request of users.
+> >> +#
+> >> +# @mode: report COLO mode when COLO exited.
+> >> +#
+> >> +# @reason: describes the reason for the COLO exit.
+> >> +#
+> >> +# Since: 3.0
+> >>
+> >
+> > ...this and other references should be updated to 3.1.
+> 
+> 
+> OK, I will fix it and resend this series.
 
-> @@ -793,15 +800,32 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
->       *l2_cache_entry_size = qemu_opt_get_size(
->           opts, QCOW2_OPT_L2_CACHE_ENTRY_SIZE, s->cluster_size);
->   
-> +    uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
-> +    uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
-> +
-> +    if (l2_cache_size_set && l2_cache_full_set) {
-> +        error_setg(errp, QCOW2_OPT_L2_CACHE_SIZE " and "
-> +                   QCOW2_OPT_L2_CACHE_FULL " may not be set at the same time");
-> +        return;
-> +    } else if (l2_cache_full_set) {
-> +        *l2_cache_size = max_l2_cache;
-> +    }
+No need to resend now; resend after the review of the other bits in the
+series; I'm sure there will be other minor things; anyway we can always
+fix up version nunmbers in merge.
 
-Since this makes the options mutually exclusive...
+Dave
 
-> +++ b/qapi/block-core.json
-> @@ -2814,6 +2814,9 @@
->   # @l2-cache-size:         the maximum size of the L2 table cache in
->   #                         bytes (since 2.2)
->   #
-> +# @l2-cache-full:         make the L2 table cache large enough to cover the
-> +#                         entire image (since 3.1)
-> +#
-
-...you should probably document that fact here.
-
-> +++ b/qemu-options.hx
-> @@ -758,6 +758,10 @@ The maximum total size of the L2 table and refcount block caches in bytes
->   The maximum size of the L2 table cache in bytes
->   (default: 4/5 of the total cache size)
->   
-> +@item l2-cache-full
-> +Make the L2 table cache large enough to cover the entire image
-> +(on/off; default: off)
-
-Likewise.
-
-> +
->   @item refcount-cache-size
->   The maximum size of the refcount block cache in bytes
->   (default: 1/5 of the total cache size)
-
-Alberto, looks like we missed this documentation in your changes to the 
-defaults.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> Thanks
+> Zhang Chen
+> 
+> 
+> >
+> >
+> > --
+> > Eric Blake, Principal Software Engineer
+> > Red Hat, Inc.           +1-919-301-3266
+> > Virtualization:  qemu.org | libvirt.org
+> >
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
