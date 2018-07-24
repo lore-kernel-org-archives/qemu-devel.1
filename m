@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fhvyx-0008Cw-Qe
+	(envelope-from <pm215@archaic.org.uk>) id 1fhvyx-0008Di-V0
 	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fhvyw-00039O-Vx
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:59:59 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fhvyx-0003A5-7r
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:00 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jul 2018 12:59:50 +0100
-Message-Id: <20180724115950.17316-6-peter.maydell@linaro.org>
+Date: Tue, 24 Jul 2018 12:59:46 +0100
+Message-Id: <20180724115950.17316-2-peter.maydell@linaro.org>
 In-Reply-To: <20180724115950.17316-1-peter.maydell@linaro.org>
 References: <20180724115950.17316-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 5/5] target/arm: Treat SCTLR_EL1.M as if it
- were zero when HCR_EL2.TGE is set
+Subject: [Qemu-devel] [PATCH 1/5] target/arm: Mask virtual interrupts if
+ HCR_EL2.TGE is set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +23,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-One of the required effects of setting HCR_EL2.TGE is that when
-SCR_EL3.NS is 1 then SCTLR_EL1.M must behave as if it is zero for
-all purposes except direct reads. That is, it effectively disables
-the MMU for the NS EL0/EL1 translation regime.
+If the "trap general exceptions" bit HCR_EL2.TGE is set, we
+must mask all virtual interrupts (as per DDI0487C.a D1.14.3).
+Implement this in arm_excp_unmasked().
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ target/arm/cpu.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 699189ebd7b..efd258fdb59 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -8402,6 +8402,14 @@ static inline bool regime_translation_disabled(CPUARMState *env,
-     if (mmu_idx == ARMMMUIdx_S2NS) {
-         return (env->cp15.hcr_el2 & HCR_VM) == 0;
-     }
-+
-+    if (env->cp15.hcr_el2 & HCR_TGE) {
-+        /* TGE means that NS EL0/1 act as if SCTLR_EL1.M is zero */
-+        if (!regime_is_secure(env, mmu_idx) && regime_el(env, mmu_idx) == 1) {
-+            return true;
-+        }
-+    }
-+
-     return (regime_sctlr(env, mmu_idx) & SCTLR_M) == 0;
- }
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e310ffc29d2..efb2a8d3f3d 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2261,13 +2261,15 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
+         break;
  
+     case EXCP_VFIQ:
+-        if (secure || !(env->cp15.hcr_el2 & HCR_FMO)) {
++        if (secure || !(env->cp15.hcr_el2 & HCR_FMO)
++            || (env->cp15.hcr_el2 & HCR_TGE)) {
+             /* VFIQs are only taken when hypervized and non-secure.  */
+             return false;
+         }
+         return !(env->daif & PSTATE_F);
+     case EXCP_VIRQ:
+-        if (secure || !(env->cp15.hcr_el2 & HCR_IMO)) {
++        if (secure || !(env->cp15.hcr_el2 & HCR_IMO)
++            || (env->cp15.hcr_el2 & HCR_TGE)) {
+             /* VIRQs are only taken when hypervized and non-secure.  */
+             return false;
+         }
 -- 
 2.17.1
