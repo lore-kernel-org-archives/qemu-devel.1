@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fhyFR-0007Pr-S3
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:25:11 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fhyFR-0007Ps-SL
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fhyFP-000099-TX
+	(envelope-from <stefanha@redhat.com>) id 1fhyFO-00008g-FZ
 	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:25:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57046 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44060 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fhyFP-00008p-LQ
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:25:07 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fhyFN-00008S-Pm
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:25:05 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 24 Jul 2018 15:25:04 +0100
-Message-Id: <20180724142504.15092-2-stefanha@redhat.com>
-In-Reply-To: <20180724142504.15092-1-stefanha@redhat.com>
-References: <20180724142504.15092-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL for-3.0 1/1] trace/simple: fix hang in child
- after fork(2)
+Date: Tue, 24 Jul 2018 15:25:03 +0100
+Message-Id: <20180724142504.15092-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL for-3.0 0/1] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,158 +24,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-The simple trace backend spawns a write-out thread which is used to
-asynchronously flush the in-memory ring buffer to disk.
+The following changes since commit 768cef2974fb1fa30dd188b043ea737e13fea477:
 
-fork(2) does not clone all threads, only the thread that invoked
-fork(2).  As a result there is no write-out thread in the child process!
+  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2018-07-24 10:37:52 +0100)
 
-This causes a hang during shutdown when atexit(3) handler installed by
-the simple trace backend waits for the non-existent write-out thread.
+are available in the Git repository at:
 
-This patch uses pthread_atfork(3) to terminate the write-out thread
-before fork and restart it in both the parent and child after fork.
-This solves a hang in qemu-iotests 147 due to qemu-nbd --fork usage.
+  git://github.com/stefanha/qemu.git tags/tracing-pull-request
 
-Reported-by: Cornelia Huck <cohuck@redhat.com>
-Tested-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20180717101944.11691-1-stefanha@redhat.com
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
+for you to fetch changes up to b6ad6a528f2356b357bd1d210048dd7988dc9a7b:
+
+  trace/simple: fix hang in child after fork(2) (2018-07-24 14:27:51 +0100)
+
+----------------------------------------------------------------
+Pull request
+
+Fix qemu-iotests 147 when QEMU was built with ./configure --enable-trace-backend=simple.
+
+----------------------------------------------------------------
+
+Stefan Hajnoczi (1):
+  trace/simple: fix hang in child after fork(2)
+
  trace/simple.c | 80 ++++++++++++++++++++++++++++++++++++++++++++------
  1 file changed, 71 insertions(+), 9 deletions(-)
 
-diff --git a/trace/simple.c b/trace/simple.c
-index 701dec639c..a4300b6ff1 100644
---- a/trace/simple.c
-+++ b/trace/simple.c
-@@ -39,9 +39,11 @@
- static GMutex trace_lock;
- static GCond trace_available_cond;
- static GCond trace_empty_cond;
-+static GThread *trace_writeout_thread;
- 
- static bool trace_available;
- static bool trace_writeout_enabled;
-+static bool trace_writeout_running;
- 
- enum {
-     TRACE_BUF_LEN = 4096 * 64,
-@@ -142,15 +144,34 @@ static void flush_trace_file(bool wait)
-     g_mutex_unlock(&trace_lock);
- }
- 
--static void wait_for_trace_records_available(void)
-+/**
-+ * Wait to be kicked by flush_trace_file()
-+ *
-+ * Returns: true if the writeout thread should continue
-+ *          false if the writeout thread should terminate
-+ */
-+static bool wait_for_trace_records_available(void)
- {
-+    bool running;
-+
-     g_mutex_lock(&trace_lock);
--    while (!(trace_available && trace_writeout_enabled)) {
-+    for (;;) {
-+        running = trace_writeout_running;
-+        if (!running) {
-+            break;
-+        }
-+
-+        if (trace_available && trace_writeout_enabled) {
-+            break;
-+        }
-+
-         g_cond_signal(&trace_empty_cond);
-         g_cond_wait(&trace_available_cond, &trace_lock);
-     }
-     trace_available = false;
-     g_mutex_unlock(&trace_lock);
-+
-+    return running;
- }
- 
- static gpointer writeout_thread(gpointer opaque)
-@@ -165,9 +186,7 @@ static gpointer writeout_thread(gpointer opaque)
-     size_t unused __attribute__ ((unused));
-     uint64_t type = TRACE_RECORD_TYPE_EVENT;
- 
--    for (;;) {
--        wait_for_trace_records_available();
--
-+    while (wait_for_trace_records_available()) {
-         if (g_atomic_int_get(&dropped_events)) {
-             dropped.rec.event = DROPPED_EVENT_ID,
-             dropped.rec.timestamp_ns = get_clock();
-@@ -398,18 +417,61 @@ static GThread *trace_thread_create(GThreadFunc fn)
-     return thread;
- }
- 
-+#ifndef _WIN32
-+static void stop_writeout_thread(void)
-+{
-+    g_mutex_lock(&trace_lock);
-+    trace_writeout_running = false;
-+    g_cond_signal(&trace_available_cond);
-+    g_mutex_unlock(&trace_lock);
-+
-+    g_thread_join(trace_writeout_thread);
-+    trace_writeout_thread = NULL;
-+
-+    /* Hold trace_lock across fork!  Since threads aren't cloned by fork() the
-+     * mutex would be held in the child process and cause a deadlock.
-+     * Acquiring the mutex here prevents other threads from being in a
-+     * trace_lock critical region when fork() occurs.
-+     */
-+    g_mutex_lock(&trace_lock);
-+}
-+
-+static void restart_writeout_thread(void)
-+{
-+    trace_writeout_running = true;
-+    trace_writeout_thread = trace_thread_create(writeout_thread);
-+    if (!trace_writeout_thread) {
-+        warn_report("unable to initialize simple trace backend");
-+    }
-+
-+    /* This relies on undefined behavior in the fork() child (it's fine in the
-+     * fork() parent).  g_mutex_unlock() on a mutex acquired by another thread
-+     * is undefined (see glib documentation).
-+     */
-+    g_mutex_unlock(&trace_lock);
-+}
-+#endif /* !_WIN32 */
-+
- bool st_init(void)
- {
--    GThread *thread;
--
-     trace_pid = getpid();
-+    trace_writeout_running = true;
- 
--    thread = trace_thread_create(writeout_thread);
--    if (!thread) {
-+    trace_writeout_thread = trace_thread_create(writeout_thread);
-+    if (!trace_writeout_thread) {
-         warn_report("unable to initialize simple trace backend");
-         return false;
-     }
- 
-+#ifndef _WIN32
-+    /* Terminate writeout thread across fork and restart it in parent and
-+     * child afterwards.
-+     */
-+    pthread_atfork(stop_writeout_thread,
-+                   restart_writeout_thread,
-+                   restart_writeout_thread);
-+#endif
-+
-     atexit(st_flush_trace_buffer);
-     return true;
- }
 -- 
 2.17.1
