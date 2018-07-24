@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fhvnZ-0003V1-7Z
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:48:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1fhvrS-0004ya-4c
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:52:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fhvnV-0005Xi-AX
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:48:13 -0400
-References: <20180724092413.5770-1-cohuck@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1fhvrR-0007Tj-9O
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:52:14 -0400
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b4479f10-d34c-714b-89b3-895ca0aac3c9@redhat.com>
-Date: Tue, 24 Jul 2018 13:48:06 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180724092413.5770-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1] s390x: remove 's390-squash-mcss'
- option
+Date: Tue, 24 Jul 2018 13:52:04 +0200
+Message-Id: <1532433124-25881-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] block/vvfat: Fix crash when reporting error
+ about too many files in directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +18,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Xiao Feng Ren <renxiaof@linux.ibm.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
 
-On 24.07.2018 11:24, Cornelia Huck wrote:
-> This option has been deprecated for two releases; remove it.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  hw/s390x/3270-ccw.c                |  2 +-
->  hw/s390x/css-bridge.c              |  1 -
->  hw/s390x/css.c                     |  6 ++----
->  hw/s390x/s390-ccw.c                |  2 +-
->  hw/s390x/s390-virtio-ccw.c         | 37 ++-----------------------------------
->  hw/s390x/virtio-ccw.c              |  2 +-
->  include/hw/s390x/css-bridge.h      |  1 -
->  include/hw/s390x/css.h             |  9 +++------
->  include/hw/s390x/s390-virtio-ccw.h |  1 -
->  qemu-deprecated.texi               |  8 --------
->  qemu-options.hx                    | 10 ----------
->  target/s390x/cpu.c                 | 10 ----------
->  target/s390x/cpu.h                 |  1 -
->  13 files changed, 10 insertions(+), 80 deletions(-)
+When using the vvfat driver with a directory that contains too many files,
+QEMU currently crashes. This can be triggered like this for example:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+ mkdir /tmp/vvfattest
+ cd /tmp/vvfattest
+ for ((x=0;x<=513;x++)); do mkdir $x; done
+ qemu-system-x86_64 -drive \
+   file.driver=vvfat,file.dir=.,read-only=on,media=cdrom
+
+Seems like read_directory() is changing the mapping->path variable. Make
+sure we use the right pointer instead.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ block/vvfat.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/block/vvfat.c b/block/vvfat.c
+index fc41841..f2e7d50 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -973,10 +973,10 @@ static int init_directories(BDRVVVFATState* s,
+         mapping = array_get(&(s->mapping), i);
+ 
+         if (mapping->mode & MODE_DIRECTORY) {
++            char *path = mapping->path;
+             mapping->begin = cluster;
+             if(read_directory(s, i)) {
+-                error_setg(errp, "Could not read directory %s",
+-                           mapping->path);
++                error_setg(errp, "Could not read directory %s", path);
+                 return -1;
+             }
+             mapping = array_get(&(s->mapping), i);
+-- 
+1.8.3.1
