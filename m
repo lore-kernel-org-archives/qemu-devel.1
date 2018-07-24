@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fhveS-0007LR-Qb
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:38:49 -0400
+	(envelope-from <peterx@redhat.com>) id 1fhver-0007b8-GY
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:39:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fhveR-0001tA-QD
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:38:48 -0400
-References: <1531927703-9799-1-git-send-email-thuth@redhat.com>
-	<20180723143340.GJ8817@localhost.localdomain>
-	<044fbf92-3f8f-c627-29bf-41653b60cf78@redhat.com>
-	<20180724104905.GA4335@localhost.localdomain>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b42cfac1-c189-60d4-f9eb-689142b2f1d4@redhat.com>
-Date: Tue, 24 Jul 2018 13:38:39 +0200
+	(envelope-from <peterx@redhat.com>) id 1fhven-0001yK-Jf
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:39:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48808 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhven-0001yD-Ea
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:39:09 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EFB9A77888
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 11:39:08 +0000 (UTC)
+Date: Tue, 24 Jul 2018 19:39:04 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180724113904.GC2479@xz-mi>
+References: <20180723123305.24792-1-peterx@redhat.com>
+	<20180723123305.24792-3-peterx@redhat.com>
+	<877ellgf9w.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20180724104905.GA4335@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] block/vvfat: Fix crash when reporting
- error about too many files in directory
+Content-Disposition: inline
+In-Reply-To: <877ellgf9w.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 2/4] migration: disallow recovery
+ for release-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +35,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 24.07.2018 12:49, Kevin Wolf wrote:
-> Am 24.07.2018 um 11:56 hat Thomas Huth geschrieben:
->> On 23.07.2018 16:33, Kevin Wolf wrote:
->>> Am 18.07.2018 um 17:28 hat Thomas Huth geschrieben:
->>>> When using the vvfat driver with a directory that contains too many =
-files,
->>>> QEMU currently crashes. We are trying to print the wrong path variab=
-le here.
->>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>>  block/vvfat.c | 3 +--
->>>>  1 file changed, 1 insertion(+), 2 deletions(-)
->>>>
->>>> diff --git a/block/vvfat.c b/block/vvfat.c
->>>> index fc41841..6ae7458 100644
->>>> --- a/block/vvfat.c
->>>> +++ b/block/vvfat.c
->>>> @@ -975,8 +975,7 @@ static int init_directories(BDRVVVFATState* s,
->>>>          if (mapping->mode & MODE_DIRECTORY) {
->>>>              mapping->begin =3D cluster;
->>>>              if(read_directory(s, i)) {
->>>> -                error_setg(errp, "Could not read directory %s",
->>>> -                           mapping->path);
->>>> +                error_setg(errp, "Could not read directory \"%s\"",=
- s->path);
->>>
->>> Hm, I'm not sure if that's right. Before this patch we were printing
->>> the name of the subdirectory that couldn't be loaded, now it's the
->>> parent directory.
->>>
->>> My test case where this difference is visible is a subdirectory with
->>> chmod 000.
->>
->> Right.
->>
->>>>                  return -1;
->>>>              }
->>>>              mapping =3D array_get(&(s->mapping), i);
->>>
->>> Maybe the right solution would be moving the reloading of mapping to
->>> between the read_directory() call and the error path?
->>
->> No, that does not work either. The problem seems to be that
->> read_directory() is changing the mapping->path pointer to something
->> invalid in between, but I've been unable to track it down where it
->> happens. This patch here seems to work for me, though:
->>
->> diff --git a/block/vvfat.c b/block/vvfat.c
->> index fc41841..f2e7d50 100644
->> --- a/block/vvfat.c
->> +++ b/block/vvfat.c
->> @@ -973,10 +973,10 @@ static int init_directories(BDRVVVFATState* s,
->>          mapping =3D array_get(&(s->mapping), i);
->>
->>          if (mapping->mode & MODE_DIRECTORY) {
->> +            char *path =3D mapping->path;
->>              mapping->begin =3D cluster;
->>              if(read_directory(s, i)) {
->> -                error_setg(errp, "Could not read directory %s",
->> -                           mapping->path);
->> +                error_setg(errp, "Could not read directory %s", path)=
-;
->>                  return -1;
->>              }
->>              mapping =3D array_get(&(s->mapping), i);
->>
->> Does this look reasonable for you, too?
->=20
-> I can't say I understand what's going on (the change I suggested did
-> work for my test case, without valgrind errors), but the above patch
-> doesn't look wrong to me at least.
+On Tue, Jul 24, 2018 at 11:21:47AM +0200, Juan Quintela wrote:
+> Peter Xu <peterx@redhat.com> wrote:
+> > Postcopy recovery won't work well with release-ram capability since
+> > release-ram will drop the page buffer as long as the page is put into
+> > the send buffer.  So if there is a network failure happened, any page
+> > buffers that have not yet reached the destination VM but have already
+> > been sent from the source VM will be lost forever.  Let's refuse the
+> > client from resuming such a postcopy migration.  Luckily release-ram was
+> > designed to only be used when src and destination VMs are on the same
+> > host, so it should be fine.
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> 
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-FWIW, my test:
+Thanks.
 
-mkdir /tmp/vvfattest
-cd /tmp/vvfattest
-for ((x=3D0;x<=3D513;x++)); do mkdir $x; done
-qemu-system-x86_64 -drive \
- file.driver=3Dvvfat,file.dir=3D.,read-only=3Don,media=3Dcdrom
+> 
+> I wonder if we should have a FAQ somewhere and point an URL to there.
 
-I'll send a proper patch with above suggestion.
+Yeah we possibly should.  I have plan to write up a postcopy recovery
+wiki page, maybe an addon to the old postcopy wiki page, but I haven't
+yet started (especially after knowing that libvirt developers know
+well about how to use it already, hence I put that a lower
+priority...).
 
- Thomas
+Regards,
+
+-- 
+Peter Xu
