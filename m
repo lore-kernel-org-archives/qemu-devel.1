@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fhuuf-00011k-0C
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:51:30 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fhuzF-0005Mu-TK
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:56:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fhuuc-0006YU-4a
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:51:29 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42696)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fhuub-0006YK-Tk
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:51:26 -0400
-Received: by mail-wr1-x441.google.com with SMTP id e7-v6so3655459wrs.9
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 03:51:25 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 24 Jul 2018 11:51:07 +0100
-Message-Id: <20180724105109.8392-16-alex.bennee@linaro.org>
-In-Reply-To: <20180724105109.8392-1-alex.bennee@linaro.org>
-References: <20180724105109.8392-1-alex.bennee@linaro.org>
+	(envelope-from <amarkovic@wavecomp.com>) id 1fhuzC-0008By-0W
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:56:13 -0400
+Received: from mail-sn1nam01on0109.outbound.protection.outlook.com
+	([104.47.32.109]:24005
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fhuzB-0008Bi-OZ
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:56:09 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 24 Jul 2018 10:56:05 +0000
+Message-ID: <BN7PR08MB4868284B9D3E798D810F1B1FC6550@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+	<1532004912-13899-5-git-send-email-stefan.markovic@rt-rk.com>,
+	<469970e4-21cf-e7e6-bd3d-cedf265e5741@linaro.org>
+In-Reply-To: <469970e4-21cf-e7e6-bd3d-cedf265e5741@linaro.org>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/17] docker: ignore distro versioning of
- debootstrap
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 04/40] target/mips: Add
+ decode_nanomips_opc() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-We do a minimum version check for the debootstrap but if the distro
-has added their own minor version tick it would fail and fall-back to
-the SCM version. This is sub-optimal as the latest/greatest version
-may be broken at any one particular time. We fix that with a little
-sed magic on the version string before passing to our ugly shell
-versioning check.
+> From: Richard Henderson <richard.henderson@linaro.org>
+> Sent: Thursday, July 19, 2018 6:39 PM
+> On 07/19/2018 05:54 AM, Stefan Markovic wrote:
+> >          decode_opc(env, ctx);
+> >      } else if (ctx->insn_flags & ASE_MICROMIPS) {
+> > -        ctx->opcode =3D cpu_lduw_code(env, ctx->base.pc_next);
+> > -        insn_bytes =3D decode_micromips_opc(env, ctx);
+> > +        if (env->insn_flags & ISA_NANOMIPS32) {
+>
+> Be consistent and use ctx->insn_flags.
+>
+> > +            ctx->opcode =3D cpu_lduw_code(env, ctx->base.pc_next);
+> > +            insn_bytes =3D decode_nanomips_opc(env, ctx);
+> > +        } else {
+> > +            ctx->opcode =3D cpu_lduw_code(env, ctx->base.pc_next);
+> > +            insn_bytes =3D decode_micromips_opc(env, ctx);
+> > +        }
+> >      } else if (ctx->insn_flags & ASE_MIPS16) {
+> >          ctx->opcode =3D cpu_lduw_code(env, ctx->base.pc_next);
+>
+> Do you really want to nest nanoMIPS within microMIPS?
+>
+> I would have thought a better structure was
+>
+>   } else if (ctx->insn_flags & ISA_NANOMIPS32) {
+>       ...
+>   } else if (ctx->insn_flags & ASE_MICROMIPS) {
+>       ...
+>   } else if (ctx->insn_flags & ASE_MIPS16) {
+>
+>
+> r~
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Hi, Richard,
 
-diff --git a/tests/docker/dockerfiles/debian-bootstrap.pre b/tests/docker/dockerfiles/debian-bootstrap.pre
-index ea324d6e4a..3b0ef95374 100755
---- a/tests/docker/dockerfiles/debian-bootstrap.pre
-+++ b/tests/docker/dockerfiles/debian-bootstrap.pre
-@@ -56,10 +56,13 @@ if [ -z $DEBOOTSTRAP_DIR ]; then
-     if [ -z $DEBOOTSTRAP ]; then
-         echo "No debootstrap installed, attempting to install from SCM"
-         NEED_DEBOOTSTRAP=true
--    elif ! (echo "${MIN_DEBOOTSTRAP_VERSION}" ; "${DEBOOTSTRAP}" --version \
--            | cut -d ' ' -f 2) | sort -t . -n -k 1,1 -k 2,2 -k 3,3 -c &>/dev/null; then
--        echo "debootstrap too old, attempting to install from SCM"
--        NEED_DEBOOTSTRAP=true
-+    else
-+        INSTALLED_VERSION=$(${DEBOOTSTRAP} --version | sed 's/debootstrap \([0-9\.]*\)[^0-9\.]*.*/\1/')
-+        if ! (echo "${MIN_DEBOOTSTRAP_VERSION}" ; echo "${INSTALLED_VERSION}") \
-+                | sort -t . -n -k 1,1 -k 2,2 -k 3,3 -C ; then
-+            echo "debootstrap too old, attempting to install from SCM"
-+            NEED_DEBOOTSTRAP=true
-+        fi
-     fi
-     if $NEED_DEBOOTSTRAP; then
-         DEBOOTSTRAP_SOURCE=https://salsa.debian.org/installer-team/debootstrap.git
--- 
-2.17.1
+This will be fixed in the way you described in v4.
+
+Aleksandar
