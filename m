@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fhvyy-0008Ek-KB
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:10 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fhvz9-0008UM-Ml
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fhvyx-0003AI-9p
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:00 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Jul 2018 12:59:49 +0100
-Message-Id: <20180724115950.17316-5-peter.maydell@linaro.org>
-In-Reply-To: <20180724115950.17316-1-peter.maydell@linaro.org>
-References: <20180724115950.17316-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 4/5] target/arm: Provide accessor functions for
- HCR_EL2.{IMO, FMO, AMO}
+	(envelope-from <pbonzini@redhat.com>) id 1fhvz4-0003J6-UW
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51892 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fhvz4-0003Ie-Qm
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:00:06 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BDACD401EF05
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 12:00:05 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 24 Jul 2018 14:00:02 +0200
+Message-Id: <20180724120003.27053-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] i386: do not migrate MSR_SMI_COUNT on machine
+ types <2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,228 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
 
-The IMO, FMO and AMO bits in HCR_EL2 are defined to "behave as
-1 for all purposes other than direct reads" if HCR_EL2.TGE
-is set and HCR_EL2.E2H is 0, and to "behave as 0 for all
-purposes other than direct reads" if HCR_EL2.TGE is set
-and HRC_EL2.E2H is 1.
+MSR_SMI_COUNT started being migrated in QEMU 2.12.  Do not migrate it
+on older machine types, or the subsection causes a load failure for
+guests that use SMM.
 
-To avoid having to check E2H and TGE everywhere where we test IMO and
-FMO, provide accessors arm_hcr_el2_imo(), arm_hcr_el2_fmo()and
-arm_hcr_el2_amo().  We don't implement ARMv8.1-VHE yet, so the E2H
-case will never be true, but we include the logic to save effort when
-we eventually do get to that.
-
-(Note that in several of these callsites the change doesn't
-actually make a difference as either the callsite is handling
-TGE specially anyway, or the CPU can't get into that situation
-with TGE set; we change everywhere for consistency.)
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/arm/cpu.h          | 64 +++++++++++++++++++++++++++++++++++----
- hw/intc/arm_gicv3_cpuif.c | 19 ++++++------
- target/arm/helper.c       |  6 ++--
- 3 files changed, 71 insertions(+), 18 deletions(-)
+ include/hw/i386/pc.h  | 4 ++++
+ target/i386/cpu.c     | 2 ++
+ target/i386/cpu.h     | 1 +
+ target/i386/machine.c | 2 +-
+ 4 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index efb2a8d3f3d..4289c33ef4c 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1229,6 +1229,12 @@ static inline void xpsr_write(CPUARMState *env, uint32_t val, uint32_t mask)
- #define HCR_RW        (1ULL << 31)
- #define HCR_CD        (1ULL << 32)
- #define HCR_ID        (1ULL << 33)
-+#define HCR_E2H       (1ULL << 34)
-+/*
-+ * When we actually implement ARMv8.1-VHE we should add HCR_E2H to
-+ * HCR_MASK and then clear it again if the feature bit is not set in
-+ * hcr_write().
-+ */
- #define HCR_MASK      ((1ULL << 34) - 1)
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 654003f44c..6894f37df1 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -317,6 +317,10 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+ #define PC_COMPAT_2_11 \
+     HW_COMPAT_2_11 \
+     {\
++        .driver   = TYPE_X86_CPU,\
++        .property = "x-migrate-smi-count",\
++        .value    = "off",\
++    },{\
+         .driver   = "Skylake-Server" "-" TYPE_X86_CPU,\
+         .property = "clflushopt",\
+         .value    = "off",\
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index e0e2f2eea1..92732ef1a0 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5435,6 +5435,8 @@ static Property x86_cpu_properties[] = {
+                      false),
+     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+     DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
++    DEFINE_PROP_BOOL("x-migrate-smi-count", X86CPU, migrate_smi_count,
++                     false),
+     /*
+      * lecacy_cache defaults to true unless the CPU model provides its
+      * own cache information (see x86_cpu_load_def()).
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 2c5a0d90a6..bcda6197a8 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1379,6 +1379,7 @@ struct X86CPU {
+     bool expose_kvm;
+     bool expose_tcg;
+     bool migratable;
++    bool migrate_smi_count;
+     bool max_features; /* Enable all supported features automatically */
+     uint32_t apic_id;
  
- #define SCR_NS                (1U << 0)
-@@ -2234,6 +2240,54 @@ bool write_cpustate_to_list(ARMCPU *cpu);
- #  define TARGET_VIRT_ADDR_SPACE_BITS 32
- #endif
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 8b64dff487..084c2c73a8 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -400,7 +400,7 @@ static bool msr_smi_count_needed(void *opaque)
+     X86CPU *cpu = opaque;
+     CPUX86State *env = &cpu->env;
  
-+/**
-+ * arm_hcr_el2_imo(): Return the effective value of HCR_EL2.IMO.
-+ * Depending on the values of HCR_EL2.E2H and TGE, this may be
-+ * "behaves as 1 for all purposes other than direct read/write" or
-+ * "behaves as 0 for all purposes other than direct read/write"
-+ */
-+static inline bool arm_hcr_el2_imo(CPUARMState *env)
-+{
-+    switch (env->cp15.hcr_el2 & (HCR_TGE | HCR_E2H)) {
-+    case HCR_TGE:
-+        return true;
-+    case HCR_TGE | HCR_E2H:
-+        return false;
-+    default:
-+        return env->cp15.hcr_el2 & HCR_IMO;
-+    }
-+}
-+
-+/**
-+ * arm_hcr_el2_fmo(): Return the effective value of HCR_EL2.FMO.
-+ */
-+static inline bool arm_hcr_el2_fmo(CPUARMState *env)
-+{
-+    switch (env->cp15.hcr_el2 & (HCR_TGE | HCR_E2H)) {
-+    case HCR_TGE:
-+        return true;
-+    case HCR_TGE | HCR_E2H:
-+        return false;
-+    default:
-+        return env->cp15.hcr_el2 & HCR_FMO;
-+    }
-+}
-+
-+/**
-+ * arm_hcr_el2_amo(): Return the effective value of HCR_EL2.AMO.
-+ */
-+static inline bool arm_hcr_el2_amo(CPUARMState *env)
-+{
-+    switch (env->cp15.hcr_el2 & (HCR_TGE | HCR_E2H)) {
-+    case HCR_TGE:
-+        return true;
-+    case HCR_TGE | HCR_E2H:
-+        return false;
-+    default:
-+        return env->cp15.hcr_el2 & HCR_AMO;
-+    }
-+}
-+
- static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
-                                      unsigned int target_el)
- {
-@@ -2261,15 +2315,13 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
-         break;
- 
-     case EXCP_VFIQ:
--        if (secure || !(env->cp15.hcr_el2 & HCR_FMO)
--            || (env->cp15.hcr_el2 & HCR_TGE)) {
-+        if (secure || !arm_hcr_el2_fmo(env) || (env->cp15.hcr_el2 & HCR_TGE)) {
-             /* VFIQs are only taken when hypervized and non-secure.  */
-             return false;
-         }
-         return !(env->daif & PSTATE_F);
-     case EXCP_VIRQ:
--        if (secure || !(env->cp15.hcr_el2 & HCR_IMO)
--            || (env->cp15.hcr_el2 & HCR_TGE)) {
-+        if (secure || !arm_hcr_el2_imo(env) || (env->cp15.hcr_el2 & HCR_TGE)) {
-             /* VIRQs are only taken when hypervized and non-secure.  */
-             return false;
-         }
-@@ -2308,7 +2360,7 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
-                  * to the CPSR.F setting otherwise we further assess the state
-                  * below.
-                  */
--                hcr = (env->cp15.hcr_el2 & HCR_FMO);
-+                hcr = arm_hcr_el2_fmo(env);
-                 scr = (env->cp15.scr_el3 & SCR_FIQ);
- 
-                 /* When EL3 is 32-bit, the SCR.FW bit controls whether the
-@@ -2325,7 +2377,7 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
-                  * when setting the target EL, so it does not have a further
-                  * affect here.
-                  */
--                hcr = (env->cp15.hcr_el2 & HCR_IMO);
-+                hcr = arm_hcr_el2_imo(env);
-                 scr = false;
-                 break;
-             default:
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index 2a60568d82c..068a8e8e9b9 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -85,7 +85,10 @@ static bool icv_access(CPUARMState *env, int hcr_flags)
-      *  * access if NS EL1 and either IMO or FMO == 1:
-      *    CTLR, DIR, PMR, RPR
-      */
--    return (env->cp15.hcr_el2 & hcr_flags) && arm_current_el(env) == 1
-+    bool flagmatch = ((hcr_flags & HCR_IMO) && arm_hcr_el2_imo(env)) ||
-+        ((hcr_flags & HCR_FMO) && arm_hcr_el2_fmo(env));
-+
-+    return flagmatch && arm_current_el(env) == 1
-         && !arm_is_secure_below_el3(env);
+-    return env->msr_smi_count != 0;
++    return cpu->migrate_smi_count && env->msr_smi_count != 0;
  }
  
-@@ -1549,8 +1552,8 @@ static void icc_dir_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     /* No need to include !IsSecure in route_*_to_el2 as it's only
-      * tested in cases where we know !IsSecure is true.
-      */
--    route_fiq_to_el2 = env->cp15.hcr_el2 & HCR_FMO;
--    route_irq_to_el2 = env->cp15.hcr_el2 & HCR_IMO;
-+    route_fiq_to_el2 = arm_hcr_el2_fmo(env);
-+    route_irq_to_el2 = arm_hcr_el2_imo(env);
- 
-     switch (arm_current_el(env)) {
-     case 3:
-@@ -1893,7 +1896,7 @@ static CPAccessResult gicv3_irqfiq_access(CPUARMState *env,
-         switch (el) {
-         case 1:
-             if (arm_is_secure_below_el3(env) ||
--                ((env->cp15.hcr_el2 & (HCR_IMO | HCR_FMO)) == 0)) {
-+                (arm_hcr_el2_imo(env) == 0 && arm_hcr_el2_fmo(env) == 0)) {
-                 r = CP_ACCESS_TRAP_EL3;
-             }
-             break;
-@@ -1933,7 +1936,7 @@ static CPAccessResult gicv3_dir_access(CPUARMState *env,
- static CPAccessResult gicv3_sgi_access(CPUARMState *env,
-                                        const ARMCPRegInfo *ri, bool isread)
- {
--    if ((env->cp15.hcr_el2 & (HCR_IMO | HCR_FMO)) &&
-+    if ((arm_hcr_el2_imo(env) || arm_hcr_el2_fmo(env)) &&
-         arm_current_el(env) == 1 && !arm_is_secure_below_el3(env)) {
-         /* Takes priority over a possible EL3 trap */
-         return CP_ACCESS_TRAP_EL2;
-@@ -1958,8 +1961,7 @@ static CPAccessResult gicv3_fiq_access(CPUARMState *env,
-     if (env->cp15.scr_el3 & SCR_FIQ) {
-         switch (el) {
-         case 1:
--            if (arm_is_secure_below_el3(env) ||
--                ((env->cp15.hcr_el2 & HCR_FMO) == 0)) {
-+            if (arm_is_secure_below_el3(env) || !arm_hcr_el2_fmo(env)) {
-                 r = CP_ACCESS_TRAP_EL3;
-             }
-             break;
-@@ -1998,8 +2000,7 @@ static CPAccessResult gicv3_irq_access(CPUARMState *env,
-     if (env->cp15.scr_el3 & SCR_IRQ) {
-         switch (el) {
-         case 1:
--            if (arm_is_secure_below_el3(env) ||
--                ((env->cp15.hcr_el2 & HCR_IMO) == 0)) {
-+            if (arm_is_secure_below_el3(env) || !arm_hcr_el2_imo(env)) {
-                 r = CP_ACCESS_TRAP_EL3;
-             }
-             break;
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index e2930e99388..699189ebd7b 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6342,15 +6342,15 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uint32_t excp_idx,
-     switch (excp_idx) {
-     case EXCP_IRQ:
-         scr = ((env->cp15.scr_el3 & SCR_IRQ) == SCR_IRQ);
--        hcr = ((env->cp15.hcr_el2 & HCR_IMO) == HCR_IMO);
-+        hcr = arm_hcr_el2_imo(env);
-         break;
-     case EXCP_FIQ:
-         scr = ((env->cp15.scr_el3 & SCR_FIQ) == SCR_FIQ);
--        hcr = ((env->cp15.hcr_el2 & HCR_FMO) == HCR_FMO);
-+        hcr = arm_hcr_el2_fmo(env);
-         break;
-     default:
-         scr = ((env->cp15.scr_el3 & SCR_EA) == SCR_EA);
--        hcr = ((env->cp15.hcr_el2 & HCR_AMO) == HCR_AMO);
-+        hcr = arm_hcr_el2_amo(env);
-         break;
-     };
- 
+ static const VMStateDescription vmstate_msr_smi_count = {
 -- 
 2.17.1
