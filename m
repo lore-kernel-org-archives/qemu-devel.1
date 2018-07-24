@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fhyE5-0006OI-JT
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:23:46 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fhyFR-0007Pr-S3
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fhyE4-0007ri-IR
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:23:45 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fhyFP-000099-TX
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:25:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57046 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fhyFP-00008p-LQ
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:25:07 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 24 Jul 2018 15:23:31 +0100
-Message-Id: <20180724142331.14669-2-stefanha@redhat.com>
-In-Reply-To: <20180724142331.14669-1-stefanha@redhat.com>
-References: <20180724142331.14669-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL for-3.0 1/1] block/file-posix: add
- bdrv_attach_aio_context callback for host dev and cdrom
+Date: Tue, 24 Jul 2018 15:25:04 +0100
+Message-Id: <20180724142504.15092-2-stefanha@redhat.com>
+In-Reply-To: <20180724142504.15092-1-stefanha@redhat.com>
+References: <20180724142504.15092-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL for-3.0 1/1] trace/simple: fix hang in child
+ after fork(2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,64 +25,160 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Max Reitz <mreitz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Nishanth Aravamudan <naravamudan@digitalocean.com>
+The simple trace backend spawns a write-out thread which is used to
+asynchronously flush the in-memory ring buffer to disk.
 
-In ed6e2161 ("linux-aio: properly bubble up errors from initialzation"),
-I only added a bdrv_attach_aio_context callback for the bdrv_file
-driver. There are several other drivers that use the shared
-aio_plug callback, though, and they will trip the assertion added to
-aio_get_linux_aio because they did not call aio_setup_linux_aio first.
-Add the appropriate callback definition to the affected driver
-definitions.
+fork(2) does not clone all threads, only the thread that invoked
+fork(2).  As a result there is no write-out thread in the child process!
 
-Fixes: ed6e2161 ("linux-aio: properly bubble up errors from initialization")
-Reported-by: Farhan Ali <alifm@linux.ibm.com>
-Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20180718211256.29774-1-naravamudan@digitalocean.com
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: John Snow <jsnow@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+This causes a hang during shutdown when atexit(3) handler installed by
+the simple trace backend waits for the non-existent write-out thread.
+
+This patch uses pthread_atfork(3) to terminate the write-out thread
+before fork and restart it in both the parent and child after fork.
+This solves a hang in qemu-iotests 147 due to qemu-nbd --fork usage.
+
+Reported-by: Cornelia Huck <cohuck@redhat.com>
+Tested-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20180717101944.11691-1-stefanha@redhat.com
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/file-posix.c | 3 +++
- 1 file changed, 3 insertions(+)
+ trace/simple.c | 80 ++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 71 insertions(+), 9 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 60af4b3d51..ad299beb38 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -3158,6 +3158,7 @@ static BlockDriver bdrv_host_device = {
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-+    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+diff --git a/trace/simple.c b/trace/simple.c
+index 701dec639c..a4300b6ff1 100644
+--- a/trace/simple.c
++++ b/trace/simple.c
+@@ -39,9 +39,11 @@
+ static GMutex trace_lock;
+ static GCond trace_available_cond;
+ static GCond trace_empty_cond;
++static GThread *trace_writeout_thread;
  
-     .bdrv_co_truncate       = raw_co_truncate,
-     .bdrv_getlength	= raw_getlength,
-@@ -3280,6 +3281,7 @@ static BlockDriver bdrv_host_cdrom = {
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-+    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+ static bool trace_available;
+ static bool trace_writeout_enabled;
++static bool trace_writeout_running;
  
-     .bdrv_co_truncate    = raw_co_truncate,
-     .bdrv_getlength      = raw_getlength,
-@@ -3410,6 +3412,7 @@ static BlockDriver bdrv_host_cdrom = {
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-+    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+ enum {
+     TRACE_BUF_LEN = 4096 * 64,
+@@ -142,15 +144,34 @@ static void flush_trace_file(bool wait)
+     g_mutex_unlock(&trace_lock);
+ }
  
-     .bdrv_co_truncate    = raw_co_truncate,
-     .bdrv_getlength      = raw_getlength,
+-static void wait_for_trace_records_available(void)
++/**
++ * Wait to be kicked by flush_trace_file()
++ *
++ * Returns: true if the writeout thread should continue
++ *          false if the writeout thread should terminate
++ */
++static bool wait_for_trace_records_available(void)
+ {
++    bool running;
++
+     g_mutex_lock(&trace_lock);
+-    while (!(trace_available && trace_writeout_enabled)) {
++    for (;;) {
++        running = trace_writeout_running;
++        if (!running) {
++            break;
++        }
++
++        if (trace_available && trace_writeout_enabled) {
++            break;
++        }
++
+         g_cond_signal(&trace_empty_cond);
+         g_cond_wait(&trace_available_cond, &trace_lock);
+     }
+     trace_available = false;
+     g_mutex_unlock(&trace_lock);
++
++    return running;
+ }
+ 
+ static gpointer writeout_thread(gpointer opaque)
+@@ -165,9 +186,7 @@ static gpointer writeout_thread(gpointer opaque)
+     size_t unused __attribute__ ((unused));
+     uint64_t type = TRACE_RECORD_TYPE_EVENT;
+ 
+-    for (;;) {
+-        wait_for_trace_records_available();
+-
++    while (wait_for_trace_records_available()) {
+         if (g_atomic_int_get(&dropped_events)) {
+             dropped.rec.event = DROPPED_EVENT_ID,
+             dropped.rec.timestamp_ns = get_clock();
+@@ -398,18 +417,61 @@ static GThread *trace_thread_create(GThreadFunc fn)
+     return thread;
+ }
+ 
++#ifndef _WIN32
++static void stop_writeout_thread(void)
++{
++    g_mutex_lock(&trace_lock);
++    trace_writeout_running = false;
++    g_cond_signal(&trace_available_cond);
++    g_mutex_unlock(&trace_lock);
++
++    g_thread_join(trace_writeout_thread);
++    trace_writeout_thread = NULL;
++
++    /* Hold trace_lock across fork!  Since threads aren't cloned by fork() the
++     * mutex would be held in the child process and cause a deadlock.
++     * Acquiring the mutex here prevents other threads from being in a
++     * trace_lock critical region when fork() occurs.
++     */
++    g_mutex_lock(&trace_lock);
++}
++
++static void restart_writeout_thread(void)
++{
++    trace_writeout_running = true;
++    trace_writeout_thread = trace_thread_create(writeout_thread);
++    if (!trace_writeout_thread) {
++        warn_report("unable to initialize simple trace backend");
++    }
++
++    /* This relies on undefined behavior in the fork() child (it's fine in the
++     * fork() parent).  g_mutex_unlock() on a mutex acquired by another thread
++     * is undefined (see glib documentation).
++     */
++    g_mutex_unlock(&trace_lock);
++}
++#endif /* !_WIN32 */
++
+ bool st_init(void)
+ {
+-    GThread *thread;
+-
+     trace_pid = getpid();
++    trace_writeout_running = true;
+ 
+-    thread = trace_thread_create(writeout_thread);
+-    if (!thread) {
++    trace_writeout_thread = trace_thread_create(writeout_thread);
++    if (!trace_writeout_thread) {
+         warn_report("unable to initialize simple trace backend");
+         return false;
+     }
+ 
++#ifndef _WIN32
++    /* Terminate writeout thread across fork and restart it in parent and
++     * child afterwards.
++     */
++    pthread_atfork(stop_writeout_thread,
++                   restart_writeout_thread,
++                   restart_writeout_thread);
++#endif
++
+     atexit(st_flush_trace_buffer);
+     return true;
+ }
 -- 
 2.17.1
