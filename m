@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fi68f-0001O7-8Y
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:50:42 -0400
+	(envelope-from <bounces@canonical.com>) id 1fi6q7-0004EC-4E
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 19:35:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fi68b-0003HI-CE
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:50:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46640)
+	(envelope-from <bounces@canonical.com>) id 1fi6q3-0004m3-2y
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 19:35:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54090)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fi68b-0003G4-4D
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:50:37 -0400
+	id 1fi6q2-0004kw-ST
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 19:35:31 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fi68Z-0002UF-NO
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 22:50:35 +0000
+	id 1fi6q1-0006xS-4U
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 23:35:29 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A99292E80C7
-	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 22:50:35 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 1BD932E80C8
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 23:35:29 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Jul 2018 22:45:21 -0000
+Date: Tue, 24 Jul 2018 23:28:04 -0000
 From: SilverOnemi <silveronemi@gmail.com>
 Reply-To: Bug 1783422 <1783422@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <153247232146.31708.16928869218429719038.malonedeb@chaenomeles.canonical.com>
+References: <153247232146.31708.16928869218429719038.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153247488457.31372.5644209860612615683.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1783422] [NEW] qemu_clock_get_ns does not take
- into account icount_time_shift
+Subject: [Qemu-devel] [Bug 1783422] Re: qemu_clock_get_ns does not take into
+ account icount_time_shift
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,47 +39,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Public bug reported:
+Actually implementing this fix causes a linux boot to crash. So there
+may be something more to this. I will investigate more.
 
-Hello,
+[  892.294463] BUG: soft lockup - CPU#0 stuck for 347s! [swapper/0:1]
+[  892.490416] Modules linked in:
+[  892.635725] =
 
-If you check the qemu/util/qemu-timer.c you will find the following
-function:
+[  892.790816] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 3.16.0-6-armmp-lpa=
+e #1 Debian 3.16.56-1+deb8u1
+[  893.098786] task: ee059640 ti: ee05a000 task.ti: ee05a000
+[  893.322395] PC is at vprintk_emit+0x2c8/0x650
+[  893.525852] LR is at console_unlock+0x234/0x4dc
+[  893.749395] pc : [<c00bdd18>]    lr : [<c00bd7a8>]    psr: 60000153
+[  893.749395] sp : ee05bdc8  ip : ee05bd70  fp : ee05be2c
+[  894.117789] r10: 00000001  r9 : 00000000  r8 : 00000006
+[  894.329454] r7 : 00000000  r6 : 00000028  r5 : c0a3dd98  r4 : c0a3dd98
+[  894.571266] r3 : c09b44cc  r2 : 60000153  r1 : 60000153  r0 : c0a3dd98
+[  894.807621] Flags: nZCv  IRQs on  FIQs off  Mode SVC_32  ISA ARM  Segmen=
+t kernel
+[  895.089213] Control: 30c7387d  Table: 40003000  DAC: fffffffd
+[  895.329468] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 3.16.0-6-armmp-lpa=
+e #1 Debian 3.16.56-1+deb8u1
+[  895.720505] [<c002cf60>] (unwind_backtrace) from [<c002764c>] (show_stac=
+k+0x20/0x24)
+[  896.065798] [<c002764c>] (show_stack) from [<c05ed770>] (dump_stack+0x9c=
+/0xb0)
+[  896.393691] [<c05ed770>] (dump_stack) from [<c0024370>] (show_regs+0x30/=
+0x34)
+[  896.713637] [<c0024370>] (show_regs) from [<c0103084>] (watchdog_timer_f=
+n+0x18c/0x1e4)
+[  897.062977] [<c0103084>] (watchdog_timer_fn) from [<c008d9c0>] (__run_hr=
+timer+0x88/0x2a8)
+[  897.412317] [<c008d9c0>] (__run_hrtimer) from [<c008ecf0>] (hrtimer_run_=
+queues+0xc0/0x1a4)
+[  897.785790] [<c008ecf0>] (hrtimer_run_queues) from [<c0076ef0>] (update_=
+process_times+0x3c/0x70)
+[  898.169815] [<c0076ef0>] (update_process_times) from [<c00d5ed4>] (tick_=
+periodic+0x4c/0xcc)
+[  898.532622] [<c00d5ed4>] (tick_periodic) from [<c00d61b0>] (tick_handle_=
+periodic+0x94/0x98)
+[  898.895806] [<c00d61b0>] (tick_handle_periodic) from [<c04ad8fc>] (arch_=
+timer_handler_virt+0x38/0x40)
+[  899.292479] [<c04ad8fc>] (arch_timer_handler_virt) from [<c00c3b48>] (ha=
+ndle_percpu_devid_irq+0x80/0x194)
+[  899.702210] [<c00c3b48>] (handle_percpu_devid_irq) from [<c00bf738>] (ge=
+neric_handle_irq+0x3c/0x4c)
+[  900.082647] [<c00bf738>] (generic_handle_irq) from [<c0023ba4>] (handle_=
+IRQ+0x50/0xa0)
+[  900.427431] [<c0023ba4>] (handle_IRQ) from [<c0008948>] (gic_handle_irq+=
+0x3c/0x70)
+[  900.767678] [<c0008948>] (gic_handle_irq) from [<c05f4180>] (__irq_svc+0=
+x40/0x54)
+[  901.037948] Exception stack(0xee05bd80 to 0xee05bdc8)
+[  901.317607] bd80: c0a3dd98 60000153 60000153 c09b44cc c0a3dd98 c0a3dd98 =
+00000028 00000000
+[  901.677252] bda0: 00000006 00000000 00000001 ee05be2c ee05bd70 ee05bdc8 =
+c00bd7a8 c00bdd18
+[  901.970690] bdc0: 60000153 ffffffff
+[  902.218760] [<c05f4180>] (__irq_svc) from [<c00bdd18>] (vprintk_emit+0x2=
+c8/0x650)
+[  902.571360] [<c00bdd18>] (vprintk_emit) from [<c05eaeb8>] (printk+0x44/0=
+x4c)
+[  902.916079] [<c05eaeb8>] (printk) from [<c00d14c0>] (__clocksource_selec=
+t+0x12c/0x170)
+[  903.290503] [<c00d14c0>] (__clocksource_select) from [<c08da7d4>] (clock=
+source_done_booting+0x38/0x4c)
+[  903.671545] [<c08da7d4>] (clocksource_done_booting) from [<c0008d14>] (d=
+o_one_initcall+0xf0/0x234)
+[  904.050606] [<c0008d14>] (do_one_initcall) from [<c08b2ec0>] (kernel_ini=
+t_freeable+0x1c8/0x268)
+[  904.433926] [<c08b2ec0>] (kernel_init_freeable) from [<c05e82ac>] (kerne=
+l_init+0x1c/0x100)
+[  904.797782] [<c05e82ac>] (kernel_init) from [<c0023280>] (ret_from_fork+=
+0x14/0x20)
 
-597: int64_t qemu_clock_get_ns(QEMUClockType type)
-598: {
-....
-602:    switch (type) {
-....
-606:    case QEMU_CLOCK_VIRTUAL:
-607:        if (use_icount) {
-608:            return cpu_get_icount(); =
 
 
-
-Now on line 606, in case we requested QEMU_CLOCK_VIRTUAL, and we are using =
-icount, the value of cpu_get_icount(); will be returned.
-
-However if I understand correctly, in order to convert icount to ns, you
-must use take into account the icount shift -- as defined in the
-documentation: "The virtual cpu will execute one instruction every 2^N
-ns of virtual time.".
-
-Therefor, the correct value to return would be
-cpu_icount_to_ns(cpu_get_icount()), where cpu_icount_to_ns is defined in
-cpus.c:
-
-296: int64_t cpu_icount_to_ns(int64_t icount)
-297: {
-298:    return icount << icount_time_shift;
-299: }
-
-Best Regards,
-Humberto "SilverOne" Carvalho
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+** Changed in: ubuntu
+       Status: New =3D> Incomplete
 
 -- =
 
@@ -90,7 +129,7 @@ Title:
   qemu_clock_get_ns does not take into account icount_time_shift
 
 Status in QEMU:
-  New
+  Incomplete
 
 Bug description:
   Hello,
