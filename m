@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fhyUx-0006pI-46
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:41:12 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fhyXz-0007yt-9h
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:44:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fhyUr-0007Pt-8k
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:41:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56212 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fhyXw-0000Zw-LJ
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:44:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56340 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fhyUr-0007Pi-3Z
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:41:05 -0400
-Date: Tue, 24 Jul 2018 15:41:01 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180724144101.GL19167@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180724142504.15092-1-stefanha@redhat.com>
-	<20180724142504.15092-2-stefanha@redhat.com>
-	<20180724143551.GK19167@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fhyXw-0000Z0-FW
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 10:44:16 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0F0AE87A74
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 14:44:16 +0000 (UTC)
+Date: Tue, 24 Jul 2018 15:44:13 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180724144412.GC2374@work-vm>
+References: <20180724120003.27053-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180724143551.GK19167@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL for-3.0 1/1] trace/simple: fix hang in child
- after fork(2)
+In-Reply-To: <20180724120003.27053-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] i386: do not migrate MSR_SMI_COUNT on
+ machine types <2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +33,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, Jul 24, 2018 at 03:35:51PM +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Jul 24, 2018 at 03:25:04PM +0100, Stefan Hajnoczi wrote:
-> > The simple trace backend spawns a write-out thread which is used to
-> > asynchronously flush the in-memory ring buffer to disk.
-> >=20
-> > fork(2) does not clone all threads, only the thread that invoked
-> > fork(2).  As a result there is no write-out thread in the child proce=
-ss!
-> >=20
-> > This causes a hang during shutdown when atexit(3) handler installed b=
-y
-> > the simple trace backend waits for the non-existent write-out thread.
-> >=20
-> > This patch uses pthread_atfork(3) to terminate the write-out thread
-> > before fork and restart it in both the parent and child after fork.
-> > This solves a hang in qemu-iotests 147 due to qemu-nbd --fork usage.
->=20
-> I'm not convinced this is safe, as it looks like it has a window in
-> which both the parent and child processes will be doing write-out to
-> the same file.
->=20
-> In particular in the main QEMU system emulators it means that any
-> time we fork() in QEMU, eg for spawning commands with migration
-> exec: URI, or TAP devuce ifup scripts, etc, we'll be starting a
-> write-out thread in the child.
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> MSR_SMI_COUNT started being migrated in QEMU 2.12.  Do not migrate it
+> on older machine types, or the subsection causes a load failure for
+> guests that use SMM.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  include/hw/i386/pc.h  | 4 ++++
+>  target/i386/cpu.c     | 2 ++
+>  target/i386/cpu.h     | 1 +
+>  target/i386/machine.c | 2 +-
+>  4 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 654003f44c..6894f37df1 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -317,6 +317,10 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>  #define PC_COMPAT_2_11 \
+>      HW_COMPAT_2_11 \
+>      {\
+> +        .driver   = TYPE_X86_CPU,\
+> +        .property = "x-migrate-smi-count",\
+> +        .value    = "off",\
+> +    },{\
+>          .driver   = "Skylake-Server" "-" TYPE_X86_CPU,\
+>          .property = "clflushopt",\
+>          .value    = "off",\
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index e0e2f2eea1..92732ef1a0 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -5435,6 +5435,8 @@ static Property x86_cpu_properties[] = {
+>                       false),
+>      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+>      DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
+> +    DEFINE_PROP_BOOL("x-migrate-smi-count", X86CPU, migrate_smi_count,
+> +                     false),
 
-I'd be more inclined to have the pthread_atfork() handle simply terminate
-the tracing process, reversing all effects of trace_init_backends(). Then
-after qemu-nbd has called fork(), it can simply call trace_init_backends(=
-)
-explicitly to start it running again. This avoids unecessarily starting
-tracing in child processes that are not requiring/expecting it.
+Shouldn't that be true?
+(and then turned off in the compat)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Dave
+
+>      /*
+>       * lecacy_cache defaults to true unless the CPU model provides its
+>       * own cache information (see x86_cpu_load_def()).
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 2c5a0d90a6..bcda6197a8 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1379,6 +1379,7 @@ struct X86CPU {
+>      bool expose_kvm;
+>      bool expose_tcg;
+>      bool migratable;
+> +    bool migrate_smi_count;
+>      bool max_features; /* Enable all supported features automatically */
+>      uint32_t apic_id;
+>  
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index 8b64dff487..084c2c73a8 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -400,7 +400,7 @@ static bool msr_smi_count_needed(void *opaque)
+>      X86CPU *cpu = opaque;
+>      CPUX86State *env = &cpu->env;
+>  
+> -    return env->msr_smi_count != 0;
+> +    return cpu->migrate_smi_count && env->msr_smi_count != 0;
+>  }
+>  
+>  static const VMStateDescription vmstate_msr_smi_count = {
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
