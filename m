@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fhwb8-0007c5-Pw
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:39:27 -0400
+	(envelope-from <peterx@redhat.com>) id 1fhwxp-0004dA-Vr
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:02:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fhwb4-000867-Sr
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:39:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58040)
+	(envelope-from <peterx@redhat.com>) id 1fhwxk-0001yj-1Y
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:02:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41540 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fhwb4-00085n-LZ
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 08:39:22 -0400
-Date: Tue, 24 Jul 2018 09:39:16 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180724123916.GC3896@localhost.localdomain>
-References: <20180723193145.24705-1-ehabkost@redhat.com>
-	<20180723193145.24705-3-ehabkost@redhat.com>
-	<20180724142949.3078da82@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhwxj-0001yd-TC
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 09:02:47 -0400
+Date: Tue, 24 Jul 2018 21:02:40 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180724130240.GE2479@xz-mi>
+References: <1532434585-14732-1-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180724142949.3078da82@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] acpi: Decouple ACPI hotplug
- callbacks from HotplugHandler
+In-Reply-To: <1532434585-14732-1-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] migration: fix the Unknown ending
+ state error log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Lidong Chen <jemmy858585@gmail.com>
+Cc: quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-On Tue, Jul 24, 2018 at 02:29:49PM +0200, Igor Mammedov wrote:
-> On Mon, 23 Jul 2018 16:31:45 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Tue, Jul 24, 2018 at 08:16:24PM +0800, Lidong Chen wrote:
+> When cancelling migration, the state is MIGRATION_STATUS_CANCELLING.
+> The state change to MIGRATION_STATUS_CANCELLED when cleanup_bh is scheduled.
+> So when migration_iteration_finish is invoked, the state should be
+> MIGRATION_STATUS_CANCELLING.
 > 
-> > The ACPI hotplug callbacks get a HotplugHandler object as
-> > argument.  This has two problems:
-> > 
-> > 1) The functions require a TYPE_ACPI_DEVICE_IF object, but the
-> >    function prototype doesn't indicate that.  It's possible to
-> >    pass an object that would make the function crash.
-> > 2) The function does not require the object to implement
-> >    TYPE_HOTPLUG_HANDLER at all, but the function prototype
-> >    imposes that for no reason.
-> > 
-> > Change the argument type to AcpiDeviceIf instead of
-> > HotplugHandler.
-> What is the motivation for this patch,
-> do you actually get crashes?
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 
-I didn't get crashes, but the idea for the change came when
-Michael asked me how to get the HotplugHandler object.  I was
-going to suggest current_machine (which is also a hotplug
-handler), when I noticed he actually needed an AcpiDeviceIf
-object.
+Thanks, Lidong.  Dave just posted the same patch some days ago:
 
-The main motivation, however, is to simply make the function
-prototypes make sense.  Is there a single reason to make the ACPI
-functions get a HotplugHandler argument instead of AcpiDeviceIf?
+  [PATCH] migrate: Fix cancelling state warning
+
+> ---
+>  migration/migration.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 8d56d56..ff05422 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2876,7 +2876,7 @@ static void migration_iteration_finish(MigrationState *s)
+>          s->vm_was_running = true;
+>          /* Fallthrough */
+>      case MIGRATION_STATUS_FAILED:
+> -    case MIGRATION_STATUS_CANCELLED:
+> +    case MIGRATION_STATUS_CANCELLING:
+>          if (s->vm_was_running) {
+>              vm_start();
+>          } else {
+> -- 
+> 1.8.3.1
+> 
+> 
+
+Regards,
 
 -- 
-Eduardo
+Peter Xu
