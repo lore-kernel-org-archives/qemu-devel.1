@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fi5do-0006nS-HS
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:18:49 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fi5ft-0000Mq-Pb
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:21:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fi5dl-0007Ih-C3
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:18:48 -0400
-From: Leonid Bloch <lbloch@janustech.com>
-Date: Wed, 25 Jul 2018 01:17:50 +0300
-Message-Id: <20180724221750.16282-5-lbloch@janustech.com>
-In-Reply-To: <20180724221750.16282-1-lbloch@janustech.com>
+	(envelope-from <lbloch@janustech.com>) id 1fi5fs-0001AR-SD
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 18:20:57 -0400
 References: <20180724221750.16282-1-lbloch@janustech.com>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <0e4edd44-ee9a-9846-b19b-547888bba6a7@janustech.com>
+Date: Wed, 25 Jul 2018 01:20:34 +0300
+In-Reply-To: <20180724221750.16282-1-lbloch@janustech.com>
+Content-Language: en-GB-large
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 4/4] iotests: Add tests for the new
- l2-cache-full option
+Content-Type: text/plain; charset="utf-8"
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] Introduction of l2-cache-full
+ option for qcow2 images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +24,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Leonid Bloch <lbloch@janustech.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Signed-off-by: Leonid Bloch <lbloch@janustech.com>
----
- tests/qemu-iotests/103     | 6 ++++++
- tests/qemu-iotests/103.out | 2 ++
- tests/qemu-iotests/137     | 2 ++
- tests/qemu-iotests/137.out | 2 ++
- 4 files changed, 12 insertions(+)
+   On 07/25/2018 01:17 AM, Leonid Bloch wrote:
 
-diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
-index 2841318492..a2886e8569 100755
---- a/tests/qemu-iotests/103
-+++ b/tests/qemu-iotests/103
-@@ -52,9 +52,15 @@ echo
- echo '=== Testing invalid option combinations ==='
- echo
- 
-+# l2-cache-size and l2-cache-full at the same time
-+$QEMU_IO -c "open -o l2-cache-full,l2-cache-size=1M $TEST_IMG" 2>&1 |
-+    _filter_testdir | _filter_imgfmt
- # all sizes set at the same time
- $QEMU_IO -c "open -o cache-size=1.25M,l2-cache-size=1M,refcount-cache-size=0.25M $TEST_IMG" \
-     2>&1 | _filter_testdir | _filter_imgfmt
-+# cache-size may not be smaller than the full L2 size if l2-cache-full is used
-+$QEMU_IO -c "open -o l2-cache-full,cache-size=6K $TEST_IMG" 2>&1 |
-+    _filter_testdir | _filter_imgfmt
- # l2-cache-size may not exceed cache-size
- $QEMU_IO -c "open -o cache-size=1M,l2-cache-size=2M $TEST_IMG" 2>&1 \
-     | _filter_testdir | _filter_imgfmt
-diff --git a/tests/qemu-iotests/103.out b/tests/qemu-iotests/103.out
-index ab56f03a00..92afbff024 100644
---- a/tests/qemu-iotests/103.out
-+++ b/tests/qemu-iotests/103.out
-@@ -5,7 +5,9 @@ wrote 65536/65536 bytes at offset 0
- 
- === Testing invalid option combinations ===
- 
-+can't open device TEST_DIR/t.IMGFMT: l2-cache-full and l2-cache-size may not be set at the same time
- can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
-+can't open device TEST_DIR/t.IMGFMT: cache-size must be greater than the full L2 cache if l2-cache-full is used
- can't open device TEST_DIR/t.IMGFMT: l2-cache-size may not exceed cache-size
- can't open device TEST_DIR/t.IMGFMT: refcount-cache-size may not exceed cache-size
- can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set the same time
-diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index 87965625d8..f460b5bfe1 100755
---- a/tests/qemu-iotests/137
-+++ b/tests/qemu-iotests/137
-@@ -106,7 +106,9 @@ echo
- 
- $QEMU_IO \
-     -c "reopen -o lazy-refcounts=42" \
-+    -c "reopen -o l2-cache-full,l2-cache-size=64k" \
-     -c "reopen -o cache-size=1M,l2-cache-size=64k,refcount-cache-size=64k" \
-+    -c "reopen -o l2-cache-full,cache-size=6K" \
-     -c "reopen -o cache-size=1M,l2-cache-size=2M" \
-     -c "reopen -o cache-size=1M,refcount-cache-size=2M" \
-     -c "reopen -o l2-cache-size=256T" \
-diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
-index 6a2ffc71fd..b15dfc391a 100644
---- a/tests/qemu-iotests/137.out
-+++ b/tests/qemu-iotests/137.out
-@@ -16,7 +16,9 @@ read 33554432/33554432 bytes at offset 0
- === Try setting some invalid values ===
- 
- Parameter 'lazy-refcounts' expects 'on' or 'off'
-+l2-cache-full and l2-cache-size may not be set at the same time
- cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
-+cache-size must be greater than the full L2 cache if l2-cache-full is used
- l2-cache-size may not exceed cache-size
- refcount-cache-size may not exceed cache-size
- L2 cache size too big
--- 
-2.14.1
+This series introduces an option to calculate and allocate
+automatically enough qcow2 L2 cache to cover the entire image.
+Using cache that covers the entire image can benefit performance,
+while having only a small memory overhead (just 1 MB for every 8 GB
+of virtual image size with the default cluster size).
+
+-------------------------
+Differences from v1:
+
+1) Documentation fixes in qapi/block-core.json and qemu-options.hx
+2) Removal of the patch which was made to fix the default sizes in
+   docs/qcow2-cache.txt - it is not needed, as the default sizes imply
+   also default cluster sizes.
+3) Documentation fixes in docs/qcow2-cache.txt, mentioning mutual
+   exclusivity of the options.
+4) Squashing the iotests patch into the main feature addition patch
+
+-------------------------
+Differences from v2:
+
+1) A separate patch for the grammar fix for 3.0
+2) A separate patch for existing documentation fixes for 3.0
+3) Separated back the iotests patch, because the grammar fix is separate now
+
+-------------------------
+Differences from v2:
+
+   * from v3
+
+1) Grammar change commit message fix
+2) Rewording the documentation more concisely
+3) Squashing the l2-cache-full docs commit to the one that introduces this
+   feature
+
+Leonid Bloch (4):
+  qcow2: A grammar fix in conflicting cache sizing error message
+  qcow2: Options' documentation fixes
+  qcow2: Introduce an option for sufficient L2 cache for the entire
+    image
+  iotests: Add tests for the new l2-cache-full option
+
+ block/qcow2.c              | 37 +++++++++++++++++++++++++++++--------
+ block/qcow2.h              |  1 +
+ docs/qcow2-cache.txt       | 18 ++++++++++++++----
+ qapi/block-core.json       |  8 +++++++-
+ qemu-options.hx            | 14 ++++++++++----
+ tests/qemu-iotests/103     |  6 ++++++
+ tests/qemu-iotests/103.out |  4 +++-
+ tests/qemu-iotests/137     |  2 ++
+ tests/qemu-iotests/137.out |  4 +++-
+ 9 files changed, 75 insertions(+), 19 deletions(-)
