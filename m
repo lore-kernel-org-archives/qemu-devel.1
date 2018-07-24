@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fhvAU-0006Uu-K0
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:07:51 -0400
+	(envelope-from <pkrempa@redhat.com>) id 1fhvIR-0001J4-IS
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fhvAR-00050T-EC
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:07:50 -0400
-Date: Tue, 24 Jul 2018 13:07:43 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180724130743.4c7decdb.cohuck@redhat.com>
-In-Reply-To: <20180724114004.67bc1281.cohuck@redhat.com>
-References: <20180723201748.25573-1-mdroth@linux.vnet.ibm.com>
-	<20180723201748.25573-6-mdroth@linux.vnet.ibm.com>
-	<153238409419.10934.1652388192245648682@sif>
-	<20180724114004.67bc1281.cohuck@redhat.com>
+	(envelope-from <pkrempa@redhat.com>) id 1fhvIO-0007MI-Dl
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 07:16:03 -0400
+Date: Tue, 24 Jul 2018 13:15:50 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20180724111550.GF20399@angien.pipo.sk>
+References: <20180724092413.5770-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/99] s390-ccw: force diag 308 subcode to
- unsigned long
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="NQTVMVnDVuULnIzU"
+Content-Disposition: inline
+In-Reply-To: <20180724092413.5770-1-cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [libvirt] [PATCH for-3.1] s390x: remove
+ 's390-squash-mcss' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Thomas Huth <thuth@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, Xiao Feng Ren <renxiaof@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, 24 Jul 2018 11:40:04 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
 
-> On Mon, 23 Jul 2018 17:14:54 -0500
-> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> 
-> > Quoting Michael Roth (2018-07-23 15:16:14)  
-> > > From: Cornelia Huck <cohuck@redhat.com>
-> > > 
-> > > We currently pass an integer as the subcode parameter. However,
-> > > the upper bits of the register containing the subcode need to
-> > > be 0, which is not guaranteed unless we explicitly specify the
-> > > subcode to be an unsigned long value.
-> > > 
-> > > Fixes: d046c51dad3 ("pc-bios/s390-ccw: Get device address via diag 308/6")
-> > > Cc: qemu-stable@nongnu.org
-> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > > Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> > > Tested-by: Thomas Huth <thuth@redhat.com>
-> > > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > > (cherry picked from commit 63d8b5ace31c1e1f3996fe4cd551d6d377594d5a)
-> > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>    
-> > 
-> > Hi Cornelia,
-> > 
-> > Would you be able to do an s390 BIOS build for this one as well?  
-> 
-> Sure, will do a build for 2.12-stable.
+--NQTVMVnDVuULnIzU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Here we go:
+On Tue, Jul 24, 2018 at 11:24:13 +0200, Cornelia Huck wrote:
+> This option has been deprecated for two releases; remove it.
+>=20
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  hw/s390x/3270-ccw.c                |  2 +-
+>  hw/s390x/css-bridge.c              |  1 -
+>  hw/s390x/css.c                     |  6 ++----
+>  hw/s390x/s390-ccw.c                |  2 +-
+>  hw/s390x/s390-virtio-ccw.c         | 37 ++------------------------------=
+-----
+>  hw/s390x/virtio-ccw.c              |  2 +-
+>  include/hw/s390x/css-bridge.h      |  1 -
+>  include/hw/s390x/css.h             |  9 +++------
+>  include/hw/s390x/s390-virtio-ccw.h |  1 -
+>  qemu-deprecated.texi               |  8 --------
+>  qemu-options.hx                    | 10 ----------
+>  target/s390x/cpu.c                 | 10 ----------
+>  target/s390x/cpu.h                 |  1 -
+>  13 files changed, 10 insertions(+), 80 deletions(-)
 
-The following changes since commit e8488edcb3768f08cda7c3cc00def6b1b2f6c615:
+Looks like libvirt did not use this option at all according to my brief
+grepping, so it should be okay to remove it.
 
-  tcg/i386: Mark xmm registers call-clobbered (2018-07-23 14:24:17 -0500)
+--NQTVMVnDVuULnIzU
+Content-Type: application/pgp-signature; name="signature.asc"
 
-are available in the Git repository at:
+-----BEGIN PGP SIGNATURE-----
 
-  git://github.com/cohuck/qemu tags/s390x-20180724-212-stable
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAltXCmMACgkQHGwCByjY
+1GodZhAAkoMH2ioByzETpMJAtR3/9W2f8w+o1YcLomle5xDxImRD931fOX5eLsmB
+NOt+/g5AZtws/RACZEQqSeJyhr9Cc8nFcfkbN6B4Rr2rfjl6KE7GMuz9SlWuL2NH
+IzBktYAqI7SfGsKemiJkWHPLb2GtNtkcE1ehHC7RRd1qTTWOqO1AYE1k2gOYwH/J
+Hrd41YvU/CNL+9Br39ov09J1hka4pSqW3vr4LJxWpQ0mJPSNd2IgySFLN7pUTr2F
+Ln+Lxu8eESzU+GvcSh+uZJZwVx8JKaKRHQcGMw6n2MO++ixdEUpJnpvvIM6nTUtj
+EZarHeIt+Srnm5QteUXDFaWtC2wZRELt8t2yLDOQpalZ6UOCU3NeKlLTEsSI0pCW
+CIx9r6NtUKaDdvN+yBz0CC6LYPVOU6f6oZGy5eeyErvuCBe8n3XrSqLZ+OYQRBcI
+3CDmx8z/TCIA79XMliRju8BEYX4qufOYdXSGI/1iYmsg/7ZYj5nh/Qkwmb22jXRv
+vUXErLqPUFW5nCUfgdBlumTFohWl6fr19U09M97fcXRumEWu1IRdI+iZepVBK71H
+By3Z03koXFRMdor4vC/MS33iUcu0KNdXmgkqIgvm0W9ay07XH4YT4GhJFkXcH0jO
+tagwpl3EMZh+Ntsi2K5cNUUd/EhAQ/Fdn7VNkqgI4NrMFdXoNbY=
+=pCyH
+-----END PGP SIGNATURE-----
 
-for you to fetch changes up to c16427177a67bc86aa7560331143bfc9c885b27d:
-
-  pc-bios/s390-ccw.img: update image for stable (2018-07-24 06:08:42 -0400)
-
-----------------------------------------------------------------
-update s390-ccw.img for stable
-
-----------------------------------------------------------------
-Cornelia Huck (1):
-      pc-bios/s390-ccw.img: update image for stable
-
- pc-bios/s390-ccw.img | Bin 30520 -> 30520 bytes
- 1 file changed, 0 insertions(+), 0 deletions(-)
-
-(for-2.12-stable branch)
+--NQTVMVnDVuULnIzU--
