@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fhuzF-0005Mu-TK
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:56:15 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fhv1m-0007PT-AG
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fhuzC-0008By-0W
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:56:13 -0400
-Received: from mail-sn1nam01on0109.outbound.protection.outlook.com
-	([104.47.32.109]:24005
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fhuzB-0008Bi-OZ
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:56:09 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Tue, 24 Jul 2018 10:56:05 +0000
-Message-ID: <BN7PR08MB4868284B9D3E798D810F1B1FC6550@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1532004912-13899-5-git-send-email-stefan.markovic@rt-rk.com>,
-	<469970e4-21cf-e7e6-bd3d-cedf265e5741@linaro.org>
-In-Reply-To: <469970e4-21cf-e7e6-bd3d-cedf265e5741@linaro.org>
-Content-Language: en-US
+	(envelope-from <alex.bennee@linaro.org>) id 1fhv1l-0000km-Cy
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:58:50 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40504)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fhv1l-0000kS-4o
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 06:58:49 -0400
+Received: by mail-wr1-x443.google.com with SMTP id t6-v6so3676080wrn.7
+	for <qemu-devel@nongnu.org>; Tue, 24 Jul 2018 03:58:48 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 24 Jul 2018 11:51:05 +0100
+Message-Id: <20180724105109.8392-14-alex.bennee@linaro.org>
+In-Reply-To: <20180724105109.8392-1-alex.bennee@linaro.org>
+References: <20180724105109.8392-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/40] target/mips: Add
- decode_nanomips_opc() function
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 13/17] docker: Update debootstrap script after
+ Debian migration from Alioth to Salsa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 
-> From: Richard Henderson <richard.henderson@linaro.org>
-> Sent: Thursday, July 19, 2018 6:39 PM
-> On 07/19/2018 05:54 AM, Stefan Markovic wrote:
-> >          decode_opc(env, ctx);
-> >      } else if (ctx->insn_flags & ASE_MICROMIPS) {
-> > -        ctx->opcode =3D cpu_lduw_code(env, ctx->base.pc_next);
-> > -        insn_bytes =3D decode_micromips_opc(env, ctx);
-> > +        if (env->insn_flags & ISA_NANOMIPS32) {
->
-> Be consistent and use ctx->insn_flags.
->
-> > +            ctx->opcode =3D cpu_lduw_code(env, ctx->base.pc_next);
-> > +            insn_bytes =3D decode_nanomips_opc(env, ctx);
-> > +        } else {
-> > +            ctx->opcode =3D cpu_lduw_code(env, ctx->base.pc_next);
-> > +            insn_bytes =3D decode_micromips_opc(env, ctx);
-> > +        }
-> >      } else if (ctx->insn_flags & ASE_MIPS16) {
-> >          ctx->opcode =3D cpu_lduw_code(env, ctx->base.pc_next);
->
-> Do you really want to nest nanoMIPS within microMIPS?
->
-> I would have thought a better structure was
->
->   } else if (ctx->insn_flags & ISA_NANOMIPS32) {
->       ...
->   } else if (ctx->insn_flags & ASE_MICROMIPS) {
->       ...
->   } else if (ctx->insn_flags & ASE_MIPS16) {
->
->
-> r~
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Hi, Richard,
+This silents the following warning:
 
-This will be fixed in the way you described in v4.
+  Cloning into './debootstrap.git'...
+  warning: redirecting to https://salsa.debian.org/installer-team/debootstrap.git/
 
-Aleksandar
+See https://lists.debian.org/debian-devel-announce/2018/01/msg00004.html
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+diff --git a/tests/docker/dockerfiles/debian-bootstrap.pre b/tests/docker/dockerfiles/debian-bootstrap.pre
+index 56e1aa7a21..ea324d6e4a 100755
+--- a/tests/docker/dockerfiles/debian-bootstrap.pre
++++ b/tests/docker/dockerfiles/debian-bootstrap.pre
+@@ -62,7 +62,7 @@ if [ -z $DEBOOTSTRAP_DIR ]; then
+         NEED_DEBOOTSTRAP=true
+     fi
+     if $NEED_DEBOOTSTRAP; then
+-        DEBOOTSTRAP_SOURCE=https://anonscm.debian.org/git/d-i/debootstrap.git
++        DEBOOTSTRAP_SOURCE=https://salsa.debian.org/installer-team/debootstrap.git
+         git clone ${DEBOOTSTRAP_SOURCE} ./debootstrap.git
+         export DEBOOTSTRAP_DIR=./debootstrap.git
+         DEBOOTSTRAP=./debootstrap.git/debootstrap
+-- 
+2.17.1
