@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhqHx-0001to-6I
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 01:55:14 -0400
+	(envelope-from <armbru@redhat.com>) id 1fhqir-0006T8-Hs
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 02:23:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fhqHt-0000Ox-VM
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 01:55:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46410 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fhqin-0001Wz-H0
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 02:23:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42438 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fhqHt-0000Mj-R9
-	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 01:55:09 -0400
-Date: Tue, 24 Jul 2018 13:55:01 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180724055501.GA2479@xz-mi>
-References: <CAHyh4xjUmwHr7b=92y7YUwKGSW0o+FUMwJLSehdzuFc3R6eLTg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fhqin-0001Wh-Br
+	for qemu-devel@nongnu.org; Tue, 24 Jul 2018 02:22:57 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180720130928.6696-1-liujunjie23@huawei.com>
+	<87h8kq86f8.fsf@dusky.pond.sub.org>
+	<B526101FCAB4654DB0892B650DEFC555086C7F48@dggemm521-mbx.china.huawei.com>
+	<87k1pm551g.fsf@dusky.pond.sub.org>
+	<B526101FCAB4654DB0892B650DEFC555086C8382@dggemm521-mbx.china.huawei.com>
+Date: Tue, 24 Jul 2018 08:22:54 +0200
+In-Reply-To: <B526101FCAB4654DB0892B650DEFC555086C8382@dggemm521-mbx.china.huawei.com>
+	(liujunjie's message of "Tue, 24 Jul 2018 01:08:21 +0000")
+Message-ID: <87r2jt40g1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHyh4xjUmwHr7b=92y7YUwKGSW0o+FUMwJLSehdzuFc3R6eLTg@mail.gmail.com>
-Subject: Re: [Qemu-devel] Virtual IOMMU + Virtio-net devices in a Windows VM
- doesn't work
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qstring: Fix integer overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "liujunjie (A)" <liujunjie23@huawei.com>
+Cc: "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Mon, Jul 23, 2018 at 04:13:18PM -0400, Jintack Lim wrote:
-> Hi,
-> 
-> I'm running a Windows VM on top of KVM on x86, and one of virtio-net
-> device in the Windows VM doesn't seem to work. I provided virtual
-> IOMMU and two virtio-net devices to the VM: one bypassing the virtual
-> IOMMU and the other one behind the virtual IOMMU[1]. It turned out
-> that the virtio-net device behind virtual IOMMU didn't work while the
-> one bypassing the virtual IOMMU worked well. In a linux VM with the
-> same configuration, both of virtio-net device worked well.
-> 
-> I found that there is a subtle difference between virtio-net devices
-> bypassing and behind virtual IOMMU in a Linux VM. The lscpu command in
-> the Linux VM shows different device names for them; the first line is
-> for the bypassing one, and the second line is for the one behind the
-> virtual IOMMU
-> 
-> 00:03.0 Ethernet controller: Red Hat, Inc Virtio network device
-> 01:00.0 Ethernet controller: Red Hat, Inc Device 1041 (rev 01)
-> 
-> I wonder if this difference somehow caused the problem in the Windows
-> VM. I've installed the latest virtio drivers (0.1.149) from the fedora
-> project [2]
-> 
-> Any thoughts?
-> 
-> I'm using v4.15 Linux kernel as a host, and QEMU 2.11.0.
+"liujunjie (A)" <liujunjie23@huawei.com> writes:
 
-Have you tried the latest QEMU?
+> The stack backtrace is as follows:
+> (gdb) bt
+> #0  0x00007f1dc3c7b091 in _g_log_abort () from /usr/lib64/libglib-2.0.so.0
+> #1  0x00007f1dc3c7c0bd in g_log_default_handler () from /usr/lib64/libglib-2.0.so.0
+> #2  0x00007f1dc3c7c341 in g_logv () from /usr/lib64/libglib-2.0.so.0
+> #3  0x00007f1dc3c7c5cf in g_log () from /usr/lib64/libglib-2.0.so.0
+> #4  0x00007f1dc3c7ac4c in g_malloc () from /usr/lib64/libglib-2.0.so.0
+> #5  0x00000000008300b7 in qstring_from_substr (
+>     str=0x7f13a2e67010 "00000000777b8000: 0000000003083000 ----A--U-\r\n00000000777b9000: 0000000005984000 ----A--U-\r\n00000000777ba000: 0000000005985000 ----A--U-\r\n00000000777bb000: 0000000003086000 ----A--U-\r\n00000000777bc000"..., start=start@entry=0, end=<optimized out>) at qobject/qstring.c:51
+> #6  0x0000000000830113 in qstring_from_str (str=<optimized out>) at qobject/qstring.c:66
+> #7  0x000000000082be98 in qobject_output_type_str (v=<optimized out>, name=0x89703b "unused", obj=0x7ffff0135f98, errp=<optimized out>)
+>     at qapi/qobject_output_visitor.c:172
+> #8  0x0000000000829d2c in visit_type_str (v=v@entry=0x4d9d940, name=name@entry=0x89703b "unused", obj=obj@entry=0x7ffff0135f98, errp=errp@entry=0x7ffff0135fa8)
+>     at qapi/qapi_visit_core.c:291
+> #9  0x0000000000576135 in qmp_marshal_output_str (
+>     ret_in=0x7f13a2e67010 "00000000777b8000: 0000000003083000 ----A--U-\r\n00000000777b9000: 0000000005984000 ----A--U-\r\n00000000777ba000: 0000000005985000 ----A--U-\r\n00000000777bb000: 0000000003086000 ----A--U-\r\n00000000777bc000"..., ret_out=ret_out@entry=0x7ffff0136068, errp=errp@entry=0x7ffff0135fe8) at qmp-marshal.c:2022
+> #10 0x00000000005762cb in qmp_marshal_human_monitor_command (args=<optimized out>, ret=0x7ffff0136068, errp=0x7ffff0136060) at qmp-marshal.c:2059
+> #11 0x000000000082c897 in do_qmp_dispatch (request=request@entry=0x1fcda50, errp=errp@entry=0x7ffff01360b8) at qapi/qmp_dispatch.c:114
+> #12 0x000000000082caeb in qmp_dispatch (request=request@entry=0x1fcda50) at qapi/qmp_dispatch.c:141
+> #13 0x000000000045e0d2 in handle_qmp_command (parser=<optimized out>, tokens=<optimized out>) at /usr/src/debug/qemu-kvm-2.8.1/monitor.c:3907
+[...]
 
-Also CC Jason and Michael.
+The code is trying to marshall the return value of
+qmp_human_monitor_command().  It's @ret_in in qmp_marshal_output_str()
+(frame#9, abbreviated by GDB), and @str in qstring_from_substr()
+(frame#5).  Also @str in qstring_from_str() (frame#6), but GDB can't see
+it there.  Sadly, GDB can't see shows qstring_from_substr()'s @end,
+either.  However, you previously examined qstring->length there:
 
-> 
-> Thanks,
-> Jintack
-> 
-> [1] https://wiki.qemu.org/Features/VT-d
-> [2] https://docs.fedoraproject.org/quick-docs/en-US/creating-windows-virtual-machines-using-virtio-drivers.html
-> 
-> 
+>> > (gdb) p/x qstring->length
+>> > $7 = 0xffffffffb0fd64bc
+>> > (gdb) p	end
+>> > $8 = <optimized out>
 
-Regards,
+We know
 
--- 
-Peter Xu
+    qstring->length = end - start + 1;
+
+If GDB shows the true value (always in doubt for optimized code), then
+@end must be qstring->length - 1, because @start is zero.  But that's
+not plausible at all!  It's almost 16 exabyte.
+
+I suspect GDB is lying to you.  Please show us the complete string, like
+this:
+
+    (gdb) set print elements unlimited
+    (gdb) print str
