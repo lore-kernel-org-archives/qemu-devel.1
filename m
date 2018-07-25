@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fiIlS-000595-8y
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:19:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1fiIm5-0005j7-1C
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fiIlP-0001Gw-8G
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:19:34 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36529)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fiIlO-0001Fg-RB
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:19:31 -0400
-Received: by mail-oi0-x242.google.com with SMTP id n21-v6so13486204oig.3
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 05:19:30 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fiIm2-0001i1-02
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60314 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fiIm1-0001gS-RL
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:09 -0400
+References: <20180713075232.9575-1-pagupta@redhat.com>
+	<20180713075232.9575-4-pagupta@redhat.com>
+	<783786ae-2e85-2376-448c-1e362c3d4d48@redhat.com>
+	<399916154.53931292.1532494899706.JavaMail.zimbra@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d3fe397a-024d-faf7-8854-bb8e9ea17f53@redhat.com>
+Date: Wed, 25 Jul 2018 07:19:53 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180725114404.6g335n3rfjt23hjc@kamzik.brq.redhat.com>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
-	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
-	<CAHmQWvDu+P26Y5CJfcQ=1_9C=hej_B8w7dLMbmuOmCV-+pYOJQ@mail.gmail.com>
-	<20180725114404.6g335n3rfjt23hjc@kamzik.brq.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 25 Jul 2018 13:19:09 +0100
-Message-ID: <CAFEAcA8wi2QV9cVg_Hp=8MYw_zfxvVciR2CbRZiGJNiQNPdHqg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+In-Reply-To: <399916154.53931292.1532494899706.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3] qemu: Add virtio pmem device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, riel@surriel.com, niteshnarayanlal@hotmail.com, david@redhat.com, ross zwisler <ross.zwisler@intel.com>, lcapitulino@redhat.com, hch@infradead.org, mst@redhat.com, stefanha@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>, nilal@redhat.com
 
-On 25 July 2018 at 12:44, Andrew Jones <drjones@redhat.com> wrote:
-> On Wed, Jul 25, 2018 at 06:46:59PM +0800, Hongbo Zhang wrote:
->> For Armv7, there is one typical platform 'vexpress', but for Armv8, no
->
-> Wasn't the vexpress model designed for a specific machine?
+On 07/25/2018 12:01 AM, Pankaj Gupta wrote:
 
-Yes.
+>>
+>> This patch has no n/M in the subject line; but is included in a thread
+>> that also has a 0/2 cover letter, as well as 1/2 and 2/2 patches in
+>> separate mails.  Is that intentional?
+> 
+> Yes, kernel series has 0-2 patches and Qemu has this one. I thought its
+> good to keep separate numbering for both the sets.
 
-> Namely for
-> Arm's simulator?
+Ah, that makes sense. The cover letter didn't make it obvious to me that 
+this was two separate series to two projects, but related enough that 
+both series have to be incorporated for the feature to work and thus 
+cross-posted under a single cover letter.
 
-No.
-
-> Is the vexpress model really something typical among
-> all the Armv7 platforms?
-
-No.
-
-"Vexpress" is a model specifically of a development board
-produced by Arm (the versatile express). It's useful if you
-want to run code that runs on that devboard, but (as with
-most of the devboards we model), it's not necessarily ideal,
-because it has all the limitations of the real hardware it's
-modelling (in this case the big ones are limited memory, no PCI).
-The hardware it models is also quite old now (maybe 7 or 8 years)
-and it's not really "typical" of anything. (In the primarily
-embedded space where most v7 CPUs are there's not really anything
-that could be described as "typical" anyway: everything is
-different.)
-
-For most people who just want to run Linux on an emulated v7 CPU,
-I would recommend the "virt" board, for the same reasons I
-recommend it for v8 cores.
-
->> such typical one, the 'virt' is typically for running workloads, one
->> example is using it under OpenStack.
->> So a 'typical' one for Armv8 is needed for firmware and OS
->> development, similar like 'vexpress' for Armv7.
->
-> What is a "typical" Armv8 machine? What will a typical Armv8 machine be in
-> two years?
->
-> Note, I'm not actually opposed to the current definition (because I don't
-> really have one myself). I'm just opposed to hard coding one.
-
-AIUI the aim here is to provide an emulated platform that is
-set up in the way that server-style armv8 machines are
-recommended to be set up, so it can be used as a testbed and
-demonstration for the firmware/OS software stack. The hope
-is that following "best practices" results in a "typical"
-machine :-)  But the word "typical" is probably not really
-very helpful here...
-
-I would expect that in the future we'd want this machine type
-to evolve with the recommendations for how to build server
-platform hardware, which might indeed be different in two years,
-since it would be the development platform for writing/testing
-the firmware/OS stack for that two-years-time hardware.
-
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
