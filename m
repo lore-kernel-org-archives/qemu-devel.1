@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fiGkc-0001l6-36
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:10:38 -0400
+	(envelope-from <peterx@redhat.com>) id 1fiGsZ-0006Ej-Ma
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:18:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fiGkY-0001CZ-LX
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:10:33 -0400
-Date: Wed, 25 Jul 2018 12:10:19 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180725101019.7lrwbgx5xquetjuw@kamzik.brq.redhat.com>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
-	<20180725084824.GA12855@redhat.com>
-	<CAKv+Gu_RHsed0KAH8njKB8UPvbUDeoTZ5sP76f_br6azisZzSQ@mail.gmail.com>
-	<CAHmQWvCqKqQXnXxOUgi=kLTyE5BhV2NxqaKzvPp63HX02V=X2g@mail.gmail.com>
-	<CAKv+Gu_eFjS_UvOuEKhbsWr34o3Jqd4h2duJ-gG1ofsFbwkGbQ@mail.gmail.com>
-	<CAHmQWvC8_J4i32UZzdHqJ4w3EdEAHmWGdgqrvGwEA7uo0kvk9A@mail.gmail.com>
-	<CAKv+Gu-B4o7dwZPOix2MkECJia6M6Q+zBMw8XVdw49kFYW6J+w@mail.gmail.com>
-	<20180725094037.uzz4ycen4qja4q4a@kamzik.brq.redhat.com>
-	<CAKv+Gu9VnKkXC8r9BpMPjXfjhsPVRaAmRaOYM8=hPyDCgXMQWQ@mail.gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1fiGsW-0007Yk-LC
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:18:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60714 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fiGsW-0007Ux-DC
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:18:44 -0400
+Date: Wed, 25 Jul 2018 18:18:36 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180725101836.GI2479@xz-mi>
+References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+	<20180629115359.GH2568@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu9VnKkXC8r9BpMPjXfjhsPVRaAmRaOYM8=hPyDCgXMQWQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+In-Reply-To: <20180629115359.GH2568@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,111 +27,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>, aarcange@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com
 
-On Wed, Jul 25, 2018 at 11:47:39AM +0200, Ard Biesheuvel wrote:
-> On 25 July 2018 at 11:40, Andrew Jones <drjones@redhat.com> wrote:
-> > On Wed, Jul 25, 2018 at 11:20:03AM +0200, Ard Biesheuvel wrote:
-> >> On 25 July 2018 at 11:17, Hongbo Zhang <hongbo.zhang@linaro.org> wro=
-te:
-> >> > On 25 July 2018 at 17:13, Ard Biesheuvel <ard.biesheuvel@linaro.or=
-g> wrote:
-> >> >> On 25 July 2018 at 11:09, Hongbo Zhang <hongbo.zhang@linaro.org> =
-wrote:
-> >> >>> On 25 July 2018 at 17:01, Ard Biesheuvel <ard.biesheuvel@linaro.=
-org> wrote:
-> >> >>>> On 25 July 2018 at 10:48, Daniel P. Berrang=E9 <berrange@redhat=
-.com> wrote:
-> >> >>>>> On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
-> >> >>>>>> For the Aarch64, there is one machine 'virt', it is primarily=
- meant to
-> >> >>>>>> run on KVM and execute virtualization workloads, but we need =
-an
-> >> >>>>>> environment as faithful as possible to physical hardware, for=
- supporting
-> >> >>>>>> firmware and OS development for pysical Aarch64 machines.
-> >> >>>>>>
-> >> >>>>>> This patch introduces new machine type 'Enterprise' with main=
- features:
-> >> >>>>>
-> >> >>>>> The 'enterprise' name is really awful - this is essentially a =
-marketing
-> >> >>>>> term completely devoid of any useful meaning.
-> >> >>>>>
-> >> >>>>> You had previously called this "sbsa" which IIUC was related t=
-o a real
-> >> >>>>> world hardware specification that it was based on. IOW, I thin=
-k this old
-> >> >>>>> name was preferrable to calling it "enterprise".
-> >> >>>>>
-> >> >>>>
-> >> >>>> I couldn't agree more. However, IIUC this change was made at th=
-e
-> >> >>>> request of one of the reviewers, although I wasn't part of the
-> >> >>>> discussion at that point, so I'm not sure who it was.
-> >> >>>>
-> >> >>>> Hongbo, could you please share a link to that discussion?
-> >> >>>>
-> >> >>>> Thanks,
-> >> >>>> Ard.
-> >> >>>>
-> >> >>>
-> >> >>> V1 discussion here:
-> >> >>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg545775.htm=
-l
-> >> >>>
-> >> >>
-> >> >> So who asked for the sbsa -> enterprise change?
-> >> >
-> >> > Actually nobody, but it was argued that sbsa does not require ehci=
- and
-> >> > ahci etc, then we should find a name fitting for this platform bet=
-ter.
-> >>
-> >> That doesn't make sense to me. The SBSA describes a minimal
-> >> configuration, it does not limit what peripherals may be attached to
-> >> the core system.
-> >>
-> >
-> > Hi Ard,
-> >
-> > I think that a machine model named 'sbsa' should provide all SBSA req=
-uired
-> > hardware, and nothing else, while providing a means to easily extend =
-the
-> > machine beyond that in any way the user likes. The user can easily ad=
-d
-> > devices with the command line and/or by using -readconfig to build a
-> > "typical" machine. Note, it should even be possible to add, e.g. an A=
-CHI
-> > controller, to the memory map using the platform bus, if that's prefe=
-rred
-> > over PCIe.
-> >
->=20
-> The purpose of the SBSA machine is not to provide a minimal
-> configuration. It is intended to exercise all the moving parts one
-> might find in a server firmware/OS stack, including pieces that are
-> not usually found on x86 machines, such as DRAM starting above 4 GB
-> and SATA/USB controllers that are not PCIe based.
+On Fri, Jun 29, 2018 at 12:53:59PM +0100, Dr. David Alan Gilbert wrote:
+> * Denis Plotnikov (dplotnikov@virtuozzo.com) wrote:
+> > The patch set adds the ability to make external snapshots while VM is running.
+> 
+> cc'ing in Andrea since this uses sigsegv's to avoid userfault-wp that
+> isn't there yet.
+> 
+> Hi Denis,
+>   How robust are you finding this SEGV based trick; for example what
+> about things like the kernel walking vhost queues or similar kernel
+> nasties?
 
-To me, this purpose actually requires that the base config be minimal.
-How else can you have the flexibility to build a wide range of
-configurations for testing?
+(I'm commenting on this old series to keep the discussion together)
 
->=20
-> If we start layering the usual components on top, it is highly likely
-> that checking the EHCI box gives you a PCI based USB2 controller,
-> partially defeating the purpose of the exercise.
->
+If we want to make this series really work for people, we should
+possibly need to know whether it could work with vhost (otherwise we
+might need to go back to userfaultfd write-protection).
 
-As I said, it should be possible to put these controllers on the system
-bus, even if they're specified on the command line. This would be done
-using the platform-bus framework. Naturally, providing platform-bus
-support for devices/controllers that need it will take some machine-done
-notifier code, etc., so this machine model patch series will get more
-complex.
+I digged a bit on the vhost-net IO, it should be using two ways to
+write to guest memory:
 
-Thanks,
-drew
+- copy_to_user(): this should possibly still be able to be captured by
+  mprotect() (after some confirmation from Paolo, but still we'd
+  better try it out)
+
+- kmap_atomic(): this is used to log dirty pages, this seems to be
+  incompatible with mprotect() but I think we can just make sure dirty
+  page tracking is disabled when live snapshot is enabled (please
+  refer to the code clip below as a referece)
+
+So IMHO this series should work with vhost if with logging off, but we
+need to confirm...  Denis, do you want to do some more test with vhost
+when you do your next post (possibly with changes like below)?
+
+=====================
+
+diff --git a/migration/ram.c b/migration/ram.c
+index 24dea2730c..a3fa256143 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1605,6 +1605,10 @@ static void migration_bitmap_sync(RAMState *rs)
+     int64_t end_time;
+     uint64_t bytes_xfer_now;
+ 
++    if (live_snapshot) {
++        return;
++    }
++
+     ram_counters.dirty_sync_count++;
+ 
+     if (!rs->time_last_bitmap_sync) {
+@@ -2952,7 +2956,10 @@ static void ram_init_bitmaps(RAMState *rs)
+     rcu_read_lock();
+ 
+     ram_list_init_bitmaps();
+-    memory_global_dirty_log_start();
++
++    if (!live_snapshot) {
++        memory_global_dirty_log_start();
++    }
+     migration_bitmap_sync(rs);
+ 
+     rcu_read_unlock();
+
+
+> 
+> Dave
+> 
+> > The workflow to make a snapshot is the following:
+> > 1. Pause the vm
+> > 2. Make a snapshot of block devices using the scheme of your choice
+> > 3. Turn on background-snapshot migration capability
+> > 4. Start the migration using the destination (migration stream) of your choice.
+> >    The migration will resume the vm execution by itself
+> >    when it has the devices' states saved  and is ready to start ram writing
+> >    to the migration stream.
+> > 5. Listen to the migration finish event
+> > 
+> > The feature relies on KVM unapplied ability to report the faulting address.
+> > Please find the KVM patch snippet to make the patchset work below:
+> > 
+> > +++ b/arch/x86/kvm/vmx.c
+> > @@ -XXXX,X +XXXX,XX @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+> >  
+> >         vcpu->arch.exit_qualification = exit_qualification;
+> >  
+> > -       return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> > +       r = kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> > +        if (r == -EFAULT) {
+> > +               unsigned long hva = kvm_vcpu_gfn_to_hva(vcpu, gpa >> PAGE_SHIFT);
+> > +
+> > +               vcpu->run->exit_reason = KVM_EXIT_FAIL_MEM_ACCESS;
+> > +               vcpu->run->hw.hardware_exit_reason = EXIT_REASON_EPT_VIOLATION;
+> > +               vcpu->run->fail_mem_access.hva = hva | (gpa & (PAGE_SIZE-1));
+> > +               r = 0;
+> > +
+> > +       }
+> > +       return r;
+> > 
+> > The patch to KVM can be sent if the patch set approved
+> > 
+> > Denis Plotnikov (7):
+> >   migration: add background snapshot capability
+> >   bitops: add some atomic versions of bitmap operations
+> >   threads: add infrastructure to process sigsegv
+> >   migration: add background snapshot infrastructure
+> >   kvm: add failed memeory access exit reason
+> >   kvm: add vCPU failed memeory access processing
+> >   migration: add background snapshotting
+> > 
+> >  include/exec/ram_addr.h   |   7 +
+> >  include/exec/ramlist.h    |   4 +-
+> >  include/qemu/bitops.h     |  24 +++
+> >  include/qemu/thread.h     |   5 +
+> >  linux-headers/linux/kvm.h |   5 +
+> >  migration/migration.c     | 141 +++++++++++++++-
+> >  migration/migration.h     |   1 +
+> >  migration/ram.c           | 333 ++++++++++++++++++++++++++++++++++++--
+> >  migration/ram.h           |  11 +-
+> >  migration/savevm.c        |  91 ++++++-----
+> >  migration/savevm.h        |   2 +
+> >  qapi/migration.json       |   6 +-
+> >  target/i386/kvm.c         |  18 +++
+> >  util/qemu-thread-posix.c  |  50 ++++++
+> >  14 files changed, 635 insertions(+), 63 deletions(-)
+> > 
+> > -- 
+> > 2.17.0
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+
+Regards,
+
+-- 
+Peter Xu
