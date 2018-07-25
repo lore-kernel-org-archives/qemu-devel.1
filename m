@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fiIm5-0005j7-1C
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:16 -0400
+	(envelope-from <thuth@redhat.com>) id 1fiImP-00060C-7N
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fiIm2-0001i1-02
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60314 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fiIm1-0001gS-RL
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:09 -0400
-References: <20180713075232.9575-1-pagupta@redhat.com>
-	<20180713075232.9575-4-pagupta@redhat.com>
-	<783786ae-2e85-2376-448c-1e362c3d4d48@redhat.com>
-	<399916154.53931292.1532494899706.JavaMail.zimbra@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d3fe397a-024d-faf7-8854-bb8e9ea17f53@redhat.com>
-Date: Wed, 25 Jul 2018 07:19:53 -0500
-MIME-Version: 1.0
-In-Reply-To: <399916154.53931292.1532494899706.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3] qemu: Add virtio pmem device
+	(envelope-from <thuth@redhat.com>) id 1fiImM-000244-6g
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:33 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 25 Jul 2018 14:20:14 +0200
+Message-Id: <1532521224-27235-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.1 00/10] Move virtio-ccw devices to
+ separate files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +18,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, riel@surriel.com, niteshnarayanlal@hotmail.com, david@redhat.com, ross zwisler <ross.zwisler@intel.com>, lcapitulino@redhat.com, hch@infradead.org, mst@redhat.com, stefanha@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>, nilal@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-On 07/25/2018 12:01 AM, Pankaj Gupta wrote:
+For more fine-grained control over the build process, it would be good
+to have the possibility to disable single virtio devices, too. We already
+have CONFIG_VIRTIO_* switches in the Makefiles, but currently all
+virtio-ccw devices are compiled in anyway. Move them to separate files
+so we can disable them in the Makefile more easily.
 
->>
->> This patch has no n/M in the subject line; but is included in a thread
->> that also has a 0/2 cover letter, as well as 1/2 and 2/2 patches in
->> separate mails.  Is that intentional?
-> 
-> Yes, kernel series has 0-2 patches and Qemu has this one. I thought its
-> good to keep separate numbering for both the sets.
+NB: I did not move virtio-blk-ccw and virtio-net-ccw to a separate file
+yet since they are essential for the s390x-virtio machine and thus it
+does IMHO not make much sense to disable net and blk. But if somebody
+needs that possibility, too, I can add two more patches on top...
 
-Ah, that makes sense. The cover letter didn't make it obvious to me that 
-this was two separate series to two projects, but related enough that 
-both series have to be incorporated for the feature to work and thus 
-cross-posted under a single cover letter.
+Thomas Huth (10):
+  hw/s390x/virtio-ccw: Consolidate calls to virtio_ccw_unrealize()
+  hw/s390x: Move virtio-ccw-serial code to a separate file
+  hw/s390x: Move virtio-ccw-balloon code to a separate file
+  hw/s390x: Move virtio-ccw-scsi code to a separate file
+  hw/s390x: Move virtio-ccw-rng code to a separate file
+  hw/s390x: Move virtio-ccw-9p code to a separate file
+  hw/s390x: Move virtio-ccw-crypto code to a separate file
+  hw/s390x: Move vhost-vsock-ccw code to a separate file
+  hw/s390x: Move virtio-ccw-gpu code to a separate file
+  hw/s390x: Move virtio-ccw-input code to a separate file
+
+ MAINTAINERS                   |   2 +-
+ hw/s390x/Makefile.objs        |   9 +
+ hw/s390x/vhost-vsock-ccw.c    |  60 +++++
+ hw/s390x/virtio-ccw-9p.c      |  65 +++++
+ hw/s390x/virtio-ccw-balloon.c |  70 +++++
+ hw/s390x/virtio-ccw-crypto.c  |  75 ++++++
+ hw/s390x/virtio-ccw-gpu.c     |  67 +++++
+ hw/s390x/virtio-ccw-input.c   | 118 +++++++++
+ hw/s390x/virtio-ccw-rng.c     |  74 ++++++
+ hw/s390x/virtio-ccw-scsi.c    | 125 +++++++++
+ hw/s390x/virtio-ccw-serial.c  |  78 ++++++
+ hw/s390x/virtio-ccw.c         | 581 +-----------------------------------------
+ 12 files changed, 749 insertions(+), 575 deletions(-)
+ create mode 100644 hw/s390x/vhost-vsock-ccw.c
+ create mode 100644 hw/s390x/virtio-ccw-9p.c
+ create mode 100644 hw/s390x/virtio-ccw-balloon.c
+ create mode 100644 hw/s390x/virtio-ccw-crypto.c
+ create mode 100644 hw/s390x/virtio-ccw-gpu.c
+ create mode 100644 hw/s390x/virtio-ccw-input.c
+ create mode 100644 hw/s390x/virtio-ccw-rng.c
+ create mode 100644 hw/s390x/virtio-ccw-scsi.c
+ create mode 100644 hw/s390x/virtio-ccw-serial.c
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+1.8.3.1
