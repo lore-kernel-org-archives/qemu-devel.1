@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fiIDK-00056P-Mw
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:44:21 -0400
+	(envelope-from <david@redhat.com>) id 1fiIQx-0002bb-Rl
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:58:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fiIDH-0003Km-Nq
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:44:18 -0400
-Date: Wed, 25 Jul 2018 13:44:04 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180725114404.6g335n3rfjt23hjc@kamzik.brq.redhat.com>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
-	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
-	<CAHmQWvDu+P26Y5CJfcQ=1_9C=hej_B8w7dLMbmuOmCV-+pYOJQ@mail.gmail.com>
+	(envelope-from <david@redhat.com>) id 1fiIQu-0006eO-U5
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:58:23 -0400
+References: <20180725091233.3300-1-david@redhat.com>
+	<20180725133640.3ea78c59.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <12ec6fa8-aa28-f8d6-a6ad-df87824e89e9@redhat.com>
+Date: Wed, 25 Jul 2018 13:58:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHmQWvDu+P26Y5CJfcQ=1_9C=hej_B8w7dLMbmuOmCV-+pYOJQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+In-Reply-To: <20180725133640.3ea78c59.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hongbo Zhang <hongbo.zhang@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Wed, Jul 25, 2018 at 06:46:59PM +0800, Hongbo Zhang wrote:
-> On 25 July 2018 at 17:54, Andrew Jones <drjones@redhat.com> wrote:
-> > On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
-> >> For the Aarch64, there is one machine 'virt', it is primarily meant to
-> >> run on KVM and execute virtualization workloads, but we need an
-> >> environment as faithful as possible to physical hardware, for supporting
-> >> firmware and OS development for pysical Aarch64 machines.
-> >>
-> >> This patch introduces new machine type 'Enterprise' with main features:
-> >>  - Based on 'virt' machine type.
-> >>  - Re-designed memory map.
-> >>  - EL2 and EL3 are enabled by default.
-> >>  - GIC version 3 by default.
-> >>  - AHCI controller attached to system bus, and then CDROM and hard disc
-> >>    can be added to it.
-> >>  - EHCI controller attached to system bus, with USB mouse and key board
-> >>    installed by default.
-> >>  - E1000E ethernet card on PCIE bus.
-> >>  - VGA display adaptor on PCIE bus.
-> >>  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
-> >>  - No virtio functions enabled, since this is to emulate real hardware.
-> >
-> > In the last review it was pointed out that using virtio-pci should still
-> > be "real" enough, so there's not much reason to avoid it. Well, unless
-> > there's some concern as to what drivers are available in the firmware and
-> > guest kernel. But that concern usually only applies to legacy firmwares
-> > and kernels, and therefore shouldn't apply to AArch64.
-> >
-> For Armv7, there is one typical platform 'vexpress', but for Armv8, no
+On 25.07.2018 13:36, Cornelia Huck wrote:
+> On Wed, 25 Jul 2018 11:12:33 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> The "max" CPU model behaves like "-cpu host" when KVM is enabled, and =
+like
+>> a CPU with the maximum possible feature set when TCG is enabled.
+>>
+>> While the "host" model can not be used under TCG ("kvm_required"), the
+>> "max" model can and "Enables all features supported by the accelerator=
+ in
+>> the current host".
+>>
+>> So we can treat "host" just as a special case of "max" (like x86 does)=
+.
+>> It differs to the "qemu" CPU model under TCG such that compatibility
+>> handling will not be performed and that some experimental CPU features
+>> not yet part of the "qemu" model might be indicated.
+>>
+>> These are right now under TCG (see "qemu_MAX"):
+>> - stfle53
+>=20
+> That's a z13 feature, so I think it's fine as we don't care about
+> machine generations for the max mode anyway, correct?
 
-Wasn't the vexpress model designed for a specific machine? Namely for
-Arm's simulator? Is the vexpress model really something typical among
-all the Armv7 platforms?
+Yes the max model really just is "give me anything you got and that you
+can expand to a static model (i.e. fully specify on the command line)".
 
-> such typical one, the 'virt' is typically for running workloads, one
-> example is using it under OpenStack.
-> So a 'typical' one for Armv8 is needed for firmware and OS
-> development, similar like 'vexpress' for Armv7.
+>=20
+>> - msa5-base
+>=20
+> That's just the warning, but as things are continuing to work, it's
+> fine as well.
 
-What is a "typical" Armv8 machine? What will a typical Armv8 machine be in
-two years?
+Yes, as these are z13 models we don't but them yet into our "stable"
+qemu model which is based on a z12.
 
-Note, I'm not actually opposed to the current definition (because I don't
-really have one myself). I'm just opposed to hard coding one.
+>=20
+>> - zpci
+>=20
+> That one theoretically has a dependency on CONFIG_PCI, but as that is
+> always set, I think it's fine as well.
+
+That is even already handled correctly, see
+	target/s390x/cpu_models.c:register_types()
+
+1314 #ifndef CONFIG_USER_ONLY
+1315     if (!pci_available) {
+1316         clear_bit(S390_FEAT_ZPCI, qemu_max_cpu_feat);
+1317     }
+1318 #endif
+
+[...]
+
+> Maybe add a comment that for kvm we try the host model, and only that
+> can fail (i.e., for tcg this will always work)?
+
+"we expect only errors under KVM, when we actually query the kernel"
+
+>=20
+>> +        error_report_err(local_err);
+>> +        /* fallback to unsupported CPU models */
+>> +        return;
+>> +    }
+>> +
+>> +    cpu->model =3D g_new(S390CPUModel, 1);
+>> +    /* copy the CPU model so we can modify it */
+>> +    memcpy(cpu->model, max_model, sizeof(*cpu->model));
+>> +}
+>> +
+>>  static void s390_cpu_model_finalize(Object *obj)
+>>  {
+>>      S390CPU *cpu =3D S390_CPU(obj);
+>=20
+> Looks sane to me.
+>=20
+
+Thanks!
+
+--=20
 
 Thanks,
-drew
+
+David / dhildenb
