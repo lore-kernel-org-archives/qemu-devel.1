@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fiG5R-0002Rj-NN
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:28:04 -0400
+	(envelope-from <drjones@redhat.com>) id 1fiGHr-0000Ad-Jf
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:40:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fiG5O-0000f3-NU
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:28:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52972 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fiG5O-0000er-GH
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:27:58 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2572E40252EC
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 09:27:58 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Wed, 25 Jul 2018 10:27:51 +0100
-Message-Id: <20180725092751.21767-3-berrange@redhat.com>
-In-Reply-To: <20180725092751.21767-1-berrange@redhat.com>
-References: <20180725092751.21767-1-berrange@redhat.com>
+	(envelope-from <drjones@redhat.com>) id 1fiGHo-00039v-L1
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:40:51 -0400
+Date: Wed, 25 Jul 2018 11:40:37 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180725094037.uzz4ycen4qja4q4a@kamzik.brq.redhat.com>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<20180725084824.GA12855@redhat.com>
+	<CAKv+Gu_RHsed0KAH8njKB8UPvbUDeoTZ5sP76f_br6azisZzSQ@mail.gmail.com>
+	<CAHmQWvCqKqQXnXxOUgi=kLTyE5BhV2NxqaKzvPp63HX02V=X2g@mail.gmail.com>
+	<CAKv+Gu_eFjS_UvOuEKhbsWr34o3Jqd4h2duJ-gG1ofsFbwkGbQ@mail.gmail.com>
+	<CAHmQWvC8_J4i32UZzdHqJ4w3EdEAHmWGdgqrvGwEA7uo0kvk9A@mail.gmail.com>
+	<CAKv+Gu-B4o7dwZPOix2MkECJia6M6Q+zBMw8XVdw49kFYW6J+w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu-B4o7dwZPOix2MkECJia6M6Q+zBMw8XVdw49kFYW6J+w@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/2] vnc: remove support for deprecated tls,
- x509, x509verify options
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,257 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-The 'tls-creds' option accepts the name of a TLS credentials
-object. This replaced the usage of 'tls', 'x509' and 'x509verify'
-options in 2.5.0. These deprecated options were grandfathered in
-when the deprecation policy was introduded in 2.10.0, so can now
-finally be removed.
-
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- qemu-deprecated.texi | 20 ----------
- qemu-options.hx      | 43 ---------------------
- ui/vnc.c             | 91 --------------------------------------------
- 3 files changed, 154 deletions(-)
-
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 9920a85adc..6b92cec48a 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -40,26 +40,6 @@ which is the default.
- The ``-no-kvm'' argument is now a synonym for setting
- ``-machine accel=3Dtcg''.
-=20
--@subsection -vnc tls (since 2.5.0)
--
--The ``-vnc tls'' argument is now a synonym for setting
--``-object tls-creds-anon,id=3Dtls0'' combined with
--``-vnc tls-creds=3Dtls0'
--
--@subsection -vnc x509 (since 2.5.0)
--
--The ``-vnc x509=3D/path/to/certs'' argument is now a
--synonym for setting
--``-object tls-creds-x509,dir=3D/path/to/certs,id=3Dtls0,verify-peer=3Dno=
-''
--combined with ``-vnc tls-creds=3Dtls0'
--
--@subsection -vnc x509verify (since 2.5.0)
--
--The ``-vnc x509verify=3D/path/to/certs'' argument is now a
--synonym for setting
--``-object tls-creds-x509,dir=3D/path/to/certs,id=3Dtls0,verify-peer=3Dye=
-s''
--combined with ``-vnc tls-creds=3Dtls0'
--
- @subsection -tftp (since 2.6.0)
-=20
- The ``-tftp /some/dir'' argument is replaced by either
-diff --git a/qemu-options.hx b/qemu-options.hx
-index b1bf0f485f..bf09c5b4e7 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1654,49 +1654,6 @@ will cause the VNC server socket to enable the VeN=
-Crypt auth
- mechanism.  The credentials should have been previously created
- using the @option{-object tls-creds} argument.
-=20
--The @option{tls-creds} parameter obsoletes the @option{tls},
--@option{x509}, and @option{x509verify} options, and as such
--it is not permitted to set both new and old type options at
--the same time.
--
--@item tls
--
--Require that client use TLS when communicating with the VNC server. This
--uses anonymous TLS credentials so is susceptible to a man-in-the-middle
--attack. It is recommended that this option be combined with either the
--@option{x509} or @option{x509verify} options.
--
--This option is now deprecated in favor of using the @option{tls-creds}
--argument.
--
--@item x509=3D@var{/path/to/certificate/dir}
--
--Valid if @option{tls} is specified. Require that x509 credentials are us=
-ed
--for negotiating the TLS session. The server will send its x509 certifica=
-te
--to the client. It is recommended that a password be set on the VNC serve=
-r
--to provide authentication of the client when this is used. The path foll=
-owing
--this option specifies where the x509 certificates are to be loaded from.
--See the @ref{vnc_security} section for details on generating certificate=
-s.
--
--This option is now deprecated in favour of using the @option{tls-creds}
--argument.
--
--@item x509verify=3D@var{/path/to/certificate/dir}
--
--Valid if @option{tls} is specified. Require that x509 credentials are us=
-ed
--for negotiating the TLS session. The server will send its x509 certifica=
-te
--to the client, and request that the client send its own x509 certificate=
+On Wed, Jul 25, 2018 at 11:20:03AM +0200, Ard Biesheuvel wrote:
+> On 25 July 2018 at 11:17, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+> > On 25 July 2018 at 17:13, Ard Biesheuvel <ard.biesheuvel@linaro.org> =
+wrote:
+> >> On 25 July 2018 at 11:09, Hongbo Zhang <hongbo.zhang@linaro.org> wro=
+te:
+> >>> On 25 July 2018 at 17:01, Ard Biesheuvel <ard.biesheuvel@linaro.org=
+> wrote:
+> >>>> On 25 July 2018 at 10:48, Daniel P. Berrang=E9 <berrange@redhat.co=
+m> wrote:
+> >>>>> On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
+> >>>>>> For the Aarch64, there is one machine 'virt', it is primarily me=
+ant to
+> >>>>>> run on KVM and execute virtualization workloads, but we need an
+> >>>>>> environment as faithful as possible to physical hardware, for su=
+pporting
+> >>>>>> firmware and OS development for pysical Aarch64 machines.
+> >>>>>>
+> >>>>>> This patch introduces new machine type 'Enterprise' with main fe=
+atures:
+> >>>>>
+> >>>>> The 'enterprise' name is really awful - this is essentially a mar=
+keting
+> >>>>> term completely devoid of any useful meaning.
+> >>>>>
+> >>>>> You had previously called this "sbsa" which IIUC was related to a=
+ real
+> >>>>> world hardware specification that it was based on. IOW, I think t=
+his old
+> >>>>> name was preferrable to calling it "enterprise".
+> >>>>>
+> >>>>
+> >>>> I couldn't agree more. However, IIUC this change was made at the
+> >>>> request of one of the reviewers, although I wasn't part of the
+> >>>> discussion at that point, so I'm not sure who it was.
+> >>>>
+> >>>> Hongbo, could you please share a link to that discussion?
+> >>>>
+> >>>> Thanks,
+> >>>> Ard.
+> >>>>
+> >>>
+> >>> V1 discussion here:
+> >>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg545775.html
+> >>>
+> >>
+> >> So who asked for the sbsa -> enterprise change?
+> >
+> > Actually nobody, but it was argued that sbsa does not require ehci an=
+d
+> > ahci etc, then we should find a name fitting for this platform better=
 .
--The server will validate the client's certificate against the CA certifi=
-cate,
--and reject clients when validation fails. If the certificate authority i=
-s
--trusted, this is a sufficient authentication mechanism. You may still wi=
-sh
--to set a password on the VNC server as a second authentication layer. Th=
-e
--path following this option specifies where the x509 certificates are to
--be loaded from. See the @ref{vnc_security} section for details on genera=
-ting
--certificates.
--
--This option is now deprecated in favour of using the @option{tls-creds}
--argument.
--
- @item sasl
-=20
- Require that the client use SASL to authenticate with the VNC server.
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 359693238b..fd929b0957 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3344,10 +3344,6 @@ static QemuOptsList qemu_vnc_opts =3D {
-         },{
-             .name =3D "tls-creds",
-             .type =3D QEMU_OPT_STRING,
--        },{
--            /* Deprecated in favour of tls-creds */
--            .name =3D "x509",
--            .type =3D QEMU_OPT_STRING,
-         },{
-             .name =3D "share",
-             .type =3D QEMU_OPT_STRING,
-@@ -3384,14 +3380,6 @@ static QemuOptsList qemu_vnc_opts =3D {
-         },{
-             .name =3D "sasl",
-             .type =3D QEMU_OPT_BOOL,
--        },{
--            /* Deprecated in favour of tls-creds */
--            .name =3D "tls",
--            .type =3D QEMU_OPT_BOOL,
--        },{
--            /* Deprecated in favour of tls-creds */
--            .name =3D "x509verify",
--            .type =3D QEMU_OPT_STRING,
-         },{
-             .name =3D "acl",
-             .type =3D QEMU_OPT_BOOL,
-@@ -3519,51 +3507,6 @@ vnc_display_setup_auth(int *auth,
- }
-=20
-=20
--/*
-- * Handle back compat with old CLI syntax by creating some
-- * suitable QCryptoTLSCreds objects
-- */
--static QCryptoTLSCreds *
--vnc_display_create_creds(bool x509,
--                         bool x509verify,
--                         const char *dir,
--                         const char *id,
--                         Error **errp)
--{
--    gchar *credsid =3D g_strdup_printf("tlsvnc%s", id);
--    Object *parent =3D object_get_objects_root();
--    Object *creds;
--    Error *err =3D NULL;
--
--    if (x509) {
--        creds =3D object_new_with_props(TYPE_QCRYPTO_TLS_CREDS_X509,
--                                      parent,
--                                      credsid,
--                                      &err,
--                                      "endpoint", "server",
--                                      "dir", dir,
--                                      "verify-peer", x509verify ? "yes" =
-: "no",
--                                      NULL);
--    } else {
--        creds =3D object_new_with_props(TYPE_QCRYPTO_TLS_CREDS_ANON,
--                                      parent,
--                                      credsid,
--                                      &err,
--                                      "endpoint", "server",
--                                      NULL);
--    }
--
--    g_free(credsid);
--
--    if (err) {
--        error_propagate(errp, err);
--        return NULL;
--    }
--
--    return QCRYPTO_TLS_CREDS(creds);
--}
--
--
- static int vnc_display_get_address(const char *addrstr,
-                                    bool websocket,
-                                    bool reverse,
-@@ -3930,15 +3873,6 @@ void vnc_display_open(const char *id, Error **errp=
-)
-     credid =3D qemu_opt_get(opts, "tls-creds");
-     if (credid) {
-         Object *creds;
--        if (qemu_opt_get(opts, "tls") ||
--            qemu_opt_get(opts, "x509") ||
--            qemu_opt_get(opts, "x509verify")) {
--            error_setg(errp,
--                       "'tls-creds' parameter is mutually exclusive with=
- "
--                       "'tls', 'x509' and 'x509verify' parameters");
--            goto fail;
--        }
--
-         creds =3D object_resolve_path_component(
-             object_get_objects_root(), credid);
-         if (!creds) {
-@@ -3961,31 +3895,6 @@ void vnc_display_open(const char *id, Error **errp=
-)
-                        "Expecting TLS credentials with a server endpoint=
-");
-             goto fail;
-         }
--    } else {
--        const char *path;
--        bool tls =3D false, x509 =3D false, x509verify =3D false;
--        tls  =3D qemu_opt_get_bool(opts, "tls", false);
--        if (tls) {
--            path =3D qemu_opt_get(opts, "x509");
--
--            if (path) {
--                x509 =3D true;
--            } else {
--                path =3D qemu_opt_get(opts, "x509verify");
--                if (path) {
--                    x509 =3D true;
--                    x509verify =3D true;
--                }
--            }
--            vd->tlscreds =3D vnc_display_create_creds(x509,
--                                                    x509verify,
--                                                    path,
--                                                    vd->id,
--                                                    errp);
--            if (!vd->tlscreds) {
--                goto fail;
--            }
--        }
-     }
-     acl =3D qemu_opt_get_bool(opts, "acl", false);
-=20
---=20
-2.17.1
+>=20
+> That doesn't make sense to me. The SBSA describes a minimal
+> configuration, it does not limit what peripherals may be attached to
+> the core system.
+>
+
+Hi Ard,
+
+I think that a machine model named 'sbsa' should provide all SBSA require=
+d
+hardware, and nothing else, while providing a means to easily extend the
+machine beyond that in any way the user likes. The user can easily add
+devices with the command line and/or by using -readconfig to build a
+"typical" machine. Note, it should even be possible to add, e.g. an ACHI
+controller, to the memory map using the platform bus, if that's preferred
+over PCIe.
+
+Thanks,
+drew
