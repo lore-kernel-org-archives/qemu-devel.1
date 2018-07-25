@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fiIml-0006Hu-9l
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1fiIo3-0007Jk-W1
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:22:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fiImi-0002aV-1q
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:55 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 25 Jul 2018 14:20:24 +0200
-Message-Id: <1532521224-27235-11-git-send-email-thuth@redhat.com>
-In-Reply-To: <1532521224-27235-1-git-send-email-thuth@redhat.com>
-References: <1532521224-27235-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH for-3.1 10/10] hw/s390x: Move virtio-ccw-input
- code to a separate file
+	(envelope-from <eblake@redhat.com>) id 1fiIo0-0003nF-VT
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:22:15 -0400
+References: <20180724200343.13733-1-lbloch@janustech.com>
+	<20180724200343.13733-4-lbloch@janustech.com>
+	<20180725082611.GA4879@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <32a32b18-0c7c-63cd-3b1d-429717b23a85@redhat.com>
+Date: Wed, 25 Jul 2018 07:22:04 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180725082611.GA4879@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] qcow2: Introduce an option for
+ sufficient L2 cache for the entire image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,278 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Leonid Bloch <lbloch@janustech.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-The code should only be enabled if CONFIG_VIRTIO_INPUT has been set.
-This can be done best if the code resides in a separate file.
+On 07/25/2018 03:26 AM, Kevin Wolf wrote:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/s390x/Makefile.objs      |   1 +
- hw/s390x/virtio-ccw-input.c | 118 ++++++++++++++++++++++++++++++++++++++++++++
- hw/s390x/virtio-ccw.c       |  98 ------------------------------------
- 3 files changed, 119 insertions(+), 98 deletions(-)
- create mode 100644 hw/s390x/virtio-ccw-input.c
+>> @@ -2840,6 +2845,7 @@
+>>               '*overlap-check': 'Qcow2OverlapChecks',
+>>               '*cache-size': 'int',
+>>               '*l2-cache-size': 'int',
+>> +            '*l2-cache-full': 'bool',
+>>               '*l2-cache-entry-size': 'int',
+>>               '*refcount-cache-size': 'int',
+>>               '*cache-clean-interval': 'int',
+> 
+> Only looking at the external interface for now, I wonder whether it
+> would be nicer not to have two mutually exclusive options, but to make
+> l2-cache-size an alternate that can take either an int like before
+> (meaning the number of bytes) or a string/enum (with the only accepted
+> value "full" for now).
 
-diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-index 9c858c1..0d7e162 100644
---- a/hw/s390x/Makefile.objs
-+++ b/hw/s390x/Makefile.objs
-@@ -14,6 +14,7 @@ obj-$(CONFIG_VIRTIO_SCSI) += virtio-ccw-scsi.o
- obj-$(CONFIG_VIRTIO_RNG) += virtio-ccw-rng.o
- obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-ccw-crypto.o
- obj-$(CONFIG_VIRTIO_GPU) += virtio-ccw-gpu.o
-+obj-$(CONFIG_VIRTIO_INPUT) += virtio-ccw-input.o
- obj-$(call land,$(CONFIG_VIRTIO_9P),$(CONFIG_VIRTFS)) += virtio-ccw-9p.o
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-ccw.o
- obj-y += css-bridge.o
-diff --git a/hw/s390x/virtio-ccw-input.c b/hw/s390x/virtio-ccw-input.c
-new file mode 100644
-index 0000000..79c87cb
---- /dev/null
-+++ b/hw/s390x/virtio-ccw-input.c
-@@ -0,0 +1,118 @@
-+/*
-+ * virtio ccw scsi implementation
-+ *
-+ * Copyright 2012, 2015 IBM Corp.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/virtio/virtio.h"
-+#include "qapi/error.h"
-+#include "virtio-ccw.h"
-+
-+static void virtio_ccw_input_realize(VirtioCcwDevice *ccw_dev, Error **errp)
-+{
-+    VirtIOInputCcw *dev = VIRTIO_INPUT_CCW(ccw_dev);
-+    DeviceState *vdev = DEVICE(&dev->vdev);
-+
-+    qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
-+    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-+}
-+
-+static Property virtio_ccw_input_properties[] = {
-+    DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
-+                    VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
-+    DEFINE_PROP_UINT32("max_revision", VirtioCcwDevice, max_rev,
-+                       VIRTIO_CCW_MAX_REV),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void virtio_ccw_input_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
-+
-+    k->realize = virtio_ccw_input_realize;
-+    dc->props = virtio_ccw_input_properties;
-+    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
-+}
-+
-+static void virtio_ccw_keyboard_instance_init(Object *obj)
-+{
-+    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
-+    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
-+
-+    ccw_dev->force_revision_1 = true;
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_KEYBOARD);
-+}
-+
-+static void virtio_ccw_mouse_instance_init(Object *obj)
-+{
-+    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
-+    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
-+
-+    ccw_dev->force_revision_1 = true;
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_MOUSE);
-+}
-+
-+static void virtio_ccw_tablet_instance_init(Object *obj)
-+{
-+    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
-+    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
-+
-+    ccw_dev->force_revision_1 = true;
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_TABLET);
-+}
-+
-+static const TypeInfo virtio_ccw_input = {
-+    .name          = TYPE_VIRTIO_INPUT_CCW,
-+    .parent        = TYPE_VIRTIO_CCW_DEVICE,
-+    .instance_size = sizeof(VirtIOInputCcw),
-+    .class_init    = virtio_ccw_input_class_init,
-+    .abstract = true,
-+};
-+
-+static const TypeInfo virtio_ccw_input_hid = {
-+    .name          = TYPE_VIRTIO_INPUT_HID_CCW,
-+    .parent        = TYPE_VIRTIO_INPUT_CCW,
-+    .instance_size = sizeof(VirtIOInputHIDCcw),
-+    .abstract = true,
-+};
-+
-+static const TypeInfo virtio_ccw_keyboard = {
-+    .name          = TYPE_VIRTIO_KEYBOARD_CCW,
-+    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
-+    .instance_size = sizeof(VirtIOInputHIDCcw),
-+    .instance_init = virtio_ccw_keyboard_instance_init,
-+};
-+
-+static const TypeInfo virtio_ccw_mouse = {
-+    .name          = TYPE_VIRTIO_MOUSE_CCW,
-+    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
-+    .instance_size = sizeof(VirtIOInputHIDCcw),
-+    .instance_init = virtio_ccw_mouse_instance_init,
-+};
-+
-+static const TypeInfo virtio_ccw_tablet = {
-+    .name          = TYPE_VIRTIO_TABLET_CCW,
-+    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
-+    .instance_size = sizeof(VirtIOInputHIDCcw),
-+    .instance_init = virtio_ccw_tablet_instance_init,
-+};
-+
-+static void virtio_ccw_input_register(void)
-+{
-+    type_register_static(&virtio_ccw_input);
-+    type_register_static(&virtio_ccw_input_hid);
-+    type_register_static(&virtio_ccw_keyboard);
-+    type_register_static(&virtio_ccw_mouse);
-+    type_register_static(&virtio_ccw_tablet);
-+}
-+
-+type_init(virtio_ccw_input_register)
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index f2aabb3..2c20434 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -811,15 +811,6 @@ static void virtio_ccw_blk_instance_init(Object *obj)
-                               "bootindex", &error_abort);
- }
- 
--static void virtio_ccw_input_realize(VirtioCcwDevice *ccw_dev, Error **errp)
--{
--    VirtIOInputCcw *dev = VIRTIO_INPUT_CCW(ccw_dev);
--    DeviceState *vdev = DEVICE(&dev->vdev);
--
--    qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
--    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
--}
--
- /* DeviceState to VirtioCcwDevice. Note: used on datapath,
-  * be careful and test performance if you change this.
-  */
-@@ -1246,90 +1237,6 @@ static const TypeInfo virtio_ccw_blk = {
-     .class_init    = virtio_ccw_blk_class_init,
- };
- 
--static Property virtio_ccw_input_properties[] = {
--    DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
--                    VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
--    DEFINE_PROP_UINT32("max_revision", VirtioCcwDevice, max_rev,
--                       VIRTIO_CCW_MAX_REV),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void virtio_ccw_input_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
--
--    k->realize = virtio_ccw_input_realize;
--    dc->props = virtio_ccw_input_properties;
--    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
--}
--
--static void virtio_ccw_keyboard_instance_init(Object *obj)
--{
--    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
--    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
--
--    ccw_dev->force_revision_1 = true;
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_KEYBOARD);
--}
--
--static void virtio_ccw_mouse_instance_init(Object *obj)
--{
--    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
--    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
--
--    ccw_dev->force_revision_1 = true;
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_MOUSE);
--}
--
--static void virtio_ccw_tablet_instance_init(Object *obj)
--{
--    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
--    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
--
--    ccw_dev->force_revision_1 = true;
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_TABLET);
--}
--
--static const TypeInfo virtio_ccw_input = {
--    .name          = TYPE_VIRTIO_INPUT_CCW,
--    .parent        = TYPE_VIRTIO_CCW_DEVICE,
--    .instance_size = sizeof(VirtIOInputCcw),
--    .class_init    = virtio_ccw_input_class_init,
--    .abstract = true,
--};
--
--static const TypeInfo virtio_ccw_input_hid = {
--    .name          = TYPE_VIRTIO_INPUT_HID_CCW,
--    .parent        = TYPE_VIRTIO_INPUT_CCW,
--    .instance_size = sizeof(VirtIOInputHIDCcw),
--    .abstract = true,
--};
--
--static const TypeInfo virtio_ccw_keyboard = {
--    .name          = TYPE_VIRTIO_KEYBOARD_CCW,
--    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
--    .instance_size = sizeof(VirtIOInputHIDCcw),
--    .instance_init = virtio_ccw_keyboard_instance_init,
--};
--
--static const TypeInfo virtio_ccw_mouse = {
--    .name          = TYPE_VIRTIO_MOUSE_CCW,
--    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
--    .instance_size = sizeof(VirtIOInputHIDCcw),
--    .instance_init = virtio_ccw_mouse_instance_init,
--};
--
--static const TypeInfo virtio_ccw_tablet = {
--    .name          = TYPE_VIRTIO_TABLET_CCW,
--    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
--    .instance_size = sizeof(VirtIOInputHIDCcw),
--    .instance_init = virtio_ccw_tablet_instance_init,
--};
--
- static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
- {
-     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
-@@ -1421,11 +1328,6 @@ static void virtio_ccw_register(void)
-     type_register_static(&virtio_ccw_device_info);
-     type_register_static(&virtio_ccw_blk);
-     type_register_static(&virtio_ccw_net);
--    type_register_static(&virtio_ccw_input);
--    type_register_static(&virtio_ccw_input_hid);
--    type_register_static(&virtio_ccw_keyboard);
--    type_register_static(&virtio_ccw_mouse);
--    type_register_static(&virtio_ccw_tablet);
- }
- 
- type_init(virtio_ccw_register)
+That does sound interesting.
+
+> 
+> Another interesting question is whether 'full' shouldn't keep meaning
+> full throughout the lifetime of the BlockDriverState, i.e. should it
+> keep adapting to the new size when the image size changes?
+
+Do we even resize the cache now for image size changes? If we use an 
+enum, we could have two different values depending on whether the chosen 
+cache size remains fixed or also tries to resize when the image grows.
+
 -- 
-1.8.3.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
