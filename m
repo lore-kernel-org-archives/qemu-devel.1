@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fiFeY-0008Kg-AS
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:00:17 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fiFeP-0008By-BM
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:00:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fiFeV-0002XQ-Cs
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:00:14 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fiFeM-0002Dp-E9
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:00:05 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 25 Jul 2018 09:59:43 +0100
-Message-Id: <20180725085944.11856-7-stefanha@redhat.com>
+Date: Wed, 25 Jul 2018 09:59:40 +0100
+Message-Id: <20180725085944.11856-4-stefanha@redhat.com>
 In-Reply-To: <20180725085944.11856-1-stefanha@redhat.com>
 References: <20180725085944.11856-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 6/7] loader: Implement .hex file loader
+Subject: [Qemu-devel] [PATCH v3 3/7] hw/arm: make bitbanded IO optional on
+ ARM M Profile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,312 +23,155 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mail@steffen-goertz.de, Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>, ilg@livius.net, qemu-arm@nongnu.org, Julia Suvorova <jusual@mail.ru>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Steffen Gortz <qemu.ml@steffen-goertz.de>, jim@groklearning.com, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Su Hang <suhang16@mails.ucas.ac.cn>
+Some ARM CPUs have bitbanded IO, a memory region that allows convenient
+bit access via 32-bit memory loads/stores.  This eliminates the need for
+read-modify-update instruction sequences.
 
-This patch adds Intel Hexadecimal Object File format support to the
-loader.  The file format specification is available here:
-http://www.piclist.com/techref/fileext/hex/intel.htm
+This patch makes this optional feature a ARMMProfile qdev property,
+allowing boards to choose whether they want bitbanding or not.
 
-This file format is often used with microcontrollers such as the
-micro:bit, Arduino, STM32, etc.  Users expect to be able to run them
-directly with qemu -kernel program.hex instead of converting to ELF or
-binary.
+Status of boards:
+ * iotkit (Cortex M33), no bitband
+ * mps2 (Cortex M3), bitband
+ * msf2 (Cortex M3), bitband
+ * stellaris (Cortex M3), bitband
+ * stm32f205 (Cortex M3), bitband
 
-Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/hw/loader.h    |  12 ++
- hw/arm/arm-m-profile.c |   3 +
- hw/core/loader.c       | 243 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 258 insertions(+)
+ include/hw/arm/arm-m-profile.h |  2 ++
+ hw/arm/arm-m-profile.c         | 38 +++++++++++++++++++---------------
+ hw/arm/mps2.c                  |  1 +
+ hw/arm/msf2-soc.c              |  1 +
+ hw/arm/stellaris.c             |  1 +
+ hw/arm/stm32f205_soc.c         |  1 +
+ 6 files changed, 27 insertions(+), 17 deletions(-)
 
-diff --git a/include/hw/loader.h b/include/hw/loader.h
-index 5235f119a3..3c112975f4 100644
---- a/include/hw/loader.h
-+++ b/include/hw/loader.h
-@@ -28,6 +28,18 @@ ssize_t load_image_size(const char *filename, void *addr, size_t size);
- int load_image_targphys_as(const char *filename,
-                            hwaddr addr, uint64_t max_sz, AddressSpace *as);
+diff --git a/include/hw/arm/arm-m-profile.h b/include/hw/arm/arm-m-profile.h
+index ea496d9b88..1eb7a5c328 100644
+--- a/include/hw/arm/arm-m-profile.h
++++ b/include/hw/arm/arm-m-profile.h
+@@ -50,6 +50,7 @@ typedef struct {
+  *   devices will be automatically layered on top of this view.)
+  * + Property "idau": IDAU interface (forwarded to CPU object)
+  * + Property "init-svtor": secure VTOR reset value (forwarded to CPU object)
++ * + Property "enable-bitband": expose bitbanded IO
+  */
+ typedef struct {
+     /*< private >*/
+@@ -70,6 +71,7 @@ typedef struct {
+     MemoryRegion *board_memory;
+     Object *idau;
+     uint32_t init_svtor;
++    bool enable_bitband;
+ } ARMMProfileState;
  
-+/**load_targphys_hex_as:
-+ * @filename: Path to the .hex file
-+ * @entry: Store the entry point given by the .hex file
-+ * @as: The AddressSpace to load the .hex file to. The value of
-+ *      address_space_memory is used if nothing is supplied here.
-+ *
-+ * Load a fixed .hex file into memory.
-+ *
-+ * Returns the size of the loaded .hex file on success, -1 otherwise.
-+ */
-+int load_targphys_hex_as(const char *filename, hwaddr *entry, AddressSpace *as);
-+
- /** load_image_targphys:
-  * Same as load_image_targphys_as(), but doesn't allow the caller to specify
-  * an AddressSpace.
+ typedef struct {
 diff --git a/hw/arm/arm-m-profile.c b/hw/arm/arm-m-profile.c
-index 8bafd6602d..441bc1a9c2 100644
+index b7dd2370d4..8bafd6602d 100644
 --- a/hw/arm/arm-m-profile.c
 +++ b/hw/arm/arm-m-profile.c
-@@ -302,6 +302,9 @@ void arm_m_profile_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem
-     if (kernel_filename) {
-         image_size = load_elf_as(kernel_filename, NULL, NULL, &entry, &lowaddr,
-                                  NULL, big_endian, EM_ARM, 1, 0, as);
-+        if (image_size < 0) {
-+            image_size = load_targphys_hex_as(kernel_filename, &entry, as);
+@@ -212,25 +212,27 @@ static void arm_m_profile_realize(DeviceState *dev, Error **errp)
+     memory_region_add_subregion(&s->container, 0xe000e000,
+                                 sysbus_mmio_get_region(sbd, 0));
+ 
+-    for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
+-        Object *obj = OBJECT(&s->bitband[i]);
+-        SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
++    if (s->enable_bitband) {
++        for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
++            Object *obj = OBJECT(&s->bitband[i]);
++            SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
+ 
+-        object_property_set_int(obj, bitband_input_addr[i], "base", &err);
+-        if (err != NULL) {
+-            error_propagate(errp, err);
+-            return;
+-        }
+-        object_property_set_link(obj, OBJECT(s->board_memory),
+-                                 "source-memory", &error_abort);
+-        object_property_set_bool(obj, true, "realized", &err);
+-        if (err != NULL) {
+-            error_propagate(errp, err);
+-            return;
+-        }
++            object_property_set_int(obj, bitband_input_addr[i], "base", &err);
++            if (err != NULL) {
++                error_propagate(errp, err);
++                return;
++            }
++            object_property_set_link(obj, OBJECT(s->board_memory),
++                                     "source-memory", &error_abort);
++            object_property_set_bool(obj, true, "realized", &err);
++            if (err != NULL) {
++                error_propagate(errp, err);
++                return;
++            }
+ 
+-        memory_region_add_subregion(&s->container, bitband_output_addr[i],
+-                                    sysbus_mmio_get_region(sbd, 0));
++            memory_region_add_subregion(&s->container, bitband_output_addr[i],
++                                        sysbus_mmio_get_region(sbd, 0));
 +        }
-         if (image_size < 0) {
-             image_size = load_image_targphys_as(kernel_filename, 0,
-                                                 mem_size, as);
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 182abcce28..9ce5f45d5c 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -1323,3 +1323,246 @@ void hmp_info_roms(Monitor *mon, const QDict *qdict)
-         }
      }
  }
-+
-+typedef enum HexRecord HexRecord;
-+enum HexRecord {
-+    DATA_RECORD = 0,
-+    EOF_RECORD,
-+    EXT_SEG_ADDR_RECORD,
-+    START_SEG_ADDR_RECORD,
-+    EXT_LINEAR_ADDR_RECORD,
-+    START_LINEAR_ADDR_RECORD,
-+};
-+
-+#define DATA_FIELD_MAX_LEN 0xff
-+#define LEN_EXCEPT_DATA 0x5
-+/* 0x5 = sizeof(byte_count) + sizeof(address) + sizeof(record_type) +
-+ *       sizeof(checksum) */
-+typedef struct {
-+    uint8_t byte_count;
-+    uint16_t address;
-+    uint8_t record_type;
-+    uint8_t data[DATA_FIELD_MAX_LEN];
-+    uint8_t checksum;
-+} HexLine;
-+
-+/* return 0 or -1 if error */
-+static bool parse_record(HexLine *line, uint8_t *our_checksum, const uint8_t c,
-+                         uint32_t *index, const bool in_process)
-+{
-+    /* +-------+---------------+-------+---------------------+--------+
-+     * | byte  |               |record |                     |        |
-+     * | count |    address    | type  |        data         |checksum|
-+     * +-------+---------------+-------+---------------------+--------+
-+     * ^       ^               ^       ^                     ^        ^
-+     * |1 byte |    2 bytes    |1 byte |     0-255 bytes     | 1 byte |
-+     */
-+    uint8_t value = 0;
-+    uint32_t idx = *index;
-+    /* ignore space */
-+    if (g_ascii_isspace(c)) {
-+        return true;
-+    }
-+    if (!g_ascii_isxdigit(c) || !in_process) {
-+        return false;
-+    }
-+    value = g_ascii_xdigit_value(c);
-+    value = idx & 0x1 ? value & 0xf : value << 4;
-+    if (idx < 2) {
-+        line->byte_count |= value;
-+    } else if (2 <= idx && idx < 6) {
-+        line->address <<= 4;
-+        line->address += g_ascii_xdigit_value(c);
-+    } else if (6 <= idx && idx < 8) {
-+        line->record_type |= value;
-+    } else if (8 <= idx && idx < 8 + 2 * line->byte_count) {
-+        line->data[(idx - 8) >> 1] |= value;
-+    } else if (8 + 2 * line->byte_count <= idx &&
-+               idx < 10 + 2 * line->byte_count) {
-+        line->checksum |= value;
-+    } else {
-+        return false;
-+    }
-+    *our_checksum += value;
-+    ++(*index);
-+    return true;
-+}
-+
-+typedef struct {
-+    const char *filename;
-+    HexLine line;
-+    uint8_t *bin_buf;
-+    hwaddr *start_addr;
-+    int total_size;
-+    uint32_t next_address_to_write;
-+    uint32_t current_address;
-+    uint32_t current_rom_index;
-+    uint32_t rom_start_address;
-+    AddressSpace *as;
-+} HexParser;
-+
-+/* return size or -1 if error */
-+static int handle_record_type(HexParser *parser)
-+{
-+    HexLine *line = &(parser->line);
-+    switch (line->record_type) {
-+    case DATA_RECORD:
-+        parser->current_address =
-+            (parser->next_address_to_write & 0xffff0000) | line->address;
-+        /* verify this is a contiguous block of memory */
-+        if (parser->current_address != parser->next_address_to_write) {
-+            if (parser->current_rom_index != 0) {
-+                rom_add_blob_fixed_as(parser->filename, parser->bin_buf,
-+                                      parser->current_rom_index,
-+                                      parser->rom_start_address, parser->as);
-+            }
-+            parser->rom_start_address = parser->current_address;
-+            parser->current_rom_index = 0;
-+        }
-+
-+        /* copy from line buffer to output bin_buf */
-+        memcpy(parser->bin_buf + parser->current_rom_index, line->data,
-+               line->byte_count);
-+        parser->current_rom_index += line->byte_count;
-+        parser->total_size += line->byte_count;
-+        /* save next address to write */
-+        parser->next_address_to_write =
-+            parser->current_address + line->byte_count;
-+        break;
-+
-+    case EOF_RECORD:
-+        if (parser->current_rom_index != 0) {
-+            rom_add_blob_fixed_as(parser->filename, parser->bin_buf,
-+                                  parser->current_rom_index,
-+                                  parser->rom_start_address, parser->as);
-+        }
-+        return parser->total_size;
-+    case EXT_SEG_ADDR_RECORD:
-+    case EXT_LINEAR_ADDR_RECORD:
-+        if (line->byte_count != 2 && line->address != 0) {
-+            return -1;
-+        }
-+
-+        if (parser->current_rom_index != 0) {
-+            rom_add_blob_fixed_as(parser->filename, parser->bin_buf,
-+                                  parser->current_rom_index,
-+                                  parser->rom_start_address, parser->as);
-+        }
-+
-+        /* save next address to write,
-+         * in case of non-contiguous block of memory */
-+        parser->next_address_to_write =
-+            line->record_type == EXT_SEG_ADDR_RECORD
-+                ? ((line->data[0] << 12) | (line->data[1] << 4))
-+                : ((line->data[0] << 24) | (line->data[1] << 16));
-+        parser->rom_start_address = parser->next_address_to_write;
-+        parser->current_rom_index = 0;
-+        break;
-+
-+    case START_SEG_ADDR_RECORD:
-+        if (line->byte_count != 4 && line->address != 0) {
-+            return -1;
-+        }
-+
-+        /* x86 16-bit CS:IP segmented addressing */
-+        *(parser->start_addr) = (((line->data[0] << 8) | line->data[1]) << 4) |
-+                                (line->data[2] << 8) | line->data[3];
-+        break;
-+
-+    case START_LINEAR_ADDR_RECORD:
-+        if (line->byte_count != 4 && line->address != 0) {
-+            return -1;
-+        }
-+
-+        *(parser->start_addr) = (line->data[0] << 24) | (line->data[1] << 16) |
-+                                (line->data[2] << 8)  | (line->data[3]);
-+        break;
-+
-+    default:
-+        return -1;
-+    }
-+
-+    return parser->total_size;
-+}
-+
-+/* return size or -1 if error */
-+static int parse_hex_blob(const char *filename, hwaddr *addr, uint8_t *hex_blob,
-+                          size_t hex_blob_size, AddressSpace *as)
-+{
-+    bool in_process = false; /* avoid re-enter and
-+                              * check whether record begin with ':' */
-+    uint8_t *end = hex_blob + hex_blob_size;
-+    uint8_t our_checksum = 0;
-+    uint32_t record_index = 0;
-+    HexParser parser = {
-+        .filename = filename,
-+        .bin_buf = g_malloc(hex_blob_size),
-+        .start_addr = addr,
-+        .as = as,
-+    };
-+
-+    rom_transaction_begin();
-+
-+    for (; hex_blob < end; ++hex_blob) {
-+        switch (*hex_blob) {
-+        case '\r':
-+        case '\n':
-+            if (!in_process) {
-+                break;
-+            }
-+
-+            in_process = false;
-+            if ((LEN_EXCEPT_DATA + parser.line.byte_count) * 2 !=
-+                    record_index ||
-+                our_checksum != 0) {
-+                parser.total_size = -1;
-+                goto out;
-+            }
-+
-+            if (handle_record_type(&parser) == -1) {
-+                parser.total_size = -1;
-+                goto out;
-+            }
-+            break;
-+
-+        /* start of a new record. */
-+        case ':':
-+            memset(&parser.line, 0, sizeof(HexLine));
-+            in_process = true;
-+            record_index = 0;
-+            break;
-+
-+        /* decoding lines */
-+        default:
-+            if (!parse_record(&parser.line, &our_checksum, *hex_blob,
-+                              &record_index, in_process)) {
-+                parser.total_size = -1;
-+                goto out;
-+            }
-+            break;
-+        }
-+    }
-+
-+out:
-+    g_free(parser.bin_buf);
-+    rom_transaction_end(parser.total_size != -1);
-+    return parser.total_size;
-+}
-+
-+/* return size or -1 if error */
-+int load_targphys_hex_as(const char *filename, hwaddr *entry, AddressSpace *as)
-+{
-+    gsize hex_blob_size;
-+    gchar *hex_blob;
-+    int total_size = 0;
-+
-+    if (!g_file_get_contents(filename, &hex_blob, &hex_blob_size, NULL)) {
-+        return -1;
-+    }
-+
-+    total_size = parse_hex_blob(filename, entry, (uint8_t *)hex_blob,
-+                                hex_blob_size, as);
-+
-+    g_free(hex_blob);
-+    return total_size;
-+}
+ 
+@@ -241,6 +243,8 @@ static Property arm_m_profile_properties[] = {
+     DEFINE_PROP_LINK("idau", ARMMProfileState, idau,
+                      TYPE_IDAU_INTERFACE, Object *),
+     DEFINE_PROP_UINT32("init-svtor", ARMMProfileState, init_svtor, 0),
++    DEFINE_PROP_BOOL("enable-bitband", ARMMProfileState,
++                     enable_bitband, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index 912e1297d5..b232162dbd 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -186,6 +186,7 @@ static void mps2_common_init(MachineState *machine)
+         g_assert_not_reached();
+     }
+     qdev_prop_set_string(armv7m, "cpu-type", machine->cpu_type);
++    qdev_prop_set_bit(armv7m, "enable-bitband", true);
+     object_property_set_link(OBJECT(&mms->armv7m), OBJECT(system_memory),
+                              "memory", &error_abort);
+     object_property_set_bool(OBJECT(&mms->armv7m), true, "realized",
+diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+index 09cdc61f44..fb5d16338f 100644
+--- a/hw/arm/msf2-soc.c
++++ b/hw/arm/msf2-soc.c
+@@ -117,6 +117,7 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
+     armv7m = DEVICE(&s->armv7m);
+     qdev_prop_set_uint32(armv7m, "num-irq", 81);
+     qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
++    qdev_prop_set_bit(armv7m, "enable-bitband", true);
+     object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+                                      "memory", &error_abort);
+     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+index 42785f5bd1..cb22684ffe 100644
+--- a/hw/arm/stellaris.c
++++ b/hw/arm/stellaris.c
+@@ -1304,6 +1304,7 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
+     nvic = qdev_create(NULL, TYPE_ARM_M_PROFILE);
+     qdev_prop_set_uint32(nvic, "num-irq", NUM_IRQ_LINES);
+     qdev_prop_set_string(nvic, "cpu-type", ms->cpu_type);
++    qdev_prop_set_bit(nvic, "enable-bitband", true);
+     object_property_set_link(OBJECT(nvic), OBJECT(get_system_memory()),
+                                      "memory", &error_abort);
+     /* This will exit with an error if the user passed us a bad cpu_type */
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index 7de1474ade..f78b89d205 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -109,6 +109,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+     armv7m = DEVICE(&s->armv7m);
+     qdev_prop_set_uint32(armv7m, "num-irq", 96);
+     qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
++    qdev_prop_set_bit(armv7m, "enable-bitband", true);
+     object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+                                      "memory", &error_abort);
+     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
 -- 
 2.17.1
