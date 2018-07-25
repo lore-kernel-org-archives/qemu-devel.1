@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fiJCZ-0004NZ-9o
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:47:38 -0400
+	(envelope-from <david@redhat.com>) id 1fiJEm-0006da-0N
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:49:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fiJCW-0005bH-35
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:47:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48144)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fiJCV-0005Zt-Oe
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:47:31 -0400
-Date: Wed, 25 Jul 2018 08:47:29 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <4226742.54063347.1532522849803.JavaMail.zimbra@redhat.com>
-In-Reply-To: <d3fe397a-024d-faf7-8854-bb8e9ea17f53@redhat.com>
-References: <20180713075232.9575-1-pagupta@redhat.com>
-	<20180713075232.9575-4-pagupta@redhat.com>
-	<783786ae-2e85-2376-448c-1e362c3d4d48@redhat.com>
-	<399916154.53931292.1532494899706.JavaMail.zimbra@redhat.com>
-	<d3fe397a-024d-faf7-8854-bb8e9ea17f53@redhat.com>
+	(envelope-from <david@redhat.com>) id 1fiJEj-0008Pj-2R
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:49:52 -0400
+References: <20180725091233.3300-1-david@redhat.com>
+	<20180725133640.3ea78c59.cohuck@redhat.com>
+	<12ec6fa8-aa28-f8d6-a6ad-df87824e89e9@redhat.com>
+	<20180725140631.54c1df1f.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <fa2b4bc2-e23f-e7db-5caf-057421ca6f96@redhat.com>
+Date: Wed, 25 Jul 2018 14:49:45 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180725140631.54c1df1f.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3] qemu: Add virtio pmem device
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, nilal@redhat.com, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, kvm@vger.kernel.org, riel@surriel.com, linux-nvdimm@ml01.01.org, david@redhat.com, ross zwisler <ross.zwisler@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, hch@infradead.org, pbonzini@redhat.com, mst@redhat.com, stefanha@redhat.com, niteshnarayanlal@hotmail.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, lcapitulino@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
+>>
+>>> Maybe add a comment that for kvm we try the host model, and only that
+>>> can fail (i.e., for tcg this will always work)?  
+>>
+>> "we expect only errors under KVM, when we actually query the kernel"
+> 
+> "We expect errors only under KVM, where we actually query the kernel"
+> 
+> ?
 
-
+Sure, maybe you can fit it into one line (which is what I tried).
 
 > 
-> >>
-> >> This patch has no n/M in the subject line; but is included in a thread
-> >> that also has a 0/2 cover letter, as well as 1/2 and 2/2 patches in
-> >> separate mails.  Is that intentional?
-> > 
-> > Yes, kernel series has 0-2 patches and Qemu has this one. I thought its
-> > good to keep separate numbering for both the sets.
-> 
-> Ah, that makes sense. The cover letter didn't make it obvious to me that
-> this was two separate series to two projects, but related enough that
-> both series have to be incorporated for the feature to work and thus
-> cross-posted under a single cover letter.
+> If nobody else has further comments, I can squash in the change and
+> queue it for 3.1. I'll let it sit for a bit longer on the list, though.
 
-Will try to make it more clear in next posting.
+If I don't have to resend, can you fixup the subject "s390x/cpumodel: ..." ?
+
+Thanks!
+
+-- 
 
 Thanks,
-Pankaj
+
+David / dhildenb
