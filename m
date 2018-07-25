@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fiHL0-0001MT-GZ
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:48:13 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fiHNf-0002oM-Ht
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:50:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fiHKx-0008V1-Ic
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:48:10 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:52661)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fiHKx-0008Sg-9u
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:48:07 -0400
-Received: by mail-wm0-x243.google.com with SMTP id o11-v6so5541760wmh.2
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 03:48:07 -0700 (PDT)
-References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
-	<d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <8bf07395-4872-ce74-c201-9fca232edd01@gmail.com>
-Date: Wed, 25 Jul 2018 13:48:03 +0300
+	(envelope-from <dgilbert@redhat.com>) id 1fiHNc-0003kM-Jw
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:50:55 -0400
+Date: Wed, 25 Jul 2018 11:50:41 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180725105040.GA2366@work-vm>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Rebecca Cran <rebecca@bluestop.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yuval Shaia <yuval.shaia@oracle.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, peter.maydell@linaro.org, radoslaw.biernacki@linaro.org, ard.biesheuvel@linaro.org, qemu-devel@nongnu.org, leif.lindholm@linaro.org, qemu-arm@nongnu.org, alex.bennee@linaro.org
 
-Hi,
+* Andrew Jones (drjones@redhat.com) wrote:
+> On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
+> > For the Aarch64, there is one machine 'virt', it is primarily meant to
+> > run on KVM and execute virtualization workloads, but we need an
+> > environment as faithful as possible to physical hardware, for supporting
+> > firmware and OS development for pysical Aarch64 machines.
+> >=20
+> > This patch introduces new machine type 'Enterprise' with main features:
+> >  - Based on 'virt' machine type.
+> >  - Re-designed memory map.
+> >  - EL2 and EL3 are enabled by default.
+> >  - GIC version 3 by default.
+> >  - AHCI controller attached to system bus, and then CDROM and hard disc
+> >    can be added to it.
+> >  - EHCI controller attached to system bus, with USB mouse and key board
+> >    installed by default.
+> >  - E1000E ethernet card on PCIE bus.
+> >  - VGA display adaptor on PCIE bus.
+> >  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
+> >  - No virtio functions enabled, since this is to emulate real hardware.
+>=20
+> In the last review it was pointed out that using virtio-pci should still
+> be "real" enough, so there's not much reason to avoid it. Well, unless
+> there's some concern as to what drivers are available in the firmware and
+> guest kernel. But that concern usually only applies to legacy firmwares
+> and kernels, and therefore shouldn't apply to AArch64.
 
-On 07/25/2018 10:32 AM, Thomas Huth wrote:
-> On 25.07.2018 06:47, Rebecca Cran wrote:
->> In commit 18a398f6a39df4b08ff86ac0d38384193ca5f4cc, ./configure on
->> FreeBSD incorrectly detects RDMA support,
+I think the difference from last time is Ard's comments earlier in this
+thread:
 
-configure is looking for the rdma related libraries,  if they are there,
-the rdma code will be compiled into QEMU.
+    The purpose of the SBSA machine is not to provide a minimal
+    configuration. It is intended to exercise all the moving parts one
+    might find in a server firmware/OS stack, including pieces that are
+    not usually found on x86 machines, such as DRAM starting above 4 GB
+    and SATA/USB controllers that are not PCIe based.
 
-You can try and run configure with --disable-rdma flag until we find
-a solution.
+that suggests that the intent of this board is to provide everything
+which a firmware writer might want to test;  that's quite different
+=66rom forming the basis of a virtualised machine for real use.
 
->>   with the build subsequently
->> failing with:
->>
->> /home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:19:10: fatal error:
->> 'linux/types.h' file not found
->> #include <linux/types.h>
->>           ^~~~~~~~~~~~~~~
-Do you have the kernel-headers package installed?
+Dave
 
->> 1 error generated.
->> gmake[1]: *** [/home/bcran/workspace/qemu/rules.mak:69:
->> hw/rdma/vmw/pvrdma_cmd.o] Error 1
->> gmake[1]: *** Waiting for unfinished jobs....
->> gmake: *** [Makefile:481: subdir-x86_64-softmmu] Error 2
-> When was it still working for you the last time? Was it still working
-> with v3.0-rc1 ? Or just with v2.12 ? Any chance that you could bisect
-> the problem to determine when it has been introduced?
 
-Good idea.
-
-Thanks,
-Marcel
-
->   Thomas
+> >  - No paravirtualized fw_cfg device either.
+> >=20
+> > Arm Trusted Firmware and UEFI porting to this are done accordingly.
+> >
+>=20
+> How will UEFI get the ACPI tables from QEMU without fw-cfg? I didn't
+> see any sort of reserved ROM region in the patch for them.
+>=20
+> Thanks,
+> drew
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
