@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fiNJF-0006lU-2G
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 13:10:48 -0400
+	(envelope-from <thuth@redhat.com>) id 1fiNNf-000055-9g
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 13:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fiNJC-0000P4-1C
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 13:10:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36600)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fiNJB-0000M8-Ko
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 13:10:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fiNJA-0005Wb-2A
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 17:10:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F3B1A2E80CB
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 17:10:39 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1fiNNc-0001XR-2v
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 13:15:19 -0400
+References: <1532521224-27235-1-git-send-email-thuth@redhat.com>
+	<c2f864e7-4009-e86d-ebd4-6ddea71df5e0@de.ibm.com>
+	<87effrffrk.fsf@secure.mitica>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <be123710-869d-1525-38ae-f370f2cad40a@redhat.com>
+Date: Wed, 25 Jul 2018 19:15:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <87effrffrk.fsf@secure.mitica>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Jul 2018 16:57:24 -0000
-From: umarcor <1783362@bugs.launchpad.net>
-Reply-To: Bug 1783362 <1783362@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153244909751.11925.3364609945591086988.malonedeb@gac.canonical.com>
-Message-Id: <153253784577.23131.12356922869044402753.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1783362] Re: qemu-user: mmap should return
- failure (MAP_FAILED, -1) instead of success (NULL, 0) when len==0
+Subject: Re: [Qemu-devel] [PATCH for-3.1 00/10] Move virtio-ccw devices to
+ separate files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,82 +26,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: quintela@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-** Summary changed:
+On 25.07.2018 18:21, Juan Quintela wrote:
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>> Are you planning to do a similar thing for virtio-pci? I think it woul=
+d be good
+>> to keep virtio-ccw similar to virtio-pci when it makes sense.
 
-- qemu-user-aarch64: mmap returns success (NULL, 0) instead of failure (MAP=
-_FAILED, -1) with len=3D=3D0
-+ qemu-user: mmap should return failure (MAP_FAILED, -1) instead of success=
- (NULL, 0) when len=3D=3D0
+Somebody=E2=84=A2 should do it, yes. For the context, see:
+ https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03935.html
 
--- =
+> +1 to that.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1783362
+I was hoping that you would take care of the pci while I'm handling the
+ccw part, Juan ;-) But if you don't have spare time for this at all, I
+can also put it on my todo list.
 
-Title:
-  qemu-user: mmap should return failure (MAP_FAILED, -1) instead of
-  success (NULL, 0) when len=3D=3D0
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  New
-
-Bug description:
-  As shown in https://github.com/beehive-
-  lab/mambo/issues/19#issuecomment-407420602, with len=3D=3D0 mmap returns
-  success (NULL, 0) instead of failure (MAP_FAILED, -1) in a x86_64 host
-  executing a ELF 64-bit LSB executable, ARM aarch64 binary.
-
-  Steps to reproduce the bug:
-
-  - (cross-)compile the attached source file:
-
-  $ aarch64-linux-gnu-gcc -static -std=3Dgnu99 -lpthread test/mmap_qemu.c
-  -o mmap_qemu
-
-  - Execute in a x86_64 host with qemu-user and qemu-user-binfmt:
-
-  $ ./mmap_qemu
-  alloc: 0
-  MAP_FAILED: -1
-  errno: 0
-  mmap_qemu: test/mmap_qemu.c:15: main: Assertion `alloc =3D=3D MAP_FAILED'=
- failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  Aborted (core dumped)
-
-  - Execute in a ARM host without any additional dependecy:
-
-  $ ./mmap_qemu
-  alloc: -1
-  MAP_FAILED: -1
-  errno: 22
-
-  The bug is present in Fedora:
-
-  $ qemu-aarch64 --version
-  qemu-aarch64 version 2.11.2(qemu-2.11.2-1.fc28)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  $ uname -r
-  4.17.7-200.fc28.x86_64
-
-  And also in Ubuntu:
-
-  $ qemu-aarch64 --version
-  qemu-aarch64 version 2.12.0 (Debian 1:2.12+dfsg-3ubuntu3)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  $ uname -r
-  4.15.0-23-generic
-
-  Possibly related to:
-
-  - https://lists.freebsd.org/pipermail/freebsd-hackers/2009-July/029109.ht=
-ml
-  - https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=3D203852
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1783362/+subscriptions
+ Thomas
