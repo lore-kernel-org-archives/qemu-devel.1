@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fiLQo-00066R-6D
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:10:29 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fiLeA-0001MT-48
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:24:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fiLQl-0003Fx-3U
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:10:26 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 25 Jul 2018 17:10:11 +0200
-Message-Id: <20180725151011.25951-1-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH] rbd: Don't convert keypairs to JSON and
- back
+	(envelope-from <lbloch@janustech.com>) id 1fiLe7-00023W-42
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:24:14 -0400
+References: <20180724200343.13733-1-lbloch@janustech.com>
+	<20180724200343.13733-4-lbloch@janustech.com>
+	<20180725082611.GA4879@localhost.localdomain>
+	<32a32b18-0c7c-63cd-3b1d-429717b23a85@redhat.com>
+	<499d5d12-cdba-76e4-3b2e-122675ef9eec@janustech.com>
+	<20180725133243.GC4879@localhost.localdomain>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <dd4a32bc-845c-f529-51a8-71c978f93861@janustech.com>
+Date: Wed, 25 Jul 2018 18:23:45 +0300
+MIME-Version: 1.0
+In-Reply-To: <20180725133243.GC4879@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB-large
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] qcow2: Introduce an option for
+ sufficient L2 cache for the entire image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,191 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jdurgin@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-qemu_rbd_parse_filename() builds a keypairs QList, converts it to JSON, and
-stores the resulting QString in a QDict.
+On 07/25/2018 04:32 PM, Kevin Wolf wrote:
+> Am 25.07.2018 um 14:32 hat Leonid Bloch geschrieben:
+>> On 07/25/2018 03:22 PM, Eric Blake wrote:
+>>
+>>      On 07/25/2018 03:26 AM, Kevin Wolf wrote:
+>>
+>>          Only looking at the external interface for now, I wonder whether it
+>>          would be nicer not to have two mutually exclusive options, but to make
+>>          l2-cache-size an alternate that can take either an int like before
+>>          (meaning the number of bytes) or a string/enum (with the only accepted
+>>          value "full" for now).
+>>
+>>      That does sound interesting.
+>>
+>> This does, but currently QEMU supports QEMU_OPT_STRING, QEMU_OPT_BOOL,
+>> QEMU_OPT_NUMBER, and QEMU_OPT_SIZE. Looks like it will require a more
+>> fundamental change to accept an option that can be either a string or a size.
+> 
+> Hm, yes, good point. We wouldn't be able to parse the options purely
+> with QemuOpts any more. So we would have to manually check for 'full' in
+> the QDict before calling qemu_opts_absorb_qdict(). If it's there, we
+> would have to process it and then delete it from the QDict before we
+> feed the QDict to qemu_opts_absorb_qdict(), which would only accept a
+> number there. A bit ugly, but should be workable.
+> 
+> Maybe this is really the time that we should convert qcow2 to use the
+> QAPI types anyway, like some of the protocol drivers do internally now.
+> Obviously, this is out of scope for this series, but it gives a
+> perspective for how to get rid of the ugliness again.
 
-qemu_rbd_co_create_opts() and qemu_rbd_open() get the QString from the
-QDict, pass it to qemu_rbd_set_keypairs(), which converts it back into
-a QList.
+I need to look into that. Thanks for the idea. But indeed looks like out 
+of scope for this series.
 
-Drop both conversions, store the QList instead.
+> 
+>>          Another interesting question is whether 'full' shouldn't keep meaning
+>>          full throughout the lifetime of the BlockDriverState, i.e. should it
+>>          keep adapting to the new size when the image size changes?
+>>
+>>
+>>      Do we even resize the cache now for image size changes? If we use an enum,
+>>      we could have two different values depending on whether the chosen cache
+>>      size remains fixed or also tries to resize when the image grows.
+> 
+> We don't because we only support absolute cache sizes today. 'full'
+> would be the first one that is relative to the image size.
+> 
+>> Is it even possible to change the virtual disk image size online?
+> 
+> Yes, this is what qcow2_co_truncate() does (can be invoked, amongst
+> others, with the QMP command 'block_resize').
 
-This affects output of qemu-img info.  Before this patch:
+Cool! This does look like a good idea to resize the L2 cache 
+accordingly, but maybe this is out of scope for now as well? The purpose 
+of the current series is just to provide an option to automatically 
+calculate the needed L2 cache size for covering the entire image, 
+instead of using an external script to do that and feed the output to 
+l2-cache-size.
 
-    $ qemu-img info rbd:rbd/testimg.raw:mon_host=192.168.15.180:rbd_cache=true:conf=/tmp/ceph.conf
-    [junk printed by Ceph library code...]
-    image: json:{"driver": "raw", "file": {"pool": "rbd", "image": "testimg.raw", "conf": "/tmp/ceph.conf", "driver": "rbd", "=keyvalue-pairs": "[\"mon_host\", \"192.168.15.180\", \"rbd_cache\", \"true\"]"}}
-    [more output, not interesting here]
+> 
+>> Found a problem with my previous patch: the property was not actually set as a
+>> proper boolean option. Also, fixing the error output in iotest 103 (thanks
+>> Kevin for the catch!). V5 is on the way.
+> 
+> Maybe give the alternate thing a try with v5, as everyone seems to agree
+> that it's a nicer interface if we can make it work.
 
-After this patch, we get
+You mean with QDict? I'll look into that now. But already sent v5 before 
+reading this email.
 
-    image: json:{"driver": "raw", "file": {"pool": "rbd", "image": "testimg.raw", "conf": "/tmp/ceph.conf", "driver": "rbd", "=keyvalue-pairs": ["mon_host", "192.168.15.180", "rbd_cache", "true"]}}
+> 
+> Also, a meta-comment: Leonid, would you mind sending plain text emails
+> instead of HTML-only?
 
-The value of member "=keyvalue-pairs" changes from a string containing
-a JSON array to that JSON array.  That's an improvement of sorts.  However:
+Sure, Kevin! Sorry, I thought Thunderbird as configured here is sending 
+plain text. I was wrong. Now it should be fine. Thanks for the remark.
 
-* Should "=keyvalue-pairs" even be visible here?  It's supposed to be
-  purely internal...
+Leonid.
 
-* Is this a stable interface we need to preserve, warts and all?
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- block/rbd.c | 50 ++++++++++++++++++++++----------------------------
- 1 file changed, 22 insertions(+), 28 deletions(-)
-
-diff --git a/block/rbd.c b/block/rbd.c
-index ca8e5bbace..ddc59e1c7a 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -23,7 +23,6 @@
- #include "qemu/cutils.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/qmp/qdict.h"
--#include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qlist.h"
- #include "qapi/qobject-input-visitor.h"
- #include "qapi/qapi-visit-block-core.h"
-@@ -106,7 +105,7 @@ typedef struct BDRVRBDState {
- 
- static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-                             BlockdevOptionsRbd *opts, bool cache,
--                            const char *keypairs, const char *secretid,
-+                            QList *keypairs, const char *secretid,
-                             Error **errp);
- 
- static char *qemu_rbd_next_tok(char *src, char delim, char **p)
-@@ -221,13 +220,11 @@ static void qemu_rbd_parse_filename(const char *filename, QDict *options,
-     }
- 
-     if (keypairs) {
--        qdict_put(options, "=keyvalue-pairs",
--                  qobject_to_json(QOBJECT(keypairs)));
-+        qdict_put(options, "=keyvalue-pairs", keypairs);
-     }
- 
- done:
-     g_free(buf);
--    qobject_unref(keypairs);
-     return;
- }
- 
-@@ -281,42 +278,36 @@ static int qemu_rbd_set_auth(rados_t cluster, BlockdevOptionsRbd *opts,
-     return 0;
- }
- 
--static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs_json,
-+static int qemu_rbd_set_keypairs(rados_t cluster, QList *keypairs,
-                                  Error **errp)
- {
--    QList *keypairs;
-+    const QListEntry *entry1, *entry2;
-     QString *name;
-     QString *value;
-     const char *key;
--    size_t remaining;
-     int ret = 0;
- 
--    if (!keypairs_json) {
-+    if (!keypairs) {
-         return ret;
-     }
--    keypairs = qobject_to(QList,
--                          qobject_from_json(keypairs_json, &error_abort));
--    remaining = qlist_size(keypairs) / 2;
--    assert(remaining);
- 
--    while (remaining--) {
--        name = qobject_to(QString, qlist_pop(keypairs));
--        value = qobject_to(QString, qlist_pop(keypairs));
-+    entry1 = qlist_first(keypairs);
-+    do {
-+        entry2 = qlist_next(entry1);
-+        name = qobject_to(QString, qlist_entry_obj(entry1));
-+        value = qobject_to(QString, qlist_entry_obj(entry2));
-         assert(name && value);
-         key = qstring_get_str(name);
- 
-         ret = rados_conf_set(cluster, key, qstring_get_str(value));
--        qobject_unref(value);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret, "invalid conf option %s", key);
--            qobject_unref(name);
-             ret = -EINVAL;
-             break;
-         }
--        qobject_unref(name);
--    }
-+        entry1 = qlist_next(entry2);
-+    } while(entry1);
- 
--    qobject_unref(keypairs);
-     return ret;
- }
- 
-@@ -370,7 +361,7 @@ static QemuOptsList runtime_opts = {
- 
- /* FIXME Deprecate and remove keypairs or make it available in QMP. */
- static int qemu_rbd_do_create(BlockdevCreateOptions *options,
--                              const char *keypairs, const char *password_secret,
-+                              QList *keypairs, const char *password_secret,
-                               Error **errp)
- {
-     BlockdevCreateOptionsRbd *opts = &options->u.rbd;
-@@ -430,7 +421,8 @@ static int coroutine_fn qemu_rbd_co_create_opts(const char *filename,
-     BlockdevCreateOptionsRbd *rbd_opts;
-     BlockdevOptionsRbd *loc;
-     Error *local_err = NULL;
--    const char *keypairs, *password_secret;
-+    const char *password_secret;
-+    QList *keypairs;
-     QDict *options = NULL;
-     int ret = 0;
- 
-@@ -470,7 +462,8 @@ static int coroutine_fn qemu_rbd_co_create_opts(const char *filename,
-     loc->user     = g_strdup(qdict_get_try_str(options, "user"));
-     loc->has_user = !!loc->user;
-     loc->image    = g_strdup(qdict_get_try_str(options, "image"));
--    keypairs      = qdict_get_try_str(options, "=keyvalue-pairs");
-+    /* non-string type, but it comes from qemu_rbd_parse_filename() */
-+    keypairs      = qdict_get_qlist(options, "=keyvalue-pairs");
- 
-     ret = qemu_rbd_do_create(create_options, keypairs, password_secret, errp);
-     if (ret < 0) {
-@@ -567,7 +560,7 @@ static char *qemu_rbd_mon_host(BlockdevOptionsRbd *opts, Error **errp)
- 
- static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-                             BlockdevOptionsRbd *opts, bool cache,
--                            const char *keypairs, const char *secretid,
-+                            QList *keypairs, const char *secretid,
-                             Error **errp)
- {
-     char *mon_host = NULL;
-@@ -663,10 +656,11 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-     Visitor *v;
-     const QDictEntry *e;
-     Error *local_err = NULL;
--    char *keypairs, *secretid;
-+    QList *keypairs;
-+    char *secretid;
-     int r;
- 
--    keypairs = g_strdup(qdict_get_try_str(options, "=keyvalue-pairs"));
-+    keypairs = qobject_ref(qdict_get_qlist(options, "=keyvalue-pairs"));
-     if (keypairs) {
-         qdict_del(options, "=keyvalue-pairs");
-     }
-@@ -741,7 +735,7 @@ failed_open:
-     rados_shutdown(s->cluster);
- out:
-     qapi_free_BlockdevOptionsRbd(opts);
--    g_free(keypairs);
-+    qobject_unref(keypairs);
-     g_free(secretid);
-     return r;
- }
--- 
-2.17.1
+> 
+> Kevin
+> 
