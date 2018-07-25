@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1fiQ21-000185-Jd
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 16:05:13 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fiQBK-0003jz-Vi
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 16:14:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1fiQ1y-00064a-Ja
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 16:05:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41402)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aarcange@redhat.com>) id 1fiQ1y-0005n1-As
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 16:05:06 -0400
-Date: Wed, 25 Jul 2018 16:04:56 -0400
-From: Andrea Arcangeli <aarcange@redhat.com>
-Message-ID: <20180725200456.GM18452@redhat.com>
-References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
-	<20180629115359.GH2568@work-vm> <20180725101836.GI2479@xz-mi>
-	<20180725191736.GE2365@work-vm>
+	(envelope-from <ehabkost@redhat.com>) id 1fiQBH-0007Z2-Uo
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 16:14:46 -0400
+Date: Wed, 25 Jul 2018 17:14:38 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180725201438.GG12380@localhost.localdomain>
+References: <20180725091233.3300-1-david@redhat.com>
+	<20180725170925.GE12380@localhost.localdomain>
+	<a33a67eb-2fb6-31fd-f4ca-1d883a5a7b75@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180725191736.GE2365@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
+In-Reply-To: <a33a67eb-2fb6-31fd-f4ca-1d883a5a7b75@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, pbonzini@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
 
-On Wed, Jul 25, 2018 at 08:17:37PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Fri, Jun 29, 2018 at 12:53:59PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Denis Plotnikov (dplotnikov@virtuozzo.com) wrote:
-> > > > The patch set adds the ability to make external snapshots while VM is running.
-> > > 
-> > > cc'ing in Andrea since this uses sigsegv's to avoid userfault-wp that
-> > > isn't there yet.
-> > > 
-> > > Hi Denis,
-> > >   How robust are you finding this SEGV based trick; for example what
-> > > about things like the kernel walking vhost queues or similar kernel
-> > > nasties?
+On Wed, Jul 25, 2018 at 07:50:21PM +0200, David Hildenbrand wrote:
+> On 25.07.2018 19:09, Eduardo Habkost wrote:
+[...]
+> >> +    if (local_err) {
+> >> +        g_assert(kvm_enabled());
+> >> +        error_report_err(local_err);
+> >> +        /* fallback to unsupported CPU models */
+> >> +        return;
 > > 
-> > (I'm commenting on this old series to keep the discussion together)
-> > 
-> > If we want to make this series really work for people, we should
-> > possibly need to know whether it could work with vhost (otherwise we
-> > might need to go back to userfaultfd write-protection).
-> > 
-> > I digged a bit on the vhost-net IO, it should be using two ways to
-> > write to guest memory:
-> > 
-> > - copy_to_user(): this should possibly still be able to be captured by
-> >   mprotect() (after some confirmation from Paolo, but still we'd
-> >   better try it out)
+> > What about moving this outside instance_init?
 > 
-> What confuses me here is who is going to get the signal from this and
-> how we recover from the signal - or does it come back as an error
-> on the vhost fd somehow?
+> To which place for example? We at least have to copy the CPU model
+> for each and every CPU instance (so we can modify it without side
+> effects using properties).
 
-The problem is having to start to handle manually all sigsegv in
-vhost-net by trapping copy_to_user returning less than the full buffer
-size or put_user returning -EFAULT.
+To any code that will look at cpu->model.
 
-Those errors would need to be forwarded by vhost-net to qemu userland
-to call mprotect after copying the data.
+You are wrapping an interface that needs to report errors
+(kvm_s390_get_host_cpu_model()) behind an interface that is not
+able to report errors (object_new()).  There's nothing that
+requires you to do that, does it?  You are free to provide an API
+that is actually able to report errors, instead of relying on
+object_new() only.
 
-That's not conceptually different from having uffd-wp sending the
-message except that will then require zero changes to vhost-net and
-every other piece of kernel code that may have to write to the write
-protected memory.
+But I understand that the QOM/qdev API doesn't make that job
+easy.  On x86 we have X86CPU::max_features and
+X86CPU::user_features because of that.
 
-It may look like the uffd-wp model is wish-feature similar to an
-optimization, but without the uffd-wp model when the WP fault is
-triggered by kernel code, the sigsegv model falls apart and requires
-all kind of ad-hoc changes just for this single feature. Plus uffd-wp
-has other benefits: it makes it all reliable in terms of not
-increasing the number of vmas in use during the snapshot. Finally it
-makes it faster too with no mmap_sem for reading and no sigsegv
-signals.
-
-The non cooperative features got merged first because there was much
-activity on the kernel side on that front, but this is just an ideal
-time to nail down the remaining issues in uffd-wp I think. That I
-believe is time better spent than trying to emulate it with sigsegv
-and changing all drivers to send new events down to qemu specific to
-the sigsegv handling. We considered this before doing uffd for
-postcopy too but overall it's unreliable and more work (no single
-change was then needed to KVM code with uffd to handle postcopy and
-here it should be the same).
-
-Thanks,
-Andrea
+-- 
+Eduardo
