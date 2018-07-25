@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <silveronemi@gmail.com>) id 1fiQUs-0008Kw-VM
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 16:35:02 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fiS8b-0007lK-Lb
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 18:20:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <silveronemi@gmail.com>) id 1fiQUp-0008Cg-Uq
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 16:34:58 -0400
-Received: from mail-ua0-x231.google.com ([2607:f8b0:400c:c08::231]:32888)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <silveronemi@gmail.com>)
-	id 1fiQUp-00086a-Oj
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 16:34:55 -0400
-Received: by mail-ua0-x231.google.com with SMTP id i4-v6so5950132uak.0
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 13:34:55 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1fiS8Y-0004na-LS
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 18:20:05 -0400
+References: <20180725142758.9980-1-lbloch@janustech.com>
+	<20180725142758.9980-2-lbloch@janustech.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8dde2638-0e6e-107c-146a-6186c198ede3@redhat.com>
+Date: Wed, 25 Jul 2018 18:19:54 -0400
 MIME-Version: 1.0
-References: <CANrBoSjsOypfar4RpPKZx+OW2LMBeoV88BJ88wAnBQPvvZX_wA@mail.gmail.com>
-In-Reply-To: <CANrBoSjsOypfar4RpPKZx+OW2LMBeoV88BJ88wAnBQPvvZX_wA@mail.gmail.com>
-From: "Humberto \"SilverOne\" Carvalho" <silveronemi@gmail.com>
-Date: Wed, 25 Jul 2018 21:34:43 +0100
-Message-ID: <CANrBoSi8M5K=DJeHB4MwnaMacqg+d7FgXO-V+TaRgGkiOeKiFw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] qemu_clock_get_ns does not take into account
- icount_time_shift
+In-Reply-To: <20180725142758.9980-2-lbloch@janustech.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 1/4 for-3.0] qcow2: A
+ grammar fix in conflicting cache sizing error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Hello,
 
-Actually this is incorrect because cpu_get_icount() invokes
-cpu_icount_to_ns later on. i apologize for the spam.
 
-Best Regards,
-Humberto "SilverOne" Carvalho
+On 07/25/2018 10:27 AM, Leonid Bloch wrote:
+> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+> ---
+>  block/qcow2.c              | 2 +-
+>  tests/qemu-iotests/103.out | 4 ++--
+>  tests/qemu-iotests/137.out | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 6162ed8be2..ec9e6238a0 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -797,7 +797,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+>          if (l2_cache_size_set && refcount_cache_size_set) {
+>              error_setg(errp, QCOW2_OPT_CACHE_SIZE ", " QCOW2_OPT_L2_CACHE_SIZE
+>                         " and " QCOW2_OPT_REFCOUNT_CACHE_SIZE " may not be set "
+> -                       "the same time");
+> +                       "at the same time");
+>              return;
+>          } else if (*l2_cache_size > combined_cache_size) {
+>              error_setg(errp, QCOW2_OPT_L2_CACHE_SIZE " may not exceed "
+> diff --git a/tests/qemu-iotests/103.out b/tests/qemu-iotests/103.out
+> index bd45d3875a..bd9eec3250 100644
+> --- a/tests/qemu-iotests/103.out
+> +++ b/tests/qemu-iotests/103.out
+> @@ -5,10 +5,10 @@ wrote 65536/65536 bytes at offset 0
+>  
+>  === Testing invalid option combinations ===
+>  
+> -can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set the same time
+> +can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
+>  can't open device TEST_DIR/t.IMGFMT: l2-cache-size may not exceed cache-size
+>  can't open device TEST_DIR/t.IMGFMT: refcount-cache-size may not exceed cache-size
+> -can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set the same time
+> +can't open device TEST_DIR/t.IMGFMT: cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
+>  can't open device TEST_DIR/t.IMGFMT: L2 cache entry size must be a power of two between 512 and the cluster size (65536)
+>  can't open device TEST_DIR/t.IMGFMT: L2 cache entry size must be a power of two between 512 and the cluster size (65536)
+>  can't open device TEST_DIR/t.IMGFMT: L2 cache entry size must be a power of two between 512 and the cluster size (65536)
+> diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
+> index 96724a6c33..6a2ffc71fd 100644
+> --- a/tests/qemu-iotests/137.out
+> +++ b/tests/qemu-iotests/137.out
+> @@ -16,7 +16,7 @@ read 33554432/33554432 bytes at offset 0
+>  === Try setting some invalid values ===
+>  
+>  Parameter 'lazy-refcounts' expects 'on' or 'off'
+> -cache-size, l2-cache-size and refcount-cache-size may not be set the same time
+> +cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
+>  l2-cache-size may not exceed cache-size
+>  refcount-cache-size may not exceed cache-size
+>  L2 cache size too big
+> 
 
-On Wed, Jul 25, 2018 at 8:25 PM Humberto "SilverOne" Carvalho <
-silveronemi@gmail.com> wrote:
-
-> Hello,
->
-> When using icount with shift, virtual time is defined as icount << N.
-> However, qemu_clock_get_ns simply returns cpu_get_icount, thereby returning
-> icount instead of icount << N.
->
-> If you check the qemu/util/qemu-timer.c file you will find the following
-> function:
->
-> 597: int64_t qemu_clock_get_ns(QEMUClockType type)
-> 598: {
-> ....
-> 602: switch (type) {
-> ....
-> 606: case QEMU_CLOCK_VIRTUAL:
-> 607: if (use_icount) {
-> 608: return cpu_get_icount();
->
-> Now on line 606, in case we requested QEMU_CLOCK_VIRTUAL, and we are using
-> icount, the value of cpu_get_icount(); will be returned.
->
-> However if I understand correctly, in order to convert icount to ns, you
-> must take into account the icount shift -- as defined in the documentation:
-> "The virtual cpu will execute one instruction every 2^N ns of virtual
-> time.".
->
-> Therefor, the correct value to return would be
-> cpu_icount_to_ns(cpu_get_icount()), where cpu_icount_to_ns is defined in
-> cpus.c:
->
-> 296: int64_t cpu_icount_to_ns(int64_t icount)
-> 297: {
-> 298: return icount << icount_time_shift;
-> 299: }
->
-> Best Regards,
-> Humberto "SilverOne" Carvalho
->
+Reviewed-by: John Snow <jsnow@redhat.com>
