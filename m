@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fiL8u-0005nn-PZ
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:51:59 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fiL9w-0006Y4-Gv
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:53:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fiL8r-0001MU-S2
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:51:56 -0400
-Received: from 5.mo6.mail-out.ovh.net ([46.105.54.31]:35023)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fiL8r-0001Fa-JC
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:51:53 -0400
-Received: from player797.ha.ovh.net (unknown [10.109.160.230])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 6E454170EE5
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 16:51:44 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 25 Jul 2018 16:45:26 +0200
-Message-ID: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
+	(envelope-from <amarkovic@wavecomp.com>) id 1fiL9t-00026b-J4
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:53:00 -0400
+Received: from mail-sn1nam01on0098.outbound.protection.outlook.com
+	([104.47.32.98]:63136
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fiL9t-00026N-1R
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:52:57 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Wed, 25 Jul 2018 14:52:53 +0000
+Message-ID: <BN7PR08MB486877C9F3E7FAEA8D28EA4DC6540@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1532453527-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1532453527-22911-53-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1532453527-22911-53-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH for-3.1] tests/cpu-plug-test: check CPU hotplug
- on ppc64 with KVM
+Subject: Re: [Qemu-devel] [PATCH v4 52/55] linux-user: Add signal.c for
+ nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-Commit b585395b655 fixed a regression introduced by some recent changes
-in the XICS code, that was causing QEMU to crash instantly during CPU
-hotplug with KVM. This is typically the kind of bug we'd like our
-test suite to detect before it gets merged. Unfortunately, the current
-tests run with '-machine accel=qtest' and don't exercise KVM specific
-paths in QEMU.
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Tuesday, July 24, 2018 7:32 PM
+> From: Dimitrije Nikolic <dnikolic@wavecomp.com>
+>
+> Add signal.c as a dredirection of regular mips' signal.c, but also
+> amend regular mips' signal.c. this is done to avoid the duplication
+> of large pieces of code.
 
-This patch hence changes add_pseries_test_case() to launch QEMU with
-'-machine accel=kvm' if KVM is available.
+dredirection of -> redirection to
+mips' -> MIPS'
+this -> This
 
-A notable consequence is that the guest will execute SLOF, but for some
-reasons SLOF sometimes hits a program exception. This causes the guest
-to loop forever and the test to be stuck.  Since we don't need the guest
-to be truely running, let's pass -S to QEMU to avoid that.
+diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
+index 6aa303e..3d7bcbc 100644
+--- a/linux-user/mips/signal.c
++++ b/linux-user/mips/signal.c
+@@ -21,7 +21,15 @@
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
 
-Also disable machine capabilities that could be unavailable in KVM, eg,
-when using PR KVM.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- tests/cpu-plug-test.c |   20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
-
-diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-index 5f39ba0df394..2107557809b7 100644
---- a/tests/cpu-plug-test.c
-+++ b/tests/cpu-plug-test.c
-@@ -21,6 +21,7 @@ struct PlugTestData {
-     unsigned cores;
-     unsigned threads;
-     unsigned maxcpus;
-+    const char *extra_args;
+-# if defined(TARGET_ABI_MIPSO32)
++#if defined(TARGET_ABI_MIPSP32)
++struct target_sigcontext {
++    uint64_t sc_regs[32];
++    uint64_t sc_pc;
++    uint32_t sc_used_math;
++    uint32_t sc_reserved;
++};
++#define TARGET_ALMASK  (~15)
++#elif defined(TARGET_ABI_MIPSO32)
+ struct target_sigcontext {
+     uint32_t   sc_regmask;     /* Unused */
+     uint32_t   sc_status;
+@@ -43,6 +51,7 @@ struct target_sigcontext {
+     target_ulong   sc_hi3;
+     target_ulong   sc_lo3;
  };
- typedef struct PlugTestData PlugTestData;
- 
-@@ -106,9 +107,10 @@ static void test_plug_with_device_add_coreid(gconstpointer data)
-     char *args;
-     unsigned int c;
- 
--    args = g_strdup_printf("-machine %s -cpu %s "
-+    args = g_strdup_printf("-machine %s -cpu %s %s "
-                            "-smp 1,sockets=%u,cores=%u,threads=%u,maxcpus=%u",
-                            td->machine, td->cpu_model,
-+                           td->extra_args ? td->extra_args : "",
-                            td->sockets, td->cores, td->threads, td->maxcpus);
-     qtest_start(args);
- 
-@@ -195,10 +197,20 @@ static void add_pseries_test_case(const char *mname)
-         (g_str_has_prefix(mname, "pseries-2.") && atoi(&mname[10]) < 7)) {
-         return;
-     }
--    data = g_new(PlugTestData, 1);
-+    data = g_new0(PlugTestData, 1);
-     data->machine = g_strdup(mname);
-     data->cpu_model = "power8_v2.0";
--    data->device_model = g_strdup("power8_v2.0-spapr-cpu-core");
-+    if (!access("/sys/module/kvm_hv", F_OK) ||
-+        !access("/sys/module/kvm_pr", F_OK)) {
-+        data->cpu_model = "host";
-+        data->extra_args =
-+            "-machine accel=kvm "
-+            "-machine cap-cfpc=broken,cap-sbbc=broken,cap-ibs=broken "
-+            "-machine cap-htm=off "
-+            "-machine cap-hpt-max-page-size=64k "
-+            "-S";
-+    }
-+    data->device_model = g_strdup_printf("%s-spapr-cpu-core", data->cpu_model);
-     data->sockets = 2;
-     data->cores = 3;
-     data->threads = 1;
-@@ -221,7 +233,7 @@ static void add_s390x_test_case(const char *mname)
-         return;
-     }
- 
--    data = g_new(PlugTestData, 1);
-+    data = g_new0(PlugTestData, 1);
-     data->machine = g_strdup(mname);
-     data->cpu_model = "qemu";
-     data->device_model = g_strdup("qemu-s390x-cpu");
++#define TARGET_ALMASK  (~7)
+ # else /* N32 || N64 */
+ struct target_sigcontext {
+     uint64_t sc_regs[32];
+@@ -61,6 +70,7 @@ struct target_sigcontext {
+     uint32_t sc_dsp;
+     uint32_t sc_reserved;
+ };
++#define TARGET_ALMASK  (~15)
+ # endif /* O32 */
+
+> struct sigframe {
+> @@ -91,6 +101,17 @@ static inline int install_sigtramp(unsigned int *tram=
+p,   unsigned int syscall)
+> {
+>     int err =3D 0;
+>=20
+> +#if defined(TARGET_ABI_MIPSP32)
+> +    uint16_t *tramp16 =3D (uint16_t *)tramp;
+> +    /*
+> +     *         li $2, __NR__foo_sigreturn
+> +     *         syscall 0
+> +     */
+> +     __put_user(0x6040 , tramp16 + 0);
+> +     __put_user(syscall, tramp16 + 1);
+> +     __put_user(0      , tramp16 + 2);
+> +     __put_user(0x1008 , tramp16 + 3);
+> +#else
+>     /*
+>      * Set up the return code ...
+>      *
+
+This code segment should be in a separate patch, called, let's say, "target=
+/mips: Set up signal trampoline for nanoMIPS". Perhaps there should be one =
+more patch "target/mips: Handle signal context for nanoMIPS", obtained in a=
+ similar fashion.
+
+Aleksandar M.=
