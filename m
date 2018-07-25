@@ -1,40 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fiKDS-0003Ac-PX
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:52:37 -0400
+	(envelope-from <drjones@redhat.com>) id 1fiKT0-0006Db-Mo
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:08:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fiKDN-0006Fv-EU
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:52:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49568
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fiKDN-0006Fi-8D
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:52:29 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w6PDmZqx131108
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 09:52:26 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2keswy9n25-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 09:52:26 -0400
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 25 Jul 2018 14:52:24 +0100
-References: <1532521224-27235-1-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 25 Jul 2018 15:52:19 +0200
+	(envelope-from <drjones@redhat.com>) id 1fiKSx-00009B-LK
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:08:38 -0400
+Date: Wed, 25 Jul 2018 16:08:24 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180725140824.vnkejw5emkxwktaz@kamzik.brq.redhat.com>
+References: <1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
+	<CAHmQWvDu+P26Y5CJfcQ=1_9C=hej_B8w7dLMbmuOmCV-+pYOJQ@mail.gmail.com>
+	<20180725114404.6g335n3rfjt23hjc@kamzik.brq.redhat.com>
+	<CAFEAcA8wi2QV9cVg_Hp=8MYw_zfxvVciR2CbRZiGJNiQNPdHqg@mail.gmail.com>
+	<20180725124700.GF12855@redhat.com>
+	<20180725125944.5nd5ydm4x4e3vvjw@kamzik.brq.redhat.com>
+	<CAKv+Gu-pbJj59wH7wgZ6Uq+Uko9wYEBqSF=WaC3LL68CFkbxEw@mail.gmail.com>
+	<20180725133810.gsgfu4x6emygu5o5@kamzik.brq.redhat.com>
+	<CAKv+Gu_91nXP4TSvrLf0e8kfX5X3ZNPcmx5UzT1jf5A_rVj8pQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1532521224-27235-1-git-send-email-thuth@redhat.com>
-Content-Language: en-US
-Message-Id: <c2f864e7-4009-e86d-ebd4-6ddea71df5e0@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1 00/10] Move virtio-ccw devices to
- separate files
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu_91nXP4TSvrLf0e8kfX5X3ZNPcmx5UzT1jf5A_rVj8pQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,56 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Hongbo Zhang <hongbo.zhang@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Are you planning to do a similar thing for virtio-pci? I think it would be good
-to keep virtio-ccw similar to virtio-pci when it makes sense.
+On Wed, Jul 25, 2018 at 03:46:01PM +0200, Ard Biesheuvel wrote:
+> On 25 July 2018 at 15:38, Andrew Jones <drjones@redhat.com> wrote:
+> > On Wed, Jul 25, 2018 at 03:03:40PM +0200, Ard Biesheuvel wrote:
+> >> On 25 July 2018 at 14:59, Andrew Jones <drjones@redhat.com> wrote:
+> >> > On Wed, Jul 25, 2018 at 01:47:00PM +0100, Daniel P. Berrang=E9 wro=
+te:
+> >> >> Would iut make any sense to call the machine  "refplatform"  or "=
+refboard"
+> >> >> to indicate it is a generic reference platform, not specifically =
+following
+> >> >> any particular real impl, albeit influence by the sbsa spec.
+> >> >>
+> >> >
+> >> > That would indeed stop me from whining about a machine model with =
+an
+> >> > 'sbsa' name not strictly implementing a minimal SBSA machine :-)
+> >> >
+> >>
+> >> I still don't get why only a minimal machine is worth considering,
+> >> given that a real-world minimal SBSA machine is not capable of doing
+> >> anything useful.
+> >
+> > One definition of an SBSA machine can be quite different than another=
+.
+> > If we only hard code the required [useless] base, but also provide a
+> > readconfig for the rest, then we get a useful machine without loss of
+> > flexibility.
+> >
+> > That flexibility comes at the cost of platform-bus code (since we nee=
+d
+> > to add devices to the system bus) and a less concise command line. Th=
+e
+> > platform-bus code may indeed be too expensive for this purpose, but
+> > we may need to see patches to be sure. I understand the desire to hav=
+e
+> > a shorter command line, but this is QEMU :)
+> >
+>=20
+> My concern is not the QEMU side. It is the code that we will need to
+> add to UEFI and ARM-TF to deal with the dynamic nature of the
+> underlying platform. That code has no counterpart in real world
+> hardware, but will surely turn up in production firmware nonetheless
+> if we end up having to add that to our SBSA reference codebase.
 
-On 07/25/2018 02:20 PM, Thomas Huth wrote:
-> For more fine-grained control over the build process, it would be good
-> to have the possibility to disable single virtio devices, too. We already
-> have CONFIG_VIRTIO_* switches in the Makefiles, but currently all
-> virtio-ccw devices are compiled in anyway. Move them to separate files
-> so we can disable them in the Makefile more easily.
-> 
-> NB: I did not move virtio-blk-ccw and virtio-net-ccw to a separate file
-> yet since they are essential for the s390x-virtio machine and thus it
-> does IMHO not make much sense to disable net and blk. But if somebody
-> needs that possibility, too, I can add two more patches on top...
-> 
-> Thomas Huth (10):
->   hw/s390x/virtio-ccw: Consolidate calls to virtio_ccw_unrealize()
->   hw/s390x: Move virtio-ccw-serial code to a separate file
->   hw/s390x: Move virtio-ccw-balloon code to a separate file
->   hw/s390x: Move virtio-ccw-scsi code to a separate file
->   hw/s390x: Move virtio-ccw-rng code to a separate file
->   hw/s390x: Move virtio-ccw-9p code to a separate file
->   hw/s390x: Move virtio-ccw-crypto code to a separate file
->   hw/s390x: Move vhost-vsock-ccw code to a separate file
->   hw/s390x: Move virtio-ccw-gpu code to a separate file
->   hw/s390x: Move virtio-ccw-input code to a separate file
-> 
->  MAINTAINERS                   |   2 +-
->  hw/s390x/Makefile.objs        |   9 +
->  hw/s390x/vhost-vsock-ccw.c    |  60 +++++
->  hw/s390x/virtio-ccw-9p.c      |  65 +++++
->  hw/s390x/virtio-ccw-balloon.c |  70 +++++
->  hw/s390x/virtio-ccw-crypto.c  |  75 ++++++
->  hw/s390x/virtio-ccw-gpu.c     |  67 +++++
->  hw/s390x/virtio-ccw-input.c   | 118 +++++++++
->  hw/s390x/virtio-ccw-rng.c     |  74 ++++++
->  hw/s390x/virtio-ccw-scsi.c    | 125 +++++++++
->  hw/s390x/virtio-ccw-serial.c  |  78 ++++++
->  hw/s390x/virtio-ccw.c         | 581 +-----------------------------------------
->  12 files changed, 749 insertions(+), 575 deletions(-)
->  create mode 100644 hw/s390x/vhost-vsock-ccw.c
->  create mode 100644 hw/s390x/virtio-ccw-9p.c
->  create mode 100644 hw/s390x/virtio-ccw-balloon.c
->  create mode 100644 hw/s390x/virtio-ccw-crypto.c
->  create mode 100644 hw/s390x/virtio-ccw-gpu.c
->  create mode 100644 hw/s390x/virtio-ccw-input.c
->  create mode 100644 hw/s390x/virtio-ccw-rng.c
->  create mode 100644 hw/s390x/virtio-ccw-scsi.c
->  create mode 100644 hw/s390x/virtio-ccw-serial.c
-> 
+It sounds like there's already some sort of informal SBSA reference
+instance specification that UEFI and ARM-TF intend to support. If
+that instance specification were slightly more formal, i.e. documented
+somewhere and given a more descriptive name (not just 'sbsa'), then
+I think it would be a lot more palatable to hard code those specification=
+s
+directly into a QEMU machine model of the same name.
+
+Thanks,
+drew
