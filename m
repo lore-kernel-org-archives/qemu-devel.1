@@ -1,34 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fiLkj-0004Ec-Fd
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:31:06 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fiLmN-0004u9-2f
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fiLkg-0006Sc-H5
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:31:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fiLkg-0006Pd-8c
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:30:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fiLke-0003zg-Dm
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 15:30:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 60DD32E8042
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 15:30:56 +0000 (UTC)
+	(envelope-from <borntraeger@de.ibm.com>) id 1fiLmK-0008If-3F
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:32:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36246
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fiLmJ-0008IO-SC
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:32:40 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6PFT366142736
+	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 11:32:39 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2keswyeuk9-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 11:32:38 -0400
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 25 Jul 2018 16:32:35 +0100
+References: <20180725143617.8731-1-mimu@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 25 Jul 2018 17:32:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Jul 2018 15:23:50 -0000
-From: umarcor <1783362@bugs.launchpad.net>
-Reply-To: Bug 1783362 <1783362@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153244909751.11925.3364609945591086988.malonedeb@gac.canonical.com>
-Message-Id: <153253223022.11887.13961118657944886001.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1783362] Re: qemu-user-aarch64: mmap returns
- success (NULL, 0) instead of failure (MAP_FAILED, -1) with len==0
+In-Reply-To: <20180725143617.8731-1-mimu@linux.ibm.com>
+Content-Language: en-US
+Message-Id: <b7a4556c-513e-a1d5-8cb7-0ca53378c0af@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390x/cpumodel: enum type
+ S390FeatGroup now gets generated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,111 +43,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Michael Mueller <mimu@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc: david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, agraf@suse.de
 
-I did some research and found that this bug is present since 2003:
+Acked-by Christian Borntraeger <borntraeger@de.ibm.com>
 
-- 2003/05/13: https://github.com/qemu/qemu/commit/54936004fddc52c321cb3f9a9=
-a51140e782bed5d#diff-2bf4728e0473404c39c97190bd02b2f8
-  - https://github.com/qemu/qemu/blob/54936004fddc52c321cb3f9a9a51140e782be=
-d5d/linux-user/mmap.c#L182-L183
-- 2008/06/02: https://github.com/qemu/qemu/commit/c8a706fe6242a553960ccc307=
-1a4e75ceba6f3d2#diff-2bf4728e0473404c39c97190bd02b2f8
-  - https://github.com/qemu/qemu/blob/c8a706fe6242a553960ccc3071a4e75ceba6f=
-3d2/linux-user/mmap.c#L284-L285
-  - https://github.com/qemu/qemu/blob/c8a706fe6242a553960ccc3071a4e75ceba6f=
-3d2/linux-user/mmap.c#L400-L410
+A quick test seems to indicate that everything is good.
 
-It is present in versions 2.11.2, 2.12.0 and master:
 
-- https://github.com/qemu/qemu/blob/v2.11.2/linux-user/mmap.c#L401-L402
-- https://github.com/qemu/qemu/blob/v2.12.0/linux-user/mmap.c#L401-L402
-- https://github.com/qemu/qemu/blob/master/linux-user/mmap.c#L400-L401
-
-I think that a possible fix is:
-
-@@ -397,8 +397,10 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, i=
-nt prot,
-     }
- =
-
-     len =3D TARGET_PAGE_ALIGN(len);
--    if (len =3D=3D 0)
--        goto the_end;
-+    if (len =3D=3D 0) {
-+        errno =3D EINVAL;
-+        goto fail;
-+    }
-     real_start =3D start & qemu_host_page_mask;
-     host_offset =3D offset & qemu_host_page_mask;
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1783362
-
-Title:
-  qemu-user-aarch64: mmap returns success (NULL, 0) instead of failure
-  (MAP_FAILED, -1) with len=3D=3D0
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  New
-
-Bug description:
-  As shown in https://github.com/beehive-
-  lab/mambo/issues/19#issuecomment-407420602, with len=3D=3D0 mmap returns
-  success (NULL, 0) instead of failure (MAP_FAILED, -1) in a x86_64 host
-  executing a ELF 64-bit LSB executable, ARM aarch64 binary.
-
-  Steps to reproduce the bug:
-
-  - (cross-)compile the attached source file:
-
-  $ aarch64-linux-gnu-gcc -static -std=3Dgnu99 -lpthread test/mmap_qemu.c
-  -o mmap_qemu
-
-  - Execute in a x86_64 host with qemu-user and qemu-user-binfmt:
-
-  $ ./mmap_qemu
-  alloc: 0
-  MAP_FAILED: -1
-  errno: 0
-  mmap_qemu: test/mmap_qemu.c:15: main: Assertion `alloc =3D=3D MAP_FAILED'=
- failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  Aborted (core dumped)
-
-  - Execute in a ARM host without any additional dependecy:
-
-  $ ./mmap_qemu
-  alloc: -1
-  MAP_FAILED: -1
-  errno: 22
-
-  The bug is present in Fedora:
-
-  $ qemu-aarch64 --version
-  qemu-aarch64 version 2.11.2(qemu-2.11.2-1.fc28)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  $ uname -r
-  4.17.7-200.fc28.x86_64
-
-  And also in Ubuntu:
-
-  $ qemu-aarch64 --version
-  qemu-aarch64 version 2.12.0 (Debian 1:2.12+dfsg-3ubuntu3)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  $ uname -r
-  4.15.0-23-generic
-
-  Possibly related to:
-
-  - https://lists.freebsd.org/pipermail/freebsd-hackers/2009-July/029109.ht=
-ml
-  - https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=3D203852
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1783362/+subscriptions
+On 07/25/2018 04:36 PM, Michael Mueller wrote:
+> The enumeration type S390FeatGroup is now generated as well.
+> This shall simplify the definition of new feature groups
+> without the requirement to modify existing code.
+> 
+> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+> ---
+>  target/s390x/cpu_features.c |  1 -
+>  target/s390x/cpu_features.h | 19 +------------------
+>  target/s390x/gen-features.c | 18 +++++++++++++++++-
+>  3 files changed, 18 insertions(+), 20 deletions(-)
+> 
+> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+> index 3b9e2745e9..d623db34a6 100644
+> --- a/target/s390x/cpu_features.c
+> +++ b/target/s390x/cpu_features.c
+> @@ -13,7 +13,6 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/module.h"
+>  #include "cpu_features.h"
+> -#include "gen-features.h"
+>  
+>  #define FEAT_INIT(_name, _type, _bit, _desc) \
+>      {                                                \
+> diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
+> index 968b12fdfe..effe790271 100644
+> --- a/target/s390x/cpu_features.h
+> +++ b/target/s390x/cpu_features.h
+> @@ -16,6 +16,7 @@
+>  
+>  #include "qemu/bitmap.h"
+>  #include "cpu_features_def.h"
+> +#include "gen-features.h"
+>  
+>  /* CPU features are announced via different ways */
+>  typedef enum {
+> @@ -64,24 +65,6 @@ void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
+>  void s390_feat_bitmap_to_ascii(const S390FeatBitmap features, void *opaque,
+>                                 void (*fn)(const char *name, void *opaque));
+>  
+> -/* static groups that will never change */
+> -typedef enum {
+> -    S390_FEAT_GROUP_PLO,
+> -    S390_FEAT_GROUP_TOD_CLOCK_STEERING,
+> -    S390_FEAT_GROUP_GEN13_PTFF_ENH,
+> -    S390_FEAT_GROUP_MSA,
+> -    S390_FEAT_GROUP_MSA_EXT_1,
+> -    S390_FEAT_GROUP_MSA_EXT_2,
+> -    S390_FEAT_GROUP_MSA_EXT_3,
+> -    S390_FEAT_GROUP_MSA_EXT_4,
+> -    S390_FEAT_GROUP_MSA_EXT_5,
+> -    S390_FEAT_GROUP_MSA_EXT_6,
+> -    S390_FEAT_GROUP_MSA_EXT_7,
+> -    S390_FEAT_GROUP_MSA_EXT_8,
+> -    S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
+> -    S390_FEAT_GROUP_MAX,
+> -} S390FeatGroup;
+> -
+>  /* Definition of a CPU feature group */
+>  typedef struct {
+>      const char *name;       /* name exposed to the user */
+> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> index 6626b6f565..2ca5ededb3 100644
+> --- a/target/s390x/gen-features.c
+> +++ b/target/s390x/gen-features.c
+> @@ -661,6 +661,7 @@ static CpuFeatDefSpec CpuFeatDef[] = {
+>  #define FEAT_GROUP_INITIALIZER(_name)                  \
+>      {                                                  \
+>          .name = "S390_FEAT_GROUP_LIST_" #_name,        \
+> +        .enum_name = "S390_FEAT_GROUP_" #_name,        \
+>          .bits =                                        \
+>              { .data = group_##_name,                   \
+>                .len = ARRAY_SIZE(group_##_name) },      \
+> @@ -668,6 +669,7 @@ static CpuFeatDefSpec CpuFeatDef[] = {
+>  
+>  typedef struct {
+>      const char *name;
+> +    const char *enum_name;
+>      BitSpec bits;
+>  } FeatGroupDefSpec;
+>  
+> @@ -678,7 +680,6 @@ static FeatGroupDefSpec FeatGroupDef[] = {
+>      FEAT_GROUP_INITIALIZER(PLO),
+>      FEAT_GROUP_INITIALIZER(TOD_CLOCK_STEERING),
+>      FEAT_GROUP_INITIALIZER(GEN13_PTFF),
+> -    FEAT_GROUP_INITIALIZER(MULTIPLE_EPOCH_PTFF),
+>      FEAT_GROUP_INITIALIZER(MSA),
+>      FEAT_GROUP_INITIALIZER(MSA_EXT_1),
+>      FEAT_GROUP_INITIALIZER(MSA_EXT_2),
+> @@ -688,6 +689,7 @@ static FeatGroupDefSpec FeatGroupDef[] = {
+>      FEAT_GROUP_INITIALIZER(MSA_EXT_6),
+>      FEAT_GROUP_INITIALIZER(MSA_EXT_7),
+>      FEAT_GROUP_INITIALIZER(MSA_EXT_8),
+> +    FEAT_GROUP_INITIALIZER(MULTIPLE_EPOCH_PTFF),
+>  };
+>  
+>  #define QEMU_FEAT_INITIALIZER(_name)                   \
+> @@ -810,6 +812,19 @@ static void print_feature_group_defs(void)
+>      }
+>  }
+>  
+> +static void print_feature_group_enum_type(void)
+> +{
+> +    int i;
+> +
+> +    printf("\n/* CPU feature group enum type */\n"
+> +           "typedef enum {\n");
+> +    for (i = 0; i < ARRAY_SIZE(FeatGroupDef); i++) {
+> +        printf("\t%s,\n", FeatGroupDef[i].enum_name);
+> +    }
+> +    printf("\tS390_FEAT_GROUP_MAX,\n"
+> +           "} S390FeatGroup;\n");
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>      printf("/*\n"
+> @@ -826,6 +841,7 @@ int main(int argc, char *argv[])
+>      print_feature_defs();
+>      print_feature_group_defs();
+>      print_qemu_feature_defs();
+> +    print_feature_group_enum_type();
+>      printf("\n#endif\n");
+>      return 0;
+>  }
+> 
