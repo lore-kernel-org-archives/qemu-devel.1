@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1fiFxo-0006oh-6C
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:20:11 -0400
+	(envelope-from <armbru@redhat.com>) id 1fiFyn-0007vS-RV
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:21:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1fiFxl-0000mu-4y
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:20:08 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:46157)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1fiFxk-0000kq-VM
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:20:05 -0400
-Received: by mail-io0-x244.google.com with SMTP id i18-v6so5737274ioj.13
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 02:20:04 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fiFyk-0003Pc-QS
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:21:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34364 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fiFyk-0003Mi-MQ
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:21:06 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180724134339.17832-1-liujunjie23@huawei.com>
+Date: Wed, 25 Jul 2018 11:21:03 +0200
+In-Reply-To: <20180724134339.17832-1-liujunjie23@huawei.com> (liujunjie's
+	message of "Tue, 24 Jul 2018 21:43:39 +0800")
+Message-ID: <87r2jry8lc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHmQWvC8_J4i32UZzdHqJ4w3EdEAHmWGdgqrvGwEA7uo0kvk9A@mail.gmail.com>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
-	<20180725084824.GA12855@redhat.com>
-	<CAKv+Gu_RHsed0KAH8njKB8UPvbUDeoTZ5sP76f_br6azisZzSQ@mail.gmail.com>
-	<CAHmQWvCqKqQXnXxOUgi=kLTyE5BhV2NxqaKzvPp63HX02V=X2g@mail.gmail.com>
-	<CAKv+Gu_eFjS_UvOuEKhbsWr34o3Jqd4h2duJ-gG1ofsFbwkGbQ@mail.gmail.com>
-	<CAHmQWvC8_J4i32UZzdHqJ4w3EdEAHmWGdgqrvGwEA7uo0kvk9A@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Wed, 25 Jul 2018 11:20:03 +0200
-Message-ID: <CAKv+Gu-B4o7dwZPOix2MkECJia6M6Q+zBMw8XVdw49kFYW6J+w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qstring: Fix qstring_from_substr() not to
+ provoke int overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,58 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hongbo Zhang <hongbo.zhang@linaro.org>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>
+To: liujunjie <liujunjie23@huawei.com>
+Cc: wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, weidong.huang@huawei.com, qemu-devel@nongnu.org
 
-On 25 July 2018 at 11:17, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
-> On 25 July 2018 at 17:13, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrot=
-e:
->> On 25 July 2018 at 11:09, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
->>> On 25 July 2018 at 17:01, Ard Biesheuvel <ard.biesheuvel@linaro.org> wr=
-ote:
->>>> On 25 July 2018 at 10:48, Daniel P. Berrang=C3=A9 <berrange@redhat.com=
-> wrote:
->>>>> On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
->>>>>> For the Aarch64, there is one machine 'virt', it is primarily meant =
-to
->>>>>> run on KVM and execute virtualization workloads, but we need an
->>>>>> environment as faithful as possible to physical hardware, for suppor=
-ting
->>>>>> firmware and OS development for pysical Aarch64 machines.
->>>>>>
->>>>>> This patch introduces new machine type 'Enterprise' with main featur=
-es:
->>>>>
->>>>> The 'enterprise' name is really awful - this is essentially a marketi=
-ng
->>>>> term completely devoid of any useful meaning.
->>>>>
->>>>> You had previously called this "sbsa" which IIUC was related to a rea=
-l
->>>>> world hardware specification that it was based on. IOW, I think this =
-old
->>>>> name was preferrable to calling it "enterprise".
->>>>>
->>>>
->>>> I couldn't agree more. However, IIUC this change was made at the
->>>> request of one of the reviewers, although I wasn't part of the
->>>> discussion at that point, so I'm not sure who it was.
->>>>
->>>> Hongbo, could you please share a link to that discussion?
->>>>
->>>> Thanks,
->>>> Ard.
->>>>
->>>
->>> V1 discussion here:
->>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg545775.html
->>>
->>
->> So who asked for the sbsa -> enterprise change?
+liujunjie <liujunjie23@huawei.com> writes:
+
+> qstring_from_substr() parameters @start and @end are of type int.
+> blkdebug_parse_filename(), blkverify_parse_filename(), nbd_parse_uri(),
+> and qstring_from_str() pass @end values of type size_t or ptrdiff_t.
+> Values exceeding INT_MAX get truncated, with possibly disastrous
+> results.
 >
-> Actually nobody, but it was argued that sbsa does not require ehci and
-> ahci etc, then we should find a name fitting for this platform better.
+> Such huge substrings seem unlikely, but we found one in a core dump,
+> where "info tlb" executed via QMP's human-monitor-command apparently
+> produced 35 GiB of output.
+>
+> Fix by changing the parameters size_t.
+>
+> Signed-off-by: liujunjie <liujunjie23@huawei.com>
+> ---
+>  include/qapi/qmp/qstring.h | 2 +-
+>  qobject/qstring.c          | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
+> index b3b3d44..3e83e3a 100644
+> --- a/include/qapi/qmp/qstring.h
+> +++ b/include/qapi/qmp/qstring.h
+> @@ -24,7 +24,7 @@ struct QString {
+>  
+>  QString *qstring_new(void);
+>  QString *qstring_from_str(const char *str);
+> -QString *qstring_from_substr(const char *str, int start, int end);
+> +QString *qstring_from_substr(const char *str, size_t start, size_t end);
+>  size_t qstring_get_length(const QString *qstring);
+>  const char *qstring_get_str(const QString *qstring);
+>  const char *qstring_get_try_str(const QString *qstring);
+> diff --git a/qobject/qstring.c b/qobject/qstring.c
+> index afca54b..18b8eb8 100644
+> --- a/qobject/qstring.c
+> +++ b/qobject/qstring.c
+> @@ -37,7 +37,7 @@ size_t qstring_get_length(const QString *qstring)
+>   *
+>   * Return string reference
+>   */
+> -QString *qstring_from_substr(const char *str, int start, int end)
+> +QString *qstring_from_substr(const char *str, size_t start, size_t end)
+>  {
+>      QString *qstring;
 
-That doesn't make sense to me. The SBSA describes a minimal
-configuration, it does not limit what peripherals may be attached to
-the core system.
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
