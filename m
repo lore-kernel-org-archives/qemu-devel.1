@@ -1,36 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1fiK7C-0005T7-Lq
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:46:09 -0400
+	(envelope-from <mst@redhat.com>) id 1fiK8B-0006SR-30
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:47:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1fiK79-0007Vi-Nw
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:46:06 -0400
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:39908)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1fiK79-0007VH-H5
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:46:03 -0400
-Received: by mail-it0-x242.google.com with SMTP id g141-v6so8718787ita.4
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 06:46:03 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1fiK88-0000BX-5E
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:47:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39200 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fiK87-0000A8-Uy
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:47:04 -0400
+Date: Wed, 25 Jul 2018 16:46:58 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180725164623-mutt-send-email-mst@kernel.org>
+References: <20180723193145.24705-1-ehabkost@redhat.com>
+	<20180723193145.24705-3-ehabkost@redhat.com>
+	<20180724142949.3078da82@redhat.com>
+	<20180724123916.GC3896@localhost.localdomain>
+	<20180724172844.5bea5a07@redhat.com>
+	<20180724211144-mutt-send-email-mst@kernel.org>
+	<20180725085720.55dd0669@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180725133810.gsgfu4x6emygu5o5@kamzik.brq.redhat.com>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
-	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
-	<CAHmQWvDu+P26Y5CJfcQ=1_9C=hej_B8w7dLMbmuOmCV-+pYOJQ@mail.gmail.com>
-	<20180725114404.6g335n3rfjt23hjc@kamzik.brq.redhat.com>
-	<CAFEAcA8wi2QV9cVg_Hp=8MYw_zfxvVciR2CbRZiGJNiQNPdHqg@mail.gmail.com>
-	<20180725124700.GF12855@redhat.com>
-	<20180725125944.5nd5ydm4x4e3vvjw@kamzik.brq.redhat.com>
-	<CAKv+Gu-pbJj59wH7wgZ6Uq+Uko9wYEBqSF=WaC3LL68CFkbxEw@mail.gmail.com>
-	<20180725133810.gsgfu4x6emygu5o5@kamzik.brq.redhat.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Wed, 25 Jul 2018 15:46:01 +0200
-Message-ID: <CAKv+Gu_91nXP4TSvrLf0e8kfX5X3ZNPcmx5UzT1jf5A_rVj8pQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180725085720.55dd0669@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] acpi: Decouple ACPI hotplug
+ callbacks from HotplugHandler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,47 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Hongbo Zhang <hongbo.zhang@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Ben Warren <ben@skyportsystems.com>
 
-On 25 July 2018 at 15:38, Andrew Jones <drjones@redhat.com> wrote:
-> On Wed, Jul 25, 2018 at 03:03:40PM +0200, Ard Biesheuvel wrote:
->> On 25 July 2018 at 14:59, Andrew Jones <drjones@redhat.com> wrote:
->> > On Wed, Jul 25, 2018 at 01:47:00PM +0100, Daniel P. Berrang=C3=A9 wrot=
-e:
->> >> Would iut make any sense to call the machine  "refplatform"  or "refb=
-oard"
->> >> to indicate it is a generic reference platform, not specifically foll=
-owing
->> >> any particular real impl, albeit influence by the sbsa spec.
->> >>
->> >
->> > That would indeed stop me from whining about a machine model with an
->> > 'sbsa' name not strictly implementing a minimal SBSA machine :-)
->> >
->>
->> I still don't get why only a minimal machine is worth considering,
->> given that a real-world minimal SBSA machine is not capable of doing
->> anything useful.
->
-> One definition of an SBSA machine can be quite different than another.
-> If we only hard code the required [useless] base, but also provide a
-> readconfig for the rest, then we get a useful machine without loss of
-> flexibility.
->
-> That flexibility comes at the cost of platform-bus code (since we need
-> to add devices to the system bus) and a less concise command line. The
-> platform-bus code may indeed be too expensive for this purpose, but
-> we may need to see patches to be sure. I understand the desire to have
-> a shorter command line, but this is QEMU :)
->
+On Wed, Jul 25, 2018 at 08:57:20AM +0200, Igor Mammedov wrote:
+> On Tue, 24 Jul 2018 21:14:48 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Tue, Jul 24, 2018 at 05:28:44PM +0200, Igor Mammedov wrote:
+> > > On Tue, 24 Jul 2018 09:39:16 -0300
+> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > >   
+> > > > On Tue, Jul 24, 2018 at 02:29:49PM +0200, Igor Mammedov wrote:  
+> > > > > On Mon, 23 Jul 2018 16:31:45 -0300
+> > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > > >     
+> > > > > > The ACPI hotplug callbacks get a HotplugHandler object as
+> > > > > > argument.  This has two problems:
+> > > > > > 
+> > > > > > 1) The functions require a TYPE_ACPI_DEVICE_IF object, but the
+> > > > > >    function prototype doesn't indicate that.  It's possible to
+> > > > > >    pass an object that would make the function crash.
+> > > > > > 2) The function does not require the object to implement
+> > > > > >    TYPE_HOTPLUG_HANDLER at all, but the function prototype
+> > > > > >    imposes that for no reason.
+> > > > > > 
+> > > > > > Change the argument type to AcpiDeviceIf instead of
+> > > > > > HotplugHandler.    
+> > > > > What is the motivation for this patch,
+> > > > > do you actually get crashes?    
+> > > > 
+> > > > I didn't get crashes, but the idea for the change came when
+> > > > Michael asked me how to get the HotplugHandler object.  I was
+> > > > going to suggest current_machine (which is also a hotplug
+> > > > handler), when I noticed he actually needed an AcpiDeviceIf
+> > > > object.
+> > > > 
+> > > > The main motivation, however, is to simply make the function
+> > > > prototypes make sense.  Is there a single reason to make the ACPI
+> > > > functions get a HotplugHandler argument instead of AcpiDeviceIf?  
+> > > I'd rather to keep current *_cb() functions as is,
+> > > as we might actually need access to hotplug handler there and in
+> > > that case keeping more generic hotplug handler would be better
+> > > and it also sort of documents better what is being passed in.
+> > > 
+> > > Also we won't have to rewrite it back from AcpiDeviceIf to
+> > > HotplugHandler again if it's needed.  
+> > 
+> > Personally I think type-safety is important, changing APIs
+> > isn't such a big deal. So I'd rather take Eduardo's patch unless
+> > the patches that would need to change it back are just
+> > round the corner. what's the status there?
+> I don't have any patches for this part nor any plan to work on it.
+> Ok, let's go ahead with Eduardo's patches. We can always change it
+> back if need arises.
 
-My concern is not the QEMU side. It is the code that we will need to
-add to UEFI and ARM-TF to deal with the dynamic nature of the
-underlying platform. That code has no counterpart in real world
-hardware, but will surely turn up in production firmware nonetheless
-if we end up having to add that to our SBSA reference codebase.
+OK - it's for-3.1 anyway, Eduardo pls remember to repost after
+the release, if that's still the case I'll merge.
 
-Of course, we can keep QEMU dynamic, and hardcode the firmware bits
-against a certain instantiation of the SBSA machine. Bonus points for
-making that command line part of the firmware payload :-)
+-- 
+MST
