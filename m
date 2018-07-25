@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fiMtd-0005ic-Dq
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 12:44:20 -0400
+	(envelope-from <bounces@canonical.com>) id 1fiN0D-0008Gx-2q
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 12:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fiMta-0000GT-FD
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 12:44:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51458 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fiMta-0000GN-9Z
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 12:44:14 -0400
-Date: Wed, 25 Jul 2018 17:44:02 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180725164401.GD2365@work-vm>
-References: <20180719121520.30026-1-xiaoguangrong@tencent.com>
-	<20180719121520.30026-4-xiaoguangrong@tencent.com>
-	<20180723043634.GC2491@xz-mi>
-	<8ae4beeb-0c6d-04a1-189a-972bcf342656@gmail.com>
-	<20180723080559.GI2491@xz-mi>
+	(envelope-from <bounces@canonical.com>) id 1fiN08-0002YT-2i
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 12:51:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55956)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fiN07-0002Y0-Rf
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 12:50:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fiN04-0001w3-Gt
+	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 16:50:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 814A52E8190
+	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 16:50:54 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180723080559.GI2491@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] migration: show the statistics of
- compression
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Jul 2018 16:45:33 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1776478 <1776478@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152880770129.26761.1762643804065210181.malonedeb@gac.canonical.com>
+Message-Id: <153253713353.2571.4909342648199720691.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1776478] Re: Getting qemu: uncaught target signal
+ 6 when running lv2 plugin cross-compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,115 +37,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Xiao Guangrong <guangrong.xiao@gmail.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Mon, Jul 23, 2018 at 03:39:18PM +0800, Xiao Guangrong wrote:
-> > 
-> > 
-> > On 07/23/2018 12:36 PM, Peter Xu wrote:
-> > > On Thu, Jul 19, 2018 at 08:15:15PM +0800, guangrong.xiao@gmail.com wrote:
-> > > > @@ -1597,6 +1608,24 @@ static void migration_update_rates(RAMState *rs, int64_t end_time)
-> > > >               rs->xbzrle_cache_miss_prev) / iter_count;
-> > > >           rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
-> > > >       }
-> > > > +
-> > > > +    if (migrate_use_compression()) {
-> > > > +        uint64_t comp_pages;
-> > > > +
-> > > > +        compression_counters.busy_rate = (double)(compression_counters.busy -
-> > > > +            rs->compress_thread_busy_prev) / iter_count;
-> > > 
-> > > Here I'm not sure it's correct...
-> > > 
-> > > "iter_count" stands for ramstate.iterations.  It's increased per
-> > > ram_find_and_save_block(), so IMHO it might contain multiple guest
-> > 
-> > ram_find_and_save_block() returns if a page is successfully posted and
-> > it only posts 1 page out at one time.
-> 
-> ram_find_and_save_block() calls ram_save_host_page(), and we should be
-> sending multiple guest pages in ram_save_host_page() if the host page
-> is a huge page?
-> 
-> > 
-> > > pages.  However compression_counters.busy should be per guest page.
-> > > 
-> > 
-> > Actually, it's derived from xbzrle_counters.cache_miss_rate:
-> >         xbzrle_counters.cache_miss_rate = (double)(xbzrle_counters.cache_miss -
-> >             rs->xbzrle_cache_miss_prev) / iter_count;
-> 
-> Then this is suspecious to me too...
+It wants debug symbols for the guest binary, not for QEMU. As it
+suggests, the "file" command pointed at the guest binary ought to help.
 
-Actually; I think this isn't totally wrong;  iter_count is the *difference* in
-iterations since the last time it was updated:
+This commandline isn't right, incidentally:
+  gdb-multiarch target remote :1234
 
-   uint64_t iter_count = rs->iterations - rs->iterations_prev;
+"target remote :1234" is a command for the gdb prompt, not a set of
+command line arguments (gdb tells you it's harmlessly ignored these
+arguments).
 
-        xbzrle_counters.cache_miss_rate = (double)(xbzrle_counters.cache_miss -
-            rs->xbzrle_cache_miss_prev) / iter_count;
+-- =
 
-so this is:
-      cache-misses-since-last-update
-      ------------------------------
-        iterations since last-update
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1776478
 
-so the 'miss_rate' is ~misses / iteration.
-Although that doesn't really correspond to time.
+Title:
+  Getting qemu: uncaught target signal 6 when running  lv2 plugin cross-
+  compilation
 
-Dave
+Status in QEMU:
+  New
 
-> > 
-> > > > +        rs->compress_thread_busy_prev = compression_counters.busy;
-> > > > +
-> > > > +        comp_pages = compression_counters.pages - rs->compress_pages_prev;
-> > > > +        if (comp_pages) {
-> > > > +            compression_counters.compression_rate =
-> > > > +                (double)(compression_counters.reduced_size -
-> > > > +                rs->compress_reduced_size_prev) /
-> > > > +                (comp_pages * TARGET_PAGE_SIZE);
-> > > > +            rs->compress_pages_prev = compression_counters.pages;
-> > > > +            rs->compress_reduced_size_prev = compression_counters.reduced_size;
-> > > > +        }
-> > > > +    }
-> > > >   }
-> > > >   static void migration_bitmap_sync(RAMState *rs)
-> > > > @@ -1872,6 +1901,9 @@ static void flush_compressed_data(RAMState *rs)
-> > > >           qemu_mutex_lock(&comp_param[idx].mutex);
-> > > >           if (!comp_param[idx].quit) {
-> > > >               len = qemu_put_qemu_file(rs->f, comp_param[idx].file);
-> > > > +            /* 8 means a header with RAM_SAVE_FLAG_CONTINUE. */
-> > > > +            compression_counters.reduced_size += TARGET_PAGE_SIZE - len + 8;
-> > > 
-> > > I would agree with Dave here - why we store the "reduced size" instead
-> > > of the size of the compressed data (which I think should be len - 8)?
-> > > 
-> > 
-> > len-8 is the size of data after compressed rather than the data improved
-> > by compression that is not straightforward for the user to see how much
-> > the improvement is by applying compression.
-> > 
-> > Hmm... but it is not a big deal to me... :)
-> 
-> Yeah it might be a personal preference indeed. :)
-> 
-> It's just natural to do that this way for me since AFAIU the
-> compression ratio is defined as:
-> 
->                            compressed data size
->   compression ratio =    ------------------------
->                             original data size
-> 
-> > 
-> > > Meanwhile, would a helper be nicer? Like:
-> > 
-> > Yup, that's nicer indeed.
-> 
-> Regards,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Bug description:
+  Hey,
+  I am part of the Zynthian team and we use qemu-arm-static to cross compil=
+e lv2 audio plugins.
+
+  When running a compilation of DISTRHO-Ports we get:
+
+  lv2_ttl_generator: pthread_mutex_lock.c:81: __pthread_mutex_lock: Asserti=
+on `mutex->__data.__owner =3D=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  ./scripts/generate-ttl.sh: line 27: 16524 Aborted                 $GEN ./=
+$FILE
+  Makefile:62: recipe for target 'gen_lv2' failed
+  make[1]: *** [gen_lv2] Error 134
+  make[1]: Leaving directory '/home/pi/zynthian-sw/plugins/DISTRHO-Ports'
+  Makefile:104: recipe for target 'lv2' failed
+  make: *** [lv2] Error 2
+
+  =
+
+  lv2_ttl_generator source is here:
+  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/libs/lv2-ttl-generat=
+or
+
+  The command that is ruining is
+  lv2_ttl_generator ./TAL-Filter-2.so =
+
+
+  And ./TAL-Filter-2.so source is here:
+  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/ports/tal-filter-2/s=
+ource
+
+
+  Is there a way to debug what is going on?
+  This runs fine on a Raspberrypi which is armv7
+
+  A workaround would also help.
+
+  =
+
+  Bug in Zynthian:
+  https://github.com/zynthian/zynthian-sys/issues/59
+  Bug in DISTRHO-Ports:
+  https://github.com/DISTRHO/DISTRHO-Ports/issues/29
+
+  Using qemu-arm-static version from master from two days ago:
+  qemu-arm version 2.12.50 (v2.12.0-1182-ga7a7309ca5-dirty), commit: a7a730=
+9ca52c327c6603d60db90ae4feeae719f7
+
+  Also saw this in qemu-arm version 2.12.0 (Debian 1:2.12+dfsg-3)
+
+  Thanks,
+  Guy
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1776478/+subscriptions
