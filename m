@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geert@linux-m68k.org>) id 1fiHze-0008Ap-Qf
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:30:13 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fiI64-00029P-Nl
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:36:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geert@linux-m68k.org>) id 1fiHzb-0000TL-RA
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:30:10 -0400
-Received: from xavier.telenet-ops.be ([2a02:1800:120:4::f00:14]:58038)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <geert@linux-m68k.org>)
-	id 1fiHzb-0000Ji-L8
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:30:07 -0400
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-Date: Wed, 25 Jul 2018 13:30:00 +0200
-Message-Id: <20180725113000.11014-1-geert+renesas@glider.be>
-Subject: [Qemu-devel] [PATCH] hw/arm/sysbus-fdt: Fix assertion in
- copy_properties_from_host()
+	(envelope-from <cohuck@redhat.com>) id 1fiI61-0003FW-O5
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:36:48 -0400
+Date: Wed, 25 Jul 2018 13:36:40 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180725133640.3ea78c59.cohuck@redhat.com>
+In-Reply-To: <20180725091233.3300-1-david@redhat.com>
+References: <20180725091233.3300-1-david@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +22,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Eric Auger <eric.auger@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, "Daniel P .
+	=?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-When copy_properties_from_host() ignores the error for an optional
-property, it frees the error, but fails to reset it.
+On Wed, 25 Jul 2018 11:12:33 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Hence if two or more optional properties are missing, an assertion is
-triggered:
+> The "max" CPU model behaves like "-cpu host" when KVM is enabled, and like
+> a CPU with the maximum possible feature set when TCG is enabled.
+> 
+> While the "host" model can not be used under TCG ("kvm_required"), the
+> "max" model can and "Enables all features supported by the accelerator in
+> the current host".
+> 
+> So we can treat "host" just as a special case of "max" (like x86 does).
+> It differs to the "qemu" CPU model under TCG such that compatibility
+> handling will not be performed and that some experimental CPU features
+> not yet part of the "qemu" model might be indicated.
+> 
+> These are right now under TCG (see "qemu_MAX"):
+> - stfle53
 
-    util/error.c:57: error_setv: Assertion `*errp == NULL' failed.
+That's a z13 feature, so I think it's fine as we don't care about
+machine generations for the max mode anyway, correct?
 
-Fis this by resetting err to NULL after ignoring the error.
+> - msa5-base
 
-Fixes: 9481cf2e5f2f2bb6 ("hw/arm/sysbus-fdt: helpers for clock node generation")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- hw/arm/sysbus-fdt.c | 1 +
- 1 file changed, 1 insertion(+)
+That's just the warning, but as things are continuing to work, it's
+fine as well.
 
-diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index 0d4c75702c3ddfae..43d6a7bb48ddc351 100644
---- a/hw/arm/sysbus-fdt.c
-+++ b/hw/arm/sysbus-fdt.c
-@@ -107,6 +107,7 @@ static void copy_properties_from_host(HostProperty *props, int nb_props,
-                 /* mandatory property not found: bail out */
-                 exit(1);
-             }
-+            err = NULL;
-         }
-     }
- }
--- 
-2.17.1
+> - zpci
+
+That one theoretically has a dependency on CONFIG_PCI, but as that is
+always set, I think it's fine as well.
+
+> 
+> This will result right now in the following warning when starting QEMU TCG
+> with the "max" model:
+>     "qemu-system-s390x: warning: 'msa5-base' requires 'kimd-sha-512'."
+> 
+> The "qemu" model (used as default in QEMU under TCG) will continue to
+> work without such warnings. The "max" mdel in the current form
+
+s/mdel/model/
+
+> might be interesting for kvm-unit-tests (where we would e.g. now also
+> test "msa5-base").
+> 
+> The "max" model is neither static nor migration safe (like the "host"
+> model). It is independent of the machine but dependends on the accelerator.
+> It can be used to detect the maximum CPU model also under TCG from upper
+> layers without having to care about CPU model names for CPU model
+> expansion.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/cpu_models.c | 81 +++++++++++++++++++++++++++------------
+>  1 file changed, 56 insertions(+), 25 deletions(-)
+> 
+
+> +static void s390_max_cpu_model_initfn(Object *obj)
+> +{
+> +    const S390CPUModel *max_model;
+> +    S390CPU *cpu = S390_CPU(obj);
+> +    Error *local_err = NULL;
+> +
+> +    if (kvm_enabled() && !kvm_s390_cpu_models_supported()) {
+> +        /* "max" and "host" always work, even without CPU model support */
+> +        return;
+> +    }
+> +
+> +    max_model = get_max_cpu_model(&local_err);
+> +    if (local_err) {
+> +        g_assert(kvm_enabled());
+
+Maybe add a comment that for kvm we try the host model, and only that
+can fail (i.e., for tcg this will always work)?
+
+> +        error_report_err(local_err);
+> +        /* fallback to unsupported CPU models */
+> +        return;
+> +    }
+> +
+> +    cpu->model = g_new(S390CPUModel, 1);
+> +    /* copy the CPU model so we can modify it */
+> +    memcpy(cpu->model, max_model, sizeof(*cpu->model));
+> +}
+> +
+>  static void s390_cpu_model_finalize(Object *obj)
+>  {
+>      S390CPU *cpu = S390_CPU(obj);
+
+Looks sane to me.
