@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fiFeT-0008FY-4z
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:00:12 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fiFeV-0008Hj-UV
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:00:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fiFeQ-0002LN-83
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:00:09 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fiFeT-0002Rg-1J
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:00:12 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 25 Jul 2018 09:59:41 +0100
-Message-Id: <20180725085944.11856-5-stefanha@redhat.com>
+Date: Wed, 25 Jul 2018 09:59:42 +0100
+Message-Id: <20180725085944.11856-6-stefanha@redhat.com>
 In-Reply-To: <20180725085944.11856-1-stefanha@redhat.com>
 References: <20180725085944.11856-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/7] target/arm: add "cortex-m0" CPU model
+Subject: [Qemu-devel] [PATCH v3 5/7] loader: add rom transaction API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,44 +22,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mail@steffen-goertz.de, Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>, ilg@livius.net, qemu-arm@nongnu.org, Julia Suvorova <jusual@mail.ru>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Steffen Gortz <qemu.ml@steffen-goertz.de>, jim@groklearning.com, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Define a "cortex-m0" ARMv6-M CPU model.
+Image file loaders may add a series of roms.  If an error occurs partway
+through loading there is no easy way to drop previously added roms.
 
-Most of the register reset values set by other CPU models are not
-relevant for the cut-down ARMv6-M architecture.
+This patch adds a transaction mechanism that works like this:
+
+  rom_transaction_begin();
+  ...call rom_add_*()...
+  rom_transaction_end(ok);
+
+If ok is false then roms added in this transaction are dropped.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- target/arm/cpu.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ include/hw/loader.h | 19 +++++++++++++++++++
+ hw/core/loader.c    | 37 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 3848ef46aa..7e477c0d23 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1255,6 +1255,15 @@ static void arm11mpcore_initfn(Object *obj)
-     cpu->reset_auxcr = 1;
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index e98b84b8f9..5235f119a3 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -225,6 +225,25 @@ int rom_check_and_register_reset(void);
+ void rom_set_fw(FWCfgState *f);
+ void rom_set_order_override(int order);
+ void rom_reset_order_override(void);
++
++/**
++ * rom_transaction_begin:
++ *
++ * Call this before of a series of rom_add_*() calls.  Call
++ * rom_transaction_end() afterwards to commit or abort.  These functions are
++ * useful for undoing a series of rom_add_*() calls if image file loading fails
++ * partway through.
++ */
++void rom_transaction_begin(void);
++
++/**
++ * rom_transaction_end:
++ * @commit: true to commit added roms, false to drop added roms
++ *
++ * Call this after a series of rom_add_*() calls.  See rom_transaction_begin().
++ */
++void rom_transaction_end(bool commit);
++
+ int rom_copy(uint8_t *dest, hwaddr addr, size_t size);
+ void *rom_ptr(hwaddr addr, size_t size);
+ void hmp_info_roms(Monitor *mon, const QDict *qdict);
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index bbb6e65bb5..182abcce28 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -840,6 +840,8 @@ struct Rom {
+     char *fw_dir;
+     char *fw_file;
+ 
++    bool committed;
++
+     hwaddr addr;
+     QTAILQ_ENTRY(Rom) next;
+ };
+@@ -866,6 +868,8 @@ static void rom_insert(Rom *rom)
+         rom->as = &address_space_memory;
+     }
+ 
++    rom->committed = false;
++
+     /* List is ordered by load address in the same address space */
+     QTAILQ_FOREACH(item, &roms, next) {
+         if (rom_order_compare(rom, item)) {
+@@ -1165,6 +1169,39 @@ void rom_reset_order_override(void)
+     fw_cfg_reset_order_override(fw_cfg);
  }
  
-+static void cortex_m0_initfn(Object *obj)
++void rom_transaction_begin(void)
 +{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    set_feature(&cpu->env, ARM_FEATURE_V6);
-+    set_feature(&cpu->env, ARM_FEATURE_M);
++    Rom *rom;
 +
-+    cpu->midr = 0x410cc200;
++    /* Ignore ROMs added without the transaction API */
++    QTAILQ_FOREACH(rom, &roms, next) {
++        rom->committed = true;
++    }
 +}
 +
- static void cortex_m3_initfn(Object *obj)
++void rom_transaction_end(bool commit)
++{
++    Rom *rom;
++    Rom *tmp;
++
++    QTAILQ_FOREACH_SAFE(rom, &roms, next, tmp) {
++        if (rom->committed) {
++            continue;
++        }
++        if (commit) {
++            rom->committed = true;
++        } else {
++            QTAILQ_REMOVE(&roms, rom, next);
++            g_free(rom->data);
++            g_free(rom->path);
++            g_free(rom->name);
++            g_free(rom->fw_dir);
++            g_free(rom->fw_file);
++            g_free(rom);
++        }
++    }
++}
++
+ static Rom *find_rom(hwaddr addr, size_t size)
  {
-     ARMCPU *cpu = ARM_CPU(obj);
-@@ -1845,6 +1854,8 @@ static const ARMCPUInfo arm_cpus[] = {
-     { .name = "arm1136",     .initfn = arm1136_initfn },
-     { .name = "arm1176",     .initfn = arm1176_initfn },
-     { .name = "arm11mpcore", .initfn = arm11mpcore_initfn },
-+    { .name = "cortex-m0",   .initfn = cortex_m0_initfn,
-+                             .class_init = arm_v7m_class_init },
-     { .name = "cortex-m3",   .initfn = cortex_m3_initfn,
-                              .class_init = arm_v7m_class_init },
-     { .name = "cortex-m4",   .initfn = cortex_m4_initfn,
+     Rom *rom;
 -- 
 2.17.1
