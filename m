@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <silveronemi@gmail.com>) id 1fiPPi-0006wa-6i
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 15:25:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fiPWT-00009Y-Jw
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 15:32:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <silveronemi@gmail.com>) id 1fiPPf-0003YO-4y
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 15:25:34 -0400
-Received: from mail-ua0-x22c.google.com ([2607:f8b0:400c:c08::22c]:39089)
+	(envelope-from <peter.maydell@linaro.org>) id 1fiPWP-00043g-SJ
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 15:32:32 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:42071)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <silveronemi@gmail.com>)
-	id 1fiPPe-0003Vc-Q4
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 15:25:30 -0400
-Received: by mail-ua0-x22c.google.com with SMTP id g18-v6so5809702uam.6
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 12:25:30 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fiPWP-00041k-Cd
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 15:32:29 -0400
+Received: by mail-oi0-x244.google.com with SMTP id n84-v6so15936958oib.9
+	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 12:32:29 -0700 (PDT)
 MIME-Version: 1.0
-From: "Humberto \"SilverOne\" Carvalho" <silveronemi@gmail.com>
-Date: Wed, 25 Jul 2018 20:25:18 +0100
-Message-ID: <CANrBoSjsOypfar4RpPKZx+OW2LMBeoV88BJ88wAnBQPvvZX_wA@mail.gmail.com>
+In-Reply-To: <17945e3f-9caf-b153-4c45-56d005f27a72@linaro.org>
+References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+	<1532004912-13899-19-git-send-email-stefan.markovic@rt-rk.com>
+	<17945e3f-9caf-b153-4c45-56d005f27a72@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 25 Jul 2018 20:32:08 +0100
+Message-ID: <CAFEAcA_9XeY=Xkb7SA5HX0wxWgpHD_-g=nb0FtN8W+tNobtZwQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] qemu_clock_get_ns does not take into account
- icount_time_shift
+Subject: Re: [Qemu-devel] [PATCH v3 18/40] target/mips: Add emulation of
+ nanoMIPS 32-bit load and store instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Stefan Markovic <stefan.markovic@rt-rk.com>, QEMU Developers <qemu-devel@nongnu.org>, Paul Burton <pburton@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe.mathieu.daude@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-Hello,
+On 20 July 2018 at 05:59, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 07/19/2018 05:54 AM, Stefan Markovic wrote:
+>> +                /* SYNCI */
+>> +                /* Break the TB to be able to sync copied instructions
+>> +                   immediately */
+>> +                ctx->base.is_jmp = DISAS_STOP;
+>
+> I'll note for future cleanup that while this matches all of the other instances
+> of SYNCI in target/mips/, this is not actually required.
+>
+> QEMU supports self-modifying code without any barriers or breaks whatsoever.
+> (Becuase, of course, i386 as a guest requires this.)
 
-When using icount with shift, virtual time is defined as icount << N.
-However, qemu_clock_get_ns simply returns cpu_get_icount, thereby returning
-icount instead of icount << N.
+This is true, but only if the target/ code defines
+TARGET_HAS_PRECISE_SMC (which at the moment only target/i386
+does), which enables some complicated code that spots
+when the current TB is being modified. Most of our
+other targets only support self-modifying code which
+has some kind of barrier insn, and break the TB at
+the barrier. (Compare Arm's handling of "isb", though
+there there is also an architectural requirement to take
+any pending interrupts at the barrier; I don't know if
+MIPS has any similar interrupt related semantics for
+their SYNCI.)
 
-If you check the qemu/util/qemu-timer.c file you will find the following
-function:
-
-597: int64_t qemu_clock_get_ns(QEMUClockType type)
-598: {
-....
-602: switch (type) {
-....
-606: case QEMU_CLOCK_VIRTUAL:
-607: if (use_icount) {
-608: return cpu_get_icount();
-
-Now on line 606, in case we requested QEMU_CLOCK_VIRTUAL, and we are using
-icount, the value of cpu_get_icount(); will be returned.
-
-However if I understand correctly, in order to convert icount to ns, you
-must take into account the icount shift -- as defined in the documentation:
-"The virtual cpu will execute one instruction every 2^N ns of virtual
-time.".
-
-Therefor, the correct value to return would be
-cpu_icount_to_ns(cpu_get_icount()), where cpu_icount_to_ns is defined in
-cpus.c:
-
-296: int64_t cpu_icount_to_ns(int64_t icount)
-297: {
-298: return icount << icount_time_shift;
-299: }
-
-Best Regards,
-Humberto "SilverOne" Carvalho
+thanks
+-- PMM
