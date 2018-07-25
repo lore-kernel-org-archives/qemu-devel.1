@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fiJuS-0008Rr-1d
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:32:59 -0400
+	(envelope-from <drjones@redhat.com>) id 1fiJzk-0001qb-PL
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:38:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fiJuP-0001eN-2H
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:32:56 -0400
-Date: Wed, 25 Jul 2018 15:32:43 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180725133243.GC4879@localhost.localdomain>
-References: <20180724200343.13733-1-lbloch@janustech.com>
-	<20180724200343.13733-4-lbloch@janustech.com>
-	<20180725082611.GA4879@localhost.localdomain>
-	<32a32b18-0c7c-63cd-3b1d-429717b23a85@redhat.com>
-	<499d5d12-cdba-76e4-3b2e-122675ef9eec@janustech.com>
+	(envelope-from <drjones@redhat.com>) id 1fiJzh-0007ip-QT
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:38:24 -0400
+Date: Wed, 25 Jul 2018 15:38:10 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180725133810.gsgfu4x6emygu5o5@kamzik.brq.redhat.com>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
+	<CAHmQWvDu+P26Y5CJfcQ=1_9C=hej_B8w7dLMbmuOmCV-+pYOJQ@mail.gmail.com>
+	<20180725114404.6g335n3rfjt23hjc@kamzik.brq.redhat.com>
+	<CAFEAcA8wi2QV9cVg_Hp=8MYw_zfxvVciR2CbRZiGJNiQNPdHqg@mail.gmail.com>
+	<20180725124700.GF12855@redhat.com>
+	<20180725125944.5nd5ydm4x4e3vvjw@kamzik.brq.redhat.com>
+	<CAKv+Gu-pbJj59wH7wgZ6Uq+Uko9wYEBqSF=WaC3LL68CFkbxEw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <499d5d12-cdba-76e4-3b2e-122675ef9eec@janustech.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] qcow2: Introduce an option for
- sufficient L2 cache for the entire image
+In-Reply-To: <CAKv+Gu-pbJj59wH7wgZ6Uq+Uko9wYEBqSF=WaC3LL68CFkbxEw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Hongbo Zhang <hongbo.zhang@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Am 25.07.2018 um 14:32 hat Leonid Bloch geschrieben:
-> On 07/25/2018 03:22 PM, Eric Blake wrote:
-> 
->     On 07/25/2018 03:26 AM, Kevin Wolf wrote:
-> 
->         Only looking at the external interface for now, I wonder whether it
->         would be nicer not to have two mutually exclusive options, but to make
->         l2-cache-size an alternate that can take either an int like before
->         (meaning the number of bytes) or a string/enum (with the only accepted
->         value "full" for now).
-> 
->     That does sound interesting.
-> 
-> This does, but currently QEMU supports QEMU_OPT_STRING, QEMU_OPT_BOOL,
-> QEMU_OPT_NUMBER, and QEMU_OPT_SIZE. Looks like it will require a more
-> fundamental change to accept an option that can be either a string or a size.
+On Wed, Jul 25, 2018 at 03:03:40PM +0200, Ard Biesheuvel wrote:
+> On 25 July 2018 at 14:59, Andrew Jones <drjones@redhat.com> wrote:
+> > On Wed, Jul 25, 2018 at 01:47:00PM +0100, Daniel P. Berrang=E9 wrote:
+> >> Would iut make any sense to call the machine  "refplatform"  or "ref=
+board"
+> >> to indicate it is a generic reference platform, not specifically fol=
+lowing
+> >> any particular real impl, albeit influence by the sbsa spec.
+> >>
+> >
+> > That would indeed stop me from whining about a machine model with an
+> > 'sbsa' name not strictly implementing a minimal SBSA machine :-)
+> >
+>=20
+> I still don't get why only a minimal machine is worth considering,
+> given that a real-world minimal SBSA machine is not capable of doing
+> anything useful.
 
-Hm, yes, good point. We wouldn't be able to parse the options purely
-with QemuOpts any more. So we would have to manually check for 'full' in
-the QDict before calling qemu_opts_absorb_qdict(). If it's there, we
-would have to process it and then delete it from the QDict before we
-feed the QDict to qemu_opts_absorb_qdict(), which would only accept a
-number there. A bit ugly, but should be workable.
+One definition of an SBSA machine can be quite different than another.
+If we only hard code the required [useless] base, but also provide a
+readconfig for the rest, then we get a useful machine without loss of
+flexibility.
 
-Maybe this is really the time that we should convert qcow2 to use the
-QAPI types anyway, like some of the protocol drivers do internally now.
-Obviously, this is out of scope for this series, but it gives a
-perspective for how to get rid of the ugliness again.
+That flexibility comes at the cost of platform-bus code (since we need
+to add devices to the system bus) and a less concise command line. The
+platform-bus code may indeed be too expensive for this purpose, but
+we may need to see patches to be sure. I understand the desire to have
+a shorter command line, but this is QEMU :)
 
->         Another interesting question is whether 'full' shouldn't keep meaning
->         full throughout the lifetime of the BlockDriverState, i.e. should it
->         keep adapting to the new size when the image size changes?
-> 
-> 
->     Do we even resize the cache now for image size changes? If we use an enum,
->     we could have two different values depending on whether the chosen cache
->     size remains fixed or also tries to resize when the image grows.
-
-We don't because we only support absolute cache sizes today. 'full'
-would be the first one that is relative to the image size.
-
-> Is it even possible to change the virtual disk image size online?
-
-Yes, this is what qcow2_co_truncate() does (can be invoked, amongst
-others, with the QMP command 'block_resize').
-
-> Found a problem with my previous patch: the property was not actually set as a
-> proper boolean option. Also, fixing the error output in iotest 103 (thanks
-> Kevin for the catch!). V5 is on the way.
-
-Maybe give the alternate thing a try with v5, as everyone seems to agree
-that it's a nicer interface if we can make it work.
-
-Also, a meta-comment: Leonid, would you mind sending plain text emails
-instead of HTML-only?
-
-Kevin
+Thanks,
+drew
