@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fiFwf-0005u5-MC
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:19:00 -0400
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1fiFxo-0006oh-6C
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:20:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fiFwc-0006SA-Lb
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:18:57 -0400
-Date: Wed, 25 Jul 2018 10:18:37 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180725091837.GB12855@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1fiFxl-0000mu-4y
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:20:08 -0400
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:46157)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1fiFxk-0000kq-VM
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:20:05 -0400
+Received: by mail-io0-x244.google.com with SMTP id i18-v6so5737274ioj.13
+	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 02:20:04 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAHmQWvC8_J4i32UZzdHqJ4w3EdEAHmWGdgqrvGwEA7uo0kvk9A@mail.gmail.com>
 References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
 	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
 	<20180725084824.GA12855@redhat.com>
-	<CAHmQWvDtNQsPDy1tCnsy9JbGzMxLAik5S0bBfpCj_0ig8=iZdA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHmQWvDtNQsPDy1tCnsy9JbGzMxLAik5S0bBfpCj_0ig8=iZdA@mail.gmail.com>
+	<CAKv+Gu_RHsed0KAH8njKB8UPvbUDeoTZ5sP76f_br6azisZzSQ@mail.gmail.com>
+	<CAHmQWvCqKqQXnXxOUgi=kLTyE5BhV2NxqaKzvPp63HX02V=X2g@mail.gmail.com>
+	<CAKv+Gu_eFjS_UvOuEKhbsWr34o3Jqd4h2duJ-gG1ofsFbwkGbQ@mail.gmail.com>
+	<CAHmQWvC8_J4i32UZzdHqJ4w3EdEAHmWGdgqrvGwEA7uo0kvk9A@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Wed, 25 Jul 2018 11:20:03 +0200
+Message-ID: <CAKv+Gu-B4o7dwZPOix2MkECJia6M6Q+zBMw8XVdw49kFYW6J+w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
  type
@@ -29,51 +37,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Hongbo Zhang <hongbo.zhang@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>
 
-On Wed, Jul 25, 2018 at 05:05:06PM +0800, Hongbo Zhang wrote:
-> On 25 July 2018 at 16:48, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
- wrote:
-> > On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
-> >> For the Aarch64, there is one machine 'virt', it is primarily meant =
+On 25 July 2018 at 11:17, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+> On 25 July 2018 at 17:13, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrot=
+e:
+>> On 25 July 2018 at 11:09, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+>>> On 25 July 2018 at 17:01, Ard Biesheuvel <ard.biesheuvel@linaro.org> wr=
+ote:
+>>>> On 25 July 2018 at 10:48, Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+> wrote:
+>>>>> On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
+>>>>>> For the Aarch64, there is one machine 'virt', it is primarily meant =
 to
-> >> run on KVM and execute virtualization workloads, but we need an
-> >> environment as faithful as possible to physical hardware, for suppor=
+>>>>>> run on KVM and execute virtualization workloads, but we need an
+>>>>>> environment as faithful as possible to physical hardware, for suppor=
 ting
-> >> firmware and OS development for pysical Aarch64 machines.
-> >>
-> >> This patch introduces new machine type 'Enterprise' with main featur=
+>>>>>> firmware and OS development for pysical Aarch64 machines.
+>>>>>>
+>>>>>> This patch introduces new machine type 'Enterprise' with main featur=
 es:
-> >
-> > The 'enterprise' name is really awful - this is essentially a marketi=
+>>>>>
+>>>>> The 'enterprise' name is really awful - this is essentially a marketi=
 ng
-> > term completely devoid of any useful meaning.
-> >
-> > You had previously called this "sbsa" which IIUC was related to a rea=
+>>>>> term completely devoid of any useful meaning.
+>>>>>
+>>>>> You had previously called this "sbsa" which IIUC was related to a rea=
 l
-> > world hardware specification that it was based on. IOW, I think this =
+>>>>> world hardware specification that it was based on. IOW, I think this =
 old
-> > name was preferrable to calling it "enterprise".
-> >
-> Thanks for your comments.
-> Frankly, I myself prefer to 'sbsa' too, in fact, at the early stage of
-> developing, we called this 'enterprise', but later I changed it to
-> 'sbsa' until I sent out v1 patch.
->=20
-> The work Arm TF and EDK2 porting to this platform needs this name to
-> be defined finally.
+>>>>> name was preferrable to calling it "enterprise".
+>>>>>
+>>>>
+>>>> I couldn't agree more. However, IIUC this change was made at the
+>>>> request of one of the reviewers, although I wasn't part of the
+>>>> discussion at that point, so I'm not sure who it was.
+>>>>
+>>>> Hongbo, could you please share a link to that discussion?
+>>>>
+>>>> Thanks,
+>>>> Ard.
+>>>>
+>>>
+>>> V1 discussion here:
+>>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg545775.html
+>>>
+>>
+>> So who asked for the sbsa -> enterprise change?
+>
+> Actually nobody, but it was argued that sbsa does not require ehci and
+> ahci etc, then we should find a name fitting for this platform better.
 
-Why should EDK2 care what the QEMU machine type name is. The machine type
-name is purely a QEMU internal tag and shouldn't be visible in the guest
-ABI at all IIUC.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+That doesn't make sense to me. The SBSA describes a minimal
+configuration, it does not limit what peripherals may be attached to
+the core system.
