@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fiLEK-0000C4-GP
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:57:35 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fiLKt-0002bV-Nq
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fiLEH-00077N-IU
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:57:32 -0400
-Received: from mail-sn1nam02on0093.outbound.protection.outlook.com
-	([104.47.36.93]:27612
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <amarkovic@wavecomp.com>) id 1fiLKq-0006HD-Nt
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:04:19 -0400
+Received: from mail-dm3nam03on0101.outbound.protection.outlook.com
+	([104.47.41.101]:26880
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fiLEH-00075G-AP
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:57:29 -0400
+	id 1fiLKq-0006Fg-Eq
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:04:16 -0400
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Wed, 25 Jul 2018 14:57:25 +0000
-Message-ID: <BN7PR08MB48689A35963D033DA1AD56B5C6540@BN7PR08MB4868.namprd08.prod.outlook.com>
+Date: Wed, 25 Jul 2018 15:04:13 +0000
+Message-ID: <BN7PR08MB48683A45E45204FCC454155EC6540@BN7PR08MB4868.namprd08.prod.outlook.com>
 References: <1532453527-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1532453527-22911-49-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1532453527-22911-49-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1532453527-22911-24-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1532453527-22911-24-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 48/55] linux-user: Add target_syscall.h
- header for nanoMIPS
+Subject: Re: [Qemu-devel] [PATCH v4 23/55] target/mips: Add emulation of DSP
+ ASE for nanoMIPS - part 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,19 +36,17 @@ To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org"
 Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
 > From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Sent: Tuesday, July 24, 2018 7:32 PM
-> From: Aleksandar Rikalo <arikalo@wavecomp.com>
+> Sent: Tuesday, July 24, 2018 7:31 PM
+> From: Stefan Markovic <smarkovic@wavecomp.com>
 >=20
-> Add target_syscall.h header for nanoMIPS.
->
+> Add emulation of DSP ASE instructions for nanoMIPS - part 3.
 
-target_syscall.h is missing
+This patch should be further split into four or so patches - each dealing w=
+ith a single instruction pool.
 
-#ifndef NANOMIPS_TARGET_SYSCALL_H
-#define NANOMIPS_TARGET_SYSCALL_H
-
-...
-
-#endif
+Also, DSP instruction pools should use NM_XXX opcodes in decoding phase, an=
+d only use OPC_XXX opcodes whet they call corresponding gen_XXX() function =
+or correspondiong helper function. This is not the case for one of instruct=
+ion pools from this patch, if I remember correctly.
 
 Aleksandar M.=
