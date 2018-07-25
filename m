@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fiGsZ-0006Ej-Ma
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:18:50 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fiGw2-0007f3-1l
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:22:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fiGsW-0007Yk-LC
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:18:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60714 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fiGsW-0007Ux-DC
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:18:44 -0400
-Date: Wed, 25 Jul 2018 18:18:36 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180725101836.GI2479@xz-mi>
-References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
-	<20180629115359.GH2568@work-vm>
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fiGvz-0004Rl-21
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:22:22 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:32781)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1fiGvy-0004RA-RP
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 06:22:18 -0400
+Received: by mail-it0-x244.google.com with SMTP id d16-v6so8413891itj.0
+	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 03:22:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180629115359.GH2568@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
+In-Reply-To: <20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Wed, 25 Jul 2018 18:22:17 +0800
+Message-ID: <CAHmQWvCKkzim+-Z4Y69fWg6igZ7V6gaWhjKJZ0m0G0dhbwOFyw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,143 +31,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>, aarcange@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On Fri, Jun 29, 2018 at 12:53:59PM +0100, Dr. David Alan Gilbert wrote:
-> * Denis Plotnikov (dplotnikov@virtuozzo.com) wrote:
-> > The patch set adds the ability to make external snapshots while VM is running.
-> 
-> cc'ing in Andrea since this uses sigsegv's to avoid userfault-wp that
-> isn't there yet.
-> 
-> Hi Denis,
->   How robust are you finding this SEGV based trick; for example what
-> about things like the kernel walking vhost queues or similar kernel
-> nasties?
+On 25 July 2018 at 17:54, Andrew Jones <drjones@redhat.com> wrote:
+> On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
+>> For the Aarch64, there is one machine 'virt', it is primarily meant to
+>> run on KVM and execute virtualization workloads, but we need an
+>> environment as faithful as possible to physical hardware, for supporting
+>> firmware and OS development for pysical Aarch64 machines.
+>>
+>> This patch introduces new machine type 'Enterprise' with main features:
+>>  - Based on 'virt' machine type.
+>>  - Re-designed memory map.
+>>  - EL2 and EL3 are enabled by default.
+>>  - GIC version 3 by default.
+>>  - AHCI controller attached to system bus, and then CDROM and hard disc
+>>    can be added to it.
+>>  - EHCI controller attached to system bus, with USB mouse and key board
+>>    installed by default.
+>>  - E1000E ethernet card on PCIE bus.
+>>  - VGA display adaptor on PCIE bus.
+>>  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
+>>  - No virtio functions enabled, since this is to emulate real hardware.
+>
+> In the last review it was pointed out that using virtio-pci should still
+> be "real" enough, so there's not much reason to avoid it. Well, unless
+> there's some concern as to what drivers are available in the firmware and
+> guest kernel. But that concern usually only applies to legacy firmwares
+> and kernels, and therefore shouldn't apply to AArch64.
+>
+In real physical arm hardware, *HCI are system memory mapped, not on PCIE.
+we need a QEMU platform like that. We need firmware developed on this
+QEMU platform can run on real hardware without change(or only a minor
+change)
+Concern is not only available firmwares, but more emphasis is on new
+firmwares to be developed on this platform (target is developing
+firmware for hardware, but using qemu if hardware is not available
+temporarily), if virtio device used, then the newly developed firmware
+must include virtio front-end codes, but it isn't needed while run on
+real hardware at last.
 
-(I'm commenting on this old series to keep the discussion together)
+>>  - No paravirtualized fw_cfg device either.
+>>
+>> Arm Trusted Firmware and UEFI porting to this are done accordingly.
+>>
+>
+> How will UEFI get the ACPI tables from QEMU without fw-cfg? I didn't
+> see any sort of reserved ROM region in the patch for them.
+>
+UEFI gets ACPI and kernel from network or mass storage, just like the
+real hardware.
+If we develop firmware depends on paravirtualized device like fw_cfg,
+then we canot run such firmware on real hardware.
 
-If we want to make this series really work for people, we should
-possibly need to know whether it could work with vhost (otherwise we
-might need to go back to userfaultfd write-protection).
-
-I digged a bit on the vhost-net IO, it should be using two ways to
-write to guest memory:
-
-- copy_to_user(): this should possibly still be able to be captured by
-  mprotect() (after some confirmation from Paolo, but still we'd
-  better try it out)
-
-- kmap_atomic(): this is used to log dirty pages, this seems to be
-  incompatible with mprotect() but I think we can just make sure dirty
-  page tracking is disabled when live snapshot is enabled (please
-  refer to the code clip below as a referece)
-
-So IMHO this series should work with vhost if with logging off, but we
-need to confirm...  Denis, do you want to do some more test with vhost
-when you do your next post (possibly with changes like below)?
-
-=====================
-
-diff --git a/migration/ram.c b/migration/ram.c
-index 24dea2730c..a3fa256143 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1605,6 +1605,10 @@ static void migration_bitmap_sync(RAMState *rs)
-     int64_t end_time;
-     uint64_t bytes_xfer_now;
- 
-+    if (live_snapshot) {
-+        return;
-+    }
-+
-     ram_counters.dirty_sync_count++;
- 
-     if (!rs->time_last_bitmap_sync) {
-@@ -2952,7 +2956,10 @@ static void ram_init_bitmaps(RAMState *rs)
-     rcu_read_lock();
- 
-     ram_list_init_bitmaps();
--    memory_global_dirty_log_start();
-+
-+    if (!live_snapshot) {
-+        memory_global_dirty_log_start();
-+    }
-     migration_bitmap_sync(rs);
- 
-     rcu_read_unlock();
-
-
-> 
-> Dave
-> 
-> > The workflow to make a snapshot is the following:
-> > 1. Pause the vm
-> > 2. Make a snapshot of block devices using the scheme of your choice
-> > 3. Turn on background-snapshot migration capability
-> > 4. Start the migration using the destination (migration stream) of your choice.
-> >    The migration will resume the vm execution by itself
-> >    when it has the devices' states saved  and is ready to start ram writing
-> >    to the migration stream.
-> > 5. Listen to the migration finish event
-> > 
-> > The feature relies on KVM unapplied ability to report the faulting address.
-> > Please find the KVM patch snippet to make the patchset work below:
-> > 
-> > +++ b/arch/x86/kvm/vmx.c
-> > @@ -XXXX,X +XXXX,XX @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
-> >  
-> >         vcpu->arch.exit_qualification = exit_qualification;
-> >  
-> > -       return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
-> > +       r = kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
-> > +        if (r == -EFAULT) {
-> > +               unsigned long hva = kvm_vcpu_gfn_to_hva(vcpu, gpa >> PAGE_SHIFT);
-> > +
-> > +               vcpu->run->exit_reason = KVM_EXIT_FAIL_MEM_ACCESS;
-> > +               vcpu->run->hw.hardware_exit_reason = EXIT_REASON_EPT_VIOLATION;
-> > +               vcpu->run->fail_mem_access.hva = hva | (gpa & (PAGE_SIZE-1));
-> > +               r = 0;
-> > +
-> > +       }
-> > +       return r;
-> > 
-> > The patch to KVM can be sent if the patch set approved
-> > 
-> > Denis Plotnikov (7):
-> >   migration: add background snapshot capability
-> >   bitops: add some atomic versions of bitmap operations
-> >   threads: add infrastructure to process sigsegv
-> >   migration: add background snapshot infrastructure
-> >   kvm: add failed memeory access exit reason
-> >   kvm: add vCPU failed memeory access processing
-> >   migration: add background snapshotting
-> > 
-> >  include/exec/ram_addr.h   |   7 +
-> >  include/exec/ramlist.h    |   4 +-
-> >  include/qemu/bitops.h     |  24 +++
-> >  include/qemu/thread.h     |   5 +
-> >  linux-headers/linux/kvm.h |   5 +
-> >  migration/migration.c     | 141 +++++++++++++++-
-> >  migration/migration.h     |   1 +
-> >  migration/ram.c           | 333 ++++++++++++++++++++++++++++++++++++--
-> >  migration/ram.h           |  11 +-
-> >  migration/savevm.c        |  91 ++++++-----
-> >  migration/savevm.h        |   2 +
-> >  qapi/migration.json       |   6 +-
-> >  target/i386/kvm.c         |  18 +++
-> >  util/qemu-thread-posix.c  |  50 ++++++
-> >  14 files changed, 635 insertions(+), 63 deletions(-)
-> > 
-> > -- 
-> > 2.17.0
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
-
-Regards,
-
--- 
-Peter Xu
+> Thanks,
+> drew
