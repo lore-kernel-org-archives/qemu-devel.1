@@ -1,14 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fiFqa-0002Lq-Q3
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:12:43 -0400
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1fiFrG-0002rY-Fq
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:13:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fiFqX-0002A0-Oa
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:12:40 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 25 Jul 2018 11:12:33 +0200
-Message-Id: <20180725091233.3300-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1fiFrD-0003eU-E6
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:13:22 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:50756)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1fiFrD-0003d6-8W
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 05:13:19 -0400
+Received: by mail-it0-x244.google.com with SMTP id w16-v6so7706380ita.0
+	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 02:13:19 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAHmQWvCqKqQXnXxOUgi=kLTyE5BhV2NxqaKzvPp63HX02V=X2g@mail.gmail.com>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<20180725084824.GA12855@redhat.com>
+	<CAKv+Gu_RHsed0KAH8njKB8UPvbUDeoTZ5sP76f_br6azisZzSQ@mail.gmail.com>
+	<CAHmQWvCqKqQXnXxOUgi=kLTyE5BhV2NxqaKzvPp63HX02V=X2g@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Wed, 25 Jul 2018 11:13:18 +0200
+Message-ID: <CAKv+Gu_eFjS_UvOuEKhbsWr34o3Jqd4h2duJ-gG1ofsFbwkGbQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,182 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Hongbo Zhang <hongbo.zhang@linaro.org>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>
 
-The "max" CPU model behaves like "-cpu host" when KVM is enabled, and like
-a CPU with the maximum possible feature set when TCG is enabled.
+On 25 July 2018 at 11:09, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+> On 25 July 2018 at 17:01, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrot=
+e:
+>> On 25 July 2018 at 10:48, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
+wrote:
+>>> On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
+>>>> For the Aarch64, there is one machine 'virt', it is primarily meant to
+>>>> run on KVM and execute virtualization workloads, but we need an
+>>>> environment as faithful as possible to physical hardware, for supporti=
+ng
+>>>> firmware and OS development for pysical Aarch64 machines.
+>>>>
+>>>> This patch introduces new machine type 'Enterprise' with main features=
+:
+>>>
+>>> The 'enterprise' name is really awful - this is essentially a marketing
+>>> term completely devoid of any useful meaning.
+>>>
+>>> You had previously called this "sbsa" which IIUC was related to a real
+>>> world hardware specification that it was based on. IOW, I think this ol=
+d
+>>> name was preferrable to calling it "enterprise".
+>>>
+>>
+>> I couldn't agree more. However, IIUC this change was made at the
+>> request of one of the reviewers, although I wasn't part of the
+>> discussion at that point, so I'm not sure who it was.
+>>
+>> Hongbo, could you please share a link to that discussion?
+>>
+>> Thanks,
+>> Ard.
+>>
+>
+> V1 discussion here:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg545775.html
+>
 
-While the "host" model can not be used under TCG ("kvm_required"), the
-"max" model can and "Enables all features supported by the accelerator in
-the current host".
-
-So we can treat "host" just as a special case of "max" (like x86 does).
-It differs to the "qemu" CPU model under TCG such that compatibility
-handling will not be performed and that some experimental CPU features
-not yet part of the "qemu" model might be indicated.
-
-These are right now under TCG (see "qemu_MAX"):
-- stfle53
-- msa5-base
-- zpci
-
-This will result right now in the following warning when starting QEMU TCG
-with the "max" model:
-    "qemu-system-s390x: warning: 'msa5-base' requires 'kimd-sha-512'."
-
-The "qemu" model (used as default in QEMU under TCG) will continue to
-work without such warnings. The "max" mdel in the current form
-might be interesting for kvm-unit-tests (where we would e.g. now also
-test "msa5-base").
-
-The "max" model is neither static nor migration safe (like the "host"
-model). It is independent of the machine but dependends on the accelerator.
-It can be used to detect the maximum CPU model also under TCG from upper
-layers without having to care about CPU model names for CPU model
-expansion.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu_models.c | 81 +++++++++++++++++++++++++++------------
- 1 file changed, 56 insertions(+), 25 deletions(-)
-
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 604898a882..708bf0e3ba 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -307,7 +307,10 @@ static gint s390_cpu_list_compare(gconstpointer a, gconstpointer b)
-     const char *name_a = object_class_get_name((ObjectClass *)a);
-     const char *name_b = object_class_get_name((ObjectClass *)b);
- 
--    /* move qemu and host to the top of the list, qemu first, host second */
-+    /*
-+     * Move qemu, host and max to the top of the list, qemu first, host second,
-+     * max third.
-+     */
-     if (name_a[0] == 'q') {
-         return -1;
-     } else if (name_b[0] == 'q') {
-@@ -316,6 +319,10 @@ static gint s390_cpu_list_compare(gconstpointer a, gconstpointer b)
-         return -1;
-     } else if (name_b[0] == 'h') {
-         return 1;
-+    } else if (name_a[0] == 'm') {
-+        return -1;
-+    } else if (name_b[0] == 'm') {
-+        return 1;
-     }
- 
-     /* keep the same order we have in our table (sorted by release date) */
-@@ -1077,27 +1084,6 @@ static void s390_cpu_model_initfn(Object *obj)
-     }
- }
- 
--#ifdef CONFIG_KVM
--static void s390_host_cpu_model_initfn(Object *obj)
--{
--    S390CPU *cpu = S390_CPU(obj);
--    Error *err = NULL;
--
--    if (!kvm_enabled() || !kvm_s390_cpu_models_supported()) {
--        return;
--    }
--
--    cpu->model = g_malloc0(sizeof(*cpu->model));
--    kvm_s390_get_host_cpu_model(cpu->model, &err);
--    if (err) {
--        error_report_err(err);
--        g_free(cpu->model);
--        /* fallback to unsupported cpu models */
--        cpu->model = NULL;
--    }
--}
--#endif
--
- static S390CPUDef s390_qemu_cpu_def;
- static S390CPUModel s390_qemu_cpu_model;
- 
-@@ -1136,6 +1122,30 @@ static void s390_qemu_cpu_model_initfn(Object *obj)
-     memcpy(cpu->model, &s390_qemu_cpu_model, sizeof(*cpu->model));
- }
- 
-+static void s390_max_cpu_model_initfn(Object *obj)
-+{
-+    const S390CPUModel *max_model;
-+    S390CPU *cpu = S390_CPU(obj);
-+    Error *local_err = NULL;
-+
-+    if (kvm_enabled() && !kvm_s390_cpu_models_supported()) {
-+        /* "max" and "host" always work, even without CPU model support */
-+        return;
-+    }
-+
-+    max_model = get_max_cpu_model(&local_err);
-+    if (local_err) {
-+        g_assert(kvm_enabled());
-+        error_report_err(local_err);
-+        /* fallback to unsupported CPU models */
-+        return;
-+    }
-+
-+    cpu->model = g_new(S390CPUModel, 1);
-+    /* copy the CPU model so we can modify it */
-+    memcpy(cpu->model, max_model, sizeof(*cpu->model));
-+}
-+
- static void s390_cpu_model_finalize(Object *obj)
- {
-     S390CPU *cpu = S390_CPU(obj);
-@@ -1209,6 +1219,20 @@ static void s390_qemu_cpu_model_class_init(ObjectClass *oc, void *data)
-                                 qemu_hw_version());
- }
- 
-+static void s390_max_cpu_model_class_init(ObjectClass *oc, void *data)
-+{
-+    S390CPUClass *xcc = S390_CPU_CLASS(oc);
-+
-+    /*
-+     * The "max" model is neither static nor migration safe. Under KVM
-+     * it represents the "host" model. Under TCG it represents some kind of
-+     * "qemu" CPU model without compat handling and maybe with some additional
-+     * CPU features that are not yet unlocked in the "qemu" model.
-+     */
-+    xcc->desc =
-+        "Enables all features supported by the accelerator in the current host";
-+}
-+
- /* Generate type name for a cpu model. Caller has to free the string. */
- static char *s390_cpu_type_name(const char *model_name)
- {
-@@ -1239,12 +1263,18 @@ static const TypeInfo qemu_s390_cpu_type_info = {
-     .class_init = s390_qemu_cpu_model_class_init,
- };
- 
-+static const TypeInfo max_s390_cpu_type_info = {
-+    .name = S390_CPU_TYPE_NAME("max"),
-+    .parent = TYPE_S390_CPU,
-+    .instance_init = s390_max_cpu_model_initfn,
-+    .instance_finalize = s390_cpu_model_finalize,
-+    .class_init = s390_max_cpu_model_class_init,
-+};
-+
- #ifdef CONFIG_KVM
- static const TypeInfo host_s390_cpu_type_info = {
-     .name = S390_CPU_TYPE_NAME("host"),
--    .parent = TYPE_S390_CPU,
--    .instance_init = s390_host_cpu_model_initfn,
--    .instance_finalize = s390_cpu_model_finalize,
-+    .parent = S390_CPU_TYPE_NAME("max"),
-     .class_init = s390_host_cpu_model_class_init,
- };
- #endif
-@@ -1326,6 +1356,7 @@ static void register_types(void)
-     }
- 
-     type_register_static(&qemu_s390_cpu_type_info);
-+    type_register_static(&max_s390_cpu_type_info);
- #ifdef CONFIG_KVM
-     type_register_static(&host_s390_cpu_type_info);
- #endif
--- 
-2.17.1
+So who asked for the sbsa -> enterprise change?
