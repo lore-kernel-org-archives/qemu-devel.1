@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fiM6Z-0002Ob-P9
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:53:40 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fiM6g-0002Sy-93
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:53:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fiM6W-0004eT-NK
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:53:35 -0400
-Date: Wed, 25 Jul 2018 17:53:23 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180725155323.GD4879@localhost.localdomain>
-References: <20180724200343.13733-1-lbloch@janustech.com>
-	<20180724200343.13733-4-lbloch@janustech.com>
-	<20180725082611.GA4879@localhost.localdomain>
-	<32a32b18-0c7c-63cd-3b1d-429717b23a85@redhat.com>
-	<499d5d12-cdba-76e4-3b2e-122675ef9eec@janustech.com>
-	<20180725133243.GC4879@localhost.localdomain>
-	<dd4a32bc-845c-f529-51a8-71c978f93861@janustech.com>
+	(envelope-from <imammedo@redhat.com>) id 1fiM6d-0004os-Bb
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:53:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42044 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fiM6d-0004o8-51
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 11:53:39 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A91A47721B
+	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 15:53:38 +0000 (UTC)
+Date: Wed, 25 Jul 2018 17:53:35 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180725175335.4b444e19@redhat.com>
+In-Reply-To: <20180725153259-mutt-send-email-mst@kernel.org>
+References: <20180710000024.542612-1-mst@redhat.com>
+	<20180725143211.2fe32f43@redhat.com>
+	<20180725153259-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dd4a32bc-845c-f529-51a8-71c978f93861@janustech.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] qcow2: Introduce an option for
- sufficient L2 cache for the entire image
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH hack dontapply v2 0/7] Dynamic _CST
+ generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +35,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 
-Am 25.07.2018 um 17:23 hat Leonid Bloch geschrieben:
-> On 07/25/2018 04:32 PM, Kevin Wolf wrote:
-> > Am 25.07.2018 um 14:32 hat Leonid Bloch geschrieben:
-> > > On 07/25/2018 03:22 PM, Eric Blake wrote:
-> > > 
-> > >      On 07/25/2018 03:26 AM, Kevin Wolf wrote:
-> > > 
-> > >          Only looking at the external interface for now, I wonder whether it
-> > >          would be nicer not to have two mutually exclusive options, but to make
-> > >          l2-cache-size an alternate that can take either an int like before
-> > >          (meaning the number of bytes) or a string/enum (with the only accepted
-> > >          value "full" for now).
-> > > 
-> > >      That does sound interesting.
-> > > 
-> > > This does, but currently QEMU supports QEMU_OPT_STRING, QEMU_OPT_BOOL,
-> > > QEMU_OPT_NUMBER, and QEMU_OPT_SIZE. Looks like it will require a more
-> > > fundamental change to accept an option that can be either a string or a size.
-> > 
-> > Hm, yes, good point. We wouldn't be able to parse the options purely
-> > with QemuOpts any more. So we would have to manually check for 'full' in
-> > the QDict before calling qemu_opts_absorb_qdict(). If it's there, we
-> > would have to process it and then delete it from the QDict before we
-> > feed the QDict to qemu_opts_absorb_qdict(), which would only accept a
-> > number there. A bit ugly, but should be workable.
-> > 
-> > Maybe this is really the time that we should convert qcow2 to use the
-> > QAPI types anyway, like some of the protocol drivers do internally now.
-> > Obviously, this is out of scope for this series, but it gives a
-> > perspective for how to get rid of the ugliness again.
+On Wed, 25 Jul 2018 15:44:37 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+> On Wed, Jul 25, 2018 at 02:32:11PM +0200, Igor Mammedov wrote:
+> > On Tue, 10 Jul 2018 03:01:30 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > Now that basic support for guest CPU PM is upstream, I started looking
+> > > for making it migrateable.  Since a VM can be migrated between different
+> > > hosts, PM info needs to change each time with move the VM to a different
+> > > host.  
+> > Considering notification is async, so there will be a window when
+> > guest will be using old Cstates on new host. What will happen if
+> > machine is migrated to host that doesn't support a Cstate
+> > that was used on source when guest was started?  
 > 
-> I need to look into that. Thanks for the idea. But indeed looks like
-> out of scope for this series.
+> My testing shows mwait with a wrong hint works, presumably it just uses
+> a lot of power.
+> 
+> > > This adds infrastructure - based on Load/Unload - to support exactly
+> > > that: QEMU generates AML (changing it on migration) and stores it in
+> > > reserved memory, OSPM loads _CST from there on demand.  
+> > Cool and very tempting idea but I have 2 worries about this approach:
+> > 1. How well does it work with Windows based guests?
+> >    (I've tried something similar but generating new AML from AML itself
+> >     to get rid of our long if/else chains there to make up Notify target name.
+> >     I ditched it (unfortunately I don't recall why) )  
+> 
+> After trying it, I can tell you why - it's a horrid mess of
+> unreadable code, with arbitrary restraints on package
+> length etc.
+in my case it was only 4 character NameString, but Windows probably
+wasn't happy or just ignored it.
+Considering recent development (TPM series) it might have been issue
+with SYSTEM_MEMORY not working properly if used as byte buffer field.
 
-QAPIfication of .bdrv_open() is a long-term goal for all block drivers
-anyway, so if you're really interested in this, any work towards it is
-welcome. But it definitely won't be needed to get the cache size thing
-in. I only mentioned it to show that we wouldn't be stuck with the
-direct QDict access forever.
+Even if it's an unreadable mess it's still stable mess and very constrained
+one within a single firmware blob that came from source.
+Hence it's more preferable than split brain in this series.
 
-> > >          Another interesting question is whether 'full' shouldn't keep meaning
-> > >          full throughout the lifetime of the BlockDriverState, i.e. should it
-> > >          keep adapting to the new size when the image size changes?
+But I don't think we even need dynamic AML for _CST usecase at all,
+existing cpuhp interface should work just fine for it and should be
+simpler as all infrastructure is already there.
+
+> > 2. (probably biggest issue) Loading dynamically generated AML
+> >    basically would make all AML code ABI, so that static AML
+> >    in RAM of old QEMU version would match dynamic generated
+> >    one on target side with new QEMU (/me generalizing approach beyond _CST support).
+> >    I'd try to keep our AML version less as much as possible
+> >    and go this route only if there is no other way to do it.  
+> 
+> That's a good point, thanks for bringing this up!
+> 
+> So it seems that we will need to define the ABI, yes. All AML code is
+> an over-statement though, there are specific entry points
+> we must maintain, right?
+Well, I'm rather unsure what and where could break,
+hence I'm afraid of a new beast and it probably won't be easy
+to convince me that ABI would be able to keep things manageable
+and stable.
+Considering big amount of AML code that we already have
+I'm not confident eye balling during review and testing the latest
+firmware/qemu would be sufficient as we suddenly would have exploded
+test matrix where firmware in use is a mixed from old/and new parts.
+
+> And that in the end isn't fundamentally different from the ABIs
+> mandated by the ACPI spec.
+> 
+> So I have these ideas to try to mitigate the issues:
+> - document the ABI (like we have in the ACPI spec)
+> - use a specific prefix for all external calls (like _ for ACPI spec ones)
+> - use a specific (different) prefix for all internal loaded calls (like
+>   [A-Z] for non-ACPI spec ones)
+ACPI spec horrible mess and bad example (even committee isn't able to keep it consistent)
+but it's necessary evil (compared to no spec at all).
+Adding ABI requirement will complicate coding/reviewing for
+already complex AML compared to current non ABI way.
+Hence from maintainability POV we should stay away from this approach
+if there is a viable alternative.
+
+> 
+> Thoughts?
+> 
+> > > This is a partially functional prototype.
 > > > 
+> > > What works:
+> > >     loading _CST dynamically and reporting it to OSPM
 > > > 
-> > >      Do we even resize the cache now for image size changes? If we use an enum,
-> > >      we could have two different values depending on whether the chosen cache
-> > >      size remains fixed or also tries to resize when the image grows.
-> > 
-> > We don't because we only support absolute cache sizes today. 'full'
-> > would be the first one that is relative to the image size.
-> > 
-> > > Is it even possible to change the virtual disk image size online?
-> > 
-> > Yes, this is what qcow2_co_truncate() does (can be invoked, amongst
-> > others, with the QMP command 'block_resize').
+> > > What doesn't:
+> > >     detecting host configuration and generating correct _CST package
+> > >     notifying guest about the change to trigger _CST re-evaluation
+> > >     disabling mwait/halt exists as appropriate
+> > > 
+> > > Michael S. Tsirkin (6):
+> > >   acpi: aml: add aml_register()
+> > >   acpi: generalize aml_package / aml_varpackage
+> > >   acpi: aml_load/aml_unload
+> > >   acpi: export acpi_checksum
+> > >   acpi: init header without linking
+> > >   acpi: aml generation for _CST
+> > >   pc: HACK: acpi: tie in _CST object to Processor
+> > > 
+> > >  include/hw/acpi/acpi.h      |   2 +
+> > >  include/hw/acpi/aml-build.h |  14 ++-
+> > >  include/hw/acpi/cst.h       |   8 ++
+> > >  include/hw/i386/pc.h        |   5 ++
+> > >  hw/acpi/aml-build.c         |  81 ++++++++++++++---
+> > >  hw/acpi/core.c              |   2 +-
+> > >  hw/acpi/cpu.c               |   5 ++
+> > >  hw/acpi/cpu_hotplug.c       |  11 +--
+> > >  hw/acpi/cst.c               | 173 ++++++++++++++++++++++++++++++++++++
+> > >  hw/arm/virt-acpi-build.c    |   2 +-
+> > >  hw/i386/acpi-build.c        |  10 ++-
+> > >  hw/acpi/Makefile.objs       |   2 +-
+> > >  12 files changed, 290 insertions(+), 25 deletions(-)
+> > >  create mode 100644 include/hw/acpi/cst.h
+> > >  create mode 100644 hw/acpi/cst.c
+> > >   
 > 
-> Cool! This does look like a good idea to resize the L2 cache accordingly,
-> but maybe this is out of scope for now as well? The purpose of the current
-> series is just to provide an option to automatically calculate the needed L2
-> cache size for covering the entire image, instead of using an external
-> script to do that and feed the output to l2-cache-size.
-
-I'm not sure. Probably both ways can be defended, but if I as a user
-said l2-cache-size=full, and then resized my 10 GB image to 20 GB, I
-think I would expect that the cache still covers the whole image and not
-only half of it. I never said I wanted enough cache for 10 GB, but I
-said that I wanted enough cache to cover the whole image.
-
-The thing is that once we decide not to resize the cache yet (and
-document the option accordingly), it becomes ABI and we can't change
-that later any more. We would have to introduce another option that
-enables adaption to changed image sizes. As I don't see a reason why you
-could want l2-cache-size=full, but no adaption, I'd prefer to implement
-it right away.
-
-And I think it might be as simple as adding something like this at the
-end of qcow2_co_truncate():
-
-    /* Update cache size for l2-cache-size=full */
-    qcow2_update_options(bs, bs->options, s->flags, NULL);
-
-I'm ignoring errors here because I think the resize was still successful
-if we couldn't update the cache size, but that could be discussed.
-
-> > > Found a problem with my previous patch: the property was not actually set as a
-> > > proper boolean option. Also, fixing the error output in iotest 103 (thanks
-> > > Kevin for the catch!). V5 is on the way.
-> > 
-> > Maybe give the alternate thing a try with v5, as everyone seems to agree
-> > that it's a nicer interface if we can make it work.
-> 
-> You mean with QDict? I'll look into that now. But already sent v5 before
-> reading this email.
-
-Yes, with reading it from the QDict. (Or whatever the simplest way is
-that results in the right external interface, but I suppose this is the
-one.)
-
-> > Also, a meta-comment: Leonid, would you mind sending plain text emails
-> > instead of HTML-only?
-> 
-> Sure, Kevin! Sorry, I thought Thunderbird as configured here is sending
-> plain text. I was wrong. Now it should be fine. Thanks for the remark.
-
-Thanks, that looks better!
-
-Kevin
