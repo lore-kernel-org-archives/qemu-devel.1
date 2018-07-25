@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marc.zyngier@arm.com>) id 1fiJVm-0004q9-L8
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:07:29 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fiJeG-00050v-13
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:16:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marc.zyngier@arm.com>) id 1fiJVj-0001F5-Ju
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:07:26 -0400
-References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
-	<20180227104708.GA11391@cbox>
-	<ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
-	<20180227124604.GA2373@cbox>
-	<20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
-	<b589d714-4f12-e450-7ca5-e55fed4d1705@oracle.com>
-	<74427c65-b860-d576-04f9-766253285210@arm.com>
-	<20180725122806.g2gpvdbrbdkriprg@kamzik.brq.redhat.com>
-From: Marc Zyngier <marc.zyngier@arm.com>
-Message-ID: <202a2c63-1a3e-7f01-850c-4fb5e48f43e7@arm.com>
-Date: Wed, 25 Jul 2018 14:07:12 +0100
+	(envelope-from <cohuck@redhat.com>) id 1fiJeD-00049N-09
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 09:16:12 -0400
+Date: Wed, 25 Jul 2018 15:16:04 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180725151604.5176c95e.cohuck@redhat.com>
+In-Reply-To: <fa2b4bc2-e23f-e7db-5caf-057421ca6f96@redhat.com>
+References: <20180725091233.3300-1-david@redhat.com>
+	<20180725133640.3ea78c59.cohuck@redhat.com>
+	<12ec6fa8-aa28-f8d6-a6ad-df87824e89e9@redhat.com>
+	<20180725140631.54c1df1f.cohuck@redhat.com>
+	<fa2b4bc2-e23f-e7db-5caf-057421ca6f96@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180725122806.g2gpvdbrbdkriprg@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] VCPU hotplug on KVM/ARM
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +26,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Maran Wilson <maran.wilson@oracle.com>, kvmarm@lists.cs.columbia.edu, bthakur@codeaurora.org, Christoffer Dall <cdall@cs.columbia.edu>, Christoffer Dall <cdall@kernel.org>, peter.maydell@linaro.org, david@redhat.com, qemu-devel@nongnu.org, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm@nongnu.org, imammedo@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, "Daniel P .
+	=?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 25/07/18 13:28, Andrew Jones wrote:
-> On Wed, Jul 25, 2018 at 11:40:54AM +0100, Marc Zyngier wrote:
->> On 24/07/18 19:35, Maran Wilson wrote:
->>> It's been a few months since this email thread died off. Has anyone 
->>> started working on a potential solution that would allow VCPU hotplug on 
->>> KVM/ARM ? Or is this a project that is still waiting for an owner who 
->>> has the time and inclination to get started?
->>
->> This is typically a project for someone who would have this particular
->> itch to scratch, and who has a demonstrable need for this functionality.
->>
->> Work wise, it would have to include adding physical CPU hotplug support
->> to the arm64 kernel as a precondition, before worrying about doing it in
->> KVM.
->>
->> For KVM itself, particular area of interests would be:
->> - Making GICv3 redistributors magically appear in the IPA space
->> - Live resizing of GICv3 structures
->> - Dynamic allocation of MPIDR, and mapping with vcpu_id
-> 
-> I have CPU topology description patches on the QEMU list now[*]. A next
-> step for me is to this MPIDR work. I probably won't get to it until the
-> end of August though.
-> 
-> [*] http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg01168.html
-> 
->>
->> This should keep someone busy for a good couple of weeks (give or take a
->> few months).
-> 
-> :-)
-> 
->>
->> That being said, I'd rather see support in QEMU first, creating all the
->> vcpu/redistributors upfront, and signalling the hotplug event via the
->> virtual firmware. And then post some numbers to show that creating all
->> the vcpus upfront is not acceptable.
-> 
-> I think the upfront allocation, allocating all possible cpus, but only
-> activating all present cpus, was the planned approach. What were the
-> concerns about that approach? Just vcpu memory overhead for too many
-> overly ambitious VM configs?
+On Wed, 25 Jul 2018 14:49:45 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-I don't have any ARM-specific concern about that, and I think this is
-the right approach. It has the good property of not requiring much
-change in the kernel (other than actually supporting CPU hotplug).
+> >>  
+> >>> Maybe add a comment that for kvm we try the host model, and only that
+> >>> can fail (i.e., for tcg this will always work)?    
+> >>
+> >> "we expect only errors under KVM, when we actually query the kernel"  
+> > 
+> > "We expect errors only under KVM, where we actually query the kernel"
+> > 
+> > ?  
+> 
+> Sure, maybe you can fit it into one line (which is what I tried).
 
-vcpu memory overhead is a generic concern though, and not only for ARM.
-We currently allow up to 512 vcpus per VM, which looks like a lot, but
-really isn't. If we're to allow this to be bumped up significantly, we
-should start accounting the vcpu-related memory against the user's
-allowance...
+Let's see.
 
-Thanks,
+> 
+> > 
+> > If nobody else has further comments, I can squash in the change and
+> > queue it for 3.1. I'll let it sit for a bit longer on the list, though.  
+> 
+> If I don't have to resend, can you fixup the subject "s390x/cpumodel: ..." ?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Sure!
