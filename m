@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fiI64-00029P-Nl
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:36:51 -0400
+	(envelope-from <drjones@redhat.com>) id 1fiI6F-0002CZ-9h
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:37:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fiI61-0003FW-O5
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:36:48 -0400
-Date: Wed, 25 Jul 2018 13:36:40 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180725133640.3ea78c59.cohuck@redhat.com>
-In-Reply-To: <20180725091233.3300-1-david@redhat.com>
-References: <20180725091233.3300-1-david@redhat.com>
+	(envelope-from <drjones@redhat.com>) id 1fiI6C-0003PY-9z
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 07:36:59 -0400
+Date: Wed, 25 Jul 2018 13:36:45 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180725113645.fthwhvzx7otrr3ya@kamzik.brq.redhat.com>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
+	<20180725105040.GA2366@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180725105040.GA2366@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,96 +26,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, "Daniel P .
-	=?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, radoslaw.biernacki@linaro.org, ard.biesheuvel@linaro.org, peter.maydell@linaro.org, qemu-devel@nongnu.org, leif.lindholm@linaro.org, qemu-arm@nongnu.org, alex.bennee@linaro.org
 
-On Wed, 25 Jul 2018 11:12:33 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> The "max" CPU model behaves like "-cpu host" when KVM is enabled, and like
-> a CPU with the maximum possible feature set when TCG is enabled.
+On Wed, Jul 25, 2018 at 11:50:41AM +0100, Dr. David Alan Gilbert wrote:
+> * Andrew Jones (drjones@redhat.com) wrote:
+> > On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
+> > > For the Aarch64, there is one machine 'virt', it is primarily meant to
+> > > run on KVM and execute virtualization workloads, but we need an
+> > > environment as faithful as possible to physical hardware, for supporting
+> > > firmware and OS development for pysical Aarch64 machines.
+> > > 
+> > > This patch introduces new machine type 'Enterprise' with main features:
+> > >  - Based on 'virt' machine type.
+> > >  - Re-designed memory map.
+> > >  - EL2 and EL3 are enabled by default.
+> > >  - GIC version 3 by default.
+> > >  - AHCI controller attached to system bus, and then CDROM and hard disc
+> > >    can be added to it.
+> > >  - EHCI controller attached to system bus, with USB mouse and key board
+> > >    installed by default.
+> > >  - E1000E ethernet card on PCIE bus.
+> > >  - VGA display adaptor on PCIE bus.
+> > >  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
+> > >  - No virtio functions enabled, since this is to emulate real hardware.
+> > 
+> > In the last review it was pointed out that using virtio-pci should still
+> > be "real" enough, so there's not much reason to avoid it. Well, unless
+> > there's some concern as to what drivers are available in the firmware and
+> > guest kernel. But that concern usually only applies to legacy firmwares
+> > and kernels, and therefore shouldn't apply to AArch64.
 > 
-> While the "host" model can not be used under TCG ("kvm_required"), the
-> "max" model can and "Enables all features supported by the accelerator in
-> the current host".
+> I think the difference from last time is Ard's comments earlier in this
+> thread:
 > 
-> So we can treat "host" just as a special case of "max" (like x86 does).
-> It differs to the "qemu" CPU model under TCG such that compatibility
-> handling will not be performed and that some experimental CPU features
-> not yet part of the "qemu" model might be indicated.
+>     The purpose of the SBSA machine is not to provide a minimal
+>     configuration. It is intended to exercise all the moving parts one
+>     might find in a server firmware/OS stack, including pieces that are
+>     not usually found on x86 machines, such as DRAM starting above 4 GB
+>     and SATA/USB controllers that are not PCIe based.
 > 
-> These are right now under TCG (see "qemu_MAX"):
-> - stfle53
+> that suggests that the intent of this board is to provide everything
+> which a firmware writer might want to test;  that's quite different
+> from forming the basis of a virtualised machine for real use.
+>
 
-That's a z13 feature, so I think it's fine as we don't care about
-machine generations for the max mode anyway, correct?
+I think I understand the purpose, and I also don't believe anything I've
+said is counter to it. Whether or not one drives a virtio-pci nic with a
+virtio-pci-net driver or drives an E1000e, also on the PCIe bus, makes
+little difference to the firmware, nor to the guest kernel - besides which
+driver gets used. And, nothing stops somebody from not plugging the
+virtio-pci nic (use -nodefaults) and then plugging the E1000e (-device)
+instead. Machine models don't need to hard code these assumptions. For
+this patch it'd probably be best if we just ensured there were no
+default devices at all, rather than replace one with another.
 
-> - msa5-base
-
-That's just the warning, but as things are continuing to work, it's
-fine as well.
-
-> - zpci
-
-That one theoretically has a dependency on CONFIG_PCI, but as that is
-always set, I think it's fine as well.
-
-> 
-> This will result right now in the following warning when starting QEMU TCG
-> with the "max" model:
->     "qemu-system-s390x: warning: 'msa5-base' requires 'kimd-sha-512'."
-> 
-> The "qemu" model (used as default in QEMU under TCG) will continue to
-> work without such warnings. The "max" mdel in the current form
-
-s/mdel/model/
-
-> might be interesting for kvm-unit-tests (where we would e.g. now also
-> test "msa5-base").
-> 
-> The "max" model is neither static nor migration safe (like the "host"
-> model). It is independent of the machine but dependends on the accelerator.
-> It can be used to detect the maximum CPU model also under TCG from upper
-> layers without having to care about CPU model names for CPU model
-> expansion.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu_models.c | 81 +++++++++++++++++++++++++++------------
->  1 file changed, 56 insertions(+), 25 deletions(-)
-> 
-
-> +static void s390_max_cpu_model_initfn(Object *obj)
-> +{
-> +    const S390CPUModel *max_model;
-> +    S390CPU *cpu = S390_CPU(obj);
-> +    Error *local_err = NULL;
-> +
-> +    if (kvm_enabled() && !kvm_s390_cpu_models_supported()) {
-> +        /* "max" and "host" always work, even without CPU model support */
-> +        return;
-> +    }
-> +
-> +    max_model = get_max_cpu_model(&local_err);
-> +    if (local_err) {
-> +        g_assert(kvm_enabled());
-
-Maybe add a comment that for kvm we try the host model, and only that
-can fail (i.e., for tcg this will always work)?
-
-> +        error_report_err(local_err);
-> +        /* fallback to unsupported CPU models */
-> +        return;
-> +    }
-> +
-> +    cpu->model = g_new(S390CPUModel, 1);
-> +    /* copy the CPU model so we can modify it */
-> +    memcpy(cpu->model, max_model, sizeof(*cpu->model));
-> +}
-> +
->  static void s390_cpu_model_finalize(Object *obj)
->  {
->      S390CPU *cpu = S390_CPU(obj);
-
-Looks sane to me.
+Thanks,
+drew
