@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fiImi-0006Ej-Mj
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1fiIml-0006Hu-9l
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fiImf-0002Xx-MQ
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:52 -0400
+	(envelope-from <thuth@redhat.com>) id 1fiImi-0002aV-1q
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:20:55 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 25 Jul 2018 14:20:23 +0200
-Message-Id: <1532521224-27235-10-git-send-email-thuth@redhat.com>
+Date: Wed, 25 Jul 2018 14:20:24 +0200
+Message-Id: <1532521224-27235-11-git-send-email-thuth@redhat.com>
 In-Reply-To: <1532521224-27235-1-git-send-email-thuth@redhat.com>
 References: <1532521224-27235-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH for-3.1 09/10] hw/s390x: Move virtio-ccw-gpu
+Subject: [Qemu-devel] [PATCH for-3.1 10/10] hw/s390x: Move virtio-ccw-input
  code to a separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,37 +23,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-The code should only be enabled if CONFIG_VIRTIO_GPU has been set. This
-can be done best if the code resides in a separate file.
+The code should only be enabled if CONFIG_VIRTIO_INPUT has been set.
+This can be done best if the code resides in a separate file.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/s390x/Makefile.objs    |  1 +
- hw/s390x/virtio-ccw-gpu.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++
- hw/s390x/virtio-ccw.c     | 47 ---------------------------------
- 3 files changed, 68 insertions(+), 47 deletions(-)
- create mode 100644 hw/s390x/virtio-ccw-gpu.c
+ hw/s390x/Makefile.objs      |   1 +
+ hw/s390x/virtio-ccw-input.c | 118 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/s390x/virtio-ccw.c       |  98 ------------------------------------
+ 3 files changed, 119 insertions(+), 98 deletions(-)
+ create mode 100644 hw/s390x/virtio-ccw-input.c
 
 diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-index f1c058e..9c858c1 100644
+index 9c858c1..0d7e162 100644
 --- a/hw/s390x/Makefile.objs
 +++ b/hw/s390x/Makefile.objs
-@@ -13,6 +13,7 @@ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-ccw-balloon.o
- obj-$(CONFIG_VIRTIO_SCSI) += virtio-ccw-scsi.o
+@@ -14,6 +14,7 @@ obj-$(CONFIG_VIRTIO_SCSI) += virtio-ccw-scsi.o
  obj-$(CONFIG_VIRTIO_RNG) += virtio-ccw-rng.o
  obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-ccw-crypto.o
-+obj-$(CONFIG_VIRTIO_GPU) += virtio-ccw-gpu.o
+ obj-$(CONFIG_VIRTIO_GPU) += virtio-ccw-gpu.o
++obj-$(CONFIG_VIRTIO_INPUT) += virtio-ccw-input.o
  obj-$(call land,$(CONFIG_VIRTIO_9P),$(CONFIG_VIRTFS)) += virtio-ccw-9p.o
  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-ccw.o
  obj-y += css-bridge.o
-diff --git a/hw/s390x/virtio-ccw-gpu.c b/hw/s390x/virtio-ccw-gpu.c
+diff --git a/hw/s390x/virtio-ccw-input.c b/hw/s390x/virtio-ccw-input.c
 new file mode 100644
-index 0000000..71869b7
+index 0000000..79c87cb
 --- /dev/null
-+++ b/hw/s390x/virtio-ccw-gpu.c
-@@ -0,0 +1,67 @@
++++ b/hw/s390x/virtio-ccw-input.c
+@@ -0,0 +1,118 @@
 +/*
-+ * virtio ccw gpu implementation
++ * virtio ccw scsi implementation
 + *
 + * Copyright 2012, 2015 IBM Corp.
 + *
@@ -67,26 +67,16 @@ index 0000000..71869b7
 +#include "qapi/error.h"
 +#include "virtio-ccw.h"
 +
-+static void virtio_ccw_gpu_realize(VirtioCcwDevice *ccw_dev, Error **errp)
++static void virtio_ccw_input_realize(VirtioCcwDevice *ccw_dev, Error **errp)
 +{
-+    VirtIOGPUCcw *dev = VIRTIO_GPU_CCW(ccw_dev);
++    VirtIOInputCcw *dev = VIRTIO_INPUT_CCW(ccw_dev);
 +    DeviceState *vdev = DEVICE(&dev->vdev);
 +
 +    qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
 +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 +}
 +
-+static void virtio_ccw_gpu_instance_init(Object *obj)
-+{
-+    VirtIOGPUCcw *dev = VIRTIO_GPU_CCW(obj);
-+    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
-+
-+    ccw_dev->force_revision_1 = true;
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_GPU);
-+}
-+
-+static Property virtio_ccw_gpu_properties[] = {
++static Property virtio_ccw_input_properties[] = {
 +    DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
 +                    VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
 +    DEFINE_PROP_UINT32("max_revision", VirtioCcwDevice, max_rev,
@@ -94,56 +84,117 @@ index 0000000..71869b7
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void virtio_ccw_gpu_class_init(ObjectClass *klass, void *data)
++static void virtio_ccw_input_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +    VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
 +
-+    k->realize = virtio_ccw_gpu_realize;
-+    dc->props = virtio_ccw_gpu_properties;
-+    dc->hotpluggable = false;
-+    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
++    k->realize = virtio_ccw_input_realize;
++    dc->props = virtio_ccw_input_properties;
++    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
 +}
 +
-+static const TypeInfo virtio_ccw_gpu = {
-+    .name          = TYPE_VIRTIO_GPU_CCW,
++static void virtio_ccw_keyboard_instance_init(Object *obj)
++{
++    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
++    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
++
++    ccw_dev->force_revision_1 = true;
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VIRTIO_KEYBOARD);
++}
++
++static void virtio_ccw_mouse_instance_init(Object *obj)
++{
++    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
++    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
++
++    ccw_dev->force_revision_1 = true;
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VIRTIO_MOUSE);
++}
++
++static void virtio_ccw_tablet_instance_init(Object *obj)
++{
++    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
++    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
++
++    ccw_dev->force_revision_1 = true;
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VIRTIO_TABLET);
++}
++
++static const TypeInfo virtio_ccw_input = {
++    .name          = TYPE_VIRTIO_INPUT_CCW,
 +    .parent        = TYPE_VIRTIO_CCW_DEVICE,
-+    .instance_size = sizeof(VirtIOGPUCcw),
-+    .instance_init = virtio_ccw_gpu_instance_init,
-+    .class_init    = virtio_ccw_gpu_class_init,
++    .instance_size = sizeof(VirtIOInputCcw),
++    .class_init    = virtio_ccw_input_class_init,
++    .abstract = true,
 +};
 +
-+static void virtio_ccw_gpu_register(void)
++static const TypeInfo virtio_ccw_input_hid = {
++    .name          = TYPE_VIRTIO_INPUT_HID_CCW,
++    .parent        = TYPE_VIRTIO_INPUT_CCW,
++    .instance_size = sizeof(VirtIOInputHIDCcw),
++    .abstract = true,
++};
++
++static const TypeInfo virtio_ccw_keyboard = {
++    .name          = TYPE_VIRTIO_KEYBOARD_CCW,
++    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
++    .instance_size = sizeof(VirtIOInputHIDCcw),
++    .instance_init = virtio_ccw_keyboard_instance_init,
++};
++
++static const TypeInfo virtio_ccw_mouse = {
++    .name          = TYPE_VIRTIO_MOUSE_CCW,
++    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
++    .instance_size = sizeof(VirtIOInputHIDCcw),
++    .instance_init = virtio_ccw_mouse_instance_init,
++};
++
++static const TypeInfo virtio_ccw_tablet = {
++    .name          = TYPE_VIRTIO_TABLET_CCW,
++    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
++    .instance_size = sizeof(VirtIOInputHIDCcw),
++    .instance_init = virtio_ccw_tablet_instance_init,
++};
++
++static void virtio_ccw_input_register(void)
 +{
-+    type_register_static(&virtio_ccw_gpu);
++    type_register_static(&virtio_ccw_input);
++    type_register_static(&virtio_ccw_input_hid);
++    type_register_static(&virtio_ccw_keyboard);
++    type_register_static(&virtio_ccw_mouse);
++    type_register_static(&virtio_ccw_tablet);
 +}
 +
-+type_init(virtio_ccw_gpu_register)
++type_init(virtio_ccw_input_register)
 diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index eff4214..f2aabb3 100644
+index f2aabb3..2c20434 100644
 --- a/hw/s390x/virtio-ccw.c
 +++ b/hw/s390x/virtio-ccw.c
 @@ -811,15 +811,6 @@ static void virtio_ccw_blk_instance_init(Object *obj)
                                "bootindex", &error_abort);
  }
  
--static void virtio_ccw_gpu_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+-static void virtio_ccw_input_realize(VirtioCcwDevice *ccw_dev, Error **errp)
 -{
--    VirtIOGPUCcw *dev = VIRTIO_GPU_CCW(ccw_dev);
+-    VirtIOInputCcw *dev = VIRTIO_INPUT_CCW(ccw_dev);
 -    DeviceState *vdev = DEVICE(&dev->vdev);
 -
 -    qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
 -    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 -}
 -
- static void virtio_ccw_input_realize(VirtioCcwDevice *ccw_dev, Error **errp)
- {
-     VirtIOInputCcw *dev = VIRTIO_INPUT_CCW(ccw_dev);
-@@ -1255,43 +1246,6 @@ static const TypeInfo virtio_ccw_blk = {
+ /* DeviceState to VirtioCcwDevice. Note: used on datapath,
+  * be careful and test performance if you change this.
+  */
+@@ -1246,90 +1237,6 @@ static const TypeInfo virtio_ccw_blk = {
      .class_init    = virtio_ccw_blk_class_init,
  };
  
--static Property virtio_ccw_gpu_properties[] = {
+-static Property virtio_ccw_input_properties[] = {
 -    DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
 -                    VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
 -    DEFINE_PROP_UINT32("max_revision", VirtioCcwDevice, max_rev,
@@ -151,45 +202,96 @@ index eff4214..f2aabb3 100644
 -    DEFINE_PROP_END_OF_LIST(),
 -};
 -
--static void virtio_ccw_gpu_instance_init(Object *obj)
--{
--    VirtIOGPUCcw *dev = VIRTIO_GPU_CCW(obj);
--    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
--
--    ccw_dev->force_revision_1 = true;
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_GPU);
--}
--
--static void virtio_ccw_gpu_class_init(ObjectClass *klass, void *data)
+-static void virtio_ccw_input_class_init(ObjectClass *klass, void *data)
 -{
 -    DeviceClass *dc = DEVICE_CLASS(klass);
 -    VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
 -
--    k->realize = virtio_ccw_gpu_realize;
--    dc->props = virtio_ccw_gpu_properties;
--    dc->hotpluggable = false;
--    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+-    k->realize = virtio_ccw_input_realize;
+-    dc->props = virtio_ccw_input_properties;
+-    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
 -}
 -
--static const TypeInfo virtio_ccw_gpu = {
--    .name          = TYPE_VIRTIO_GPU_CCW,
+-static void virtio_ccw_keyboard_instance_init(Object *obj)
+-{
+-    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
+-    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
+-
+-    ccw_dev->force_revision_1 = true;
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VIRTIO_KEYBOARD);
+-}
+-
+-static void virtio_ccw_mouse_instance_init(Object *obj)
+-{
+-    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
+-    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
+-
+-    ccw_dev->force_revision_1 = true;
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VIRTIO_MOUSE);
+-}
+-
+-static void virtio_ccw_tablet_instance_init(Object *obj)
+-{
+-    VirtIOInputHIDCcw *dev = VIRTIO_INPUT_HID_CCW(obj);
+-    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
+-
+-    ccw_dev->force_revision_1 = true;
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VIRTIO_TABLET);
+-}
+-
+-static const TypeInfo virtio_ccw_input = {
+-    .name          = TYPE_VIRTIO_INPUT_CCW,
 -    .parent        = TYPE_VIRTIO_CCW_DEVICE,
--    .instance_size = sizeof(VirtIOGPUCcw),
--    .instance_init = virtio_ccw_gpu_instance_init,
--    .class_init    = virtio_ccw_gpu_class_init,
+-    .instance_size = sizeof(VirtIOInputCcw),
+-    .class_init    = virtio_ccw_input_class_init,
+-    .abstract = true,
 -};
 -
- static Property virtio_ccw_input_properties[] = {
-     DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
-                     VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
-@@ -1467,7 +1421,6 @@ static void virtio_ccw_register(void)
+-static const TypeInfo virtio_ccw_input_hid = {
+-    .name          = TYPE_VIRTIO_INPUT_HID_CCW,
+-    .parent        = TYPE_VIRTIO_INPUT_CCW,
+-    .instance_size = sizeof(VirtIOInputHIDCcw),
+-    .abstract = true,
+-};
+-
+-static const TypeInfo virtio_ccw_keyboard = {
+-    .name          = TYPE_VIRTIO_KEYBOARD_CCW,
+-    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
+-    .instance_size = sizeof(VirtIOInputHIDCcw),
+-    .instance_init = virtio_ccw_keyboard_instance_init,
+-};
+-
+-static const TypeInfo virtio_ccw_mouse = {
+-    .name          = TYPE_VIRTIO_MOUSE_CCW,
+-    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
+-    .instance_size = sizeof(VirtIOInputHIDCcw),
+-    .instance_init = virtio_ccw_mouse_instance_init,
+-};
+-
+-static const TypeInfo virtio_ccw_tablet = {
+-    .name          = TYPE_VIRTIO_TABLET_CCW,
+-    .parent        = TYPE_VIRTIO_INPUT_HID_CCW,
+-    .instance_size = sizeof(VirtIOInputHIDCcw),
+-    .instance_init = virtio_ccw_tablet_instance_init,
+-};
+-
+ static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
+ {
+     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+@@ -1421,11 +1328,6 @@ static void virtio_ccw_register(void)
      type_register_static(&virtio_ccw_device_info);
      type_register_static(&virtio_ccw_blk);
      type_register_static(&virtio_ccw_net);
--    type_register_static(&virtio_ccw_gpu);
-     type_register_static(&virtio_ccw_input);
-     type_register_static(&virtio_ccw_input_hid);
-     type_register_static(&virtio_ccw_keyboard);
+-    type_register_static(&virtio_ccw_input);
+-    type_register_static(&virtio_ccw_input_hid);
+-    type_register_static(&virtio_ccw_keyboard);
+-    type_register_static(&virtio_ccw_mouse);
+-    type_register_static(&virtio_ccw_tablet);
+ }
+ 
+ type_init(virtio_ccw_register)
 -- 
 1.8.3.1
