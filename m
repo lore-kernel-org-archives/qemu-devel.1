@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fiNAL-0002jK-4n
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 13:01:36 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fiNI6-0005Sx-Lp
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 13:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fiNAI-0007VW-7g
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 13:01:33 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34158)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fiNAI-0007UW-1p
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 13:01:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fiNAF-00049b-4L
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 17:01:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B15D52E80E1
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 17:01:25 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1fiNI3-0006q5-KZ
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 13:09:34 -0400
+Date: Wed, 25 Jul 2018 14:09:25 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180725170925.GE12380@localhost.localdomain>
+References: <20180725091233.3300-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Jul 2018 16:51:18 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1776478 <1776478@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152880770129.26761.1762643804065210181.malonedeb@gac.canonical.com>
-Message-Id: <153253747832.23059.6111027296050722495.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1776478] Re: Getting qemu: uncaught target signal
- 6 when running lv2 plugin cross-compilation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180725091233.3300-1-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,81 +22,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>
 
-http://tinkering-is-fun.blogspot.com/2009/12/debugging-non-native-
-programs-with-qemu.html looks like a plausible tutorial for what you
-need to do with "file" (and has some other commands that might help for
-dynamically linked libraries). What you want to do when you get to the
-SIGABRT is tell gdb "bt" to get a backtrace, which if you have the
-symbol info will give a backtrace of where the guest was.
+On Wed, Jul 25, 2018 at 11:12:33AM +0200, David Hildenbrand wrote:
+> The "max" CPU model behaves like "-cpu host" when KVM is enabled, and like
+> a CPU with the maximum possible feature set when TCG is enabled.
+> 
+> While the "host" model can not be used under TCG ("kvm_required"), the
+> "max" model can and "Enables all features supported by the accelerator in
+> the current host".
+> 
+> So we can treat "host" just as a special case of "max" (like x86 does).
+> It differs to the "qemu" CPU model under TCG such that compatibility
+> handling will not be performed and that some experimental CPU features
+> not yet part of the "qemu" model might be indicated.
+> 
+> These are right now under TCG (see "qemu_MAX"):
+> - stfle53
+> - msa5-base
+> - zpci
+> 
+> This will result right now in the following warning when starting QEMU TCG
+> with the "max" model:
+>     "qemu-system-s390x: warning: 'msa5-base' requires 'kimd-sha-512'."
+> 
+> The "qemu" model (used as default in QEMU under TCG) will continue to
+> work without such warnings. The "max" mdel in the current form
+> might be interesting for kvm-unit-tests (where we would e.g. now also
+> test "msa5-base").
+> 
+> The "max" model is neither static nor migration safe (like the "host"
+> model). It is independent of the machine but dependends on the accelerator.
+> It can be used to detect the maximum CPU model also under TCG from upper
+> layers without having to care about CPU model names for CPU model
+> expansion.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/cpu_models.c | 81 +++++++++++++++++++++++++++------------
+>  1 file changed, 56 insertions(+), 25 deletions(-)
+> 
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index 604898a882..708bf0e3ba 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -307,7 +307,10 @@ static gint s390_cpu_list_compare(gconstpointer a, gconstpointer b)
+>      const char *name_a = object_class_get_name((ObjectClass *)a);
+>      const char *name_b = object_class_get_name((ObjectClass *)b);
+>  
+> -    /* move qemu and host to the top of the list, qemu first, host second */
+> +    /*
+> +     * Move qemu, host and max to the top of the list, qemu first, host second,
+> +     * max third.
+> +     */
+>      if (name_a[0] == 'q') {
+>          return -1;
+>      } else if (name_b[0] == 'q') {
+> @@ -316,6 +319,10 @@ static gint s390_cpu_list_compare(gconstpointer a, gconstpointer b)
+>          return -1;
+>      } else if (name_b[0] == 'h') {
+>          return 1;
+> +    } else if (name_a[0] == 'm') {
+> +        return -1;
+> +    } else if (name_b[0] == 'm') {
+> +        return 1;
+>      }
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1776478
-
-Title:
-  Getting qemu: uncaught target signal 6 when running  lv2 plugin cross-
-  compilation
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hey,
-  I am part of the Zynthian team and we use qemu-arm-static to cross compil=
-e lv2 audio plugins.
-
-  When running a compilation of DISTRHO-Ports we get:
-
-  lv2_ttl_generator: pthread_mutex_lock.c:81: __pthread_mutex_lock: Asserti=
-on `mutex->__data.__owner =3D=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  ./scripts/generate-ttl.sh: line 27: 16524 Aborted                 $GEN ./=
-$FILE
-  Makefile:62: recipe for target 'gen_lv2' failed
-  make[1]: *** [gen_lv2] Error 134
-  make[1]: Leaving directory '/home/pi/zynthian-sw/plugins/DISTRHO-Ports'
-  Makefile:104: recipe for target 'lv2' failed
-  make: *** [lv2] Error 2
-
-  =
-
-  lv2_ttl_generator source is here:
-  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/libs/lv2-ttl-generat=
-or
-
-  The command that is ruining is
-  lv2_ttl_generator ./TAL-Filter-2.so =
+Isn't it simpler to add a S390CPUClass::ordering field?  See
+x86_cpu_list_compare() for an example.
 
 
-  And ./TAL-Filter-2.so source is here:
-  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/ports/tal-filter-2/s=
-ource
+>  
+>      /* keep the same order we have in our table (sorted by release date) */
+> @@ -1077,27 +1084,6 @@ static void s390_cpu_model_initfn(Object *obj)
+>      }
+>  }
+>  
+> -#ifdef CONFIG_KVM
+> -static void s390_host_cpu_model_initfn(Object *obj)
+> -{
+> -    S390CPU *cpu = S390_CPU(obj);
+> -    Error *err = NULL;
+> -
+> -    if (!kvm_enabled() || !kvm_s390_cpu_models_supported()) {
+> -        return;
+> -    }
+> -
+> -    cpu->model = g_malloc0(sizeof(*cpu->model));
+> -    kvm_s390_get_host_cpu_model(cpu->model, &err);
+> -    if (err) {
+> -        error_report_err(err);
+> -        g_free(cpu->model);
+> -        /* fallback to unsupported cpu models */
+> -        cpu->model = NULL;
+> -    }
+> -}
+> -#endif
+> -
+>  static S390CPUDef s390_qemu_cpu_def;
+>  static S390CPUModel s390_qemu_cpu_model;
+>  
+> @@ -1136,6 +1122,30 @@ static void s390_qemu_cpu_model_initfn(Object *obj)
+>      memcpy(cpu->model, &s390_qemu_cpu_model, sizeof(*cpu->model));
+>  }
+>  
+> +static void s390_max_cpu_model_initfn(Object *obj)
+> +{
+> +    const S390CPUModel *max_model;
+> +    S390CPU *cpu = S390_CPU(obj);
+> +    Error *local_err = NULL;
+> +
+> +    if (kvm_enabled() && !kvm_s390_cpu_models_supported()) {
+> +        /* "max" and "host" always work, even without CPU model support */
+> +        return;
+> +    }
+
+What's the use case that requires this check to be here?
+
+What do you expect 'query-cpu-model-expansion model=max' to
+return if !kvm_s390_cpu_models_supported()?
 
 
-  Is there a way to debug what is going on?
-  This runs fine on a Raspberrypi which is armv7
+> +
+> +    max_model = get_max_cpu_model(&local_err);
 
-  A workaround would also help.
+I've just confirmed that get_max_cpu_model() is already ready to
+work with TCG.
 
-  =
+> +    if (local_err) {
+> +        g_assert(kvm_enabled());
+> +        error_report_err(local_err);
+> +        /* fallback to unsupported CPU models */
+> +        return;
 
-  Bug in Zynthian:
-  https://github.com/zynthian/zynthian-sys/issues/59
-  Bug in DISTRHO-Ports:
-  https://github.com/DISTRHO/DISTRHO-Ports/issues/29
+What about moving this outside instance_init?
 
-  Using qemu-arm-static version from master from two days ago:
-  qemu-arm version 2.12.50 (v2.12.0-1182-ga7a7309ca5-dirty), commit: a7a730=
-9ca52c327c6603d60db90ae4feeae719f7
+On x86 we have a x86_cpu_expand_features() function to allow us
+to handle CPU model expansion errors more gracefully.
 
-  Also saw this in qemu-arm version 2.12.0 (Debian 1:2.12+dfsg-3)
+None of my comments are about new code, but existing code from
+"host", so:
 
-  Thanks,
-  Guy
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1776478/+subscriptions
+> +    }
+> +
+> +    cpu->model = g_new(S390CPUModel, 1);
+> +    /* copy the CPU model so we can modify it */
+> +    memcpy(cpu->model, max_model, sizeof(*cpu->model));
+> +}
+> +
+>  static void s390_cpu_model_finalize(Object *obj)
+>  {
+>      S390CPU *cpu = S390_CPU(obj);
+> @@ -1209,6 +1219,20 @@ static void s390_qemu_cpu_model_class_init(ObjectClass *oc, void *data)
+>                                  qemu_hw_version());
+>  }
+>  
+> +static void s390_max_cpu_model_class_init(ObjectClass *oc, void *data)
+> +{
+> +    S390CPUClass *xcc = S390_CPU_CLASS(oc);
+> +
+> +    /*
+> +     * The "max" model is neither static nor migration safe. Under KVM
+> +     * it represents the "host" model. Under TCG it represents some kind of
+> +     * "qemu" CPU model without compat handling and maybe with some additional
+> +     * CPU features that are not yet unlocked in the "qemu" model.
+> +     */
+> +    xcc->desc =
+> +        "Enables all features supported by the accelerator in the current host";
+> +}
+> +
+>  /* Generate type name for a cpu model. Caller has to free the string. */
+>  static char *s390_cpu_type_name(const char *model_name)
+>  {
+> @@ -1239,12 +1263,18 @@ static const TypeInfo qemu_s390_cpu_type_info = {
+>      .class_init = s390_qemu_cpu_model_class_init,
+>  };
+>  
+> +static const TypeInfo max_s390_cpu_type_info = {
+> +    .name = S390_CPU_TYPE_NAME("max"),
+> +    .parent = TYPE_S390_CPU,
+> +    .instance_init = s390_max_cpu_model_initfn,
+> +    .instance_finalize = s390_cpu_model_finalize,
+> +    .class_init = s390_max_cpu_model_class_init,
+> +};
+> +
+>  #ifdef CONFIG_KVM
+>  static const TypeInfo host_s390_cpu_type_info = {
+>      .name = S390_CPU_TYPE_NAME("host"),
+> -    .parent = TYPE_S390_CPU,
+> -    .instance_init = s390_host_cpu_model_initfn,
+> -    .instance_finalize = s390_cpu_model_finalize,
+> +    .parent = S390_CPU_TYPE_NAME("max"),
+>      .class_init = s390_host_cpu_model_class_init,
+>  };
+>  #endif
+> @@ -1326,6 +1356,7 @@ static void register_types(void)
+>      }
+>  
+>      type_register_static(&qemu_s390_cpu_type_info);
+> +    type_register_static(&max_s390_cpu_type_info);
+>  #ifdef CONFIG_KVM
+>      type_register_static(&host_s390_cpu_type_info);
+>  #endif
+> -- 
+> 2.17.1
+> 
+
+-- 
+Eduardo
