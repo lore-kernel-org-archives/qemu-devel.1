@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mimu@linux.ibm.com>) id 1fiKu1-00038o-N2
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:36:36 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fiLDv-0008T1-D5
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:57:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mimu@linux.ibm.com>) id 1fiKty-0007Wy-O3
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:36:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59984
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mimu@linux.ibm.com>) id 1fiKty-0007Ud-HA
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:36:30 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w6PEY6rQ074908
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 10:36:27 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2keswyc3bs-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 25 Jul 2018 10:36:27 -0400
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mimu@linux.ibm.com>;
-	Wed, 25 Jul 2018 15:36:25 +0100
-From: Michael Mueller <mimu@linux.ibm.com>
-Date: Wed, 25 Jul 2018 16:36:17 +0200
-Message-Id: <20180725143617.8731-1-mimu@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH] s390x/cpumodel: enum type S390FeatGroup now
- gets generated
+	(envelope-from <dgilbert@redhat.com>) id 1fiLDs-0006ZW-FA
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:57:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39998 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fiLDs-0006W3-3X
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 10:57:04 -0400
+Date: Wed, 25 Jul 2018 15:56:51 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180725145651.GC2365@work-vm>
+References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
+	<20180725121400.12867.82957.stgit@pasha-VirtualBox>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180725121400.12867.82957.stgit@pasha-VirtualBox>
+Subject: Re: [Qemu-devel] [PATCH v5 08/24] replay: introduce info hmp/qmp
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,132 +28,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com, agraf@suse.de, david@redhat.com, Michael Mueller <mimu@linux.ibm.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, rth@twiddle.net
 
-The enumeration type S390FeatGroup is now generated as well.
-This shall simplify the definition of new feature groups
-without the requirement to modify existing code.
+* Pavel Dovgalyuk (Pavel.Dovgaluk@ispras.ru) wrote:
+> This patch introduces 'info replay' monitor command and
+> corresponding qmp request.
+> These commands request the current record/replay mode, replay log file name,
+> and the execution step (number or recorded/replayed instructions).
+> 
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
----
- target/s390x/cpu_features.c |  1 -
- target/s390x/cpu_features.h | 19 +------------------
- target/s390x/gen-features.c | 18 +++++++++++++++++-
- 3 files changed, 18 insertions(+), 20 deletions(-)
+ACK for HMP
 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 3b9e2745e9..d623db34a6 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -13,7 +13,6 @@
- #include "qemu/osdep.h"
- #include "qemu/module.h"
- #include "cpu_features.h"
--#include "gen-features.h"
- 
- #define FEAT_INIT(_name, _type, _bit, _desc) \
-     {                                                \
-diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
-index 968b12fdfe..effe790271 100644
---- a/target/s390x/cpu_features.h
-+++ b/target/s390x/cpu_features.h
-@@ -16,6 +16,7 @@
- 
- #include "qemu/bitmap.h"
- #include "cpu_features_def.h"
-+#include "gen-features.h"
- 
- /* CPU features are announced via different ways */
- typedef enum {
-@@ -64,24 +65,6 @@ void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
- void s390_feat_bitmap_to_ascii(const S390FeatBitmap features, void *opaque,
-                                void (*fn)(const char *name, void *opaque));
- 
--/* static groups that will never change */
--typedef enum {
--    S390_FEAT_GROUP_PLO,
--    S390_FEAT_GROUP_TOD_CLOCK_STEERING,
--    S390_FEAT_GROUP_GEN13_PTFF_ENH,
--    S390_FEAT_GROUP_MSA,
--    S390_FEAT_GROUP_MSA_EXT_1,
--    S390_FEAT_GROUP_MSA_EXT_2,
--    S390_FEAT_GROUP_MSA_EXT_3,
--    S390_FEAT_GROUP_MSA_EXT_4,
--    S390_FEAT_GROUP_MSA_EXT_5,
--    S390_FEAT_GROUP_MSA_EXT_6,
--    S390_FEAT_GROUP_MSA_EXT_7,
--    S390_FEAT_GROUP_MSA_EXT_8,
--    S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
--    S390_FEAT_GROUP_MAX,
--} S390FeatGroup;
--
- /* Definition of a CPU feature group */
- typedef struct {
-     const char *name;       /* name exposed to the user */
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 6626b6f565..2ca5ededb3 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -661,6 +661,7 @@ static CpuFeatDefSpec CpuFeatDef[] = {
- #define FEAT_GROUP_INITIALIZER(_name)                  \
-     {                                                  \
-         .name = "S390_FEAT_GROUP_LIST_" #_name,        \
-+        .enum_name = "S390_FEAT_GROUP_" #_name,        \
-         .bits =                                        \
-             { .data = group_##_name,                   \
-               .len = ARRAY_SIZE(group_##_name) },      \
-@@ -668,6 +669,7 @@ static CpuFeatDefSpec CpuFeatDef[] = {
- 
- typedef struct {
-     const char *name;
-+    const char *enum_name;
-     BitSpec bits;
- } FeatGroupDefSpec;
- 
-@@ -678,7 +680,6 @@ static FeatGroupDefSpec FeatGroupDef[] = {
-     FEAT_GROUP_INITIALIZER(PLO),
-     FEAT_GROUP_INITIALIZER(TOD_CLOCK_STEERING),
-     FEAT_GROUP_INITIALIZER(GEN13_PTFF),
--    FEAT_GROUP_INITIALIZER(MULTIPLE_EPOCH_PTFF),
-     FEAT_GROUP_INITIALIZER(MSA),
-     FEAT_GROUP_INITIALIZER(MSA_EXT_1),
-     FEAT_GROUP_INITIALIZER(MSA_EXT_2),
-@@ -688,6 +689,7 @@ static FeatGroupDefSpec FeatGroupDef[] = {
-     FEAT_GROUP_INITIALIZER(MSA_EXT_6),
-     FEAT_GROUP_INITIALIZER(MSA_EXT_7),
-     FEAT_GROUP_INITIALIZER(MSA_EXT_8),
-+    FEAT_GROUP_INITIALIZER(MULTIPLE_EPOCH_PTFF),
- };
- 
- #define QEMU_FEAT_INITIALIZER(_name)                   \
-@@ -810,6 +812,19 @@ static void print_feature_group_defs(void)
-     }
- }
- 
-+static void print_feature_group_enum_type(void)
-+{
-+    int i;
-+
-+    printf("\n/* CPU feature group enum type */\n"
-+           "typedef enum {\n");
-+    for (i = 0; i < ARRAY_SIZE(FeatGroupDef); i++) {
-+        printf("\t%s,\n", FeatGroupDef[i].enum_name);
-+    }
-+    printf("\tS390_FEAT_GROUP_MAX,\n"
-+           "} S390FeatGroup;\n");
-+}
-+
- int main(int argc, char *argv[])
- {
-     printf("/*\n"
-@@ -826,6 +841,7 @@ int main(int argc, char *argv[])
-     print_feature_defs();
-     print_feature_group_defs();
-     print_qemu_feature_defs();
-+    print_feature_group_enum_type();
-     printf("\n#endif\n");
-     return 0;
- }
--- 
-2.13.4
+Note you might want to make an accessor for the filename rather than
+making it a global?
+
+Dave
+
+> 
+> --
+> 
+> v2:
+>  - renamed info_replay qmp into query-replay (suggested by Eric Blake)
+> ---
+>  hmp-commands-info.hx      |   14 ++++++++++++++
+>  hmp.h                     |    1 +
+>  qapi/misc.json            |   35 +++++++++++++++++++++++++++++++++++
+>  replay/Makefile.objs      |    3 ++-
+>  replay/replay-debugging.c |   41 +++++++++++++++++++++++++++++++++++++++++
+>  replay/replay-internal.h  |    2 ++
+>  replay/replay.c           |    3 +--
+>  7 files changed, 96 insertions(+), 3 deletions(-)
+>  create mode 100644 replay/replay-debugging.c
+> 
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index 70639f6..1b24714 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -896,6 +896,20 @@ STEXI
+>  Show SEV information.
+>  ETEXI
+>  
+> +    {
+> +        .name       = "replay",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "show parameters of the record/replay",
+> +        .cmd        = hmp_info_replay,
+> +    },
+> +
+> +STEXI
+> +@item info replay
+> +@findex info replay
+> +Display the current record/replay mode and the currently executing step.
+> +ETEXI
+> +
+>  STEXI
+>  @end table
+>  ETEXI
+> diff --git a/hmp.h b/hmp.h
+> index 33354f1..9d12c63 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -147,5 +147,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+>  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+>  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+>  void hmp_info_sev(Monitor *mon, const QDict *qdict);
+> +void hmp_info_replay(Monitor *mon, const QDict *qdict);
+>  
+>  #endif
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index d450cfe..e246ce3 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -3100,6 +3100,41 @@
+>    'data': [ 'none', 'record', 'play' ] }
+>  
+>  ##
+> +# @ReplayInfo:
+> +#
+> +# Status of the record/replay mode.
+> +#
+> +# @mode: current mode.
+> +#
+> +# @filename: name of the record/replay log file.
+> +#
+> +# @step: current step number.
+> +#
+> +# Since: 3.1
+> +#
+> +##
+> +{ 'struct': 'ReplayInfo',
+> +  'data': { 'mode': 'ReplayMode', '*filename': 'str', 'step': 'int' } }
+> +
+> +##
+> +# @query-replay:
+> +#
+> +# Retrieves the status of the execution record/replay.
+> +#
+> +# Returns: structure with the properties of the record/replay.
+> +#
+> +# Since: 3.1
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "query-replay" }
+> +# <- { "return": { "mode": "play", "filename": "log.rr", "step": 220414 } }
+> +#
+> +##
+> +{ 'command': 'query-replay',
+> +  'returns': 'ReplayInfo' }
+> +
+> +##
+>  # @xen-load-devices-state:
+>  #
+>  # Load the state of all devices from file. The RAM and the block devices
+> diff --git a/replay/Makefile.objs b/replay/Makefile.objs
+> index cee6539..6694e3e 100644
+> --- a/replay/Makefile.objs
+> +++ b/replay/Makefile.objs
+> @@ -6,4 +6,5 @@ common-obj-y += replay-input.o
+>  common-obj-y += replay-char.o
+>  common-obj-y += replay-snapshot.o
+>  common-obj-y += replay-net.o
+> -common-obj-y += replay-audio.o
+> \ No newline at end of file
+> +common-obj-y += replay-audio.o
+> +common-obj-y += replay-debugging.o
+> diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+> new file mode 100644
+> index 0000000..03e7db8
+> --- /dev/null
+> +++ b/replay/replay-debugging.c
+> @@ -0,0 +1,41 @@
+> +/*
+> + * replay-debugging.c
+> + *
+> + * Copyright (c) 2010-2018 Institute for System Programming
+> + *                         of the Russian Academy of Sciences.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "sysemu/replay.h"
+> +#include "replay-internal.h"
+> +#include "hmp.h"
+> +#include "monitor/monitor.h"
+> +#include "qapi/qapi-commands-misc.h"
+> +
+> +void hmp_info_replay(Monitor *mon, const QDict *qdict)
+> +{
+> +    if (replay_mode == REPLAY_MODE_NONE) {
+> +        monitor_printf(mon, "No record/replay\n");
+> +    } else {
+> +        monitor_printf(mon, "%s execution '%s': current step = %"PRId64"\n",
+> +            replay_mode == REPLAY_MODE_RECORD ? "Recording" : "Replaying",
+> +            replay_filename, replay_get_current_step());
+> +    }
+> +}
+> +
+> +ReplayInfo *qmp_query_replay(Error **errp)
+> +{
+> +    ReplayInfo *retval = g_new0(ReplayInfo, 1);
+> +    retval->mode = replay_mode;
+> +    if (replay_filename) {
+> +        retval->filename = g_strdup(replay_filename);
+> +        retval->has_filename = true;
+> +    }
+> +    retval->step = replay_get_current_step();
+> +    return retval;
+> +}
+> diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+> index ac4b27b..ef82b5e 100644
+> --- a/replay/replay-internal.h
+> +++ b/replay/replay-internal.h
+> @@ -91,6 +91,8 @@ extern ReplayState replay_state;
+>  
+>  /* File for replay writing */
+>  extern FILE *replay_file;
+> +/*! Name of replay file  */
+> +extern char *replay_filename;
+>  
+>  void replay_put_byte(uint8_t byte);
+>  void replay_put_event(uint8_t event);
+> diff --git a/replay/replay.c b/replay/replay.c
+> index 58a986f..8b70d7d 100644
+> --- a/replay/replay.c
+> +++ b/replay/replay.c
+> @@ -29,8 +29,7 @@
+>  ReplayMode replay_mode = REPLAY_MODE_NONE;
+>  char *replay_snapshot;
+>  
+> -/* Name of replay file  */
+> -static char *replay_filename;
+> +char *replay_filename;
+>  ReplayState replay_state;
+>  static GSList *replay_blockers;
+>  
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
