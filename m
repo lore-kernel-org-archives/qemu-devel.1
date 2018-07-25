@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fiJEm-0006da-0N
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:49:55 -0400
+	(envelope-from <mst@redhat.com>) id 1fiJFD-00071j-0k
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:50:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fiJEj-0008Pj-2R
-	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:49:52 -0400
-References: <20180725091233.3300-1-david@redhat.com>
-	<20180725133640.3ea78c59.cohuck@redhat.com>
-	<12ec6fa8-aa28-f8d6-a6ad-df87824e89e9@redhat.com>
-	<20180725140631.54c1df1f.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <fa2b4bc2-e23f-e7db-5caf-057421ca6f96@redhat.com>
-Date: Wed, 25 Jul 2018 14:49:45 +0200
+	(envelope-from <mst@redhat.com>) id 1fiJFA-0000Tt-0R
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:50:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35806 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fiJF9-0000TF-Kb
+	for qemu-devel@nongnu.org; Wed, 25 Jul 2018 08:50:15 -0400
+Date: Wed, 25 Jul 2018 15:50:09 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180725154517-mutt-send-email-mst@kernel.org>
+References: <20180710000024.542612-1-mst@redhat.com>
+	<20180710000024.542612-8-mst@redhat.com>
+	<20180725143724.50b38789@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180725140631.54c1df1f.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180725143724.50b38789@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH hack dontapply v2 7/7] pc: HACK: acpi: tie
+ in _CST object to Processor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +29,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, ehabkost@redhat.com, pbonzini@redhat.com
 
->>
->>> Maybe add a comment that for kvm we try the host model, and only that
->>> can fail (i.e., for tcg this will always work)?  
->>
->> "we expect only errors under KVM, when we actually query the kernel"
+On Wed, Jul 25, 2018 at 02:37:24PM +0200, Igor Mammedov wrote:
+> On Tue, 10 Jul 2018 03:01:34 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> "We expect errors only under KVM, where we actually query the kernel"
-> 
-> ?
+> > Based on patch by Igor Mammedov.
+> > 
+> > This is a hack: we definitely shouldn't do it
+> > unconditionally, and initialization should be handled
+> > differently (through an isa device?). io port to use
+> > should depend on the PC type and should be documented.
+> > 
+> > Notifications should be supported.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  include/hw/i386/pc.h |  5 +++++
+> >  hw/acpi/cpu.c        |  5 +++++
+> >  hw/i386/acpi-build.c | 10 +++++++++-
+> >  3 files changed, 19 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > index 316230e570..83b3a84322 100644
+> > --- a/include/hw/i386/pc.h
+> > +++ b/include/hw/i386/pc.h
+> > @@ -20,6 +20,11 @@
+> >  
+> >  #define HPET_INTCAP "hpet-intcap"
+> >  
+> > +typedef struct PCCstate {
+> > +    uint32_t latency;
+> > +    uint32_t hint;
+> > +} PCCstate;
+> > +
+> >  /**
+> >   * PCMachineState:
+> >   * @acpi_dev: link to ACPI PM device that performs ACPI hotplug handling
+> > diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> > index 5ae595ecbe..e9e207b033 100644
+> > --- a/hw/acpi/cpu.c
+> > +++ b/hw/acpi/cpu.c
+> > @@ -561,6 +561,11 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+> >                             aml_int(arch_ids->cpus[i].props.node_id)));
+> >              }
+> >  
+> > +            if (1) {
+> > +                method = aml_method("_CST", 0, AML_NOTSERIALIZED);
+> > +                aml_append(method, aml_return(aml_call0("CCST")));
+> in case of not loaded CCST it would be unresolved reference.
+> It would be better to have a package /SB.CPUS.CCST filled with some startup values
+> and than that could be updated on the fly with new package.
 
-Sure, maybe you can fit it into one line (which is what I tried).
+I think it will conflict if we do. But yes we could load \SB.CCST and
+then \SB.CPUS.CCST will override that. Would it help though?
+ACPI spec does not describe what happens on load failure.
+For linux it does not matter much -
+it just handles the error. What happens on windows with an unresolved
+reference? Is failure to load the object any better?
 
-> 
-> If nobody else has further comments, I can squash in the change and
-> queue it for 3.1. I'll let it sit for a bit longer on the list, though.
 
-If I don't have to resend, can you fixup the subject "s390x/cpumodel: ..." ?
+> > +                aml_append(dev, method);
+> > +            }
+> >              aml_append(cpus_dev, dev);
+> >          }
+> >      }
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index fff1059a31..da2c830db7 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -64,6 +64,7 @@
+> >  #include "hw/i386/intel_iommu.h"
+> >  
+> >  #include "hw/acpi/ipmi.h"
+> > +#include "hw/acpi/cst.h"
+> >  
+> >  /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
+> >   * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
+> > @@ -1840,7 +1841,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+> >      } else {
+> >          CPUHotplugFeatures opts = {
+> > -            .apci_1_compatible = true, .has_legacy_cphp = true
+> > +            .apci_1_compatible = true, .has_legacy_cphp = true,
+> unrelated change???
 
-Thanks!
+Good catch.
 
--- 
-
-Thanks,
-
-David / dhildenb
+> >          };
+> >          build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+> >                         "\\_SB.PCI0", "\\_GPE._E02");
+> > @@ -2693,6 +2694,10 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+> >                             tables->vmgenid, tables->linker);
+> >      }
+> >  
+> > +    /* TODO: get a free ioport. This one is PIIX specific. */
+> > +    acpi_add_table(table_offsets, tables_blob);
+> > +    cst_build_acpi(tables_blob, tables->linker, 0xaf20);
+> > +
+> >      if (misc.has_hpet) {
+> >          acpi_add_table(table_offsets, tables_blob);
+> >          build_hpet(tables_blob, tables->linker);
+> > @@ -2891,6 +2896,9 @@ void acpi_setup(void)
+> >  
+> >      build_state = g_malloc0(sizeof *build_state);
+> >  
+> > +    /* TODO: this is not the best place to do it */
+> > +    cst_register(pcms->fw_cfg, 0xaf20);
+> > +
+> >      acpi_build_tables_init(&tables);
+> >      acpi_build(&tables, MACHINE(pcms));
+> >  
