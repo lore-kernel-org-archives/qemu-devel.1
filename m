@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fik2a-0004ds-0o
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:27:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1fik3N-00056O-CE
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:27:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fik2V-00047z-RD
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:27:04 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:38109)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fik2V-00046n-D8
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:26:59 -0400
-Received: by mail-oi0-x242.google.com with SMTP id v8-v6so4356158oie.5
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 10:26:59 -0700 (PDT)
-References: <153258768962.6738.11319866502689416568.stgit@dhcp-9-109-246-16>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b707ccc3-47bb-569f-3df0-aeb91e90b820@linaro.org>
-Date: Thu, 26 Jul 2018 10:26:53 -0700
+	(envelope-from <armbru@redhat.com>) id 1fik3I-0004hW-H2
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:27:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38884 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fik3I-0004gp-D6
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:27:48 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180726061844.25992-1-armbru@redhat.com>
+	<20180726061844.25992-2-armbru@redhat.com>
+	<ba393187-cb99-0ed6-e135-05c58ccd975a@redhat.com>
+Date: Thu, 26 Jul 2018 19:27:46 +0200
+In-Reply-To: <ba393187-cb99-0ed6-e135-05c58ccd975a@redhat.com> (Eric Blake's
+	message of "Thu, 26 Jul 2018 09:04:51 -0500")
+Message-ID: <87tvoldi0d.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <153258768962.6738.11319866502689416568.stgit@dhcp-9-109-246-16>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: ppc64: don't use volatile
- register during safe_syscall
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] qstring: Assert size calculations
+ don't overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,21 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, dgibson@redhat.com, riku.voipio@iki.fi, laurent@vivier.eu
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, liujunjie23@huawei.com
 
-On 07/25/2018 11:48 PM, Shivaprasad G Bhat wrote:
-> Reference:
-> https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
+Eric Blake <eblake@redhat.com> writes:
 
-This document is for _CALL_ELF < 2.  For ppc64le, the document is at
+> On 07/26/2018 01:18 AM, Markus Armbruster wrote:
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   qobject/qstring.c | 6 +++++-
+>>   1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/qobject/qstring.c b/qobject/qstring.c
+>> index 18b8eb82f8..7990569c5a 100644
+>> --- a/qobject/qstring.c
+>> +++ b/qobject/qstring.c
+>> @@ -41,17 +41,19 @@ QString *qstring_from_substr(const char *str, size_t start, size_t end)
+>>   {
+>>       QString *qstring;
+>>   +    assert(start <= end + 1);
+>
+> end + 1 can overflow size_t, but it is unsigned so well-defined, and
+> the assert will trigger as desired.
+>
+>> @@ -68,7 +70,9 @@ QString *qstring_from_str(const char *str)
+>>   static void capacity_increase(QString *qstring, size_t len)
+>>   {
+>>       if (qstring->capacity < (qstring->length + len)) {
+>> +        assert(len <= SIZE_MAX - qstring->capacity);
+>>           qstring->capacity += len;
+>
+> You've asserted that this addition won't overflow...
+>
+>> +        assert(qstring->capacity + len <= SIZE_MAX / 2);
+>
+> ...but now that qstring->capacity is larger, this could overflow. Do
+> you really need the +len in here, given that...
+>
+>>           qstring->capacity *= 2; /* use exponential growth */
+>
+> ...you are really only trying to prevent overflow of doubling
+> qstring->capacity without adding yet another len in the mix?
 
-https://openpowerfoundation.org/wp-content/uploads/2016/03/ABI64BitOpenPOWERv1.1_16July2015_pub4.pdf
-
-In both cases, it appears that we can (ab)use SP+16 to save
-the value of r14 across the syscall.  This slot would normally
-be used for saving our own return address (LR), but we have no
-need to save that value because it *is* preserved across the syscall.
-
-
-r~
+You're right, my assertion is broken.  v2 coming.
