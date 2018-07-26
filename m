@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fiiXy-0007hA-Dp
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:51:23 -0400
+	(envelope-from <mst@redhat.com>) id 1fiipV-0005wL-DA
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:09:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fiiXu-0007cM-De
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:51:22 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39957)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fiiXu-0007af-2d
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:51:18 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h15-v6so2195904wrs.7
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 08:51:17 -0700 (PDT)
-References: <DB5PR05MB11605C65D7D734C9354F0421D54F0@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<1407239306.11199051.1530240887935.JavaMail.zimbra@redhat.com>
-	<20180705194311-mutt-send-email-mst@kernel.org>
-	<DB5PR05MB1160D84E747DA480435B6605D5440@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<DB5PR05MB1160BB381473C723C8336EC2D55A0@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<AM5PR0501MB2499CB4F2D01BCDA47C0ACB6C95A0@AM5PR0501MB2499.eurprd05.prod.outlook.com>
-	<DB5PR05MB1160093E018FD91787E80A79D5590@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<20180726145214.GD17777@stefanha-x1.localdomain>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <488bdc8d-e36c-ad3e-f7b3-a45a78a99dda@gmail.com>
-Date: Thu, 26 Jul 2018 18:51:13 +0300
+	(envelope-from <mst@redhat.com>) id 1fiipS-0002FS-1Z
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:09:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38288 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fiipR-0002Eh-R5
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:09:25 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 46377406F619
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 16:09:24 +0000 (UTC)
+Date: Thu, 26 Jul 2018 19:09:22 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180726185019-mutt-send-email-mst@kernel.org>
+References: <20180710000024.542612-1-mst@redhat.com>
+	<20180725143211.2fe32f43@redhat.com>
+	<20180725153259-mutt-send-email-mst@kernel.org>
+	<20180725175335.4b444e19@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180726145214.GD17777@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] Question: SRIOV support over Win Hyper-V VM
- running in QEMU process on Linux host
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180725175335.4b444e19@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH hack dontapply v2 0/7] Dynamic _CST
+ generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,192 +36,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahs@mellanox.com>, Knut Omang <knut.omang@oracle.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Tal Attaly <talat@mellanox.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 
-Hi
+On Wed, Jul 25, 2018 at 05:53:35PM +0200, Igor Mammedov wrote:
+> On Wed, 25 Jul 2018 15:44:37 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Wed, Jul 25, 2018 at 02:32:11PM +0200, Igor Mammedov wrote:
+> > > On Tue, 10 Jul 2018 03:01:30 +0300
+> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > >   
+> > > > Now that basic support for guest CPU PM is upstream, I started looking
+> > > > for making it migrateable.  Since a VM can be migrated between different
+> > > > hosts, PM info needs to change each time with move the VM to a different
+> > > > host.  
+> > > Considering notification is async, so there will be a window when
+> > > guest will be using old Cstates on new host. What will happen if
+> > > machine is migrated to host that doesn't support a Cstate
+> > > that was used on source when guest was started?  
+> > 
+> > My testing shows mwait with a wrong hint works, presumably it just uses
+> > a lot of power.
+> > 
+> > > > This adds infrastructure - based on Load/Unload - to support exactly
+> > > > that: QEMU generates AML (changing it on migration) and stores it in
+> > > > reserved memory, OSPM loads _CST from there on demand.  
+> > > Cool and very tempting idea but I have 2 worries about this approach:
+> > > 1. How well does it work with Windows based guests?
+> > >    (I've tried something similar but generating new AML from AML itself
+> > >     to get rid of our long if/else chains there to make up Notify target name.
+> > >     I ditched it (unfortunately I don't recall why) )  
+> > 
+> > After trying it, I can tell you why - it's a horrid mess of
+> > unreadable code, with arbitrary restraints on package
+> > length etc.
+> in my case it was only 4 character NameString, but Windows probably
+> wasn't happy or just ignored it.
+> Considering recent development (TPM series) it might have been issue
+> with SYSTEM_MEMORY not working properly if used as byte buffer field.
+> 
+> Even if it's an unreadable mess it's still stable mess and very constrained
+> one within a single firmware blob that came from source.
 
-On 07/26/2018 05:52 PM, Stefan Hajnoczi wrote:
-> On Thu, Jul 12, 2018 at 07:33:14AM +0000, Elijah Shakkour wrote:
->> Hey,
->>
->> Our team is adding a NIC functional  emulation to QEMU.
->> One of the features we are adding to this NIC is SRIOV.
->>
->> Here is the error message I get when checking SRIOV support of  our emulated NIC on Win2016 server (the hyper-v VM).
->> "
->> SR-IOV cannot be used on this system as the PCI Express hardware does not support Access Control Services (ACS) at any root port.
+That's exectly the argument we had for keeping ACPI
+generation in bios. It's just not an interface that scales.
 
-QEMU's emulated PCI Express Root Ports do not support ACS yet, however I 
-am not sure ACS is a prerequisite
-for SR-IOV. We would need ARI support for allowing more than 8VFs, but 
-QEMU doesn't support that either (yet).
+> Hence it's more preferable than split brain in this series.
+> 
+> But I don't think we even need dynamic AML for _CST usecase at all,
+> existing cpuhp interface should work just fine for it and should be
+> simpler as all infrastructure is already there.
 
-Knut Omag has some working patches, he successfully implemented SR-IOV 
-with QEMU, see:
-      https://github.com/knuto/qemu/tree/sriov_patches_v7
+Not sure I get what you mean. Could you post a patch?
 
-The code was not merged since we need at least a device with SR-IOV 
-support to justify the addition.
+> > > 2. (probably biggest issue) Loading dynamically generated AML
+> > >    basically would make all AML code ABI, so that static AML
+> > >    in RAM of old QEMU version would match dynamic generated
+> > >    one on target side with new QEMU (/me generalizing approach beyond _CST support).
+> > >    I'd try to keep our AML version less as much as possible
+> > >    and go this route only if there is no other way to do it.  
+> > 
+> > That's a good point, thanks for bringing this up!
+> > 
+> > So it seems that we will need to define the ABI, yes. All AML code is
+> > an over-statement though, there are specific entry points
+> > we must maintain, right?
+> Well, I'm rather unsure what and where could break,
+> hence I'm afraid of a new beast and it probably won't be easy
+> to convince me that ABI would be able to keep things manageable
+> and stable.
+> Considering big amount of AML code that we already have
+> I'm not confident eye balling during review and testing the latest
+> firmware/qemu would be sufficient as we suddenly would have exploded
+> test matrix where firmware in use is a mixed from old/and new parts.
 
->> Contact your system vendor for further information.
->> "
-> I'm not sure what the status of emulated SR-IOV is so I have CCed
-> Michael Tsirkin and Marcel Apfelbaum, the PCI maintainers in QEMU.
+Well there's one exported method so far and it relies on one container
+device in static table set which does not sound too hard to keep stable.
 
-Thanks,
-Marcel
+Given how simple the dynamic table is, how about just checking it
+with a unit test? It is literally a single return statement.
+If it returns a valid package, that is all that we
+care about. I can write some firmware to test that constraint.
 
->> Could you please advise about what could be the issue here?
->>
->> BTW: I use same configuration (VM XML file attached) when running linux VM (RH7.2) image (instead of Win Hyper-V) over the same host and SRIOV is working for me there.
->>
->> Here the XML file I use to define the VM (our emulated NIC is added at the end of XML):
->> "
->> <domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
->>    <name>nst105</name>
->>    <uuid>0249a525-2ee2-432b-a1f5-a6db83b089a3</uuid>
->>    <memory unit='KiB'>8388608</memory>
->>    <currentMemory unit='KiB'>8388608</currentMemory>
->>    <vcpu placement='static'>8</vcpu>
->>    <resource>
->>      <partition>/machine</partition>
->>    </resource>
->>    <os>
->>      <type arch='x86_64' machine='pc-q35-2.11'>hvm</type>
->>    </os>
->>    <features>
->>      <acpi/>
->>      <apic/>
->>      <hyperv>
->>        <relaxed state='on'/>
->>        <vapic state='on'/>
->>        <spinlocks state='on' retries='8191'/>
->>      </hyperv>
->>    </features>
->>    <cpu mode='custom' match='exact' check='none'>
->>      <model fallback='forbid'>SandyBridge</model>
->>      <feature policy='require' name='hypervisor'/>
->>      <feature policy='require' name='vmx'/>
->>    </cpu>
->>    <clock offset='localtime'>
->>      <timer name='rtc' tickpolicy='catchup'/>
->>      <timer name='pit' tickpolicy='delay'/>
->>      <timer name='hpet' present='no'/>
->>      <timer name='hypervclock' present='yes'/>
->>    </clock>
->>    <on_poweroff>destroy</on_poweroff>
->>    <on_reboot>restart</on_reboot>
->>    <on_crash>destroy</on_crash>
->>    <pm>
->>      <suspend-to-mem enabled='no'/>
->>      <suspend-to-disk enabled='no'/>
->>    </pm>
->>    <devices>
->>      <emulator>/opt/qemu/bin/qemu-system-x86_64</emulator>
->>      <disk type='file' device='disk'>
->>        <driver name='qemu' type='qcow2'/>
->>        <source file='/images/nst105.qcow2'/>
->>        <target dev='sda' bus='sata'/>
->>        <boot order='2'/>
->>        <address type='drive' controller='0' bus='0' target='0' unit='0'/>
->>      </disk>
->>      <controller type='usb' index='0' model='ich9-ehci1'>
->>        <address type='pci' domain='0x0000' bus='0x00' slot='0x1d' function='0x7'/>
->>      </controller>
->>      <controller type='usb' index='0' model='ich9-uhci1'>
->>        <master startport='0'/>
->>        <address type='pci' domain='0x0000' bus='0x00' slot='0x1d' function='0x0' multifunction='on'/>
->>      </controller>
->>      <controller type='usb' index='0' model='ich9-uhci2'>
->>        <master startport='2'/>
->>        <address type='pci' domain='0x0000' bus='0x00' slot='0x1d' function='0x1'/>
->>      </controller>
->>      <controller type='usb' index='0' model='ich9-uhci3'>
->>        <master startport='4'/>
->>        <address type='pci' domain='0x0000' bus='0x00' slot='0x1d' function='0x2'/>
->>      </controller>
->>      <controller type='sata' index='0'>
->>        <address type='pci' domain='0x0000' bus='0x00' slot='0x1f' function='0x2'/>
->>      </controller>
->>      <controller type='pci' index='0' model='pcie-root'/>
->>      <controller type='pci' index='1' model='pcie-root-port'>
->>        <model name='pcie-root-port'/>
->>        <target chassis='1' port='0x10'/>
->>        <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0' multifunction='on'/>
->>      </controller>
->>      <controller type='pci' index='2' model='pcie-root-port'>
->>        <model name='pcie-root-port'/>
->>        <target chassis='2' port='0x11'/>
->>        <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x1'/>
->>      </controller>
->>      <controller type='pci' index='3' model='pcie-root-port'>
->>        <model name='pcie-root-port'/>
->>        <target chassis='3' port='0x12'/>
->>        <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x2'/>
->>      </controller>
->>      <controller type='pci' index='4' model='dmi-to-pci-bridge'>
->>        <model name='i82801b11-bridge'/>
->>        <address type='pci' domain='0x0000' bus='0x00' slot='0x1e' function='0x0'/>
->>      </controller>
->>      <controller type='pci' index='5' model='pci-bridge'>
->>        <model name='pci-bridge'/>
->>        <target chassisNr='5'/>
->>        <address type='pci' domain='0x0000' bus='0x04' slot='0x00' function='0x0'/>
->>      </controller>
->>      <interface type='bridge'>
->>        <mac address='00:50:56:1b:dd:6f'/>
->>        <source bridge='br0'/>
->>        <model type='virtio'/>
->>        <boot order='1'/>
->>        <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
->>      </interface>
->>      <serial type='pty'>
->>        <target port='0'/>
->>      </serial>
->>      <console type='pty'>
->>        <target type='serial' port='0'/>
->>      </console>
->>      <input type='tablet' bus='usb'>
->>        <address type='usb' bus='0' port='1'/>
->>      </input>
->>      <input type='mouse' bus='ps2'/>
->>      <input type='keyboard' bus='ps2'/>
->>      <graphics type='vnc' port='-1' autoport='yes' listen='127.0.0.1' keymap='en-us'>
->>        <listen type='address' address='127.0.0.1'/>
->>      </graphics>
->>      <video>
->>        <model type='vga' vram='16384' heads='1' primary='yes'/>
->>        <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>
->>      </video>
->>      <memballoon model='virtio'>
->>        <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
->>      </memballoon>
->>    </devices>
->>    <seclabel type='none' model='none'/>
->>    <seclabel type='dynamic' model='dac' relabel='yes'/>
->>    <qemu:commandline>
->>      <qemu:arg value='-device'/>
->>      <qemu:arg value='pcie-root-port,pref64-reserve=500M,slot=0,id=pcie_port.1'/>
->>      <qemu:arg value='-netdev'/>
->>      <qemu:arg value='tap,id=tap5,ifname=tap5,script=no,downscript=no'/>
->>      <qemu:arg value='-device'/>
->>      <qemu:arg value='my_emu_nic,netdev=tap5,bus=pcie_port.1'/>
->>    </qemu:commandline>
->> </domain>
->> "
->> ______________________
->> General info:
->> Host OS: RH7.0 (Kernel: 4.14.13)
->> QEMU version: 2.11
->> libvirt version: 3.2.0
->> Running the following on the host shows that both nested and IOMMU are
->> enabled:
->> ~]#: cat /sys/module/kvm_intel/parameters/nested
->> Y
->> ~]# dmesg | grep -e DMAR -e IOMMU
->> [    0.000000] DMAR: IOMMU enabled
->>
->> Thanks,
->> Elijah
->>
+
+> > And that in the end isn't fundamentally different from the ABIs
+> > mandated by the ACPI spec.
+> > 
+> > So I have these ideas to try to mitigate the issues:
+> > - document the ABI (like we have in the ACPI spec)
+> > - use a specific prefix for all external calls (like _ for ACPI spec ones)
+> > - use a specific (different) prefix for all internal loaded calls (like
+> >   [A-Z] for non-ACPI spec ones)
+> ACPI spec horrible mess and bad example (even committee isn't able to keep it consistent)
+> but it's necessary evil (compared to no spec at all).
+> Adding ABI requirement will complicate coding/reviewing for
+> already complex AML compared to current non ABI way.
+> Hence from maintainability POV we should stay away from this approach
+> if there is a viable alternative.
+
+I agree. Not that I see one.
+
+> > 
+> > Thoughts?
+> > 
+> > > > This is a partially functional prototype.
+> > > > 
+> > > > What works:
+> > > >     loading _CST dynamically and reporting it to OSPM
+> > > > 
+> > > > What doesn't:
+> > > >     detecting host configuration and generating correct _CST package
+> > > >     notifying guest about the change to trigger _CST re-evaluation
+> > > >     disabling mwait/halt exists as appropriate
+> > > > 
+> > > > Michael S. Tsirkin (6):
+> > > >   acpi: aml: add aml_register()
+> > > >   acpi: generalize aml_package / aml_varpackage
+> > > >   acpi: aml_load/aml_unload
+> > > >   acpi: export acpi_checksum
+> > > >   acpi: init header without linking
+> > > >   acpi: aml generation for _CST
+> > > >   pc: HACK: acpi: tie in _CST object to Processor
+> > > > 
+> > > >  include/hw/acpi/acpi.h      |   2 +
+> > > >  include/hw/acpi/aml-build.h |  14 ++-
+> > > >  include/hw/acpi/cst.h       |   8 ++
+> > > >  include/hw/i386/pc.h        |   5 ++
+> > > >  hw/acpi/aml-build.c         |  81 ++++++++++++++---
+> > > >  hw/acpi/core.c              |   2 +-
+> > > >  hw/acpi/cpu.c               |   5 ++
+> > > >  hw/acpi/cpu_hotplug.c       |  11 +--
+> > > >  hw/acpi/cst.c               | 173 ++++++++++++++++++++++++++++++++++++
+> > > >  hw/arm/virt-acpi-build.c    |   2 +-
+> > > >  hw/i386/acpi-build.c        |  10 ++-
+> > > >  hw/acpi/Makefile.objs       |   2 +-
+> > > >  12 files changed, 290 insertions(+), 25 deletions(-)
+> > > >  create mode 100644 include/hw/acpi/cst.h
+> > > >  create mode 100644 hw/acpi/cst.c
+> > > >   
+> > 
