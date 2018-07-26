@@ -1,10 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fikYk-0000i5-Ch
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:00:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fikhw-0003eE-Lf
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:09:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fikYj-0007ty-GX
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:00:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fikhv-0007CP-Gw
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:09:48 -0400
+Date: Thu, 26 Jul 2018 20:09:37 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180726180937.GK4215@localhost.localdomain>
 References: <20180726113337.23144-1-kwolf@redhat.com>
 	<605ad10a-13c0-7f62-1c71-a8afe9021ee6@redhat.com>
 	<20180726150655.GG4215@localhost.localdomain>
@@ -14,14 +17,10 @@ References: <20180726113337.23144-1-kwolf@redhat.com>
 	<CAMRbyyvWsSTCfNaDJDFwqECsErJHc3=Z+SEaRea0rro95AwUgA@mail.gmail.com>
 	<20180726165823.GJ4215@localhost.localdomain>
 	<CAMRbyyuTtC8YUgn-GECRsV=NqUBudHte8XfkSeF2rftpf701vQ@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <53ff05bd-03ba-f4b8-e8f5-f47c5cacecc3@redhat.com>
-Date: Thu, 26 Jul 2018 13:00:00 -0500
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <CAMRbyyuTtC8YUgn-GECRsV=NqUBudHte8XfkSeF2rftpf701vQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH for-3.0] file-posix: Fix write_zeroes with
  unmap on block devices
 List-Id: <qemu-devel.nongnu.org>
@@ -32,52 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Idan Shaby <ishaby@redhat.com>
+To: Nir Soffer <nsoffer@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Idan Shaby <ishaby@redhat.com>
 
-On 07/26/2018 12:34 PM, Nir Soffer wrote:
-
+Am 26.07.2018 um 19:34 hat Nir Soffer geschrieben:
+> On Thu, Jul 26, 2018 at 7:58 PM Kevin Wolf <kwolf@redhat.com> wrote:
+> > Am 26.07.2018 um 18:46 hat Nir Soffer geschrieben:
+> > > I don't think we should depend on undocumented kernel code.
+> >
+> > Yes, the man page says "filesystem blocks" instead of just "blocks". If
+> > you're in a nit-picking mood, that excludes block devices. But I think
+> > it's pretty obvious what the intended meaning is and how it consistently
+> > extends to block devices, and the code confirms it.
+> >
+> > That's by far not "undocumented kernel code" in my book.
 > 
+> Maybe it is more correct to say this is poorly documented.
+> 
+> The manual is very specific about supported filesystems, but there
+> nothing about block devices:
+
+Well, as specific as "_at least_ the following filesystems" can be.
+
+>        Not all filesystems support FALLOC_FL_PUNCH_HOLE; if a filesystem
+>        doesn't support the operation, an error is returned.  The operation
+> is
+>        supported  on  at  least  the  following filesystems:
+> 
+>        *  XFS (since Linux 2.6.38)
+>        *  ext4 (since Linux 3.0)
+>        *  Btrfs (since Linux 3.7)
+>        *  tmpfs(5) (since Linux 3.5)
+> 
+> I expect to see something like:
+> 
+>     * block devices (since Linux 4.9)
+
+Yup, the man page does need an update. But it says "at least", so
+technically it's not wrong.
+
 > Anyway this looks the same level of documentation as FALLOC_FL_ZERO_RANGE,
 > so if we are ok with using it, FALLOC_FL_PUNCH_HOLE is fine.
 > 
 > Does this change mean that oVirt can start to enable discard for VM when
 > disks are using wipe-after-delete?
 > 
-> Currently we disable discard if a disk is marked for wiping, since discard
-> does not
-> guarantee that discarded ranges are zeroed.
+> Currently we disable discard if a disk is marked for wiping, since
+> discard does not guarantee that discarded ranges are zeroed.
 
-Discard does not ever guarantee anything (it is ALWAYS advisory, and 
-thus may be ignored at any point in the stack).  If you NEED to 
-guarantee that something reads as zeros, you have to either explicitly 
-write zeroes, or do a combination of discard first and write zeroes 
-second (and hopefully, the combination of discard+write zeroes is 
-sufficiently optimized in the case where you were lucky that discard 
-does result in a reads-as-zeroes to not do any extra work on the write 
-zeroes call).
+How do you wipe the disk? Does this really involve a write_zeroes
+operation in qemu? But even if so, we always implemented that correctly
+(modulo (mostly theoretical?) inaccuracy of BLKDISCARDZEROS in older
+kernels). This patch fixes that we fall back to inefficient explicit
+zero writing instead of offloading with recent kernels, but we didn't
+just discard.
 
-Oddly enough, write zeroes first and discard second is NOT guaranteed to 
-read zeroes; the most obvious case would be if discard across an 
-encrypted volume has some bulk-erase mechanism that writes all 0s to the 
-hardware but decrypting all 0s now sees garbage, which is different from 
-writing 0s which gets encrypted to something not all 0s on hardware 
-(that said, such a scenario might still be considered reasonably clean 
-for a wipe-after-delete disk - although with discard being advisory, 
-it's hard to make guarantees).
+The explanation I've heard before from your team was that you're wiping
+the disk with regular writes, but they feared that this doesn't take
+effect for blocks that have previously been discarded. This is bullshit
+without any basis in reality and has never been correct. When you zero
+out data regions, they read as zeros, period. It doens't make any
+difference whether the block had been discarded previously.
 
-The current kernel implementation that Kevin posted makes it look like 
-for block devices, you now get:
+So either way, I feel like I already explained it to your team a
+thousand times, but once again: Get rid of that behaviour yesterday. It
+doesn't make sense and it never made sense.
 
-FL_PUNCH_HOLE: guarantee that you read zeroes, using the fastest means 
-possible (possibly by discarding - but only when discard reads as zeroes)
-
-FL_PUNCH_HOLE | FL_NO_HIDE_STALE: deallocate, what you read is no longer 
-guaranteed (a true discard, regardless of whether discard reads as zeroes)
-
-FL_ZERO_RANGE: guarantee that you read zeroes, without using discard
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Kevin
