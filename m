@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fih6P-0007vF-FB
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 10:18:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1fih8E-0000vk-AG
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 10:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fih6M-0002Dx-EX
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 10:18:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59874 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fih6M-0002Dl-81
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 10:18:46 -0400
-Date: Thu, 26 Jul 2018 15:18:43 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180726141843.GA438@stefanha-x1.localdomain>
-References: <20180724142504.15092-1-stefanha@redhat.com>
-	<20180724142504.15092-2-stefanha@redhat.com>
-	<20180724143551.GK19167@redhat.com>
-	<20180724144101.GL19167@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fih8B-0004BZ-9M
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 10:20:42 -0400
+References: <20180725142758.9980-1-lbloch@janustech.com>
+	<20180725142758.9980-3-lbloch@janustech.com>
+	<20180726100242.GD4215@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3373f5e8-e613-c5eb-81d3-77a2b9dc73fb@redhat.com>
+Date: Thu, 26 Jul 2018 09:20:31 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="n8g4imXOkfNTN/H1"
-Content-Disposition: inline
-In-Reply-To: <20180724144101.GL19167@redhat.com>
-Subject: Re: [Qemu-devel] [PULL for-3.0 1/1] trace/simple: fix hang in child
- after fork(2)
+In-Reply-To: <20180726100242.GD4215@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 2/4 for-3.0] qcow2: Options'
+ documentation fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, Leonid Bloch <lbloch@janustech.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
+On 07/26/2018 05:02 AM, Kevin Wolf wrote:
+> Am 25.07.2018 um 16:27 hat Leonid Bloch geschrieben:
+>> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+>> ---
+>>   docs/qcow2-cache.txt |  3 +++
+>>   qemu-options.hx      | 10 ++++++----
+>>   2 files changed, 9 insertions(+), 4 deletions(-)
+>>
 
---n8g4imXOkfNTN/H1
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> +++ b/qemu-options.hx
+>> @@ -752,15 +752,17 @@ image file)
+>>   
+>>   @item cache-size
+>>   The maximum total size of the L2 table and refcount block caches in bytes
+>> -(default: 1048576 bytes or 8 clusters, whichever is larger)
+> 
+> I think it would be good to still say something about the default.
+> Maybe something like "default: the sum of l2-cache-size and
+> refcount-cache-size"?
 
-On Tue, Jul 24, 2018 at 03:41:01PM +0100, Daniel P. Berrang=E9 wrote:
-> On Tue, Jul 24, 2018 at 03:35:51PM +0100, Daniel P. Berrang=E9 wrote:
-> > On Tue, Jul 24, 2018 at 03:25:04PM +0100, Stefan Hajnoczi wrote:
-> > > The simple trace backend spawns a write-out thread which is used to
-> > > asynchronously flush the in-memory ring buffer to disk.
-> > >=20
-> > > fork(2) does not clone all threads, only the thread that invoked
-> > > fork(2).  As a result there is no write-out thread in the child proce=
-ss!
-> > >=20
-> > > This causes a hang during shutdown when atexit(3) handler installed by
-> > > the simple trace backend waits for the non-existent write-out thread.
-> > >=20
-> > > This patch uses pthread_atfork(3) to terminate the write-out thread
-> > > before fork and restart it in both the parent and child after fork.
-> > > This solves a hang in qemu-iotests 147 due to qemu-nbd --fork usage.
-> >=20
-> > I'm not convinced this is safe, as it looks like it has a window in
-> > which both the parent and child processes will be doing write-out to
-> > the same file.
-> >=20
-> > In particular in the main QEMU system emulators it means that any
-> > time we fork() in QEMU, eg for spawning commands with migration
-> > exec: URI, or TAP devuce ifup scripts, etc, we'll be starting a
-> > write-out thread in the child.
->=20
-> I'd be more inclined to have the pthread_atfork() handle simply terminate
-> the tracing process, reversing all effects of trace_init_backends(). Then
-> after qemu-nbd has called fork(), it can simply call trace_init_backends()
-> explicitly to start it running again. This avoids unecessarily starting
-> tracing in child processes that are not requiring/expecting it.
+Except what happens if you specify only one of l2-cache-size or 
+refcount-cache-size? Is the defaulted cache-size then just that one size 
+you specified (and the other cache ignored), or is the total cache size 
+still defaulted to the 1M/8-cluster size (assuming its larger than the 
+other size specified)?
 
-Good point.
+> 
+>>   @item l2-cache-size
+>> -The maximum size of the L2 table cache in bytes
+>> -(default: 4/5 of the total cache size)
+>> +The maximum size of the L2 table cache.
+> 
+> Why did you remove "in bytes" and add a period which the other options
+> don't have? I prefer the old version of this line.
+> 
+>> +(default: if cache-size is not defined - 1048576 bytes or 8 clusters, whichever
+>> +is larger; otherwise, as large as possible or needed within the cache-size,
+>> +while permitting the requested or the minimal refcount cache size)
+>>   
+>>   @item refcount-cache-size
+>>   The maximum size of the refcount block cache in bytes
+>> -(default: 1/5 of the total cache size)
+>> +(default: 4 times the cluster size, or any portion of the cache-size, if it is
+>> +specified and large enough, left over after allocating the full L2 cache)
+> 
+> I found the second part hard to understand. Maybe "4 times the cluster
+> size; or if both cache-size and l2-cache-size are given, the part of
+> the cache-size that is not used for the L2 cache yet."?
+> 
+> Kevin
+> 
 
-NACK
-
-Stefan
-
---n8g4imXOkfNTN/H1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbWdhDAAoJEJykq7OBq3PIX6wH/jxPik6nih5rQC8SsUyW+9GA
-KD90XxfWoy8A8+2VaT5M/ndnZydqtX2/SMVY3sTzHmko/jgguTbDxZNlpAXOwXLv
-mbvX876u4cYvinlG6KERfKXasGGlTtBRrxAtAMc5NqeEQBk1sWGc5nI02g2nxdke
-X2OBG8WRsLSrc4lWlPLoq6Uet7eln4piufR627f9wIQzv+wQaHqnbNkuU6P8JeZJ
-d58qW9y8BjZgt3j/sk9kwKxcDC7S2dYk7lm0R0o3xBOBsaxNrtpdwQ2Vij4tE12K
-YF3jPoDJRcCjV18O/jzrQKO7v2NC+HZTsMzHmy/mi7ZYhExwDjnaXYvAxRXw/II=
-=odFy
------END PGP SIGNATURE-----
-
---n8g4imXOkfNTN/H1--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
