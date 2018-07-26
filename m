@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fibY7-0000x0-Vz
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:23:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1fibaY-00035p-1Z
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:25:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fibY4-0000Ga-Vz
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:23:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55644)
+	(envelope-from <bounces@canonical.com>) id 1fibaV-0006Y0-0o
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:25:34 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56266)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fibY4-0000Cb-Mk
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:23:00 -0400
+	id 1fibaU-0006TR-EY
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:25:30 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fibY1-00063J-Qz
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 08:22:58 +0000
+	id 1fibaS-0006MK-Rt
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 08:25:28 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CC4002E818E
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 08:16:25 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id BC3E62E80CE
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 08:25:28 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Jul 2018 07:56:52 -0000
-From: =?utf-8?q?=C5=81ukasz_Zemczak?= <1587065@bugs.launchpad.net>
+Date: Thu, 26 Jul 2018 08:06:53 -0000
+From: Launchpad Bug Tracker <1587065@bugs.launchpad.net>
 Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
-Message-Id: <153259181262.32021.1037608847755566623.malone@chaenomeles.canonical.com>
+Message-Id: <153259241652.25709.4266134459820825768.malone@ackee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1587065] Update Released
+Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
+ block fsfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,13 +39,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The verification of the Stable Release Update for qemu has completed
-successfully and the package has now been released to -updates.
-Subsequently, the Ubuntu Stable Release Updates Team is being
-unsubscribed and will not receive messages about this bug report.  In
-the event that you encounter a regression using the package from
--updates please report a new bug using ubuntu-bug and tag the bug report
-regression-update so we can easily find any regressions.
+This bug was fixed in the package qemu - 1:2.5+dfsg-5ubuntu10.31
+
+---------------
+qemu (1:2.5+dfsg-5ubuntu10.31) xenial; urgency=3Dmedium
+
+  * d/p/ubuntu/lp-1587065-qga-ignore-EBUSY-when-freezing-a-filesystem.patch:
+    Fix qemu-guest-agent failing to freeze filesystems that were mounted
+    multiple times like bind mounts. (LP: #1587065).
+
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Thu, 28 Jun
+2018 11:35:05 +0200
+
+** Changed in: qemu (Ubuntu Xenial)
+       Status: Fix Committed =3D> Fix Released
 
 -- =
 
