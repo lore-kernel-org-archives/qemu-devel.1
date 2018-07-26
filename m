@@ -1,21 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fiZbu-0000g0-2j
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 02:18:53 -0400
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fia57-0006uv-Hv
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 02:49:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fiZbr-0001VV-2L
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 02:18:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56064 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fiZbq-0001V0-T8
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 02:18:47 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 26 Jul 2018 08:18:44 +0200
-Message-Id: <20180726061844.25992-3-armbru@redhat.com>
-In-Reply-To: <20180726061844.25992-1-armbru@redhat.com>
-References: <20180726061844.25992-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] qstring: Move qstring_from_substr()'s @end
- one to the right
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fia54-0007Th-JX
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 02:49:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37040)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sbhat@linux.vnet.ibm.com>)
+	id 1fia54-0007TX-9R
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 02:48:58 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6Q6mpoP015104
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 02:48:56 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2kf5w7f5qu-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 02:48:55 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sbhat@linux.vnet.ibm.com>;
+	Thu, 26 Jul 2018 07:48:53 +0100
+From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+Date: Thu, 26 Jul 2018 12:18:47 +0530
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <153258768962.6738.11319866502689416568.stgit@dhcp-9-109-246-16>
+Subject: [Qemu-devel] [PATCH] linux-user: ppc64: don't use volatile register
+ during safe_syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,118 +39,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: liujunjie23@huawei.com
+To: dgibson@redhat.com, riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu
+Cc: sbhat@linux.vnet.ibm.com, qemu-devel@nongnu.org
 
-qstring_from_substr() takes the index of the substring's first and
-last character.  qstring_from_substr(s, 0, SIZE_MAX) denotes an empty
-substring.  Awkward.
+r11 is a volatile register on PPC as per calling conventions.
+The safe_syscall code uses it to check if the signal_pending
+is set during the safe_syscall. When a syscall is interrupted
+on return from signal handling, the r11 might be corrupted
+before we retry the syscall leading to a crash. The registers
+r0-r13 are not to be used here as they have
+volatile/designated/reserved usages. Change the code to use
+r14 which is non-volatile and is appropriate for local use in
+safe_syscall.
 
-Shift the end index one to the right.  This simplifies both
-qstring_from_substr() and its callers.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
 ---
- block/blkdebug.c      | 2 +-
- block/blkverify.c     | 2 +-
- block/nbd.c           | 2 +-
- qobject/qstring.c     | 6 +++---
- tests/check-qobject.c | 2 +-
- tests/check-qstring.c | 2 +-
- 6 files changed, 8 insertions(+), 8 deletions(-)
+Steps to reproduce:
+On PPC host, issue `qemu-ppc64le /usr/bin/cc -E -`
+Attempt Ctrl-C, the issue is reproduced.
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 0457bf5b66..0759452925 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -305,7 +305,7 @@ static void blkdebug_parse_filename(const char *filename, QDict *options,
- 
-     if (c != filename) {
-         QString *config_path;
--        config_path = qstring_from_substr(filename, 0, c - filename - 1);
-+        config_path = qstring_from_substr(filename, 0, c - filename);
-         qdict_put(options, "config", config_path);
-     }
- 
-diff --git a/block/blkverify.c b/block/blkverify.c
-index da97ee5927..89bf4386e3 100644
---- a/block/blkverify.c
-+++ b/block/blkverify.c
-@@ -80,7 +80,7 @@ static void blkverify_parse_filename(const char *filename, QDict *options,
-     }
- 
-     /* TODO Implement option pass-through and set raw.filename here */
--    raw_path = qstring_from_substr(filename, 0, c - filename - 1);
-+    raw_path = qstring_from_substr(filename, 0, c - filename);
-     qdict_put(options, "x-raw", raw_path);
- 
-     /* TODO Allow multi-level nesting and set file.filename here */
-diff --git a/block/nbd.c b/block/nbd.c
-index b198ad775f..e87699fb73 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -109,7 +109,7 @@ static int nbd_parse_uri(const char *filename, QDict *options)
-         /* strip braces from literal IPv6 address */
-         if (uri->server[0] == '[') {
-             host = qstring_from_substr(uri->server, 1,
--                                       strlen(uri->server) - 2);
-+                                       strlen(uri->server) - 1);
-         } else {
-             host = qstring_from_str(uri->server);
-         }
-diff --git a/qobject/qstring.c b/qobject/qstring.c
-index 7990569c5a..6afb8b005c 100644
---- a/qobject/qstring.c
-+++ b/qobject/qstring.c
-@@ -41,12 +41,12 @@ QString *qstring_from_substr(const char *str, size_t start, size_t end)
- {
-     QString *qstring;
- 
--    assert(start <= end + 1);
-+    assert(start <= end);
- 
-     qstring = g_malloc(sizeof(*qstring));
-     qobject_init(QOBJECT(qstring), QTYPE_QSTRING);
- 
--    qstring->length = end - start + 1;
-+    qstring->length = end - start;
-     qstring->capacity = qstring->length;
- 
-     assert(qstring->capacity < SIZE_MAX);
-@@ -64,7 +64,7 @@ QString *qstring_from_substr(const char *str, size_t start, size_t end)
-  */
- QString *qstring_from_str(const char *str)
- {
--    return qstring_from_substr(str, 0, strlen(str) - 1);
-+    return qstring_from_substr(str, 0, strlen(str));
- }
- 
- static void capacity_increase(QString *qstring, size_t len)
-diff --git a/tests/check-qobject.c b/tests/check-qobject.c
-index 16ccbde82c..593c3a0618 100644
---- a/tests/check-qobject.c
-+++ b/tests/check-qobject.c
-@@ -154,7 +154,7 @@ static void qobject_is_equal_string_test(void)
-     str_case = qstring_from_str("Foo");
- 
-     /* Should yield "foo" */
--    str_built = qstring_from_substr("form", 0, 1);
-+    str_built = qstring_from_substr("form", 0, 2);
-     qstring_append_chr(str_built, 'o');
- 
-     check_unequal(str_base, str_whitespace_0, str_whitespace_1,
-diff --git a/tests/check-qstring.c b/tests/check-qstring.c
-index f11a7a8605..2d079921e3 100644
---- a/tests/check-qstring.c
-+++ b/tests/check-qstring.c
-@@ -66,7 +66,7 @@ static void qstring_from_substr_test(void)
- {
-     QString *qs;
- 
--    qs = qstring_from_substr("virtualization", 3, 9);
-+    qs = qstring_from_substr("virtualization", 3, 10);
-     g_assert(qs != NULL);
-     g_assert(strcmp(qstring_get_str(qs), "tualiza") == 0);
- 
--- 
-2.17.1
+Reference:
+https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
+
+ linux-user/host/ppc64/safe-syscall.inc.S |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
+index d30050a67c..b0cbbe6a69 100644
+--- a/linux-user/host/ppc64/safe-syscall.inc.S
++++ b/linux-user/host/ppc64/safe-syscall.inc.S
+@@ -49,7 +49,7 @@ safe_syscall_base:
+ 	 *               and returns the result in r3
+ 	 * Shuffle everything around appropriately.
+ 	 */
+-	mr	11, 3	/* signal_pending */
++	mr	14, 3	/* signal_pending */
+ 	mr	0, 4	/* syscall number */
+ 	mr	3, 5	/* syscall arguments */
+ 	mr	4, 6
+@@ -67,7 +67,7 @@ safe_syscall_base:
+ 	 */
+ safe_syscall_start:
+ 	/* if signal_pending is non-zero, don't do the call */
+-	lwz	12, 0(11)
++	lwz	12, 0(14)
+ 	cmpwi	0, 12, 0
+ 	bne-	0f
+ 	sc
