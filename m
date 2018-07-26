@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <saipava@xilinx.com>) id 1fidSm-0006Eb-Ar
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 06:25:43 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fidUr-0006x6-0T
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 06:27:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <saipava@xilinx.com>) id 1fidSj-0004Zn-AW
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 06:25:40 -0400
-Received: from mail-cys01nam02on0065.outbound.protection.outlook.com
-	([104.47.37.65]:53758
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1fidSi-0004WH-V6
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 06:25:37 -0400
-From: Sai Pavan Boddu <saipava@xilinx.com>
-Date: Thu, 26 Jul 2018 10:25:32 +0000
-Message-ID: <MWHPR02MB2478B45F18C19453BE8B54B2CA2B0@MWHPR02MB2478.namprd02.prod.outlook.com>
-References: <MWHPR02MB247893FCAFB6011E0CB1AACBCA540@MWHPR02MB2478.namprd02.prod.outlook.com>
-In-Reply-To: <MWHPR02MB247893FCAFB6011E0CB1AACBCA540@MWHPR02MB2478.namprd02.prod.outlook.com>
-Content-Language: en-US
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fidUo-00075Z-18
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 06:27:49 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:52510)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1fidUn-000754-Rk
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 06:27:45 -0400
+Received: by mail-it0-x244.google.com with SMTP id d9-v6so1802869itf.2
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 03:27:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] tb_flush during softreset
+In-Reply-To: <CAFEAcA8wi2QV9cVg_Hp=8MYw_zfxvVciR2CbRZiGJNiQNPdHqg@mail.gmail.com>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
+	<CAHmQWvDu+P26Y5CJfcQ=1_9C=hej_B8w7dLMbmuOmCV-+pYOJQ@mail.gmail.com>
+	<20180725114404.6g335n3rfjt23hjc@kamzik.brq.redhat.com>
+	<CAFEAcA8wi2QV9cVg_Hp=8MYw_zfxvVciR2CbRZiGJNiQNPdHqg@mail.gmail.com>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Thu, 26 Jul 2018 18:27:44 +0800
+Message-ID: <CAHmQWvDZytNXkw05DAnq_5HY3RN_UZUpue4kQ2-xSb+75SPgAg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +34,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Edgar Iglesias <edgari@xilinx.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jones <drjones@redhat.com>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-Hi,
+On 25 July 2018 at 20:19, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 25 July 2018 at 12:44, Andrew Jones <drjones@redhat.com> wrote:
+>> On Wed, Jul 25, 2018 at 06:46:59PM +0800, Hongbo Zhang wrote:
+>>> For Armv7, there is one typical platform 'vexpress', but for Armv8, no
+>>
+>> Wasn't the vexpress model designed for a specific machine?
+>
+> Yes.
+>
+>> Namely for
+>> Arm's simulator?
+>
+> No.
+>
+>> Is the vexpress model really something typical among
+>> all the Armv7 platforms?
+>
+> No.
+>
+> "Vexpress" is a model specifically of a development board
+> produced by Arm (the versatile express). It's useful if you
+> want to run code that runs on that devboard, but (as with
+> most of the devboards we model), it's not necessarily ideal,
+> because it has all the limitations of the real hardware it's
+> modelling (in this case the big ones are limited memory, no PCI).
+> The hardware it models is also quite old now (maybe 7 or 8 years)
+> and it's not really "typical" of anything. (In the primarily
+> embedded space where most v7 CPUs are there's not really anything
+> that could be described as "typical" anyway: everything is
+> different.)
+>
+> For most people who just want to run Linux on an emulated v7 CPU,
+> I would recommend the "virt" board, for the same reasons I
+> recommend it for v8 cores.
+>
+>>> such typical one, the 'virt' is typically for running workloads, one
+>>> example is using it under OpenStack.
+>>> So a 'typical' one for Armv8 is needed for firmware and OS
+>>> development, similar like 'vexpress' for Armv7.
+>>
+>> What is a "typical" Armv8 machine? What will a typical Armv8 machine be in
+>> two years?
+>>
+>> Note, I'm not actually opposed to the current definition (because I don't
+>> really have one myself). I'm just opposed to hard coding one.
+>
+> AIUI the aim here is to provide an emulated platform that is
+> set up in the way that server-style armv8 machines are
+> recommended to be set up, so it can be used as a testbed and
+> demonstration for the firmware/OS software stack. The hope
+> is that following "best practices" results in a "typical"
+> machine :-)  But the word "typical" is probably not really
+> very helpful here...
+Yes the aim is truely like that.
+Let's forget the word 'typical', a none-english speaker may has his
+slightly different understanding according to his own language
+culture...
 
-Still looking if anyone can comment on this, Thanks.
-
-Regards,
-Sai Pavan
-
-From: Sai Pavan Boddu
-Sent: Wednesday, July 25, 2018 1:34 PM
-To: qemu-devel@nongnu.org
-Cc: Edgar Iglesias <edgari@xilinx.com>
-Subject: tb_flush during softreset
-
-Hi,
-
-We are seeing issue when fetching tb cache, any suggestions for debug would=
- be helpful.
-
-Issue: Post soft reset of the core, bootloader(running over different cpu) =
-reloads the program memory and releases the reset. At that point CPU crashe=
-s after first tb cache fetch.
-
-Note: cpu's have mmu disabled. So no tlb_flush_pages are called.
-
-Question: Is tb_flush called when bootloader has written to program memory =
-of the target cpu ?
-
-Thanks & Regards,
-Sai Pavan
+>
+> I would expect that in the future we'd want this machine type
+> to evolve with the recommendations for how to build server
+> platform hardware, which might indeed be different in two years,
+> since it would be the development platform for writing/testing
+> the firmware/OS stack for that two-years-time hardware.
+>
+> thanks
+> -- PMM
