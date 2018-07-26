@@ -1,34 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fibaY-00035p-1Z
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:25:37 -0400
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fibbR-0003u0-FG
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:26:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fibaV-0006Y0-0o
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:25:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56266)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fibaU-0006TR-EY
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:25:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fibaS-0006MK-Rt
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 08:25:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BC3E62E80CE
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 08:25:28 +0000 (UTC)
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fibbO-0000br-FE
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:26:29 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59478
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sbhat@linux.vnet.ibm.com>)
+	id 1fibbO-0000av-7R
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:26:26 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6Q8NfiK068971
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 04:26:25 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2kfaa99fdc-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 04:26:25 -0400
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sbhat@linux.vnet.ibm.com>;
+	Thu, 26 Jul 2018 09:26:23 +0100
+From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+Date: Thu, 26 Jul 2018 13:56:19 +0530
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Jul 2018 08:06:53 -0000
-From: Launchpad Bug Tracker <1587065@bugs.launchpad.net>
-Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
-Message-Id: <153259241652.25709.4266134459820825768.malone@ackee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
- block fsfreeze
+Content-Transfer-Encoding: 7bit
+Message-Id: <153259340275.5529.15876484471761179518.stgit@dhcp-9-109-246-16>
+Subject: [Qemu-devel] [PATCH v2] linux-user: ppc64: don't use volatile
+ register during safe_syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,165 +40,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: dgibson@redhat.com, riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu
+Cc: qemu-ppc@nongnu.org, sbhat@linux.vnet.ibm.com, qemu-devel@nongnu.org
 
-This bug was fixed in the package qemu - 1:2.5+dfsg-5ubuntu10.31
+r11 is a volatile register on PPC as per calling conventions.
+The safe_syscall code uses it to check if the signal_pending
+is set during the safe_syscall. When a syscall is interrupted
+on return from signal handling, the r11 might be corrupted
+before we retry the syscall leading to a crash. The registers
+r0-r13 are not to be used here as they have
+volatile/designated/reserved usages. Change the code to use
+r14 which is non-volatile and is appropriate for local use in
+safe_syscall.
 
----------------
-qemu (1:2.5+dfsg-5ubuntu10.31) xenial; urgency=3Dmedium
+Steps to reproduce:
+On PPC host, issue `qemu-x86_64 /usr/bin/cc -E -`
+Attempt Ctrl-C, the issue is reproduced.
 
-  * d/p/ubuntu/lp-1587065-qga-ignore-EBUSY-when-freezing-a-filesystem.patch:
-    Fix qemu-guest-agent failing to freeze filesystems that were mounted
-    multiple times like bind mounts. (LP: #1587065).
+Reference:
+https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
 
- -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Thu, 28 Jun
-2018 11:35:05 +0200
+Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+Tested-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+---
+v1: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg05089.html
+Changes from v1:
+   Fixed the commit message as suggested
 
-** Changed in: qemu (Ubuntu Xenial)
-       Status: Fix Committed =3D> Fix Released
+ linux-user/host/ppc64/safe-syscall.inc.S |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1587065
-
-Title:
-  btrfs qemu-ga - multiple mounts block fsfreeze
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Fix Released
-
-Bug description:
-  [Impact]
-
-  =C2=A0* backport upstream fix to avoid double unmounts (e.g. bind mounts)
-  =C2=A0=C2=A0=C2=A0hanging the freeze action.
-
-  [Test Case]
-
-  =C2=A0* Prepare a guest
-  =C2=A0=C2=A0=C2=A0$ uvt-simplestreams-libvirt --verbose sync --source htt=
-p://cloud-images.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddai=
-ly
-  uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial l=
-abel=3Ddaily
-
-  =C2=A0* Shut it down and use virsh edit to add a channel for the agent. A=
-dd this somewhere under <devices>:
-  <channel type=3D'unix'>
-  =C2=A0=C2=A0=C2=A0<source mode=3D'bind'/>
-  =C2=A0=C2=A0=C2=A0<target type=3D'virtio' name=3D'org.qemu.guest_agent.0'=
-/>
-  </channel>
-
-  =C2=A0=C2=A0* Start the guest again, in it install qemu-guest-agent
-
-  =C2=A0=C2=A0*
-
-  =C2=A0=C2=A0* On the Host then freeze and thaw the guest
-  =C2=A0=C2=A0=C2=A0=C2=A0$ virsh domfsfreeze x-freeze
-  =C2=A0=C2=A0=C2=A0=C2=A0$ virsh domfsthaw x-freeze
-
-  =C2=A0=C2=A0# The above works, then trigger the issue, in the guest do
-  =C2=A0=C2=A0=C2=A0=C2=A0$ sudo mkdir /mnt/test
-  =C2=A0=C2=A0=C2=A0=C2=A0$ sudo mount -o bind / /mnt/test/
-
-  =C2=A0=C2=A0* Now the freeze/thaw will fail unless the fix is applied to =
-the
-  guest.
-
-  [Regression Potential]
-
-  =C2=A0* From looking at the code alone I could think of a different cause=
- that
-  =C2=A0=C2=A0=C2=A0makes it return EBUSY.
-  =C2=A0=C2=A0=C2=A0The biggest risk I could see due to that is the agent r=
-eporting a
-  =C2=A0=C2=A0=C2=A0successful freeze due to accepting EBUSY which is not a=
-ctually true.
-  =C2=A0=C2=A0=C2=A0But we have that in Ubuntu since Artful and
-  =C2=A0=C2=A0=C2=A0upstream since January 2017 and there are no such repor=
-ts.
-
-  [Other Info]
-
-  =C2=A0* n/a
-
-  ---
-
-  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
-sible.
-  root@CmsrvMTA:/# mount -l | grep /dev/vda2
-  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
-=3D/@)
-  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
-vol=3D/@home)
-
-  Having two mounts is rather common with btrfs, so the feature fsfreeze
-  is unusable on these systems.
-
-  Below more information about how we encountered this issue...
-
-  Message send to qemu-discuss@nongnu.org:
-
-  Message 1:
-  ----------
-  I use external snapshots to backup my guests. I use the 'quiesce' option =
-to flush and frees the guest file system with the qemu guest agent.
-
-  With the exeption of one guest, this procedure works fine. On the 'unwill=
-ing' guest, I get this error message:
-  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
-nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
-ze /: Device or resource busy"
-
-  I don't think this is not some sort of time-out error, because
-  activation of the fsfreeze and the error message happen immediately
-  after each other:
-
-  $ grep qemu-ga syslog.1
-  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
-
-  This is the only entry of the qemu guest agent in syslog.
-
-  $ sudo virsh version
-  Compiled against library: libvirt 1.3.1
-  Using library: libvirt 1.3.1
-  Gebruikte API: QEMU 1.3.1
-  Draaiende hypervisor: QEMU 2.5.0
-
-  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
-  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
-"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
-ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
--response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
-ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
-response":true}, ... }
-
-  For making an external snapshot, I use this command:
-  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
-uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
-
-  Piece of reply 1:
-  -----------------
-  I have encountered this before. Some operating systems
-  =C2=A0may have bind-mounts that let a device appear multiple times in the=
- mount list. Unfortunately the guest agent is not smart enough to consider =
-a device that has been frozen as succesfull and keep going. This causes thi=
-s specific error.
-
-  Piece of reply 2:
-  -----------------
-  Ok, that seems to be it.
-
-  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
-he same device formatted as btrfs on
-  two separate sub volumes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
+diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
+index d30050a67c..b0cbbe6a69 100644
+--- a/linux-user/host/ppc64/safe-syscall.inc.S
++++ b/linux-user/host/ppc64/safe-syscall.inc.S
+@@ -49,7 +49,7 @@ safe_syscall_base:
+ 	 *               and returns the result in r3
+ 	 * Shuffle everything around appropriately.
+ 	 */
+-	mr	11, 3	/* signal_pending */
++	mr	14, 3	/* signal_pending */
+ 	mr	0, 4	/* syscall number */
+ 	mr	3, 5	/* syscall arguments */
+ 	mr	4, 6
+@@ -67,7 +67,7 @@ safe_syscall_base:
+ 	 */
+ safe_syscall_start:
+ 	/* if signal_pending is non-zero, don't do the call */
+-	lwz	12, 0(11)
++	lwz	12, 0(14)
+ 	cmpwi	0, 12, 0
+ 	bne-	0f
+ 	sc
