@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fiaie-0005qI-IW
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:29:59 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fiaoD-0007qC-I6
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:35:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fiaib-0003g9-DC
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:29:52 -0400
-References: <20180725091233.3300-1-david@redhat.com>
-	<20180725170925.GE12380@localhost.localdomain>
-	<a33a67eb-2fb6-31fd-f4ca-1d883a5a7b75@redhat.com>
-	<20180725201438.GG12380@localhost.localdomain>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <36882ae2-5a00-d842-0b0d-d1458b1f0654@redhat.com>
-Date: Thu, 26 Jul 2018 09:29:44 +0200
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fiaoA-0006XE-Gk
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:35:37 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:42471)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1fiaoA-0006Wo-AD
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:35:34 -0400
+Received: by mail-io0-x241.google.com with SMTP id g11-v6so592976ioq.9
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 00:35:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180725201438.GG12380@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
+In-Reply-To: <20180725105330.GB2366@work-vm>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
+	<CAHmQWvCKkzim+-Z4Y69fWg6igZ7V6gaWhjKJZ0m0G0dhbwOFyw@mail.gmail.com>
+	<20180725105330.GB2366@work-vm>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Thu, 26 Jul 2018 15:35:32 +0800
+Message-ID: <CAHmQWvCHBxdMy+Qocc1XfURx86RTZd72rnB5-R=5QA00R6fEqw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,82 +33,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On 25.07.2018 22:14, Eduardo Habkost wrote:
-> On Wed, Jul 25, 2018 at 07:50:21PM +0200, David Hildenbrand wrote:
->> On 25.07.2018 19:09, Eduardo Habkost wrote:
-> [...]
->>>> +    if (local_err) {
->>>> +        g_assert(kvm_enabled());
->>>> +        error_report_err(local_err);
->>>> +        /* fallback to unsupported CPU models */
->>>> +        return;
->>>
->>> What about moving this outside instance_init?
+On 25 July 2018 at 18:53, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+> * Hongbo Zhang (hongbo.zhang@linaro.org) wrote:
+>> On 25 July 2018 at 17:54, Andrew Jones <drjones@redhat.com> wrote:
+>> > On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
+>> >> For the Aarch64, there is one machine 'virt', it is primarily meant to
+>> >> run on KVM and execute virtualization workloads, but we need an
+>> >> environment as faithful as possible to physical hardware, for supporting
+>> >> firmware and OS development for pysical Aarch64 machines.
+>> >>
+>> >> This patch introduces new machine type 'Enterprise' with main features:
+>> >>  - Based on 'virt' machine type.
+>> >>  - Re-designed memory map.
+>> >>  - EL2 and EL3 are enabled by default.
+>> >>  - GIC version 3 by default.
+>> >>  - AHCI controller attached to system bus, and then CDROM and hard disc
+>> >>    can be added to it.
+>> >>  - EHCI controller attached to system bus, with USB mouse and key board
+>> >>    installed by default.
+>> >>  - E1000E ethernet card on PCIE bus.
+>> >>  - VGA display adaptor on PCIE bus.
+>> >>  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
+>> >>  - No virtio functions enabled, since this is to emulate real hardware.
+>> >
+>> > In the last review it was pointed out that using virtio-pci should still
+>> > be "real" enough, so there's not much reason to avoid it. Well, unless
+>> > there's some concern as to what drivers are available in the firmware and
+>> > guest kernel. But that concern usually only applies to legacy firmwares
+>> > and kernels, and therefore shouldn't apply to AArch64.
+>> >
+>> In real physical arm hardware, *HCI are system memory mapped, not on PCIE.
+>> we need a QEMU platform like that. We need firmware developed on this
+>> QEMU platform can run on real hardware without change(or only a minor
+>> change)
+>
+> How would you deal with most modern hardware now using XHCI rather than
+> EHCI ?
+>
+Well, EHCI still works well on server, some new X86 servers have both
+XHCI and EHCI, Qualcomm Centriq Arm server even has only EHCI, so
+currently only the EHCI is added.
+I had no strong reason for XHCI or EHCI, if newer is better or some
+users have special requirement for XHCI, it can be added too.
+
+> Dave
+>
+>> Concern is not only available firmwares, but more emphasis is on new
+>> firmwares to be developed on this platform (target is developing
+>> firmware for hardware, but using qemu if hardware is not available
+>> temporarily), if virtio device used, then the newly developed firmware
+>> must include virtio front-end codes, but it isn't needed while run on
+>> real hardware at last.
 >>
->> To which place for example? We at least have to copy the CPU model
->> for each and every CPU instance (so we can modify it without side
->> effects using properties).
->=20
-> To any code that will look at cpu->model.
->=20
-> You are wrapping an interface that needs to report errors
-> (kvm_s390_get_host_cpu_model()) behind an interface that is not
-> able to report errors (object_new()).  There's nothing that
-> requires you to do that, does it?  You are free to provide an API
-> that is actually able to report errors, instead of relying on
-> object_new() only.
-
-I see what you mean. One solution would be to preload and store the
-model somewhere globally (not locally). So in the init function, we
-would not have to handle errors.
-
-But I am not even sure where we could do such a global initialization +
-be able to report errors easily. I remember that we had a hard time to
-get this running smoothly due to the dependency of
-kvm_s390_get_host_cpu_model() on:
-- accelerator
-- machine
-- KVM init state
-
-And initializing cpu->model in realize() is too late, because all
-properties have to access it. Even a pre_plug handler will not work.
-
-
-On the other hand, I decided to ignore all errors back then and fallback
-to the "host CPU model unknown" case, because there are some corner
-cases where we still want to allow running the "host" model even though
-there was a problem detecting it.
-
-So my summary would be: We ignore errors (and rather treat them like
-warnings) for a reason here and fallback to "unsupported CPU models",
-which allows to run + use QEMU even in environments where our CPU model
-detection fails (e.g. on a very strange new CPU model we could have in
-the future).
-
-Especially "!cpu->model" does not imply that there was an error. It
-includes disabled CPU model support or unavailable CPU model support
-(KVM), which is perfectly fine. Replicating initialization attempts at
-all places where we access "cpu->model" does therefore not sound 100%
-clean to me and most likely makes the code way more complicated.
-
-Right now the semantics are clear: if we have "!cpu->model" after the
-object has been created, details about the host CPU model are not
-available (models unavailable/unsupported). Modifying properties,
-baselining, expanding is not possible with that model then. But it can
-be used for execution.
-
->=20
-> But I understand that the QOM/qdev API doesn't make that job
-> easy.  On x86 we have X86CPU::max_features and
-> X86CPU::user_features because of that.
->=20
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+>> >>  - No paravirtualized fw_cfg device either.
+>> >>
+>> >> Arm Trusted Firmware and UEFI porting to this are done accordingly.
+>> >>
+>> >
+>> > How will UEFI get the ACPI tables from QEMU without fw-cfg? I didn't
+>> > see any sort of reserved ROM region in the patch for them.
+>> >
+>> UEFI gets ACPI and kernel from network or mass storage, just like the
+>> real hardware.
+>> If we develop firmware depends on paravirtualized device like fw_cfg,
+>> then we canot run such firmware on real hardware.
+>>
+>> > Thanks,
+>> > drew
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
