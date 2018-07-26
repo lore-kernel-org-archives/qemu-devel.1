@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fia57-0006uv-Hv
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 02:49:04 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fiaO1-00023h-OU
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:08:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fia54-0007Th-JX
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 02:49:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37040)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sbhat@linux.vnet.ibm.com>)
-	id 1fia54-0007TX-9R
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 02:48:58 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w6Q6mpoP015104
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 02:48:56 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2kf5w7f5qu-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 02:48:55 -0400
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sbhat@linux.vnet.ibm.com>;
-	Thu, 26 Jul 2018 07:48:53 +0100
-From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
-Date: Thu, 26 Jul 2018 12:18:47 +0530
+	(envelope-from <dovgaluk@ispras.ru>) id 1fiaNy-0000UD-MW
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:08:33 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:32862)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fiaNy-0000Ro-DP
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:08:30 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
+	<20180725121706.12867.98787.stgit@pasha-VirtualBox>
+	<20180725134429.roe7iuzakjywdv7e@var.youpi.perso.aquilenet.fr>
+In-Reply-To: <20180725134429.roe7iuzakjywdv7e@var.youpi.perso.aquilenet.fr>
+Date: Thu, 26 Jul 2018 10:08:29 +0300
+Message-ID: <000601d424af$74e5c900$5eb15b00$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Message-Id: <153258768962.6738.11319866502689416568.stgit@dhcp-9-109-246-16>
-Subject: [Qemu-devel] [PATCH] linux-user: ppc64: don't use volatile register
- during safe_syscall
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v5 24/24] slirp: fix ipv6 timers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,50 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgibson@redhat.com, riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu
-Cc: sbhat@linux.vnet.ibm.com, qemu-devel@nongnu.org
+To: 'Samuel Thibault' <samuel.thibault@gnu.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-r11 is a volatile register on PPC as per calling conventions.
-The safe_syscall code uses it to check if the signal_pending
-is set during the safe_syscall. When a syscall is interrupted
-on return from signal handling, the r11 might be corrupted
-before we retry the syscall leading to a crash. The registers
-r0-r13 are not to be used here as they have
-volatile/designated/reserved usages. Change the code to use
-r14 which is non-volatile and is appropriate for local use in
-safe_syscall.
+> From: Samuel Thibault [mailto:samuel.thibault@gnu.org]
+> Pavel Dovgalyuk, le mer. 25 juil. 2018 15:17:06 +0300, a ecrit:
+> > ICMP implementation for IPv6 uses timers based on virtual clock.
+> > This is incorrect because this service is not related to the guest state.
+> 
+> ? Why not?  The RAs are seen by the guest.  
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
----
-Steps to reproduce:
-On PPC host, issue `qemu-ppc64le /usr/bin/cc -E -`
-Attempt Ctrl-C, the issue is reproduced.
+Because virtual clock should be used by the virtual devices.
+slirp module is not the virtual device. Therefore processed packets
+become visible to the guest after passing to the virtual network card.
+Before that it can create any timers that should not change the state of the guest.
 
-Reference:
-https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
+> As documented:
+> 
+>  * @QEMU_CLOCK_REALTIME: Real time clock
+>  *
+>  * The real time clock should be used only for stuff which does not
+>  * change the virtual machine state, as it runs even if the virtual
+>  * machine is stopped.
+> 
+> There is no reason to "send RAs" while the machine is stopped.
 
- linux-user/host/ppc64/safe-syscall.inc.S |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I see.
+Then we'll need one more clock. Which works like realtime+virtual:
+intended to be used for the internal QEMU purposes, but stops when
+VM is stopped.
 
-diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
-index d30050a67c..b0cbbe6a69 100644
---- a/linux-user/host/ppc64/safe-syscall.inc.S
-+++ b/linux-user/host/ppc64/safe-syscall.inc.S
-@@ -49,7 +49,7 @@ safe_syscall_base:
- 	 *               and returns the result in r3
- 	 * Shuffle everything around appropriately.
- 	 */
--	mr	11, 3	/* signal_pending */
-+	mr	14, 3	/* signal_pending */
- 	mr	0, 4	/* syscall number */
- 	mr	3, 5	/* syscall arguments */
- 	mr	4, 6
-@@ -67,7 +67,7 @@ safe_syscall_base:
- 	 */
- safe_syscall_start:
- 	/* if signal_pending is non-zero, don't do the call */
--	lwz	12, 0(11)
-+	lwz	12, 0(14)
- 	cmpwi	0, 12, 0
- 	bne-	0f
- 	sc
+Pavel Dovgalyuk
