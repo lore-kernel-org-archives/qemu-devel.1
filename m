@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fikhw-0003eE-Lf
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:09:49 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fiklA-0005VD-El
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:13:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fikhv-0007CP-Gw
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:09:48 -0400
-Date: Thu, 26 Jul 2018 20:09:37 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180726180937.GK4215@localhost.localdomain>
-References: <20180726113337.23144-1-kwolf@redhat.com>
-	<605ad10a-13c0-7f62-1c71-a8afe9021ee6@redhat.com>
-	<20180726150655.GG4215@localhost.localdomain>
-	<6cdde651-acdc-e6eb-63fc-e7efe8136710@redhat.com>
-	<20180726153356.GH4215@localhost.localdomain>
-	<9eb742d5-42c7-29da-b06f-e41873d1d645@redhat.com>
-	<CAMRbyyvWsSTCfNaDJDFwqECsErJHc3=Z+SEaRea0rro95AwUgA@mail.gmail.com>
-	<20180726165823.GJ4215@localhost.localdomain>
-	<CAMRbyyuTtC8YUgn-GECRsV=NqUBudHte8XfkSeF2rftpf701vQ@mail.gmail.com>
+	(envelope-from <laurent@vivier.eu>) id 1fikl5-0001W5-Ig
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:13:08 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:42601)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fikl5-0001VK-6e
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:13:03 -0400
+References: <20180726132947.28538-1-alex.bennee@linaro.org>
+	<20180726132947.28538-2-alex.bennee@linaro.org>
+	<a2dd4939-3fd3-31dd-7763-c96b1b627c21@vivier.eu>
+	<87va91swu1.fsf@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <a77ed37b-e8b0-6c39-8975-75ae5353db78@vivier.eu>
+Date: Thu, 26 Jul 2018 20:12:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMRbyyuTtC8YUgn-GECRsV=NqUBudHte8XfkSeF2rftpf701vQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.0] file-posix: Fix write_zeroes with
- unmap on block devices
+In-Reply-To: <87va91swu1.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 for 3.0 1/2] linux-user/mmap.c: handle
+ len = 0 maps correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nsoffer@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Idan Shaby <ishaby@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, umarcor <1783362@bugs.launchpad.net>, Riku Voipio <riku.voipio@iki.fi>
 
-Am 26.07.2018 um 19:34 hat Nir Soffer geschrieben:
-> On Thu, Jul 26, 2018 at 7:58 PM Kevin Wolf <kwolf@redhat.com> wrote:
-> > Am 26.07.2018 um 18:46 hat Nir Soffer geschrieben:
-> > > I don't think we should depend on undocumented kernel code.
-> >
-> > Yes, the man page says "filesystem blocks" instead of just "blocks". If
-> > you're in a nit-picking mood, that excludes block devices. But I think
-> > it's pretty obvious what the intended meaning is and how it consistently
-> > extends to block devices, and the code confirms it.
-> >
-> > That's by far not "undocumented kernel code" in my book.
+Le 26/07/2018 à 19:58, Alex Bennée a écrit :
 > 
-> Maybe it is more correct to say this is poorly documented.
+> Laurent Vivier <laurent@vivier.eu> writes:
 > 
-> The manual is very specific about supported filesystems, but there
-> nothing about block devices:
-
-Well, as specific as "_at least_ the following filesystems" can be.
-
->        Not all filesystems support FALLOC_FL_PUNCH_HOLE; if a filesystem
->        doesn't support the operation, an error is returned.  The operation
-> is
->        supported  on  at  least  the  following filesystems:
+>> Le 26/07/2018 à 15:29, Alex Bennée a écrit:
+>>> I've slightly re-organised the check to more closely match the
+>>> sequence that the kernel uses in do_mmap().
+>>>
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>> Cc: umarcor <1783362@bugs.launchpad.net>
+>>> ---
+>>>  linux-user/mmap.c | 14 +++++++++++---
+>>>  1 file changed, 11 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+>>> index d0c50e4888..3ef69fa2d0 100644
+>>> --- a/linux-user/mmap.c
+>>> +++ b/linux-user/mmap.c
+>>> @@ -391,14 +391,22 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+>>>      }
+>>>  #endif
+>>>
+>>> -    if (offset & ~TARGET_PAGE_MASK) {
+>>> +    if (!len) {
+>>>          errno = EINVAL;
+>>>          goto fail;
+>>>      }
+>>>
+>>>      len = TARGET_PAGE_ALIGN(len);
+>>> -    if (len == 0)
+>>> -        goto the_end;
+>>> +    if (!len) {
+>>> +        errno = EINVAL;
+>>> +        goto fail;
+>>> +    }
+>>
+>> Why do you check twice len?
+>> TARGET_PAGE_ALIGN() rounds up the value, so if it was not 0, it cannot
+>> be now.
 > 
->        *  XFS (since Linux 2.6.38)
->        *  ext4 (since Linux 3.0)
->        *  Btrfs (since Linux 3.7)
->        *  tmpfs(5) (since Linux 3.5)
+> I was trying to follow the kernel style but I realise TARGET_PAGE_ALIGN
+> might be a different test compared to the kernel's PAGE_ALIGN(len) for
+> overflows:
+...
+> 	/* Careful about overflows.. */
+> 	len = PAGE_ALIGN(len);
+> 	if (!len)
+> 		return -ENOMEM;
 > 
-> I expect to see something like:
-> 
->     * block devices (since Linux 4.9)
 
-Yup, the man page does need an update. But it says "at least", so
-technically it's not wrong.
 
-> Anyway this looks the same level of documentation as FALLOC_FL_ZERO_RANGE,
-> so if we are ok with using it, FALLOC_FL_PUNCH_HOLE is fine.
-> 
-> Does this change mean that oVirt can start to enable discard for VM when
-> disks are using wipe-after-delete?
-> 
-> Currently we disable discard if a disk is marked for wiping, since
-> discard does not guarantee that discarded ranges are zeroed.
+OK, so keep it but you should use ENOMEM, not EINVAL (and add a comment :) )
 
-How do you wipe the disk? Does this really involve a write_zeroes
-operation in qemu? But even if so, we always implemented that correctly
-(modulo (mostly theoretical?) inaccuracy of BLKDISCARDZEROS in older
-kernels). This patch fixes that we fall back to inefficient explicit
-zero writing instead of offloading with recent kernels, but we didn't
-just discard.
-
-The explanation I've heard before from your team was that you're wiping
-the disk with regular writes, but they feared that this doesn't take
-effect for blocks that have previously been discarded. This is bullshit
-without any basis in reality and has never been correct. When you zero
-out data regions, they read as zeros, period. It doens't make any
-difference whether the block had been discarded previously.
-
-So either way, I feel like I already explained it to your team a
-thousand times, but once again: Get rid of that behaviour yesterday. It
-doesn't make sense and it never made sense.
-
-Kevin
+Thanks,
+Laurent
