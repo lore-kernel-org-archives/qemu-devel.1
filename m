@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fin4l-0002jH-Tq
+	(envelope-from <bounces@canonical.com>) id 1fin4l-0002jI-Tn
 	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:41:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fin4g-0001cj-Vv
+	(envelope-from <bounces@canonical.com>) id 1fin4h-0001cq-05
 	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:41:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35344)
+Received: from indium.canonical.com ([91.189.90.7]:35352)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fin4g-0001YB-OP
+	id 1fin4g-0001YO-OS
 	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:41:26 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fin4d-0004BG-MA
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 20:41:23 +0000
+	id 1fin4e-0004Af-4M
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 20:41:24 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A1CFD2E80EA
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 20:41:22 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4A1E32E80CB
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 20:41:23 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Jul 2018 20:33:04 -0000
+Date: Thu, 26 Jul 2018 20:34:31 -0000
 From: David Hoelzer <1777672@bugs.launchpad.net>
 Reply-To: Bug 1777672 <1777672@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152942324302.25954.17370619302309595715.malonedeb@soybean.canonical.com>
-Message-Id: <153263718489.4620.14120420016049512895.malone@gac.canonical.com>
+Message-Id: <153263727179.9162.2887614133601378597.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1777672] Re: QEMU aarch64 virtual/physical frame
  buffer
@@ -39,19 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Certainly!  Attached.
+Whoops.. Forgot to include the QEMU command line:
 
-
-If you start the attached on a piece of hardware, it will start and display=
- fine.. If you start it in QEMU, it will start but display a double-height =
-screen rather than limiting the physical screen to the specified dimensions.
-
-(The virtual display is double-height in preparation for double
-buffering)
-
-** Attachment added: "kernel8.img"
-   https://bugs.launchpad.net/qemu/+bug/1777672/+attachment/5168270/+files/=
-kernel8.img
+qemu-system-aarch64 -M raspi3 --kernel kernel8.img -serial stdio
 
 -- =
 
