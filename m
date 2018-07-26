@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fin8y-0005Fc-Dn
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:45:53 -0400
+	(envelope-from <lbloch@janustech.com>) id 1finVt-0001G4-HP
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 17:09:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fin8t-0007dG-Il
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:45:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33758 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fin8t-0007cf-BI
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:45:47 -0400
-Date: Thu, 26 Jul 2018 14:45:39 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180726144539.740acf4d@t450s.home>
-In-Reply-To: <20180723045956.27521-4-tiwei.bie@intel.com>
-References: <20180723045956.27521-1-tiwei.bie@intel.com>
-	<20180723045956.27521-4-tiwei.bie@intel.com>
+	(envelope-from <lbloch@janustech.com>) id 1finVq-00012d-65
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 17:09:33 -0400
+Date: Fri, 27 Jul 2018 00:08:58 +0300
+In-Reply-To: <20180726201903.GL4215@localhost.localdomain>
+References: <20180725082611.GA4879@localhost.localdomain>
+	<32a32b18-0c7c-63cd-3b1d-429717b23a85@redhat.com>
+	<499d5d12-cdba-76e4-3b2e-122675ef9eec@janustech.com>
+	<20180725133243.GC4879@localhost.localdomain>
+	<dd4a32bc-845c-f529-51a8-71c978f93861@janustech.com>
+	<20180725155323.GD4879@localhost.localdomain>
+	<0638cd7c-23f7-0f99-735b-c3fb3102e254@janustech.com>
+	<20180726144232.GE4215@localhost.localdomain>
+	<c1a93a3b-1207-99c9-fcf4-a23db8f45dcc@janustech.com>
+	<05696f3c-369e-22a7-a556-d6fae22ec623@janustech.com>
+	<20180726201903.GL4215@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 3/3] vhost-user: support programming VFIO
- group in master
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <80F33942-D745-468B-AFAA-0438B3D5B0B9@janustech.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] qcow2: Introduce an option for
+ sufficient L2 cache for the entire image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,163 +34,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Mon, 23 Jul 2018 12:59:56 +0800
-Tiwei Bie <tiwei.bie@intel.com> wrote:
 
-> Introduce a slave message to allow slave to share its
-> VFIO group fd to master and do the IOMMU programming
-> based on virtio device's DMA address space for this
-> group in QEMU.
-> 
-> For the vhost backends which support vDPA, they could
-> leverage this message to ask master to do the IOMMU
-> programming in QEMU for the vDPA device in backend.
-> 
-> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> ---
->  docs/interop/vhost-user.txt    | 16 ++++++++++++++
->  hw/virtio/vhost-user.c         | 40 ++++++++++++++++++++++++++++++++++
->  include/hw/virtio/vhost-user.h |  2 ++
->  3 files changed, 58 insertions(+)
-> 
-> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> index f59667f498..a57a8f9451 100644
-> --- a/docs/interop/vhost-user.txt
-> +++ b/docs/interop/vhost-user.txt
-> @@ -397,6 +397,7 @@ Protocol features
->  #define VHOST_USER_PROTOCOL_F_CONFIG         9
->  #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
->  #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
-> +#define VHOST_USER_PROTOCOL_F_VFIO_GROUP     12
->  
->  Master message types
->  --------------------
-> @@ -815,6 +816,21 @@ Slave message types
->        This request should be sent only when VHOST_USER_PROTOCOL_F_HOST_NOTIFIER
->        protocol feature has been successfully negotiated.
->  
-> + * VHOST_USER_SLAVE_VFIO_GROUP_MSG
-> +
-> +      Id: 4
-> +      Equivalent ioctl: N/A
-> +      Slave payload: N/A
-> +      Master payload: N/A
-> +
-> +      When VHOST_USER_PROTOCOL_F_VFIO_GROUP is negotiated, vhost-user slave
-> +      could send this request to share its VFIO group fd via ancillary data
-> +      to master. After receiving this request from slave, master will close
-> +      the existing VFIO group if any and do the DMA programming based on the
-> +      virtio device's DMA address space for the new group if the request is
-> +      sent with a file descriptor.
-> +
-> +
->  VHOST_USER_PROTOCOL_F_REPLY_ACK:
->  -------------------------------
->  The original vhost-user specification only demands replies for certain
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index b041343632..db958e24c7 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -52,6 +52,7 @@ enum VhostUserProtocolFeature {
->      VHOST_USER_PROTOCOL_F_CONFIG = 9,
->      VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD = 10,
->      VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
-> +    VHOST_USER_PROTOCOL_F_VFIO_GROUP = 12,
->      VHOST_USER_PROTOCOL_F_MAX
->  };
->  
-> @@ -97,6 +98,7 @@ typedef enum VhostUserSlaveRequest {
->      VHOST_USER_SLAVE_IOTLB_MSG = 1,
->      VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
->      VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG = 3,
-> +    VHOST_USER_SLAVE_VFIO_GROUP_MSG = 4,
->      VHOST_USER_SLAVE_MAX
->  }  VhostUserSlaveRequest;
->  
-> @@ -949,6 +951,41 @@ static int vhost_user_slave_handle_vring_host_notifier(struct vhost_dev *dev,
->      return 0;
->  }
->  
-> +static int vhost_user_slave_handle_vfio_group(struct vhost_dev *dev,
-> +                                              int *fd)
-> +{
-> +    struct vhost_user *u = dev->opaque;
-> +    VhostUserState *user = u->user;
-> +    VirtIODevice *vdev = dev->vdev;
-> +    int groupfd = fd[0];
-> +    VFIOGroup *group;
-> +
-> +    if (!virtio_has_feature(dev->protocol_features,
-> +                            VHOST_USER_PROTOCOL_F_VFIO_GROUP) ||
-> +        vdev == NULL) {
-> +        return -1;
-> +    }
-> +
-> +    if (user->vfio_group) {
-> +        vfio_put_group(user->vfio_group);
-> +        user->vfio_group = NULL;
-> +    }
-> +
-> +    group = vfio_get_group_from_fd(groupfd, vdev->dma_as, NULL);
-> +    if (group == NULL) {
-> +        return -1;
-> +    }
-> +
-> +    if (group->fd != groupfd) {
-> +        close(groupfd);
-> +    }
-> +
-> +    user->vfio_group = group;
-> +    fd[0] = -1;
-> +
-> +    return 0;
-> +}
 
-This all looks very sketchy, we're reaching into vfio internal state
-and arbitrarily releasing data structures, reusing existing ones, and
-maybe creating new ones.  We know that a vfio group only allows a
-single open, right?  So if you have a groupfd, vfio will never have
-that same group opened already.  Is that the goal?  It's not obvious in
-the code.  I don't really understand what vhost goes on to do with this
-group, but I'm pretty sure the existing state machine in vfio isn't
-designed for it.  Thanks,
+On July 26, 2018 11:19:03 PM EEST, Kevin Wolf <kwolf@redhat=2Ecom> wrote:
+>Am 26=2E07=2E2018 um 21:43 hat Leonid Bloch geschrieben:
+>> On 07/26/2018 05:50 PM, Leonid Bloch wrote:
+>> > On 07/26/2018 05:42 PM, Kevin Wolf wrote:
+>> > > Am 26=2E07=2E2018 um 14:24 hat Leonid Bloch geschrieben:
+>> > > > > > You mean with QDict? I'll look into that now=2E But
+>> > > > > > already sent v5 before
+>> > > > > > reading this email=2E
+>> > > > >=20
+>> > > > > Yes, with reading it from the QDict=2E (Or whatever the
+>simplest way is
+>> > > > > that results in the right external interface, but I suppose
+>this is the
+>> > > > > one=2E)
+>> > > >=20
+>> > > > Well, there is a problem with that: I can easily isolate
+>> > > > l2-cache-size from QDict, check if it is "full", and if it is -
+>> > > > do whatever
+>> > > > is needed, and delete this option before parsing=2E But what if
+>it
+>> > > > is "foo"?
+>> > > > It will not get deleted, and the regular QEMU_OPT_SIZE parsing
+>> > > > error will
+>> > > > appear, stating that l2-cache-size "expects a non-negative
+>> > > > number=2E=2E=2E" - no
+>> > > > word about that it can expect "full" as well=2E Now, one can try
+>to modify
+>> > > > local_err->msg for this particular option, but this will
+>require
+>> > > > substantial
+>> > > > additional logic=2E I think considering this, it would be easier
+>> > > > to stick with
+>> > > > a dedicated option, l2-cache-full=2E
+>> > > >=20
+>> > > > Do you think there is a smarter way to parse the l2-cache-size
+>> > > > option, so it
+>> > > > would accept both size and "full", while handling errors
+>> > > > correctly? It seems
+>> > > > more elegant to have a single option, but the internal handling
+>> > > > will be more
+>> > > > elegant and simpler with two mutually exclusive options=2E
+>> > >=20
+>> > > I think we can live with the suboptimal error message for a
+>while=2E Once
+>> > > qcow2 is QAPIfied, it should become easy to improve it=2E Let's not
+>choose
+>> > > a worse design (that stays forever) for a temporarily better
+>error
+>> > > message=2E
+>> >=20
+>> > OK=2E I'll add a TODO then=2E
+>>=20
+>> Another problem without a dedicated option, is that if l2-cache-size
+>is
+>> processed and deleted, it can not be read again when needed for
+>resizing=2E
+>> Without some *extremely* dirty tricks, that is=2E
+>
+>Are you sure? The way that the =2Ebdrv_open() callbacks work, _all_
+>options that are processed are removed from the QDict=2E The difference
+>is
+>just whether qemu_opts_absorb_qdict() removes them or you do that
+>manually=2E In the end, if options are left in the QDict, the block layer
+>returns an error because that means that an unknown option was
+>specified=2E
+>
+>I suppose you use bs->options while resizing=2E This is a copy of the
+>QDict which is not affected by the removal of processed options=2E
 
-Alex
+This probably explains why it works on the first resize, but fails on the =
+second onward=2E
 
-> +
->  static void slave_read(void *opaque)
->  {
->      struct vhost_dev *dev = opaque;
-> @@ -1021,6 +1058,9 @@ static void slave_read(void *opaque)
->          ret = vhost_user_slave_handle_vring_host_notifier(dev, &payload.area,
->                                                            fd[0]);
->          break;
-> +    case VHOST_USER_SLAVE_VFIO_GROUP_MSG:
-> +        ret = vhost_user_slave_handle_vfio_group(dev, fd);
-> +        break;
->      default:
->          error_report("Received unexpected msg type.");
->          ret = -EINVAL;
-> diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
-> index fd660393a0..9e11473274 100644
-> --- a/include/hw/virtio/vhost-user.h
-> +++ b/include/hw/virtio/vhost-user.h
-> @@ -10,6 +10,7 @@
->  
->  #include "chardev/char-fe.h"
->  #include "hw/virtio/virtio.h"
-> +#include "hw/vfio/vfio-common.h"
->  
->  typedef struct VhostUserHostNotifier {
->      MemoryRegion mr;
-> @@ -20,6 +21,7 @@ typedef struct VhostUserHostNotifier {
->  typedef struct VhostUserState {
->      CharBackend *chr;
->      VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
-> +    VFIOGroup *vfio_group;
->  } VhostUserState;
->  
->  VhostUserState *vhost_user_init(void);
+>
+>> Can QAPI be the solution? I've seen some examples, and it looks like
+>the
+>> qcow2 driver already uses QAPI to some extent - I mean all the qdict
+>stuff
+>> is from QAPI, no? Can you please point me to an example of how QAPI
+>can
+>> solve the issue of an option that can accept both a size and a
+>string?
+>
+>By using QAPI I mean using types like BlockdevOptionsQcow2=2E These types
+>are directly generated from the JSON schema, where it's possible to
+>specify an alternate of a string and an integer=2E
+>
+>One example for an alternate in the JSON schema is BlockdevRef, where
+>you can give a string (to reference a node-name) or an inline
+>declaration of a block device=2E In JSON, it looks like this:
+>
+>    { 'alternate': 'BlockdevRef',
+>      'data': { 'definition': 'BlockdevOptions',
+>                'reference': 'str' } }
+>
+>And the generated C type for it is:
+>
+>    struct BlockdevRef {
+>        QType type;
+>        union { /* union tag is @type */
+>            BlockdevOptions definition;
+>            char *reference;
+>        } u;
+>    };
+>
+>In our case, we would get a union of int64_t and char* instead, and
+>still the QType type as a discriminator=2E
+
+Thanks for the explanation!
+But qcow2 already has the options in the JSON file, they're just not used =
+for some reason?
+
+Leonid=2E
+
+>
+>Kevin
+
+--=20
+Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
