@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fiiqS-0006XT-AN
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:10:29 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fiirp-0007TJ-Vv
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:11:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fiiqR-0003dV-AJ
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:10:28 -0400
-References: <20180726113337.23144-1-kwolf@redhat.com>
-	<605ad10a-13c0-7f62-1c71-a8afe9021ee6@redhat.com>
-	<20180726150655.GG4215@localhost.localdomain>
-	<6cdde651-acdc-e6eb-63fc-e7efe8136710@redhat.com>
-	<20180726153356.GH4215@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9eb742d5-42c7-29da-b06f-e41873d1d645@redhat.com>
-Date: Thu, 26 Jul 2018 11:10:19 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fiirm-00054y-Kr
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:11:53 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38941)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fiirm-00053e-C8
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:11:50 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id h10-v6so2263892wre.6
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 09:11:50 -0700 (PDT)
+References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
+	<d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
+	<8bf07395-4872-ce74-c201-9fca232edd01@gmail.com>
+	<20180725105944.GC2366@work-vm>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <50119bfb-384d-49f0-609c-36de374a8c6b@gmail.com>
+Date: Thu, 26 Jul 2018 19:11:46 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180726153356.GH4215@localhost.localdomain>
+In-Reply-To: <20180725105944.GC2366@work-vm>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.0] file-posix: Fix write_zeroes with
- unmap on block devices
+Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Nir Soffer <nsoffer@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Rebecca Cran <rebecca@bluestop.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Yuval Shaia <yuval.shaia@oracle.com>
 
-On 07/26/2018 10:33 AM, Kevin Wolf wrote:
 
-> 
-> As far as I know, the comment you quoted is accurate for BLKDISCARD and
-> BLKZEROOUT, but not for the fallocate() flags.
-> 
 
-I sure wish the man pages were more explicit on what guarantees each 
-flag offers.
-
->> Hmm - that thread also mentions FALLOC_FL_NO_HIDE_STALE, which is a new flag
->> not present/documented on Fedora 28. I wonder if it helps, too.
+On 07/25/2018 01:59 PM, Dr. David Alan Gilbert wrote:
+> * Marcel Apfelbaum (marcel.apfelbaum@gmail.com) wrote:
+>> Hi,
 >>
->>>
->>> FALLOC_FL_ZERO_RANGE in contrast implements write_zeroes without unmap.
+>> On 07/25/2018 10:32 AM, Thomas Huth wrote:
+>>> On 25.07.2018 06:47, Rebecca Cran wrote:
+>>>> In commit 18a398f6a39df4b08ff86ac0d38384193ca5f4cc, ./configure on
+>>>> FreeBSD incorrectly detects RDMA support,
+>> configure is looking for the rdma related libraries,  if they are there,
+>> the rdma code will be compiled into QEMU.
 >>
->> I thought the opposite: FALLOC_FL_ZERO_RANGE guarantees that you read back
->> 0, using whatever is most efficient under the hood (in the case of block
->> devices, unmapping that reliably reads back as zero is favored).
-> 
-> See the code I quoted above, FALLOC_FL_ZERO_RANGE calls
-> blkdev_issue_zeroout() with BLKDEV_ZERO_NOUNMAP internally.
+>> You can try and run configure with --disable-rdma flag until we find
+>> a solution.
+> Note that this flag is tied to both the RMDA migration and the RDMA
+> device emulation; RDMA migration may well be working for the reporter.
 
-Having to resort to reading the kernel code to learn what the guarantees 
-are is annoying (it's nice that GPL guarantees that we CAN do that, but 
-it means the man pages could use some TLC so that we don't have to). 
-Especially since the kernel code has changed over time.
+That's in case they don't care for either RDMA functionality of course -
+to be used until we would find a solution.
 
-But your paste of current kernel code is rather hard to argue against.
+Thanks,
+Marcel
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> Dave
+>
+>>>>    with the build subsequently
+>>>> failing with:
+>>>>
+>>>> /home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:19:10: fatal error:
+>>>> 'linux/types.h' file not found
+>>>> #include <linux/types.h>
+>>>>            ^~~~~~~~~~~~~~~
+>> Do you have the kernel-headers package installed?
+>>
+>>>> 1 error generated.
+>>>> gmake[1]: *** [/home/bcran/workspace/qemu/rules.mak:69:
+>>>> hw/rdma/vmw/pvrdma_cmd.o] Error 1
+>>>> gmake[1]: *** Waiting for unfinished jobs....
+>>>> gmake: *** [Makefile:481: subdir-x86_64-softmmu] Error 2
+>>> When was it still working for you the last time? Was it still working
+>>> with v3.0-rc1 ? Or just with v2.12 ? Any chance that you could bisect
+>>> the problem to determine when it has been introduced?
+>> Good idea.
+>>
+>> Thanks,
+>> Marcel
+>>
+>>>    Thomas
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
