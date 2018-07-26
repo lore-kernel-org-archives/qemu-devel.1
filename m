@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fieep-00061l-MU
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 07:42:14 -0400
+	(envelope-from <otubo@redhat.com>) id 1fif0O-00031z-RB
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 08:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fieem-0003xv-NR
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 07:42:11 -0400
-Date: Thu, 26 Jul 2018 13:41:58 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180726114158.am7kgc3jekxg55i5@kamzik.brq.redhat.com>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
-	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
-	<CAHmQWvCKkzim+-Z4Y69fWg6igZ7V6gaWhjKJZ0m0G0dhbwOFyw@mail.gmail.com>
-	<20180725112621.imdzdkntpmh3n5og@kamzik.brq.redhat.com>
-	<CAHmQWvCfHFSU7RGKG5t6=m7ZSWZjf3TeqOo3cX2KT-GSiN3mPw@mail.gmail.com>
-	<20180726102855.x6ffdoqjpejpyae7@kamzik.brq.redhat.com>
-	<CAKv+Gu-ffZRNmACH6YieNsg=AHxJxYoXHsBGf6C=nOvFfTu7Sg@mail.gmail.com>
-	<20180726111109.w24jk6ehklimige7@kamzik.brq.redhat.com>
-	<CAKv+Gu80KfwZft4t1HtOXPuijuPLV80K9iW+BsTgs7WcnosMXA@mail.gmail.com>
+	(envelope-from <otubo@redhat.com>) id 1fif0L-0008T1-Qo
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 08:04:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58552 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1fif0L-0008Io-CX
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 08:04:25 -0400
+Date: Thu, 26 Jul 2018 14:04:08 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20180726120408.GA6511@vader>
+References: <20180725141610.12075-1-otubo@redhat.com>
+	<CAFEAcA-K-BAsMdn=0g3HCZEVfveLOjsmRutTgqOY96b_yvOs3Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="azLHFNyN32YCQGCU"
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu80KfwZft4t1HtOXPuijuPLV80K9iW+BsTgs7WcnosMXA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+In-Reply-To: <CAFEAcA-K-BAsMdn=0g3HCZEVfveLOjsmRutTgqOY96b_yvOs3Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/2] seccomp branch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On Thu, Jul 26, 2018 at 01:15:15PM +0200, Ard Biesheuvel wrote:
-> That may be true. But we'll still end up with a UEFI build that has
-> OVMF virtio bus drivers and device drivers included, blurring the line
-> between emulation and virtualization.
 
-The UEFI build can drop the virtio-mmio support, and all the virtio-mmio
-device drivers. Those haven't been necessary since the virt machine got
-a PCIe host bridge. You'd still need the virtio-pci device drivers, which
-may or may not "taint" the reference code, depending on its requirements.
+--azLHFNyN32YCQGCU
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > I don't disagree, but there's no point in making QEMU ACPI generation
-> > code changes that will never be consumed. This patch adds tables for
-> > the hard coded ?HCI controllers to ACPI. We don't need those changes for
-> > the virt machine and, without fw-cfg, you can't use them on the reference
-> > machine.
+On 26/07/2018 - 11:47:46, Peter Maydell wrote:
+> On 25 July 2018 at 15:16, Eduardo Otubo <otubo@redhat.com> wrote:
+> > The following changes since commit 18a398f6a39df4b08ff86ac0d38384193ca5=
+f4cc:
 > >
-> 
-> Ah, indeed. I missed that bit.
-> 
-> We should not include any changes that modify the DT node or ACPI
-> table generation for mach-virt.
->
+> >   Update version for v3.0.0-rc2 release (2018-07-24 22:06:31 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/otubo/qemu.git tags/pull-seccomp-20180725
+> >
+> > for you to fetch changes up to 5b2f59307372bae13a2ff95706646674eccb65e0:
+> >
+> >   RFC: seccomp: prefer SCMP_ACT_KILL_PROCESS if available (2018-07-25 1=
+6:07:31 +0200)
+> >
+> > ----------------------------------------------------------------
+> > pull-seccomp-20180725
+> >
+> > ----------------------------------------------------------------
+> > Marc-Andr=C3=A9 Lureau (2):
+> >       seccomp: use SIGSYS signal instead of killing the thread
+> >       RFC: seccomp: prefer SCMP_ACT_KILL_PROCESS if available
+>=20
+> Hi. This fails to compile with clang:
+>=20
+>   CC      qemu-seccomp.o
+> qemu-seccomp.c:112:1: error: unused function 'qemu_seccomp'
+> [-Werror,-Wunused-function]
+> qemu_seccomp(unsigned int operation, unsigned int flags, void *args)
+> ^
+>=20
+> This is because clang is stricter about warning about static inline
+> functions defined in .c files but never used and your ifdef
+> guard on the callsite is not matched by one around the function
+> definition.
+>=20
 
-The patch guards the generation. It'll only modify DT and ACPI for the
-new machine type. But, while modifying the DT makes sense, as that
-generated DT will get consumed, the ACPI tables have no way of being
-consumed without fw-cfg. If the new machine type doesn't want fw-cfg,
-then there's no need to touch any ACPI generation code at all in this
-patch.
+Peter, sorry for not catching that before.
+Marc, can you fix and resend?
 
-Thanks,
-drew
+--=20
+Eduardo Otubo
+
+--azLHFNyN32YCQGCU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbWbi4AAoJEN8y58Dw//miZeEIAMqdGNJv+Bj16OWnRCduRpil
+7zHUT3TYi2pBzJMiJa9+f6jcE4E+cfC03BfWsA9ybDCi4EFVo8LtQpn10NZ+Ghla
+Avm2lyDc/Z0QGSXfBq1MfN2bNXaYHbuuh/+2olCB86P3i9nYEliRxMN00ocJOB81
+n+rz4mBs5WHZ/ggi+tZg2HsLe1EDia/cRWW56FeoHvHyJa9Mzg9FN+n8KdjGKwEZ
+kRoFdbKR4YHscWEGgrvh96o+BFfNdbfp6YbxGiVKEm59H4A5TqBz6AHfHcZAZgHu
+/IdDn+WE0MdWUuORMoqXBpBHN2FMTrlVd+mJqFdRDOsg1Licd7D1gZXhuA8A2GE=
+=BjoS
+-----END PGP SIGNATURE-----
+
+--azLHFNyN32YCQGCU--
