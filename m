@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fie1W-00043D-C8
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 07:01:37 -0400
+	(envelope-from <drjones@redhat.com>) id 1fieB1-0005jc-GW
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 07:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fie1T-0002Bq-E9
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 07:01:34 -0400
-References: <20180726023645.13927-1-joel@jms.id.au>
-	<20180726023645.13927-3-joel@jms.id.au>
-From: Julia Suvorova <jusual@mail.ru>
-Message-ID: <94bc2d11-7916-bc4e-02d8-da62e3ed303b@mail.ru>
-Date: Thu, 26 Jul 2018 14:01:07 +0300
+	(envelope-from <drjones@redhat.com>) id 1fieAy-0000aw-FY
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 07:11:23 -0400
+Date: Thu, 26 Jul 2018 13:11:09 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180726111109.w24jk6ehklimige7@kamzik.brq.redhat.com>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
+	<CAHmQWvCKkzim+-Z4Y69fWg6igZ7V6gaWhjKJZ0m0G0dhbwOFyw@mail.gmail.com>
+	<20180725112621.imdzdkntpmh3n5og@kamzik.brq.redhat.com>
+	<CAHmQWvCfHFSU7RGKG5t6=m7ZSWZjf3TeqOo3cX2KT-GSiN3mPw@mail.gmail.com>
+	<20180726102855.x6ffdoqjpejpyae7@kamzik.brq.redhat.com>
+	<CAKv+Gu-ffZRNmACH6YieNsg=AHxJxYoXHsBGf6C=nOvFfTu7Sg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180726023645.13927-3-joel@jms.id.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] arm: Add Nordic Semiconductor nRF51
- SoC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu-ffZRNmACH6YieNsg=AHxJxYoXHsBGf6C=nOvFfTu7Sg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,157 +30,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 26.07.2018 05:36, Joel Stanley wrote:
-> The nRF51 is a Cortex-M0 microcontroller with an on-board radio module,
-> plus other common ARM SoC peripherals.
+On Thu, Jul 26, 2018 at 12:35:08PM +0200, Ard Biesheuvel wrote:
+> On 26 July 2018 at 12:28, Andrew Jones <drjones@redhat.com> wrote:
+> > On Thu, Jul 26, 2018 at 05:22:14PM +0800, Hongbo Zhang wrote:
+> >> On 25 July 2018 at 19:26, Andrew Jones <drjones@redhat.com> wrote:
+> >> > On Wed, Jul 25, 2018 at 06:22:17PM +0800, Hongbo Zhang wrote:
+> >> >> On 25 July 2018 at 17:54, Andrew Jones <drjones@redhat.com> wrote:
+> >> >> > On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
+> >> >> >> For the Aarch64, there is one machine 'virt', it is primarily meant to
+> >> >> >> run on KVM and execute virtualization workloads, but we need an
+> >> >> >> environment as faithful as possible to physical hardware, for supporting
+> >> >> >> firmware and OS development for pysical Aarch64 machines.
+> >> >> >>
+> >> >> >> This patch introduces new machine type 'Enterprise' with main features:
+> >> >> >>  - Based on 'virt' machine type.
+> >> >> >>  - Re-designed memory map.
+> >> >> >>  - EL2 and EL3 are enabled by default.
+> >> >> >>  - GIC version 3 by default.
+> >> >> >>  - AHCI controller attached to system bus, and then CDROM and hard disc
+> >> >> >>    can be added to it.
+> >> >> >>  - EHCI controller attached to system bus, with USB mouse and key board
+> >> >> >>    installed by default.
+> >> >> >>  - E1000E ethernet card on PCIE bus.
+> >> >> >>  - VGA display adaptor on PCIE bus.
+> >> >> >>  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
+> >> >> >>  - No virtio functions enabled, since this is to emulate real hardware.
+> >> >> >
+> >> >> > In the last review it was pointed out that using virtio-pci should still
+> >> >> > be "real" enough, so there's not much reason to avoid it. Well, unless
+> >> >> > there's some concern as to what drivers are available in the firmware and
+> >> >> > guest kernel. But that concern usually only applies to legacy firmwares
+> >> >> > and kernels, and therefore shouldn't apply to AArch64.
+> >> >> >
+> >> >> In real physical arm hardware, *HCI are system memory mapped, not on PCIE.
+> >> >> we need a QEMU platform like that. We need firmware developed on this
+> >> >> QEMU platform can run on real hardware without change(or only a minor
+> >> >> change)
+> >> >
+> >> > virtio-pci has nothing to do with *HCI. You're adding an E1000e to the
+> >> > PCIe bus instead of a virtio-pci nic. Why?
+> >> >
+> >> No virtio devices are need on this platform, so no virtio-pci either,
+> >> on the real Arm server hardware, a NIC is inserted into PCIE, and
+> >> E1000E is a typical one.
+> >
+> > It is possible to make a real piece of hardware that really goes in a PCIe
+> > slot which knows how to talk VirtIO. The fact that an E1000e driver will
+> > drive an E1000e QEMU model instead of a VirtIO driver driving a VirtIO
+> > backend is, to me, pretty arbitrary. The only reason it should matter for
+> > the guest firmware/kernel is whether or not the firmware/kernel will have
+> > VirtIO drivers available. Do we know that? Is it documented somewhere
+> > that the guest firmware/kernel is guaranteed to have E1000e drivers, but
+> > VirtIO drivers are optional, or even forbidden? If so, where's that
+> > document?
+> >
 > 
->   http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
-> 
-> This defines a basic model of the CPU and memory, with no peripherals
-> implemented at this stage.
-> 
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> ---
-> v2:
->    put memory as struct fileds in state structure
->    pass OBJECT(s) as owner, not NULL
->    Add missing addresses for ficr
->    Fix flash and sram sizes for microbit
->    Embed cpu object in state object an initalise it without use of armv7m_init
->    Link to datasheet
-> v3:
->    rebase nrf51 on m0 changes
->    remove unused kernel_filename
->    clarify flash and sram size
->    make flash and sram size properties of the soc state
-> ---
->   default-configs/arm-softmmu.mak |   1 +
->   hw/arm/Makefile.objs            |   1 +
->   hw/arm/nrf51_soc.c              | 119 ++++++++++++++++++++++++++++++++
->   include/hw/arm/nrf51_soc.h      |  42 +++++++++++
->   4 files changed, 163 insertions(+)
->   create mode 100644 hw/arm/nrf51_soc.c
->   create mode 100644 include/hw/arm/nrf51_soc.h
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index e704cb6e34d7..3432721d7d08 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -102,6 +102,7 @@ CONFIG_STM32F2XX_SYSCFG=y
->   CONFIG_STM32F2XX_ADC=y
->   CONFIG_STM32F2XX_SPI=y
->   CONFIG_STM32F205_SOC=y
-> +CONFIG_NRF51_SOC=y
->   
->   CONFIG_CMSDK_APB_TIMER=y
->   CONFIG_CMSDK_APB_UART=y
-> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> index b1e4f8f006aa..e31875ec69bc 100644
-> --- a/hw/arm/Makefile.objs
-> +++ b/hw/arm/Makefile.objs
-> @@ -36,3 +36,4 @@ obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
->   obj-$(CONFIG_IOTKIT) += iotkit.o
->   obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
->   obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o smmuv3.o
-> +obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o
-> diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-> new file mode 100644
-> index 000000000000..03fa1dfc7456
-> --- /dev/null
-> +++ b/hw/arm/nrf51_soc.c
-> @@ -0,0 +1,119 @@
-> +/*
-> + * Nordic Semiconductor nRF51 SoC
-> + * http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.1.pdf
-> + *
-> + * Copyright 2018 Joel Stanley <joel@jms.id.au>
-> + *
-> + * This code is licensed under the GPL version 2 or later.  See
-> + * the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qemu-common.h"
-> +#include "hw/arm/arm.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/boards.h"
-> +#include "hw/devices.h"
-> +#include "hw/misc/unimp.h"
-> +#include "exec/address-spaces.h"
-> +#include "sysemu/sysemu.h"
-> +#include "qemu/log.h"
-> +#include "cpu.h"
-> +
-> +#include "hw/arm/nrf51_soc.h"
-> +
-> +#define IOMEM_BASE      0x40000000
-> +#define IOMEM_SIZE      0x20000000
-> +
-> +#define FICR_BASE       0x10000000
-> +#define FICR_SIZE       0x000000fc
-> +
-> +#define FLASH_BASE      0x00000000
-> +#define SRAM_BASE       0x20000000
-> +
-> +/* The size and base is for the NRF51822 part. If other parts
-> + * are supported in the future, add a sub-class of NRF51SoC for
-> + * the specific variants */
-> +#define NRF51822_FLASH_SIZE     (256 * 1024)
-> +#define NRF51822_SRAM_SIZE      (16 * 1024)
-> +
-> +static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
-> +{
-> +    NRF51State *s = NRF51_SOC(dev_soc);
-> +    Error *err = NULL;
-> +
-> +    if (!s->board_memory) {
-> +        error_setg(errp, "memory property was not set");
-> +        return;
-> +    }
-> +
-> +    object_property_set_link(OBJECT(&s->cpu), OBJECT(&s->container), "memory",
-> +            &err);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
-> +
-> +    memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
-> +
-> +    memory_region_init_ram(&s->flash, OBJECT(s), "nrf51.flash", s->flash_size,
-> +            &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    memory_region_set_readonly(&s->flash, true);
-> +    memory_region_add_subregion(&s->container, FLASH_BASE, &s->flash);
-> +
-> +    memory_region_init_ram(&s->sram, NULL, "nrf51.sram", s->sram_size, &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    memory_region_add_subregion(&s->container, SRAM_BASE, &s->sram);
-> +
-> +    create_unimplemented_device("nrf51_soc.io", IOMEM_BASE, IOMEM_SIZE);
-> +    create_unimplemented_device("nrf51_soc.ficr", FICR_BASE, FICR_SIZE);
-> +    create_unimplemented_device("nrf51_soc.private", 0xF0000000, 0x10000000);
-> +}
-> +
-> +static void nrf51_soc_init(Object *obj)
-> +{
-> +    NRF51State *s = NRF51_SOC(obj);
-> +
-> +    memory_region_init(&s->container, obj, "nrf51-container", UINT64_MAX);
-> +
-> +    object_initialize(&s->cpu, sizeof(s->cpu), TYPE_ARM_M_PROFILE);
-> +    object_property_add_child(OBJECT(s), "armv6m", OBJECT(&s->cpu), &error_abort);
-> +    qdev_set_parent_bus(DEVICE(&s->cpu), sysbus_get_default());
-> +    qdev_prop_set_string(DEVICE(&s->cpu), "cpu-type", ARM_CPU_TYPE_NAME("cortex-m0"));
-> +    qdev_prop_set_uint32(DEVICE(&s->cpu), "num-irq", 96);
+> It is not pretty arbitrary. One is paravirtualization and one is not.
 
-Where did this number come from? ARMv6-M NVIC supports only 32 interrupts.
+But the paravirtness is a driver detail, not a platform detail. The
+virtio-pci device is just a PCIe device to the platform. Drive it or
+not, drive it with knowledge that it's paravirt or not, the platform
+doesn't care.
 
-Best regards, Julia Suvorova.
+> 
+> >>
+> >> >> Concern is not only available firmwares, but more emphasis is on new
+> >> >> firmwares to be developed on this platform (target is developing
+> >> >> firmware for hardware, but using qemu if hardware is not available
+> >> >> temporarily), if virtio device used, then the newly developed firmware
+> >> >> must include virtio front-end codes, but it isn't needed while run on
+> >> >> real hardware at last.
+> >> >
+> >> > Right. The new firmwares and kernels would need to include virtio-pci nic
+> >> > and scsi drivers. Is that a problem? Anyway, this is all the more reason
+> >> > not to hard code peripherals. If a particular peripheral is a problem
+> >> > for a given firmware, then simply don't add it to the command line, add a
+> >> > different one.
+> >> >
+> >> Yes that is problem, for newly developed firmwares, extra efforts will
+> >> be wasted on frontend codes (or glue-layer, whatever we call it), we
+> >> want firmwares developed on this platform can run easily on real
+> >> hardware, without such change.
+> >> Requirement is: some Linaro members just want a qemu platform as true
+> >> as possible with real hardware, there should be no problem with such
+> >> requirement, problem is 'virt' machine cannot satisfy the requirement,
+> >> so a new one is needed.
+> >
+> > It sounds like somebody knows what drivers are available and what
+> > drivers aren't. If that's not already documented, then it should
+> > be, and a pointer to it should be in this patch series.
+> >
+> 
+> Available where?
+
+Available in UEFI, ARM-TF, and the target guest kernel. What software
+stack is this machine model targeting? I get the impression people
+know what they need, but knowing and specifying with a document are
+two different things.
+
+> 
+> UEFI has drivers for ?HCI industry standard hardware. As for the
+> networking side, we should review whether E1000e is the most
+> appropriate or this, given the lack of open source drivers. However, I
+> do agree that discoverable hardware should not be hardcoded, and we
+> should even try to use the emulated option ROM to provide a UEFI
+> driver.
+
+Amen to that.
+
+> 
+> >>
+> >> >>
+> >> >> >>  - No paravirtualized fw_cfg device either.
+> >> >> >>
+> >> >> >> Arm Trusted Firmware and UEFI porting to this are done accordingly.
+> >> >> >>
+> >> >> >
+> >> >> > How will UEFI get the ACPI tables from QEMU without fw-cfg? I didn't
+> >> >> > see any sort of reserved ROM region in the patch for them.
+> >> >> >
+> >> >> UEFI gets ACPI and kernel from network or mass storage, just like the
+> >> >> real hardware.
+> >> >
+> >> > Hmm. I thought for real hardware that the ACPI tables were built into
+> >> > the firmware. So, assuming UEFI knows how to read ACPI tables from
+> >> > some storage, then how do the QEMU generated ACPI tables get into that
+> >> > storage?
+> >> >
+> >> I should say "mass storage and flash"
+> >> There was fw_cfg in v1 patch, it is removed in v2.
+> >> If no fw_cfg, just like real hardware, UEFI should include ACPI
+> >> support for this SBSA platform, and UEFI/ACPI is load via -pflash,
+> >> then the QEMU built-in ACPI isn't used.
+> >> But there are side effects too, command 'qemu -bios uefi -kernel'
+> >> won't work, I need extra time to evaluate this change.
+> >
+> > Right. Neither ACPI nor '-bios ... -kernel ...' can work without fw-cfg.
+> > This patch either needs to keep fw-cfg, or to remove the ACPI changes.
+> > I can't see how an SBSA reference platform would be much use without ACPI
+> > though.
+> >
+> 
+> Even if mach-virt's ACPI code depends on fw_cfg currently, there is no
+> reason whatsoever that this sbsa machine should not implement it like
+> real hardware does, i.e., hard coded tables.
+> 
+
+I don't disagree, but there's no point in making QEMU ACPI generation
+code changes that will never be consumed. This patch adds tables for
+the hard coded ?HCI controllers to ACPI. We don't need those changes for
+the virt machine and, without fw-cfg, you can't use them on the reference
+machine.
+
+Thanks,
+drew
