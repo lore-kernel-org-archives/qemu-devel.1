@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fiiK3-0002kY-Ur
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:37:01 -0400
+	(envelope-from <mst@redhat.com>) id 1fiiWk-00076u-Hc
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:50:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fiiJz-0000Qp-AV
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:36:59 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:53033)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fiiJy-0000Pr-Va
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:36:55 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id o11-v6so2399445wmh.2
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 08:36:54 -0700 (PDT)
-References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
-	<20180725121701.12867.49392.stgit@pasha-VirtualBox>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180725121701.12867.49392.stgit@pasha-VirtualBox>
-Date: Thu, 26 Jul 2018 16:36:52 +0100
-Message-ID: <87zhyerotn.fsf@linaro.org>
+	(envelope-from <mst@redhat.com>) id 1fiiWg-0004lj-G4
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:50:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49054 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fiiWg-0004ie-81
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:50:02 -0400
+Date: Thu, 26 Jul 2018 18:49:57 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180726184816-mutt-send-email-mst@kernel.org>
+References: <20180710000024.542612-1-mst@redhat.com>
+	<20180710000024.542612-8-mst@redhat.com>
+	<20180725143724.50b38789@redhat.com>
+	<20180725154517-mutt-send-email-mst@kernel.org>
+	<20180725164908.07a941a6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 23/24] replay: add BH oneshot event for
- block layer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180725164908.07a941a6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH hack dontapply v2 7/7] pc: HACK: acpi: tie
+ in _CST object to Processor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,172 +31,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, ehabkost@redhat.com, pbonzini@redhat.com
 
+On Wed, Jul 25, 2018 at 04:49:08PM +0200, Igor Mammedov wrote:
+> On Wed, 25 Jul 2018 15:50:09 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Wed, Jul 25, 2018 at 02:37:24PM +0200, Igor Mammedov wrote:
+> > > On Tue, 10 Jul 2018 03:01:34 +0300
+> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > >   
+> > > > Based on patch by Igor Mammedov.
+> > > > 
+> > > > This is a hack: we definitely shouldn't do it
+> > > > unconditionally, and initialization should be handled
+> > > > differently (through an isa device?). io port to use
+> > > > should depend on the PC type and should be documented.
+> > > > 
+> > > > Notifications should be supported.
+> > > > 
+> > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > ---
+> > > >  include/hw/i386/pc.h |  5 +++++
+> > > >  hw/acpi/cpu.c        |  5 +++++
+> > > >  hw/i386/acpi-build.c | 10 +++++++++-
+> > > >  3 files changed, 19 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > > > index 316230e570..83b3a84322 100644
+> > > > --- a/include/hw/i386/pc.h
+> > > > +++ b/include/hw/i386/pc.h
+> > > > @@ -20,6 +20,11 @@
+> > > >  
+> > > >  #define HPET_INTCAP "hpet-intcap"
+> > > >  
+> > > > +typedef struct PCCstate {
+> > > > +    uint32_t latency;
+> > > > +    uint32_t hint;
+> > > > +} PCCstate;
+> > > > +
+> > > >  /**
+> > > >   * PCMachineState:
+> > > >   * @acpi_dev: link to ACPI PM device that performs ACPI hotplug handling
+> > > > diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> > > > index 5ae595ecbe..e9e207b033 100644
+> > > > --- a/hw/acpi/cpu.c
+> > > > +++ b/hw/acpi/cpu.c
+> > > > @@ -561,6 +561,11 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+> > > >                             aml_int(arch_ids->cpus[i].props.node_id)));
+> > > >              }
+> > > >  
+> > > > +            if (1) {
+> > > > +                method = aml_method("_CST", 0, AML_NOTSERIALIZED);
+> > > > +                aml_append(method, aml_return(aml_call0("CCST")));  
+> > > in case of not loaded CCST it would be unresolved reference.
+> > > It would be better to have a package /SB.CPUS.CCST filled with some startup values
+> > > and than that could be updated on the fly with new package.  
+> > 
+> > I think it will conflict if we do. But yes we could load \SB.CCST and
+> > then \SB.CPUS.CCST will override that. Would it help though?
+> > ACPI spec does not describe what happens on load failure.
+> > For linux it does not matter much -
+> > it just handles the error. What happens on windows with an unresolved
+> > reference? Is failure to load the object any better?
+> I was thinking more in a align of assigning a new temporary package value to
+> a statically named CCST:
+> 
+>   update_cst_METHOD()
+>      build package in local0
+>      \SB.CPUS.CCST = local0
+> 
+> so guest gets valid initial CCST with values on source host at boot time
+> and on target values are replaced on update.
+> 
+> It doesn't have to be named variable/could be a method but with always
+> valid values.
 
-Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+Right but what are we trying to achieve here?
 
-> Replay is capable of recording normal BH events, but sometimes
-> there are single use callbacks scheduled with aio_bh_schedule_oneshot
-> function. This patch enables recording and replaying such callbacks.
-> Block layer uses these events for calling the completion function.
-> Replaying these calls makes the execution deterministic.
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-
-I'm not sure what about this commit causes the compile breakage I'm
-seeing:
-
-  LINK    aarch64-linux-user/qemu-aarch64
-../libqemuutil.a(cpu-get-icount.o):(.bss+0x0): multiple definition of `use_=
-icount'
-exec.o:(.bss+0x58): first defined here
-collect2: error: ld returned 1 exit status
-Makefile:199: recipe for target 'qemu-aarch64' failed
-make[1]: *** [qemu-aarch64] Error 1
-Makefile:481: recipe for target 'subdir-aarch64-linux-user' failed
-make: *** [subdir-aarch64-linux-user] Error 2
-
-It only occurs on a make clean && make -j on that commit though. It's
-hidden if you do incremental builds.
-
-
-
-> ---
->  block/block-backend.c    |    3 ++-
->  include/sysemu/replay.h  |    3 +++
->  replay/replay-events.c   |   16 ++++++++++++++++
->  replay/replay-internal.h |    1 +
->  replay/replay.c          |    2 +-
->  stubs/replay.c           |    6 ++++++
->  6 files changed, 29 insertions(+), 2 deletions(-)
->
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index f2f75a9..232d114 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -17,6 +17,7 @@
->  #include "block/throttle-groups.h"
->  #include "sysemu/blockdev.h"
->  #include "sysemu/sysemu.h"
-> +#include "sysemu/replay.h"
->  #include "qapi/error.h"
->  #include "qapi/qapi-events-block.h"
->  #include "qemu/id.h"
-> @@ -1370,7 +1371,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, =
-int64_t offset, int bytes,
->
->      acb->has_returned =3D true;
->      if (acb->rwco.ret !=3D NOT_DONE) {
-> -        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
-> +        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
->                                  blk_aio_complete_bh, acb);
->      }
->
-> diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-> index 8118b00..945bc74 100644
-> --- a/include/sysemu/replay.h
-> +++ b/include/sysemu/replay.h
-> @@ -152,6 +152,9 @@ bool replay_events_enabled(void);
->  void replay_flush_events(void);
->  /*! Adds bottom half event to the queue */
->  void replay_bh_schedule_event(QEMUBH *bh);
-> +/*! Adds oneshot bottom half event to the queue */
-> +void replay_bh_schedule_oneshot_event(AioContext *ctx,
-> +    QEMUBHFunc *cb, void *opaque);
->  /*! Adds input event to the queue */
->  void replay_input_event(QemuConsole *src, InputEvent *evt);
->  /*! Adds input sync event to the queue */
-> diff --git a/replay/replay-events.c b/replay/replay-events.c
-> index 0964a82..0ac8a5c 100644
-> --- a/replay/replay-events.c
-> +++ b/replay/replay-events.c
-> @@ -37,6 +37,9 @@ static void replay_run_event(Event *event)
->      case REPLAY_ASYNC_EVENT_BH:
->          aio_bh_call(event->opaque);
->          break;
-> +    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
-> +        ((QEMUBHFunc*)event->opaque)(event->opaque2);
-> +        break;
->      case REPLAY_ASYNC_EVENT_INPUT:
->          qemu_input_event_send_impl(NULL, (InputEvent *)event->opaque);
->          qapi_free_InputEvent((InputEvent *)event->opaque);
-> @@ -132,6 +135,17 @@ void replay_bh_schedule_event(QEMUBH *bh)
->      }
->  }
->
-> +void replay_bh_schedule_oneshot_event(AioContext *ctx,
-> +    QEMUBHFunc *cb,void *opaque)
-> +{
-> +    if (events_enabled) {
-> +        uint64_t id =3D replay_get_current_step();
-> +        replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb, opaque, id);
-> +    } else {
-> +        aio_bh_schedule_oneshot(ctx, cb, opaque);
-> +    }
-> +}
-> +
->  void replay_add_input_event(struct InputEvent *event)
->  {
->      replay_add_event(REPLAY_ASYNC_EVENT_INPUT, event, NULL, 0);
-> @@ -162,6 +176,7 @@ static void replay_save_event(Event *event, int check=
-point)
->          /* save event-specific data */
->          switch (event->event_kind) {
->          case REPLAY_ASYNC_EVENT_BH:
-> +        case REPLAY_ASYNC_EVENT_BH_ONESHOT:
->              replay_put_qword(event->id);
->              break;
->          case REPLAY_ASYNC_EVENT_INPUT:
-> @@ -216,6 +231,7 @@ static Event *replay_read_event(int checkpoint)
->      /* Events that has not to be in the queue */
->      switch (replay_state.read_event_kind) {
->      case REPLAY_ASYNC_EVENT_BH:
-> +    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
->          if (replay_state.read_event_id =3D=3D -1) {
->              replay_state.read_event_id =3D replay_get_qword();
->          }
-> diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-> index 08ef2ec..0c0ed16 100644
-> --- a/replay/replay-internal.h
-> +++ b/replay/replay-internal.h
-> @@ -51,6 +51,7 @@ enum ReplayEvents {
->
->  enum ReplayAsyncEventKind {
->      REPLAY_ASYNC_EVENT_BH,
-> +    REPLAY_ASYNC_EVENT_BH_ONESHOT,
->      REPLAY_ASYNC_EVENT_INPUT,
->      REPLAY_ASYNC_EVENT_INPUT_SYNC,
->      REPLAY_ASYNC_EVENT_CHAR_READ,
-> diff --git a/replay/replay.c b/replay/replay.c
-> index 6e82764..061b1e2 100644
-> --- a/replay/replay.c
-> +++ b/replay/replay.c
-> @@ -22,7 +22,7 @@
->
->  /* Current version of the replay mechanism.
->     Increase it when file format changes. */
-> -#define REPLAY_VERSION              0xe02007
-> +#define REPLAY_VERSION              0xe02008
->  /* Size of replay log header */
->  #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t))
->
-> diff --git a/stubs/replay.c b/stubs/replay.c
-> index 781974e..cbdac80 100644
-> --- a/stubs/replay.c
-> +++ b/stubs/replay.c
-> @@ -90,3 +90,9 @@ bool replay_reverse_continue(void)
->  {
->      return false;
->  }
-> +
-> +void replay_bh_schedule_oneshot_event(AioContext *ctx,
-> +    QEMUBHFunc *cb,void *opaque)
-> +{
-> +    aio_bh_schedule_oneshot(ctx, cb, opaque);
-> +}
-
-
---
-Alex Benn=C3=A9e
+> > 
+> > > > +                aml_append(dev, method);
+> > > > +            }
+> > > >              aml_append(cpus_dev, dev);
+> > > >          }
+> > > >      }
+> > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > > index fff1059a31..da2c830db7 100644
+> > > > --- a/hw/i386/acpi-build.c
+> > > > +++ b/hw/i386/acpi-build.c
+> > > > @@ -64,6 +64,7 @@
+> > > >  #include "hw/i386/intel_iommu.h"
+> > > >  
+> > > >  #include "hw/acpi/ipmi.h"
+> > > > +#include "hw/acpi/cst.h"
+> > > >  
+> > > >  /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
+> > > >   * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
+> > > > @@ -1840,7 +1841,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> > > >          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+> > > >      } else {
+> > > >          CPUHotplugFeatures opts = {
+> > > > -            .apci_1_compatible = true, .has_legacy_cphp = true
+> > > > +            .apci_1_compatible = true, .has_legacy_cphp = true,  
+> > > unrelated change???  
+> > 
+> > Good catch.
+> > 
+> > > >          };
+> > > >          build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+> > > >                         "\\_SB.PCI0", "\\_GPE._E02");
+> > > > @@ -2693,6 +2694,10 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+> > > >                             tables->vmgenid, tables->linker);
+> > > >      }
+> > > >  
+> > > > +    /* TODO: get a free ioport. This one is PIIX specific. */
+> > > > +    acpi_add_table(table_offsets, tables_blob);
+> > > > +    cst_build_acpi(tables_blob, tables->linker, 0xaf20);
+> > > > +
+> > > >      if (misc.has_hpet) {
+> > > >          acpi_add_table(table_offsets, tables_blob);
+> > > >          build_hpet(tables_blob, tables->linker);
+> > > > @@ -2891,6 +2896,9 @@ void acpi_setup(void)
+> > > >  
+> > > >      build_state = g_malloc0(sizeof *build_state);
+> > > >  
+> > > > +    /* TODO: this is not the best place to do it */
+> > > > +    cst_register(pcms->fw_cfg, 0xaf20);
+> > > > +
+> > > >      acpi_build_tables_init(&tables);
+> > > >      acpi_build(&tables, MACHINE(pcms));
+> > > >    
