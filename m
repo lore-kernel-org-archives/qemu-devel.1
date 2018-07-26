@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fin4l-0002jI-Tn
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:41:33 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fin8y-0005Fc-Dn
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:45:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fin4h-0001cq-05
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:41:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35352)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fin4g-0001YO-OS
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:41:26 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fin4e-0004Af-4M
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 20:41:24 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4A1E32E80CB
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 20:41:23 +0000 (UTC)
+	(envelope-from <alex.williamson@redhat.com>) id 1fin8t-0007dG-Il
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:45:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33758 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1fin8t-0007cf-BI
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 16:45:47 -0400
+Date: Thu, 26 Jul 2018 14:45:39 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180726144539.740acf4d@t450s.home>
+In-Reply-To: <20180723045956.27521-4-tiwei.bie@intel.com>
+References: <20180723045956.27521-1-tiwei.bie@intel.com>
+	<20180723045956.27521-4-tiwei.bie@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Jul 2018 20:34:31 -0000
-From: David Hoelzer <1777672@bugs.launchpad.net>
-Reply-To: Bug 1777672 <1777672@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152942324302.25954.17370619302309595715.malonedeb@soybean.canonical.com>
-Message-Id: <153263727179.9162.2887614133601378597.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1777672] Re: QEMU aarch64 virtual/physical frame
- buffer
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 3/3] vhost-user: support programming VFIO
+ group in master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,102 +29,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Tiwei Bie <tiwei.bie@intel.com>
+Cc: mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
 
-Whoops.. Forgot to include the QEMU command line:
+On Mon, 23 Jul 2018 12:59:56 +0800
+Tiwei Bie <tiwei.bie@intel.com> wrote:
 
-qemu-system-aarch64 -M raspi3 --kernel kernel8.img -serial stdio
+> Introduce a slave message to allow slave to share its
+> VFIO group fd to master and do the IOMMU programming
+> based on virtio device's DMA address space for this
+> group in QEMU.
+> 
+> For the vhost backends which support vDPA, they could
+> leverage this message to ask master to do the IOMMU
+> programming in QEMU for the vDPA device in backend.
+> 
+> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> ---
+>  docs/interop/vhost-user.txt    | 16 ++++++++++++++
+>  hw/virtio/vhost-user.c         | 40 ++++++++++++++++++++++++++++++++++
+>  include/hw/virtio/vhost-user.h |  2 ++
+>  3 files changed, 58 insertions(+)
+> 
+> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> index f59667f498..a57a8f9451 100644
+> --- a/docs/interop/vhost-user.txt
+> +++ b/docs/interop/vhost-user.txt
+> @@ -397,6 +397,7 @@ Protocol features
+>  #define VHOST_USER_PROTOCOL_F_CONFIG         9
+>  #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
+>  #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
+> +#define VHOST_USER_PROTOCOL_F_VFIO_GROUP     12
+>  
+>  Master message types
+>  --------------------
+> @@ -815,6 +816,21 @@ Slave message types
+>        This request should be sent only when VHOST_USER_PROTOCOL_F_HOST_NOTIFIER
+>        protocol feature has been successfully negotiated.
+>  
+> + * VHOST_USER_SLAVE_VFIO_GROUP_MSG
+> +
+> +      Id: 4
+> +      Equivalent ioctl: N/A
+> +      Slave payload: N/A
+> +      Master payload: N/A
+> +
+> +      When VHOST_USER_PROTOCOL_F_VFIO_GROUP is negotiated, vhost-user slave
+> +      could send this request to share its VFIO group fd via ancillary data
+> +      to master. After receiving this request from slave, master will close
+> +      the existing VFIO group if any and do the DMA programming based on the
+> +      virtio device's DMA address space for the new group if the request is
+> +      sent with a file descriptor.
+> +
+> +
+>  VHOST_USER_PROTOCOL_F_REPLY_ACK:
+>  -------------------------------
+>  The original vhost-user specification only demands replies for certain
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index b041343632..db958e24c7 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -52,6 +52,7 @@ enum VhostUserProtocolFeature {
+>      VHOST_USER_PROTOCOL_F_CONFIG = 9,
+>      VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD = 10,
+>      VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
+> +    VHOST_USER_PROTOCOL_F_VFIO_GROUP = 12,
+>      VHOST_USER_PROTOCOL_F_MAX
+>  };
+>  
+> @@ -97,6 +98,7 @@ typedef enum VhostUserSlaveRequest {
+>      VHOST_USER_SLAVE_IOTLB_MSG = 1,
+>      VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
+>      VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG = 3,
+> +    VHOST_USER_SLAVE_VFIO_GROUP_MSG = 4,
+>      VHOST_USER_SLAVE_MAX
+>  }  VhostUserSlaveRequest;
+>  
+> @@ -949,6 +951,41 @@ static int vhost_user_slave_handle_vring_host_notifier(struct vhost_dev *dev,
+>      return 0;
+>  }
+>  
+> +static int vhost_user_slave_handle_vfio_group(struct vhost_dev *dev,
+> +                                              int *fd)
+> +{
+> +    struct vhost_user *u = dev->opaque;
+> +    VhostUserState *user = u->user;
+> +    VirtIODevice *vdev = dev->vdev;
+> +    int groupfd = fd[0];
+> +    VFIOGroup *group;
+> +
+> +    if (!virtio_has_feature(dev->protocol_features,
+> +                            VHOST_USER_PROTOCOL_F_VFIO_GROUP) ||
+> +        vdev == NULL) {
+> +        return -1;
+> +    }
+> +
+> +    if (user->vfio_group) {
+> +        vfio_put_group(user->vfio_group);
+> +        user->vfio_group = NULL;
+> +    }
+> +
+> +    group = vfio_get_group_from_fd(groupfd, vdev->dma_as, NULL);
+> +    if (group == NULL) {
+> +        return -1;
+> +    }
+> +
+> +    if (group->fd != groupfd) {
+> +        close(groupfd);
+> +    }
+> +
+> +    user->vfio_group = group;
+> +    fd[0] = -1;
+> +
+> +    return 0;
+> +}
 
--- =
+This all looks very sketchy, we're reaching into vfio internal state
+and arbitrarily releasing data structures, reusing existing ones, and
+maybe creating new ones.  We know that a vfio group only allows a
+single open, right?  So if you have a groupfd, vfio will never have
+that same group opened already.  Is that the goal?  It's not obvious in
+the code.  I don't really understand what vhost goes on to do with this
+group, but I'm pretty sure the existing state machine in vfio isn't
+designed for it.  Thanks,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1777672
+Alex
 
-Title:
-  QEMU aarch64 virtual/physical frame buffer
-
-Status in QEMU:
-  New
-
-Bug description:
-  I fully recognize that the error here could be mine, but the code is
-  pretty simple and straightforward; When emulating a Raspberry PI 3
-  using aarch64 and allocating a virtual framebuffer larger than the
-  physical frambuffer (for double-buffering purposes), the QEMU window
-  shows the full size of the *virtual* framebuffer rather than the size
-  of the *physical* framebuffer.
-
-  You can replicate this with code such as:
-
-  =
-
-  #define FBWIDTH 1024
-  #define FBHEIGHT 768
-
-  void lfb_init()
-  {
-      uart_puts("Initializing Framebuffer\n");
-      mbox[0] =3D 35*4;
-      mbox[1] =3D MBOX_REQUEST;
-
-      mbox[2] =3D 0x48003;  //set phy wh
-      mbox[3] =3D 8;
-      mbox[4] =3D 8;
-      mbox[5] =3D FBWIDTH;         //FrameBufferInfo.width
-      mbox[6] =3D FBHEIGHT;          //FrameBufferInfo.height
-
-      mbox[7] =3D 0x48004;  //set virt wh
-      mbox[8] =3D 8;
-      mbox[9] =3D 8;
-      mbox[10] =3D FBWIDTH;        //FrameBufferInfo.virtual_width
-      mbox[11] =3D FBHEIGHT * 2;         //FrameBufferInfo.virtual_height
-      =
-
-      mbox[12] =3D 0x48009; //set virt offset
-      mbox[13] =3D 8;
-      mbox[14] =3D 8;
-      mbox[15] =3D 0;           //FrameBufferInfo.x_offset
-      mbox[16] =3D 0;           //FrameBufferInfo.y.offset
-      =
-
-      mbox[17] =3D 0x48005; //set depth
-      mbox[18] =3D 4;
-      mbox[19] =3D 4;
-      mbox[20] =3D 32;          //FrameBufferInfo.depth
-
-      mbox[21] =3D 0x48006; //set pixel order
-      mbox[22] =3D 4;
-      mbox[23] =3D 4;
-      mbox[24] =3D 1;           //RGB, not BGR preferably
-
-      mbox[25] =3D 0x40001; //get framebuffer, gets alignment on request
-      mbox[26] =3D 8;
-      mbox[27] =3D 8;
-      mbox[28] =3D 4096;        //FrameBufferInfo.pointer
-      mbox[29] =3D 0;           //FrameBufferInfo.size
-
-      mbox[30] =3D 0x40008; //get pitch
-      mbox[31] =3D 4;
-      mbox[32] =3D 4;
-      mbox[33] =3D 0;           //FrameBufferInfo.pitch
-
-      mbox[34] =3D MBOX_TAG_LAST;
-
-      if(mbox_call(MBOX_CH_PROP) && mbox[20]=3D=3D32 && mbox[28]!=3D0) {
-          mbox[28]&=3D0x3FFFFFFF;
-          fbwidth=3Dmbox[5];
-          fbheight=3Dmbox[6];
-          pitch=3Dmbox[33];
-          lfb=3D(void*)((unsigned long)mbox[28]);
-      }
-  }
-
-  I will assume, for the sake of this posting, that the reader
-  understands the mailbox architecture and the appropriate address
-  definitions for them.  The key point is that allocating a virtual
-  buffer twice the height of the physical buffer results in QEMU
-  improperly displaying a double-height window.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1777672/+subscriptions
+> +
+>  static void slave_read(void *opaque)
+>  {
+>      struct vhost_dev *dev = opaque;
+> @@ -1021,6 +1058,9 @@ static void slave_read(void *opaque)
+>          ret = vhost_user_slave_handle_vring_host_notifier(dev, &payload.area,
+>                                                            fd[0]);
+>          break;
+> +    case VHOST_USER_SLAVE_VFIO_GROUP_MSG:
+> +        ret = vhost_user_slave_handle_vfio_group(dev, fd);
+> +        break;
+>      default:
+>          error_report("Received unexpected msg type.");
+>          ret = -EINVAL;
+> diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
+> index fd660393a0..9e11473274 100644
+> --- a/include/hw/virtio/vhost-user.h
+> +++ b/include/hw/virtio/vhost-user.h
+> @@ -10,6 +10,7 @@
+>  
+>  #include "chardev/char-fe.h"
+>  #include "hw/virtio/virtio.h"
+> +#include "hw/vfio/vfio-common.h"
+>  
+>  typedef struct VhostUserHostNotifier {
+>      MemoryRegion mr;
+> @@ -20,6 +21,7 @@ typedef struct VhostUserHostNotifier {
+>  typedef struct VhostUserState {
+>      CharBackend *chr;
+>      VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
+> +    VFIOGroup *vfio_group;
+>  } VhostUserState;
+>  
+>  VhostUserState *vhost_user_init(void);
