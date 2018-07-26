@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fiaO1-00023h-OU
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:08:36 -0400
+	(envelope-from <david@redhat.com>) id 1fiaie-0005qI-IW
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:29:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fiaNy-0000UD-MW
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:08:33 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:32862)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fiaNy-0000Ro-DP
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:08:30 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
-	<20180725121706.12867.98787.stgit@pasha-VirtualBox>
-	<20180725134429.roe7iuzakjywdv7e@var.youpi.perso.aquilenet.fr>
-In-Reply-To: <20180725134429.roe7iuzakjywdv7e@var.youpi.perso.aquilenet.fr>
-Date: Thu, 26 Jul 2018 10:08:29 +0300
-Message-ID: <000601d424af$74e5c900$5eb15b00$@ru>
+	(envelope-from <david@redhat.com>) id 1fiaib-0003g9-DC
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 03:29:52 -0400
+References: <20180725091233.3300-1-david@redhat.com>
+	<20180725170925.GE12380@localhost.localdomain>
+	<a33a67eb-2fb6-31fd-f4ca-1d883a5a7b75@redhat.com>
+	<20180725201438.GG12380@localhost.localdomain>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <36882ae2-5a00-d842-0b0d-d1458b1f0654@redhat.com>
+Date: Thu, 26 Jul 2018 09:29:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v5 24/24] slirp: fix ipv6 timers
+In-Reply-To: <20180725201438.GG12380@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +26,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Samuel Thibault' <samuel.thibault@gnu.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
 
-> From: Samuel Thibault [mailto:samuel.thibault@gnu.org]
-> Pavel Dovgalyuk, le mer. 25 juil. 2018 15:17:06 +0300, a ecrit:
-> > ICMP implementation for IPv6 uses timers based on virtual clock.
-> > This is incorrect because this service is not related to the guest state.
-> 
-> ? Why not?  The RAs are seen by the guest.  
+On 25.07.2018 22:14, Eduardo Habkost wrote:
+> On Wed, Jul 25, 2018 at 07:50:21PM +0200, David Hildenbrand wrote:
+>> On 25.07.2018 19:09, Eduardo Habkost wrote:
+> [...]
+>>>> +    if (local_err) {
+>>>> +        g_assert(kvm_enabled());
+>>>> +        error_report_err(local_err);
+>>>> +        /* fallback to unsupported CPU models */
+>>>> +        return;
+>>>
+>>> What about moving this outside instance_init?
+>>
+>> To which place for example? We at least have to copy the CPU model
+>> for each and every CPU instance (so we can modify it without side
+>> effects using properties).
+>=20
+> To any code that will look at cpu->model.
+>=20
+> You are wrapping an interface that needs to report errors
+> (kvm_s390_get_host_cpu_model()) behind an interface that is not
+> able to report errors (object_new()).  There's nothing that
+> requires you to do that, does it?  You are free to provide an API
+> that is actually able to report errors, instead of relying on
+> object_new() only.
 
-Because virtual clock should be used by the virtual devices.
-slirp module is not the virtual device. Therefore processed packets
-become visible to the guest after passing to the virtual network card.
-Before that it can create any timers that should not change the state of the guest.
+I see what you mean. One solution would be to preload and store the
+model somewhere globally (not locally). So in the init function, we
+would not have to handle errors.
 
-> As documented:
-> 
->  * @QEMU_CLOCK_REALTIME: Real time clock
->  *
->  * The real time clock should be used only for stuff which does not
->  * change the virtual machine state, as it runs even if the virtual
->  * machine is stopped.
-> 
-> There is no reason to "send RAs" while the machine is stopped.
+But I am not even sure where we could do such a global initialization +
+be able to report errors easily. I remember that we had a hard time to
+get this running smoothly due to the dependency of
+kvm_s390_get_host_cpu_model() on:
+- accelerator
+- machine
+- KVM init state
 
-I see.
-Then we'll need one more clock. Which works like realtime+virtual:
-intended to be used for the internal QEMU purposes, but stops when
-VM is stopped.
+And initializing cpu->model in realize() is too late, because all
+properties have to access it. Even a pre_plug handler will not work.
 
-Pavel Dovgalyuk
+
+On the other hand, I decided to ignore all errors back then and fallback
+to the "host CPU model unknown" case, because there are some corner
+cases where we still want to allow running the "host" model even though
+there was a problem detecting it.
+
+So my summary would be: We ignore errors (and rather treat them like
+warnings) for a reason here and fallback to "unsupported CPU models",
+which allows to run + use QEMU even in environments where our CPU model
+detection fails (e.g. on a very strange new CPU model we could have in
+the future).
+
+Especially "!cpu->model" does not imply that there was an error. It
+includes disabled CPU model support or unavailable CPU model support
+(KVM), which is perfectly fine. Replicating initialization attempts at
+all places where we access "cpu->model" does therefore not sound 100%
+clean to me and most likely makes the code way more complicated.
+
+Right now the semantics are clear: if we have "!cpu->model" after the
+object has been created, details about the host CPU model are not
+available (models unavailable/unsupported). Modifying properties,
+baselining, expanding is not possible with that model then. But it can
+be used for execution.
+
+>=20
+> But I understand that the QOM/qdev API doesn't make that job
+> easy.  On x86 we have X86CPU::max_features and
+> X86CPU::user_features because of that.
+>=20
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
