@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fih8E-0000vk-AG
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 10:20:45 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fihFJ-0002X0-3x
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 10:28:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fih8B-0004BZ-9M
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 10:20:42 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fihFG-0000t7-3J
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 10:28:01 -0400
 References: <20180725142758.9980-1-lbloch@janustech.com>
 	<20180725142758.9980-3-lbloch@janustech.com>
 	<20180726100242.GD4215@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3373f5e8-e613-c5eb-81d3-77a2b9dc73fb@redhat.com>
-Date: Thu, 26 Jul 2018 09:20:31 -0500
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <5188afdb-8486-5fcf-27d4-c627a382291b@janustech.com>
+Date: Thu, 26 Jul 2018 17:27:14 +0300
 MIME-Version: 1.0
 In-Reply-To: <20180726100242.GD4215@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Language: en-GB-large
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v5 2/4 for-3.0] qcow2: Options'
  documentation fixes
@@ -26,10 +26,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Leonid Bloch <lbloch@janustech.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 07/26/2018 05:02 AM, Kevin Wolf wrote:
+On 07/26/2018 01:02 PM, Kevin Wolf wrote:
 > Am 25.07.2018 um 16:27 hat Leonid Bloch geschrieben:
 >> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
 >> ---
@@ -37,7 +37,25 @@ On 07/26/2018 05:02 AM, Kevin Wolf wrote:
 >>   qemu-options.hx      | 10 ++++++----
 >>   2 files changed, 9 insertions(+), 4 deletions(-)
 >>
-
+>> diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
+>> index 8a09a5cc5f..3673f2be0e 100644
+>> --- a/docs/qcow2-cache.txt
+>> +++ b/docs/qcow2-cache.txt
+>> @@ -130,6 +130,9 @@ There are a few things that need to be taken into account:
+>>      memory as possible to the L2 cache before increasing the refcount
+>>      cache size.
+>>   
+>> +- At most two of "l2-cache-size", "refcount-cache-size", and "cache-size"
+>> +  can be set simultaneously.
+> 
+> The indentation is off here, the other list items have one space more.
+> 
+>>   Unlike L2 tables, refcount blocks are not used during normal I/O but
+>>   only during allocations and internal snapshots. In most cases they are
+>>   accessed sequentially (even during random guest I/O) so increasing the
+>> diff --git a/qemu-options.hx b/qemu-options.hx
+>> index b1bf0f485f..13ece21cb6 100644
+>> --- a/qemu-options.hx
 >> +++ b/qemu-options.hx
 >> @@ -752,15 +752,17 @@ image file)
 >>   
@@ -49,11 +67,7 @@ On 07/26/2018 05:02 AM, Kevin Wolf wrote:
 > Maybe something like "default: the sum of l2-cache-size and
 > refcount-cache-size"?
 
-Except what happens if you specify only one of l2-cache-size or 
-refcount-cache-size? Is the defaulted cache-size then just that one size 
-you specified (and the other cache ignored), or is the total cache size 
-still defaulted to the 1M/8-cluster size (assuming its larger than the 
-other size specified)?
+Yes, that sounds good!
 
 > 
 >>   @item l2-cache-size
@@ -63,7 +77,11 @@ other size specified)?
 > 
 > Why did you remove "in bytes" and add a period which the other options
 > don't have? I prefer the old version of this line.
-> 
+
+I removed "in bytes" because it also accepts k, M, G, ... but on a 
+second thought, these are amounts of bytes as well, so changing back to 
+the old version.
+
 >> +(default: if cache-size is not defined - 1048576 bytes or 8 clusters, whichever
 >> +is larger; otherwise, as large as possible or needed within the cache-size,
 >> +while permitting the requested or the minimal refcount cache size)
@@ -77,11 +95,16 @@ other size specified)?
 > I found the second part hard to understand. Maybe "4 times the cluster
 > size; or if both cache-size and l2-cache-size are given, the part of
 > the cache-size that is not used for the L2 cache yet."?
-> 
-> Kevin
-> 
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+That is not accurate. Because even if l2-cache-size is not given and 
+cache-size is large enough to accommodate enough L2 cache to cover the 
+entire image, plus the minimal amount of refcount cache with room to 
+spare - refcount cache will use all the rest of the cache-size. How about:
+
+"default: 4 times the cluster size; or if cache-size is specified, the 
+part of it which is not used for the L2 cache"
+
+Leonid.
+
+> Kevin
+>
