@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fijwa-0008CQ-AM
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:20:53 -0400
+	(envelope-from <knut.omang@oracle.com>) id 1fijy7-0000xb-4m
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fijwW-0008G4-2O
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:20:52 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:51700)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fijwV-0008Fd-Rc
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:20:47 -0400
-Received: by mail-wm0-x244.google.com with SMTP id y2-v6so2725551wma.1
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 10:20:47 -0700 (PDT)
-References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
-	<20180725121701.12867.49392.stgit@pasha-VirtualBox>
-	<87zhyerotn.fsf@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87zhyerotn.fsf@linaro.org>
-Date: Thu, 26 Jul 2018 18:20:45 +0100
-Message-ID: <87wothsyky.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 23/24] replay: add BH oneshot event for
- block layer
+	(envelope-from <knut.omang@oracle.com>) id 1fijy2-0000ba-6k
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:22:27 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:55900)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
+	id 1fijy1-0000bE-TS
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:22:22 -0400
+Message-ID: <1532625727.2458.183.camel@oracle.com>
+From: Knut Omang <knut.omang@oracle.com>
+Date: Thu, 26 Jul 2018 19:22:07 +0200
+In-Reply-To: <20180726201113-mutt-send-email-mst@kernel.org>
+References: <1407239306.11199051.1530240887935.JavaMail.zimbra@redhat.com>
+	<20180705194311-mutt-send-email-mst@kernel.org>
+	<DB5PR05MB1160D84E747DA480435B6605D5440@DB5PR05MB1160.eurprd05.prod.outlook.com>
+	<DB5PR05MB1160BB381473C723C8336EC2D55A0@DB5PR05MB1160.eurprd05.prod.outlook.com>
+	<AM5PR0501MB2499CB4F2D01BCDA47C0ACB6C95A0@AM5PR0501MB2499.eurprd05.prod.outlook.com>
+	<DB5PR05MB1160093E018FD91787E80A79D5590@DB5PR05MB1160.eurprd05.prod.outlook.com>
+	<20180726145214.GD17777@stefanha-x1.localdomain>
+	<488bdc8d-e36c-ad3e-f7b3-a45a78a99dda@gmail.com>
+	<20180726191315-mutt-send-email-mst@kernel.org>
+	<20180726104252.3d162f34@t450s.home>
+	<20180726201113-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Question: SRIOV support over Win Hyper-V VM
+ running in QEMU process on Linux host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +38,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
+To: "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tal Attaly <talat@mellanox.com>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Elijah Shakkour <elijahs@mellanox.com>
 
+On Thu, 2018-07-26 at 20:11 +0300, Michael S. Tsirkin wrote:
+> On Thu, Jul 26, 2018 at 10:42:52AM -0600, Alex Williamson wrote:
+> > On Thu, 26 Jul 2018 19:14:45 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > 
+> > > On Thu, Jul 26, 2018 at 06:51:13PM +0300, Marcel Apfelbaum wrote:
+> > > > Hi
+> > > > 
+> > > > On 07/26/2018 05:52 PM, Stefan Hajnoczi wrote:  
+> > > > > On Thu, Jul 12, 2018 at 07:33:14AM +0000, Elijah Shakkour wrote:  
+> > > > > > Hey,
+> > > > > > 
+> > > > > > Our team is adding a NIC functional  emulation to QEMU.
+> > > > > > One of the features we are adding to this NIC is SRIOV.
+> > > > > > 
+> > > > > > Here is the error message I get when checking SRIOV support of  our
+> > > > > > emulated NIC on Win2016 server (the hyper-v VM).
+> > > > > > "
+> > > > > > SR-IOV cannot be used on this system as the PCI Express hardware
+> > > > > > does not support Access Control Services (ACS) at any root port.  
+> > > > 
+> > > > QEMU's emulated PCI Express Root Ports do not support ACS yet, however I
+> > > > am
+> > > > not sure ACS is a prerequisite
+> > > > for SR-IOV.
+> > 
+> > ACS is certainly not a prerequisite for SR-IOV.
+> >  
+> > > Looks like windows blocks dev assignment in nested VMs without it.
+> > > Thinking about it, doesn't vfio do the same by default? I think vfio has
+> > > a flag to override this though.
+> > 
+> > IOMMU grouping in Linux takes isolation via ACS and device specific
+> > mechanisms into account, limiting the granularity with which a
+> > userspace driver can claim ownership of devices,
+> 
+> In that you must assign all devices behind this port as a group?
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+Yes, that's why I needed to add PCIe config space ACS support in ioh3420:
+to be able to use VFIO to pass through individual VFs to different L2 VMs with
+"plain" kernels on the L1 host which owns the SR/IOV device.
 
-> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
->
->> Replay is capable of recording normal BH events, but sometimes
->> there are single use callbacks scheduled with aio_bh_schedule_oneshot
->> function. This patch enables recording and replaying such callbacks.
->> Block layer uses these events for calling the completion function.
->> Replaying these calls makes the execution deterministic.
->>
->> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->
-> I'm not sure what about this commit causes the compile breakage I'm
-> seeing:
->
->   LINK    aarch64-linux-user/qemu-aarch64
-> ../libqemuutil.a(cpu-get-icount.o):(.bss+0x0): multiple definition of `us=
-e_icount'
-> exec.o:(.bss+0x58): first defined here
-> collect2: error: ld returned 1 exit status
-> Makefile:199: recipe for target 'qemu-aarch64' failed
-> make[1]: *** [qemu-aarch64] Error 1
-> Makefile:481: recipe for target 'subdir-aarch64-linux-user' failed
-> make: *** [subdir-aarch64-linux-user] Error 2
->
-> It only occurs on a make clean && make -j on that commit though. It's
-> hidden if you do incremental builds.
+Knut
 
-And it seems to be the same failure across all the cross builds:
-
-  https://app.shippable.com/github/stsquad/qemu/runs/538/summary/console
-
---
-Alex Benn=C3=A9e
+> > but it doesn't
+> > actually prevent enabling SR-IOV on the endpoint.  It just makes it
+> > less useful if your intention is to use SR-IOV for device assignment.
+> > The only overrides for this are out-of-tree.  Thanks,
+> >
+> > 
+> > Alex
+> 
+> 
