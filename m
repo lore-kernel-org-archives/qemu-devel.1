@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fihs7-0001Ib-SB
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:08:09 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fihxI-0003fS-HJ
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:13:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fihs3-00079M-TI
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:08:07 -0400
-Date: Thu, 26 Jul 2018 12:07:54 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180726150754.GL12380@localhost.localdomain>
-References: <20180725091233.3300-1-david@redhat.com>
-	<20180725170925.GE12380@localhost.localdomain>
-	<a33a67eb-2fb6-31fd-f4ca-1d883a5a7b75@redhat.com>
-	<20180725201438.GG12380@localhost.localdomain>
-	<36882ae2-5a00-d842-0b0d-d1458b1f0654@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1fihxE-0005h5-I2
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:13:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41794 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fihxD-0005Zw-Sj
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:13:24 -0400
+Date: Thu, 26 Jul 2018 16:13:06 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180726151306.GC2514@work-vm>
+References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+	<20180629115359.GH2568@work-vm> <20180725101836.GI2479@xz-mi>
+	<20180725191736.GE2365@work-vm> <20180725200456.GM18452@redhat.com>
+	<e1c85e53-1b94-b1df-b7ee-6d93bb43caf6@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <36882ae2-5a00-d842-0b0d-d1458b1f0654@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
+In-Reply-To: <e1c85e53-1b94-b1df-b7ee-6d93bb43caf6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>, Peter Xu <peterx@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org, quintela@redhat.com
 
-On Thu, Jul 26, 2018 at 09:29:44AM +0200, David Hildenbrand wrote:
-> On 25.07.2018 22:14, Eduardo Habkost wrote:
-> > On Wed, Jul 25, 2018 at 07:50:21PM +0200, David Hildenbrand wrote:
-> >> On 25.07.2018 19:09, Eduardo Habkost wrote:
-> > [...]
-> >>>> +    if (local_err) {
-> >>>> +        g_assert(kvm_enabled());
-> >>>> +        error_report_err(local_err);
-> >>>> +        /* fallback to unsupported CPU models */
-> >>>> +        return;
-> >>>
-> >>> What about moving this outside instance_init?
-> >>
-> >> To which place for example? We at least have to copy the CPU model
-> >> for each and every CPU instance (so we can modify it without side
-> >> effects using properties).
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 25/07/2018 22:04, Andrea Arcangeli wrote:
 > > 
-> > To any code that will look at cpu->model.
+> > It may look like the uffd-wp model is wish-feature similar to an
+> > optimization, but without the uffd-wp model when the WP fault is
+> > triggered by kernel code, the sigsegv model falls apart and requires
+> > all kind of ad-hoc changes just for this single feature. Plus uffd-wp
+> > has other benefits: it makes it all reliable in terms of not
+> > increasing the number of vmas in use during the snapshot. Finally it
+> > makes it faster too with no mmap_sem for reading and no sigsegv
+> > signals.
 > > 
-> > You are wrapping an interface that needs to report errors
-> > (kvm_s390_get_host_cpu_model()) behind an interface that is not
-> > able to report errors (object_new()).  There's nothing that
-> > requires you to do that, does it?  You are free to provide an API
-> > that is actually able to report errors, instead of relying on
-> > object_new() only.
+> > The non cooperative features got merged first because there was much
+> > activity on the kernel side on that front, but this is just an ideal
+> > time to nail down the remaining issues in uffd-wp I think. That I
+> > believe is time better spent than trying to emulate it with sigsegv
+> > and changing all drivers to send new events down to qemu specific to
+> > the sigsegv handling. We considered this before doing uffd for
+> > postcopy too but overall it's unreliable and more work (no single
+> > change was then needed to KVM code with uffd to handle postcopy and
+> > here it should be the same).
 > 
-> I see what you mean. One solution would be to preload and store the
-> model somewhere globally (not locally). So in the init function, we
-> would not have to handle errors.
-> 
-> But I am not even sure where we could do such a global initialization +
-> be able to report errors easily. I remember that we had a hard time to
-> get this running smoothly due to the dependency of
-> kvm_s390_get_host_cpu_model() on:
-> - accelerator
-> - machine
-> - KVM init state
+> I totally agree.  The hard part in userfaultfd was the changes to the
+> kernel get_user_pages API, but the payback was huge because _all_ kernel
+> uses (KVM, vhost-net, syscalls, etc.) just work with userfaultfd.  Going
+> back to mprotect would be a huge mistake.
 
-If we had a S390KVMAccelerator object on machine->accelerator,
-S390KVMAccelerator::host_model would be a good candidate?
+TBF I think Denis just wanted to get things moving, knowing that we've
+not got userfault-wp yet;  what I'm curious about though is how Denis
+has anything stable given that the faults can land in syscalls and
+vhost etc.
 
-> 
-> And initializing cpu->model in realize() is too late, because all
-> properties have to access it. Even a pre_plug handler will not work.
+Dave
 
-Yeah, the instance_init/realize abstraction seems insufficient
-here.  instance_init has too many restrictions, realize is too
-late.
-
-
-> 
-> On the other hand, I decided to ignore all errors back then and fallback
-> to the "host CPU model unknown" case, because there are some corner
-> cases where we still want to allow running the "host" model even though
-> there was a problem detecting it.
-> 
-> So my summary would be: We ignore errors (and rather treat them like
-> warnings) for a reason here and fallback to "unsupported CPU models",
-> which allows to run + use QEMU even in environments where our CPU model
-> detection fails (e.g. on a very strange new CPU model we could have in
-> the future).
-> 
-> Especially "!cpu->model" does not imply that there was an error. It
-> includes disabled CPU model support or unavailable CPU model support
-> (KVM), which is perfectly fine. Replicating initialization attempts at
-> all places where we access "cpu->model" does therefore not sound 100%
-> clean to me and most likely makes the code way more complicated.
-> 
-> Right now the semantics are clear: if we have "!cpu->model" after the
-> object has been created, details about the host CPU model are not
-> available (models unavailable/unsupported). Modifying properties,
-> baselining, expanding is not possible with that model then. But it can
-> be used for execution.
-
-This is interesting.  If most users of cpu->model don't care
-about kvm_s390_get_host_cpu_model() errors at all, the current
-solution sounds more reasonable.
-
-Except for the error_report_err() call inside instance_init.
-This still bothers me, but it's not a big deal.
-
--- 
-Eduardo
+> Paolo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
