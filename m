@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fijnt-0003vr-Hb
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:11:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fijru-0004pQ-3U
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fijnq-0003De-DL
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:11:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41586 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fijnq-0003D7-7r
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:11:50 -0400
-Date: Thu, 26 Jul 2018 20:11:44 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180726201113-mutt-send-email-mst@kernel.org>
-References: <1407239306.11199051.1530240887935.JavaMail.zimbra@redhat.com>
-	<20180705194311-mutt-send-email-mst@kernel.org>
-	<DB5PR05MB1160D84E747DA480435B6605D5440@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<DB5PR05MB1160BB381473C723C8336EC2D55A0@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<AM5PR0501MB2499CB4F2D01BCDA47C0ACB6C95A0@AM5PR0501MB2499.eurprd05.prod.outlook.com>
-	<DB5PR05MB1160093E018FD91787E80A79D5590@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<20180726145214.GD17777@stefanha-x1.localdomain>
-	<488bdc8d-e36c-ad3e-f7b3-a45a78a99dda@gmail.com>
-	<20180726191315-mutt-send-email-mst@kernel.org>
-	<20180726104252.3d162f34@t450s.home>
+	(envelope-from <richard.henderson@linaro.org>) id 1fijrr-0005Ro-0R
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:16:02 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40316)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fijrq-0005RX-MQ
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:15:58 -0400
+Received: by mail-pg1-x541.google.com with SMTP id x5-v6so1551418pgp.7
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 10:15:58 -0700 (PDT)
+References: <153258768962.6738.11319866502689416568.stgit@dhcp-9-109-246-16>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4671a0f0-e399-6187-3205-994f663fa260@linaro.org>
+Date: Thu, 26 Jul 2018 10:15:53 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180726104252.3d162f34@t450s.home>
-Subject: Re: [Qemu-devel] Question: SRIOV support over Win Hyper-V VM
- running in QEMU process on Linux host
+In-Reply-To: <153258768962.6738.11319866502689416568.stgit@dhcp-9-109-246-16>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: ppc64: don't use volatile
+ register during safe_syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,46 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tal Attaly <talat@mellanox.com>, Stefan Hajnoczi <stefanha@gmail.com>, Knut Omang <knut.omang@oracle.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Elijah Shakkour <elijahs@mellanox.com>
+To: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, dgibson@redhat.com, riku.voipio@iki.fi, laurent@vivier.eu
+Cc: qemu-devel@nongnu.org
 
-On Thu, Jul 26, 2018 at 10:42:52AM -0600, Alex Williamson wrote:
-> On Thu, 26 Jul 2018 19:14:45 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 07/25/2018 11:48 PM, Shivaprasad G Bhat wrote:
+> r11 is a volatile register on PPC as per calling conventions.
+> The safe_syscall code uses it to check if the signal_pending
+> is set during the safe_syscall. When a syscall is interrupted
+> on return from signal handling, the r11 might be corrupted
+> before we retry the syscall leading to a crash. The registers
+> r0-r13 are not to be used here as they have
+> volatile/designated/reserved usages. Change the code to use
+> r14 which is non-volatile and is appropriate for local use in
+> safe_syscall.
 > 
-> > On Thu, Jul 26, 2018 at 06:51:13PM +0300, Marcel Apfelbaum wrote:
-> > > Hi
-> > > 
-> > > On 07/26/2018 05:52 PM, Stefan Hajnoczi wrote:  
-> > > > On Thu, Jul 12, 2018 at 07:33:14AM +0000, Elijah Shakkour wrote:  
-> > > > > Hey,
-> > > > > 
-> > > > > Our team is adding a NIC functional  emulation to QEMU.
-> > > > > One of the features we are adding to this NIC is SRIOV.
-> > > > > 
-> > > > > Here is the error message I get when checking SRIOV support of  our emulated NIC on Win2016 server (the hyper-v VM).
-> > > > > "
-> > > > > SR-IOV cannot be used on this system as the PCI Express hardware does not support Access Control Services (ACS) at any root port.  
-> > > 
-> > > QEMU's emulated PCI Express Root Ports do not support ACS yet, however I am
-> > > not sure ACS is a prerequisite
-> > > for SR-IOV.
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+> ---
+> Steps to reproduce:
+> On PPC host, issue `qemu-ppc64le /usr/bin/cc -E -`
+> Attempt Ctrl-C, the issue is reproduced.
 > 
-> ACS is certainly not a prerequisite for SR-IOV.
->  
-> > Looks like windows blocks dev assignment in nested VMs without it.
-> > Thinking about it, doesn't vfio do the same by default? I think vfio has
-> > a flag to override this though.
+> Reference:
+> https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
 > 
-> IOMMU grouping in Linux takes isolation via ACS and device specific
-> mechanisms into account, limiting the granularity with which a
-> userspace driver can claim ownership of devices,
+>  linux-user/host/ppc64/safe-syscall.inc.S |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
+> index d30050a67c..b0cbbe6a69 100644
+> --- a/linux-user/host/ppc64/safe-syscall.inc.S
+> +++ b/linux-user/host/ppc64/safe-syscall.inc.S
+> @@ -49,7 +49,7 @@ safe_syscall_base:
+>  	 *               and returns the result in r3
+>  	 * Shuffle everything around appropriately.
+>  	 */
+> -	mr	11, 3	/* signal_pending */
+> +	mr	14, 3	/* signal_pending */
 
-In that you must assign all devices behind this port as a group?
+I do see that I was incorrect in assuming that r11 would be unmodified.  But
+you can't simply write to a call-saved register -- you must preserve its value
+for the caller.
 
-> but it doesn't
-> actually prevent enabling SR-IOV on the endpoint.  It just makes it
-> less useful if your intention is to use SR-IOV for device assignment.
-> The only overrides for this are out-of-tree.  Thanks,
-> 
-> Alex
+Saving the value requires that you find some space on, or create, a stack
+frame.  Note that there are two different conventions for _CALL_AIX and
+_CALL_ELF==2.
+
+
+r~
