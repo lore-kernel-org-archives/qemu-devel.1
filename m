@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fiiui-0001Mg-3r
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:14:53 -0400
+	(envelope-from <nsoffer@redhat.com>) id 1fij2h-0003pb-UD
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:23:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fiiue-0000EX-KE
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:14:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50428 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fiiue-0000D4-Dk
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:14:48 -0400
-Date: Thu, 26 Jul 2018 19:14:45 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180726191315-mutt-send-email-mst@kernel.org>
-References: <DB5PR05MB11605C65D7D734C9354F0421D54F0@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<1407239306.11199051.1530240887935.JavaMail.zimbra@redhat.com>
-	<20180705194311-mutt-send-email-mst@kernel.org>
-	<DB5PR05MB1160D84E747DA480435B6605D5440@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<DB5PR05MB1160BB381473C723C8336EC2D55A0@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<AM5PR0501MB2499CB4F2D01BCDA47C0ACB6C95A0@AM5PR0501MB2499.eurprd05.prod.outlook.com>
-	<DB5PR05MB1160093E018FD91787E80A79D5590@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<20180726145214.GD17777@stefanha-x1.localdomain>
-	<488bdc8d-e36c-ad3e-f7b3-a45a78a99dda@gmail.com>
+	(envelope-from <nsoffer@redhat.com>) id 1fij2e-0005vw-QU
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:23:07 -0400
+Received: from mail-ua0-f177.google.com ([209.85.217.177]:34630)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1fij2e-0005vd-J1
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:23:04 -0400
+Received: by mail-ua0-f177.google.com with SMTP id r10-v6so1477656uao.1
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 09:23:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <488bdc8d-e36c-ad3e-f7b3-a45a78a99dda@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Question: SRIOV support over Win Hyper-V VM
- running in QEMU process on Linux host
+References: <20180726113337.23144-1-kwolf@redhat.com>
+In-Reply-To: <20180726113337.23144-1-kwolf@redhat.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Thu, 26 Jul 2018 19:22:52 +0300
+Message-ID: <CAMRbyyt-+ncsJzNbtF6dVNVHGiykORE-edF4z=nXepW9U=-RZg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-3.0] file-posix: Fix
+ write_zeroes with unmap on block devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,229 +28,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahs@mellanox.com>, Knut Omang <knut.omang@oracle.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Tal Attaly <talat@mellanox.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On Thu, Jul 26, 2018 at 06:51:13PM +0300, Marcel Apfelbaum wrote:
-> Hi
->=20
-> On 07/26/2018 05:52 PM, Stefan Hajnoczi wrote:
-> > On Thu, Jul 12, 2018 at 07:33:14AM +0000, Elijah Shakkour wrote:
-> > > Hey,
-> > >=20
-> > > Our team is adding a NIC functional  emulation to QEMU.
-> > > One of the features we are adding to this NIC is SRIOV.
-> > >=20
-> > > Here is the error message I get when checking SRIOV support of  our=
- emulated NIC on Win2016 server (the hyper-v VM).
-> > > "
-> > > SR-IOV cannot be used on this system as the PCI Express hardware do=
-es not support Access Control Services (ACS) at any root port.
->=20
-> QEMU's emulated PCI Express Root Ports do not support ACS yet, however =
-I am
-> not sure ACS is a prerequisite
-> for SR-IOV.
+On Thu, Jul 26, 2018 at 2:33 PM Kevin Wolf <kwolf@redhat.com> wrote:
 
-Looks like windows blocks dev assignment in nested VMs without it.
-Thinking about it, doesn't vfio do the same by default? I think vfio has
-a flag to override this though.
+> The BLKDISCARD ioctl doesn't guarantee that the discarded blocks read as
+> all-zero afterwards, so don't try to abuse it for zero writing. We try
+> to only use this if BLKDISCARDZEROES tells us that it is safe, but this
+> is unreliable on older kernels and a constant 0 in newer kernels. In
+> other words, this code path is never actually used with newer kernels,
+> so we don't even try to unmap while writing zeros.
+>
+> This patch removes the abuse of discard for writing zeroes from
+> file-posix and instead adds a new function that uses interfaces that are
+> actually meant to deallocate and zero out at the same time. Only if
+> those fail, it falls back to zeroing out without unmap. We never fall
+> back to a discard operation any more that may or may not result in
+> zeros.
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/file-posix.c | 62
+> +++++++++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 47 insertions(+), 15 deletions(-)
+>
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 60af4b3d51..9c66cd87d1 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -648,7 +648,7 @@ static int raw_open_common(BlockDriverState *bs, QDict
+> *options,
+>      }
+>  #endif
+>
+> -    bs->supported_zero_flags = s->discard_zeroes ? BDRV_REQ_MAY_UNMAP : 0;
+> +    bs->supported_zero_flags = BDRV_REQ_MAY_UNMAP;
+>      ret = 0;
+>  fail:
+>      if (filename && (bdrv_flags & BDRV_O_TEMPORARY)) {
+> @@ -1487,6 +1487,38 @@ static ssize_t
+> handle_aiocb_write_zeroes(RawPosixAIOData *aiocb)
+>      return -ENOTSUP;
+>  }
+>
+> +static ssize_t handle_aiocb_write_zeroes_unmap(RawPosixAIOData *aiocb)
+> +{
+> +    BDRVRawState *s = aiocb->bs->opaque;
+> +    int ret;
+> +
+> +    /* First try to write zeros and unmap at the same time */
+> +
+> +#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+> +    ret = do_fallocate(s->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+> +                       aiocb->aio_offset, aiocb->aio_nbytes);
+> +    if (ret != -ENOTSUP) {
+>
 
-> We would need ARI support for allowing more than 8VFs, but QEMU
-> doesn't support that either (yet).
->=20
-> Knut Omag has some working patches, he successfully implemented SR-IOV =
-with
-> QEMU, see:
-> =A0=A0=A0=A0 https://github.com/knuto/qemu/tree/sriov_patches_v7
->=20
-> The code was not merged since we need at least a device with SR-IOV sup=
-port
-> to justify the addition.
->=20
-> > > Contact your system vendor for further information.
-> > > "
-> > I'm not sure what the status of emulated SR-IOV is so I have CCed
-> > Michael Tsirkin and Marcel Apfelbaum, the PCI maintainers in QEMU.
->=20
-> Thanks,
-> Marcel
->=20
-> > > Could you please advise about what could be the issue here?
-> > >=20
-> > > BTW: I use same configuration (VM XML file attached) when running l=
-inux VM (RH7.2) image (instead of Win Hyper-V) over the same host and SRI=
-OV is working for me there.
-> > >=20
-> > > Here the XML file I use to define the VM (our emulated NIC is added=
- at the end of XML):
-> > > "
-> > > <domain type=3D'kvm' xmlns:qemu=3D'http://libvirt.org/schemas/domai=
-n/qemu/1.0'>
-> > >    <name>nst105</name>
-> > >    <uuid>0249a525-2ee2-432b-a1f5-a6db83b089a3</uuid>
-> > >    <memory unit=3D'KiB'>8388608</memory>
-> > >    <currentMemory unit=3D'KiB'>8388608</currentMemory>
-> > >    <vcpu placement=3D'static'>8</vcpu>
-> > >    <resource>
-> > >      <partition>/machine</partition>
-> > >    </resource>
-> > >    <os>
-> > >      <type arch=3D'x86_64' machine=3D'pc-q35-2.11'>hvm</type>
-> > >    </os>
-> > >    <features>
-> > >      <acpi/>
-> > >      <apic/>
-> > >      <hyperv>
-> > >        <relaxed state=3D'on'/>
-> > >        <vapic state=3D'on'/>
-> > >        <spinlocks state=3D'on' retries=3D'8191'/>
-> > >      </hyperv>
-> > >    </features>
-> > >    <cpu mode=3D'custom' match=3D'exact' check=3D'none'>
-> > >      <model fallback=3D'forbid'>SandyBridge</model>
-> > >      <feature policy=3D'require' name=3D'hypervisor'/>
-> > >      <feature policy=3D'require' name=3D'vmx'/>
-> > >    </cpu>
-> > >    <clock offset=3D'localtime'>
-> > >      <timer name=3D'rtc' tickpolicy=3D'catchup'/>
-> > >      <timer name=3D'pit' tickpolicy=3D'delay'/>
-> > >      <timer name=3D'hpet' present=3D'no'/>
-> > >      <timer name=3D'hypervclock' present=3D'yes'/>
-> > >    </clock>
-> > >    <on_poweroff>destroy</on_poweroff>
-> > >    <on_reboot>restart</on_reboot>
-> > >    <on_crash>destroy</on_crash>
-> > >    <pm>
-> > >      <suspend-to-mem enabled=3D'no'/>
-> > >      <suspend-to-disk enabled=3D'no'/>
-> > >    </pm>
-> > >    <devices>
-> > >      <emulator>/opt/qemu/bin/qemu-system-x86_64</emulator>
-> > >      <disk type=3D'file' device=3D'disk'>
-> > >        <driver name=3D'qemu' type=3D'qcow2'/>
-> > >        <source file=3D'/images/nst105.qcow2'/>
-> > >        <target dev=3D'sda' bus=3D'sata'/>
-> > >        <boot order=3D'2'/>
-> > >        <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D=
-'0' unit=3D'0'/>
-> > >      </disk>
-> > >      <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D=
-'0x1d' function=3D'0x7'/>
-> > >      </controller>
-> > >      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
-> > >        <master startport=3D'0'/>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D=
-'0x1d' function=3D'0x0' multifunction=3D'on'/>
-> > >      </controller>
-> > >      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
-> > >        <master startport=3D'2'/>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D=
-'0x1d' function=3D'0x1'/>
-> > >      </controller>
-> > >      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
-> > >        <master startport=3D'4'/>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D=
-'0x1d' function=3D'0x2'/>
-> > >      </controller>
-> > >      <controller type=3D'sata' index=3D'0'>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D=
-'0x1f' function=3D'0x2'/>
-> > >      </controller>
-> > >      <controller type=3D'pci' index=3D'0' model=3D'pcie-root'/>
-> > >      <controller type=3D'pci' index=3D'1' model=3D'pcie-root-port'>
-> > >        <model name=3D'pcie-root-port'/>
-> > >        <target chassis=3D'1' port=3D'0x10'/>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D=
-'0x02' function=3D'0x0' multifunction=3D'on'/>
-> > >      </controller>
-> > >      <controller type=3D'pci' index=3D'2' model=3D'pcie-root-port'>
-> > >        <model name=3D'pcie-root-port'/>
-> > >        <target chassis=3D'2' port=3D'0x11'/>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D=
-'0x02' function=3D'0x1'/>
-> > >      </controller>
-> > >      <controller type=3D'pci' index=3D'3' model=3D'pcie-root-port'>
-> > >        <model name=3D'pcie-root-port'/>
-> > >        <target chassis=3D'3' port=3D'0x12'/>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D=
-'0x02' function=3D'0x2'/>
-> > >      </controller>
-> > >      <controller type=3D'pci' index=3D'4' model=3D'dmi-to-pci-bridg=
-e'>
-> > >        <model name=3D'i82801b11-bridge'/>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D=
-'0x1e' function=3D'0x0'/>
-> > >      </controller>
-> > >      <controller type=3D'pci' index=3D'5' model=3D'pci-bridge'>
-> > >        <model name=3D'pci-bridge'/>
-> > >        <target chassisNr=3D'5'/>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x04' slot=3D=
-'0x00' function=3D'0x0'/>
-> > >      </controller>
-> > >      <interface type=3D'bridge'>
-> > >        <mac address=3D'00:50:56:1b:dd:6f'/>
-> > >        <source bridge=3D'br0'/>
-> > >        <model type=3D'virtio'/>
-> > >        <boot order=3D'1'/>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x01' slot=3D=
-'0x00' function=3D'0x0'/>
-> > >      </interface>
-> > >      <serial type=3D'pty'>
-> > >        <target port=3D'0'/>
-> > >      </serial>
-> > >      <console type=3D'pty'>
-> > >        <target type=3D'serial' port=3D'0'/>
-> > >      </console>
-> > >      <input type=3D'tablet' bus=3D'usb'>
-> > >        <address type=3D'usb' bus=3D'0' port=3D'1'/>
-> > >      </input>
-> > >      <input type=3D'mouse' bus=3D'ps2'/>
-> > >      <input type=3D'keyboard' bus=3D'ps2'/>
-> > >      <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes' listen=3D'=
-127.0.0.1' keymap=3D'en-us'>
-> > >        <listen type=3D'address' address=3D'127.0.0.1'/>
-> > >      </graphics>
-> > >      <video>
-> > >        <model type=3D'vga' vram=3D'16384' heads=3D'1' primary=3D'ye=
-s'/>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D=
-'0x01' function=3D'0x0'/>
-> > >      </video>
-> > >      <memballoon model=3D'virtio'>
-> > >        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x02' slot=3D=
-'0x00' function=3D'0x0'/>
-> > >      </memballoon>
-> > >    </devices>
-> > >    <seclabel type=3D'none' model=3D'none'/>
-> > >    <seclabel type=3D'dynamic' model=3D'dac' relabel=3D'yes'/>
-> > >    <qemu:commandline>
-> > >      <qemu:arg value=3D'-device'/>
-> > >      <qemu:arg value=3D'pcie-root-port,pref64-reserve=3D500M,slot=3D=
-0,id=3Dpcie_port.1'/>
-> > >      <qemu:arg value=3D'-netdev'/>
-> > >      <qemu:arg value=3D'tap,id=3Dtap5,ifname=3Dtap5,script=3Dno,dow=
-nscript=3Dno'/>
-> > >      <qemu:arg value=3D'-device'/>
-> > >      <qemu:arg value=3D'my_emu_nic,netdev=3Dtap5,bus=3Dpcie_port.1'=
-/>
-> > >    </qemu:commandline>
-> > > </domain>
-> > > "
-> > > ______________________
-> > > General info:
-> > > Host OS: RH7.0 (Kernel: 4.14.13)
-> > > QEMU version: 2.11
-> > > libvirt version: 3.2.0
-> > > Running the following on the host shows that both nested and IOMMU =
-are
-> > > enabled:
-> > > ~]#: cat /sys/module/kvm_intel/parameters/nested
-> > > Y
-> > > ~]# dmesg | grep -e DMAR -e IOMMU
-> > > [    0.000000] DMAR: IOMMU enabled
-> > >=20
-> > > Thanks,
-> > > Elijah
-> > >=20
+This fails with ENODEV on RHEL 7.5 when fd is a block device.
+
+The manual says:
+
+       ENODEV fd does not refer to a regular file or a directory.  (If fd
+is a pipe or FIFO, a different error results.)
+
+Same issue exists in this patch:
+http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg07194.html
+
++        return ret;
+> +    }
+> +#endif
+> +
+> +#ifdef CONFIG_XFS
+> +    if (s->is_xfs) {
+> +        /* xfs_discard() guarantees that the discarded area reads as
+> all-zero
+> +         * afterwards, so we can use it here. */
+> +        return xfs_discard(s, aiocb->aio_offset, aiocb->aio_nbytes);
+> +    }
+> +#endif
+> +
+> +    /* Make the compiler happy if neither of the above is compiled in */
+> +    (void) s;
+> +
+> +    /* If we couldn't manage to unmap while guaranteed that the area
+> reads as
+> +     * all-zero afterwards, just write zeroes without unmapping */
+> +    ret = handle_aiocb_write_zeroes(aiocb);
+> +    return ret;
+> +}
+> +
+>  #ifndef HAVE_COPY_FILE_RANGE
+>  static off_t copy_file_range(int in_fd, off_t *in_off, int out_fd,
+>                               off_t *out_off, size_t len, unsigned int
+> flags)
+> @@ -1729,6 +1761,9 @@ static int aio_worker(void *arg)
+>      case QEMU_AIO_WRITE_ZEROES:
+>          ret = handle_aiocb_write_zeroes(aiocb);
+>          break;
+> +    case QEMU_AIO_WRITE_ZEROES | QEMU_AIO_DISCARD:
+> +        ret = handle_aiocb_write_zeroes_unmap(aiocb);
+> +        break;
+>      case QEMU_AIO_COPY_RANGE:
+>          ret = handle_aiocb_copy_range(aiocb);
+>          break;
+> @@ -2553,15 +2588,13 @@ static int coroutine_fn raw_co_pwrite_zeroes(
+>      int bytes, BdrvRequestFlags flags)
+>  {
+>      BDRVRawState *s = bs->opaque;
+> +    int operation = QEMU_AIO_WRITE_ZEROES;
+>
+> -    if (!(flags & BDRV_REQ_MAY_UNMAP)) {
+> -        return paio_submit_co(bs, s->fd, offset, NULL, bytes,
+> -                              QEMU_AIO_WRITE_ZEROES);
+> -    } else if (s->discard_zeroes) {
+> -        return paio_submit_co(bs, s->fd, offset, NULL, bytes,
+> -                              QEMU_AIO_DISCARD);
+> +    if (flags & BDRV_REQ_MAY_UNMAP) {
+> +        operation |= QEMU_AIO_DISCARD;
+>      }
+> -    return -ENOTSUP;
+> +
+> +    return paio_submit_co(bs, s->fd, offset, NULL, bytes, operation);
+>  }
+>
+>  static int raw_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+> @@ -3054,20 +3087,19 @@ static coroutine_fn int
+> hdev_co_pwrite_zeroes(BlockDriverState *bs,
+>      int64_t offset, int bytes, BdrvRequestFlags flags)
+>  {
+>      BDRVRawState *s = bs->opaque;
+> +    int operation = QEMU_AIO_WRITE_ZEROES | QEMU_AIO_BLKDEV;
+>      int rc;
+>
+>      rc = fd_open(bs);
+>      if (rc < 0) {
+>          return rc;
+>      }
+> -    if (!(flags & BDRV_REQ_MAY_UNMAP)) {
+> -        return paio_submit_co(bs, s->fd, offset, NULL, bytes,
+> -                              QEMU_AIO_WRITE_ZEROES|QEMU_AIO_BLKDEV);
+> -    } else if (s->discard_zeroes) {
+> -        return paio_submit_co(bs, s->fd, offset, NULL, bytes,
+> -                              QEMU_AIO_DISCARD|QEMU_AIO_BLKDEV);
+> +
+> +    if (flags & BDRV_REQ_MAY_UNMAP) {
+> +        operation |= QEMU_AIO_DISCARD;
+>      }
+> -    return -ENOTSUP;
+> +
+> +    return paio_submit_co(bs, s->fd, offset, NULL, bytes, operation);
+>  }
+>
+>  static int coroutine_fn hdev_co_create_opts(const char *filename,
+> QemuOpts *opts,
+> --
+> 2.13.6
+>
+>
+>
