@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1ficTT-00059I-Lw
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:22:22 -0400
+	(envelope-from <peterx@redhat.com>) id 1ficUP-0005gX-1j
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:23:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1ficTQ-0006B1-L2
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:22:19 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:51003)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1ficTQ-0006AD-En
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:22:16 -0400
-Received: by mail-it0-x243.google.com with SMTP id w16-v6so1840329ita.0
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 02:22:16 -0700 (PDT)
+	(envelope-from <peterx@redhat.com>) id 1ficUM-0007MA-1L
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:23:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51910 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ficUL-0007Ll-Qi
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:23:13 -0400
+Date: Thu, 26 Jul 2018 17:23:07 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180726092307.GL2479@xz-mi>
+References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+	<20180629115359.GH2568@work-vm> <20180725101836.GI2479@xz-mi>
+	<20180725191736.GE2365@work-vm> <20180725200456.GM18452@redhat.com>
+	<e1c85e53-1b94-b1df-b7ee-6d93bb43caf6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180725112621.imdzdkntpmh3n5og@kamzik.brq.redhat.com>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
-	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
-	<CAHmQWvCKkzim+-Z4Y69fWg6igZ7V6gaWhjKJZ0m0G0dhbwOFyw@mail.gmail.com>
-	<20180725112621.imdzdkntpmh3n5og@kamzik.brq.redhat.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Thu, 26 Jul 2018 17:22:14 +0800
-Message-ID: <CAHmQWvCfHFSU7RGKG5t6=m7ZSWZjf3TeqOo3cX2KT-GSiN3mPw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e1c85e53-1b94-b1df-b7ee-6d93bb43caf6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org, quintela@redhat.com
 
-On 25 July 2018 at 19:26, Andrew Jones <drjones@redhat.com> wrote:
-> On Wed, Jul 25, 2018 at 06:22:17PM +0800, Hongbo Zhang wrote:
->> On 25 July 2018 at 17:54, Andrew Jones <drjones@redhat.com> wrote:
->> > On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
->> >> For the Aarch64, there is one machine 'virt', it is primarily meant to
->> >> run on KVM and execute virtualization workloads, but we need an
->> >> environment as faithful as possible to physical hardware, for supporting
->> >> firmware and OS development for pysical Aarch64 machines.
->> >>
->> >> This patch introduces new machine type 'Enterprise' with main features:
->> >>  - Based on 'virt' machine type.
->> >>  - Re-designed memory map.
->> >>  - EL2 and EL3 are enabled by default.
->> >>  - GIC version 3 by default.
->> >>  - AHCI controller attached to system bus, and then CDROM and hard disc
->> >>    can be added to it.
->> >>  - EHCI controller attached to system bus, with USB mouse and key board
->> >>    installed by default.
->> >>  - E1000E ethernet card on PCIE bus.
->> >>  - VGA display adaptor on PCIE bus.
->> >>  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
->> >>  - No virtio functions enabled, since this is to emulate real hardware.
->> >
->> > In the last review it was pointed out that using virtio-pci should still
->> > be "real" enough, so there's not much reason to avoid it. Well, unless
->> > there's some concern as to what drivers are available in the firmware and
->> > guest kernel. But that concern usually only applies to legacy firmwares
->> > and kernels, and therefore shouldn't apply to AArch64.
->> >
->> In real physical arm hardware, *HCI are system memory mapped, not on PCIE.
->> we need a QEMU platform like that. We need firmware developed on this
->> QEMU platform can run on real hardware without change(or only a minor
->> change)
->
-> virtio-pci has nothing to do with *HCI. You're adding an E1000e to the
-> PCIe bus instead of a virtio-pci nic. Why?
->
-No virtio devices are need on this platform, so no virtio-pci either,
-on the real Arm server hardware, a NIC is inserted into PCIE, and
-E1000E is a typical one.
+On Thu, Jul 26, 2018 at 10:51:33AM +0200, Paolo Bonzini wrote:
+> On 25/07/2018 22:04, Andrea Arcangeli wrote:
+> > 
+> > It may look like the uffd-wp model is wish-feature similar to an
+> > optimization, but without the uffd-wp model when the WP fault is
+> > triggered by kernel code, the sigsegv model falls apart and requires
+> > all kind of ad-hoc changes just for this single feature. Plus uffd-wp
+> > has other benefits: it makes it all reliable in terms of not
+> > increasing the number of vmas in use during the snapshot. Finally it
+> > makes it faster too with no mmap_sem for reading and no sigsegv
+> > signals.
+> > 
+> > The non cooperative features got merged first because there was much
+> > activity on the kernel side on that front, but this is just an ideal
+> > time to nail down the remaining issues in uffd-wp I think. That I
+> > believe is time better spent than trying to emulate it with sigsegv
+> > and changing all drivers to send new events down to qemu specific to
+> > the sigsegv handling. We considered this before doing uffd for
+> > postcopy too but overall it's unreliable and more work (no single
+> > change was then needed to KVM code with uffd to handle postcopy and
+> > here it should be the same).
+> 
+> I totally agree.  The hard part in userfaultfd was the changes to the
+> kernel get_user_pages API, but the payback was huge because _all_ kernel
+> uses (KVM, vhost-net, syscalls, etc.) just work with userfaultfd.  Going
+> back to mprotect would be a huge mistake.
 
->> Concern is not only available firmwares, but more emphasis is on new
->> firmwares to be developed on this platform (target is developing
->> firmware for hardware, but using qemu if hardware is not available
->> temporarily), if virtio device used, then the newly developed firmware
->> must include virtio front-end codes, but it isn't needed while run on
->> real hardware at last.
->
-> Right. The new firmwares and kernels would need to include virtio-pci nic
-> and scsi drivers. Is that a problem? Anyway, this is all the more reason
-> not to hard code peripherals. If a particular peripheral is a problem
-> for a given firmware, then simply don't add it to the command line, add a
-> different one.
->
-Yes that is problem, for newly developed firmwares, extra efforts will
-be wasted on frontend codes (or glue-layer, whatever we call it), we
-want firmwares developed on this platform can run easily on real
-hardware, without such change.
-Requirement is: some Linaro members just want a qemu platform as true
-as possible with real hardware, there should be no problem with such
-requirement, problem is 'virt' machine cannot satisfy the requirement,
-so a new one is needed.
+Thanks for explaining the bits.  I'd say I wasn't aware of the
+difference before I started the investigation (and only until now I
+noticed that major difference between mprotect and userfaultfd).  I'm
+really glad that it's much clear (at least for me) on which way we
+should choose.
 
->>
->> >>  - No paravirtualized fw_cfg device either.
->> >>
->> >> Arm Trusted Firmware and UEFI porting to this are done accordingly.
->> >>
->> >
->> > How will UEFI get the ACPI tables from QEMU without fw-cfg? I didn't
->> > see any sort of reserved ROM region in the patch for them.
->> >
->> UEFI gets ACPI and kernel from network or mass storage, just like the
->> real hardware.
->
-> Hmm. I thought for real hardware that the ACPI tables were built into
-> the firmware. So, assuming UEFI knows how to read ACPI tables from
-> some storage, then how do the QEMU generated ACPI tables get into that
-> storage?
->
-I should say "mass storage and flash"
-There was fw_cfg in v1 patch, it is removed in v2.
-If no fw_cfg, just like real hardware, UEFI should include ACPI
-support for this SBSA platform, and UEFI/ACPI is load via -pflash,
-then the QEMU built-in ACPI isn't used.
-But there are side effects too, command 'qemu -bios uefi -kernel'
-won't work, I need extra time to evaluate this change.
+Now I'm thinking whether we can move the userfault write protect work
+forward.  The latest discussion I saw so far is in 2016, when someone
+from Huawei tried to use the write protect feature for that old
+version of live snapshot but reported issue:
 
->> If we develop firmware depends on paravirtualized device like fw_cfg,
->> then we canot run such firmware on real hardware.
->
-> Yes, fw-cfg is paravirt, so it's obvious why you'd prefer it not be there,
-> but, where real hardware builds its hardware descriptions into its
-> platform-specific firmware, or uses some platform-specific means of
-> extracting a description from some platform-specific place, QEMU
-> machine models use fw-cfg.
->
-> Thanks,
-> drew
+  https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01127.html
+
+Is that the latest status for userfaultfd wr-protect?
+
+If so, I'm thinking whether I can try to re-verify the work (I tried
+his QEMU repository but I failed to compile somehow, so I plan to
+write some even simpler code to try) to see whether I can get the same
+KVM error he encountered.
+
+Thoughts?
+
+Regards,
+
+-- 
+Peter Xu
