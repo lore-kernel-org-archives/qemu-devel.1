@@ -1,19 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ficeX-0000Up-Nr
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:33:48 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1ficqq-0003m0-0f
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:46:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ficeU-000401-Oi
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:33:45 -0400
-Date: Thu, 26 Jul 2018 11:33:26 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180726093326.GB4215@localhost.localdomain>
-References: <1532542049-21893-1-git-send-email-frederic.konrad@adacore.com>
+	(envelope-from <hongbo.zhang@linaro.org>) id 1ficqn-00032f-2G
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:46:28 -0400
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:35949)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1ficqm-00031R-R6
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:46:24 -0400
+Received: by mail-it0-x242.google.com with SMTP id p81-v6so1830531itp.1
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 02:46:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1532542049-21893-1-git-send-email-frederic.konrad@adacore.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.0] qcow: fix a reference leak
+In-Reply-To: <20180725140824.vnkejw5emkxwktaz@kamzik.brq.redhat.com>
+References: <1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
+	<CAHmQWvDu+P26Y5CJfcQ=1_9C=hej_B8w7dLMbmuOmCV-+pYOJQ@mail.gmail.com>
+	<20180725114404.6g335n3rfjt23hjc@kamzik.brq.redhat.com>
+	<CAFEAcA8wi2QV9cVg_Hp=8MYw_zfxvVciR2CbRZiGJNiQNPdHqg@mail.gmail.com>
+	<20180725124700.GF12855@redhat.com>
+	<20180725125944.5nd5ydm4x4e3vvjw@kamzik.brq.redhat.com>
+	<CAKv+Gu-pbJj59wH7wgZ6Uq+Uko9wYEBqSF=WaC3LL68CFkbxEw@mail.gmail.com>
+	<20180725133810.gsgfu4x6emygu5o5@kamzik.brq.redhat.com>
+	<CAKv+Gu_91nXP4TSvrLf0e8kfX5X3ZNPcmx5UzT1jf5A_rVj8pQ@mail.gmail.com>
+	<20180725140824.vnkejw5emkxwktaz@kamzik.brq.redhat.com>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Thu, 26 Jul 2018 17:46:23 +0800
+Message-ID: <CAHmQWvDY6hb7-a2X8e7CbJ=vhHKni1RUwSH4C7quccGTOZxm+w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +40,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, mreitz@redhat.com, qemu-block@nongnu.org, qemu-stable@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-Am 25.07.2018 um 20:07 hat KONRAD Frederic geschrieben:
-> Since 42a3e1ab367cdf38cce093de24eb406b99a4ef96 qemu asserts when using the
-> vvfat driver:
-> 
-> git clone git://qemu.org/qemu.git
-> cd qemu
-> ./configure --target-list=ppc-softmmu --enable-debug
-> make -j8
-> mkdir foo
-> touch foo/hello
-> ./ppc-softmmu/qemu-system-ppc -M prep --nographic --monitor null             \
->                               -hda fat:rw:./foo
-> 
-> "Ctrl-C"
-> 
-> qemu-system-ppc: block.c:3368: bdrv_close_all: Assertion                     \
->    `((&all_bdrv_states)->tqh_first == ((void *)0))' failed.
-> 
-> This is because we reference bs twice in qcow_co_create(..) one time in
-> bdrv_open_blockdev_ref(..) and in blk_insert_bs(..) but we unref it only once
-> in blk_unref which leads to the reference leak.
-> 
-> Note that I didn't tested much QCOW after this change as I don't use it much.
-> 
-> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+On 25 July 2018 at 22:08, Andrew Jones <drjones@redhat.com> wrote:
+> On Wed, Jul 25, 2018 at 03:46:01PM +0200, Ard Biesheuvel wrote:
+>> On 25 July 2018 at 15:38, Andrew Jones <drjones@redhat.com> wrote:
+>> > On Wed, Jul 25, 2018 at 03:03:40PM +0200, Ard Biesheuvel wrote:
+>> >> On 25 July 2018 at 14:59, Andrew Jones <drjones@redhat.com> wrote:
+>> >> > On Wed, Jul 25, 2018 at 01:47:00PM +0100, Daniel P. Berrang=C3=A9 w=
+rote:
+>> >> >> Would iut make any sense to call the machine  "refplatform"  or "r=
+efboard"
+>> >> >> to indicate it is a generic reference platform, not specifically f=
+ollowing
+>> >> >> any particular real impl, albeit influence by the sbsa spec.
+>> >> >>
+>> >> >
+>> >> > That would indeed stop me from whining about a machine model with a=
+n
+>> >> > 'sbsa' name not strictly implementing a minimal SBSA machine :-)
+>> >> >
+>> >>
+>> >> I still don't get why only a minimal machine is worth considering,
+>> >> given that a real-world minimal SBSA machine is not capable of doing
+>> >> anything useful.
+>> >
+>> > One definition of an SBSA machine can be quite different than another.
+>> > If we only hard code the required [useless] base, but also provide a
+>> > readconfig for the rest, then we get a useful machine without loss of
+>> > flexibility.
+>> >
+>> > That flexibility comes at the cost of platform-bus code (since we need
+>> > to add devices to the system bus) and a less concise command line. The
+>> > platform-bus code may indeed be too expensive for this purpose, but
+>> > we may need to see patches to be sure. I understand the desire to have
+>> > a shorter command line, but this is QEMU :)
+>> >
+>>
+>> My concern is not the QEMU side. It is the code that we will need to
+>> add to UEFI and ARM-TF to deal with the dynamic nature of the
+>> underlying platform. That code has no counterpart in real world
+>> hardware, but will surely turn up in production firmware nonetheless
+>> if we end up having to add that to our SBSA reference codebase.
+>
+> It sounds like there's already some sort of informal SBSA reference
+> instance specification that UEFI and ARM-TF intend to support. If
+> that instance specification were slightly more formal, i.e. documented
+> somewhere and given a more descriptive name (not just 'sbsa'), then
+> I think it would be a lot more palatable to hard code those specification=
+s
+> directly into a QEMU machine model of the same name.
+>
+Root cause is requirement. This platform and virt serve different use cases=
+.
 
-Thanks, applied to the block branch.
+As to command line and readconfig, my opinion is they are suitable for
+change slightly some base/typical platforms, not for change one to
+another with big difference, otherwise we can even reduce some
+platforms in qemu I guess.
 
-Kevin
+> Thanks,
+> drew
