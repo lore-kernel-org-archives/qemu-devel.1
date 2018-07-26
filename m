@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fijM3-0002Jg-Jo
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:43:08 -0400
+	(envelope-from <nsoffer@redhat.com>) id 1fijPy-0004r9-12
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:47:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fijM0-0004XR-GT
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:43:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36988 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fijM0-0004Uq-9j
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:43:04 -0400
-Date: Thu, 26 Jul 2018 10:42:52 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180726104252.3d162f34@t450s.home>
-In-Reply-To: <20180726191315-mutt-send-email-mst@kernel.org>
-References: <DB5PR05MB11605C65D7D734C9354F0421D54F0@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<1407239306.11199051.1530240887935.JavaMail.zimbra@redhat.com>
-	<20180705194311-mutt-send-email-mst@kernel.org>
-	<DB5PR05MB1160D84E747DA480435B6605D5440@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<DB5PR05MB1160BB381473C723C8336EC2D55A0@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<AM5PR0501MB2499CB4F2D01BCDA47C0ACB6C95A0@AM5PR0501MB2499.eurprd05.prod.outlook.com>
-	<DB5PR05MB1160093E018FD91787E80A79D5590@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<20180726145214.GD17777@stefanha-x1.localdomain>
-	<488bdc8d-e36c-ad3e-f7b3-a45a78a99dda@gmail.com>
-	<20180726191315-mutt-send-email-mst@kernel.org>
+	(envelope-from <nsoffer@redhat.com>) id 1fijPu-0000RF-UG
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:47:10 -0400
+Received: from mail-vk0-f65.google.com ([209.85.213.65]:33429)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1fijPu-0000Pc-Nk
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 12:47:06 -0400
+Received: by mail-vk0-f65.google.com with SMTP id y70-v6so1118061vkc.0
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 09:47:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Question: SRIOV support over Win Hyper-V VM
- running in QEMU process on Linux host
+References: <20180726113337.23144-1-kwolf@redhat.com>
+	<605ad10a-13c0-7f62-1c71-a8afe9021ee6@redhat.com>
+	<20180726150655.GG4215@localhost.localdomain>
+	<6cdde651-acdc-e6eb-63fc-e7efe8136710@redhat.com>
+	<20180726153356.GH4215@localhost.localdomain>
+	<9eb742d5-42c7-29da-b06f-e41873d1d645@redhat.com>
+In-Reply-To: <9eb742d5-42c7-29da-b06f-e41873d1d645@redhat.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Thu, 26 Jul 2018 19:46:54 +0300
+Message-ID: <CAMRbyyvWsSTCfNaDJDFwqECsErJHc3=Z+SEaRea0rro95AwUgA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.0] file-posix: Fix write_zeroes with
+ unmap on block devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tal Attaly <talat@mellanox.com>, Stefan Hajnoczi <stefanha@gmail.com>, Knut Omang <knut.omang@oracle.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Elijah Shakkour <elijahs@mellanox.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On Thu, 26 Jul 2018 19:14:45 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Thu, Jul 26, 2018 at 7:10 PM Eric Blake <eblake@redhat.com> wrote:
 
-> On Thu, Jul 26, 2018 at 06:51:13PM +0300, Marcel Apfelbaum wrote:
-> > Hi
-> > 
-> > On 07/26/2018 05:52 PM, Stefan Hajnoczi wrote:  
-> > > On Thu, Jul 12, 2018 at 07:33:14AM +0000, Elijah Shakkour wrote:  
-> > > > Hey,
-> > > > 
-> > > > Our team is adding a NIC functional  emulation to QEMU.
-> > > > One of the features we are adding to this NIC is SRIOV.
-> > > > 
-> > > > Here is the error message I get when checking SRIOV support of  our emulated NIC on Win2016 server (the hyper-v VM).
-> > > > "
-> > > > SR-IOV cannot be used on this system as the PCI Express hardware does not support Access Control Services (ACS) at any root port.  
-> > 
-> > QEMU's emulated PCI Express Root Ports do not support ACS yet, however I am
-> > not sure ACS is a prerequisite
-> > for SR-IOV.
+> On 07/26/2018 10:33 AM, Kevin Wolf wrote:
+>
+> >
+> > As far as I know, the comment you quoted is accurate for BLKDISCARD and
+> > BLKZEROOUT, but not for the fallocate() flags.
+> >
+>
+> I sure wish the man pages were more explicit on what guarantees each
+> flag offers.
+>
+> >> Hmm - that thread also mentions FALLOC_FL_NO_HIDE_STALE, which is a new
+> flag
+> >> not present/documented on Fedora 28. I wonder if it helps, too.
+> >>
+> >>>
+> >>> FALLOC_FL_ZERO_RANGE in contrast implements write_zeroes without unmap.
+> >>
+> >> I thought the opposite: FALLOC_FL_ZERO_RANGE guarantees that you read
+> back
+> >> 0, using whatever is most efficient under the hood (in the case of block
+> >> devices, unmapping that reliably reads back as zero is favored).
+> >
+> > See the code I quoted above, FALLOC_FL_ZERO_RANGE calls
+> > blkdev_issue_zeroout() with BLKDEV_ZERO_NOUNMAP internally.
+>
+> Having to resort to reading the kernel code to learn what the guarantees
+> are is annoying (it's nice that GPL guarantees that we CAN do that, but
+> it means the man pages could use some TLC so that we don't have to).
+> Especially since the kernel code has changed over time.
+>
+> But your paste of current kernel code is rather hard to argue against.
+>
 
-ACS is certainly not a prerequisite for SR-IOV.
- 
-> Looks like windows blocks dev assignment in nested VMs without it.
-> Thinking about it, doesn't vfio do the same by default? I think vfio has
-> a flag to override this though.
+I don't think we should depend on undocumented kernel code.
 
-IOMMU grouping in Linux takes isolation via ACS and device specific
-mechanisms into account, limiting the granularity with which a
-userspace driver can claim ownership of devices, but it doesn't
-actually prevent enabling SR-IOV on the endpoint.  It just makes it
-less useful if your intention is to use SR-IOV for device assignment.
-The only overrides for this are out-of-tree.  Thanks,
-
-Alex
+Nir
