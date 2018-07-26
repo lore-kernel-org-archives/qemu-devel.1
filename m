@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fibIz-0004pH-O0
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:07:28 -0400
+	(envelope-from <bounces@canonical.com>) id 1fibY7-0000x0-Vz
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:23:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fibIw-0000jh-NX
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:07:25 -0400
-Received: from hera.aquilenet.fr ([185.233.100.1]:37696)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1fibIw-0000fs-GS
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:07:22 -0400
-Date: Thu, 26 Jul 2018 10:07:18 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20180726080718.pdzxwxoj4sjjpycm@var.youpi.perso.aquilenet.fr>
-References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
-	<20180725121706.12867.98787.stgit@pasha-VirtualBox>
-	<20180725134429.roe7iuzakjywdv7e@var.youpi.perso.aquilenet.fr>
-	<000601d424af$74e5c900$5eb15b00$@ru>
+	(envelope-from <bounces@canonical.com>) id 1fibY4-0000Ga-Vz
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:23:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55644)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fibY4-0000Cb-Mk
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 04:23:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fibY1-00063J-Qz
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 08:22:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CC4002E818E
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 08:16:25 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000601d424af$74e5c900$5eb15b00$@ru>
-Subject: Re: [Qemu-devel] [PATCH v5 24/24] slirp: fix ipv6 timers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Jul 2018 07:56:52 -0000
+From: =?utf-8?q?=C5=81ukasz_Zemczak?= <1587065@bugs.launchpad.net>
+Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
+Message-Id: <153259181262.32021.1037608847755566623.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1587065] Update Released
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +36,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
 
-Pavel Dovgalyuk, le jeu. 26 juil. 2018 10:08:29 +0300, a ecrit:
-> virtual clock should be used by the virtual devices.
-> slirp module is not the virtual device. Therefore processed packets
-> become visible to the guest after passing to the virtual network card.
-> Before that it can create any timers that should not change the state of the guest.
+The verification of the Stable Release Update for qemu has completed
+successfully and the package has now been released to -updates.
+Subsequently, the Ubuntu Stable Release Updates Team is being
+unsubscribed and will not receive messages about this bug report.  In
+the event that you encounter a regression using the package from
+-updates please report a new bug using ubuntu-bug and tag the bug report
+regression-update so we can easily find any regressions.
 
-I'm not sure I understand that part correctly. slirp is not a "device"
-strictly speaking, but it has a whole foot in the virtual world. All
-TCP/UDP/ARP/RA timings are related to the guest timing, so
+-- =
 
-> > > this service is not related to the guest state.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1587065
 
-seems incorrect. At the moment the ip6_icmp timer's current value is not
-saved in the guest state, but in principle it should, so that the guest
-does see the RAs at a regular rate. In practice we don't care because
-the timing is randomized anyway.
+Title:
+  btrfs qemu-ga - multiple mounts block fsfreeze
 
-> intended to be used for the internal QEMU purposes, but stops when VM
-> is stopped.
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Fix Released
 
-I again don't understand this. The ip6_icmp timing is not for internal
-QEMU purpose, its whole point is how often RAs are sent to the guest.
+Bug description:
+  [Impact]
 
-slirp's guest part is not a device as directly seen by guest I/O, but
-it's a router device as seen through guest packets. Think of it like a
-USB device, which is seen by the guest through USB packets.
+  =C2=A0* backport upstream fix to avoid double unmounts (e.g. bind mounts)
+  =C2=A0=C2=A0=C2=A0hanging the freeze action.
 
-Samuel
+  [Test Case]
+
+  =C2=A0* Prepare a guest
+  =C2=A0=C2=A0=C2=A0$ uvt-simplestreams-libvirt --verbose sync --source htt=
+p://cloud-images.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddai=
+ly
+  uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial l=
+abel=3Ddaily
+
+  =C2=A0* Shut it down and use virsh edit to add a channel for the agent. A=
+dd this somewhere under <devices>:
+  <channel type=3D'unix'>
+  =C2=A0=C2=A0=C2=A0<source mode=3D'bind'/>
+  =C2=A0=C2=A0=C2=A0<target type=3D'virtio' name=3D'org.qemu.guest_agent.0'=
+/>
+  </channel>
+
+  =C2=A0=C2=A0* Start the guest again, in it install qemu-guest-agent
+
+  =C2=A0=C2=A0*
+
+  =C2=A0=C2=A0* On the Host then freeze and thaw the guest
+  =C2=A0=C2=A0=C2=A0=C2=A0$ virsh domfsfreeze x-freeze
+  =C2=A0=C2=A0=C2=A0=C2=A0$ virsh domfsthaw x-freeze
+
+  =C2=A0=C2=A0# The above works, then trigger the issue, in the guest do
+  =C2=A0=C2=A0=C2=A0=C2=A0$ sudo mkdir /mnt/test
+  =C2=A0=C2=A0=C2=A0=C2=A0$ sudo mount -o bind / /mnt/test/
+
+  =C2=A0=C2=A0* Now the freeze/thaw will fail unless the fix is applied to =
+the
+  guest.
+
+  [Regression Potential]
+
+  =C2=A0* From looking at the code alone I could think of a different cause=
+ that
+  =C2=A0=C2=A0=C2=A0makes it return EBUSY.
+  =C2=A0=C2=A0=C2=A0The biggest risk I could see due to that is the agent r=
+eporting a
+  =C2=A0=C2=A0=C2=A0successful freeze due to accepting EBUSY which is not a=
+ctually true.
+  =C2=A0=C2=A0=C2=A0But we have that in Ubuntu since Artful and
+  =C2=A0=C2=A0=C2=A0upstream since January 2017 and there are no such repor=
+ts.
+
+  [Other Info]
+
+  =C2=A0* n/a
+
+  ---
+
+  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
+sible.
+  root@CmsrvMTA:/# mount -l | grep /dev/vda2
+  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
+=3D/@)
+  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
+vol=3D/@home)
+
+  Having two mounts is rather common with btrfs, so the feature fsfreeze
+  is unusable on these systems.
+
+  Below more information about how we encountered this issue...
+
+  Message send to qemu-discuss@nongnu.org:
+
+  Message 1:
+  ----------
+  I use external snapshots to backup my guests. I use the 'quiesce' option =
+to flush and frees the guest file system with the qemu guest agent.
+
+  With the exeption of one guest, this procedure works fine. On the 'unwill=
+ing' guest, I get this error message:
+  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
+nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
+ze /: Device or resource busy"
+
+  I don't think this is not some sort of time-out error, because
+  activation of the fsfreeze and the error message happen immediately
+  after each other:
+
+  $ grep qemu-ga syslog.1
+  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
+
+  This is the only entry of the qemu guest agent in syslog.
+
+  $ sudo virsh version
+  Compiled against library: libvirt 1.3.1
+  Using library: libvirt 1.3.1
+  Gebruikte API: QEMU 1.3.1
+  Draaiende hypervisor: QEMU 2.5.0
+
+  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
+  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
+"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
+ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
+-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
+ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
+response":true}, ... }
+
+  For making an external snapshot, I use this command:
+  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
+uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
+
+  Piece of reply 1:
+  -----------------
+  I have encountered this before. Some operating systems
+  =C2=A0may have bind-mounts that let a device appear multiple times in the=
+ mount list. Unfortunately the guest agent is not smart enough to consider =
+a device that has been frozen as succesfull and keep going. This causes thi=
+s specific error.
+
+  Piece of reply 2:
+  -----------------
+  Ok, that seems to be it.
+
+  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
+he same device formatted as btrfs on
+  two separate sub volumes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
