@@ -1,37 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1fik5R-0006WY-DW
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:30:03 -0400
+	(envelope-from <nsoffer@redhat.com>) id 1fikA0-0000uh-Nx
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:34:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1fik5M-00067L-FG
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:30:01 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:45792)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1fik5M-00066u-6F
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:29:56 -0400
-Message-ID: <1532625946.2458.187.camel@oracle.com>
-From: Knut Omang <knut.omang@oracle.com>
-Date: Thu, 26 Jul 2018 19:25:46 +0200
-In-Reply-To: <9e3bedbf-e6a7-61ae-babd-79a9ec13da24@gmail.com>
-References: <DB5PR05MB11605C65D7D734C9354F0421D54F0@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<1407239306.11199051.1530240887935.JavaMail.zimbra@redhat.com>
-	<20180705194311-mutt-send-email-mst@kernel.org>
-	<DB5PR05MB1160D84E747DA480435B6605D5440@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<DB5PR05MB1160BB381473C723C8336EC2D55A0@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<AM5PR0501MB2499CB4F2D01BCDA47C0ACB6C95A0@AM5PR0501MB2499.eurprd05.prod.outlook.com>
-	<DB5PR05MB1160093E018FD91787E80A79D5590@DB5PR05MB1160.eurprd05.prod.outlook.com>
-	<20180726145214.GD17777@stefanha-x1.localdomain>
-	<488bdc8d-e36c-ad3e-f7b3-a45a78a99dda@gmail.com>
-	<1532623112.2458.172.camel@oracle.com>
-	<20180726193949-mutt-send-email-mst@kernel.org>
-	<1532623371.2458.174.camel@oracle.com>
-	<9e3bedbf-e6a7-61ae-babd-79a9ec13da24@gmail.com>
+	(envelope-from <nsoffer@redhat.com>) id 1fik9w-00036e-IX
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:34:44 -0400
+Received: from mail-ua0-f194.google.com ([209.85.217.194]:34472)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1fik9w-000369-CQ
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:34:40 -0400
+Received: by mail-ua0-f194.google.com with SMTP id r10-v6so1628516uao.1
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 10:34:40 -0700 (PDT)
+MIME-Version: 1.0
+References: <20180726113337.23144-1-kwolf@redhat.com>
+	<605ad10a-13c0-7f62-1c71-a8afe9021ee6@redhat.com>
+	<20180726150655.GG4215@localhost.localdomain>
+	<6cdde651-acdc-e6eb-63fc-e7efe8136710@redhat.com>
+	<20180726153356.GH4215@localhost.localdomain>
+	<9eb742d5-42c7-29da-b06f-e41873d1d645@redhat.com>
+	<CAMRbyyvWsSTCfNaDJDFwqECsErJHc3=Z+SEaRea0rro95AwUgA@mail.gmail.com>
+	<20180726165823.GJ4215@localhost.localdomain>
+In-Reply-To: <20180726165823.GJ4215@localhost.localdomain>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Thu, 26 Jul 2018 20:34:27 +0300
+Message-ID: <CAMRbyyuTtC8YUgn-GECRsV=NqUBudHte8XfkSeF2rftpf701vQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Question: SRIOV support over Win Hyper-V VM
- running in QEMU process on Linux host
+Subject: Re: [Qemu-devel] [PATCH for-3.0] file-posix: Fix write_zeroes with
+ unmap on block devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,295 +35,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahs@mellanox.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Tal Attaly <talat@mellanox.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Idan Shaby <ishaby@redhat.com>
 
-On Thu, 2018-07-26 at 20:05 +0300, Marcel Apfelbaum wrote:
-> 
-> On 07/26/2018 07:42 PM, Knut Omang wrote:
-> > On Thu, 2018-07-26 at 19:41 +0300, Michael S. Tsirkin wrote:
-> > > On Thu, Jul 26, 2018 at 06:38:32PM +0200, Knut Omang wrote:
-> > > > On Thu, 2018-07-26 at 18:51 +0300, Marcel Apfelbaum wrote:
-> > > > > Hi
-> > > > > 
-> > > > > On 07/26/2018 05:52 PM, Stefan Hajnoczi wrote:
-> > > > > > On Thu, Jul 12, 2018 at 07:33:14AM +0000, Elijah Shakkour wrote:
-> > > > > > > Hey,
-> > > > > > > 
-> > > > > > > Our team is adding a NIC functional  emulation to QEMU.
-> > > > > > > One of the features we are adding to this NIC is SRIOV.
-> > > > > > > 
-> > > > > > > Here is the error message I get when checking SRIOV support
-> > > > > > > of  our
-> > > > > > > emulated NIC on Win2016 server (the hyper-v VM).
-> > > > > > > "
-> > > > > > > SR-IOV cannot be used on this system as the PCI Express hardware
-> > > > > > > does
-> > > > > > > not
-> > > > > > > support Access Control Services (ACS) at any root port.
-> > > > > 
-> > > > > QEMU's emulated PCI Express Root Ports do not support ACS yet, however
-> > > > > I
-> > > > > am not sure ACS is a prerequisite
-> > > > > for SR-IOV. We would need ARI support for allowing more than 8VFs, but
-> > > > > QEMU doesn't support that either (yet).
-> > > > > 
-> > > > > Knut Omag has some working patches, he successfully implemented SR-IOV
-> > > > > with QEMU, see:
-> > > > >        https://github.com/knuto/qemu/tree/sriov_patches_v7
-> > > > > 
-> > > > > The code was not merged since we need at least a device with SR-IOV
-> > > > > support to justify the addition.
-> > > > 
-> > > > FYI, I recently rebased these to latest master but just didn't get to
-> > > > push
-> > > > them
-> > > > out. I did just now - they are available here:
-> > > > 
-> > > >     https://github.com/knuto/qemu/tree/sriov_patches_v8
-> > > > 
-> > > > As far as I know ARI support with my patch set works just fine - I have
-> > > > tested
-> > > > it with lots of VFs.
-> > > > 
-> > > > One of the patches in the series (pci: Make use of the devfn property
-> > > > when
-> > > > registering new devices) is necessary to make ARI work as it should with
-> > > > SR/IOV.
-> > > > 
-> > > > For the hardware model I developed the SR/IOV patches for, I also added
-> > > > enough
-> > > > ACS support in the root port (PCIe capability helper patch + usage in
-> > > > ioh3420) to make VFIO "happy". I haven't submitted them because they
-> > > > are "questionable" since they likely do not reflect the actual features
-> > > > of
-> > > > the
-> > > > ioh3420.
-> > > 
-> > > In that the actual ioh3420 doesn't support ACS?
-> > 
-> > yes.. I don't have one so I don't know but that was my assumption..
-> 
-> Hi Knut,
-> 
-> We have now a generic PCIe Root Port we can add whatever we want to it.
-> See please hw/pci-bridge/gen_pcie_root_port.c.
+On Thu, Jul 26, 2018 at 7:58 PM Kevin Wolf <kwolf@redhat.com> wrote:
 
-Ok, I see! - I wasn't aware of that. I was thinking more in terms of just 
-emulating a slightly newer Intel root port but never got around to that.
+> Am 26.07.2018 um 18:46 hat Nir Soffer geschrieben:
+> > On Thu, Jul 26, 2018 at 7:10 PM Eric Blake <eblake@redhat.com> wrote:
+> >
+> > > On 07/26/2018 10:33 AM, Kevin Wolf wrote:
+> > >
+> > > >
+> > > > As far as I know, the comment you quoted is accurate for BLKDISCARD
+> and
+> > > > BLKZEROOUT, but not for the fallocate() flags.
+> > > >
+> > >
+> > > I sure wish the man pages were more explicit on what guarantees each
+> > > flag offers.
+> > >
+> > > >> Hmm - that thread also mentions FALLOC_FL_NO_HIDE_STALE, which is a
+> new
+> > > flag
+> > > >> not present/documented on Fedora 28. I wonder if it helps, too.
+> > > >>
+> > > >>>
+> > > >>> FALLOC_FL_ZERO_RANGE in contrast implements write_zeroes without
+> unmap.
+> > > >>
+> > > >> I thought the opposite: FALLOC_FL_ZERO_RANGE guarantees that you
+> read
+> > > back
+> > > >> 0, using whatever is most efficient under the hood (in the case of
+> block
+> > > >> devices, unmapping that reliably reads back as zero is favored).
+> > > >
+> > > > See the code I quoted above, FALLOC_FL_ZERO_RANGE calls
+> > > > blkdev_issue_zeroout() with BLKDEV_ZERO_NOUNMAP internally.
+> > >
+> > > Having to resort to reading the kernel code to learn what the
+> guarantees
+> > > are is annoying (it's nice that GPL guarantees that we CAN do that, but
+> > > it means the man pages could use some TLC so that we don't have to).
+> > > Especially since the kernel code has changed over time.
+> > >
+> > > But your paste of current kernel code is rather hard to argue against.
+> >
+> > I don't think we should depend on undocumented kernel code.
+>
+> Yes, the man page says "filesystem blocks" instead of just "blocks". If
+> you're in a nit-picking mood, that excludes block devices. But I think
+> it's pretty obvious what the intended meaning is and how it consistently
+> extends to block devices, and the code confirms it.
+>
+> That's by far not "undocumented kernel code" in my book.
+>
 
-> So your patches add both ARI and ACS support, nice!
-> Maybe it worth merging at least these features.
+Maybe it is more correct to say this is poorly documented.
 
-I'll have a look at the generic root port, it is probably a natural extension 
-for v9 of the sriov patch set :-)
+The manual is very specific about supported filesystems, but there nothing
+about
+block devices:
 
-Thanks,
-Knut
+   Deallocating file space
 
-> 
-> Thanks,
-> Marcel
-> 
-> > 
-> > Knut
-> > 
-> > > > I can make those available if interesting.
-> > > > 
-> > > > Thanks,
-> > > > Knut
-> > > > 
-> > > > > > > Contact your system vendor for further information.
-> > > > > > > "
-> > > > > > 
-> > > > > > I'm not sure what the status of emulated SR-IOV is so I have CCed
-> > > > > > Michael Tsirkin and Marcel Apfelbaum, the PCI maintainers in QEMU.
-> > > > > 
-> > > > > Thanks,
-> > > > > Marcel
-> > > > > 
-> > > > > > > Could you please advise about what could be the issue here?
-> > > > > > > 
-> > > > > > > BTW: I use same configuration (VM XML file attached) when running
-> > > > > > > linux VM
-> > > > > > > (RH7.2) image (instead of Win Hyper-V) over the same host and
-> > > > > > > SRIOV is
-> > > > > > > working for me there.
-> > > > > > > 
-> > > > > > > Here the XML file I use to define the VM (our emulated NIC is
-> > > > > > > added at
-> > > > > > > the
-> > > > > > > end of XML):
-> > > > > > > "
-> > > > > > > <domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/q
-> > > > > > > emu/
-> > > > > > > 1.0'
-> > > > > > > > ;
-> > > > > > > 
-> > > > > > >     <name>nst105</name>
-> > > > > > >     <uuid>0249a525-2ee2-432b-a1f5-a6db83b089a3</uuid>
-> > > > > > >     <memory unit='KiB'>8388608</memory>
-> > > > > > >     <currentMemory unit='KiB'>8388608</currentMemory>
-> > > > > > >     <vcpu placement='static'>8</vcpu>
-> > > > > > >     <resource>
-> > > > > > >       <partition>/machine</partition>
-> > > > > > >     </resource>
-> > > > > > >     <os>
-> > > > > > >       <type arch='x86_64' machine='pc-q35-2.11'>hvm</type>
-> > > > > > >     </os>
-> > > > > > >     <features>
-> > > > > > >       <acpi/>
-> > > > > > >       <apic/>
-> > > > > > >       <hyperv>
-> > > > > > >         <relaxed state='on'/>
-> > > > > > >         <vapic state='on'/>
-> > > > > > >         <spinlocks state='on' retries='8191'/>
-> > > > > > >       </hyperv>
-> > > > > > >     </features>
-> > > > > > >     <cpu mode='custom' match='exact' check='none'>
-> > > > > > >       <model fallback='forbid'>SandyBridge</model>
-> > > > > > >       <feature policy='require' name='hypervisor'/>
-> > > > > > >       <feature policy='require' name='vmx'/>
-> > > > > > >     </cpu>
-> > > > > > >     <clock offset='localtime'>
-> > > > > > >       <timer name='rtc' tickpolicy='catchup'/>
-> > > > > > >       <timer name='pit' tickpolicy='delay'/>
-> > > > > > >       <timer name='hpet' present='no'/>
-> > > > > > >       <timer name='hypervclock' present='yes'/>
-> > > > > > >     </clock>
-> > > > > > >     <on_poweroff>destroy</on_poweroff>
-> > > > > > >     <on_reboot>restart</on_reboot>
-> > > > > > >     <on_crash>destroy</on_crash>
-> > > > > > >     <pm>
-> > > > > > >       <suspend-to-mem enabled='no'/>
-> > > > > > >       <suspend-to-disk enabled='no'/>
-> > > > > > >     </pm>
-> > > > > > >     <devices>
-> > > > > > >       <emulator>/opt/qemu/bin/qemu-system-x86_64</emulator>
-> > > > > > >       <disk type='file' device='disk'>
-> > > > > > >         <driver name='qemu' type='qcow2'/>
-> > > > > > >         <source file='/images/nst105.qcow2'/>
-> > > > > > >         <target dev='sda' bus='sata'/>
-> > > > > > >         <boot order='2'/>
-> > > > > > >         <address type='drive' controller='0' bus='0' target='0'
-> > > > > > > unit='0'/>
-> > > > > > >       </disk>
-> > > > > > >       <controller type='usb' index='0' model='ich9-ehci1'>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x00' slot='0x1d'
-> > > > > > > function='0x7'/>
-> > > > > > >       </controller>
-> > > > > > >       <controller type='usb' index='0' model='ich9-uhci1'>
-> > > > > > >         <master startport='0'/>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x00' slot='0x1d'
-> > > > > > > function='0x0' multifunction='on'/>
-> > > > > > >       </controller>
-> > > > > > >       <controller type='usb' index='0' model='ich9-uhci2'>
-> > > > > > >         <master startport='2'/>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x00' slot='0x1d'
-> > > > > > > function='0x1'/>
-> > > > > > >       </controller>
-> > > > > > >       <controller type='usb' index='0' model='ich9-uhci3'>
-> > > > > > >         <master startport='4'/>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x00' slot='0x1d'
-> > > > > > > function='0x2'/>
-> > > > > > >       </controller>
-> > > > > > >       <controller type='sata' index='0'>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x00' slot='0x1f'
-> > > > > > > function='0x2'/>
-> > > > > > >       </controller>
-> > > > > > >       <controller type='pci' index='0' model='pcie-root'/>
-> > > > > > >       <controller type='pci' index='1' model='pcie-root-port'>
-> > > > > > >         <model name='pcie-root-port'/>
-> > > > > > >         <target chassis='1' port='0x10'/>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x00' slot='0x02'
-> > > > > > > function='0x0' multifunction='on'/>
-> > > > > > >       </controller>
-> > > > > > >       <controller type='pci' index='2' model='pcie-root-port'>
-> > > > > > >         <model name='pcie-root-port'/>
-> > > > > > >         <target chassis='2' port='0x11'/>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x00' slot='0x02'
-> > > > > > > function='0x1'/>
-> > > > > > >       </controller>
-> > > > > > >       <controller type='pci' index='3' model='pcie-root-port'>
-> > > > > > >         <model name='pcie-root-port'/>
-> > > > > > >         <target chassis='3' port='0x12'/>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x00' slot='0x02'
-> > > > > > > function='0x2'/>
-> > > > > > >       </controller>
-> > > > > > >       <controller type='pci' index='4' model='dmi-to-pci-bridge'>
-> > > > > > >         <model name='i82801b11-bridge'/>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x00' slot='0x1e'
-> > > > > > > function='0x0'/>
-> > > > > > >       </controller>
-> > > > > > >       <controller type='pci' index='5' model='pci-bridge'>
-> > > > > > >         <model name='pci-bridge'/>
-> > > > > > >         <target chassisNr='5'/>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x04' slot='0x00'
-> > > > > > > function='0x0'/>
-> > > > > > >       </controller>
-> > > > > > >       <interface type='bridge'>
-> > > > > > >         <mac address='00:50:56:1b:dd:6f'/>
-> > > > > > >         <source bridge='br0'/>
-> > > > > > >         <model type='virtio'/>
-> > > > > > >         <boot order='1'/>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x01' slot='0x00'
-> > > > > > > function='0x0'/>
-> > > > > > >       </interface>
-> > > > > > >       <serial type='pty'>
-> > > > > > >         <target port='0'/>
-> > > > > > >       </serial>
-> > > > > > >       <console type='pty'>
-> > > > > > >         <target type='serial' port='0'/>
-> > > > > > >       </console>
-> > > > > > >       <input type='tablet' bus='usb'>
-> > > > > > >         <address type='usb' bus='0' port='1'/>
-> > > > > > >       </input>
-> > > > > > >       <input type='mouse' bus='ps2'/>
-> > > > > > >       <input type='keyboard' bus='ps2'/>
-> > > > > > >       <graphics type='vnc' port='-1' autoport='yes'
-> > > > > > > listen='127.0.0.1'
-> > > > > > > keymap='en-us'>
-> > > > > > >         <listen type='address' address='127.0.0.1'/>
-> > > > > > >       </graphics>
-> > > > > > >       <video>
-> > > > > > >         <model type='vga' vram='16384' heads='1' primary='yes'/>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x00' slot='0x01'
-> > > > > > > function='0x0'/>
-> > > > > > >       </video>
-> > > > > > >       <memballoon model='virtio'>
-> > > > > > >         <address type='pci' domain='0x0000' bus='0x02' slot='0x00'
-> > > > > > > function='0x0'/>
-> > > > > > >       </memballoon>
-> > > > > > >     </devices>
-> > > > > > >     <seclabel type='none' model='none'/>
-> > > > > > >     <seclabel type='dynamic' model='dac' relabel='yes'/>
-> > > > > > >     <qemu:commandline>
-> > > > > > >       <qemu:arg value='-device'/>
-> > > > > > >       <qemu:arg value='pcie-root-port,pref64-
-> > > > > > > reserve=500M,slot=0,id=pcie_port.1'/>
-> > > > > > >       <qemu:arg value='-netdev'/>
-> > > > > > >       <qemu:arg
-> > > > > > > value='tap,id=tap5,ifname=tap5,script=no,downscript=no'/>
-> > > > > > >       <qemu:arg value='-device'/>
-> > > > > > >       <qemu:arg value='my_emu_nic,netdev=tap5,bus=pcie_port.1'/>
-> > > > > > >     </qemu:commandline>
-> > > > > > > </domain>
-> > > > > > > "
-> > > > > > > ______________________
-> > > > > > > General info:
-> > > > > > > Host OS: RH7.0 (Kernel: 4.14.13)
-> > > > > > > QEMU version: 2.11
-> > > > > > > libvirt version: 3.2.0
-> > > > > > > Running the following on the host shows that both nested and IOMMU
-> > > > > > > are
-> > > > > > > enabled:
-> > > > > > > ~]#: cat /sys/module/kvm_intel/parameters/nested
-> > > > > > > Y
-> > > > > > > ~]# dmesg | grep -e DMAR -e IOMMU
-> > > > > > > [    0.000000] DMAR: IOMMU enabled
-> > > > > > > 
-> > > > > > > Thanks,
-> > > > > > > Elijah
-> > > > > > > 
-> 
-> 
+
+       Specifying  the  FALLOC_FL_PUNCH_HOLE flag (available since Linux
+       2.6.38) in mode deallocates space (i.e., creates a hole) in the
+       byte range starting at offset and continuing for len bytes.  Within
+the
+       specified range, partial filesystem blocks are zeroed, and whole
+       filesystem blocks are removed from the file.  After a successful
+call,
+       subsequent  reads from this range will return zeroes.
+
+       The  FALLOC_FL_PUNCH_HOLE  flag  must be ORed with
+FALLOC_FL_KEEP_SIZE
+       in mode; in other words, even when punching off the end of the file,
+the
+       file size (as reported by stat(2)) does not change.
+
+       Not all filesystems support FALLOC_FL_PUNCH_HOLE; if a filesystem
+       doesn't support the operation, an error is returned.  The operation
+is
+       supported  on  at  least  the  following filesystems:
+
+       *  XFS (since Linux 2.6.38)
+       *  ext4 (since Linux 3.0)
+       *  Btrfs (since Linux 3.7)
+       *  tmpfs(5) (since Linux 3.5)
+
+I expect to see something like:
+
+    * block devices (since Linux 4.9)
+
+Anyway this looks the same level of documentation as FALLOC_FL_ZERO_RANGE,
+so if we are ok with using it, FALLOC_FL_PUNCH_HOLE is fine.
+
+Does this change mean that oVirt can start to enable discard for VM when
+disks are using wipe-after-delete?
+
+Currently we disable discard if a disk is marked for wiping, since discard
+does not
+guarantee that discarded ranges are zeroed.
+
+Nir
