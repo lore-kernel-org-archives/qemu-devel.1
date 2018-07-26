@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fikX6-0007Te-7v
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:58:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1fikYk-0000i5-Ch
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:00:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fikX3-00066I-7a
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:58:36 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41234)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fikX2-00065B-Mw
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:58:33 -0400
-Received: by mail-wr1-x442.google.com with SMTP id j5-v6so2567622wrr.8
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 10:58:32 -0700 (PDT)
-References: <20180726132947.28538-1-alex.bennee@linaro.org>
-	<20180726132947.28538-2-alex.bennee@linaro.org>
-	<a2dd4939-3fd3-31dd-7763-c96b1b627c21@vivier.eu>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <a2dd4939-3fd3-31dd-7763-c96b1b627c21@vivier.eu>
-Date: Thu, 26 Jul 2018 18:58:30 +0100
-Message-ID: <87va91swu1.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1fikYj-0007ty-GX
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:00:18 -0400
+References: <20180726113337.23144-1-kwolf@redhat.com>
+	<605ad10a-13c0-7f62-1c71-a8afe9021ee6@redhat.com>
+	<20180726150655.GG4215@localhost.localdomain>
+	<6cdde651-acdc-e6eb-63fc-e7efe8136710@redhat.com>
+	<20180726153356.GH4215@localhost.localdomain>
+	<9eb742d5-42c7-29da-b06f-e41873d1d645@redhat.com>
+	<CAMRbyyvWsSTCfNaDJDFwqECsErJHc3=Z+SEaRea0rro95AwUgA@mail.gmail.com>
+	<20180726165823.GJ4215@localhost.localdomain>
+	<CAMRbyyuTtC8YUgn-GECRsV=NqUBudHte8XfkSeF2rftpf701vQ@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <53ff05bd-03ba-f4b8-e8f5-f47c5cacecc3@redhat.com>
+Date: Thu, 26 Jul 2018 13:00:00 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 for 3.0 1/2] linux-user/mmap.c: handle
- len = 0 maps correctly
+In-Reply-To: <CAMRbyyuTtC8YUgn-GECRsV=NqUBudHte8XfkSeF2rftpf701vQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.0] file-posix: Fix write_zeroes with
+ unmap on block devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,83 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, umarcor <1783362@bugs.launchpad.net>, Riku Voipio <riku.voipio@iki.fi>
+To: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Idan Shaby <ishaby@redhat.com>
 
+On 07/26/2018 12:34 PM, Nir Soffer wrote:
 
-Laurent Vivier <laurent@vivier.eu> writes:
+> 
+> Anyway this looks the same level of documentation as FALLOC_FL_ZERO_RANGE,
+> so if we are ok with using it, FALLOC_FL_PUNCH_HOLE is fine.
+> 
+> Does this change mean that oVirt can start to enable discard for VM when
+> disks are using wipe-after-delete?
+> 
+> Currently we disable discard if a disk is marked for wiping, since discard
+> does not
+> guarantee that discarded ranges are zeroed.
 
-> Le 26/07/2018 =C3=A0 15:29, Alex Benn=C3=A9e a =C3=A9crit:
->> I've slightly re-organised the check to more closely match the
->> sequence that the kernel uses in do_mmap().
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Cc: umarcor <1783362@bugs.launchpad.net>
->> ---
->>  linux-user/mmap.c | 14 +++++++++++---
->>  1 file changed, 11 insertions(+), 3 deletions(-)
->>
->> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
->> index d0c50e4888..3ef69fa2d0 100644
->> --- a/linux-user/mmap.c
->> +++ b/linux-user/mmap.c
->> @@ -391,14 +391,22 @@ abi_long target_mmap(abi_ulong start, abi_ulong le=
-n, int prot,
->>      }
->>  #endif
->>
->> -    if (offset & ~TARGET_PAGE_MASK) {
->> +    if (!len) {
->>          errno =3D EINVAL;
->>          goto fail;
->>      }
->>
->>      len =3D TARGET_PAGE_ALIGN(len);
->> -    if (len =3D=3D 0)
->> -        goto the_end;
->> +    if (!len) {
->> +        errno =3D EINVAL;
->> +        goto fail;
->> +    }
->
-> Why do you check twice len?
-> TARGET_PAGE_ALIGN() rounds up the value, so if it was not 0, it cannot
-> be now.
+Discard does not ever guarantee anything (it is ALWAYS advisory, and 
+thus may be ignored at any point in the stack).  If you NEED to 
+guarantee that something reads as zeros, you have to either explicitly 
+write zeroes, or do a combination of discard first and write zeroes 
+second (and hopefully, the combination of discard+write zeroes is 
+sufficiently optimized in the case where you were lucky that discard 
+does result in a reads-as-zeroes to not do any extra work on the write 
+zeroes call).
 
-I was trying to follow the kernel style but I realise TARGET_PAGE_ALIGN
-might be a different test compared to the kernel's PAGE_ALIGN(len) for
-overflows:
+Oddly enough, write zeroes first and discard second is NOT guaranteed to 
+read zeroes; the most obvious case would be if discard across an 
+encrypted volume has some bulk-erase mechanism that writes all 0s to the 
+hardware but decrypting all 0s now sees garbage, which is different from 
+writing 0s which gets encrypted to something not all 0s on hardware 
+(that said, such a scenario might still be considered reasonably clean 
+for a wipe-after-delete disk - although with discard being advisory, 
+it's hard to make guarantees).
 
-	if (!len)
-		return -EINVAL;
+The current kernel implementation that Kevin posted makes it look like 
+for block devices, you now get:
 
-	/*
-	 * Does the application expect PROT_READ to imply PROT_EXEC?
-	 *
-	 * (the exception is when the underlying filesystem is noexec
-	 *  mounted, in which case we dont add PROT_EXEC.)
-	 */
-	if ((prot & PROT_READ) && (current->personality & READ_IMPLIES_EXEC))
-		if (!(file && path_noexec(&file->f_path)))
-			prot |=3D PROT_EXEC;
+FL_PUNCH_HOLE: guarantee that you read zeroes, using the fastest means 
+possible (possibly by discarding - but only when discard reads as zeroes)
 
-	/* force arch specific MAP_FIXED handling in get_unmapped_area */
-	if (flags & MAP_FIXED_NOREPLACE)
-		flags |=3D MAP_FIXED;
+FL_PUNCH_HOLE | FL_NO_HIDE_STALE: deallocate, what you read is no longer 
+guaranteed (a true discard, regardless of whether discard reads as zeroes)
 
-	if (!(flags & MAP_FIXED))
-		addr =3D round_hint_to_min(addr);
+FL_ZERO_RANGE: guarantee that you read zeroes, without using discard
 
-	/* Careful about overflows.. */
-	len =3D PAGE_ALIGN(len);
-	if (!len)
-		return -ENOMEM;
-
-
->
-> Thanks,
-> Laurent
-
-
---
-Alex Benn=C3=A9e
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
