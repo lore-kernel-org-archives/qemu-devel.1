@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fiklA-0005VD-El
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:13:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1fikwb-0001Vd-I0
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fikl5-0001W5-Ig
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:13:08 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:42601)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fikl5-0001VK-6e
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:13:03 -0400
-References: <20180726132947.28538-1-alex.bennee@linaro.org>
-	<20180726132947.28538-2-alex.bennee@linaro.org>
-	<a2dd4939-3fd3-31dd-7763-c96b1b627c21@vivier.eu>
-	<87va91swu1.fsf@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <a77ed37b-e8b0-6c39-8975-75ae5353db78@vivier.eu>
-Date: Thu, 26 Jul 2018 20:12:16 +0200
+	(envelope-from <eblake@redhat.com>) id 1fikwa-0003ka-Aw
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 14:24:57 -0400
+References: <20180726113337.23144-1-kwolf@redhat.com>
+	<605ad10a-13c0-7f62-1c71-a8afe9021ee6@redhat.com>
+	<20180726150655.GG4215@localhost.localdomain>
+	<6cdde651-acdc-e6eb-63fc-e7efe8136710@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1d5a5355-344e-7029-f7d7-ddb52c65651a@redhat.com>
+Date: Thu, 26 Jul 2018 13:24:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <87va91swu1.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <6cdde651-acdc-e6eb-63fc-e7efe8136710@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 for 3.0 1/2] linux-user/mmap.c: handle
- len = 0 maps correctly
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.0] file-posix: Fix write_zeroes with
+ unmap on block devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, umarcor <1783362@bugs.launchpad.net>, Riku Voipio <riku.voipio@iki.fi>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, Nir Soffer <nsoffer@redhat.com>, pbonzini@redhat.com
 
-Le 26/07/2018 à 19:58, Alex Bennée a écrit :
-> 
-> Laurent Vivier <laurent@vivier.eu> writes:
-> 
->> Le 26/07/2018 à 15:29, Alex Bennée a écrit:
->>> I've slightly re-organised the check to more closely match the
->>> sequence that the kernel uses in do_mmap().
->>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> Cc: umarcor <1783362@bugs.launchpad.net>
->>> ---
->>>  linux-user/mmap.c | 14 +++++++++++---
->>>  1 file changed, 11 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
->>> index d0c50e4888..3ef69fa2d0 100644
->>> --- a/linux-user/mmap.c
->>> +++ b/linux-user/mmap.c
->>> @@ -391,14 +391,22 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
->>>      }
->>>  #endif
->>>
->>> -    if (offset & ~TARGET_PAGE_MASK) {
->>> +    if (!len) {
->>>          errno = EINVAL;
->>>          goto fail;
->>>      }
->>>
->>>      len = TARGET_PAGE_ALIGN(len);
->>> -    if (len == 0)
->>> -        goto the_end;
->>> +    if (!len) {
->>> +        errno = EINVAL;
->>> +        goto fail;
->>> +    }
->>
->> Why do you check twice len?
->> TARGET_PAGE_ALIGN() rounds up the value, so if it was not 0, it cannot
->> be now.
-> 
-> I was trying to follow the kernel style but I realise TARGET_PAGE_ALIGN
-> might be a different test compared to the kernel's PAGE_ALIGN(len) for
-> overflows:
-...
-> 	/* Careful about overflows.. */
-> 	len = PAGE_ALIGN(len);
-> 	if (!len)
-> 		return -ENOMEM;
-> 
+On 07/26/2018 10:23 AM, Eric Blake wrote:
 
+> 
+> Hmm - that thread also mentions FALLOC_FL_NO_HIDE_STALE, which is a new 
+> flag not present/documented on Fedora 28. I wonder if it helps, too.
 
-OK, so keep it but you should use ENOMEM, not EINVAL (and add a comment :) )
+Even more odd - that flag has been proposed to the kernel since 2012 but 
+still not mentioned in the F28 man page:
 
-Thanks,
-Laurent
+https://lwn.net/Articles/492920/
+
+and that its use on block devices is much more recent, just last month:
+
+https://webcache.googleusercontent.com/search?q=cache:1LV2Y06XnjkJ:https://patchwork.kernel.org/patch/10466183/+&cd=5&hl=en&ct=clnk&gl=us&client=firefox-b-1
+
+but now that I've read that, it makes total sense that the combination 
+PUNCH_HOLE|NO_HIDE_STALE is explicitly asking for semantics of "discard 
+as fast as possible regardless of whatever later reads will see", while 
+plain PUNCH_HOLE means "guarantee that I can read zeroes, using the 
+fastest means possible [discard, if that works]"
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
