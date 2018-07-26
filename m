@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ficMx-0002D8-CS
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:15:38 -0400
+	(envelope-from <ndevos@redhat.com>) id 1ficQc-0003Zc-1v
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:19:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ficMu-0000mu-BQ
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:15:35 -0400
-Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:1039)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1ficMt-0000kX-PS
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:15:32 -0400
-Date: Thu, 26 Jul 2018 11:15:27 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20180726091527.j3zw677cprhpfazu@var.youpi.perso.aquilenet.fr>
-References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
-	<20180725121706.12867.98787.stgit@pasha-VirtualBox>
-	<20180725134429.roe7iuzakjywdv7e@var.youpi.perso.aquilenet.fr>
-	<000601d424af$74e5c900$5eb15b00$@ru>
-	<20180726080718.pdzxwxoj4sjjpycm@var.youpi.perso.aquilenet.fr>
-	<000801d424bb$f4b23130$de169390$@ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000801d424bb$f4b23130$de169390$@ru>
-Subject: Re: [Qemu-devel] [PATCH v5 24/24] slirp: fix ipv6 timers
+	(envelope-from <ndevos@redhat.com>) id 1ficQZ-0003aH-1S
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 05:19:22 -0400
+From: Niels de Vos <ndevos@redhat.com>
+Date: Thu, 26 Jul 2018 11:19:07 +0200
+Message-Id: <20180726091907.26839-1-ndevos@redhat.com>
+In-Reply-To: <20180412111614.9724-1-prasanna.kalever@redhat.com>
+References: <20180412111614.9724-1-prasanna.kalever@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] block/gluster: defend on legacy ftruncate
+ api use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +20,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Niels de Vos <ndevos@redhat.com>, Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
 
-Pavel Dovgalyuk, le jeu. 26 juil. 2018 11:37:57 +0300, a ecrit:
-> > From: Samuel Thibault [mailto:samuel.thibault@gnu.org]
-> > Pavel Dovgalyuk, le jeu. 26 juil. 2018 10:08:29 +0300, a ecrit:
-> > > virtual clock should be used by the virtual devices.
-> > > slirp module is not the virtual device. Therefore processed packets
-> > > become visible to the guest after passing to the virtual network card.
-> > > Before that it can create any timers that should not change the state of the guest.
-> > 
-> > I'm not sure I understand that part correctly. slirp is not a "device"
-> > strictly speaking, but it has a whole foot in the virtual world. All
-> > TCP/UDP/ARP/RA timings are related to the guest timing, so
-> 
-> I don't know all details of slirp, so let me ask:
-> if the virtual timer runs very slowly (when it configured this way with icount option),
-> should the timings relate this speed?
+From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
 
-Yes. Otherwise the guest will not be fast enough to answer promptly
-according to slirp's TCP delays.
+New versions of Glusters libgfapi.so have an updated glfs_ftruncate()
+function that returns additional 'struct stat' structures to enable
+advanced caching of attributes. This is useful for file servers, not so
+much for QEMU. Never the less, the API has changed and needs to be
+adopted.
 
-> Or the timers are related to the network devices (e.g., servers in the
-> outer world)?
+Signed-off-by: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+Signed-off-by: Niels de Vos <ndevos@redhat.com>
 
-No.
+--
+v2: do a compile check as suggested by Eric Blake
+---
+ block/gluster.c | 15 +++++++++++++--
+ configure       | 18 ++++++++++++++++++
+ 2 files changed, 31 insertions(+), 2 deletions(-)
 
-> > > > > this service is not related to the guest state.
-> > 
-> > seems incorrect. At the moment the ip6_icmp timer's current value is not
-> > saved in the guest state, but in principle it should, so that the guest
-> > does see the RAs at a regular rate. In practice we don't care because
-> > the timing is randomized anyway.
-> 
-> Isn't this just a side effect?
-> I mean that slirp may be replaced by, say, tap, and the guest should not notice
-> the difference.
-
-Well, if a guest is connected through a tap, the virtual time should
-really run as fast as the realtime, and it should not be paused.
-Otherwise TCP connections will break since the guest won't be able to
-reply fast enough, without even knowing about the issue. Slirp can
-compensate this thanks to a buffer between what happens in the real
-world and what happens in the virtual world. Real world timings are
-handled by the OS socket implementation, and virtual world timings are
-handled with the qemu timer.
-
-> > > intended to be used for the internal QEMU purposes, but stops when VM
-> > > is stopped.
-> > 
-> > I again don't understand this. The ip6_icmp timing is not for internal
-> > QEMU purpose, its whole point is how often RAs are sent to the guest.
-> > 
-> > slirp's guest part is not a device as directly seen by guest I/O, but
-> > it's a router device as seen through guest packets. Think of it like a
-> > USB device, which is seen by the guest through USB packets.
-> 
-> Record/replay implementation creates a line between the guest state and
-> the outer world. Everything crossing this line is saved in the log replayed.
-> In case of network, this line is implemented with the network filter.
-> It takes packets from slirp(or anything) and passes(or not) them to the guest nic.
-> When replaying, the saved packets are injected into the filter directly.
-
-> Slirp is the part of the outer world,
-
-In normal uses it is not. It is a virtual world (its DHCP server, tftp
-server, TCP connexions, etc.) that lives along the guest.
-
-Now, I understand that for record/replay it's simpler to put the line
-after slirp.
-
-Ideally slirp's state should ideally be split it two: the part connected
-to the real world (data from/to the sockets), and the part connected to
-the virtual world (TCP buffering with the guest). So that when pausing,
-going back, going forward etc. the slirp buffers act accordingly, TCP
-knowing exactly what is supposed to be sent or not (otherwise, TCP
-would for instance be really astonished if the guest happens to insist
-requesting old data that it has already ACKed).
-
-But that's tricky, and I understand it's simpler to just put the line
-after slirp, and let the replay of frames provide the guest (which for
-instance has been reset to an older time) with the missing data, and TCP
-will nicely cope with duplicate ACKs and spurious re-emissions from the
-guest.
-
-That being said, there will be problems with TCP connections if you
-pause the guest for a long time: slirp's TCP will timeout and reset the
-connexion. Yes, that happens with tap devices anyway, but slirp acting
-as a buffer seems more useful to me.
-
-Samuel
+diff --git a/block/gluster.c b/block/gluster.c
+index 4fd55a9cc5..d1c6f81f5c 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -997,6 +997,7 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
+                                     PreallocMode prealloc, Error **errp)
+ {
+     int64_t current_length;
++    int ret;
+ 
+     current_length = glfs_lseek(fd, 0, SEEK_END);
+     if (current_length < 0) {
+@@ -1024,7 +1025,12 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
+ #endif /* CONFIG_GLUSTERFS_FALLOCATE */
+ #ifdef CONFIG_GLUSTERFS_ZEROFILL
+     case PREALLOC_MODE_FULL:
+-        if (glfs_ftruncate(fd, offset)) {
++#ifdef CONFIG_GLUSTERFS_LEGACY_FTRUNCATE
++        ret = glfs_ftruncate(fd, offset);
++#else
++        ret = glfs_ftruncate(fd, offset, NULL, NULL);
++#endif
++        if (ret) {
+             error_setg_errno(errp, errno, "Could not resize file");
+             return -errno;
+         }
+@@ -1035,7 +1041,12 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
+         break;
+ #endif /* CONFIG_GLUSTERFS_ZEROFILL */
+     case PREALLOC_MODE_OFF:
+-        if (glfs_ftruncate(fd, offset)) {
++#ifdef CONFIG_GLUSTERFS_LEGACY_FTRUNCATE
++        ret = glfs_ftruncate(fd, offset);
++#else
++        ret = glfs_ftruncate(fd, offset, NULL, NULL);
++#endif
++        if (ret) {
+             error_setg_errno(errp, errno, "Could not resize file");
+             return -errno;
+         }
+diff --git a/configure b/configure
+index 2a7796ea80..f3c0918d6b 100755
+--- a/configure
++++ b/configure
+@@ -451,6 +451,7 @@ glusterfs_xlator_opt="no"
+ glusterfs_discard="no"
+ glusterfs_fallocate="no"
+ glusterfs_zerofill="no"
++glusterfs_legacy_ftruncate="no"
+ gtk=""
+ gtkabi=""
+ gtk_gl="no"
+@@ -3947,6 +3948,19 @@ if test "$glusterfs" != "no" ; then
+       glusterfs_fallocate="yes"
+       glusterfs_zerofill="yes"
+     fi
++    cat > $TMPC << EOF
++#include <glusterfs/api/glfs.h>
++
++int
++main(void)
++{
++	/* new glfs_ftruncate() passes two additional args */
++	return glfs_ftruncate(NULL, 0 /*, NULL, NULL */);
++}
++EOF
++    if compile_prog "$glusterfs_cflags" "$glusterfs_libs" ; then
++      glusterfs_legacy_ftruncate="yes"
++    fi
+   else
+     if test "$glusterfs" = "yes" ; then
+       feature_not_found "GlusterFS backend support" \
+@@ -6644,6 +6658,10 @@ if test "$glusterfs_zerofill" = "yes" ; then
+   echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
+ fi
+ 
++if test "$glusterfs_legacy_ftruncate" = "yes" ; then
++  echo "CONFIG_GLUSTERFS_LEGACY_FTRUNCATE=y" >> $config_host_mak
++fi
++
+ if test "$libssh2" = "yes" ; then
+   echo "CONFIG_LIBSSH2=m" >> $config_host_mak
+   echo "LIBSSH2_CFLAGS=$libssh2_cflags" >> $config_host_mak
+-- 
+2.17.1
