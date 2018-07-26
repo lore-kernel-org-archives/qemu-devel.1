@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1fikA0-0000uh-Nx
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:34:46 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fikFL-0004J0-Eq
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:40:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1fik9w-00036e-IX
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:34:44 -0400
-Received: from mail-ua0-f194.google.com ([209.85.217.194]:34472)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1fik9w-000369-CQ
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:34:40 -0400
-Received: by mail-ua0-f194.google.com with SMTP id r10-v6so1628516uao.1
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 10:34:40 -0700 (PDT)
+	(envelope-from <laurent@vivier.eu>) id 1fikFH-0003n0-HU
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:40:15 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:38229)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fikFH-0003iK-8B
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 13:40:11 -0400
+References: <153258768962.6738.11319866502689416568.stgit@dhcp-9-109-246-16>
+	<4671a0f0-e399-6187-3205-994f663fa260@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <db84d8c9-fab0-a1eb-7cd8-a154a2a76b10@vivier.eu>
+Date: Thu, 26 Jul 2018 19:39:38 +0200
 MIME-Version: 1.0
-References: <20180726113337.23144-1-kwolf@redhat.com>
-	<605ad10a-13c0-7f62-1c71-a8afe9021ee6@redhat.com>
-	<20180726150655.GG4215@localhost.localdomain>
-	<6cdde651-acdc-e6eb-63fc-e7efe8136710@redhat.com>
-	<20180726153356.GH4215@localhost.localdomain>
-	<9eb742d5-42c7-29da-b06f-e41873d1d645@redhat.com>
-	<CAMRbyyvWsSTCfNaDJDFwqECsErJHc3=Z+SEaRea0rro95AwUgA@mail.gmail.com>
-	<20180726165823.GJ4215@localhost.localdomain>
-In-Reply-To: <20180726165823.GJ4215@localhost.localdomain>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Thu, 26 Jul 2018 20:34:27 +0300
-Message-ID: <CAMRbyyuTtC8YUgn-GECRsV=NqUBudHte8XfkSeF2rftpf701vQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.0] file-posix: Fix write_zeroes with
- unmap on block devices
+In-Reply-To: <4671a0f0-e399-6187-3205-994f663fa260@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: ppc64: don't use volatile
+ register during safe_syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,108 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Idan Shaby <ishaby@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, dgibson@redhat.com, riku.voipio@iki.fi
+Cc: qemu-devel@nongnu.org
 
-On Thu, Jul 26, 2018 at 7:58 PM Kevin Wolf <kwolf@redhat.com> wrote:
+Le 26/07/2018 à 19:15, Richard Henderson a écrit :
+> On 07/25/2018 11:48 PM, Shivaprasad G Bhat wrote:
+>> r11 is a volatile register on PPC as per calling conventions.
+>> The safe_syscall code uses it to check if the signal_pending
+>> is set during the safe_syscall. When a syscall is interrupted
+>> on return from signal handling, the r11 might be corrupted
+>> before we retry the syscall leading to a crash. The registers
+>> r0-r13 are not to be used here as they have
+>> volatile/designated/reserved usages. Change the code to use
+>> r14 which is non-volatile and is appropriate for local use in
+>> safe_syscall.
+>>
+>> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+>> ---
+>> Steps to reproduce:
+>> On PPC host, issue `qemu-ppc64le /usr/bin/cc -E -`
+>> Attempt Ctrl-C, the issue is reproduced.
+>>
+>> Reference:
+>> https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
+>>
+>>  linux-user/host/ppc64/safe-syscall.inc.S |    4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
+>> index d30050a67c..b0cbbe6a69 100644
+>> --- a/linux-user/host/ppc64/safe-syscall.inc.S
+>> +++ b/linux-user/host/ppc64/safe-syscall.inc.S
+>> @@ -49,7 +49,7 @@ safe_syscall_base:
+>>  	 *               and returns the result in r3
+>>  	 * Shuffle everything around appropriately.
+>>  	 */
+>> -	mr	11, 3	/* signal_pending */
+>> +	mr	14, 3	/* signal_pending */
+> 
+> I do see that I was incorrect in assuming that r11 would be unmodified.  But
+> you can't simply write to a call-saved register -- you must preserve its value
+> for the caller.
+> 
+> Saving the value requires that you find some space on, or create, a stack
+> frame.  Note that there are two different conventions for _CALL_AIX and
+> _CALL_ELF==2.
 
-> Am 26.07.2018 um 18:46 hat Nir Soffer geschrieben:
-> > On Thu, Jul 26, 2018 at 7:10 PM Eric Blake <eblake@redhat.com> wrote:
-> >
-> > > On 07/26/2018 10:33 AM, Kevin Wolf wrote:
-> > >
-> > > >
-> > > > As far as I know, the comment you quoted is accurate for BLKDISCARD
-> and
-> > > > BLKZEROOUT, but not for the fallocate() flags.
-> > > >
-> > >
-> > > I sure wish the man pages were more explicit on what guarantees each
-> > > flag offers.
-> > >
-> > > >> Hmm - that thread also mentions FALLOC_FL_NO_HIDE_STALE, which is a
-> new
-> > > flag
-> > > >> not present/documented on Fedora 28. I wonder if it helps, too.
-> > > >>
-> > > >>>
-> > > >>> FALLOC_FL_ZERO_RANGE in contrast implements write_zeroes without
-> unmap.
-> > > >>
-> > > >> I thought the opposite: FALLOC_FL_ZERO_RANGE guarantees that you
-> read
-> > > back
-> > > >> 0, using whatever is most efficient under the hood (in the case of
-> block
-> > > >> devices, unmapping that reliably reads back as zero is favored).
-> > > >
-> > > > See the code I quoted above, FALLOC_FL_ZERO_RANGE calls
-> > > > blkdev_issue_zeroout() with BLKDEV_ZERO_NOUNMAP internally.
-> > >
-> > > Having to resort to reading the kernel code to learn what the
-> guarantees
-> > > are is annoying (it's nice that GPL guarantees that we CAN do that, but
-> > > it means the man pages could use some TLC so that we don't have to).
-> > > Especially since the kernel code has changed over time.
-> > >
-> > > But your paste of current kernel code is rather hard to argue against.
-> >
-> > I don't think we should depend on undocumented kernel code.
->
-> Yes, the man page says "filesystem blocks" instead of just "blocks". If
-> you're in a nit-picking mood, that excludes block devices. But I think
-> it's pretty obvious what the intended meaning is and how it consistently
-> extends to block devices, and the code confirms it.
->
-> That's by far not "undocumented kernel code" in my book.
->
+Can we guess the syscall ('sc') will not modify neither r11 nor r14, but
+the function caller expects that r11 is not modified because it's the
+environment pointer, and saves r14 because it's one of its local
+variable it knows it has to preserve?
 
-Maybe it is more correct to say this is poorly documented.
+In this case, I think Shivaprasad's fix is correct.
 
-The manual is very specific about supported filesystems, but there nothing
-about
-block devices:
-
-   Deallocating file space
-
-
-       Specifying  the  FALLOC_FL_PUNCH_HOLE flag (available since Linux
-       2.6.38) in mode deallocates space (i.e., creates a hole) in the
-       byte range starting at offset and continuing for len bytes.  Within
-the
-       specified range, partial filesystem blocks are zeroed, and whole
-       filesystem blocks are removed from the file.  After a successful
-call,
-       subsequent  reads from this range will return zeroes.
-
-       The  FALLOC_FL_PUNCH_HOLE  flag  must be ORed with
-FALLOC_FL_KEEP_SIZE
-       in mode; in other words, even when punching off the end of the file,
-the
-       file size (as reported by stat(2)) does not change.
-
-       Not all filesystems support FALLOC_FL_PUNCH_HOLE; if a filesystem
-       doesn't support the operation, an error is returned.  The operation
-is
-       supported  on  at  least  the  following filesystems:
-
-       *  XFS (since Linux 2.6.38)
-       *  ext4 (since Linux 3.0)
-       *  Btrfs (since Linux 3.7)
-       *  tmpfs(5) (since Linux 3.5)
-
-I expect to see something like:
-
-    * block devices (since Linux 4.9)
-
-Anyway this looks the same level of documentation as FALLOC_FL_ZERO_RANGE,
-so if we are ok with using it, FALLOC_FL_PUNCH_HOLE is fine.
-
-Does this change mean that oVirt can start to enable discard for VM when
-disks are using wipe-after-delete?
-
-Currently we disable discard if a disk is marked for wiping, since discard
-does not
-guarantee that discarded ranges are zeroed.
-
-Nir
+Thanks,
+Laurent
