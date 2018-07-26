@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1fieEq-0007yv-5M
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 07:15:23 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fieWl-0002qz-Aq
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 07:33:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1fieEm-0003Lo-UB
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 07:15:20 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:35479)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1fieEm-0003Ld-MB
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 07:15:16 -0400
-Received: by mail-it0-x244.google.com with SMTP id q20-v6so2134250ith.0
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 04:15:16 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180726111109.w24jk6ehklimige7@kamzik.brq.redhat.com>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
-	<20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
-	<CAHmQWvCKkzim+-Z4Y69fWg6igZ7V6gaWhjKJZ0m0G0dhbwOFyw@mail.gmail.com>
-	<20180725112621.imdzdkntpmh3n5og@kamzik.brq.redhat.com>
-	<CAHmQWvCfHFSU7RGKG5t6=m7ZSWZjf3TeqOo3cX2KT-GSiN3mPw@mail.gmail.com>
-	<20180726102855.x6ffdoqjpejpyae7@kamzik.brq.redhat.com>
-	<CAKv+Gu-ffZRNmACH6YieNsg=AHxJxYoXHsBGf6C=nOvFfTu7Sg@mail.gmail.com>
-	<20180726111109.w24jk6ehklimige7@kamzik.brq.redhat.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Thu, 26 Jul 2018 13:15:15 +0200
-Message-ID: <CAKv+Gu80KfwZft4t1HtOXPuijuPLV80K9iW+BsTgs7WcnosMXA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+	(envelope-from <kwolf@redhat.com>) id 1fieWi-0008Gp-B1
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 07:33:51 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Thu, 26 Jul 2018 13:33:37 +0200
+Message-Id: <20180726113337.23144-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.0] file-posix: Fix write_zeroes with
+ unmap on block devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,172 +18,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-On 26 July 2018 at 13:11, Andrew Jones <drjones@redhat.com> wrote:
-> On Thu, Jul 26, 2018 at 12:35:08PM +0200, Ard Biesheuvel wrote:
->> On 26 July 2018 at 12:28, Andrew Jones <drjones@redhat.com> wrote:
->> > On Thu, Jul 26, 2018 at 05:22:14PM +0800, Hongbo Zhang wrote:
->> >> On 25 July 2018 at 19:26, Andrew Jones <drjones@redhat.com> wrote:
->> >> > On Wed, Jul 25, 2018 at 06:22:17PM +0800, Hongbo Zhang wrote:
->> >> >> On 25 July 2018 at 17:54, Andrew Jones <drjones@redhat.com> wrote:
->> >> >> > On Wed, Jul 25, 2018 at 01:30:52PM +0800, Hongbo Zhang wrote:
->> >> >> >> For the Aarch64, there is one machine 'virt', it is primarily meant to
->> >> >> >> run on KVM and execute virtualization workloads, but we need an
->> >> >> >> environment as faithful as possible to physical hardware, for supporting
->> >> >> >> firmware and OS development for pysical Aarch64 machines.
->> >> >> >>
->> >> >> >> This patch introduces new machine type 'Enterprise' with main features:
->> >> >> >>  - Based on 'virt' machine type.
->> >> >> >>  - Re-designed memory map.
->> >> >> >>  - EL2 and EL3 are enabled by default.
->> >> >> >>  - GIC version 3 by default.
->> >> >> >>  - AHCI controller attached to system bus, and then CDROM and hard disc
->> >> >> >>    can be added to it.
->> >> >> >>  - EHCI controller attached to system bus, with USB mouse and key board
->> >> >> >>    installed by default.
->> >> >> >>  - E1000E ethernet card on PCIE bus.
->> >> >> >>  - VGA display adaptor on PCIE bus.
->> >> >> >>  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
->> >> >> >>  - No virtio functions enabled, since this is to emulate real hardware.
->> >> >> >
->> >> >> > In the last review it was pointed out that using virtio-pci should still
->> >> >> > be "real" enough, so there's not much reason to avoid it. Well, unless
->> >> >> > there's some concern as to what drivers are available in the firmware and
->> >> >> > guest kernel. But that concern usually only applies to legacy firmwares
->> >> >> > and kernels, and therefore shouldn't apply to AArch64.
->> >> >> >
->> >> >> In real physical arm hardware, *HCI are system memory mapped, not on PCIE.
->> >> >> we need a QEMU platform like that. We need firmware developed on this
->> >> >> QEMU platform can run on real hardware without change(or only a minor
->> >> >> change)
->> >> >
->> >> > virtio-pci has nothing to do with *HCI. You're adding an E1000e to the
->> >> > PCIe bus instead of a virtio-pci nic. Why?
->> >> >
->> >> No virtio devices are need on this platform, so no virtio-pci either,
->> >> on the real Arm server hardware, a NIC is inserted into PCIE, and
->> >> E1000E is a typical one.
->> >
->> > It is possible to make a real piece of hardware that really goes in a PCIe
->> > slot which knows how to talk VirtIO. The fact that an E1000e driver will
->> > drive an E1000e QEMU model instead of a VirtIO driver driving a VirtIO
->> > backend is, to me, pretty arbitrary. The only reason it should matter for
->> > the guest firmware/kernel is whether or not the firmware/kernel will have
->> > VirtIO drivers available. Do we know that? Is it documented somewhere
->> > that the guest firmware/kernel is guaranteed to have E1000e drivers, but
->> > VirtIO drivers are optional, or even forbidden? If so, where's that
->> > document?
->> >
->>
->> It is not pretty arbitrary. One is paravirtualization and one is not.
->
-> But the paravirtness is a driver detail, not a platform detail. The
-> virtio-pci device is just a PCIe device to the platform. Drive it or
-> not, drive it with knowledge that it's paravirt or not, the platform
-> doesn't care.
->
+The BLKDISCARD ioctl doesn't guarantee that the discarded blocks read as
+all-zero afterwards, so don't try to abuse it for zero writing. We try
+to only use this if BLKDISCARDZEROES tells us that it is safe, but this
+is unreliable on older kernels and a constant 0 in newer kernels. In
+other words, this code path is never actually used with newer kernels,
+so we don't even try to unmap while writing zeros.
 
-That may be true. But we'll still end up with a UEFI build that has
-OVMF virtio bus drivers and device drivers included, blurring the line
-between emulation and virtualization.
+This patch removes the abuse of discard for writing zeroes from
+file-posix and instead adds a new function that uses interfaces that are
+actually meant to deallocate and zero out at the same time. Only if
+those fail, it falls back to zeroing out without unmap. We never fall
+back to a discard operation any more that may or may not result in
+zeros.
 
->>
->> >>
->> >> >> Concern is not only available firmwares, but more emphasis is on new
->> >> >> firmwares to be developed on this platform (target is developing
->> >> >> firmware for hardware, but using qemu if hardware is not available
->> >> >> temporarily), if virtio device used, then the newly developed firmware
->> >> >> must include virtio front-end codes, but it isn't needed while run on
->> >> >> real hardware at last.
->> >> >
->> >> > Right. The new firmwares and kernels would need to include virtio-pci nic
->> >> > and scsi drivers. Is that a problem? Anyway, this is all the more reason
->> >> > not to hard code peripherals. If a particular peripheral is a problem
->> >> > for a given firmware, then simply don't add it to the command line, add a
->> >> > different one.
->> >> >
->> >> Yes that is problem, for newly developed firmwares, extra efforts will
->> >> be wasted on frontend codes (or glue-layer, whatever we call it), we
->> >> want firmwares developed on this platform can run easily on real
->> >> hardware, without such change.
->> >> Requirement is: some Linaro members just want a qemu platform as true
->> >> as possible with real hardware, there should be no problem with such
->> >> requirement, problem is 'virt' machine cannot satisfy the requirement,
->> >> so a new one is needed.
->> >
->> > It sounds like somebody knows what drivers are available and what
->> > drivers aren't. If that's not already documented, then it should
->> > be, and a pointer to it should be in this patch series.
->> >
->>
->> Available where?
->
-> Available in UEFI, ARM-TF, and the target guest kernel. What software
-> stack is this machine model targeting? I get the impression people
-> know what they need, but knowing and specifying with a document are
-> two different things.
->
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/file-posix.c | 62 +++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 47 insertions(+), 15 deletions(-)
 
-Right.
-
->>
->> UEFI has drivers for ?HCI industry standard hardware. As for the
->> networking side, we should review whether E1000e is the most
->> appropriate or this, given the lack of open source drivers. However, I
->> do agree that discoverable hardware should not be hardcoded, and we
->> should even try to use the emulated option ROM to provide a UEFI
->> driver.
->
-> Amen to that.
->
->>
->> >>
->> >> >>
->> >> >> >>  - No paravirtualized fw_cfg device either.
->> >> >> >>
->> >> >> >> Arm Trusted Firmware and UEFI porting to this are done accordingly.
->> >> >> >>
->> >> >> >
->> >> >> > How will UEFI get the ACPI tables from QEMU without fw-cfg? I didn't
->> >> >> > see any sort of reserved ROM region in the patch for them.
->> >> >> >
->> >> >> UEFI gets ACPI and kernel from network or mass storage, just like the
->> >> >> real hardware.
->> >> >
->> >> > Hmm. I thought for real hardware that the ACPI tables were built into
->> >> > the firmware. So, assuming UEFI knows how to read ACPI tables from
->> >> > some storage, then how do the QEMU generated ACPI tables get into that
->> >> > storage?
->> >> >
->> >> I should say "mass storage and flash"
->> >> There was fw_cfg in v1 patch, it is removed in v2.
->> >> If no fw_cfg, just like real hardware, UEFI should include ACPI
->> >> support for this SBSA platform, and UEFI/ACPI is load via -pflash,
->> >> then the QEMU built-in ACPI isn't used.
->> >> But there are side effects too, command 'qemu -bios uefi -kernel'
->> >> won't work, I need extra time to evaluate this change.
->> >
->> > Right. Neither ACPI nor '-bios ... -kernel ...' can work without fw-cfg.
->> > This patch either needs to keep fw-cfg, or to remove the ACPI changes.
->> > I can't see how an SBSA reference platform would be much use without ACPI
->> > though.
->> >
->>
->> Even if mach-virt's ACPI code depends on fw_cfg currently, there is no
->> reason whatsoever that this sbsa machine should not implement it like
->> real hardware does, i.e., hard coded tables.
->>
->
-> I don't disagree, but there's no point in making QEMU ACPI generation
-> code changes that will never be consumed. This patch adds tables for
-> the hard coded ?HCI controllers to ACPI. We don't need those changes for
-> the virt machine and, without fw-cfg, you can't use them on the reference
-> machine.
->
-
-Ah, indeed. I missed that bit.
-
-We should not include any changes that modify the DT node or ACPI
-table generation for mach-virt.
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 60af4b3d51..9c66cd87d1 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -648,7 +648,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+     }
+ #endif
+ 
+-    bs->supported_zero_flags = s->discard_zeroes ? BDRV_REQ_MAY_UNMAP : 0;
++    bs->supported_zero_flags = BDRV_REQ_MAY_UNMAP;
+     ret = 0;
+ fail:
+     if (filename && (bdrv_flags & BDRV_O_TEMPORARY)) {
+@@ -1487,6 +1487,38 @@ static ssize_t handle_aiocb_write_zeroes(RawPosixAIOData *aiocb)
+     return -ENOTSUP;
+ }
+ 
++static ssize_t handle_aiocb_write_zeroes_unmap(RawPosixAIOData *aiocb)
++{
++    BDRVRawState *s = aiocb->bs->opaque;
++    int ret;
++
++    /* First try to write zeros and unmap at the same time */
++
++#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
++    ret = do_fallocate(s->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
++                       aiocb->aio_offset, aiocb->aio_nbytes);
++    if (ret != -ENOTSUP) {
++        return ret;
++    }
++#endif
++
++#ifdef CONFIG_XFS
++    if (s->is_xfs) {
++        /* xfs_discard() guarantees that the discarded area reads as all-zero
++         * afterwards, so we can use it here. */
++        return xfs_discard(s, aiocb->aio_offset, aiocb->aio_nbytes);
++    }
++#endif
++
++    /* Make the compiler happy if neither of the above is compiled in */
++    (void) s;
++
++    /* If we couldn't manage to unmap while guaranteed that the area reads as
++     * all-zero afterwards, just write zeroes without unmapping */
++    ret = handle_aiocb_write_zeroes(aiocb);
++    return ret;
++}
++
+ #ifndef HAVE_COPY_FILE_RANGE
+ static off_t copy_file_range(int in_fd, off_t *in_off, int out_fd,
+                              off_t *out_off, size_t len, unsigned int flags)
+@@ -1729,6 +1761,9 @@ static int aio_worker(void *arg)
+     case QEMU_AIO_WRITE_ZEROES:
+         ret = handle_aiocb_write_zeroes(aiocb);
+         break;
++    case QEMU_AIO_WRITE_ZEROES | QEMU_AIO_DISCARD:
++        ret = handle_aiocb_write_zeroes_unmap(aiocb);
++        break;
+     case QEMU_AIO_COPY_RANGE:
+         ret = handle_aiocb_copy_range(aiocb);
+         break;
+@@ -2553,15 +2588,13 @@ static int coroutine_fn raw_co_pwrite_zeroes(
+     int bytes, BdrvRequestFlags flags)
+ {
+     BDRVRawState *s = bs->opaque;
++    int operation = QEMU_AIO_WRITE_ZEROES;
+ 
+-    if (!(flags & BDRV_REQ_MAY_UNMAP)) {
+-        return paio_submit_co(bs, s->fd, offset, NULL, bytes,
+-                              QEMU_AIO_WRITE_ZEROES);
+-    } else if (s->discard_zeroes) {
+-        return paio_submit_co(bs, s->fd, offset, NULL, bytes,
+-                              QEMU_AIO_DISCARD);
++    if (flags & BDRV_REQ_MAY_UNMAP) {
++        operation |= QEMU_AIO_DISCARD;
+     }
+-    return -ENOTSUP;
++
++    return paio_submit_co(bs, s->fd, offset, NULL, bytes, operation);
+ }
+ 
+ static int raw_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+@@ -3054,20 +3087,19 @@ static coroutine_fn int hdev_co_pwrite_zeroes(BlockDriverState *bs,
+     int64_t offset, int bytes, BdrvRequestFlags flags)
+ {
+     BDRVRawState *s = bs->opaque;
++    int operation = QEMU_AIO_WRITE_ZEROES | QEMU_AIO_BLKDEV;
+     int rc;
+ 
+     rc = fd_open(bs);
+     if (rc < 0) {
+         return rc;
+     }
+-    if (!(flags & BDRV_REQ_MAY_UNMAP)) {
+-        return paio_submit_co(bs, s->fd, offset, NULL, bytes,
+-                              QEMU_AIO_WRITE_ZEROES|QEMU_AIO_BLKDEV);
+-    } else if (s->discard_zeroes) {
+-        return paio_submit_co(bs, s->fd, offset, NULL, bytes,
+-                              QEMU_AIO_DISCARD|QEMU_AIO_BLKDEV);
++
++    if (flags & BDRV_REQ_MAY_UNMAP) {
++        operation |= QEMU_AIO_DISCARD;
+     }
+-    return -ENOTSUP;
++
++    return paio_submit_co(bs, s->fd, offset, NULL, bytes, operation);
+ }
+ 
+ static int coroutine_fn hdev_co_create_opts(const char *filename, QemuOpts *opts,
+-- 
+2.13.6
