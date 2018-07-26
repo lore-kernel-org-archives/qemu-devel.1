@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fiiHI-00016I-PW
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:34:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fiiK3-0002kY-Ur
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:37:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fiiHH-0006Ip-L9
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:34:08 -0400
-Date: Thu, 26 Jul 2018 17:33:56 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180726153356.GH4215@localhost.localdomain>
-References: <20180726113337.23144-1-kwolf@redhat.com>
-	<605ad10a-13c0-7f62-1c71-a8afe9021ee6@redhat.com>
-	<20180726150655.GG4215@localhost.localdomain>
-	<6cdde651-acdc-e6eb-63fc-e7efe8136710@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fiiJz-0000Qp-AV
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:36:59 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:53033)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fiiJy-0000Pr-Va
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:36:55 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id o11-v6so2399445wmh.2
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 08:36:54 -0700 (PDT)
+References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
+	<20180725121701.12867.49392.stgit@pasha-VirtualBox>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180725121701.12867.49392.stgit@pasha-VirtualBox>
+Date: Thu, 26 Jul 2018 16:36:52 +0100
+Message-ID: <87zhyerotn.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6cdde651-acdc-e6eb-63fc-e7efe8136710@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.0] file-posix: Fix write_zeroes with
- unmap on block devices
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 23/24] replay: add BH oneshot event for
+ block layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,93 +31,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Nir Soffer <nsoffer@redhat.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 
-Am 26.07.2018 um 17:23 hat Eric Blake geschrieben:
-> On 07/26/2018 10:06 AM, Kevin Wolf wrote:
-> 
-> > > > +#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
-> > > > +    ret = do_fallocate(s->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> > > > +                       aiocb->aio_offset, aiocb->aio_nbytes);
-> > > 
-> > > Umm, doesn't this have to use FALLOC_FL_ZERO_RANGE? FALLOC_FL_PUNCH_HOLE
-> > > deallocs, but is not required to write zeroes.
-> > 
-> > Yes, it is. See the man page:
-> > 
-> >      Specifying the FALLOC_FL_PUNCH_HOLE flag (available since Linux
-> >      2.6.38) in mode deallocates space (i.e., creates a hole) in the byte
-> >      range starting at offset and continuing for len bytes. Within the
-> >      specified range, partial filesystem blocks are zeroed, and whole
-> >      filesystem blocks are removed from the file. After a successful
-> >      call, subsequent reads from this range will return zeroes.
-> 
-> That's true for file-system fds, but not for block device fds.
 
-It is true for block device fds, too. Look at fs/block_dev.c,
-specifically blkdev_fallocate():
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
 
-        switch (mode) {
-        case FALLOC_FL_ZERO_RANGE:
-        case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE: 
-                error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
-                                            GFP_KERNEL, BLKDEV_ZERO_NOUNMAP);
-                break;
-        case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE: 
-                error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
-                                             GFP_KERNEL, BLKDEV_ZERO_NOFALLBACK);
-                break;
-        case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
-                error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
-                                             GFP_KERNEL, 0);
-                break;
-        default:
-                return -EOPNOTSUPP;
-        }
+> Replay is capable of recording normal BH events, but sometimes
+> there are single use callbacks scheduled with aio_bh_schedule_oneshot
+> function. This patch enables recording and replaying such callbacks.
+> Block layer uses these events for calling the completion function.
+> Replaying these calls makes the execution deterministic.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-> As pointed out by Nir,
-> 
-> > https://patchwork.kernel.org/patch/9903757/
-> Which says, among other things:
-> 
-> >> Do we also know that the blocks were discarded as we do with
-> >> BLKDISCARD ?
-> >
-> > There never was a way to know for sure.
-> >
-> > ATA DSM TRIM and SCSI UNMAP are hints by definition. We attempted to
-> > bend their semantics towards getting predictable behavior but ultimately
-> > failed. Too many corner cases.
-> >
-> >> As I mentioned before. We relied on discard_zeroes_data in mkfs.ext4
-> >> to make sure that inode tables are zeroed after discard.
-> >
-> > The point is that you shouldn't have an if (discard_zeroes_data)
-> > conditional in the first place.
-> >
-> >  - If you need to dellocate a block range and you don't care about its
-> >    contents in the future, use BLKDISCARD / FL_PUNCH_HOLE.
-> >
-> >  - If you need to zero a block range, use BLKZEROOUT / FL_ZERO_RANGE.
-> 
-> PUNCH_HOLE deallocates; but can only guarantee a read back of zero on file
-> systems.
+I'm not sure what about this commit causes the compile breakage I'm
+seeing:
 
-As far as I know, the comment you quoted is accurate for BLKDISCARD and
-BLKZEROOUT, but not for the fallocate() flags.
+  LINK    aarch64-linux-user/qemu-aarch64
+../libqemuutil.a(cpu-get-icount.o):(.bss+0x0): multiple definition of `use_=
+icount'
+exec.o:(.bss+0x58): first defined here
+collect2: error: ld returned 1 exit status
+Makefile:199: recipe for target 'qemu-aarch64' failed
+make[1]: *** [qemu-aarch64] Error 1
+Makefile:481: recipe for target 'subdir-aarch64-linux-user' failed
+make: *** [subdir-aarch64-linux-user] Error 2
 
-> Hmm - that thread also mentions FALLOC_FL_NO_HIDE_STALE, which is a new flag
-> not present/documented on Fedora 28. I wonder if it helps, too.
-> 
-> > 
-> > FALLOC_FL_ZERO_RANGE in contrast implements write_zeroes without unmap.
-> 
-> I thought the opposite: FALLOC_FL_ZERO_RANGE guarantees that you read back
-> 0, using whatever is most efficient under the hood (in the case of block
-> devices, unmapping that reliably reads back as zero is favored).
+It only occurs on a make clean && make -j on that commit though. It's
+hidden if you do incremental builds.
 
-See the code I quoted above, FALLOC_FL_ZERO_RANGE calls
-blkdev_issue_zeroout() with BLKDEV_ZERO_NOUNMAP internally.
 
-Kevin
+
+> ---
+>  block/block-backend.c    |    3 ++-
+>  include/sysemu/replay.h  |    3 +++
+>  replay/replay-events.c   |   16 ++++++++++++++++
+>  replay/replay-internal.h |    1 +
+>  replay/replay.c          |    2 +-
+>  stubs/replay.c           |    6 ++++++
+>  6 files changed, 29 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index f2f75a9..232d114 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -17,6 +17,7 @@
+>  #include "block/throttle-groups.h"
+>  #include "sysemu/blockdev.h"
+>  #include "sysemu/sysemu.h"
+> +#include "sysemu/replay.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-events-block.h"
+>  #include "qemu/id.h"
+> @@ -1370,7 +1371,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, =
+int64_t offset, int bytes,
+>
+>      acb->has_returned =3D true;
+>      if (acb->rwco.ret !=3D NOT_DONE) {
+> -        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
+> +        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
+>                                  blk_aio_complete_bh, acb);
+>      }
+>
+> diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+> index 8118b00..945bc74 100644
+> --- a/include/sysemu/replay.h
+> +++ b/include/sysemu/replay.h
+> @@ -152,6 +152,9 @@ bool replay_events_enabled(void);
+>  void replay_flush_events(void);
+>  /*! Adds bottom half event to the queue */
+>  void replay_bh_schedule_event(QEMUBH *bh);
+> +/*! Adds oneshot bottom half event to the queue */
+> +void replay_bh_schedule_oneshot_event(AioContext *ctx,
+> +    QEMUBHFunc *cb, void *opaque);
+>  /*! Adds input event to the queue */
+>  void replay_input_event(QemuConsole *src, InputEvent *evt);
+>  /*! Adds input sync event to the queue */
+> diff --git a/replay/replay-events.c b/replay/replay-events.c
+> index 0964a82..0ac8a5c 100644
+> --- a/replay/replay-events.c
+> +++ b/replay/replay-events.c
+> @@ -37,6 +37,9 @@ static void replay_run_event(Event *event)
+>      case REPLAY_ASYNC_EVENT_BH:
+>          aio_bh_call(event->opaque);
+>          break;
+> +    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
+> +        ((QEMUBHFunc*)event->opaque)(event->opaque2);
+> +        break;
+>      case REPLAY_ASYNC_EVENT_INPUT:
+>          qemu_input_event_send_impl(NULL, (InputEvent *)event->opaque);
+>          qapi_free_InputEvent((InputEvent *)event->opaque);
+> @@ -132,6 +135,17 @@ void replay_bh_schedule_event(QEMUBH *bh)
+>      }
+>  }
+>
+> +void replay_bh_schedule_oneshot_event(AioContext *ctx,
+> +    QEMUBHFunc *cb,void *opaque)
+> +{
+> +    if (events_enabled) {
+> +        uint64_t id =3D replay_get_current_step();
+> +        replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb, opaque, id);
+> +    } else {
+> +        aio_bh_schedule_oneshot(ctx, cb, opaque);
+> +    }
+> +}
+> +
+>  void replay_add_input_event(struct InputEvent *event)
+>  {
+>      replay_add_event(REPLAY_ASYNC_EVENT_INPUT, event, NULL, 0);
+> @@ -162,6 +176,7 @@ static void replay_save_event(Event *event, int check=
+point)
+>          /* save event-specific data */
+>          switch (event->event_kind) {
+>          case REPLAY_ASYNC_EVENT_BH:
+> +        case REPLAY_ASYNC_EVENT_BH_ONESHOT:
+>              replay_put_qword(event->id);
+>              break;
+>          case REPLAY_ASYNC_EVENT_INPUT:
+> @@ -216,6 +231,7 @@ static Event *replay_read_event(int checkpoint)
+>      /* Events that has not to be in the queue */
+>      switch (replay_state.read_event_kind) {
+>      case REPLAY_ASYNC_EVENT_BH:
+> +    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
+>          if (replay_state.read_event_id =3D=3D -1) {
+>              replay_state.read_event_id =3D replay_get_qword();
+>          }
+> diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+> index 08ef2ec..0c0ed16 100644
+> --- a/replay/replay-internal.h
+> +++ b/replay/replay-internal.h
+> @@ -51,6 +51,7 @@ enum ReplayEvents {
+>
+>  enum ReplayAsyncEventKind {
+>      REPLAY_ASYNC_EVENT_BH,
+> +    REPLAY_ASYNC_EVENT_BH_ONESHOT,
+>      REPLAY_ASYNC_EVENT_INPUT,
+>      REPLAY_ASYNC_EVENT_INPUT_SYNC,
+>      REPLAY_ASYNC_EVENT_CHAR_READ,
+> diff --git a/replay/replay.c b/replay/replay.c
+> index 6e82764..061b1e2 100644
+> --- a/replay/replay.c
+> +++ b/replay/replay.c
+> @@ -22,7 +22,7 @@
+>
+>  /* Current version of the replay mechanism.
+>     Increase it when file format changes. */
+> -#define REPLAY_VERSION              0xe02007
+> +#define REPLAY_VERSION              0xe02008
+>  /* Size of replay log header */
+>  #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t))
+>
+> diff --git a/stubs/replay.c b/stubs/replay.c
+> index 781974e..cbdac80 100644
+> --- a/stubs/replay.c
+> +++ b/stubs/replay.c
+> @@ -90,3 +90,9 @@ bool replay_reverse_continue(void)
+>  {
+>      return false;
+>  }
+> +
+> +void replay_bh_schedule_oneshot_event(AioContext *ctx,
+> +    QEMUBHFunc *cb,void *opaque)
+> +{
+> +    aio_bh_schedule_oneshot(ctx, cb, opaque);
+> +}
+
+
+--
+Alex Benn=C3=A9e
