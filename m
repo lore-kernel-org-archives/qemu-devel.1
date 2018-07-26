@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fihrA-0000e7-B9
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:07:12 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fihs7-0001Ib-SB
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:08:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fihr6-0005LV-3K
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:07:08 -0400
-Date: Thu, 26 Jul 2018 17:06:55 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180726150655.GG4215@localhost.localdomain>
-References: <20180726113337.23144-1-kwolf@redhat.com>
-	<605ad10a-13c0-7f62-1c71-a8afe9021ee6@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1fihs3-00079M-TI
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 11:08:07 -0400
+Date: Thu, 26 Jul 2018 12:07:54 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180726150754.GL12380@localhost.localdomain>
+References: <20180725091233.3300-1-david@redhat.com>
+	<20180725170925.GE12380@localhost.localdomain>
+	<a33a67eb-2fb6-31fd-f4ca-1d883a5a7b75@redhat.com>
+	<20180725201438.GG12380@localhost.localdomain>
+	<36882ae2-5a00-d842-0b0d-d1458b1f0654@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <605ad10a-13c0-7f62-1c71-a8afe9021ee6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.0] file-posix: Fix write_zeroes with
- unmap on block devices
+In-Reply-To: <36882ae2-5a00-d842-0b0d-d1458b1f0654@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,109 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
 
-Am 26.07.2018 um 16:28 hat Eric Blake geschrieben:
-> On 07/26/2018 06:33 AM, Kevin Wolf wrote:
-> > The BLKDISCARD ioctl doesn't guarantee that the discarded blocks read as
-> > all-zero afterwards, so don't try to abuse it for zero writing. We try
-> > to only use this if BLKDISCARDZEROES tells us that it is safe, but this
-> > is unreliable on older kernels and a constant 0 in newer kernels. In
-> 
-> For my own curiosity, which kernel commit switched to constant 0, so I can
-> read the rationale in that commit message?
-
-I think 48920ff2a5a9 is the commit that actually changes the value.
-
-Essentially the kernel abused discard for zero writes previously (so it
-needed something like BLKDISCARDZEROES) and then switched to a separate
-write_zeroes operation like we do in QEMU. Once this was done, second
-guessing the behaviour of discard wasn't necessary any more because you
-just tell what you really want to do (discard or zero out).
-
-> > other words, this code path is never actually used with newer kernels,
-> > so we don't even try to unmap while writing zeros.
+On Thu, Jul 26, 2018 at 09:29:44AM +0200, David Hildenbrand wrote:
+> On 25.07.2018 22:14, Eduardo Habkost wrote:
+> > On Wed, Jul 25, 2018 at 07:50:21PM +0200, David Hildenbrand wrote:
+> >> On 25.07.2018 19:09, Eduardo Habkost wrote:
+> > [...]
+> >>>> +    if (local_err) {
+> >>>> +        g_assert(kvm_enabled());
+> >>>> +        error_report_err(local_err);
+> >>>> +        /* fallback to unsupported CPU models */
+> >>>> +        return;
+> >>>
+> >>> What about moving this outside instance_init?
+> >>
+> >> To which place for example? We at least have to copy the CPU model
+> >> for each and every CPU instance (so we can modify it without side
+> >> effects using properties).
 > > 
-> > This patch removes the abuse of discard for writing zeroes from
-> > file-posix and instead adds a new function that uses interfaces that are
-> > actually meant to deallocate and zero out at the same time. Only if
-> > those fail, it falls back to zeroing out without unmap. We never fall
-> > back to a discard operation any more that may or may not result in
-> > zeros.
-> 
-> Makes sense.
-> 
+> > To any code that will look at cpu->model.
 > > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >   block/file-posix.c | 62 +++++++++++++++++++++++++++++++++++++++++-------------
-> >   1 file changed, 47 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/block/file-posix.c b/block/file-posix.c
-> > index 60af4b3d51..9c66cd87d1 100644
-> > --- a/block/file-posix.c
-> > +++ b/block/file-posix.c
-> > @@ -648,7 +648,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-> >       }
-> >   #endif
-> > -    bs->supported_zero_flags = s->discard_zeroes ? BDRV_REQ_MAY_UNMAP : 0;
-> > +    bs->supported_zero_flags = BDRV_REQ_MAY_UNMAP;
-> >       ret = 0;
-> >   fail:
-> >       if (filename && (bdrv_flags & BDRV_O_TEMPORARY)) {
-> > @@ -1487,6 +1487,38 @@ static ssize_t handle_aiocb_write_zeroes(RawPosixAIOData *aiocb)
-> >       return -ENOTSUP;
-> >   }
-> > +static ssize_t handle_aiocb_write_zeroes_unmap(RawPosixAIOData *aiocb)
-> > +{
-> > +    BDRVRawState *s = aiocb->bs->opaque;
-> > +    int ret;
-> > +
-> > +    /* First try to write zeros and unmap at the same time */
-> > +
-> > +#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
-> > +    ret = do_fallocate(s->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> > +                       aiocb->aio_offset, aiocb->aio_nbytes);
+> > You are wrapping an interface that needs to report errors
+> > (kvm_s390_get_host_cpu_model()) behind an interface that is not
+> > able to report errors (object_new()).  There's nothing that
+> > requires you to do that, does it?  You are free to provide an API
+> > that is actually able to report errors, instead of relying on
+> > object_new() only.
 > 
-> Umm, doesn't this have to use FALLOC_FL_ZERO_RANGE? FALLOC_FL_PUNCH_HOLE
-> deallocs, but is not required to write zeroes.
-
-Yes, it is. See the man page:
-
-    Specifying the FALLOC_FL_PUNCH_HOLE flag (available since Linux
-    2.6.38) in mode deallocates space (i.e., creates a hole) in the byte
-    range starting at offset and continuing for len bytes. Within the
-    specified range, partial filesystem blocks are zeroed, and whole
-    filesystem blocks are removed from the file. After a successful
-    call, subsequent reads from this range will return zeroes.
-
-FALLOC_FL_ZERO_RANGE in contrast implements write_zeroes without unmap.
-
-> > +    if (ret != -ENOTSUP) {
-> > +        return ret;
-> > +    }
-> > +#endif
-> > +
-> > +#ifdef CONFIG_XFS
-> > +    if (s->is_xfs) {
-> > +        /* xfs_discard() guarantees that the discarded area reads as all-zero
-> > +         * afterwards, so we can use it here. */
-> > +        return xfs_discard(s, aiocb->aio_offset, aiocb->aio_nbytes);
-> > +    }
-> > +#endif
-> > +
-> > +    /* Make the compiler happy if neither of the above is compiled in */
-> > +    (void) s;
+> I see what you mean. One solution would be to preload and store the
+> model somewhere globally (not locally). So in the init function, we
+> would not have to handle errors.
 > 
-> Could also be done in fewer lines by use of:
-> 
->    BDRVRawState *s G_GNUC_UNUSED = aiocb->bs->opaque;
-> 
-> since that attribute means "might be unused, don't warn if it is actually
-> unused" (and not the stricter "must be unused, warn if it got used anyway")
+> But I am not even sure where we could do such a global initialization +
+> be able to report errors easily. I remember that we had a hard time to
+> get this running smoothly due to the dependency of
+> kvm_s390_get_host_cpu_model() on:
+> - accelerator
+> - machine
+> - KVM init state
 
-Thanks, I wasn't aware of G_GNUC_UNUSED (and didn't want to add a
-__attribute__ here without a macro that wraps it).
+If we had a S390KVMAccelerator object on machine->accelerator,
+S390KVMAccelerator::host_model would be a good candidate?
 
-Kevin
+> 
+> And initializing cpu->model in realize() is too late, because all
+> properties have to access it. Even a pre_plug handler will not work.
+
+Yeah, the instance_init/realize abstraction seems insufficient
+here.  instance_init has too many restrictions, realize is too
+late.
+
+
+> 
+> On the other hand, I decided to ignore all errors back then and fallback
+> to the "host CPU model unknown" case, because there are some corner
+> cases where we still want to allow running the "host" model even though
+> there was a problem detecting it.
+> 
+> So my summary would be: We ignore errors (and rather treat them like
+> warnings) for a reason here and fallback to "unsupported CPU models",
+> which allows to run + use QEMU even in environments where our CPU model
+> detection fails (e.g. on a very strange new CPU model we could have in
+> the future).
+> 
+> Especially "!cpu->model" does not imply that there was an error. It
+> includes disabled CPU model support or unavailable CPU model support
+> (KVM), which is perfectly fine. Replicating initialization attempts at
+> all places where we access "cpu->model" does therefore not sound 100%
+> clean to me and most likely makes the code way more complicated.
+> 
+> Right now the semantics are clear: if we have "!cpu->model" after the
+> object has been created, details about the host CPU model are not
+> available (models unavailable/unsupported). Modifying properties,
+> baselining, expanding is not possible with that model then. But it can
+> be used for execution.
+
+This is interesting.  If most users of cpu->model don't care
+about kvm_s390_get_host_cpu_model() errors at all, the current
+solution sounds more reasonable.
+
+Except for the error_report_err() call inside instance_init.
+This still bothers me, but it's not a big deal.
+
+-- 
+Eduardo
