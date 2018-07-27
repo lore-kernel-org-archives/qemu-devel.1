@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fj4bU-0006sY-Fj
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:24:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1fj4bz-0007kJ-Sf
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:25:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fj4bT-0001ce-Kb
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:24:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59178 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fj4bw-0001ri-OE
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:24:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34794 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fj4bT-0001ba-EH
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:24:27 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fj4bw-0001qu-JU
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:24:56 -0400
 References: <20180727151359.29061-1-armbru@redhat.com>
-	<20180727151359.29061-3-armbru@redhat.com>
+	<20180727151359.29061-4-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <3b9339b3-9a22-e6df-7a93-4e0f870d342f@redhat.com>
-Date: Fri, 27 Jul 2018 10:24:25 -0500
+Message-ID: <ce71cd21-ed5f-ee51-b6c5-65441b9a6664@redhat.com>
+Date: Fri, 27 Jul 2018 10:24:55 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180727151359.29061-3-armbru@redhat.com>
+In-Reply-To: <20180727151359.29061-4-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/23] libqtest: Rename functions to
- send QMP messages
+Subject: Re: [Qemu-devel] [PATCH v2 03/23] libqtest: Clean up how we read
+ device_del messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +33,21 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: thuth@redhat.com, f4bug@amsat.org
 
 On 07/27/2018 10:13 AM, Markus Armbruster wrote:
-> The functions to receive messages are called qtest_qmp_receive() and
-> qmp_receive(), qmp_fd_receive().  The ones to send messages are called
-> qtest_async_qmp(), qtest_async_qmpv(), qmp_async(), qmp_fd_send(),
-> qmp_fd_sendv().  Inconsistent.  Rename the *_async* ones to
-> qmp_send(), qtest_qmp_send(), qtest_qmp_vsend().  Rename
-> qmp_fd_sendv() to qmp_fd_vsend().
+> qtest_qmp_device_del() still uses the qmp("") hack to receive a
+> message, even though we have qmp_receive() since commit 66e0c7b187e.
+> Put it to use.
+>=20
+> Bonus: gets rid of empty format strings.  A step towards compile-time
+> format string checking without triggering -Wformat-zero-length.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
+>   tests/libqtest.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> @@ -1592,8 +1592,8 @@ static void test_atapi_tray(void)
->       atapi_wait_tray(false);
->  =20
->       /* Remove media */
-> -    qmp_async("{'execute': 'blockdev-open-tray', "
-> -               "'arguments': {'id': 'cd0'}}");
-> +    qmp_send("{'execute': 'blockdev-open-tray',"
-> +             " 'arguments': {'id': 'cd0'}}");
-
-Could perhaps fit in one line now, but I won't insist.
 
 --=20
 Eric Blake, Principal Software Engineer
