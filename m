@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sH-0003FD-R3
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:37:46 -0400
+	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sH-0003FE-SQ
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:37:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sG-0008Ii-Mm
+	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sG-0008Ib-IY
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:37:45 -0400
 From: Damien Hedde <damien.hedde@greensocs.com>
-Date: Fri, 27 Jul 2018 16:37:24 +0200
-Message-Id: <172aa4f0544c31a22603c783a836aef3c29d564e.1532701430.git.damien.hedde@greensocs.com>
+Date: Fri, 27 Jul 2018 16:37:20 +0200
+Message-Id: <0379e54aecc5534d68e1ac3bdf61fda79916396e.1532701430.git.damien.hedde@greensocs.com>
 In-Reply-To: <cover.1532701430.git.damien.hedde@greensocs.com>
 References: <cover.1532701430.git.damien.hedde@greensocs.com>
-Subject: [Qemu-devel] [RFC PATCH 5/6] zynq_slcr: add uart clock gating and
- soft reset support
+Subject: [Qemu-devel] [RFC PATCH 1/6] qdev: add a power and clock gating
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,128 +23,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, peter.maydell@linaro.org, edgar.iglesias@xilinx.com, mark.burton@greensocs.com, saipava@xilinx.com, luc.michel@greensocs.com, alistair@alistair23.me, Damien Hedde <damien.hedde@greensocs.com>
 
-Clock gating and reset of uart0 and uart1 is controlled by
-UART_CLK_CTRL and UART_RST_CTRL.
-Uart0 and uart1 links are kept in properties to allow taking action.
+Add two boolean new fields _powered_ and _clocked_ to hold the gating
+state. Also add methods to act on each gating change.
+The power/clock gating is controlled by 2 functions *device_set_power* and
+*device_set_clock*.
 
-The CLKACT bit in UART_CLK_CTRL is used to driver the clock gating.
-
-In order to implement the reset behavior, which can be hold: when
-reset is asserted, device_reset is called on the uart and the clock
-is also disabled until reset is deasserted.
+Add a default behavior to do a device_reset at power-up.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- hw/misc/zynq_slcr.c | 63 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+ include/hw/qdev-core.h | 30 ++++++++++++++++++++++++
+ hw/core/qdev.c         | 52 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 82 insertions(+)
 
-diff --git a/hw/misc/zynq_slcr.c b/hw/misc/zynq_slcr.c
-index d6bdd027ef..55dd586066 100644
---- a/hw/misc/zynq_slcr.c
-+++ b/hw/misc/zynq_slcr.c
-@@ -168,6 +168,14 @@ enum {
- #define DDRIOB_LENGTH 14
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index f1fd0f8736..659287e185 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -34,6 +34,7 @@ typedef void (*DeviceUnrealize)(DeviceState *dev, Error **errp);
+ typedef void (*DeviceReset)(DeviceState *dev);
+ typedef void (*BusRealize)(BusState *bus, Error **errp);
+ typedef void (*BusUnrealize)(BusState *bus, Error **errp);
++typedef void (*DeviceGatingUpdate)(DeviceState *dev);
+ 
+ struct VMStateDescription;
+ 
+@@ -109,6 +110,8 @@ typedef struct DeviceClass {
+     DeviceReset reset;
+     DeviceRealize realize;
+     DeviceUnrealize unrealize;
++    DeviceGatingUpdate power_update;
++    DeviceGatingUpdate clock_update;
+ 
+     /* device state */
+     const struct VMStateDescription *vmsd;
+@@ -151,6 +154,9 @@ struct DeviceState {
+     int num_child_bus;
+     int instance_id_alias;
+     int alias_required_for_version;
++
++    bool powered;
++    bool clocked;
  };
  
-+enum {
-+    UART_CLK_CTRL_CLKACT0 = 0x0001,
-+    UART_CLK_CTRL_CLKACT1 = 0x0002,
-+
-+    UART_RST_CTRL_UART0_REF_RST = 0x04,
-+    UART_RST_CTRL_UART1_REF_RST = 0x08,
-+};
-+
- #define ZYNQ_SLCR_MMIO_SIZE     0x1000
- #define ZYNQ_SLCR_NUM_REGS      (ZYNQ_SLCR_MMIO_SIZE / 4)
+ struct DeviceListener {
+@@ -404,6 +410,12 @@ void device_class_set_parent_realize(DeviceClass *dc,
+ void device_class_set_parent_unrealize(DeviceClass *dc,
+                                        DeviceUnrealize dev_unrealize,
+                                        DeviceUnrealize *parent_unrealize);
++void device_class_set_parent_power_update(DeviceClass *dc,
++                                          DeviceGatingUpdate dev_power_update,
++                                          DeviceGatingUpdate *parent_power_update);
++void device_class_set_parent_clock_update(DeviceClass *dc,
++                                          DeviceGatingUpdate dev_clock_update,
++                                          DeviceGatingUpdate *parent_clock_update);
  
-@@ -180,6 +188,9 @@ typedef struct ZynqSLCRState {
-     MemoryRegion iomem;
+ const struct VMStateDescription *qdev_get_vmsd(DeviceState *dev);
  
-     uint32_t regs[ZYNQ_SLCR_NUM_REGS];
+@@ -434,4 +446,22 @@ static inline bool qbus_is_hotpluggable(BusState *bus)
+ void device_listener_register(DeviceListener *listener);
+ void device_listener_unregister(DeviceListener *listener);
+ 
++/**
++ * device_set_power:
++ * Enable/Disable the power of a device
++ *
++ * @dev: device to update
++ * @en: true to enable, false to disable
++ */
++void device_set_power(DeviceState *dev, bool en);
 +
-+    DeviceState *uart0;
-+    DeviceState *uart1;
- } ZynqSLCRState;
++/**
++ * device_set_clock:
++ * Enable/Disable the clock of a device
++ *
++ * @dev: device to update
++ * @en: true to enable, false to disable
++ */
++void device_set_clock(DeviceState *dev, bool en);
++
+ #endif
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 529b82de18..bb6d36eab9 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -950,6 +950,8 @@ static void device_initfn(Object *obj)
  
- static void zynq_slcr_reset(DeviceState *d)
-@@ -355,6 +366,35 @@ static uint64_t zynq_slcr_read(void *opaque, hwaddr offset,
-     return ret;
+     dev->instance_id_alias = -1;
+     dev->realized = false;
++    dev->powered = true;
++    dev->clocked = true;
+ 
+     object_property_add_bool(obj, "realized",
+                              device_get_realized, device_set_realized, NULL);
+@@ -1038,6 +1040,13 @@ static void device_unparent(Object *obj)
+     }
  }
  
-+/*
-+ * zynq_slcr_update_clock:
-+ * Update a device clock state given its:
-+ * + clock enable bit
-+ * + reset asserted bit
-+ * Since reset cannot be enabled and disabled, the clock is disabled when
-+ * reset is asserted
-+ */
-+static void zynq_slcr_update_clock(DeviceState *dev, bool clken, bool rsten)
++static void device_power_update(DeviceState *dev)
 +{
-+    if (dev) {
-+        device_set_clock(dev, clken && !rsten);
-+    }
-+}
-+
-+/*
-+ * zynq_slcr_update_reset:
-+ * Update a device reset state given its:
-+ * + reset asserted bit
-+ * Also trigger a clock update
-+ */
-+static void zynq_slcr_update_reset(DeviceState *dev, bool clken, bool rsten)
-+{
-+    if (dev && rsten) {
++    if (dev->powered) {
 +        device_reset(dev);
 +    }
-+    zynq_slcr_update_clock(dev, clken, rsten);
 +}
 +
- static void zynq_slcr_write(void *opaque, hwaddr offset,
-                           uint64_t val, unsigned size)
+ static void device_class_init(ObjectClass *class, void *data)
  {
-@@ -408,6 +448,22 @@ static void zynq_slcr_write(void *opaque, hwaddr offset,
-             qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-         }
-         break;
-+    case UART_CLK_CTRL:
-+        zynq_slcr_update_clock(s->uart0,
-+                s->regs[UART_CLK_CTRL] & UART_CLK_CTRL_CLKACT0,
-+                s->regs[UART_RST_CTRL] & UART_RST_CTRL_UART0_REF_RST);
-+        zynq_slcr_update_clock(s->uart1,
-+                s->regs[UART_CLK_CTRL] & UART_CLK_CTRL_CLKACT1,
-+                s->regs[UART_RST_CTRL] & UART_RST_CTRL_UART1_REF_RST);
-+        break;
-+    case UART_RST_CTRL:
-+        zynq_slcr_update_reset(s->uart0,
-+                s->regs[UART_CLK_CTRL] & UART_CLK_CTRL_CLKACT0,
-+                s->regs[UART_RST_CTRL] & UART_RST_CTRL_UART0_REF_RST);
-+        zynq_slcr_update_reset(s->uart1,
-+                s->regs[UART_CLK_CTRL] & UART_CLK_CTRL_CLKACT1,
-+                s->regs[UART_RST_CTRL] & UART_RST_CTRL_UART1_REF_RST);
-+        break;
-     }
- }
- 
-@@ -436,12 +492,19 @@ static const VMStateDescription vmstate_zynq_slcr = {
-     }
- };
- 
-+static Property zynq_slcr_properties[] = {
-+    DEFINE_PROP_LINK("uart0", ZynqSLCRState, uart0, TYPE_DEVICE, DeviceState *),
-+    DEFINE_PROP_LINK("uart1", ZynqSLCRState, uart1, TYPE_DEVICE, DeviceState *),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
+     DeviceClass *dc = DEVICE_CLASS(class);
+@@ -1052,6 +1061,8 @@ static void device_class_init(ObjectClass *class, void *data)
+      */
+     dc->hotpluggable = true;
+     dc->user_creatable = true;
 +
- static void zynq_slcr_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->vmsd = &vmstate_zynq_slcr;
-     dc->reset = zynq_slcr_reset;
-+    dc->props = zynq_slcr_properties;
++    dc->power_update = device_power_update;
  }
  
- static const TypeInfo zynq_slcr_info = {
+ void device_class_set_parent_reset(DeviceClass *dc,
+@@ -1078,6 +1089,22 @@ void device_class_set_parent_unrealize(DeviceClass *dc,
+     dc->unrealize = dev_unrealize;
+ }
+ 
++void device_class_set_parent_power_update(DeviceClass *dc,
++                                       DeviceGatingUpdate dev_power_update,
++                                       DeviceGatingUpdate *parent_power_update)
++{
++    *parent_power_update = dc->power_update;
++    dc->power_update = dev_power_update;
++}
++
++void device_class_set_parent_clock_update(DeviceClass *dc,
++                                       DeviceGatingUpdate dev_clock_update,
++                                       DeviceGatingUpdate *parent_clock_update)
++{
++    *parent_clock_update = dc->clock_update;
++    dc->clock_update = dev_clock_update;
++}
++
+ void device_reset(DeviceState *dev)
+ {
+     DeviceClass *klass = DEVICE_GET_CLASS(dev);
+@@ -1087,6 +1114,31 @@ void device_reset(DeviceState *dev)
+     }
+ }
+ 
++void device_set_power(DeviceState *dev, bool en)
++{
++    DeviceClass *klass = DEVICE_GET_CLASS(dev);
++
++    if (en != dev->powered) {
++        dev->powered = en;
++        if (klass->power_update) {
++            klass->power_update(dev);
++        }
++    }
++}
++
++void device_set_clock(DeviceState *dev, bool en)
++{
++    DeviceClass *klass = DEVICE_GET_CLASS(dev);
++
++    if (en != dev->clocked) {
++        dev->clocked = en;
++        if (klass->clock_update) {
++            klass->clock_update(dev);
++        }
++    }
++}
++
++
+ Object *qdev_get_machine(void)
+ {
+     static Object *dev;
 -- 
 2.18.0
