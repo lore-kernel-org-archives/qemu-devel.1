@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fj4Pm-00054L-Dj
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:12:23 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1fj4QV-0005TE-OH
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fj4Pl-0006i5-KA
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:12:22 -0400
-References: <20180727141539.506-1-kwolf@redhat.com>
-	<20180727141539.506-4-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <89a2b536-0b00-b6f1-74d8-2c9f4748fa0c@redhat.com>
-Date: Fri, 27 Jul 2018 10:12:14 -0500
+	(envelope-from <frederic.konrad@adacore.com>) id 1fj4QU-0007MB-Sh
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:13:07 -0400
+References: <cover.1532701430.git.damien.hedde@greensocs.com>
+	<CAFEAcA-X=eziUHurc0SEcGEeM25t4YgkTczsVeF8myWHjfp3MQ@mail.gmail.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <2d22fcb2-b825-6195-a935-bf2adb3e0a60@adacore.com>
+Date: Fri, 27 Jul 2018 17:12:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180727141539.506-4-kwolf@redhat.com>
+In-Reply-To: <CAFEAcA-X=eziUHurc0SEcGEeM25t4YgkTczsVeF8myWHjfp3MQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.0 3/3] qemu-iotests: Test
- query-blockstats with -drive and -blockdev
+Content-Language: fr
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 0/6] Clock and power gating support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Damien Hedde <damien.hedde@greensocs.com>
+Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Luc Michel <luc.michel@greensocs.com>
 
-On 07/27/2018 09:15 AM, Kevin Wolf wrote:
-> Make sure that query-blockstats returns information for every
-> BlockBackend that is named or attached to a device model (or both).
 
-Needed for libvirt switching over to -blockdev, so even though we're 
-rather late in the 3.0 cycle, I can understand it going in now.
 
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
+Le 07/27/2018 =C3=A0 04:59 PM, Peter Maydell a =C3=A9crit=C2=A0:
+> On 27 July 2018 at 15:37, Damien Hedde <damien.hedde@greensocs.com> wro=
+te:
+>> This set of patches add support for power and clock gating in device o=
+bjects.
+>> It adds two booleans to the state, one for power state and one of cloc=
+k state.
+>>
+>> The state is controlled trough 2 functions, one for power and one for =
+clock.
+>> Two new methods *power_update* and *clock_update* is added to the devi=
+ce class
+>> which are called on state change and can be overriden.
+>=20
+> So, you folks at Greensocs had a series a couple of years ago to try
+> to add clocktree support (which included handling things like guests
+> configuring clock rates, some clocks being "downstream" of others, and
+> so on). It didn't make it into mainline, though it did get a fair amoun=
+t
+> of design/code review. How does this approach fit into / compare with
+> that ?
+>=20
+> thanks
+> -- PMM
+>=20
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Hi all,
 
-> +++ b/tests/qemu-iotests/227.out
-> @@ -0,0 +1,42 @@
-> +QA output created by 227
-> +
-> +=== blockstats with -drive if=virtio ===
-> +
-> +Testing: -drive driver=null-co,if=virtio
-> +QMP_VERSION
-> +{"return": {}}
-> +{"return": [{"device": "virtio0", "stats": {"flush_total_time_ns": 0, "wr_highest_offset": 0, "wr_total_time_ns": 0, "failed_wr_operations": 0, "failed_rd_operations": 0, "wr_merged": 0, "wr_bytes": 0, "timed_stats": [], "failed_flush_operations": 0, "account_invalid": true, "rd_total_time_ns": 0, "flush_operations": 0, "wr_operations": 0, "rd_merged": 0, "rd_bytes": 0, "invalid_flush_operations": 0, "account_failed": true, "rd_operations": 0, "invalid_wr_operations": 0, "invalid_rd_operations": 0}, "node-name": "NODE_NAME", "qdev": "/machine/peripheral-anon/device[0]/virtio-backend"}]}
+I didn't have time to push a new version of the clock series and
+I lost the track a little bit (was 13 months ago). Sorry for
+that :(.. Would be still nice to have I think.
 
-Long lines. Would it be worth writing the test to use QMP pretty mode?
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Cheers,
+Fred
