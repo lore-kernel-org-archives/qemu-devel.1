@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fj569-0005C3-RI
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:56:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fj58x-0007GR-Ca
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fj568-0004D5-LM
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:56:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34922 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fj568-0004Cl-Gl
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:56:08 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F372E7DAC3
-	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 15:56:07 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-135.ams2.redhat.com
-	[10.36.116.135])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CE2B5111E418
-	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 15:56:07 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 27 Jul 2018 17:55:59 +0200
-Message-Id: <20180727155602.10148-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 0/3] QObject patches for 2018-07-27 (3.0.0-rc3)
+	(envelope-from <kwolf@redhat.com>) id 1fj58w-00078o-Mj
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:59:03 -0400
+Date: Fri, 27 Jul 2018 17:58:54 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180727155854.GF4355@localhost.localdomain>
+References: <20180727141539.506-1-kwolf@redhat.com>
+	<20180727141539.506-2-kwolf@redhat.com>
+	<7721290c-94f0-d203-10c0-8aa586c54600@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7721290c-94f0-d203-10c0-8aa586c54600@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 1/3] block/qapi: Add 'qdev' field
+ to query-blockstats result
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, pkrempa@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org
 
-The following changes since commit 18a398f6a39df4b08ff86ac0d38384193ca5f4cc:
+Am 27.07.2018 um 17:07 hat Eric Blake geschrieben:
+> On 07/27/2018 09:15 AM, Kevin Wolf wrote:
+> > Like for query-block, the client needs to identify which BlockBackend
+> > the returned data is for. Anonymous BlockBackends are identified by the
+> > device model they are attached to. Add a 'qdev' field that contains the
+> > qdev ID or QOM path of the attached device model.
+> > 
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> 
+> > @@ -879,7 +882,7 @@
+> >   # Since: 0.14.0
+> >   ##
+> >   { 'struct': 'BlockStats',
+> > -  'data': {'*device': 'str', '*node-name': 'str',
+> > +  'data': {'*device': 'str', '*qdev': 'str', '*node-name': 'str',
+> >              'stats': 'BlockDeviceStats',
+> >              '*parent': 'BlockStats',
+> >              '*backing': 'BlockStats'} }
+> 
+> Can we also update the example under query-blockstats a few lines later to
+> show the added field?
 
-  Update version for v3.0.0-rc2 release (2018-07-24 22:06:31 +0100)
+I'll add the qdev field, but the example is hopelessly outdated anyway.
+Sounds like something for another patch.
 
-are available in the Git repository at:
+> At any rate, it looks helpful. Although this is borderline new feature, it
+> resolves a need identified in libvirt using -blockdev, and so I can live
+> with it as a 3.0 bugfix.
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-qobject-2018-07-27
+Thanks.
 
-for you to fetch changes up to 307fb894ce0608aede990ec40ce84eaeb358c8ec:
-
-  qstring: Move qstring_from_substr()'s @end one to the right (2018-07-27 17:16:03 +0200)
-
-----------------------------------------------------------------
-QObject patches for 2018-07-27 (3.0.0-rc3)
-
-This pull request fixes an integer overflow bug, and hardens the code
-in question a bit.  Abuse of QMP can make the bug crash QEMU, so it
-seems worth fixing at this late stage.
-
-----------------------------------------------------------------
-Markus Armbruster (2):
-      qstring: Assert size calculations don't overflow
-      qstring: Move qstring_from_substr()'s @end one to the right
-
-liujunjie (1):
-      qstring: Fix qstring_from_substr() not to provoke int overflow
-
- block/blkdebug.c           |  2 +-
- block/blkverify.c          |  2 +-
- block/nbd.c                |  2 +-
- include/qapi/qmp/qstring.h |  2 +-
- qobject/qstring.c          | 12 ++++++++----
- tests/check-qobject.c      |  2 +-
- tests/check-qstring.c      |  2 +-
- 7 files changed, 14 insertions(+), 10 deletions(-)
-
--- 
-2.17.1
+Kevin
