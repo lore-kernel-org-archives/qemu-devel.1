@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fizSn-0003wf-KF
+	(envelope-from <luc.michel@greensocs.com>) id 1fizSm-0003vx-G3
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:55:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fizSl-0006QL-28
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:55:09 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fizSj-0006Oo-K6
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:55:08 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Fri, 27 Jul 2018 11:54:16 +0200
-Message-Id: <20180727095421.386-16-luc.michel@greensocs.com>
+Date: Fri, 27 Jul 2018 11:54:20 +0200
+Message-Id: <20180727095421.386-20-luc.michel@greensocs.com>
 In-Reply-To: <20180727095421.386-1-luc.michel@greensocs.com>
 References: <20180727095421.386-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH v5 15/20] intc/arm_gic: Implement the virtual
- interface registers
+Subject: [Qemu-devel] [PATCH v5 19/20] xlnx-zynqmp: Improve GIC wiring and
+ MMIO mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,309 +23,229 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-Implement the read and write functions for the virtual interface of the
-virtualization extensions in the GICv2.
+This commit improve the way the GIC is realized and connected in the
+ZynqMP SoC. The security extensions are enabled only if requested in the
+machine state. The same goes for the virtualization extensions.
 
-One mirror region per CPU is also created, which maps to that specific
-CPU id. This is required by the GIC architecture specification.
+All the GIC to APU CPU(s) IRQ lines are now connected, including FIQ,
+vIRQ and vFIQ. The missing CPU to GIC timers IRQ connections are also
+added (HYP and SEC timers).
+
+The GIC maintenance IRQs are back-wired to the correct GIC PPIs.
+
+Finally, the MMIO mappings are reworked to take into account the ZynqMP
+specifics. The GIC (v)CPU interface is aliased 16 times:
+  * for the first 0x1000 bytes from 0xf9010000 to 0xf901f000
+  * for the second 0x1000 bytes from 0xf9020000 to 0xf902f000
+Mappings of the virtual interface and virtual CPU interface are mapped
+only when virtualization extensions are requested. The
+XlnxZynqMPGICRegion struct has been enhanced to be able to catch all
+this information.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/intc/arm_gic.c | 235 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 233 insertions(+), 2 deletions(-)
+ hw/arm/xlnx-zynqmp.c         | 92 ++++++++++++++++++++++++++++++++----
+ include/hw/arm/xlnx-zynqmp.h |  4 +-
+ 2 files changed, 86 insertions(+), 10 deletions(-)
 
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 7ee2e6bcbb..6063196487 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -145,10 +145,28 @@ static void gic_update(GICState *s)
-         qemu_set_irq(s->parent_irq[cpu], irq_level);
-         qemu_set_irq(s->parent_fiq[cpu], fiq_level);
-     }
- }
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 8de4868eb9..c195040350 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -27,16 +27,21 @@
  
-+/* Return true if this LR is empty, i.e. the corresponding bit
-+ * in ELRSR is set.
-+ */
-+static inline bool gic_lr_entry_is_free(uint32_t entry)
-+{
-+    return (GICH_LR_STATE(entry) == GICH_LR_STATE_INVALID)
-+        && (GICH_LR_HW(entry) || !GICH_LR_EOI(entry));
-+}
-+
-+/* Return true if this LR should trigger an EOI maintenance interrupt, i.e. the
-+ * corrsponding bit in EISR is set.
-+ */
-+static inline bool gic_lr_entry_is_eoi(uint32_t entry)
-+{
-+    return (GICH_LR_STATE(entry) == GICH_LR_STATE_INVALID)
-+        && !GICH_LR_HW(entry) && GICH_LR_EOI(entry);
-+}
-+
- static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
-                                  int cm, int target)
- {
-     if (level) {
-         GIC_DIST_SET_LEVEL(irq, cm);
-@@ -1570,10 +1588,204 @@ static MemTxResult gic_thisvcpu_write(void *opaque, hwaddr addr,
-     GICState *s = (GICState *)opaque;
+ #define GIC_NUM_SPI_INTR 160
  
-     return gic_cpu_write(s, gic_get_current_vcpu(s), addr, value, attrs);
- }
+ #define ARM_PHYS_TIMER_PPI  30
+ #define ARM_VIRT_TIMER_PPI  27
++#define ARM_HYP_TIMER_PPI   26
++#define ARM_SEC_TIMER_PPI   29
++#define GIC_MAINTENANCE_PPI 25
  
-+static uint32_t gic_compute_eisr(GICState *s, int cpu, int lr_start)
-+{
-+    int lr_idx;
-+    uint32_t ret = 0;
-+
-+    for (lr_idx = lr_start; lr_idx < s->num_lrs; lr_idx++) {
-+        uint32_t *entry = &s->h_lr[lr_idx][cpu];
-+        ret = deposit32(ret, lr_idx - lr_start, 1,
-+                        gic_lr_entry_is_eoi(*entry));
-+    }
-+
-+    return ret;
-+}
-+
-+static uint32_t gic_compute_elrsr(GICState *s, int cpu, int lr_start)
-+{
-+    int lr_idx;
-+    uint32_t ret = 0;
-+
-+    for (lr_idx = lr_start; lr_idx < s->num_lrs; lr_idx++) {
-+        uint32_t *entry = &s->h_lr[lr_idx][cpu];
-+        ret = deposit32(ret, lr_idx - lr_start, 1,
-+                        gic_lr_entry_is_free(*entry));
-+    }
-+
-+    return ret;
-+}
-+
-+static void gic_vmcr_write(GICState *s, uint32_t value, MemTxAttrs attrs)
-+{
-+    int vcpu = gic_get_current_vcpu(s);
-+    uint32_t ctlr;
-+    uint32_t abpr;
-+    uint32_t bpr;
-+    uint32_t prio_mask;
-+
-+    ctlr = FIELD_EX32(value, GICH_VMCR, VMCCtlr);
-+    abpr = FIELD_EX32(value, GICH_VMCR, VMABP);
-+    bpr = FIELD_EX32(value, GICH_VMCR, VMBP);
-+    prio_mask = FIELD_EX32(value, GICH_VMCR, VMPriMask) << 3;
-+
-+    gic_set_cpu_control(s, vcpu, ctlr, attrs);
-+    s->abpr[vcpu] = MAX(abpr, GIC_VIRT_MIN_ABPR);
-+    s->bpr[vcpu] = MAX(bpr, GIC_VIRT_MIN_BPR);
-+    gic_set_priority_mask(s, vcpu, prio_mask, attrs);
-+}
-+
-+static MemTxResult gic_hyp_read(void *opaque, int cpu, hwaddr addr,
-+                                uint64_t *data, MemTxAttrs attrs)
-+{
-+    GICState *s = ARM_GIC(opaque);
-+    int vcpu = cpu + GIC_NCPU;
-+
-+    switch (addr) {
-+    case A_GICH_HCR: /* Hypervisor Control */
-+        *data = s->h_hcr[cpu];
-+        break;
-+
-+    case A_GICH_VTR: /* VGIC Type */
-+        *data = FIELD_DP32(0, GICH_VTR, ListRegs, s->num_lrs - 1);
-+        *data = FIELD_DP32(*data, GICH_VTR, PREbits,
-+                           GIC_VIRT_MAX_GROUP_PRIO_BITS - 1);
-+        *data = FIELD_DP32(*data, GICH_VTR, PRIbits,
-+                           (7 - GIC_VIRT_MIN_BPR) - 1);
-+        break;
-+
-+    case A_GICH_VMCR: /* Virtual Machine Control */
-+        *data = FIELD_DP32(0, GICH_VMCR, VMCCtlr,
-+                           extract32(s->cpu_ctlr[vcpu], 0, 10));
-+        *data = FIELD_DP32(*data, GICH_VMCR, VMABP, s->abpr[vcpu]);
-+        *data = FIELD_DP32(*data, GICH_VMCR, VMBP, s->bpr[vcpu]);
-+        *data = FIELD_DP32(*data, GICH_VMCR, VMPriMask,
-+                           extract32(s->priority_mask[vcpu], 3, 5));
-+        break;
-+
-+    case A_GICH_MISR: /* Maintenance Interrupt Status */
-+        *data = s->h_misr[cpu];
-+        break;
-+
-+    case A_GICH_EISR0: /* End of Interrupt Status 0 and 1 */
-+    case A_GICH_EISR1:
-+        *data = gic_compute_eisr(s, cpu, (addr - A_GICH_EISR0) * 8);
-+        break;
-+
-+    case A_GICH_ELRSR0: /* Empty List Status 0 and 1 */
-+    case A_GICH_ELRSR1:
-+        *data = gic_compute_elrsr(s, cpu, (addr - A_GICH_ELRSR0) * 8);
-+        break;
-+
-+    case A_GICH_APR: /* Active Priorities */
-+        *data = s->h_apr[cpu];
-+        break;
-+
-+    case A_GICH_LR0 ... A_GICH_LR63: /* List Registers */
-+    {
-+        int lr_idx = (addr - A_GICH_LR0) / 4;
-+
-+        if (lr_idx > s->num_lrs) {
-+            *data = 0;
-+        } else {
-+            *data = s->h_lr[lr_idx][cpu];
-+        }
-+        break;
-+    }
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "gic_hyp_read: Bad offset %" HWADDR_PRIx "\n", addr);
-+        return MEMTX_OK;
-+    }
-+
-+    return MEMTX_OK;
-+}
-+
-+static MemTxResult gic_hyp_write(void *opaque, int cpu, hwaddr addr,
-+                                 uint64_t value, MemTxAttrs attrs)
-+{
-+    GICState *s = ARM_GIC(opaque);
-+    int vcpu = cpu + GIC_NCPU;
-+
-+    switch (addr) {
-+    case A_GICH_HCR: /* Hypervisor Control */
-+        s->h_hcr[cpu] = value & GICH_HCR_MASK;
-+        break;
-+
-+    case A_GICH_VMCR: /* Virtual Machine Control */
-+        gic_vmcr_write(s, value, attrs);
-+        break;
-+
-+    case A_GICH_APR: /* Active Priorities */
-+        s->h_apr[cpu] = value;
-+        s->running_priority[vcpu] = gic_get_prio_from_apr_bits(s, vcpu);
-+        break;
-+
-+    case A_GICH_LR0 ... A_GICH_LR63: /* List Registers */
-+    {
-+        int lr_idx = (addr - A_GICH_LR0) / 4;
-+
-+        if (lr_idx > s->num_lrs) {
-+            return MEMTX_OK;
-+        }
-+
-+        s->h_lr[lr_idx][cpu] = value & GICH_LR_MASK;
-+        break;
-+    }
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "gic_hyp_write: Bad offset %" HWADDR_PRIx "\n", addr);
-+        return MEMTX_OK;
-+    }
-+
-+    return MEMTX_OK;
-+}
-+
-+static MemTxResult gic_thiscpu_hyp_read(void *opaque, hwaddr addr, uint64_t *data,
-+                                    unsigned size, MemTxAttrs attrs)
-+{
-+    GICState *s = (GICState *)opaque;
-+
-+    return gic_hyp_read(s, gic_get_current_cpu(s), addr, data, attrs);
-+}
-+
-+static MemTxResult gic_thiscpu_hyp_write(void *opaque, hwaddr addr,
-+                                     uint64_t value, unsigned size,
-+                                     MemTxAttrs attrs)
-+{
-+    GICState *s = (GICState *)opaque;
-+
-+    return gic_hyp_write(s, gic_get_current_cpu(s), addr, value, attrs);
-+}
-+
-+static MemTxResult gic_do_hyp_read(void *opaque, hwaddr addr, uint64_t *data,
-+                                    unsigned size, MemTxAttrs attrs)
-+{
-+    GICState **backref = (GICState **)opaque;
-+    GICState *s = *backref;
-+    int id = (backref - s->backref);
-+
-+    return gic_hyp_read(s, id, addr, data, attrs);
-+}
-+
-+static MemTxResult gic_do_hyp_write(void *opaque, hwaddr addr,
-+                                     uint64_t value, unsigned size,
-+                                     MemTxAttrs attrs)
-+{
-+    GICState **backref = (GICState **)opaque;
-+    GICState *s = *backref;
-+    int id = (backref - s->backref);
-+
-+    return gic_hyp_write(s, id + GIC_NCPU, addr, value, attrs);
-+
-+}
-+
- static const MemoryRegionOps gic_ops[2] = {
-     {
-         .read_with_attrs = gic_dist_read,
-         .write_with_attrs = gic_dist_write,
-         .endianness = DEVICE_NATIVE_ENDIAN,
-@@ -1591,21 +1803,27 @@ static const MemoryRegionOps gic_cpu_ops = {
-     .endianness = DEVICE_NATIVE_ENDIAN,
+ #define GEM_REVISION        0x40070106
+ 
+ #define GIC_BASE_ADDR       0xf9000000
+ #define GIC_DIST_ADDR       0xf9010000
+ #define GIC_CPU_ADDR        0xf9020000
++#define GIC_VIFACE_ADDR     0xf9040000
++#define GIC_VCPU_ADDR       0xf9060000
+ 
+ #define SATA_INTR           133
+ #define SATA_ADDR           0xFD0C0000
+ #define SATA_NUM_PORTS      2
+ 
+@@ -109,15 +114,58 @@ static const int adma_ch_intr[XLNX_ZYNQMP_NUM_ADMA_CH] = {
  };
  
- static const MemoryRegionOps gic_virt_ops[2] = {
-     {
--        .read_with_attrs = NULL,
--        .write_with_attrs = NULL,
-+        .read_with_attrs = gic_thiscpu_hyp_read,
-+        .write_with_attrs = gic_thiscpu_hyp_write,
-         .endianness = DEVICE_NATIVE_ENDIAN,
-     },
-     {
-         .read_with_attrs = gic_thisvcpu_read,
-         .write_with_attrs = gic_thisvcpu_write,
-         .endianness = DEVICE_NATIVE_ENDIAN,
-     }
+ typedef struct XlnxZynqMPGICRegion {
+     int region_index;
+     uint32_t address;
++    uint32_t offset;
++    bool virt;
+ } XlnxZynqMPGICRegion;
+ 
+ static const XlnxZynqMPGICRegion xlnx_zynqmp_gic_regions[] = {
+-    { .region_index = 0, .address = GIC_DIST_ADDR, },
+-    { .region_index = 1, .address = GIC_CPU_ADDR,  },
++    /* Distributor */
++    {
++        .region_index = 0,
++        .address = GIC_DIST_ADDR,
++        .offset = 0,
++        .virt = false
++    },
++
++    /* CPU interface */
++    {
++        .region_index = 1,
++        .address = GIC_CPU_ADDR,
++        .offset = 0,
++        .virt = false
++    },
++    {
++        .region_index = 1,
++        .address = GIC_CPU_ADDR + 0x10000,
++        .offset = 0x1000,
++        .virt = false
++    },
++
++    /* Virtual interface */
++    {
++        .region_index = 2,
++        .address = GIC_VIFACE_ADDR,
++        .offset = 0,
++        .virt = true
++    },
++
++    /* Virtual CPU interface */
++    {
++        .region_index = 3,
++        .address = GIC_VCPU_ADDR,
++        .offset = 0,
++        .virt = true
++    },
++    {
++        .region_index = 3,
++        .address = GIC_VCPU_ADDR + 0x10000,
++        .offset = 0x1000,
++        .virt = true
++    },
  };
  
-+static const MemoryRegionOps gic_viface_ops = {
-+    .read_with_attrs = gic_do_hyp_read,
-+    .write_with_attrs = gic_do_hyp_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
- static void arm_gic_realize(DeviceState *dev, Error **errp)
+ static inline int arm_gic_ppi_index(int cpu_nr, int ppi_index)
  {
-     /* Device instance realize function for the GIC sysbus device */
-     int i;
-     GICState *s = ARM_GIC(dev);
-@@ -1643,10 +1861,23 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
-         s->backref[i] = s;
-         memory_region_init_io(&s->cpuiomem[i+1], OBJECT(s), &gic_cpu_ops,
-                               &s->backref[i], "gic_cpu", 0x100);
-         sysbus_init_mmio(sbd, &s->cpuiomem[i+1]);
+     return GIC_NUM_SPI_INTR + cpu_nr * GIC_INTERNAL + ppi_index;
+@@ -279,10 +327,13 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
      }
-+
-+    /* Extra core-specific regions for virtual interfaces. This is required by
-+     * the GICv2 specification.
-+     */
-+    if (s->virt_extn) {
-+        for (i = 0; i < s->num_cpu; i++) {
-+            memory_region_init_io(&s->vifaceiomem[i + 1], OBJECT(s),
-+                                  &gic_viface_ops, &s->backref[i],
-+                                  "gic_viface", 0x1000);
-+            sysbus_init_mmio(sbd, &s->vifaceiomem[i + 1]);
-+        }
-+    }
-+
- }
  
- static void arm_gic_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
+     qdev_prop_set_uint32(DEVICE(&s->gic), "num-irq", GIC_NUM_SPI_INTR + 32);
+     qdev_prop_set_uint32(DEVICE(&s->gic), "revision", 2);
+     qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", num_apus);
++    qdev_prop_set_bit(DEVICE(&s->gic), "has-security-extensions", s->secure);
++    qdev_prop_set_bit(DEVICE(&s->gic),
++                      "has-virtualization-extensions", s->virt);
+ 
+     /* Realize APUs before realizing the GIC. KVM requires this.  */
+     for (i = 0; i < num_apus; i++) {
+         char *name;
+ 
+@@ -323,38 +374,63 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+ 
+     assert(ARRAY_SIZE(xlnx_zynqmp_gic_regions) == XLNX_ZYNQMP_GIC_REGIONS);
+     for (i = 0; i < XLNX_ZYNQMP_GIC_REGIONS; i++) {
+         SysBusDevice *gic = SYS_BUS_DEVICE(&s->gic);
+         const XlnxZynqMPGICRegion *r = &xlnx_zynqmp_gic_regions[i];
+-        MemoryRegion *mr = sysbus_mmio_get_region(gic, r->region_index);
++        MemoryRegion *mr;
+         uint32_t addr = r->address;
+         int j;
+ 
+-        sysbus_mmio_map(gic, r->region_index, addr);
++        if (r->virt && !s->virt) {
++            continue;
++        }
+ 
++        mr = sysbus_mmio_get_region(gic, r->region_index);
+         for (j = 0; j < XLNX_ZYNQMP_GIC_ALIASES; j++) {
+             MemoryRegion *alias = &s->gic_mr[i][j];
+ 
+-            addr += XLNX_ZYNQMP_GIC_REGION_SIZE;
+             memory_region_init_alias(alias, OBJECT(s), "zynqmp-gic-alias", mr,
+-                                     0, XLNX_ZYNQMP_GIC_REGION_SIZE);
++                                     r->offset, XLNX_ZYNQMP_GIC_REGION_SIZE);
+             memory_region_add_subregion(system_memory, addr, alias);
++
++            addr += XLNX_ZYNQMP_GIC_REGION_SIZE;
+         }
+     }
+ 
+     for (i = 0; i < num_apus; i++) {
+         qemu_irq irq;
+ 
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i,
+                            qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
+                                             ARM_CPU_IRQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus,
++                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
++                                            ARM_CPU_FIQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 2,
++                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
++                                            ARM_CPU_VIRQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 3,
++                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
++                                            ARM_CPU_VFIQ));
+         irq = qdev_get_gpio_in(DEVICE(&s->gic),
+                                arm_gic_ppi_index(i, ARM_PHYS_TIMER_PPI));
+-        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), 0, irq);
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_PHYS, irq);
+         irq = qdev_get_gpio_in(DEVICE(&s->gic),
+                                arm_gic_ppi_index(i, ARM_VIRT_TIMER_PPI));
+-        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), 1, irq);
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_VIRT, irq);
++        irq = qdev_get_gpio_in(DEVICE(&s->gic),
++                               arm_gic_ppi_index(i, ARM_HYP_TIMER_PPI));
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_HYP, irq);
++        irq = qdev_get_gpio_in(DEVICE(&s->gic),
++                               arm_gic_ppi_index(i, ARM_SEC_TIMER_PPI));
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_SEC, irq);
++
++        if (s->virt) {
++            irq = qdev_get_gpio_in(DEVICE(&s->gic),
++                                   arm_gic_ppi_index(i, GIC_MAINTENANCE_PPI));
++            sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 4, irq);
++        }
+     }
+ 
+     if (s->has_rpu) {
+         info_report("The 'has_rpu' property is no longer required, to use the "
+                     "RPUs just use -smp 6.");
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 82b6ec2486..98f925ab84 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -51,20 +51,20 @@
+ 
+ #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
+ #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
+ #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
+ 
+-#define XLNX_ZYNQMP_GIC_REGIONS 2
++#define XLNX_ZYNQMP_GIC_REGIONS 6
+ 
+ /* ZynqMP maps the ARM GIC regions (GICC, GICD ...) at consecutive 64k offsets
+  * and under-decodes the 64k region. This mirrors the 4k regions to every 4k
+  * aligned address in the 64k region. To implement each GIC region needs a
+  * number of memory region aliases.
+  */
+ 
+ #define XLNX_ZYNQMP_GIC_REGION_SIZE 0x1000
+-#define XLNX_ZYNQMP_GIC_ALIASES     (0x10000 / XLNX_ZYNQMP_GIC_REGION_SIZE - 1)
++#define XLNX_ZYNQMP_GIC_ALIASES     (0x10000 / XLNX_ZYNQMP_GIC_REGION_SIZE)
+ 
+ #define XLNX_ZYNQMP_MAX_LOW_RAM_SIZE    0x80000000ull
+ 
+ #define XLNX_ZYNQMP_MAX_HIGH_RAM_SIZE   0x800000000ull
+ #define XLNX_ZYNQMP_HIGH_RAM_START      0x800000000ull
 -- 
 2.18.0
