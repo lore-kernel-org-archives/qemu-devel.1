@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fj1HO-0002wI-49
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 07:51:31 -0400
+	(envelope-from <groug@kaod.org>) id 1fj1TO-0006Ji-S3
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:03:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fj1HL-00019y-2B
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 07:51:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36800 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1fj1TL-0005ij-Mj
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:03:54 -0400
+Received: from 4.mo4.mail-out.ovh.net ([178.32.98.131]:51963)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fj1HK-00019W-Rz
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 07:51:26 -0400
-Date: Fri, 27 Jul 2018 14:51:18 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180727144726-mutt-send-email-mst@kernel.org>
-References: <1514626559-162312-1-git-send-email-longpeng2@huawei.com>
-	<1514626559-162312-2-git-send-email-longpeng2@huawei.com>
-	<fcb63fc3-22eb-7f6c-2014-744ee75784eb@linux.vnet.ibm.com>
-	<5B51CF0B.8020706@huawei.com>
-	<a332a516-16dc-1e50-3ea6-b68571880cb7@linux.ibm.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fj1TL-0005d6-Dm
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:03:51 -0400
+Received: from player695.ha.ovh.net (unknown [10.109.160.253])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 37F0C19205B
+	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 14:03:47 +0200 (CEST)
+Date: Fri, 27 Jul 2018 14:03:39 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180727140339.4b936931@bahia>
+In-Reply-To: <45f3757c-9c29-a894-d709-ba69ea9e9087@redhat.com>
+References: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
+	<20180727052724.GJ3694@umbus.fritz.box>
+	<20180727095452.45edee8b@bahia>
+	<f43c94da-43d1-7621-1997-00407708d496@redhat.com>
+	<20180727110000.16f55218@bahia>
+	<45f3757c-9c29-a894-d709-ba69ea9e9087@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a332a516-16dc-1e50-3ea6-b68571880cb7@linux.ibm.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [v23 1/2] virtio-crypto: Add
- virtio crypto device specification
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1] tests/cpu-plug-test: check CPU
+ hotplug on ppc64 with KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +35,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: "Longpeng (Mike)" <longpeng2@huawei.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, virtio-dev@lists.oasis-open.org, Ola.Liljedahl@arm.com, brian.a.keating@intel.com, wangxinxin.wang@huawei.com, liang.j.ma@intel.com, jasowang@redhat.com, xin.zeng@intel.com, qemu-devel@nongnu.org, john.griffin@intel.com, agraf@suse.de, arei.gonglei@huawei.com, stefanha@redhat.com, jianjay.zhou@huawei.com, cornelia.huck@de.ibm.com, Varun.Sethi@freescale.com, Jani.Kokkonen@huawei.com, vincent.jardin@6wind.com, denglingli@chinamobile.com, weidong.huang@huawei.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, Jul 26, 2018 at 06:55:44PM +0200, Halil Pasic wrote:
-> Sorry I did not have any time for this last days. And this
-> to make it worse this is a follow up to something that was
-> half a year ago. That means I have to re-familiarize myself
-> with the topic.
-> 
-> If I don't get around to answer in couple of weeks, feel
-> free to ping me.
-> 
-> Since from what I've seen most of the questions were of type
-> 'Can we do it like this?', maybe sending out a new version
-> is the best. So people (like me) can read through the whole
-> thing and point out problems if any.
-> 
-> Regards,
-> Halil
+On Fri, 27 Jul 2018 13:25:33 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-
-While two weeks for review is borderline reasonable as an exception, it
-does trouble me that  we are at v23, for something that is used
-in the field so it's not like we can just change things at will.
-So I hope everyone concerned makes an effort to try to converge on a spec
-ASAP.
-
-> On 07/20/2018 02:01 PM, Longpeng (Mike) wrote:
+> On 07/27/2018 11:00 AM, Greg Kurz wrote:
+> > On Fri, 27 Jul 2018 10:18:14 +0200
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >   
+> >> On 07/27/2018 09:54 AM, Greg Kurz wrote:  
+> >>> On Fri, 27 Jul 2018 15:27:24 +1000
+> >>> David Gibson <david@gibson.dropbear.id.au> wrote:
+> >>>     
+> >>>> On Wed, Jul 25, 2018 at 04:45:26PM +0200, Greg Kurz wrote:    
+> >>>>> Commit b585395b655 fixed a regression introduced by some recent changes
+> >>>>> in the XICS code, that was causing QEMU to crash instantly during CPU
+> >>>>> hotplug with KVM. This is typically the kind of bug we'd like our
+> >>>>> test suite to detect before it gets merged. Unfortunately, the current
+> >>>>> tests run with '-machine accel=qtest' and don't exercise KVM specific
+> >>>>> paths in QEMU.
+> >>>>>
+> >>>>> This patch hence changes add_pseries_test_case() to launch QEMU with
+> >>>>> '-machine accel=kvm' if KVM is available.
+> >>>>>
+> >>>>> A notable consequence is that the guest will execute SLOF, but for some
+> >>>>> reasons SLOF sometimes hits a program exception. This causes the guest
+> >>>>> to loop forever and the test to be stuck.  Since we don't need the guest
+> >>>>> to be truely running, let's pass -S to QEMU to avoid that.
+> >>>>>
+> >>>>> Also disable machine capabilities that could be unavailable in KVM, eg,
+> >>>>> when using PR KVM.
+> >>>>>
+> >>>>> Signed-off-by: Greg Kurz <groug@kaod.org>      
+> >>>>
+> >>>> I'm pretty sure trying to change the accelerator on a qtest test just
+> >>>> doesn't make sense.  We'd need a different approach for testing cpu
+> >>>> hotplug against kvm & tcg backends.
+> >>>>    
+> >>>
+> >>> The test starts QEMU, triggers the CPU hotplug code with a QMP command
+> >>> and checks the command didn't fail (or QEMU didn't crash, as it would
+> >>> have before commit b585395b655a)... I really don't understand what
+> >>> is wrong with that... Please elaborate.    
+> >>
+> >> For a "real" test, I think you'd need a guest OS that is reacting to the
+> >> hot plug events. So maybe this should rather be done in the avocado
+> >> framework instead?
+> >>  
 > > 
+> > The intent isn't a "real" test actually, but just to exercise the XICS-KVM
+> > paths in QEMU that get called during CPU hotplug. This cannot be achieved
+> > with the qtest accelerator.
 > > 
-> > On 2018/1/10 1:05, Halil Pasic wrote:
-> > 
-> > > 
-> > > 
-> > > On 12/30/2017 10:35 AM, Longpeng(Mike) wrote:
-> > > > From: Gonglei <arei.gonglei@huawei.com>
+> > This patch would have revealed the regression in b585395b655a right away,
+> > with the simple 'make check' developers are expected to run before posting.  
 > 
+> OK, that's fair. I think what rather bugs me here is that you start QEMU
+> with -S to work around something that sounds like real bug in SLOF ...
+> any chance that you could fix that bug in SLOF instead of using -S here?
 > 
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+
+Yeah, -S is a workaround indeed. I've chosen to go that way because I couldn't
+find any impact on the hotplug path, but I may have overlooked something, so
+I'm not surprised by your request :)
+
+I guess that's fair too and I'll investigate.
+
+Cheers,
+
+--
+Greg
+
+>  Thomas
