@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fizSk-0003qP-1F
+	(envelope-from <luc.michel@greensocs.com>) id 1fizSl-0003tt-Ch
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:55:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fizSg-0006L0-QM
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:55:06 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fizSh-0006LW-5a
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:55:07 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Fri, 27 Jul 2018 11:54:08 +0200
-Message-Id: <20180727095421.386-8-luc.michel@greensocs.com>
+Date: Fri, 27 Jul 2018 11:54:09 +0200
+Message-Id: <20180727095421.386-9-luc.michel@greensocs.com>
 In-Reply-To: <20180727095421.386-1-luc.michel@greensocs.com>
 References: <20180727095421.386-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH v5 07/20] intc/arm_gic: Add virtualization
- extensions helper macros and functions
+Subject: [Qemu-devel] [PATCH v5 08/20] intc/arm_gic: Refactor secure/ns
+ access check in the CPU interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,146 +23,272 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-Add some helper macros and functions related to the virtualization
-extensions to gic_internal.h.
+An access to the CPU interface is non-secure if the current GIC instance
+implements the security extensions, and the memory access is actually
+non-secure. Until then, it was checked with tests such as
+  if (s->security_extn && !attrs.secure) { ... }
+in various places of the CPU interface code.
 
-The GICH_LR_* macros help extracting specific fields of a list register
-value. The only tricky one is the priority field as only the MSB are
-stored. The value must be shifted accordingly to obtain the correct
-priority value.
+With the implementation of the virtualization extensions, those tests
+must be updated to take into account whether we are in a vCPU interface
+or not. This is because the exposed vCPU interface does not implement
+security extensions.
 
-gic_is_vcpu() and gic_get_vcpu_real_id() help with (v)CPU id manipulation
-to abstract the fact that vCPU id are in the range
-[ GIC_NCPU; (GIC_NCPU + num_cpu) [.
+This commits replaces all those tests with a call to the
+gic_cpu_ns_access() function to check if the current access to the CPU
+interface is non-secure. This function takes into account whether the
+current CPU is a vCPU or not.
 
-gic_lr_* and gic_virq_is_valid() help with the list registers.
-gic_get_lr_entry() returns the LR entry for a given (vCPU, irq) pair. It
-is meant to be used in contexts where we know for sure that the entry
-exists, so we assert that entry is actually found, and the caller can
-avoid the NULL check on the returned pointer.
+Note that this function is used only in the (v)CPU interface code path.
+The distributor code path is left unchanged, as the distributor is not
+exposed to vCPUs at all.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gic.c      |  5 +++
- hw/intc/gic_internal.h | 74 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 79 insertions(+)
+ hw/intc/arm_gic.c | 39 ++++++++++++++++++++++-----------------
+ 1 file changed, 22 insertions(+), 17 deletions(-)
 
 diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 5231579985..41141fee53 100644
+index 41141fee53..94d5982e2a 100644
 --- a/hw/intc/arm_gic.c
 +++ b/hw/intc/arm_gic.c
-@@ -59,10 +59,15 @@ static inline int gic_get_current_cpu(GICState *s)
-         return current_cpu->cpu_index;
-     }
-     return 0;
- }
- 
-+static inline int gic_get_current_vcpu(GICState *s)
-+{
-+    return gic_get_current_cpu(s) + GIC_NCPU;
-+}
-+
- /* Return true if this GIC config has interrupt groups, which is
-  * true if we're a GICv2, or a GICv1 with the security extensions.
-  */
+@@ -72,10 +72,15 @@ static inline int gic_get_current_vcpu(GICState *s)
  static inline bool gic_has_groups(GICState *s)
  {
-diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
-index 1aa888a576..cc5acc5d41 100644
---- a/hw/intc/gic_internal.h
-+++ b/hw/intc/gic_internal.h
-@@ -127,10 +127,24 @@ REG32(GICH_LR63, 0x1fc)
-     (R_GICH_LR0_VirtualID_MASK | R_GICH_LR0_PhysicalID_MASK | \
-      R_GICH_LR0_CPUID_MASK | R_GICH_LR0_EOI_MASK | \
-      R_GICH_LR0_Priority_MASK | R_GICH_LR0_State_MASK | \
-      R_GICH_LR0_Grp1_MASK | R_GICH_LR0_HW_MASK)
- 
-+#define GICH_LR_STATE_INVALID         0
-+#define GICH_LR_STATE_PENDING         1
-+#define GICH_LR_STATE_ACTIVE          2
-+#define GICH_LR_STATE_ACTIVE_PENDING  3
-+
-+#define GICH_LR_VIRT_ID(entry) (FIELD_EX32(entry, GICH_LR0, VirtualID))
-+#define GICH_LR_PHYS_ID(entry) (FIELD_EX32(entry, GICH_LR0, PhysicalID))
-+#define GICH_LR_CPUID(entry) (FIELD_EX32(entry, GICH_LR0, CPUID))
-+#define GICH_LR_EOI(entry) (FIELD_EX32(entry, GICH_LR0, EOI))
-+#define GICH_LR_PRIORITY(entry) (FIELD_EX32(entry, GICH_LR0, Priority) << 3)
-+#define GICH_LR_STATE(entry) (FIELD_EX32(entry, GICH_LR0, State))
-+#define GICH_LR_GROUP(entry) (FIELD_EX32(entry, GICH_LR0, Grp1))
-+#define GICH_LR_HW(entry) (FIELD_EX32(entry, GICH_LR0, HW))
-+
- /* Valid bits for GICC_CTLR for GICv1, v1 with security extensions,
-  * GICv2 and GICv2 with security extensions:
-  */
- #define GICC_CTLR_V1_MASK    0x1
- #define GICC_CTLR_V1_S_MASK  0x1f
-@@ -162,6 +176,66 @@ static inline bool gic_test_pending(GICState *s, int irq, int cm)
- static inline bool gic_is_vcpu(int cpu)
- {
-     return cpu >= GIC_NCPU;
+     return s->revision == 2 || s->security_extn;
  }
  
-+static inline int gic_get_vcpu_real_id(int cpu)
++static inline bool gic_cpu_ns_access(GICState *s, int cpu, MemTxAttrs attrs)
 +{
-+    return (cpu >= GIC_NCPU) ? (cpu - GIC_NCPU) : cpu;
++    return !gic_is_vcpu(cpu) && s->security_extn && !attrs.secure;
 +}
 +
-+/* Return true if the given vIRQ state exists in a LR and is either active or
-+ * pending and active.
-+ *
-+ * This function is used to check that a guest's `end of interrupt' or
-+ * `interrupts deactivation' request is valid, and matches with a LR of an
-+ * already acknowledged vIRQ (i.e. has the active bit set in its state).
-+ */
-+static inline bool gic_virq_is_valid(GICState *s, int irq, int vcpu)
-+{
-+    int cpu = gic_get_vcpu_real_id(vcpu);
-+    int lr_idx;
-+
-+    for (lr_idx = 0; lr_idx < s->num_lrs; lr_idx++) {
-+        uint32_t *entry = &s->h_lr[lr_idx][cpu];
-+
-+        if ((GICH_LR_VIRT_ID(*entry) == irq) &&
-+            (GICH_LR_STATE(*entry) & GICH_LR_STATE_ACTIVE)) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
-+/* Return a pointer on the LR entry matching the given vIRQ.
-+ *
-+ * This function is used to retrieve an LR for which we know for sure that the
-+ * corresponding vIRQ exists in the current context (i.e. its current state is
-+ * not `invalid'):
-+ *   - Either the corresponding vIRQ has been validated with gic_virq_is_valid()
-+ *     so it is `active' or `active and pending',
-+ *   - Or it was pending and has been selected by gic_get_best_virq(). It is now
-+ *     `pending', `active' or `active and pending', depending on what the guest
-+ *     already did with this vIRQ.
-+ *
-+ * Having multiple LRs with the same VirtualID leads to UNPREDICTABLE
-+ * behaviour in the GIC. We choose to return the first one that matches.
-+ */
-+static inline uint32_t *gic_get_lr_entry(GICState *s, int irq, int vcpu)
-+{
-+    int cpu = gic_get_vcpu_real_id(vcpu);
-+    int lr_idx;
-+
-+    for (lr_idx = 0; lr_idx < s->num_lrs; lr_idx++) {
-+        uint32_t *entry = &s->h_lr[lr_idx][cpu];
-+
-+        if ((GICH_LR_VIRT_ID(*entry) == irq) &&
-+            (GICH_LR_STATE(*entry) != GICH_LR_STATE_INVALID)) {
-+            return entry;
-+        }
-+    }
-+
-+    g_assert_not_reached();
-+}
-+
- #endif /* QEMU_ARM_GIC_INTERNAL_H */
+ /* TODO: Many places that call this routine could be optimized.  */
+ /* Update interrupt status after enabled or pending bits have been changed.  */
+ static void gic_update(GICState *s)
+ {
+     int best_irq;
+@@ -219,11 +224,11 @@ static uint16_t gic_get_current_pending_irq(GICState *s, int cpu,
+     if (pending_irq < GIC_MAXIRQ && gic_has_groups(s)) {
+         int group = GIC_DIST_TEST_GROUP(pending_irq, (1 << cpu));
+         /* On a GIC without the security extensions, reading this register
+          * behaves in the same way as a secure access to a GIC with them.
+          */
+-        bool secure = !s->security_extn || attrs.secure;
++        bool secure = !gic_cpu_ns_access(s, cpu, attrs);
+ 
+         if (group == 0 && !secure) {
+             /* Group0 interrupts hidden from Non-secure access */
+             return 1023;
+         }
+@@ -426,11 +431,11 @@ static uint32_t gic_dist_get_priority(GICState *s, int cpu, int irq,
+ }
+ 
+ static void gic_set_priority_mask(GICState *s, int cpu, uint8_t pmask,
+                                   MemTxAttrs attrs)
+ {
+-    if (s->security_extn && !attrs.secure) {
++    if (gic_cpu_ns_access(s, cpu, attrs)) {
+         if (s->priority_mask[cpu] & 0x80) {
+             /* Priority Mask in upper half */
+             pmask = 0x80 | (pmask >> 1);
+         } else {
+             /* Non-secure write ignored if priority mask is in lower half */
+@@ -442,11 +447,11 @@ static void gic_set_priority_mask(GICState *s, int cpu, uint8_t pmask,
+ 
+ static uint32_t gic_get_priority_mask(GICState *s, int cpu, MemTxAttrs attrs)
+ {
+     uint32_t pmask = s->priority_mask[cpu];
+ 
+-    if (s->security_extn && !attrs.secure) {
++    if (gic_cpu_ns_access(s, cpu, attrs)) {
+         if (pmask & 0x80) {
+             /* Priority Mask in upper half, return Non-secure view */
+             pmask = (pmask << 1) & 0xff;
+         } else {
+             /* Priority Mask in lower half, RAZ */
+@@ -458,11 +463,11 @@ static uint32_t gic_get_priority_mask(GICState *s, int cpu, MemTxAttrs attrs)
+ 
+ static uint32_t gic_get_cpu_control(GICState *s, int cpu, MemTxAttrs attrs)
+ {
+     uint32_t ret = s->cpu_ctlr[cpu];
+ 
+-    if (s->security_extn && !attrs.secure) {
++    if (gic_cpu_ns_access(s, cpu, attrs)) {
+         /* Construct the NS banked view of GICC_CTLR from the correct
+          * bits of the S banked view. We don't need to move the bypass
+          * control bits because we don't implement that (IMPDEF) part
+          * of the GIC architecture.
+          */
+@@ -474,11 +479,11 @@ static uint32_t gic_get_cpu_control(GICState *s, int cpu, MemTxAttrs attrs)
+ static void gic_set_cpu_control(GICState *s, int cpu, uint32_t value,
+                                 MemTxAttrs attrs)
+ {
+     uint32_t mask;
+ 
+-    if (s->security_extn && !attrs.secure) {
++    if (gic_cpu_ns_access(s, cpu, attrs)) {
+         /* The NS view can only write certain bits in the register;
+          * the rest are unchanged
+          */
+         mask = GICC_CTLR_EN_GRP1;
+         if (s->revision == 2) {
+@@ -505,11 +510,11 @@ static uint8_t gic_get_running_priority(GICState *s, int cpu, MemTxAttrs attrs)
+     if ((s->revision != REV_11MPCORE) && (s->running_priority[cpu] > 0xff)) {
+         /* Idle priority */
+         return 0xff;
+     }
+ 
+-    if (s->security_extn && !attrs.secure) {
++    if (gic_cpu_ns_access(s, cpu, attrs)) {
+         if (s->running_priority[cpu] & 0x80) {
+             /* Running priority in upper half of range: return the Non-secure
+              * view of the priority.
+              */
+             return s->running_priority[cpu] << 1;
+@@ -529,11 +534,11 @@ static bool gic_eoi_split(GICState *s, int cpu, MemTxAttrs attrs)
+ {
+     if (s->revision != 2) {
+         /* Before GICv2 prio-drop and deactivate are not separable */
+         return false;
+     }
+-    if (s->security_extn && !attrs.secure) {
++    if (gic_cpu_ns_access(s, cpu, attrs)) {
+         return s->cpu_ctlr[cpu] & GICC_CTLR_EOIMODE_NS;
+     }
+     return s->cpu_ctlr[cpu] & GICC_CTLR_EOIMODE;
+ }
+ 
+@@ -561,11 +566,11 @@ static void gic_deactivate_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "gic_deactivate_irq: GICC_DIR write when EOIMode clear");
+         return;
+     }
+ 
+-    if (s->security_extn && !attrs.secure && !group) {
++    if (gic_cpu_ns_access(s, cpu, attrs) && !group) {
+         DPRINTF("Non-secure DI for Group0 interrupt %d ignored\n", irq);
+         return;
+     }
+ 
+     GIC_DIST_CLEAR_ACTIVE(irq, cm);
+@@ -603,11 +608,11 @@ static void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+         }
+     }
+ 
+     group = gic_has_groups(s) && GIC_DIST_TEST_GROUP(irq, cm);
+ 
+-    if (s->security_extn && !attrs.secure && !group) {
++    if (gic_cpu_ns_access(s, cpu, attrs) && !group) {
+         DPRINTF("Non-secure EOI for Group0 interrupt %d ignored\n", irq);
+         return;
+     }
+ 
+     /* Secure EOI with GICC_CTLR.AckCtl == 0 when the IRQ is a Group 1
+@@ -1279,11 +1284,11 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+         break;
+     case 0x04: /* Priority mask */
+         *data = gic_get_priority_mask(s, cpu, attrs);
+         break;
+     case 0x08: /* Binary Point */
+-        if (s->security_extn && !attrs.secure) {
++        if (gic_cpu_ns_access(s, cpu, attrs)) {
+             if (s->cpu_ctlr[cpu] & GICC_CTLR_CBPR) {
+                 /* NS view of BPR when CBPR is 1 */
+                 *data = MIN(s->bpr[cpu] + 1, 7);
+             } else {
+                 /* BPR is banked. Non-secure copy stored in ABPR. */
+@@ -1306,11 +1311,11 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+         /* GIC v2, no security: ABPR
+          * GIC v1, no security: not implemented (RAZ/WI)
+          * With security extensions, secure access: ABPR (alias of NS BPR)
+          * With security extensions, nonsecure access: RAZ/WI
+          */
+-        if (!gic_has_groups(s) || (s->security_extn && !attrs.secure)) {
++        if (!gic_has_groups(s) || (gic_cpu_ns_access(s, cpu, attrs))) {
+             *data = 0;
+         } else {
+             *data = s->abpr[cpu];
+         }
+         break;
+@@ -1318,11 +1323,11 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+     {
+         int regno = (offset - 0xd0) / 4;
+ 
+         if (regno >= GIC_NR_APRS || s->revision != 2) {
+             *data = 0;
+-        } else if (s->security_extn && !attrs.secure) {
++        } else if (gic_cpu_ns_access(s, cpu, attrs)) {
+             /* NS view of GICC_APR<n> is the top half of GIC_NSAPR<n> */
+             *data = gic_apr_ns_view(s, regno, cpu);
+         } else {
+             *data = s->apr[regno][cpu];
+         }
+@@ -1331,11 +1336,11 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+     case 0xe0: case 0xe4: case 0xe8: case 0xec:
+     {
+         int regno = (offset - 0xe0) / 4;
+ 
+         if (regno >= GIC_NR_APRS || s->revision != 2 || !gic_has_groups(s) ||
+-            (s->security_extn && !attrs.secure)) {
++            gic_cpu_ns_access(s, cpu, attrs)) {
+             *data = 0;
+         } else {
+             *data = s->nsapr[regno][cpu];
+         }
+         break;
+@@ -1358,11 +1363,11 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+         break;
+     case 0x04: /* Priority mask */
+         gic_set_priority_mask(s, cpu, value, attrs);
+         break;
+     case 0x08: /* Binary Point */
+-        if (s->security_extn && !attrs.secure) {
++        if (gic_cpu_ns_access(s, cpu, attrs)) {
+             if (s->cpu_ctlr[cpu] & GICC_CTLR_CBPR) {
+                 /* WI when CBPR is 1 */
+                 return MEMTX_OK;
+             } else {
+                 s->abpr[cpu] = MAX(value & 0x7, GIC_MIN_ABPR);
+@@ -1373,11 +1378,11 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+         break;
+     case 0x10: /* End Of Interrupt */
+         gic_complete_irq(s, cpu, value & 0x3ff, attrs);
+         return MEMTX_OK;
+     case 0x1c: /* Aliased Binary Point */
+-        if (!gic_has_groups(s) || (s->security_extn && !attrs.secure)) {
++        if (!gic_has_groups(s) || (gic_cpu_ns_access(s, cpu, attrs))) {
+             /* unimplemented, or NS access: RAZ/WI */
+             return MEMTX_OK;
+         } else {
+             s->abpr[cpu] = MAX(value & 0x7, GIC_MIN_ABPR);
+         }
+@@ -1387,11 +1392,11 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+         int regno = (offset - 0xd0) / 4;
+ 
+         if (regno >= GIC_NR_APRS || s->revision != 2) {
+             return MEMTX_OK;
+         }
+-        if (s->security_extn && !attrs.secure) {
++        if (gic_cpu_ns_access(s, cpu, attrs)) {
+             /* NS view of GICC_APR<n> is the top half of GIC_NSAPR<n> */
+             gic_apr_write_ns_view(s, regno, cpu, value);
+         } else {
+             s->apr[regno][cpu] = value;
+         }
+@@ -1402,11 +1407,11 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+         int regno = (offset - 0xe0) / 4;
+ 
+         if (regno >= GIC_NR_APRS || s->revision != 2) {
+             return MEMTX_OK;
+         }
+-        if (!gic_has_groups(s) || (s->security_extn && !attrs.secure)) {
++        if (!gic_has_groups(s) || (gic_cpu_ns_access(s, cpu, attrs))) {
+             return MEMTX_OK;
+         }
+         s->nsapr[regno][cpu] = value;
+         break;
+     }
 -- 
 2.18.0
