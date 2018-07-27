@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fj4yu-00015Y-7T
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:48:41 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fj50e-0002Pt-5I
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:50:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fj4yp-0006qi-KW
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:48:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48816 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fj4yp-0006qF-Ej
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:48:35 -0400
-References: <20180727151359.29061-1-armbru@redhat.com>
-	<20180727151359.29061-14-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1c126eed-8b47-b61a-69d8-38176e1e586d@redhat.com>
-Date: Fri, 27 Jul 2018 10:48:33 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1fj50Z-0000HL-9j
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:50:28 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:34893)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fj50Z-0000G3-01
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:50:23 -0400
+Received: by mail-pl0-x242.google.com with SMTP id w3-v6so2483499plq.2
+	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 08:50:22 -0700 (PDT)
+References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+	<1532004912-13899-24-git-send-email-stefan.markovic@rt-rk.com>
+	<b2be38da-84b6-904c-a826-1c86fed7e03c@linaro.org>
+	<SN6PR08MB4879EDCAD5A9D3EBC076F2C0C62A0@SN6PR08MB4879.namprd08.prod.outlook.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <5dca6edd-e849-ca6e-18ea-84eeeb99ff97@linaro.org>
+Date: Fri, 27 Jul 2018 08:50:17 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180727151359.29061-14-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <SN6PR08MB4879EDCAD5A9D3EBC076F2C0C62A0@SN6PR08MB4879.namprd08.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 13/23] tests: Clean up string
- interpolation around qtest_qmp_device_add()
+Subject: Re: [Qemu-devel] [PATCH v3 23/40] target/mips: Implement emulation
+ of nanoMIPS LLWP/SCWP pair
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +34,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, f4bug@amsat.org
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-On 07/27/2018 10:13 AM, Markus Armbruster wrote:
-> Leaving interpolation into JSON to qmp() is more robust than building
-> QMP input manually, as explained in the commit before previous.
+On 07/27/2018 08:29 AM, Aleksandar Markovic wrote:
+> static void gen_llwp(DisasContext *ctx, uint32_t base, int16_t offset,
+>                      uint32_t reg1, uint32_t reg2)
+> {
+>     TCGv taddr = tcg_temp_new();
+>     TCGv_i64 tval = tcg_temp_new_i64();
+>     TCGv tmp1 = tcg_temp_new();
+>     TCGv tmp2 = tcg_temp_new();
+>     TCGv tmp3 = tcg_temp_new();
+>     TCGLabel *l1 = gen_new_label();
 > 
-> qtest_qmp_device_add() and its wrappers interpolate into JSON as
-> follows:
-> 
-> * qtest_qmp_device_add() interpolates members into a JSON object.
-> 
-> * So do its wrappers qpci_plug_device_test() and usb_test_hotplug().
-> 
-> * usb_test_hotplug() additionally interpolates strings and numbers
->    into JSON strings.
-> 
-> Clean them up:
-> 
-> * Have qtest_qmp_device_add() take its extra device properties as
->    arguments for for qdict_from_jsonf_nofail() instead of a string
+>     gen_base_offset_addr(ctx, taddr, base, offset);
+>     tcg_gen_andi_tl(tmp3, taddr, 0x7);
+>     tcg_gen_brcondi_tl(TCG_COND_EQ, tmp3, 0, l1);
+>     tcg_temp_free(tmp3);
+>     tcg_gen_st_tl(taddr, cpu_env, offsetof(CPUMIPSState, CP0_BadVAddr));
+>     generate_exception(ctx, EXCP_AdES);
+>     gen_set_label(l1);
 
-s/for for/for/
+You shouldn't need this, as it is implied by
 
->    containing JSON members.
+cpu.h:#define ALIGNED_ONLY
+
+and will, for softmmu anyway, fault
+
+>     tcg_gen_qemu_ld64(tval, taddr, ctx->mem_idx);
+
+here.
+
+(If you are testing -linux-user, there are many other missing
+alignment faults and I suggest you ignore the issue entirely; it needs to be
+dealt with generically.)
+
+>     tcg_gen_extr_i64_tl(tmp1, tmp2, tval);
+>     gen_store_gpr(tmp1, reg1);
+>     tcg_temp_free(tmp1);
+>     gen_store_gpr(tmp2, reg2);
+>     tcg_temp_free(tmp2);
+
+Has the swap of register numbers for big vs little-endian happened in the
+caller?  You didn't show enough context to tell.
+
+
+
+> static void gen_scwp(DisasContext *ctx, uint32_t base, int16_t offset,
+>                      uint32_t reg1, uint32_t reg2)
+> {
+>     TCGv taddr = tcg_temp_new();
+>     TCGv lladdr = tcg_temp_new();
+>     TCGv_i64 tval = tcg_temp_new_i64();
+>     TCGv_i64 llval = tcg_temp_new_i64();
+>     TCGv_i64 val = tcg_temp_new_i64();
+>     TCGv tmp1 = tcg_temp_new();
+>     TCGv tmp2 = tcg_temp_new();
+>     TCGLabel *l1 = gen_new_label();
+>     TCGLabel *lab_fail = gen_new_label();
+>     TCGLabel *lab_done = gen_new_label();
+>  
+>     gen_base_offset_addr(ctx, taddr, base, offset);
+>     tcg_gen_andi_tl(tmp1, taddr, 0x7);
+>     tcg_gen_brcondi_tl(TCG_COND_EQ, tmp1, 0, l1);
+>     tcg_gen_st_tl(taddr, cpu_env, offsetof(CPUMIPSState, CP0_BadVAddr));
+>     generate_exception(ctx, EXCP_AdES);
 > 
-> * Drop qpci_plug_device_test(), use qtest_qmp_device_add()
->    directly.
+>     gen_set_label(l1);
+
+Hmm.  You could perhaps move the alignment test to the lab_fail path, because
+
+>     tcg_gen_ld_tl(lladdr, cpu_env, offsetof(CPUMIPSState, lladdr));
+>     tcg_gen_brcond_tl(TCG_COND_NE, taddr, lladdr, lab_fail);
+
+if we pass this test we know that taddr == lladdr, and that lladdr is aligned
+because the load for LLWP did not fault.  Even if that were not the case, the
+cmpxchg itself would trigger an alignment fault.
+
+>     gen_load_gpr(tmp1, reg1);
+>     gen_load_gpr(tmp2, reg2);
+>     tcg_gen_concat_tl_i64(tval, tmp1, tmp2);
+
+Again, did a the reg1/reg2 swap happen in the caller?
+
+>     tcg_gen_ld_i64(llval, cpu_env, offsetof(CPUMIPSState, llval_wp));
+>     tcg_gen_atomic_cmpxchg_i64(val, taddr, llval, tval,
+>                                ctx->mem_idx, MO_64);
+>     tcg_gen_setcond_i64(TCG_COND_EQ, val, val, llval);
+>     tcg_gen_br(lab_done);
+
+You failed to write back "val" to GPR[rt].
+
+>  
+>     gen_set_label(lab_fail);
+>     tcg_gen_movi_tl(cpu_gpr[reg2], 0);
+>  
+>     gen_set_label(lab_done);
+>     tcg_gen_movi_tl(lladdr, -1);
+>     tcg_gen_st_tl(lladdr, cpu_env, offsetof(CPUMIPSState, lladdr));
+> }
 > 
-> * Change usb_test_hotplug() parameter @port to string, to avoid
->    interpolation.  Interpolate @hcd_id separately.
-> 
-> Bonus: gets rid of a non-literal format string.  A step towards
-> compile-time format string checking without triggering
-> -Wformat-nonliteral.
-> 
-> Cc: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
 
-> +++ b/tests/ivshmem-test.c
-> @@ -420,19 +420,17 @@ static void test_ivshmem_server_irq(void)
->   static void test_ivshmem_hotplug(void)
->   {
->       const char *arch = qtest_get_arch();
-> -    gchar *opts;
->   
->       qtest_start("");
->   
-> -    opts = g_strdup_printf("'shm': '%s', 'size': '1M'", tmpshm);
-> -
-> -    qpci_plug_device_test("ivshmem", "iv1", PCI_SLOT_HP, opts);
-> +    qtest_qmp_device_add("ivshmem",
-> +                         "iv1", "{'addr': %s, 'shm': '%s', 'size': '1M'}",
 
-Umm, how does this still pass?  You want 'shm':%s, not 'shm':'%s'.
-
-(We really want to assert that any % interpolations in our JSON parser 
-are NOT embedded in '').
-
-With that error fixed,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+r~
