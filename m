@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fivPM-0006i9-IN
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:35:21 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fivTO-0000Pe-Ni
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:39:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fivPI-0004Pz-Js
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:35:20 -0400
-Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:45734)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fivPI-0004Pf-Cx
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:35:16 -0400
-Received: by mail-ua0-x241.google.com with SMTP id k8-v6so2608393uaq.12
-	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 22:35:16 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20180622004435.10291-1-f4bug@amsat.org>
-	<20180622004435.10291-2-f4bug@amsat.org> <87k1qivqm5.fsf@linaro.org>
-	<87a7revapy.fsf@linaro.org>
-	<f8c3ed3c-8dac-d596-208a-e8f72797c784@amsat.org>
-Message-ID: <99e1a77f-31e3-916d-e3ca-02348ea92668@amsat.org>
-Date: Fri, 27 Jul 2018 02:35:12 -0300
+	(envelope-from <dgibson@ozlabs.org>) id 1fivTK-0006xR-SJ
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:39:30 -0400
+Date: Fri, 27 Jul 2018 15:34:09 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180727053409.GL3694@umbus.fritz.box>
+References: <153259340275.5529.15876484471761179518.stgit@dhcp-9-109-246-16>
+	<20180727031348.GD3694@umbus.fritz.box>
+	<c162e499-1429-7863-4a1a-58cfbb4d3057@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <f8c3ed3c-8dac-d596-208a-e8f72797c784@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/6] avocado: Add a Test.arch
- property
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="O8/n5iBOhiUtMkxf"
+Content-Disposition: inline
+In-Reply-To: <c162e499-1429-7863-4a1a-58cfbb4d3057@linaro.org>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] linux-user: ppc64: don't use
+ volatile register during safe_syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,100 +26,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, dgibson@redhat.com, riku.voipio@iki.fi, laurent@vivier.eu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Hi Cleber,
 
-On 06/28/2018 07:03 PM, Philippe Mathieu-Daudé wrote:
-> On 06/28/2018 06:54 PM, Alex Bennée wrote:
->> Alex Bennée <alex.bennee@linaro.org> writes:
->>> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->>>
->>>> Tests can change this property to run tests in other
->>>> architectures than the host one.
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>> ---
->>>>  tests/acceptance/avocado_qemu/__init__.py | 17 +++++++++++++----
->>>>  1 file changed, 13 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
->>>> index 1e54fd5932..6e9601f5e9 100644
->>>> --- a/tests/acceptance/avocado_qemu/__init__.py
->>>> +++ b/tests/acceptance/avocado_qemu/__init__.py
->>>> @@ -13,6 +13,7 @@ import sys
->>>>
->>>>  import avocado
->>>>
->>>> +HOST_ARCH = os.uname()[4]
->>>
->>> The python docs seem to point to platform as a more stable way of
->>> querying this stuff:
->>>
->>>   platform.machine() => 'x86_64' or 'aarch64'
->>>
->>>>  SRC_ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
->>>>  SRC_ROOT_DIR = os.path.abspath(os.path.dirname(SRC_ROOT_DIR))
->>>>  sys.path.append(os.path.join(SRC_ROOT_DIR, 'scripts'))
->>>> @@ -23,12 +24,11 @@ def is_readable_executable_file(path):
->>>>      return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
->>>>
->>>>
->>>> -def pick_default_qemu_bin():
->>>> +def pick_default_qemu_bin(arch):
->>>>      """
->>>>      Picks the path of a QEMU binary, starting either in the current working
->>>>      directory or in the source tree root directory.
->>>>      """
->>>> -    arch = os.uname()[4]
->>>>      qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
->>>>                                            "qemu-system-%s" % arch)
->>>>      if is_readable_executable_file(qemu_bin_relative_path):
->>>> @@ -41,10 +41,19 @@ def pick_default_qemu_bin():
->>>>
->>>>
->>>>  class Test(avocado.Test):
->>>> +    _arch = HOST_ARCH
->>
->> But actually this is wrong - because the host arch may not boot machines
->> defined in the tests. I suspect each superclass needs to explicitly set
->> it's arch and we should assert it has done so here.
+--O8/n5iBOhiUtMkxf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Do you have any suggestion on how we could clear this?
+On Thu, Jul 26, 2018 at 10:20:11PM -0700, Richard Henderson wrote:
+> On 07/26/2018 08:13 PM, David Gibson wrote:
+> > On Thu, Jul 26, 2018 at 01:56:19PM +0530, Shivaprasad G Bhat wrote:
+> >> r11 is a volatile register on PPC as per calling conventions.
+> >> The safe_syscall code uses it to check if the signal_pending
+> >> is set during the safe_syscall. When a syscall is interrupted
+> >> on return from signal handling, the r11 might be corrupted
+> >> before we retry the syscall leading to a crash. The registers
+> >> r0-r13 are not to be used here as they have
+> >> volatile/designated/reserved usages. Change the code to use
+> >> r14 which is non-volatile and is appropriate for local use in
+> >> safe_syscall.
+> >>
+> >> Steps to reproduce:
+> >> On PPC host, issue `qemu-x86_64 /usr/bin/cc -E -`
+> >> Attempt Ctrl-C, the issue is reproduced.
+> >>
+> >> Reference:
+> >> https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#R=
+EG
+> >>
+> >> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+> >> Tested-by: Laurent Vivier <laurent@vivier.eu>
+> >> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> >=20
+> > Applied to ppc-for-3.0.
+>=20
+> No please!  r14 is a call-saved register and needs saving before
+> clobbering.
 
-> 
-> Hmm but arch-specific tests are protected by the 'arch' tag:
-> 
-> class BootLinuxConsoleMips(Test):
->     """
->     :avocado: enable
->     :avocado: tags=endian:big
->     :avocado: tags=arch:mips
->     :avocado: tags=board:malta
->     """
-> 
-> Oh no they aren't, it is just a way to filter which selection of tests
-> to run :|
+Oops, pulled out now.
 
->>>> +
->>>> +    @property
->>>> +    def arch(self):
->>>> +        """
->>>> +        Returns the architecture required to run the current test
->>>> +        """
->>>> +        return self._arch
->>>> +> 
->>
->> --
->> Alex Bennée
->>
->>>>      def setUp(self):
->>>>          self.vm = None
->>>> -        self.qemu_bin = self.params.get('qemu_bin',
->>>> -                                        default=pick_default_qemu_bin())
->>>> +        qemu_bin = pick_default_qemu_bin(self.arch)
->>>> +        self.qemu_bin = self.params.get('qemu_bin', default=qemu_bin)
->>>>          if self.qemu_bin is None:
->>>>              self.cancel("No QEMU binary defined or found in the source tree")
->>>>          self.vm = QEMUMachine(self.qemu_bin)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--O8/n5iBOhiUtMkxf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltartAACgkQbDjKyiDZ
+s5LOaw/+Jqop3jwqbZcHsQTQFqX4ysk0xhm2RMdp8BfyuLh+U6/vdBO+eMm5HQpw
+ttcRf2Jts6R/T9WKGt5NMBUdiU2Pgul0NQCUkiq0wWoZG6ZStOXoHZDbBkwfVhd7
+vf+rxG/HaFJ+ByFvR/8h1cFooXiE8MA3f1Wo4B4zXhOoxBwMjfEGzDj7KGoKYdQ0
+LW5bd09atIfFOoKyEr+NQ+yomiDoCkYKkzMML87ni6k09uqksT+Oz0/fc/qOgGQM
+VaHK4qoNPF0r3RvC+kxuS0OwbmFKL/lbrqweFe79sRA3gVjxV894i/eBWM2duCir
+b4QlC6gZCziQKzHBgyhC2g/iba7jYZn4/sa0PkcFg91G/MA0ysxbBQt7pQ5iZYii
+Oud2sumgJL+WRSK9VAXKzxkwcZ2n4FDU+m9S98ZwH0O1icVsNN1KHOxswvl9ICAs
+aI4oruYSYsEsTEaPkIWsSn1Q3jcrraRKI7z10NMvkR22AhoaYY0q9e+jDtOCVZ4b
+0r96v/t5SHm4UMsFt0LSA2f6OWPMcUR1TOPsI2fLMGVVU7UexFjsqrhXuPkVJ95O
+rFzj7Yp22jDVED+Z80+bcBISmXisM1yX7ac3WKwzdqbUtJlIA9R+xsdIHUWfICDc
+XeunRE5DKnUHMrfYuIQ/djiS5feaLc7XnRDpVmNT6OzZTudZqn8=
+=3UlP
+-----END PGP SIGNATURE-----
+
+--O8/n5iBOhiUtMkxf--
