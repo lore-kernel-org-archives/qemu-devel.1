@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fj4Ri-0006I7-Id
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:24 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fj4Rs-0006TP-UK
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fj4Rd-0000KY-NC
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59452 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fj4Rn-0000OT-WA
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57376 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fj4Rd-00007X-5R
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:17 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 27 Jul 2018 17:13:38 +0200
-Message-Id: <20180727151359.29061-3-armbru@redhat.com>
-In-Reply-To: <20180727151359.29061-1-armbru@redhat.com>
-References: <20180727151359.29061-1-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fj4Rn-0000KA-PM
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:27 -0400
+Date: Fri, 27 Jul 2018 16:14:13 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180727151412.GC2498@work-vm>
+References: <20180727123112.13707-1-dgilbert@redhat.com>
+	<d09b7607-a23b-7c05-9faf-7ec0000684af@ilande.co.uk>
+	<20180727134453.GB2498@work-vm>
+	<c8608e2e-35da-d095-193a-626d0d47c036@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 02/23] libqtest: Rename functions to send
- QMP messages
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c8608e2e-35da-d095-193a-626d0d47c036@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH] macio/pmu: Fix missing vmsd terminator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,285 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, agraf@suse.de
 
-The functions to receive messages are called qtest_qmp_receive() and
-qmp_receive(), qmp_fd_receive().  The ones to send messages are called
-qtest_async_qmp(), qtest_async_qmpv(), qmp_async(), qmp_fd_send(),
-qmp_fd_sendv().  Inconsistent.  Rename the *_async* ones to
-qmp_send(), qtest_qmp_send(), qtest_qmp_vsend().  Rename
-qmp_fd_sendv() to qmp_fd_vsend().
+* Mark Cave-Ayland (mark.cave-ayland@ilande.co.uk) wrote:
+> On 27/07/18 14:44, Dr. David Alan Gilbert wrote:
+> 
+> > * Mark Cave-Ayland (mark.cave-ayland@ilande.co.uk) wrote:
+> > > On 27/07/18 13:31, Dr. David Alan Gilbert (git) wrote:
+> > > 
+> > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > > 
+> > > > Fix missing terminator in VMStateDescription
+> > > > 
+> > > > Fixes: d811d61fbc6ca5f2be2185fd7cfa916e7ba613ce
+> > > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > ---
+> > > >    hw/misc/macio/pmu.c | 1 +
+> > > >    1 file changed, 1 insertion(+)
+> > > > 
+> > > > diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
+> > > > index e246b0fd41..27dfaf8a74 100644
+> > > > --- a/hw/misc/macio/pmu.c
+> > > > +++ b/hw/misc/macio/pmu.c
+> > > > @@ -686,6 +686,7 @@ static const VMStateDescription vmstate_pmu_adb = {
+> > > >            VMSTATE_TIMER_PTR(adb_poll_timer, PMUState),
+> > > >            VMSTATE_UINT8(adb_reply_size, PMUState),
+> > > >            VMSTATE_BUFFER(adb_reply, PMUState),
+> > > > +        VMSTATE_END_OF_LIST()
+> > > >        }
+> > > >    };
+> > > 
+> > > Gah, yes indeed it certainly looks like I missed this whilst working on the
+> > > PMU code :(
+> > > 
+> > > Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > > 
+> > > Just out of interest does a savevm/loadvm migration still succeed once this
+> > > has been added?
+> > 
+> > Have you got a suggested command line to test it with?
+> 
+> I'm effectively AFK until tomorrow now, but just quickly:
+> 
+> $ ./qemu-system-ppc -M mac99,via=pmu
+> 
+> Note that PMU support is new for 3.0 so there shouldn't be any backward
+> compatibility issue here.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- tests/ahci-test.c   | 10 +++++-----
- tests/libqos/ahci.c |  4 ++--
- tests/libqtest.c    | 20 ++++++++++----------
- tests/libqtest.h    | 14 +++++++-------
- tests/qmp-test.c    | 18 +++++++++---------
- 5 files changed, 33 insertions(+), 33 deletions(-)
+[root@virtlab414 try-64]# ./ppc-softmmu/qemu-system-ppc -M mac99,via=pmu -nographic /home/vms/dummy1.qcow2 
+QEMU 2.12.50 monitor - type 'help' for more information
+(qemu) ss>> et_property: NULL phandle
 
-diff --git a/tests/ahci-test.c b/tests/ahci-test.c
-index 1a7b761304..7e3491b5bd 100644
---- a/tests/ahci-test.c
-+++ b/tests/ahci-test.c
-@@ -1389,7 +1389,7 @@ static void test_flush_migrate(void)
-=20
-     /* Complete the command */
-     s =3D "{'execute':'cont' }";
--    qmp_async(s);
-+    qmp_send(s);
-     qmp_eventwait("RESUME");
-     ahci_command_wait(dst, cmd);
-     ahci_command_verify(dst, cmd);
-@@ -1592,8 +1592,8 @@ static void test_atapi_tray(void)
-     atapi_wait_tray(false);
-=20
-     /* Remove media */
--    qmp_async("{'execute': 'blockdev-open-tray', "
--               "'arguments': {'id': 'cd0'}}");
-+    qmp_send("{'execute': 'blockdev-open-tray',"
-+             " 'arguments': {'id': 'cd0'}}");
-     atapi_wait_tray(true);
-     rsp =3D qmp_receive();
-     qobject_unref(rsp);
-@@ -1619,8 +1619,8 @@ static void test_atapi_tray(void)
-                                          "'node-name': 'node0' }}");
-=20
-     /* Again, the event shows up first */
--    qmp_async("{'execute': 'blockdev-close-tray', "
--               "'arguments': {'id': 'cd0'}}");
-+    qmp_send("{'execute': 'blockdev-close-tray',"
-+             " 'arguments': {'id': 'cd0'}}");
-     atapi_wait_tray(false);
-     rsp =3D qmp_receive();
-     qobject_unref(rsp);
-diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
-index 42d3f76933..63fbc9e3c9 100644
---- a/tests/libqos/ahci.c
-+++ b/tests/libqos/ahci.c
-@@ -674,7 +674,7 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
-         g_assert_cmpint(rc, =3D=3D, 0);
-     }
-     if (opts->error) {
--        qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
-+        qtest_qmp_send(ahci->parent->qts, "{'execute':'cont' }");
-         qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
-     }
-=20
-@@ -712,7 +712,7 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uin=
-t8_t port,
- void ahci_guest_io_resume(AHCIQState *ahci, AHCICommand *cmd)
- {
-     /* Complete the command */
--    qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
-+    qtest_qmp_send(ahci->parent->qts, "{'execute':'cont' }");
-     qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
-     ahci_command_wait(ahci, cmd);
-     ahci_command_verify(ahci, cmd);
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 098af6aec4..9cb4096639 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -484,7 +484,7 @@ QDict *qtest_qmp_receive(QTestState *s)
-  * in the case that they choose to discard all replies up until
-  * a particular EVENT is received.
-  */
--void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
-+void qmp_fd_vsend(int fd, const char *fmt, va_list ap)
- {
-     va_list ap_copy;
-     QObject *qobj;
-@@ -529,21 +529,21 @@ void qmp_fd_sendv(int fd, const char *fmt, va_list =
-ap)
-     }
- }
-=20
--void qtest_async_qmpv(QTestState *s, const char *fmt, va_list ap)
-+void qtest_qmp_vsend(QTestState *s, const char *fmt, va_list ap)
- {
--    qmp_fd_sendv(s->qmp_fd, fmt, ap);
-+    qmp_fd_vsend(s->qmp_fd, fmt, ap);
- }
-=20
- QDict *qmp_fdv(int fd, const char *fmt, va_list ap)
- {
--    qmp_fd_sendv(fd, fmt, ap);
-+    qmp_fd_vsend(fd, fmt, ap);
-=20
-     return qmp_fd_receive(fd);
- }
-=20
- QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap)
- {
--    qtest_async_qmpv(s, fmt, ap);
-+    qtest_qmp_vsend(s, fmt, ap);
-=20
-     /* Receive reply */
-     return qtest_qmp_receive(s);
-@@ -565,7 +565,7 @@ void qmp_fd_send(int fd, const char *fmt, ...)
-     va_list ap;
-=20
-     va_start(ap, fmt);
--    qmp_fd_sendv(fd, fmt, ap);
-+    qmp_fd_vsend(fd, fmt, ap);
-     va_end(ap);
- }
-=20
-@@ -580,12 +580,12 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ..=
-.)
-     return response;
- }
-=20
--void qtest_async_qmp(QTestState *s, const char *fmt, ...)
-+void qtest_qmp_send(QTestState *s, const char *fmt, ...)
- {
-     va_list ap;
-=20
-     va_start(ap, fmt);
--    qtest_async_qmpv(s, fmt, ap);
-+    qtest_qmp_vsend(s, fmt, ap);
-     va_end(ap);
- }
-=20
-@@ -968,12 +968,12 @@ QDict *qmp(const char *fmt, ...)
-     return response;
- }
-=20
--void qmp_async(const char *fmt, ...)
-+void qmp_send(const char *fmt, ...)
- {
-     va_list ap;
-=20
-     va_start(ap, fmt);
--    qtest_async_qmpv(global_qtest, fmt, ap);
-+    qtest_qmp_vsend(global_qtest, fmt, ap);
-     va_end(ap);
- }
-=20
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index aa2b2cd7c1..ced95f490a 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -96,7 +96,7 @@ void qtest_qmp_discard_response(QTestState *s, const ch=
-ar *fmt, ...);
- QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
-=20
- /**
-- * qtest_async_qmp:
-+ * qtest_qmp_send:
-  * @s: #QTestState instance to operate on.
-  * @fmt...: QMP message to send to qemu, formatted like
-  * qobject_from_jsonf().
-@@ -104,7 +104,7 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ...)=
-;
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-  */
--void qtest_async_qmp(QTestState *s, const char *fmt, ...);
-+void qtest_qmp_send(QTestState *s, const char *fmt, ...);
-=20
- /**
-  * qtest_qmpv_discard_response:
-@@ -131,7 +131,7 @@ void qtest_qmpv_discard_response(QTestState *s, const=
- char *fmt, va_list ap);
- QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap);
-=20
- /**
-- * qtest_async_qmpv:
-+ * qtest_qmp_vsend:
-  * @s: #QTestState instance to operate on.
-  * @fmt: QMP message to send to QEMU, formatted like
-  * qobject_from_jsonf().
-@@ -140,7 +140,7 @@ QDict *qtest_qmpv(QTestState *s, const char *fmt, va_=
-list ap);
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-  */
--void qtest_async_qmpv(QTestState *s, const char *fmt, va_list ap);
-+void qtest_qmp_vsend(QTestState *s, const char *fmt, va_list ap);
-=20
- /**
-  * qtest_receive:
-@@ -583,14 +583,14 @@ static inline void qtest_end(void)
- QDict *qmp(const char *fmt, ...);
-=20
- /**
-- * qmp_async:
-+ * qmp_send:
-  * @fmt...: QMP message to send to qemu, formatted like
-  * qobject_from_jsonf().
-  * Only understands '%((l|ll|I64)?d|[ipsf])', see parse_escape().
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-  */
--void qmp_async(const char *fmt, ...);
-+void qmp_send(const char *fmt, ...);
-=20
- /**
-  * qmp_discard_response:
-@@ -959,7 +959,7 @@ static inline int64_t clock_set(int64_t val)
- }
-=20
- QDict *qmp_fd_receive(int fd);
--void qmp_fd_sendv(int fd, const char *fmt, va_list ap);
-+void qmp_fd_vsend(int fd, const char *fmt, va_list ap);
- void qmp_fd_send(int fd, const char *fmt, ...);
- QDict *qmp_fdv(int fd, const char *fmt, va_list ap);
- QDict *qmp_fd(int fd, const char *fmt, ...);
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index b9774084f8..5eb15daebc 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -159,12 +159,12 @@ static void cleanup_blocking_cmd(void)
-=20
- static void send_cmd_that_blocks(QTestState *s, const char *id)
- {
--    qtest_async_qmp(s, "{ 'execute': 'blockdev-add',  'id': %s,"
--                    " 'arguments': {"
--                    " 'driver': 'blkdebug', 'node-name': %s,"
--                    " 'config': %s,"
--                    " 'image': { 'driver': 'null-co' } } }",
--                    id, id, fifo_name);
-+    qtest_qmp_send(s, "{ 'execute': 'blockdev-add',  'id': %s,"
-+                   " 'arguments': {"
-+                   " 'driver': 'blkdebug', 'node-name': %s,"
-+                   " 'config': %s,"
-+                   " 'image': { 'driver': 'null-co' } } }",
-+                   id, id, fifo_name);
- }
-=20
- static void unblock_blocked_cmd(void)
-@@ -176,7 +176,7 @@ static void unblock_blocked_cmd(void)
-=20
- static void send_oob_cmd_that_fails(QTestState *s, const char *id)
- {
--    qtest_async_qmp(s, "{ 'exec-oob': 'migrate-pause', 'id': %s }", id);
-+    qtest_qmp_send(s, "{ 'exec-oob': 'migrate-pause', 'id': %s }", id);
- }
-=20
- static void recv_cmd_id(QTestState *s, const char *id)
-@@ -235,7 +235,7 @@ static void test_qmp_oob(void)
-     /* OOB command overtakes slow in-band command */
-     setup_blocking_cmd();
-     send_cmd_that_blocks(qts, "ib-blocks-1");
--    qtest_async_qmp(qts, "{ 'execute': 'query-name', 'id': 'ib-quick-1' =
-}");
-+    qtest_qmp_send(qts, "{ 'execute': 'query-name', 'id': 'ib-quick-1' }=
-");
-     send_oob_cmd_that_fails(qts, "oob-1");
-     recv_cmd_id(qts, "oob-1");
-     unblock_blocked_cmd();
-@@ -244,7 +244,7 @@ static void test_qmp_oob(void)
-=20
-     /* Even malformed in-band command fails in-band */
-     send_cmd_that_blocks(qts, "blocks-2");
--    qtest_async_qmp(qts, "{ 'id': 'err-2' }");
-+    qtest_qmp_send(qts, "{ 'id': 'err-2' }");
-     unblock_blocked_cmd();
-     recv_cmd_id(qts, "blocks-2");
-     recv_cmd_id(qts, "err-2");
---=20
-2.17.1
+>> =============================================================
+>> OpenBIOS 1.1 [Jun 18 2018 18:20]
+>> Configuration device id QEMU version 1 machine id 1
+>> CPUs: 1
+>> Memory: 128M
+>> UUID: 00000000-0000-0000-0000-000000000000
+>> CPU type PowerPC,G4
+milliseconds isn't unique.
+saWelcome to OpenBIOS v1.1 built on Jun 18 2018 18:20
+Trying hd:,\\:tbxi...
+savTrying hd:,\ppc\bootinfo.txt...
+Trying hd:,%BOOT...
+saveNo valid state has been set by load or init-program
+
+
+(qemu) 
+  ok
+0 >   ok
+0 > (qemu) 
+(qemu) savevm "frob"
+(qemu) loadvm "frob"
+(qemu) 
+  ok
+0 > 2 2 + . 4  ok
+
+Looks OK to me.
+
+Dave
+
+> 
+> ATB,
+> 
+> Mark.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
