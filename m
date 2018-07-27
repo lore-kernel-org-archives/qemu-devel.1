@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fj2lq-0002Wc-A2
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:27:03 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fj2t7-0004gL-77
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:34:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fj2lp-0007x9-G0
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:27:02 -0400
-Date: Fri, 27 Jul 2018 14:26:54 +0100
+	(envelope-from <stefanha@gmail.com>) id 1fj2t4-0004bP-1x
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:34:33 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:37463)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fj2t3-0004aj-Qf
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:34:30 -0400
+Received: by mail-wm0-x241.google.com with SMTP id n11-v6so5486127wmc.2
+	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 06:34:29 -0700 (PDT)
+Date: Fri, 27 Jul 2018 14:34:26 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180727132654.GH28555@stefanha-x1.localdomain>
-References: <20180718211256.29774-1-naravamudan@digitalocean.com>
-	<a1269390-a798-9165-aaf5-a2aa6270bd54@linux.ibm.com>
-	<20180723163011.GH20596@stefanha-x1.localdomain>
-	<81e4d6fe-1736-b3cc-45ec-ecaa07098906@linux.ibm.com>
+Message-ID: <20180727133426.GI28555@stefanha-x1.localdomain>
+References: <20180724134339.17832-1-liujunjie23@huawei.com>
+	<87r2jry8lc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="3VRmKSg17yJg2MZg"
+	protocol="application/pgp-signature"; boundary="itqfrb9Qq3wY07cp"
 Content-Disposition: inline
-In-Reply-To: <81e4d6fe-1736-b3cc-45ec-ecaa07098906@linux.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/file-posix: add
- bdrv_attach_aio_context callback for host dev and cdrom
+In-Reply-To: <87r2jry8lc.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH] qstring: Fix qstring_from_substr() not to
+ provoke int overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Nishanth Aravamudan <naravamudan@digitalocean.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: liujunjie <liujunjie23@huawei.com>, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, weidong.huang@huawei.com, qemu-devel@nongnu.org
 
 
---3VRmKSg17yJg2MZg
+--itqfrb9Qq3wY07cp
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 23, 2018 at 12:42:02PM -0400, Farhan Ali wrote:
+On Wed, Jul 25, 2018 at 11:21:03AM +0200, Markus Armbruster wrote:
+> liujunjie <liujunjie23@huawei.com> writes:
+> > diff --git a/qobject/qstring.c b/qobject/qstring.c
+> > index afca54b..18b8eb8 100644
+> > --- a/qobject/qstring.c
+> > +++ b/qobject/qstring.c
+> > @@ -37,7 +37,7 @@ size_t qstring_get_length(const QString *qstring)
+> >   *
+> >   * Return string reference
+> >   */
+> > -QString *qstring_from_substr(const char *str, int start, int end)
+> > +QString *qstring_from_substr(const char *str, size_t start, size_t end)
+> >  {
+> >      QString *qstring;
 >=20
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 >=20
-> On 07/23/2018 12:30 PM, Stefan Hajnoczi wrote:
-> > On Fri, Jul 20, 2018 at 03:11:14PM -0400, Farhan Ali wrote:
-> > > I am seeing another issue pop up, in a different test. Even though it=
-'s a
-> > > different assertion, it might be related based on the call trace.
-> >=20
-> > Which test case?
->=20
-> This test case involved one guest with 2 disks, with an iothread for each
-> disk. The guest was running a memory workload.
 
-Please post a link to the test case.
+None more qualified to merge this than you:
 
-Stefan
+$ scripts/get_maintainer.pl -f qobject/qstring.c
+Markus Armbruster <armbru@redhat.com> (supporter:QObject)
+qemu-devel@nongnu.org (open list:All patches CC here)
 
---3VRmKSg17yJg2MZg
+:)
+
+--itqfrb9Qq3wY07cp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJbWx2eAAoJEJykq7OBq3PIiiYH/R0RiMHi17iw98fyVQAExU5j
-06GMDTrs5SM2xqvmVJcmvq4cemj8HklvaRYyI87uyQfdE/+mRGEdmjaTxAwkDnAW
-cUMlcm82e+I9iYNaJ2Gq+DyuNdhIkFTN/AzQpHbomB6d8EzQ2nUDARc6F9UEQf9m
-+TMrcuUe18i/Kj7Zl6Ys8PrJ7IsfmWw0SkxNwqXOtA4iORhNhITJqKjCTRM8MEgU
-ol8F+nPKlctJ8uTCukdJHZ4w7prgriW7j3SdeVGimQ99vxkciZ+pQuNTZmP5wovA
-cRrAUtvx8cLBBoMDA+aRQsveBa23sC3Q+RkgHTiZrB4LdI9fPqJulbBemb+jPng=
-=Cant
+iQEcBAEBAgAGBQJbWx9iAAoJEJykq7OBq3PIbIsH/0QmwGFNaZv+YSeVd4kNk4Q4
+L3sFgvlArQjGR/4X50UaRM2o22BpTSv6bmn9WXKvJpC8qNy6PA29R5cNH6/GY7aF
+jQSSvTdeRuM0+fXKe7HD1dfOZZweCOEe6WEP/tkQjSlYlwoIYkHR3Umt1yBrLpZM
+YxnKjVQRXGTafBIXQkdcWxzN5JiDWqQQh05Y6mu5Nol1KN5lRG+RVsWjWV1v6+G0
+8w/n9cLvCbI0O4KuzzGTXk0Dj1TJ59GSvbfR4gkfQMCfRnnfyyp/sgD6O6WQRJVD
+nsvhX1GlqErlMN6Fb1aURaq/LP2LHni+Pl5yNFStoVqqfzLBUjRr93LS9O64r5o=
+=2vid
 -----END PGP SIGNATURE-----
 
---3VRmKSg17yJg2MZg--
+--itqfrb9Qq3wY07cp--
