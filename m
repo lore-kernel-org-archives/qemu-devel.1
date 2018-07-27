@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sH-0003FC-Ny
+	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sH-0003FD-R3
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:37:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sG-0008Iq-OK
+	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sG-0008Ii-Mm
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:37:45 -0400
 From: Damien Hedde <damien.hedde@greensocs.com>
-Date: Fri, 27 Jul 2018 16:37:19 +0200
-Message-Id: <cover.1532701430.git.damien.hedde@greensocs.com>
-Subject: [Qemu-devel] [RFC PATCH 0/6] Clock and power gating support
+Date: Fri, 27 Jul 2018 16:37:24 +0200
+Message-Id: <172aa4f0544c31a22603c783a836aef3c29d564e.1532701430.git.damien.hedde@greensocs.com>
+In-Reply-To: <cover.1532701430.git.damien.hedde@greensocs.com>
+References: <cover.1532701430.git.damien.hedde@greensocs.com>
+Subject: [Qemu-devel] [RFC PATCH 5/6] zynq_slcr: add uart clock gating and
+ soft reset support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,72 +23,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, peter.maydell@linaro.org, edgar.iglesias@xilinx.com, mark.burton@greensocs.com, saipava@xilinx.com, luc.michel@greensocs.com, alistair@alistair23.me, Damien Hedde <damien.hedde@greensocs.com>
 
-This set of patches add support for power and clock gating in device objects.
-It adds two booleans to the state, one for power state and one of clock state.
+Clock gating and reset of uart0 and uart1 is controlled by
+UART_CLK_CTRL and UART_RST_CTRL.
+Uart0 and uart1 links are kept in properties to allow taking action.
 
-The state is controlled trough 2 functions, one for power and one for clock.
-Two new methods *power_update* and *clock_update* is added to the device class
-which are called on state change and can be overriden.
+The CLKACT bit in UART_CLK_CTRL is used to driver the clock gating.
 
-Default behavior is the following:
-+ Device are initialized in powered and clocked state.
-+ reset method is called when powering-up.
+In order to implement the reset behavior, which can be hold: when
+reset is asserted, device_reset is called on the uart and the clock
+is also disabled until reset is deasserted.
 
-This set also implements this support in the cadence_uart device in the
-xilinx_zynq platform as an example.
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+---
+ hw/misc/zynq_slcr.c | 63 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
 
-The 1st patch add the gating support to the base device object. The 2nd patch
-add functions to act on a whole bus tree. The 3rd patch overrides the 
-*power/clock_update* methods for sysbus devices to enable/disable the memory
-regions according to the state.
-
-The 4th patch updates the cadence_uart device and the 5th patch adds
-uart clock gating support to the zynq clock controller *slcr*. The 6th patch
-finally adds the support to *xilinx-zynq* machine.
-
-This is an RFC as it remains open questions about the strategy to implement
-this kind of support. Here's some remarks:
-
-+ This set adds power and clock, some reset state could be added too. Although
-  default behavior is tricky to implement because there is many kind of reset
-  (eg syncronous/asynchronous).
-+ I used methods which require to store links of controlled devices in
-  clock/power controller. Using gpios or specifics child objects to
-  achieve the same functionnaly is possible.
-+ Power and clock state could be merged to a single 3-state (powered-off,
-  unclocked, on) since clock does not really matters when powered-off.
-+ Regarding migration, it's problematic to add the VMStateDescription in qdev
-  so we let it to the specialization (eg in cadence_uart) to handle it. Is
-  this a problem ? Anyway support of clock gating requires modification in
-  specialization. It may not be necessary to store the gating states in each
-  device, since it is stored already in the controller registers. But we would
-  then have to set the gating state of devices in the controller's post_load
-  which may occurs before or after devices VMState load: It seems tricky to
-  ensure device state is correct at the end if gating update do side-effects.
-+ theses patches add a simple vision (1 power, 1 clock). Devices can be more
-  complex. For example, the zynq's uart has 2 independant clock domains:
-  1 for the bus interface, 1 for uart operations. I'm not sure if we should
-  keep 1, add the bus/device separation or do something more configurable on
-  a per-specialization basis.
-
-Feel free to comment,
-
-Damien Hedde (6):
-  qdev: add a power and clock gating support
-  qdev: add power/clock gating control on bus tree
-  sysbus: Specialize gating_update to enable/disable memory regions
-  cadence_uart: add clock/power gating support
-  zynq_slcr: add uart clock gating and soft reset support
-  xilinx_zynq: add uart clock gating support
-
- include/hw/qdev-core.h |  50 ++++++++++++++++++++
- include/hw/sysbus.h    |   3 ++
- hw/arm/xilinx_zynq.c   |  20 +++++---
- hw/char/cadence_uart.c |  25 +++++++++-
- hw/core/qdev.c         | 103 +++++++++++++++++++++++++++++++++++++++++
- hw/core/sysbus.c       |  39 ++++++++++++++++
- hw/misc/zynq_slcr.c    |  63 +++++++++++++++++++++++++
- 7 files changed, 296 insertions(+), 7 deletions(-)
-
+diff --git a/hw/misc/zynq_slcr.c b/hw/misc/zynq_slcr.c
+index d6bdd027ef..55dd586066 100644
+--- a/hw/misc/zynq_slcr.c
++++ b/hw/misc/zynq_slcr.c
+@@ -168,6 +168,14 @@ enum {
+ #define DDRIOB_LENGTH 14
+ };
+ 
++enum {
++    UART_CLK_CTRL_CLKACT0 = 0x0001,
++    UART_CLK_CTRL_CLKACT1 = 0x0002,
++
++    UART_RST_CTRL_UART0_REF_RST = 0x04,
++    UART_RST_CTRL_UART1_REF_RST = 0x08,
++};
++
+ #define ZYNQ_SLCR_MMIO_SIZE     0x1000
+ #define ZYNQ_SLCR_NUM_REGS      (ZYNQ_SLCR_MMIO_SIZE / 4)
+ 
+@@ -180,6 +188,9 @@ typedef struct ZynqSLCRState {
+     MemoryRegion iomem;
+ 
+     uint32_t regs[ZYNQ_SLCR_NUM_REGS];
++
++    DeviceState *uart0;
++    DeviceState *uart1;
+ } ZynqSLCRState;
+ 
+ static void zynq_slcr_reset(DeviceState *d)
+@@ -355,6 +366,35 @@ static uint64_t zynq_slcr_read(void *opaque, hwaddr offset,
+     return ret;
+ }
+ 
++/*
++ * zynq_slcr_update_clock:
++ * Update a device clock state given its:
++ * + clock enable bit
++ * + reset asserted bit
++ * Since reset cannot be enabled and disabled, the clock is disabled when
++ * reset is asserted
++ */
++static void zynq_slcr_update_clock(DeviceState *dev, bool clken, bool rsten)
++{
++    if (dev) {
++        device_set_clock(dev, clken && !rsten);
++    }
++}
++
++/*
++ * zynq_slcr_update_reset:
++ * Update a device reset state given its:
++ * + reset asserted bit
++ * Also trigger a clock update
++ */
++static void zynq_slcr_update_reset(DeviceState *dev, bool clken, bool rsten)
++{
++    if (dev && rsten) {
++        device_reset(dev);
++    }
++    zynq_slcr_update_clock(dev, clken, rsten);
++}
++
+ static void zynq_slcr_write(void *opaque, hwaddr offset,
+                           uint64_t val, unsigned size)
+ {
+@@ -408,6 +448,22 @@ static void zynq_slcr_write(void *opaque, hwaddr offset,
+             qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+         }
+         break;
++    case UART_CLK_CTRL:
++        zynq_slcr_update_clock(s->uart0,
++                s->regs[UART_CLK_CTRL] & UART_CLK_CTRL_CLKACT0,
++                s->regs[UART_RST_CTRL] & UART_RST_CTRL_UART0_REF_RST);
++        zynq_slcr_update_clock(s->uart1,
++                s->regs[UART_CLK_CTRL] & UART_CLK_CTRL_CLKACT1,
++                s->regs[UART_RST_CTRL] & UART_RST_CTRL_UART1_REF_RST);
++        break;
++    case UART_RST_CTRL:
++        zynq_slcr_update_reset(s->uart0,
++                s->regs[UART_CLK_CTRL] & UART_CLK_CTRL_CLKACT0,
++                s->regs[UART_RST_CTRL] & UART_RST_CTRL_UART0_REF_RST);
++        zynq_slcr_update_reset(s->uart1,
++                s->regs[UART_CLK_CTRL] & UART_CLK_CTRL_CLKACT1,
++                s->regs[UART_RST_CTRL] & UART_RST_CTRL_UART1_REF_RST);
++        break;
+     }
+ }
+ 
+@@ -436,12 +492,19 @@ static const VMStateDescription vmstate_zynq_slcr = {
+     }
+ };
+ 
++static Property zynq_slcr_properties[] = {
++    DEFINE_PROP_LINK("uart0", ZynqSLCRState, uart0, TYPE_DEVICE, DeviceState *),
++    DEFINE_PROP_LINK("uart1", ZynqSLCRState, uart1, TYPE_DEVICE, DeviceState *),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void zynq_slcr_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->vmsd = &vmstate_zynq_slcr;
+     dc->reset = zynq_slcr_reset;
++    dc->props = zynq_slcr_properties;
+ }
+ 
+ static const TypeInfo zynq_slcr_info = {
 -- 
 2.18.0
