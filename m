@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fj2dM-0005gD-4S
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:18:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1fj2gx-0007Tr-Ed
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:22:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fj2dI-00013k-5b
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:18:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46356 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fj2dI-00013Y-07
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:18:12 -0400
-References: <20180727062204.10401-1-armbru@redhat.com>
-	<20180727062204.10401-2-armbru@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fj2gw-0003rN-EH
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:21:59 -0400
+References: <20180727081939.28185-1-ndevos@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <3d7d621c-19d0-6c02-f34f-cfd4e3e6afbe@redhat.com>
-Date: Fri, 27 Jul 2018 08:18:10 -0500
+Message-ID: <26dfbdc3-b3f3-4532-6dbb-f25b8a6dec7a@redhat.com>
+Date: Fri, 27 Jul 2018 08:21:40 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180727062204.10401-2-armbru@redhat.com>
+In-Reply-To: <20180727081939.28185-1-ndevos@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] qstring: Assert size calculations
- don't overflow
+Subject: Re: [Qemu-devel] [PATCH v3 for-3.0] block/gluster: Handle changed
+ glfs_ftruncate signature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: liujunjie23@huawei.com
+To: Niels de Vos <ndevos@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
 
-On 07/27/2018 01:22 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On 07/27/2018 03:19 AM, Niels de Vos wrote:
+> From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+> 
+> New versions of Glusters libgfapi.so have an updated glfs_ftruncate()
+
+s/Glusters/Gluster's/
+
+> function that returns additional 'struct stat' structures to enable
+> advanced caching of attributes. This is useful for file servers, not so
+> much for QEMU. Nevertheless, the API has changed and needs to be
+> adopted.
+> 
+> Signed-off-by: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+> Signed-off-by: Niels de Vos <ndevos@redhat.com>
+> 
 > ---
->   qobject/qstring.c | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
+> v2: do a compile check as suggested by Eric Blake
+> v3: define old backwards compatible glfs_ftruncate() macro, from Eric Blake
+> ---
+>   block/gluster.c | 11 +++++++++--
+>   configure       | 18 ++++++++++++++++++
+>   2 files changed, 27 insertions(+), 2 deletions(-)
+
+Seems reasonable to get into 3.0 if we still can (for fewer platforms 
+with failed builds); but not the end of the world if it slips into 3.1.
+
+> @@ -997,6 +1001,7 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
+>                                       PreallocMode prealloc, Error **errp)
+>   {
+>       int64_t current_length;
+> +    int ret;
+>   
+>       current_length = glfs_lseek(fd, 0, SEEK_END);
+>       if (current_length < 0) {
+> @@ -1024,7 +1029,8 @@ static int qemu_gluster_do_truncate(struct glfs_fd *fd, int64_t offset,
+>   #endif /* CONFIG_GLUSTERFS_FALLOCATE */
+>   #ifdef CONFIG_GLUSTERFS_ZEROFILL
+>       case PREALLOC_MODE_FULL:
+> -        if (glfs_ftruncate(fd, offset)) {
+> +        ret = glfs_ftruncate(fd, offset, NULL, NULL);
+> +        if (ret) {
+
+Adding 'ret' is not strictly necessary (checking the return directly in 
+the 'if' still works), but doesn't hurt. So,
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> 
-> diff --git a/qobject/qstring.c b/qobject/qstring.c
-> index 18b8eb82f8..1bb7784a88 100644
-> --- a/qobject/qstring.c
-> +++ b/qobject/qstring.c
-> @@ -41,17 +41,19 @@ QString *qstring_from_substr(const char *str, size_t start, size_t end)
->   {
->       QString *qstring;
->   
-> +    assert(start <= end + 1);
-
-Could also be spelled assert(start < end), but the next patch gets rid 
-of the +1 so this form is fine.
 
 -- 
 Eric Blake, Principal Software Engineer
