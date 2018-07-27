@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fj1TO-0006Ji-S3
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:03:55 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fj1VQ-0007Xk-RG
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:06:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fj1TL-0005ij-Mj
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:03:54 -0400
-Received: from 4.mo4.mail-out.ovh.net ([178.32.98.131]:51963)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fj1TL-0005d6-Dm
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:03:51 -0400
-Received: from player695.ha.ovh.net (unknown [10.109.160.253])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 37F0C19205B
-	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 14:03:47 +0200 (CEST)
-Date: Fri, 27 Jul 2018 14:03:39 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180727140339.4b936931@bahia>
-In-Reply-To: <45f3757c-9c29-a894-d709-ba69ea9e9087@redhat.com>
-References: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
-	<20180727052724.GJ3694@umbus.fritz.box>
-	<20180727095452.45edee8b@bahia>
-	<f43c94da-43d1-7621-1997-00407708d496@redhat.com>
-	<20180727110000.16f55218@bahia>
-	<45f3757c-9c29-a894-d709-ba69ea9e9087@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fj1VN-0000ZC-Lv
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:06:00 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180727113854.20283-1-peter.maydell@linaro.org>
+	<20180727113854.20283-3-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9c2441dd-717d-0272-e386-a936bf3da17f@amsat.org>
+Date: Fri, 27 Jul 2018 09:05:52 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1] tests/cpu-plug-test: check CPU
- hotplug on ppc64 with KVM
+In-Reply-To: <20180727113854.20283-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-3.0 2/2] hw/arm/iotkit: Fix
+ IRQ number for timer1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,77 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
 
-On Fri, 27 Jul 2018 13:25:33 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 07/27/2018 11:00 AM, Greg Kurz wrote:
-> > On Fri, 27 Jul 2018 10:18:14 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >   
-> >> On 07/27/2018 09:54 AM, Greg Kurz wrote:  
-> >>> On Fri, 27 Jul 2018 15:27:24 +1000
-> >>> David Gibson <david@gibson.dropbear.id.au> wrote:
-> >>>     
-> >>>> On Wed, Jul 25, 2018 at 04:45:26PM +0200, Greg Kurz wrote:    
-> >>>>> Commit b585395b655 fixed a regression introduced by some recent changes
-> >>>>> in the XICS code, that was causing QEMU to crash instantly during CPU
-> >>>>> hotplug with KVM. This is typically the kind of bug we'd like our
-> >>>>> test suite to detect before it gets merged. Unfortunately, the current
-> >>>>> tests run with '-machine accel=qtest' and don't exercise KVM specific
-> >>>>> paths in QEMU.
-> >>>>>
-> >>>>> This patch hence changes add_pseries_test_case() to launch QEMU with
-> >>>>> '-machine accel=kvm' if KVM is available.
-> >>>>>
-> >>>>> A notable consequence is that the guest will execute SLOF, but for some
-> >>>>> reasons SLOF sometimes hits a program exception. This causes the guest
-> >>>>> to loop forever and the test to be stuck.  Since we don't need the guest
-> >>>>> to be truely running, let's pass -S to QEMU to avoid that.
-> >>>>>
-> >>>>> Also disable machine capabilities that could be unavailable in KVM, eg,
-> >>>>> when using PR KVM.
-> >>>>>
-> >>>>> Signed-off-by: Greg Kurz <groug@kaod.org>      
-> >>>>
-> >>>> I'm pretty sure trying to change the accelerator on a qtest test just
-> >>>> doesn't make sense.  We'd need a different approach for testing cpu
-> >>>> hotplug against kvm & tcg backends.
-> >>>>    
-> >>>
-> >>> The test starts QEMU, triggers the CPU hotplug code with a QMP command
-> >>> and checks the command didn't fail (or QEMU didn't crash, as it would
-> >>> have before commit b585395b655a)... I really don't understand what
-> >>> is wrong with that... Please elaborate.    
-> >>
-> >> For a "real" test, I think you'd need a guest OS that is reacting to the
-> >> hot plug events. So maybe this should rather be done in the avocado
-> >> framework instead?
-> >>  
-> > 
-> > The intent isn't a "real" test actually, but just to exercise the XICS-KVM
-> > paths in QEMU that get called during CPU hotplug. This cannot be achieved
-> > with the qtest accelerator.
-> > 
-> > This patch would have revealed the regression in b585395b655a right away,
-> > with the simple 'make check' developers are expected to run before posting.  
+On 07/27/2018 08:38 AM, Peter Maydell wrote:
+> A cut-and-paste error meant we were incorrectly wiring up the timer1
+> IRQ to IRQ3. IRQ3 is the interrupt for timer0 -- move timer0 to
+> IRQ4 where it belongs.
 > 
-> OK, that's fair. I think what rather bugs me here is that you start QEMU
-> with -S to work around something that sounds like real bug in SLOF ...
-> any chance that you could fix that bug in SLOF instead of using -S here?
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+(ARM-ECM-0601256 Table 66 Interrupt Map)
+
+> ---
+>  hw/arm/iotkit.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-
-Yeah, -S is a workaround indeed. I've chosen to go that way because I couldn't
-find any impact on the hotplug path, but I may have overlooked something, so
-I'm not surprised by your request :)
-
-I guess that's fair too and I'll investigate.
-
-Cheers,
-
---
-Greg
-
->  Thomas
+> diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+> index c76d3ed7435..8cadc8b1608 100644
+> --- a/hw/arm/iotkit.c
+> +++ b/hw/arm/iotkit.c
+> @@ -382,7 +382,7 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>      sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer1), 0,
+> -                       qdev_get_gpio_in(DEVICE(&s->armv7m), 3));
+> +                       qdev_get_gpio_in(DEVICE(&s->armv7m), 4));
+>      mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->timer1), 0);
+>      object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[1]", &err);
+>      if (err) {
+> 
