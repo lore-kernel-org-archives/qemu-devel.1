@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fj2br-00055k-2i
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:16:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1fj2dM-0005gD-4S
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:18:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fj2bq-000054-4A
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:16:43 -0400
-Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:33596)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fj2bp-0008Vy-Km
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:16:42 -0400
-Received: by mail-oi0-x22b.google.com with SMTP id l10-v6so8978697oii.0
-	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 06:16:41 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fj2dI-00013k-5b
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:18:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46356 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fj2dI-00013Y-07
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:18:12 -0400
+References: <20180727062204.10401-1-armbru@redhat.com>
+	<20180727062204.10401-2-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3d7d621c-19d0-6c02-f34f-cfd4e3e6afbe@redhat.com>
+Date: Fri, 27 Jul 2018 08:18:10 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180727130317.GE28555@stefanha-x1.localdomain>
-References: <20180717195028.GA6691@localhost.localdomain>
-	<CAFEAcA-pPsvfn7ARu_pn0HH03rZh05fLP=wr+p=hx5douSf7vA@mail.gmail.com>
-	<87a7qnk9qa.fsf@dusky.pond.sub.org>
-	<20180727130317.GE28555@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Jul 2018 14:16:18 +0100
-Message-ID: <CAFEAcA93LZ5Mw9o5xbDL_H=+aNhfSiSB_LWQ7qYf9YgYbZJuAA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Why do we typedef every struct on QEMU?
+In-Reply-To: <20180727062204.10401-2-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qstring: Assert size calculations
+ don't overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: liujunjie23@huawei.com
 
-On 27 July 2018 at 14:03, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Thu, Jul 19, 2018 at 08:42:05AM +0200, Markus Armbruster wrote:
->> That the code shows anything resembling consistency at all is a
->> testament to humanity's yearning for order within a chaotic world.
->
-> Going back to something concrete after this nice philosophical musing:
->
-> The coding style checker (checkpatch.pl) seems like a huge success to
-> me.  Without it, achieving consistency is futile.
->
-> checkpatch.pl defines the true coding style of QEMU - the subset that
-> can be automatically checked by patchew.  If we want to follow a coding
-> style, implementing the rules in checkpatch.pl is important.
+On 07/27/2018 01:22 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   qobject/qstring.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
 
-I think that overall if you look at QEMU's code we have a lot of
-consistency in that we follow the common "open source Unix C code"
-coding style. For instance if you look at:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-static BOOL GetSystemName(
-    const void *pvSystemStore,
-    DWORD dwFlags,
-    PENUM_ARG pEnumArg,
-    LPCWSTR *ppwszSystemName ) {
+> 
+> diff --git a/qobject/qstring.c b/qobject/qstring.c
+> index 18b8eb82f8..1bb7784a88 100644
+> --- a/qobject/qstring.c
+> +++ b/qobject/qstring.c
+> @@ -41,17 +41,19 @@ QString *qstring_from_substr(const char *str, size_t start, size_t end)
+>   {
+>       QString *qstring;
+>   
+> +    assert(start <= end + 1);
 
-you probably recognize immediately that it's Windows style,
-and we don't require checkpatch to avoid code that is that
-sharply divergent from the cultural norm.
+Could also be spelled assert(start < end), but the next patch gets rid 
+of the +1 so this form is fine.
 
-CODING_STYLE has a lot of nitpicky stuff because we mostly
-disagree about the edge cases rather than the core things, I think.
-
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
