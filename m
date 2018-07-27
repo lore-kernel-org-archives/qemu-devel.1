@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fj2j6-0008Rw-I1
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:24:13 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fj2jT-0000HM-F0
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:24:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fj2j5-0005oY-KS
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:24:12 -0400
-References: <20180727081939.28185-1-ndevos@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f0a7edbd-f731-7ac5-4aee-ef2ba594ed64@redhat.com>
-Date: Fri, 27 Jul 2018 08:24:05 -0500
+	(envelope-from <stefanha@gmail.com>) id 1fj2jQ-00065t-9B
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:24:35 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34746)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fj2jQ-00064y-0E
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:24:32 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c13-v6so5055596wrt.1
+	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 06:24:31 -0700 (PDT)
+Date: Fri, 27 Jul 2018 14:24:29 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180727132429.GG28555@stefanha-x1.localdomain>
+References: <20180723104342.22992-1-e.emanuelegiuseppe@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180727081939.28185-1-ndevos@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] block/gluster: Handle changed
- glfs_ftruncate signature
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="1XWsVB21DFCvn2e8"
+Content-Disposition: inline
+In-Reply-To: <20180723104342.22992-1-e.emanuelegiuseppe@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] pci-pc: add NULL check for qpci_free_pc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Niels de Vos <ndevos@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+To: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On 07/27/2018 03:19 AM, Niels de Vos wrote:
-> From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
-> 
-> New versions of Glusters libgfapi.so have an updated glfs_ftruncate()
-> function that returns additional 'struct stat' structures to enable
-> advanced caching of attributes. This is useful for file servers, not so
-> much for QEMU. Nevertheless, the API has changed and needs to be
-> adopted.
-> 
 
-Oh, one other comment.
+--1XWsVB21DFCvn2e8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +++ b/block/gluster.c
-> @@ -20,6 +20,10 @@
->   #include "qemu/option.h"
->   #include "qemu/cutils.h"
->   
-> +#ifdef CONFIG_GLUSTERFS_LEGACY_FTRUNCATE
-> +# define glfs_ftruncate(fd, offset, _u1, _u2) glfs_ftruncate(fd, offset)
-> +#endif
+On Mon, Jul 23, 2018 at 12:43:42PM +0200, Emanuele Giuseppe Esposito wrote:
+> The current layout of struct QPCIBusPC provides only one field,
+> QPCIBus bus, so passing a NULL pointer to qpci_free_pc()
+> makes container_of(NULL, QPCIBusPC, bus)
+> returning 0 (NULL), that is correctly handled by g_free().
+> This is bad practice, allowing the caller to think that it's okay
+> to always pass NULL to the function, even though this is just a
+> particular case.
+> In facts, qpci_free_pc() happens to return NULL only because container_of
+> computes the subtraction between the given NULL
+> pointer and offsetof(QPCIBus, bus), with the latter returning 0 too,
+> since bus is the first element of the struct and there is no
+> offset betwen itself and QPCIBusPC.
+>=20
+> However, if in future the bus field changes its position, for example bec=
+oming
+> the second field, offsetof will return a number > 0, since there is some =
+offset
+> between the beginning of the struct and the bus field.
+> Therefore passing a NULL pointer to the container_of macro will return a
+> negative number, that will be translated into an invalid address passed to
+> g_free() and causing a seg fault.
+>=20
+> Adding a preventive safety check that returns from the function if the
+> given pointer is NULL solves the problem.
+>=20
+> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> ---
+>  tests/libqos/pci-pc.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-Someday, when we can assume new enough gluster everywhere, we can drop 
-this hunk...
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> +++ b/configure
+--1XWsVB21DFCvn2e8
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> +	/* new glfs_ftruncate() passes two additional args */
-> +	return glfs_ftruncate(NULL, 0 /*, NULL, NULL */);
-> +}
-> +EOF
-> +    if compile_prog "$glusterfs_cflags" "$glusterfs_libs" ; then
-> +      glusterfs_legacy_ftruncate="yes"
-> +    fi
+-----BEGIN PGP SIGNATURE-----
 
-...but it will be easier to remember to do so if this comment in 
-configure calls out the upstream gluster version that no longer requires 
-the legacy workaround, as our hint for when...
+iQEcBAEBAgAGBQJbWx0NAAoJEJykq7OBq3PInlMH/37lAUvgn2H32T2r2jYZkCJp
+goB9D72paalVosbI228kr2zxt03ECy3lv11+FBO9TsJiMw88E5NE6mDtZwUJYbMv
+EUFjTkzuFr6UFQRZ6e7qxGkHgFuDmfzwvkp6OYhbwz/aBXNz09mr67XAyI2XwyBp
+MFpKmHh7bOU4bPfx9Gd6hLUXxh4EEGEMZpNYpjolt0Dnv6Q/gJfW+imD9q86Y2N2
+7SjdLFjBNLZqUaYj2C6q02HJm18mWJrkRDEaVTLH7mcIjzbhCx2LLi6blC+BPaDu
+17NSEBP9cAZZzfR3UpX9Mg/Rbiu8Hs0Ypw2bjF++o5WodWmIWp1/r6pgvUr2WhU=
+=lkjL
+-----END PGP SIGNATURE-----
 
->     else
->       if test "$glusterfs" = "yes" ; then
->         feature_not_found "GlusterFS backend support" \
-> @@ -6644,6 +6658,10 @@ if test "$glusterfs_zerofill" = "yes" ; then
->     echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
->   fi
->   
-> +if test "$glusterfs_legacy_ftruncate" = "yes" ; then
-> +  echo "CONFIG_GLUSTERFS_LEGACY_FTRUNCATE=y" >> $config_host_mak
-
-...this #define is no longer necessary.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--1XWsVB21DFCvn2e8--
