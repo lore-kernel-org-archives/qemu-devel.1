@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fixdc-0000VS-Ec
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 03:58:13 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fixhJ-0001T5-2N
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 04:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fixdZ-0002XS-4J
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 03:58:12 -0400
-Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:55828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fixdY-0002LJ-Pf
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 03:58:09 -0400
-Received: from player786.ha.ovh.net (unknown [10.109.146.1])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 9C8C119200C
-	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 09:57:59 +0200 (CEST)
-Date: Fri, 27 Jul 2018 09:54:52 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180727095452.45edee8b@bahia>
-In-Reply-To: <20180727052724.GJ3694@umbus.fritz.box>
-References: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
-	<20180727052724.GJ3694@umbus.fritz.box>
+	(envelope-from <laurent@vivier.eu>) id 1fixhF-00065a-W6
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 04:02:01 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:37999)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fixhF-00064h-KM
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 04:01:57 -0400
+References: <153258768962.6738.11319866502689416568.stgit@dhcp-9-109-246-16>
+	<4671a0f0-e399-6187-3205-994f663fa260@linaro.org>
+	<db84d8c9-fab0-a1eb-7cd8-a154a2a76b10@vivier.eu>
+	<f8f59cca-86e6-2a42-3184-faddd51e5424@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <8ffbfbb7-cb4b-665f-ace7-d890c75d14a8@vivier.eu>
+Date: Fri, 27 Jul 2018 10:01:06 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/HB0RlW/aeLnSkBhQ/WBs+B_";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH for-3.1] tests/cpu-plug-test: check CPU
- hotplug on ppc64 with KVM
+In-Reply-To: <f8f59cca-86e6-2a42-3184-faddd51e5424@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: ppc64: don't use volatile
+ register during safe_syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,137 +31,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, =?UTF-8?B?Q8Op?= =?UTF-8?B?ZHJpYw==?= Le Goater <clg@kaod.org>
+To: Richard Henderson <richard.henderson@linaro.org>, Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, dgibson@redhat.com, riku.voipio@iki.fi
+Cc: qemu-devel@nongnu.org
 
---Sig_/HB0RlW/aeLnSkBhQ/WBs+B_
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Le 27/07/2018 à 06:47, Richard Henderson a écrit :
+> On 07/26/2018 10:39 AM, Laurent Vivier wrote:
+>> Le 26/07/2018 à 19:15, Richard Henderson a écrit :
+>>> On 07/25/2018 11:48 PM, Shivaprasad G Bhat wrote:
+>>>> r11 is a volatile register on PPC as per calling conventions.
+>>>> The safe_syscall code uses it to check if the signal_pending
+>>>> is set during the safe_syscall. When a syscall is interrupted
+>>>> on return from signal handling, the r11 might be corrupted
+>>>> before we retry the syscall leading to a crash. The registers
+>>>> r0-r13 are not to be used here as they have
+>>>> volatile/designated/reserved usages. Change the code to use
+>>>> r14 which is non-volatile and is appropriate for local use in
+>>>> safe_syscall.
+>>>>
+>>>> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+>>>> ---
+>>>> Steps to reproduce:
+>>>> On PPC host, issue `qemu-ppc64le /usr/bin/cc -E -`
+>>>> Attempt Ctrl-C, the issue is reproduced.
+>>>>
+>>>> Reference:
+>>>> https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
+>>>>
+>>>>  linux-user/host/ppc64/safe-syscall.inc.S |    4 ++--
+>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
+>>>> index d30050a67c..b0cbbe6a69 100644
+>>>> --- a/linux-user/host/ppc64/safe-syscall.inc.S
+>>>> +++ b/linux-user/host/ppc64/safe-syscall.inc.S
+>>>> @@ -49,7 +49,7 @@ safe_syscall_base:
+>>>>  	 *               and returns the result in r3
+>>>>  	 * Shuffle everything around appropriately.
+>>>>  	 */
+>>>> -	mr	11, 3	/* signal_pending */
+>>>> +	mr	14, 3	/* signal_pending */
+>>>
+>>> I do see that I was incorrect in assuming that r11 would be unmodified.  But
+>>> you can't simply write to a call-saved register -- you must preserve its value
+>>> for the caller.
+>>>
+>>> Saving the value requires that you find some space on, or create, a stack
+>>> frame.  Note that there are two different conventions for _CALL_AIX and
+>>> _CALL_ELF==2.
+>>
+>> Can we guess the syscall ('sc') will not modify neither r11 nor r14...
+> 
+> But sc does modify r11.
+> 
+>         li      r11,0
+>         std     r11,GPR9(r1)
+>         std     r11,GPR10(r1)
+>         std     r11,GPR11(r1)
+> 
+> (Incidentally, unless I'm misreading, the kernel could have saved r11 with
+> exactly as much effort as it took to clobber it to zero.  That's just rude.)
+> 
+>> but the function caller expects that r11 is not modified because it's the
+>> environment pointer
+> 
+> Huh?  What do you think an "environment pointer" is in this context?
 
-On Fri, 27 Jul 2018 15:27:24 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+It's the comment for r11 in the section "2.2.1.1 Register Roles" of the
+document.
 
-> On Wed, Jul 25, 2018 at 04:45:26PM +0200, Greg Kurz wrote:
-> > Commit b585395b655 fixed a regression introduced by some recent changes
-> > in the XICS code, that was causing QEMU to crash instantly during CPU
-> > hotplug with KVM. This is typically the kind of bug we'd like our
-> > test suite to detect before it gets merged. Unfortunately, the current
-> > tests run with '-machine accel=3Dqtest' and don't exercise KVM specific
-> > paths in QEMU.
-> >=20
-> > This patch hence changes add_pseries_test_case() to launch QEMU with
-> > '-machine accel=3Dkvm' if KVM is available.
-> >=20
-> > A notable consequence is that the guest will execute SLOF, but for some
-> > reasons SLOF sometimes hits a program exception. This causes the guest
-> > to loop forever and the test to be stuck.  Since we don't need the guest
-> > to be truely running, let's pass -S to QEMU to avoid that.
-> >=20
-> > Also disable machine capabilities that could be unavailable in KVM, eg,
-> > when using PR KVM.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
->=20
-> I'm pretty sure trying to change the accelerator on a qtest test just
-> doesn't make sense.  We'd need a different approach for testing cpu
-> hotplug against kvm & tcg backends.
->=20
+> In the ppc64 abi, r11 is one of the ones that are clobbered by plt entries; it
+> is not special in any way except as a scratch.
+> 
+>> and saves r14 because it's one of its local
+>> variable it knows it has to preserve?
+> 
+> Huh?  The caller of safe_syscall does not save r14, and does not expect it
+> clobbered.
 
-The test starts QEMU, triggers the CPU hotplug code with a QMP command
-and checks the command didn't fail (or QEMU didn't crash, as it would
-have before commit b585395b655a)... I really don't understand what
-is wrong with that... Please elaborate.
+Yes, you're right. The callee has to save nonvolatile registers, and r14
+is a nonvolatile register. And r11 is volatile, it's why it can be
+modified by sc.
 
-> > ---
-> >  tests/cpu-plug-test.c |   20 ++++++++++++++++----
-> >  1 file changed, 16 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-> > index 5f39ba0df394..2107557809b7 100644
-> > --- a/tests/cpu-plug-test.c
-> > +++ b/tests/cpu-plug-test.c
-> > @@ -21,6 +21,7 @@ struct PlugTestData {
-> >      unsigned cores;
-> >      unsigned threads;
-> >      unsigned maxcpus;
-> > +    const char *extra_args;
-> >  };
-> >  typedef struct PlugTestData PlugTestData;
-> > =20
-> > @@ -106,9 +107,10 @@ static void test_plug_with_device_add_coreid(gcons=
-tpointer data)
-> >      char *args;
-> >      unsigned int c;
-> > =20
-> > -    args =3D g_strdup_printf("-machine %s -cpu %s "
-> > +    args =3D g_strdup_printf("-machine %s -cpu %s %s "
-> >                             "-smp 1,sockets=3D%u,cores=3D%u,threads=3D%=
-u,maxcpus=3D%u",
-> >                             td->machine, td->cpu_model,
-> > +                           td->extra_args ? td->extra_args : "",
-> >                             td->sockets, td->cores, td->threads, td->ma=
-xcpus);
-> >      qtest_start(args);
-> > =20
-> > @@ -195,10 +197,20 @@ static void add_pseries_test_case(const char *mna=
-me)
-> >          (g_str_has_prefix(mname, "pseries-2.") && atoi(&mname[10]) < 7=
-)) {
-> >          return;
-> >      }
-> > -    data =3D g_new(PlugTestData, 1);
-> > +    data =3D g_new0(PlugTestData, 1);
-> >      data->machine =3D g_strdup(mname);
-> >      data->cpu_model =3D "power8_v2.0";
-> > -    data->device_model =3D g_strdup("power8_v2.0-spapr-cpu-core");
-> > +    if (!access("/sys/module/kvm_hv", F_OK) ||
-> > +        !access("/sys/module/kvm_pr", F_OK)) {
-> > +        data->cpu_model =3D "host";
-> > +        data->extra_args =3D
-> > +            "-machine accel=3Dkvm "
-> > +            "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbr=
-oken "
-> > +            "-machine cap-htm=3Doff "
-> > +            "-machine cap-hpt-max-page-size=3D64k "
-> > +            "-S";
-> > +    }
-> > +    data->device_model =3D g_strdup_printf("%s-spapr-cpu-core", data->=
-cpu_model);
-> >      data->sockets =3D 2;
-> >      data->cores =3D 3;
-> >      data->threads =3D 1;
-> > @@ -221,7 +233,7 @@ static void add_s390x_test_case(const char *mname)
-> >          return;
-> >      }
-> > =20
-> > -    data =3D g_new(PlugTestData, 1);
-> > +    data =3D g_new0(PlugTestData, 1);
-> >      data->machine =3D g_strdup(mname);
-> >      data->cpu_model =3D "qemu";
-> >      data->device_model =3D g_strdup("qemu-s390x-cpu");
-> >  =20
->=20
+I should read the doc more carefully.
 
-
---Sig_/HB0RlW/aeLnSkBhQ/WBs+B_
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAltaz8wACgkQcdTV5YIv
-c9Zakg//YlBHpAe2cy8USDheschocF4TRKKRZVCON6nxR226StcV6zICUdFLHgAO
-SA+gkT224Zrk3uliQWLUyg6nkzfxmOeqzYvI52PvGeHlcM3eXxvGzHhADpKktisk
-g8hnpcqRfRkk/bAzKYxq2ZI2Di6Q/p98DpYJ9EpS6HA9O5NH+T9kNMEX3V5mH703
-h3g8BzHiUVJDGf/KVuWRsv7JfAa4YoWL6co3tpt75MUi9oQtJ+KMtJ+p4TkE8lIx
-QiYkgNVf2VYuyrDhS9KMXzpNFdIKndS8JTbLjXf2Dzu2SbBhr3DGW6ewLo+bF8vQ
-HWGXO5mmiljj5WLFCxyfL2XJHqHpr6rNiNhCFZKpLPbcGdfLSbmhdQ+y3WqimMxv
-4859Aw9YfxvBXml7EPmmWUTC7gn+F3dIfkSOZa0E1Ix8n5Oygiw5Xcg5XfAvFsag
-czFM5dzZa+9gSKsLjV+xoCNnGUFXBYdrj59/pT8PqFd4ZsNSyia0U/GfDCtgbZ9E
-ifeBAwqsG8E1WgusQ4GCizI6p/9pIh4l4isKFP0DQmvV5fj4TkeQktmgjxCTHHWk
-uRvs14+KrK1uSX/13WTXeVVe5KA1ELdUCxe6/NarG4OAy/9/1QoaYxe3kRR4qjn4
-VsOBxV0XhvMxcZ4rLWICdgyQYfZj2ouY34iPWrw+FHGSupWkx8I=
-=9Qxf
------END PGP SIGNATURE-----
-
---Sig_/HB0RlW/aeLnSkBhQ/WBs+B_--
+Thanks,
+Laurent
