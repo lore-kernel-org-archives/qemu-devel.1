@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sH-0003FA-Lk
+	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sH-0003FB-Ma
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:37:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sG-0008Iw-PO
+	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sG-0008Ih-Nt
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:37:45 -0400
 From: Damien Hedde <damien.hedde@greensocs.com>
-Date: Fri, 27 Jul 2018 16:37:25 +0200
-Message-Id: <f7f6b76036ffcb6ef7f844f815f7d433374157f7.1532701430.git.damien.hedde@greensocs.com>
+Date: Fri, 27 Jul 2018 16:37:21 +0200
+Message-Id: <2b92ae960dfc47149945c9e47f90b4433d8eee35.1532701430.git.damien.hedde@greensocs.com>
 In-Reply-To: <cover.1532701430.git.damien.hedde@greensocs.com>
 References: <cover.1532701430.git.damien.hedde@greensocs.com>
-Subject: [Qemu-devel] [RFC PATCH 6/6] xilinx_zynq: add uart clock gating
- support
+Subject: [Qemu-devel] [RFC PATCH 2/6] qdev: add power/clock gating control
+ on bus tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +23,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, peter.maydell@linaro.org, edgar.iglesias@xilinx.com, mark.burton@greensocs.com, saipava@xilinx.com, luc.michel@greensocs.com, alistair@alistair23.me, Damien Hedde <damien.hedde@greensocs.com>
 
-Add the link between the clock controller _slcr_ and the two
-uarts _uart0_ and _uart1_ so that the controller can do the gating.
+Add functions [qdev|qbus]_set_[power|clock]_all(_fn).
+Theses allow to control power and clock gating along a bus hierarchy.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- hw/arm/xilinx_zynq.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+ include/hw/qdev-core.h | 20 +++++++++++++++++
+ hw/core/qdev.c         | 51 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 71 insertions(+)
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index f1496d2927..2ca2dc32cf 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -166,7 +166,7 @@ static void zynq_init(MachineState *machine)
-     MemoryRegion *address_space_mem = get_system_memory();
-     MemoryRegion *ext_ram = g_new(MemoryRegion, 1);
-     MemoryRegion *ocm_ram = g_new(MemoryRegion, 1);
--    DeviceState *dev;
-+    DeviceState *dev, *slcr;
-     SysBusDevice *busdev;
-     qemu_irq pic[64];
-     int n;
-@@ -212,9 +212,11 @@ static void zynq_init(MachineState *machine)
-                           1, 0x0066, 0x0022, 0x0000, 0x0000, 0x0555, 0x2aa,
-                               0);
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 659287e185..607c367738 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -464,4 +464,24 @@ void device_set_power(DeviceState *dev, bool en);
+  */
+ void device_set_clock(DeviceState *dev, bool en);
  
--    dev = qdev_create(NULL, "xilinx,zynq_slcr");
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xF8000000);
-+    /*
-+     * Create slcr, initialization is completed below
-+     * because we have some properties to set
-+     */
-+    slcr = qdev_create(NULL, "xilinx,zynq_slcr");
- 
-     dev = qdev_create(NULL, TYPE_A9MPCORE_PRIV);
-     qdev_prop_set_uint32(dev, "num-cpu", 1);
-@@ -235,8 +237,10 @@ static void zynq_init(MachineState *machine)
-     sysbus_create_simple("xlnx,ps7-usb", 0xE0002000, pic[53-IRQ_OFFSET]);
-     sysbus_create_simple("xlnx,ps7-usb", 0xE0003000, pic[76-IRQ_OFFSET]);
- 
--    cadence_uart_create(0xE0000000, pic[59 - IRQ_OFFSET], serial_hd(0));
--    cadence_uart_create(0xE0001000, pic[82 - IRQ_OFFSET], serial_hd(1));
-+    dev = cadence_uart_create(0xE0000000, pic[59 - IRQ_OFFSET], serial_hd(0));
-+    object_property_set_link(OBJECT(slcr), OBJECT(dev), "uart0", &error_abort);
-+    dev = cadence_uart_create(0xE0001000, pic[82 - IRQ_OFFSET], serial_hd(1));
-+    object_property_set_link(OBJECT(slcr), OBJECT(dev), "uart1", &error_abort);
- 
-     sysbus_create_varargs("cadence_ttc", 0xF8001000,
-             pic[42-IRQ_OFFSET], pic[43-IRQ_OFFSET], pic[44-IRQ_OFFSET], NULL);
-@@ -246,6 +250,10 @@ static void zynq_init(MachineState *machine)
-     gem_init(&nd_table[0], 0xE000B000, pic[54-IRQ_OFFSET]);
-     gem_init(&nd_table[1], 0xE000C000, pic[77-IRQ_OFFSET]);
- 
-+    /* Complete the slcr initialization */
-+    qdev_init_nofail(slcr);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(slcr), 0, 0xF8000000);
++/**
++ * qdev/qbus_set_power_all(_fn)
++ * Enable/Disable the power of a tree starting
++ * at given device or bus
++ */
++void qdev_set_power_all(DeviceState *dev, bool en);
++void qdev_set_power_all_fn(void *opaque, bool en);
++void qbus_set_power_all(BusState *bus, bool en);
++void qbus_set_power_all_fn(void *opaque, bool en);
 +
-     for (n = 0; n < 2; n++) {
-         int hci_irq = n ? 79 : 56;
-         hwaddr hci_addr = n ? 0xE0101000 : 0xE0100000;
++/**
++ * qdev/qbus_set_clock_all(_fn)
++ * Enable/Disable the clock of a tree starting
++ * at given device or bus
++ */
++void qdev_set_clock_all(DeviceState *dev, bool en);
++void qdev_set_clock_all_fn(void *opaque, bool en);
++void qbus_set_clock_all(BusState *bus, bool en);
++void qbus_set_clock_all_fn(void *opaque, bool en);
++
+ #endif
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index bb6d36eab9..24b90bd45f 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -1138,6 +1138,57 @@ void device_set_clock(DeviceState *dev, bool en)
+     }
+ }
+ 
++static int qdev_set_power_one(DeviceState *dev, void *opaque)
++{
++    device_set_power(dev, *((bool *)opaque));
++    return 0;
++}
++
++void qdev_set_power_all(DeviceState *dev, bool en)
++{
++    qdev_walk_children(dev, NULL, NULL, qdev_set_power_one, NULL, &en);
++}
++
++void qdev_set_power_all_fn(void *opaque, bool en)
++{
++    qdev_set_power_all(DEVICE(opaque), en);
++}
++
++void qbus_set_power_all(BusState *bus, bool en)
++{
++    qbus_walk_children(bus, NULL, NULL, qdev_set_power_one, NULL, &en);
++}
++
++void qbus_set_power_all_fn(void *opaque, bool en)
++{
++    qbus_set_power_all(BUS(opaque), en);
++}
++
++static int qdev_set_clock_one(DeviceState *dev, void *opaque)
++{
++    device_set_clock(dev, *((bool *)opaque));
++    return 0;
++}
++
++void qdev_set_clock_all(DeviceState *dev, bool en)
++{
++    qdev_walk_children(dev, NULL, NULL, qdev_set_clock_one, NULL, &en);
++}
++
++void qdev_set_clock_all_fn(void *opaque, bool en)
++{
++    qdev_set_clock_all(DEVICE(opaque), en);
++}
++
++void qbus_set_clock_all(BusState *bus, bool en)
++{
++    qbus_walk_children(bus, NULL, NULL, qdev_set_clock_one, NULL, &en);
++}
++
++void qbus_set_clock_all_fn(void *opaque, bool en)
++{
++    qbus_set_clock_all(BUS(opaque), en);
++}
+ 
+ Object *qdev_get_machine(void)
+ {
 -- 
 2.18.0
