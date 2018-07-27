@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fivNf-00053O-Ak
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:33:36 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fivOj-0005s9-CU
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fivNb-0003Ng-8d
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:33:35 -0400
-Received: from ozlabs.org ([203.11.71.1]:43289)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fivNa-0003Kp-AZ
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:33:31 -0400
-Date: Fri, 27 Jul 2018 15:27:24 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180727052724.GJ3694@umbus.fritz.box>
-References: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
+	(envelope-from <jemmy858585@gmail.com>) id 1fivOh-00045H-RY
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:34:41 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:52150)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
+	id 1fivOh-00044l-LT
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:34:39 -0400
+Received: by mail-it0-x244.google.com with SMTP id e14-v6so6036056itf.1
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 22:34:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="SBT+cnFS/G3NVgv4"
-Content-Disposition: inline
-In-Reply-To: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH for-3.1] tests/cpu-plug-test: check CPU
- hotplug on ppc64 with KVM
+In-Reply-To: <VI1PR0501MB2784008D66F24945AB066395B5560@VI1PR0501MB2784.eurprd05.prod.outlook.com>
+References: <1528212489-19137-1-git-send-email-lidongchen@tencent.com>
+	<1528212489-19137-9-git-send-email-lidongchen@tencent.com>
+	<20180627185952.GJ2423@work-vm>
+	<CAOGPPbfMZRTdfiXj0ekij1bwL3JgQEF3zHGR4AKuor-MGmQGiw@mail.gmail.com>
+	<CAOGPPbcTN55ASX64rJe3iUUNmxQJvuy22Har5Lwk7qsEVBxdow@mail.gmail.com>
+	<VI1PR0501MB2784008D66F24945AB066395B5560@VI1PR0501MB2784.eurprd05.prod.outlook.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Fri, 27 Jul 2018 13:34:38 +0800
+Message-ID: <CAOGPPbf+GimTM0DmmpRx5k7fEjNd_m0HYma3FWSANkpo7pC40Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 08/10] migration: create a dedicated
+ thread to release rdma resource
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,132 +35,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+To: Gal Shachaf <galsha@mellanox.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Aviad Yehezkel <aviadye@mellanox.com>, "zhang.zhanghailiang@huawei.com" <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Adi Dotan <adido@mellanox.com>, Lidong Chen <lidongchen@tencent.com>
 
+On Mon, Jul 23, 2018 at 10:54 PM, Gal Shachaf <galsha@mellanox.com> wrote:
+> On Thu, Jul 5, 2018 at 10:26 PM, 858585 jemmy <jemmy858585@gmail.com> wro=
+te:
+>> On Thu, Jun 28, 2018 at 2:59 AM, Dr. David Alan Gilbert
+>> <dgilbert@redhat.com> wrote:
+>>> * Lidong Chen (jemmy858585@gmail.com) wrote:
+>>>> ibv_dereg_mr wait for a long time for big memory size virtual server.
+>>>>
+>>>> The test result is:
+>>>>   10GB  326ms
+>>>>   20GB  699ms
+>>>>   30GB  1021ms
+>>>>   40GB  1387ms
+>>>>   50GB  1712ms
+>>>>   60GB  2034ms
+>>>>   70GB  2457ms
+>>>>   80GB  2807ms
+>>>>   90GB  3107ms
+>>>>   100GB 3474ms
+>>>>   110GB 3735ms
+>>>>   120GB 4064ms
+>>>>   130GB 4567ms
+>>>>   140GB 4886ms
+>>>>
+>>>> this will cause the guest os hang for a while when migration finished.
+>>>> So create a dedicated thread to release rdma resource.
+>>>>
+>>>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>>>> ---
+>>>>  migration/rdma.c | 43 +++++++++++++++++++++++++++----------------
+>>>>  1 file changed, 27 insertions(+), 16 deletions(-)
+>>>>
+>>>> diff --git a/migration/rdma.c b/migration/rdma.c index
+>>>> dfa4f77..f12e8d5 100644
+>>>> --- a/migration/rdma.c
+>>>> +++ b/migration/rdma.c
+>>>> @@ -2979,35 +2979,46 @@ static void qio_channel_rdma_set_aio_fd_handle=
+r(QIOChannel *ioc,
+>>>>      }
+>>>>  }
+>>>>
+>>>> -static int qio_channel_rdma_close(QIOChannel *ioc,
+>>>> -                                  Error **errp)
+>>>> +static void *qio_channel_rdma_close_thread(void *arg)
+>>>>  {
+>>>> -    QIOChannelRDMA *rioc =3D QIO_CHANNEL_RDMA(ioc);
+>>>> -    RDMAContext *rdmain, *rdmaout;
+>>>> -    trace_qemu_rdma_close();
+>>>> +    RDMAContext **rdma =3D arg;
+>>>> +    RDMAContext *rdmain =3D rdma[0];
+>>>> +    RDMAContext *rdmaout =3D rdma[1];
+>>>>
+>>>> -    rdmain =3D rioc->rdmain;
+>>>> -    if (rdmain) {
+>>>> -        atomic_rcu_set(&rioc->rdmain, NULL);
+>>>> -    }
+>>>> -
+>>>> -    rdmaout =3D rioc->rdmaout;
+>>>> -    if (rdmaout) {
+>>>> -        atomic_rcu_set(&rioc->rdmaout, NULL);
+>>>> -    }
+>>>> +    rcu_register_thread();
+>>>>
+>>>>      synchronize_rcu();
+>>>
+>>> * see below
+>>>
+>>>> -
+>>>>      if (rdmain) {
+>>>>          qemu_rdma_cleanup(rdmain);
+>>>>      }
+>>>> -
+>>>>      if (rdmaout) {
+>>>>          qemu_rdma_cleanup(rdmaout);
+>>>>      }
+>>>>
+>>>>      g_free(rdmain);
+>>>>      g_free(rdmaout);
+>>>> +    g_free(rdma);
+>>>> +
+>>>> +    rcu_unregister_thread();
+>>>> +    return NULL;
+>>>> +}
+>>>> +
+>>>> +static int qio_channel_rdma_close(QIOChannel *ioc,
+>>>> +                                  Error **errp) {
+>>>> +    QemuThread t;
+>>>> +    QIOChannelRDMA *rioc =3D QIO_CHANNEL_RDMA(ioc);
+>>>> +    RDMAContext **rdma =3D g_new0(RDMAContext*, 2);
+>>>> +
+>>>> +    trace_qemu_rdma_close();
+>>>> +    if (rioc->rdmain || rioc->rdmaout) {
+>>>> +        rdma[0] =3D  rioc->rdmain;
+>>>> +        rdma[1] =3D  rioc->rdmaout;
+>>>> +        qemu_thread_create(&t, "rdma cleanup", qio_channel_rdma_close=
+_thread,
+>>>> +                           rdma, QEMU_THREAD_DETACHED);
+>>>> +        atomic_rcu_set(&rioc->rdmain, NULL);
+>>>> +        atomic_rcu_set(&rioc->rdmaout, NULL);
+>>>
+>>> I'm not sure this pair is ordered with the synchronise_rcu above;
+>>> Doesn't that mean, on a bad day, that you could get:
+>>>
+>>>
+>>>     main-thread          rdma_cleanup     another-thread
+>>>     qmu_thread_create
+>>>                       synchronise_rcu
+>>>                                         reads rioc->rdmain
+>>>                                         starts doing something with rdm=
+ain
+>>>     atomic_rcu_set
+>>>                       rdma_cleanup
+>>>
+>>>
+>>> so the another-thread is using it during the cleanup?
+>>> Would just moving the atomic_rcu_sets before the qemu_thread_create
+>>> fix that?
+>> yes, I will fix it.
+>>
+>>>
+>>> However, I've got other worries as well:
+>>>    a) qemu_rdma_cleanup does:
+>>>        migrate_get_current()->state =3D=3D MIGRATION_STATUS_CANCELLING
+>>>
+>>>       which worries me a little if someone immediately tries to restart
+>>>       the migration.
+>
+> Because the current qemu version don't wait for RDMA_CM_EVENT_DISCONNECTE=
+D event after rdma_disconnect, so I think it's not necessary to send RDMA_C=
+ONTROL_ERROR.
+>
+> compare to send RDMA_CONTROL_ERROR, I think use cm event to notify peer q=
+emu is better.
+> maybe the rdma is already in error_state, and RDMA_CONTROL_ERROR cannot s=
+end successfully.
+>
+> For peer qemu, in qemu_rdma_wait_comp_channel function, it's should not o=
+nly poll rdma->comp_channel->fd, it's should also poll  rdma->channel->fd.
+> [GS] I agree that we should poll on CM events in addition to CQ events.
+>
+> for the source qemu, it's fixed by this patch.
+> migration: poll the cm event while wait RDMA work request completion
+>
+> and for destination qemu, it's need a new patch to fix it.
+>
+> so I prefer to remove MIGRATION_STATUS_CANCELLING in qemu_rdma_cleanup fu=
+nction.
+>
+> [GS] The intention of this patch is to move the costly ibv_dereg_mr to a =
+separate thread, so we do not actually need to also move the RDMA_CONTROL_E=
+RROR  and rdma_disconnect, that come beforehand in qemu_rdma_cleanup,  to a=
+ thread. I suggest that we move them out of qemu_rdma_cleanup to a new func=
+tion "qemu_rdma_disconnect" and call it on each RDMAcontext before the qemu=
+_thread_create.
 
---SBT+cnFS/G3NVgv4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Dave, Gal:
+I find the reason why we send RDMA_CONTROL_ERROR  while
+MIGRATION_STATUS_CANCELLING is to fix this issue.
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D32bce196344772df8d68ab40e=
+2dd1dd57be1aa7c
 
-On Wed, Jul 25, 2018 at 04:45:26PM +0200, Greg Kurz wrote:
-> Commit b585395b655 fixed a regression introduced by some recent changes
-> in the XICS code, that was causing QEMU to crash instantly during CPU
-> hotplug with KVM. This is typically the kind of bug we'd like our
-> test suite to detect before it gets merged. Unfortunately, the current
-> tests run with '-machine accel=3Dqtest' and don't exercise KVM specific
-> paths in QEMU.
->=20
-> This patch hence changes add_pseries_test_case() to launch QEMU with
-> '-machine accel=3Dkvm' if KVM is available.
->=20
-> A notable consequence is that the guest will execute SLOF, but for some
-> reasons SLOF sometimes hits a program exception. This causes the guest
-> to loop forever and the test to be stuck.  Since we don't need the guest
-> to be truely running, let's pass -S to QEMU to avoid that.
->=20
-> Also disable machine capabilities that could be unavailable in KVM, eg,
-> when using PR KVM.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+The current qemu version don't wait for RDMA_CM_EVENT_DISCONNECTED
+event after rdma_disconnect, so I think it's not necessary to send
+RDMA_CONTROL_ERROR while MIGRATION_STATUS_CANCELLING.
 
-I'm pretty sure trying to change the accelerator on a qtest test just
-doesn't make sense.  We'd need a different approach for testing cpu
-hotplug against kvm & tcg backends.
+and I was confused about the purpose of RDMA_CONTROL_ERROR.
+It seems to notify something error on one side, but it's only invoked
+in qemu_rdma_cleanup.
+and rdma_disconnect is enough to notify peer qemu.
+and Gal told me that DREQ drop just the same as the DREP, so we cannot
+guarantee that the destination will receive the
+RDMA_CM_EVENT_DISCONNECTED
+event.
+but we also cannot guarantee the destination will receive the
+RDMA_CONTROL_ERROR when rdma in is error state.
 
-> ---
->  tests/cpu-plug-test.c |   20 ++++++++++++++++----
->  1 file changed, 16 insertions(+), 4 deletions(-)
->=20
-> diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-> index 5f39ba0df394..2107557809b7 100644
-> --- a/tests/cpu-plug-test.c
-> +++ b/tests/cpu-plug-test.c
-> @@ -21,6 +21,7 @@ struct PlugTestData {
->      unsigned cores;
->      unsigned threads;
->      unsigned maxcpus;
-> +    const char *extra_args;
->  };
->  typedef struct PlugTestData PlugTestData;
-> =20
-> @@ -106,9 +107,10 @@ static void test_plug_with_device_add_coreid(gconstp=
-ointer data)
->      char *args;
->      unsigned int c;
-> =20
-> -    args =3D g_strdup_printf("-machine %s -cpu %s "
-> +    args =3D g_strdup_printf("-machine %s -cpu %s %s "
->                             "-smp 1,sockets=3D%u,cores=3D%u,threads=3D%u,=
-maxcpus=3D%u",
->                             td->machine, td->cpu_model,
-> +                           td->extra_args ? td->extra_args : "",
->                             td->sockets, td->cores, td->threads, td->maxc=
-pus);
->      qtest_start(args);
-> =20
-> @@ -195,10 +197,20 @@ static void add_pseries_test_case(const char *mname)
->          (g_str_has_prefix(mname, "pseries-2.") && atoi(&mname[10]) < 7))=
- {
->          return;
->      }
-> -    data =3D g_new(PlugTestData, 1);
-> +    data =3D g_new0(PlugTestData, 1);
->      data->machine =3D g_strdup(mname);
->      data->cpu_model =3D "power8_v2.0";
-> -    data->device_model =3D g_strdup("power8_v2.0-spapr-cpu-core");
-> +    if (!access("/sys/module/kvm_hv", F_OK) ||
-> +        !access("/sys/module/kvm_pr", F_OK)) {
-> +        data->cpu_model =3D "host";
-> +        data->extra_args =3D
-> +            "-machine accel=3Dkvm "
-> +            "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbrok=
-en "
-> +            "-machine cap-htm=3Doff "
-> +            "-machine cap-hpt-max-page-size=3D64k "
-> +            "-S";
-> +    }
-> +    data->device_model =3D g_strdup_printf("%s-spapr-cpu-core", data->cp=
-u_model);
->      data->sockets =3D 2;
->      data->cores =3D 3;
->      data->threads =3D 1;
-> @@ -221,7 +233,7 @@ static void add_s390x_test_case(const char *mname)
->          return;
->      }
-> =20
-> -    data =3D g_new(PlugTestData, 1);
-> +    data =3D g_new0(PlugTestData, 1);
->      data->machine =3D g_strdup(mname);
->      data->cpu_model =3D "qemu";
->      data->device_model =3D g_strdup("qemu-s390x-cpu");
->=20
+So I prefer to also remove send RDMA_CONTROL_ERROR in qemu_rdma_cleanup.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Any suggestion?
 
---SBT+cnFS/G3NVgv4
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltarTkACgkQbDjKyiDZ
-s5LlQRAAzPptunMtdOVf01mLyMfoINEJmfDsTnAjPU6E5B+YucKHzZbD9C3ifNvo
-XTT0jMdXF4ty3bteGeXx+EobF18YLIxAsySLHHukT74mrzMk8yCRGTxlXI8uHM1z
-kxtkxi9loOG8wxsB65kmbbJDxcg2ofDezsAc/8IPouo9M0kNhTcmi9gAAEDrzuQi
-F9CcNTn/4L/du29siSDVoStWShA+uCniu1avL+8U38IHyGBW4dduFffQGWgpGTYx
-jYv9Kgcu/89EjOO4xNbFNuTsILBe53h7cGcEtP+MwFK0w6wtiMpDmgWk0qUCQajk
-QYvlXaIvgmcWFD7sODTSFxNmEgcvTMr0HqYiweqrVNdzNF+fywlZkiIwMT+S+lZn
-mo3eUZfSLdTH+ulH9OUd/DddoBN9fGHiYaUZquy3w+kpkFciFmyte0WnJyPy5Pks
-fPsjbIo4oW41ZCdGoqkDCQJesvrsc0dNTTIRf4IVxzU+i60+RsUgBa3znEnvc0x/
-tabTWqQsEQIfTHMzxle5CzQw4bvEh+Aez/hOSnurhnfgHg2j+O+doawBgS9+QBt8
-cMj3GDwqKNzmxQxuT79IsiCGoaPHWujUrcjoaZyAtM5aao7m+KnWwo5v01gF3cGj
-KjweTcnZC0KJaqcscfwC3IiQOoZTntJc8ngSgxFzdgmNo9ptCH0=
-=+dmx
------END PGP SIGNATURE-----
-
---SBT+cnFS/G3NVgv4--
+>>>
+>>>    b) I don't understand what happens if someone does try and restart
+>>>       the migration after that, but in the ~5s it takes the ibv cleanup
+>>>       to happen.
+>
+> I prefer to add a new variable in current_migration.  if the rdma cleanup=
+ thread has not exited. it's should not start a new migration.
+> [GS] I support this suggestion.
+>
+>>
+>> yes, I will try to fix it.
+>>
+>>>
+>>> Dave
+>>>
+>>>
+>>>> +    }
+>>>>
+>>>>      return 0;
+>>>>  }
+>>>> --
+>>>> 1.8.3.1
+>>>>
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
