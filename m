@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fivNf-00053P-Hm
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:33:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fivNf-00053O-Ak
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:33:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fivNb-0003No-99
+	(envelope-from <dgibson@ozlabs.org>) id 1fivNb-0003Ng-8d
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:33:35 -0400
-Date: Fri, 27 Jul 2018 15:32:47 +1000
+Received: from ozlabs.org ([203.11.71.1]:43289)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fivNa-0003Kp-AZ
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:33:31 -0400
+Date: Fri, 27 Jul 2018 15:27:24 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180727053247.GK3694@umbus.fritz.box>
-References: <20180628083633.12413-1-clg@kaod.org>
-	<20180628083633.12413-2-clg@kaod.org>
-	<20180718061230.GE2102@umbus.fritz.box>
-	<f6500bf1-792b-aba5-9deb-adc3303eeee7@kaod.org>
+Message-ID: <20180727052724.GJ3694@umbus.fritz.box>
+References: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="C7Ke/meiCZutM6I/"
+	protocol="application/pgp-signature"; boundary="SBT+cnFS/G3NVgv4"
 Content-Disposition: inline
-In-Reply-To: <f6500bf1-792b-aba5-9deb-adc3303eeee7@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] ppc/pnv: Add model for Power8 PHB3
- PCIe Host bridge
+In-Reply-To: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH for-3.1] tests/cpu-plug-test: check CPU
+ hotplug on ppc64 with KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,146 +28,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Andrea Bolognani <abologna@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 
 
---C7Ke/meiCZutM6I/
-Content-Type: text/plain; charset=iso-8859-1
+--SBT+cnFS/G3NVgv4
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 24, 2018 at 02:18:30PM +0200, C=E9dric Le Goater wrote:
-> Hello,
+On Wed, Jul 25, 2018 at 04:45:26PM +0200, Greg Kurz wrote:
+> Commit b585395b655 fixed a regression introduced by some recent changes
+> in the XICS code, that was causing QEMU to crash instantly during CPU
+> hotplug with KVM. This is typically the kind of bug we'd like our
+> test suite to detect before it gets merged. Unfortunately, the current
+> tests run with '-machine accel=3Dqtest' and don't exercise KVM specific
+> paths in QEMU.
 >=20
-> >From the discussion on the XICS MSI object, I gather that exporting
-> icp_irq is fine.=20
+> This patch hence changes add_pseries_test_case() to launch QEMU with
+> '-machine accel=3Dkvm' if KVM is available.
 >=20
-> Some more comments below, I have tried to answer the parts that were=20
-> not addressed yet.
+> A notable consequence is that the guest will execute SLOF, but for some
+> reasons SLOF sometimes hits a program exception. This causes the guest
+> to loop forever and the test to be stuck.  Since we don't need the guest
+> to be truely running, let's pass -S to QEMU to avoid that.
+>=20
+> Also disable machine capabilities that could be unavailable in KVM, eg,
+> when using PR KVM.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-[snip]
-> > Could you use memory_region_set_enabled() rather than having to add
-> > and delete the subregion and keep track of it in this separate
-> > variable?
->=20
-> pnv_phb3_check_m32/m64 remap the regions.
+I'm pretty sure trying to change the accelerator on a qtest test just
+doesn't make sense.  We'd need a different approach for testing cpu
+hotplug against kvm & tcg backends.
 
-Ah, ok.
-
-[snip]
-> > That said... shouldn't you filter our invalid or read-only regs before
-> > updating the cache?
+> ---
+>  tests/cpu-plug-test.c |   20 ++++++++++++++++----
+>  1 file changed, 16 insertions(+), 4 deletions(-)
 >=20
-> hmm, the current model relies on the fact that some registers have
-> their value implicitly updated. But I guess, we can dump which are
-> accessed and implement a default behavior for these. I will take a
-> look.
-
-I don't really follow what you're saying here, but I guess I'll see
-what it looks like in te next spin.
-
->=20
-> [ ... ]
->=20
-> >> +static const MemoryRegionOps pnv_phb3_msi_ops =3D {
-> >> +    /* There is no .read as the read result is undefined by PCI spec =
-*/
-> >=20
-> > What will qemu do if it hits a NULL read here?  The behaviour may be
-> > undefind, but we'd prefer it didn't crash qemu..
->=20
-> I will add one with a standard error message. It is better to have
-> some output anyway.
->=20
-> [ ... ]
->=20
-> >> +static void pnv_phb3_pci_create(PnvPHB3 *phb, Error **errp)
-> >> +{
-> >> +    PCIHostState *pcih =3D PCI_HOST_BRIDGE(phb);
-> >> +    PCIDevice *brdev;
-> >> +    PCIDevice *pdev;
-> >> +    PCIBus *parent;
-> >> +    uint8_t chassis =3D phb->chip_id * 4 + phb->phb_id;
-> >> +    uint8_t chassis_nr =3D 128;
-> >> +
-> >> +    /* Add root complex */
-> >> +    pdev =3D pci_create(pcih->bus, 0, TYPE_PNV_PHB3_RC);
-> >> +    object_property_add_child(OBJECT(phb), "phb3-rc", OBJECT(pdev), N=
-ULL);
-> >> +    qdev_prop_set_uint8(DEVICE(pdev), "chassis", chassis);
-> >> +    qdev_prop_set_uint16(DEVICE(pdev), "slot", 1);
-> >> +    qdev_init_nofail(DEVICE(pdev));
-> >> +
-> >> +    /* Setup bus for that chip */
-> >> +    parent =3D pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
-> >> +
-> >> +    brdev =3D pci_create(parent, 0, "pci-bridge");
-> >=20
-> > What is this pci bridge representing?  I know PCI-e PHBs typically
-> > have a pseudo P2P bridge right under them, but isn't that represnted
-> > by the root complex above?
->=20
-> This is the legacy pci bridge under the pcie bus.
-
-Ah, ok.  Didn't realise there was a vanilla PCI bridge built in.
-
-> Here is is the qdev hierarchy :
->=20
->   dev: pnv-phb3, id ""
->     index =3D 0 (0x0)
->     chip-id =3D 0 (0x0)
->     bus: phb3-root-bus
->       type pnv-phb3-root-bus
->       dev: pnv-phb3-rc, id ""
->         power_controller_present =3D true
->         chassis =3D 0 (0x0)
->         slot =3D 1 (0x1)
->         port =3D 0 (0x0)
->         aer_log_max =3D 8 (0x8)
->         addr =3D 00.0
->         romfile =3D ""
->         rombar =3D 1 (0x1)
->         multifunction =3D false
->         command_serr_enable =3D true
->         x-pcie-lnksta-dllla =3D true
->         x-pcie-extcap-init =3D true
->         class PCI bridge, addr 00:00.0, pci id 1014:03dc (sub 0000:0000)
->         bus: pcie.0
->           type PCIE
->           dev: pci-bridge, id ""
->             chassis_nr =3D 128 (0x80)
->             msi =3D "off"
->             shpc =3D false
->             addr =3D 00.0
->             romfile =3D ""
->             rombar =3D 1 (0x1)
->             multifunction =3D false
->             command_serr_enable =3D true
->             x-pcie-lnksta-dllla =3D true
->             x-pcie-extcap-init =3D true
->             class PCI bridge, addr 00:00.0, pci id 1b36:0001 (sub 0000:00=
-00)
->             bus: pci.0
->               type PCI
->=20
-> [ ... ]
->=20
-> >> +static const PropertyInfo pnv_phb3_phb_id_propinfo =3D {
-> >> +    .name =3D "irq",
-> >> +    .get =3D pnv_phb3_get_phb_id,
-> >> +    .set =3D pnv_phb3_set_phb_id,
-> >> +};
-> >=20
-> > Can't you use a static DeviceProps style property for this, which is a
-> > bit simpler?
->=20
-> OK. We will address user creatable PHBs in some other way. Most
-> certainly in the realize routine like you suggested.
->=20
-> Thanks,
->=20
-> C.=20
+> diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+> index 5f39ba0df394..2107557809b7 100644
+> --- a/tests/cpu-plug-test.c
+> +++ b/tests/cpu-plug-test.c
+> @@ -21,6 +21,7 @@ struct PlugTestData {
+>      unsigned cores;
+>      unsigned threads;
+>      unsigned maxcpus;
+> +    const char *extra_args;
+>  };
+>  typedef struct PlugTestData PlugTestData;
+> =20
+> @@ -106,9 +107,10 @@ static void test_plug_with_device_add_coreid(gconstp=
+ointer data)
+>      char *args;
+>      unsigned int c;
+> =20
+> -    args =3D g_strdup_printf("-machine %s -cpu %s "
+> +    args =3D g_strdup_printf("-machine %s -cpu %s %s "
+>                             "-smp 1,sockets=3D%u,cores=3D%u,threads=3D%u,=
+maxcpus=3D%u",
+>                             td->machine, td->cpu_model,
+> +                           td->extra_args ? td->extra_args : "",
+>                             td->sockets, td->cores, td->threads, td->maxc=
+pus);
+>      qtest_start(args);
+> =20
+> @@ -195,10 +197,20 @@ static void add_pseries_test_case(const char *mname)
+>          (g_str_has_prefix(mname, "pseries-2.") && atoi(&mname[10]) < 7))=
+ {
+>          return;
+>      }
+> -    data =3D g_new(PlugTestData, 1);
+> +    data =3D g_new0(PlugTestData, 1);
+>      data->machine =3D g_strdup(mname);
+>      data->cpu_model =3D "power8_v2.0";
+> -    data->device_model =3D g_strdup("power8_v2.0-spapr-cpu-core");
+> +    if (!access("/sys/module/kvm_hv", F_OK) ||
+> +        !access("/sys/module/kvm_pr", F_OK)) {
+> +        data->cpu_model =3D "host";
+> +        data->extra_args =3D
+> +            "-machine accel=3Dkvm "
+> +            "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbrok=
+en "
+> +            "-machine cap-htm=3Doff "
+> +            "-machine cap-hpt-max-page-size=3D64k "
+> +            "-S";
+> +    }
+> +    data->device_model =3D g_strdup_printf("%s-spapr-cpu-core", data->cp=
+u_model);
+>      data->sockets =3D 2;
+>      data->cores =3D 3;
+>      data->threads =3D 1;
+> @@ -221,7 +233,7 @@ static void add_s390x_test_case(const char *mname)
+>          return;
+>      }
+> =20
+> -    data =3D g_new(PlugTestData, 1);
+> +    data =3D g_new0(PlugTestData, 1);
+>      data->machine =3D g_strdup(mname);
+>      data->cpu_model =3D "qemu";
+>      data->device_model =3D g_strdup("qemu-s390x-cpu");
 >=20
 
 --=20
@@ -175,24 +136,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---C7Ke/meiCZutM6I/
+--SBT+cnFS/G3NVgv4
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltarn8ACgkQbDjKyiDZ
-s5L0aQ/9HstbQ0qWZyqRS9pO88YoZ/K+IKDCNNslG1pcGUTJxTpNzzX3VORmYKgR
-S+2rC5Hh3Zqf61MseWDm23YPS1g4loiyPHT+xi8JgKqtz++g03lJm+4d4EA02EGo
-Nl9mKpw9GCbHLngP+43fX1VRxz/eAKOBP1oyz5dioWdVGmwIu/GCX0UiPiFRKPIh
-LVAOG7wIhsQodGIiq+lVFLM3+QuJLcH5EE+B+Y492vowwZiccXzuiKtxqBNtL3YH
-HdEaskM5UTnlFOqvK9CNTMFx7k5jRo1busx/VhrFcbdB5P7KcTsdnAsLan0e5Ttn
-xqJxQneXJVeLLvPokmbEIECz7ifzSkL1LB+D7X3gbNbYTnCCvazpdzvYTVvAj5eZ
-4rJ8+BI5f4y6vs5koXTWFo9VEXGWQGuUUbJI/miyKcOLhSE2afKocPi/B78dx9Xs
-ukgShYiHAzRN1N22imJ+rE8FvY6BMdwr+nl7oV/0+hhdMbab1+qvj5VeMH8Bm9B/
-Fu97cNodlEW+a/t7rZmUHNzubkEDpEzaKXypW3Aeek0y+fi/wApZa2KpbVSFsfFn
-3BjyqEblZXsoo7zx9JxZ5JVmWNbz5za/UlSMObFrU5LnPmWu9PWyyFZnBS/W1L/B
-pqzZAwLaEUvDwDxdoPbA7gKgSjfwNaPs7ThOgjWdK8URCNxo5no=
-=QxqZ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltarTkACgkQbDjKyiDZ
+s5LlQRAAzPptunMtdOVf01mLyMfoINEJmfDsTnAjPU6E5B+YucKHzZbD9C3ifNvo
+XTT0jMdXF4ty3bteGeXx+EobF18YLIxAsySLHHukT74mrzMk8yCRGTxlXI8uHM1z
+kxtkxi9loOG8wxsB65kmbbJDxcg2ofDezsAc/8IPouo9M0kNhTcmi9gAAEDrzuQi
+F9CcNTn/4L/du29siSDVoStWShA+uCniu1avL+8U38IHyGBW4dduFffQGWgpGTYx
+jYv9Kgcu/89EjOO4xNbFNuTsILBe53h7cGcEtP+MwFK0w6wtiMpDmgWk0qUCQajk
+QYvlXaIvgmcWFD7sODTSFxNmEgcvTMr0HqYiweqrVNdzNF+fywlZkiIwMT+S+lZn
+mo3eUZfSLdTH+ulH9OUd/DddoBN9fGHiYaUZquy3w+kpkFciFmyte0WnJyPy5Pks
+fPsjbIo4oW41ZCdGoqkDCQJesvrsc0dNTTIRf4IVxzU+i60+RsUgBa3znEnvc0x/
+tabTWqQsEQIfTHMzxle5CzQw4bvEh+Aez/hOSnurhnfgHg2j+O+doawBgS9+QBt8
+cMj3GDwqKNzmxQxuT79IsiCGoaPHWujUrcjoaZyAtM5aao7m+KnWwo5v01gF3cGj
+KjweTcnZC0KJaqcscfwC3IiQOoZTntJc8ngSgxFzdgmNo9ptCH0=
+=+dmx
 -----END PGP SIGNATURE-----
 
---C7Ke/meiCZutM6I/--
+--SBT+cnFS/G3NVgv4--
