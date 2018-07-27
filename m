@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sH-0003FE-SQ
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:37:47 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fj450-00030I-Th
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:50:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1fj3sG-0008Ib-IY
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:37:45 -0400
-From: Damien Hedde <damien.hedde@greensocs.com>
-Date: Fri, 27 Jul 2018 16:37:20 +0200
-Message-Id: <0379e54aecc5534d68e1ac3bdf61fda79916396e.1532701430.git.damien.hedde@greensocs.com>
-In-Reply-To: <cover.1532701430.git.damien.hedde@greensocs.com>
-References: <cover.1532701430.git.damien.hedde@greensocs.com>
-Subject: [Qemu-devel] [RFC PATCH 1/6] qdev: add a power and clock gating
- support
+	(envelope-from <imammedo@redhat.com>) id 1fj44x-0006ma-RD
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:50:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57954 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fj44x-0006lM-Kv
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:50:51 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1506F4022905
+	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 14:50:50 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Fri, 27 Jul 2018 16:50:31 +0200
+Message-Id: <1532703031-166467-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.0] pc: acpi: fix memhp regression by
+ reducing stub SRAT entry size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,178 +29,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, peter.maydell@linaro.org, edgar.iglesias@xilinx.com, mark.burton@greensocs.com, saipava@xilinx.com, luc.michel@greensocs.com, alistair@alistair23.me, Damien Hedde <damien.hedde@greensocs.com>
+Cc: ehabkost@redhat.com, mst@redhat.com
 
-Add two boolean new fields _powered_ and _clocked_ to hold the gating
-state. Also add methods to act on each gating change.
-The power/clock gating is controlled by 2 functions *device_set_power* and
-*device_set_clock*.
+Commit 848a1cc1e (hw/acpi-build: build SRAT memory affinity structures for DIMM devices)
+broke the first dimm hotplug in following cases:
 
-Add a default behavior to do a device_reset at power-up.
+ 1: there is no coldplugged dimm in the last numa node
+    but there is a coldplugged dimm in another node
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+  -m 4096,slots=4,maxmem=32G               \
+  -object memory-backend-ram,size=2G,id=m0 \
+  -device pc-dimm,memdev=m0,node=1         \
+  -object memory-backend-ram,id=m1,size=2G \
+  -device pc-dimm,memdev=m1,node=0         \
+  -numa node,nodeid=0                      \
+  -numa node,nodeid=1
+
+ 2: if order of dimms on CLI is:
+       1st plugged dimm in node1
+       2nd plugged dimm in node0
+
+  -m 4096,slots=4,maxmem=32G               \
+  -object memory-backend-ram,id=m1,size=2G \
+  -device pc-dimm,memdev=m1,node=0         \
+  -numa node,nodeid=0                      \
+  -numa node,nodeid=1
+
+(qemu) object_add memory-backend-ram,id=m1,size=1G
+(qemu) device_add pc-dimm,id=d1,memdev=m1,node=0
+
+the first DIMM hotplug to any node except the last one
+fails (Windows is unable to online it).
+
+Length reduction of stub hotplug memory SRAT entry,
+fixes issue for some reason.
+
+RHBZ: 1609234
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- include/hw/qdev-core.h | 30 ++++++++++++++++++++++++
- hw/core/qdev.c         | 52 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 82 insertions(+)
+NOTE TO MAINTAINER: UPDATE REFERRENCE APCI TABLE BLOBS IN TESTS
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index f1fd0f8736..659287e185 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -34,6 +34,7 @@ typedef void (*DeviceUnrealize)(DeviceState *dev, Error **errp);
- typedef void (*DeviceReset)(DeviceState *dev);
- typedef void (*BusRealize)(BusState *bus, Error **errp);
- typedef void (*BusUnrealize)(BusState *bus, Error **errp);
-+typedef void (*DeviceGatingUpdate)(DeviceState *dev);
+---
+ hw/i386/acpi-build.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 9e8350c..b52fdb2 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2269,7 +2269,16 @@ static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
+         numamem = acpi_data_push(table_data, sizeof *numamem);
  
- struct VMStateDescription;
- 
-@@ -109,6 +110,8 @@ typedef struct DeviceClass {
-     DeviceReset reset;
-     DeviceRealize realize;
-     DeviceUnrealize unrealize;
-+    DeviceGatingUpdate power_update;
-+    DeviceGatingUpdate clock_update;
- 
-     /* device state */
-     const struct VMStateDescription *vmsd;
-@@ -151,6 +154,9 @@ struct DeviceState {
-     int num_child_bus;
-     int instance_id_alias;
-     int alias_required_for_version;
-+
-+    bool powered;
-+    bool clocked;
- };
- 
- struct DeviceListener {
-@@ -404,6 +410,12 @@ void device_class_set_parent_realize(DeviceClass *dc,
- void device_class_set_parent_unrealize(DeviceClass *dc,
-                                        DeviceUnrealize dev_unrealize,
-                                        DeviceUnrealize *parent_unrealize);
-+void device_class_set_parent_power_update(DeviceClass *dc,
-+                                          DeviceGatingUpdate dev_power_update,
-+                                          DeviceGatingUpdate *parent_power_update);
-+void device_class_set_parent_clock_update(DeviceClass *dc,
-+                                          DeviceGatingUpdate dev_clock_update,
-+                                          DeviceGatingUpdate *parent_clock_update);
- 
- const struct VMStateDescription *qdev_get_vmsd(DeviceState *dev);
- 
-@@ -434,4 +446,22 @@ static inline bool qbus_is_hotpluggable(BusState *bus)
- void device_listener_register(DeviceListener *listener);
- void device_listener_unregister(DeviceListener *listener);
- 
-+/**
-+ * device_set_power:
-+ * Enable/Disable the power of a device
-+ *
-+ * @dev: device to update
-+ * @en: true to enable, false to disable
-+ */
-+void device_set_power(DeviceState *dev, bool en);
-+
-+/**
-+ * device_set_clock:
-+ * Enable/Disable the clock of a device
-+ *
-+ * @dev: device to update
-+ * @en: true to enable, false to disable
-+ */
-+void device_set_clock(DeviceState *dev, bool en);
-+
- #endif
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 529b82de18..bb6d36eab9 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -950,6 +950,8 @@ static void device_initfn(Object *obj)
- 
-     dev->instance_id_alias = -1;
-     dev->realized = false;
-+    dev->powered = true;
-+    dev->clocked = true;
- 
-     object_property_add_bool(obj, "realized",
-                              device_get_realized, device_set_realized, NULL);
-@@ -1038,6 +1040,13 @@ static void device_unparent(Object *obj)
+         if (!info) {
+-            build_srat_memory(numamem, cur, end - cur, default_node,
++            /*
++             * Entry is required for Windows to enable memory hotplug in OS
++             * and for Linux to enable SWIOTLB when booted with less than
++             * 4G of RAM. Windows works better if the entry sets proximity
++             * to the highest NUMA node in the machine at the end of the
++             * reserved space.
++             * Memory devices may override proximity set by this entry,
++             * providing _PXM method if necessary.
++             */
++            build_srat_memory(numamem, end - 1, 1, default_node,
+                               MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+             break;
+         }
+@@ -2402,14 +2411,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+         build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
      }
- }
  
-+static void device_power_update(DeviceState *dev)
-+{
-+    if (dev->powered) {
-+        device_reset(dev);
-+    }
-+}
-+
- static void device_class_init(ObjectClass *class, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(class);
-@@ -1052,6 +1061,8 @@ static void device_class_init(ObjectClass *class, void *data)
-      */
-     dc->hotpluggable = true;
-     dc->user_creatable = true;
-+
-+    dc->power_update = device_power_update;
- }
- 
- void device_class_set_parent_reset(DeviceClass *dc,
-@@ -1078,6 +1089,22 @@ void device_class_set_parent_unrealize(DeviceClass *dc,
-     dc->unrealize = dev_unrealize;
- }
- 
-+void device_class_set_parent_power_update(DeviceClass *dc,
-+                                       DeviceGatingUpdate dev_power_update,
-+                                       DeviceGatingUpdate *parent_power_update)
-+{
-+    *parent_power_update = dc->power_update;
-+    dc->power_update = dev_power_update;
-+}
-+
-+void device_class_set_parent_clock_update(DeviceClass *dc,
-+                                       DeviceGatingUpdate dev_clock_update,
-+                                       DeviceGatingUpdate *parent_clock_update)
-+{
-+    *parent_clock_update = dc->clock_update;
-+    dc->clock_update = dev_clock_update;
-+}
-+
- void device_reset(DeviceState *dev)
- {
-     DeviceClass *klass = DEVICE_GET_CLASS(dev);
-@@ -1087,6 +1114,31 @@ void device_reset(DeviceState *dev)
-     }
- }
- 
-+void device_set_power(DeviceState *dev, bool en)
-+{
-+    DeviceClass *klass = DEVICE_GET_CLASS(dev);
-+
-+    if (en != dev->powered) {
-+        dev->powered = en;
-+        if (klass->power_update) {
-+            klass->power_update(dev);
-+        }
-+    }
-+}
-+
-+void device_set_clock(DeviceState *dev, bool en)
-+{
-+    DeviceClass *klass = DEVICE_GET_CLASS(dev);
-+
-+    if (en != dev->clocked) {
-+        dev->clocked = en;
-+        if (klass->clock_update) {
-+            klass->clock_update(dev);
-+        }
-+    }
-+}
-+
-+
- Object *qdev_get_machine(void)
- {
-     static Object *dev;
+-    /*
+-     * Entry is required for Windows to enable memory hotplug in OS
+-     * and for Linux to enable SWIOTLB when booted with less than
+-     * 4G of RAM. Windows works better if the entry sets proximity
+-     * to the highest NUMA node in the machine.
+-     * Memory devices may override proximity set by this entry,
+-     * providing _PXM method if necessary.
+-     */
+     if (hotplugabble_address_space_size) {
+         build_srat_hotpluggable_memory(table_data, machine->device_memory->base,
+                                        hotplugabble_address_space_size,
 -- 
-2.18.0
+2.7.4
