@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fiylh-0005ks-33
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:10:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fiypg-0006zE-Il
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fiyld-0003KP-SF
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:10:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59518 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fiyld-0003Jw-EX
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:10:33 -0400
-Date: Fri, 27 Jul 2018 17:10:30 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180727091030.GE19416@lemon.usersys.redhat.com>
-References: <20180621122638.12113-1-f4bug@amsat.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fiypf-0004xn-M3
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:14:44 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:40392)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fiypf-0004xf-8t
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 05:14:43 -0400
+Received: by mail-oi0-x242.google.com with SMTP id w126-v6so7905724oie.7
+	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 02:14:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 In-Reply-To: <20180621122638.12113-1-f4bug@amsat.org>
+References: <20180621122638.12113-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Jul 2018 10:14:22 +0100
+Message-ID: <CAFEAcA9=SFQvQfu-9E9Qi+XrB-1uXxutWQ29pjRf=vxJH_h-7g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [RFC PATCH] travis: Test out-of-tree builds
 List-Id: <qemu-devel.nongnu.org>
@@ -27,61 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 06/21 09:26, Philippe Mathieu-Daud=E9 wrote:
+On 21 June 2018 at 13:26, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
+te:
 > Force one config to build 'out-of-tree' (object files and executables
 > are created in a tree outside the project source code).
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
 > I noticed various out-of-tree issue in the last 2 merge windows.
->=20
-> Pseudo-randomly picked a build from the matrix which covers system + us=
-er.
->=20
->  .travis.yml | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->=20
-> diff --git a/.travis.yml b/.travis.yml
-> index fabfe9ec34..02e096f6a9 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -50,6 +50,8 @@ notifications:
->      on_failure: always
->  env:
->    global:
-> +    - SRC_DIR=3D"."
-> +    - BUILD_DIR=3D"."
->      - TEST_CMD=3D"make check"
->      - MAKEFLAGS=3D"-j3"
->    matrix:
-> @@ -69,11 +71,15 @@ before_install:
->    - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git=
--seed.tar.xz | tar -xvJ
->    - git submodule update --init --recursive
->  before_script:
-> -  - ./configure ${CONFIG} || { cat config.log && exit 1; }
-> +  - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
-> +  - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
->  script:
->    - make ${MAKEFLAGS} && ${TEST_CMD}
->  matrix:
->    include:
-> +    # Test out-of-tree builds
-> +    - env: CONFIG=3D"--enable-debug --enable-debug-tcg"
-> +           BUILD_DIR=3D"out-of-tree/build/dir" SRC_DIR=3D"../../.."
 
-Is a three-level nesting really necessary? I think a simple './build' dir=
- should
-do.
+That's odd, because all my pre-merge build tests are out-of-tree
+(in-tree is the case I don't cover). Presumably they were only
+for specific oddball configs ?
 
->      # Test with Clang for compile portability (Travis uses clang-5.0)
->      - env: CONFIG=3D"--disable-system"
->        compiler: clang
-> --=20
-> 2.18.0.rc2
->=20
+(Not that there's any harm in covering this in travis too.)
 
-Fam
+thanks
+-- PMM
