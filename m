@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fj2iV-00086v-4h
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:23:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1fj2j6-0008Rw-I1
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:24:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fj2iR-0005Is-VJ
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:23:35 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 27 Jul 2018 10:23:11 -0300
-Message-Id: <20180727132311.2777-1-f4bug@amsat.org>
+	(envelope-from <eblake@redhat.com>) id 1fj2j5-0005oY-KS
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:24:12 -0400
+References: <20180727081939.28185-1-ndevos@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f0a7edbd-f731-7ac5-4aee-ef2ba594ed64@redhat.com>
+Date: Fri, 27 Jul 2018 08:24:05 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] target/arm: Remove duplicate 'host' entry in
- '-cpu ?' output
+In-Reply-To: <20180727081939.28185-1-ndevos@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] block/gluster: Handle changed
+ glfs_ftruncate signature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: Niels de Vos <ndevos@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
 
-Since 86f0a186d6f the TYPE_ARM_HOST_CPU is only compiled when CONFIG_KVM
-is enabled.
+On 07/27/2018 03:19 AM, Niels de Vos wrote:
+> From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+> 
+> New versions of Glusters libgfapi.so have an updated glfs_ftruncate()
+> function that returns additional 'struct stat' structures to enable
+> advanced caching of attributes. This is useful for file servers, not so
+> much for QEMU. Nevertheless, the API has changed and needs to be
+> adopted.
+> 
 
-Remove the now redundant special-case introduced in a96c0514ab7, to avoid:
+Oh, one other comment.
 
-  $ qemu-system-aarch64 -machine virt -cpu \? | fgrep host
-  host
-  host (only available in KVM mode)
+> +++ b/block/gluster.c
+> @@ -20,6 +20,10 @@
+>   #include "qemu/option.h"
+>   #include "qemu/cutils.h"
+>   
+> +#ifdef CONFIG_GLUSTERFS_LEGACY_FTRUNCATE
+> +# define glfs_ftruncate(fd, offset, _u1, _u2) glfs_ftruncate(fd, offset)
+> +#endif
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- target/arm/helper.c | 6 ------
- 1 file changed, 6 deletions(-)
+Someday, when we can assume new enough gluster everywhere, we can drop 
+this hunk...
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 22d812240a..66afb08ee0 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5591,12 +5591,6 @@ void arm_cpu_list(FILE *f, fprintf_function cpu_fprintf)
-     (*cpu_fprintf)(f, "Available CPUs:\n");
-     g_slist_foreach(list, arm_cpu_list_entry, &s);
-     g_slist_free(list);
--#ifdef CONFIG_KVM
--    /* The 'host' CPU type is dynamically registered only if KVM is
--     * enabled, so we have to special-case it here:
--     */
--    (*cpu_fprintf)(f, "  host (only available in KVM mode)\n");
--#endif
- }
- 
- static void arm_cpu_add_definition(gpointer data, gpointer user_data)
+> +++ b/configure
+
+> +	/* new glfs_ftruncate() passes two additional args */
+> +	return glfs_ftruncate(NULL, 0 /*, NULL, NULL */);
+> +}
+> +EOF
+> +    if compile_prog "$glusterfs_cflags" "$glusterfs_libs" ; then
+> +      glusterfs_legacy_ftruncate="yes"
+> +    fi
+
+...but it will be easier to remember to do so if this comment in 
+configure calls out the upstream gluster version that no longer requires 
+the legacy workaround, as our hint for when...
+
+>     else
+>       if test "$glusterfs" = "yes" ; then
+>         feature_not_found "GlusterFS backend support" \
+> @@ -6644,6 +6658,10 @@ if test "$glusterfs_zerofill" = "yes" ; then
+>     echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
+>   fi
+>   
+> +if test "$glusterfs_legacy_ftruncate" = "yes" ; then
+> +  echo "CONFIG_GLUSTERFS_LEGACY_FTRUNCATE=y" >> $config_host_mak
+
+...this #define is no longer necessary.
+
 -- 
-2.18.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
