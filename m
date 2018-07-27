@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fj2Oz-0007J2-5x
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:03:26 -0400
+	(envelope-from <mst@redhat.com>) id 1fj2S2-0008J9-GH
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fj2Ou-0001fS-H9
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:03:25 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:54299)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fj2Ou-0001ec-8W
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:03:20 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id c14-v6so5188303wmb.4
-	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 06:03:20 -0700 (PDT)
-Date: Fri, 27 Jul 2018 14:03:17 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180727130317.GE28555@stefanha-x1.localdomain>
-References: <20180717195028.GA6691@localhost.localdomain>
-	<CAFEAcA-pPsvfn7ARu_pn0HH03rZh05fLP=wr+p=hx5douSf7vA@mail.gmail.com>
-	<87a7qnk9qa.fsf@dusky.pond.sub.org>
+	(envelope-from <mst@redhat.com>) id 1fj2Ry-0006tV-E6
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:06:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38530 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fj2Ry-0006r5-6S
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:06:30 -0400
+Date: Fri, 27 Jul 2018 16:06:23 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180727160529-mutt-send-email-mst@kernel.org>
+References: <1531900083-18167-1-git-send-email-junyan.he@gmx.com>
+	<20180727124917.GC28555@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="y2zxS2PfCDLh6JVG"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87a7qnk9qa.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] Why do we typedef every struct on QEMU?
+In-Reply-To: <20180727124917.GC28555@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 0/7 V11] nvdimm: guarantee persistence of
+ QEMU writes to persistent memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +28,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: junyan.he@gmx.com, ehabkost@redhat.com, quintela@redhat.com, rth@twiddle.net, crosthwaite.peter@gmail.com, qemu-devel@nongnu.org, dgilbert@redhat.com, Junyan He <junyan.he@intel.com>, stefanha@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, yi.z.zhang@intel.com, xiaoguangrong.eric@gmail.com
 
+On Fri, Jul 27, 2018 at 01:49:17PM +0100, Stefan Hajnoczi wrote:
+> On Wed, Jul 18, 2018 at 03:47:56PM +0800, junyan.he@gmx.com wrote:
+> > From: Junyan He <junyan.he@intel.com>
+> > 
+> > QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and live migration.
+> > If the backend is on the persistent memory, QEMU needs to take proper operations to
+> > ensure its writes persistent on the persistent memory. Otherwise, a host power failure
+> > may result in the loss the guest data on the persistent memory.
+> 
+> Ping Michael.  Can this go through your tree?
 
---y2zxS2PfCDLh6JVG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+OK but do you really think it's appropriate in this release cycle?
+If not pls repost after the release including the acks.
 
-On Thu, Jul 19, 2018 at 08:42:05AM +0200, Markus Armbruster wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->=20
-> > On 17 July 2018 at 20:50, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> Instead, we've repeatedly wasted time on debating which kind of ugly we
-> hate less, and all we can show for our troubles is CODING_STYLE.  Which
-> leaves a whole lot more questions open than it answers, so we can keep
-> enjoying style debates.
->=20
-> That the code shows anything resembling consistency at all is a
-> testament to humanity's yearning for order within a chaotic world.
-
-Going back to something concrete after this nice philosophical musing:
-
-The coding style checker (checkpatch.pl) seems like a huge success to
-me.  Without it, achieving consistency is futile.
-
-checkpatch.pl defines the true coding style of QEMU - the subset that
-can be automatically checked by patchew.  If we want to follow a coding
-style, implementing the rules in checkpatch.pl is important.
-
-(Though I'll be the first to admit that checkpatch.pl has many
-limitations.)
-
-Stefan
-
---y2zxS2PfCDLh6JVG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbWxgVAAoJEJykq7OBq3PIK0EH/RfPZXhRxYp+hcdFuk/TyQc9
-1K71XACxVDFGR71+uOvEXq8OO1OJJ9jViqEYHJ+eg08xIfiKl2R1xJRsm/TwtZSJ
-1aQbE6Wv+RZEencIM//3CDszcAGDn6fiFNcVEeMiYjuMdbbdHNP4VEVhykl5t+WW
-X1PrYb/gvLtfpXiKIyIPlEiQASYPvwhmB+zXpQWmcCfgZ38V3YPnrsIGgerTwL55
-LH3exqI2omM7iQPFDIPnlE6NzjQpXtKBngXS6oVDp2yGVDJADdjC/4MddnJW6Pzh
-oKaGSB5qweuvlAOHTRiSEskCEE+NWVhijLMXWjifBmPvJ6BELBQgJZ5Upx/yG5c=
-=rmwH
------END PGP SIGNATURE-----
-
---y2zxS2PfCDLh6JVG--
+> > 
+> > This patch series is based on Marcel's patch "mem: add share parameter to memory-backend-ram" [1]
+> > because of the changes in patch 1.
+> > [1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03858.html
+> > 
+> > Previous versions of this patch series can be found at: 
+> > v10: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03433.html
+> > v9: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg02361.html
+> > v8: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg02279.html
+> > v7: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg02997.html
+> > v6: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg00061.html
+> > v5: https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02258.html
+> > V4: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06993.html
+> > v3: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04365.html
+> > v2: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01579.html
+> > v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
+> > 
+> > Changes in v11:
+> > * (Patch 2) Modify the ram_flags parameter to 32bits, the same size as it in RAMBlock
+> > * (Patch 5 and Patch 7) Delete pmem_xxx stub functions in stubs/pmem.c. Use inline
+> > functions with assert to replace them, because we never come there when pmem is enabled
+> > but lack of libpmem support.
+> > 
+> > Changes in v10:
+> > * (Patch 4) Fix a nit in nvdimm docs about pmem option usage in command line 
+> > The v10 patch set is all reviewed by Igor Mammedov <imammedo@redhat.com>
+> > 
+> > Changes in v9:
+> > * (Patch 3 and Patch 4) Reorder these two patches to make logic right.
+> > Firstly add libpmem support, and then we can use libpmem's configure
+> > check result. Also fix some typo and grammar issues in these two patches.
+> > 
+> > Changs in v8: 
+> > * (Patch 3) Report a error when user set 'pmem' to file-backend, while
+> > the qemu is lack of libpmem support. In this case, we can not ensure
+> > the persistence of the file-backend, so we choose to fail the build
+> > rather than contine and make the thing more confused.
+> > 
+> > Changes in v7: 
+> > The v6 patch set has already reviewed by Stefan Hajnoczi <stefanha@redhat.com>
+> > No logic change in this v7 version, just:
+> > * Spelling check and some document words refined.
+> > * Rebase to "ram is migratable" patch set.
+> > 
+> > Changes in v6: 
+> > * (Patch 1) Expose all ram block flags rather than redefine the flags.
+> > * (Patch 4) Use pkg-config rather the hard check when configure. 
+> > * (Patch 7) Sync and flush all the pmem data when migration completes,
+> > rather than sync pages one by one in previous version.
+> > 
+> > Changes in v5: 
+> > * (Patch 9) Add post copy check and output some messages for nvdimm.
+> > 
+> > Changes in v4: 
+> > * (Patch 2) Fix compilation errors found by patchew.
+> > 
+> > Changes in v3:
+> > * (Patch 5) Add a is_pmem flag to ram_handle_compressed() and handle
+> > PMEM writes in it, so we don't need the _common function.
+> > * (Patch 6) Expose qemu_get_buffer_common so we can remove the
+> > unnecessary qemu_get_buffer_to_pmem wrapper.
+> > * (Patch 8) Add a is_pmem flag to xbzrle_decode_buffer() and handle
+> > PMEM writes in it, so we can remove the unnecessary
+> > xbzrle_decode_buffer_{common, to_pmem}.
+> > * Move libpmem stubs to stubs/pmem.c and fix the compilation failures
+> > of test-{xbzrle,vmstate}.c.
+> > 
+> > Changes in v2:
+> > * (Patch 1) Use a flags parameter in file ram allocation functions.
+> > * (Patch 2) Add a new option 'pmem' to hostmem-file.
+> > * (Patch 3) Use libpmem to operate on the persistent memory, rather
+> > than re-implementing those operations in QEMU.
+> > * (Patch 5-8) Consider the write persistence in the migration path.
+> > 
+> > 
+> > Junyan:
+> > [1/7] memory, exec: Expose all memory block related flags.
+> > [6/7] migration/ram: Add check and info message to nvdimm post copy.
+> > [7/7] migration/ram: ensure write persistence on loading all date to PMEM.
+> > 
+> > Haozhong:
+> > [5/7] mem/nvdimm: ensure write persistence to PMEM in label emulation
+> > 
+> > Haozhong & Junyan:
+> > [2/7] memory, exec: switch file ram allocation functions to 'flags' parameters
+> > [3/7] configure: add libpmem support [4/7] hostmem-file: add the 'pmem' option
+> > [4/7] hostmem-file: add the 'pmem' option
+> > 
+> > --
+> > backends/hostmem-file.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
+> > configure               | 29 +++++++++++++++++++++++++++++
+> > docs/nvdimm.txt         | 22 ++++++++++++++++++++++
+> > exec.c                  | 38 +++++++++++++-------------------------
+> > hw/mem/nvdimm.c         |  9 ++++++++-
+> > include/exec/memory.h   | 31 +++++++++++++++++++++++++++++--
+> > include/exec/ram_addr.h | 28 ++++++++++++++++++++++++++--
+> > include/qemu/pmem.h     | 36 ++++++++++++++++++++++++++++++++++++
+> > memory.c                |  8 +++++---
+> > migration/ram.c         | 17 +++++++++++++++++
+> > numa.c                  |  2 +-
+> > qemu-options.hx         |  7 +++++++
+> > 12 files changed, 235 insertions(+), 36 deletions(-)
+> > create mode 100644 include/qemu/pmem.h
+> > 
+> > -- 
+> > 2.7.4
+> > 
+> > 
