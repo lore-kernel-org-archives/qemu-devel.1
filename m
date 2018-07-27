@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fitWH-0007MG-A8
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 23:34:22 -0400
+	(envelope-from <famz@redhat.com>) id 1fitWH-0007ME-81
+	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 23:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fitWG-0003IL-CO
+	(envelope-from <famz@redhat.com>) id 1fitWG-0003IR-Cw
 	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 23:34:21 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 27 Jul 2018 11:34:00 +0800
-Message-Id: <20180727033402.13513-2-famz@redhat.com>
-In-Reply-To: <20180727033402.13513-1-famz@redhat.com>
-References: <20180727033402.13513-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC for-3.0-rc3 1/3] Revert "qemu-img: Document
- copy offloading implications with -S and -c"
+Date: Fri, 27 Jul 2018 11:33:59 +0800
+Message-Id: <20180727033402.13513-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC for-3.0-rc3 0/3] qemu-img: Disable copy
+ offloading by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,39 +21,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-This reverts commit eb461485f4558e362fab905735b50987505bca44.
+Kevin pointed out that both glibc and kernel provides a slow fallback of
+copy_file_range which hurts thin provisioning. This is particularly true for
+thin LVs, because host_device driver cannot get allocation info from the
+volume, and copy_file_range is called on every sectors, making the dst fully
+allocated.
 
-Now that we introduce an explicit option, these implicit rules are not
-used.
+NFS mount points also doesn't support SEEK_DATA well, so the allocation
+information is unknown to QEMU.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- qemu-img.texi | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+That leaves only iscsi:// which seems to do what we want so far, but it is a
+smaller use case.
 
-diff --git a/qemu-img.texi b/qemu-img.texi
-index 5853cd18d1..aeb1b9e66c 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -96,8 +96,7 @@ will enumerate information about backing files in a disk image chain. Refer
- below for further description.
- 
- @item -c
--indicates that target image must be compressed (qcow format only). If this
--option is used, copy offloading will not be attempted.
-+indicates that target image must be compressed (qcow format only)
- 
- @item -h
- with or without a command shows help and lists the supported formats
-@@ -116,8 +115,7 @@ in case both @var{-q} and @var{-p} options are used.
- indicates the consecutive number of bytes that must contain only zeros
- for qemu-img to create a sparse image during conversion. This value is rounded
- down to the nearest 512 bytes. You may use the common size suffixes like
--@code{k} for kilobytes. If this option is used, copy offloading will not be
--attempted.
-+@code{k} for kilobytes.
- 
- @item -t @var{cache}
- specifies the cache mode that should be used with the (destination) file. See
+Add an option to qemu-img convert, "-C", to enable (attempting) copy offloading
+explicitly. And mark it incompatible with "-S" and "-c".
+
+Fam Zheng (3):
+  Revert "qemu-img: Document copy offloading implications with -S and
+    -c"
+  qemu-img: Add -C option for convert with copy offloading
+  iotests: Add test for 'qemu-img convert -C' compatibility
+
+ qemu-img-cmds.hx           |  2 +-
+ qemu-img.c                 | 21 +++++++++++++++++----
+ qemu-img.texi              | 14 +++++++++-----
+ tests/qemu-iotests/082     |  8 ++++++++
+ tests/qemu-iotests/082.out | 11 +++++++++++
+ 5 files changed, 46 insertions(+), 10 deletions(-)
+
 -- 
 2.17.1
