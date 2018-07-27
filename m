@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fj2t7-0004gL-77
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:34:33 -0400
+	(envelope-from <nsoffer@redhat.com>) id 1fj2ym-0007HG-Qj
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:40:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fj2t4-0004bP-1x
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:34:33 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:37463)
+	(envelope-from <nsoffer@redhat.com>) id 1fj2yh-0000eH-RB
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:40:24 -0400
+Received: from mail-ua0-f194.google.com ([209.85.217.194]:46677)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fj2t3-0004aj-Qf
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:34:30 -0400
-Received: by mail-wm0-x241.google.com with SMTP id n11-v6so5486127wmc.2
-	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 06:34:29 -0700 (PDT)
-Date: Fri, 27 Jul 2018 14:34:26 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180727133426.GI28555@stefanha-x1.localdomain>
-References: <20180724134339.17832-1-liujunjie23@huawei.com>
-	<87r2jry8lc.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1fj2yh-0000e6-K1
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 09:40:19 -0400
+Received: by mail-ua0-f194.google.com with SMTP id r18-v6so3341619ual.13
+	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 06:40:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="itqfrb9Qq3wY07cp"
-Content-Disposition: inline
-In-Reply-To: <87r2jry8lc.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] qstring: Fix qstring_from_substr() not to
- provoke int overflow
+References: <20180727033402.13513-1-famz@redhat.com>
+	<20180727102938.GD4355@localhost.localdomain>
+	<CAK1Eb9m2Fzs8_1Swm5Z8qbPdK=qUShX5zhZQ0Wtqx=LOBT8HnQ@mail.gmail.com>
+In-Reply-To: <CAK1Eb9m2Fzs8_1Swm5Z8qbPdK=qUShX5zhZQ0Wtqx=LOBT8HnQ@mail.gmail.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Fri, 27 Jul 2018 16:40:05 +0300
+Message-ID: <CAMRbyyspTmzUOh=42rN3SvP7SsUmEq-Xn39HWCLjFADqcCQV9Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC for-3.0-rc3 0/3] qemu-img:
+ Disable copy offloading by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: liujunjie <liujunjie23@huawei.com>, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, weidong.huang@huawei.com, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+
+On Fri, Jul 27, 2018 at 3:15 PM Fam Zheng <famz@redhat.com> wrote:
+
+> On Fri, Jul 27, 2018 at 6:29 PM Kevin Wolf <kwolf@redhat.com> wrote:
+> >
+> > Am 27.07.2018 um 05:33 hat Fam Zheng geschrieben:
+> > > Kevin pointed out that both glibc and kernel provides a slow fallback
+> of
+> > > copy_file_range which hurts thin provisioning. This is particularly
+> true for
+> > > thin LVs, because host_device driver cannot get allocation info from
+> the
+> > > volume, and copy_file_range is called on every sectors, making the dst
+> fully
+> > > allocated.
+> > >
+> > > NFS mount points also doesn't support SEEK_DATA well, so the allocation
+> > > information is unknown to QEMU.
+>
+
+NFS >= 4.2 supports SEEK_DATA/HOLE.
 
 
---itqfrb9Qq3wY07cp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> > >
+> > > That leaves only iscsi:// which seems to do what we want so far, but
+> it is a
+> > > smaller use case.
+> > >
+> > > Add an option to qemu-img convert, "-C", to enable (attempting) copy
+> offloading
+> > > explicitly. And mark it incompatible with "-S" and "-c".
+> >
+> > Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+> >
+> > Not sure why you made this an RFC only, but I think we absolutely need
+> > this. People are used to using 'qemu-img convert' to compact images and
+> > this would regress with automatic copy offloading.
+> >
+> > Do you think we need more discussion?
+>
+> I think merging this for 3.0 is the right thing do to.
+>
+> What worries me is the general usability of the feature. We could
+> probably explore ideas about how we can better take advantage of copy
+> offloading. I don't think counting on the user to make the right
+> decision between disk efficiency (thin provisioning) and BW efficiency
 
-On Wed, Jul 25, 2018 at 11:21:03AM +0200, Markus Armbruster wrote:
-> liujunjie <liujunjie23@huawei.com> writes:
-> > diff --git a/qobject/qstring.c b/qobject/qstring.c
-> > index afca54b..18b8eb8 100644
-> > --- a/qobject/qstring.c
-> > +++ b/qobject/qstring.c
-> > @@ -37,7 +37,7 @@ size_t qstring_get_length(const QString *qstring)
-> >   *
-> >   * Return string reference
-> >   */
-> > -QString *qstring_from_substr(const char *str, int start, int end)
-> > +QString *qstring_from_substr(const char *str, size_t start, size_t end)
-> >  {
-> >      QString *qstring;
->=20
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->=20
+(copy offloading) will ever work. Even if we don't care about breaking
+> the default '-S 4k' behavior, the lack of SEEK_DATA/SEEK_HOLE support
+> on host NFS and block devices will make it very hard to use. Making it
+> worse, if the network to NFS server is good enough, convert with
+> pread64/pwrite64 with host page cache
 
-None more qualified to merge this than you:
+is also more efficient than
+> copy_file_range, so we'll be slower by trying to play clever. :(
+>
 
-$ scripts/get_maintainer.pl -f qobject/qstring.c
-Markus Armbruster <armbru@redhat.com> (supporter:QObject)
-qemu-devel@nongnu.org (open list:All patches CC here)
+In oVirt we always disable caching (-t none -T none), so using
+host page cache is not an option.
 
-:)
+I think adding an option for copy offloading is the right thing. This way
+we can introduce the feature early without breaking the rest of the stuck.
 
---itqfrb9Qq3wY07cp
-Content-Type: application/pgp-signature; name="signature.asc"
+For long term it would be nicer if qemu could select the best way to do
+the copy automatically, keeping the allocation policy specified by the user.
+oVirt still have bugs related to converting preallocated images to sparse
+and sparse images to preallocated. Users like to have control on this, so
+qemu-img cannot change the policy.
 
------BEGIN PGP SIGNATURE-----
+Do we have some documentation on the useful cases for copy
+offloading? Did we benchmark this with different kind of storage?
 
-iQEcBAEBAgAGBQJbWx9iAAoJEJykq7OBq3PIbIsH/0QmwGFNaZv+YSeVd4kNk4Q4
-L3sFgvlArQjGR/4X50UaRM2o22BpTSv6bmn9WXKvJpC8qNy6PA29R5cNH6/GY7aF
-jQSSvTdeRuM0+fXKe7HD1dfOZZweCOEe6WEP/tkQjSlYlwoIYkHR3Umt1yBrLpZM
-YxnKjVQRXGTafBIXQkdcWxzN5JiDWqQQh05Y6mu5Nol1KN5lRG+RVsWjWV1v6+G0
-8w/n9cLvCbI0O4KuzzGTXk0Dj1TJ59GSvbfR4gkfQMCfRnnfyyp/sgD6O6WQRJVD
-nsvhX1GlqErlMN6Fb1aURaq/LP2LHni+Pl5yNFStoVqqfzLBUjRr93LS9O64r5o=
-=2vid
------END PGP SIGNATURE-----
+The interesting use case for oVirt are:
+- block storage: copying rregular LV on shared storage to
+  another LV on same VG, but may be on a different PV.
+- file storage: copying files on same NFS or GlusterFS mont.
+- copying between different servers or file types, I guess
+  copy_file_range will not help in this case, right?
 
---itqfrb9Qq3wY07cp--
+Nir
