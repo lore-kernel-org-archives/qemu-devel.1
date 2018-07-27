@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fj4Ra-00069O-Jy
+	(envelope-from <armbru@redhat.com>) id 1fj4Rb-00069p-3D
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fj4RY-0000Hq-PZ
+	(envelope-from <armbru@redhat.com>) id 1fj4RY-0000I7-Sk
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48182 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45258 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fj4RY-0000AU-AN
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fj4RY-00007U-G8
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:12 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 27 Jul 2018 17:13:54 +0200
-Message-Id: <20180727151359.29061-19-armbru@redhat.com>
-In-Reply-To: <20180727151359.29061-1-armbru@redhat.com>
-References: <20180727151359.29061-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 18/23] migration-test: Clean up string
- interpolation into QMP, part 2
+Date: Fri, 27 Jul 2018 17:13:36 +0200
+Message-Id: <20180727151359.29061-1-armbru@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 00/23] tests: Compile-time format string
+ checking for libqtest.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +26,102 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com
 
-Leaving interpolation into JSON to qmp() is more robust than building
-QMP input manually, as explained in the recent commit "tests: Clean up
-string interpolation into QMP input (simple cases)".
+This is a reboot of "[PATCH 0/9] tests: Clean up around qmp() and
+hmp()" I sent about a year ago.  Back then, Eric folded it into his
+"Clean up around qmp() and hmp()" series, which stalled after v4.
 
-migrate() interpolates members into a JSON object.  Change it to take
-its extra QMP arguments as arguments for qdict_from_jsonf_nofail()
-instead of a string containing JSON members.
+My reboot tries to avoid that fate by reducing mission creep.  There
+are plenty of good ideas in Eric's series we should mine some day, but
+today is not that day.
 
-Bonus: gets rid of a non-literal format string.  A step towards
-compile-time format string checking without triggering
--Wformat-nonliteral.
+v2:
+* PATCH 01: Comments tweaked, ripple effect on PATCH 05+13
+* PATCH 05: Commit message improved [Thomas]
+* PATCH 06: Style fix [Philippe]
+* PATCH 16+17: Silence a warning
+* PATCH 21-23: New
 
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
----
- tests/migration-test.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+Eric Blake (1):
+  libqtest: Document calling conventions
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 323bb60535..1c1e56b15b 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -14,6 +14,7 @@
- 
- #include "libqtest.h"
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qjson.h"
- #include "qemu/option.h"
- #include "qemu/range.h"
- #include "qemu/sockets.h"
-@@ -381,16 +382,19 @@ static void migrate_set_capability(QTestState *who, const char *capability,
-     qobject_unref(rsp);
- }
- 
--static void migrate(QTestState *who, const char *uri, const char *extra)
-+static void migrate(QTestState *who, const char *uri, const char *fmt, ...)
- {
--    QDict *rsp;
--    gchar *cmd;
-+    va_list ap;
-+    QDict *args, *rsp;
- 
--    cmd = g_strdup_printf("{ 'execute': 'migrate',"
--                          "  'arguments': { 'uri': '%s' %s } }",
--                          uri, extra ? extra : "");
--    rsp = qtest_qmp(who, cmd);
--    g_free(cmd);
-+    va_start(ap, fmt);
-+    args = qdict_from_vjsonf_nofail(fmt, ap);
-+    va_end(ap);
-+
-+    g_assert(!qdict_haskey(args, "uri"));
-+    qdict_put_str(args, "uri", uri);
-+
-+    rsp = qmp("{ 'execute': 'migrate', 'arguments': %p}", args);
-     g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
- }
-@@ -582,7 +586,7 @@ static int migrate_postcopy_prepare(QTestState **from_ptr,
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
- 
--    migrate(from, uri, NULL);
-+    migrate(from, uri, "{}");
-     g_free(uri);
- 
-     wait_for_migration_pass(from);
-@@ -665,7 +669,7 @@ static void test_postcopy_recovery(void)
-      * the newly created channel
-      */
-     wait_for_migration_status(from, "postcopy-paused");
--    migrate(from, uri, ", 'resume': true");
-+    migrate(from, uri, "{'resume': true}");
-     g_free(uri);
- 
-     /* Restore the postcopy bandwidth to unlimited */
-@@ -684,7 +688,7 @@ static void test_baddest(void)
-     if (test_migrate_start(&from, &to, "tcp:0:0", true)) {
-         return;
-     }
--    migrate(from, "tcp:0:0", NULL);
-+    migrate(from, "tcp:0:0", "{}");
-     do {
-         status = migrate_query_status(from);
-         g_assert(!strcmp(status, "setup") || !(strcmp(status, "failed")));
-@@ -722,7 +726,7 @@ static void test_precopy_unix(void)
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
- 
--    migrate(from, uri, NULL);
-+    migrate(from, uri, "{}");
- 
-     wait_for_migration_pass(from);
- 
--- 
+Markus Armbruster (22):
+  libqtest: Rename functions to send QMP messages
+  libqtest: Clean up how we read device_del messages
+  libqtest: Clean up how we read the QMP greeting
+  qobject: Replace qobject_from_jsonf() by qobject_from_jsonf_nofail()
+  qobject: New qobject_from_vjsonf_nofail(), qdict_from_vjsonf_nofail()
+  libqtest: Simplify qmp_fd_vsend() a bit
+  test-qobject-input-visitor: Avoid format string ambiguity
+  qobject: qobject_from_jsonv() is dangerous, hide it away
+  tests: Pass literal format strings directly to qmp_FOO()
+  tests: Clean up string interpolation into QMP input (simple cases)
+  cpu-plug-test: Don't pass integers as strings to device_add
+  tests: Clean up string interpolation around qtest_qmp_device_add()
+  migration-test: Make wait_command() return the "return" member
+  tests: New helper qtest_qmp_receive_success()
+  migration-test: Make wait_command() cope with '%'
+  migration-test: Clean up string interpolation into QMP, part 1
+  migration-test: Clean up string interpolation into QMP, part 2
+  migration-test: Clean up string interpolation into QMP, part 3
+  libqtest: Enable compile-time format string checking
+  libqtest: Remove qtest_qmp_discard_response() & friends
+  libqtest: Replace qtest_startf() by qtest_initf()
+  libqtest: Rename qtest_FOOv() to qtest_vFOO() for consistency
+
+ include/qapi/qmp/qjson.h           |  12 +-
+ qobject/qjson.c                    |  89 ++++++++++----
+ tests/ahci-test.c                  |  24 ++--
+ tests/boot-order-test.c            |  12 +-
+ tests/boot-serial-test.c           |  10 +-
+ tests/cdrom-test.c                 |   6 +-
+ tests/check-qjson.c                |  15 +--
+ tests/cpu-plug-test.c              |   7 +-
+ tests/drive_del-test.c             |   4 +-
+ tests/e1000e-test.c                |   6 +-
+ tests/endianness-test.c            |  24 ++--
+ tests/fdc-test.c                   |   9 +-
+ tests/ide-test.c                   |   6 +-
+ tests/ipmi-bt-test.c               |   2 +-
+ tests/ivshmem-test.c               |   8 +-
+ tests/libqos/ahci.c                |   4 +-
+ tests/libqos/pci-pc.c              |   9 +-
+ tests/libqos/pci.c                 |   7 --
+ tests/libqos/pci.h                 |   2 -
+ tests/libqos/usb.c                 |  10 +-
+ tests/libqos/usb.h                 |   2 +-
+ tests/libqtest.c                   | 189 ++++++++++++++---------------
+ tests/libqtest.h                   | 124 ++++++++++---------
+ tests/m25p80-test.c                |   6 +-
+ tests/m48t59-test.c                |   2 +-
+ tests/machine-none-test.c          |   2 +-
+ tests/migration-test.c             | 180 ++++++++++++---------------
+ tests/numa-test.c                  |   4 +-
+ tests/pnv-xscom-test.c             |   8 +-
+ tests/prom-env-test.c              |  10 +-
+ tests/qmp-test.c                   |  20 +--
+ tests/sdhci-test.c                 |   6 +-
+ tests/tco-test.c                   |   6 +-
+ tests/test-filter-mirror.c         |   5 +-
+ tests/test-filter-redirector.c     |   9 +-
+ tests/test-qga.c                   | 150 ++++++++++-------------
+ tests/test-qobject-input-visitor.c |  19 +--
+ tests/tpm-util.c                   |  41 ++-----
+ tests/usb-hcd-ehci-test.c          |   2 +-
+ tests/usb-hcd-ohci-test.c          |   2 +-
+ tests/usb-hcd-uhci-test.c          |   4 +-
+ tests/usb-hcd-xhci-test.c          |  10 +-
+ tests/vhost-user-test.c            |   6 +-
+ tests/virtio-balloon-test.c        |   4 +-
+ tests/virtio-blk-test.c            |  32 ++---
+ tests/virtio-console-test.c        |  12 +-
+ tests/virtio-net-test.c            |   3 +-
+ tests/virtio-rng-test.c            |   3 +-
+ tests/virtio-scsi-test.c           |   2 +-
+ tests/virtio-serial-test.c         |   6 +-
+ tests/vmgenid-test.c               |   6 +-
+ 51 files changed, 554 insertions(+), 587 deletions(-)
+
+--=20
 2.17.1
