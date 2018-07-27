@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fiul6-0002Eg-NG
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 00:53:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fiv8G-0000e8-6R
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:17:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fiul5-0002Fv-BZ
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 00:53:44 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180725085944.11856-1-stefanha@redhat.com>
-	<20180725085944.11856-4-stefanha@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d3b4e258-369e-c769-55c1-3b62be174979@amsat.org>
-Date: Fri, 27 Jul 2018 01:53:32 -0300
+	(envelope-from <dgibson@ozlabs.org>) id 1fiv8D-0008Vf-P6
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 01:17:40 -0400
+Date: Fri, 27 Jul 2018 15:16:01 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180727051601.GI3694@umbus.fritz.box>
+References: <20180726133723.17041-1-clg@kaod.org>
+	<20180726133723.17041-3-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20180725085944.11856-4-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 3/7] hw/arm: make bitbanded
- IO optional on ARM M Profile
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="4LwthZj+AV2mq5CX"
+Content-Disposition: inline
+In-Reply-To: <20180726133723.17041-3-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] spapr: introduce a IRQ controller
+ backend to the machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,161 +25,651 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, mail@steffen-goertz.de, Su Hang <suhang16@mails.ucas.ac.cn>, ilg@livius.net, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-On 07/25/2018 05:59 AM, Stefan Hajnoczi wrote:
-> Some ARM CPUs have bitbanded IO, a memory region that allows convenient
-> bit access via 32-bit memory loads/stores.  This eliminates the need for
-> read-modify-update instruction sequences.
-> 
-> This patch makes this optional feature a ARMMProfile qdev property,
-> allowing boards to choose whether they want bitbanding or not.
-> 
-> Status of boards:
->  * iotkit (Cortex M33), no bitband
->  * mps2 (Cortex M3), bitband
->  * msf2 (Cortex M3), bitband
->  * stellaris (Cortex M3), bitband
->  * stm32f205 (Cortex M3), bitband
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+--4LwthZj+AV2mq5CX
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jul 26, 2018 at 03:37:22PM +0200, C=E9dric Le Goater wrote:
+> This proposal moves all the related IRQ routines of the sPAPR machine
+> behind a sPAPR IRQ backend interface 'spapr_irq' to prepare for future
+> changes. First of which will be to increase the size of the IRQ number
+> space, then, will follow a new backend for the POWER9 XIVE IRQ controller.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+This is looking pretty reasonable, some comments below, though.
 
 > ---
->  include/hw/arm/arm-m-profile.h |  2 ++
->  hw/arm/arm-m-profile.c         | 38 +++++++++++++++++++---------------
->  hw/arm/mps2.c                  |  1 +
->  hw/arm/msf2-soc.c              |  1 +
->  hw/arm/stellaris.c             |  1 +
->  hw/arm/stm32f205_soc.c         |  1 +
->  6 files changed, 27 insertions(+), 17 deletions(-)
-> 
-> diff --git a/include/hw/arm/arm-m-profile.h b/include/hw/arm/arm-m-profile.h
-> index ea496d9b88..1eb7a5c328 100644
-> --- a/include/hw/arm/arm-m-profile.h
-> +++ b/include/hw/arm/arm-m-profile.h
-> @@ -50,6 +50,7 @@ typedef struct {
->   *   devices will be automatically layered on top of this view.)
->   * + Property "idau": IDAU interface (forwarded to CPU object)
->   * + Property "init-svtor": secure VTOR reset value (forwarded to CPU object)
-> + * + Property "enable-bitband": expose bitbanded IO
->   */
->  typedef struct {
->      /*< private >*/
-> @@ -70,6 +71,7 @@ typedef struct {
->      MemoryRegion *board_memory;
->      Object *idau;
->      uint32_t init_svtor;
-> +    bool enable_bitband;
->  } ARMMProfileState;
->  
->  typedef struct {
-> diff --git a/hw/arm/arm-m-profile.c b/hw/arm/arm-m-profile.c
-> index b7dd2370d4..8bafd6602d 100644
-> --- a/hw/arm/arm-m-profile.c
-> +++ b/hw/arm/arm-m-profile.c
-> @@ -212,25 +212,27 @@ static void arm_m_profile_realize(DeviceState *dev, Error **errp)
->      memory_region_add_subregion(&s->container, 0xe000e000,
->                                  sysbus_mmio_get_region(sbd, 0));
->  
-> -    for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
-> -        Object *obj = OBJECT(&s->bitband[i]);
-> -        SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
-> +    if (s->enable_bitband) {
-> +        for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
-> +            Object *obj = OBJECT(&s->bitband[i]);
-> +            SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
->  
-> -        object_property_set_int(obj, bitband_input_addr[i], "base", &err);
-> -        if (err != NULL) {
-> -            error_propagate(errp, err);
-> -            return;
-> -        }
-> -        object_property_set_link(obj, OBJECT(s->board_memory),
-> -                                 "source-memory", &error_abort);
-> -        object_property_set_bool(obj, true, "realized", &err);
-> -        if (err != NULL) {
-> -            error_propagate(errp, err);
-> -            return;
-> -        }
-> +            object_property_set_int(obj, bitband_input_addr[i], "base", &err);
-> +            if (err != NULL) {
-> +                error_propagate(errp, err);
-> +                return;
-> +            }
-> +            object_property_set_link(obj, OBJECT(s->board_memory),
-> +                                     "source-memory", &error_abort);
-> +            object_property_set_bool(obj, true, "realized", &err);
-> +            if (err != NULL) {
-> +                error_propagate(errp, err);
-> +                return;
-> +            }
->  
-> -        memory_region_add_subregion(&s->container, bitband_output_addr[i],
-> -                                    sysbus_mmio_get_region(sbd, 0));
-> +            memory_region_add_subregion(&s->container, bitband_output_addr[i],
-> +                                        sysbus_mmio_get_region(sbd, 0));
-> +        }
->      }
->  }
->  
-> @@ -241,6 +243,8 @@ static Property arm_m_profile_properties[] = {
->      DEFINE_PROP_LINK("idau", ARMMProfileState, idau,
->                       TYPE_IDAU_INTERFACE, Object *),
->      DEFINE_PROP_UINT32("init-svtor", ARMMProfileState, init_svtor, 0),
-> +    DEFINE_PROP_BOOL("enable-bitband", ARMMProfileState,
-> +                     enable_bitband, false),
->      DEFINE_PROP_END_OF_LIST(),
+>  include/hw/ppc/spapr.h     |  11 +-
+>  include/hw/ppc/spapr_irq.h |  22 ++++
+>  hw/ppc/spapr.c             | 180 +----------------------------
+>  hw/ppc/spapr_cpu_core.c    |   1 +
+>  hw/ppc/spapr_irq.c         | 230 +++++++++++++++++++++++++++++++++++++
+>  5 files changed, 259 insertions(+), 185 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 73067f5ee8aa..ad4d7cfd97b0 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -4,7 +4,6 @@
+>  #include "qemu/units.h"
+>  #include "sysemu/dma.h"
+>  #include "hw/boards.h"
+> -#include "hw/ppc/xics.h"
+>  #include "hw/ppc/spapr_drc.h"
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/ppc/spapr_ovec.h"
+> @@ -16,6 +15,7 @@ struct sPAPRNVRAM;
+>  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
+>  typedef struct sPAPREventSource sPAPREventSource;
+>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+> +typedef struct ICSState ICSState;
+> =20
+>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+>  #define SPAPR_ENTRY_POINT       0x100
+> @@ -110,6 +110,7 @@ struct sPAPRMachineClass {
+>                            unsigned n_dma, uint32_t *liobns, Error **errp=
+);
+>      sPAPRResizeHPT resize_hpt_default;
+>      sPAPRCapabilities default_caps;
+> +    sPAPRIrq *irq;
 >  };
->  
-> diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-> index 912e1297d5..b232162dbd 100644
-> --- a/hw/arm/mps2.c
-> +++ b/hw/arm/mps2.c
-> @@ -186,6 +186,7 @@ static void mps2_common_init(MachineState *machine)
->          g_assert_not_reached();
->      }
->      qdev_prop_set_string(armv7m, "cpu-type", machine->cpu_type);
-> +    qdev_prop_set_bit(armv7m, "enable-bitband", true);
->      object_property_set_link(OBJECT(&mms->armv7m), OBJECT(system_memory),
->                               "memory", &error_abort);
->      object_property_set_bool(OBJECT(&mms->armv7m), true, "realized",
-> diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
-> index 09cdc61f44..fb5d16338f 100644
-> --- a/hw/arm/msf2-soc.c
-> +++ b/hw/arm/msf2-soc.c
-> @@ -117,6 +117,7 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
->      armv7m = DEVICE(&s->armv7m);
->      qdev_prop_set_uint32(armv7m, "num-irq", 81);
->      qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
-> +    qdev_prop_set_bit(armv7m, "enable-bitband", true);
->      object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
->                                       "memory", &error_abort);
->      object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
-> diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-> index 42785f5bd1..cb22684ffe 100644
-> --- a/hw/arm/stellaris.c
-> +++ b/hw/arm/stellaris.c
-> @@ -1304,6 +1304,7 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
->      nvic = qdev_create(NULL, TYPE_ARM_M_PROFILE);
->      qdev_prop_set_uint32(nvic, "num-irq", NUM_IRQ_LINES);
->      qdev_prop_set_string(nvic, "cpu-type", ms->cpu_type);
-> +    qdev_prop_set_bit(nvic, "enable-bitband", true);
->      object_property_set_link(OBJECT(nvic), OBJECT(get_system_memory()),
->                                       "memory", &error_abort);
->      /* This will exit with an error if the user passed us a bad cpu_type */
-> diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
-> index 7de1474ade..f78b89d205 100644
-> --- a/hw/arm/stm32f205_soc.c
-> +++ b/hw/arm/stm32f205_soc.c
-> @@ -109,6 +109,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
->      armv7m = DEVICE(&s->armv7m);
->      qdev_prop_set_uint32(armv7m, "num-irq", 96);
->      qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
-> +    qdev_prop_set_bit(armv7m, "enable-bitband", true);
->      object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
->                                       "memory", &error_abort);
->      object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
-> 
+> =20
+>  /**
+> @@ -780,14 +781,6 @@ int spapr_get_vcpu_id(PowerPCCPU *cpu);
+>  void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp);
+>  PowerPCCPU *spapr_find_cpu(int vcpu_id);
+> =20
+> -int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align,
+> -                   Error **errp);
+> -#define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false, e=
+rrp)
+> -int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp);
+> -void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+> -qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+> -
+> -
+>  int spapr_caps_pre_load(void *opaque);
+>  int spapr_caps_pre_save(void *opaque);
+> =20
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index 6f7f50548809..0e98c4474bb2 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -29,4 +29,26 @@ int spapr_irq_msi_alloc(sPAPRMachineState *spapr, uint=
+32_t num, bool align,
+>  void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t num);
+>  void spapr_irq_msi_reset(sPAPRMachineState *spapr);
+> =20
+> +typedef struct sPAPRIrq {
+> +    uint32_t    nr_irqs;
+> +
+> +    void (*init)(sPAPRMachineState *spapr, Error **errp);
+> +    int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error **er=
+rp);
+> +    void (*free)(sPAPRMachineState *spapr, int irq, int num);
+> +    qemu_irq (*qirq)(sPAPRMachineState *spapr, int irq);
+> +    void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
+> +} sPAPRIrq;
+> +
+> +extern sPAPRIrq spapr_irq_xics;
+> +
+> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp);
+> +void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+> +qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+> +
+> +/*
+> + * XICS legacy routines
+> + */
+> +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Error =
+**errp);
+> +#define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false, e=
+rrp)
+> +
+>  #endif
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 1794952d4e2a..693144e40d49 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -54,7 +54,6 @@
+>  #include "hw/ppc/spapr.h"
+>  #include "hw/ppc/spapr_vio.h"
+>  #include "hw/pci-host/spapr.h"
+> -#include "hw/ppc/xics.h"
+>  #include "hw/pci/msi.h"
+> =20
+>  #include "hw/pci/pci.h"
+> @@ -117,33 +116,6 @@ static bool spapr_is_thread0_in_vcore(sPAPRMachineSt=
+ate *spapr,
+>      return spapr_get_vcpu_id(cpu) % spapr->vsmt =3D=3D 0;
+>  }
+> =20
+> -static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
+> -                                  const char *type_ics,
+> -                                  int nr_irqs, Error **errp)
+> -{
+> -    Error *local_err =3D NULL;
+> -    Object *obj;
+> -
+> -    obj =3D object_new(type_ics);
+> -    object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+> -    object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+> -                                   &error_abort);
+> -    object_property_set_int(obj, nr_irqs, "nr-irqs", &local_err);
+> -    if (local_err) {
+> -        goto error;
+> -    }
+> -    object_property_set_bool(obj, true, "realized", &local_err);
+> -    if (local_err) {
+> -        goto error;
+> -    }
+> -
+> -    return ICS_BASE(obj);
+> -
+> -error:
+> -    error_propagate(errp, local_err);
+> -    return NULL;
+> -}
+> -
+>  static bool pre_2_10_vmstate_dummy_icp_needed(void *opaque)
+>  {
+>      /* Dummy entries correspond to unused ICPState objects in older QEMU=
+s,
+> @@ -184,43 +156,6 @@ static int xics_max_server_number(sPAPRMachineState =
+*spapr)
+>      return DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads);
+>  }
+> =20
+> -static void xics_system_init(MachineState *machine, int nr_irqs, Error *=
+*errp)
+> -{
+> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
+> -    Error *local_err =3D NULL;
+> -
+> -    /* Initialize the MSI IRQ allocator. */
+> -    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> -        spapr_irq_msi_init(spapr, XICS_IRQ_BASE + nr_irqs - SPAPR_IRQ_MS=
+I);
+> -    }
+> -
+> -    if (kvm_enabled()) {
+> -        if (machine_kernel_irqchip_allowed(machine) &&
+> -            !xics_kvm_init(spapr, &local_err)) {
+> -            spapr->icp_type =3D TYPE_KVM_ICP;
+> -            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irqs,
+> -                                          &local_err);
+> -        }
+> -        if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
+> -            error_prepend(&local_err,
+> -                          "kernel_irqchip requested but unavailable: ");
+> -            goto error;
+> -        }
+> -        error_free(local_err);
+> -        local_err =3D NULL;
+> -    }
+> -
+> -    if (!spapr->ics) {
+> -        xics_spapr_init(spapr);
+> -        spapr->icp_type =3D TYPE_ICP;
+> -        spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs,
+> -                                      &local_err);
+> -    }
+> -
+> -error:
+> -    error_propagate(errp, local_err);
+> -}
+> -
+>  static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
+>                                    int smt_threads)
+>  {
+> @@ -2618,7 +2553,7 @@ static void spapr_machine_init(MachineState *machin=
+e)
+>      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
+> =20
+>      /* Set up Interrupt Controller before we create the VCPUs */
+> -    xics_system_init(machine, XICS_IRQS_SPAPR, &error_fatal);
+> +    smc->irq->init(spapr, &error_fatal);
+> =20
+>      /* Set up containers for ibm,client-architecture-support negotiated =
+options
+>       */
+> @@ -3810,121 +3745,13 @@ static ICPState *spapr_icp_get(XICSFabric *xi, i=
+nt vcpu_id)
+>      return cpu ? ICP(cpu->intc) : NULL;
+>  }
+> =20
+> -#define ICS_IRQ_FREE(ics, srcno)   \
+> -    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
+> -
+> -static int ics_find_free_block(ICSState *ics, int num, int alignnum)
+> -{
+> -    int first, i;
+> -
+> -    for (first =3D 0; first < ics->nr_irqs; first +=3D alignnum) {
+> -        if (num > (ics->nr_irqs - first)) {
+> -            return -1;
+> -        }
+> -        for (i =3D first; i < first + num; ++i) {
+> -            if (!ICS_IRQ_FREE(ics, i)) {
+> -                break;
+> -            }
+> -        }
+> -        if (i =3D=3D (first + num)) {
+> -            return first;
+> -        }
+> -    }
+> -
+> -    return -1;
+> -}
+> -
+> -int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Error =
+**errp)
+> -{
+> -    ICSState *ics =3D spapr->ics;
+> -    int first =3D -1;
+> -
+> -    assert(ics);
+> -
+> -    /*
+> -     * MSIMesage::data is used for storing VIRQ so
+> -     * it has to be aligned to num to support multiple
+> -     * MSI vectors. MSI-X is not affected by this.
+> -     * The hint is used for the first IRQ, the rest should
+> -     * be allocated continuously.
+> -     */
+> -    if (align) {
+> -        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+> -               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+> -        first =3D ics_find_free_block(ics, num, num);
+> -    } else {
+> -        first =3D ics_find_free_block(ics, num, 1);
+> -    }
+> -
+> -    if (first < 0) {
+> -        error_setg(errp, "can't find a free %d-IRQ block", num);
+> -        return -1;
+> -    }
+> -
+> -    return first + ics->offset;
+> -}
+> -
+> -int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp)
+> -{
+> -    ICSState *ics =3D spapr->ics;
+> -
+> -    assert(ics);
+> -
+> -    if (!ics_valid_irq(ics, irq)) {
+> -        error_setg(errp, "IRQ %d is invalid", irq);
+> -        return -1;
+> -    }
+> -
+> -    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
+> -        error_setg(errp, "IRQ %d is not free", irq);
+> -        return -1;
+> -    }
+> -
+> -    ics_set_irq_type(ics, irq - ics->offset, lsi);
+> -    return 0;
+> -}
+> -
+> -void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+> -{
+> -    ICSState *ics =3D spapr->ics;
+> -    int srcno =3D irq - ics->offset;
+> -    int i;
+> -
+> -    if (ics_valid_irq(ics, irq)) {
+> -        trace_spapr_irq_free(0, irq, num);
+> -        for (i =3D srcno; i < srcno + num; ++i) {
+> -            if (ICS_IRQ_FREE(ics, i)) {
+> -                trace_spapr_irq_free_warn(0, i + ics->offset);
+> -            }
+> -            memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+> -        }
+> -    }
+> -}
+> -
+> -qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq)
+> -{
+> -    ICSState *ics =3D spapr->ics;
+> -
+> -    if (ics_valid_irq(ics, irq)) {
+> -        return ics->qirqs[irq - ics->offset];
+> -    }
+> -
+> -    return NULL;
+> -}
+> -
+>  static void spapr_pic_print_info(InterruptStatsProvider *obj,
+>                                   Monitor *mon)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> -    CPUState *cs;
+> -
+> -    CPU_FOREACH(cs) {
+> -        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> -
+> -        icp_pic_print_info(ICP(cpu->intc), mon);
+> -    }
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> =20
+> -    ics_pic_print_info(spapr->ics, mon);
+> +    smc->irq->print_info(spapr, mon);
+>  }
+> =20
+>  int spapr_get_vcpu_id(PowerPCCPU *cpu)
+> @@ -4036,6 +3863,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+>      smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
+>      smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64kiB */
+>      spapr_caps_add_properties(smc, &error_abort);
+> +    smc->irq =3D &spapr_irq_xics;
+>  }
+> =20
+>  static const TypeInfo spapr_machine_info =3D {
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 993759db47fa..fb091995a11f 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -11,6 +11,7 @@
+>  #include "hw/ppc/spapr_cpu_core.h"
+>  #include "target/ppc/cpu.h"
+>  #include "hw/ppc/spapr.h"
+> +#include "hw/ppc/xics.h" /* for icp_create() - to be removed */
+>  #include "hw/boards.h"
+>  #include "qapi/error.h"
+>  #include "sysemu/cpus.h"
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 24e9c1d4433c..0cbb5dd39368 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -13,6 +13,9 @@
+>  #include "qapi/error.h"
+>  #include "hw/ppc/spapr.h"
+>  #include "hw/ppc/xics.h"
+> +#include "sysemu/kvm.h"
+> +
+> +#include "trace.h"
+> =20
+>  void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_msis)
+>  {
+> @@ -54,3 +57,230 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr)
+>  {
+>      bitmap_clear(spapr->irq_map, 0, spapr->irq_map_nr);
+>  }
+> +
+> +
+> +/*
+> + * XICS IRQ backend.
+> + */
+> +
+> +static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
+> +                                  const char *type_ics,
+> +                                  int nr_irqs, Error **errp)
+> +{
+> +    Error *local_err =3D NULL;
+> +    Object *obj;
+> +
+> +    obj =3D object_new(type_ics);
+> +    object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+> +    object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+> +                                   &error_abort);
+> +    object_property_set_int(obj, nr_irqs, "nr-irqs", &local_err);
+> +    if (local_err) {
+> +        goto error;
+> +    }
+> +    object_property_set_bool(obj, true, "realized", &local_err);
+> +    if (local_err) {
+> +        goto error;
+> +    }
+> +
+> +    return ICS_BASE(obj);
+> +
+> +error:
+> +    error_propagate(errp, local_err);
+> +    return NULL;
+> +}
+> +
+> +static void spapr_irq_init_xics(sPAPRMachineState *spapr, Error **errp)
+> +{
+> +    MachineState *machine =3D MACHINE(spapr);
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +    int nr_irqs =3D smc->irq->nr_irqs;
+> +    Error *local_err =3D NULL;
+> +
+> +    /* Initialize the MSI IRQ allocator. */
+> +    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +        spapr_irq_msi_init(spapr, XICS_IRQ_BASE + nr_irqs - SPAPR_IRQ_MS=
+I);
+> +    }
+
+I think this belongs in common code, rather than xics specific.
+
+> +
+> +    if (kvm_enabled()) {
+> +        if (machine_kernel_irqchip_allowed(machine) &&
+> +            !xics_kvm_init(spapr, &local_err)) {
+> +            spapr->icp_type =3D TYPE_KVM_ICP;
+> +            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irqs,
+> +                                          &local_err);
+> +        }
+> +        if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
+> +            error_prepend(&local_err,
+> +                          "kernel_irqchip requested but unavailable: ");
+> +            goto error;
+> +        }
+> +        error_free(local_err);
+> +        local_err =3D NULL;
+> +    }
+> +
+> +    if (!spapr->ics) {
+
+When could this get called with spapr->ics already initialized?
+
+> +        xics_spapr_init(spapr);
+> +        spapr->icp_type =3D TYPE_ICP;
+> +        spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs,
+> +                                      &local_err);
+> +    }
+> +
+> +error:
+> +    error_propagate(errp, local_err);
+> +}
+> +
+> +#define ICS_IRQ_FREE(ics, srcno)   \
+> +    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
+> +
+> +static int spapr_irq_claim_xics(sPAPRMachineState *spapr, int irq, bool =
+lsi,
+> +                                Error **errp)
+> +{
+> +    ICSState *ics =3D spapr->ics;
+> +
+> +    assert(ics);
+> +
+> +    if (!ics_valid_irq(ics, irq)) {
+> +        error_setg(errp, "IRQ %d is invalid", irq);
+> +        return -1;
+> +    }
+> +
+> +    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
+> +        error_setg(errp, "IRQ %d is not free", irq);
+> +        return -1;
+> +    }
+> +
+> +    ics_set_irq_type(ics, irq - ics->offset, lsi);
+> +    return 0;
+> +}
+> +
+> +static void spapr_irq_free_xics(sPAPRMachineState *spapr, int irq, int n=
+um)
+> +{
+> +    ICSState *ics =3D spapr->ics;
+> +    uint32_t srcno =3D irq - ics->offset;
+> +    int i;
+> +
+> +    if (ics_valid_irq(ics, irq)) {
+> +        trace_spapr_irq_free(0, irq, num);
+> +        for (i =3D srcno; i < srcno + num; ++i) {
+> +            if (ICS_IRQ_FREE(ics, i)) {
+> +                trace_spapr_irq_free_warn(0, i);
+> +            }
+> +            memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+> +        }
+> +    }
+> +}
+> +
+> +static qemu_irq spapr_qirq_xics(sPAPRMachineState *spapr, int irq)
+> +{
+> +    ICSState *ics =3D spapr->ics;
+> +    uint32_t srcno =3D irq - ics->offset;
+> +
+> +    if (ics_valid_irq(ics, irq)) {
+> +        return ics->qirqs[srcno];
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+> +static void spapr_irq_print_info_xics(sPAPRMachineState *spapr, Monitor =
+*mon)
+> +{
+> +    CPUState *cs;
+> +
+> +    CPU_FOREACH(cs) {
+> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> +
+> +        icp_pic_print_info(ICP(cpu->intc), mon);
+> +    }
+> +
+> +    ics_pic_print_info(spapr->ics, mon);
+> +}
+> +
+> +sPAPRIrq spapr_irq_xics =3D {
+> +    .nr_irqs     =3D XICS_IRQS_SPAPR,
+> +
+> +    .init        =3D spapr_irq_init_xics,
+> +    .claim       =3D spapr_irq_claim_xics,
+> +    .free        =3D spapr_irq_free_xics,
+> +    .qirq        =3D spapr_qirq_xics,
+> +    .print_info  =3D spapr_irq_print_info_xics,
+> +};
+> +
+> +/*
+> + * sPAPR IRQ frontend routines for devices
+> + */
+> +
+> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp)
+> +{
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +
+> +    return smc->irq->claim(spapr, irq, lsi, errp);
+> +}
+> +
+> +void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+> +{
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +
+> +    smc->irq->free(spapr, irq, num);
+> +}
+> +
+> +qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq)
+> +{
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +
+> +    return smc->irq->qirq(spapr, irq);
+> +}
+> +
+> +/*
+> + * XICS legacy routines - to deprecate one day
+> + */
+> +
+> +static int ics_find_free_block(ICSState *ics, int num, int alignnum)
+> +{
+> +    int first, i;
+> +
+> +    for (first =3D 0; first < ics->nr_irqs; first +=3D alignnum) {
+> +        if (num > (ics->nr_irqs - first)) {
+> +            return -1;
+> +        }
+> +        for (i =3D first; i < first + num; ++i) {
+> +            if (!ICS_IRQ_FREE(ics, i)) {
+> +                break;
+> +            }
+> +        }
+> +        if (i =3D=3D (first + num)) {
+> +            return first;
+> +        }
+> +    }
+> +
+> +    return -1;
+> +}
+> +
+> +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Error =
+**errp)
+> +{
+> +    ICSState *ics =3D spapr->ics;
+> +    int first =3D -1;
+> +
+> +    assert(ics);
+> +
+> +    /*
+> +     * MSIMesage::data is used for storing VIRQ so
+> +     * it has to be aligned to num to support multiple
+> +     * MSI vectors. MSI-X is not affected by this.
+> +     * The hint is used for the first IRQ, the rest should
+> +     * be allocated continuously.
+> +     */
+> +    if (align) {
+> +        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+> +               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+> +        first =3D ics_find_free_block(ics, num, num);
+> +    } else {
+> +        first =3D ics_find_free_block(ics, num, 1);
+> +    }
+> +
+> +    if (first < 0) {
+> +        error_setg(errp, "can't find a free %d-IRQ block", num);
+> +        return -1;
+> +    }
+> +
+> +    return first + ics->offset;
+> +}
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--4LwthZj+AV2mq5CX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltaqo8ACgkQbDjKyiDZ
+s5Ja2A//dR6vTXpujQftCUhuxzv5huhmEFMWuFvS57xaWB9LLiTeWHFG6Q+a4Mg4
+lauSFKxM3i8LBnqIQ9LoSoaXse+CpcYT+2aKmpN2590TEWjUSd42DuRFcYOfmFBH
+UIc5t2wf4/29IUzd85xm0xUVy3cOfnT2KuJ2QMGhbtBQxt6Q4gaT3fr+F0xGfvO+
+y+go6L9/7LRUyMKMfrRjMnADZWDB0wVKDgCb6Dfh9NjzYPypo+ue/txrLQRg6EZG
+1b6dj0mSMpgAkioIFrnDJ+MW0gA7h5TIS/xm/gWlBgySb0941+WhOBc8PDD4b+zv
+FTyEnRirAP2FxjbZgU4b9mCW6y7m3ha/q0iux9IY2re5k9EmGFDUdljgSfgnR7Rf
+KZEbj8zT5MjjTRMttV2IapAKq/S9nBJigAEU7c8JMH4jkv+MueqVwKMPac8ZJyUL
+Vv9JoD4Oeo0edbyFub/8P0h9C6xot1UDJlrnRPZ4pBQ3wry3jQvelrTg31A/TnpA
+E2RTZAQ5z+n+uX9i8i8rOVFy91RUQvEoR4kJjQZDV5AQaB2n72+ltW2gYXgRiEK+
+fBwNjcFYbAO+1PqyOZmeGKGVdWR8Qcj7Tn7momTtJYw6fIhvkpnsjpq2CLgEXdwG
+m/BrXgup5CxukvZq3ibvBy56Ai4toeXi9Hf+VXjOE05ksuD0UYc=
+=/Jq0
+-----END PGP SIGNATURE-----
+
+--4LwthZj+AV2mq5CX--
