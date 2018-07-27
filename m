@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fj2GX-0004LJ-27
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:54:42 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fj2Hs-0005VY-0Z
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:56:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fj2GS-0007GL-5X
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:54:41 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33897)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fj2GR-0007G8-RQ
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:54:36 -0400
-Received: by mail-wm0-x242.google.com with SMTP id l2-v6so2031733wme.1
-	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 05:54:35 -0700 (PDT)
-Date: Fri, 27 Jul 2018 13:54:32 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180727125432.GD28555@stefanha-x1.localdomain>
-References: <20180709091136.28849-1-e.emanuelegiuseppe@gmail.com>
-	<20180709091136.28849-2-e.emanuelegiuseppe@gmail.com>
-	<20180711142819.GM31228@stefanha-x1.localdomain>
-	<bc76dd27-434f-9a75-0afd-47049cc915d6@redhat.com>
-	<20180718142357.GM21825@stefanha-x1.localdomain>
-	<00b4f8fe-b473-ac7a-4f13-9752aeef7062@redhat.com>
-	<8349f160-fcc8-610b-774e-b074d77f6d9f@gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1fj2Hm-000840-VT
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 08:56:03 -0400
+Date: Fri, 27 Jul 2018 14:55:51 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180727145551.2a1df03f.cohuck@redhat.com>
+In-Reply-To: <20180725091233.3300-1-david@redhat.com>
+References: <20180725091233.3300-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DrWhICOqskFTAXiy"
-Content-Disposition: inline
-In-Reply-To: <8349f160-fcc8-610b-774e-b074d77f6d9f@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/7] tests: qgraph API for the qtest driver
- framework
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,65 +22,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Emanuele <e.emanuelegiuseppe@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, "Daniel P .
+	=?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
+On Wed, 25 Jul 2018 11:12:33 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
---DrWhICOqskFTAXiy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> The "max" CPU model behaves like "-cpu host" when KVM is enabled, and like
+> a CPU with the maximum possible feature set when TCG is enabled.
+> 
+> While the "host" model can not be used under TCG ("kvm_required"), the
+> "max" model can and "Enables all features supported by the accelerator in
+> the current host".
+> 
+> So we can treat "host" just as a special case of "max" (like x86 does).
+> It differs to the "qemu" CPU model under TCG such that compatibility
+> handling will not be performed and that some experimental CPU features
+> not yet part of the "qemu" model might be indicated.
+> 
+> These are right now under TCG (see "qemu_MAX"):
+> - stfle53
+> - msa5-base
+> - zpci
+> 
+> This will result right now in the following warning when starting QEMU TCG
+> with the "max" model:
+>     "qemu-system-s390x: warning: 'msa5-base' requires 'kimd-sha-512'."
+> 
+> The "qemu" model (used as default in QEMU under TCG) will continue to
+> work without such warnings. The "max" mdel in the current form
+> might be interesting for kvm-unit-tests (where we would e.g. now also
+> test "msa5-base").
+> 
+> The "max" model is neither static nor migration safe (like the "host"
+> model). It is independent of the machine but dependends on the accelerator.
+> It can be used to detect the maximum CPU model also under TCG from upper
+> layers without having to care about CPU model names for CPU model
+> expansion.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/cpu_models.c | 81 +++++++++++++++++++++++++++------------
+>  1 file changed, 56 insertions(+), 25 deletions(-)
 
-On Wed, Jul 18, 2018 at 11:13:18PM +0200, Emanuele wrote:
->=20
->=20
-> On 07/18/2018 09:28 PM, Paolo Bonzini wrote:
-> > On 18/07/2018 16:23, Stefan Hajnoczi wrote:
-> > > > > > +struct QOSGraphObject {
-> > > > > > +    /* for produces, returns void * */
-> > > > > > +    QOSGetDriver get_driver;
-> > > > > Unused?
-> > > > >=20
-> > > > > > +    /* for contains, returns a QOSGraphObject * */
-> > > > > > +    QOSGetDevice get_device;
-> > > > > Unused?
-> > > > What is unused?
-> > > Neither of these fields are used in this patch.  Please introduce them
-> > > in the first patch that actually uses them.  This way code review can
-> > > proceed linearly and it also prevents deadcode when just part of a pa=
-tch
-> > > series is merged or backported.
-> > So do you suggest to squash patch 6 into this one, so that a user of
-> > QOSGraphObject exists already here?
-> I think he's right, it makes no sense to have qos-graph as patch 6, it co=
-uld
-> go as patch 2, even though by that time no object/node exist yet.
->=20
-> Moreover, right now no file in patch 3-4-5 is actually compiled until pat=
-ch
-> 6, which is easily prone to errors in case of future edits (I too have th=
-is
-> problem right now, when I need to modify sdhci.c and I'm forced to return=
- to
-> the branch head to compile), so adding it before would make things more
-> clear.
-
-Sounds good.
-
-Stefan
-
---DrWhICOqskFTAXiy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbWxYIAAoJEJykq7OBq3PI+DoH/2tF15N/wOnTOp6cuyPtmAHz
-O9onm9xjd9BcPzDGQ8QYxaSXEI02EOIzOraWX7LoM3gaIZLuLnKGtZPWO7XZTa8y
-6bnCitP37rAoMdIUY0unozd6oP8DfdrphxecOurcwYHmWtm4KqL9aYs/Gucz+Fqq
-iQV8QpDBBIkvhTz6xKCDJBzyer3p6A2Jzwvm2FS0U+cXDa7OWEtVUUYhz5YlcjUB
-4EI5OQiGjR3zFUuSgFqJBG4KYxBRNK/7VnbPCCdp398miwlWqbL5deb/e08B3Pk4
-sMkQl+oX/WZtTDpP6ebQs1SqFnaaEDQboMcSGf7amJzkX3pP3Y0aPKt24ljQfug=
-=mKJY
------END PGP SIGNATURE-----
-
---DrWhICOqskFTAXiy--
+So, what's the outcome? Can I merge this with the discussed minor
+edits, or should I wait for a v2?
