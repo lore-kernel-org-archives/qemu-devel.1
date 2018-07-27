@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fj4RW-00066Z-At
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:13 -0400
+	(envelope-from <armbru@redhat.com>) id 1fj4RX-00067h-SQ
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fj4RV-0000Dt-02
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59484 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fj4RU-0000E0-WC
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59485 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fj4RU-0000DT-Pj
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fj4RU-0000DR-Qk
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:08 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 27 Jul 2018 17:13:42 +0200
-Message-Id: <20180727151359.29061-7-armbru@redhat.com>
+Date: Fri, 27 Jul 2018 17:13:45 +0200
+Message-Id: <20180727151359.29061-10-armbru@redhat.com>
 In-Reply-To: <20180727151359.29061-1-armbru@redhat.com>
 References: <20180727151359.29061-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 06/23] qobject: New
- qobject_from_vjsonf_nofail(), qdict_from_vjsonf_nofail()
+Subject: [Qemu-devel] [PATCH v2 09/23] qobject: qobject_from_jsonv() is
+ dangerous, hide it away
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +30,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com
 
-Every printf()-like function sooner or later needs its vprintf()-like
-buddy.  The next commit will need qobject_from_jsonf_nofail()'s buddy,
-and qdict_from_jsonf_nofail()'s buddy will be used later in this
-series.  Add both.
+qobject_from_jsonv() takes ownership of %p arguments.  On failure, we
+can't generally know whether we failed before or after %p, so
+ownership becomes indeterminate.  To avoid leaks, callers passing %p
+must terminate on error, e.g. by passing &error_abort.  Trap for the
+unwary; document and give the function internal linkage.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- include/qapi/qmp/qjson.h |  4 ++++
- qobject/qjson.c          | 44 +++++++++++++++++++++++++++++++++-------
- 2 files changed, 41 insertions(+), 7 deletions(-)
+ include/qapi/qmp/qjson.h |  2 --
+ qobject/qjson.c          | 13 ++++++++++++-
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/include/qapi/qmp/qjson.h b/include/qapi/qmp/qjson.h
-index dc509d51ae..dce78583dc 100644
+index dce78583dc..5ebbe5a118 100644
 --- a/include/qapi/qmp/qjson.h
 +++ b/include/qapi/qmp/qjson.h
-@@ -18,8 +18,12 @@ QObject *qobject_from_json(const char *string, Error *=
-*errp);
- QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **err=
+@@ -15,8 +15,6 @@
+ #define QJSON_H
+=20
+ QObject *qobject_from_json(const char *string, Error **errp);
+-QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **err=
 p)
+-    GCC_FMT_ATTR(1, 0);
+=20
+ QObject *qobject_from_vjsonf_nofail(const char *string, va_list ap)
      GCC_FMT_ATTR(1, 0);
-=20
-+QObject *qobject_from_vjsonf_nofail(const char *string, va_list ap)
-+    GCC_FMT_ATTR(1, 0);
- QObject *qobject_from_jsonf_nofail(const char *string, ...)
-     GCC_FMT_ATTR(1, 2);
-+QDict *qdict_from_vjsonf_nofail(const char *string, va_list ap)
-+    GCC_FMT_ATTR(1, 0);
- QDict *qdict_from_jsonf_nofail(const char *string, ...)
-     GCC_FMT_ATTR(1, 2);
-=20
 diff --git a/qobject/qjson.c b/qobject/qjson.c
-index 4a9dcff343..2e450231ff 100644
+index 2e450231ff..ab4040f235 100644
 --- a/qobject/qjson.c
 +++ b/qobject/qjson.c
-@@ -59,6 +59,25 @@ QObject *qobject_from_json(const char *string, Error *=
-*errp)
-     return qobject_from_jsonv(string, NULL, errp);
+@@ -39,7 +39,18 @@ static void parse_json(JSONMessageParser *parser, GQue=
+ue *tokens)
+     s->result =3D json_parser_parse_err(tokens, s->ap, &s->err);
  }
 =20
+-QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **err=
+p)
 +/*
-+ * Parse @string as JSON value with %-escapes interpolated.
-+ * Abort on error.  Do not use with untrusted @string.
-+ * Return the resulting QObject.  It is never null.
++ * Parse @string as JSON value.
++ * If @ap is non-null, interpolate %-escapes.
++ * Takes ownership of %p arguments.
++ * On success, return the JSON value.
++ * On failure, store an error through @errp and return NULL.
++ * Ownership of %p arguments becomes indeterminate then.  To avoid
++ * leaks, callers passing %p must terminate on error, e.g. by passing
++ * &error_abort.
 + */
-+QObject *qobject_from_vjsonf_nofail(const char *string, va_list ap)
-+{
-+    va_list ap_copy;
-+    QObject *obj;
-+
-+    /* va_copy() is needed when va_list is an array type */
-+    va_copy(ap_copy, ap);
-+    obj =3D qobject_from_jsonv(string, &ap_copy, &error_abort);
-+    va_end(ap_copy);
-+
-+    assert(obj);
-+    return obj;
-+}
-+
- /*
-  * Parse @string as JSON value with %-escapes interpolated.
-  * Abort on error.  Do not use with untrusted @string.
-@@ -70,13 +89,26 @@ QObject *qobject_from_jsonf_nofail(const char *string=
-, ...)
-     va_list ap;
-=20
-     va_start(ap, string);
--    obj =3D qobject_from_jsonv(string, &ap, &error_abort);
-+    obj =3D qobject_from_vjsonf_nofail(string, ap);
-     va_end(ap);
-=20
--    assert(obj);
-     return obj;
- }
-=20
-+/*
-+ * Parse @string as JSON object with %-escapes interpolated.
-+ * Abort on error.  Do not use with untrusted @string.
-+ * Return the resulting QDict.  It is never null.
-+ */
-+QDict *qdict_from_vjsonf_nofail(const char *string, va_list ap)
-+{
-+    QDict *qdict;
-+
-+    qdict =3D qobject_to(QDict, qobject_from_vjsonf_nofail(string, ap));
-+    assert(qdict);
-+    return qdict;
-+}
-+
- /*
-  * Parse @string as JSON object with %-escapes interpolated.
-  * Abort on error.  Do not use with untrusted @string.
-@@ -84,15 +116,13 @@ QObject *qobject_from_jsonf_nofail(const char *strin=
-g, ...)
-  */
- QDict *qdict_from_jsonf_nofail(const char *string, ...)
++static QObject *qobject_from_jsonv(const char *string, va_list *ap,
++                                   Error **errp)
  {
--    QDict *obj;
-+    QDict *qdict;
-     va_list ap;
+     JSONParsingState state =3D {};
 =20
-     va_start(ap, string);
--    obj =3D qobject_to(QDict, qobject_from_jsonv(string, &ap, &error_abo=
-rt));
-+    qdict =3D qdict_from_vjsonf_nofail(string, ap);
-     va_end(ap);
--
--    assert(obj);
--    return obj;
-+    return qdict;
- }
-=20
- typedef struct ToJsonIterState
 --=20
 2.17.1
