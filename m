@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fj4RW-00066d-B3
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:11 -0400
+	(envelope-from <armbru@redhat.com>) id 1fj4RW-00066e-B5
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fj4RU-0000DC-6O
+	(envelope-from <armbru@redhat.com>) id 1fj4RU-0000DF-6K
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48190 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55270 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fj4RU-0000Cm-0Q
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fj4RU-0000AP-05
 	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 11:14:08 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 27 Jul 2018 17:13:53 +0200
-Message-Id: <20180727151359.29061-18-armbru@redhat.com>
+Date: Fri, 27 Jul 2018 17:13:48 +0200
+Message-Id: <20180727151359.29061-13-armbru@redhat.com>
 In-Reply-To: <20180727151359.29061-1-armbru@redhat.com>
 References: <20180727151359.29061-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 17/23] migration-test: Clean up string
- interpolation into QMP, part 1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 12/23] cpu-plug-test: Don't pass integers as
+ strings to device_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +28,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com
 
-Leaving interpolation into JSON to qmp() is more robust than building
-QMP input manually, as explained in the recent commit "tests: Clean up
-string interpolation into QMP input (simple cases)".
+test_plug_with_device_add_x86() plugs Haswell-i386-cpu and
+Haswell-x86_64-cpu with device_add.  It passes socket-id, core-id,
+thread-id as JSON strings.  The properties are actually integers.
 
-migrate_recover() builds QMP input manually because wait_command()
-can't interpolate.  Well, it can since the previous commit.  Simplify
-accordingly.
+test_plug_with_device_add_coreid() plugs power8_v2.0-spapr-cpu-core
+and qemu-s390x-cpu with device_add.  It passes core-id as JSON string.
+The properties are actually integers.
 
-Bonus: gets rid of a non-literal format string.  A step towards
-compile-time format string checking without triggering
--Wformat-nonliteral.
+Passing JSON string values to integer properties works only due to
+device_add implementation accidents.  Fix the test to pass JSON
+numbers.  While there, use %u rather than %i with unsigned int.
 
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/migration-test.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ tests/cpu-plug-test.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 0c92f2b1cd..323bb60535 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -156,6 +156,7 @@ static void stop_cb(void *opaque, const char *name, QDict *data)
- /*
-  * Events can get in the way of responses we are actually waiting for.
-  */
-+GCC_FMT_ATTR(2, 3)
- static QDict *wait_command(QTestState *who, const char *command, ...)
- {
-     va_list ap;
-@@ -354,13 +355,12 @@ static void migrate_pause(QTestState *who)
- static void migrate_recover(QTestState *who, const char *uri)
- {
-     QDict *rsp;
--    gchar *cmd = g_strdup_printf(
--        "{ 'execute': 'migrate-recover', "
--        "  'id': 'recover-cmd', "
--        "  'arguments': { 'uri': '%s' } }", uri);
- 
--    rsp = wait_command(who, cmd);
--    g_free(cmd);
-+    rsp = wait_command(who,
-+                       "{ 'execute': 'migrate-recover', "
-+                       "  'id': 'recover-cmd', "
-+                       "  'arguments': { 'uri': %s } }",
-+                       uri);
-     qobject_unref(rsp);
- }
- 
--- 
+diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+index 5f39ba0df3..ab3bf6df90 100644
+--- a/tests/cpu-plug-test.c
++++ b/tests/cpu-plug-test.c
+@@ -88,8 +88,8 @@ static void test_plug_with_device_add_x86(gconstpointer=
+ data)
+         for (c =3D 0; c < td->cores; c++) {
+             for (t =3D 0; t < td->threads; t++) {
+                 char *id =3D g_strdup_printf("id-%i-%i-%i", s, c, t);
+-                qtest_qmp_device_add(td->device_model, id, "'socket-id':=
+'%i', "
+-                                     "'core-id':'%i', 'thread-id':'%i'",
++                qtest_qmp_device_add(td->device_model, id, "'socket-id':=
+%u, "
++                                     "'core-id':%u, 'thread-id':%u",
+                                      s, c, t);
+                 g_free(id);
+             }
+@@ -114,7 +114,7 @@ static void test_plug_with_device_add_coreid(gconstpo=
+inter data)
+=20
+     for (c =3D td->cores; c < td->maxcpus / td->sockets / td->threads; c=
+++) {
+         char *id =3D g_strdup_printf("id-%i", c);
+-        qtest_qmp_device_add(td->device_model, id, "'core-id':'%i'", c);
++        qtest_qmp_device_add(td->device_model, id, "'core-id':%u", c);
+         g_free(id);
+     }
+=20
+--=20
 2.17.1
