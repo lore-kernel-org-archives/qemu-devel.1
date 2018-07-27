@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fittE-0005tv-9x
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 23:58:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fiufW-00009I-9x
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 00:47:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fittB-0005cA-8L
-	for qemu-devel@nongnu.org; Thu, 26 Jul 2018 23:58:04 -0400
-Date: Fri, 27 Jul 2018 13:56:11 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180727035611.GG3694@umbus.fritz.box>
-References: <20180726133723.17041-1-clg@kaod.org>
-	<20180726133723.17041-2-clg@kaod.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1fiufS-0008TB-Ch
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 00:47:58 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:33718)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fiufS-0008S2-3a
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 00:47:54 -0400
+Received: by mail-pl0-x242.google.com with SMTP id 6-v6so1778617plb.0
+	for <qemu-devel@nongnu.org>; Thu, 26 Jul 2018 21:47:53 -0700 (PDT)
+References: <153258768962.6738.11319866502689416568.stgit@dhcp-9-109-246-16>
+	<4671a0f0-e399-6187-3205-994f663fa260@linaro.org>
+	<db84d8c9-fab0-a1eb-7cd8-a154a2a76b10@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <f8f59cca-86e6-2a42-3184-faddd51e5424@linaro.org>
+Date: Thu, 26 Jul 2018 21:47:48 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="L1c6L/cjZjI9d0Eq"
-Content-Disposition: inline
-In-Reply-To: <20180726133723.17041-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 1/3] spapr: introduce a fixed IRQ number
- space
+In-Reply-To: <db84d8c9-fab0-a1eb-7cd8-a154a2a76b10@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: ppc64: don't use volatile
+ register during safe_syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +33,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Laurent Vivier <laurent@vivier.eu>, Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, dgibson@redhat.com, riku.voipio@iki.fi
+Cc: qemu-devel@nongnu.org
+
+On 07/26/2018 10:39 AM, Laurent Vivier wrote:
+> Le 26/07/2018 à 19:15, Richard Henderson a écrit :
+>> On 07/25/2018 11:48 PM, Shivaprasad G Bhat wrote:
+>>> r11 is a volatile register on PPC as per calling conventions.
+>>> The safe_syscall code uses it to check if the signal_pending
+>>> is set during the safe_syscall. When a syscall is interrupted
+>>> on return from signal handling, the r11 might be corrupted
+>>> before we retry the syscall leading to a crash. The registers
+>>> r0-r13 are not to be used here as they have
+>>> volatile/designated/reserved usages. Change the code to use
+>>> r14 which is non-volatile and is appropriate for local use in
+>>> safe_syscall.
+>>>
+>>> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+>>> ---
+>>> Steps to reproduce:
+>>> On PPC host, issue `qemu-ppc64le /usr/bin/cc -E -`
+>>> Attempt Ctrl-C, the issue is reproduced.
+>>>
+>>> Reference:
+>>> https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
+>>>
+>>>  linux-user/host/ppc64/safe-syscall.inc.S |    4 ++--
+>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
+>>> index d30050a67c..b0cbbe6a69 100644
+>>> --- a/linux-user/host/ppc64/safe-syscall.inc.S
+>>> +++ b/linux-user/host/ppc64/safe-syscall.inc.S
+>>> @@ -49,7 +49,7 @@ safe_syscall_base:
+>>>  	 *               and returns the result in r3
+>>>  	 * Shuffle everything around appropriately.
+>>>  	 */
+>>> -	mr	11, 3	/* signal_pending */
+>>> +	mr	14, 3	/* signal_pending */
+>>
+>> I do see that I was incorrect in assuming that r11 would be unmodified.  But
+>> you can't simply write to a call-saved register -- you must preserve its value
+>> for the caller.
+>>
+>> Saving the value requires that you find some space on, or create, a stack
+>> frame.  Note that there are two different conventions for _CALL_AIX and
+>> _CALL_ELF==2.
+> 
+> Can we guess the syscall ('sc') will not modify neither r11 nor r14...
+
+But sc does modify r11.
+
+        li      r11,0
+        std     r11,GPR9(r1)
+        std     r11,GPR10(r1)
+        std     r11,GPR11(r1)
+
+(Incidentally, unless I'm misreading, the kernel could have saved r11 with
+exactly as much effort as it took to clobber it to zero.  That's just rude.)
+
+> but the function caller expects that r11 is not modified because it's the
+> environment pointer
+
+Huh?  What do you think an "environment pointer" is in this context?
+
+In the ppc64 abi, r11 is one of the ones that are clobbered by plt entries; it
+is not special in any way except as a scratch.
+
+> and saves r14 because it's one of its local
+> variable it knows it has to preserve?
+
+Huh?  The caller of safe_syscall does not save r14, and does not expect it
+clobbered.
+
+> In this case, I think Shivaprasad's fix is correct.
+
+Definitely not.
 
 
---L1c6L/cjZjI9d0Eq
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jul 26, 2018 at 03:37:21PM +0200, C=E9dric Le Goater wrote:
-> This proposal introduces a new IRQ number space layout using static
-> numbers for all devices, depending on a device index, and a bitmap
-> allocator for the MSI IRQ numbers which are negotiated by the guest at
-> runtime.
->=20
-> As the VIO device model does not have a device index but a "reg"
-> property, we introduce a formula to compute an IRQ number from a "reg"
-> value. It should minimize most of the collisions.
->=20
-> The previous layout is kept in pre-3.1 machines raising the
-> 'legacy_irq_allocation' machine class flag.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-One nit left..
-
-[snip]
-> +static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
-> +{
-> +    uint32_t irq;
-> +
-> +    if (reg >=3D SPAPR_VIO_REG_BASE) {
-> +        /*
-> +         * VIO device register values when allocated by QEMU. For
-> +         * these, we simply mask the high bits to fit the overall
-> +         * range: [0x00 - 0xff].
-> +         *
-> +         * The nvram VIO device (reg=3D0x71000000) is a static device of
-> +         * the pseries machine and so is always allocated by QEMU. Its
-> +         * IRQ number is 0x0.
-> +         */
-> +        irq =3D reg & 0xff;
-> +
-> +    } else if (reg >=3D 0x30000000) {
-> +        /*
-> +         * VIO tty devices register values, when allocated by livirt,
-> +         * are mapped in range [0xf0 - 0xff], gives us a maximum of 16
-> +         * vtys.
-> +         */
-> +        irq =3D 0xf0 | ((reg >> 12) & 0xf);
-> +
-> +    } else {
-> +        /*
-> +         * Other VIO devices register values, when allocated by
-> +         * livirt, are mapped in range [0x00 - 0xef].
-> +         */
-> +        irq =3D (reg >> 12) & 0xef;
-
-This mask doesn't do what you intend - it will map 0x10 to 0, for
-example.  You could use % 0xf0, but actually you might as well just
-use & 0xff.  Yes, it could collide with the vty devices, but either
-way you can still have collisions if you try hard enough.  And, either
-way, they'll get detected later.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---L1c6L/cjZjI9d0Eq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltal9gACgkQbDjKyiDZ
-s5LR0RAAgHdFYWg/vAJsmbyR9WnIcWIEr/BLOw1jx9dedSkCFVBfFARlR1glGAbh
-uM81bs26t97HClk/HKTcIVNbI6ZAI6/dEl513xZpBLVNngPP1Q5HCfd1kx0ylfWk
-ZEGwXO7SZQFAq9brfnAJP1OqSeZQjOQRDB+7fAJz3hLfNoi7tToDTmAaYY9229RZ
-zHyN/2pmC7+4ljAi2+JnZ44WmaO1GWKU8RtFGTk//5zx9ioIvB5mS5TCDcgeEgTV
-k7gZHek7cHUql1pASiNleEn97dG1jH9bJukvWHk/9GTeEn3qCAMIub83Tv+KsHFF
-SfV5S7JOVBzzBkWs8ccR5r+ZgrgfQyZIco85jywtUfFGJVhI3xbqP+/rQiI7P/WK
-U8tVCbmP1zeMoVDI1MdMA5fGa5C4kOEy8quvvmlk19CqN1W6mw1YWH66q83XD/pY
-eVohCPEttp4eFH73AdBvVkLndELeYQVfZv6t0ucRm4cELyqva0kYANnmLfUUofVH
-1jIk10fteUjq0OME8yxSXBeYUgeutJC/o9CIgM3eJsLR53VtzmofiILTj5Ips4TC
-IllXP5JIn50jPuS8qpA9Uv2KFzNVKK4FK6SuGS8ANt+iBPA/Z/tTeSnsirPuQkIo
-QL1hGXq67Mwi+oOIl64X1uzSdJSMLG8GJPPbKi6Q/jrNs5/ojx4=
-=l8sr
------END PGP SIGNATURE-----
-
---L1c6L/cjZjI9d0Eq--
+r~
