@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fj450-00030I-Th
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:50:55 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fj477-0003w5-S8
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fj44x-0006ma-RD
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:50:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57954 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fj44x-0006lM-Kv
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:50:51 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1506F4022905
-	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 14:50:50 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 27 Jul 2018 16:50:31 +0200
-Message-Id: <1532703031-166467-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-3.0] pc: acpi: fix memhp regression by
- reducing stub SRAT entry size
+	(envelope-from <kwolf@redhat.com>) id 1fj476-0000Ph-UX
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 10:53:05 -0400
+Date: Fri, 27 Jul 2018 16:52:54 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180727145254.GE4355@localhost.localdomain>
+References: <20180727033402.13513-1-famz@redhat.com>
+	<20180727102938.GD4355@localhost.localdomain>
+	<CAK1Eb9m2Fzs8_1Swm5Z8qbPdK=qUShX5zhZQ0Wtqx=LOBT8HnQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK1Eb9m2Fzs8_1Swm5Z8qbPdK=qUShX5zhZQ0Wtqx=LOBT8HnQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH RFC for-3.0-rc3 0/3] qemu-img: Disable copy
+ offloading by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, mst@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu block <qemu-block@nongnu.org>
 
-Commit 848a1cc1e (hw/acpi-build: build SRAT memory affinity structures for DIMM devices)
-broke the first dimm hotplug in following cases:
+Am 27.07.2018 um 14:14 hat Fam Zheng geschrieben:
+> On Fri, Jul 27, 2018 at 6:29 PM Kevin Wolf <kwolf@redhat.com> wrote:
+> >
+> > Am 27.07.2018 um 05:33 hat Fam Zheng geschrieben:
+> > > Kevin pointed out that both glibc and kernel provides a slow fallback of
+> > > copy_file_range which hurts thin provisioning. This is particularly true for
+> > > thin LVs, because host_device driver cannot get allocation info from the
+> > > volume, and copy_file_range is called on every sectors, making the dst fully
+> > > allocated.
+> > >
+> > > NFS mount points also doesn't support SEEK_DATA well, so the allocation
+> > > information is unknown to QEMU.
+> > >
+> > > That leaves only iscsi:// which seems to do what we want so far, but it is a
+> > > smaller use case.
+> > >
+> > > Add an option to qemu-img convert, "-C", to enable (attempting) copy offloading
+> > > explicitly. And mark it incompatible with "-S" and "-c".
+> >
+> > Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+> >
+> > Not sure why you made this an RFC only, but I think we absolutely need
+> > this. People are used to using 'qemu-img convert' to compact images and
+> > this would regress with automatic copy offloading.
+> >
+> > Do you think we need more discussion?
+> 
+> I think merging this for 3.0 is the right thing do to.
 
- 1: there is no coldplugged dimm in the last numa node
-    but there is a coldplugged dimm in another node
+Thanks, applied to the block branch.
 
-  -m 4096,slots=4,maxmem=32G               \
-  -object memory-backend-ram,size=2G,id=m0 \
-  -device pc-dimm,memdev=m0,node=1         \
-  -object memory-backend-ram,id=m1,size=2G \
-  -device pc-dimm,memdev=m1,node=0         \
-  -numa node,nodeid=0                      \
-  -numa node,nodeid=1
+> What worries me is the general usability of the feature. We could
+> probably explore ideas about how we can better take advantage of copy
+> offloading. I don't think counting on the user to make the right
+> decision between disk efficiency (thin provisioning) and BW efficiency
+> (copy offloading) will ever work.
 
- 2: if order of dimms on CLI is:
-       1st plugged dimm in node1
-       2nd plugged dimm in node0
+Ultimately it is a decision that QEMU can't make, though. The user needs
+to tell us at least whether they are trying to compact the image or
+whether they just want to get it copied as fast as possible.
 
-  -m 4096,slots=4,maxmem=32G               \
-  -object memory-backend-ram,id=m1,size=2G \
-  -device pc-dimm,memdev=m1,node=0         \
-  -numa node,nodeid=0                      \
-  -numa node,nodeid=1
+Even if we know this, of course, we may still be lacking information
+about the storage to make the best decision.
 
-(qemu) object_add memory-backend-ram,id=m1,size=1G
-(qemu) device_add pc-dimm,id=d1,memdev=m1,node=0
+> Even if we don't care about breaking the default '-S 4k' behavior, the
+> lack of SEEK_DATA/SEEK_HOLE support on host NFS and block devices will
+> make it very hard to use.
 
-the first DIMM hotplug to any node except the last one
-fails (Windows is unable to online it).
+I hope that NFS 4.2 will gain some ground in the future. Without it,
+thin provisioning with raw images on NFS is basically impossible.
 
-Length reduction of stub hotplug memory SRAT entry,
-fixes issue for some reason.
+I'm not aware of problems with block devices?
 
-RHBZ: 1609234
+> Making it worse, if the network to NFS server is good enough, convert
+> with pread64/pwrite64 with host page cache is also more efficient than
+> copy_file_range, so we'll be slower by trying to play clever. :(
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-NOTE TO MAINTAINER: UPDATE REFERRENCE APCI TABLE BLOBS IN TESTS
+Really? I could understand not being much faster, but being actually
+slower sounds wrong. Are we slower because of overhead in
+copy_file_range() itself or something during preparation?
 
----
- hw/i386/acpi-build.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 9e8350c..b52fdb2 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2269,7 +2269,16 @@ static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
-         numamem = acpi_data_push(table_data, sizeof *numamem);
- 
-         if (!info) {
--            build_srat_memory(numamem, cur, end - cur, default_node,
-+            /*
-+             * Entry is required for Windows to enable memory hotplug in OS
-+             * and for Linux to enable SWIOTLB when booted with less than
-+             * 4G of RAM. Windows works better if the entry sets proximity
-+             * to the highest NUMA node in the machine at the end of the
-+             * reserved space.
-+             * Memory devices may override proximity set by this entry,
-+             * providing _PXM method if necessary.
-+             */
-+            build_srat_memory(numamem, end - 1, 1, default_node,
-                               MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-             break;
-         }
-@@ -2402,14 +2411,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-         build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
-     }
- 
--    /*
--     * Entry is required for Windows to enable memory hotplug in OS
--     * and for Linux to enable SWIOTLB when booted with less than
--     * 4G of RAM. Windows works better if the entry sets proximity
--     * to the highest NUMA node in the machine.
--     * Memory devices may override proximity set by this entry,
--     * providing _PXM method if necessary.
--     */
-     if (hotplugabble_address_space_size) {
-         build_srat_hotpluggable_memory(table_data, machine->device_memory->base,
-                                        hotplugabble_address_space_size,
--- 
-2.7.4
+Kevin
