@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rebecca@bluestop.org>) id 1fjGFe-0006vD-Sx
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 23:50:43 -0400
+	(envelope-from <mjc@sifive.com>) id 1fjGd5-0002h3-OE
+	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 00:14:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rebecca@bluestop.org>) id 1fjGFb-0006Zd-Bf
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 23:50:42 -0400
-Received: from muon.bluestop.org ([96.73.9.1]:61713)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rebecca@bluestop.org>)
-	id 1fjGFa-0006Er-Rg
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 23:50:39 -0400
-References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
-	<d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
-	<8bf07395-4872-ce74-c201-9fca232edd01@gmail.com>
-	<80532e46-ffbf-9c87-5296-741bbb6f83ac@redhat.com>
-From: Rebecca Cran <rebecca@bluestop.org>
-Message-ID: <d5ad3096-86b1-29e4-47bd-1ca71b8e7879@bluestop.org>
-Date: Fri, 27 Jul 2018 21:50:00 -0600
+	(envelope-from <mjc@sifive.com>) id 1fjGd4-0007ap-EW
+	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 00:14:55 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44035)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fjGd4-0007Ze-6C
+	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 00:14:54 -0400
+Received: by mail-oi0-x241.google.com with SMTP id s198-v6so12561616oih.11
+	for <qemu-devel@nongnu.org>; Fri, 27 Jul 2018 21:14:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <80532e46-ffbf-9c87-5296-741bbb6f83ac@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
+In-Reply-To: <eb8233618cf64aa21c87e2809933f112a7aedf68.1532735306.git.alistair.francis@wdc.com>
+References: <eb8233618cf64aa21c87e2809933f112a7aedf68.1532735306.git.alistair.francis@wdc.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Sat, 28 Jul 2018 16:14:52 +1200
+Message-ID: <CAHNT7NuXwFfP3y78bmt7SWyMyLnOt1PzZmG_052RBWia0aqwXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] configure: Add RISC-V host support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yuval Shaia <yuval.shaia@oracle.com>
+To: Alistair Francis <alistair.francis@wdc.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>
 
-On 7/25/18 5:14 AM, Thomas Huth wrote:
+On Sat, Jul 28, 2018 at 11:49 AM, Alistair Francis <alistair.francis@wdc.com
+> wrote:
 
+> Allow QEMU to be built to run on a RISC-V host.
 >
-> Note that the error has been reported to happen on FreeBSD - so I doubt
-> that this <linux/types.h> header should be here.
+> QEMU does not yet have a RISC-V TCG or user mode target port, but
+> running other architectures on RISC-V using TCI does work.
 >
-> Anyway, our include/standard-headers/linux/types.h is also empty ... so
-> could you try whether it compiles if you simply remove this #include
-> line, Rebecca?
 
+There is this RISC-V TCG backend here:
 
-Sorry for the delay, I'm just getting back to this. Removing the include
-causes it to fail later on, with:
+https://github.com/riscv/riscv-qemu/tree/wip-riscv-tcg-backend
 
+I realized I had not sent an update to the list. There is a working TCG
+backend for RISC-V:
 
-/home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning:
-implicit declaration of function 'mremap' is invalid in C99
-[-Wimplicit-function-declaration]
-=C2=A0=C2=A0=C2=A0 host_virt =3D mremap(curr_page, 0, length, MREMAP_MAYM=
-OVE);
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 ^
-/home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning: this
-function declaration is not a prototype [-Wstrict-prototypes]
-/home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:46: error: use of
-undeclared identifier 'MREMAP_MAYMOVE'
-=C2=A0=C2=A0=C2=A0 host_virt =3D mremap(curr_page, 0, length, MREMAP_MAYM=
-OVE);
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^
-/home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:97:48: error: use of
-undeclared identifier 'MREMAP_MAYMOVE'
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mremap(curr_page, 0, TARGET_PA=
-GE_SIZE, MREMAP_MAYMOVE |
-MREMAP_FIXED,
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^
-/home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:97:65: error: use of
-undeclared identifier 'MREMAP_FIXED'
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mremap(curr_page, 0, TARGET_PA=
-GE_SIZE, MREMAP_MAYMOVE |
-MREMAP_FIXED,
+- I've so far tested it with user-mode translation only.
+- It does not support large guests e.g. 64-bit hosts on riscv32.
+- The softmmu implementation is there but needs testing.
+- Some things are missing, e.g. memory fences. big-endian support
 
+You might find some other relevant changes in the configure hunks in the
+patch. IIRC there were a few changes to configure, one of them was to get
+the riscv disassembler working.
 
-Since I'm not interested in RDMA support, I can work around it by
-passing --disable-rdma on the command line.
-
-
---=20
-Rebecca
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  configure | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+>
+> diff --git a/configure b/configure
+> index 2a7796ea80..c3ff3ae146 100755
+> --- a/configure
+> +++ b/configure
+> @@ -606,6 +606,16 @@ EOF
+>    compile_object
+>  }
+>
+> +check_define_value() {
+> +cat > $TMPC <<EOF
+> +#if (($1) != ($2))
+> +#error $1 != ($2)
+> +#endif
+> +int main(void) { return 0; }
+> +EOF
+> +  compile_object
+> +}
+> +
+>  check_include() {
+>  cat > $TMPC <<EOF
+>  #include <$1>
+> @@ -704,6 +714,12 @@ elif check_define __arm__ ; then
+>    cpu="arm"
+>  elif check_define __aarch64__ ; then
+>    cpu="aarch64"
+> +elif check_define __riscv ; then
+> +  if check_define_value __riscv_xlen 64 ; then
+> +    cpu="riscv64"
+> +  else
+> +    cpu="riscv32"
+> +  fi
+>  else
+>    cpu=$(uname -m)
+>  fi
+> @@ -712,7 +728,7 @@ ARCH=
+>  # Normalise host CPU name and set ARCH.
+>  # Note that this case should only have supported host CPUs, not guests.
+>  case "$cpu" in
+> -  ppc|ppc64|s390|s390x|sparc64|x32)
+> +  ppc|ppc64|s390|s390x|sparc64|x32|riscv32|riscv64)
+>      cpu="$cpu"
+>      supported_cpu="yes"
+>      eval "cross_cc_${cpu}=\$host_cc"
+> --
+> 2.17.1
+>
+>
