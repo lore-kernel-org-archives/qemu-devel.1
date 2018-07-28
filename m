@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fjGgu-0003Ti-H5
-	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 00:18:53 -0400
+	(envelope-from <jcody@redhat.com>) id 1fjGlB-0005SJ-BX
+	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 00:23:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fjGgt-0001Dj-CQ
-	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 00:18:52 -0400
-Date: Sat, 28 Jul 2018 00:18:39 -0400
+	(envelope-from <jcody@redhat.com>) id 1fjGlA-0005sx-9L
+	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 00:23:17 -0400
+Date: Sat, 28 Jul 2018 00:23:08 -0400
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180728041839.GA1325070@localhost.localdomain>
-References: <20180727081939.28185-1-ndevos@redhat.com>
-	<f0a7edbd-f731-7ac5-4aee-ef2ba594ed64@redhat.com>
+Message-ID: <20180728042308.GB1325070@localhost.localdomain>
+References: <20180725151011.25951-1-armbru@redhat.com>
+	<5e713599-997f-7dda-917c-80902f6ef328@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f0a7edbd-f731-7ac5-4aee-ef2ba594ed64@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] block/gluster: Handle changed
- glfs_ftruncate signature
+In-Reply-To: <5e713599-997f-7dda-917c-80902f6ef328@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] rbd: Don't convert keypairs to JSON
+ and back
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +25,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: Niels de Vos <ndevos@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, jdurgin@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Fri, Jul 27, 2018 at 08:24:05AM -0500, Eric Blake wrote:
-> On 07/27/2018 03:19 AM, Niels de Vos wrote:
-> >From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+On Wed, Jul 25, 2018 at 10:56:48AM -0500, Eric Blake wrote:
+> On 07/25/2018 10:10 AM, Markus Armbruster wrote:
+> >qemu_rbd_parse_filename() builds a keypairs QList, converts it to JSON, and
+> >stores the resulting QString in a QDict.
 > >
-> >New versions of Glusters libgfapi.so have an updated glfs_ftruncate()
-> >function that returns additional 'struct stat' structures to enable
-> >advanced caching of attributes. This is useful for file servers, not so
-> >much for QEMU. Nevertheless, the API has changed and needs to be
-> >adopted.
+> >qemu_rbd_co_create_opts() and qemu_rbd_open() get the QString from the
+> >QDict, pass it to qemu_rbd_set_keypairs(), which converts it back into
+> >a QList.
 > >
+> >Drop both conversions, store the QList instead.
+> >
+> >This affects output of qemu-img info.  Before this patch:
+> >
+> >     $ qemu-img info rbd:rbd/testimg.raw:mon_host=192.168.15.180:rbd_cache=true:conf=/tmp/ceph.conf
+> >     [junk printed by Ceph library code...]
+> >     image: json:{"driver": "raw", "file": {"pool": "rbd", "image": "testimg.raw", "conf": "/tmp/ceph.conf", "driver": "rbd", "=keyvalue-pairs": "[\"mon_host\", \"192.168.15.180\", \"rbd_cache\", \"true\"]"}}
+> >     [more output, not interesting here]
+> >
+> >After this patch, we get
+> >
+> >     image: json:{"driver": "raw", "file": {"pool": "rbd", "image": "testimg.raw", "conf": "/tmp/ceph.conf", "driver": "rbd", "=keyvalue-pairs": ["mon_host", "192.168.15.180", "rbd_cache", "true"]}}
+> >
+> >The value of member "=keyvalue-pairs" changes from a string containing
+> >a JSON array to that JSON array.  That's an improvement of sorts.  However:
+> >
+> >* Should "=keyvalue-pairs" even be visible here?  It's supposed to be
+> >   purely internal...
 > 
-> Oh, one other comment.
+> I'd argue that since it is supposed to be internal (as evidenced by the
+> leading '=' that does not name a normal variable), changing it doesn't hurt
+> stability. But yes, it would be nicer if we could filter it entirely so that
+> it does not appear in json: output, if it doesn't truly affect the contents
+> that the guest would see.
 > 
-> >+++ b/block/gluster.c
-> >@@ -20,6 +20,10 @@
-> >  #include "qemu/option.h"
-> >  #include "qemu/cutils.h"
-> >+#ifdef CONFIG_GLUSTERFS_LEGACY_FTRUNCATE
-> >+# define glfs_ftruncate(fd, offset, _u1, _u2) glfs_ftruncate(fd, offset)
-> >+#endif
+> >
+> >* Is this a stable interface we need to preserve, warts and all?
 > 
-> Someday, when we can assume new enough gluster everywhere, we can drop this
-> hunk...
+> I hope not.
 > 
+> >
+> >Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >---
+> >  block/rbd.c | 50 ++++++++++++++++++++++----------------------------
+> >  1 file changed, 22 insertions(+), 28 deletions(-)
+> 
+> I'm not yet convinced if we want this patch for 3.0 without more comments
+> from the RBD experts, nor do I see too much of an issue if this doesn't go
+> in until 3.1.  But as to the code changes itself, I find them nice.
 
-Part of me wishes that libgfapi had just created a new function
-'glfs_ftruncate2', so that existing users don't need to handle the api
-change.  But I guess in the grand scheme, not a huge deal either way.
+Based on my IRC discussions with Markus, I believe the target for this patch
+is indeed 3.1, not 3.0.
 
-> >+++ b/configure
 > 
-> >+	/* new glfs_ftruncate() passes two additional args */
-> >+	return glfs_ftruncate(NULL, 0 /*, NULL, NULL */);
-> >+}
-> >+EOF
-> >+    if compile_prog "$glusterfs_cflags" "$glusterfs_libs" ; then
-> >+      glusterfs_legacy_ftruncate="yes"
-> >+    fi
-> 
-> ...but it will be easier to remember to do so if this comment in configure
-> calls out the upstream gluster version that no longer requires the legacy
-> workaround, as our hint for when...
-> 
-
-I can go ahead and add that to the comment in my branch after applying, if
-Niels can let me know what that version is/will be (if known).
-
-> >    else
-> >      if test "$glusterfs" = "yes" ; then
-> >        feature_not_found "GlusterFS backend support" \
-> >@@ -6644,6 +6658,10 @@ if test "$glusterfs_zerofill" = "yes" ; then
-> >    echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
-> >  fi
-> >+if test "$glusterfs_legacy_ftruncate" = "yes" ; then
-> >+  echo "CONFIG_GLUSTERFS_LEGACY_FTRUNCATE=y" >> $config_host_mak
-> 
-> ...this #define is no longer necessary.
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > 
 > -- 
 > Eric Blake, Principal Software Engineer
 > Red Hat, Inc.           +1-919-301-3266
 > Virtualization:  qemu.org | libvirt.org
+> 
