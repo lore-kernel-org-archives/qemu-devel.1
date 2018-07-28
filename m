@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1fjJzV-0007XA-6p
-	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 03:50:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fjSCs-0001fA-NK
+	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 12:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1fjJzT-0000f4-SJ
-	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 03:50:17 -0400
-Date: Sat, 28 Jul 2018 09:50:05 +0200
-From: Niels de Vos <ndevos@redhat.com>
-Message-ID: <20180728075005.GE1827@ndevos-x270>
-References: <20180727081939.28185-1-ndevos@redhat.com>
-	<f0a7edbd-f731-7ac5-4aee-ef2ba594ed64@redhat.com>
-	<20180728041839.GA1325070@localhost.localdomain>
+	(envelope-from <richard.henderson@linaro.org>) id 1fjSCp-0002I6-HH
+	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 12:36:38 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:45533)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fjSCp-0002Hq-9h
+	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 12:36:35 -0400
+Received: by mail-pg1-x543.google.com with SMTP id f1-v6so4934999pgq.12
+	for <qemu-devel@nongnu.org>; Sat, 28 Jul 2018 09:36:34 -0700 (PDT)
+References: <eb8233618cf64aa21c87e2809933f112a7aedf68.1532735306.git.alistair.francis@wdc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <383842e2-9d91-ff2d-642d-c3cb003895b7@linaro.org>
+Date: Sat, 28 Jul 2018 09:36:30 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180728041839.GA1325070@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3] block/gluster: Handle changed
- glfs_ftruncate signature
+In-Reply-To: <eb8233618cf64aa21c87e2809933f112a7aedf68.1532735306.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] configure: Add RISC-V host support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,82 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org, mjc@sifive.com
+Cc: alistair23@gmail.com
 
-On Sat, Jul 28, 2018 at 12:18:39AM -0400, Jeff Cody wrote:
-> On Fri, Jul 27, 2018 at 08:24:05AM -0500, Eric Blake wrote:
-> > On 07/27/2018 03:19 AM, Niels de Vos wrote:
-> > >From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
-> > >
-> > >New versions of Glusters libgfapi.so have an updated glfs_ftruncate()
-> > >function that returns additional 'struct stat' structures to enable
-> > >advanced caching of attributes. This is useful for file servers, not so
-> > >much for QEMU. Nevertheless, the API has changed and needs to be
-> > >adopted.
-> > >
-> > 
-> > Oh, one other comment.
-> > 
-> > >+++ b/block/gluster.c
-> > >@@ -20,6 +20,10 @@
-> > >  #include "qemu/option.h"
-> > >  #include "qemu/cutils.h"
-> > >+#ifdef CONFIG_GLUSTERFS_LEGACY_FTRUNCATE
-> > >+# define glfs_ftruncate(fd, offset, _u1, _u2) glfs_ftruncate(fd, offset)
-> > >+#endif
-> > 
-> > Someday, when we can assume new enough gluster everywhere, we can drop this
-> > hunk...
-> > 
+On 07/27/2018 04:49 PM, Alistair Francis wrote:
+> Allow QEMU to be built to run on a RISC-V host.
 > 
-> Part of me wishes that libgfapi had just created a new function
-> 'glfs_ftruncate2', so that existing users don't need to handle the api
-> change.  But I guess in the grand scheme, not a huge deal either way.
-
-Gluster uses versioned symbols, so older binaries will keep working with
-new libraries. It is (hopefully) rare that existing symbols get updated.
-We try to send patches for these kind of changes to the projects we know
-well in advance, reducing the number of surprises.
-
-> > >+++ b/configure
-> > 
-> > >+	/* new glfs_ftruncate() passes two additional args */
-> > >+	return glfs_ftruncate(NULL, 0 /*, NULL, NULL */);
-> > >+}
-> > >+EOF
-> > >+    if compile_prog "$glusterfs_cflags" "$glusterfs_libs" ; then
-> > >+      glusterfs_legacy_ftruncate="yes"
-> > >+    fi
-> > 
-> > ...but it will be easier to remember to do so if this comment in configure
-> > calls out the upstream gluster version that no longer requires the legacy
-> > workaround, as our hint for when...
-> > 
+> QEMU does not yet have a RISC-V TCG or user mode target port, but
+> running other architectures on RISC-V using TCI does work.
 > 
-> I can go ahead and add that to the comment in my branch after applying, if
-> Niels can let me know what that version is/will be (if known).
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  configure | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
 
-The new glfs_ftruncate() will be part of glusterfs-5 (planned for
-October). We're changing the numbering scheme, it was expected to come
-in glusterfs-4.2, but that is a version that never will be released.
+This is ok as far as it goes.
 
-Thanks for correcting the last bits of the patch!
-Niels
+Even for TCI, you need some more.
+
+At minimum, see Michael Clark's branch changes to accel/tcg/user-exec.c for
+host signal handling.  While you can run *-softmmu without this, none of
+*-linux-user will work reliably.
+
+Another piece that even Michael Clark does not have is
+linux-user/host/*/safe-syscall.S.
 
 
-> > >    else
-> > >      if test "$glusterfs" = "yes" ; then
-> > >        feature_not_found "GlusterFS backend support" \
-> > >@@ -6644,6 +6658,10 @@ if test "$glusterfs_zerofill" = "yes" ; then
-> > >    echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
-> > >  fi
-> > >+if test "$glusterfs_legacy_ftruncate" = "yes" ; then
-> > >+  echo "CONFIG_GLUSTERFS_LEGACY_FTRUNCATE=y" >> $config_host_mak
-> > 
-> > ...this #define is no longer necessary.
-> > 
-> > -- 
-> > Eric Blake, Principal Software Engineer
-> > Red Hat, Inc.           +1-919-301-3266
-> > Virtualization:  qemu.org | libvirt.org
+r~
