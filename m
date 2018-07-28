@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fjCd7-0003Rl-Ft
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 19:58:42 -0400
+	(envelope-from <rebecca@bluestop.org>) id 1fjGFe-0006vD-Sx
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 23:50:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fjCd6-0007uH-LP
-	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 19:58:41 -0400
-Date: Sat, 28 Jul 2018 07:58:17 +0800 (GMT+08:00)
-From: "Su Hang" <suhang16@mails.ucas.ac.cn>
-In-Reply-To: <0c2c23f3-5ec9-5446-17ca-683d267d0f4c@amsat.org>
-References: <20180725085944.11856-1-stefanha@redhat.com>
-	<20180725085944.11856-8-stefanha@redhat.com>
-	<0c2c23f3-5ec9-5446-17ca-683d267d0f4c@amsat.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <rebecca@bluestop.org>) id 1fjGFb-0006Zd-Bf
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 23:50:42 -0400
+Received: from muon.bluestop.org ([96.73.9.1]:61713)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rebecca@bluestop.org>)
+	id 1fjGFa-0006Er-Rg
+	for qemu-devel@nongnu.org; Fri, 27 Jul 2018 23:50:39 -0400
+References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
+	<d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
+	<8bf07395-4872-ce74-c201-9fca232edd01@gmail.com>
+	<80532e46-ffbf-9c87-5296-741bbb6f83ac@redhat.com>
+From: Rebecca Cran <rebecca@bluestop.org>
+Message-ID: <d5ad3096-86b1-29e4-47bd-1ca71b8e7879@bluestop.org>
+Date: Fri, 27 Jul 2018 21:50:00 -0600
 MIME-Version: 1.0
-Message-ID: <6c1020b8.17461.164de2dc109.Coremail.suhang16@mails.ucas.ac.cn>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 7/7] Add QTest testcase for
- the Intel Hexadecimal
+In-Reply-To: <80532e46-ffbf-9c87-5296-741bbb6f83ac@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?philippe_mathieu-daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, peter.maydell@linaro.org, alistair@alistair23.me, sundeep.lkml@gmail.com, qemu.ml@steffen-goertz.de, joel@jms.id.au, jusual@mail.ru, qemu-arm@nongnu.org, jim@groklearning.com, mail@steffen-goertz.de, ilg@livius.net
+To: Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yuval Shaia <yuval.shaia@oracle.com>
 
-PiA+ICsjZGVmaW5lIEJJTl9TSVpFIDE0Ngo+ID4gKwo+ID4gK3N0YXRpYyB1bnNpZ25lZCBjaGFy
-IHByZV9zdG9yZVtCSU5fU0laRV0gPSB7Cj4gPiArICAgIDQsICAgMjA4LCAxNTksIDIyOSwgMjIs
-ICAwLCAgIDAsICAgMjM1LCAyNTQsIDI1NSwgMjU1LCAyMzQsIDE1MiwgMTYsICAxLAo+ID4gKyAg
-ICAwLCAgIDQsICAgMTc2LCA0NSwgIDIyOSwgMCwgICAxNzYsIDE0MSwgMjI2LCAxMiwgIDIwOCwg
-NzcsICAyMjYsIDgsICAgMCwKPiA+ICsgICAgMTEsICAyMjksIDYsICAgMCwgICAwLCAgIDIzNCwg
-OCwgICA0OCwgIDI3LCAgMjI5LCAwLCAgIDMyLCAgMjExLCAyMjksIDQ0LAo+ID4gKyAgICA0OCwg
-IDE1OSwgMjI5LCAwLCAgIDMyLCAgMTMxLCAyMjksIDgsICAgNDgsICAyNywgIDIyOSwgMSwgICA0
-OCwgIDEzMSwgMjI2LAo+ID4gKyAgICA4LCAgIDQ4LCAgMTEsICAyMjksIDgsICAgNDgsICAyNywg
-IDIyOSwgMCwgICA0OCwgIDIxMSwgMjI5LCAwLCAgIDAsICAgODMsCj4gPiArICAgIDIyNywgMjQ0
-LCAyNTUsIDI1NSwgMjYsICAwLCAgIDAsICAgMTYwLCAyMjUsIDAsICAgMjA4LCAxMzksIDIyNiwg
-NCwgICAxNzYsCj4gPiArICAgIDE1NywgMjI4LCAzMCwgIDI1NSwgNDcsICAyMjUsIDAsICAgMTYs
-ICAzMSwgIDE2LCAgMCwgICA3MiwgIDQ1LCAgMjMzLCA0LAo+ID4gKyAgICAxNzYsIDE0MSwgMjI2
-LCA4LCAgIDAsICAgMTU5LCAyMjksIDIzMCwgMjU1LCAyNTUsIDIzNSwgMCwgICAwLCAgIDE2MCwg
-MjI1LAo+ID4gKyAgICAwLCAgIDEzNiwgMTg5LCAyMzIsIDEzMiwgMCwgICAxLCAgIDAsICAgMCwg
-ICAxNiwgIDMxLCAgMTYsICA3MiwgIDEwMSwgMTA4LAo+ID4gKyAgICAxMDgsIDExMSwgMzIsICAx
-MTksIDExMSwgMTE0LCAxMDgsIDEwMCwgMzMsICAxMCwgIDB9Owo+IAo+IENhbiB0aGlzIGJlOgo+
-IAo+ICAgMHgwNCwgMHhkMCwgMHg5ZiwgMHhlNSwgICAweDE2LCAweDAwLCAweDAwLCAweGViLCAg
-IDB4ZmUsIDB4ZmYsIDB4ZmYsCj4gMHhlYSwKPiAgIDB4OTgsIDB4MTAsIDB4MDEsIDB4MDAsICAg
-MHgwNCwgMHhiMCwgMHgyZCwgMHhlNSwgICAweDAwLCAweGIwLCAweDhkLAo+IDB4ZTIsCj4gICAw
-eDBjLCAweGQwLCAweDRkLCAweGUyLCAgIDB4MDgsIDB4MDAsIDB4MGIsIDB4ZTUsICAgMHgwNiwg
-MHgwMCwgMHgwMCwKPiAweGVhLAo+ICAgMHgwOCwgMHgzMCwgMHgxYiwgMHhlNSwgICAweDAwLCAw
-eDIwLCAweGQzLCAweGU1LCAgIDB4MmMsIDB4MzAsIDB4OWYsCj4gMHhlNSwKPiAgIDB4MDAsIDB4
-MjAsIDB4ODMsIDB4ZTUsICAgMHgwOCwgMHgzMCwgMHgxYiwgMHhlNSwgICAweDAxLCAweDMwLCAw
-eDgzLAo+IDB4ZTIsCj4gICAweDA4LCAweDMwLCAweDBiLCAweGU1LCAgIDB4MDgsIDB4MzAsIDB4
-MWIsIDB4ZTUsICAgMHgwMCwgMHgzMCwgMHhkMywKPiAweGU1LAo+ICAgMHgwMCwgMHgwMCwgMHg1
-MywgMHhlMywgICAweGY0LCAweGZmLCAweGZmLCAweDFhLCAgIDB4MDAsIDB4MDAsIDB4YTAsCj4g
-MHhlMSwKPiAgIDB4MDAsIDB4ZDAsIDB4OGIsIDB4ZTIsICAgMHgwNCwgMHhiMCwgMHg5ZCwgMHhl
-NCwgICAweDFlLCAweGZmLCAweDJmLAo+IDB4ZTEsCj4gICAweDAwLCAweDEwLCAweDFmLCAweDEw
-LCAgIDB4MDAsIDB4NDgsIDB4MmQsIDB4ZTksICAgMHgwNCwgMHhiMCwgMHg4ZCwKPiAweGUyLAo+
-ICAgMHgwOCwgMHgwMCwgMHg5ZiwgMHhlNSwgICAweGU2LCAweGZmLCAweGZmLCAweGViLCAgIDB4
-MDAsIDB4MDAsIDB4YTAsCj4gMHhlMSwKPiAgIDB4MDAsIDB4ODgsIDB4YmQsIDB4ZTgsICAgMHg4
-NCwgMHgwMCwgMHgwMSwgMHgwMCwgICAweDAwLCAweDEwLCAweDFmLAo+IDB4MTAsCj4gICAnSCcs
-ICAnZScsICAnbCcsICAnbCcsICAgICdvJywgICcgJywgICd3JywgICdvJywgICAgJ3InLCAgJ2wn
-LCAgJ2QnLCAgJyEnLAo+ICAgJ1xuJywgJ1wwJwo+IH07Cj4gCj4gPwoKWWVzLCBnb29kIHN1Z2dl
-c3Rpb24uIFlvdXIgdmVyc2lvbiBpcyBjbGVhcmVyIGFuZCBtb3JlIHJlYWRhYmxlIGZvciBodW1h
-bnMuCgpCZXN0LApTdSBIYW5n
+On 7/25/18 5:14 AM, Thomas Huth wrote:
+
+>
+> Note that the error has been reported to happen on FreeBSD - so I doubt
+> that this <linux/types.h> header should be here.
+>
+> Anyway, our include/standard-headers/linux/types.h is also empty ... so
+> could you try whether it compiles if you simply remove this #include
+> line, Rebecca?
+
+
+Sorry for the delay, I'm just getting back to this. Removing the include
+causes it to fail later on, with:
+
+
+/home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning:
+implicit declaration of function 'mremap' is invalid in C99
+[-Wimplicit-function-declaration]
+=C2=A0=C2=A0=C2=A0 host_virt =3D mremap(curr_page, 0, length, MREMAP_MAYM=
+OVE);
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 ^
+/home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning: this
+function declaration is not a prototype [-Wstrict-prototypes]
+/home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:46: error: use of
+undeclared identifier 'MREMAP_MAYMOVE'
+=C2=A0=C2=A0=C2=A0 host_virt =3D mremap(curr_page, 0, length, MREMAP_MAYM=
+OVE);
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^
+/home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:97:48: error: use of
+undeclared identifier 'MREMAP_MAYMOVE'
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mremap(curr_page, 0, TARGET_PA=
+GE_SIZE, MREMAP_MAYMOVE |
+MREMAP_FIXED,
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^
+/home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:97:65: error: use of
+undeclared identifier 'MREMAP_FIXED'
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mremap(curr_page, 0, TARGET_PA=
+GE_SIZE, MREMAP_MAYMOVE |
+MREMAP_FIXED,
+
+
+Since I'm not interested in RDMA support, I can work around it by
+passing --disable-rdma on the command line.
+
+
+--=20
+Rebecca
