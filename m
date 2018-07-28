@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fjTgI-0000f9-9U
-	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 14:11:07 -0400
+	(envelope-from <mst@redhat.com>) id 1fjWDI-0006qN-KE
+	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 16:53:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fjTgD-0004aH-HV
-	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 14:11:06 -0400
-Resent-Message-Id: <E1fjTgD-0004aH-HV@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21045)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fjTgD-0004YO-6K
-	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 14:11:01 -0400
-In-Reply-To: <20180726132947.28538-1-alex.bennee@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153279872224.5387.1816141035966333544@502c9da6d61e>
+	(envelope-from <mst@redhat.com>) id 1fjWDF-0007x8-9d
+	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 16:53:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49986 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fjWDF-0007vZ-2n
+	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 16:53:17 -0400
+Date: Sat, 28 Jul 2018 23:53:12 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180728233617-mutt-send-email-mst@kernel.org>
+References: <20180710000024.542612-1-mst@redhat.com>
+	<20180710000024.542612-8-mst@redhat.com>
+	<20180725143724.50b38789@redhat.com>
+	<20180725154517-mutt-send-email-mst@kernel.org>
+	<20180725164908.07a941a6@redhat.com>
+	<20180726184816-mutt-send-email-mst@kernel.org>
+	<20180727170206.0de5eb4f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 28 Jul 2018 10:25:23 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v1 for 3.0 0/2] fix for bug 1783362
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180727170206.0de5eb4f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH hack dontapply v2 7/7] pc: HACK: acpi: tie
+ in _CST object to Processor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +33,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, ehabkost@redhat.com, pbonzini@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNzI2MTMyOTQ3LjI4NTM4LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxIGZvciAzLjAgMC8yXSBmaXggZm9yIGJ1ZyAx
-NzgzMzYyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
-Z3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
-Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
-ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
-LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
-ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
-bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
-YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFu
-Y2ggJ3Rlc3QnCjAyNGQyYjNkYTMgdGVzdHM6IGFkZCBjaGVja19pbnZhbGlkX21hcHMgdG8gdGVz
-dC1tbWFwCmExMzNiNGE4YjUgbGludXgtdXNlci9tbWFwLmM6IGhhbmRsZSBsZW4gPSAwIG1hcHMg
-Y29ycmVjdGx5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IGxpbnV4
-LXVzZXIvbW1hcC5jOiBoYW5kbGUgbGVuID0gMCBtYXBzIGNvcnJlY3RseS4uLgpDaGVja2luZyBQ
-QVRDSCAyLzI6IHRlc3RzOiBhZGQgY2hlY2tfaW52YWxpZF9tYXBzIHRvIHRlc3QtbW1hcC4uLgpF
-UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1NDogRklMRTogdGVzdHMv
-dGNnL211bHRpYXJjaC90ZXN0LW1tYXAuYzo0OTI6CiteSWNoZWNrX2ludmFsaWRfbW1hcHMoKTsk
-Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDM0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Fri, Jul 27, 2018 at 05:02:06PM +0200, Igor Mammedov wrote:
+> On Thu, 26 Jul 2018 18:49:57 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Wed, Jul 25, 2018 at 04:49:08PM +0200, Igor Mammedov wrote:
+> > > On Wed, 25 Jul 2018 15:50:09 +0300
+> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > >   
+> > > > On Wed, Jul 25, 2018 at 02:37:24PM +0200, Igor Mammedov wrote:  
+> > > > > On Tue, 10 Jul 2018 03:01:34 +0300
+> > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > >     
+> > > > > > Based on patch by Igor Mammedov.
+> > > > > > 
+> > > > > > This is a hack: we definitely shouldn't do it
+> > > > > > unconditionally, and initialization should be handled
+> > > > > > differently (through an isa device?). io port to use
+> > > > > > should depend on the PC type and should be documented.
+> > > > > > 
+> > > > > > Notifications should be supported.
+> > > > > > 
+> > > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > ---
+> > > > > >  include/hw/i386/pc.h |  5 +++++
+> > > > > >  hw/acpi/cpu.c        |  5 +++++
+> > > > > >  hw/i386/acpi-build.c | 10 +++++++++-
+> > > > > >  3 files changed, 19 insertions(+), 1 deletion(-)
+> > > > > > 
+> > > > > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > > > > > index 316230e570..83b3a84322 100644
+> > > > > > --- a/include/hw/i386/pc.h
+> > > > > > +++ b/include/hw/i386/pc.h
+> > > > > > @@ -20,6 +20,11 @@
+> > > > > >  
+> > > > > >  #define HPET_INTCAP "hpet-intcap"
+> > > > > >  
+> > > > > > +typedef struct PCCstate {
+> > > > > > +    uint32_t latency;
+> > > > > > +    uint32_t hint;
+> > > > > > +} PCCstate;
+> > > > > > +
+> > > > > >  /**
+> > > > > >   * PCMachineState:
+> > > > > >   * @acpi_dev: link to ACPI PM device that performs ACPI hotplug handling
+> > > > > > diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> > > > > > index 5ae595ecbe..e9e207b033 100644
+> > > > > > --- a/hw/acpi/cpu.c
+> > > > > > +++ b/hw/acpi/cpu.c
+> > > > > > @@ -561,6 +561,11 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+> > > > > >                             aml_int(arch_ids->cpus[i].props.node_id)));
+> > > > > >              }
+> > > > > >  
+> > > > > > +            if (1) {
+> > > > > > +                method = aml_method("_CST", 0, AML_NOTSERIALIZED);
+> > > > > > +                aml_append(method, aml_return(aml_call0("CCST")));    
+> > > > > in case of not loaded CCST it would be unresolved reference.
+> > > > > It would be better to have a package /SB.CPUS.CCST filled with some startup values
+> > > > > and than that could be updated on the fly with new package.    
+> > > > 
+> > > > I think it will conflict if we do. But yes we could load \SB.CCST and
+> > > > then \SB.CPUS.CCST will override that. Would it help though?
+> > > > ACPI spec does not describe what happens on load failure.
+> > > > For linux it does not matter much -
+> > > > it just handles the error. What happens on windows with an unresolved
+> > > > reference? Is failure to load the object any better?  
+> > > I was thinking more in a align of assigning a new temporary package value to
+> > > a statically named CCST:
+> > > 
+> > >   update_cst_METHOD()
+> > >      build package in local0
+> > >      \SB.CPUS.CCST = local0
+> > > 
+> > > so guest gets valid initial CCST with values on source host at boot time
+> > > and on target values are replaced on update.
+> > > 
+> > > It doesn't have to be named variable/could be a method but with always
+> > > valid values.  
+> > 
+> > Right but what are we trying to achieve here?
+> have a valid package not only on update but on boot up as well
+
+
+So my patches basically do:
+
+(1)
+on interrupt:
+	notify OSPM
+on _CST
+	get CST from host and return
+
+What you propose:
+
+(2)
+on interrupt:
+	get CST from host and store in CCST
+	notify OSPM
+on _CST
+	return CCST
+
+Is this a fair summary? If so I'd like to understand what do you mean
+when you say "have a valid package on boot up as well".  In both
+approaches _CST always returns a valid package *on each call*.
+
+Is it that in absence of migration the configuration is easier to debug
+since you can just dump SSDT to see the _CST value?
+
+I think that's fair - unfortunately with (2) it is by comparison to (1)
+harder to debug and test _CST updates since that flow looks quite
+different from how normal _CST works. E.g. testing is harder as you need
+migration to trigger DMA.  I would prefer a single path that works the
+same with and without migration.
+
+Let me know if I understand your concern correctly, if yes I'll try to
+think of solutions.
+
+
+> > 
+> > > >   
+> > > > > > +                aml_append(dev, method);
+> > > > > > +            }
+> > > > > >              aml_append(cpus_dev, dev);
+> > > > > >          }
+> > > > > >      }
+> > > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > > > > index fff1059a31..da2c830db7 100644
+> > > > > > --- a/hw/i386/acpi-build.c
+> > > > > > +++ b/hw/i386/acpi-build.c
+> > > > > > @@ -64,6 +64,7 @@
+> > > > > >  #include "hw/i386/intel_iommu.h"
+> > > > > >  
+> > > > > >  #include "hw/acpi/ipmi.h"
+> > > > > > +#include "hw/acpi/cst.h"
+> > > > > >  
+> > > > > >  /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
+> > > > > >   * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
+> > > > > > @@ -1840,7 +1841,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> > > > > >          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+> > > > > >      } else {
+> > > > > >          CPUHotplugFeatures opts = {
+> > > > > > -            .apci_1_compatible = true, .has_legacy_cphp = true
+> > > > > > +            .apci_1_compatible = true, .has_legacy_cphp = true,    
+> > > > > unrelated change???    
+> > > > 
+> > > > Good catch.
+> > > >   
+> > > > > >          };
+> > > > > >          build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+> > > > > >                         "\\_SB.PCI0", "\\_GPE._E02");
+> > > > > > @@ -2693,6 +2694,10 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+> > > > > >                             tables->vmgenid, tables->linker);
+> > > > > >      }
+> > > > > >  
+> > > > > > +    /* TODO: get a free ioport. This one is PIIX specific. */
+> > > > > > +    acpi_add_table(table_offsets, tables_blob);
+> > > > > > +    cst_build_acpi(tables_blob, tables->linker, 0xaf20);
+> > > > > > +
+> > > > > >      if (misc.has_hpet) {
+> > > > > >          acpi_add_table(table_offsets, tables_blob);
+> > > > > >          build_hpet(tables_blob, tables->linker);
+> > > > > > @@ -2891,6 +2896,9 @@ void acpi_setup(void)
+> > > > > >  
+> > > > > >      build_state = g_malloc0(sizeof *build_state);
+> > > > > >  
+> > > > > > +    /* TODO: this is not the best place to do it */
+> > > > > > +    cst_register(pcms->fw_cfg, 0xaf20);
+> > > > > > +
+> > > > > >      acpi_build_tables_init(&tables);
+> > > > > >      acpi_build(&tables, MACHINE(pcms));
+> > > > > >      
