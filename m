@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fjmnq-0006Ar-5A
-	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 10:36:11 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fjn32-0003lT-52
+	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 10:51:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fjmnn-0004vA-2v
-	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 10:36:10 -0400
-Received: from hera.aquilenet.fr ([185.233.100.1]:32790)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1fjmnm-0004u9-R3
-	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 10:36:06 -0400
-Date: Sun, 29 Jul 2018 16:36:03 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20180729143603.c5gttlsperko4lso@var.youpi.perso.aquilenet.fr>
-References: <20180729015426.67133-1-aoates@google.com>
+	(envelope-from <mreitz@redhat.com>) id 1fjn31-0003RS-4U
+	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 10:51:52 -0400
+References: <20180725151011.25951-1-armbru@redhat.com>
+	<5e713599-997f-7dda-917c-80902f6ef328@redhat.com>
+	<20180725160144.GJ12855@redhat.com>
+	<20180728043238.GC1325070@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <371fc437-1330-6873-7f6d-99af8d56c5df@redhat.com>
+Date: Sun, 29 Jul 2018 16:51:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180729015426.67133-1-aoates@google.com>
-Subject: Re: [Qemu-devel] [PATCH v2] slirp: fix ICMP handling on macOS hosts
+In-Reply-To: <20180728043238.GC1325070@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Q4wEcTnqIu4lUw3ERilshQwzhSbeNsxNP"
+Subject: Re: [Qemu-devel] [RFC PATCH] rbd: Don't convert keypairs to JSON
+ and back
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +27,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: aoates@google.com
-Cc: qemu-devel@nongnu.org, jan.kiszka@siemens.com
+To: Jeff Cody <jcody@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, kwolf@redhat.com, jdurgin@redhat.com, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-Hello,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Q4wEcTnqIu4lUw3ERilshQwzhSbeNsxNP
+From: Max Reitz <mreitz@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, =?UTF-8?Q?Daniel_P._Berrang=c3=a9?=
+ <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, kwolf@redhat.com, jdurgin@redhat.com,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <371fc437-1330-6873-7f6d-99af8d56c5df@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] rbd: Don't convert keypairs to JSON and
+ back
+References: <20180725151011.25951-1-armbru@redhat.com>
+ <5e713599-997f-7dda-917c-80902f6ef328@redhat.com>
+ <20180725160144.GJ12855@redhat.com>
+ <20180728043238.GC1325070@localhost.localdomain>
+In-Reply-To: <20180728043238.GC1325070@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-aoates@google.com, le sam. 28 juil. 2018 21:54:26 -0400, a ecrit:
-> From: Andrew Oates <aoates@google.com>
-> 
-> On Linux, SOCK_DGRAM+IPPROTO_ICMP sockets give only the ICMP packet when
-> read from.  On macOS, however, the socket acts like a SOCK_RAW socket
-> and includes the IP header as well.
-> 
-> This change strips the extra IP header from the received packet on macOS
-> before sending it to the guest.
-> 
-> Signed-off-by: Andrew Oates <aoates@google.com>
+On 2018-07-28 06:32, Jeff Cody wrote:
+> On Wed, Jul 25, 2018 at 05:01:44PM +0100, Daniel P. Berrang=C3=A9 wrote=
+:
+>> On Wed, Jul 25, 2018 at 10:56:48AM -0500, Eric Blake wrote:
+>>> On 07/25/2018 10:10 AM, Markus Armbruster wrote:
+>>>> qemu_rbd_parse_filename() builds a keypairs QList, converts it to JS=
+ON, and
+>>>> stores the resulting QString in a QDict.
+>>>>
+>>>> qemu_rbd_co_create_opts() and qemu_rbd_open() get the QString from t=
+he
+>>>> QDict, pass it to qemu_rbd_set_keypairs(), which converts it back in=
+to
+>>>> a QList.
+>>>>
+>>>> Drop both conversions, store the QList instead.
+>>>>
+>>>> This affects output of qemu-img info.  Before this patch:
+>>>>
+>>>>      $ qemu-img info rbd:rbd/testimg.raw:mon_host=3D192.168.15.180:r=
+bd_cache=3Dtrue:conf=3D/tmp/ceph.conf
+>>>>      [junk printed by Ceph library code...]
+>>>>      image: json:{"driver": "raw", "file": {"pool": "rbd", "image": =
+"testimg.raw", "conf": "/tmp/ceph.conf", "driver": "rbd", "=3Dkeyvalue-pa=
+irs": "[\"mon_host\", \"192.168.15.180\", \"rbd_cache\", \"true\"]"}}
+>>>>      [more output, not interesting here]
+>>>>
+>>>> After this patch, we get
+>>>>
+>>>>      image: json:{"driver": "raw", "file": {"pool": "rbd", "image": =
+"testimg.raw", "conf": "/tmp/ceph.conf", "driver": "rbd", "=3Dkeyvalue-pa=
+irs": ["mon_host", "192.168.15.180", "rbd_cache", "true"]}}
+>>>>
+>>>> The value of member "=3Dkeyvalue-pairs" changes from a string contai=
+ning
+>>>> a JSON array to that JSON array.  That's an improvement of sorts.  H=
+owever:
+>>>>
+>>>> * Should "=3Dkeyvalue-pairs" even be visible here?  It's supposed to=
+ be
+>>>>    purely internal...
+>>>
+>>> I'd argue that since it is supposed to be internal (as evidenced by t=
+he
+>>> leading '=3D' that does not name a normal variable), changing it does=
+n't hurt
+>>> stability. But yes, it would be nicer if we could filter it entirely =
+so that
+>>> it does not appear in json: output, if it doesn't truly affect the co=
+ntents
+>>> that the guest would see.
+>>
+>> If it appears in the json: output, then that means it could get writte=
+n
+>> into qcow2 headers as a backing file name, which would make it ABI
+>> sensitive. This makes it even more important to filter it if it is sup=
+posed
+>> to be internal only, with no ABI guarantee.
+>>
+>=20
+> It's been present for a couple releases (counting 3.0); is it safe to
+> assume that, although it could be present in the qcow2 headers, that it=
+ will
+> not break anything by altering it or removing it?
 
-Applied to my tree, thanks!
+Did =3Dkeyvalue-pairs even work in json:{} filename?  If so, it will
+continue to work even after filtering it.  If not, then filtering it
+won't break existing files because they didn't work before either.
 
-> ---
-> v2: check validity of inner_hlen and update len appropriately
-> 
->  slirp/ip_icmp.c | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
-> index 0b667a429a..76c6d54b11 100644
-> --- a/slirp/ip_icmp.c
-> +++ b/slirp/ip_icmp.c
-> @@ -420,7 +420,21 @@ void icmp_receive(struct socket *so)
->      icp = mtod(m, struct icmp *);
->  
->      id = icp->icmp_id;
-> -    len = qemu_recv(so->s, icp, m->m_len, 0);
-> +    len = qemu_recv(so->s, icp, M_ROOM(m), 0);
-> +#ifdef CONFIG_DARWIN
-> +    if (len > 0) {
-> +        /* Skip the IP header that OS X (unlike Linux) includes. */
-> +        struct ip *inner_ip = mtod(m, struct ip *);
-> +        int inner_hlen = inner_ip->ip_hl << 2;
-> +        if (inner_hlen > len) {
-> +            len = -1;
-> +            errno = -EINVAL;
-> +        } else {
-> +            len -= inner_hlen;
-> +            memmove(icp, (unsigned char *)icp + inner_hlen, len);
-> +        }
-> +    }
-> +#endif
->      icp->icmp_id = id;
->  
->      m->m_data -= hlen;
-> -- 
-> 2.17.0
-> 
+To me personally the issue is that if you can specify a plain filename,
+bdrv_refresh_filename() should give you that plain filename back.  So
+rbd's implementation of that is lacking.  Well, it just doesn't exist.
 
--- 
-Samuel
-"...Unix, MS-DOS, and Windows NT (also known as the Good, the Bad, and
-the Ugly)."
-(By Matt Welsh)
+> If so, and we are comfortable changing the output the way this patch do=
+es
+> (technically altering ABI anyway), we might as well go all the way and
+> filter it out completely.  That would be preferable to cleaning up the =
+json
+> output of the internal key/value pairs, IMO.
+
+Well, this filtering at least is done by my "Fix some filename
+generation issues" series.
+
+Max
+
+
+--Q4wEcTnqIu4lUw3ERilshQwzhSbeNsxNP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltd1HwACgkQ9AfbAGHV
+z0A+VAgAio1hlPY9EagPirtz31giaUVEuRTVFrhz/7jFjlcRKxysxtuNGaKb5YxB
+NcRivQ1QAjMus0EnJQO2qgZU7TNNiM+eW5ubw8LShibg2TgQ+PgqdrRIg6ToxDHA
+kH+PGxuCGTYddHRldQTQXc/OV/9LNKThrJxLkxKgEy3Z8btkQQDsCfZN3xPyvDTl
+gfvSNPQS/QqhsgEgVcPcgbQ8jvjh6T5iq+xaraKiVNs4dYTkzymaHckKz4Lf1ltA
+9TjJnsjlTbFleteXiymYdugmgi2e2zdpgOum7Y6a8MRc9cFWjbfZXWTGHzn7Tn/8
+LihWVg5H7sFxhH7BwkOl/mlnrNv7nQ==
+=nAt1
+-----END PGP SIGNATURE-----
+
+--Q4wEcTnqIu4lUw3ERilshQwzhSbeNsxNP--
