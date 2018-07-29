@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rebecca@bluestop.org>) id 1fjc43-0007h0-RP
-	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 23:08:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fjjsR-00074w-AG
+	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 07:28:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rebecca@bluestop.org>) id 1fjc3z-0007YP-SM
-	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 23:08:11 -0400
-Received: from muon.bluestop.org ([96.73.9.1]:23831)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rebecca@bluestop.org>)
-	id 1fjc3z-0007YB-Kf
-	for qemu-devel@nongnu.org; Sat, 28 Jul 2018 23:08:07 -0400
-References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
-	<d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
-From: Rebecca Cran <rebecca@bluestop.org>
-Message-ID: <a550a2c5-4024-0a4d-d7e5-644e4218af84@bluestop.org>
-Date: Sat, 28 Jul 2018 21:08:05 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1fjjsQ-0003fp-G9
+	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 07:28:43 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:34814)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fjjsQ-0003fA-AO
+	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 07:28:42 -0400
+Received: by mail-oi0-x241.google.com with SMTP id 13-v6so16502515ois.1
+	for <qemu-devel@nongnu.org>; Sun, 29 Jul 2018 04:28:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
+In-Reply-To: <383842e2-9d91-ff2d-642d-c3cb003895b7@linaro.org>
+References: <eb8233618cf64aa21c87e2809933f112a7aedf68.1532735306.git.alistair.francis@wdc.com>
+	<383842e2-9d91-ff2d-642d-c3cb003895b7@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 29 Jul 2018 12:28:20 +0100
+Message-ID: <CAFEAcA_NaTDYPb_-w2mO-Y8xZ45=zkBQRA=XwHu4ioH+N8Y52g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] configure: Add RISC-V host support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yuval Shaia <yuval.shaia@oracle.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <alistair23@gmail.com>
 
-On 7/25/18 1:32 AM, Thomas Huth wrote:
+On 28 July 2018 at 17:36, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 07/27/2018 04:49 PM, Alistair Francis wrote:
+>> Allow QEMU to be built to run on a RISC-V host.
+>>
+>> QEMU does not yet have a RISC-V TCG or user mode target port, but
+>> running other architectures on RISC-V using TCI does work.
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>> ---
+>>  configure | 18 +++++++++++++++++-
+>>  1 file changed, 17 insertions(+), 1 deletion(-)
 >
-> When was it still working for you the last time? Was it still working
-> with v3.0-rc1 ? Or just with v2.12 ? Any chance that you could bisect
-> the problem to determine when it has been introduced?
+> This is ok as far as it goes.
+>
+> Even for TCI, you need some more.
+>
+> At minimum, see Michael Clark's branch changes to accel/tcg/user-exec.c for
+> host signal handling.  While you can run *-softmmu without this, none of
+> *-linux-user will work reliably.
+>
+> Another piece that even Michael Clark does not have is
+> linux-user/host/*/safe-syscall.S.
 
+It might be nice to complete the safe-syscall stuff for all hosts,
+and then remove the fallback that lets you build an unreliable
+linux-user binary without it...
 
-I'm not sure if it's FreeBSD that might have changed to cause things to
-break as well, since I _am_ running 12.0-CURRENT (i.e. HEAD).
-
-However, I did some bisection and v2.12.0-rc0 and newer is broken, while
-v2.11.0 works.
-
-
--- 
-
-Rebecca
+thanks
+-- PMM
