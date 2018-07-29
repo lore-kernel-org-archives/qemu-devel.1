@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1fjrET-0000AV-N5
-	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 15:19:58 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fjtF2-00020d-8e
+	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 17:28:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1fjrEQ-0006i3-IZ
-	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 15:19:57 -0400
-Received: from relay2.mail.vrmd.de ([81.28.224.28]:47036)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mail@sebastianbauer.info>)
-	id 1fjrEQ-0006hS-BI
-	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 15:19:54 -0400
-From: Sebastian Bauer <mail@sebastianbauer.info>
-Date: Sun, 29 Jul 2018 21:19:28 +0200
-Message-Id: <20180729191928.11254-1-mail@sebastianbauer.info>
-Subject: [Qemu-devel] [PATCH] ohci: Clear the interrupt counter for
- erroneous transfers
+	(envelope-from <lbloch@janustech.com>) id 1fjtF0-0000XV-Oz
+	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 17:28:40 -0400
+From: Leonid Bloch <lbloch@janustech.com>
+Date: Mon, 30 Jul 2018 00:27:38 +0300
+Message-Id: <20180729212744.23709-1-lbloch@janustech.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 0/6] qcow2: Make the L2 cache cover the whole
+ image by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +20,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mail@sebastianbauer.info
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Leonid Bloch <lbloch@janustech.com>
 
-This is mandated by the ohci specification. It tells at 6.4.4 on page 104
-that for transfer descriptors that are retired with an error the done
-queue interrupt counter is cleared as if the interrupt delay field of the
-descriptions were zero.
+This series makes the qcow2 L2 cache cover the entire image by default.
+The importance of this change is in noticeable performance improvement,
+especially with heavy random I/O. The memory overhead is very small:
+only 1 MB of cache for every 8 GB of image size. On systems with very
+limited RAM the maximal cache size can be limited by the existing
+cache-size and l2-cache-size options.
 
-Before this change, error conditions were handled similarly to the
-successful condition which is especially troublesome for control transfers.
-Some drivers (e.g., the AmigaOS-one) as well as the example code in the
-spec, set the setup stage with an interrupt delay of seven (which means no
-interrupt). This is fine under normal conditions, because one usually
-doesn't want to be notified about the completion of this stage. However, if
-an error occurs in this stage, these drivers will not get notified with the
-current implementation. The fix addresses this by following the spec more
-closely. Also, otherwise, the ability to set interrupt delay to seven would
-be useless.
+The L2 cache is also resized accordingly, by default, if the image is
+resized.
 
-Note that Linux drivers that I looked at don't seem to be affected as they
-set six as the interrupt delay presumably for the reason that they won't
-get notified otherwise.
+The reasons for making this behavior default, unlike in the patches I
+have sent previously, are the following:
+1) Unelegant complications with making an option to accept either a
+   size or a string, while outputting a proper error message.
+2) More bulky logic to sort out what to do if the image is being resized
+   but the (defined) overall cache size is too small to contain the
+   new l2-cache-size.
+(Making this behavior default resolves all of these technical issues
+neatly)
+3) The performance gain (as measured by fio in random read/write tests)
+   can be as high as 50%, or even more, so this would be a reasonable
+   default behavior.
+4) The memory overhead is really small for the gain, and in cases when
+   memory economy is critical, the maximal cache values can always be
+   set by the appropriate options.
 
-Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
----
- hw/usb/hcd-ohci.c | 3 +++
- 1 file changed, 3 insertions(+)
+Leonid Bloch (6):
+  Update .gitignore
+  qcow2: A grammar fix in conflicting cache sizing error message
+  qcow2: Options' documentation fixes
+  qcow2: Update total_sectors when resizing the image
+  qcow2: Make the default L2 cache sufficient to cover the entire image
+  qcow2: Resize the cache upon image resizing
 
-diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-index d4c0293db5..98da5f0f04 100644
---- a/hw/usb/hcd-ohci.c
-+++ b/hw/usb/hcd-ohci.c
-@@ -1156,6 +1156,9 @@ static int ohci_service_td(OHCIState *ohci, struct ohci_ed *ed)
-                 OHCI_SET_BM(td.flags, TD_EC, 3);
-                 break;
-             }
-+            /* An error occured so we have to clear the interrupt counter. See
-+             * spec at 6.4.4 on page 104 */
-+            ohci->done_count = 0;
-         }
-         ed->head |= OHCI_ED_H;
-     }
+ .gitignore                 |  1 +
+ block/qcow2.c              | 20 +++++++++++++-------
+ block/qcow2.h              |  4 ----
+ docs/qcow2-cache.txt       | 30 +++++++++++++++++-------------
+ qapi/block-core.json       |  6 +++---
+ qemu-options.hx            | 15 +++++++++------
+ tests/qemu-iotests/103.out |  4 ++--
+ tests/qemu-iotests/137.out |  2 +-
+ 8 files changed, 46 insertions(+), 36 deletions(-)
+
 -- 
-2.18.0
+2.17.1
