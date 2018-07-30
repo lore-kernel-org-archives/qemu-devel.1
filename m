@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fkAyr-0001NT-DU
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:25:10 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fkAyn-0001J5-Ok
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fkAyp-0001Ds-Tk
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:25:09 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fkAym-0001Bn-Lm
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:25:05 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jul 2018 17:24:54 +0100
-Message-Id: <20180730162458.23186-2-peter.maydell@linaro.org>
-In-Reply-To: <20180730162458.23186-1-peter.maydell@linaro.org>
-References: <20180730162458.23186-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/5] hw/misc/mps2-fpgaio: Implement 1Hz and
- 100Hz counters
+Date: Mon, 30 Jul 2018 17:24:53 +0100
+Message-Id: <20180730162458.23186-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/5] mps2: Implement FPGAIO counters and
+ dual-timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,154 +21,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-The MPS2 FPGAIO block includes some simple free-running counters.
-Implement these.
+This patchset adds some missing timer and counter devices
+to the MPS2 boards:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/misc/mps2-fpgaio.h |  4 +++
- hw/misc/mps2-fpgaio.c         | 53 ++++++++++++++++++++++++++++++++++-
- 2 files changed, 56 insertions(+), 1 deletion(-)
+ * the MPS2 "fpgaio" register bank includes some registers
+   which provide various kinds of free-running counter
+ * the boards have an instance fo the CMSDK "dual timer module"
 
-diff --git a/include/hw/misc/mps2-fpgaio.h b/include/hw/misc/mps2-fpgaio.h
-index eedf17ebc6d..ec057d38c76 100644
---- a/include/hw/misc/mps2-fpgaio.h
-+++ b/include/hw/misc/mps2-fpgaio.h
-@@ -38,6 +38,10 @@ typedef struct {
-     uint32_t misc;
- 
-     uint32_t prescale_clk;
-+
-+    /* These hold the CLOCK_VIRTUAL ns tick when the CLK1HZ/CLK100HZ was zero */
-+    int64_t clk1hz_tick_offset;
-+    int64_t clk100hz_tick_offset;
- } MPS2FPGAIO;
- 
- #endif
-diff --git a/hw/misc/mps2-fpgaio.c b/hw/misc/mps2-fpgaio.c
-index 7394a057d82..bbc28f641f0 100644
---- a/hw/misc/mps2-fpgaio.c
-+++ b/hw/misc/mps2-fpgaio.c
-@@ -22,6 +22,7 @@
- #include "hw/sysbus.h"
- #include "hw/registerfields.h"
- #include "hw/misc/mps2-fpgaio.h"
-+#include "qemu/timer.h"
- 
- REG32(LED0, 0)
- REG32(BUTTON, 8)
-@@ -32,10 +33,21 @@ REG32(PRESCALE, 0x1c)
- REG32(PSCNTR, 0x20)
- REG32(MISC, 0x4c)
- 
-+static uint32_t counter_from_tickoff(int64_t now, int64_t tick_offset, int frq)
-+{
-+    return muldiv64(now - tick_offset, frq, NANOSECONDS_PER_SECOND);
-+}
-+
-+static int64_t tickoff_from_counter(int64_t now, uint32_t count, int frq)
-+{
-+    return now - muldiv64(count, NANOSECONDS_PER_SECOND, frq);
-+}
-+
- static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
- {
-     MPS2FPGAIO *s = MPS2_FPGAIO(opaque);
-     uint64_t r;
-+    int64_t now;
- 
-     switch (offset) {
-     case A_LED0:
-@@ -54,10 +66,15 @@ static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
-         r = s->misc;
-         break;
-     case A_CLK1HZ:
-+        now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        r = counter_from_tickoff(now, s->clk1hz_tick_offset, 1);
-+        break;
-     case A_CLK100HZ:
-+        now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        r = counter_from_tickoff(now, s->clk100hz_tick_offset, 100);
-+        break;
-     case A_COUNTER:
-     case A_PSCNTR:
--        /* These are all upcounters of various frequencies. */
-         qemu_log_mask(LOG_UNIMP, "MPS2 FPGAIO: counters unimplemented\n");
-         r = 0;
-         break;
-@@ -76,6 +93,7 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
-                               unsigned size)
- {
-     MPS2FPGAIO *s = MPS2_FPGAIO(opaque);
-+    int64_t now;
- 
-     trace_mps2_fpgaio_write(offset, value, size);
- 
-@@ -100,6 +118,14 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
-                       "MPS2 FPGAIO: MISC control bits unimplemented\n");
-         s->misc = value;
-         break;
-+    case A_CLK1HZ:
-+        now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        s->clk1hz_tick_offset = tickoff_from_counter(now, value, 1);
-+        break;
-+    case A_CLK100HZ:
-+        now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        s->clk100hz_tick_offset = tickoff_from_counter(now, value, 100);
-+        break;
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "MPS2 FPGAIO write: bad offset 0x%x\n", (int) offset);
-@@ -116,11 +142,14 @@ static const MemoryRegionOps mps2_fpgaio_ops = {
- static void mps2_fpgaio_reset(DeviceState *dev)
- {
-     MPS2FPGAIO *s = MPS2_FPGAIO(dev);
-+    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
- 
-     trace_mps2_fpgaio_reset();
-     s->led0 = 0;
-     s->prescale = 0;
-     s->misc = 0;
-+    s->clk1hz_tick_offset = tickoff_from_counter(now, 0, 1);
-+    s->clk100hz_tick_offset = tickoff_from_counter(now, 0, 100);
- }
- 
- static void mps2_fpgaio_init(Object *obj)
-@@ -133,6 +162,24 @@ static void mps2_fpgaio_init(Object *obj)
-     sysbus_init_mmio(sbd, &s->iomem);
- }
- 
-+static bool mps2_fpgaio_counters_needed(void *opaque)
-+{
-+    /* Currently vmstate.c insists all subsections have a 'needed' function */
-+    return true;
-+}
-+
-+static const VMStateDescription mps2_fpgaio_counters_vmstate = {
-+    .name = "mps2-fpgaio/counters",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = mps2_fpgaio_counters_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_INT64(clk1hz_tick_offset, MPS2FPGAIO),
-+        VMSTATE_INT64(clk100hz_tick_offset, MPS2FPGAIO),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription mps2_fpgaio_vmstate = {
-     .name = "mps2-fpgaio",
-     .version_id = 1,
-@@ -142,6 +189,10 @@ static const VMStateDescription mps2_fpgaio_vmstate = {
-         VMSTATE_UINT32(prescale, MPS2FPGAIO),
-         VMSTATE_UINT32(misc, MPS2FPGAIO),
-         VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription*[]) {
-+        &mps2_fpgaio_counters_vmstate,
-+        NULL
-     }
- };
- 
+Together these are sufficient for QEMU's mps2-an505
+emulation to pass the "timer test" subsection of the
+self-test program which can be found (behind a clickthrough
+EULA) in the Cortex-M33_IoT_kit_2_0.zip at:
+ https://developer.arm.com/products/system-design/development-boards/fpga-prototyping-boards/download-fpga-images
+
+The dual-timer patch ended up a bit big; I can try to split
+that up if people would prefer that for review.
+
+thanks
+-- PMM
+
+Peter Maydell (5):
+  hw/misc/mps2-fpgaio: Implement 1Hz and 100Hz counters
+  hw/misc/mps2-fpgaio: Implement PSCNTR and COUNTER
+  hw/timer/cmsdk-apb-dualtimer: Implement CMSDK dual timer module
+  hw/arm/iotkit: Wire up the dualtimer
+  hw/arm/mps2: Wire up dual-timer in mps2-an385 and mps2-an511
+
+ hw/timer/Makefile.objs                 |   1 +
+ include/hw/arm/iotkit.h                |   3 +-
+ include/hw/misc/mps2-fpgaio.h          |  10 +
+ include/hw/timer/cmsdk-apb-dualtimer.h |  72 ++++
+ hw/arm/iotkit.c                        |   8 +-
+ hw/arm/mps2.c                          |  11 +
+ hw/misc/mps2-fpgaio.c                  | 146 ++++++-
+ hw/timer/cmsdk-apb-dualtimer.c         | 515 +++++++++++++++++++++++++
+ MAINTAINERS                            |   2 +
+ default-configs/arm-softmmu.mak        |   1 +
+ hw/timer/trace-events                  |   5 +
+ 11 files changed, 767 insertions(+), 7 deletions(-)
+ create mode 100644 include/hw/timer/cmsdk-apb-dualtimer.h
+ create mode 100644 hw/timer/cmsdk-apb-dualtimer.c
+
 -- 
 2.17.1
