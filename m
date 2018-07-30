@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkCQK-0000R0-8b
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:57:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fkCUp-0002rM-J6
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:02:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkCQJ-0004VE-Cc
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:57:36 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:39435)
+	(envelope-from <peter.maydell@linaro.org>) id 1fkCUo-0006S0-Lv
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:02:15 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:35798)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fkCQJ-0004Up-0Z
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:57:35 -0400
-Received: by mail-oi0-x242.google.com with SMTP id d189-v6so22877766oib.6
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 10:57:34 -0700 (PDT)
+	id 1fkCUo-0006Rn-GM
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:02:14 -0400
+Received: by mail-oi0-x243.google.com with SMTP id i12-v6so22964097oik.2
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 11:02:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180725085944.11856-6-stefanha@redhat.com>
+In-Reply-To: <20180725085944.11856-7-stefanha@redhat.com>
 References: <20180725085944.11856-1-stefanha@redhat.com>
-	<20180725085944.11856-6-stefanha@redhat.com>
+	<20180725085944.11856-7-stefanha@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jul 2018 18:57:13 +0100
-Message-ID: <CAFEAcA8N26yjrLeaDzkoJfx50Rd5h_y9hHVA8W19L9q1EOhfMA@mail.gmail.com>
+Date: Mon, 30 Jul 2018 19:01:53 +0100
+Message-ID: <CAFEAcA8m2f-DRiDNF0ry4nMH9bzZ1gODV4MTgtLwR5jTNdgeJA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] loader: add rom transaction API
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] loader: Implement .hex file loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,45 +33,24 @@ To: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, Alistair Francis <alistair@alistair23.me>, Liviu Ionescu <ilg@livius.net>, qemu-arm <qemu-arm@nongnu.org>, Julia Suvorova <jusual@mail.ru>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Steffen Gortz <qemu.ml@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>
 
 On 25 July 2018 at 09:59, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> Image file loaders may add a series of roms.  If an error occurs partway
-> through loading there is no easy way to drop previously added roms.
+> From: Su Hang <suhang16@mails.ucas.ac.cn>
 >
-> This patch adds a transaction mechanism that works like this:
+> This patch adds Intel Hexadecimal Object File format support to the
+> loader.  The file format specification is available here:
+> http://www.piclist.com/techref/fileext/hex/intel.htm
 >
->   rom_transaction_begin();
->   ...call rom_add_*()...
->   rom_transaction_end(ok);
->
-> If ok is false then roms added in this transaction are dropped.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> +void rom_transaction_end(bool commit)
-> +{
-> +    Rom *rom;
-> +    Rom *tmp;
-> +
-> +    QTAILQ_FOREACH_SAFE(rom, &roms, next, tmp) {
-> +        if (rom->committed) {
-> +            continue;
-> +        }
-> +        if (commit) {
-> +            rom->committed = true;
-> +        } else {
-> +            QTAILQ_REMOVE(&roms, rom, next);
-> +            g_free(rom->data);
-> +            g_free(rom->path);
-> +            g_free(rom->name);
-> +            g_free(rom->fw_dir);
-> +            g_free(rom->fw_file);
-> +            g_free(rom);
+> This file format is often used with microcontrollers such as the
+> micro:bit, Arduino, STM32, etc.  Users expect to be able to run them
+> directly with qemu -kernel program.hex instead of converting to ELF or
+> binary.
 
-Is it worth having a rom_free() function so we can
-share the "free all the pointers" code between this
-and the error-exit codepath at the end of rom_add_file() ?
+I'm still not convinced we want to add another random
+special case only-works-on-one-architecture-and-some-boards
+feature to the -kernel command line option.
 
-Either way
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Adding it to the "generic loader" device might be more plausible?
+Or just get the user to create ELF files or plain binary files,
+both of which we already handle.
 
 thanks
 -- PMM
