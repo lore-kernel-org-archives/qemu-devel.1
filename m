@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fkDLb-00044W-98
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:56:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1fkDQD-0005Sq-1f
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 15:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fkDLX-0006dT-1A
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:56:47 -0400
-Resent-Message-Id: <E1fkDLX-0006dT-1A@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21055)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fkDLW-0006cr-O7
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:56:42 -0400
-In-Reply-To: <cover.1532963204.git.jcd@tribudubois.net>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153297696197.25173.16553571835968719960@502c9da6d61e>
+	(envelope-from <bounces@canonical.com>) id 1fkDQ9-0000GK-21
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 15:01:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57352)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fkDQ8-0000GA-Rg
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 15:01:28 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fkDQ6-0002Z9-Oq
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 19:01:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E4E5D2E8193
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 19:01:23 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 30 Jul 2018 11:56:03 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] i.MX: Add the i.MX6UL SOC and a
- reference board.
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 30 Jul 2018 18:47:40 -0000
+From: Tristan Burgess <1720969@bugs.launchpad.net>
+Reply-To: Bug 1720969 <1720969@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150701930722.20909.12415412860482115977.malonedeb@soybean.canonical.com>
+Message-Id: <153297646059.4662.8360227578676793394.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1720969] Re: qemu/memory.c:206: pointless copies
+ of large structs ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jcd@tribudubois.net
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, peter.chubb@nicta.com.au, andrew.smirnov@gmail.com
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IGNvdmVyLjE1MzI5NjMyMDQuZ2l0LmpjZEB0cmlidWR1Ym9pcy5uZXQKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzNdIGkuTVg6IEFkZCB0aGUgaS5NWDZVTCBTT0Mg
-YW5kIGEgcmVmZXJlbmNlIGJvYXJkLgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
-dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
-UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
-ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
-ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
-dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICAgNmQ5ZGQ1ZmI5ZC4uN2Fl
-ZmMxNDU2NSAgbWFzdGVyICAgICAtPiBtYXN0ZXIKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAg
-cGF0Y2hldy8yMDE4MDczMDE0MTc0OC40MzAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4g
-cGF0Y2hldy8yMDE4MDczMDE0MTc0OC40MzAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKICog
-W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDczMDE3MzcxMi5HRzQ5ODdAb3Mu
-aW5mLnR1LWRyZXNkZW4uZGUgLT4gcGF0Y2hldy8yMDE4MDczMDE3MzcxMi5HRzQ5ODdAb3MuaW5m
-LnR1LWRyZXNkZW4uZGUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkMzA1YzdkNmQw
-IGkuTVg2VUw6IEFkZCBGcmVlc2NhbGUgaS5NWDYgVWx0cmFMaXRlIDE0eDE0IEVWSyBCb2FyZApk
-NDVhMmE4NjAyIGkuTVg2VUw6IEFkZCBpLk1YNlVMIFNPQwowN2ZmZjNkODY1IGkuTVg2VUw6IEFk
-ZCBpLk1YNlVMIHNwZWNpZmljIENDTSBkZXZpY2UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvMzogaS5NWDZVTDogQWRkIGkuTVg2VUwgc3BlY2lmaWMgQ0NNIGRldmljZS4u
-LgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlO
-RVJTIG5lZWQgdXBkYXRpbmc/CiMyMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDExMzMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAyLzM6IGkuTVg2VUw6IEFkZCBpLk1Y
-NlVMIFNPQy4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpF
-UlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwg
-NykKIzExMzogRklMRTogaHcvYXJtL2ZzbC1pbXg2dWwuYzo3ODoKKyAgICBmb3IgKGkgPSAwOyBp
-IDwgRlNMX0lNWDZVTF9OVU1fR1BJT1M7IGkrKykgeworICAgICAgIHNucHJpbnRmKG5hbWUsIE5B
-TUVfU0laRSwgImdwaW8lZCIsIGkpOwoKRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9yIGNv
-bmRpdGlvbmFsIHN0YXRlbWVudHMgKDQsIDcpCiMxMjI6IEZJTEU6IGh3L2FybS9mc2wtaW14NnVs
-LmM6ODc6CisgICAgZm9yIChpID0gMDsgaSA8IEZTTF9JTVg2VUxfTlVNX0dQVFM7IGkrKykgewor
-ICAgICAgIHNucHJpbnRmKG5hbWUsIE5BTUVfU0laRSwgImdwdCVkIiwgaSk7CgpFUlJPUjogc3Vz
-cGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgNykKIzEzMTog
-RklMRTogaHcvYXJtL2ZzbC1pbXg2dWwuYzo5NjoKKyAgICBmb3IgKGkgPSAwOyBpIDwgRlNMX0lN
-WDZVTF9OVU1fRVBJVFM7IGkrKykgeworICAgICAgIHNucHJpbnRmKG5hbWUsIE5BTUVfU0laRSwg
-ImVwaXQlZCIsIGkgKyAxKTsKCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRp
-b25hbCBzdGF0ZW1lbnRzICg0LCA3KQojMTQwOiBGSUxFOiBody9hcm0vZnNsLWlteDZ1bC5jOjEw
-NToKKyAgICBmb3IgKGkgPSAwOyBpIDwgRlNMX0lNWDZVTF9OVU1fRUNTUElTOyBpKyspIHsKKyAg
-ICAgICBzbnByaW50ZihuYW1lLCBOQU1FX1NJWkUsICJzcGklZCIsIGkgKyAxKTsKCkVSUk9SOiBz
-dXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg0LCA3KQojMTQ5
-OiBGSUxFOiBody9hcm0vZnNsLWlteDZ1bC5jOjExNDoKKyAgICBmb3IgKGkgPSAwOyBpIDwgRlNM
-X0lNWDZVTF9OVU1fSTJDUzsgaSsrKSB7CisgICAgICAgc25wcmludGYobmFtZSwgTkFNRV9TSVpF
-LCAiaTJjJWQiLCBpICsgMSk7CgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0
-aW9uYWwgc3RhdGVtZW50cyAoNCwgNykKIzE1ODogRklMRTogaHcvYXJtL2ZzbC1pbXg2dWwuYzox
-MjM6CisgICAgZm9yIChpID0gMDsgaSA8IEZTTF9JTVg2VUxfTlVNX1VBUlRTOyBpKyspIHsKKyAg
-ICAgICBzbnByaW50ZihuYW1lLCBOQU1FX1NJWkUsICJ1YXJ0JWQiLCBpKTsKCkVSUk9SOiBzdXNw
-ZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg0LCA3KQojMTY3OiBG
-SUxFOiBody9hcm0vZnNsLWlteDZ1bC5jOjEzMjoKKyAgICBmb3IgKGkgPSAwOyBpIDwgRlNMX0lN
-WDZVTF9OVU1fRVRIUzsgaSsrKSB7CisgICAgICAgc25wcmludGYobmFtZSwgTkFNRV9TSVpFLCAi
-ZXRoJWQiLCBpKTsKCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBz
-dGF0ZW1lbnRzICg0LCA3KQojMTc2OiBGSUxFOiBody9hcm0vZnNsLWlteDZ1bC5jOjE0MToKKyAg
-ICBmb3IgKGkgPSAwOyBpIDwgRlNMX0lNWDZVTF9OVU1fVVNESENTOyBpKyspIHsKKyAgICAgICBz
-bnByaW50ZihuYW1lLCBOQU1FX1NJWkUsICJ1c2RoYyVkIiwgaSk7CgpFUlJPUjogc3VzcGVjdCBj
-b2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgNykKIzE4NTogRklMRTog
-aHcvYXJtL2ZzbC1pbXg2dWwuYzoxNTA6CisgICAgZm9yIChpID0gMDsgaSA8IEZTTF9JTVg2VUxf
-TlVNX1dEVFM7IGkrKykgeworICAgICAgIHNucHJpbnRmKG5hbWUsIE5BTUVfU0laRSwgIndkdCVk
-IiwgaSk7Cgp0b3RhbDogOSBlcnJvcnMsIDEgd2FybmluZ3MsIDk2OCBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzM6
-IGkuTVg2VUw6IEFkZCBGcmVlc2NhbGUgaS5NWDYgVWx0cmFMaXRlIDE0eDE0IEVWSyBCb2FyZC4u
-LgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlO
-RVJTIG5lZWQgdXBkYXRpbmc/CiMyMzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDkwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Fix committed and sent upstream:
+https://github.com/qemu/qemu/commit/73bb753d24a702b37913ce4b5ddb6dca40dab067
+
+** Changed in: qemu
+       Status: New =3D> Fix Committed
+
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Tristan Burgess (tburgessdev)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1720969
+
+Title:
+  qemu/memory.c:206:  pointless copies of large structs ?
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  [qemu/memory.c:206]: (performance) Function parameter 'a' should be passe=
+d by reference.
+  [qemu/memory.c:207]: (performance) Function parameter 'b' should be passe=
+d by reference.
+
+  Source code is
+
+  static bool memory_region_ioeventfd_equal(MemoryRegionIoeventfd a,
+                                            MemoryRegionIoeventfd b)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1720969/+subscriptions
