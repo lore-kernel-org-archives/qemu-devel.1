@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fk6qy-0004BB-2K
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:00:45 -0400
+	(envelope-from <mail@sebastianbauer.info>) id 1fk6ux-00058q-3H
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:04:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fk6qx-0002aT-1H
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:00:44 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:46214)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fk6qw-0002Zz-QI
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:00:42 -0400
-Received: by mail-oi0-x241.google.com with SMTP id y207-v6so20697972oie.13
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 05:00:42 -0700 (PDT)
+	(envelope-from <mail@sebastianbauer.info>) id 1fk6us-0004FM-3Q
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:04:51 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAHNT7NsJnejaweD24bFR9BEZyJ+yiyabX6a9F3cmGBhqXp5Z=A@mail.gmail.com>
-References: <1527229488-49822-1-git-send-email-mjc@sifive.com>
-	<83728e91-de69-c376-a768-0aad501ff64e@twiddle.net>
-	<CAFEAcA-hOTPOfW7ruRsSYt32Ahu707iMJtXdXkUREpLyHdFwJQ@mail.gmail.com>
-	<CAHNT7NsJnejaweD24bFR9BEZyJ+yiyabX6a9F3cmGBhqXp5Z=A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jul 2018 13:00:21 +0100
-Message-ID: <CAFEAcA8KxwoJGKY6++7uNp29orJDWivnq0YQ_TPzQzoh38NpQw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] RISC-V: Correct typo in RV32 perf counters
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Mon, 30 Jul 2018 14:04:32 +0200
+From: Sebastian Bauer <mail@sebastianbauer.info>
+In-Reply-To: <alpine.BSF.2.21.1807301254450.49677@zero.eik.bme.hu>
+References: <20180730043904.17023-1-mail@sebastianbauer.info>
+	<alpine.BSF.2.21.1807301254450.49677@zero.eik.bme.hu>
+Message-ID: <fbaa741e42e50457a0ba9c7654e1d03d@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PATCH] sam460ex: Fix PCI interrupt connections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +24,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Richard Henderson <rth@twiddle.net>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, agraf@suse.de, qemu-ppc@nongnu.org
 
-On 30 July 2018 at 12:42, Michael Clark <mjc@sifive.com> wrote:
->
->
-> On Mon, 30 Jul 2018 at 10:46 PM, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
->>
->> On 25 May 2018 at 14:17, Richard Henderson <rth@twiddle.net> wrote:
->> > On 05/24/2018 11:24 PM, Michael Clark wrote:
->> >> This patch enables mhpmcounter3h through mhpmcounter31h on RV32.
->> >> Previously the RV32 h versions (high 32-bits of 64-bit counters)
->> >> of these counters would trap with an illegal instruction instead
->> >> of returning 0 as intended.
->> >>
->> >> Reported-by: Richard Henderson <rth@twiddle.net>
->> >> Signed-off-by: Michael Clark <mjc@sifive.com>
->> >> ---
->> >>  target/riscv/op_helper.c | 2 +-
->> >>  1 file changed, 1 insertion(+), 1 deletion(-)
->> >
->> > Fixes: Coverity CID 1390849
->> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>
->> Ping -- Coverity is still complaining about this -- did this
->> patch get lost?
->
->
-> Sort of. I assumed it would go into a trivial queue.
+Am 2018-07-30 13:06, schrieb BALATON Zoltan:
+> On Mon, 30 Jul 2018, Sebastian Bauer wrote:
+>> The four interrupts of the PCI bus are connected to the same UIC pin 
+>> on the
+>> real Sam460ex. Evidence for this can be found in the UBoot source for 
+>> the
+>> Sam460ex in the Sam460ex.c file where PCI_INTERRUPT_LINE in written. 
+>> This
+>> change brings the connection in line with this.
+>> 
+>> This fixes the problem that can be observed when adding further PCI 
+>> cards
+>> that get their interrupt rotated to other interrupts than PCI INT A. 
+>> In
+>> particular, the bug was observed and verified to be fixed (after this
+>> change) with an additional OHCI PCI card.
+>> 
+>> Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+>> ---
+>> hw/ppc/sam460ex.c | 4 ++--
+>> 1 file changed, 2 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+>> index 0999efcc1e..b2b22f280d 100644
+>> --- a/hw/ppc/sam460ex.c
+>> +++ b/hw/ppc/sam460ex.c
+>> @@ -515,9 +515,9 @@ static void sam460ex_init(MachineState *machine)
+>> 
+>>     /* PCI bus */
+>>     ppc460ex_pcie_init(env);
+>> -    /* FIXME: is this correct? */
+>> +    /* All PCI ints are connected to the same UIC pin (cf. UBoot 
+>> source) */
+>>     dev = sysbus_create_varargs("ppc440-pcix-host", 0xc0ec00000,
+>> -                                uic[1][0], uic[1][20], uic[1][21], 
+>> uic[1][22],
+>> +                                uic[1][0], uic[1][0], uic[1][0], 
+>> uic[1][0],
+> 
+> I don't understand QOM. Does this really work? It will ultimately do
+> 
+> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 0, uic[1][0]);
+> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 1, uic[1][0]);
+> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 2, uic[1][0]);
+> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 3, uic[1][0]);
+> 
+> which will call for each of these
+> 
+> object_property_set_link(dev, uic[1][0], "some name", &errp);
 
-As a general rule of thumb, patches which apply to an area
-of code which has a maintainer (especially when that area is
-in active development, as riscv is), usually go through that
-maintainer's tree. Picking up and shepherding patches like this
-into master is one of the things maintainers do in QEMU's system.
-The -trivial queue mostly exists for things which would otherwise
-fall through the cracks between different subsystems.
+I don't know QOM myself, but my research was that "some name" is 
+different on each invocation. So you associate the same value to the 
+same object (dev) under a property different name. What was not obvious 
+to me was who is the owner of the value. But according to the doc QOM 
+has the notation of strong references, but it is not created like that 
+in qdev_connect_gpio_out_named(). So I assume that it is weak reference 
+and the parent is not the owner.
 
-> Feel free to apply, however it=E2=80=99s going to create (another) rebase=
- conflict
-> against my =E2=80=98for-upstream=E2=80=99 queue as this code has gone awa=
-y, hence it is not
-> in my queue.
+> Would this correctly add all device interrupts to the uic[1][0] irq or
+> will this replace it so only the last line will be connected instead
+> of the first after this patch? Could someone with more understanding
+> about QOM confirm this?
 
-That sort of possibility for conflicts is why it makes more sense
-to put even fairly minor patches through maintainer trees rather
-than via -trivial).
+I don't know how this affects QOM, but as I see it the PCI bus has four 
+interrupts and so you need to specify all of them (and specifying wrong 
+ones seems to be not ideal either). The code assumes this throughout, 
+e.g., see ppc440_pcix_initfn().
 
-> I can include this change in my pull for 3.1, along with the patches in m=
-y
-> tree that have Reviewed-by and fix the rebase conflicts for anything that
-> depends on new context (hopefully not creating new bugs during that
-> process).
+As I have written in the commit log, I tested this change. I used two 
+cards, the (default) SATA and the OHCI controller and everything was 
+working nicely (contrary to the previous state where only the SATA card 
+worked because this was put into slot 1). Did you have a chance to test 
+it yourself?
 
-If the code has been removed then you don't need to put this
-patch in your pullrequest for 3.1, because you already have
-changes that make it moot. (Given that Coverity spotted
-it rather than an actual user it doesn't seem like a bug fix
-urgent enough to put in 3.0.)
+> If this does not work this way would mapping all PCI interrupts to
+> first line in ppc440_pcix_map_irq at hw/ppc/ppc440_pcix.c:417 and
+> assign only that to uic[1][0] be a better fix?
 
-thanks
--- PMM
+I thought about this, but then it needs to passed that we are dealing 
+with a SAM board, which seems to be more complicated than this solution. 
+You also would need to adjust that ppc440_pcix_initfn() and I'm not sure 
+if it is possible to register a root PCI bus with only one interrupt and 
+how the remaining code deals with that. Overall, this solution seem to 
+be much simpler. Of course, if it doesn't work the way I proposed it 
+must be changed again.
+
+But thinking more about it, what it is indeed not so clear to me is how 
+the interrupt states are logical combined. The hardware most likely 
+would do an "or" (but it is difficult to verify this without 
+schematics), not sure what QEMU does. It may just forward the level 
+change which would be not the right thing of course. I'll investigate 
+it. The behaviour would still be better than the previous state as 
+usually both interrupt handlers are invoked, so no interrupt will be 
+missed.
+
+Bye
+Sebastian
