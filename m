@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkC2z-0001i0-8w
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:33:31 -0400
+	(envelope-from <mst@redhat.com>) id 1fkC5N-0003Va-0m
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkC2y-0007lK-En
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:33:29 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38579)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fkC2y-0007l4-8u
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:33:28 -0400
-Received: by mail-oi0-x241.google.com with SMTP id v8-v6so22760563oie.5
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 10:33:28 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1fkC5J-0000Xh-D5
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:35:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45830 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fkC5J-0000XQ-8t
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:35:53 -0400
+Date: Mon, 30 Jul 2018 20:35:48 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180730203315-mutt-send-email-mst@kernel.org>
+References: <20180717222721.14019.27548.stgit@gimli.home>
+	<20180730163123-mutt-send-email-mst@kernel.org>
+	<20180730083939.23f3b9cc@t450s.home>
+	<20180730174601-mutt-send-email-mst@kernel.org>
+	<20180730090137.15917879@t450s.home>
+	<20180730182951-mutt-send-email-mst@kernel.org>
+	<20180730104205.1fb5a826@t450s.home>
 MIME-Version: 1.0
-In-Reply-To: <20180725085944.11856-4-stefanha@redhat.com>
-References: <20180725085944.11856-1-stefanha@redhat.com>
-	<20180725085944.11856-4-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jul 2018 18:33:07 +0100
-Message-ID: <CAFEAcA9N370ujtaJ-jHy==sOqwq42sOYw3PWt6oATYMha=QW=Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] hw/arm: make bitbanded IO optional
- on ARM M Profile
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180730104205.1fb5a826@t450s.home>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, Alistair Francis <alistair@alistair23.me>, Liviu Ionescu <ilg@livius.net>, qemu-arm <qemu-arm@nongnu.org>, Julia Suvorova <jusual@mail.ru>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Steffen Gortz <qemu.ml@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-On 25 July 2018 at 09:59, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> Some ARM CPUs have bitbanded IO, a memory region that allows convenient
-> bit access via 32-bit memory loads/stores.  This eliminates the need for
-> read-modify-update instruction sequences.
->
-> This patch makes this optional feature a ARMMProfile qdev property,
-> allowing boards to choose whether they want bitbanding or not.
->
-> Status of boards:
->  * iotkit (Cortex M33), no bitband
->  * mps2 (Cortex M3), bitband
->  * msf2 (Cortex M3), bitband
->  * stellaris (Cortex M3), bitband
->  * stm32f205 (Cortex M3), bitband
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Mon, Jul 30, 2018 at 10:42:05AM -0600, Alex Williamson wrote:
+> On Mon, 30 Jul 2018 18:49:58 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Mon, Jul 30, 2018 at 09:01:37AM -0600, Alex Williamson wrote:
+> > > > > but I don't think it can be done
+> > > > > atomically with respect to inflight DMA of a physical device where we
+> > > > > cannot halt the device without interfering with its state.    
+> > > > 
+> > > > Guests never add pages to the balloon if they are under DMA,
+> > > > so that's fine - there's never an in-flight DMA, if
+> > > > there is guest is buggy and it's ok to crash it.  
+> > > 
+> > > It's not the ballooned page that I'm trying to note, it's the entire
+> > > remainder of the SubRegion which needs to be unmapped to remove that
+> > > one page.  It's more compatible from an IOMMU perspective in that we're
+> > > only unmapping with the same granularity with which we mapped, but it's
+> > > incompatible with inflight DMA as we have no idea what DMA targets may
+> > > reside within the remainder of that mapping while it's temporarily
+> > > unmapped.  
+> > 
+> > I see. Yes you need to be careful to replace the host IOMMU PTE
+> > atomically. Same applies to vIOMMU though - if guest changes
+> > a PTE atomically host should do the same.
+> 
+> I'm not sure the hardware supports atomic updates in these cases and
+> therefore I don't think the vIOMMU does either.  Thanks,
+> 
+> Alex
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Interesting. What makes you think simply writing into PTE
+then flushing the cache isn't atomic?
 
-thanks
--- PMM
+-- 
+MST
