@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fkGN0-0002wg-0c
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 18:10:27 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fkGnU-0000gI-C7
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 18:37:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fkGMy-0005j6-M9
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 18:10:25 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fkGnQ-0008Sl-Df
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 18:37:48 -0400
+Date: Tue, 31 Jul 2018 00:37:34 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <fbaa741e42e50457a0ba9c7654e1d03d@sebastianbauer.info>
+Message-ID: <alpine.BSF.2.21.1807310009440.24147@zero.eik.bme.hu>
+References: <20180730043904.17023-1-mail@sebastianbauer.info>
+	<alpine.BSF.2.21.1807301254450.49677@zero.eik.bme.hu>
+	<fbaa741e42e50457a0ba9c7654e1d03d@sebastianbauer.info>
 MIME-Version: 1.0
-In-Reply-To: <20180730162458.23186-3-peter.maydell@linaro.org>
-References: <20180730162458.23186-1-peter.maydell@linaro.org>
-	<20180730162458.23186-3-peter.maydell@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 30 Jul 2018 15:09:48 -0700
-Message-ID: <CAKmqyKO2oUfSoiqWAA_rOWRzjgHE8om_X9sMuDdcZjgkE3q2Gg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/5] hw/misc/mps2-fpgaio: Implement PSCNTR
- and COUNTER
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH] sam460ex: Fix PCI interrupt connections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,196 +23,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
+To: Sebastian Bauer <mail@sebastianbauer.info>
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, agraf@suse.de, qemu-ppc@nongnu.org
 
-On Mon, Jul 30, 2018 at 9:24 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> In the MPS2 FPGAIO, PSCNTR is a free-running downcounter with
-> a reload value configured via the PRESCALE register, and
-> COUNTER counts up by 1 every time PSCNTR reaches zero.
-> Implement these counters.
+On Mon, 30 Jul 2018, Sebastian Bauer wrote:
+> Am 2018-07-30 13:06, schrieb BALATON Zoltan:
+>> On Mon, 30 Jul 2018, Sebastian Bauer wrote:
+>>> The four interrupts of the PCI bus are connected to the same UIC pin on 
+>>> the
+>>> real Sam460ex. Evidence for this can be found in the UBoot source for the
+>>> Sam460ex in the Sam460ex.c file where PCI_INTERRUPT_LINE in written. This
+>>> change brings the connection in line with this.
+>>> 
+>>> This fixes the problem that can be observed when adding further PCI cards
+>>> that get their interrupt rotated to other interrupts than PCI INT A. In
+>>> particular, the bug was observed and verified to be fixed (after this
+>>> change) with an additional OHCI PCI card.
+>>> 
+>>> Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+>>> ---
+>>> hw/ppc/sam460ex.c | 4 ++--
+>>> 1 file changed, 2 insertions(+), 2 deletions(-)
+>>> 
+>>> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+>>> index 0999efcc1e..b2b22f280d 100644
+>>> --- a/hw/ppc/sam460ex.c
+>>> +++ b/hw/ppc/sam460ex.c
+>>> @@ -515,9 +515,9 @@ static void sam460ex_init(MachineState *machine)
+>>>
+>>>     /* PCI bus */
+>>>     ppc460ex_pcie_init(env);
+>>> -    /* FIXME: is this correct? */
+>>> +    /* All PCI ints are connected to the same UIC pin (cf. UBoot source) 
+>>> */
+>>>     dev = sysbus_create_varargs("ppc440-pcix-host", 0xc0ec00000,
+>>> -                                uic[1][0], uic[1][20], uic[1][21], 
+>>> uic[1][22],
+>>> +                                uic[1][0], uic[1][0], uic[1][0], 
+>>> uic[1][0],
+>> 
+>> I don't understand QOM. Does this really work? It will ultimately do
+>> 
+>> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 0, uic[1][0]);
+>> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 1, uic[1][0]);
+>> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 2, uic[1][0]);
+>> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 3, uic[1][0]);
+>> 
+>> which will call for each of these
+>> 
+>> object_property_set_link(dev, uic[1][0], "some name", &errp);
 >
-> We can just increment the counters migration subsection's
-> version ID because we only added it in the previous commit,
-> so no released QEMU versions will be using it.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> I don't know QOM myself, but my research was that "some name" is different on 
+> each invocation. So you associate the same value to the same object (dev) 
+> under a property different name. What was not obvious to me was who is the 
+> owner of the value. But according to the doc QOM has the notation of strong 
+> references, but it is not created like that in qdev_connect_gpio_out_named(). 
+> So I assume that it is weak reference and the parent is not the owner.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Yes, you are right, different name is generated for each irq line. But all 
+this does not seem to matter because at the end irqs are raised/lowered 
+directly in the irq array through functions passed when calling 
+pci_register_root_bus so I'm not sure what these properties are used for 
+if they are used at all so their value probably don't matter.
 
-Alistair
+>> Would this correctly add all device interrupts to the uic[1][0] irq or
+>> will this replace it so only the last line will be connected instead
+>> of the first after this patch? Could someone with more understanding
+>> about QOM confirm this?
+>
+> I don't know how this affects QOM, but as I see it the PCI bus has four 
+> interrupts and so you need to specify all of them (and specifying wrong ones 
+> seems to be not ideal either). The code assumes this throughout, e.g., see 
+> ppc440_pcix_initfn().
 
-> ---
->  include/hw/misc/mps2-fpgaio.h |  6 +++
->  hw/misc/mps2-fpgaio.c         | 97 +++++++++++++++++++++++++++++++++--
->  2 files changed, 99 insertions(+), 4 deletions(-)
+I think the number of irq lines could be set, the functions have an nirq 
+or num_irq parameters so the 4 lines is only assumed because PCI defines 
+that and this is what's modelled but we could use different value here. 
+Sam460ex seems to connect all four PCI irq lines to a single irq but I'm 
+not sure what's the best way to model this (implementing 1 line in 
+ppc440_pcix model or trying to merge these at some higher level). Using 
+wrong irq lines is definitely wrong and was only left there because I had 
+no clue about this when I've written that so your patch is definitely 
+closer to what the board does.
+
+> As I have written in the commit log, I tested this change. I used two cards, 
+> the (default) SATA and the OHCI controller and everything was working nicely 
+> (contrary to the previous state where only the SATA card worked because this 
+> was put into slot 1). Did you have a chance to test it yourself?
+
+I could not test it yet, I was trying to understand the code instead to 
+make sure it works than just verifying it fixes one particular problem 
+which I believe you've done.
+
+>> If this does not work this way would mapping all PCI interrupts to
+>> first line in ppc440_pcix_map_irq at hw/ppc/ppc440_pcix.c:417 and
+>> assign only that to uic[1][0] be a better fix?
 >
-> diff --git a/include/hw/misc/mps2-fpgaio.h b/include/hw/misc/mps2-fpgaio.h
-> index ec057d38c76..69e265cd4b2 100644
-> --- a/include/hw/misc/mps2-fpgaio.h
-> +++ b/include/hw/misc/mps2-fpgaio.h
-> @@ -37,6 +37,12 @@ typedef struct {
->      uint32_t prescale;
->      uint32_t misc;
->
-> +    /* QEMU_CLOCK_VIRTUAL time at which counter and pscntr were last synced */
-> +    int64_t pscntr_sync_ticks;
-> +    /* Values of COUNTER and PSCNTR at time pscntr_sync_ticks */
-> +    uint32_t counter;
-> +    uint32_t pscntr;
-> +
->      uint32_t prescale_clk;
->
->      /* These hold the CLOCK_VIRTUAL ns tick when the CLK1HZ/CLK100HZ was zero */
-> diff --git a/hw/misc/mps2-fpgaio.c b/hw/misc/mps2-fpgaio.c
-> index bbc28f641f0..5cf10ebd66a 100644
-> --- a/hw/misc/mps2-fpgaio.c
-> +++ b/hw/misc/mps2-fpgaio.c
-> @@ -43,6 +43,77 @@ static int64_t tickoff_from_counter(int64_t now, uint32_t count, int frq)
->      return now - muldiv64(count, NANOSECONDS_PER_SECOND, frq);
->  }
->
-> +static void resync_counter(MPS2FPGAIO *s)
-> +{
-> +    /*
-> +     * Update s->counter and s->pscntr to their true current values
-> +     * by calculating how many times PSCNTR has ticked since the
-> +     * last time we did a resync.
-> +     */
-> +    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> +    int64_t elapsed = now - s->pscntr_sync_ticks;
-> +
-> +    /*
-> +     * Round elapsed down to a whole number of PSCNTR ticks, so we don't
-> +     * lose time if we do multiple resyncs in a single tick.
-> +     */
-> +    uint64_t ticks = muldiv64(elapsed, s->prescale_clk, NANOSECONDS_PER_SECOND);
-> +
-> +    /*
-> +     * Work out what PSCNTR and COUNTER have moved to. We assume that
-> +     * PSCNTR reloads from PRESCALE one tick-period after it hits zero,
-> +     * and that COUNTER increments at the same moment.
-> +     */
-> +    if (ticks == 0) {
-> +        /* We haven't ticked since the last time we were asked */
-> +        return;
-> +    } else if (ticks < s->pscntr) {
-> +        /* We haven't yet reached zero, just reduce the PSCNTR */
-> +        s->pscntr -= ticks;
-> +    } else {
-> +        if (s->prescale == 0) {
-> +            /*
-> +             * If the reload value is zero then the PSCNTR will stick
-> +             * at zero once it reaches it, and so we will increment
-> +             * COUNTER every tick after that.
-> +             */
-> +            s->counter += ticks - s->pscntr;
-> +            s->pscntr = 0;
-> +        } else {
-> +            /*
-> +             * This is the complicated bit. This ASCII art diagram gives an
-> +             * example with PRESCALE==5 PSCNTR==7:
-> +             *
-> +             * ticks  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
-> +             * PSCNTR 7  6  5  4  3  2  1  0  5  4  3  2  1  0  5
-> +             * cinc                           1                 2
-> +             * y            0  1  2  3  4  5  6  7  8  9 10 11 12
-> +             * x            0  1  2  3  4  5  0  1  2  3  4  5  0
-> +             *
-> +             * where x = y % (s->prescale + 1)
-> +             * and so PSCNTR = s->prescale - x
-> +             * and COUNTER is incremented by y / (s->prescale + 1)
-> +             *
-> +             * The case where PSCNTR < PRESCALE works out the same,
-> +             * though we must be careful to calculate y as 64-bit unsigned
-> +             * for all parts of the expression.
-> +             * y < 0 is not possible because that implies ticks < s->pscntr.
-> +             */
-> +            uint64_t y = ticks - s->pscntr + s->prescale;
-> +            s->pscntr = s->prescale - (y % (s->prescale + 1));
-> +            s->counter += y / (s->prescale + 1);
-> +        }
-> +    }
-> +
-> +    /*
-> +     * Only advance the sync time to the timestamp of the last PSCNTR tick,
-> +     * not all the way to 'now', so we don't lose time if we do multiple
-> +     * resyncs in a single tick.
-> +     */
-> +    s->pscntr_sync_ticks += muldiv64(ticks, NANOSECONDS_PER_SECOND,
-> +                                     s->prescale_clk);
-> +}
-> +
->  static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
->  {
->      MPS2FPGAIO *s = MPS2_FPGAIO(opaque);
-> @@ -74,9 +145,12 @@ static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
->          r = counter_from_tickoff(now, s->clk100hz_tick_offset, 100);
->          break;
->      case A_COUNTER:
-> +        resync_counter(s);
-> +        r = s->counter;
-> +        break;
->      case A_PSCNTR:
-> -        qemu_log_mask(LOG_UNIMP, "MPS2 FPGAIO: counters unimplemented\n");
-> -        r = 0;
-> +        resync_counter(s);
-> +        r = s->pscntr;
->          break;
->      default:
->          qemu_log_mask(LOG_GUEST_ERROR,
-> @@ -107,6 +181,7 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
->          s->led0 = value & 0x3;
->          break;
->      case A_PRESCALE:
-> +        resync_counter(s);
->          s->prescale = value;
->          break;
->      case A_MISC:
-> @@ -126,6 +201,14 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
->          now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
->          s->clk100hz_tick_offset = tickoff_from_counter(now, value, 100);
->          break;
-> +    case A_COUNTER:
-> +        resync_counter(s);
-> +        s->counter = value;
-> +        break;
-> +    case A_PSCNTR:
-> +        resync_counter(s);
-> +        s->pscntr = value;
-> +        break;
->      default:
->          qemu_log_mask(LOG_GUEST_ERROR,
->                        "MPS2 FPGAIO write: bad offset 0x%x\n", (int) offset);
-> @@ -150,6 +233,9 @@ static void mps2_fpgaio_reset(DeviceState *dev)
->      s->misc = 0;
->      s->clk1hz_tick_offset = tickoff_from_counter(now, 0, 1);
->      s->clk100hz_tick_offset = tickoff_from_counter(now, 0, 100);
-> +    s->counter = 0;
-> +    s->pscntr = 0;
-> +    s->pscntr_sync_ticks = now;
->  }
->
->  static void mps2_fpgaio_init(Object *obj)
-> @@ -170,12 +256,15 @@ static bool mps2_fpgaio_counters_needed(void *opaque)
->
->  static const VMStateDescription mps2_fpgaio_counters_vmstate = {
->      .name = "mps2-fpgaio/counters",
-> -    .version_id = 1,
-> -    .minimum_version_id = 1,
-> +    .version_id = 2,
-> +    .minimum_version_id = 2,
->      .needed = mps2_fpgaio_counters_needed,
->      .fields = (VMStateField[]) {
->          VMSTATE_INT64(clk1hz_tick_offset, MPS2FPGAIO),
->          VMSTATE_INT64(clk100hz_tick_offset, MPS2FPGAIO),
-> +        VMSTATE_UINT32(counter, MPS2FPGAIO),
-> +        VMSTATE_UINT32(pscntr, MPS2FPGAIO),
-> +        VMSTATE_INT64(pscntr_sync_ticks, MPS2FPGAIO),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> --
-> 2.17.1
->
->
+> I thought about this, but then it needs to passed that we are dealing with a 
+> SAM board, which seems to be more complicated than this solution. You also 
+> would need to adjust that ppc440_pcix_initfn() and I'm not sure if it is 
+> possible to register a root PCI bus with only one interrupt and how the 
+> remaining code deals with that. Overall, this solution seem to be much 
+> simpler. Of course, if it doesn't work the way I proposed it must be changed 
+> again.
+
+The ppc440_pcix model is only used on the sam460ex so I think we can 
+change it to model that and care about other cases when/if another SoC is 
+added that has this part with different irqs just to keep things simple.
+
+> But thinking more about it, what it is indeed not so clear to me is how the 
+> interrupt states are logical combined. The hardware most likely would do an 
+> "or" (but it is difficult to verify this without schematics), not sure what 
+> QEMU does. It may just forward the level change which would be not the right 
+> thing of course. I'll investigate it. The behaviour would still be better 
+> than the previous state as usually both interrupt handlers are invoked, so no 
+> interrupt will be missed.
+
+I was trying to read hw/pci/pci.c to find out what would specifying the 
+same irq multiple times do but I'm still not sure I could undestand it 
+completely. AFAIU it will call the map_irq and set_irq functions specified 
+in pci_register_root_bus. When we have the same irq in multiple lines 
+theoretically it may happen that one slot is raising the interrupt and 
+another is lowering another line which would change the same line here but 
+I'm not sure how this is synchronised and if this could cause any problem.
+
+Probably we can just change the map function in ppc440_pcix.c to always 
+return the first line then what's specified for other lines should not 
+matter and the above problem is avoided. We could even get rid of those 
+additional irqs by changing ppc440_pcix.c to only model a single line but 
+I'd need someone with better understanding of this to confirm that I got 
+this right.
+
+David, who should we ask to get advice on this?
+
+Regards,
+BALATON Zoltan
