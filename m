@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1fk6Ou-0002xp-Cr
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 07:31:45 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fk6YH-0005UV-C0
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 07:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1fk6Or-0005We-6o
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 07:31:44 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2402 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1fk6Oq-0005Vj-OA
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 07:31:41 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Mon, 30 Jul 2018 11:31:32 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DB070866@dggeml511-mbx.china.huawei.com>
-References: <20180730085121.12523-1-pbonzini@redhat.com>
-	<CAFEAcA97zcO-KSwSZ_8_bLUv4ghT7zhCUkhqc_0KDkK52z70ng@mail.gmail.com>
-In-Reply-To: <CAFEAcA97zcO-KSwSZ_8_bLUv4ghT7zhCUkhqc_0KDkK52z70ng@mail.gmail.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <lbloch@janustech.com>) id 1fk6YG-0001Bf-Kw
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 07:41:25 -0400
+References: <20180729212744.23709-1-lbloch@janustech.com>
+	<20180729212744.23709-5-lbloch@janustech.com>
+	<20180730094320.GB3775@localhost.localdomain>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <8d1a2a16-6fa6-1318-d278-ff0c8b45a6f5@janustech.com>
+Date: Mon, 30 Jul 2018 14:41:02 +0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] cryptodev: remove dead code
+In-Reply-To: <20180730094320.GB3775@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB-large
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/6] qcow2: Update total_sectors when
+ resizing the image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgTWF5ZGVsbCBb
-bWFpbHRvOnBldGVyLm1heWRlbGxAbGluYXJvLm9yZ10NCj4gU2VudDogTW9uZGF5LCBKdWx5IDMw
-LCAyMDE4IDY6NDkgUE0NCj4gVG86IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+
-DQo+IENjOiBRRU1VIERldmVsb3BlcnMgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz47IEdvbmdsZWkg
-KEFyZWkpDQo+IDxhcmVpLmdvbmdsZWlAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtRZW11
-LWRldmVsXSBbUEFUQ0hdIGNyeXB0b2RldjogcmVtb3ZlIGRlYWQgY29kZQ0KPiANCj4gT24gMzAg
-SnVseSAyMDE4IGF0IDA5OjUxLCBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPiB3
-cm90ZToNCj4gPiBSZXBvcnRlZCBieSBDb3Zlcml0eSBhcyBDSUQgMTM5MDYwMC4NCj4gPg0KPiA+
-IFNpZ25lZC1vZmYtYnk6IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+DQo+ID4g
-LS0tDQo+IA0KPiBUaGlzIGFscmVhZHkgaGFzIGEgcmV2aWV3ZWQgcGF0Y2ggb24tbGlzdCBmb3Ig
-dGhpcyBmcm9tDQo+IGJhY2sgaW4gQXByaWw6DQo+IA0KPiBodHRwczovL3BhdGNod29yay5vemxh
-YnMub3JnL3BhdGNoLzkwNjA0MS8NCj4gDQo+IHNvIEkgdGhpbmsgd2Ugc2hvdWxkIGp1c3QgYXBw
-bHkgdGhhdC4NCj4gDQpPaCwgeWVzLiBXb3VsZCB5b3UgcGljayBpdCB1cCBkaXJlY3RseT8gT3Ig
-YnkgcWVtdS10cml2aWFsPw0KDQpUaGFua3MsDQotR29uZ2xlaQ0K
+On 07/30/2018 12:43 PM, Kevin Wolf wrote:
+> Am 29.07.2018 um 23:27 hat Leonid Bloch geschrieben:
+>> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+>> ---
+>>   block/qcow2.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/block/qcow2.c b/block/qcow2.c
+>> index ec9e6238a0..223d351e40 100644
+>> --- a/block/qcow2.c
+>> +++ b/block/qcow2.c
+>> @@ -3646,6 +3646,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+>>           }
+>>       }
+>>   
+>> +    bs->total_sectors = offset / 512;
+>> +
+>>       /* write updated header.size */
+>>       offset = cpu_to_be64(offset);
+>>       ret = bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
+> 
+> This shouldn't be necessary, bdrv_co_truncate() already updates
+> bs->total_sectors after calling the block driver.
+
+It looks like without it the cache resize works only on the second resize.
+
+> If this is needed by one of the following patches, we need a comment
+> that explains why this seemingly superfluous assignment is actually
+> necessary.
+> 
+> Also, 512 should be BDRV_SECTOR_SIZE.
+
+I was surprised that it's not, but it's 512 also in two other places, 
+including in qcow2_co_truncate itself. So I decided to keep that. 
+Probably would be better if I'd repair it in the other places instead. :)
+
+Thanks!
+Leonid.
+
+> Kevin
+> 
