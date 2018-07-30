@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fk7Xr-0001V0-Ja
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:45:06 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fk7kY-00050l-GJ
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:58:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fk7Xq-0006wt-9u
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:45:03 -0400
-Date: Mon, 30 Jul 2018 14:44:53 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180730124453.GE3775@localhost.localdomain>
-References: <20180729212744.23709-1-lbloch@janustech.com>
-	<20180730105522.GC3775@localhost.localdomain>
-	<a64ef34a-e4d2-7c35-974b-622c80c925a4@janustech.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fk7kV-0000fb-DH
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:58:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37944 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fk7kV-0000Xu-6W
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:58:07 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B3BE140216FE
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 12:57:55 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 30 Jul 2018 14:57:46 +0200
+Message-Id: <20180730125746.22794-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a64ef34a-e4d2-7c35-974b-622c80c925a4@janustech.com>
-Subject: Re: [Qemu-devel] [PATCH 0/6] qcow2: Make the L2 cache cover the
- whole image by default
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH RFC] monitor: temporary fix for dead-lock on
+ event recursion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,127 +32,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, berto@igalia.com
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Am 30.07.2018 um 14:13 hat Leonid Bloch geschrieben:
-> On 07/30/2018 01:55 PM, Kevin Wolf wrote:
-> > Am 29.07.2018 um 23:27 hat Leonid Bloch geschrieben:
-> > > This series makes the qcow2 L2 cache cover the entire image by default.
-> > > The importance of this change is in noticeable performance improvement,
-> > > especially with heavy random I/O. The memory overhead is very small:
-> > > only 1 MB of cache for every 8 GB of image size. On systems with very
-> > > limited RAM the maximal cache size can be limited by the existing
-> > > cache-size and l2-cache-size options.
-> > > 
-> > > The L2 cache is also resized accordingly, by default, if the image is
-> > > resized.
-> > 
-> > I agree with changing the defaults, I would have proposed a change
-> > myself soon. We have been offering cache size options for a long time,
-> > and management tools are still ignoring them. So we need to do something
-> > in QEMU.
-> > 
-> > Now, what the exact defaults should be, is something to use a bit more
-> > thought on. You say "the memory overhead is very small", without going
-> > into details. Let's check.
-> > 
-> > This is the formula from your patch (unit is bytes):
-> > 
-> >      uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
-> > 
-> > So we get:
-> > 
-> >      64k clusters, 8G image:   1M (maximum covered by old default)
-> >      64k clusters, 1T image: 128M
-> >      1M clusters, 1T image:    8M
-> >      512b clusters, 1T image: 16G
-> > 
-> > 1T is by far not the maximum size for a qcow2 image, and 16G memory
-> > usage is definitely not "very small" overhead. Even the 128M for the
-> > default cluster size are already a lot. So the simplistic approch of
-> > this series won't work as a default.
-> > 
-> > Let's refine it a bit:
-> > 
-> > * Basing it on max_l2_cache sounds fine generally
-> > * Cap it at 32 MB (?) by default
-> 
-> Yes! A great idea! Definitely necessary.
-> 
-> > * Enable cache-clean-interval=30 (?) by default to compensate a bit for
-> >    the higher maximum memory usage
-> 
-> Do you think that we need this if we cap the cache at 32 MB? And that's only
-> the cap. 256 GB+ images are not that often used. And compared to the overall
-> QEMU overhead, of over 500 MB, extra 32 in the worst case is not that much,
-> considering the performance gain.
+With a Spice port chardev, it is possible to reenter
+monitor_qapi_event_queue() (when the client disconnects for
+example). This will dead-lock on monitor_lock.
 
-Don't forget that if you take a few snapshots so you get a backing file
-chain, every layer in the chain has its own cache. So capping at 32 MB
-with 9 backing files still means that we use 320 MB.
+Instead, use some TLS variables to check for recursion and queue the
+events.
 
-And honestly, is there a real reason not to use cache-clean-interval by
-default? Even if it doesn't help much in some cases, it should hardly
-ever hurt. If the image was completely idle for 30 seconds (or whatever
-number we choose), having to reload some 64k from the disk on the next
-access shouldn't make a big difference.
+Fixes:
+ (gdb) bt
+ #0  0x00007fa69e7217fd in __lll_lock_wait () at /lib64/libpthread.so.0
+ #1  0x00007fa69e71acf4 in pthread_mutex_lock () at /lib64/libpthread.so.=
+0
+ #2  0x0000563303567619 in qemu_mutex_lock_impl (mutex=3D0x563303d3e220 <=
+monitor_lock>, file=3D0x5633036589a8 "/home/elmarco/src/qq/monitor.c", li=
+ne=3D645) at /home/elmarco/src/qq/util/qemu-thread-posix.c:66
+ #3  0x0000563302fa6c25 in monitor_qapi_event_queue (event=3DQAPI_EVENT_S=
+PICE_DISCONNECTED, qdict=3D0x56330602bde0, errp=3D0x7ffc6ab5e728) at /hom=
+e/elmarco/src/qq/monitor.c:645
+ #4  0x0000563303549aca in qapi_event_send_spice_disconnected (server=3D0=
+x563305afd630, client=3D0x563305745360, errp=3D0x563303d8d0f0 <error_abor=
+t>) at qapi/qapi-events-ui.c:149
+ #5  0x00005633033e600f in channel_event (event=3D3, info=3D0x5633061b005=
+0) at /home/elmarco/src/qq/ui/spice-core.c:235
+ #6  0x00007fa69f6c86bb in reds_handle_channel_event (reds=3D<optimized o=
+ut>, event=3D3, info=3D0x5633061b0050) at reds.c:316
+ #7  0x00007fa69f6b193b in main_dispatcher_self_handle_channel_event (inf=
+o=3D0x5633061b0050, event=3D3, self=3D0x563304e088c0) at main-dispatcher.=
+c:197
+ #8  0x00007fa69f6b193b in main_dispatcher_channel_event (self=3D0x563304=
+e088c0, event=3Devent@entry=3D3, info=3D0x5633061b0050) at main-dispatche=
+r.c:197
+ #9  0x00007fa69f6d0833 in red_stream_push_channel_event (s=3Ds@entry=3D0=
+x563305ad8f50, event=3Devent@entry=3D3) at red-stream.c:414
+ #10 0x00007fa69f6d086b in red_stream_free (s=3D0x563305ad8f50) at red-st=
+ream.c:388
+ #11 0x00007fa69f6b7ddc in red_channel_client_finalize (object=3D0x563304=
+df2360) at red-channel-client.c:347
+ #12 0x00007fa6a56b7fb9 in g_object_unref () at /lib64/libgobject-2.0.so.=
+0
+ #13 0x00007fa69f6ba212 in red_channel_client_push (rcc=3D0x563304df2360)=
+ at red-channel-client.c:1341
+ #14 0x00007fa69f68b259 in red_char_device_send_msg_to_client (client=3D<=
+optimized out>, msg=3D0x5633059b6310, dev=3D0x563304e08bc0) at char-devic=
+e.c:305
+ #15 0x00007fa69f68b259 in red_char_device_send_msg_to_clients (msg=3D0x5=
+633059b6310, dev=3D0x563304e08bc0) at char-device.c:305
+ #16 0x00007fa69f68b259 in red_char_device_read_from_device (dev=3D0x5633=
+04e08bc0) at char-device.c:353
+ #17 0x000056330317d01d in spice_chr_write (chr=3D0x563304cafe20, buf=3D0=
+x563304cc50b0 "{\"timestamp\": {\"seconds\": 1532944763, \"microseconds\"=
+: 326636}, \"event\": \"SHUTDOWN\", \"data\": {\"guest\": false}}\r\n", l=
+en=3D111) at /home/elmarco/src/qq/chardev/spice.c:199
+ #18 0x00005633034deee7 in qemu_chr_write_buffer (s=3D0x563304cafe20, buf=
+=3D0x563304cc50b0 "{\"timestamp\": {\"seconds\": 1532944763, \"microsecon=
+ds\": 326636}, \"event\": \"SHUTDOWN\", \"data\": {\"guest\": false}}\r\n=
+", len=3D111, offset=3D0x7ffc6ab5ea70, write_all=3Dfalse) at /home/elmarc=
+o/src/qq/chardev/char.c:112
+ #19 0x00005633034df054 in qemu_chr_write (s=3D0x563304cafe20, buf=3D0x56=
+3304cc50b0 "{\"timestamp\": {\"seconds\": 1532944763, \"microseconds\": 3=
+26636}, \"event\": \"SHUTDOWN\", \"data\": {\"guest\": false}}\r\n", len=3D=
+111, write_all=3Dfalse) at /home/elmarco/src/qq/chardev/char.c:147
+ #20 0x00005633034e1e13 in qemu_chr_fe_write (be=3D0x563304dbb800, buf=3D=
+0x563304cc50b0 "{\"timestamp\": {\"seconds\": 1532944763, \"microseconds\=
+": 326636}, \"event\": \"SHUTDOWN\", \"data\": {\"guest\": false}}\r\n", =
+len=3D111) at /home/elmarco/src/qq/chardev/char-fe.c:42
+ #21 0x0000563302fa6334 in monitor_flush_locked (mon=3D0x563304dbb800) at=
+ /home/elmarco/src/qq/monitor.c:425
+ #22 0x0000563302fa6520 in monitor_puts (mon=3D0x563304dbb800, str=3D0x56=
+3305de7e9e "") at /home/elmarco/src/qq/monitor.c:468
+ #23 0x0000563302fa680c in qmp_send_response (mon=3D0x563304dbb800, rsp=3D=
+0x563304df5730) at /home/elmarco/src/qq/monitor.c:517
+ #24 0x0000563302fa6905 in qmp_queue_response (mon=3D0x563304dbb800, rsp=3D=
+0x563304df5730) at /home/elmarco/src/qq/monitor.c:538
+ #25 0x0000563302fa6b5b in monitor_qapi_event_emit (event=3DQAPI_EVENT_SH=
+UTDOWN, qdict=3D0x563304df5730) at /home/elmarco/src/qq/monitor.c:624
+ #26 0x0000563302fa6c4b in monitor_qapi_event_queue (event=3DQAPI_EVENT_S=
+HUTDOWN, qdict=3D0x563304df5730, errp=3D0x7ffc6ab5ed00) at /home/elmarco/=
+src/qq/monitor.c:649
+ #27 0x0000563303548cce in qapi_event_send_shutdown (guest=3Dfalse, errp=3D=
+0x563303d8d0f0 <error_abort>) at qapi/qapi-events-run-state.c:58
+ #28 0x000056330313bcd7 in main_loop_should_exit () at /home/elmarco/src/=
+qq/vl.c:1822
+ #29 0x000056330313bde3 in main_loop () at /home/elmarco/src/qq/vl.c:1862
+ #30 0x0000563303143781 in main (argc=3D3, argv=3D0x7ffc6ab5f068, envp=3D=
+0x7ffc6ab5f088) at /home/elmarco/src/qq/vl.c:4644
 
-> > Another thing I just noticed while looking at the code is that
-> > cache-clean-interval only considers blocks that aren't dirty, but
-> > doesn't take measures to get dirty blocks written out, so we depend on
-> > the guest flushing the cache before we can get free the memory. Should
-> > we attempt to write unused dirty entries back? Berto?
-> > 
-> > > The reasons for making this behavior default, unlike in the patches I
-> > > have sent previously, are the following:
-> > > 1) Unelegant complications with making an option to accept either a
-> > >     size or a string, while outputting a proper error message.
-> > > 2) More bulky logic to sort out what to do if the image is being resized
-> > >     but the (defined) overall cache size is too small to contain the
-> > >     new l2-cache-size.
-> > > (Making this behavior default resolves all of these technical issues
-> > > neatly)
-> > 
-> > The default must always correspond to some explicit setting. We can only
-> > change defaults relatively freely because we can assume that if a user
-> > cared about the setting, they would have specified it explicitly. If
-> > it's not possible to specify a setting explicitly, we can't make this
-> > assumption any more, so we'd be stuck with the default forever.
-> > 
-> > Now, considering what I wrote above, an alternate wouldn't be the best
-> > way to represent this any more. We do have a cache size again (the 32 MB
-> > cap) even while trying to cover the whole image.
-> > 
-> > Maybe the right interface with this in mind would be a boolean option
-> > that specifies whether the given cache sizes are exact values (old
-> > semantics) or maximum values, which are limited to what the actual
-> > images size requires. If you do want the "real" full mode, you'd set
-> > l2-cache-size=INT64_MAX and exact-cache-sizes=false (this could use a
-> > better name). The new default would be l2-cache-size=32M,
-> > exact-cache-sizes=false. The old default is cache-size=1M,
-> > exact-cache-sizes=true.
-> 
-> The existing cache-size and l2-cache-size options are already documented as
-> maximal values. It would make sense to actually make them as such: the
-> caches will be as big as necessary to cover the entire image (no need for
-> them to be more than that) but they will be capped by the current options,
-> while the new default of l2-cache-size will be 32M. Why would one need
-> exact-cache-sizes, if they would be MIN(needed, max)?
-> Does it sound reasonable?
+Note that error report is now moved to the first caller, which may
+receive an error for a recursed event. This is probably fine (95% of
+callers use &error_abort, the rest have NULL error and ignore it)
 
-I think you have a point there.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ monitor.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 50 insertions(+), 1 deletion(-)
 
-There is one case where we need to cover more than the virtual disk
-size, and that is the VM state for internal snapshots. These are
-sequential accesses, though, so it doesn't matter for it much how many
-L2 tables we have cached. And having to reload some tables after taking
-or loading a snapshot sounds okay, too.
-
-So essentially everything boils down to applying max_l2_cache even if a
-L2 size was explicitly specified (which makes cache-size=INT64_MAX a
-reasonable option), changing the default from cache-size=1M to
-cache-size=32M (covers 256 GB with the default 64k clusters), and
-enabling cache-clean-interval by default. Right?
-
-Kevin
+diff --git a/monitor.c b/monitor.c
+index d8d8211ae4..d580c5a79c 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -633,7 +633,7 @@ static void monitor_qapi_event_handler(void *opaque);
+  * applying any rate limiting if required.
+  */
+ static void
+-monitor_qapi_event_queue(QAPIEvent event, QDict *qdict, Error **errp)
++monitor_qapi_event_queue_no_recurse(QAPIEvent event, QDict *qdict, Error=
+ **errp)
+ {
+     MonitorQAPIEventConf *evconf;
+     MonitorQAPIEventState *evstate;
+@@ -688,6 +688,55 @@ monitor_qapi_event_queue(QAPIEvent event, QDict *qdi=
+ct, Error **errp)
+     qemu_mutex_unlock(&monitor_lock);
+ }
+=20
++static void
++monitor_qapi_event_queue(QAPIEvent event, QDict *qdict, Error **errp)
++{
++    Error *local_err =3D NULL;
++    /*
++     * If the function recurse, monitor_lock will dead-lock.
++     * Instead, queue pending events in TLS.
++     * TODO: remove this, make it re-enter safe.
++     */
++    static __thread bool recurse;
++    typedef struct MonitorQapiEvent {
++        QAPIEvent event;
++        QDict *qdict;
++        QSIMPLEQ_ENTRY(MonitorQapiEvent) entry;
++    } MonitorQapiEvent;
++    MonitorQapiEvent *ev;
++    static __thread QSIMPLEQ_HEAD(, MonitorQapiEvent) event_queue;
++
++    if (!recurse) {
++        QSIMPLEQ_INIT(&event_queue);
++    }
++
++    ev =3D g_new(MonitorQapiEvent, 1);
++    ev->qdict =3D qobject_ref(qdict);
++    ev->event =3D event;
++    QSIMPLEQ_INSERT_TAIL(&event_queue, ev, entry);
++    if (recurse) {
++        return;
++    }
++
++    recurse =3D true;
++
++    while ((ev =3D QSIMPLEQ_FIRST(&event_queue)) !=3D NULL) {
++        QSIMPLEQ_REMOVE_HEAD(&event_queue, entry);
++        if (!local_err) {
++            monitor_qapi_event_queue_no_recurse(ev->event, ev->qdict,
++                                                &local_err);
++        }
++        qobject_unref(ev->qdict);
++        g_free(ev);
++    }
++
++    recurse =3D false;
++
++    if (local_err) {
++        error_propagate(errp, local_err);
++    }
++}
++
+ /*
+  * This function runs evconf->rate ns after sending a throttled
+  * event.
+--=20
+2.18.0.232.gb7bd9486b0
