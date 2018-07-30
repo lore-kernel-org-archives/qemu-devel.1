@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fk8lc-0000xN-VU
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:03:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fk8q9-0002Eg-AA
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:08:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fk8lY-00083W-S8
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:03:21 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fk8q8-0002dP-EW
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:08:01 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:41238)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fk8q8-0002d5-8O
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:08:00 -0400
+Received: by mail-oi0-x242.google.com with SMTP id k12-v6so21437068oiw.8
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 07:08:00 -0700 (PDT)
 MIME-Version: 1.0
-Sender: joel.stan@gmail.com
-In-Reply-To: <94bc2d11-7916-bc4e-02d8-da62e3ed303b@mail.ru>
-References: <20180726023645.13927-1-joel@jms.id.au>
-	<20180726023645.13927-3-joel@jms.id.au>
-	<94bc2d11-7916-bc4e-02d8-da62e3ed303b@mail.ru>
-From: Joel Stanley <joel@jms.id.au>
-Date: Mon, 30 Jul 2018 23:32:55 +0930
-Message-ID: <CACPK8XfYvU8+0s+FBGe7NuAst38ska0vpS8HVPWkM8OHyLFpdQ@mail.gmail.com>
+In-Reply-To: <20180727132311.2777-1-f4bug@amsat.org>
+References: <20180727132311.2777-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Jul 2018 15:07:39 +0100
+Message-ID: <CAFEAcA8eyggMm5QH_VyJYHO2orQUgS1vRdRV9s4qrit+QvpiJg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] arm: Add Nordic Semiconductor nRF51
- SoC
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Remove duplicate 'host' entry
+ in '-cpu ?' output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 26 July 2018 at 20:31, Julia Suvorova <jusual@mail.ru> wrote:
-
->> +++ b/hw/arm/nrf51_soc.c
-
->> +static void nrf51_soc_init(Object *obj)
->> +{
->> +    NRF51State *s = NRF51_SOC(obj);
->> +
->> +    memory_region_init(&s->container, obj, "nrf51-container",
->> UINT64_MAX);
->> +
->> +    object_initialize(&s->cpu, sizeof(s->cpu), TYPE_ARM_M_PROFILE);
->> +    object_property_add_child(OBJECT(s), "armv6m", OBJECT(&s->cpu),
->> &error_abort);
->> +    qdev_set_parent_bus(DEVICE(&s->cpu), sysbus_get_default());
->> +    qdev_prop_set_string(DEVICE(&s->cpu), "cpu-type",
->> ARM_CPU_TYPE_NAME("cortex-m0"));
->> +    qdev_prop_set_uint32(DEVICE(&s->cpu), "num-irq", 96);
+On 27 July 2018 at 14:23, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
+te:
+> Since 86f0a186d6f the TYPE_ARM_HOST_CPU is only compiled when CONFIG_KVM
+> is enabled.
 >
+> Remove the now redundant special-case introduced in a96c0514ab7, to avoid=
+:
 >
-> Where did this number come from? ARMv6-M NVIC supports only 32 interrupts.
+>   $ qemu-system-aarch64 -machine virt -cpu \? | fgrep host
+>   host
+>   host (only available in KVM mode)
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  target/arm/helper.c | 6 ------
+>  1 file changed, 6 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 22d812240a..66afb08ee0 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -5591,12 +5591,6 @@ void arm_cpu_list(FILE *f, fprintf_function cpu_fp=
+rintf)
+>      (*cpu_fprintf)(f, "Available CPUs:\n");
+>      g_slist_foreach(list, arm_cpu_list_entry, &s);
+>      g_slist_free(list);
+> -#ifdef CONFIG_KVM
+> -    /* The 'host' CPU type is dynamically registered only if KVM is
+> -     * enabled, so we have to special-case it here:
+> -     */
+> -    (*cpu_fprintf)(f, "  host (only available in KVM mode)\n");
+> -#endif
+>  }
 
-I think this was left over from when I was first creating a m0 based
-system (efm32hg) over a year ago. Good catch.
+Applied to target-arm.next for 3.0, thanks.
 
-I couldn't see a table of valid interrupts in the nrf51 datasheet. Are
-you able to find this information?
-
-If not, I will re-spin with the number of irqs set to 32.
-
-Cheers,
-
-Joel
+-- PMM
