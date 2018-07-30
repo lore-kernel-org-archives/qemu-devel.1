@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fk3cJ-0003Os-QG
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1fk3cL-0003P4-JE
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fk3cI-0004X4-6t
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41584 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fk3cI-0004Xj-Ba
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45082 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fk3cH-0004WT-NA
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:21 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fk3cI-0004Wk-5B
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:22 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 30 Jul 2018 10:33:06 +0200
-Message-Id: <20180730083317.11765-13-armbru@redhat.com>
+Date: Mon, 30 Jul 2018 10:33:10 +0200
+Message-Id: <20180730083317.11765-17-armbru@redhat.com>
 In-Reply-To: <20180730083317.11765-1-armbru@redhat.com>
 References: <20180730083317.11765-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 12/23] cpu-plug-test: Don't pass integers as
- strings to device_add
+Subject: [Qemu-devel] [PATCH v3 16/23] migration-test: Make wait_command()
+ cope with '%'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +25,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com
+Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-test_plug_with_device_add_x86() plugs Haswell-i386-cpu and
-Haswell-x86_64-cpu with device_add.  It passes socket-id, core-id,
-thread-id as JSON strings.  The properties are actually integers.
+wait_command() passes its argument @command to qtest_qmp_send().
+Falls apart if @command contain '%'.  Two ways to disarm this trap:
+suppress interpretation of '%' by passing @command as argument to
+format string "%s", or fix it by having wait_command() take the
+variable arguments to go with @command.  Do the latter.
 
-test_plug_with_device_add_coreid() plugs power8_v2.0-spapr-cpu-core
-and qemu-s390x-cpu with device_add.  It passes core-id as JSON string.
-The properties are actually integers.
+This is another step towards compile-time format string checking
+without triggering -Wformat-nonliteral.
 
-Passing JSON string values to integer properties works only due to
-device_add implementation accidents.  Fix the test to pass JSON
-numbers.  While there, use %u rather than %i with unsigned int.
-
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/cpu-plug-test.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tests/migration-test.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-index 5f39ba0df3..ab3bf6df90 100644
---- a/tests/cpu-plug-test.c
-+++ b/tests/cpu-plug-test.c
-@@ -88,8 +88,8 @@ static void test_plug_with_device_add_x86(gconstpointer=
- data)
-         for (c =3D 0; c < td->cores; c++) {
-             for (t =3D 0; t < td->threads; t++) {
-                 char *id =3D g_strdup_printf("id-%i-%i-%i", s, c, t);
--                qtest_qmp_device_add(td->device_model, id, "'socket-id':=
-'%i', "
--                                     "'core-id':'%i', 'thread-id':'%i'",
-+                qtest_qmp_device_add(td->device_model, id, "'socket-id':=
-%u, "
-+                                     "'core-id':%u, 'thread-id':%u",
-                                      s, c, t);
-                 g_free(id);
-             }
-@@ -114,7 +114,7 @@ static void test_plug_with_device_add_coreid(gconstpo=
-inter data)
-=20
-     for (c =3D td->cores; c < td->maxcpus / td->sockets / td->threads; c=
-++) {
-         char *id =3D g_strdup_printf("id-%i", c);
--        qtest_qmp_device_add(td->device_model, id, "'core-id':'%i'", c);
-+        qtest_qmp_device_add(td->device_model, id, "'core-id':%u", c);
-         g_free(id);
-     }
-=20
---=20
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 860b8aa0b9..0c92f2b1cd 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -156,9 +156,14 @@ static void stop_cb(void *opaque, const char *name, QDict *data)
+ /*
+  * Events can get in the way of responses we are actually waiting for.
+  */
+-static QDict *wait_command(QTestState *who, const char *command)
++static QDict *wait_command(QTestState *who, const char *command, ...)
+ {
+-    qtest_qmp_send(who, command);
++    va_list ap;
++
++    va_start(ap, command);
++    qtest_qmp_vsend(who, command, ap);
++    va_end(ap);
++
+     return qtest_qmp_receive_success(who, stop_cb, NULL);
+ }
+ 
+-- 
 2.17.1
