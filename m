@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fk4WH-0006VL-BU
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 05:31:15 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fk4gj-0001Ek-5b
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 05:42:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fk4WE-00058e-6z
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 05:31:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58538 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fk4gf-00022r-WA
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 05:42:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54170 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fk4WE-00056C-0K
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 05:31:10 -0400
-Date: Mon, 30 Jul 2018 12:30:58 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180730121704-mutt-send-email-mst@kernel.org>
-References: <20180723045956.27521-1-tiwei.bie@intel.com>
-	<20180723045956.27521-4-tiwei.bie@intel.com>
-	<20180726144539.740acf4d@t450s.home>
-	<20180727015805.GA11247@debian>
-	<20180727140300.022d9872@t450s.home>
-	<20180730081003.GA10680@debian>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180730081003.GA10680@debian>
-Subject: Re: [Qemu-devel] [RFC 3/3] vhost-user: support programming VFIO
- group in master
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fk4gf-00022S-PG
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 05:41:57 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2E846DC3A
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 09:41:56 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Mon, 30 Jul 2018 11:41:41 +0200
+Message-Id: <1532943701-83614-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.0 v2] pc: acpi: fix memory hotplug
+ regression by reducing stub SRAT entry size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,188 +28,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, jasowang@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com
 
-On Mon, Jul 30, 2018 at 04:10:04PM +0800, Tiwei Bie wrote:
-> On Fri, Jul 27, 2018 at 02:03:00PM -0600, Alex Williamson wrote:
-> > On Fri, 27 Jul 2018 09:58:05 +0800
-> > Tiwei Bie <tiwei.bie@intel.com> wrote:
-> > 
-> > > On Thu, Jul 26, 2018 at 02:45:39PM -0600, Alex Williamson wrote:
-> > > > On Mon, 23 Jul 2018 12:59:56 +0800
-> > > > Tiwei Bie <tiwei.bie@intel.com> wrote:
-> > > >   
-> > > [...]
-> > > > >  
-> > > > > +static int vhost_user_slave_handle_vfio_group(struct vhost_dev *dev,
-> > > > > +                                              int *fd)
-> > > > > +{
-> > > > > +    struct vhost_user *u = dev->opaque;
-> > > > > +    VhostUserState *user = u->user;
-> > > > > +    VirtIODevice *vdev = dev->vdev;
-> > > > > +    int groupfd = fd[0];
-> > > > > +    VFIOGroup *group;
-> > > > > +
-> > > > > +    if (!virtio_has_feature(dev->protocol_features,
-> > > > > +                            VHOST_USER_PROTOCOL_F_VFIO_GROUP) ||
-> > > > > +        vdev == NULL) {
-> > > > > +        return -1;
-> > > > > +    }
-> > > > > +
-> > > > > +    if (user->vfio_group) {
-> > > > > +        vfio_put_group(user->vfio_group);
-> > > > > +        user->vfio_group = NULL;
-> > > > > +    }
-> > > > > +  
-> > > 
-> > > There should be a below check here (I missed it in this
-> > > patch, sorry..):
-> > > 
-> > >     if (groupfd < 0) {
-> > >         return 0;
-> > >     }
-> > > 
-> > > > > +    group = vfio_get_group_from_fd(groupfd, vdev->dma_as, NULL);
-> > > > > +    if (group == NULL) {
-> > > > > +        return -1;
-> > > > > +    }
-> > > > > +
-> > > > > +    if (group->fd != groupfd) {
-> > > > > +        close(groupfd);
-> > > > > +    }
-> > > > > +
-> > > > > +    user->vfio_group = group;
-> > > > > +    fd[0] = -1;
-> > > > > +
-> > > > > +    return 0;
-> > > > > +}  
-> > > > 
-> > > > This all looks very sketchy, we're reaching into vfio internal state
-> > > > and arbitrarily releasing data structures, reusing existing ones, and
-> > > > maybe creating new ones.  We know that a vfio group only allows a
-> > > > single open, right?  
-> > > 
-> > > Yeah, exactly!
-> > > 
-> > > When the vhost-user backend process has opened a VFIO group fd,
-> > > QEMU won't be able to open this group file via open() any more.
-> > > So vhost-user backend process will share the VFIO group fd to
-> > > QEMU via the UNIX socket. And that's why we're introducing a
-> > > new API:
-> > > 
-> > > 	vfio_get_group_from_fd(groupfd, ...);
-> > > 
-> > > for vfio/common.c to get (setup) a VFIOGroup structure. (Because
-> > > in this case, vfio/common.c can't open this group file via open(),
-> > > and what we have is a VFIO group fd shared by another process via
-> > > UNIX socket). And ...
-> > > 
-> > > > So if you have a groupfd, vfio will never have
-> > > > that same group opened already.  
-> > > 
-> > > ... if the same vhost-user backend process shares the same VFIO
-> > > group fd more than one times via different vhost-user slave channels
-> > > to different vhost-user frontends in the same QEMU process, the
-> > > same VFIOGroup could exist already.
-> > > 
-> > > This case could happen when e.g. there are two vhost accelerator
-> > > devices in the same VFIO group, and they are managed by the same
-> > > vhost-user backend process, and used to accelerate two different
-> > > virtio devices in QEMU. In this case, the same VFIO group fd could
-> > > be sent twice.
-> > > 
-> > > If we need to support this case, more changes in vfio/common.c
-> > > will be needed, e.g. 1) add a refcnt in VFIOGroup to support
-> > > getting and putting a VFIOGroup structure multiple times,
-> > > 2) add a lock to make vfio_get_group*() and vfio_put_group()
-> > > thread-safe.
-> > 
-> > This is the sort of case where it seems like we're just grabbing
-> > internal interfaces and using them from other modules.  VFIOGroups have
-> > a device_list and currently handles multiple puts by testing whether
-> > that device list is empty (ie. we already have a refcnt effectively).
-> > Now we have a group user that has no devices, which is not something
-> > that it seems like we've designed or audited the code for handling.
-> > IOW, while the header file lives in a common location, it's not really
-> > intended to be an API within QEMU and it makes me a bit uncomfortable
-> > to use it as such.
-> > 
-> > > > Is that the goal?  It's not obvious in
-> > > > the code.  I don't really understand what vhost goes on to do with this
-> > > > group,  
-> > > 
-> > > The goal is that, we have a VFIO group opened by an external
-> > > vhost-user backend process, this process will manage the VFIO
-> > > device, but want QEMU to manage the VFIO group, including:
-> > > 
-> > > 1 - program the DMA mappings for this VFIO group based on
-> > >     the front-end device's dma_as in QEMU.
-> > > 
-> > > 2 - add this VFIO group to KVM (KVM_DEV_VFIO_GROUP_ADD).
-> > > 
-> > > Vhost-user in QEMU as the vhost-user frontend just wants
-> > > hw/vfio to do above things after receiving a VFIO group fd
-> > > from the vhost-user backend process.
-> > > 
-> > > Vhost-user will just ask hw/vfio to get (setup) a VFIOGroup
-> > > by calling vfio_get_group_from_fd() or put this VFIOGroup by
-> > > calling vfio_put_group() when it's not needed anymore, and
-> > > won't do anything else.
-> > > 
-> > > Vhost-user will only deal with the VFIOGroups allocated by
-> > > itself, and won't influence any other VFIOGroups used by the
-> > > VFIO passthru devices (-device vfio-pci). Because the same
-> > > VFIO group file can only be opened by one process via open().
-> > 
-> > But there's nothing here that guarantees the reverse.  vhost cannot
-> > open the group of an existing vfio-pci device, but vfio-pci can re-use
-> > the group that vhost has already opened.  This is again where it seems
-> > like we're trying to cherry pick from an internal API and leaving some
-> > loose ends dangling.
-> > 
-> > > > but I'm pretty sure the existing state machine in vfio isn't
-> > > > designed for it.  Thanks,  
-> > > 
-> > > Yeah, more changes (e.g. refcnt, ..) in hw/vfio are needed to
-> > > make it work robustly. Hmm.. Is above idea (e.g. how vhost-user
-> > > is going to use VFIOGroup and how we are going to extend hw/vfio)
-> > > acceptable to you? Thanks!
-> > 
-> > I certainly would not want to duplicate managing the group, container,
-> > and MemoryListener, but I think we need a more formal interface with at
-> > least some notion of reference counting beyond the device list or
-> > explicit knowledge of an external user.
-> 
-> Got it! I'll try to address this. Thanks!
-> 
-> > I'm also curious if it really
-> > makes sense that the vhost backend is opening the group rather than
-> > letting QEMU do it.  It seems that vhost wants to deal with the device
-> > and we can never have symmetry in the scenario above, where a group
-> > might contain multiple devices and order matters because of where the
-> > group is opened.  If we still had a notion of a VFIODevice for an
-> > external user, then the device_list refcnt would just work.  Thanks,
-> 
-> Vhost-user backend will but QEMU won't open the VFIO
-> fds, because QEMU just has a vhost-user UNIX socket
-> path that it should connect to or listen on. So QEMU
-> doesn't know which group and device it should open.
-> The vhost accelerator devices are probed and managed
-> in the vhost-user backend process. And the vhost-user
-> backend process will bind the vhost-user instances
-> and vhost accelerator devices based on some sort of
-> user's input.
-> 
-> Best regards,
-> Tiwei Bie
+Commit 848a1cc1e (hw/acpi-build: build SRAT memory affinity structures for DIMM devices)
+broke the first dimm hotplug in following cases:
 
-Is the reason it's done like this because the
-backend is sharing the device with multiple QEMUs?
+ 1: there is no coldplugged dimm in the last numa node
+    but there is a coldplugged dimm in another node
 
-I generally wonder how are restarts of the backend handled
-with this approach: closing the VFIO device tends to reset
-the whole device.
+  -m 4096,slots=4,maxmem=32G               \
+  -object memory-backend-ram,id=m0,size=2G \
+  -device pc-dimm,memdev=m0,node=0         \
+  -numa node,nodeid=0                      \
+  -numa node,nodeid=1
 
+ 2: if order of dimms on CLI is:
+       1st plugged dimm in node1
+       2nd plugged dimm in node0
+
+  -m 4096,slots=4,maxmem=32G               \
+  -object memory-backend-ram,size=2G,id=m0 \
+  -device pc-dimm,memdev=m0,node=1         \
+  -object memory-backend-ram,id=m1,size=2G \
+  -device pc-dimm,memdev=m1,node=0         \
+  -numa node,nodeid=0                      \
+  -numa node,nodeid=1
+
+(qemu) object_add memory-backend-ram,id=m2,size=1G
+(qemu) device_add pc-dimm,memdev=m2,node=0
+
+the first DIMM hotplug to any node except the last one
+fails (Windows is unable to online it).
+
+Length reduction of stub hotplug memory SRAT entry,
+fixes issue for some reason.
+
+RHBZ: 1609234
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+NOTE TO MAINTAINER: UPDATE REFERENCE APCI TABLE BLOBS
+
+v2:
+ fixup examples in commit message
+ (they were in wrong order and with duplicate memdev=m1)
+---
+ hw/i386/acpi-build.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 9e8350c..b52fdb2 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2269,7 +2269,16 @@ static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
+         numamem = acpi_data_push(table_data, sizeof *numamem);
+ 
+         if (!info) {
+-            build_srat_memory(numamem, cur, end - cur, default_node,
++            /*
++             * Entry is required for Windows to enable memory hotplug in OS
++             * and for Linux to enable SWIOTLB when booted with less than
++             * 4G of RAM. Windows works better if the entry sets proximity
++             * to the highest NUMA node in the machine at the end of the
++             * reserved space.
++             * Memory devices may override proximity set by this entry,
++             * providing _PXM method if necessary.
++             */
++            build_srat_memory(numamem, end - 1, 1, default_node,
+                               MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+             break;
+         }
+@@ -2402,14 +2411,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+         build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
+     }
+ 
+-    /*
+-     * Entry is required for Windows to enable memory hotplug in OS
+-     * and for Linux to enable SWIOTLB when booted with less than
+-     * 4G of RAM. Windows works better if the entry sets proximity
+-     * to the highest NUMA node in the machine.
+-     * Memory devices may override proximity set by this entry,
+-     * providing _PXM method if necessary.
+-     */
+     if (hotplugabble_address_space_size) {
+         build_srat_hotpluggable_memory(table_data, machine->device_memory->base,
+                                        hotplugabble_address_space_size,
 -- 
-MST
+2.7.4
