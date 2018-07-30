@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAtl-0004up-OW
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:19:54 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAtz-0005CF-MI
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:20:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAtk-0006dp-Pc
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:19:53 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56213 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAtw-0006ii-TZ
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:20:07 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56983 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fkAtk-0006dX-HV
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:19:52 -0400
+	id 1fkAtw-0006i3-I4
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:20:04 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 30 Jul 2018 18:11:55 +0200
-Message-Id: <1532967169-22265-23-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 30 Jul 2018 18:11:56 +0200
+Message-Id: <1532967169-22265-24-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 22/76] target/mips: Add emulation of
- nanoMIPS 16-bit misc instructions
+Subject: [Qemu-devel] [PATCH v5 23/76] target/mips: Add emulation of
+ nanoMIPS 16-bit load and store instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +30,129 @@ Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aur
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add emulation of misc nanoMIPS 16-bit instructions.
+Add emulation of LWXS16, LB16, SB16, LBU16, LH16, SH16, LHU16, LW16, LWSP16,
+LW4X4, SW4X4, LWGP16, SWSP16, SW16, and SWGP16 instructions.
 
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ target/mips/translate.c | 78 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index c985b93..9c230ce 100644
+index 9c230ce..fd06701 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16539,6 +16539,40 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-     op = extract32(ctx->opcode, 10, 6);
-     switch (op) {
-     case NM_P16_MV:
-+        rt = NANOMIPS_EXTRACT_RD5(ctx->opcode);
-+        if (rt != 0) {
-+            /* MOVE */
-+            rs = NANOMIPS_EXTRACT_RS5(ctx->opcode);
-+            gen_arith(ctx, OPC_ADDU, rt, rs, 0);
-+        } else {
-+            /* P16.RI */
-+            switch (extract32(ctx->opcode, 3, 2)) {
-+            case NM_P16_SYSCALL:
-+                if (extract32(ctx->opcode, 2, 1) == 0) {
-+                    generate_exception_end(ctx, EXCP_SYSCALL);
-+                } else {
-+                    generate_exception_end(ctx, EXCP_RI);
-+                }
-+                break;
-+            case NM_BREAK16:
-+                generate_exception_end(ctx, EXCP_BREAK);
-+                break;
-+            case NM_SDBBP16:
-+                if (is_uhi(extract32(ctx->opcode, 0, 3))) {
-+                    gen_helper_do_semihosting(cpu_env);
-+                } else {
-+                    if (ctx->hflags & MIPS_HFLAG_SBRI) {
-+                        generate_exception_end(ctx, EXCP_RI);
-+                    } else {
-+                        generate_exception_end(ctx, EXCP_DBp);
-+                    }
-+                }
-+                break;
-+            default:
-+                generate_exception_end(ctx, EXCP_RI);
-+                break;
-+            }
-+        }
-         break;
-     case NM_P16_SHIFT:
-         {
-@@ -16618,6 +16652,13 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+@@ -16592,6 +16592,13 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
          }
          break;
-     case NM_LI16:
-+        {
-+            int imm = extract32(ctx->opcode, 0, 7);
-+            imm = (imm == 0x7f ? -1 : imm);
-+            if (rt != 0) {
-+                tcg_gen_movi_tl(cpu_gpr[rt], imm);
-+            }
+     case NM_P16C:
++        switch (ctx->opcode & 1) {
++        case NM_POOL16C_0:
++            break;
++        case NM_LWXS16:
++            gen_ldxs(ctx, rt, rs, rd);
++            break;
 +        }
          break;
+     case NM_P16_A1:
+         switch (extract32(ctx->opcode, 6, 1)) {
+@@ -16663,24 +16670,95 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
      case NM_ANDI16:
          break;
+     case NM_P16_LB:
++        rd = extract32(ctx->opcode, 0, 2);
++        switch (extract32(ctx->opcode, 2, 2)) {
++        case NM_LB16:
++            gen_ld(ctx, OPC_LB, rt, rs, rd);
++            break;
++        case NM_SB16:
++            rt = decode_gpr_gpr3_src_store(
++                     NANOMIPS_EXTRACT_RD(ctx->opcode));
++            gen_st(ctx, OPC_SB, rt, rs, rd);
++            break;
++        case NM_LBU16:
++            gen_ld(ctx, OPC_LBU, rt, rs, rd);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
+         break;
+     case NM_P16_LH:
++        rd = extract32(ctx->opcode, 1, 2) << 1;
++        switch ((extract32(ctx->opcode, 3, 1) << 1) | (ctx->opcode & 1)) {
++        case NM_LH16:
++            gen_ld(ctx, OPC_LH, rt, rs, rd);
++            break;
++        case NM_SH16:
++            rt = decode_gpr_gpr3_src_store(
++                     NANOMIPS_EXTRACT_RD(ctx->opcode));
++            gen_st(ctx, OPC_SH, rt, rs, rd);
++            break;
++        case NM_LHU16:
++            gen_ld(ctx, OPC_LHU, rt, rs, rd);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
+         break;
+     case NM_LW16:
++        rd = extract32(ctx->opcode, 0, 4) << 2;
++        gen_ld(ctx, OPC_LW, rt, rs, rd);
+         break;
+     case NM_LWSP16:
++        rt = NANOMIPS_EXTRACT_RD5(ctx->opcode);
++        rd = extract32(ctx->opcode, 0, 5) << 2;
++        gen_ld(ctx, OPC_LW, rt, 29, rd);
+         break;
+     case NM_LW4X4:
++        rt = (extract32(ctx->opcode, 9, 1) << 3) |
++             extract32(ctx->opcode, 5, 3);
++        rs = (extract32(ctx->opcode, 4, 1) << 3) |
++             extract32(ctx->opcode, 0, 3);
++        rd = (extract32(ctx->opcode, 3, 1) << 3) |
++             (extract32(ctx->opcode, 8, 1) << 2);
++        rt = decode_gpr_gpr4(rt);
++        rs = decode_gpr_gpr4(rs);
++        gen_ld(ctx, OPC_LW, rt, rs, rd);
+         break;
+     case NM_SW4X4:
++        rt = (extract32(ctx->opcode, 9, 1) << 3) |
++             extract32(ctx->opcode, 5, 3);
++        rs = (extract32(ctx->opcode, 4, 1) << 3) |
++             extract32(ctx->opcode, 0, 3);
++        rd = (extract32(ctx->opcode, 3, 1) << 3) |
++             (extract32(ctx->opcode, 8, 1) << 2);
++        rt = decode_gpr_gpr4_zero(rt);
++        rs = decode_gpr_gpr4(rs);
++        gen_st(ctx, OPC_SW, rt, rs, rd);
+         break;
+     case NM_LWGP16:
++        rd = extract32(ctx->opcode, 0, 7) << 2;
++        gen_ld(ctx, OPC_LW, rt, 28, rd);
+         break;
+     case NM_SWSP16:
++        rt = NANOMIPS_EXTRACT_RD5(ctx->opcode);
++        rd = extract32(ctx->opcode, 0, 5) << 2;
++        gen_st(ctx, OPC_SW, rt, 29, rd);
+         break;
+     case NM_SW16:
++        rt = decode_gpr_gpr3_src_store(
++                 NANOMIPS_EXTRACT_RD(ctx->opcode));
++        rs = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS(ctx->opcode));
++        rd = extract32(ctx->opcode, 0, 4) << 2;
++        gen_st(ctx, OPC_SW, rt, rs, rd);
+         break;
+     case NM_SWGP16:
++        rt = decode_gpr_gpr3_src_store(
++                 NANOMIPS_EXTRACT_RD(ctx->opcode));
++        rs = extract32(ctx->opcode, 0, 7) << 2;
++        gen_st(ctx, OPC_SW, rt, 28, rs);
+         break;
+     case NM_BC16:
+         gen_compute_branch(ctx, OPC_BEQ, 2, 0, 0,
 -- 
 2.7.4
