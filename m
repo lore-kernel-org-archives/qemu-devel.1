@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkCaC-00051q-Qp
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:07:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fkCeG-0006dj-TT
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:12:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkCaB-0000ND-W9
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:07:48 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:33246)
+	(envelope-from <peter.maydell@linaro.org>) id 1fkCeG-0002hq-2O
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:12:00 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:37747)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fkCaB-0000Lz-Qt
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:07:47 -0400
-Received: by mail-oi0-x241.google.com with SMTP id l10-v6so22968220oii.0
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 11:07:47 -0700 (PDT)
+	id 1fkCeF-0002hm-TE
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:12:00 -0400
+Received: by mail-oi0-x243.google.com with SMTP id k81-v6so22970773oib.4
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 11:11:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+In-Reply-To: <20180730141748.430-1-peter.maydell@linaro.org>
+References: <20180730141748.430-1-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jul 2018 19:07:26 +0100
-Message-ID: <CAFEAcA-v+tOzub5V1_3stzNYX9M7hHX0c__jhSWM-q14QdtoTA@mail.gmail.com>
+Date: Mon, 30 Jul 2018 19:11:38 +0100
+Message-ID: <CAFEAcA9kdFbz+ceaMD6s-1ZhcaLZYZHatxTNf6nsGWKauSBKhA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] hw/arm: check fw_cfg return value
- before using it
+Subject: Re: [Qemu-devel] [PULL 0/6] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hongbo Zhang <hongbo.zhang@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On 25 July 2018 at 06:30, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
-> The fw_cfg value returned from fw_cfg_find() may be NULL, so check it
-> before using.
+On 30 July 2018 at 15:17, Peter Maydell <peter.maydell@linaro.org> wrote:
+> A set of small bugfixes for arm for 3.0; the "migration was
+> broken" fixes for SMMUv3 and v7M NVIC with security extensions
+> are the most significant.
 >
-> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
-> ---
->  hw/arm/boot.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> thanks
+> -- PMM
 >
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index e09201c..43b217f 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -930,6 +930,7 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->      hwaddr entry;
->      static const ARMInsnFixup *primary_loader;
->      AddressSpace *as = arm_boot_address_space(cpu, info);
-> +    FWCfgState *fw_cfg;
+> The following changes since commit 6d9dd5fb9d0e9f4a174f53a0e20a39fbe809c71e:
 >
->      /* CPU objects (unlike devices) are not automatically reset on system
->       * reset, so we must always register a handler to do so. If we're
-> @@ -960,11 +961,10 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->              info->dtb_start = info->loader_start;
->          }
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qobject-2018-07-27-v2' into staging (2018-07-30 09:55:47 +0100)
 >
-> -        if (info->kernel_filename) {
-> -            FWCfgState *fw_cfg;
-> +        fw_cfg = fw_cfg_find();
-> +        if (info->kernel_filename && fw_cfg) {
->              bool try_decompressing_kernel;
+> are available in the Git repository at:
+>
+>   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180730
+>
+> for you to fetch changes up to 0261fb805c00a6f97d143235e7b06b0906bdf898:
+>
+>   target/arm: Remove duplicate 'host' entry in '-cpu ?' output (2018-07-30 15:07:08 +0100)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * arm/smmuv3: Fix broken VM state migration
+>  * armv7m_nvic: Fix broken VM state migration
+>  * hw/arm/sysbus-fdt: Fix assertion in copy_properties_from_host()
+>  * hw/arm/iotkit: Fix IRQ number for timer1
+>  * hw/misc/tz-mpc: Zero the LUT on initialization, not just reset
+>  * target/arm: Remove duplicate 'host' entry in '-cpu ?' output
+>
+> ----------------------------------------------------------------
 
-This can only happen if:
- * the user provided a firmware blob
- * the user provided a -kernel option
- * the board does not have a fw_cfg so we can't pass the kernel to
-   the firmware blob
-right?
+Applied, thanks.
 
-I think in this situation we should exit with a helpful error
-message to the user (telling them that this board model does
-not support using the -kernel option when a guest firmware image
-is being booted), rather than silently ignoring the option.
-
-thanks
 -- PMM
