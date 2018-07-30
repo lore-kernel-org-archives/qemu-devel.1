@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.burton@greensocs.com>) id 1fk83O-00026J-G3
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:17:40 -0400
+	(envelope-from <quintela@redhat.com>) id 1fk85K-0003e1-6Y
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:19:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.burton@greensocs.com>) id 1fk83N-000872-Eg
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:17:38 -0400
-From: Mark Burton <mark.burton@greensocs.com>
-Date: Mon, 30 Jul 2018 15:17:16 +0200
-Message-ID: <164eb4a8d68.27d4.d127438ad377917fe05d617879a0d354@greensocs.com>
-In-Reply-To: <2d22fcb2-b825-6195-a935-bf2adb3e0a60@adacore.com>
-References: <cover.1532701430.git.damien.hedde@greensocs.com>
-	<CAFEAcA-X=eziUHurc0SEcGEeM25t4YgkTczsVeF8myWHjfp3MQ@mail.gmail.com>
-	<2d22fcb2-b825-6195-a935-bf2adb3e0a60@adacore.com>
+	(envelope-from <quintela@redhat.com>) id 1fk85F-0000fB-BP
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:19:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52508 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fk85F-0000dj-6N
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:19:33 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <5B5EC604.4020301@intel.com> (Wei Wang's message of "Mon, 30 Jul
+	2018 16:02:12 +0800")
+References: <1532934837-5966-1-git-send-email-wei.w.wang@intel.com>
+	<1532934837-5966-2-git-send-email-wei.w.wang@intel.com>
+	<5B5EC604.4020301@intel.com>
+Reply-To: quintela@redhat.com
+Date: Mon, 30 Jul 2018 15:19:30 +0200
+Message-ID: <87zhy8kgil.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 0/6] Clock and power gating support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] bitmap.h: add comments to
+ BITMAP_LAST_WORD_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>, Peter Maydell <peter.maydell@linaro.org>, Damien Hedde <damien.hedde@greensocs.com>
-Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Luc Michel <luc.michel@greensocs.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, mst@redhat.com
 
-Hi Pete, sorry for the tardy reply, Im not in the office.
-
-
-Your right  we shoujd have co-ordinated better the 2 patches, sorry for t=
-hat.
-
-Regarding this new patchset, we think there is a degree of complementary =
-to the
-clocktree one.
-Here we simply add a couple of generic power states to a device. We
-introduce
-an interface to control power and clock gating on any devices, with sensi=
-ble
-generic behaviour (reset on power on, disabling memory regions when
-asleep or
-off). The device can specialize this to adopt specific behaviours.
-
-It allows easy implementation of commonly found "system controller", "pin
-controllers", "power management unit", or similar blocks in SoCs.
-Specialization of devices can be implemented as-needed when a machine
-requires
-it.
-
-
-Cheers
-Mark
-
-On 27 July 2018 17:22:30 KONRAD Frederic <frederic.konrad@adacore.com> wr=
-ote:
-
-> Le 07/27/2018 =C3=A0 04:59 PM, Peter Maydell a =C3=A9crit :
->> On 27 July 2018 at 15:37, Damien Hedde <damien.hedde@greensocs.com> wr=
-ote:
->>> This set of patches add support for power and clock gating in device =
-objects.
->>> It adds two booleans to the state, one for power state and one of clo=
-ck state.
->>>
->>> The state is controlled trough 2 functions, one for power and one for=
- clock.
->>> Two new methods *power_update* and *clock_update* is added to the dev=
-ice class
->>> which are called on state change and can be overriden.
+Wei Wang <wei.w.wang@intel.com> wrote:
+> On 07/30/2018 03:13 PM, Wei Wang wrote:
+>> This macro was ported from Linux and we've reached an aggreement there
+>> that the corner case "nbits = 0" is not applicable to this macro, because
+>> when "nbits = 0", which means no bits to mask, this macro is expected to
+>> return 0, instead of 0xffffffff. This patch simply adds a comment above
+>> the macro as a note to users about the corner case.
 >>
->> So, you folks at Greensocs had a series a couple of years ago to try
->> to add clocktree support (which included handling things like guests
->> configuring clock rates, some clocks being "downstream" of others, and
->> so on). It didn't make it into mainline, though it did get a fair amou=
-nt
->> of design/code review. How does this approach fit into / compare with
->> that ?
+>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> CC: Juan Quintela <quintela@redhat.com>
+>> CC: Peter Xu <peterx@redhat.com>
+>> ---
+>>   include/qemu/bitmap.h | 1 +
+>>   1 file changed, 1 insertion(+)
 >>
->> thanks
->> -- PMM
+>> diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+>> index 509eedd..f53c640 100644
+>> --- a/include/qemu/bitmap.h
+>> +++ b/include/qemu/bitmap.h
+>> @@ -60,6 +60,7 @@
+>>    */
+>>     #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) &
+>> (BITS_PER_LONG - 1)))
+>> +/* "nbits = 0" is not applicable to this macro. Callers should avoid that. */
+>>   #define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
+>>     #define DECLARE_BITMAP(name,bits)                  \
 >
-> Hi all,
+> A better fix would be to directly change the macro to:  nbits ? (~0UL
+>>> (-(nbits) & (BITS_PER_LONG - 1))) : 0,
+> so that we don't need to fix other callers like bitmap_full,
+> bitmap_intersects.
 >
-> I didn't have time to push a new version of the clock series and
-> I lost the track a little bit (was 13 months ago). Sorry for
-> that :(.. Would be still nice to have I think.
+> So just post this out for a discussion whether it's preferred to just
+> adding note comments as we did for linux or fixing the macro directly.
 >
-> Cheers,
-> Fred
+> Best,
+> Wei
+
+On one hand:
+a - we have copied it form linux, we don't want to diverge
+On the other hand:
+b - it is much easier to use if we change the macro
+
+So, it is a tought one.
+
+I slightly preffer b), but will not object to a either.  As you are the
+one doing the patch, your choice.
+
+Later, Juan.
