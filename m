@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fkEYH-0007Tm-Ju
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 16:13:58 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fkEaL-0000RK-0O
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 16:16:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fkEYC-00010u-KU
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 16:13:57 -0400
-Date: Mon, 30 Jul 2018 17:13:46 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180730201346.GL12380@localhost.localdomain>
-References: <20180725091233.3300-1-david@redhat.com>
-	<20180727145551.2a1df03f.cohuck@redhat.com>
-	<f0779ee6-b52c-554d-8ca2-529ff153b745@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f0779ee6-b52c-554d-8ca2-529ff153b745@redhat.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1] s390x/cpu_models: Add
- "-cpu max" support
+	(envelope-from <richard.henderson@linaro.org>) id 1fkEaG-00020C-2M
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 16:16:04 -0400
+Received: from mail-ua0-x235.google.com ([2607:f8b0:400c:c08::235]:33608)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fkEaF-0001zv-Tx
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 16:15:59 -0400
+Received: by mail-ua0-x235.google.com with SMTP id i4-v6so8733136uak.0
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 13:15:59 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon, 30 Jul 2018 16:15:49 -0400
+Message-Id: <20180730201553.32423-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/3] linux-user/sparc: Fixes for clone
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, laurent@vivier.eu, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com
 
-On Mon, Jul 30, 2018 at 11:16:38AM +0200, David Hildenbrand wrote:
-> On 27.07.2018 14:55, Cornelia Huck wrote:
-> > On Wed, 25 Jul 2018 11:12:33 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> > 
-> >> The "max" CPU model behaves like "-cpu host" when KVM is enabled, and like
-> >> a CPU with the maximum possible feature set when TCG is enabled.
-> >>
-> >> While the "host" model can not be used under TCG ("kvm_required"), the
-> >> "max" model can and "Enables all features supported by the accelerator in
-> >> the current host".
-> >>
-> >> So we can treat "host" just as a special case of "max" (like x86 does).
-> >> It differs to the "qemu" CPU model under TCG such that compatibility
-> >> handling will not be performed and that some experimental CPU features
-> >> not yet part of the "qemu" model might be indicated.
-> >>
-> >> These are right now under TCG (see "qemu_MAX"):
-> >> - stfle53
-> >> - msa5-base
-> >> - zpci
-> >>
-> >> This will result right now in the following warning when starting QEMU TCG
-> >> with the "max" model:
-> >>     "qemu-system-s390x: warning: 'msa5-base' requires 'kimd-sha-512'."
-> >>
-> >> The "qemu" model (used as default in QEMU under TCG) will continue to
-> >> work without such warnings. The "max" mdel in the current form
-> >> might be interesting for kvm-unit-tests (where we would e.g. now also
-> >> test "msa5-base").
-> >>
-> >> The "max" model is neither static nor migration safe (like the "host"
-> >> model). It is independent of the machine but dependends on the accelerator.
-> >> It can be used to detect the maximum CPU model also under TCG from upper
-> >> layers without having to care about CPU model names for CPU model
-> >> expansion.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  target/s390x/cpu_models.c | 81 +++++++++++++++++++++++++++------------
-> >>  1 file changed, 56 insertions(+), 25 deletions(-)
-> > 
-> > So, what's the outcome? Can I merge this with the discussed minor
-> > edits, or should I wait for a v2?
-> > 
-> 
-> Eduardo identified possible optimizations independent of this patch, so
-> we should be good to go. @Eduardo, please correct me if I'm wrong!
+There are at least 4 separate bugs preventing clone from working.
 
-This version still looks good to me, my Reviewed-by line still
-applies.  Thanks!
+(1) cpu_copy left both cpus sharing the same register window (!)
+
+(2) cpu_clone_regs did not initialize %o1, so the new thread path
+    in the guest __clone was always taken, even for the parent
+    (old %o1 value was newsp, and so non-zero).
+
+(3) cpu_clone_regs did not advance the pc past the syscall in the
+    child, which meant that the child re-executed the syscall
+    (and because of (1), with essentially random inputs).
+
+(4) clone did not flush register windows, which would cause the
+    parent stack to be clobbered by the child writing out old
+    windows in order to allocate a new one.
+    
+This is enough for Alex's atomic-test to make progress, but not
+quite enough for it to actually work.  What I'm seeing now is a
+legitimate SEGV for a write to a r-xp memory segment.  I'll need
+to examine the testcase further to see why that is happening.
+
+
+r~
+
+
+Richard Henderson (4):
+  linux-user: Disallow setting newsp for fork
+  linux-user: Pass the parent env to cpu_clone_regs
+  linux-user/sparc: Fix cpu_clone_regs
+  linux-user/sparc: Flush register windows before clone
+
+ linux-user/aarch64/target_cpu.h    |  3 ++-
+ linux-user/alpha/target_cpu.h      |  3 ++-
+ linux-user/arm/target_cpu.h        |  3 ++-
+ linux-user/cris/target_cpu.h       |  3 ++-
+ linux-user/hppa/target_cpu.h       |  3 ++-
+ linux-user/i386/target_cpu.h       |  3 ++-
+ linux-user/m68k/target_cpu.h       |  3 ++-
+ linux-user/microblaze/target_cpu.h |  3 ++-
+ linux-user/mips/target_cpu.h       |  3 ++-
+ linux-user/nios2/target_cpu.h      |  3 ++-
+ linux-user/openrisc/target_cpu.h   |  4 +++-
+ linux-user/ppc/target_cpu.h        |  3 ++-
+ linux-user/riscv/target_cpu.h      |  3 ++-
+ linux-user/s390x/target_cpu.h      |  3 ++-
+ linux-user/sh4/target_cpu.h        |  3 ++-
+ linux-user/sparc/target_cpu.h      | 23 ++++++++++++++++++++---
+ linux-user/tilegx/target_cpu.h     |  3 ++-
+ linux-user/xtensa/target_cpu.h     |  3 ++-
+ linux-user/sparc/cpu_loop.c        |  3 +++
+ linux-user/syscall.c               |  9 ++++++---
+ 20 files changed, 64 insertions(+), 23 deletions(-)
 
 -- 
-Eduardo
+2.17.1
