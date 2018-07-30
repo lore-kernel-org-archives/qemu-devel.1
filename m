@@ -1,32 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fk56P-0008D1-Jw
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:08:34 -0400
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fk58W-0001AA-Vt
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:10:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fk56M-0006fi-Cm
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:08:33 -0400
-Received: from 8.mo173.mail-out.ovh.net ([46.105.46.122]:60486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fk56M-0006f9-4f
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:08:30 -0400
-Received: from player756.ha.ovh.net (unknown [10.109.146.163])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 32A70CEDF9
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 12:08:28 +0200 (CEST)
-Date: Mon, 30 Jul 2018 11:59:00 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180730115900.0ba16809@bahia.lan>
-In-Reply-To: <20180730104145.109ef196@bahia.lan>
-References: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
-	<20180727052724.GJ3694@umbus.fritz.box>
-	<20180727095452.45edee8b@bahia>
-	<20180730055715.GD2708@umbus.fritz.box>
-	<20180730104145.109ef196@bahia.lan>
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fk58T-0003pS-Q1
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:10:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50800
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sbhat@linux.vnet.ibm.com>)
+	id 1fk58T-0007j3-JC
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:10:41 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6UA9P8L081828
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 06:09:42 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2khyyjhvf5-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 06:09:41 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sbhat@linux.vnet.ibm.com>;
+	Mon, 30 Jul 2018 11:09:40 +0100
+From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+Date: Mon, 30 Jul 2018 15:39:34 +0530
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/nMSUG=Qiex=nCPm767pG9Le";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH for-3.1] tests/cpu-plug-test: check CPU
- hotplug on ppc64 with KVM
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <153294521235.6959.12520498748431693809.stgit@dhcp-9-109-246-16>
+Subject: [Qemu-devel] [PATCH v3] linux-user: ppc64: don't use volatile
+ register during safe_syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,83 +40,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?B?Q8Op?= =?UTF-8?B?ZHJpYw==?= Le Goater <clg@kaod.org>
+To: dgibson@redhat.com, riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu
+Cc: qemu-ppc@nongnu.org, sbhat@linux.vnet.ibm.com, qemu-devel@nongnu.org
 
---Sig_/nMSUG=Qiex=nCPm767pG9Le
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+r11 is a volatile register on PPC as per calling conventions.
+The safe_syscall code uses it to check if the signal_pending
+is set during the safe_syscall. When a syscall is interrupted
+on return from signal handling, the r11 might be corrupted
+before we retry the syscall leading to a crash. The registers
+r0-r13 are not to be used here as they have
+volatile/designated/reserved usages.
 
-On Mon, 30 Jul 2018 10:41:45 +0200
-Greg Kurz <groug@kaod.org> wrote:
+Change the code to use r14 which is non-volatile.
+Use SP+16 which is a slot for LR, for save/restore of previous value
+of r14. SP+16 can be used, as LR is preserved across the syscall.
 
-> On Mon, 30 Jul 2018 15:57:15 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
-[...]
-> > > > I'm pretty sure trying to change the accelerator on a qtest test ju=
-st
-> > > > doesn't make sense.  We'd need a different approach for testing cpu
-> > > > hotplug against kvm & tcg backends.
-> > > >    =20
-> > >=20
-> > > The test starts QEMU, triggers the CPU hotplug code with a QMP command
-> > > and checks the command didn't fail (or QEMU didn't crash, as it would
-> > > have before commit b585395b655a)... I really don't understand what
-> > > is wrong with that... Please elaborate.   =20
-> >=20
-> > Well, ok, let me turn that around.  A test that doesn't rely on
-> > controlling the guest side behaviour at all probably shouldn't be a
-> > qtest based test, since that's what qtest is all about.
-> >  =20
->=20
-> The CPU hotplug test doesn't seem to do anything on the guest side: it
-> just checks that 'device_add' returns a response that isn't an error.
-> I'm not aware that the guest is expected to have a specific behavior
-> during 'device_add', apart from not crashing or hanging. That was the
-> initial idea behind passing '-S' to ensure the guest doesn't run.
->=20
-> Your remark seems to be more general though... are you meaning that
-> doing something like qtest_start("-machine accel=3Dkvm:tcg") is just
-> wrong ?
+Steps to reproduce:
+On PPC host, issue `qemu-x86_64 /usr/bin/cc -E -`
+Attempt Ctrl-C, the issue is reproduced.
 
-The purpose of this test is simply to exercise a path in QEMU that
-is only used with KVM, but it can also be achieved the other way
-around:
+Reference:
+https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
+https://openpowerfoundation.org/wp-content/uploads/2016/03/ABI64BitOpenPOWERv1.1_16July2015_pub4.pdf
 
-@@ -189,7 +190,7 @@ static void xics_system_init(MachineState *machine, int=
- nr_irqs, Error **errp)
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
-     Error *local_err =3D NULL;
-=20
--    if (kvm_enabled()) {
-+    if (kvm_enabled() || qtest_enabled()) {
-         if (machine_kernel_irqchip_allowed(machine) &&
-             !xics_kvm_init(spapr, &local_err)) {
+Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+---
+v2: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg05102.html
+Changes from v2:
+   Added code to store and restore r14 register. 
 
-This will test the setup of the in-kernel XICS when run on a book3s host,
-and fallback to emulated XICS otherwise (eg, travis).
+v1: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg05089.html
+Changes from v1:
+   Fixed the commit message as suggested
 
-Would this be more acceptable ?
+ linux-user/host/ppc64/safe-syscall.inc.S |    7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
---Sig_/nMSUG=Qiex=nCPm767pG9Le
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlte4WQACgkQcdTV5YIv
-c9ZS7Q//UcOqd3UdlndrCjxhGGFCN2GEtLiG4t6/yoPuPBorWFa5y3IknV6/vR1Q
-6tlvcaqjJPK5r3DLFGz6bFqc/sxrsKHGFmF5zCSlWQMlq+fPYHZVJymN+80nROtD
-bj/+wC9GjkqQa7vWBxJn7XvLYamj/XCo5qcPgEXVFe/RtnUG1AJSgogneiBBAiop
-YE+d5PqFCAxX6ms5msaEFk5GyePvxiF4KL3cHB8eosVKIcG5zM81lQe6K6MBWhGZ
-XDOKBZkERLXtzdNHwfHbQCIiVmlsxe90A1BjVF0QeCpdVTR9jAoCeHQLJKLqXCpU
-aPIwSmGgw5d+oIcWE77i/AUYnTJRKO6TYYMC47vegnFF8Ikwyk7Dwya8Xn2Q2PTR
-UJy0WNfixQ9xQ5mvpCN+SmP275sTgu2vdKaQTCppoe1ygKjXseGsC9nMEsKZHUwq
-QdeF1Rmb7xEPkWkPjwKGK8nmt+cRebBWmQLefIJifAi3sXZRD+jFO6OnpGKUdbTT
-ECXLfSuZdUrTNQylsqWs+pg77SsggnM1+p1RpPkrnDFH6arPhYTSWZcd876ZOXLJ
-iEZOSHGngMT2r2HGBeNKg6SJKtjLDboH2wwgDxY1lLRZcbFdw2NbiddwxIkxiKwH
-nvxtu/Lf1W/Xgc6vyua5gEldYsY3D5BV1eBiKj9R0Wj4mFv1I0A=
-=ibaq
------END PGP SIGNATURE-----
-
---Sig_/nMSUG=Qiex=nCPm767pG9Le--
+diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
+index d30050a67c..ca85da13bd 100644
+--- a/linux-user/host/ppc64/safe-syscall.inc.S
++++ b/linux-user/host/ppc64/safe-syscall.inc.S
+@@ -49,7 +49,8 @@ safe_syscall_base:
+ 	 *               and returns the result in r3
+ 	 * Shuffle everything around appropriately.
+ 	 */
+-	mr	11, 3	/* signal_pending */
++	std     14, 16(1) /* Preserve r14 in SP+16 */
++	mr	14, 3	/* signal_pending */
+ 	mr	0, 4	/* syscall number */
+ 	mr	3, 5	/* syscall arguments */
+ 	mr	4, 6
+@@ -67,11 +68,12 @@ safe_syscall_base:
+ 	 */
+ safe_syscall_start:
+ 	/* if signal_pending is non-zero, don't do the call */
+-	lwz	12, 0(11)
++	lwz	12, 0(14)
+ 	cmpwi	0, 12, 0
+ 	bne-	0f
+ 	sc
+ safe_syscall_end:
++	ld 14, 16(1) /* restore r14 to its original value */
+ 	/* code path when we did execute the syscall */
+ 	bnslr+
+ 
+@@ -81,6 +83,7 @@ safe_syscall_end:
+ 
+ 	/* code path when we didn't execute the syscall */
+ 0:	addi	3, 0, -TARGET_ERESTARTSYS
++	ld 14, 16(1) /* restore r14 to its orginal value */
+ 	blr
+ 	.cfi_endproc
+ 
