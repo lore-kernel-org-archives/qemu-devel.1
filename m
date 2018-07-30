@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1fk6JJ-0001nF-Sd
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 07:25:58 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1fk6Ou-0002xp-Cr
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 07:31:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1fk6JI-00030e-Rr
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 07:25:57 -0400
-Date: Mon, 30 Jul 2018 13:25:45 +0200
-From: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20180730112545.GJ20399@angien.pipo.sk>
-References: <20180727141539.506-1-kwolf@redhat.com>
-	<20180727141539.506-2-kwolf@redhat.com>
-	<7721290c-94f0-d203-10c0-8aa586c54600@redhat.com>
-	<20180727155854.GF4355@localhost.localdomain>
+	(envelope-from <arei.gonglei@huawei.com>) id 1fk6Or-0005We-6o
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 07:31:44 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2402 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1fk6Oq-0005Vj-OA
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 07:31:41 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Mon, 30 Jul 2018 11:31:32 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DB070866@dggeml511-mbx.china.huawei.com>
+References: <20180730085121.12523-1-pbonzini@redhat.com>
+	<CAFEAcA97zcO-KSwSZ_8_bLUv4ghT7zhCUkhqc_0KDkK52z70ng@mail.gmail.com>
+In-Reply-To: <CAFEAcA97zcO-KSwSZ_8_bLUv4ghT7zhCUkhqc_0KDkK52z70ng@mail.gmail.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="UlxN1C6awaFNesUv"
-Content-Disposition: inline
-In-Reply-To: <20180727155854.GF4355@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH for-3.0 1/3] block/qapi: Add 'qdev' field
- to query-blockstats result
+Subject: Re: [Qemu-devel] [PATCH] cryptodev: remove dead code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-
---UlxN1C6awaFNesUv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jul 27, 2018 at 17:58:54 +0200, Kevin Wolf wrote:
-> Am 27.07.2018 um 17:07 hat Eric Blake geschrieben:
-> > On 07/27/2018 09:15 AM, Kevin Wolf wrote:
-> > > Like for query-block, the client needs to identify which BlockBackend
-> > > the returned data is for. Anonymous BlockBackends are identified by t=
-he
-> > > device model they are attached to. Add a 'qdev' field that contains t=
-he
-> > > qdev ID or QOM path of the attached device model.
-> > >=20
-> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > > ---
-> >=20
-> > > @@ -879,7 +882,7 @@
-> > >   # Since: 0.14.0
-> > >   ##
-> > >   { 'struct': 'BlockStats',
-> > > -  'data': {'*device': 'str', '*node-name': 'str',
-> > > +  'data': {'*device': 'str', '*qdev': 'str', '*node-name': 'str',
-> > >              'stats': 'BlockDeviceStats',
-> > >              '*parent': 'BlockStats',
-> > >              '*backing': 'BlockStats'} }
-> >=20
-> > Can we also update the example under query-blockstats a few lines later=
- to
-> > show the added field?
->=20
-> I'll add the qdev field, but the example is hopelessly outdated anyway.
-> Sounds like something for another patch.
-
-When doing further cleanups it would be worth also noting that the
-'query-nodes' argument of 'query-blockstats' does not return correct
-information.
-
-Right now it creates a false impression that it just changes the output
-=66rom nested to linear and includes filter nodes, but in fact the data is
-not correct in that mode.
-
---UlxN1C6awaFNesUv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlte9bYACgkQHGwCByjY
-1GqCvw/9GYGMLj8EzZibYdmbyWPeAoNg18aAcfu+F1sYYafn0Fr9kMKFIkr3EVsT
-K1E5ZdWdhd5Sm84nwdco3uE7yRRGK7lzz1LNmMnxPDMnCVG+phhF45+OXH7rDlwS
-JnpsAYYgPF1PduX9S5jkSh0hwUVsmBVvzurUupvE2ipGVuiMoeEvZNFNrwSiS0z7
-89ZyiXlHiqkOuR3mrz/T08rXm/3D9qQh3T3qYsb/ga79i/Q+7ZU/gg6DA66UQWhG
-uKFPr171RWcZvVRhgTxAc1i3eQZKpvtxXiVp3pdRc7onodGPxzLEyxmRREnoRKDk
-nLqqwF66cqgAY2hblYd2Nsyvri7tyN9yD00TZcdomdz/AISc+3J1f9JIiCpYJVV6
-rwfw9nZKhyXaMgs+lql3nDhWBErvfQ0RwYZjm4keMJ+51lqx1Oyki1BudB1Em8tB
-o5cBhP86ZVtdxP9UDbGcCnl/VJYBU8AK5osL+qJUUsQn3ijCAG2kimVbiHaSCWct
-ip+qnNNXG+o+wKGoqrq84957MFRxcDQsZTuTKKElPGcHfUoWank683gCfJjpP9AU
-Hp7ZsXDUu3uxEcUcdv/VRcKF4weDxfDinpXvLB7ISLcBfN0F+A5FG6dPVXISKYMM
-04A8gpYVbte2fAcmg0AEj//l3LJg1Hi1qAvvM1PQr8Fzuyq3mpU=
-=Hq0m
------END PGP SIGNATURE-----
-
---UlxN1C6awaFNesUv--
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgTWF5ZGVsbCBb
+bWFpbHRvOnBldGVyLm1heWRlbGxAbGluYXJvLm9yZ10NCj4gU2VudDogTW9uZGF5LCBKdWx5IDMw
+LCAyMDE4IDY6NDkgUE0NCj4gVG86IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+
+DQo+IENjOiBRRU1VIERldmVsb3BlcnMgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz47IEdvbmdsZWkg
+KEFyZWkpDQo+IDxhcmVpLmdvbmdsZWlAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtRZW11
+LWRldmVsXSBbUEFUQ0hdIGNyeXB0b2RldjogcmVtb3ZlIGRlYWQgY29kZQ0KPiANCj4gT24gMzAg
+SnVseSAyMDE4IGF0IDA5OjUxLCBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPiB3
+cm90ZToNCj4gPiBSZXBvcnRlZCBieSBDb3Zlcml0eSBhcyBDSUQgMTM5MDYwMC4NCj4gPg0KPiA+
+IFNpZ25lZC1vZmYtYnk6IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+DQo+ID4g
+LS0tDQo+IA0KPiBUaGlzIGFscmVhZHkgaGFzIGEgcmV2aWV3ZWQgcGF0Y2ggb24tbGlzdCBmb3Ig
+dGhpcyBmcm9tDQo+IGJhY2sgaW4gQXByaWw6DQo+IA0KPiBodHRwczovL3BhdGNod29yay5vemxh
+YnMub3JnL3BhdGNoLzkwNjA0MS8NCj4gDQo+IHNvIEkgdGhpbmsgd2Ugc2hvdWxkIGp1c3QgYXBw
+bHkgdGhhdC4NCj4gDQpPaCwgeWVzLiBXb3VsZCB5b3UgcGljayBpdCB1cCBkaXJlY3RseT8gT3Ig
+YnkgcWVtdS10cml2aWFsPw0KDQpUaGFua3MsDQotR29uZ2xlaQ0K
