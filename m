@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fk4II-0002Ph-Q3
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 05:16:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fk4QC-0003w1-PV
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 05:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fk4IE-0007Cg-Ml
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 05:16:46 -0400
-References: <20180725091233.3300-1-david@redhat.com>
-	<20180727145551.2a1df03f.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <f0779ee6-b52c-554d-8ca2-529ff153b745@redhat.com>
-Date: Mon, 30 Jul 2018 11:16:38 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fk4QB-0001ct-UX
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 05:24:56 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36590)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fk4QB-0001cf-P4
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 05:24:55 -0400
+Received: by mail-oi0-x242.google.com with SMTP id n21-v6so19993767oig.3
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 02:24:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180727145551.2a1df03f.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1] s390x/cpu_models: Add
- "-cpu max" support
+In-Reply-To: <20180728071638.17077-1-armbru@redhat.com>
+References: <20180728071638.17077-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Jul 2018 10:24:34 +0100
+Message-ID: <CAFEAcA8F5iwSju3BSOG4vMfmgKQm=6kKrbKxnq2QCUFLj7gAqA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 0/3] QObject patches for 2018-07-27
+ (3.0.0-rc3)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 27.07.2018 14:55, Cornelia Huck wrote:
-> On Wed, 25 Jul 2018 11:12:33 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> The "max" CPU model behaves like "-cpu host" when KVM is enabled, and like
->> a CPU with the maximum possible feature set when TCG is enabled.
->>
->> While the "host" model can not be used under TCG ("kvm_required"), the
->> "max" model can and "Enables all features supported by the accelerator in
->> the current host".
->>
->> So we can treat "host" just as a special case of "max" (like x86 does).
->> It differs to the "qemu" CPU model under TCG such that compatibility
->> handling will not be performed and that some experimental CPU features
->> not yet part of the "qemu" model might be indicated.
->>
->> These are right now under TCG (see "qemu_MAX"):
->> - stfle53
->> - msa5-base
->> - zpci
->>
->> This will result right now in the following warning when starting QEMU TCG
->> with the "max" model:
->>     "qemu-system-s390x: warning: 'msa5-base' requires 'kimd-sha-512'."
->>
->> The "qemu" model (used as default in QEMU under TCG) will continue to
->> work without such warnings. The "max" mdel in the current form
->> might be interesting for kvm-unit-tests (where we would e.g. now also
->> test "msa5-base").
->>
->> The "max" model is neither static nor migration safe (like the "host"
->> model). It is independent of the machine but dependends on the accelerator.
->> It can be used to detect the maximum CPU model also under TCG from upper
->> layers without having to care about CPU model names for CPU model
->> expansion.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/cpu_models.c | 81 +++++++++++++++++++++++++++------------
->>  1 file changed, 56 insertions(+), 25 deletions(-)
-> 
-> So, what's the outcome? Can I merge this with the discussed minor
-> edits, or should I wait for a v2?
-> 
+On 28 July 2018 at 08:16, Markus Armbruster <armbru@redhat.com> wrote:
+> The following changes since commit 18a398f6a39df4b08ff86ac0d38384193ca5f4cc:
+>
+>   Update version for v3.0.0-rc2 release (2018-07-24 22:06:31 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qobject-2018-07-27-v2
+>
+> for you to fetch changes up to ba891d68b4ff17faaea3d3a8bfd82af3eed0a134:
+>
+>   qstring: Move qstring_from_substr()'s @end one to the right (2018-07-28 09:09:58 +0200)
+>
+> ----------------------------------------------------------------
+> QObject patches for 2018-07-27 (3.0.0-rc3)
+>
+> This pull request fixes an integer overflow bug, and hardens the code
+> in question a bit.  Abuse of QMP can make the bug crash QEMU, so it
+> seems worth fixing at this late stage.
+>
+> ----------------------------------------------------------------
+> Markus Armbruster (2):
+>       qstring: Assert size calculations don't overflow
+>       qstring: Move qstring_from_substr()'s @end one to the right
+>
+> liujunjie (1):
+>       qstring: Fix qstring_from_substr() not to provoke int overflow
+>
 
-Eduardo identified possible optimizations independent of this patch, so
-we should be good to go. @Eduardo, please correct me if I'm wrong!
+Applied, thanks.
 
--- 
-
-Thanks,
-
-David / dhildenb
+-- PMM
