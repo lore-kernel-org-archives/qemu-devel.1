@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1fk2wQ-0008V8-0Y
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 03:50:12 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1fk342-00023F-7x
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 03:57:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1fk2wO-00044Z-Vp
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 03:50:06 -0400
-Date: Mon, 30 Jul 2018 15:49:52 +0800
-From: yuchenlin <yuchenlin@synology.com>
-Message-ID: <6616ccd2-847b-4f5b-bdcd-e0c4d6a2263a@Mail>
-In-Reply-To: <96bc216a-d335-dd36-06f0-5985bb52df53@weilnetz.de>
-References: <20180730024701.7613-1-yuchenlin@synology.com>
-	<96bc216a-d335-dd36-06f0-5985bb52df53@weilnetz.de>
+	(envelope-from <wei.w.wang@intel.com>) id 1fk33z-0006Vf-7k
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 03:57:58 -0400
+Received: from mga04.intel.com ([192.55.52.120]:27685)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1fk33y-0006VB-S6
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 03:57:55 -0400
+Message-ID: <5B5EC604.4020301@intel.com>
+Date: Mon, 30 Jul 2018 16:02:12 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Subject: Re: [Qemu-devel] [PATCH 0/2] Refine some vdi code
+References: <1532934837-5966-1-git-send-email-wei.w.wang@intel.com>
+	<1532934837-5966-2-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1532934837-5966-2-git-send-email-wei.w.wang@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] bitmap.h: add comments to
+ BITMAP_LAST_WORD_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+Cc: mst@redhat.com
 
-Hi, Stefan
+On 07/30/2018 03:13 PM, Wei Wang wrote:
+> This macro was ported from Linux and we've reached an aggreement there
+> that the corner case "nbits = 0" is not applicable to this macro, because
+> when "nbits = 0", which means no bits to mask, this macro is expected to
+> return 0, instead of 0xffffffff. This patch simply adds a comment above
+> the macro as a note to users about the corner case.
+>
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Peter Xu <peterx@redhat.com>
+> ---
+>   include/qemu/bitmap.h | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+> index 509eedd..f53c640 100644
+> --- a/include/qemu/bitmap.h
+> +++ b/include/qemu/bitmap.h
+> @@ -60,6 +60,7 @@
+>    */
+>   
+>   #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) & (BITS_PER_LONG - 1)))
+> +/* "nbits = 0" is not applicable to this macro. Callers should avoid that. */
+>   #define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
+>   
+>   #define DECLARE_BITMAP(name,bits)                  \
 
-I agree that redundancy of If else may helps people to understand the cod=
-e.
+A better fix would be to directly change the macro to:  nbits ? (~0UL >> 
+(-(nbits) & (BITS_PER_LONG - 1))) : 0,
+so that we don't need to fix other callers like bitmap_full, 
+bitmap_intersects.
 
-However, CON=46IG=5FVDI=5FWRITE only contributes:
+So just post this out for a discussion whether it's preferred to just 
+adding note comments as we did for linux or fixing the macro directly.
 
-=23if defined(CON=46IG=5FVDI=5FWRITE)
-.bdrv=5Fco=5Fpwritev =3D vdi=5Fco=5Fpwritev,
-=23endif
-
-I think we don't need CON=46IG=5FVDI=5FWRITE to document the code.
-As its name implies, vdi=5Fco=5Fpwritev shows the code parts for vdi writ=
-e support.
-
-
-I appreciated your time and effort for reviews.
-
-Regards,
-yuchenlin
-
-
-Stefan Weil <sw=40weilnetz.de> =E6=96=BC 2018-07-30 15:13 =E5=AF=AB=E9=81=
-=93=EF=BC=9A
-> Am 30.07.2018 um 04:46 schrieb yuchenlin=40synology.com: > =46rom: yuch=
-enlin <yuchenlin=40synology.com> > > This series refine some code in vdi.=
-c, includes: > > * Remvoe CON=46IG=5FVDI=5FWRITE because there is no reas=
-on to leave an always on > and cannot configure option in the code-side. =
-> * decouple if else if chain to get more readability. > > Thanks, > yuch=
-enlin > > yuchenlin (2): > vdi: remove CON=46IG=5FVDI=5FWRITE > vdi: refi=
-ne code for vdi=5Fopen > > block/vdi.c =7C 32 ++++++++++++++++++---------=
------ > 1 file changed, 18 insertions(+), 14 deletions(-) Technically the=
-se changes are fine, but personally I prefer my old code. If else is rend=
-undant here, but redundancy helps humans to understand the code. CON=46IG=
-=5FVDI=5FWRITE still has a similar function as it documents which code pa=
-rts are relevant for write support. Stefan  =20
+Best,
+Wei
