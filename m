@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fkGLJ-00029e-0J
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 18:08:42 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fkGN0-0002wg-0c
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 18:10:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fkGLF-0005Eu-Pz
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 18:08:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54194 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fkGLF-0005Eg-Ia
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 18:08:37 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 30 Jul 2018 17:08:31 -0500
-Message-Id: <20180730220831.390182-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 for-3.0] tests/libqtest: Improve kill_qemu()
+	(envelope-from <alistair23@gmail.com>) id 1fkGMy-0005j6-M9
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 18:10:25 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180730162458.23186-3-peter.maydell@linaro.org>
+References: <20180730162458.23186-1-peter.maydell@linaro.org>
+	<20180730162458.23186-3-peter.maydell@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 30 Jul 2018 15:09:48 -0700
+Message-ID: <CAKmqyKO2oUfSoiqWAA_rOWRzjgHE8om_X9sMuDdcZjgkE3q2Gg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/5] hw/misc/mps2-fpgaio: Implement PSCNTR
+ and COUNTER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,94 +23,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, armbru@redhat.com, mst@redhat.com, peter.maydell@linaro.org, alex.bennee@linaro.org, f4bug@amsat.org, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-In kill_qemu() we have an assert that checks that the QEMU process
-didn't dump core:
-            assert(!WCOREDUMP(wstatus));
+On Mon, Jul 30, 2018 at 9:24 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> In the MPS2 FPGAIO, PSCNTR is a free-running downcounter with
+> a reload value configured via the PRESCALE register, and
+> COUNTER counts up by 1 every time PSCNTR reaches zero.
+> Implement these counters.
+>
+> We can just increment the counters migration subsection's
+> version ID because we only added it in the previous commit,
+> so no released QEMU versions will be using it.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Unfortunately the WCOREDUMP macro here means the resulting message
-is not very easy to comprehend on at least some systems:
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-ahci-test: tests/libqtest.c:113: kill_qemu: Assertion `!(((__extension__ (((union { __typeof(wstatus) __in; int __i; }) { .__in = (wstatus) }).__i))) & 0x80)' failed.
+Alistair
 
-and it doesn't identify what signal the process took.
-
-Furthermore, we are NOT detecting EINTR (while EINTR shouldn't be
-happening if we didn't install signal handlers, it's still better
-to always be robust), and also want to log unexpected non-zero status
-that was not accompanied by a core dump.
-
-Instead of using a raw assert, print the information in an
-easier to understand way:
-
-/i386/ahci/sanity: tests/libqtest.c:119: kill_qemu() detected QEMU death with core dump from signal 11 (Segmentation fault)
-Aborted (core dumped)
-
-(Of course, the really useful information would be why the QEMU
-process dumped core in the first place, but we don't have that
-by the time the test program has picked up the exit status.)
-
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Eric Blake <eblake@redhat.com>
-
----
-v3: use TFR() instead of open-coding the retry loop [Thomas]
----
- tests/libqtest.c | 37 ++++++++++++++++++++++++++++++++++---
- 1 file changed, 34 insertions(+), 3 deletions(-)
-
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 098af6aec44..3aa3e4c2a46 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -105,12 +105,43 @@ static void kill_qemu(QTestState *s)
-     if (s->qemu_pid != -1) {
-         int wstatus = 0;
-         pid_t pid;
-+        bool die = false;
-
-         kill(s->qemu_pid, SIGTERM);
--        pid = waitpid(s->qemu_pid, &wstatus, 0);
-+        TFR(pid = waitpid(s->qemu_pid, &wstatus, 0));
-
--        if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
--            assert(!WCOREDUMP(wstatus));
-+        assert(pid == s->qemu_pid);
-+        /*
-+         * We expect qemu to exit with status 0; anything else is
-+         * fishy and should be logged.  Abort except when death by
-+         * signal is not accompanied by a coredump (as that's the only
-+         * time it was likely that the user is trying to kill the
-+         * testsuite early).
-+         */
-+        if (wstatus) {
-+            die = true;
-+            if (WIFEXITED(wstatus)) {
-+                fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
-+                        "process but encountered exit status %d\n",
-+                        __FILE__, __LINE__, WEXITSTATUS(wstatus));
-+            } else if (WIFSIGNALED(wstatus)) {
-+                int sig = WTERMSIG(wstatus);
-+                const char *signame = strsignal(sig) ?: "unknown ???";
-+
-+                if (!WCOREDUMP(wstatus)) {
-+                    die = false;
-+                    fprintf(stderr, "%s:%d: kill_qemu() ignoring QEMU death "
-+                            "by signal %d (%s)\n",
-+                            __FILE__, __LINE__, sig, signame);
-+                } else {
-+                    fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
-+                            "with core dump from signal %d (%s)\n",
-+                            __FILE__, __LINE__, sig, signame);
-+                }
-+            }
-+        }
-+        if (die) {
-+            abort();
-         }
-     }
- }
--- 
-2.14.4
+> ---
+>  include/hw/misc/mps2-fpgaio.h |  6 +++
+>  hw/misc/mps2-fpgaio.c         | 97 +++++++++++++++++++++++++++++++++--
+>  2 files changed, 99 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/hw/misc/mps2-fpgaio.h b/include/hw/misc/mps2-fpgaio.h
+> index ec057d38c76..69e265cd4b2 100644
+> --- a/include/hw/misc/mps2-fpgaio.h
+> +++ b/include/hw/misc/mps2-fpgaio.h
+> @@ -37,6 +37,12 @@ typedef struct {
+>      uint32_t prescale;
+>      uint32_t misc;
+>
+> +    /* QEMU_CLOCK_VIRTUAL time at which counter and pscntr were last synced */
+> +    int64_t pscntr_sync_ticks;
+> +    /* Values of COUNTER and PSCNTR at time pscntr_sync_ticks */
+> +    uint32_t counter;
+> +    uint32_t pscntr;
+> +
+>      uint32_t prescale_clk;
+>
+>      /* These hold the CLOCK_VIRTUAL ns tick when the CLK1HZ/CLK100HZ was zero */
+> diff --git a/hw/misc/mps2-fpgaio.c b/hw/misc/mps2-fpgaio.c
+> index bbc28f641f0..5cf10ebd66a 100644
+> --- a/hw/misc/mps2-fpgaio.c
+> +++ b/hw/misc/mps2-fpgaio.c
+> @@ -43,6 +43,77 @@ static int64_t tickoff_from_counter(int64_t now, uint32_t count, int frq)
+>      return now - muldiv64(count, NANOSECONDS_PER_SECOND, frq);
+>  }
+>
+> +static void resync_counter(MPS2FPGAIO *s)
+> +{
+> +    /*
+> +     * Update s->counter and s->pscntr to their true current values
+> +     * by calculating how many times PSCNTR has ticked since the
+> +     * last time we did a resync.
+> +     */
+> +    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +    int64_t elapsed = now - s->pscntr_sync_ticks;
+> +
+> +    /*
+> +     * Round elapsed down to a whole number of PSCNTR ticks, so we don't
+> +     * lose time if we do multiple resyncs in a single tick.
+> +     */
+> +    uint64_t ticks = muldiv64(elapsed, s->prescale_clk, NANOSECONDS_PER_SECOND);
+> +
+> +    /*
+> +     * Work out what PSCNTR and COUNTER have moved to. We assume that
+> +     * PSCNTR reloads from PRESCALE one tick-period after it hits zero,
+> +     * and that COUNTER increments at the same moment.
+> +     */
+> +    if (ticks == 0) {
+> +        /* We haven't ticked since the last time we were asked */
+> +        return;
+> +    } else if (ticks < s->pscntr) {
+> +        /* We haven't yet reached zero, just reduce the PSCNTR */
+> +        s->pscntr -= ticks;
+> +    } else {
+> +        if (s->prescale == 0) {
+> +            /*
+> +             * If the reload value is zero then the PSCNTR will stick
+> +             * at zero once it reaches it, and so we will increment
+> +             * COUNTER every tick after that.
+> +             */
+> +            s->counter += ticks - s->pscntr;
+> +            s->pscntr = 0;
+> +        } else {
+> +            /*
+> +             * This is the complicated bit. This ASCII art diagram gives an
+> +             * example with PRESCALE==5 PSCNTR==7:
+> +             *
+> +             * ticks  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
+> +             * PSCNTR 7  6  5  4  3  2  1  0  5  4  3  2  1  0  5
+> +             * cinc                           1                 2
+> +             * y            0  1  2  3  4  5  6  7  8  9 10 11 12
+> +             * x            0  1  2  3  4  5  0  1  2  3  4  5  0
+> +             *
+> +             * where x = y % (s->prescale + 1)
+> +             * and so PSCNTR = s->prescale - x
+> +             * and COUNTER is incremented by y / (s->prescale + 1)
+> +             *
+> +             * The case where PSCNTR < PRESCALE works out the same,
+> +             * though we must be careful to calculate y as 64-bit unsigned
+> +             * for all parts of the expression.
+> +             * y < 0 is not possible because that implies ticks < s->pscntr.
+> +             */
+> +            uint64_t y = ticks - s->pscntr + s->prescale;
+> +            s->pscntr = s->prescale - (y % (s->prescale + 1));
+> +            s->counter += y / (s->prescale + 1);
+> +        }
+> +    }
+> +
+> +    /*
+> +     * Only advance the sync time to the timestamp of the last PSCNTR tick,
+> +     * not all the way to 'now', so we don't lose time if we do multiple
+> +     * resyncs in a single tick.
+> +     */
+> +    s->pscntr_sync_ticks += muldiv64(ticks, NANOSECONDS_PER_SECOND,
+> +                                     s->prescale_clk);
+> +}
+> +
+>  static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
+>  {
+>      MPS2FPGAIO *s = MPS2_FPGAIO(opaque);
+> @@ -74,9 +145,12 @@ static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
+>          r = counter_from_tickoff(now, s->clk100hz_tick_offset, 100);
+>          break;
+>      case A_COUNTER:
+> +        resync_counter(s);
+> +        r = s->counter;
+> +        break;
+>      case A_PSCNTR:
+> -        qemu_log_mask(LOG_UNIMP, "MPS2 FPGAIO: counters unimplemented\n");
+> -        r = 0;
+> +        resync_counter(s);
+> +        r = s->pscntr;
+>          break;
+>      default:
+>          qemu_log_mask(LOG_GUEST_ERROR,
+> @@ -107,6 +181,7 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
+>          s->led0 = value & 0x3;
+>          break;
+>      case A_PRESCALE:
+> +        resync_counter(s);
+>          s->prescale = value;
+>          break;
+>      case A_MISC:
+> @@ -126,6 +201,14 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
+>          now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>          s->clk100hz_tick_offset = tickoff_from_counter(now, value, 100);
+>          break;
+> +    case A_COUNTER:
+> +        resync_counter(s);
+> +        s->counter = value;
+> +        break;
+> +    case A_PSCNTR:
+> +        resync_counter(s);
+> +        s->pscntr = value;
+> +        break;
+>      default:
+>          qemu_log_mask(LOG_GUEST_ERROR,
+>                        "MPS2 FPGAIO write: bad offset 0x%x\n", (int) offset);
+> @@ -150,6 +233,9 @@ static void mps2_fpgaio_reset(DeviceState *dev)
+>      s->misc = 0;
+>      s->clk1hz_tick_offset = tickoff_from_counter(now, 0, 1);
+>      s->clk100hz_tick_offset = tickoff_from_counter(now, 0, 100);
+> +    s->counter = 0;
+> +    s->pscntr = 0;
+> +    s->pscntr_sync_ticks = now;
+>  }
+>
+>  static void mps2_fpgaio_init(Object *obj)
+> @@ -170,12 +256,15 @@ static bool mps2_fpgaio_counters_needed(void *opaque)
+>
+>  static const VMStateDescription mps2_fpgaio_counters_vmstate = {
+>      .name = "mps2-fpgaio/counters",
+> -    .version_id = 1,
+> -    .minimum_version_id = 1,
+> +    .version_id = 2,
+> +    .minimum_version_id = 2,
+>      .needed = mps2_fpgaio_counters_needed,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_INT64(clk1hz_tick_offset, MPS2FPGAIO),
+>          VMSTATE_INT64(clk100hz_tick_offset, MPS2FPGAIO),
+> +        VMSTATE_UINT32(counter, MPS2FPGAIO),
+> +        VMSTATE_UINT32(pscntr, MPS2FPGAIO),
+> +        VMSTATE_INT64(pscntr_sync_ticks, MPS2FPGAIO),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+> --
+> 2.17.1
+>
+>
