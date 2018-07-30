@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fk2vV-0007xS-HP
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 03:49:10 -0400
+	(envelope-from <yuchenlin@synology.com>) id 1fk2wQ-0008V8-0Y
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 03:50:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fk2vS-0003jF-F6
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 03:49:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57950 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fk2vS-0003ir-AR
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 03:49:06 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 374948160F82
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 07:49:05 +0000 (UTC)
-Date: Mon, 30 Jul 2018 09:49:03 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180730094903.2b469c71@redhat.com>
-In-Reply-To: <20180729000937-mutt-send-email-mst@kernel.org>
-References: <1532703031-166467-1-git-send-email-imammedo@redhat.com>
-	<20180727215240.GX12380@localhost.localdomain>
-	<20180729000937-mutt-send-email-mst@kernel.org>
+	(envelope-from <yuchenlin@synology.com>) id 1fk2wO-00044Z-Vp
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 03:50:06 -0400
+Date: Mon, 30 Jul 2018 15:49:52 +0800
+From: yuchenlin <yuchenlin@synology.com>
+Message-ID: <6616ccd2-847b-4f5b-bdcd-e0c4d6a2263a@Mail>
+In-Reply-To: <96bc216a-d335-dd36-06f0-5985bb52df53@weilnetz.de>
+References: <20180730024701.7613-1-yuchenlin@synology.com>
+	<96bc216a-d335-dd36-06f0-5985bb52df53@weilnetz.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.0] pc: acpi: fix memhp regression by
- reducing stub SRAT entry size
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Subject: Re: [Qemu-devel] [PATCH 0/2] Refine some vdi code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,24 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+To: Stefan Weil <sw@weilnetz.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Sun, 29 Jul 2018 00:09:58 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+Hi, Stefan
 
-> On Fri, Jul 27, 2018 at 06:52:40PM -0300, Eduardo Habkost wrote:
-> > On Fri, Jul 27, 2018 at 04:50:31PM +0200, Igor Mammedov wrote:
-> > [...]  
-> > > NOTE TO MAINTAINER: UPDATE REFERRENCE APCI TABLE BLOBS IN TESTS  
-> > 
-> > Why this needs to be done manually?  Can't the ACPI table update
-> > be included in the e-mailed patch? 
-additional reason is that we can't really review the binary part,
-hence we came up with this reminder policy
- 
-> Yes but then there's no guarantee it will apply to my tree:
-> binary diff conflicts can't be resolved.
-> 
-> > -- 
-> > Eduardo  
+I agree that redundancy of If else may helps people to understand the cod=
+e.
+
+However, CON=46IG=5FVDI=5FWRITE only contributes:
+
+=23if defined(CON=46IG=5FVDI=5FWRITE)
+.bdrv=5Fco=5Fpwritev =3D vdi=5Fco=5Fpwritev,
+=23endif
+
+I think we don't need CON=46IG=5FVDI=5FWRITE to document the code.
+As its name implies, vdi=5Fco=5Fpwritev shows the code parts for vdi writ=
+e support.
+
+
+I appreciated your time and effort for reviews.
+
+Regards,
+yuchenlin
+
+
+Stefan Weil <sw=40weilnetz.de> =E6=96=BC 2018-07-30 15:13 =E5=AF=AB=E9=81=
+=93=EF=BC=9A
+> Am 30.07.2018 um 04:46 schrieb yuchenlin=40synology.com: > =46rom: yuch=
+enlin <yuchenlin=40synology.com> > > This series refine some code in vdi.=
+c, includes: > > * Remvoe CON=46IG=5FVDI=5FWRITE because there is no reas=
+on to leave an always on > and cannot configure option in the code-side. =
+> * decouple if else if chain to get more readability. > > Thanks, > yuch=
+enlin > > yuchenlin (2): > vdi: remove CON=46IG=5FVDI=5FWRITE > vdi: refi=
+ne code for vdi=5Fopen > > block/vdi.c =7C 32 ++++++++++++++++++---------=
+----- > 1 file changed, 18 insertions(+), 14 deletions(-) Technically the=
+se changes are fine, but personally I prefer my old code. If else is rend=
+undant here, but redundancy helps humans to understand the code. CON=46IG=
+=5FVDI=5FWRITE still has a similar function as it documents which code pa=
+rts are relevant for write support. Stefan  =20
