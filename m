@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fkH9o-0006XO-MQ
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 19:00:53 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fkHMI-0000ty-2u
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 19:13:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fkH9l-0001VV-LF
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 19:00:52 -0400
-Date: Tue, 31 Jul 2018 01:00:46 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA_wxAbODS=voCunFYYMZdSG7jOuu7B-8mRhH15snGp6=A@mail.gmail.com>
-Message-ID: <alpine.BSF.2.21.1807310055170.24147@zero.eik.bme.hu>
-References: <20180730043904.17023-1-mail@sebastianbauer.info>
-	<alpine.BSF.2.21.1807301254450.49677@zero.eik.bme.hu>
-	<CAFEAcA_wxAbODS=voCunFYYMZdSG7jOuu7B-8mRhH15snGp6=A@mail.gmail.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1fkHME-0006L7-Uo
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 19:13:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45820)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1fkHME-0006Ks-Na
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 19:13:42 -0400
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Mon, 30 Jul 2018 17:13:26 -0600
+Message-ID: <153299204130.14411.11438396195753743913.stgit@gimli.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] sam460ex: Fix PCI interrupt connections
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2 0/4] Balloon inhibit enhancements,
+ vfio restriction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Sebastian Bauer <mail@sebastianbauer.info>, Alexander Graf <agraf@suse.de>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, peterx@redhat.com, cohuck@redhat.com, mst@redhat.com, david@redhat.com
 
-On Mon, 30 Jul 2018, Peter Maydell wrote:
-> On 30 July 2018 at 12:06, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->> On Mon, 30 Jul 2018, Sebastian Bauer wrote:
->>>
->>> The four interrupts of the PCI bus are connected to the same UIC pin on
->>> the
->>> real Sam460ex. Evidence for this can be found in the UBoot source for the
->>> Sam460ex in the Sam460ex.c file where PCI_INTERRUPT_LINE in written. This
->>> change brings the connection in line with this.
->>>
->>> This fixes the problem that can be observed when adding further PCI cards
->>> that get their interrupt rotated to other interrupts than PCI INT A. In
->>> particular, the bug was observed and verified to be fixed (after this
->>> change) with an additional OHCI PCI card.
->>>
->>> Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
->>> ---
->>> hw/ppc/sam460ex.c | 4 ++--
->>> 1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
->>> index 0999efcc1e..b2b22f280d 100644
->>> --- a/hw/ppc/sam460ex.c
->>> +++ b/hw/ppc/sam460ex.c
->>> @@ -515,9 +515,9 @@ static void sam460ex_init(MachineState *machine)
->>>
->>>     /* PCI bus */
->>>     ppc460ex_pcie_init(env);
->>> -    /* FIXME: is this correct? */
->>> +    /* All PCI ints are connected to the same UIC pin (cf. UBoot source)
->>> */
->>>     dev = sysbus_create_varargs("ppc440-pcix-host", 0xc0ec00000,
->>> -                                uic[1][0], uic[1][20], uic[1][21],
->>> uic[1][22],
->>> +                                uic[1][0], uic[1][0], uic[1][0],
->>> uic[1][0],
->>
->>
->> I don't understand QOM. Does this really work? It will ultimately do
->>
->> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 0, uic[1][0]);
->> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 1, uic[1][0]);
->> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 2, uic[1][0]);
->> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 3, uic[1][0]);
->
-> You are correct; this will not do the intended thing. If you
-> want to wire up multiple outputs which are logically ORed
-> together into a single input, you need to instantiate an
-> OR gate for that (we have the TYPE_OR_IRQ for this).
+v2:
+ - Use atomic ops for balloon inhibit counter (Peter)
+ - Allow endpoint driver opt-in for ballooning, vfio-ccw opt-in by
+   default, vfio-pci opt-in by device option, only allowed for mdev
+   devices, no support added for platform as there are no platform
+   mdev devices.
 
-Thanks for confirming it. However after reading hw/pci/pci.c I still don't 
-see where these properties are used at all. It looks like it will just 
-call the map_irq and set_irq functions specified in pci_register_root_bus 
-passing them the irq array given in opaque and these will change irq lines 
-directly. So I think we could just change the map function to map 
-everything to the first line and then the other lines don't matter at all. 
-We could even get rid of them and change ppc440_pcix to have a single line 
-as used in the sam460ex (which is the only board using this model 
-currently so we can add more complexity when/if anything else needs it to 
-be different). Is there anything why this simple solution would not work 
-that justifies adding more complexity now?
+See patch 3/4 for detailed explanation why ballooning and device
+assignment typically don't mix.  If this eventually changes, flags
+on the iommu info struct or perhaps device info struct can inform
+us for automatic opt-in.  Thanks,
 
-Regards,
-BALATON Zoltan
+Alex
+
+---
+
+Alex Williamson (4):
+      balloon: Allow nested inhibits
+      kvm: Use inhibit to prevent ballooning without synchronous mmu
+      vfio: Inhibit ballooning based on group attachment to a container
+      vfio/ccw/pci: Allow devices to opt-in for ballooning
+
+
+ accel/kvm/kvm-all.c           |    4 ++++
+ balloon.c                     |   13 ++++++++++---
+ hw/vfio/ccw.c                 |    9 +++++++++
+ hw/vfio/common.c              |   26 ++++++++++++++++++++++++++
+ hw/vfio/pci.c                 |   26 +++++++++++++++++++++++++-
+ hw/vfio/trace-events          |    1 +
+ hw/virtio/virtio-balloon.c    |    4 +---
+ include/hw/vfio/vfio-common.h |    2 ++
+ 8 files changed, 78 insertions(+), 7 deletions(-)
