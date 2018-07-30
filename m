@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fkA3A-00071I-MG
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:25:33 -0400
+	(envelope-from <david@redhat.com>) id 1fkA5x-00012k-89
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:28:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fkA37-0000SB-3Y
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:25:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40104 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fkA36-0000Ru-Gr
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:25:28 -0400
-References: <20180727151359.29061-1-armbru@redhat.com>
-	<20180727151359.29061-14-armbru@redhat.com>
-	<1c126eed-8b47-b61a-69d8-38176e1e586d@redhat.com>
-	<87wotdxgt2.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2d7397fd-87e3-32a3-e5e2-38557ae65e2e@redhat.com>
-Date: Mon, 30 Jul 2018 10:25:26 -0500
+	(envelope-from <david@redhat.com>) id 1fkA5u-0001HW-Hp
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:28:25 -0400
+References: <1532959766-53343-1-git-send-email-borntraeger@de.ibm.com>
+	<1bf75ad8-dc90-b94e-0ead-53fdbc72dd4f@redhat.com>
+	<b894e494-1dfc-8953-79e9-fde3f9560c77@de.ibm.com>
+	<9bdf3ea6-d0f4-d637-3e34-eb43a9821434@redhat.com>
+	<95e3d12c-12fb-c983-c0aa-e99c08321a98@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <534864ae-172c-ff27-0584-4e69da18742f@redhat.com>
+Date: Mon, 30 Jul 2018 17:28:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <87wotdxgt2.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <95e3d12c-12fb-c983-c0aa-e99c08321a98@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 13/23] tests: Clean up string
- interpolation around qtest_qmp_device_add()
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 1/1] s390x/sclp: fix maxram
+ calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, f4bug@amsat.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Janosch Frank <frankja@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, imbrenda@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>
 
-On 07/30/2018 03:34 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
+On 30.07.2018 17:20, Christian Borntraeger wrote:
 > 
-> [...]
->> (We really want to assert that any % interpolations in our JSON parser
->> are NOT embedded in '').
 > 
-> I'll look into that, but it'll be in a separate series.
+> On 07/30/2018 05:17 PM, David Hildenbrand wrote:
+>> On 30.07.2018 17:00, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 07/30/2018 04:34 PM, David Hildenbrand wrote:
+>>>> On 30.07.2018 16:09, Christian Borntraeger wrote:
+>>>>> We clamp down ram_size to match the sclp increment size. We do
+>>>>> not do the same for maxram_size, which means for large guests
+>>>>> with some sizes (e.g. -m 50000) maxram_size differs from ram_size.
+>>>>> This can break other code (e.g. CMMA migration) which uses maxram_size
+>>>>> to calculate the number of pages and then throws some errors.
+>>>>
+>>>> So the only problem is that the buffer size between source and target
+>>>> differ?
+>>>
+>>> The problem is that the target tries to access a non-existing buffer when 
+>>> committing all cmma value, so the kernel returns with EFAULT.
+>>>>
+>>
+>> Am I wrong or does CMMA migration code really not care about which parts
+>> of maxram are actually used (== which memory regions are actually defined)?
+>>
+>> If so, this looks broken to me and the right fix is to use ramsize for
+>> now, because it simply does not support maxram.
+>>
+>> (I assume using some -m X,maxmem=X+Y would make it fail in the same way)
+>>
+>> (this patch still makes sense and should be done)
+> 
+> I am looking for the minimal fix for 2.13 and ideally even for 2.12.1.
+> 
+> Can we agree on this fix and do the remaining thing later?
+> 
 
-Agreed.  In fact, my more ambitious series had reached that point by 
-implementing %% interpolation inside strings, combined with asserting 
-that %% cannot occur except within strings during the JSON parse, then 
-during the JSON interpolation that the only use of % within strings was 
-the %% escape (so that we no longer risk consuming a va-arg during 
-string interpolation, while still benefiting from gcc's -Wformat 
-checking).  So probably one of the easier things to revive, once this 
-series lands.
+Yes. The clean fix should then really only consider mapped memory
+regions (so the sending side should somehow iterate over them and also
+only access that memory).
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+
+Thanks,
+
+David / dhildenb
