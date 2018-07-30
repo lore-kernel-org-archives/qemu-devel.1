@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAyI-0000fu-83
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:24:35 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fkAyp-0001LO-NA
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:25:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAyH-00012i-DB
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:24:34 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:36481 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fkAyH-00012R-65
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:24:33 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 30 Jul 2018 18:12:16 +0200
-Message-Id: <1532967169-22265-44-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 43/76] target/mips: Add emulation of DSP ASE
- for nanoMIPS - part 6
+	(envelope-from <pm215@archaic.org.uk>) id 1fkAyo-0001D1-J8
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:25:07 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Jul 2018 17:24:58 +0100
+Message-Id: <20180730162458.23186-6-peter.maydell@linaro.org>
+In-Reply-To: <20180730162458.23186-1-peter.maydell@linaro.org>
+References: <20180730162458.23186-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 5/5] hw/arm/mps2: Wire up dual-timer in
+ mps2-an385 and mps2-an511
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +20,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+The MPS2 FPGA images for the Cortex-M3 (mps2-an385 and mps2-511)
+both include a CMSDK dual-timer module. Wire this up.
 
-Add emulation of DSP ASE instructions for nanoMIPS - part 6.
-
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/mips/translate.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ hw/arm/mps2.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 132e40e..5066eff 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -17543,6 +17543,61 @@ static void gen_pool32axf_4_nanomips_insn(DisasContext *ctx, uint32_t opc,
-     tcg_temp_free(v1_t);
- }
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index c3946da3173..b0125ca0ebf 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -34,6 +34,7 @@
+ #include "hw/misc/unimp.h"
+ #include "hw/char/cmsdk-apb-uart.h"
+ #include "hw/timer/cmsdk-apb-timer.h"
++#include "hw/timer/cmsdk-apb-dualtimer.h"
+ #include "hw/misc/mps2-scc.h"
+ #include "hw/devices.h"
+ #include "net/net.h"
+@@ -64,6 +65,7 @@ typedef struct {
+     MemoryRegion blockram_m3;
+     MemoryRegion sram;
+     MPS2SCC scc;
++    CMSDKAPBDualTimer dualtimer;
+ } MPS2MachineState;
  
-+static void gen_pool32axf_7_nanomips_insn(DisasContext *ctx, uint32_t opc,
-+                                          int ret, int v1, int v2)
-+{
-+    int16_t imm;
-+
-+    TCGv t0;
-+    TCGv v1_t;
-+
-+    t0 = tcg_temp_new();
-+    v1_t = tcg_temp_new();
-+
-+    gen_load_gpr(v1_t, v1);
-+
-+    switch (opc) {
-+    case NM_SHRA_R_QB:
-+        tcg_gen_movi_tl(t0, v2 >> 2);
-+        switch (extract32(ctx->opcode, 12, 1)) {
-+        case 0:
-+            /* NM_SHRA_QB */
-+            check_dspr2(ctx);
-+            gen_helper_shra_qb(cpu_gpr[ret], t0, v1_t);
-+            break;
-+        case 1:
-+            /* NM_SHRA_R_QB */
-+            check_dspr2(ctx);
-+            gen_helper_shra_r_qb(cpu_gpr[ret], t0, v1_t);
-+            break;
-+        }
-+        break;
-+    case NM_SHRL_PH:
-+        check_dspr2(ctx);
-+        tcg_gen_movi_tl(t0, v2 >> 1);
-+        gen_helper_shrl_ph(cpu_gpr[ret], t0, v1_t);
-+        break;
-+    case NM_REPL_QB:
-+        {
-+            check_dsp(ctx);
-+            target_long result;
-+            imm = extract32(ctx->opcode, 13, 8);
-+            result = (uint32_t)imm << 24 |
-+                     (uint32_t)imm << 16 |
-+                    (uint32_t)imm << 8  |
-+                     (uint32_t)imm;
-+            result = (int32_t)result;
-+            tcg_gen_movi_tl(cpu_gpr[ret], result);
-+        }
-+        break;
-+    default:
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    }
-+    tcg_temp_free(t0);
-+    tcg_temp_free(v1_t);
-+}
-+
+ #define TYPE_MPS2_MACHINE "mps2"
+@@ -296,6 +298,15 @@ static void mps2_common_init(MachineState *machine)
+     cmsdk_apb_timer_create(0x40000000, qdev_get_gpio_in(armv7m, 8), SYSCLK_FRQ);
+     cmsdk_apb_timer_create(0x40001000, qdev_get_gpio_in(armv7m, 9), SYSCLK_FRQ);
  
- static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
- {
-@@ -17644,6 +17699,10 @@ static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case NM_POOL32AXF_7:
-+        {
-+            int32_t op1 = extract32(ctx->opcode, 9, 3);
-+            gen_pool32axf_7_nanomips_insn(ctx, op1, rt, rs, rd);
-+        }
-         break;
-     default:
-         generate_exception_end(ctx, EXCP_RI);
++    sysbus_init_child_obj(OBJECT(mms), "dualtimer", &mms->dualtimer,
++                          sizeof(mms->dualtimer), TYPE_CMSDK_APB_DUALTIMER);
++    qdev_prop_set_uint32(DEVICE(&mms->dualtimer), "pclk-frq", SYSCLK_FRQ);
++    object_property_set_bool(OBJECT(&mms->dualtimer), true, "realized",
++                             &error_fatal);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&mms->dualtimer), 0,
++                       qdev_get_gpio_in(armv7m, 10));
++    sysbus_mmio_map(SYS_BUS_DEVICE(&mms->dualtimer), 0, 0x40002000);
++
+     object_initialize(&mms->scc, sizeof(mms->scc), TYPE_MPS2_SCC);
+     sccdev = DEVICE(&mms->scc);
+     qdev_set_parent_bus(sccdev, sysbus_get_default());
 -- 
-2.7.4
+2.17.1
