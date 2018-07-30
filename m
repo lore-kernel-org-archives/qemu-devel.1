@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fk3cO-0003Qr-TQ
+	(envelope-from <armbru@redhat.com>) id 1fk3cP-0003RV-9S
 	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fk3cJ-0004Zg-CM
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41606 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fk3cJ-0004Zy-PC
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51124 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fk3cJ-0004Y7-57
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fk3cJ-0004Yg-It
 	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:23 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 30 Jul 2018 10:33:16 +0200
-Message-Id: <20180730083317.11765-23-armbru@redhat.com>
+Date: Mon, 30 Jul 2018 10:33:07 +0200
+Message-Id: <20180730083317.11765-14-armbru@redhat.com>
 In-Reply-To: <20180730083317.11765-1-armbru@redhat.com>
 References: <20180730083317.11765-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 22/23] libqtest: Replace qtest_startf() by
- qtest_initf()
+Subject: [Qemu-devel] [PATCH v3 13/23] tests: Clean up string interpolation
+ around qtest_qmp_device_add()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,546 +27,404 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com
 
-qtest_init() creates a new QTestState, and leaves @global_qtest alone.
-qtest_start() additionally assigns it to @global_qtest, but
-qtest_startf() additionally assigns NULL to @global_qtest.  This makes
-no sense.  Replace it by qtest_initf() that works like qtest_init(),
-i.e. leaves @global_qtest alone.
+Leaving interpolation into JSON to qmp() is more robust than building
+QMP input manually, as explained in the commit before previous.
 
+qtest_qmp_device_add() and its wrappers interpolate into JSON as
+follows:
+
+* qtest_qmp_device_add() interpolates members into a JSON object.
+
+* So do its wrappers qpci_plug_device_test() and usb_test_hotplug().
+
+* usb_test_hotplug() additionally interpolates strings and numbers
+  into JSON strings.
+
+Clean them up:
+
+* Have qtest_qmp_device_add() take its extra device properties as
+  arguments for qdict_from_jsonf_nofail() instead of a string
+  containing JSON members.
+
+* Drop qpci_plug_device_test(), use qtest_qmp_device_add()
+  directly.
+
+* Change usb_test_hotplug() parameter @port to string, to avoid
+  interpolation.  Interpolate @hcd_id separately.
+
+Bonus: gets rid of a non-literal format string.  A step towards
+compile-time format string checking without triggering
+-Wformat-nonliteral.
+
+Cc: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/boot-order-test.c        |  8 ++++----
- tests/boot-serial-test.c       | 10 +++++-----
- tests/cdrom-test.c             |  6 +++---
- tests/endianness-test.c        | 24 ++++++++++++------------
- tests/ipmi-bt-test.c           |  2 +-
- tests/libqtest.c               |  9 ++++-----
- tests/libqtest.h               | 17 ++++++++---------
- tests/m25p80-test.c            |  6 +++---
- tests/m48t59-test.c            |  2 +-
- tests/machine-none-test.c      |  2 +-
- tests/numa-test.c              |  4 ++--
- tests/pnv-xscom-test.c         |  8 ++++----
- tests/prom-env-test.c          | 10 +++++-----
- tests/qmp-test.c               |  2 +-
- tests/sdhci-test.c             |  6 +++---
- tests/tco-test.c               |  6 +++---
- tests/test-filter-mirror.c     |  2 +-
- tests/test-filter-redirector.c |  4 ++--
- tests/virtio-balloon-test.c    |  4 ++--
- tests/virtio-blk-test.c        |  8 ++++----
- tests/virtio-console-test.c    | 12 ++++++------
- tests/virtio-serial-test.c     |  4 ++--
- tests/vmgenid-test.c           |  6 +++---
- 23 files changed, 80 insertions(+), 82 deletions(-)
+ tests/cpu-plug-test.c      |  7 ++++---
+ tests/e1000e-test.c        |  6 ++----
+ tests/ivshmem-test.c       |  8 +++-----
+ tests/libqos/pci.c         |  7 -------
+ tests/libqos/pci.h         |  2 --
+ tests/libqos/usb.c         | 10 ++++++----
+ tests/libqos/usb.h         |  2 +-
+ tests/libqtest.c           | 27 +++++++++++----------------
+ tests/libqtest.h           |  4 +++-
+ tests/usb-hcd-ehci-test.c  |  2 +-
+ tests/usb-hcd-ohci-test.c  |  2 +-
+ tests/usb-hcd-uhci-test.c  |  4 ++--
+ tests/usb-hcd-xhci-test.c  | 10 +++++-----
+ tests/virtio-blk-test.c    |  5 +++--
+ tests/virtio-net-test.c    |  3 ++-
+ tests/virtio-rng-test.c    |  3 ++-
+ tests/virtio-scsi-test.c   |  2 +-
+ tests/virtio-serial-test.c |  2 +-
+ 18 files changed, 48 insertions(+), 58 deletions(-)
 
-diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
-index 2ec86c0ee2..bf0702945b 100644
---- a/tests/boot-order-test.c
-+++ b/tests/boot-order-test.c
-@@ -30,10 +30,10 @@ static void test_a_boot_order(const char *machine,
- {
-     uint64_t actual;
+diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+index ab3bf6df90..f5d57da60e 100644
+--- a/tests/cpu-plug-test.c
++++ b/tests/cpu-plug-test.c
+@@ -88,8 +88,9 @@ static void test_plug_with_device_add_x86(gconstpointer data)
+         for (c = 0; c < td->cores; c++) {
+             for (t = 0; t < td->threads; t++) {
+                 char *id = g_strdup_printf("id-%i-%i-%i", s, c, t);
+-                qtest_qmp_device_add(td->device_model, id, "'socket-id':%u, "
+-                                     "'core-id':%u, 'thread-id':%u",
++                qtest_qmp_device_add(td->device_model, id,
++                                     "{'socket-id':%u, 'core-id':%u,"
++                                     " 'thread-id':%u}",
+                                      s, c, t);
+                 g_free(id);
+             }
+@@ -114,7 +115,7 @@ static void test_plug_with_device_add_coreid(gconstpointer data)
  
--    global_qtest = qtest_startf("-nodefaults%s%s %s",
--                                machine ? " -M " : "",
--                                machine ?: "",
--                                test_args);
-+    global_qtest = qtest_initf("-nodefaults%s%s %s",
-+                               machine ? " -M " : "",
-+                               machine ?: "",
-+                               test_args);
-     actual = read_boot_order();
-     g_assert_cmphex(actual, ==, expected_boot);
-     qobject_unref(qmp("{ 'execute': 'system_reset' }"));
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index 952a2e7ead..1355df924d 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -172,11 +172,11 @@ static void test_machine(const void *data)
-      * Make sure that this test uses tcg if available: It is used as a
-      * fast-enough smoketest for that.
-      */
--    global_qtest = qtest_startf("%s %s -M %s,accel=tcg:kvm "
--                                "-chardev file,id=serial0,path=%s "
--                                "-no-shutdown -serial chardev:serial0 %s",
--                                codeparam, code ? codetmp : "",
--                                test->machine, serialtmp, test->extra);
-+    global_qtest = qtest_initf("%s %s -M %s,accel=tcg:kvm "
-+                               "-chardev file,id=serial0,path=%s "
-+                               "-no-shutdown -serial chardev:serial0 %s",
-+                               codeparam, code ? codetmp : "",
-+                               test->machine, serialtmp, test->extra);
-     if (code) {
-         unlink(codetmp);
+     for (c = td->cores; c < td->maxcpus / td->sockets / td->threads; c++) {
+         char *id = g_strdup_printf("id-%i", c);
+-        qtest_qmp_device_add(td->device_model, id, "'core-id':%u", c);
++        qtest_qmp_device_add(td->device_model, id, "{'core-id':%u}", c);
+         g_free(id);
      }
-diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
-index 7a1fce5dfb..9b43dc9ab4 100644
---- a/tests/cdrom-test.c
-+++ b/tests/cdrom-test.c
-@@ -99,7 +99,7 @@ static void test_cdrom_param(gconstpointer data)
-     QTestState *qts;
-     char *resp;
  
--    qts = qtest_startf("-M %s -cdrom %s", (const char *)data, isoimage);
-+    qts = qtest_initf("-M %s -cdrom %s", (const char *)data, isoimage);
-     resp = qtest_hmp(qts, "info block");
-     g_assert(strstr(resp, isoimage) != 0);
-     g_free(resp);
-@@ -120,8 +120,8 @@ static void test_cdboot(gconstpointer data)
+diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
+index 32aa738b72..c9408a5d1f 100644
+--- a/tests/e1000e-test.c
++++ b/tests/e1000e-test.c
+@@ -456,12 +456,10 @@ static void test_e1000e_multiple_transfers(gconstpointer data)
+ 
+ static void test_e1000e_hotplug(gconstpointer data)
  {
-     QTestState *qts;
+-    static const uint8_t slot = 0x06;
+-
+     qtest_start("-device e1000e");
  
--    qts = qtest_startf("-accel kvm:tcg -no-shutdown %s%s", (const char *)data,
--                       isoimage);
-+    qts = qtest_initf("-accel kvm:tcg -no-shutdown %s%s", (const char *)data,
-+                      isoimage);
-     boot_sector_test(qts);
-     qtest_quit(qts);
+-    qpci_plug_device_test("e1000e", "e1000e_net", slot, NULL);
+-    qpci_unplug_acpi_device_test("e1000e_net", slot);
++    qtest_qmp_device_add("e1000e", "e1000e_net", "{'addr': '0x06'}");
++    qpci_unplug_acpi_device_test("e1000e_net", 0x06);
+ 
+     qtest_end();
  }
-diff --git a/tests/endianness-test.c b/tests/endianness-test.c
-index 546e0969e4..48680cd131 100644
---- a/tests/endianness-test.c
-+++ b/tests/endianness-test.c
-@@ -115,10 +115,10 @@ static void test_endianness(gconstpointer data)
+diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+index 9b407a3e42..c37b196b32 100644
+--- a/tests/ivshmem-test.c
++++ b/tests/ivshmem-test.c
+@@ -420,19 +420,17 @@ static void test_ivshmem_server_irq(void)
+ static void test_ivshmem_hotplug(void)
  {
-     const TestCase *test = data;
+     const char *arch = qtest_get_arch();
+-    gchar *opts;
  
--    global_qtest = qtest_startf("-M %s%s%s -device pc-testdev",
--                                test->machine,
--                                test->superio ? " -device " : "",
--                                test->superio ?: "");
-+    global_qtest = qtest_initf("-M %s%s%s -device pc-testdev",
-+                               test->machine,
-+                               test->superio ? " -device " : "",
-+                               test->superio ?: "");
-     isa_outl(test, 0xe0, 0x87654321);
-     g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87654321);
-     g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8765);
-@@ -187,10 +187,10 @@ static void test_endianness_split(gconstpointer data)
+     qtest_start("");
+ 
+-    opts = g_strdup_printf("'shm': '%s', 'size': '1M'", tmpshm);
+-
+-    qpci_plug_device_test("ivshmem", "iv1", PCI_SLOT_HP, opts);
++    qtest_qmp_device_add("ivshmem",
++                         "iv1", "{'addr': %s, 'shm': %s, 'size': '1M'}",
++                         stringify(PCI_SLOT_HP), tmpshm);
+     if (strcmp(arch, "ppc64") != 0) {
+         qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
+     }
+ 
+     qtest_end();
+-    g_free(opts);
+ }
+ 
+ static void test_ivshmem_memdev(void)
+diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
+index 0b73cb23d0..e8c342c257 100644
+--- a/tests/libqos/pci.c
++++ b/tests/libqos/pci.c
+@@ -395,10 +395,3 @@ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr)
+     QPCIBar bar = { .addr = addr };
+     return bar;
+ }
+-
+-void qpci_plug_device_test(const char *driver, const char *id,
+-                           uint8_t slot, const char *opts)
+-{
+-    qtest_qmp_device_add(driver, id, "'addr': '%d'%s%s", slot,
+-                         opts ? ", " : "", opts ? opts : "");
+-}
+diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
+index 429c382282..0b7e936174 100644
+--- a/tests/libqos/pci.h
++++ b/tests/libqos/pci.h
+@@ -109,7 +109,5 @@ QPCIBar qpci_iomap(QPCIDevice *dev, int barno, uint64_t *sizeptr);
+ void qpci_iounmap(QPCIDevice *dev, QPCIBar addr);
+ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr);
+ 
+-void qpci_plug_device_test(const char *driver, const char *id,
+-                           uint8_t slot, const char *opts);
+ void qpci_unplug_acpi_device_test(const char *id, uint8_t slot);
+ #endif
+diff --git a/tests/libqos/usb.c b/tests/libqos/usb.c
+index 2a476049a8..49e2f4bc0a 100644
+--- a/tests/libqos/usb.c
++++ b/tests/libqos/usb.c
+@@ -37,13 +37,14 @@ void uhci_port_test(struct qhc *hc, int port, uint16_t expect)
+     g_assert((value & mask) == (expect & mask));
+ }
+ 
+-void usb_test_hotplug(const char *hcd_id, const int port,
++void usb_test_hotplug(const char *hcd_id, const char *port,
+                       void (*port_check)(void))
  {
-     const TestCase *test = data;
+-    char  *id = g_strdup_printf("usbdev%d", port);
++    char *id = g_strdup_printf("usbdev%s", port);
++    char *bus = g_strdup_printf("%s.0", hcd_id);
  
--    global_qtest = qtest_startf("-M %s%s%s -device pc-testdev",
--                                test->machine,
--                                test->superio ? " -device " : "",
--                                test->superio ?: "");
-+    global_qtest = qtest_initf("-M %s%s%s -device pc-testdev",
-+                               test->machine,
-+                               test->superio ? " -device " : "",
-+                               test->superio ?: "");
-     isa_outl(test, 0xe8, 0x87654321);
-     g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87654321);
-     g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8765);
-@@ -231,10 +231,10 @@ static void test_endianness_combine(gconstpointer data)
- {
-     const TestCase *test = data;
+-    qtest_qmp_device_add("usb-tablet", id, "'port': '%d', 'bus': '%s.0'",
+-                         port, hcd_id);
++    qtest_qmp_device_add("usb-tablet", id, "{'port': %s, 'bus': %s}",
++                         port, bus);
  
--    global_qtest = qtest_startf("-M %s%s%s -device pc-testdev",
--                                test->machine,
--                                test->superio ? " -device " : "",
--                                test->superio ?: "");
-+    global_qtest = qtest_initf("-M %s%s%s -device pc-testdev",
-+                               test->machine,
-+                               test->superio ? " -device " : "",
-+                               test->superio ?: "");
-     isa_outl(test, 0xe0, 0x87654321);
-     g_assert_cmphex(isa_inl(test, 0xe8), ==, 0x87654321);
-     g_assert_cmphex(isa_inw(test, 0xea), ==, 0x8765);
-diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
-index 8be18e3f42..f4a81b5265 100644
---- a/tests/ipmi-bt-test.c
-+++ b/tests/ipmi-bt-test.c
-@@ -414,7 +414,7 @@ int main(int argc, char **argv)
-     /* Run the tests */
-     g_test_init(&argc, &argv, NULL);
+     if (port_check) {
+         port_check();
+@@ -51,5 +52,6 @@ void usb_test_hotplug(const char *hcd_id, const int port,
  
--    global_qtest = qtest_startf(
-+    global_qtest = qtest_initf(
-         " -chardev socket,id=ipmi0,host=localhost,port=%d,reconnect=10"
-         " -device ipmi-bmc-extern,chardev=ipmi0,id=bmc0"
-         " -device isa-ipmi-bt,bmc=bmc0", emu_port);
+     qtest_qmp_device_del(id);
+ 
++    g_free(bus);
+     g_free(id);
+ }
+diff --git a/tests/libqos/usb.h b/tests/libqos/usb.h
+index 297cfc564d..c506418a13 100644
+--- a/tests/libqos/usb.h
++++ b/tests/libqos/usb.h
+@@ -13,6 +13,6 @@ void qusb_pci_init_one(QPCIBus *pcibus, struct qhc *hc,
+ void uhci_port_test(struct qhc *hc, int port, uint16_t expect);
+ void uhci_deinit(struct qhc *hc);
+ 
+-void usb_test_hotplug(const char *bus_name, const int port,
++void usb_test_hotplug(const char *bus_name, const char *port,
+                       void (*port_check)(void));
+ #endif
 diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 2f81bc6382..a0d44793fa 100644
+index e36cc5ede3..dfca3af89d 100644
 --- a/tests/libqtest.c
 +++ b/tests/libqtest.c
-@@ -259,24 +259,23 @@ QTestState *qtest_init(const char *extra_args)
-     return s;
- }
- 
--QTestState *qtest_vstartf(const char *fmt, va_list ap)
-+QTestState *qtest_vinitf(const char *fmt, va_list ap)
+@@ -1032,26 +1032,21 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
+ /*
+  * Generic hot-plugging test via the device_add QMP command.
+  */
+-void qtest_qmp_device_add(const char *driver, const char *id, const char *fmt,
+-                          ...)
++void qtest_qmp_device_add(const char *driver, const char *id,
++                          const char *fmt, ...)
  {
-     char *args = g_strdup_vprintf(fmt, ap);
-     QTestState *s;
+-    QDict *response;
+-    char *cmd, *opts = NULL;
+-    va_list va;
++    QDict *args, *response;
++    va_list ap;
  
--    s = qtest_start(args);
-+    s = qtest_init(args);
-     g_free(args);
--    global_qtest = NULL;
-     return s;
- }
+-    if (fmt) {
+-        va_start(va, fmt);
+-        opts = g_strdup_vprintf(fmt, va);
+-        va_end(va);
+-    }
++    va_start(ap, fmt);
++    args = qdict_from_vjsonf_nofail(fmt, ap);
++    va_end(ap);
  
--QTestState *qtest_startf(const char *fmt, ...)
-+QTestState *qtest_initf(const char *fmt, ...)
- {
-     va_list ap;
-     QTestState *s;
+-    cmd = g_strdup_printf("{'execute': 'device_add',"
+-                          " 'arguments': { 'driver': '%s', 'id': '%s'%s%s }}",
+-                          driver, id, opts ? ", " : "", opts ? opts : "");
+-    g_free(opts);
++    g_assert(!qdict_haskey(args, "driver") && !qdict_haskey(args, "id"));
++    qdict_put_str(args, "driver", driver);
++    qdict_put_str(args, "id", id);
  
-     va_start(ap, fmt);
--    s = qtest_vstartf(fmt, ap);
-+    s = qtest_vinitf(fmt, ap);
-     va_end(ap);
-     return s;
- }
+-    response = qmp(cmd);
+-    g_free(cmd);
++    response = qmp("{'execute': 'device_add', 'arguments': %p}", args);
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "event")); /* We don't expect any events */
+     g_assert(!qdict_haskey(response, "error"));
 diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 58dea82c76..3848086928 100644
+index a67e5e34eb..ce6c092fc9 100644
 --- a/tests/libqtest.h
 +++ b/tests/libqtest.h
-@@ -22,33 +22,32 @@ typedef struct QTestState QTestState;
- extern QTestState *global_qtest;
- 
- /**
-- * qtest_startf:
-+ * qtest_initf:
-  * @fmt...: Format for creating other arguments to pass to QEMU, formatted
-  * like sprintf().
+@@ -976,7 +976,9 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine));
+  * qtest_qmp_device_add:
+  * @driver: Name of the device that should be added
+  * @id: Identification string
+- * @fmt: printf-like format string for further options to device_add
++ * @fmt...: QMP message to send to qemu, formatted like
++ * qobject_from_jsonf_nofail().
++ * Only understands '%((l|ll|I64)?d|[ipsf])', see parse_escape().
   *
-- * Start QEMU and return the resulting #QTestState (but unlike qtest_start(),
-- * #global_qtest is left at NULL).
-+ * Convenience wrapper around qtest_start().
-  *
-  * Returns: #QTestState instance.
+  * Generic hot-plugging test via the device_add QMP command.
   */
--QTestState *qtest_startf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-+QTestState *qtest_initf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+diff --git a/tests/usb-hcd-ehci-test.c b/tests/usb-hcd-ehci-test.c
+index 55d4743a2a..f28ea27f37 100644
+--- a/tests/usb-hcd-ehci-test.c
++++ b/tests/usb-hcd-ehci-test.c
+@@ -139,7 +139,7 @@ static void pci_ehci_port_3_hotplug(void)
  
- /**
-- * qtest_vstartf:
-+ * qtest_vinitf:
-  * @fmt: Format for creating other arguments to pass to QEMU, formatted
-  * like vsprintf().
-  * @ap: Format arguments.
-  *
-- * Start QEMU and return the resulting #QTestState (but unlike qtest_start(),
-- * #global_qtest is left at NULL).
-+ * Convenience wrapper around qtest_start().
-  *
-  * Returns: #QTestState instance.
-  */
--QTestState *qtest_vstartf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
-+QTestState *qtest_vinitf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
- 
- /**
-  * qtest_init:
-- * @extra_args: other arguments to pass to QEMU.
-+ * @extra_args: other arguments to pass to QEMU.  CAUTION: these
-+ * arguments are subject to word splitting and shell evaluation.
-  *
-  * Returns: #QTestState instance.
-  */
-diff --git a/tests/m25p80-test.c b/tests/m25p80-test.c
-index c276e738e9..055f7246a8 100644
---- a/tests/m25p80-test.c
-+++ b/tests/m25p80-test.c
-@@ -363,9 +363,9 @@ int main(int argc, char **argv)
-     g_assert(ret == 0);
-     close(fd);
- 
--    global_qtest = qtest_startf("-m 256 -machine palmetto-bmc "
--                                "-drive file=%s,format=raw,if=mtd",
--                                tmp_path);
-+    global_qtest = qtest_initf("-m 256 -machine palmetto-bmc "
-+                               "-drive file=%s,format=raw,if=mtd",
-+                               tmp_path);
- 
-     qtest_add_func("/m25p80/read_jedec", test_read_jedec);
-     qtest_add_func("/m25p80/erase_sector", test_erase_sector);
-diff --git a/tests/m48t59-test.c b/tests/m48t59-test.c
-index 5b695971c7..4abf9c605c 100644
---- a/tests/m48t59-test.c
-+++ b/tests/m48t59-test.c
-@@ -146,7 +146,7 @@ static void cmos_get_date_time(QTestState *s, struct tm *date)
- 
- static QTestState *m48t59_qtest_start(void)
+ static void pci_ehci_port_hotplug(void)
  {
--    return qtest_startf("-M %s -rtc clock=vm", base_machine);
-+    return qtest_initf("-M %s -rtc clock=vm", base_machine);
+-    usb_test_hotplug("ich9-ehci-1", 3, pci_ehci_port_3_hotplug);
++    usb_test_hotplug("ich9-ehci-1", "3", pci_ehci_port_3_hotplug);
  }
  
- static void bcd_check_time(void)
-diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-index f286557b3e..7e72466354 100644
---- a/tests/machine-none-test.c
-+++ b/tests/machine-none-test.c
-@@ -84,7 +84,7 @@ static void test_machine_cpu_cli(void)
-         }
-         return; /* TODO: die here to force all targets have a test */
-     }
--    global_qtest = qtest_startf("-machine none -cpu '%s'", cpu_model);
-+    global_qtest = qtest_initf("-machine none -cpu '%s'", cpu_model);
  
-     response = qmp("{ 'execute': 'quit' }");
-     g_assert(qdict_haskey(response, "return"));
-diff --git a/tests/numa-test.c b/tests/numa-test.c
-index 893f826acb..9824fdd587 100644
---- a/tests/numa-test.c
-+++ b/tests/numa-test.c
-@@ -267,8 +267,8 @@ static void pc_dynamic_cpu_cfg(const void *data)
-     QList *cpus;
-     QTestState *qs;
+diff --git a/tests/usb-hcd-ohci-test.c b/tests/usb-hcd-ohci-test.c
+index 4758813d78..48ddbfd26d 100644
+--- a/tests/usb-hcd-ohci-test.c
++++ b/tests/usb-hcd-ohci-test.c
+@@ -19,7 +19,7 @@ static void test_ohci_init(void)
  
--    qs = qtest_startf("%s %s", data ? (char *)data : "",
--                              "-nodefaults --preconfig -smp 2");
-+    qs = qtest_initf("%s -nodefaults --preconfig -smp 2",
-+                     data ? (char *)data : "");
- 
-     /* create 2 numa nodes */
-     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
-index efb7c838b5..70f4c84d1b 100644
---- a/tests/pnv-xscom-test.c
-+++ b/tests/pnv-xscom-test.c
-@@ -79,8 +79,8 @@ static void test_cfam_id(const void *data)
+ static void test_ohci_hotplug(void)
  {
-     const PnvChip *chip = data;
- 
--    global_qtest = qtest_startf("-M powernv,accel=tcg -cpu %s",
--                                chip->cpu_model);
-+    global_qtest = qtest_initf("-M powernv,accel=tcg -cpu %s",
-+                               chip->cpu_model);
-     test_xscom_cfam_id(chip);
-     qtest_quit(global_qtest);
+-    usb_test_hotplug("ohci", 1, NULL);
++    usb_test_hotplug("ohci", "1", NULL);
  }
-@@ -114,8 +114,8 @@ static void test_core(const void *data)
- {
-     const PnvChip *chip = data;
  
--    global_qtest = qtest_startf("-M powernv,accel=tcg -cpu %s",
--                                chip->cpu_model);
-+    global_qtest = qtest_initf("-M powernv,accel=tcg -cpu %s",
-+                               chip->cpu_model);
-     test_xscom_core(chip);
-     qtest_quit(global_qtest);
+ int main(int argc, char **argv)
+diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
+index 6a7e5a2fed..a119d6d5c8 100644
+--- a/tests/usb-hcd-uhci-test.c
++++ b/tests/usb-hcd-uhci-test.c
+@@ -43,12 +43,12 @@ static void test_port_2(void)
+ 
+ static void test_uhci_hotplug(void)
+ {
+-    usb_test_hotplug("uhci", 2, test_port_2);
++    usb_test_hotplug("uhci", "2", test_port_2);
  }
-diff --git a/tests/prom-env-test.c b/tests/prom-env-test.c
-index 8c867e631a..198d007f1b 100644
---- a/tests/prom-env-test.c
-+++ b/tests/prom-env-test.c
-@@ -49,11 +49,11 @@ static void test_machine(const void *machine)
-     /* The pseries firmware boots much faster without the default devices */
-     extra_args = strcmp(machine, "pseries") == 0 ? "-nodefaults" : "";
  
--    global_qtest = qtest_startf("-M %s,accel=tcg %s "
--                                "-prom-env 'use-nvramrc?=true' "
--                                "-prom-env 'nvramrc=%x %x l!' ",
--                                (const char *)machine, extra_args,
--                                MAGIC, ADDRESS);
-+    global_qtest = qtest_initf("-M %s,accel=tcg %s "
-+                               "-prom-env 'use-nvramrc?=true' "
-+                               "-prom-env 'nvramrc=%x %x l!' ",
-+                               (const char *)machine, extra_args,
-+                               MAGIC, ADDRESS);
-     check_guest_memory();
-     qtest_quit(global_qtest);
+ static void test_usb_storage_hotplug(void)
+ {
+-    qtest_qmp_device_add("usb-storage", "usbdev0", "'drive': 'drive0'");
++    qtest_qmp_device_add("usb-storage", "usbdev0", "{'drive': 'drive0'}");
+ 
+     qtest_qmp_device_del("usbdev0");
  }
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 5eb15daebc..487ef946ed 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -436,7 +436,7 @@ static void add_query_tests(QmpSchema *schema)
- static void test_qmp_preconfig(void)
+diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
+index 5b1b681bf2..9eb24b00e4 100644
+--- a/tests/usb-hcd-xhci-test.c
++++ b/tests/usb-hcd-xhci-test.c
+@@ -18,13 +18,13 @@ static void test_xhci_init(void)
+ 
+ static void test_xhci_hotplug(void)
  {
-     QDict *rsp, *ret;
--    QTestState *qs = qtest_startf("%s --preconfig", common_args);
-+    QTestState *qs = qtest_initf("%s --preconfig", common_args);
+-    usb_test_hotplug("xhci", 1, NULL);
++    usb_test_hotplug("xhci", "1", NULL);
+ }
  
-     /* preconfig state */
-     /* enabled commands, no error expected  */
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index 1d825eb010..982f5ebbb2 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -184,8 +184,8 @@ static QSDHCI *machine_start(const struct sdhci_t *test)
-         uint16_t vendor_id, device_id;
-         uint64_t barsize;
- 
--        global_qtest = qtest_startf("-machine %s -device sdhci-pci",
--                                    test->machine);
-+        global_qtest = qtest_initf("-machine %s -device sdhci-pci",
-+                                   test->machine);
- 
-         s->pci.bus = qpci_init_pc(global_qtest, NULL);
- 
-@@ -200,7 +200,7 @@ static QSDHCI *machine_start(const struct sdhci_t *test)
-         qpci_device_enable(s->pci.dev);
-     } else {
-         /* SysBus */
--        global_qtest = qtest_startf("-machine %s", test->machine);
-+        global_qtest = qtest_initf("-machine %s", test->machine);
-         s->addr = test->sdhci.addr;
-     }
- 
-diff --git a/tests/tco-test.c b/tests/tco-test.c
-index 9945fb8469..6bee9a37d3 100644
---- a/tests/tco-test.c
-+++ b/tests/tco-test.c
-@@ -58,9 +58,9 @@ static void test_init(TestData *d)
+ static void test_usb_uas_hotplug(void)
  {
-     QTestState *qs;
+-    qtest_qmp_device_add("usb-uas", "uas", NULL);
+-    qtest_qmp_device_add("scsi-hd", "scsihd", "'drive': 'drive0'");
++    qtest_qmp_device_add("usb-uas", "uas", "{}");
++    qtest_qmp_device_add("scsi-hd", "scsihd", "{'drive': 'drive0'}");
  
--    qs = qtest_startf("-machine q35 %s %s",
--                      d->noreboot ? "" : "-global ICH9-LPC.noreboot=false",
--                      !d->args ? "" : d->args);
-+    qs = qtest_initf("-machine q35 %s %s",
-+                     d->noreboot ? "" : "-global ICH9-LPC.noreboot=false",
-+                     !d->args ? "" : d->args);
-     global_qtest = qs;
-     qtest_irq_intercept_in(qs, "ioapic");
+     /* TODO:
+         UAS HBA driver in libqos, to check that
+@@ -37,10 +37,10 @@ static void test_usb_uas_hotplug(void)
  
-diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
-index 1ab4759b80..1d66b5dbb0 100644
---- a/tests/test-filter-mirror.c
-+++ b/tests/test-filter-mirror.c
-@@ -37,7 +37,7 @@ static void test_mirror(void)
-     ret = mkstemp(sock_path);
-     g_assert_cmpint(ret, !=, -1);
+ static void test_usb_ccid_hotplug(void)
+ {
+-    qtest_qmp_device_add("usb-ccid", "ccid", NULL);
++    qtest_qmp_device_add("usb-ccid", "ccid", "{}");
+     qtest_qmp_device_del("ccid");
+     /* check the device can be added again */
+-    qtest_qmp_device_add("usb-ccid", "ccid", NULL);
++    qtest_qmp_device_add("usb-ccid", "ccid", "{}");
+     qtest_qmp_device_del("ccid");
+ }
  
--    global_qtest = qtest_startf(
-+    global_qtest = qtest_initf(
-         "-netdev socket,id=qtest-bn0,fd=%d "
-         "-device %s,netdev=qtest-bn0,id=qtest-e0 "
-         "-chardev socket,id=mirror0,path=%s,server,nowait "
-diff --git a/tests/test-filter-redirector.c b/tests/test-filter-redirector.c
-index 5b6c594867..934ddee427 100644
---- a/tests/test-filter-redirector.c
-+++ b/tests/test-filter-redirector.c
-@@ -87,7 +87,7 @@ static void test_redirector_tx(void)
-     ret = mkstemp(sock_path1);
-     g_assert_cmpint(ret, !=, -1);
- 
--    global_qtest = qtest_startf(
-+    global_qtest = qtest_initf(
-         "-netdev socket,id=qtest-bn0,fd=%d "
-         "-device %s,netdev=qtest-bn0,id=qtest-e0 "
-         "-chardev socket,id=redirector0,path=%s,server,nowait "
-@@ -156,7 +156,7 @@ static void test_redirector_rx(void)
-     ret = mkstemp(sock_path1);
-     g_assert_cmpint(ret, !=, -1);
- 
--    global_qtest = qtest_startf(
-+    global_qtest = qtest_initf(
-         "-netdev socket,id=qtest-bn0,fd=%d "
-         "-device %s,netdev=qtest-bn0,id=qtest-e0 "
-         "-chardev socket,id=redirector0,path=%s,server,nowait "
-diff --git a/tests/virtio-balloon-test.c b/tests/virtio-balloon-test.c
-index 0a07e036bb..5a1d0ccbb7 100644
---- a/tests/virtio-balloon-test.c
-+++ b/tests/virtio-balloon-test.c
-@@ -23,8 +23,8 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/virtio/balloon/nop", balloon_nop);
- 
--    global_qtest = qtest_startf("-device virtio-balloon-%s",
--                                qvirtio_get_dev_type());
-+    global_qtest = qtest_initf("-device virtio-balloon-%s",
-+                               qvirtio_get_dev_type());
-     ret = g_test_run();
- 
-     qtest_end();
 diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 5955bf6d57..d9893516bb 100644
+index 9be9ffb378..d96b4c69e1 100644
 --- a/tests/virtio-blk-test.c
 +++ b/tests/virtio-blk-test.c
-@@ -90,10 +90,10 @@ static void arm_test_start(void)
+@@ -662,8 +662,9 @@ static void pci_hotplug(void)
+     qs = pci_test_start();
  
-     tmp_path = drive_create();
+     /* plug secondary disk */
+-    qpci_plug_device_test("virtio-blk-pci", "drv1", PCI_SLOT_HP,
+-                          "'drive': 'drive1'");
++    qtest_qmp_device_add("virtio-blk-pci", "drv1",
++                         "{'addr': %s, 'drive': 'drive1'}",
++                         stringify(PCI_SLOT_HP));
  
--    global_qtest = qtest_startf("-machine virt "
--                                "-drive if=none,id=drive0,file=%s,format=raw "
--                                "-device virtio-blk-device,drive=drive0",
--                                tmp_path);
-+    global_qtest = qtest_initf("-machine virt "
-+                               "-drive if=none,id=drive0,file=%s,format=raw "
-+                               "-device virtio-blk-device,drive=drive0",
-+                               tmp_path);
-     unlink(tmp_path);
-     g_free(tmp_path);
- }
-diff --git a/tests/virtio-console-test.c b/tests/virtio-console-test.c
-index 945bae5a15..a7c6f167c3 100644
---- a/tests/virtio-console-test.c
-+++ b/tests/virtio-console-test.c
-@@ -14,17 +14,17 @@
- /* Tests only initialization so far. TODO: Replace with functional tests */
- static void console_nop(void)
+     dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT_HP);
+     g_assert(dev);
+diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
+index b285a262e9..dcb87a8b6e 100644
+--- a/tests/virtio-net-test.c
++++ b/tests/virtio-net-test.c
+@@ -249,7 +249,8 @@ static void hotplug(void)
+ 
+     qtest_start("-device virtio-net-pci");
+ 
+-    qpci_plug_device_test("virtio-net-pci", "net1", PCI_SLOT_HP, NULL);
++    qtest_qmp_device_add("virtio-net-pci", "net1",
++                         "{'addr': %s}", stringify(PCI_SLOT_HP));
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         qpci_unplug_acpi_device_test("net1", PCI_SLOT_HP);
+diff --git a/tests/virtio-rng-test.c b/tests/virtio-rng-test.c
+index dcecf77463..657d9a4105 100644
+--- a/tests/virtio-rng-test.c
++++ b/tests/virtio-rng-test.c
+@@ -22,7 +22,8 @@ static void hotplug(void)
  {
--    global_qtest = qtest_startf("-device virtio-serial-%s,id=vser0 "
--                                "-device virtconsole,bus=vser0.0",
--                                qvirtio_get_dev_type());
-+    global_qtest = qtest_initf("-device virtio-serial-%s,id=vser0 "
-+                               "-device virtconsole,bus=vser0.0",
-+                               qvirtio_get_dev_type());
-     qtest_end();
- }
+     const char *arch = qtest_get_arch();
  
- static void serialport_nop(void)
- {
--    global_qtest = qtest_startf("-device virtio-serial-%s,id=vser0 "
--                                "-device virtserialport,bus=vser0.0",
--                                qvirtio_get_dev_type());
-+    global_qtest = qtest_initf("-device virtio-serial-%s,id=vser0 "
-+                               "-device virtserialport,bus=vser0.0",
-+                               qvirtio_get_dev_type());
-     qtest_end();
- }
+-    qpci_plug_device_test("virtio-rng-pci", "rng1", PCI_SLOT_HP, NULL);
++    qtest_qmp_device_add("virtio-rng-pci", "rng1",
++                         "{'addr': %s}", stringify(PCI_SLOT_HP));
  
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         qpci_unplug_acpi_device_test("rng1", PCI_SLOT_HP);
+diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
+index 037872bb98..0d4f25d369 100644
+--- a/tests/virtio-scsi-test.c
++++ b/tests/virtio-scsi-test.c
+@@ -199,7 +199,7 @@ static void hotplug(void)
+ 
+     qs = qvirtio_scsi_start(
+             "-drive id=drv1,if=none,file=null-co://,format=raw");
+-    qtest_qmp_device_add("scsi-hd", "scsihd", "'drive': 'drv1'");
++    qtest_qmp_device_add("scsi-hd", "scsihd", "{'drive': 'drv1'}");
+     qtest_qmp_device_del("scsihd");
+     qvirtio_scsi_stop(qs);
+ }
 diff --git a/tests/virtio-serial-test.c b/tests/virtio-serial-test.c
-index e4b18b1c8a..8da9980a24 100644
+index 7cc7060264..e4b18b1c8a 100644
 --- a/tests/virtio-serial-test.c
 +++ b/tests/virtio-serial-test.c
-@@ -31,8 +31,8 @@ int main(int argc, char **argv)
-     qtest_add_func("/virtio/serial/nop", virtio_serial_nop);
-     qtest_add_func("/virtio/serial/hotplug", hotplug);
+@@ -18,7 +18,7 @@ static void virtio_serial_nop(void)
  
--    global_qtest = qtest_startf("-device virtio-serial-%s",
--                                qvirtio_get_dev_type());
-+    global_qtest = qtest_initf("-device virtio-serial-%s",
-+                               qvirtio_get_dev_type());
-     ret = g_test_run();
- 
-     qtest_end();
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index 8d915c610c..0a6fb55f2e 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -142,7 +142,7 @@ static void vmgenid_set_guid_test(void)
- 
-     g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
- 
--    global_qtest = qtest_startf(GUID_CMD(VGID_GUID));
-+    global_qtest = qtest_initf(GUID_CMD(VGID_GUID));
- 
-     /* Read the GUID from accessing guest memory */
-     read_guid_from_memory(&measured);
-@@ -155,7 +155,7 @@ static void vmgenid_set_guid_auto_test(void)
+ static void hotplug(void)
  {
-     QemuUUID measured;
+-    qtest_qmp_device_add("virtserialport", "hp-port", NULL);
++    qtest_qmp_device_add("virtserialport", "hp-port", "{}");
  
--    global_qtest = qtest_startf(GUID_CMD("auto"));
-+    global_qtest = qtest_initf(GUID_CMD("auto"));
- 
-     read_guid_from_memory(&measured);
- 
-@@ -171,7 +171,7 @@ static void vmgenid_query_monitor_test(void)
- 
-     g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
- 
--    global_qtest = qtest_startf(GUID_CMD(VGID_GUID));
-+    global_qtest = qtest_initf(GUID_CMD(VGID_GUID));
- 
-     /* Read the GUID via the monitor */
-     read_guid_from_monitor(&measured);
+     qtest_qmp_device_del("hp-port");
+ }
 -- 
 2.17.1
