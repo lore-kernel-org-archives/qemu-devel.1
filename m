@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fkC5N-0003Va-0m
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:35:57 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fkCCR-0000O4-VZ
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:43:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fkC5J-0000Xh-D5
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:35:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45830 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fkC5J-0000XQ-8t
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:35:53 -0400
-Date: Mon, 30 Jul 2018 20:35:48 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180730203315-mutt-send-email-mst@kernel.org>
-References: <20180717222721.14019.27548.stgit@gimli.home>
-	<20180730163123-mutt-send-email-mst@kernel.org>
-	<20180730083939.23f3b9cc@t450s.home>
-	<20180730174601-mutt-send-email-mst@kernel.org>
-	<20180730090137.15917879@t450s.home>
-	<20180730182951-mutt-send-email-mst@kernel.org>
-	<20180730104205.1fb5a826@t450s.home>
+	(envelope-from <jsnow@redhat.com>) id 1fkCCR-0005Or-3P
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:43:15 -0400
+References: <20180723222210.11077-1-jsnow@redhat.com>
+	<153297036163.12997.1309407319525391577@sif>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <a55c92c1-d36f-8e56-5699-e5394399d2ae@redhat.com>
+Date: Mon, 30 Jul 2018 13:43:08 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180730104205.1fb5a826@t450s.home>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
+In-Reply-To: <153297036163.12997.1309407319525391577@sif>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.0 0/7] fix persistent bitmaps
+ migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Mon, Jul 30, 2018 at 10:42:05AM -0600, Alex Williamson wrote:
-> On Mon, 30 Jul 2018 18:49:58 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Mon, Jul 30, 2018 at 09:01:37AM -0600, Alex Williamson wrote:
-> > > > > but I don't think it can be done
-> > > > > atomically with respect to inflight DMA of a physical device where we
-> > > > > cannot halt the device without interfering with its state.    
-> > > > 
-> > > > Guests never add pages to the balloon if they are under DMA,
-> > > > so that's fine - there's never an in-flight DMA, if
-> > > > there is guest is buggy and it's ok to crash it.  
-> > > 
-> > > It's not the ballooned page that I'm trying to note, it's the entire
-> > > remainder of the SubRegion which needs to be unmapped to remove that
-> > > one page.  It's more compatible from an IOMMU perspective in that we're
-> > > only unmapping with the same granularity with which we mapped, but it's
-> > > incompatible with inflight DMA as we have no idea what DMA targets may
-> > > reside within the remainder of that mapping while it's temporarily
-> > > unmapped.  
-> > 
-> > I see. Yes you need to be careful to replace the host IOMMU PTE
-> > atomically. Same applies to vIOMMU though - if guest changes
-> > a PTE atomically host should do the same.
-> 
-> I'm not sure the hardware supports atomic updates in these cases and
-> therefore I don't think the vIOMMU does either.  Thanks,
-> 
-> Alex
 
-Interesting. What makes you think simply writing into PTE
-then flushing the cache isn't atomic?
 
--- 
-MST
+On 07/30/2018 01:06 PM, Michael Roth wrote:
+> Quoting John Snow (2018-07-23 17:22:03)
+>> This is an updated version of Vladimir's proposal for fixing the
+>> handling around migration and persistent dirty bitmaps.
+> 
+> Are these still being considered for 3.0 rc3/rc4? 2.12.1 releases this week
+> and I'm not sure how badly these are needed.
+> 
+
+Good question. I'd still LIKE them in 3.0, but further fixes are
+actually still needed, and I'm working on this right now.
+
+I think you'll find that you might have trouble applying them to 2.12.1
+without a fairly long trail of prerequisites, so it might not be easily
+plausible.
+
+>>
+>> Patches 1, 4, 6, and 7 update the testing for this feature.
+>> Patch 2 touches up an error message.
+>> Patch 3 removes dead code.
+>> Patch 5 contains the real fix.
+>>
+>> v2:
+>>  - Add a new patch 4 as a prerequisite for what's now patch 5
+>>  - Rework the fix to be (hopefully) cleaner, see patch 5 notes
+>>  - Adjust error message in patch 2 (Eric)
+>>  - Adjust test logic slightly (patches 6, 7) to deal with changes
+>>    in patch 5.
+>>
+>> John Snow (2):
+>>   iotests: 169: actually test block migration
+>>   dirty-bitmaps: clean-up bitmaps loading and migration logic
+>>
+>> Vladimir Sementsov-Ogievskiy (5):
+>>   iotests: 169: drop deprecated 'autoload' parameter
+>>   block/qcow2: improve error message in qcow2_inactivate
+>>   block/qcow2: drop dirty_bitmaps_loaded state variable
+>>   iotests: improve 169
+>>   iotests: 169: add cases for source vm resuming
+>>
+>>  block.c                        |  4 ---
+>>  block/dirty-bitmap.c           | 20 ------------
+>>  block/qcow2-bitmap.c           | 16 +++++++++
+>>  block/qcow2.c                  | 26 ++++-----------
+>>  block/qcow2.h                  |  1 -
+>>  include/block/dirty-bitmap.h   |  2 +-
+>>  migration/block-dirty-bitmap.c | 11 ++++---
+>>  tests/qemu-iotests/169         | 74 ++++++++++++++++++++++++++++++++++++++++--
+>>  tests/qemu-iotests/169.out     |  4 +--
+>>  9 files changed, 103 insertions(+), 55 deletions(-)
+>>
+>> -- 
+>> 2.14.4
+>>
+>>
