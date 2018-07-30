@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1fk6ux-00058q-3H
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:04:52 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fk73j-0007G6-U0
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:13:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1fk6us-0004FM-3Q
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:04:51 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fk73i-0000Oi-IY
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:13:55 -0400
+References: <20180729212744.23709-1-lbloch@janustech.com>
+	<20180730105522.GC3775@localhost.localdomain>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <a64ef34a-e4d2-7c35-974b-622c80c925a4@janustech.com>
+Date: Mon, 30 Jul 2018 15:13:32 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20180730105522.GC3775@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB-large
 Content-Transfer-Encoding: 7bit
-Date: Mon, 30 Jul 2018 14:04:32 +0200
-From: Sebastian Bauer <mail@sebastianbauer.info>
-In-Reply-To: <alpine.BSF.2.21.1807301254450.49677@zero.eik.bme.hu>
-References: <20180730043904.17023-1-mail@sebastianbauer.info>
-	<alpine.BSF.2.21.1807301254450.49677@zero.eik.bme.hu>
-Message-ID: <fbaa741e42e50457a0ba9c7654e1d03d@sebastianbauer.info>
-Subject: Re: [Qemu-devel] [PATCH] sam460ex: Fix PCI interrupt connections
+Subject: Re: [Qemu-devel] [PATCH 0/6] qcow2: Make the L2 cache cover the
+ whole image by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +25,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, agraf@suse.de, qemu-ppc@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, berto@igalia.com
 
-Am 2018-07-30 13:06, schrieb BALATON Zoltan:
-> On Mon, 30 Jul 2018, Sebastian Bauer wrote:
->> The four interrupts of the PCI bus are connected to the same UIC pin 
->> on the
->> real Sam460ex. Evidence for this can be found in the UBoot source for 
->> the
->> Sam460ex in the Sam460ex.c file where PCI_INTERRUPT_LINE in written. 
->> This
->> change brings the connection in line with this.
->> 
->> This fixes the problem that can be observed when adding further PCI 
->> cards
->> that get their interrupt rotated to other interrupts than PCI INT A. 
->> In
->> particular, the bug was observed and verified to be fixed (after this
->> change) with an additional OHCI PCI card.
->> 
->> Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
->> ---
->> hw/ppc/sam460ex.c | 4 ++--
->> 1 file changed, 2 insertions(+), 2 deletions(-)
->> 
->> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
->> index 0999efcc1e..b2b22f280d 100644
->> --- a/hw/ppc/sam460ex.c
->> +++ b/hw/ppc/sam460ex.c
->> @@ -515,9 +515,9 @@ static void sam460ex_init(MachineState *machine)
->> 
->>     /* PCI bus */
->>     ppc460ex_pcie_init(env);
->> -    /* FIXME: is this correct? */
->> +    /* All PCI ints are connected to the same UIC pin (cf. UBoot 
->> source) */
->>     dev = sysbus_create_varargs("ppc440-pcix-host", 0xc0ec00000,
->> -                                uic[1][0], uic[1][20], uic[1][21], 
->> uic[1][22],
->> +                                uic[1][0], uic[1][0], uic[1][0], 
->> uic[1][0],
+On 07/30/2018 01:55 PM, Kevin Wolf wrote:
+> Am 29.07.2018 um 23:27 hat Leonid Bloch geschrieben:
+>> This series makes the qcow2 L2 cache cover the entire image by default.
+>> The importance of this change is in noticeable performance improvement,
+>> especially with heavy random I/O. The memory overhead is very small:
+>> only 1 MB of cache for every 8 GB of image size. On systems with very
+>> limited RAM the maximal cache size can be limited by the existing
+>> cache-size and l2-cache-size options.
+>>
+>> The L2 cache is also resized accordingly, by default, if the image is
+>> resized.
 > 
-> I don't understand QOM. Does this really work? It will ultimately do
+> I agree with changing the defaults, I would have proposed a change
+> myself soon. We have been offering cache size options for a long time,
+> and management tools are still ignoring them. So we need to do something
+> in QEMU.
 > 
-> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 0, uic[1][0]);
-> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 1, uic[1][0]);
-> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 2, uic[1][0]);
-> qdev_connect_gpio_out_named(dev, SYSBUS_DEVICE_GPIO_IRQ, 3, uic[1][0]);
+> Now, what the exact defaults should be, is something to use a bit more
+> thought on. You say "the memory overhead is very small", without going
+> into details. Let's check.
 > 
-> which will call for each of these
+> This is the formula from your patch (unit is bytes):
 > 
-> object_property_set_link(dev, uic[1][0], "some name", &errp);
+>      uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
+> 
+> So we get:
+> 
+>      64k clusters, 8G image:   1M (maximum covered by old default)
+>      64k clusters, 1T image: 128M
+>      1M clusters, 1T image:    8M
+>      512b clusters, 1T image: 16G
+> 
+> 1T is by far not the maximum size for a qcow2 image, and 16G memory
+> usage is definitely not "very small" overhead. Even the 128M for the
+> default cluster size are already a lot. So the simplistic approch of
+> this series won't work as a default.
+> 
+> Let's refine it a bit:
+> 
+> * Basing it on max_l2_cache sounds fine generally
+> * Cap it at 32 MB (?) by default
 
-I don't know QOM myself, but my research was that "some name" is 
-different on each invocation. So you associate the same value to the 
-same object (dev) under a property different name. What was not obvious 
-to me was who is the owner of the value. But according to the doc QOM 
-has the notation of strong references, but it is not created like that 
-in qdev_connect_gpio_out_named(). So I assume that it is weak reference 
-and the parent is not the owner.
+Yes! A great idea! Definitely necessary.
 
-> Would this correctly add all device interrupts to the uic[1][0] irq or
-> will this replace it so only the last line will be connected instead
-> of the first after this patch? Could someone with more understanding
-> about QOM confirm this?
+> * Enable cache-clean-interval=30 (?) by default to compensate a bit for
+>    the higher maximum memory usage
 
-I don't know how this affects QOM, but as I see it the PCI bus has four 
-interrupts and so you need to specify all of them (and specifying wrong 
-ones seems to be not ideal either). The code assumes this throughout, 
-e.g., see ppc440_pcix_initfn().
+Do you think that we need this if we cap the cache at 32 MB? And that's 
+only the cap. 256 GB+ images are not that often used. And compared to 
+the overall QEMU overhead, of over 500 MB, extra 32 in the worst case is 
+not that much, considering the performance gain.
 
-As I have written in the commit log, I tested this change. I used two 
-cards, the (default) SATA and the OHCI controller and everything was 
-working nicely (contrary to the previous state where only the SATA card 
-worked because this was put into slot 1). Did you have a chance to test 
-it yourself?
+> Another thing I just noticed while looking at the code is that
+> cache-clean-interval only considers blocks that aren't dirty, but
+> doesn't take measures to get dirty blocks written out, so we depend on
+> the guest flushing the cache before we can get free the memory. Should
+> we attempt to write unused dirty entries back? Berto?
+> 
+>> The reasons for making this behavior default, unlike in the patches I
+>> have sent previously, are the following:
+>> 1) Unelegant complications with making an option to accept either a
+>>     size or a string, while outputting a proper error message.
+>> 2) More bulky logic to sort out what to do if the image is being resized
+>>     but the (defined) overall cache size is too small to contain the
+>>     new l2-cache-size.
+>> (Making this behavior default resolves all of these technical issues
+>> neatly)
+> 
+> The default must always correspond to some explicit setting. We can only
+> change defaults relatively freely because we can assume that if a user
+> cared about the setting, they would have specified it explicitly. If
+> it's not possible to specify a setting explicitly, we can't make this
+> assumption any more, so we'd be stuck with the default forever.
+> 
+> Now, considering what I wrote above, an alternate wouldn't be the best
+> way to represent this any more. We do have a cache size again (the 32 MB
+> cap) even while trying to cover the whole image.
+> 
+> Maybe the right interface with this in mind would be a boolean option
+> that specifies whether the given cache sizes are exact values (old
+> semantics) or maximum values, which are limited to what the actual
+> images size requires. If you do want the "real" full mode, you'd set
+> l2-cache-size=INT64_MAX and exact-cache-sizes=false (this could use a
+> better name). The new default would be l2-cache-size=32M,
+> exact-cache-sizes=false. The old default is cache-size=1M,
+> exact-cache-sizes=true.
 
-> If this does not work this way would mapping all PCI interrupts to
-> first line in ppc440_pcix_map_irq at hw/ppc/ppc440_pcix.c:417 and
-> assign only that to uic[1][0] be a better fix?
+The existing cache-size and l2-cache-size options are already documented 
+as maximal values. It would make sense to actually make them as such: 
+the caches will be as big as necessary to cover the entire image (no 
+need for them to be more than that) but they will be capped by the 
+current options, while the new default of l2-cache-size will be 32M. Why 
+would one need exact-cache-sizes, if they would be MIN(needed, max)?
+Does it sound reasonable?
 
-I thought about this, but then it needs to passed that we are dealing 
-with a SAM board, which seems to be more complicated than this solution. 
-You also would need to adjust that ppc440_pcix_initfn() and I'm not sure 
-if it is possible to register a root PCI bus with only one interrupt and 
-how the remaining code deals with that. Overall, this solution seem to 
-be much simpler. Of course, if it doesn't work the way I proposed it 
-must be changed again.
+Leonid.
 
-But thinking more about it, what it is indeed not so clear to me is how 
-the interrupt states are logical combined. The hardware most likely 
-would do an "or" (but it is difficult to verify this without 
-schematics), not sure what QEMU does. It may just forward the level 
-change which would be not the right thing of course. I'll investigate 
-it. The behaviour would still be better than the previous state as 
-usually both interrupt handlers are invoked, so no interrupt will be 
-missed.
-
-Bye
-Sebastian
+> 
+> Kevin
+> 
+>> 3) The performance gain (as measured by fio in random read/write tests)
+>>     can be as high as 50%, or even more, so this would be a reasonable
+>>     default behavior.
+>> 4) The memory overhead is really small for the gain, and in cases when
+>>     memory economy is critical, the maximal cache values can always be
+>>     set by the appropriate options.
