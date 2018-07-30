@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fkCCR-0000O4-VZ
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:43:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fkCKk-0006C9-AJ
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:51:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fkCCR-0005Or-3P
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:43:15 -0400
-References: <20180723222210.11077-1-jsnow@redhat.com>
-	<153297036163.12997.1309407319525391577@sif>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a55c92c1-d36f-8e56-5699-e5394399d2ae@redhat.com>
-Date: Mon, 30 Jul 2018 13:43:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fkCKj-0001gK-AV
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:51:50 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:46148)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fkCKj-0001fp-30
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:51:49 -0400
+Received: by mail-oi0-x242.google.com with SMTP id y207-v6so22859034oie.13
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 10:51:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <153297036163.12997.1309407319525391577@sif>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.0 0/7] fix persistent bitmaps
- migration logic
+In-Reply-To: <829318c8-9921-b856-e2bb-86583f43a8e7@amsat.org>
+References: <20180725085944.11856-1-stefanha@redhat.com>
+	<20180725085944.11856-5-stefanha@redhat.com>
+	<829318c8-9921-b856-e2bb-86583f43a8e7@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Jul 2018 18:51:27 +0100
+Message-ID: <CAFEAcA-YQ1yE0jc2CgTvvPipNjMC=7SkKQcKHV5-vgPwEBFHSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 4/7] target/arm: add
+ "cortex-m0" CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, Su Hang <suhang16@mails.ucas.ac.cn>, Liviu Ionescu <ilg@livius.net>, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>
 
+On 27 July 2018 at 06:26, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
+te:
+> Hi Stefan,
+>
+> On 07/25/2018 05:59 AM, Stefan Hajnoczi wrote:
+>> Define a "cortex-m0" ARMv6-M CPU model.
+>>
+>> Most of the register reset values set by other CPU models are not
+>> relevant for the cut-down ARMv6-M architecture.
+>>
+>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> ---
+>>  target/arm/cpu.c | 11 +++++++++++
+>>  1 file changed, 11 insertions(+)
+>>
+>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+>> index 3848ef46aa..7e477c0d23 100644
+>> --- a/target/arm/cpu.c
+>> +++ b/target/arm/cpu.c
+>> @@ -1255,6 +1255,15 @@ static void arm11mpcore_initfn(Object *obj)
+>>      cpu->reset_auxcr =3D 1;
+>>  }
+>>
+>> +static void cortex_m0_initfn(Object *obj)
+>> +{
+>> +    ARMCPU *cpu =3D ARM_CPU(obj);
+>> +    set_feature(&cpu->env, ARM_FEATURE_V6);
+>> +    set_feature(&cpu->env, ARM_FEATURE_M);
+>
+> What about ARM_FEATURE_THUMB2 (T32)?
 
+No, the M0 doesn't have Thumb2. It has Thumb1 plus a tiny set
+of 32-bit instructions (which we deal with specially in translate.c).
 
-On 07/30/2018 01:06 PM, Michael Roth wrote:
-> Quoting John Snow (2018-07-23 17:22:03)
->> This is an updated version of Vladimir's proposal for fixing the
->> handling around migration and persistent dirty bitmaps.
-> 
-> Are these still being considered for 3.0 rc3/rc4? 2.12.1 releases this week
-> and I'm not sure how badly these are needed.
-> 
+(As it happens we generally can't get to the checks on the THUMB2
+feature for a v6M core, so I think but have not checked thoroughly
+that it would make no difference to QEMU's behaviour whether the
+feature bit was set or not.)
 
-Good question. I'd still LIKE them in 3.0, but further fixes are
-actually still needed, and I'm working on this right now.
+> Peter: Since the M0 (optionally?) supports 32x32 multiply, should this
+> cpu use the ARM_FEATURE_THUMB_DSP feature? Else this might trigger an
+> 'Undefined Instruction' in disas_thumb2_insn().
 
-I think you'll find that you might have trouble applying them to 2.12.1
-without a fairly long trail of prerequisites, so it might not be easily
-plausible.
+ARM_FEATURE_THUMB_DSP only enables checks in disas_thumb2_insn()
+(and 32x32->32 multiply is not one of the insns it gates).
+The only insns in that function that a v6M core can execute are
+msr, mrs, dsb, dmb, isb and bl, none of which are affected by that
+feature switch.
 
->>
->> Patches 1, 4, 6, and 7 update the testing for this feature.
->> Patch 2 touches up an error message.
->> Patch 3 removes dead code.
->> Patch 5 contains the real fix.
->>
->> v2:
->>  - Add a new patch 4 as a prerequisite for what's now patch 5
->>  - Rework the fix to be (hopefully) cleaner, see patch 5 notes
->>  - Adjust error message in patch 2 (Eric)
->>  - Adjust test logic slightly (patches 6, 7) to deal with changes
->>    in patch 5.
->>
->> John Snow (2):
->>   iotests: 169: actually test block migration
->>   dirty-bitmaps: clean-up bitmaps loading and migration logic
->>
->> Vladimir Sementsov-Ogievskiy (5):
->>   iotests: 169: drop deprecated 'autoload' parameter
->>   block/qcow2: improve error message in qcow2_inactivate
->>   block/qcow2: drop dirty_bitmaps_loaded state variable
->>   iotests: improve 169
->>   iotests: 169: add cases for source vm resuming
->>
->>  block.c                        |  4 ---
->>  block/dirty-bitmap.c           | 20 ------------
->>  block/qcow2-bitmap.c           | 16 +++++++++
->>  block/qcow2.c                  | 26 ++++-----------
->>  block/qcow2.h                  |  1 -
->>  include/block/dirty-bitmap.h   |  2 +-
->>  migration/block-dirty-bitmap.c | 11 ++++---
->>  tests/qemu-iotests/169         | 74 ++++++++++++++++++++++++++++++++++++++++--
->>  tests/qemu-iotests/169.out     |  4 +--
->>  9 files changed, 103 insertions(+), 55 deletions(-)
->>
->> -- 
->> 2.14.4
->>
->>
+> And what about optional ARM_FEATURE_PMSA?
+> Oh this would be cortex_m0plus_initfn() for "cortex-m0-plus", ok.
+
+Yep, plain M0 has no MPU (and so we're postponing the work
+of implementing the v6M PMSA, which IIRC isn't quite the
+same as the v7M one).
+
+thanks
+-- PMM
