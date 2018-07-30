@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fkBNM-0006kf-3a
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:50:29 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fkBUU-0004lL-MS
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:57:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fkBNI-00043u-Cp
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:50:28 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:43337)
+	(envelope-from <laurent@vivier.eu>) id 1fkBUR-0006kf-Vv
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:57:50 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:56810)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fkBNH-00042y-S1
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:50:24 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fkBUR-0006kO-KL
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:57:47 -0400
 References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1532967169-22265-8-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1532967169-22265-9-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4bc391e5-9aac-57c6-7173-0fdd7a25bccc@vivier.eu>
-Date: Mon, 30 Jul 2018 18:49:42 +0200
+Message-ID: <0306c5c6-d7bf-9018-8679-be11970420ad@vivier.eu>
+Date: Mon, 30 Jul 2018 18:56:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <1532967169-22265-8-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1532967169-22265-9-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 07/76] elf: Remove duplicate
- preprocessor constant definition
+Subject: Re: [Qemu-devel] [PATCH v5 08/76] elf: Add ELF flags for MIPS
+ machine variants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,32 +35,14 @@ Cc: riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, 
 Le 30/07/2018 à 18:11, Aleksandar Markovic a écrit :
 > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> Remove duplicate preprocessor constant definition for EF_MIPS_ARCH.
-> 
-> The duplicate was introduced in commit 45506bdd.
+> Add MIPS machine variants ELF flags so that the emulation behavior
+> can be adjusted if needed.
 > 
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  include/elf.h | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/include/elf.h b/include/elf.h
-> index 934dbbd..c8aaa2a 100644
-> --- a/include/elf.h
-> +++ b/include/elf.h
-> @@ -33,7 +33,6 @@ typedef int64_t  Elf64_Sxword;
->  
->  /* Flags in the e_flags field of the header */
->  /* MIPS architecture level. */
-> -#define EF_MIPS_ARCH            0xf0000000
->  
->  /* Legal values for MIPS architecture level.  */
->  #define EF_MIPS_ARCH_1		0x00000000	/* -mips1 code.  */
-> 
+>  include/elf.h | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
 
-You should move the comment "MIPS architecture level" where the other
-EF_MIPS_ARCH is defined (see glibc or system elf.h).
-
-Thanks,
-Laurent
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
