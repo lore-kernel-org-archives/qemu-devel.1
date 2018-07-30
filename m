@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fkFW4-0002R0-Gb
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:15:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1fkFf6-00056Z-FV
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:25:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fkFVz-0004ph-Pi
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:15:44 -0400
-Resent-Message-Id: <E1fkFVz-0004ph-Pi@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21062)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fkFVz-0004p6-H1
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:15:39 -0400
-In-Reply-To: <20180730162458.23186-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153298440654.25507.3377227996117907283@502c9da6d61e>
+	(envelope-from <eblake@redhat.com>) id 1fkFf1-0007sp-QU
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:25:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40102 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fkFf1-0007qj-KV
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:24:59 -0400
+References: <20180723193530.20891-1-eblake@redhat.com>
+	<87in553zsx.fsf@dusky.pond.sub.org>
+	<8c082bfd-6753-c8d2-cfcd-e2be77c3f763@redhat.com>
+	<878t5zxpc2.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a5c7582a-419a-03fb-4f05-c59fed4f0732@redhat.com>
+Date: Mon, 30 Jul 2018 16:24:55 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 30 Jul 2018 14:00:07 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/5] mps2: Implement FPGAIO counters and
- dual-timer
+In-Reply-To: <878t5zxpc2.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-3.0] tests/libqtest: Improve
+ kill_qemu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: peter.maydell@linaro.org, mst@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org, alex.bennee@linaro.org, rth@twiddle.net
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNzMwMTYyNDU4LjIzMTg2LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
-ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC81XSBtcHMyOiBJbXBsZW1lbnQgRlBHQUlP
-IGNvdW50ZXJzIGFuZCBkdWFsLXRpbWVyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
-IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjcyMzE2ODQ1ZDIgaHcvYXJtL21wczI6IFdpcmUg
-dXAgZHVhbC10aW1lciBpbiBtcHMyLWFuMzg1IGFuZCBtcHMyLWFuNTExCjFlNDBiOTc0OTYgaHcv
-YXJtL2lvdGtpdDogV2lyZSB1cCB0aGUgZHVhbHRpbWVyCmI0OTcwYmM2MTUgaHcvdGltZXIvY21z
-ZGstYXBiLWR1YWx0aW1lcjogSW1wbGVtZW50IENNU0RLIGR1YWwgdGltZXIgbW9kdWxlCjIyMmRl
-ODgxNTQgaHcvbWlzYy9tcHMyLWZwZ2FpbzogSW1wbGVtZW50IFBTQ05UUiBhbmQgQ09VTlRFUgoy
-MDFmYTBlZWYwIGh3L21pc2MvbXBzMi1mcGdhaW86IEltcGxlbWVudCAxSHogYW5kIDEwMEh6IGNv
-dW50ZXJzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IGh3L21pc2Mv
-bXBzMi1mcGdhaW86IEltcGxlbWVudCAxSHogYW5kIDEwMEh6IGNvdW50ZXJzLi4uCkVSUk9SOiBz
-cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojMTMxOiBGSUxFOiBody9t
-aXNjL21wczItZnBnYWlvLmM6MTkzOgorICAgIC5zdWJzZWN0aW9ucyA9IChjb25zdCBWTVN0YXRl
-RGVzY3JpcHRpb24qW10pIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjMgbGluZXMgY2hlY2tlZAoK
-WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi81
-OiBody9taXNjL21wczItZnBnYWlvOiBJbXBsZW1lbnQgUFNDTlRSIGFuZCBDT1VOVEVSLi4uCkNo
-ZWNraW5nIFBBVENIIDMvNTogaHcvdGltZXIvY21zZGstYXBiLWR1YWx0aW1lcjogSW1wbGVtZW50
-IENNU0RLIGR1YWwgdGltZXIgbW9kdWxlLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxl
-dGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzUwOiAKbmV3IGZp
-bGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjE3IGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFU
-Q0ggNC81OiBody9hcm0vaW90a2l0OiBXaXJlIHVwIHRoZSBkdWFsdGltZXIuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNS81OiBody9hcm0vbXBzMjogV2lyZSB1cCBkdWFsLXRpbWVyIGluIG1wczItYW4zODUg
-YW5kIG1wczItYW41MTEuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 07/25/2018 11:17 AM, Markus Armbruster wrote:
+
+>>
+>> the output was produced by bash, which uses waitpid() - and therefore
+>> the fact that bash reports the core dump even when no core file is
+>> created is promising.
+> 
+> Proof beats plausibility argument:
+> 
+> $ cat wcordump.c
+
+> $ gcc -Wall -g -O wcordump.c
+> $ (ulimit -c unlimited; ./a.out)
+> sig 6 128
+> $ (ulimit -c 0; ./a.out)
+> sig 6 0
+
+Doesn't match my results:
+
+$ (ulimit -c 0; ./a.out)
+sig 6 128
+
+So, what's different between our two environments?
+
+kernel 4.17.7-100.fc27.x86_64
+
+$ echo /proc/sys/kernel/core_*
+/proc/sys/kernel/core_pattern /proc/sys/kernel/core_pipe_limit 
+/proc/sys/kernel/core_uses_pid
+$ cat /proc/sys/kernel/core_*
+|/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %e
+0
+1
+
+> 
+> Looks like WCOREDUMP() does depend on my ulimit -c.
+
+Or worse, that its behavior is kernel/environment-sensitive.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
