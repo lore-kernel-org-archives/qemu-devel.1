@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fkAKg-0003D2-IY
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:43:39 -0400
+	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1fkAKp-0003M8-CJ
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:43:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fkAKf-0007rW-N8
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:43:38 -0400
-References: <20180729212744.23709-1-lbloch@janustech.com>
-	<20180729212744.23709-2-lbloch@janustech.com>
-	<ceb7a6e9-1dc2-b5f5-c81e-ba08841c8ba9@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <16e29571-c7e6-35e6-6b1e-442668362913@redhat.com>
-Date: Mon, 30 Jul 2018 10:43:30 -0500
+	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1fkAKo-0007uN-H3
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:43:47 -0400
+Date: Mon, 30 Jul 2018 23:43:23 +0800
+From: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+Message-ID: <20180730154323.GA6933@byw>
+Reply-To: baiyaowei@cmss.chinamobile.com
+References: <1532755124-23795-1-git-send-email-baiyaowei@cmss.chinamobile.com>
 MIME-Version: 1.0
-In-Reply-To: <ceb7a6e9-1dc2-b5f5-c81e-ba08841c8ba9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/6 for-3.0] Update .gitignore
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1532755124-23795-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-blk: fix comment for
+ virtio_blk_rw_complete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: stefanha@redhat.com, mst@redhat.com, kwolf@redhat.com, mreitz@redhat.com, mjt@tls.msk.ru, laurent@vivier.eu
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 07/30/2018 10:40 AM, Eric Blake wrote:
-> On 07/29/2018 04:27 PM, Leonid Bloch wrote:
->> Adds /roms/vgabios to .gitignore - this directory appears after the
->> build, and was not ignored by Git so far.
->>
+Oh, sorry, this patch should go into trivial mail list.
+
+On Sat, Jul 28, 2018 at 01:18:44PM +0800, Yaowei Bai wrote:
+> Here should be submit_requests, there is no submit_merged_requests
+> function.
 > 
-> Actually, that's the directories for one of the submodules. It seems 
-> fishy to have a directory listed in both .gitignore and .gitmodules at 
-> the same time, so I'm inclined to NACK this patch, and instead figure 
-> out what in the build is dirtying the directory when the submodule is 
-> not checked out.
-
-Or rather, it was a submodule until commit 91b8eba9. So maybe what's 
-happening is that you previously had it checked out, and now that we no 
-longer have the submodule, it shows up unless .gitconfig ignores it. For 
-that, I'd recommend editing .git/info/exclude to ignore it locally (if 
-you plan on frequently checking out points both before and after the 
-deletion) rather than making it part of upstream (which tends to focus 
-more on ignoring files built by the current contents of master, not 
-files that are leftovers from earlier commits).
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> Signed-off-by: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+> ---
+>  hw/block/virtio-blk.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 50b5c86..91cbede 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -97,8 +97,8 @@ static void virtio_blk_rw_complete(void *opaque, int ret)
+>  
+>          if (req->qiov.nalloc != -1) {
+>              /* If nalloc is != 1 req->qiov is a local copy of the original
+> -             * external iovec. It was allocated in submit_merged_requests
+> -             * to be able to merge requests. */
+> +             * external iovec. It was allocated in submit_requests to be
+> +             * able to merge requests. */
+>              qemu_iovec_destroy(&req->qiov);
+>          }
+>  
+> -- 
+> 1.8.3.1
+> 
