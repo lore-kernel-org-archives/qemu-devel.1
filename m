@@ -1,16 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1fkEkg-0005ij-BE
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 16:26:47 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fkErr-0000cY-R3
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 16:34:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1fkEkf-0000UB-Ls
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 16:26:46 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fkErn-0007yc-Tj
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 16:34:11 -0400
+Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:43330)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fkErn-0007xy-KH
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 16:34:07 -0400
+Received: by mail-vk0-x242.google.com with SMTP id s17-v6so6398117vke.10
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 13:34:07 -0700 (PDT)
+References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1532967169-22265-15-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a09d5aa0-9241-b2ba-23fd-db3b4fef5409@linaro.org>
+Date: Mon, 30 Jul 2018 16:34:01 -0400
 MIME-Version: 1.0
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Mon, 30 Jul 2018 22:26:44 +0200
-Message-ID: <CABoDooPN3LASO-0FVm_shUg3QwQKmCaEfWnuPBS6BOABGr+STw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] ARM: SVE issue in saturated subtraction
+In-Reply-To: <1532967169-22265-15-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 14/76] target/mips: Add
+ gen_op_addr_addi()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,15 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-Hello Richard,
+On 07/30/2018 12:11 PM, Aleksandar Markovic wrote:
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+> 
+> Add gen_op_addr_addi(). This function will be used in emulation of
+> some nanoMIPS instructions.
+> 
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  target/mips/translate.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 
-the signed overflow computation for 64-bit saturated subtraction in
-do_sat_addsub_64 looks wrong:  I think the second xor should use t1
-instead of t0.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Thanks,
+For your general mips to-do list, there are lots of places in
+the existing code that can be cleaned up to make use of this
+new function.
 
-Laurent
+
+r~
