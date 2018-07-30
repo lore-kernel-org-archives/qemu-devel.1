@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fk7X7-0000gV-3D
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:44:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fk7Xr-0001V0-Ja
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fk7X4-0006fU-1k
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:44:17 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:39609)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fk7X3-0006f8-Ta
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:44:13 -0400
-Received: by mail-vk0-x242.google.com with SMTP id e139-v6so5622183vkf.6
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 05:44:13 -0700 (PDT)
-References: <153294521235.6959.12520498748431693809.stgit@dhcp-9-109-246-16>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4a633022-d560-a704-e143-928b8467f09c@linaro.org>
-Date: Mon, 30 Jul 2018 08:44:07 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fk7Xq-0006wt-9u
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:45:03 -0400
+Date: Mon, 30 Jul 2018 14:44:53 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180730124453.GE3775@localhost.localdomain>
+References: <20180729212744.23709-1-lbloch@janustech.com>
+	<20180730105522.GC3775@localhost.localdomain>
+	<a64ef34a-e4d2-7c35-974b-622c80c925a4@janustech.com>
 MIME-Version: 1.0
-In-Reply-To: <153294521235.6959.12520498748431693809.stgit@dhcp-9-109-246-16>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] linux-user: ppc64: don't use volatile
- register during safe_syscall
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a64ef34a-e4d2-7c35-974b-622c80c925a4@janustech.com>
+Subject: Re: [Qemu-devel] [PATCH 0/6] qcow2: Make the L2 cache cover the
+ whole image by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +25,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, dgibson@redhat.com, riku.voipio@iki.fi, laurent@vivier.eu
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Leonid Bloch <lbloch@janustech.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, berto@igalia.com
 
-On 07/30/2018 06:09 AM, Shivaprasad G Bhat wrote:
-> r11 is a volatile register on PPC as per calling conventions.
-> The safe_syscall code uses it to check if the signal_pending
-> is set during the safe_syscall. When a syscall is interrupted
-> on return from signal handling, the r11 might be corrupted
-> before we retry the syscall leading to a crash. The registers
-> r0-r13 are not to be used here as they have
-> volatile/designated/reserved usages.
+Am 30.07.2018 um 14:13 hat Leonid Bloch geschrieben:
+> On 07/30/2018 01:55 PM, Kevin Wolf wrote:
+> > Am 29.07.2018 um 23:27 hat Leonid Bloch geschrieben:
+> > > This series makes the qcow2 L2 cache cover the entire image by default.
+> > > The importance of this change is in noticeable performance improvement,
+> > > especially with heavy random I/O. The memory overhead is very small:
+> > > only 1 MB of cache for every 8 GB of image size. On systems with very
+> > > limited RAM the maximal cache size can be limited by the existing
+> > > cache-size and l2-cache-size options.
+> > > 
+> > > The L2 cache is also resized accordingly, by default, if the image is
+> > > resized.
+> > 
+> > I agree with changing the defaults, I would have proposed a change
+> > myself soon. We have been offering cache size options for a long time,
+> > and management tools are still ignoring them. So we need to do something
+> > in QEMU.
+> > 
+> > Now, what the exact defaults should be, is something to use a bit more
+> > thought on. You say "the memory overhead is very small", without going
+> > into details. Let's check.
+> > 
+> > This is the formula from your patch (unit is bytes):
+> > 
+> >      uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
+> > 
+> > So we get:
+> > 
+> >      64k clusters, 8G image:   1M (maximum covered by old default)
+> >      64k clusters, 1T image: 128M
+> >      1M clusters, 1T image:    8M
+> >      512b clusters, 1T image: 16G
+> > 
+> > 1T is by far not the maximum size for a qcow2 image, and 16G memory
+> > usage is definitely not "very small" overhead. Even the 128M for the
+> > default cluster size are already a lot. So the simplistic approch of
+> > this series won't work as a default.
+> > 
+> > Let's refine it a bit:
+> > 
+> > * Basing it on max_l2_cache sounds fine generally
+> > * Cap it at 32 MB (?) by default
 > 
-> Change the code to use r14 which is non-volatile.
-> Use SP+16 which is a slot for LR, for save/restore of previous value
-> of r14. SP+16 can be used, as LR is preserved across the syscall.
+> Yes! A great idea! Definitely necessary.
 > 
-> Steps to reproduce:
-> On PPC host, issue `qemu-x86_64 /usr/bin/cc -E -`
-> Attempt Ctrl-C, the issue is reproduced.
+> > * Enable cache-clean-interval=30 (?) by default to compensate a bit for
+> >    the higher maximum memory usage
 > 
-> Reference:
-> https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
-> https://openpowerfoundation.org/wp-content/uploads/2016/03/ABI64BitOpenPOWERv1.1_16July2015_pub4.pdf
+> Do you think that we need this if we cap the cache at 32 MB? And that's only
+> the cap. 256 GB+ images are not that often used. And compared to the overall
+> QEMU overhead, of over 500 MB, extra 32 in the worst case is not that much,
+> considering the performance gain.
+
+Don't forget that if you take a few snapshots so you get a backing file
+chain, every layer in the chain has its own cache. So capping at 32 MB
+with 9 backing files still means that we use 320 MB.
+
+And honestly, is there a real reason not to use cache-clean-interval by
+default? Even if it doesn't help much in some cases, it should hardly
+ever hurt. If the image was completely idle for 30 seconds (or whatever
+number we choose), having to reload some 64k from the disk on the next
+access shouldn't make a big difference.
+
+> > Another thing I just noticed while looking at the code is that
+> > cache-clean-interval only considers blocks that aren't dirty, but
+> > doesn't take measures to get dirty blocks written out, so we depend on
+> > the guest flushing the cache before we can get free the memory. Should
+> > we attempt to write unused dirty entries back? Berto?
+> > 
+> > > The reasons for making this behavior default, unlike in the patches I
+> > > have sent previously, are the following:
+> > > 1) Unelegant complications with making an option to accept either a
+> > >     size or a string, while outputting a proper error message.
+> > > 2) More bulky logic to sort out what to do if the image is being resized
+> > >     but the (defined) overall cache size is too small to contain the
+> > >     new l2-cache-size.
+> > > (Making this behavior default resolves all of these technical issues
+> > > neatly)
+> > 
+> > The default must always correspond to some explicit setting. We can only
+> > change defaults relatively freely because we can assume that if a user
+> > cared about the setting, they would have specified it explicitly. If
+> > it's not possible to specify a setting explicitly, we can't make this
+> > assumption any more, so we'd be stuck with the default forever.
+> > 
+> > Now, considering what I wrote above, an alternate wouldn't be the best
+> > way to represent this any more. We do have a cache size again (the 32 MB
+> > cap) even while trying to cover the whole image.
+> > 
+> > Maybe the right interface with this in mind would be a boolean option
+> > that specifies whether the given cache sizes are exact values (old
+> > semantics) or maximum values, which are limited to what the actual
+> > images size requires. If you do want the "real" full mode, you'd set
+> > l2-cache-size=INT64_MAX and exact-cache-sizes=false (this could use a
+> > better name). The new default would be l2-cache-size=32M,
+> > exact-cache-sizes=false. The old default is cache-size=1M,
+> > exact-cache-sizes=true.
 > 
-> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+> The existing cache-size and l2-cache-size options are already documented as
+> maximal values. It would make sense to actually make them as such: the
+> caches will be as big as necessary to cover the entire image (no need for
+> them to be more than that) but they will be capped by the current options,
+> while the new default of l2-cache-size will be 32M. Why would one need
+> exact-cache-sizes, if they would be MIN(needed, max)?
+> Does it sound reasonable?
 
-This does fix the bug, so
-Tested-by: Richard Henderson <richard.henderson@linaro.org>
+I think you have a point there.
 
-But we can do slightly better:
+There is one case where we need to cover more than the virtual disk
+size, and that is the VM state for internal snapshots. These are
+sequential accesses, though, so it doesn't matter for it much how many
+L2 tables we have cached. And having to reload some tables after taking
+or loading a snapshot sounds okay, too.
 
-> @@ -49,7 +49,8 @@ safe_syscall_base:
->  	 *               and returns the result in r3
->  	 * Shuffle everything around appropriately.
->  	 */
-> -	mr	11, 3	/* signal_pending */
-> +	std     14, 16(1) /* Preserve r14 in SP+16 */
+So essentially everything boils down to applying max_l2_cache even if a
+L2 size was explicitly specified (which makes cache-size=INT64_MAX a
+reasonable option), changing the default from cache-size=1M to
+cache-size=32M (covers 256 GB with the default 64k clusters), and
+enabling cache-clean-interval by default. Right?
 
-Above this context, we have a .cfi_startproc directive, which indicates we are
-providing unwind information for this function (trivial up to this point).
-
-To preserve that, you need to add
-
-	.cfi_offset 14, 16
-
-right here, indicating r14 is saved 16 bytes "up" the stack frame.
-
-Since this portion of the stack frame is allocated by the caller, this saved
-value remains valid through the end of the function, so we do not need to do
-anything at the points where the value is restored.
-
->  safe_syscall_end:
-> +	ld 14, 16(1) /* restore r14 to its original value */
->  	/* code path when we did execute the syscall */
-
-Swap these two lines.
-
-With those two changes,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+Kevin
