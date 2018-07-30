@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fk3cL-0003P6-Lj
+	(envelope-from <armbru@redhat.com>) id 1fk3cM-0003P8-4k
 	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fk3cI-0004XS-Ac
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41594 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fk3cI-0004Xp-CQ
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51104 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fk3cI-0004Wh-0c
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fk3cI-0004Wq-5i
 	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:22 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 30 Jul 2018 10:33:11 +0200
-Message-Id: <20180730083317.11765-18-armbru@redhat.com>
+Date: Mon, 30 Jul 2018 10:33:12 +0200
+Message-Id: <20180730083317.11765-19-armbru@redhat.com>
 In-Reply-To: <20180730083317.11765-1-armbru@redhat.com>
 References: <20180730083317.11765-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 17/23] migration-test: Clean up string
- interpolation into QMP, part 1
+Subject: [Qemu-devel] [PATCH v3 18/23] migration-test: Clean up string
+ interpolation into QMP, part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,9 +31,9 @@ Leaving interpolation into JSON to qmp() is more robust than building
 QMP input manually, as explained in the recent commit "tests: Clean up
 string interpolation into QMP input (simple cases)".
 
-migrate_recover() builds QMP input manually because wait_command()
-can't interpolate.  Well, it can since the previous commit.  Simplify
-accordingly.
+migrate() interpolates members into a JSON object.  Change it to take
+its extra QMP arguments as arguments for qdict_from_jsonf_nofail()
+instead of a string containing JSON members.
 
 Bonus: gets rid of a non-literal format string.  A step towards
 compile-time format string checking without triggering
@@ -45,39 +45,90 @@ Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/migration-test.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ tests/migration-test.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 0c92f2b1cd..323bb60535 100644
+index 323bb60535..beccb6337e 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -156,6 +156,7 @@ static void stop_cb(void *opaque, const char *name, QDict *data)
- /*
-  * Events can get in the way of responses we are actually waiting for.
-  */
-+GCC_FMT_ATTR(2, 3)
- static QDict *wait_command(QTestState *who, const char *command, ...)
- {
-     va_list ap;
-@@ -354,13 +355,12 @@ static void migrate_pause(QTestState *who)
- static void migrate_recover(QTestState *who, const char *uri)
- {
-     QDict *rsp;
--    gchar *cmd = g_strdup_printf(
--        "{ 'execute': 'migrate-recover', "
--        "  'id': 'recover-cmd', "
--        "  'arguments': { 'uri': '%s' } }", uri);
+@@ -14,6 +14,7 @@
  
--    rsp = wait_command(who, cmd);
--    g_free(cmd);
-+    rsp = wait_command(who,
-+                       "{ 'execute': 'migrate-recover', "
-+                       "  'id': 'recover-cmd', "
-+                       "  'arguments': { 'uri': %s } }",
-+                       uri);
+ #include "libqtest.h"
+ #include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qjson.h"
+ #include "qemu/option.h"
+ #include "qemu/range.h"
+ #include "qemu/sockets.h"
+@@ -381,16 +382,25 @@ static void migrate_set_capability(QTestState *who, const char *capability,
      qobject_unref(rsp);
  }
+ 
+-static void migrate(QTestState *who, const char *uri, const char *extra)
++/*
++ * Send QMP command "migrate".
++ * Arguments are built from @fmt... (formatted like
++ * qobject_from_jsonf_nofail()) with "uri": @uri spliced in.
++ */
++GCC_FMT_ATTR(3, 4)
++static void migrate(QTestState *who, const char *uri, const char *fmt, ...)
+ {
+-    QDict *rsp;
+-    gchar *cmd;
++    va_list ap;
++    QDict *args, *rsp;
+ 
+-    cmd = g_strdup_printf("{ 'execute': 'migrate',"
+-                          "  'arguments': { 'uri': '%s' %s } }",
+-                          uri, extra ? extra : "");
+-    rsp = qtest_qmp(who, cmd);
+-    g_free(cmd);
++    va_start(ap, fmt);
++    args = qdict_from_vjsonf_nofail(fmt, ap);
++    va_end(ap);
++
++    g_assert(!qdict_haskey(args, "uri"));
++    qdict_put_str(args, "uri", uri);
++
++    rsp = qmp("{ 'execute': 'migrate', 'arguments': %p}", args);
+     g_assert(qdict_haskey(rsp, "return"));
+     qobject_unref(rsp);
+ }
+@@ -582,7 +592,7 @@ static int migrate_postcopy_prepare(QTestState **from_ptr,
+     /* Wait for the first serial output from the source */
+     wait_for_serial("src_serial");
+ 
+-    migrate(from, uri, NULL);
++    migrate(from, uri, "{}");
+     g_free(uri);
+ 
+     wait_for_migration_pass(from);
+@@ -665,7 +675,7 @@ static void test_postcopy_recovery(void)
+      * the newly created channel
+      */
+     wait_for_migration_status(from, "postcopy-paused");
+-    migrate(from, uri, ", 'resume': true");
++    migrate(from, uri, "{'resume': true}");
+     g_free(uri);
+ 
+     /* Restore the postcopy bandwidth to unlimited */
+@@ -684,7 +694,7 @@ static void test_baddest(void)
+     if (test_migrate_start(&from, &to, "tcp:0:0", true)) {
+         return;
+     }
+-    migrate(from, "tcp:0:0", NULL);
++    migrate(from, "tcp:0:0", "{}");
+     do {
+         status = migrate_query_status(from);
+         g_assert(!strcmp(status, "setup") || !(strcmp(status, "failed")));
+@@ -722,7 +732,7 @@ static void test_precopy_unix(void)
+     /* Wait for the first serial output from the source */
+     wait_for_serial("src_serial");
+ 
+-    migrate(from, uri, NULL);
++    migrate(from, uri, "{}");
+ 
+     wait_for_migration_pass(from);
  
 -- 
 2.17.1
