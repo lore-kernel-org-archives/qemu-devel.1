@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fk7Hw-0006Gt-RC
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:28:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fk7X7-0000gV-3D
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:44:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fk7Hv-0007YX-RI
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:28:36 -0400
-Date: Mon, 30 Jul 2018 14:28:28 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180730122828.GD3775@localhost.localdomain>
-References: <20180729212744.23709-1-lbloch@janustech.com>
-	<20180729212744.23709-5-lbloch@janustech.com>
-	<20180730094320.GB3775@localhost.localdomain>
-	<8d1a2a16-6fa6-1318-d278-ff0c8b45a6f5@janustech.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fk7X4-0006fU-1k
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:44:17 -0400
+Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:39609)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fk7X3-0006f8-Ta
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 08:44:13 -0400
+Received: by mail-vk0-x242.google.com with SMTP id e139-v6so5622183vkf.6
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 05:44:13 -0700 (PDT)
+References: <153294521235.6959.12520498748431693809.stgit@dhcp-9-109-246-16>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4a633022-d560-a704-e143-928b8467f09c@linaro.org>
+Date: Mon, 30 Jul 2018 08:44:07 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8d1a2a16-6fa6-1318-d278-ff0c8b45a6f5@janustech.com>
-Subject: Re: [Qemu-devel] [PATCH 4/6] qcow2: Update total_sectors when
- resizing the image
+In-Reply-To: <153294521235.6959.12520498748431693809.stgit@dhcp-9-109-246-16>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] linux-user: ppc64: don't use volatile
+ register during safe_syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, dgibson@redhat.com, riku.voipio@iki.fi, laurent@vivier.eu
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Am 30.07.2018 um 13:41 hat Leonid Bloch geschrieben:
-> On 07/30/2018 12:43 PM, Kevin Wolf wrote:
-> > Am 29.07.2018 um 23:27 hat Leonid Bloch geschrieben:
-> > > Signed-off-by: Leonid Bloch <lbloch@janustech.com>
-> > > ---
-> > >   block/qcow2.c | 2 ++
-> > >   1 file changed, 2 insertions(+)
-> > > 
-> > > diff --git a/block/qcow2.c b/block/qcow2.c
-> > > index ec9e6238a0..223d351e40 100644
-> > > --- a/block/qcow2.c
-> > > +++ b/block/qcow2.c
-> > > @@ -3646,6 +3646,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-> > >           }
-> > >       }
-> > > +    bs->total_sectors = offset / 512;
-> > > +
-> > >       /* write updated header.size */
-> > >       offset = cpu_to_be64(offset);
-> > >       ret = bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
-> > 
-> > This shouldn't be necessary, bdrv_co_truncate() already updates
-> > bs->total_sectors after calling the block driver.
+On 07/30/2018 06:09 AM, Shivaprasad G Bhat wrote:
+> r11 is a volatile register on PPC as per calling conventions.
+> The safe_syscall code uses it to check if the signal_pending
+> is set during the safe_syscall. When a syscall is interrupted
+> on return from signal handling, the r11 might be corrupted
+> before we retry the syscall leading to a crash. The registers
+> r0-r13 are not to be used here as they have
+> volatile/designated/reserved usages.
 > 
-> It looks like without it the cache resize works only on the second resize.
-
-Yes, and after reading the rest of the series, it makes sense to me
-because qcow2_update_option() -> read_cache_sizes() uses
-bs->total_sectors, so if we call that in qcow2_co_truncate(), we already
-need to update the value early.
-
-The comment should explain this connection because otherwise it's not
-obvious when you read the code.
-
-> > If this is needed by one of the following patches, we need a comment
-> > that explains why this seemingly superfluous assignment is actually
-> > necessary.
-> > 
-> > Also, 512 should be BDRV_SECTOR_SIZE.
+> Change the code to use r14 which is non-volatile.
+> Use SP+16 which is a slot for LR, for save/restore of previous value
+> of r14. SP+16 can be used, as LR is preserved across the syscall.
 > 
-> I was surprised that it's not, but it's 512 also in two other places,
-> including in qcow2_co_truncate itself. So I decided to keep that. Probably
-> would be better if I'd repair it in the other places instead. :)
+> Steps to reproduce:
+> On PPC host, issue `qemu-x86_64 /usr/bin/cc -E -`
+> Attempt Ctrl-C, the issue is reproduced.
+> 
+> Reference:
+> https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
+> https://openpowerfoundation.org/wp-content/uploads/2016/03/ABI64BitOpenPOWERv1.1_16July2015_pub4.pdf
+> 
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
 
-Yeah, or at least not introduce new places with a literal 512.
+This does fix the bug, so
+Tested-by: Richard Henderson <richard.henderson@linaro.org>
 
-Kevin
+But we can do slightly better:
+
+> @@ -49,7 +49,8 @@ safe_syscall_base:
+>  	 *               and returns the result in r3
+>  	 * Shuffle everything around appropriately.
+>  	 */
+> -	mr	11, 3	/* signal_pending */
+> +	std     14, 16(1) /* Preserve r14 in SP+16 */
+
+Above this context, we have a .cfi_startproc directive, which indicates we are
+providing unwind information for this function (trivial up to this point).
+
+To preserve that, you need to add
+
+	.cfi_offset 14, 16
+
+right here, indicating r14 is saved 16 bytes "up" the stack frame.
+
+Since this portion of the stack frame is allocated by the caller, this saved
+value remains valid through the end of the function, so we do not need to do
+anything at the points where the value is restored.
+
+>  safe_syscall_end:
+> +	ld 14, 16(1) /* restore r14 to its original value */
+>  	/* code path when we did execute the syscall */
+
+Swap these two lines.
+
+With those two changes,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
