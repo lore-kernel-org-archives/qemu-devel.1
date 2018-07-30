@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fkBuh-0002gz-2b
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:24:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fkBzF-0006jZ-Ts
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:29:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fkBug-0002mw-2B
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:24:55 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:35925)
+	(envelope-from <peter.maydell@linaro.org>) id 1fkBzF-0005NT-1e
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:29:37 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41462)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fkBuf-0002mX-Q1
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:24:53 -0400
-Received: by mail-lf1-x144.google.com with SMTP id b22-v6so8696044lfa.3
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 10:24:53 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fkBzE-0005NK-RB
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:29:36 -0400
+Received: by mail-oi0-x241.google.com with SMTP id k12-v6so22736233oiw.8
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 10:29:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_NaTDYPb_-w2mO-Y8xZ45=zkBQRA=XwHu4ioH+N8Y52g@mail.gmail.com>
-References: <eb8233618cf64aa21c87e2809933f112a7aedf68.1532735306.git.alistair.francis@wdc.com>
-	<383842e2-9d91-ff2d-642d-c3cb003895b7@linaro.org>
-	<CAFEAcA_NaTDYPb_-w2mO-Y8xZ45=zkBQRA=XwHu4ioH+N8Y52g@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 30 Jul 2018 10:24:21 -0700
-Message-ID: <CAKmqyKP4AiSjBT=Lf4MWce7gOB+ufbo6HSVLoJxR2rC6ChXkJQ@mail.gmail.com>
+In-Reply-To: <20180725085944.11856-3-stefanha@redhat.com>
+References: <20180725085944.11856-1-stefanha@redhat.com>
+	<20180725085944.11856-3-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Jul 2018 18:29:15 +0100
+Message-ID: <CAFEAcA-i3PepdAJzDViGHjgDPWTTLiqmGMszNeT41+MmjK-viA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] configure: Add RISC-V host support
+Subject: Re: [Qemu-devel] [PATCH v3 2/7] hw/arm: rename TYPE_ARMV7M to
+ TYPE_ARM_M_PROFILE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, Alistair Francis <alistair@alistair23.me>, Liviu Ionescu <ilg@livius.net>, qemu-arm <qemu-arm@nongnu.org>, Julia Suvorova <jusual@mail.ru>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Steffen Gortz <qemu.ml@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>
 
-On Sun, Jul 29, 2018 at 4:28 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 28 July 2018 at 17:36, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> On 07/27/2018 04:49 PM, Alistair Francis wrote:
->>> Allow QEMU to be built to run on a RISC-V host.
->>>
->>> QEMU does not yet have a RISC-V TCG or user mode target port, but
->>> running other architectures on RISC-V using TCI does work.
->>>
->>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->>> ---
->>>  configure | 18 +++++++++++++++++-
->>>  1 file changed, 17 insertions(+), 1 deletion(-)
->>
->> This is ok as far as it goes.
->>
->> Even for TCI, you need some more.
->>
->> At minimum, see Michael Clark's branch changes to accel/tcg/user-exec.c for
->> host signal handling.  While you can run *-softmmu without this, none of
->> *-linux-user will work reliably.
->>
->> Another piece that even Michael Clark does not have is
->> linux-user/host/*/safe-syscall.S.
+On 25 July 2018 at 09:59, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The TYPE_ARMV7M class is really a container for an ARM M Profile CPU,
+> NVIC, and related pieces.  It can also be used for ARMv6-M and ARMv8-M.
+> Rename the class since it is not exclusive to ARMv7-M.
 >
-> It might be nice to complete the safe-syscall stuff for all hosts,
-> and then remove the fallback that lets you build an unreliable
-> linux-user binary without it...
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  hw/arm/Makefile.objs                         |   1 -
+>  include/hw/arm/{armv7m.h => arm-m-profile.h} |  37 ++-
+>  include/hw/arm/iotkit.h                      |   4 +-
+>  include/hw/arm/msf2-soc.h                    |   4 +-
+>  include/hw/arm/stm32f205_soc.h               |   4 +-
+>  hw/arm/arm-m-profile.c                       | 271 +++++++++++++++++
+>  hw/arm/armv7m.c                              | 290 -------------------
+>  hw/arm/iotkit.c                              |   2 +-
+>  hw/arm/mps2-tz.c                             |   1 -
+>  hw/arm/mps2.c                                |   6 +-
+>  hw/arm/msf2-soc.c                            |   2 +-
+>  hw/arm/stellaris.c                           |   4 +-
+>  hw/arm/stm32f205_soc.c                       |   2 +-
+>  13 files changed, 313 insertions(+), 315 deletions(-)
+>  rename include/hw/arm/{armv7m.h => arm-m-profile.h} (65%)
+>  delete mode 100644 hw/arm/armv7m.c
 
-At the moment though QEMU won't build with Linux user. So some work is
-required just to get the build working.
+It would be nice if this rename showed up in the patch as
+a rename, rather than a "delete everything and have a new one"...
+Reviewing this is going to be painful enough to make me wonder
+whether it really matters that we call this "m-profile" rather
+than "v7m" (we have a lot of places that use 'v7m' as a somewhat
+inaccurate name for "M profile" anyway, including a bunch
+of new code I wrote that's really v8m related.)
 
-Alistair
-
->
-> thanks
-> -- PMM
+thanks
+-- PMM
