@@ -1,34 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fjxir-0004DT-Tz
-	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 22:15:47 -0400
+	(envelope-from <yuchenlin@synology.com>) id 1fjyDr-0004J8-Fb
+	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 22:47:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fjxio-0007go-Lq
-	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 22:15:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43974)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fjxio-0007gT-DA
-	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 22:15:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fjxim-0005SO-BD
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 02:15:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 505522E8052
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 02:15:40 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 30 Jul 2018 02:05:39 -0000
-From: umarcor <1783362@bugs.launchpad.net>
-Reply-To: Bug 1783362 <1783362@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153244909751.11925.3364609945591086988.malonedeb@gac.canonical.com>
-Message-Id: <153291634076.16627.13000337932523048103.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1783362] Re: qemu-user: mmap should return
- failure (MAP_FAILED, -1) instead of success (NULL, 0) when len==0
+	(envelope-from <yuchenlin@synology.com>) id 1fjyDq-0001f0-IV
+	for qemu-devel@nongnu.org; Sun, 29 Jul 2018 22:47:47 -0400
+From: yuchenlin@synology.com
+Date: Mon, 30 Jul 2018 10:47:01 +0800
+Message-Id: <20180730024701.7613-3-yuchenlin@synology.com>
+In-Reply-To: <20180730024701.7613-1-yuchenlin@synology.com>
+References: <20180730024701.7613-1-yuchenlin@synology.com>
+Subject: [Qemu-devel] [PATCH 2/2] vdi: refine code for vdi_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,80 +20,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: sw@weilnetz.de, qemu-block@nongnu.org, yuchenlin <yuchenlin@synology.com>
 
-** Changed in: qemu
-       Status: New =3D> In Progress
+From: yuchenlin <yuchenlin@synology.com>
 
-** Changed in: qemu (Ubuntu)
-       Status: New =3D> In Progress
+When the condition of each if or else if is true,
+the code flow will goto fail. Which means we can decouple
+if else if chain to get some readability.
 
--- =
+Signed-off-by: yuchenlin <yuchenlin@synology.com>
+---
+ block/vdi.c | 27 ++++++++++++++++++---------
+ 1 file changed, 18 insertions(+), 9 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1783362
-
-Title:
-  qemu-user: mmap should return failure (MAP_FAILED, -1) instead of
-  success (NULL, 0) when len=3D=3D0
-
-Status in QEMU:
-  In Progress
-Status in qemu package in Ubuntu:
-  In Progress
-
-Bug description:
-  As shown in https://github.com/beehive-
-  lab/mambo/issues/19#issuecomment-407420602, with len=3D=3D0 mmap returns
-  success (NULL, 0) instead of failure (MAP_FAILED, -1) in a x86_64 host
-  executing a ELF 64-bit LSB executable, ARM aarch64 binary.
-
-  Steps to reproduce the bug:
-
-  - (cross-)compile the attached source file:
-
-  $ aarch64-linux-gnu-gcc -static -std=3Dgnu99 -lpthread test/mmap_qemu.c
-  -o mmap_qemu
-
-  - Execute in a x86_64 host with qemu-user and qemu-user-binfmt:
-
-  $ ./mmap_qemu
-  alloc: 0
-  MAP_FAILED: -1
-  errno: 0
-  mmap_qemu: test/mmap_qemu.c:15: main: Assertion `alloc =3D=3D MAP_FAILED'=
- failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  Aborted (core dumped)
-
-  - Execute in a ARM host without any additional dependecy:
-
-  $ ./mmap_qemu
-  alloc: -1
-  MAP_FAILED: -1
-  errno: 22
-
-  The bug is present in Fedora:
-
-  $ qemu-aarch64 --version
-  qemu-aarch64 version 2.11.2(qemu-2.11.2-1.fc28)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  $ uname -r
-  4.17.7-200.fc28.x86_64
-
-  And also in Ubuntu:
-
-  $ qemu-aarch64 --version
-  qemu-aarch64 version 2.12.0 (Debian 1:2.12+dfsg-3ubuntu3)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  $ uname -r
-  4.15.0-23-generic
-
-  Possibly related to:
-
-  - https://lists.freebsd.org/pipermail/freebsd-hackers/2009-July/029109.ht=
-ml
-  - https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=3D203852
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1783362/+subscriptions
+diff --git a/block/vdi.c b/block/vdi.c
+index 12f92e7891..28fc6210a7 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -405,35 +405,41 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+                    ")", header.signature);
+         ret = -EINVAL;
+         goto fail;
+-    } else if (header.version != VDI_VERSION_1_1) {
++    }
++    if (header.version != VDI_VERSION_1_1) {
+         error_setg(errp, "unsupported VDI image (version %" PRIu32 ".%" PRIu32
+                    ")", header.version >> 16, header.version & 0xffff);
+         ret = -ENOTSUP;
+         goto fail;
+-    } else if (header.offset_bmap % SECTOR_SIZE != 0) {
++    }
++    if (header.offset_bmap % SECTOR_SIZE != 0) {
+         /* We only support block maps which start on a sector boundary. */
+         error_setg(errp, "unsupported VDI image (unaligned block map offset "
+                    "0x%" PRIx32 ")", header.offset_bmap);
+         ret = -ENOTSUP;
+         goto fail;
+-    } else if (header.offset_data % SECTOR_SIZE != 0) {
++    }
++    if (header.offset_data % SECTOR_SIZE != 0) {
+         /* We only support data blocks which start on a sector boundary. */
+         error_setg(errp, "unsupported VDI image (unaligned data offset 0x%"
+                    PRIx32 ")", header.offset_data);
+         ret = -ENOTSUP;
+         goto fail;
+-    } else if (header.sector_size != SECTOR_SIZE) {
++    }
++    if (header.sector_size != SECTOR_SIZE) {
+         error_setg(errp, "unsupported VDI image (sector size %" PRIu32
+                    " is not %u)", header.sector_size, SECTOR_SIZE);
+         ret = -ENOTSUP;
+         goto fail;
+-    } else if (header.block_size != DEFAULT_CLUSTER_SIZE) {
++    }
++    if (header.block_size != DEFAULT_CLUSTER_SIZE) {
+         error_setg(errp, "unsupported VDI image (block size %" PRIu32
+                          " is not %" PRIu64 ")",
+                    header.block_size, DEFAULT_CLUSTER_SIZE);
+         ret = -ENOTSUP;
+         goto fail;
+-    } else if (header.disk_size >
++    }
++    if (header.disk_size >
+                (uint64_t)header.blocks_in_image * header.block_size) {
+         error_setg(errp, "unsupported VDI image (disk size %" PRIu64 ", "
+                    "image bitmap has room for %" PRIu64 ")",
+@@ -441,15 +447,18 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+                    (uint64_t)header.blocks_in_image * header.block_size);
+         ret = -ENOTSUP;
+         goto fail;
+-    } else if (!qemu_uuid_is_null(&header.uuid_link)) {
++    }
++    if (!qemu_uuid_is_null(&header.uuid_link)) {
+         error_setg(errp, "unsupported VDI image (non-NULL link UUID)");
+         ret = -ENOTSUP;
+         goto fail;
+-    } else if (!qemu_uuid_is_null(&header.uuid_parent)) {
++    }
++    if (!qemu_uuid_is_null(&header.uuid_parent)) {
+         error_setg(errp, "unsupported VDI image (non-NULL parent UUID)");
+         ret = -ENOTSUP;
+         goto fail;
+-    } else if (header.blocks_in_image > VDI_BLOCKS_IN_IMAGE_MAX) {
++    }
++    if (header.blocks_in_image > VDI_BLOCKS_IN_IMAGE_MAX) {
+         error_setg(errp, "unsupported VDI image "
+                          "(too many blocks %u, max is %u)",
+                           header.blocks_in_image, VDI_BLOCKS_IN_IMAGE_MAX);
+-- 
+2.17.0
