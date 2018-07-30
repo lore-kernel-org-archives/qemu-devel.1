@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1fkFKu-0005YL-Ft
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:04:16 -0400
+	(envelope-from <jcd@tribudubois.net>) id 1fkFL1-0005aQ-31
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:04:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1fkFKr-0000b2-0p
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:04:12 -0400
-Received: from relay4-d.mail.gandi.net ([217.70.183.196]:47801)
+	(envelope-from <jcd@tribudubois.net>) id 1fkFKx-0000fW-Rt
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:04:19 -0400
+Received: from relay8-d.mail.gandi.net ([217.70.183.201]:41353)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1fkFKq-0000aX-Ii
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:04:08 -0400
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1fkFKx-0000f7-Dw
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:04:15 -0400
 From: Jean-Christophe Dubois <jcd@tribudubois.net>
-Date: Mon, 30 Jul 2018 23:04:02 +0200
-Message-Id: <34b6704ceb81b49e35ce1ad162bf758e5141ff87.1532984236.git.jcd@tribudubois.net>
+Date: Mon, 30 Jul 2018 23:04:09 +0200
+Message-Id: <3853ec555d68e7e25d726170833b775796151a07.1532984236.git.jcd@tribudubois.net>
 In-Reply-To: <cover.1532984236.git.jcd@tribudubois.net>
 References: <cover.1532984236.git.jcd@tribudubois.net>
-Subject: [Qemu-devel] [PATCH v3 1/3] i.MX6UL: Add i.MX6UL specific CCM device
+Subject: [Qemu-devel] [PATCH v3 2/3] i.MX6UL: Add i.MX6UL SOC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,1177 +30,1008 @@ Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
 ---
 
 Changes in V3:
- * None
+ * Fix coding style issue with indent.
 
 Changes in V2:
- * move all CCM "debug" to the "trace" framework for i.MX6UL
- * remove unecessary breaks
- * prevent g_assert_not_reached triggered by guest.
- * Add assert to help static analyzer.
- * use FIELD_EX32 from hw/registerfields.h instead of defining my own.
+ * use object_initialize_child instead of several funcions
+ * use sysbus_init_child_obj instead for several functions
 
- hw/misc/Makefile.objs        |   1 +
- hw/misc/imx6ul_ccm.c         | 890 +++++++++++++++++++++++++++++++++++
- hw/misc/trace-events         |   7 +
- include/hw/misc/imx6ul_ccm.h | 226 +++++++++
- 4 files changed, 1124 insertions(+)
- create mode 100644 hw/misc/imx6ul_ccm.c
- create mode 100644 include/hw/misc/imx6ul_ccm.h
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/Makefile.objs            |   1 +
+ hw/arm/fsl-imx6ul.c             | 617 ++++++++++++++++++++++++++++++++
+ include/hw/arm/fsl-imx6ul.h     | 339 ++++++++++++++++++
+ 4 files changed, 958 insertions(+)
+ create mode 100644 hw/arm/fsl-imx6ul.c
+ create mode 100644 include/hw/arm/fsl-imx6ul.h
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 9350900845..51d27b3af1 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -36,6 +36,7 @@ obj-$(CONFIG_IMX) += imx_ccm.o
- obj-$(CONFIG_IMX) += imx31_ccm.o
- obj-$(CONFIG_IMX) += imx25_ccm.o
- obj-$(CONFIG_IMX) += imx6_ccm.o
-+obj-$(CONFIG_IMX) += imx6ul_ccm.o
- obj-$(CONFIG_IMX) += imx6_src.o
- obj-$(CONFIG_IMX) += imx7_ccm.o
- obj-$(CONFIG_IMX) += imx2_wdt.o
-diff --git a/hw/misc/imx6ul_ccm.c b/hw/misc/imx6ul_ccm.c
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 834d45cfaf..311584fd74 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -133,6 +133,7 @@ CONFIG_FSL_IMX6=y
+ CONFIG_FSL_IMX31=y
+ CONFIG_FSL_IMX25=y
+ CONFIG_FSL_IMX7=y
++CONFIG_FSL_IMX6UL=y
+ 
+ CONFIG_IMX_I2C=y
+ 
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index d51fcecaf2..e419ad040b 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -36,3 +36,4 @@ obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
+ obj-$(CONFIG_IOTKIT) += iotkit.o
+ obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
+ obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o smmuv3.o
++obj-$(CONFIG_FSL_IMX6UL) += fsl-imx6ul.o
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
 new file mode 100644
-index 0000000000..32197b2435
+index 0000000000..258f470623
 --- /dev/null
-+++ b/hw/misc/imx6ul_ccm.c
-@@ -0,0 +1,890 @@
++++ b/hw/arm/fsl-imx6ul.c
+@@ -0,0 +1,617 @@
 +/*
-+ * IMX6UL Clock Control Module
-+ *
 + * Copyright (c) 2018 Jean-Christophe Dubois <jcd@tribudubois.net>
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * i.MX6UL SOC emulation.
 + *
-+ * To get the timer frequencies right, we need to emulate at least part of
-+ * the CCM.
++ * Based on hw/arm/fsl-imx7.c
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "hw/registerfields.h"
-+#include "hw/misc/imx6ul_ccm.h"
-+#include "qemu/log.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "hw/arm/fsl-imx6ul.h"
++#include "hw/misc/unimp.h"
++#include "sysemu/sysemu.h"
++#include "qemu/error-report.h"
 +
-+#include "trace.h"
++#define NAME_SIZE 20
 +
-+static const char *imx6ul_ccm_reg_name(uint32_t reg)
++static void fsl_imx6ul_init(Object *obj)
 +{
-+    static char unknown[20];
++    FslIMX6ULState *s = FSL_IMX6UL(obj);
++    char name[NAME_SIZE];
++    int i;
 +
-+    switch (reg) {
-+    case CCM_CCR:
-+        return "CCR";
-+    case CCM_CCDR:
-+        return "CCDR";
-+    case CCM_CSR:
-+        return "CSR";
-+    case CCM_CCSR:
-+        return "CCSR";
-+    case CCM_CACRR:
-+        return "CACRR";
-+    case CCM_CBCDR:
-+        return "CBCDR";
-+    case CCM_CBCMR:
-+        return "CBCMR";
-+    case CCM_CSCMR1:
-+        return "CSCMR1";
-+    case CCM_CSCMR2:
-+        return "CSCMR2";
-+    case CCM_CSCDR1:
-+        return "CSCDR1";
-+    case CCM_CS1CDR:
-+        return "CS1CDR";
-+    case CCM_CS2CDR:
-+        return "CS2CDR";
-+    case CCM_CDCDR:
-+        return "CDCDR";
-+    case CCM_CHSCCDR:
-+        return "CHSCCDR";
-+    case CCM_CSCDR2:
-+        return "CSCDR2";
-+    case CCM_CSCDR3:
-+        return "CSCDR3";
-+    case CCM_CDHIPR:
-+        return "CDHIPR";
-+    case CCM_CTOR:
-+        return "CTOR";
-+    case CCM_CLPCR:
-+        return "CLPCR";
-+    case CCM_CISR:
-+        return "CISR";
-+    case CCM_CIMR:
-+        return "CIMR";
-+    case CCM_CCOSR:
-+        return "CCOSR";
-+    case CCM_CGPR:
-+        return "CGPR";
-+    case CCM_CCGR0:
-+        return "CCGR0";
-+    case CCM_CCGR1:
-+        return "CCGR1";
-+    case CCM_CCGR2:
-+        return "CCGR2";
-+    case CCM_CCGR3:
-+        return "CCGR3";
-+    case CCM_CCGR4:
-+        return "CCGR4";
-+    case CCM_CCGR5:
-+        return "CCGR5";
-+    case CCM_CCGR6:
-+        return "CCGR6";
-+    case CCM_CMEOR:
-+        return "CMEOR";
-+    default:
-+        sprintf(unknown, "%d ?", reg);
-+        return unknown;
++    for (i = 0; i < MIN(smp_cpus, FSL_IMX6UL_NUM_CPUS); i++) {
++        snprintf(name, NAME_SIZE, "cpu%d", i);
++        object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
++                                "cortex-a7-" TYPE_ARM_CPU, &error_abort, NULL);
 +    }
-+}
-+
-+static const char *imx6ul_analog_reg_name(uint32_t reg)
-+{
-+    static char unknown[20];
-+
-+    switch (reg) {
-+    case CCM_ANALOG_PLL_ARM:
-+        return "PLL_ARM";
-+    case CCM_ANALOG_PLL_ARM_SET:
-+        return "PLL_ARM_SET";
-+    case CCM_ANALOG_PLL_ARM_CLR:
-+        return "PLL_ARM_CLR";
-+    case CCM_ANALOG_PLL_ARM_TOG:
-+        return "PLL_ARM_TOG";
-+    case CCM_ANALOG_PLL_USB1:
-+        return "PLL_USB1";
-+    case CCM_ANALOG_PLL_USB1_SET:
-+        return "PLL_USB1_SET";
-+    case CCM_ANALOG_PLL_USB1_CLR:
-+        return "PLL_USB1_CLR";
-+    case CCM_ANALOG_PLL_USB1_TOG:
-+        return "PLL_USB1_TOG";
-+    case CCM_ANALOG_PLL_USB2:
-+        return "PLL_USB2";
-+    case CCM_ANALOG_PLL_USB2_SET:
-+        return "PLL_USB2_SET";
-+    case CCM_ANALOG_PLL_USB2_CLR:
-+        return "PLL_USB2_CLR";
-+    case CCM_ANALOG_PLL_USB2_TOG:
-+        return "PLL_USB2_TOG";
-+    case CCM_ANALOG_PLL_SYS:
-+        return "PLL_SYS";
-+    case CCM_ANALOG_PLL_SYS_SET:
-+        return "PLL_SYS_SET";
-+    case CCM_ANALOG_PLL_SYS_CLR:
-+        return "PLL_SYS_CLR";
-+    case CCM_ANALOG_PLL_SYS_TOG:
-+        return "PLL_SYS_TOG";
-+    case CCM_ANALOG_PLL_SYS_SS:
-+        return "PLL_SYS_SS";
-+    case CCM_ANALOG_PLL_SYS_NUM:
-+        return "PLL_SYS_NUM";
-+    case CCM_ANALOG_PLL_SYS_DENOM:
-+        return "PLL_SYS_DENOM";
-+    case CCM_ANALOG_PLL_AUDIO:
-+        return "PLL_AUDIO";
-+    case CCM_ANALOG_PLL_AUDIO_SET:
-+        return "PLL_AUDIO_SET";
-+    case CCM_ANALOG_PLL_AUDIO_CLR:
-+        return "PLL_AUDIO_CLR";
-+    case CCM_ANALOG_PLL_AUDIO_TOG:
-+        return "PLL_AUDIO_TOG";
-+    case CCM_ANALOG_PLL_AUDIO_NUM:
-+        return "PLL_AUDIO_NUM";
-+    case CCM_ANALOG_PLL_AUDIO_DENOM:
-+        return "PLL_AUDIO_DENOM";
-+    case CCM_ANALOG_PLL_VIDEO:
-+        return "PLL_VIDEO";
-+    case CCM_ANALOG_PLL_VIDEO_SET:
-+        return "PLL_VIDEO_SET";
-+    case CCM_ANALOG_PLL_VIDEO_CLR:
-+        return "PLL_VIDEO_CLR";
-+    case CCM_ANALOG_PLL_VIDEO_TOG:
-+        return "PLL_VIDEO_TOG";
-+    case CCM_ANALOG_PLL_VIDEO_NUM:
-+        return "PLL_VIDEO_NUM";
-+    case CCM_ANALOG_PLL_VIDEO_DENOM:
-+        return "PLL_VIDEO_DENOM";
-+    case CCM_ANALOG_PLL_ENET:
-+        return "PLL_ENET";
-+    case CCM_ANALOG_PLL_ENET_SET:
-+        return "PLL_ENET_SET";
-+    case CCM_ANALOG_PLL_ENET_CLR:
-+        return "PLL_ENET_CLR";
-+    case CCM_ANALOG_PLL_ENET_TOG:
-+        return "PLL_ENET_TOG";
-+    case CCM_ANALOG_PFD_480:
-+        return "PFD_480";
-+    case CCM_ANALOG_PFD_480_SET:
-+        return "PFD_480_SET";
-+    case CCM_ANALOG_PFD_480_CLR:
-+        return "PFD_480_CLR";
-+    case CCM_ANALOG_PFD_480_TOG:
-+        return "PFD_480_TOG";
-+    case CCM_ANALOG_PFD_528:
-+        return "PFD_528";
-+    case CCM_ANALOG_PFD_528_SET:
-+        return "PFD_528_SET";
-+    case CCM_ANALOG_PFD_528_CLR:
-+        return "PFD_528_CLR";
-+    case CCM_ANALOG_PFD_528_TOG:
-+        return "PFD_528_TOG";
-+    case CCM_ANALOG_MISC0:
-+        return "MISC0";
-+    case CCM_ANALOG_MISC0_SET:
-+        return "MISC0_SET";
-+    case CCM_ANALOG_MISC0_CLR:
-+        return "MISC0_CLR";
-+    case CCM_ANALOG_MISC0_TOG:
-+        return "MISC0_TOG";
-+    case CCM_ANALOG_MISC2:
-+        return "MISC2";
-+    case CCM_ANALOG_MISC2_SET:
-+        return "MISC2_SET";
-+    case CCM_ANALOG_MISC2_CLR:
-+        return "MISC2_CLR";
-+    case CCM_ANALOG_MISC2_TOG:
-+        return "MISC2_TOG";
-+    case PMU_REG_1P1:
-+        return "PMU_REG_1P1";
-+    case PMU_REG_3P0:
-+        return "PMU_REG_3P0";
-+    case PMU_REG_2P5:
-+        return "PMU_REG_2P5";
-+    case PMU_REG_CORE:
-+        return "PMU_REG_CORE";
-+    case PMU_MISC1:
-+        return "PMU_MISC1";
-+    case PMU_MISC1_SET:
-+        return "PMU_MISC1_SET";
-+    case PMU_MISC1_CLR:
-+        return "PMU_MISC1_CLR";
-+    case PMU_MISC1_TOG:
-+        return "PMU_MISC1_TOG";
-+    case USB_ANALOG_DIGPROG:
-+        return "USB_ANALOG_DIGPROG";
-+    default:
-+        sprintf(unknown, "%d ?", reg);
-+        return unknown;
-+    }
-+}
-+
-+#define CKIH_FREQ 24000000 /* 24MHz crystal input */
-+
-+static const VMStateDescription vmstate_imx6ul_ccm = {
-+    .name = TYPE_IMX6UL_CCM,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(ccm, IMX6ULCCMState, CCM_MAX),
-+        VMSTATE_UINT32_ARRAY(analog, IMX6ULCCMState, CCM_ANALOG_MAX),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static uint64_t imx6ul_analog_get_osc_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = CKIH_FREQ;
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_analog_get_pll2_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = imx6ul_analog_get_osc_clk(dev);
-+
-+    if (FIELD_EX32(dev->analog[CCM_ANALOG_PLL_SYS],
-+                   ANALOG_PLL_SYS, DIV_SELECT)) {
-+        freq *= 22;
-+    } else {
-+        freq *= 20;
-+    }
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_analog_get_pll3_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = imx6ul_analog_get_osc_clk(dev) * 20;
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_analog_get_pll2_pfd0_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = 0;
-+
-+    freq = imx6ul_analog_get_pll2_clk(dev) * 18
-+           / FIELD_EX32(dev->analog[CCM_ANALOG_PFD_528],
-+                        ANALOG_PFD_528, PFD0_FRAC);
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_analog_get_pll2_pfd2_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = 0;
-+
-+    freq = imx6ul_analog_get_pll2_clk(dev) * 18
-+           / FIELD_EX32(dev->analog[CCM_ANALOG_PFD_528],
-+                        ANALOG_PFD_528, PFD2_FRAC);
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_analog_pll2_bypass_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = 0;
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_ccm_get_periph_clk2_sel_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = 0;
-+
-+    switch (FIELD_EX32(dev->ccm[CCM_CBCMR], CBCMR, PERIPH_CLK2_SEL)) {
-+    case 0:
-+        freq = imx6ul_analog_get_pll3_clk(dev);
-+        break;
-+    case 1:
-+        freq = imx6ul_analog_get_osc_clk(dev);
-+        break;
-+    case 2:
-+        freq = imx6ul_analog_pll2_bypass_clk(dev);
-+        break;
-+    case 3:
-+        /* We should never get there as 3 is a reserved value */
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "[%s]%s: unsupported PERIPH_CLK2_SEL value 3\n",
-+                      TYPE_IMX6UL_CCM, __func__);
-+        /* freq is set to 0 as we don't know what it should be */
-+        break;
-+    default:
-+        /* We should never get there */
-+        g_assert_not_reached();
-+    }
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_ccm_get_periph_clk_sel_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = 0;
-+
-+    switch (FIELD_EX32(dev->ccm[CCM_CBCMR], CBCMR, PRE_PERIPH_CLK_SEL)) {
-+    case 0:
-+        freq = imx6ul_analog_get_pll2_clk(dev);
-+        break;
-+    case 1:
-+        freq = imx6ul_analog_get_pll2_pfd2_clk(dev);
-+        break;
-+    case 2:
-+        freq = imx6ul_analog_get_pll2_pfd0_clk(dev);
-+        break;
-+    case 3:
-+        freq = imx6ul_analog_get_pll2_pfd2_clk(dev) / 2;
-+        break;
-+    default:
-+        /* We should never get there */
-+        g_assert_not_reached();
-+    }
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_ccm_get_periph_clk2_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = 0;
-+
-+    freq = imx6ul_ccm_get_periph_clk2_sel_clk(dev)
-+           / (1 + FIELD_EX32(dev->ccm[CCM_CBCDR], CBCDR, PERIPH_CLK2_PODF));
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_ccm_get_periph_sel_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = 0;
-+
-+    switch (FIELD_EX32(dev->ccm[CCM_CBCDR], CBCDR, PERIPH_CLK_SEL)) {
-+    case 0:
-+        freq = imx6ul_ccm_get_periph_clk_sel_clk(dev);
-+        break;
-+    case 1:
-+        freq = imx6ul_ccm_get_periph_clk2_clk(dev);
-+        break;
-+    default:
-+        /* We should never get there */
-+        g_assert_not_reached();
-+    }
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_ccm_get_ahb_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = 0;
-+
-+    freq = imx6ul_ccm_get_periph_sel_clk(dev)
-+           / (1 + FIELD_EX32(dev->ccm[CCM_CBCDR], CBCDR, AHB_PODF));
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_ccm_get_ipg_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = 0;
-+
-+    freq = imx6ul_ccm_get_ahb_clk(dev)
-+           / (1 + FIELD_EX32(dev->ccm[CCM_CBCDR], CBCDR, IPG_PODF));
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_ccm_get_per_sel_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = 0;
-+
-+    switch (FIELD_EX32(dev->ccm[CCM_CSCMR1], CSCMR1, PERCLK_CLK_SEL)) {
-+    case 0:
-+        freq = imx6ul_ccm_get_ipg_clk(dev);
-+        break;
-+    case 1:
-+        freq = imx6ul_analog_get_osc_clk(dev);
-+        break;
-+    default:
-+        /* We should never get there */
-+        g_assert_not_reached();
-+    }
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint64_t imx6ul_ccm_get_per_clk(IMX6ULCCMState *dev)
-+{
-+    uint64_t freq = 0;
-+
-+    freq = imx6ul_ccm_get_per_sel_clk(dev)
-+           / (1 + FIELD_EX32(dev->ccm[CCM_CSCMR1], CSCMR1, PERCLK_PODF));
-+
-+    trace_ccm_freq((uint32_t)freq);
-+
-+    return freq;
-+}
-+
-+static uint32_t imx6ul_ccm_get_clock_frequency(IMXCCMState *dev, IMXClk clock)
-+{
-+    uint32_t freq = 0;
-+    IMX6ULCCMState *s = IMX6UL_CCM(dev);
-+
-+    switch (clock) {
-+    case CLK_NONE:
-+        break;
-+    case CLK_IPG:
-+        freq = imx6ul_ccm_get_ipg_clk(s);
-+        break;
-+    case CLK_IPG_HIGH:
-+        freq = imx6ul_ccm_get_per_clk(s);
-+        break;
-+    case CLK_32k:
-+        freq = CKIL_FREQ;
-+        break;
-+    case CLK_HIGH:
-+        freq = CKIH_FREQ;
-+        break;
-+    case CLK_HIGH_DIV:
-+        freq = CKIH_FREQ / 8;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: unsupported clock %d\n",
-+                      TYPE_IMX6UL_CCM, __func__, clock);
-+        break;
-+    }
-+
-+    trace_ccm_clock_freq(clock, freq);
-+
-+    return freq;
-+}
-+
-+static void imx6ul_ccm_reset(DeviceState *dev)
-+{
-+    IMX6ULCCMState *s = IMX6UL_CCM(dev);
-+
-+    trace_ccm_entry();
-+
-+    s->ccm[CCM_CCR] = 0x0401167F;
-+    s->ccm[CCM_CCDR] = 0x00000000;
-+    s->ccm[CCM_CSR] = 0x00000010;
-+    s->ccm[CCM_CCSR] = 0x00000100;
-+    s->ccm[CCM_CACRR] = 0x00000000;
-+    s->ccm[CCM_CBCDR] = 0x00018D00;
-+    s->ccm[CCM_CBCMR] = 0x24860324;
-+    s->ccm[CCM_CSCMR1] = 0x04900080;
-+    s->ccm[CCM_CSCMR2] = 0x03192F06;
-+    s->ccm[CCM_CSCDR1] = 0x00490B00;
-+    s->ccm[CCM_CS1CDR] = 0x0EC102C1;
-+    s->ccm[CCM_CS2CDR] = 0x000336C1;
-+    s->ccm[CCM_CDCDR] = 0x33F71F92;
-+    s->ccm[CCM_CHSCCDR] = 0x000248A4;
-+    s->ccm[CCM_CSCDR2] = 0x00029B48;
-+    s->ccm[CCM_CSCDR3] = 0x00014841;
-+    s->ccm[CCM_CDHIPR] = 0x00000000;
-+    s->ccm[CCM_CTOR] = 0x00000000;
-+    s->ccm[CCM_CLPCR] = 0x00000079;
-+    s->ccm[CCM_CISR] = 0x00000000;
-+    s->ccm[CCM_CIMR] = 0xFFFFFFFF;
-+    s->ccm[CCM_CCOSR] = 0x000A0001;
-+    s->ccm[CCM_CGPR] = 0x0000FE62;
-+    s->ccm[CCM_CCGR0] = 0xFFFFFFFF;
-+    s->ccm[CCM_CCGR1] = 0xFFFFFFFF;
-+    s->ccm[CCM_CCGR2] = 0xFC3FFFFF;
-+    s->ccm[CCM_CCGR3] = 0xFFFFFFFF;
-+    s->ccm[CCM_CCGR4] = 0xFFFFFFFF;
-+    s->ccm[CCM_CCGR5] = 0xFFFFFFFF;
-+    s->ccm[CCM_CCGR6] = 0xFFFFFFFF;
-+    s->ccm[CCM_CMEOR] = 0xFFFFFFFF;
-+
-+    s->analog[CCM_ANALOG_PLL_ARM] = 0x00013063;
-+    s->analog[CCM_ANALOG_PLL_USB1] = 0x00012000;
-+    s->analog[CCM_ANALOG_PLL_USB2] = 0x00012000;
-+    s->analog[CCM_ANALOG_PLL_SYS] = 0x00013001;
-+    s->analog[CCM_ANALOG_PLL_SYS_SS] = 0x00000000;
-+    s->analog[CCM_ANALOG_PLL_SYS_NUM] = 0x00000000;
-+    s->analog[CCM_ANALOG_PLL_SYS_DENOM] = 0x00000012;
-+    s->analog[CCM_ANALOG_PLL_AUDIO] = 0x00011006;
-+    s->analog[CCM_ANALOG_PLL_AUDIO_NUM] = 0x05F5E100;
-+    s->analog[CCM_ANALOG_PLL_AUDIO_DENOM] = 0x2964619C;
-+    s->analog[CCM_ANALOG_PLL_VIDEO] = 0x0001100C;
-+    s->analog[CCM_ANALOG_PLL_VIDEO_NUM] = 0x05F5E100;
-+    s->analog[CCM_ANALOG_PLL_VIDEO_DENOM] = 0x10A24447;
-+    s->analog[CCM_ANALOG_PLL_ENET] = 0x00011001;
-+    s->analog[CCM_ANALOG_PFD_480] = 0x1311100C;
-+    s->analog[CCM_ANALOG_PFD_528] = 0x1018101B;
-+
-+    s->analog[PMU_REG_1P1] = 0x00001073;
-+    s->analog[PMU_REG_3P0] = 0x00000F74;
-+    s->analog[PMU_REG_2P5] = 0x00001073;
-+    s->analog[PMU_REG_CORE] = 0x00482012;
-+    s->analog[PMU_MISC0] = 0x04000000;
-+    s->analog[PMU_MISC1] = 0x00000000;
-+    s->analog[PMU_MISC2] = 0x00272727;
-+    s->analog[PMU_LOWPWR_CTRL] = 0x00004009;
-+
-+    s->analog[USB_ANALOG_USB1_VBUS_DETECT] = 0x01000004;
-+    s->analog[USB_ANALOG_USB1_CHRG_DETECT] = 0x00000000;
-+    s->analog[USB_ANALOG_USB1_VBUS_DETECT_STAT] = 0x00000000;
-+    s->analog[USB_ANALOG_USB1_CHRG_DETECT_STAT] = 0x00000000;
-+    s->analog[USB_ANALOG_USB1_MISC] = 0x00000002;
-+    s->analog[USB_ANALOG_USB2_VBUS_DETECT] = 0x01000004;
-+    s->analog[USB_ANALOG_USB2_CHRG_DETECT] = 0x00000000;
-+    s->analog[USB_ANALOG_USB2_MISC] = 0x00000002;
-+    s->analog[USB_ANALOG_DIGPROG] = 0x00640000;
-+
-+    /* all PLLs need to be locked */
-+    s->analog[CCM_ANALOG_PLL_ARM]   |= CCM_ANALOG_PLL_LOCK;
-+    s->analog[CCM_ANALOG_PLL_USB1]  |= CCM_ANALOG_PLL_LOCK;
-+    s->analog[CCM_ANALOG_PLL_USB2]  |= CCM_ANALOG_PLL_LOCK;
-+    s->analog[CCM_ANALOG_PLL_SYS]   |= CCM_ANALOG_PLL_LOCK;
-+    s->analog[CCM_ANALOG_PLL_AUDIO] |= CCM_ANALOG_PLL_LOCK;
-+    s->analog[CCM_ANALOG_PLL_VIDEO] |= CCM_ANALOG_PLL_LOCK;
-+    s->analog[CCM_ANALOG_PLL_ENET]  |= CCM_ANALOG_PLL_LOCK;
-+
-+    s->analog[TEMPMON_TEMPSENSE0] = 0x00000001;
-+    s->analog[TEMPMON_TEMPSENSE1] = 0x00000001;
-+    s->analog[TEMPMON_TEMPSENSE2] = 0x00000000;
-+}
-+
-+static uint64_t imx6ul_ccm_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    uint32_t value = 0;
-+    uint32_t index = offset >> 2;
-+    IMX6ULCCMState *s = (IMX6ULCCMState *)opaque;
-+
-+    assert(index < CCM_MAX);
-+
-+    value = s->ccm[index];
-+
-+    trace_ccm_read_reg(imx6ul_ccm_reg_name(index), (uint32_t)value);
-+
-+    return (uint64_t)value;
-+}
-+
-+static void imx6ul_ccm_write(void *opaque, hwaddr offset, uint64_t value,
-+                           unsigned size)
-+{
-+    uint32_t index = offset >> 2;
-+    IMX6ULCCMState *s = (IMX6ULCCMState *)opaque;
-+
-+    assert(index < CCM_MAX);
-+
-+    trace_ccm_write_reg(imx6ul_ccm_reg_name(index), (uint32_t)value);
 +
 +    /*
-+     * We will do a better implementation later. In particular some bits
-+     * cannot be written to.
++     * A7MPCORE
 +     */
-+    s->ccm[index] = (uint32_t)value;
-+}
++    sysbus_init_child_obj(obj, "a7mpcore", &s->a7mpcore, sizeof(s->a7mpcore),
++                          TYPE_A15MPCORE_PRIV);
 +
-+static uint64_t imx6ul_analog_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    uint32_t value;
-+    uint32_t index = offset >> 2;
-+    IMX6ULCCMState *s = (IMX6ULCCMState *)opaque;
++    /*
++     * CCM
++     */
++    sysbus_init_child_obj(obj, "ccm", &s->ccm, sizeof(s->ccm), TYPE_IMX6UL_CCM);
 +
-+    assert(index < CCM_ANALOG_MAX);
++    /*
++     * SRC
++     */
++    sysbus_init_child_obj(obj, "src", &s->src, sizeof(s->src), TYPE_IMX6_SRC);
 +
-+    switch (index) {
-+    case CCM_ANALOG_PLL_ARM_SET:
-+    case CCM_ANALOG_PLL_USB1_SET:
-+    case CCM_ANALOG_PLL_USB2_SET:
-+    case CCM_ANALOG_PLL_SYS_SET:
-+    case CCM_ANALOG_PLL_AUDIO_SET:
-+    case CCM_ANALOG_PLL_VIDEO_SET:
-+    case CCM_ANALOG_PLL_ENET_SET:
-+    case CCM_ANALOG_PFD_480_SET:
-+    case CCM_ANALOG_PFD_528_SET:
-+    case CCM_ANALOG_MISC0_SET:
-+    case PMU_MISC1_SET:
-+    case CCM_ANALOG_MISC2_SET:
-+    case USB_ANALOG_USB1_VBUS_DETECT_SET:
-+    case USB_ANALOG_USB1_CHRG_DETECT_SET:
-+    case USB_ANALOG_USB1_MISC_SET:
-+    case USB_ANALOG_USB2_VBUS_DETECT_SET:
-+    case USB_ANALOG_USB2_CHRG_DETECT_SET:
-+    case USB_ANALOG_USB2_MISC_SET:
-+    case TEMPMON_TEMPSENSE0_SET:
-+    case TEMPMON_TEMPSENSE1_SET:
-+    case TEMPMON_TEMPSENSE2_SET:
-+        /*
-+         * All REG_NAME_SET register access are in fact targeting the
-+         * the REG_NAME register.
-+         */
-+        value = s->analog[index - 1];
-+        break;
-+    case CCM_ANALOG_PLL_ARM_CLR:
-+    case CCM_ANALOG_PLL_USB1_CLR:
-+    case CCM_ANALOG_PLL_USB2_CLR:
-+    case CCM_ANALOG_PLL_SYS_CLR:
-+    case CCM_ANALOG_PLL_AUDIO_CLR:
-+    case CCM_ANALOG_PLL_VIDEO_CLR:
-+    case CCM_ANALOG_PLL_ENET_CLR:
-+    case CCM_ANALOG_PFD_480_CLR:
-+    case CCM_ANALOG_PFD_528_CLR:
-+    case CCM_ANALOG_MISC0_CLR:
-+    case PMU_MISC1_CLR:
-+    case CCM_ANALOG_MISC2_CLR:
-+    case USB_ANALOG_USB1_VBUS_DETECT_CLR:
-+    case USB_ANALOG_USB1_CHRG_DETECT_CLR:
-+    case USB_ANALOG_USB1_MISC_CLR:
-+    case USB_ANALOG_USB2_VBUS_DETECT_CLR:
-+    case USB_ANALOG_USB2_CHRG_DETECT_CLR:
-+    case USB_ANALOG_USB2_MISC_CLR:
-+    case TEMPMON_TEMPSENSE0_CLR:
-+    case TEMPMON_TEMPSENSE1_CLR:
-+    case TEMPMON_TEMPSENSE2_CLR:
-+        /*
-+         * All REG_NAME_CLR register access are in fact targeting the
-+         * the REG_NAME register.
-+         */
-+        value = s->analog[index - 2];
-+        break;
-+    case CCM_ANALOG_PLL_ARM_TOG:
-+    case CCM_ANALOG_PLL_USB1_TOG:
-+    case CCM_ANALOG_PLL_USB2_TOG:
-+    case CCM_ANALOG_PLL_SYS_TOG:
-+    case CCM_ANALOG_PLL_AUDIO_TOG:
-+    case CCM_ANALOG_PLL_VIDEO_TOG:
-+    case CCM_ANALOG_PLL_ENET_TOG:
-+    case CCM_ANALOG_PFD_480_TOG:
-+    case CCM_ANALOG_PFD_528_TOG:
-+    case CCM_ANALOG_MISC0_TOG:
-+    case PMU_MISC1_TOG:
-+    case CCM_ANALOG_MISC2_TOG:
-+    case USB_ANALOG_USB1_VBUS_DETECT_TOG:
-+    case USB_ANALOG_USB1_CHRG_DETECT_TOG:
-+    case USB_ANALOG_USB1_MISC_TOG:
-+    case USB_ANALOG_USB2_VBUS_DETECT_TOG:
-+    case USB_ANALOG_USB2_CHRG_DETECT_TOG:
-+    case USB_ANALOG_USB2_MISC_TOG:
-+    case TEMPMON_TEMPSENSE0_TOG:
-+    case TEMPMON_TEMPSENSE1_TOG:
-+    case TEMPMON_TEMPSENSE2_TOG:
-+        /*
-+         * All REG_NAME_TOG register access are in fact targeting the
-+         * the REG_NAME register.
-+         */
-+        value = s->analog[index - 3];
-+        break;
-+    default:
-+        value = s->analog[index];
-+        break;
++    /*
++     * GPCv2
++     */
++    sysbus_init_child_obj(obj, "gpcv2", &s->gpcv2, sizeof(s->gpcv2),
++                          TYPE_IMX_GPCV2);
++
++    /*
++     * SNVS
++     */
++    sysbus_init_child_obj(obj, "snvs", &s->snvs, sizeof(s->snvs),
++                          TYPE_IMX7_SNVS);
++
++    /*
++     * GPR
++     */
++    sysbus_init_child_obj(obj, "gpr", &s->gpr, sizeof(s->gpr),
++                          TYPE_IMX7_GPR);
++
++    /*
++     * GPIOs 1 to 5
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_GPIOS; i++) {
++        snprintf(name, NAME_SIZE, "gpio%d", i);
++        sysbus_init_child_obj(obj, name, &s->gpio[i], sizeof(s->gpio[i]),
++                              TYPE_IMX_GPIO);
 +    }
 +
-+    trace_ccm_read_reg(imx6ul_analog_reg_name(index), (uint32_t)value);
++    /*
++     * GPT 1, 2
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_GPTS; i++) {
++        snprintf(name, NAME_SIZE, "gpt%d", i);
++        sysbus_init_child_obj(obj, name, &s->gpt[i], sizeof(s->gpt[i]),
++                              TYPE_IMX7_GPT);
++    }
 +
-+    return (uint64_t)value;
-+}
++    /*
++     * EPIT 1, 2
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_EPITS; i++) {
++        snprintf(name, NAME_SIZE, "epit%d", i + 1);
++        sysbus_init_child_obj(obj, name, &s->epit[i], sizeof(s->epit[i]),
++                              TYPE_IMX_EPIT);
++    }
 +
-+static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
-+                              unsigned size)
-+{
-+    uint32_t index = offset >> 2;
-+    IMX6ULCCMState *s = (IMX6ULCCMState *)opaque;
++    /*
++     * eCSPI
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_ECSPIS; i++) {
++        snprintf(name, NAME_SIZE, "spi%d", i + 1);
++        sysbus_init_child_obj(obj, name, &s->spi[i], sizeof(s->spi[i]),
++                              TYPE_IMX_SPI);
++    }
 +
-+    assert(index < CCM_ANALOG_MAX);
++    /*
++     * I2C
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_I2CS; i++) {
++        snprintf(name, NAME_SIZE, "i2c%d", i + 1);
++        sysbus_init_child_obj(obj, name, &s->i2c[i], sizeof(s->i2c[i]),
++                              TYPE_IMX_I2C);
++    }
 +
-+    trace_ccm_write_reg(imx6ul_analog_reg_name(index), (uint32_t)value);
++    /*
++     * UART
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_UARTS; i++) {
++        snprintf(name, NAME_SIZE, "uart%d", i);
++        sysbus_init_child_obj(obj, name, &s->uart[i], sizeof(s->uart[i]),
++                              TYPE_IMX_SERIAL);
++    }
 +
-+    switch (index) {
-+    case CCM_ANALOG_PLL_ARM_SET:
-+    case CCM_ANALOG_PLL_USB1_SET:
-+    case CCM_ANALOG_PLL_USB2_SET:
-+    case CCM_ANALOG_PLL_SYS_SET:
-+    case CCM_ANALOG_PLL_AUDIO_SET:
-+    case CCM_ANALOG_PLL_VIDEO_SET:
-+    case CCM_ANALOG_PLL_ENET_SET:
-+    case CCM_ANALOG_PFD_480_SET:
-+    case CCM_ANALOG_PFD_528_SET:
-+    case CCM_ANALOG_MISC0_SET:
-+    case PMU_MISC1_SET:
-+    case CCM_ANALOG_MISC2_SET:
-+    case USB_ANALOG_USB1_VBUS_DETECT_SET:
-+    case USB_ANALOG_USB1_CHRG_DETECT_SET:
-+    case USB_ANALOG_USB1_MISC_SET:
-+    case USB_ANALOG_USB2_VBUS_DETECT_SET:
-+    case USB_ANALOG_USB2_CHRG_DETECT_SET:
-+    case USB_ANALOG_USB2_MISC_SET:
-+        /*
-+         * All REG_NAME_SET register access are in fact targeting the
-+         * the REG_NAME register. So we change the value of the
-+         * REG_NAME register, setting bits passed in the value.
-+         */
-+        s->analog[index - 1] |= value;
-+        break;
-+    case CCM_ANALOG_PLL_ARM_CLR:
-+    case CCM_ANALOG_PLL_USB1_CLR:
-+    case CCM_ANALOG_PLL_USB2_CLR:
-+    case CCM_ANALOG_PLL_SYS_CLR:
-+    case CCM_ANALOG_PLL_AUDIO_CLR:
-+    case CCM_ANALOG_PLL_VIDEO_CLR:
-+    case CCM_ANALOG_PLL_ENET_CLR:
-+    case CCM_ANALOG_PFD_480_CLR:
-+    case CCM_ANALOG_PFD_528_CLR:
-+    case CCM_ANALOG_MISC0_CLR:
-+    case PMU_MISC1_CLR:
-+    case CCM_ANALOG_MISC2_CLR:
-+    case USB_ANALOG_USB1_VBUS_DETECT_CLR:
-+    case USB_ANALOG_USB1_CHRG_DETECT_CLR:
-+    case USB_ANALOG_USB1_MISC_CLR:
-+    case USB_ANALOG_USB2_VBUS_DETECT_CLR:
-+    case USB_ANALOG_USB2_CHRG_DETECT_CLR:
-+    case USB_ANALOG_USB2_MISC_CLR:
-+        /*
-+         * All REG_NAME_CLR register access are in fact targeting the
-+         * the REG_NAME register. So we change the value of the
-+         * REG_NAME register, unsetting bits passed in the value.
-+         */
-+        s->analog[index - 2] &= ~value;
-+        break;
-+    case CCM_ANALOG_PLL_ARM_TOG:
-+    case CCM_ANALOG_PLL_USB1_TOG:
-+    case CCM_ANALOG_PLL_USB2_TOG:
-+    case CCM_ANALOG_PLL_SYS_TOG:
-+    case CCM_ANALOG_PLL_AUDIO_TOG:
-+    case CCM_ANALOG_PLL_VIDEO_TOG:
-+    case CCM_ANALOG_PLL_ENET_TOG:
-+    case CCM_ANALOG_PFD_480_TOG:
-+    case CCM_ANALOG_PFD_528_TOG:
-+    case CCM_ANALOG_MISC0_TOG:
-+    case PMU_MISC1_TOG:
-+    case CCM_ANALOG_MISC2_TOG:
-+    case USB_ANALOG_USB1_VBUS_DETECT_TOG:
-+    case USB_ANALOG_USB1_CHRG_DETECT_TOG:
-+    case USB_ANALOG_USB1_MISC_TOG:
-+    case USB_ANALOG_USB2_VBUS_DETECT_TOG:
-+    case USB_ANALOG_USB2_CHRG_DETECT_TOG:
-+    case USB_ANALOG_USB2_MISC_TOG:
-+        /*
-+         * All REG_NAME_TOG register access are in fact targeting the
-+         * the REG_NAME register. So we change the value of the
-+         * REG_NAME register, toggling bits passed in the value.
-+         */
-+        s->analog[index - 3] ^= value;
-+        break;
-+    default:
-+        /*
-+         * We will do a better implementation later. In particular some bits
-+         * cannot be written to.
-+         */
-+        s->analog[index] = value;
-+        break;
++    /*
++     * Ethernet
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_ETHS; i++) {
++        snprintf(name, NAME_SIZE, "eth%d", i);
++        sysbus_init_child_obj(obj, name, &s->eth[i], sizeof(s->eth[i]),
++                              TYPE_IMX_ENET);
++    }
++
++    /*
++     * SDHCI
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_USDHCS; i++) {
++        snprintf(name, NAME_SIZE, "usdhc%d", i);
++        sysbus_init_child_obj(obj, name, &s->usdhc[i], sizeof(s->usdhc[i]),
++                              TYPE_IMX_USDHC);
++    }
++
++    /*
++     * Watchdog
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_WDTS; i++) {
++        snprintf(name, NAME_SIZE, "wdt%d", i);
++        sysbus_init_child_obj(obj, name, &s->wdt[i], sizeof(s->wdt[i]),
++                              TYPE_IMX2_WDT);
 +    }
 +}
 +
-+static const struct MemoryRegionOps imx6ul_ccm_ops = {
-+    .read = imx6ul_ccm_read,
-+    .write = imx6ul_ccm_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        /*
-+         * Our device would not work correctly if the guest was doing
-+         * unaligned access. This might not be a limitation on the real
-+         * device but in practice there is no reason for a guest to access
-+         * this device unaligned.
-+         */
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+        .unaligned = false,
-+    },
-+};
-+
-+static const struct MemoryRegionOps imx6ul_analog_ops = {
-+    .read = imx6ul_analog_read,
-+    .write = imx6ul_analog_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        /*
-+         * Our device would not work correctly if the guest was doing
-+         * unaligned access. This might not be a limitation on the real
-+         * device but in practice there is no reason for a guest to access
-+         * this device unaligned.
-+         */
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+        .unaligned = false,
-+    },
-+};
-+
-+static void imx6ul_ccm_init(Object *obj)
++static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
 +{
-+    DeviceState *dev = DEVICE(obj);
-+    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-+    IMX6ULCCMState *s = IMX6UL_CCM(obj);
++    FslIMX6ULState *s = FSL_IMX6UL(dev);
++    int i;
++    qemu_irq irq;
++    char name[NAME_SIZE];
 +
-+    /* initialize a container for the all memory range */
-+    memory_region_init(&s->container, OBJECT(dev), TYPE_IMX6UL_CCM, 0x8000);
++    if (smp_cpus > FSL_IMX6UL_NUM_CPUS) {
++        error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
++                   TYPE_FSL_IMX6UL, FSL_IMX6UL_NUM_CPUS, smp_cpus);
++        return;
++    }
 +
-+    /* We initialize an IO memory region for the CCM part */
-+    memory_region_init_io(&s->ioccm, OBJECT(dev), &imx6ul_ccm_ops, s,
-+                          TYPE_IMX6UL_CCM ".ccm", CCM_MAX * sizeof(uint32_t));
++    for (i = 0; i < smp_cpus; i++) {
++        Object *o = OBJECT(&s->cpu[i]);
 +
-+    /* Add the CCM as a subregion at offset 0 */
-+    memory_region_add_subregion(&s->container, 0, &s->ioccm);
++        object_property_set_int(o, QEMU_PSCI_CONDUIT_SMC,
++                                "psci-conduit", &error_abort);
 +
-+    /* We initialize an IO memory region for the ANALOG part */
-+    memory_region_init_io(&s->ioanalog, OBJECT(dev), &imx6ul_analog_ops, s,
-+                          TYPE_IMX6UL_CCM ".analog",
-+                          CCM_ANALOG_MAX * sizeof(uint32_t));
++        /* On uniprocessor, the CBAR is set to 0 */
++        if (smp_cpus > 1) {
++            object_property_set_int(o, FSL_IMX6UL_A7MPCORE_ADDR,
++                                    "reset-cbar", &error_abort);
++        }
 +
-+    /* Add the ANALOG as a subregion at offset 0x4000 */
-+    memory_region_add_subregion(&s->container, 0x4000, &s->ioanalog);
++        if (i) {
++            /* Secondary CPUs start in PSCI powered-down state */
++            object_property_set_bool(o, true,
++                                     "start-powered-off", &error_abort);
++        }
 +
-+    sysbus_init_mmio(sd, &s->container);
++        object_property_set_bool(o, true, "realized", &error_abort);
++    }
++
++    /*
++     * A7MPCORE
++     */
++    object_property_set_int(OBJECT(&s->a7mpcore), smp_cpus, "num-cpu",
++                            &error_abort);
++    object_property_set_int(OBJECT(&s->a7mpcore),
++                            FSL_IMX6UL_MAX_IRQ + GIC_INTERNAL,
++                            "num-irq", &error_abort);
++    object_property_set_bool(OBJECT(&s->a7mpcore), true, "realized",
++                             &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->a7mpcore), 0, FSL_IMX6UL_A7MPCORE_ADDR);
++
++    for (i = 0; i < smp_cpus; i++) {
++        SysBusDevice *sbd = SYS_BUS_DEVICE(&s->a7mpcore);
++        DeviceState  *d   = DEVICE(qemu_get_cpu(i));
++
++        irq = qdev_get_gpio_in(d, ARM_CPU_IRQ);
++        sysbus_connect_irq(sbd, i, irq);
++        sysbus_connect_irq(sbd, i + smp_cpus, qdev_get_gpio_in(d, ARM_CPU_FIQ));
++    }
++
++    /*
++     * A7MPCORE DAP
++     */
++    create_unimplemented_device("a7mpcore-dap", FSL_IMX6UL_A7MPCORE_DAP_ADDR,
++                                0x100000);
++
++    /*
++     * GPT 1, 2
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_GPTS; i++) {
++        static const hwaddr FSL_IMX6UL_GPTn_ADDR[FSL_IMX6UL_NUM_GPTS] = {
++            FSL_IMX6UL_GPT1_ADDR,
++            FSL_IMX6UL_GPT2_ADDR,
++        };
++
++        static const int FSL_IMX6UL_GPTn_IRQ[FSL_IMX6UL_NUM_GPTS] = {
++            FSL_IMX6UL_GPT1_IRQ,
++            FSL_IMX6UL_GPT2_IRQ,
++        };
++
++        s->gpt[i].ccm = IMX_CCM(&s->ccm);
++        object_property_set_bool(OBJECT(&s->gpt[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpt[i]), 0,
++                        FSL_IMX6UL_GPTn_ADDR[i]);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpt[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX6UL_GPTn_IRQ[i]));
++    }
++
++    /*
++     * EPIT 1, 2
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_EPITS; i++) {
++        static const hwaddr FSL_IMX6UL_EPITn_ADDR[FSL_IMX6UL_NUM_EPITS] = {
++            FSL_IMX6UL_EPIT1_ADDR,
++            FSL_IMX6UL_EPIT2_ADDR,
++        };
++
++        static const int FSL_IMX6UL_EPITn_IRQ[FSL_IMX6UL_NUM_EPITS] = {
++            FSL_IMX6UL_EPIT1_IRQ,
++            FSL_IMX6UL_EPIT2_IRQ,
++        };
++
++        s->epit[i].ccm = IMX_CCM(&s->ccm);
++        object_property_set_bool(OBJECT(&s->epit[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->epit[i]), 0,
++                        FSL_IMX6UL_EPITn_ADDR[i]);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->epit[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX6UL_EPITn_IRQ[i]));
++    }
++
++    /*
++     * GPIO
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_GPIOS; i++) {
++        static const hwaddr FSL_IMX6UL_GPIOn_ADDR[FSL_IMX6UL_NUM_GPIOS] = {
++            FSL_IMX6UL_GPIO1_ADDR,
++            FSL_IMX6UL_GPIO2_ADDR,
++            FSL_IMX6UL_GPIO3_ADDR,
++            FSL_IMX6UL_GPIO4_ADDR,
++            FSL_IMX6UL_GPIO5_ADDR,
++        };
++
++        static const int FSL_IMX6UL_GPIOn_LOW_IRQ[FSL_IMX6UL_NUM_GPIOS] = {
++            FSL_IMX6UL_GPIO1_LOW_IRQ,
++            FSL_IMX6UL_GPIO2_LOW_IRQ,
++            FSL_IMX6UL_GPIO3_LOW_IRQ,
++            FSL_IMX6UL_GPIO4_LOW_IRQ,
++            FSL_IMX6UL_GPIO5_LOW_IRQ,
++        };
++
++        static const int FSL_IMX6UL_GPIOn_HIGH_IRQ[FSL_IMX6UL_NUM_GPIOS] = {
++            FSL_IMX6UL_GPIO1_HIGH_IRQ,
++            FSL_IMX6UL_GPIO2_HIGH_IRQ,
++            FSL_IMX6UL_GPIO3_HIGH_IRQ,
++            FSL_IMX6UL_GPIO4_HIGH_IRQ,
++            FSL_IMX6UL_GPIO5_HIGH_IRQ,
++        };
++
++        object_property_set_bool(OBJECT(&s->gpio[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio[i]), 0,
++                        FSL_IMX6UL_GPIOn_ADDR[i]);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX6UL_GPIOn_LOW_IRQ[i]));
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio[i]), 1,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX6UL_GPIOn_HIGH_IRQ[i]));
++    }
++
++    /*
++     * IOMUXC and IOMUXC_GPR
++     */
++    for (i = 0; i < 1; i++) {
++        static const hwaddr FSL_IMX6UL_IOMUXCn_ADDR[FSL_IMX6UL_NUM_IOMUXCS] = {
++            FSL_IMX6UL_IOMUXC_ADDR,
++            FSL_IMX6UL_IOMUXC_GPR_ADDR,
++        };
++
++        snprintf(name, NAME_SIZE, "iomuxc%d", i);
++        create_unimplemented_device(name, FSL_IMX6UL_IOMUXCn_ADDR[i], 0x4000);
++    }
++
++    /*
++     * CCM
++     */
++    object_property_set_bool(OBJECT(&s->ccm), true, "realized", &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccm), 0, FSL_IMX6UL_CCM_ADDR);
++
++    /*
++     * SRC
++     */
++    object_property_set_bool(OBJECT(&s->src), true, "realized", &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->src), 0, FSL_IMX6UL_SRC_ADDR);
++
++    /*
++     * GPCv2
++     */
++    object_property_set_bool(OBJECT(&s->gpcv2), true,
++                             "realized", &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpcv2), 0, FSL_IMX6UL_GPC_ADDR);
++
++    /* Initialize all ECSPI */
++    for (i = 0; i < FSL_IMX6UL_NUM_ECSPIS; i++) {
++        static const hwaddr FSL_IMX6UL_SPIn_ADDR[FSL_IMX6UL_NUM_ECSPIS] = {
++            FSL_IMX6UL_ECSPI1_ADDR,
++            FSL_IMX6UL_ECSPI2_ADDR,
++            FSL_IMX6UL_ECSPI3_ADDR,
++            FSL_IMX6UL_ECSPI4_ADDR,
++        };
++
++        static const int FSL_IMX6UL_SPIn_IRQ[FSL_IMX6UL_NUM_ECSPIS] = {
++            FSL_IMX6UL_ECSPI1_IRQ,
++            FSL_IMX6UL_ECSPI2_IRQ,
++            FSL_IMX6UL_ECSPI3_IRQ,
++            FSL_IMX6UL_ECSPI4_IRQ,
++        };
++
++        /* Initialize the SPI */
++        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0,
++                        FSL_IMX6UL_SPIn_ADDR[i]);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX6UL_SPIn_IRQ[i]));
++    }
++
++    /*
++     * I2C
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_I2CS; i++) {
++        static const hwaddr FSL_IMX6UL_I2Cn_ADDR[FSL_IMX6UL_NUM_I2CS] = {
++            FSL_IMX6UL_I2C1_ADDR,
++            FSL_IMX6UL_I2C2_ADDR,
++            FSL_IMX6UL_I2C3_ADDR,
++            FSL_IMX6UL_I2C4_ADDR,
++        };
++
++        static const int FSL_IMX6UL_I2Cn_IRQ[FSL_IMX6UL_NUM_I2CS] = {
++            FSL_IMX6UL_I2C1_IRQ,
++            FSL_IMX6UL_I2C2_IRQ,
++            FSL_IMX6UL_I2C3_IRQ,
++            FSL_IMX6UL_I2C4_IRQ,
++        };
++
++        object_property_set_bool(OBJECT(&s->i2c[i]), true, "realized",
++                                 &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->i2c[i]), 0, FSL_IMX6UL_I2Cn_ADDR[i]);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->i2c[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX6UL_I2Cn_IRQ[i]));
++    }
++
++    /*
++     * UART
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_UARTS; i++) {
++        static const hwaddr FSL_IMX6UL_UARTn_ADDR[FSL_IMX6UL_NUM_UARTS] = {
++            FSL_IMX6UL_UART1_ADDR,
++            FSL_IMX6UL_UART2_ADDR,
++            FSL_IMX6UL_UART3_ADDR,
++            FSL_IMX6UL_UART4_ADDR,
++            FSL_IMX6UL_UART5_ADDR,
++            FSL_IMX6UL_UART6_ADDR,
++            FSL_IMX6UL_UART7_ADDR,
++            FSL_IMX6UL_UART8_ADDR,
++        };
++
++        static const int FSL_IMX6UL_UARTn_IRQ[FSL_IMX6UL_NUM_UARTS] = {
++            FSL_IMX6UL_UART1_IRQ,
++            FSL_IMX6UL_UART2_IRQ,
++            FSL_IMX6UL_UART3_IRQ,
++            FSL_IMX6UL_UART4_IRQ,
++            FSL_IMX6UL_UART5_IRQ,
++            FSL_IMX6UL_UART6_IRQ,
++            FSL_IMX6UL_UART7_IRQ,
++            FSL_IMX6UL_UART8_IRQ,
++        };
++
++        qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hd(i));
++
++        object_property_set_bool(OBJECT(&s->uart[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->uart[i]), 0,
++                        FSL_IMX6UL_UARTn_ADDR[i]);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX6UL_UARTn_IRQ[i]));
++    }
++
++    /*
++     * Ethernet
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_ETHS; i++) {
++        static const hwaddr FSL_IMX6UL_ENETn_ADDR[FSL_IMX6UL_NUM_ETHS] = {
++            FSL_IMX6UL_ENET1_ADDR,
++            FSL_IMX6UL_ENET2_ADDR,
++        };
++
++        static const int FSL_IMX6UL_ENETn_IRQ[FSL_IMX6UL_NUM_ETHS] = {
++            FSL_IMX6UL_ENET1_IRQ,
++            FSL_IMX6UL_ENET2_IRQ,
++        };
++
++        static const int FSL_IMX6UL_ENETn_TIMER_IRQ[FSL_IMX6UL_NUM_ETHS] = {
++            FSL_IMX6UL_ENET1_TIMER_IRQ,
++            FSL_IMX6UL_ENET2_TIMER_IRQ,
++        };
++
++        object_property_set_uint(OBJECT(&s->eth[i]),
++                                 FSL_IMX6UL_ETH_NUM_TX_RINGS,
++                                 "tx-ring-num", &error_abort);
++        qdev_set_nic_properties(DEVICE(&s->eth[i]), &nd_table[i]);
++        object_property_set_bool(OBJECT(&s->eth[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->eth[i]), 0,
++                        FSL_IMX6UL_ENETn_ADDR[i]);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->eth[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX6UL_ENETn_IRQ[i]));
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->eth[i]), 1,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX6UL_ENETn_TIMER_IRQ[i]));
++    }
++
++    /*
++     * USDHC
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_USDHCS; i++) {
++        static const hwaddr FSL_IMX6UL_USDHCn_ADDR[FSL_IMX6UL_NUM_USDHCS] = {
++            FSL_IMX6UL_USDHC1_ADDR,
++            FSL_IMX6UL_USDHC2_ADDR,
++        };
++
++        static const int FSL_IMX6UL_USDHCn_IRQ[FSL_IMX6UL_NUM_USDHCS] = {
++            FSL_IMX6UL_USDHC1_IRQ,
++            FSL_IMX6UL_USDHC2_IRQ,
++        };
++
++        object_property_set_bool(OBJECT(&s->usdhc[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->usdhc[i]), 0,
++                        FSL_IMX6UL_USDHCn_ADDR[i]);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->usdhc[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX6UL_USDHCn_IRQ[i]));
++    }
++
++    /*
++     * SNVS
++     */
++    object_property_set_bool(OBJECT(&s->snvs), true, "realized", &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->snvs), 0, FSL_IMX6UL_SNVS_HP_ADDR);
++
++    /*
++     * Watchdog
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_WDTS; i++) {
++        static const hwaddr FSL_IMX6UL_WDOGn_ADDR[FSL_IMX6UL_NUM_WDTS] = {
++            FSL_IMX6UL_WDOG1_ADDR,
++            FSL_IMX6UL_WDOG2_ADDR,
++            FSL_IMX6UL_WDOG3_ADDR,
++        };
++
++        object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0,
++                        FSL_IMX6UL_WDOGn_ADDR[i]);
++    }
++
++    /*
++     * GPR
++     */
++    object_property_set_bool(OBJECT(&s->gpr), true, "realized",
++                             &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpr), 0, FSL_IMX6UL_IOMUXC_GPR_ADDR);
++
++    /*
++     * SDMA
++     */
++    create_unimplemented_device("sdma", FSL_IMX6UL_SDMA_ADDR, 0x4000);
++
++    /*
++     * APHB_DMA
++     */
++    create_unimplemented_device("aphb_dma", FSL_IMX6UL_APBH_DMA_ADDR,
++                                FSL_IMX6UL_APBH_DMA_SIZE);
++
++    /*
++     * ADCs
++     */
++    for (i = 0; i < FSL_IMX6UL_NUM_ADCS; i++) {
++        static const hwaddr FSL_IMX6UL_ADCn_ADDR[FSL_IMX6UL_NUM_ADCS] = {
++            FSL_IMX6UL_ADC1_ADDR,
++            FSL_IMX6UL_ADC2_ADDR,
++        };
++
++        snprintf(name, NAME_SIZE, "adc%d", i);
++        create_unimplemented_device(name, FSL_IMX6UL_ADCn_ADDR[i], 0x4000);
++    }
++
++    /*
++     * LCD
++     */
++    create_unimplemented_device("lcdif", FSL_IMX6UL_LCDIF_ADDR, 0x4000);
++
++    /*
++     * ROM memory
++     */
++    memory_region_init_rom(&s->rom, NULL, "imx6ul.rom",
++                           FSL_IMX6UL_ROM_SIZE, &error_abort);
++    memory_region_add_subregion(get_system_memory(), FSL_IMX6UL_ROM_ADDR,
++                                &s->rom);
++
++    /*
++     * CAAM memory
++     */
++    memory_region_init_rom(&s->caam, NULL, "imx6ul.caam",
++                           FSL_IMX6UL_CAAM_MEM_SIZE, &error_abort);
++    memory_region_add_subregion(get_system_memory(), FSL_IMX6UL_CAAM_MEM_ADDR,
++                                &s->caam);
++
++    /*
++     * OCRAM memory
++     */
++    memory_region_init_ram(&s->ocram, NULL, "imx6ul.ocram",
++                           FSL_IMX6UL_OCRAM_MEM_SIZE,
++                           &error_abort);
++    memory_region_add_subregion(get_system_memory(), FSL_IMX6UL_OCRAM_MEM_ADDR,
++                                &s->ocram);
++
++    /*
++     * internal OCRAM (128 KB) is aliased over 512 KB
++     */
++    memory_region_init_alias(&s->ocram_alias, NULL, "imx6ul.ocram_alias",
++                             &s->ocram, 0, FSL_IMX6UL_OCRAM_ALIAS_SIZE);
++    memory_region_add_subregion(get_system_memory(),
++                                FSL_IMX6UL_OCRAM_ALIAS_ADDR, &s->ocram_alias);
 +}
 +
-+static void imx6ul_ccm_class_init(ObjectClass *klass, void *data)
++static void fsl_imx6ul_class_init(ObjectClass *oc, void *data)
 +{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    IMXCCMClass *ccm = IMX_CCM_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(oc);
 +
-+    dc->reset = imx6ul_ccm_reset;
-+    dc->vmsd = &vmstate_imx6ul_ccm;
-+    dc->desc = "i.MX6UL Clock Control Module";
-+
-+    ccm->get_clock_frequency = imx6ul_ccm_get_clock_frequency;
++    dc->realize = fsl_imx6ul_realize;
++    dc->desc = "i.MX6UL SOC";
++    /* Reason: Uses serial_hds and nd_table in realize() directly */
++    dc->user_creatable = false;
 +}
 +
-+static const TypeInfo imx6ul_ccm_info = {
-+    .name          = TYPE_IMX6UL_CCM,
-+    .parent        = TYPE_IMX_CCM,
-+    .instance_size = sizeof(IMX6ULCCMState),
-+    .instance_init = imx6ul_ccm_init,
-+    .class_init    = imx6ul_ccm_class_init,
++static const TypeInfo fsl_imx6ul_type_info = {
++    .name = TYPE_FSL_IMX6UL,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(FslIMX6ULState),
++    .instance_init = fsl_imx6ul_init,
++    .class_init = fsl_imx6ul_class_init,
 +};
 +
-+static void imx6ul_ccm_register_types(void)
++static void fsl_imx6ul_register_types(void)
 +{
-+    type_register_static(&imx6ul_ccm_info);
++    type_register_static(&fsl_imx6ul_type_info);
 +}
-+
-+type_init(imx6ul_ccm_register_types)
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index c956e1419b..1341508b33 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -109,3 +109,10 @@ iotkit_secctl_s_write(uint32_t offset, uint64_t data, unsigned size) "IoTKit Sec
- iotkit_secctl_ns_read(uint32_t offset, uint64_t data, unsigned size) "IoTKit SecCtl NS regs read: offset 0x%x data 0x%" PRIx64 " size %u"
- iotkit_secctl_ns_write(uint32_t offset, uint64_t data, unsigned size) "IoTKit SecCtl NS regs write: offset 0x%x data 0x%" PRIx64 " size %u"
- iotkit_secctl_reset(void) "IoTKit SecCtl: reset"
-+
-+# hw/misc/imx6ul_ccm.c
-+ccm_entry(void) "\n"
-+ccm_freq(uint32_t freq) "freq = %d\n"
-+ccm_clock_freq(uint32_t clock, uint32_t freq) "(Clock = %d) = %d\n"
-+ccm_read_reg(const char *reg_name, uint32_t value) "reg[%s] <= 0x%" PRIx32 "\n"
-+ccm_write_reg(const char *reg_name, uint32_t value) "reg[%s] => 0x%" PRIx32 "\n"
-diff --git a/include/hw/misc/imx6ul_ccm.h b/include/hw/misc/imx6ul_ccm.h
++type_init(fsl_imx6ul_register_types)
+diff --git a/include/hw/arm/fsl-imx6ul.h b/include/hw/arm/fsl-imx6ul.h
 new file mode 100644
-index 0000000000..377ddca244
+index 0000000000..5897217194
 --- /dev/null
-+++ b/include/hw/misc/imx6ul_ccm.h
-@@ -0,0 +1,226 @@
++++ b/include/hw/arm/fsl-imx6ul.h
+@@ -0,0 +1,339 @@
 +/*
-+ * IMX6UL Clock Control Module
++ * Copyright (c) 2018 Jean-Christophe Dubois <jcd@tribudubois.net>
 + *
-+ * Copyright (C) 2018 by Jean-Christophe Dubois <jcd@tribudubois.net>
++ * i.MX6ul SoC definitions
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
 + */
 +
-+#ifndef IMX6UL_CCM_H
-+#define IMX6UL_CCM_H
++#ifndef FSL_IMX6UL_H
++#define FSL_IMX6UL_H
 +
-+#include "hw/misc/imx_ccm.h"
-+#include "qemu/bitops.h"
++#include "hw/arm/arm.h"
++#include "hw/cpu/a15mpcore.h"
++#include "hw/misc/imx6ul_ccm.h"
++#include "hw/misc/imx6_src.h"
++#include "hw/misc/imx7_snvs.h"
++#include "hw/misc/imx7_gpr.h"
++#include "hw/intc/imx_gpcv2.h"
++#include "hw/misc/imx2_wdt.h"
++#include "hw/gpio/imx_gpio.h"
++#include "hw/char/imx_serial.h"
++#include "hw/timer/imx_gpt.h"
++#include "hw/timer/imx_epit.h"
++#include "hw/i2c/imx_i2c.h"
++#include "hw/gpio/imx_gpio.h"
++#include "hw/sd/sdhci.h"
++#include "hw/ssi/imx_spi.h"
++#include "hw/net/imx_fec.h"
++#include "exec/memory.h"
++#include "cpu.h"
 +
-+#define CCM_CCR 0
-+#define CCM_CCDR 1
-+#define CCM_CSR 2
-+#define CCM_CCSR 3
-+#define CCM_CACRR 4
-+#define CCM_CBCDR 5
-+#define CCM_CBCMR 6
-+#define CCM_CSCMR1 7
-+#define CCM_CSCMR2 8
-+#define CCM_CSCDR1 9
-+#define CCM_CS1CDR 10
-+#define CCM_CS2CDR 11
-+#define CCM_CDCDR 12
-+#define CCM_CHSCCDR 13
-+#define CCM_CSCDR2 14
-+#define CCM_CSCDR3 15
-+#define CCM_CDHIPR 18
-+#define CCM_CTOR 20
-+#define CCM_CLPCR 21
-+#define CCM_CISR 22
-+#define CCM_CIMR 23
-+#define CCM_CCOSR 24
-+#define CCM_CGPR 25
-+#define CCM_CCGR0 26
-+#define CCM_CCGR1 27
-+#define CCM_CCGR2 28
-+#define CCM_CCGR3 29
-+#define CCM_CCGR4 30
-+#define CCM_CCGR5 31
-+#define CCM_CCGR6 32
-+#define CCM_CMEOR 34
-+#define CCM_MAX 35
++#define TYPE_FSL_IMX6UL "fsl,imx6ul"
++#define FSL_IMX6UL(obj) OBJECT_CHECK(FslIMX6ULState, (obj), TYPE_FSL_IMX6UL)
 +
-+#define CCM_ANALOG_PLL_ARM 0
-+#define CCM_ANALOG_PLL_ARM_SET 1
-+#define CCM_ANALOG_PLL_ARM_CLR 2
-+#define CCM_ANALOG_PLL_ARM_TOG 3
-+#define CCM_ANALOG_PLL_USB1 4
-+#define CCM_ANALOG_PLL_USB1_SET 5
-+#define CCM_ANALOG_PLL_USB1_CLR 6
-+#define CCM_ANALOG_PLL_USB1_TOG 7
-+#define CCM_ANALOG_PLL_USB2 8
-+#define CCM_ANALOG_PLL_USB2_SET 9
-+#define CCM_ANALOG_PLL_USB2_CLR 10
-+#define CCM_ANALOG_PLL_USB2_TOG 11
-+#define CCM_ANALOG_PLL_SYS 12
-+#define CCM_ANALOG_PLL_SYS_SET 13
-+#define CCM_ANALOG_PLL_SYS_CLR 14
-+#define CCM_ANALOG_PLL_SYS_TOG 15
-+#define CCM_ANALOG_PLL_SYS_SS 16
-+#define CCM_ANALOG_PLL_SYS_NUM 20
-+#define CCM_ANALOG_PLL_SYS_DENOM 24
-+#define CCM_ANALOG_PLL_AUDIO 28
-+#define CCM_ANALOG_PLL_AUDIO_SET 29
-+#define CCM_ANALOG_PLL_AUDIO_CLR 30
-+#define CCM_ANALOG_PLL_AUDIO_TOG 31
-+#define CCM_ANALOG_PLL_AUDIO_NUM 32
-+#define CCM_ANALOG_PLL_AUDIO_DENOM 36
-+#define CCM_ANALOG_PLL_VIDEO 40
-+#define CCM_ANALOG_PLL_VIDEO_SET 41
-+#define CCM_ANALOG_PLL_VIDEO_CLR 42
-+#define CCM_ANALOG_PLL_VIDEO_TOG 44
-+#define CCM_ANALOG_PLL_VIDEO_NUM 46
-+#define CCM_ANALOG_PLL_VIDEO_DENOM 48
-+#define CCM_ANALOG_PLL_ENET 56
-+#define CCM_ANALOG_PLL_ENET_SET 57
-+#define CCM_ANALOG_PLL_ENET_CLR 58
-+#define CCM_ANALOG_PLL_ENET_TOG 59
-+#define CCM_ANALOG_PFD_480 60
-+#define CCM_ANALOG_PFD_480_SET 61
-+#define CCM_ANALOG_PFD_480_CLR 62
-+#define CCM_ANALOG_PFD_480_TOG 63
-+#define CCM_ANALOG_PFD_528 64
-+#define CCM_ANALOG_PFD_528_SET 65
-+#define CCM_ANALOG_PFD_528_CLR 66
-+#define CCM_ANALOG_PFD_528_TOG 67
++enum FslIMX6ULConfiguration {
++    FSL_IMX6UL_NUM_CPUS         = 1,
++    FSL_IMX6UL_NUM_UARTS        = 8,
++    FSL_IMX6UL_NUM_ETHS         = 2,
++    FSL_IMX6UL_ETH_NUM_TX_RINGS = 2,
++    FSL_IMX6UL_NUM_USDHCS       = 2,
++    FSL_IMX6UL_NUM_WDTS         = 3,
++    FSL_IMX6UL_NUM_GPTS         = 2,
++    FSL_IMX6UL_NUM_EPITS        = 2,
++    FSL_IMX6UL_NUM_IOMUXCS      = 2,
++    FSL_IMX6UL_NUM_GPIOS        = 5,
++    FSL_IMX6UL_NUM_I2CS         = 4,
++    FSL_IMX6UL_NUM_ECSPIS       = 4,
++    FSL_IMX6UL_NUM_ADCS         = 2,
++};
 +
-+/* PMU registers */
-+#define PMU_REG_1P1 68
-+#define PMU_REG_3P0 72
-+#define PMU_REG_2P5 76
-+#define PMU_REG_CORE 80
++typedef struct FslIMX6ULState {
++    /*< private >*/
++    DeviceState    parent_obj;
 +
-+#define CCM_ANALOG_MISC0 84
-+#define PMU_MISC0 CCM_ANALOG_MISC0
-+#define CCM_ANALOG_MISC0_SET 85
-+#define PMU_MISC0_SET CCM_ANALOG_MISC0_SET
-+#define CCM_ANALOG_MISC0_CLR 86
-+#define PMU_MISC0_CLR CCM_ANALOG_MISC0_CLR
-+#define CCM_ANALOG_MISC0_TOG 87
-+#define PMU_MISC0_TOG CCM_ANALOG_MISC0_TOG
++    /*< public >*/
++    ARMCPU             cpu[FSL_IMX6UL_NUM_CPUS];
++    A15MPPrivState     a7mpcore;
++    IMXGPTState        gpt[FSL_IMX6UL_NUM_GPTS];
++    IMXEPITState       epit[FSL_IMX6UL_NUM_EPITS];
++    IMXGPIOState       gpio[FSL_IMX6UL_NUM_GPIOS];
++    IMX6ULCCMState     ccm;
++    IMX6SRCState       src;
++    IMX7SNVSState      snvs;
++    IMXGPCv2State      gpcv2;
++    IMX7GPRState       gpr;
++    IMXSPIState        spi[FSL_IMX6UL_NUM_ECSPIS];
++    IMXI2CState        i2c[FSL_IMX6UL_NUM_I2CS];
++    IMXSerialState     uart[FSL_IMX6UL_NUM_UARTS];
++    IMXFECState        eth[FSL_IMX6UL_NUM_ETHS];
++    SDHCIState         usdhc[FSL_IMX6UL_NUM_USDHCS];
++    IMX2WdtState       wdt[FSL_IMX6UL_NUM_WDTS];
++    MemoryRegion       rom;
++    MemoryRegion       caam;
++    MemoryRegion       ocram;
++    MemoryRegion       ocram_alias;
++} FslIMX6ULState;
 +
-+#define CCM_ANALOG_MISC1 88
-+#define PMU_MISC1 CCM_ANALOG_MISC1
-+#define CCM_ANALOG_MISC1_SET 89
-+#define PMU_MISC1_SET CCM_ANALOG_MISC1_SET
-+#define CCM_ANALOG_MISC1_CLR 90
-+#define PMU_MISC1_CLR CCM_ANALOG_MISC1_CLR
-+#define CCM_ANALOG_MISC1_TOG 91
-+#define PMU_MISC1_TOG CCM_ANALOG_MISC1_TOG
++enum FslIMX6ULMemoryMap {
++    FSL_IMX6UL_MMDC_ADDR            = 0x80000000,
++    FSL_IMX6UL_MMDC_SIZE            = 2 * 1024 * 1024 * 1024UL,
 +
-+#define CCM_ANALOG_MISC2 92
-+#define PMU_MISC2 CCM_ANALOG_MISC2
-+#define CCM_ANALOG_MISC2_SET 93
-+#define PMU_MISC2_SET CCM_ANALOG_MISC2_SET
-+#define CCM_ANALOG_MISC2_CLR 94
-+#define PMU_MISC2_CLR CCM_ANALOG_MISC2_CLR
-+#define CCM_ANALOG_MISC2_TOG 95
-+#define PMU_MISC2_TOG CCM_ANALOG_MISC2_TOG
++    FSL_IMX6UL_QSPI1_MEM_ADDR       = 0x60000000,
++    FSL_IMX6UL_EIM_ALIAS_ADDR       = 0x58000000,
++    FSL_IMX6UL_EIM_CS_ADDR          = 0x50000000,
++    FSL_IMX6UL_AES_ENCRYPT_ADDR     = 0x10000000,
++    FSL_IMX6UL_QSPI1_RX_ADDR        = 0x0C000000,
 +
-+#define TEMPMON_TEMPSENSE0 96
-+#define TEMPMON_TEMPSENSE0_SET 97
-+#define TEMPMON_TEMPSENSE0_CLR 98
-+#define TEMPMON_TEMPSENSE0_TOG 99
-+#define TEMPMON_TEMPSENSE1 100
-+#define TEMPMON_TEMPSENSE1_SET 101
-+#define TEMPMON_TEMPSENSE1_CLR 102
-+#define TEMPMON_TEMPSENSE1_TOG 103
-+#define TEMPMON_TEMPSENSE2 164
-+#define TEMPMON_TEMPSENSE2_SET 165
-+#define TEMPMON_TEMPSENSE2_CLR 166
-+#define TEMPMON_TEMPSENSE2_TOG 167
++    /* AIPS-2 */
++    FSL_IMX6UL_UART6_ADDR           = 0x021FC000,
++    FSL_IMX6UL_I2C4_ADDR            = 0x021F8000,
++    FSL_IMX6UL_UART5_ADDR           = 0x021F4000,
++    FSL_IMX6UL_UART4_ADDR           = 0x021F0000,
++    FSL_IMX6UL_UART3_ADDR           = 0x021EC000,
++    FSL_IMX6UL_UART2_ADDR           = 0x021E8000,
++    FSL_IMX6UL_WDOG3_ADDR           = 0x021E4000,
++    FSL_IMX6UL_QSPI_ADDR            = 0x021E0000,
++    FSL_IMX6UL_SYS_CNT_CTRL_ADDR    = 0x021DC000,
++    FSL_IMX6UL_SYS_CNT_CMP_ADDR     = 0x021D8000,
++    FSL_IMX6UL_SYS_CNT_RD_ADDR      = 0x021D4000,
++    FSL_IMX6UL_TZASC_ADDR           = 0x021D0000,
++    FSL_IMX6UL_PXP_ADDR             = 0x021CC000,
++    FSL_IMX6UL_LCDIF_ADDR           = 0x021C8000,
++    FSL_IMX6UL_CSI_ADDR             = 0x021C4000,
++    FSL_IMX6UL_CSU_ADDR             = 0x021C0000,
++    FSL_IMX6UL_OCOTP_CTRL_ADDR      = 0x021BC000,
++    FSL_IMX6UL_EIM_ADDR             = 0x021B8000,
++    FSL_IMX6UL_SIM2_ADDR            = 0x021B4000,
++    FSL_IMX6UL_MMDC_CFG_ADDR        = 0x021B0000,
++    FSL_IMX6UL_ROMCP_ADDR           = 0x021AC000,
++    FSL_IMX6UL_I2C3_ADDR            = 0x021A8000,
++    FSL_IMX6UL_I2C2_ADDR            = 0x021A4000,
++    FSL_IMX6UL_I2C1_ADDR            = 0x021A0000,
++    FSL_IMX6UL_ADC2_ADDR            = 0x0219C000,
++    FSL_IMX6UL_ADC1_ADDR            = 0x02198000,
++    FSL_IMX6UL_USDHC2_ADDR          = 0x02194000,
++    FSL_IMX6UL_USDHC1_ADDR          = 0x02190000,
++    FSL_IMX6UL_SIM1_ADDR            = 0x0218C000,
++    FSL_IMX6UL_ENET1_ADDR           = 0x02188000,
++    FSL_IMX6UL_USBO2_USBMISC_ADDR   = 0x02184800,
++    FSL_IMX6UL_USBO2_USB_ADDR       = 0x02184000,
++    FSL_IMX6UL_USBO2_PL301_ADDR     = 0x02180000,
++    FSL_IMX6UL_AIPS2_CFG_ADDR       = 0x0217C000,
++    FSL_IMX6UL_CAAM_ADDR            = 0x02140000,
++    FSL_IMX6UL_A7MPCORE_DAP_ADDR    = 0x02100000,
 +
-+#define PMU_LOWPWR_CTRL 155
-+#define PMU_LOWPWR_CTRL_SET 156
-+#define PMU_LOWPWR_CTRL_CLR 157
-+#define PMU_LOWPWR_CTRL_TOG 158
++    /* AIPS-1 */
++    FSL_IMX6UL_PWM8_ADDR            = 0x020FC000,
++    FSL_IMX6UL_PWM7_ADDR            = 0x020F8000,
++    FSL_IMX6UL_PWM6_ADDR            = 0x020F4000,
++    FSL_IMX6UL_PWM5_ADDR            = 0x020F0000,
++    FSL_IMX6UL_SDMA_ADDR            = 0x020EC000,
++    FSL_IMX6UL_GPT2_ADDR            = 0x020E8000,
++    FSL_IMX6UL_IOMUXC_GPR_ADDR      = 0x020E4000,
++    FSL_IMX6UL_IOMUXC_ADDR          = 0x020E0000,
++    FSL_IMX6UL_GPC_ADDR             = 0x020DC000,
++    FSL_IMX6UL_SRC_ADDR             = 0x020D8000,
++    FSL_IMX6UL_EPIT2_ADDR           = 0x020D4000,
++    FSL_IMX6UL_EPIT1_ADDR           = 0x020D0000,
++    FSL_IMX6UL_SNVS_HP_ADDR         = 0x020CC000,
++    FSL_IMX6UL_ANALOG_ADDR          = 0x020C8000,
++    FSL_IMX6UL_CCM_ADDR             = 0x020C4000,
++    FSL_IMX6UL_WDOG2_ADDR           = 0x020C0000,
++    FSL_IMX6UL_WDOG1_ADDR           = 0x020BC000,
++    FSL_IMX6UL_KPP_ADDR             = 0x020B8000,
++    FSL_IMX6UL_ENET2_ADDR           = 0x020B4000,
++    FSL_IMX6UL_SNVS_LP_ADDR         = 0x020B0000,
++    FSL_IMX6UL_GPIO5_ADDR           = 0x020AC000,
++    FSL_IMX6UL_GPIO4_ADDR           = 0x020A8000,
++    FSL_IMX6UL_GPIO3_ADDR           = 0x020A4000,
++    FSL_IMX6UL_GPIO2_ADDR           = 0x020A0000,
++    FSL_IMX6UL_GPIO1_ADDR           = 0x0209C000,
++    FSL_IMX6UL_GPT1_ADDR            = 0x02098000,
++    FSL_IMX6UL_CAN2_ADDR            = 0x02094000,
++    FSL_IMX6UL_CAN1_ADDR            = 0x02090000,
++    FSL_IMX6UL_PWM4_ADDR            = 0x0208C000,
++    FSL_IMX6UL_PWM3_ADDR            = 0x02088000,
++    FSL_IMX6UL_PWM2_ADDR            = 0x02084000,
++    FSL_IMX6UL_PWM1_ADDR            = 0x02080000,
++    FSL_IMX6UL_AIPS1_CFG_ADDR       = 0x0207C000,
++    FSL_IMX6UL_BEE_ADDR             = 0x02044000,
++    FSL_IMX6UL_TOUCH_CTRL_ADDR      = 0x02040000,
++    FSL_IMX6UL_SPBA_ADDR            = 0x0203C000,
++    FSL_IMX6UL_ASRC_ADDR            = 0x02034000,
++    FSL_IMX6UL_SAI3_ADDR            = 0x02030000,
++    FSL_IMX6UL_SAI2_ADDR            = 0x0202C000,
++    FSL_IMX6UL_SAI1_ADDR            = 0x02028000,
++    FSL_IMX6UL_UART8_ADDR           = 0x02024000,
++    FSL_IMX6UL_UART1_ADDR           = 0x02020000,
++    FSL_IMX6UL_UART7_ADDR           = 0x02018000,
++    FSL_IMX6UL_ECSPI4_ADDR          = 0x02014000,
++    FSL_IMX6UL_ECSPI3_ADDR          = 0x02010000,
++    FSL_IMX6UL_ECSPI2_ADDR          = 0x0200C000,
++    FSL_IMX6UL_ECSPI1_ADDR          = 0x02008000,
++    FSL_IMX6UL_SPDIF_ADDR           = 0x02004000,
 +
-+#define USB_ANALOG_USB1_VBUS_DETECT 104
-+#define USB_ANALOG_USB1_VBUS_DETECT_SET 105
-+#define USB_ANALOG_USB1_VBUS_DETECT_CLR 106
-+#define USB_ANALOG_USB1_VBUS_DETECT_TOG 107
-+#define USB_ANALOG_USB1_CHRG_DETECT 108
-+#define USB_ANALOG_USB1_CHRG_DETECT_SET 109
-+#define USB_ANALOG_USB1_CHRG_DETECT_CLR 110
-+#define USB_ANALOG_USB1_CHRG_DETECT_TOG 111
-+#define USB_ANALOG_USB1_VBUS_DETECT_STAT 112
-+#define USB_ANALOG_USB1_CHRG_DETECT_STAT 116
-+#define USB_ANALOG_USB1_MISC 124
-+#define USB_ANALOG_USB1_MISC_SET 125
-+#define USB_ANALOG_USB1_MISC_CLR 126
-+#define USB_ANALOG_USB1_MISC_TOG 127
-+#define USB_ANALOG_USB2_VBUS_DETECT 128
-+#define USB_ANALOG_USB2_VBUS_DETECT_SET 129
-+#define USB_ANALOG_USB2_VBUS_DETECT_CLR 130
-+#define USB_ANALOG_USB2_VBUS_DETECT_TOG 131
-+#define USB_ANALOG_USB2_CHRG_DETECT 132
-+#define USB_ANALOG_USB2_CHRG_DETECT_SET 133
-+#define USB_ANALOG_USB2_CHRG_DETECT_CLR 134
-+#define USB_ANALOG_USB2_CHRG_DETECT_TOG 135
-+#define USB_ANALOG_USB2_VBUS_DETECT_STAT 136
-+#define USB_ANALOG_USB2_CHRG_DETECT_STAT 140
-+#define USB_ANALOG_USB2_MISC 148
-+#define USB_ANALOG_USB2_MISC_SET 149
-+#define USB_ANALOG_USB2_MISC_CLR 150
-+#define USB_ANALOG_USB2_MISC_TOG 151
-+#define USB_ANALOG_DIGPROG 152
-+#define CCM_ANALOG_MAX 4096
++    FSL_IMX6UL_APBH_DMA_ADDR        = 0x01804000,
++    FSL_IMX6UL_APBH_DMA_SIZE        = (32 * 1024),
 +
-+/* CCM_CBCMR */
-+#define R_CBCMR_PRE_PERIPH_CLK_SEL_SHIFT  (18)
-+#define R_CBCMR_PRE_PERIPH_CLK_SEL_LENGTH (2)
-+#define R_CBCMR_PERIPH_CLK2_SEL_SHIFT    (12)
-+#define R_CBCMR_PERIPH_CLK2_SEL_LENGTH   (2)
++    FSL_IMX6UL_A7MPCORE_ADDR        = 0x00A00000,
 +
-+/* CCM_CBCDR */
-+#define R_CBCDR_AHB_PODF_SHIFT           (10)
-+#define R_CBCDR_AHB_PODF_LENGTH          (3)
-+#define R_CBCDR_IPG_PODF_SHIFT           (8)
-+#define R_CBCDR_IPG_PODF_LENGTH          (2)
-+#define R_CBCDR_PERIPH_CLK_SEL_SHIFT     (25)
-+#define R_CBCDR_PERIPH_CLK_SEL_LENGTH    (1)
-+#define R_CBCDR_PERIPH_CLK2_PODF_SHIFT   (27)
-+#define R_CBCDR_PERIPH_CLK2_PODF_LENGTH  (3)
++    FSL_IMX6UL_OCRAM_ALIAS_ADDR     = 0x00920000,
++    FSL_IMX6UL_OCRAM_ALIAS_SIZE     = 0x00060000,
++    FSL_IMX6UL_OCRAM_MEM_ADDR       = 0x00900000,
++    FSL_IMX6UL_OCRAM_MEM_SIZE       = 0x00020000,
++    FSL_IMX6UL_CAAM_MEM_ADDR        = 0x00100000,
++    FSL_IMX6UL_CAAM_MEM_SIZE        = 0x00008000,
++    FSL_IMX6UL_ROM_ADDR             = 0x00000000,
++    FSL_IMX6UL_ROM_SIZE             = 0x00018000,
++};
 +
-+/* CCM_CSCMR1 */
-+#define R_CSCMR1_PERCLK_PODF_SHIFT        (0)
-+#define R_CSCMR1_PERCLK_PODF_LENGTH       (6)
-+#define R_CSCMR1_PERCLK_CLK_SEL_SHIFT     (6)
-+#define R_CSCMR1_PERCLK_CLK_SEL_LENGTH    (1)
++enum FslIMX6ULIRQs {
++    FSL_IMX6UL_IOMUXC_IRQ   = 0,
++    FSL_IMX6UL_DAP_IRQ      = 1,
++    FSL_IMX6UL_SDMA_IRQ     = 2,
++    FSL_IMX6UL_TSC_IRQ      = 3,
++    FSL_IMX6UL_SNVS_IRQ     = 4,
++    FSL_IMX6UL_LCDIF_IRQ    = 5,
++    FSL_IMX6UL_BEE_IRQ      = 6,
++    FSL_IMX6UL_CSI_IRQ      = 7,
++    FSL_IMX6UL_PXP_IRQ      = 8,
++    FSL_IMX6UL_SCTR1_IRQ    = 9,
++    FSL_IMX6UL_SCTR2_IRQ    = 10,
++    FSL_IMX6UL_WDOG3_IRQ    = 11,
++    FSL_IMX6UL_APBH_DMA_IRQ = 13,
++    FSL_IMX6UL_WEIM_IRQ     = 14,
++    FSL_IMX6UL_RAWNAND1_IRQ = 15,
++    FSL_IMX6UL_RAWNAND2_IRQ = 16,
++    FSL_IMX6UL_UART6_IRQ    = 17,
++    FSL_IMX6UL_SRTC_IRQ     = 19,
++    FSL_IMX6UL_SRTC_SEC_IRQ = 20,
++    FSL_IMX6UL_CSU_IRQ      = 21,
++    FSL_IMX6UL_USDHC1_IRQ   = 22,
++    FSL_IMX6UL_USDHC2_IRQ   = 23,
++    FSL_IMX6UL_SAI3_IRQ     = 24,
++    FSL_IMX6UL_SAI32_IRQ    = 25,
 +
-+/* CCM_ANALOG_PFD_528 */
-+#define R_ANALOG_PFD_528_PFD0_FRAC_SHIFT          (0)
-+#define R_ANALOG_PFD_528_PFD0_FRAC_LENGTH         (6)
-+#define R_ANALOG_PFD_528_PFD2_FRAC_SHIFT          (16)
-+#define R_ANALOG_PFD_528_PFD2_FRAC_LENGTH         (6)
++    FSL_IMX6UL_UART1_IRQ    = 26,
++    FSL_IMX6UL_UART2_IRQ    = 27,
++    FSL_IMX6UL_UART3_IRQ    = 28,
++    FSL_IMX6UL_UART4_IRQ    = 29,
++    FSL_IMX6UL_UART5_IRQ    = 30,
 +
-+/* CCM_ANALOG_PLL_SYS */
-+#define R_ANALOG_PLL_SYS_DIV_SELECT_SHIFT         (0)
-+#define R_ANALOG_PLL_SYS_DIV_SELECT_LENGTH        (1)
++    FSL_IMX6UL_ECSPI1_IRQ   = 31,
++    FSL_IMX6UL_ECSPI2_IRQ   = 32,
++    FSL_IMX6UL_ECSPI3_IRQ   = 33,
++    FSL_IMX6UL_ECSPI4_IRQ   = 34,
 +
-+#define CCM_ANALOG_PLL_LOCK      (1 << 31);
++    FSL_IMX6UL_I2C4_IRQ     = 35,
++    FSL_IMX6UL_I2C1_IRQ     = 36,
++    FSL_IMX6UL_I2C2_IRQ     = 37,
++    FSL_IMX6UL_I2C3_IRQ     = 38,
 +
-+#define TYPE_IMX6UL_CCM "imx6ul.ccm"
-+#define IMX6UL_CCM(obj) OBJECT_CHECK(IMX6ULCCMState, (obj), TYPE_IMX6UL_CCM)
++    FSL_IMX6UL_UART7_IRQ    = 39,
++    FSL_IMX6UL_UART8_IRQ    = 40,
 +
-+typedef struct IMX6ULCCMState {
-+    /* <private> */
-+    IMXCCMState parent_obj;
++    FSL_IMX6UL_USB1_IRQ     = 42,
++    FSL_IMX6UL_USB2_IRQ     = 43,
++    FSL_IMX6UL_USB_PHY1_IRQ = 44,
++    FSL_IMX6UL_USB_PHY2_IRQ = 44,
 +
-+    /* <public> */
-+    MemoryRegion container;
-+    MemoryRegion ioccm;
-+    MemoryRegion ioanalog;
++    FSL_IMX6UL_CAAM_JQ2_IRQ = 46,
++    FSL_IMX6UL_CAAM_ERR_IRQ = 47,
++    FSL_IMX6UL_CAAM_RTIC_IRQ = 48,
++    FSL_IMX6UL_TEMP_IRQ     = 49,
++    FSL_IMX6UL_ASRC_IRQ     = 50,
++    FSL_IMX6UL_SPDIF_IRQ    = 52,
++    FSL_IMX6UL_PMU_REG_IRQ  = 54,
++    FSL_IMX6UL_GPT1_IRQ     = 55,
 +
-+    uint32_t ccm[CCM_MAX];
-+    uint32_t analog[CCM_ANALOG_MAX];
++    FSL_IMX6UL_EPIT1_IRQ    = 56,
++    FSL_IMX6UL_EPIT2_IRQ    = 57,
 +
-+} IMX6ULCCMState;
++    FSL_IMX6UL_GPIO1_INT7_IRQ = 58,
++    FSL_IMX6UL_GPIO1_INT6_IRQ = 59,
++    FSL_IMX6UL_GPIO1_INT5_IRQ = 60,
++    FSL_IMX6UL_GPIO1_INT4_IRQ = 61,
++    FSL_IMX6UL_GPIO1_INT3_IRQ = 62,
++    FSL_IMX6UL_GPIO1_INT2_IRQ = 63,
++    FSL_IMX6UL_GPIO1_INT1_IRQ = 64,
++    FSL_IMX6UL_GPIO1_INT0_IRQ = 65,
++    FSL_IMX6UL_GPIO1_LOW_IRQ  = 66,
++    FSL_IMX6UL_GPIO1_HIGH_IRQ = 67,
++    FSL_IMX6UL_GPIO2_LOW_IRQ  = 68,
++    FSL_IMX6UL_GPIO2_HIGH_IRQ = 69,
++    FSL_IMX6UL_GPIO3_LOW_IRQ  = 70,
++    FSL_IMX6UL_GPIO3_HIGH_IRQ = 71,
++    FSL_IMX6UL_GPIO4_LOW_IRQ  = 72,
++    FSL_IMX6UL_GPIO4_HIGH_IRQ = 73,
++    FSL_IMX6UL_GPIO5_LOW_IRQ  = 74,
++    FSL_IMX6UL_GPIO5_HIGH_IRQ = 75,
 +
-+#endif /* IMX6UL_CCM_H */
++    FSL_IMX6UL_WDOG1_IRQ    = 80,
++    FSL_IMX6UL_WDOG2_IRQ    = 81,
++
++    FSL_IMX6UL_KPP_IRQ      = 82,
++
++    FSL_IMX6UL_PWM1_IRQ     = 83,
++    FSL_IMX6UL_PWM2_IRQ     = 84,
++    FSL_IMX6UL_PWM3_IRQ     = 85,
++    FSL_IMX6UL_PWM4_IRQ     = 86,
++
++    FSL_IMX6UL_CCM1_IRQ     = 87,
++    FSL_IMX6UL_CCM2_IRQ     = 88,
++
++    FSL_IMX6UL_GPC_IRQ      = 89,
++
++    FSL_IMX6UL_SRC_IRQ      = 91,
++
++    FSL_IMX6UL_CPU_PERF_IRQ = 94,
++    FSL_IMX6UL_CPU_CTI_IRQ  = 95,
++
++    FSL_IMX6UL_SRC_WDOG_IRQ = 96,
++
++    FSL_IMX6UL_SAI1_IRQ     = 97,
++    FSL_IMX6UL_SAI2_IRQ     = 98,
++
++    FSL_IMX6UL_ADC1_IRQ     = 100,
++    FSL_IMX6UL_ADC2_IRQ     = 101,
++
++    FSL_IMX6UL_SJC_IRQ      = 104,
++
++    FSL_IMX6UL_CAAM_RING0_IRQ = 105,
++    FSL_IMX6UL_CAAM_RING1_IRQ = 106,
++
++    FSL_IMX6UL_QSPI_IRQ     = 107,
++
++    FSL_IMX6UL_TZASC_IRQ    = 108,
++
++    FSL_IMX6UL_GPT2_IRQ     = 109,
++
++    FSL_IMX6UL_CAN1_IRQ     = 110,
++    FSL_IMX6UL_CAN2_IRQ     = 111,
++
++    FSL_IMX6UL_SIM1_IRQ     = 112,
++    FSL_IMX6UL_SIM2_IRQ     = 113,
++
++    FSL_IMX6UL_PWM5_IRQ     = 114,
++    FSL_IMX6UL_PWM6_IRQ     = 115,
++    FSL_IMX6UL_PWM7_IRQ     = 116,
++    FSL_IMX6UL_PWM8_IRQ     = 117,
++
++    FSL_IMX6UL_ENET1_IRQ    = 118,
++    FSL_IMX6UL_ENET1_TIMER_IRQ = 119,
++    FSL_IMX6UL_ENET2_IRQ    = 120,
++    FSL_IMX6UL_ENET2_TIMER_IRQ = 121,
++
++    FSL_IMX6UL_PMU_CORE_IRQ = 127,
++    FSL_IMX6UL_MAX_IRQ      = 128,
++};
++
++#endif /* FSL_IMX6UL_H */
 -- 
 2.17.1
