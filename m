@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fk8Fe-0000q4-Mt
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:30:19 -0400
+	(envelope-from <mst@redhat.com>) id 1fk8JV-00022s-M4
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:34:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fk8Fa-00045t-Nf
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:30:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53080 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fk8JR-0005Eo-Of
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:34:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56398 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fk8Fa-00045d-IB
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:30:14 -0400
-Date: Mon, 30 Jul 2018 14:30:10 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180730133010.GK1626@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CAFEAcA8yrNzEaL5_D79OjHCUUwPQnS4MnQhU9gumR7fpTThyuQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fk8JR-0005EY-J3
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:34:13 -0400
+Date: Mon, 30 Jul 2018 16:34:09 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180730163123-mutt-send-email-mst@kernel.org>
+References: <20180717222721.14019.27548.stgit@gimli.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA8yrNzEaL5_D79OjHCUUwPQnS4MnQhU9gumR7fpTThyuQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] 'make vm-build-freebsd' &c don't work if KVM isn't
- enabled
+In-Reply-To: <20180717222721.14019.27548.stgit@gimli.home>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-On Mon, Jul 30, 2018 at 02:23:50PM +0100, Peter Maydell wrote:
-> The tests in tests/vm/ seem to make some attempt to cope with the
-> host system not allowing the user to use KVM, but it doesn't quite
-> work. The problem is that tests/vm/basevm.py always uses "-cpu host"
-> in the QEMU options it uses to run the VM, and that only works if
-> KVM is enabled. If the user can't run KVM then we correctly avoid
-> passing it "-enable-kvm" but then QEMU doesn't run because "-cpu host"
-> isn't supported...
+On Tue, Jul 17, 2018 at 04:47:31PM -0600, Alex Williamson wrote:
+> Directly assigned vfio devices have never been compatible with
+> ballooning.  Zapping MADV_DONTNEED pages happens completely
+> independent of vfio page pinning and IOMMU mapping, leaving us with
+> inconsistent GPA to HPA mapping between vCPUs and assigned devices
+> when the balloon deflates.  Mediated devices can theoretically do
+> better, if we make the assumption that the mdev vendor driver is fully
+> synchronized to the actual working set of the guest driver.  In that
+> case the guest balloon driver should never be able to allocate an mdev
+> pinned page for balloon inflation.  Unfortunately, QEMU can't know the
+> workings of the vendor driver pinning, and doesn't actually know the
+> difference between mdev devices and directly assigned devices.  Until
+> we can sort out how the vfio IOMMU backend can tell us if ballooning
+> is safe, the best approach is to disabling ballooning any time a vfio
+> devices is attached.
 > 
-> I guess the right fix here is to use "-cpu max" ?
+> To do that, simply make the balloon inhibitor a counter rather than a
+> boolean, fixup a case where KVM can then simply use the inhibit
+> interface, and inhibit ballooning any time a vfio device is attached.
+> I'm expecting we'll expose some sort of flag similar to
+> KVM_CAP_SYNC_MMU from the vfio IOMMU for cases where we can resolve
+> this.  An addition we could consider here would be yet another device
+> option for vfio, such as x-disable-balloon-inhibit, in case there are
+> mdev devices that behave in a manner compatible with ballooning.
+> 
+> Please let me know if this looks like a good idea.  Thanks,
+> 
+> Alex
 
-Yes, sounds like exactly the kind of scenario that 'max' was intended
-to support.
+It's probably the only a reasonable thing to do for this release.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Long term however, why can't balloon notify vfio as pages are
+added and removed? VFIO could update its mappings then.
+
+> ---
+> 
+> Alex Williamson (3):
+>       balloon: Allow nested inhibits
+>       kvm: Use inhibit to prevent ballooning without synchronous mmu
+>       vfio: Inhibit ballooning
+> 
+> 
+>  accel/kvm/kvm-all.c        |    4 ++++
+>  balloon.c                  |    7 ++++---
+>  hw/vfio/common.c           |    6 ++++++
+>  hw/virtio/virtio-balloon.c |    4 +---
+>  4 files changed, 15 insertions(+), 6 deletions(-)
