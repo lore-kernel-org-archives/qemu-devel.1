@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fk3cJ-0003P0-SD
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1fk3cJ-0003Os-QG
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fk3cF-0004Ux-SB
+	(envelope-from <armbru@redhat.com>) id 1fk3cI-0004X4-6t
 	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56610 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41584 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fk3cF-0004Un-NE
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:19 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fk3cH-0004WT-NA
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:21 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 30 Jul 2018 10:32:58 +0200
-Message-Id: <20180730083317.11765-5-armbru@redhat.com>
+Date: Mon, 30 Jul 2018 10:33:06 +0200
+Message-Id: <20180730083317.11765-13-armbru@redhat.com>
 In-Reply-To: <20180730083317.11765-1-armbru@redhat.com>
 References: <20180730083317.11765-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 04/23] libqtest: Clean up how we read the
- QMP greeting
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 12/23] cpu-plug-test: Don't pass integers as
+ strings to device_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +30,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com
 
-qtest_init() still uses the qtest_qmp_discard_response(s, "") hack to
-receive the greeting, even though we have qtest_qmp_receive() since
-commit 66e0c7b187e.  Put it to use.
+test_plug_with_device_add_x86() plugs Haswell-i386-cpu and
+Haswell-x86_64-cpu with device_add.  It passes socket-id, core-id,
+thread-id as JSON strings.  The properties are actually integers.
 
-Bonus: gets rid of an empty format string.  A step towards
-compile-time format string checking without triggering
--Wformat-zero-length.
+test_plug_with_device_add_coreid() plugs power8_v2.0-spapr-cpu-core
+and qemu-s390x-cpu with device_add.  It passes core-id as JSON string.
+The properties are actually integers.
 
+Passing JSON string values to integer properties works only due to
+device_add implementation accidents.  Fix the test to pass JSON
+numbers.  While there, use %u rather than %i with unsigned int.
+
+Cc: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/cpu-plug-test.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 071d7eb7b1..c2c08a890c 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -249,9 +249,11 @@ QTestState *qtest_init_without_qmp_handshake(bool use_oob,
- QTestState *qtest_init(const char *extra_args)
- {
-     QTestState *s = qtest_init_without_qmp_handshake(false, extra_args);
-+    QDict *greeting;
- 
-     /* Read the QMP greeting and then do the handshake */
--    qtest_qmp_discard_response(s, "");
-+    greeting = qtest_qmp_receive(s);
-+    qobject_unref(greeting);
-     qtest_qmp_discard_response(s, "{ 'execute': 'qmp_capabilities' }");
- 
-     return s;
--- 
+diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+index 5f39ba0df3..ab3bf6df90 100644
+--- a/tests/cpu-plug-test.c
++++ b/tests/cpu-plug-test.c
+@@ -88,8 +88,8 @@ static void test_plug_with_device_add_x86(gconstpointer=
+ data)
+         for (c =3D 0; c < td->cores; c++) {
+             for (t =3D 0; t < td->threads; t++) {
+                 char *id =3D g_strdup_printf("id-%i-%i-%i", s, c, t);
+-                qtest_qmp_device_add(td->device_model, id, "'socket-id':=
+'%i', "
+-                                     "'core-id':'%i', 'thread-id':'%i'",
++                qtest_qmp_device_add(td->device_model, id, "'socket-id':=
+%u, "
++                                     "'core-id':%u, 'thread-id':%u",
+                                      s, c, t);
+                 g_free(id);
+             }
+@@ -114,7 +114,7 @@ static void test_plug_with_device_add_coreid(gconstpo=
+inter data)
+=20
+     for (c =3D td->cores; c < td->maxcpus / td->sockets / td->threads; c=
+++) {
+         char *id =3D g_strdup_printf("id-%i", c);
+-        qtest_qmp_device_add(td->device_model, id, "'core-id':'%i'", c);
++        qtest_qmp_device_add(td->device_model, id, "'core-id':%u", c);
+         g_free(id);
+     }
+=20
+--=20
 2.17.1
