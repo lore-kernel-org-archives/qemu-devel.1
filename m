@@ -1,37 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fk58W-0001AA-Vt
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:10:46 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fk5ZX-0006p8-Bm
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:38:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fk58T-0003pS-Q1
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:10:44 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50800
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sbhat@linux.vnet.ibm.com>)
-	id 1fk58T-0007j3-JC
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:10:41 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w6UA9P8L081828
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 06:09:42 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2khyyjhvf5-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 06:09:41 -0400
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sbhat@linux.vnet.ibm.com>;
-	Mon, 30 Jul 2018 11:09:40 +0100
-From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
-Date: Mon, 30 Jul 2018 15:39:34 +0530
+	(envelope-from <peter.maydell@linaro.org>) id 1fk5ZW-0005LQ-E0
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:38:39 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:39409)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fk5ZW-0005L7-7T
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 06:38:38 -0400
+Received: by mail-oi0-x243.google.com with SMTP id d189-v6so20289268oib.6
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 03:38:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <153294521235.6959.12520498748431693809.stgit@dhcp-9-109-246-16>
-Subject: [Qemu-devel] [PATCH v3] linux-user: ppc64: don't use volatile
- register during safe_syscall
+In-Reply-To: <20180729143545.6978-2-samuel.thibault@ens-lyon.org>
+References: <20180729143545.6978-1-samuel.thibault@ens-lyon.org>
+	<20180729143545.6978-2-samuel.thibault@ens-lyon.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Jul 2018 11:38:16 +0100
+Message-ID: <CAFEAcA8tX0_MNg99oorgOWarJa8Oy+gFFwoRys-fU7ZX3_Ufng@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 1/1] slirp: fix ICMP handling on macOS hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,75 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgibson@redhat.com, riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu
-Cc: qemu-ppc@nongnu.org, sbhat@linux.vnet.ibm.com, qemu-devel@nongnu.org
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Andrew Oates <aoates@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-r11 is a volatile register on PPC as per calling conventions.
-The safe_syscall code uses it to check if the signal_pending
-is set during the safe_syscall. When a syscall is interrupted
-on return from signal handling, the r11 might be corrupted
-before we retry the syscall leading to a crash. The registers
-r0-r13 are not to be used here as they have
-volatile/designated/reserved usages.
+On 29 July 2018 at 15:35, Samuel Thibault <samuel.thibault@ens-lyon.org> wrote:
+> From: Andrew Oates <aoates@google.com>
+>
+> On Linux, SOCK_DGRAM+IPPROTO_ICMP sockets give only the ICMP packet when
+> read from.  On macOS, however, the socket acts like a SOCK_RAW socket
+> and includes the IP header as well.
+>
+> This change strips the extra IP header from the received packet on macOS
+> before sending it to the guest.
+>
+> Signed-off-by: Andrew Oates <aoates@google.com>
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> ---
+>  slirp/ip_icmp.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+>
+> diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
+> index 0b667a429a..6316427ed3 100644
+> --- a/slirp/ip_icmp.c
+> +++ b/slirp/ip_icmp.c
+> @@ -420,7 +420,21 @@ void icmp_receive(struct socket *so)
+>      icp = mtod(m, struct icmp *);
+>
+>      id = icp->icmp_id;
+> -    len = qemu_recv(so->s, icp, m->m_len, 0);
+> +    len = qemu_recv(so->s, icp, M_ROOM(m), 0);
+> +#ifdef CONFIG_DARWIN
+> +    if (len >= sizeof(struct ip)) {
+> +        /* Skip the IP header that OS X (unlike Linux) includes. */
+> +        struct ip *inner_ip = mtod(m, struct ip *);
+> +        int inner_hlen = inner_ip->ip_hl << 2;
+> +        if (inner_hlen > len) {
+> +            len = -1;
+> +            errno = -EINVAL;
+> +        } else {
+> +            len -= inner_hlen;
+> +            memmove(icp, (unsigned char *)icp + inner_hlen, len);
+> +        }
+> +    }
+> +#endif
 
-Change the code to use r14 which is non-volatile.
-Use SP+16 which is a slot for LR, for save/restore of previous value
-of r14. SP+16 can be used, as LR is preserved across the syscall.
+I think it's generally preferable to avoid per-OS ifdefs -- is
+this really OSX specific and not (for instance) also applicable
+to the other BSDs? Is there some other (configure or runtime) check
+we could do to identify whether this is required?
 
-Steps to reproduce:
-On PPC host, issue `qemu-x86_64 /usr/bin/cc -E -`
-Attempt Ctrl-C, the issue is reproduced.
+For instance the FreeBSD manpage for icmp(4)
+https://www.freebsd.org/cgi/man.cgi?query=icmp&apropos=0&sektion=0&manpath=FreeBSD+11.2-RELEASE&arch=default&format=html
 
-Reference:
-https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
-https://openpowerfoundation.org/wp-content/uploads/2016/03/ABI64BitOpenPOWERv1.1_16July2015_pub4.pdf
+says "incoming packets are received with the IP header and
+options intact" and I would be unsurprised to find that
+all the BSDs behave the same way here.
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
----
-v2: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg05102.html
-Changes from v2:
-   Added code to store and restore r14 register. 
-
-v1: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg05089.html
-Changes from v1:
-   Fixed the commit message as suggested
-
- linux-user/host/ppc64/safe-syscall.inc.S |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
-index d30050a67c..ca85da13bd 100644
---- a/linux-user/host/ppc64/safe-syscall.inc.S
-+++ b/linux-user/host/ppc64/safe-syscall.inc.S
-@@ -49,7 +49,8 @@ safe_syscall_base:
- 	 *               and returns the result in r3
- 	 * Shuffle everything around appropriately.
- 	 */
--	mr	11, 3	/* signal_pending */
-+	std     14, 16(1) /* Preserve r14 in SP+16 */
-+	mr	14, 3	/* signal_pending */
- 	mr	0, 4	/* syscall number */
- 	mr	3, 5	/* syscall arguments */
- 	mr	4, 6
-@@ -67,11 +68,12 @@ safe_syscall_base:
- 	 */
- safe_syscall_start:
- 	/* if signal_pending is non-zero, don't do the call */
--	lwz	12, 0(11)
-+	lwz	12, 0(14)
- 	cmpwi	0, 12, 0
- 	bne-	0f
- 	sc
- safe_syscall_end:
-+	ld 14, 16(1) /* restore r14 to its original value */
- 	/* code path when we did execute the syscall */
- 	bnslr+
- 
-@@ -81,6 +83,7 @@ safe_syscall_end:
- 
- 	/* code path when we didn't execute the syscall */
- 0:	addi	3, 0, -TARGET_ERESTARTSYS
-+	ld 14, 16(1) /* restore r14 to its orginal value */
- 	blr
- 	.cfi_endproc
- 
+thanks
+-- PMM
