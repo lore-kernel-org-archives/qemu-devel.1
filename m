@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fk9On-00007P-EW
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:43:50 -0400
+	(envelope-from <david@redhat.com>) id 1fk9RS-0001xv-JL
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:46:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fk9Ok-0006DN-Rj
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:43:49 -0400
-Received: from 3.mo6.mail-out.ovh.net ([178.33.253.26]:40818)
+	(envelope-from <david@redhat.com>) id 1fk9RQ-0007JK-0B
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:46:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35146 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fk9Ok-0006D2-KB
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:43:46 -0400
-Received: from player729.ha.ovh.net (unknown [10.109.143.220])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 00F58172262
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 16:43:44 +0200 (CEST)
-Date: Mon, 30 Jul 2018 16:43:35 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180730164335.48dfef03@bahia.lan>
-In-Reply-To: <20180730141134.31153-2-clg@kaod.org>
-References: <20180730141134.31153-1-clg@kaod.org>
-	<20180730141134.31153-2-clg@kaod.org>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fk9RP-0007IX-Nx
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:46:31 -0400
+References: <20180717222721.14019.27548.stgit@gimli.home>
+	<20180730163123-mutt-send-email-mst@kernel.org>
+	<57aca548-b6f3-eae3-3b2e-a25523294a7d@redhat.com>
+	<20180730165720-mutt-send-email-mst@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <9700e54a-14c2-4051-b54e-d9580df2c854@redhat.com>
+Date: Mon, 30 Jul 2018 16:46:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 1/4] spapr: Add a pseries-3.1 machine
- type
+In-Reply-To: <20180730165720-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-On Mon, 30 Jul 2018 16:11:31 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On 30.07.2018 15:59, Michael S. Tsirkin wrote:
+> On Mon, Jul 30, 2018 at 03:54:04PM +0200, David Hildenbrand wrote:
+>> On 30.07.2018 15:34, Michael S. Tsirkin wrote:
+>>> On Tue, Jul 17, 2018 at 04:47:31PM -0600, Alex Williamson wrote:
+>>>> Directly assigned vfio devices have never been compatible with
+>>>> ballooning.  Zapping MADV_DONTNEED pages happens completely
+>>>> independent of vfio page pinning and IOMMU mapping, leaving us with
+>>>> inconsistent GPA to HPA mapping between vCPUs and assigned devices
+>>>> when the balloon deflates.  Mediated devices can theoretically do
+>>>> better, if we make the assumption that the mdev vendor driver is fully
+>>>> synchronized to the actual working set of the guest driver.  In that
+>>>> case the guest balloon driver should never be able to allocate an mdev
+>>>> pinned page for balloon inflation.  Unfortunately, QEMU can't know the
+>>>> workings of the vendor driver pinning, and doesn't actually know the
+>>>> difference between mdev devices and directly assigned devices.  Until
+>>>> we can sort out how the vfio IOMMU backend can tell us if ballooning
+>>>> is safe, the best approach is to disabling ballooning any time a vfio
+>>>> devices is attached.
+>>>>
+>>>> To do that, simply make the balloon inhibitor a counter rather than a
+>>>> boolean, fixup a case where KVM can then simply use the inhibit
+>>>> interface, and inhibit ballooning any time a vfio device is attached.
+>>>> I'm expecting we'll expose some sort of flag similar to
+>>>> KVM_CAP_SYNC_MMU from the vfio IOMMU for cases where we can resolve
+>>>> this.  An addition we could consider here would be yet another device
+>>>> option for vfio, such as x-disable-balloon-inhibit, in case there are
+>>>> mdev devices that behave in a manner compatible with ballooning.
+>>>>
+>>>> Please let me know if this looks like a good idea.  Thanks,
+>>>>
+>>>> Alex
+>>>
+>>> It's probably the only a reasonable thing to do for this release.
+>>>
+>>> Long term however, why can't balloon notify vfio as pages are
+>>> added and removed? VFIO could update its mappings then.
+>>
+>> What if the guest is rebooted and pages are silently getting reused
+>> without getting a deflation request first?
+> 
+> Good point. To handle we'd need to deflate fully on
+> on device reset, allowing access to all memory again.
 
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
+1. Doing it from the guest: not reliable. E.g. think about crashes +
+reboots, or a plain "system_reset" in QEMU. Deflation is definetly not
+reliably possible.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+2. Doing it in QEMU balloon implementation. Not possible. We don't track
+the memory that has been inflated (and also should not do it).
 
->  include/hw/compat.h |  3 +++
->  hw/ppc/spapr.c      | 23 +++++++++++++++++++++--
->  2 files changed, 24 insertions(+), 2 deletions(-)
->=20
-> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> index c08f4040bb80..6f4d5fc64704 100644
-> --- a/include/hw/compat.h
-> +++ b/include/hw/compat.h
-> @@ -1,6 +1,9 @@
->  #ifndef HW_COMPAT_H
->  #define HW_COMPAT_H
-> =20
-> +#define HW_COMPAT_3_0 \
-> +    /* empty */
-> +
->  #define HW_COMPAT_2_12 \
->      {\
->          .driver   =3D "migration",\
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 421b2dd09b51..3c72173c7e0f 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4058,19 +4058,38 @@ static const TypeInfo spapr_machine_info =3D {
->      }                                                                \
->      type_init(spapr_machine_register_##suffix)
-> =20
-> + /*
-> + * pseries-3.1
-> + */
-> +static void spapr_machine_3_1_instance_options(MachineState *machine)
-> +{
-> +}
-> +
-> +static void spapr_machine_3_1_class_options(MachineClass *mc)
-> +{
-> +    /* Defaults for the latest behaviour inherited from the base class */
-> +}
-> +
-> +DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
-> +
->  /*
->   * pseries-3.0
->   */
-> +#define SPAPR_COMPAT_3_0                                              \
-> +    HW_COMPAT_3_0
-> +
->  static void spapr_machine_3_0_instance_options(MachineState *machine)
->  {
-> +    spapr_machine_3_1_instance_options(machine);
->  }
-> =20
->  static void spapr_machine_3_0_class_options(MachineClass *mc)
->  {
-> -    /* Defaults for the latest behaviour inherited from the base class */
-> +    spapr_machine_3_1_class_options(mc);
-> +    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_0);
->  }
-> =20
-> -DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
-> +DEFINE_SPAPR_MACHINE(3_0, "3.0", false);
-> =20
->  /*
->   * pseries-2.12
+So the only thing we could do is "deflate all guest memory" which
+implies a madvise WILLNEED on all guest memory. We definitely don't want
+this. We could inform vfio about all guest memory.
+
+Everything sounds like a big hack that should be handled internally in
+the kernel.
+
+-- 
+
+Thanks,
+
+David / dhildenb
