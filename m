@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkCUp-0002rM-J6
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:02:16 -0400
+	(envelope-from <adam@l4re.org>) id 1fkC8q-0006OO-5K
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkCUo-0006S0-Lv
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:02:15 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:35798)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fkCUo-0006Rn-GM
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:02:14 -0400
-Received: by mail-oi0-x243.google.com with SMTP id i12-v6so22964097oik.2
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 11:02:14 -0700 (PDT)
+	(envelope-from <adam@l4re.org>) id 1fkC8m-0002wJ-LR
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:39:32 -0400
+Received: from os.inf.tu-dresden.de ([141.76.48.99]:50662)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <adam@l4re.org>) id 1fkC8m-0002uQ-Dj
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 13:39:28 -0400
+Received: from erwin.inf.tu-dresden.de ([141.76.48.80]
+	helo=os.inf.tu-dresden.de) by os.inf.tu-dresden.de with esmtps
+	(TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256) (Exim 4.91)
+	id 1fkC6d-0004Bz-Hg
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 19:37:15 +0200
+Date: Mon, 30 Jul 2018 19:37:12 +0200
+From: Adam Lackorzynski <adam@l4re.org>
+Message-ID: <20180730173712.GG4987@os.inf.tu-dresden.de>
 MIME-Version: 1.0
-In-Reply-To: <20180725085944.11856-7-stefanha@redhat.com>
-References: <20180725085944.11856-1-stefanha@redhat.com>
-	<20180725085944.11856-7-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jul 2018 19:01:53 +0100
-Message-ID: <CAFEAcA8m2f-DRiDNF0ry4nMH9bzZ1gODV4MTgtLwR5jTNdgeJA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] loader: Implement .hex file loader
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] arm: Fix return code of arm_load_elf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, Alistair Francis <alistair@alistair23.me>, Liviu Ionescu <ilg@livius.net>, qemu-arm <qemu-arm@nongnu.org>, Julia Suvorova <jusual@mail.ru>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Steffen Gortz <qemu.ml@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>
+To: qemu-devel@nongnu.org
 
-On 25 July 2018 at 09:59, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> From: Su Hang <suhang16@mails.ucas.ac.cn>
->
-> This patch adds Intel Hexadecimal Object File format support to the
-> loader.  The file format specification is available here:
-> http://www.piclist.com/techref/fileext/hex/intel.htm
->
-> This file format is often used with microcontrollers such as the
-> micro:bit, Arduino, STM32, etc.  Users expect to be able to run them
-> directly with qemu -kernel program.hex instead of converting to ELF or
-> binary.
+Use an int64_t as a return type to restore
+the negative check for arm_load_as.
 
-I'm still not convinced we want to add another random
-special case only-works-on-one-architecture-and-some-boards
-feature to the -kernel command line option.
+Signed-off-by: Adam Lackorzynski <adam@l4re.org>
+---
+ hw/arm/boot.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Adding it to the "generic loader" device might be more plausible?
-Or just get the user to create ELF files or plain binary files,
-both of which we already handle.
-
-thanks
--- PMM
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index e09201cc97..ca9467e583 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -818,9 +818,9 @@ static int do_arm_linux_init(Object *obj, void *opaque)
+     return 0;
+ }
+ 
+-static uint64_t arm_load_elf(struct arm_boot_info *info, uint64_t *pentry,
+-                             uint64_t *lowaddr, uint64_t *highaddr,
+-                             int elf_machine, AddressSpace *as)
++static int64_t arm_load_elf(struct arm_boot_info *info, uint64_t *pentry,
++                            uint64_t *lowaddr, uint64_t *highaddr,
++                            int elf_machine, AddressSpace *as)
+ {
+     bool elf_is64;
+     union {
+@@ -829,7 +829,7 @@ static uint64_t arm_load_elf(struct arm_boot_info *info, uint64_t *pentry,
+     } elf_header;
+     int data_swab = 0;
+     bool big_endian;
+-    uint64_t ret = -1;
++    int64_t ret = -1;
+     Error *err = NULL;
+ 
+ 
+-- 
+2.18.0
