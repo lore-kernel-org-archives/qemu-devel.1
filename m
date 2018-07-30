@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAuy-0006Ja-Dc
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:21:09 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAvB-0006Yp-QJ
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:21:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAuv-00076T-MO
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:21:08 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:59244 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAvA-0007Bw-Px
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:21:21 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59737 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fkAuv-00076C-EH
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:21:05 -0400
+	id 1fkAvA-0007BF-EO
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:21:20 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 30 Jul 2018 18:12:00 +0200
-Message-Id: <1532967169-22265-28-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 30 Jul 2018 18:12:01 +0200
+Message-Id: <1532967169-22265-29-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 27/76] target/mips: Add emulation of
- nanoMIPS instructions MOVE.P and MOVE.PREV
+Subject: [Qemu-devel] [PATCH v5 28/76] target/mips: Add emulation of
+ nanoMIPS 48-bit instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +30,93 @@ Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aur
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add emulation of nanoMIPS instructions MOVE.P and MOVE.PREV.
+Add emulation of LI48, ADDIU48, ADDIUGP48, ADDIUPC48, LWPC48, and
+SWPC48 instructions.
 
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ target/mips/translate.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 65 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 6347804..ac16bcf 100644
+index ac16bcf..51ef5ee 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -17183,8 +17183,39 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+@@ -16685,7 +16685,71 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
          }
          break;
-     case NM_MOVEP:
--        break;
-     case NM_MOVEPREV:
+     case NM_P48I:
+-        return 6;
 +        {
-+            static const int gpr2reg1[] = {4, 5, 6, 7};
-+            static const int gpr2reg2[] = {5, 6, 7, 8};
-+            int re;
-+            int rd2 = extract32(ctx->opcode, 3, 1) << 1 |
-+                      extract32(ctx->opcode, 8, 1);
-+            int r1 = gpr2reg1[rd2];
-+            int r2 = gpr2reg2[rd2];
-+            int r3 = extract32(ctx->opcode, 4, 1) << 3 |
-+                     extract32(ctx->opcode, 0, 3);
-+            int r4 = extract32(ctx->opcode, 9, 1) << 3 |
-+                     extract32(ctx->opcode, 5, 3);
-+            TCGv t0 = tcg_temp_new();
-+            TCGv t1 = tcg_temp_new();
-+            if (op == NM_MOVEP) {
-+                rd = r1;
-+                re = r2;
-+                rs = decode_gpr_gpr4_zero(r3);
-+                rt = decode_gpr_gpr4_zero(r4);
-+            } else {
-+                rd = decode_gpr_gpr4(r3);
-+                re = decode_gpr_gpr4(r4);
-+                rs = r1;
-+                rt = r2;
++            insn = cpu_lduw_code(env, ctx->base.pc_next + 4);
++            uint32_t offset = extract32(ctx->opcode, 0, 16) | insn << 16;
++            switch (extract32(ctx->opcode, 16, 5)) {
++            case NM_LI48:
++                if (rt != 0) {
++                    tcg_gen_movi_tl(cpu_gpr[rt], offset);
++                }
++                break;
++            case NM_ADDIU48:
++                if (rt != 0) {
++                    tcg_gen_addi_tl(cpu_gpr[rt], cpu_gpr[rt], offset);
++                    tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
++                }
++                break;
++            case NM_ADDIUGP48:
++                if (rt != 0) {
++                    gen_op_addr_addi(ctx, cpu_gpr[rt], cpu_gpr[28], offset);
++                }
++                break;
++            case NM_ADDIUPC48:
++                if (rt != 0) {
++                    target_long addr = addr_add(ctx, ctx->base.pc_next + 6,
++                                                offset);
++
++                    tcg_gen_movi_tl(cpu_gpr[rt], addr);
++                }
++                break;
++            case NM_LWPC48:
++                if (rt != 0) {
++                    TCGv t0;
++                    t0 = tcg_temp_new();
++
++                    target_long addr = addr_add(ctx, ctx->base.pc_next + 6,
++                                                offset);
++
++                    tcg_gen_movi_tl(t0, addr);
++                    tcg_gen_qemu_ld_tl(cpu_gpr[rt], t0, ctx->mem_idx, MO_TESL);
++                    tcg_temp_free(t0);
++                }
++                break;
++            case NM_SWPC48:
++                {
++                    TCGv t0, t1;
++                    t0 = tcg_temp_new();
++                    t1 = tcg_temp_new();
++
++                    target_long addr = addr_add(ctx, ctx->base.pc_next + 6,
++                                                offset);
++
++                    tcg_gen_movi_tl(t0, addr);
++                    gen_load_gpr(t1, rt);
++
++                    tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUL);
++
++                    tcg_temp_free(t0);
++                    tcg_temp_free(t1);
++                }
++                break;
++            default:
++                generate_exception_end(ctx, EXCP_RI);
++                break;
 +            }
-+            gen_load_gpr(t0, rs);
-+            gen_load_gpr(t1, rt);
-+            tcg_gen_mov_tl(cpu_gpr[rd], t0);
-+            tcg_gen_mov_tl(cpu_gpr[re], t1);
-+            tcg_temp_free(t0);
-+            tcg_temp_free(t1);
++            return 6;
 +        }
-         break;
-     default:
-         return decode_nanomips_32_48_opc(env, ctx);
+     case NM_P_U12:
+         switch (extract32(ctx->opcode, 12, 4)) {
+         case NM_ORI:
 -- 
 2.7.4
