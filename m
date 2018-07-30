@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fk9oE-0002zr-Qu
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:10:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fk9oJ-00037V-0X
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:10:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fk9oD-00087Q-Nl
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:10:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fk9oE-00088Q-Sk
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:10:10 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 30 Jul 2018 17:09:45 +0200
-Message-Id: <20180730150958.14607-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 00/13] Block layer patches
+Date: Mon, 30 Jul 2018 17:09:46 +0200
+Message-Id: <20180730150958.14607-2-kwolf@redhat.com>
+In-Reply-To: <20180730150958.14607-1-kwolf@redhat.com>
+References: <20180730150958.14607-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 01/13] qcow: fix a reference leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,67 +22,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-The following changes since commit 6d9dd5fb9d0e9f4a174f53a0e20a39fbe809c71e:
+From: KONRAD Frederic <frederic.konrad@adacore.com>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-qobject-2018-07-27-v2' into staging (2018-07-30 09:55:47 +0100)
+Since 42a3e1ab367cdf38cce093de24eb406b99a4ef96 qemu asserts when using the
+vvfat driver:
 
-are available in the git repository at:
+git clone git://qemu.org/qemu.git
+cd qemu
+./configure --target-list=ppc-softmmu --enable-debug
+make -j8
+mkdir foo
+touch foo/hello
+./ppc-softmmu/qemu-system-ppc -M prep --nographic --monitor null             \
+                              -hda fat:rw:./foo
 
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+"Ctrl-C"
 
-for you to fetch changes up to 1239ac241fe170bb9fcf0be74bfff04f6f1c2560:
+qemu-system-ppc: block.c:3368: bdrv_close_all: Assertion                     \
+   `((&all_bdrv_states)->tqh_first == ((void *)0))' failed.
 
-  qemu-iotests: Test query-blockstats with -drive and -blockdev (2018-07-30 15:35:37 +0200)
+This is because we reference bs twice in qcow_co_create(..) one time in
+bdrv_open_blockdev_ref(..) and in blk_insert_bs(..) but we unref it only once
+in blk_unref which leads to the reference leak.
 
-----------------------------------------------------------------
-Block layer patches:
+Note that I didn't tested much QCOW after this change as I don't use it much.
 
-- qemu-img convert -C is now required to enable copy offloading
-- file-posix: Fix write_zeroes with unmap on block devices (would fall
-  back to explicit writes on recent kernels)
-- Fix query-blockstats interface for use with -blockdev
-- Minor fixes and documentation updates
+Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/qcow.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-----------------------------------------------------------------
-Fam Zheng (6):
-      file-posix: Handle EINTR in preallocation=full write
-      docs: Describe using images in writing iotests
-      iotests: Don't lock /dev/null in 226
-      Revert "qemu-img: Document copy offloading implications with -S and -c"
-      qemu-img: Add -C option for convert with copy offloading
-      iotests: Add test for 'qemu-img convert -C' compatibility
-
-KONRAD Frederic (1):
-      qcow: fix a reference leak
-
-Kevin Wolf (5):
-      block: Fix documentation for BDRV_REQ_MAY_UNMAP
-      file-posix: Fix write_zeroes with unmap on block devices
-      block/qapi: Add 'qdev' field to query-blockstats result
-      block/qapi: Include anonymous BBs in query-blockstats
-      qemu-iotests: Test query-blockstats with -drive and -blockdev
-
-Leonid Bloch (1):
-      qcow2: A grammar fix in conflicting cache sizing error message
-
- qapi/block-core.json       |  14 +++-
- include/block/block.h      |  11 +--
- block/file-posix.c         |  62 ++++++++++----
- block/qapi.c               |  16 +++-
- block/qcow.c               |   1 +
- block/qcow2.c              |   2 +-
- qemu-img.c                 |  21 ++++-
- docs/devel/testing.rst     |  11 +++
- qemu-img-cmds.hx           |   2 +-
- qemu-img.texi              |  14 ++--
- tests/qemu-iotests/082     |   8 ++
- tests/qemu-iotests/082.out |  11 +++
- tests/qemu-iotests/103.out |   4 +-
- tests/qemu-iotests/137.out |   2 +-
- tests/qemu-iotests/226     |   4 +-
- tests/qemu-iotests/227     | 101 ++++++++++++++++++++++
- tests/qemu-iotests/227.out | 205 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 18 files changed, 449 insertions(+), 41 deletions(-)
- create mode 100755 tests/qemu-iotests/227
- create mode 100644 tests/qemu-iotests/227.out
+diff --git a/block/qcow.c b/block/qcow.c
+index 102d058d1c..385d935258 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -938,6 +938,7 @@ static int coroutine_fn qcow_co_create(BlockdevCreateOptions *opts,
+     ret = 0;
+ exit:
+     blk_unref(qcow_blk);
++    bdrv_unref(bs);
+     qcrypto_block_free(crypto);
+     return ret;
+ }
+-- 
+2.13.6
