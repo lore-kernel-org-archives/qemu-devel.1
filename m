@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fk8co-00058s-UC
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:54:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fk8fF-0006W5-Td
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:56:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fk8cl-0004w4-RT
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:54:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58168 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fk8cl-0004v3-Ku
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:54:11 -0400
-References: <20180717222721.14019.27548.stgit@gimli.home>
-	<20180730163123-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <57aca548-b6f3-eae3-3b2e-a25523294a7d@redhat.com>
-Date: Mon, 30 Jul 2018 15:54:04 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fk8fF-0005d0-06
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:56:46 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:46579)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fk8fE-0005co-R3
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 09:56:44 -0400
+Received: by mail-oi0-x243.google.com with SMTP id y207-v6so21359962oie.13
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 06:56:44 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180730163123-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
+In-Reply-To: <a69b9ba5-1973-0d37-0cb9-0de4e4f21a91@redhat.com>
+References: <20180724153616.32352-1-peter.maydell@linaro.org>
+	<a69b9ba5-1973-0d37-0cb9-0de4e4f21a91@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Jul 2018 14:56:23 +0100
+Message-ID: <CAFEAcA8Us98KNcjOA5pPmUTxBxGBEHQvJo9+T4fkEMR45HbxFA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.0] hw/misc/tz-mpc: Zero the LUT on
+ initialization, not just reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 30.07.2018 15:34, Michael S. Tsirkin wrote:
-> On Tue, Jul 17, 2018 at 04:47:31PM -0600, Alex Williamson wrote:
->> Directly assigned vfio devices have never been compatible with
->> ballooning.  Zapping MADV_DONTNEED pages happens completely
->> independent of vfio page pinning and IOMMU mapping, leaving us with
->> inconsistent GPA to HPA mapping between vCPUs and assigned devices
->> when the balloon deflates.  Mediated devices can theoretically do
->> better, if we make the assumption that the mdev vendor driver is fully
->> synchronized to the actual working set of the guest driver.  In that
->> case the guest balloon driver should never be able to allocate an mdev
->> pinned page for balloon inflation.  Unfortunately, QEMU can't know the
->> workings of the vendor driver pinning, and doesn't actually know the
->> difference between mdev devices and directly assigned devices.  Until
->> we can sort out how the vfio IOMMU backend can tell us if ballooning
->> is safe, the best approach is to disabling ballooning any time a vfio
->> devices is attached.
+On 24 July 2018 at 16:45, Thomas Huth <thuth@redhat.com> wrote:
+> On 24.07.2018 17:36, Peter Maydell wrote:
+>> In the tz-mpc device we allocate a data block for the LUT,
+>> which we then clear to zero in the device's reset method.
+>> This is conceptually fine, but unfortunately results in a
+>> valgrind complaint about use of uninitialized data on startup:
 >>
->> To do that, simply make the balloon inhibitor a counter rather than a
->> boolean, fixup a case where KVM can then simply use the inhibit
->> interface, and inhibit ballooning any time a vfio device is attached.
->> I'm expecting we'll expose some sort of flag similar to
->> KVM_CAP_SYNC_MMU from the vfio IOMMU for cases where we can resolve
->> this.  An addition we could consider here would be yet another device
->> option for vfio, such as x-disable-balloon-inhibit, in case there are
->> mdev devices that behave in a manner compatible with ballooning.
+>> ==30906== Conditional jump or move depends on uninitialised value(s)
+>> ==30906==    at 0x503609: tz_mpc_translate (tz-mpc.c:439)
+>> ==30906==    by 0x3F3D90: address_space_translate_iommu (exec.c:511)
+>> ==30906==    by 0x3F3FF8: flatview_do_translate (exec.c:584)
+>> ==30906==    by 0x3F4292: flatview_translate (exec.c:644)
+>> ==30906==    by 0x3F2120: address_space_translate (memory.h:1962)
+>> ==30906==    by 0x3FB753: address_space_ldl_internal (memory_ldst.inc.c:36)
+>> ==30906==    by 0x3FB8A6: address_space_ldl (memory_ldst.inc.c:80)
+>> ==30906==    by 0x619037: ldl_phys (memory_ldst_phys.inc.h:25)
+>> ==30906==    by 0x61985D: arm_cpu_reset (cpu.c:255)
+>> ==30906==    by 0x98791B: cpu_reset (cpu.c:249)
+>> ==30906==    by 0x57FFDB: armv7m_reset (armv7m.c:265)
+>> ==30906==    by 0x7B1775: qemu_devices_reset (reset.c:69)
 >>
->> Please let me know if this looks like a good idea.  Thanks,
+>> This is because of a reset ordering problem -- the TZ MPC
+>> resets after the CPU, but an M-profile CPU's reset function
+>> includes memory loads to get the initial PC and SP, which
+>> then go through an MPC that hasn't yet been reset.
 >>
->> Alex
-> 
-> It's probably the only a reasonable thing to do for this release.
-> 
-> Long term however, why can't balloon notify vfio as pages are
-> added and removed? VFIO could update its mappings then.
+>> The simplest fix for this is to zero the LUT when we
+>> initialize the data, which will result in the MPC's
+>> translate function giving the right answers for these
+>> early memory accesses.
+>
+> Thanks, that fixes the issue, indeed:
+>
+> Tested-by: Thomas Huth <thuth@redhat.com>
 
-What if the guest is rebooted and pages are silently getting reused
-without getting a deflation request first?
+Thanks; applied to target-arm for 3.0.
 
--- 
-
-Thanks,
-
-David / dhildenb
+-- PMM
