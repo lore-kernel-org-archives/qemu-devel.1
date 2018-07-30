@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fk3cM-0003PD-Jy
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:29 -0400
+	(envelope-from <armbru@redhat.com>) id 1fk3cN-0003Pf-Tf
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fk3cJ-0004YP-2b
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51112 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fk3cI-0004XX-Ad
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45078 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fk3cI-0004XI-S8
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fk3cI-0004WZ-0g
 	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 04:33:22 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 30 Jul 2018 10:33:13 +0200
-Message-Id: <20180730083317.11765-20-armbru@redhat.com>
+Date: Mon, 30 Jul 2018 10:33:05 +0200
+Message-Id: <20180730083317.11765-12-armbru@redhat.com>
 In-Reply-To: <20180730083317.11765-1-armbru@redhat.com>
 References: <20180730083317.11765-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 19/23] migration-test: Clean up string
- interpolation into QMP, part 3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 11/23] tests: Clean up string interpolation
+ into QMP input (simple cases)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,209 +28,484 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com
 
-Leaving interpolation into JSON to qmp() is more robust than building
-QMP input manually, as explained in the recent commit "tests: Clean up
-string interpolation into QMP input (simple cases)".
+When you build QMP input manually like this
 
-migration-test.c interpolates strings into JSON in a few places:
+    cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
+                          "'arguments': { 'uri': '%s' } }",
+                          uri);
+    rsp =3D qmp(cmd);
+    g_free(cmd);
 
-* migrate_set_parameter() interpolates string parameter @value as a
-  JSON number.  Change it to long long.  This requires changing
-  migrate_check_parameter() similarly.
+you're responsible for escaping the interpolated values for JSON.  Not
+done here, and therefore works only for sufficiently nice @uri.  For
+instance, if @uri contained a single "'", qobject_from_vjsonf_nofail()
+would abort.  A sufficiently nasty @uri could even inject unwanted
+members into the arguments object.
 
-* migrate_set_capability() interpolates string parameter @value as a
-  JSON boolean.  Change it to bool.
+Leaving interpolation into JSON to qmp() is more robust:
 
-* deprecated_set_speed() interpolates string parameter @value as a
-  JSON number.  Change it to long long.
+    rsp =3D qmp("{ 'execute': 'migrate', 'arguments': { 'uri': %s } }", u=
+ri);
+
+It's also more concise.
+
+Clean up the simple cases where we interpolate exactly a JSON value.
 
 Bonus: gets rid of non-literal format strings.  A step towards
 compile-time format string checking without triggering
 -Wformat-nonliteral.
 
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/migration-test.c | 74 +++++++++++++++++-------------------------
- 1 file changed, 29 insertions(+), 45 deletions(-)
+ tests/libqos/pci-pc.c   |   9 +--
+ tests/libqtest.c        |   7 +-
+ tests/migration-test.c  |   8 +--
+ tests/test-qga.c        | 150 ++++++++++++++++++----------------------
+ tests/tpm-util.c        |   9 +--
+ tests/vhost-user-test.c |   6 +-
+ 6 files changed, 77 insertions(+), 112 deletions(-)
 
+diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+index a7803308b7..585f5289ec 100644
+--- a/tests/libqos/pci-pc.c
++++ b/tests/libqos/pci-pc.c
+@@ -160,14 +160,9 @@ void qpci_free_pc(QPCIBus *bus)
+ void qpci_unplug_acpi_device_test(const char *id, uint8_t slot)
+ {
+     QDict *response;
+-    char *cmd;
+=20
+-    cmd =3D g_strdup_printf("{'execute': 'device_del',"
+-                          " 'arguments': {"
+-                          "   'id': '%s'"
+-                          "}}", id);
+-    response =3D qmp(cmd);
+-    g_free(cmd);
++    response =3D qmp("{'execute': 'device_del', 'arguments': {'id': %s}}=
+",
++                   id);
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     qobject_unref(response);
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 3bfb062fcb..e36cc5ede3 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -1079,12 +1079,9 @@ void qtest_qmp_device_add(const char *driver, cons=
+t char *id, const char *fmt,
+ void qtest_qmp_device_del(const char *id)
+ {
+     QDict *response1, *response2, *event =3D NULL;
+-    char *cmd;
+=20
+-    cmd =3D g_strdup_printf("{'execute': 'device_del',"
+-                          " 'arguments': { 'id': '%s' }}", id);
+-    response1 =3D qmp(cmd);
+-    g_free(cmd);
++    response1 =3D qmp("{'execute': 'device_del', 'arguments': {'id': %s}=
+}",
++                    id);
+     g_assert(response1);
+     g_assert(!qdict_haskey(response1, "error"));
+=20
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index beccb6337e..48f81a0600 100644
+index e079e0bdb6..c6c7089ce1 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -315,31 +315,25 @@ static void cleanup(const char *filename)
- }
- 
- static void migrate_check_parameter(QTestState *who, const char *parameter,
--                                    const char *value)
-+                                    long long value)
- {
-     QDict *rsp_return;
--    char *result;
- 
-     rsp_return = wait_command(who,
-                               "{ 'execute': 'query-migrate-parameters' }");
--    result = g_strdup_printf("%" PRId64,
--                             qdict_get_try_int(rsp_return,  parameter, -1));
--    g_assert_cmpstr(result, ==, value);
--    g_free(result);
-+    g_assert_cmpint(qdict_get_int(rsp_return, parameter), ==, value);
-     qobject_unref(rsp_return);
- }
- 
- static void migrate_set_parameter(QTestState *who, const char *parameter,
--                                  const char *value)
-+                                  long long value)
- {
-     QDict *rsp;
--    gchar *cmd;
- 
--    cmd = g_strdup_printf("{ 'execute': 'migrate-set-parameters',"
--                          "'arguments': { '%s': %s } }",
--                          parameter, value);
--    rsp = qtest_qmp(who, cmd);
--    g_free(cmd);
-+    rsp = qtest_qmp(who,
-+                    "{ 'execute': 'migrate-set-parameters',"
-+                    "'arguments': { %s: %lld } }",
-+                    parameter, value);
-     g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
-     migrate_check_parameter(who, parameter, value);
-@@ -366,18 +360,16 @@ static void migrate_recover(QTestState *who, const char *uri)
- }
- 
- static void migrate_set_capability(QTestState *who, const char *capability,
--                                   const char *value)
-+                                   bool value)
- {
-     QDict *rsp;
--    gchar *cmd;
- 
--    cmd = g_strdup_printf("{ 'execute': 'migrate-set-capabilities',"
--                          "'arguments': { "
--                          "'capabilities': [ { "
--                          "'capability': '%s', 'state': %s } ] } }",
--                          capability, value);
--    rsp = qtest_qmp(who, cmd);
--    g_free(cmd);
-+    rsp = qtest_qmp(who,
-+                    "{ 'execute': 'migrate-set-capabilities',"
-+                    "'arguments': { "
-+                    "'capabilities': [ { "
-+                    "'capability': %s, 'state': %i } ] } }",
-+                    capability, value);
-     g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
- }
-@@ -527,29 +519,21 @@ static void test_migrate_end(QTestState *from, QTestState *to, bool test_dest)
+@@ -529,14 +529,12 @@ static void test_migrate_end(QTestState *from, QTes=
+tState *to, bool test_dest)
  static void deprecated_set_downtime(QTestState *who, const double value)
  {
      QDict *rsp;
--    char *expected;
--    int64_t result_int;
- 
-     rsp = qtest_qmp(who,
-                     "{ 'execute': 'migrate_set_downtime',"
-                     " 'arguments': { 'value': %f } }", value);
+-    gchar *cmd;
+     char *expected;
+     int64_t result_int;
+=20
+-    cmd =3D g_strdup_printf("{ 'execute': 'migrate_set_downtime',"
+-                          "'arguments': { 'value': %g } }", value);
+-    rsp =3D qtest_qmp(who, cmd);
+-    g_free(cmd);
++    rsp =3D qtest_qmp(who,
++                    "{ 'execute': 'migrate_set_downtime',"
++                    " 'arguments': { 'value': %f } }", value);
      g_assert(qdict_haskey(rsp, "return"));
      qobject_unref(rsp);
--    result_int = value * 1000L;
--    expected = g_strdup_printf("%" PRId64, result_int);
--    migrate_check_parameter(who, "downtime-limit", expected);
--    g_free(expected);
-+    migrate_check_parameter(who, "downtime-limit", value * 1000);
+     result_int =3D value * 1000L;
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index d638b1571a..c552cc0125 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -146,12 +146,11 @@ static void test_qga_sync_delimited(gconstpointer f=
+ix)
+     guint32 v, r =3D g_random_int();
+     unsigned char c;
+     QDict *ret;
+-    gchar *cmd;
+=20
+-    cmd =3D g_strdup_printf("\xff{'execute': 'guest-sync-delimited',"
+-                          " 'arguments': {'id': %u } }", r);
+-    qmp_fd_send(fixture->fd, cmd);
+-    g_free(cmd);
++    qmp_fd_send(fixture->fd,
++                "\xff{'execute': 'guest-sync-delimited',"
++                " 'arguments': {'id': %u } }",
++                r);
+=20
+     /*
+      * Read and ignore garbage until resynchronized.
+@@ -188,7 +187,6 @@ static void test_qga_sync(gconstpointer fix)
+     const TestFixture *fixture =3D fix;
+     guint32 v, r =3D g_random_int();
+     QDict *ret;
+-    gchar *cmd;
+=20
+     /*
+      * TODO guest-sync is inherently limited: we cannot distinguish
+@@ -201,10 +199,9 @@ static void test_qga_sync(gconstpointer fix)
+      * invalid JSON. Testing of '\xff' handling is done in
+      * guest-sync-delimited instead.
+      */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-sync',"
+-                          " 'arguments': {'id': %u } }", r);
+-    ret =3D qmp_fd(fixture->fd, cmd);
+-    g_free(cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-sync', 'arguments': {'id': %u } }",
++                 r);
+=20
+     g_assert_nonnull(ret);
+     qmp_assert_no_error(ret);
+@@ -428,7 +425,7 @@ static void test_qga_file_ops(gconstpointer fix)
+     const TestFixture *fixture =3D fix;
+     const unsigned char helloworld[] =3D "Hello World!\n";
+     const char *b64;
+-    gchar *cmd, *path, *enc;
++    gchar *path, *enc;
+     unsigned char *dec;
+     QDict *ret, *val;
+     int64_t id, eof;
+@@ -446,10 +443,10 @@ static void test_qga_file_ops(gconstpointer fix)
+=20
+     enc =3D g_base64_encode(helloworld, sizeof(helloworld));
+     /* write */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-write',"
+-                          " 'arguments': { 'handle': %" PRId64 ","
+-                          " 'buf-b64': '%s' } }", id, enc);
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-write',"
++                 " 'arguments': { 'handle': %" PRId64 ", 'buf-b64': %s }=
+ }",
++                 id, enc);
+     g_assert_nonnull(ret);
+     qmp_assert_no_error(ret);
+=20
+@@ -459,23 +456,20 @@ static void test_qga_file_ops(gconstpointer fix)
+     g_assert_cmpint(count, =3D=3D, sizeof(helloworld));
+     g_assert_cmpint(eof, =3D=3D, 0);
+     qobject_unref(ret);
+-    g_free(cmd);
+=20
+     /* flush */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-flush',"
+-                          " 'arguments': {'handle': %" PRId64 "} }",
+-                          id);
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-flush',"
++                 " 'arguments': {'handle': %" PRId64 "} }",
++                 id);
+     qobject_unref(ret);
+-    g_free(cmd);
+=20
+     /* close */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-close',"
+-                          " 'arguments': {'handle': %" PRId64 "} }",
+-                          id);
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-close',"
++                 " 'arguments': {'handle': %" PRId64 "} }",
++                 id);
+     qobject_unref(ret);
+-    g_free(cmd);
+=20
+     /* check content */
+     path =3D g_build_filename(fixture->test_dir, "foo", NULL);
+@@ -497,10 +491,10 @@ static void test_qga_file_ops(gconstpointer fix)
+     qobject_unref(ret);
+=20
+     /* read */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-read',"
+-                          " 'arguments': { 'handle': %" PRId64 "} }",
+-                          id);
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-read',"
++                 " 'arguments': { 'handle': %" PRId64 "} }",
++                 id);
+     val =3D qdict_get_qdict(ret, "return");
+     count =3D qdict_get_int(val, "count");
+     eof =3D qdict_get_bool(val, "eof");
+@@ -510,14 +504,13 @@ static void test_qga_file_ops(gconstpointer fix)
+     g_assert_cmpstr(b64, =3D=3D, enc);
+=20
+     qobject_unref(ret);
+-    g_free(cmd);
+     g_free(enc);
+=20
+     /* read eof */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-read',"
+-                          " 'arguments': { 'handle': %" PRId64 "} }",
+-                          id);
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-read',"
++                 " 'arguments': { 'handle': %" PRId64 "} }",
++                 id);
+     val =3D qdict_get_qdict(ret, "return");
+     count =3D qdict_get_int(val, "count");
+     eof =3D qdict_get_bool(val, "eof");
+@@ -526,14 +519,13 @@ static void test_qga_file_ops(gconstpointer fix)
+     g_assert(eof);
+     g_assert_cmpstr(b64, =3D=3D, "");
+     qobject_unref(ret);
+-    g_free(cmd);
+=20
+     /* seek */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-seek',"
+-                          " 'arguments': { 'handle': %" PRId64 ", "
+-                          " 'offset': %d, 'whence': '%s' } }",
+-                          id, 6, "set");
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-seek',"
++                 " 'arguments': { 'handle': %" PRId64 ", "
++                 " 'offset': %d, 'whence': %s } }",
++                 id, 6, "set");
+     qmp_assert_no_error(ret);
+     val =3D qdict_get_qdict(ret, "return");
+     count =3D qdict_get_int(val, "position");
+@@ -541,13 +533,12 @@ static void test_qga_file_ops(gconstpointer fix)
+     g_assert_cmpint(count, =3D=3D, 6);
+     g_assert(!eof);
+     qobject_unref(ret);
+-    g_free(cmd);
+=20
+     /* partial read */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-read',"
+-                          " 'arguments': { 'handle': %" PRId64 "} }",
+-                          id);
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-read',"
++                 " 'arguments': { 'handle': %" PRId64 "} }",
++                 id);
+     val =3D qdict_get_qdict(ret, "return");
+     count =3D qdict_get_int(val, "count");
+     eof =3D qdict_get_bool(val, "eof");
+@@ -560,15 +551,13 @@ static void test_qga_file_ops(gconstpointer fix)
+     g_free(dec);
+=20
+     qobject_unref(ret);
+-    g_free(cmd);
+=20
+     /* close */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-close',"
+-                          " 'arguments': {'handle': %" PRId64 "} }",
+-                          id);
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-close',"
++                 " 'arguments': {'handle': %" PRId64 "} }",
++                 id);
+     qobject_unref(ret);
+-    g_free(cmd);
  }
- 
--static void deprecated_set_speed(QTestState *who, const char *value)
-+static void deprecated_set_speed(QTestState *who, long long value)
+=20
+ static void test_qga_file_write_read(gconstpointer fix)
+@@ -576,7 +565,7 @@ static void test_qga_file_write_read(gconstpointer fi=
+x)
+     const TestFixture *fixture =3D fix;
+     const unsigned char helloworld[] =3D "Hello World!\n";
+     const char *b64;
+-    gchar *cmd, *enc;
++    gchar *enc;
+     QDict *ret, *val;
+     int64_t id, eof;
+     gsize count;
+@@ -591,10 +580,10 @@ static void test_qga_file_write_read(gconstpointer =
+fix)
+=20
+     enc =3D g_base64_encode(helloworld, sizeof(helloworld));
+     /* write */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-write',"
+-                          " 'arguments': { 'handle': %" PRId64 ","
+-                          " 'buf-b64': '%s' } }", id, enc);
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-write',"
++                 " 'arguments': { 'handle': %" PRId64 ","
++                 " 'buf-b64': %s } }", id, enc);
+     g_assert_nonnull(ret);
+     qmp_assert_no_error(ret);
+=20
+@@ -604,13 +593,12 @@ static void test_qga_file_write_read(gconstpointer =
+fix)
+     g_assert_cmpint(count, =3D=3D, sizeof(helloworld));
+     g_assert_cmpint(eof, =3D=3D, 0);
+     qobject_unref(ret);
+-    g_free(cmd);
+=20
+     /* read (check implicit flush) */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-read',"
+-                          " 'arguments': { 'handle': %" PRId64 "} }",
+-                          id);
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-read',"
++                 " 'arguments': { 'handle': %" PRId64 "} }",
++                 id);
+     val =3D qdict_get_qdict(ret, "return");
+     count =3D qdict_get_int(val, "count");
+     eof =3D qdict_get_bool(val, "eof");
+@@ -619,14 +607,13 @@ static void test_qga_file_write_read(gconstpointer =
+fix)
+     g_assert(eof);
+     g_assert_cmpstr(b64, =3D=3D, "");
+     qobject_unref(ret);
+-    g_free(cmd);
+=20
+     /* seek to 0 */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-seek',"
+-                          " 'arguments': { 'handle': %" PRId64 ", "
+-                          " 'offset': %d, 'whence': '%s' } }",
+-                          id, 0, "set");
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-seek',"
++                 " 'arguments': { 'handle': %" PRId64 ", "
++                 " 'offset': %d, 'whence': %s } }",
++                 id, 0, "set");
+     qmp_assert_no_error(ret);
+     val =3D qdict_get_qdict(ret, "return");
+     count =3D qdict_get_int(val, "position");
+@@ -634,13 +621,12 @@ static void test_qga_file_write_read(gconstpointer =
+fix)
+     g_assert_cmpint(count, =3D=3D, 0);
+     g_assert(!eof);
+     qobject_unref(ret);
+-    g_free(cmd);
+=20
+     /* read */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-read',"
+-                          " 'arguments': { 'handle': %" PRId64 "} }",
+-                          id);
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-read',"
++                 " 'arguments': { 'handle': %" PRId64 "} }",
++                 id);
+     val =3D qdict_get_qdict(ret, "return");
+     count =3D qdict_get_int(val, "count");
+     eof =3D qdict_get_bool(val, "eof");
+@@ -649,16 +635,14 @@ static void test_qga_file_write_read(gconstpointer =
+fix)
+     g_assert(eof);
+     g_assert_cmpstr(b64, =3D=3D, enc);
+     qobject_unref(ret);
+-    g_free(cmd);
+     g_free(enc);
+=20
+     /* close */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-file-close',"
+-                          " 'arguments': {'handle': %" PRId64 "} }",
+-                          id);
+-    ret =3D qmp_fd(fixture->fd, cmd);
++    ret =3D qmp_fd(fixture->fd,
++                 "{'execute': 'guest-file-close',"
++                 " 'arguments': {'handle': %" PRId64 "} }",
++                 id);
+     qobject_unref(ret);
+-    g_free(cmd);
+ }
+=20
+ static void test_qga_get_time(gconstpointer fix)
+@@ -814,7 +798,6 @@ static void test_qga_guest_exec(gconstpointer fix)
+     int64_t pid, now, exitcode;
+     gsize len;
+     bool exited;
+-    char *cmd;
+=20
+     /* exec 'echo foo bar' */
+     ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-exec', 'arguments': =
+{"
+@@ -829,10 +812,10 @@ static void test_qga_guest_exec(gconstpointer fix)
+=20
+     /* wait for completion */
+     now =3D g_get_monotonic_time();
+-    cmd =3D g_strdup_printf("{'execute': 'guest-exec-status',"
+-                          " 'arguments': { 'pid': %" PRId64 " } }", pid)=
+;
+     do {
+-        ret =3D qmp_fd(fixture->fd, cmd);
++        ret =3D qmp_fd(fixture->fd,
++                     "{'execute': 'guest-exec-status',"
++                     " 'arguments': { 'pid': %" PRId64 " } }", pid);
+         g_assert_nonnull(ret);
+         val =3D qdict_get_qdict(ret, "return");
+         exited =3D qdict_get_bool(val, "exited");
+@@ -842,7 +825,6 @@ static void test_qga_guest_exec(gconstpointer fix)
+     } while (!exited &&
+              g_get_monotonic_time() < now + 5 * G_TIME_SPAN_SECOND);
+     g_assert(exited);
+-    g_free(cmd);
+=20
+     /* check stdout */
+     exitcode =3D qdict_get_int(val, "exitcode");
+diff --git a/tests/tpm-util.c b/tests/tpm-util.c
+index 672cedf905..3bd2887f1e 100644
+--- a/tests/tpm-util.c
++++ b/tests/tpm-util.c
+@@ -239,13 +239,10 @@ void tpm_util_swtpm_kill(GPid pid)
+ void tpm_util_migrate(QTestState *who, const char *uri)
  {
      QDict *rsp;
 -    gchar *cmd;
- 
--    cmd = g_strdup_printf("{ 'execute': 'migrate_set_speed',"
--                          "'arguments': { 'value': %s } }", value);
--    rsp = qtest_qmp(who, cmd);
+=20
+-    cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
+-                          "'arguments': { 'uri': '%s' } }",
+-                          uri);
+-    rsp =3D qtest_qmp(who, cmd);
 -    g_free(cmd);
-+    rsp = qtest_qmp(who, "{ 'execute': 'migrate_set_speed',"
-+                          "'arguments': { 'value': %lld } }", value);
++    rsp =3D qtest_qmp(who,
++                    "{ 'execute': 'migrate', 'arguments': { 'uri': %s } =
+}",
++                    uri);
      g_assert(qdict_haskey(rsp, "return"));
      qobject_unref(rsp);
-     migrate_check_parameter(who, "max-bandwidth", value);
-@@ -562,7 +546,7 @@ static void test_deprecated(void)
-     from = qtest_start("");
- 
-     deprecated_set_downtime(from, 0.12345);
--    deprecated_set_speed(from, "12345");
-+    deprecated_set_speed(from, 12345);
- 
-     qtest_quit(from);
  }
-@@ -578,16 +562,16 @@ static int migrate_postcopy_prepare(QTestState **from_ptr,
-         return -1;
-     }
- 
--    migrate_set_capability(from, "postcopy-ram", "true");
--    migrate_set_capability(to, "postcopy-ram", "true");
--    migrate_set_capability(to, "postcopy-blocktime", "true");
-+    migrate_set_capability(from, "postcopy-ram", true);
-+    migrate_set_capability(to, "postcopy-ram", true);
-+    migrate_set_capability(to, "postcopy-blocktime", true);
- 
-     /* We want to pick a speed slow enough that the test completes
-      * quickly, but that it doesn't complete precopy even on a slow
-      * machine, so also set the downtime.
-      */
--    migrate_set_parameter(from, "max-bandwidth", "100000000");
--    migrate_set_parameter(from, "downtime-limit", "1");
-+    migrate_set_parameter(from, "max-bandwidth", 100000000);
-+    migrate_set_parameter(from, "downtime-limit", 1);
- 
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-@@ -638,7 +622,7 @@ static void test_postcopy_recovery(void)
-     }
- 
-     /* Turn postcopy speed down, 4K/s is slow enough on any machines */
--    migrate_set_parameter(from, "max-postcopy-bandwidth", "4096");
-+    migrate_set_parameter(from, "max-postcopy-bandwidth", 4096);
- 
-     /* Now we start the postcopy */
-     migrate_postcopy_start(from, to);
-@@ -679,7 +663,7 @@ static void test_postcopy_recovery(void)
-     g_free(uri);
- 
-     /* Restore the postcopy bandwidth to unlimited */
--    migrate_set_parameter(from, "max-postcopy-bandwidth", "0");
-+    migrate_set_parameter(from, "max-postcopy-bandwidth", 0);
- 
-     migrate_postcopy_complete(from, to);
- }
-@@ -725,9 +709,9 @@ static void test_precopy_unix(void)
-      * machine, so also set the downtime.
-      */
-     /* 1 ms should make it not converge*/
--    migrate_set_parameter(from, "downtime-limit", "1");
-+    migrate_set_parameter(from, "downtime-limit", 1);
-     /* 1GB/s */
--    migrate_set_parameter(from, "max-bandwidth", "1000000000");
-+    migrate_set_parameter(from, "max-bandwidth", 1000000000);
- 
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-@@ -737,7 +721,7 @@ static void test_precopy_unix(void)
-     wait_for_migration_pass(from);
- 
-     /* 300 ms should converge */
--    migrate_set_parameter(from, "downtime-limit", "300");
-+    migrate_set_parameter(from, "downtime-limit", 300);
- 
-     if (!got_stop) {
-         qtest_qmp_eventwait(from, "STOP");
--- 
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index fecc832d99..ca6251f5f8 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -709,11 +709,7 @@ static void test_migrate(void)
+     g_assert(qdict_haskey(rsp, "return"));
+     qobject_unref(rsp);
+=20
+-    cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
+-                          "'arguments': { 'uri': '%s' } }",
+-                          uri);
+-    rsp =3D qmp(cmd);
+-    g_free(cmd);
++    rsp =3D qmp("{ 'execute': 'migrate', 'arguments': { 'uri': %s } }", =
+uri);
+     g_assert(qdict_haskey(rsp, "return"));
+     qobject_unref(rsp);
+=20
+--=20
 2.17.1
