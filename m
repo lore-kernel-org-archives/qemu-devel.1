@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fkDBC-0008Gy-Ag
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:46:03 -0400
+	(envelope-from <danielhb413@gmail.com>) id 1fkDG5-0002NY-7s
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:51:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fkDB7-0002D0-BP
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:46:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52320)
+	(envelope-from <danielhb413@gmail.com>) id 1fkDG4-0003ld-9T
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:51:05 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35962)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fkDB7-0002CX-4V
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:45:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fkDB4-0008V2-6N
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 18:45:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B5CD32E80D1
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 18:45:53 +0000 (UTC)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1fkDG4-0003l5-2z
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:51:04 -0400
+Received: by mail-qt0-x244.google.com with SMTP id t5-v6so13241953qtn.3
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 11:51:03 -0700 (PDT)
+References: <20180705200813.2033-1-danielhb413@gmail.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <1c0932e0-0b43-28ad-1b4b-41a68b5b8f86@gmail.com>
+Date: Mon, 30 Jul 2018 15:50:56 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 30 Jul 2018 18:38:48 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1777777 <1777777@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152947435461.1911.16896504402050089205.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153297592885.3867.6958781175423605727.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1777777] Re: arm9 clock pending (SP804)
+In-Reply-To: <20180705200813.2033-1-danielhb413@gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 0/3] wakeup-from-suspend and
+ system_wakeup changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +32,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com
 
-Sorry, I should have been clearer. Please can you provide a test case
-binary and QEMU command line that reproduces the problem (including what
-the expected output is and what the actual output is)?
+Ping
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1777777
-
-Title:
-  arm9 clock pending (SP804)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello all,
-
-  I'm using the versatilepb board and the timer Interrupt Mask Status
-  register (offset 0x14 of the SP804) does not seem to be working
-  properly on the latest qemu-2.12. I tried on the 2.5 (i believe this
-  is the mainstream version that comes with Linux) and it works
-  perfectly.
-
-  What happens is that the pending bit does not seem to be set in some
-  scenarios. In my case, I see the timer value decreasing to 0 and then
-  being reset to the reload value and neither does the interrupt is
-  triggered nor the pending bit is set.
-
-  I believe this is a matter of timing since in the "long" run the
-  system eventually catches up (after a few microseconds).
-
-  Thank you
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1777777/+subscriptions
+On 07/05/2018 05:08 PM, Daniel Henrique Barboza wrote:
+> changes in v8:
+> - created 'query-current-machine' API to hold the wakeup-suspend-support
+>    flag
+> - wake-up flag now considers the --no-acpi config option for PC archs
+> - fixes in patch 3 proposed by Markus.
+> Previous series link:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04234.html
+>
+> Daniel Henrique Barboza (3):
+>    qmp: query-current-machine with wakeup-suspend-support
+>    qga: update guest-suspend-ram and guest-suspend-hybrid descriptions
+>    qmp hmp: Make system_wakeup check wake-up support and run state
+>
+>   hmp.c                   |  5 ++++-
+>   include/sysemu/sysemu.h |  1 +
+>   qapi/misc.json          | 29 ++++++++++++++++++++++++++++-
+>   qga/qapi-schema.json    | 12 ++++++------
+>   qmp.c                   | 11 ++++++++++-
+>   vl.c                    | 30 ++++++++++++++++++++++++++++++
+>   6 files changed, 79 insertions(+), 9 deletions(-)
+>
