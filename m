@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkB6G-0008Ml-26
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:32:49 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fkBEu-0007gz-QK
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:41:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkB6A-00056G-F0
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:32:48 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:50310 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fkB6A-00053x-73
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:32:42 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 30 Jul 2018 18:12:49 +0200
-Message-Id: <1532967169-22265-77-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1fkBEq-0008UL-Ha
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:41:44 -0400
+Received: from mail-cys01nam02on0731.outbound.protection.outlook.com
+	([2a01:111:f400:fe45::731]:45074
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fkBEq-0008Tq-5e
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:41:40 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 30 Jul 2018 16:41:35 +0000
+Message-ID: <BN7PR08MB486887FE64E831C3298A3B0CC62F0@BN7PR08MB4868.namprd08.prod.outlook.com>
 References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 76/76] linux-user: Add nanoMIPS linux user
- mode configuration support
+In-Reply-To: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v5 00/76] Add nanoMIPS support to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>=20
+> v4->v5:
+>=20
+>   - merged series "Mips maintenance and misc fixes and improvements"
+>     and this one for easier handling (there are build dependencies)
+>   - eliminated shadow variables from translate.c
+>   - replaced shift/mask combination with extract32()
+>   - added new function gen_op_addr_addi()
+>   - added "fall through" comments at appropriate places
+>   - eliminated micromips flag from I7200 definition
+>   - numerous other enhancements originating from reviewer's
+>     comments
+>   - some of the patches split into two or more for easier
+>     handling and review
+>   - rebased to the latest code
 
-Add new linux user mode configuration for nanoMIPS.
+I forgot to include an important item here:
 
-Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
----
- configure                               | 13 ++++++++++++-
- default-configs/nanomips-linux-user.mak |  1 +
- 2 files changed, 13 insertions(+), 1 deletion(-)
- create mode 100644 default-configs/nanomips-linux-user.mak
+  - reimplemented emulation of LLWP/SCWP pair
 
-diff --git a/configure b/configure
-index 2a7796e..86c8b28 100755
---- a/configure
-+++ b/configure
-@@ -742,6 +742,9 @@ case "$cpu" in
-     supported_cpu="yes"
-     cross_cc_mips=$host_cc
-   ;;
-+  nanomips*)
-+    cpu="mips"
-+  ;;
-   sparc|sun4[cdmuv])
-     cpu="sparc"
-     supported_cpu="yes"
-@@ -6883,7 +6886,7 @@ target_name=$(echo $target | cut -d '-' -f 1)
- target_bigendian="no"
- 
- case "$target_name" in
--  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
-+  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|nanomipseb|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
-   target_bigendian=yes
-   ;;
- esac
-@@ -6999,6 +7002,11 @@ case "$target_name" in
-   moxie)
-     target_compiler=$cross_cc_moxie
-   ;;
-+  nanomips|nanomipseb)
-+    TARGET_ARCH=nanomips
-+    TARGET_BASE_ARCH=mips
-+    echo "TARGET_ABI_MIPSP32=y" >> $config_target_mak
-+  ;;
-   nios2)
-     target_compiler=$cross_cc_nios2
-   ;;
-@@ -7256,6 +7264,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-   moxie*)
-     disas_config "MOXIE"
-   ;;
-+  nanomips*)
-+    disas_config "MIPS"
-+  ;;
-   nios2)
-     disas_config "NIOS2"
-   ;;
-diff --git a/default-configs/nanomips-linux-user.mak b/default-configs/nanomips-linux-user.mak
-new file mode 100644
-index 0000000..68fc1f7
---- /dev/null
-+++ b/default-configs/nanomips-linux-user.mak
-@@ -0,0 +1 @@
-+# Default configuration for nanomips-linux-user
--- 
-2.7.4
+Aleksandar M.
