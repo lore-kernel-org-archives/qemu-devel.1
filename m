@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fk8uf-0005OZ-Fa
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:12:42 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fk8zm-00010N-MQ
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fk8ub-0005xJ-Dc
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:12:41 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:48103)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fk8ub-0005wI-3r
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:12:37 -0400
-References: <20180730134321.19898-1-alex.bennee@linaro.org>
-	<20180730134321.19898-2-alex.bennee@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <bb23514b-741c-bda3-309b-6bcedc071ab5@vivier.eu>
-Date: Mon, 30 Jul 2018 16:12:23 +0200
+	(envelope-from <pm215@archaic.org.uk>) id 1fk8zl-0002Kf-SY
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:17:58 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43820)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fk8zl-00029y-Kn
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 10:17:57 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1fk8ze-0004Ei-1Q
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 15:17:50 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Jul 2018 15:17:42 +0100
+Message-Id: <20180730141748.430-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180730134321.19898-2-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 for 3.0 1/2] linux-user/mmap.c: handle
- invalid len maps correctly
+Subject: [Qemu-devel] [PULL 0/6] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, 1783362@bugs.launchpad.net
+To: qemu-devel@nongnu.org
 
-Le 30/07/2018 à 15:43, Alex Bennée a écrit :
-> I've slightly re-organised the check to more closely match the
-> sequence that the kernel uses in do_mmap(). We check for both the zero
-> case (EINVAL) and the overflow length case (ENOMEM).
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Cc: umarcor <1783362@bugs.launchpad.net>
-> 
-> ---
-> v2
->   - add comment on overflow
-> ---
->  linux-user/mmap.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-> index d0c50e4888..41e0983ce8 100644
-> --- a/linux-user/mmap.c
-> +++ b/linux-user/mmap.c
-> @@ -391,14 +391,23 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
->      }
->  #endif
->  
-> -    if (offset & ~TARGET_PAGE_MASK) {
-> +    if (!len) {
->          errno = EINVAL;
->          goto fail;
->      }
->  
-> +    /* Also check for overflows... */
->      len = TARGET_PAGE_ALIGN(len);
-> -    if (len == 0)
-> -        goto the_end;
-> +    if (!len) {
-> +        errno = ENOMEM;
-> +        goto fail;
-> +    }
-> +
-> +    if (offset & ~TARGET_PAGE_MASK) {
-> +        errno = EINVAL;
-> +        goto fail;
-> +    }
-> +
->      real_start = start & qemu_host_page_mask;
->      host_offset = offset & qemu_host_page_mask;
->  
-> 
+A set of small bugfixes for arm for 3.0; the "migration was
+broken" fixes for SMMUv3 and v7M NVIC with security extensions
+are the most significant.
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+thanks
+-- PMM
+
+The following changes since commit 6d9dd5fb9d0e9f4a174f53a0e20a39fbe809c71e:
+
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-qobject-2018-07-27-v2' into staging (2018-07-30 09:55:47 +0100)
+
+are available in the Git repository at:
+
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180730
+
+for you to fetch changes up to 0261fb805c00a6f97d143235e7b06b0906bdf898:
+
+  target/arm: Remove duplicate 'host' entry in '-cpu ?' output (2018-07-30 15:07:08 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * arm/smmuv3: Fix broken VM state migration
+ * armv7m_nvic: Fix broken VM state migration
+ * hw/arm/sysbus-fdt: Fix assertion in copy_properties_from_host()
+ * hw/arm/iotkit: Fix IRQ number for timer1
+ * hw/misc/tz-mpc: Zero the LUT on initialization, not just reset
+ * target/arm: Remove duplicate 'host' entry in '-cpu ?' output
+
+----------------------------------------------------------------
+Dr. David Alan Gilbert (1):
+      arm/smmuv3: Fix missing VMSD terminator
+
+Geert Uytterhoeven (1):
+      hw/arm/sysbus-fdt: Fix assertion in copy_properties_from_host()
+
+Peter Maydell (3):
+      armv7m_nvic: Fix m-security subsection name
+      hw/arm/iotkit: Fix IRQ number for timer1
+      hw/misc/tz-mpc: Zero the LUT on initialization, not just reset
+
+Philippe Mathieu-Daudé (1):
+      target/arm: Remove duplicate 'host' entry in '-cpu ?' output
+
+ hw/arm/iotkit.c       | 2 +-
+ hw/arm/smmuv3.c       | 1 +
+ hw/arm/sysbus-fdt.c   | 1 +
+ hw/intc/armv7m_nvic.c | 2 +-
+ hw/misc/tz-mpc.c      | 2 +-
+ target/arm/helper.c   | 6 ------
+ 6 files changed, 5 insertions(+), 9 deletions(-)
