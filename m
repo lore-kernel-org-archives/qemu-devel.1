@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fkAQw-00085v-Mk
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:50:07 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fkAWA-0002bT-BR
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:55:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fkAQs-0002GQ-Ie
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:50:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52138 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fkAQs-0002GF-FC
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:50:02 -0400
-Date: Mon, 30 Jul 2018 18:49:58 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180730182951-mutt-send-email-mst@kernel.org>
-References: <20180717222721.14019.27548.stgit@gimli.home>
-	<20180730163123-mutt-send-email-mst@kernel.org>
-	<20180730083939.23f3b9cc@t450s.home>
-	<20180730174601-mutt-send-email-mst@kernel.org>
-	<20180730090137.15917879@t450s.home>
+	(envelope-from <cohuck@redhat.com>) id 1fkAW6-0004Tq-3w
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:55:30 -0400
+Date: Mon, 30 Jul 2018 17:55:19 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180730175519.03dd4bef.cohuck@redhat.com>
+In-Reply-To: <1532959766-53343-1-git-send-email-borntraeger@de.ibm.com>
+References: <1532959766-53343-1-git-send-email-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180730090137.15917879@t450s.home>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/sclp: fix maxram calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +22,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, imbrenda@linux.vnet.ibm.com
 
-On Mon, Jul 30, 2018 at 09:01:37AM -0600, Alex Williamson wrote:
-> > > but I don't think it can be done
-> > > atomically with respect to inflight DMA of a physical device where we
-> > > cannot halt the device without interfering with its state.  
-> > 
-> > Guests never add pages to the balloon if they are under DMA,
-> > so that's fine - there's never an in-flight DMA, if
-> > there is guest is buggy and it's ok to crash it.
+On Mon, 30 Jul 2018 16:09:26 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> We clamp down ram_size to match the sclp increment size. We do
+> not do the same for maxram_size, which means for large guests
+> with some sizes (e.g. -m 50000) maxram_size differs from ram_size.
+> This can break other code (e.g. CMMA migration) which uses maxram_size
+> to calculate the number of pages and then throws some errors.
 > 
-> It's not the ballooned page that I'm trying to note, it's the entire
-> remainder of the SubRegion which needs to be unmapped to remove that
-> one page.  It's more compatible from an IOMMU perspective in that we're
-> only unmapping with the same granularity with which we mapped, but it's
-> incompatible with inflight DMA as we have no idea what DMA targets may
-> reside within the remainder of that mapping while it's temporarily
-> unmapped.
+> Fixes: 82fab5c5b90e468f3e9d54c ("s390x/sclp: remove memory hotplug support")
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> CC: qemu-stable@nongnu.org
+> CC: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/sclp.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index bd2a024..4510a80 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -320,6 +320,7 @@ static void sclp_memory_init(SCLPDevice *sclp)
+>      initial_mem = initial_mem >> increment_size << increment_size;
+>  
+>      machine->ram_size = initial_mem;
+> +    machine->maxram_size = initial_mem;
+>      /* let's propagate the changed ram size into the global variable. */
+>      ram_size = initial_mem;
+>  }
 
-I see. Yes you need to be careful to replace the host IOMMU PTE
-atomically. Same applies to vIOMMU though - if guest changes
-a PTE atomically host should do the same.
-
---
-MST
+Thanks, queued to s390-fixes.
