@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAne-0008RZ-Cl
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:13:36 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAnf-0008Ry-FG
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAnZ-00040G-JM
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:13:32 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:48280 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAnd-00041H-FV
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:13:35 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:48462 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fkAnZ-0003pi-76
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:13:29 -0400
+	id 1fkAnc-00040r-Up
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:13:33 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 30 Jul 2018 18:11:33 +0200
-Message-Id: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 00/76] Add nanoMIPS support to QEMU
+Date: Mon, 30 Jul 2018 18:11:35 +0200
+Message-Id: <1532967169-22265-3-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 02/76] target/mips: Avoid case statements
+ formulated by ranges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,230 +33,581 @@ Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aur
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-v4->v5:
+Remove "range style" case statements to make code analysis easier.
 
-  - merged series "Mips maintenance and misc fixes and improvements"
-    and this one for easier handling (there are build dependencies)
-  - eliminated shadow variables from translate.c
-  - replaced shift/mask combination with extract32()
-  - added new function gen_op_addr_addi()
-  - added "fall through" comments at appropriate places
-  - eliminated micromips flag from I7200 definition
-  - numerous other enhancements originating from reviewer's
-    comments
-  - some of the patches split into two or more for easier
-    handling and review
-  - rebased to the latest code
+This is needed also for some upcoming nanoMIPS-related refactorings.
 
-v3->v4:
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/mips/translate.c | 249 ++++++++++++++++++++++++++++++++++++++----=
+------
+ 1 file changed, 200 insertions(+), 49 deletions(-)
 
-  - added support for nanoMIPS user mode functionality and
-    configuration
-  - DSP patch split into three for easier review and handling
-  - corrected indentation in all decoding engine patches
-  - shift/mask replaced with equivalent extract32() in some
-    patches
-  - added missing default cases in some patches
-  - refactored invocation logic aroung decode_nanomips_opc()
-  - improved comments before decode_gpr_XXX() utilities
-  - all four decode_gpr_XXX() are now in a single patch
-  - two patches on updating BadInstr and related registers
-    are now merged, and execution logic improved
-  - minor formatting corrections
-  - rebased to the latest code
-
-v2->v3:
-
-  - added support for nanoMIPS-specifics in ELF headers
-  - added support for CP0 Config0.WR bit
-  - updated I7200 definition
-  - improved indentation of some switch statements
-  - slight reorganization of patches (splitting, order)
-  - rebased to the latest code
-
-v1->v2:
-
-  - added DSP ASE support
-  - added MT ASE support
-  - added GDB XML support
-  - order of patches changed
-  - commit messages and patch title improved accross the board
-  - obsolete email addresses for authors and cosigners replaced
-    with the right ones
-  - some functions renamed to reflect better the documentation
-  - some macros renamed to reflect better their nanoMIPS nature
-  - streamlined formatting
-  - some of other reviewer's comments addressed, but the majority
-    was not; this is because the focus of this version was on
-    completing the functionality as much as possible; remaining
-    comments will be addressed in the subsequent versions of this
-    series
-
-This series of patches implements recently announced nanoMIPS on QEMU.
-nanoMIPS is a variable length ISA containing 16, 32 and 48-bit wide
-instructions. It is designed to be portable at assembly level with
-other MIPS and microMIPS code, but contains a number of changes that
-enhance code density and efficiency. The largest portion of patches
-is nanoMIPS decoding engine.
-
-For more information, please refer to the following link:
-
-https://www.mips.com/products/architectures/nanomips/
-
-Aleksandar Markovic (14):
-  target/mips: Update maintainer's email addresses
-  target/mips: Avoid case statements formulated by ranges
-  target/mips: Update some CP0 registers bit definitions
-  elf: Remove duplicate preprocessor constant definition
-  elf: Add ELF flags for MIPS machine variants
-  linux-user: Update MIPS syscall numbers up to kernel 4.18 headers
-  target/mips: Add preprocessor constants for nanoMIPS
-  target/mips: Fix two instances of shadow variables
-  target/mips: Mark switch fallthroughs with interpretable comments
-  target/mips: Add placeholder and invocation of decode_nanomips_opc()
-  target/mips: Add nanoMIPS decoding and extraction utilities
-  elf: Relax MIPS' elf_check_arch() to accept EM_NANOMIPS too
-  elf: Don't check FCR31_NAN2008 bit for nanoMIPS
-  linux-user: Update syscall_defs.h header for nanoMIPS
-
-Aleksandar Rikalo (11):
-  linux-user: Add preprocessor availability control to some syscalls
-  target/mips: Implement emulation of nanoMIPS LLWP/SCWP pair
-  elf: Add nanoMIPS specific variations in ELF header fields
-  linux-user: Add syscall numbers for nanoMIPS
-  linux-user: Add target_signal.h header for nanoMIPS
-  linux-user: Add termbits.h header for nanoMIPS
-  linux-user: Add target_fcntl.h header for nanoMIPS
-  linux-user: Add sockbits.h header for nanoMIPS
-  linux-user: Add target_syscall.h header for nanoMIPS
-  linux-user: Add support for nanoMIPS signal trampoline
-  linux-user: Amend sigaction syscall support for nanoMIPS
-
-Dimitrije Nikolic (5):
-  linux-user: Add target_cpu.h header for nanoMIPS
-  linux-user: Add target_structs.h header for nanoMIPS
-  linux-user: Add target_elf.h header for nanoMIPS
-  linux-user: Add signal.c for nanoMIPS
-  linux-user: Add cpu_loop.c for nanoMIPS
-
-James Hogan (5):
-  target/mips: Implement emulation of nanoMIPS EXTW instruction
-  target/mips: Adjust exception_resume_pc() for nanoMIPS
-  target/mips: Adjust set_hflags_for_handler() for nanoMIPS
-  target/mips: Adjust set_pc() for nanoMIPS
-  gdbstub: Disable handling of nanoMIPS ISA bit in the MIPS gdbstub
-
-Matthew Fortune (4):
-  target/mips: Add emulation of nanoMIPS 16-bit save and restore
-    instructions
-  target/mips: Implement emulation of nanoMIPS ROTX instruction
-  target/mips: Add handling of branch delay slots for nanoMIPS
-  mips_malta: Add basic nanoMIPS boot code for MIPS' Malta
-
-Paul Burton (1):
-  mips_malta: Setup GT64120 BARs in nanoMIPS bootloader
-
-Stefan Markovic (16):
-  target/mips: Add CP0 BadInstrX register
-  target/mips: Add nanoMIPS DSP ASE opcodes
-  target/mips: Add gen_op_addr_addi()
-  target/mips: Implement MT ASE support for nanoMIPS
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 1
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 2
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 3
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 4
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 5
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 6
-  target/mips: Add updating BadInstr, BadInstrP, BadInstrX for nanoMIPS
-  target/mips: Implement CP0 Config0.WR bit functionality
-  mips_malta: Fix semihosting argument passing for nanoMIPS bare metal
-  gdbstub: Add XML support for GDB for nanoMIPS
-  target/mips: Add definition of nanoMIPS I7200 CPU
-  linux-user: Add nanoMIPS linux user mode configuration support
-
-Yongbok Kim (20):
-  target/mips: Don't update BadVAddr register in Debug Mode
-  target/mips: Check ELPA flag only in some cases of MFHC0 and MTHC0
-  target/mips: Add nanoMIPS base instruction set opcodes
-  target/mips: Add emulation of nanoMIPS 16-bit arithmetic instructions
-  target/mips: Add emulation of nanoMIPS 16-bit branch instructions
-  target/mips: Add emulation of nanoMIPS 16-bit shift instructions
-  target/mips: Add emulation of nanoMIPS 16-bit misc instructions
-  target/mips: Add emulation of nanoMIPS 16-bit load and store
-    instructions
-  target/mips: Add emulation of nanoMIPS 16-bit logic instructions
-  target/mips: Add emulation of some common nanoMIPS 32-bit instructions
-  target/mips: Add emulation of nanoMIPS instructions MOVE.P and
-    MOVE.PREV
-  target/mips: Add emulation of nanoMIPS 48-bit instructions
-  target/mips: Add emulation of nanoMIPS FP instructions
-  target/mips: Add emulation of misc nanoMIPS instructions (pool32a0)
-  target/mips: Add emulation of misc nanoMIPS instructions (pool32axf)
-  target/mips: Add emulation of misc nanoMIPS instructions (p_lsx)
-  target/mips: Add emulation of nanoMIPS 32-bit load and store
-    instructions
-  target/mips: Add emulation of nanoMIPS 32-bit branch instructions
-  target/mips: Adjust behavior of Config3's ISAOnExc bit for nanoMIPS
-  target/mips: Fix ERET/ERETNC behavior related to ADEL exception
-
- .mailmap                                |    7 +-
- MAINTAINERS                             |   12 +-
- configure                               |   13 +-
- default-configs/nanomips-linux-user.mak |    1 +
- gdb-xml/nanomips-cp0.xml                |   13 +
- gdb-xml/nanomips-cpu.xml                |   44 +
- gdb-xml/nanomips-dsp.xml                |   20 +
- gdb-xml/nanomips-fpu.xml                |   45 +
- gdb-xml/nanomips-linux.xml              |   20 +
- hw/mips/mips_malta.c                    |  153 +-
- include/elf.h                           |   44 +-
- linux-user/elfload.c                    |    2 +
- linux-user/mips/cpu_loop.c              |   36 +-
- linux-user/mips/signal.c                |   36 +-
- linux-user/mips/syscall_nr.h            |    9 +
- linux-user/mips/termbits.h              |    4 +
- linux-user/mips64/syscall_nr.h          |   18 +
- linux-user/nanomips/cpu_loop.c          |    1 +
- linux-user/nanomips/signal.c            |    1 +
- linux-user/nanomips/sockbits.h          |    1 +
- linux-user/nanomips/syscall_nr.h        |  275 ++
- linux-user/nanomips/target_cpu.h        |   21 +
- linux-user/nanomips/target_elf.h        |   14 +
- linux-user/nanomips/target_fcntl.h      |   38 +
- linux-user/nanomips/target_signal.h     |   22 +
- linux-user/nanomips/target_structs.h    |    1 +
- linux-user/nanomips/target_syscall.h    |   30 +
- linux-user/nanomips/termbits.h          |    1 +
- linux-user/strace.c                     |   14 +-
- linux-user/syscall.c                    |   31 +-
- linux-user/syscall_defs.h               |   57 +-
- target/mips/cpu.h                       |  160 +-
- target/mips/gdbstub.c                   |   13 +-
- target/mips/helper.c                    |   47 +-
- target/mips/helper.h                    |    4 +
- target/mips/machine.c                   |    5 +-
- target/mips/mips-defs.h                 |    4 +
- target/mips/op_helper.c                 |  159 +-
- target/mips/translate.c                 | 4821 ++++++++++++++++++++++++++++++-
- target/mips/translate_init.inc.c        |   39 +
- 40 files changed, 5985 insertions(+), 251 deletions(-)
- create mode 100644 default-configs/nanomips-linux-user.mak
- create mode 100644 gdb-xml/nanomips-cp0.xml
- create mode 100644 gdb-xml/nanomips-cpu.xml
- create mode 100644 gdb-xml/nanomips-dsp.xml
- create mode 100644 gdb-xml/nanomips-fpu.xml
- create mode 100644 gdb-xml/nanomips-linux.xml
- create mode 100644 linux-user/nanomips/cpu_loop.c
- create mode 100644 linux-user/nanomips/signal.c
- create mode 100644 linux-user/nanomips/sockbits.h
- create mode 100644 linux-user/nanomips/syscall_nr.h
- create mode 100644 linux-user/nanomips/target_cpu.h
- create mode 100644 linux-user/nanomips/target_elf.h
- create mode 100644 linux-user/nanomips/target_fcntl.h
- create mode 100644 linux-user/nanomips/target_signal.h
- create mode 100644 linux-user/nanomips/target_structs.h
- create mode 100644 linux-user/nanomips/target_syscall.h
- create mode 100644 linux-user/nanomips/termbits.h
-
--- 
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 20b43c0..051dda5 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -5494,7 +5494,14 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+         break;
+     case 18:
+         switch (sel) {
+-        case 0 ... 7:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             gen_helper_1e0i(mfc0_watchlo, arg, sel);
+             rn =3D "WatchLo";
+             break;
+@@ -5504,7 +5511,14 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+         break;
+     case 19:
+         switch (sel) {
+-        case 0 ...7:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             gen_helper_1e0i(mfc0_watchhi, arg, sel);
+             rn =3D "WatchHi";
+             break;
+@@ -5630,7 +5644,10 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+         break;
+     case 27:
+         switch (sel) {
+-        case 0 ... 3:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
+             tcg_gen_movi_tl(arg, 0); /* unimplemented */
+             rn =3D "CacheErr";
+             break;
+@@ -5701,7 +5718,12 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_DESAVE));
+             rn =3D "DESAVE";
+             break;
+-        case 2 ... 7:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             CP0_CHECK(ctx->kscrexist & (1 << sel));
+             tcg_gen_ld_tl(arg, cpu_env,
+                           offsetof(CPUMIPSState, CP0_KScratch[sel-2]));
+@@ -6167,7 +6189,14 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+         break;
+     case 18:
+         switch (sel) {
+-        case 0 ... 7:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             gen_helper_0e1i(mtc0_watchlo, arg, sel);
+             rn =3D "WatchLo";
+             break;
+@@ -6177,7 +6206,14 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+         break;
+     case 19:
+         switch (sel) {
+-        case 0 ... 7:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             gen_helper_0e1i(mtc0_watchhi, arg, sel);
+             rn =3D "WatchHi";
+             break;
+@@ -6315,7 +6351,10 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+         break;
+     case 27:
+         switch (sel) {
+-        case 0 ... 3:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
+             /* ignored */
+             rn =3D "CacheErr";
+             break;
+@@ -6381,7 +6420,12 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+             gen_mtc0_store32(arg, offsetof(CPUMIPSState, CP0_DESAVE));
+             rn =3D "DESAVE";
+             break;
+-        case 2 ... 7:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             CP0_CHECK(ctx->kscrexist & (1 << sel));
+             tcg_gen_st_tl(arg, cpu_env,
+                           offsetof(CPUMIPSState, CP0_KScratch[sel-2]));
+@@ -6842,7 +6886,14 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+         break;
+     case 18:
+         switch (sel) {
+-        case 0 ... 7:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             gen_helper_1e0i(dmfc0_watchlo, arg, sel);
+             rn =3D "WatchLo";
+             break;
+@@ -6852,7 +6903,14 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+         break;
+     case 19:
+         switch (sel) {
+-        case 0 ... 7:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             gen_helper_1e0i(mfc0_watchhi, arg, sel);
+             rn =3D "WatchHi";
+             break;
+@@ -6975,7 +7033,10 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+     case 27:
+         switch (sel) {
+         /* ignored */
+-        case 0 ... 3:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
+             tcg_gen_movi_tl(arg, 0); /* unimplemented */
+             rn =3D "CacheErr";
+             break;
+@@ -7040,7 +7101,12 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_DESAVE));
+             rn =3D "DESAVE";
+             break;
+-        case 2 ... 7:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             CP0_CHECK(ctx->kscrexist & (1 << sel));
+             tcg_gen_ld_tl(arg, cpu_env,
+                           offsetof(CPUMIPSState, CP0_KScratch[sel-2]));
+@@ -7497,7 +7563,14 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+         break;
+     case 18:
+         switch (sel) {
+-        case 0 ... 7:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             gen_helper_0e1i(mtc0_watchlo, arg, sel);
+             rn =3D "WatchLo";
+             break;
+@@ -7507,7 +7580,14 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+         break;
+     case 19:
+         switch (sel) {
+-        case 0 ... 7:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             gen_helper_0e1i(mtc0_watchhi, arg, sel);
+             rn =3D "WatchHi";
+             break;
+@@ -7641,7 +7721,10 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+         break;
+     case 27:
+         switch (sel) {
+-        case 0 ... 3:
++        case 0:
++        case 1:
++        case 2:
++        case 3:
+             /* ignored */
+             rn =3D "CacheErr";
+             break;
+@@ -7707,7 +7790,12 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+             gen_mtc0_store32(arg, offsetof(CPUMIPSState, CP0_DESAVE));
+             rn =3D "DESAVE";
+             break;
+-        case 2 ... 7:
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 6:
++        case 7:
+             CP0_CHECK(ctx->kscrexist & (1 << sel));
+             tcg_gen_st_tl(arg, cpu_env,
+                           offsetof(CPUMIPSState, CP0_KScratch[sel-2]));
+@@ -7843,7 +7931,14 @@ static void gen_mftr(CPUMIPSState *env, DisasConte=
+xt *ctx, int rt, int rd,
+             break;
+         case 16:
+             switch (sel) {
+-            case 0 ... 7:
++            case 0:
++            case 1:
++            case 2:
++            case 3:
++            case 4:
++            case 5:
++            case 6:
++            case 7:
+                 gen_helper_mftc0_configx(t0, cpu_env, tcg_const_tl(sel))=
+;
+                 break;
+             default:
+@@ -17231,7 +17326,10 @@ static void decode_opc_special_r6(CPUMIPSState *=
+env, DisasContext *ctx)
+     case OPC_LSA:
+         gen_lsa(ctx, op1, rd, rs, rt, extract32(ctx->opcode, 6, 2));
+         break;
+-    case OPC_MULT ... OPC_DIVU:
++    case OPC_MULT:
++    case OPC_MULTU:
++    case OPC_DIV:
++    case OPC_DIVU:
+         op2 =3D MASK_R6_MULDIV(ctx->opcode);
+         switch (op2) {
+         case R6_OPC_MUL:
+@@ -17291,7 +17389,11 @@ static void decode_opc_special_r6(CPUMIPSState *=
+env, DisasContext *ctx)
+             generate_exception_end(ctx, EXCP_RI);
+         }
+         break;
+-    case OPC_DMULT ... OPC_DDIVU:
++    case OPC_DMULT:
++    case OPC_DMULTU:
++    case OPC_DDIV:
++    case OPC_DDIVU:
++
+         op2 =3D MASK_R6_MULDIV(ctx->opcode);
+         switch (op2) {
+         case R6_OPC_DMUL:
+@@ -17370,7 +17472,10 @@ static void decode_opc_special_legacy(CPUMIPSSta=
+te *env, DisasContext *ctx)
+         gen_muldiv(ctx, op1, 0, rs, rt);
+         break;
+ #if defined(TARGET_MIPS64)
+-    case OPC_DMULT ... OPC_DDIVU:
++    case OPC_DMULT:
++    case OPC_DMULTU:
++    case OPC_DDIV:
++    case OPC_DDIVU:
+         check_insn(ctx, ISA_MIPS3);
+         check_mips_64(ctx);
+         gen_muldiv(ctx, op1, 0, rs, rt);
+@@ -17437,7 +17542,10 @@ static void decode_opc_special(CPUMIPSState *env=
+, DisasContext *ctx)
+             break;
+         }
+         break;
+-    case OPC_ADD ... OPC_SUBU:
++    case OPC_ADD:
++    case OPC_ADDU:
++    case OPC_SUB:
++    case OPC_SUBU:
+         gen_arith(ctx, op1, rd, rs, rt);
+         break;
+     case OPC_SLLV:         /* Shifts */
+@@ -17473,7 +17581,11 @@ static void decode_opc_special(CPUMIPSState *env=
+, DisasContext *ctx)
+     case OPC_JALR:
+         gen_compute_branch(ctx, op1, 4, rs, rd, sa, 4);
+         break;
+-    case OPC_TGE ... OPC_TEQ: /* Traps */
++    case OPC_TGE: /* Traps */
++    case OPC_TGEU:
++    case OPC_TLT:
++    case OPC_TLTU:
++    case OPC_TEQ:
+     case OPC_TNE:
+         check_insn(ctx, ISA_MIPS2);
+         gen_trap(ctx, op1, rs, rt, -1);
+@@ -17549,7 +17661,10 @@ static void decode_opc_special(CPUMIPSState *env=
+, DisasContext *ctx)
+             break;
+         }
+         break;
+-    case OPC_DADD ... OPC_DSUBU:
++    case OPC_DADD:
++    case OPC_DADDU:
++    case OPC_DSUB:
++    case OPC_DSUBU:
+         check_insn(ctx, ISA_MIPS3);
+         check_mips_64(ctx);
+         gen_arith(ctx, op1, rd, rs, rt);
+@@ -17607,8 +17722,10 @@ static void decode_opc_special2_legacy(CPUMIPSSt=
+ate *env, DisasContext *ctx)
+=20
+     op1 =3D MASK_SPECIAL2(ctx->opcode);
+     switch (op1) {
+-    case OPC_MADD ... OPC_MADDU: /* Multiply and add/sub */
+-    case OPC_MSUB ... OPC_MSUBU:
++    case OPC_MADD: /* Multiply and add/sub */
++    case OPC_MADDU:
++    case OPC_MSUB:
++    case OPC_MSUBU:
+         check_insn(ctx, ISA_MIPS32);
+         gen_muldiv(ctx, op1, rd & 3, rs, rt);
+         break;
+@@ -17705,7 +17822,8 @@ static void decode_opc_special3_r6(CPUMIPSState *=
+env, DisasContext *ctx)
+             }
+             op2 =3D MASK_BSHFL(ctx->opcode);
+             switch (op2) {
+-            case OPC_ALIGN ... OPC_ALIGN_END:
++            case OPC_ALIGN:
++            case OPC_ALIGN_END:
+                 gen_align(ctx, OPC_ALIGN, rd, rs, rt, sa & 3);
+                 break;
+             case OPC_BITSWAP:
+@@ -17730,7 +17848,8 @@ static void decode_opc_special3_r6(CPUMIPSState *=
+env, DisasContext *ctx)
+             }
+             op2 =3D MASK_DBSHFL(ctx->opcode);
+             switch (op2) {
+-            case OPC_DALIGN ... OPC_DALIGN_END:
++            case OPC_DALIGN:
++            case OPC_DALIGN_END:
+                 gen_align(ctx, OPC_DALIGN, rd, rs, rt, sa & 7);
+                 break;
+             case OPC_DBITSWAP:
+@@ -17759,9 +17878,12 @@ static void decode_opc_special3_legacy(CPUMIPSSt=
+ate *env, DisasContext *ctx)
+=20
+     op1 =3D MASK_SPECIAL3(ctx->opcode);
+     switch (op1) {
+-    case OPC_DIV_G_2E ... OPC_DIVU_G_2E:
+-    case OPC_MOD_G_2E ... OPC_MODU_G_2E:
+-    case OPC_MULT_G_2E ... OPC_MULTU_G_2E:
++    case OPC_DIV_G_2E:
++    case OPC_DIVU_G_2E:
++    case OPC_MOD_G_2E:
++    case OPC_MODU_G_2E:
++    case OPC_MULT_G_2E:
++    case OPC_MULTU_G_2E:
+         /* OPC_MULT_G_2E, OPC_ADDUH_QB_DSP, OPC_MUL_PH_DSP have
+          * the same mask and op1. */
+         if ((ctx->insn_flags & ASE_DSPR2) && (op1 =3D=3D OPC_MULT_G_2E))=
+ {
+@@ -18025,9 +18147,12 @@ static void decode_opc_special3_legacy(CPUMIPSSt=
+ate *env, DisasContext *ctx)
+         }
+         break;
+ #if defined(TARGET_MIPS64)
+-    case OPC_DDIV_G_2E ... OPC_DDIVU_G_2E:
+-    case OPC_DMULT_G_2E ... OPC_DMULTU_G_2E:
+-    case OPC_DMOD_G_2E ... OPC_DMODU_G_2E:
++    case OPC_DDIV_G_2E:
++    case OPC_DDIVU_G_2E:
++    case OPC_DMULT_G_2E:
++    case OPC_DMULTU_G_2E:
++    case OPC_DMOD_G_2E:
++    case OPC_DMODU_G_2E:
+         check_insn(ctx, INSN_LOONGSON2E);
+         gen_loongson_integer(ctx, op1, rd, rs, rt);
+         break;
+@@ -18289,18 +18414,25 @@ static void decode_opc_special3(CPUMIPSState *e=
+nv, DisasContext *ctx)
+      */
+     if (ctx->eva) {
+         switch (op1) {
+-        case OPC_LWLE ... OPC_LWRE:
++        case OPC_LWLE:
++        case OPC_LWRE:
+             check_insn_opc_removed(ctx, ISA_MIPS32R6);
+             /* fall through */
+-        case OPC_LBUE ... OPC_LHUE:
+-        case OPC_LBE ... OPC_LWE:
++        case OPC_LBUE:
++        case OPC_LHUE:
++        case OPC_LBE:
++        case OPC_LHE:
++        case OPC_LLE:
++        case OPC_LWE:
+             check_cp0_enabled(ctx);
+             gen_ld(ctx, op1, rt, rs, imm);
+             return;
+-        case OPC_SWLE ... OPC_SWRE:
++        case OPC_SWLE:
++        case OPC_SWRE:
+             check_insn_opc_removed(ctx, ISA_MIPS32R6);
+             /* fall through */
+-        case OPC_SBE ... OPC_SHE:
++        case OPC_SBE:
++        case OPC_SHE:
+         case OPC_SWE:
+             check_cp0_enabled(ctx);
+             gen_st(ctx, op1, rt, rs, imm);
+@@ -18332,7 +18464,8 @@ static void decode_opc_special3(CPUMIPSState *env=
+, DisasContext *ctx)
+     case OPC_BSHFL:
+         op2 =3D MASK_BSHFL(ctx->opcode);
+         switch (op2) {
+-        case OPC_ALIGN ... OPC_ALIGN_END:
++        case OPC_ALIGN:
++        case OPC_ALIGN_END:
+         case OPC_BITSWAP:
+             check_insn(ctx, ISA_MIPS32R6);
+             decode_opc_special3_r6(env, ctx);
+@@ -18344,8 +18477,12 @@ static void decode_opc_special3(CPUMIPSState *en=
+v, DisasContext *ctx)
+         }
+         break;
+ #if defined(TARGET_MIPS64)
+-    case OPC_DEXTM ... OPC_DEXT:
+-    case OPC_DINSM ... OPC_DINS:
++    case OPC_DEXTM:
++    case OPC_DEXTU:
++    case OPC_DEXT:
++    case OPC_DINSM:
++    case OPC_DINSU:
++    case OPC_DINS:
+         check_insn(ctx, ISA_MIPS64R2);
+         check_mips_64(ctx);
+         gen_bitops(ctx, op1, rt, rs, sa, rd);
+@@ -18353,7 +18490,8 @@ static void decode_opc_special3(CPUMIPSState *env=
+, DisasContext *ctx)
+     case OPC_DBSHFL:
+         op2 =3D MASK_DBSHFL(ctx->opcode);
+         switch (op2) {
+-        case OPC_DALIGN ... OPC_DALIGN_END:
++        case OPC_DALIGN:
++        case OPC_DALIGN_END:
+         case OPC_DBITSWAP:
+             check_insn(ctx, ISA_MIPS32R6);
+             decode_opc_special3_r6(env, ctx);
+@@ -19584,7 +19722,12 @@ static void decode_opc(CPUMIPSState *env, DisasC=
+ontext *ctx)
+                 gen_compute_branch(ctx, op1, 4, rs, -1, imm << 2, 4);
+             }
+             break;
+-        case OPC_TGEI ... OPC_TEQI: /* REGIMM traps */
++        case OPC_TGEI: /* REGIMM traps */
++        case OPC_TGEIU:
++        case OPC_TLTI:
++        case OPC_TLTIU:
++        case OPC_TEQI:
++
+         case OPC_TNEI:
+             check_insn(ctx, ISA_MIPS2);
+             check_insn_opc_removed(ctx, ISA_MIPS32R6);
+@@ -19759,7 +19902,8 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
+ntext *ctx)
+     case OPC_XORI:
+          gen_logic_imm(ctx, op, rt, rs, imm);
+          break;
+-    case OPC_J ... OPC_JAL: /* Jump */
++    case OPC_J: /* Jump */
++    case OPC_JAL:
+          offset =3D (int32_t)(ctx->opcode & 0x3FFFFFF) << 2;
+          gen_compute_branch(ctx, op, 4, rs, rt, offset, 4);
+          break;
+@@ -19826,15 +19970,20 @@ static void decode_opc(CPUMIPSState *env, Disas=
+Context *ctx)
+     case OPC_LWR:
+         check_insn_opc_removed(ctx, ISA_MIPS32R6);
+          /* Fallthrough */
+-    case OPC_LB ... OPC_LH:
+-    case OPC_LW ... OPC_LHU:
++    case OPC_LB:
++    case OPC_LH:
++    case OPC_LW:
++    case OPC_LWPC:
++    case OPC_LBU:
++    case OPC_LHU:
+          gen_ld(ctx, op, rt, rs, imm);
+          break;
+     case OPC_SWL:
+     case OPC_SWR:
+         check_insn_opc_removed(ctx, ISA_MIPS32R6);
+         /* fall through */
+-    case OPC_SB ... OPC_SH:
++    case OPC_SB:
++    case OPC_SH:
+     case OPC_SW:
+          gen_st(ctx, op, rt, rs, imm);
+          break;
+@@ -20105,7 +20254,8 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
+ntext *ctx)
+=20
+ #if defined(TARGET_MIPS64)
+     /* MIPS64 opcodes */
+-    case OPC_LDL ... OPC_LDR:
++    case OPC_LDL:
++    case OPC_LDR:
+     case OPC_LLD:
+         check_insn_opc_removed(ctx, ISA_MIPS32R6);
+         /* fall through */
+@@ -20115,7 +20265,8 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
+ntext *ctx)
+         check_mips_64(ctx);
+         gen_ld(ctx, op, rt, rs, imm);
+         break;
+-    case OPC_SDL ... OPC_SDR:
++    case OPC_SDL:
++    case OPC_SDR:
+         check_insn_opc_removed(ctx, ISA_MIPS32R6);
+         /* fall through */
+     case OPC_SD:
+--=20
 2.7.4
