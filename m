@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAuj-000687-U8
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:20:55 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fkAun-0006BD-M0
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fkAui-000725-Ik
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:20:53 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:58793 helo=mail.rt-rk.com)
+	(envelope-from <alex.williamson@redhat.com>) id 1fkAuk-00072z-R8
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:20:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:3341)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fkAui-00071G-70
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:20:52 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 30 Jul 2018 18:11:59 +0200
-Message-Id: <1532967169-22265-27-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 26/76] target/mips: Add emulation of some
- common nanoMIPS 32-bit instructions
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1fkAuk-00072e-Hw
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 12:20:54 -0400
+Date: Mon, 30 Jul 2018 10:20:29 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180730102029.122765d2@t450s.home>
+In-Reply-To: <20180730121704-mutt-send-email-mst@kernel.org>
+References: <20180723045956.27521-1-tiwei.bie@intel.com>
+	<20180723045956.27521-4-tiwei.bie@intel.com>
+	<20180726144539.740acf4d@t450s.home>
+	<20180727015805.GA11247@debian>
+	<20180727140300.022d9872@t450s.home>
+	<20180730081003.GA10680@debian>
+	<20180730121704-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 3/3] vhost-user: support programming VFIO
+ group in master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,313 +34,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Tiwei Bie <tiwei.bie@intel.com>, jasowang@redhat.com, qemu-devel@nongnu.org
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+On Mon, 30 Jul 2018 12:30:58 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Add emulation of SIGRIE, SYSCALL, BREAK, SDBBP, ADDIU, ADDIUPC,
-ADDIUGP.W, LWGP, SWGP, ORI, XORI, ANDI, and other instructions.
+> On Mon, Jul 30, 2018 at 04:10:04PM +0800, Tiwei Bie wrote:
+> > On Fri, Jul 27, 2018 at 02:03:00PM -0600, Alex Williamson wrote:  
+> > > On Fri, 27 Jul 2018 09:58:05 +0800
+> > > Tiwei Bie <tiwei.bie@intel.com> wrote:
+> > >   
+> > > > On Thu, Jul 26, 2018 at 02:45:39PM -0600, Alex Williamson wrote:  
+> > > > > On Mon, 23 Jul 2018 12:59:56 +0800
+> > > > > Tiwei Bie <tiwei.bie@intel.com> wrote:
+> > > > >     
+> > > > [...]  
+> > > > > >  
+> > > > > > +static int vhost_user_slave_handle_vfio_group(struct vhost_dev *dev,
+> > > > > > +                                              int *fd)
+> > > > > > +{
+> > > > > > +    struct vhost_user *u = dev->opaque;
+> > > > > > +    VhostUserState *user = u->user;
+> > > > > > +    VirtIODevice *vdev = dev->vdev;
+> > > > > > +    int groupfd = fd[0];
+> > > > > > +    VFIOGroup *group;
+> > > > > > +
+> > > > > > +    if (!virtio_has_feature(dev->protocol_features,
+> > > > > > +                            VHOST_USER_PROTOCOL_F_VFIO_GROUP) ||
+> > > > > > +        vdev == NULL) {
+> > > > > > +        return -1;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    if (user->vfio_group) {
+> > > > > > +        vfio_put_group(user->vfio_group);
+> > > > > > +        user->vfio_group = NULL;
+> > > > > > +    }
+> > > > > > +    
+> > > > 
+> > > > There should be a below check here (I missed it in this
+> > > > patch, sorry..):
+> > > > 
+> > > >     if (groupfd < 0) {
+> > > >         return 0;
+> > > >     }
+> > > >   
+> > > > > > +    group = vfio_get_group_from_fd(groupfd, vdev->dma_as, NULL);
+> > > > > > +    if (group == NULL) {
+> > > > > > +        return -1;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    if (group->fd != groupfd) {
+> > > > > > +        close(groupfd);
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    user->vfio_group = group;
+> > > > > > +    fd[0] = -1;
+> > > > > > +
+> > > > > > +    return 0;
+> > > > > > +}    
+> > > > > 
+> > > > > This all looks very sketchy, we're reaching into vfio internal state
+> > > > > and arbitrarily releasing data structures, reusing existing ones, and
+> > > > > maybe creating new ones.  We know that a vfio group only allows a
+> > > > > single open, right?    
+> > > > 
+> > > > Yeah, exactly!
+> > > > 
+> > > > When the vhost-user backend process has opened a VFIO group fd,
+> > > > QEMU won't be able to open this group file via open() any more.
+> > > > So vhost-user backend process will share the VFIO group fd to
+> > > > QEMU via the UNIX socket. And that's why we're introducing a
+> > > > new API:
+> > > > 
+> > > > 	vfio_get_group_from_fd(groupfd, ...);
+> > > > 
+> > > > for vfio/common.c to get (setup) a VFIOGroup structure. (Because
+> > > > in this case, vfio/common.c can't open this group file via open(),
+> > > > and what we have is a VFIO group fd shared by another process via
+> > > > UNIX socket). And ...
+> > > >   
+> > > > > So if you have a groupfd, vfio will never have
+> > > > > that same group opened already.    
+> > > > 
+> > > > ... if the same vhost-user backend process shares the same VFIO
+> > > > group fd more than one times via different vhost-user slave channels
+> > > > to different vhost-user frontends in the same QEMU process, the
+> > > > same VFIOGroup could exist already.
+> > > > 
+> > > > This case could happen when e.g. there are two vhost accelerator
+> > > > devices in the same VFIO group, and they are managed by the same
+> > > > vhost-user backend process, and used to accelerate two different
+> > > > virtio devices in QEMU. In this case, the same VFIO group fd could
+> > > > be sent twice.
+> > > > 
+> > > > If we need to support this case, more changes in vfio/common.c
+> > > > will be needed, e.g. 1) add a refcnt in VFIOGroup to support
+> > > > getting and putting a VFIOGroup structure multiple times,
+> > > > 2) add a lock to make vfio_get_group*() and vfio_put_group()
+> > > > thread-safe.  
+> > > 
+> > > This is the sort of case where it seems like we're just grabbing
+> > > internal interfaces and using them from other modules.  VFIOGroups have
+> > > a device_list and currently handles multiple puts by testing whether
+> > > that device list is empty (ie. we already have a refcnt effectively).
+> > > Now we have a group user that has no devices, which is not something
+> > > that it seems like we've designed or audited the code for handling.
+> > > IOW, while the header file lives in a common location, it's not really
+> > > intended to be an API within QEMU and it makes me a bit uncomfortable
+> > > to use it as such.
+> > >   
+> > > > > Is that the goal?  It's not obvious in
+> > > > > the code.  I don't really understand what vhost goes on to do with this
+> > > > > group,    
+> > > > 
+> > > > The goal is that, we have a VFIO group opened by an external
+> > > > vhost-user backend process, this process will manage the VFIO
+> > > > device, but want QEMU to manage the VFIO group, including:
+> > > > 
+> > > > 1 - program the DMA mappings for this VFIO group based on
+> > > >     the front-end device's dma_as in QEMU.
+> > > > 
+> > > > 2 - add this VFIO group to KVM (KVM_DEV_VFIO_GROUP_ADD).
+> > > > 
+> > > > Vhost-user in QEMU as the vhost-user frontend just wants
+> > > > hw/vfio to do above things after receiving a VFIO group fd
+> > > > from the vhost-user backend process.
+> > > > 
+> > > > Vhost-user will just ask hw/vfio to get (setup) a VFIOGroup
+> > > > by calling vfio_get_group_from_fd() or put this VFIOGroup by
+> > > > calling vfio_put_group() when it's not needed anymore, and
+> > > > won't do anything else.
+> > > > 
+> > > > Vhost-user will only deal with the VFIOGroups allocated by
+> > > > itself, and won't influence any other VFIOGroups used by the
+> > > > VFIO passthru devices (-device vfio-pci). Because the same
+> > > > VFIO group file can only be opened by one process via open().  
+> > > 
+> > > But there's nothing here that guarantees the reverse.  vhost cannot
+> > > open the group of an existing vfio-pci device, but vfio-pci can re-use
+> > > the group that vhost has already opened.  This is again where it seems
+> > > like we're trying to cherry pick from an internal API and leaving some
+> > > loose ends dangling.
+> > >   
+> > > > > but I'm pretty sure the existing state machine in vfio isn't
+> > > > > designed for it.  Thanks,    
+> > > > 
+> > > > Yeah, more changes (e.g. refcnt, ..) in hw/vfio are needed to
+> > > > make it work robustly. Hmm.. Is above idea (e.g. how vhost-user
+> > > > is going to use VFIOGroup and how we are going to extend hw/vfio)
+> > > > acceptable to you? Thanks!  
+> > > 
+> > > I certainly would not want to duplicate managing the group, container,
+> > > and MemoryListener, but I think we need a more formal interface with at
+> > > least some notion of reference counting beyond the device list or
+> > > explicit knowledge of an external user.  
+> > 
+> > Got it! I'll try to address this. Thanks!
+> >   
+> > > I'm also curious if it really
+> > > makes sense that the vhost backend is opening the group rather than
+> > > letting QEMU do it.  It seems that vhost wants to deal with the device
+> > > and we can never have symmetry in the scenario above, where a group
+> > > might contain multiple devices and order matters because of where the
+> > > group is opened.  If we still had a notion of a VFIODevice for an
+> > > external user, then the device_list refcnt would just work.  Thanks,  
+> > 
+> > Vhost-user backend will but QEMU won't open the VFIO
+> > fds, because QEMU just has a vhost-user UNIX socket
+> > path that it should connect to or listen on. So QEMU
+> > doesn't know which group and device it should open.
+> > The vhost accelerator devices are probed and managed
+> > in the vhost-user backend process. And the vhost-user
+> > backend process will bind the vhost-user instances
+> > and vhost accelerator devices based on some sort of
+> > user's input.
+> > 
+> > Best regards,
+> > Tiwei Bie  
+> 
+> Is the reason it's done like this because the
+> backend is sharing the device with multiple QEMUs?
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
----
- target/mips/translate.c | 274 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 273 insertions(+), 1 deletion(-)
+Each QEMU instance that gets passed a vfio group would attempt to add
+it to a vfio container (ie. IOMMU domain), so this mechanism cannot
+support multiple QEMU instances attached to the same group.  Beyond
+that, the address space of each device would need to be unique within
+the instance as we only have a single IOVA space for the group.  Thanks,
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e1cc299..6347804 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -16600,6 +16600,278 @@ static void gen_pool16c_nanomips_insn(DisasContext *ctx)
-     }
- }
- 
-+static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-+{
-+    uint16_t insn;
-+    int rt, rs;
-+    uint32_t op;
-+
-+    insn = cpu_lduw_code(env, ctx->base.pc_next + 2);
-+    ctx->opcode = (ctx->opcode << 16) | insn;
-+
-+    rt = extract32(ctx->opcode, 21, 5);
-+    rs = extract32(ctx->opcode, 16, 5);
-+
-+    op = extract32(ctx->opcode, 26, 6);
-+    switch (op) {
-+    case NM_P_ADDIU:
-+        if (rt == 0) {
-+            /* P.RI */
-+            switch (extract32(ctx->opcode, 19, 2)) {
-+            case NM_SIGRIE:
-+            default:
-+                generate_exception_end(ctx, EXCP_RI);
-+                break;
-+            case NM_P_SYSCALL:
-+                if ((extract32(ctx->opcode, 18, 1)) == NM_SYSCALL) {
-+                    generate_exception_end(ctx, EXCP_SYSCALL);
-+                } else {
-+                    generate_exception_end(ctx, EXCP_RI);
-+                }
-+                break;
-+            case NM_BREAK:
-+                generate_exception_end(ctx, EXCP_BREAK);
-+                break;
-+            case NM_SDBBP:
-+                if (is_uhi(extract32(ctx->opcode, 0, 19))) {
-+                    gen_helper_do_semihosting(cpu_env);
-+                } else {
-+                    if (ctx->hflags & MIPS_HFLAG_SBRI) {
-+                        generate_exception_end(ctx, EXCP_RI);
-+                    } else {
-+                        generate_exception_end(ctx, EXCP_DBp);
-+                    }
-+                }
-+                break;
-+            }
-+        } else {
-+            uint16_t imm;
-+            imm = extract32(ctx->opcode, 0, 16);
-+            if (rs != 0) {
-+                tcg_gen_addi_tl(cpu_gpr[rt], cpu_gpr[rs], imm);
-+                tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
-+            } else {
-+                tcg_gen_movi_tl(cpu_gpr[rt], imm);
-+            }
-+        }
-+        break;
-+    case NM_ADDIUPC:
-+        if (rt != 0) {
-+            int32_t offset = sextract32(ctx->opcode, 0, 1) << 21 |
-+                             extract32(ctx->opcode, 1, 20) << 1;
-+            target_long addr = addr_add(ctx, ctx->base.pc_next + 4, offset);
-+            tcg_gen_movi_tl(cpu_gpr[rt], (int32_t)addr);
-+        }
-+        break;
-+    case NM_POOL32A:
-+        break;
-+    case NM_P_GP_W:
-+        switch (ctx->opcode & 0x03) {
-+        case NM_ADDIUGP_W:
-+            if (rt != 0) {
-+                uint32_t offset = extract32(ctx->opcode, 0, 21);
-+                gen_op_addr_addi(ctx, cpu_gpr[rt], cpu_gpr[28], offset);
-+            }
-+            break;
-+        case NM_LWGP:
-+            gen_ld(ctx, OPC_LW, rt, 28, extract32(ctx->opcode, 2, 19) << 2);
-+            break;
-+        case NM_SWGP:
-+            gen_st(ctx, OPC_SW, rt, 28, extract32(ctx->opcode, 2, 19) << 2);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_P48I:
-+        return 6;
-+    case NM_P_U12:
-+        switch (extract32(ctx->opcode, 12, 4)) {
-+        case NM_ORI:
-+            gen_logic_imm(ctx, OPC_ORI, rt, rs, extract32(ctx->opcode, 0, 12));
-+            break;
-+        case NM_XORI:
-+            gen_logic_imm(ctx, OPC_XORI, rt, rs, extract32(ctx->opcode, 0, 12));
-+            break;
-+        case NM_ANDI:
-+            gen_logic_imm(ctx, OPC_ANDI, rt, rs, extract32(ctx->opcode, 0, 12));
-+            break;
-+        case NM_P_SR:
-+            switch (extract32(ctx->opcode, 20, 1)) {
-+            case NM_PP_SR:
-+                switch (ctx->opcode & 3) {
-+                case NM_SAVE:
-+                    gen_save(ctx, rt, extract32(ctx->opcode, 16, 4),
-+                             extract32(ctx->opcode, 2, 1),
-+                             extract32(ctx->opcode, 3, 9) << 3);
-+                    break;
-+                case NM_RESTORE:
-+                case NM_RESTORE_JRC:
-+                    gen_restore(ctx, rt, extract32(ctx->opcode, 16, 4),
-+                                extract32(ctx->opcode, 2, 1),
-+                                extract32(ctx->opcode, 3, 9) << 3);
-+                    if ((ctx->opcode & 3) == NM_RESTORE_JRC) {
-+                        gen_compute_branch(ctx, OPC_JR, 2, 31, 0, 0, 0);
-+                    }
-+                    break;
-+                }
-+                break;
-+            case NM_P_SR_F:
-+                generate_exception_end(ctx, EXCP_RI);
-+                break;
-+            }
-+            break;
-+        case NM_SLTI:
-+            gen_slt_imm(ctx, OPC_SLTI, rt, rs, extract32(ctx->opcode, 0, 12));
-+            break;
-+        case NM_SLTIU:
-+            gen_slt_imm(ctx, OPC_SLTIU, rt, rs, extract32(ctx->opcode, 0, 12));
-+            break;
-+        case NM_SEQI:
-+            {
-+                TCGv t0 = tcg_temp_new();
-+                TCGv t1 = tcg_temp_new();
-+                TCGv t2 = tcg_temp_local_new();
-+
-+                gen_load_gpr(t0, rs);
-+                tcg_gen_movi_tl(t1, extract32(ctx->opcode, 0, 12));
-+                tcg_gen_setcond_tl(TCG_COND_EQ, t2, t0, t1);
-+                gen_store_gpr(t2, rt);
-+
-+                tcg_temp_free(t0);
-+                tcg_temp_free(t1);
-+                tcg_temp_free(t2);
-+            }
-+            break;
-+        case NM_ADDIUNEG:
-+            {
-+                int16_t imm;
-+                imm = (int16_t) extract32(ctx->opcode, 0, 12);
-+                gen_arith_imm(ctx, OPC_ADDIU, rt, rs, -imm);
-+            }
-+            break;
-+        case NM_P_SHIFT:
-+            {
-+                int shift = extract32(ctx->opcode, 0, 5);
-+                switch (extract32(ctx->opcode, 5, 4)) {
-+                case NM_P_SLL:
-+                    if (rt == 0 && shift == 0) {
-+                        /* NOP */
-+                    } else if (rt == 0 && shift == 3) {
-+                        /* EHB treat as NOP */
-+                    } else if (rt == 0 && shift == 5) {
-+                        /* PAUSE */
-+                        if (ctx->hflags & MIPS_HFLAG_BMASK) {
-+                            generate_exception_end(ctx, EXCP_RI);
-+                        }
-+                    } else if (rt == 0 && shift == 6) {
-+                        /* SYNC */
-+                        check_insn(ctx, ISA_MIPS2);
-+                        gen_sync(extract32(ctx->opcode, 16, 5));
-+                    } else {
-+                        /* SLL */
-+                        gen_shift_imm(ctx, OPC_SLL, rt, rs,
-+                                      extract32(ctx->opcode, 0, 5));
-+                    }
-+                    break;
-+                case NM_SRL:
-+                    gen_shift_imm(ctx, OPC_SRL, rt, rs,
-+                                  extract32(ctx->opcode, 0, 5));
-+                    break;
-+                case NM_SRA:
-+                    gen_shift_imm(ctx, OPC_SRA, rt, rs,
-+                                  extract32(ctx->opcode, 0, 5));
-+                    break;
-+                case NM_ROTR:
-+                    gen_shift_imm(ctx, OPC_ROTR, rt, rs,
-+                                  extract32(ctx->opcode, 0, 5));
-+                    break;
-+                }
-+            }
-+            break;
-+        case NM_P_ROTX:
-+            break;
-+        case NM_P_INS:
-+            switch (((ctx->opcode >> 10) & 2) |
-+                    (extract32(ctx->opcode, 5, 1))) {
-+            case NM_INS:
-+                gen_bitops(ctx, OPC_INS, rt, rs, extract32(ctx->opcode, 0, 5),
-+                           extract32(ctx->opcode, 6, 5));
-+                break;
-+            default:
-+                generate_exception_end(ctx, EXCP_RI);
-+                break;
-+            }
-+            break;
-+        case NM_P_EXT:
-+            switch (((ctx->opcode >> 10) & 2) |
-+                    (extract32(ctx->opcode, 5, 1))) {
-+            case NM_EXT:
-+                gen_bitops(ctx, OPC_EXT, rt, rs, extract32(ctx->opcode, 0, 5),
-+                           extract32(ctx->opcode, 6, 5));
-+                break;
-+            default:
-+                generate_exception_end(ctx, EXCP_RI);
-+                break;
-+            }
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_POOL32F:
-+        break;
-+    case NM_POOL32S:
-+        break;
-+    case NM_P_LUI:
-+        switch (extract32(ctx->opcode, 1, 1)) {
-+        case NM_LUI:
-+            if (rt != 0) {
-+                tcg_gen_movi_tl(cpu_gpr[rt],
-+                                sextract32(ctx->opcode, 0, 1) << 31 |
-+                                extract32(ctx->opcode, 2, 10) << 21 |
-+                                extract32(ctx->opcode, 12, 9) << 12);
-+            }
-+            break;
-+        case NM_ALUIPC:
-+            if (rt != 0) {
-+                int offset = sextract32(ctx->opcode, 0, 1) << 31 |
-+                             extract32(ctx->opcode, 2, 10) << 21 |
-+                             extract32(ctx->opcode, 12, 9) << 12;
-+                target_long addr;
-+                addr = ~0xFFF & addr_add(ctx, ctx->base.pc_next + 4, offset);
-+                tcg_gen_movi_tl(cpu_gpr[rt], addr);
-+            }
-+            break;
-+        }
-+        break;
-+    case NM_P_GP_BH:
-+        break;
-+    case NM_P_LS_U12:
-+        break;
-+    case NM_P_LS_S9:
-+        break;
-+    case NM_MOVE_BALC:
-+        break;
-+    case NM_P_BAL:
-+        break;
-+    case NM_P_J:
-+        break;
-+    case NM_P_BR1:
-+        break;
-+    case NM_P_BR2:
-+        break;
-+    case NM_P_BRI:
-+        break;
-+    default:
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    }
-+    return 4;
-+}
-+
- static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t op;
-@@ -16915,7 +17187,7 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-     case NM_MOVEPREV:
-         break;
-     default:
--        break;
-+        return decode_nanomips_32_48_opc(env, ctx);
-     }
- 
-     return 2;
--- 
-2.7.4
+Alex
