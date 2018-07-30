@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fkFKL-0005I1-NY
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:03:38 -0400
+	(envelope-from <jcd@tribudubois.net>) id 1fkFKo-0005Ux-21
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:04:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fkFKI-0008VM-KD
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:03:37 -0400
-Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:40002)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fkFKI-0008V5-Em
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:03:34 -0400
-Received: by mail-ua0-x244.google.com with SMTP id p22-v6so8820650uao.7
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 14:03:34 -0700 (PDT)
-References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1532967169-22265-24-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d4a35847-b376-a30b-edc9-5b697fd4ebe5@linaro.org>
-Date: Mon, 30 Jul 2018 17:03:29 -0400
-MIME-Version: 1.0
-In-Reply-To: <1532967169-22265-24-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 23/76] target/mips: Add emulation of
- nanoMIPS 16-bit load and store instructions
+	(envelope-from <jcd@tribudubois.net>) id 1fkFKk-0000YR-Vc
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:04:06 -0400
+Received: from relay4-d.mail.gandi.net ([217.70.183.196]:58981)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1fkFKk-0000Xc-PH
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 17:04:02 -0400
+From: Jean-Christophe Dubois <jcd@tribudubois.net>
+Date: Mon, 30 Jul 2018 23:03:43 +0200
+Message-Id: <cover.1532984236.git.jcd@tribudubois.net>
+Subject: [Qemu-devel] [PATCH v3 0/3] i.MX: Add the i.MX6UL SOC and a
+ reference board.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +22,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org, peter.chubb@nicta.com.au, andrew.smirnov@gmail.com
+Cc: Jean-Christophe Dubois <jcd@tribudubois.net>
 
-On 07/30/2018 12:11 PM, Aleksandar Markovic wrote:
->      case NM_P16_LB:
-> +        rd = extract32(ctx->opcode, 0, 2);
-> +        switch (extract32(ctx->opcode, 2, 2)) {
-...
->      case NM_P16_LH:
-> +        rd = extract32(ctx->opcode, 1, 2) << 1;
-> +        switch ((extract32(ctx->opcode, 3, 1) << 1) | (ctx->opcode & 1)) {
-...
->      case NM_LW16:
-> +        rd = extract32(ctx->opcode, 0, 4) << 2;
-> +        gen_ld(ctx, OPC_LW, rt, rs, rd);
+This series adds the i.MX6UL SOC from NXP/Freescale and the reference
+evaluation board.
 
-Again, do not use RD to hold anything other than a register.
-In these cases and more through this patch, RD being set to
-the immediate offset to the memory operation.
+This series was tested by booting linux 4.18 (built using imx_v6_v7_defconfig)
+on the emulated board (with the appropriate device tree).
 
+Jean-Christophe Dubois (3):
+  i.MX6UL: Add i.MX6UL specific CCM device
+  i.MX6UL: Add i.MX6UL SOC
+  i.MX6UL: Add Freescale i.MX6 UltraLite 14x14 EVK Board
 
-r~
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/Makefile.objs            |   1 +
+ hw/arm/fsl-imx6ul.c             | 617 ++++++++++++++++++++++
+ hw/arm/mcimx6ul-evk.c           |  85 +++
+ hw/misc/Makefile.objs           |   1 +
+ hw/misc/imx6ul_ccm.c            | 890 ++++++++++++++++++++++++++++++++
+ hw/misc/trace-events            |   7 +
+ include/hw/arm/fsl-imx6ul.h     | 339 ++++++++++++
+ include/hw/misc/imx6ul_ccm.h    | 226 ++++++++
+ 9 files changed, 2167 insertions(+)
+ create mode 100644 hw/arm/fsl-imx6ul.c
+ create mode 100644 hw/arm/mcimx6ul-evk.c
+ create mode 100644 hw/misc/imx6ul_ccm.c
+ create mode 100644 include/hw/arm/fsl-imx6ul.h
+ create mode 100644 include/hw/misc/imx6ul_ccm.h
+
+-- 
+2.17.1
