@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkD3h-0005nQ-4H
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:38:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1fkDBC-0008Gy-Ag
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:46:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkD3g-0006ef-C0
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:38:17 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42237)
+	(envelope-from <bounces@canonical.com>) id 1fkDB7-0002D0-BP
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:46:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52320)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fkD3g-0006eD-6H
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:38:16 -0400
-Received: by mail-oi0-x242.google.com with SMTP id n84-v6so23110951oib.9
-	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 11:38:16 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fkDB7-0002CX-4V
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 14:45:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fkDB4-0008V2-6N
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 18:45:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B5CD32E80D1
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 18:45:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <9d7f6a73-a00f-ebc1-efb3-18367e3c0f32@amsat.org>
-References: <eb8233618cf64aa21c87e2809933f112a7aedf68.1532735306.git.alistair.francis@wdc.com>
-	<9d7f6a73-a00f-ebc1-efb3-18367e3c0f32@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Jul 2018 19:37:55 +0100
-Message-ID: <CAFEAcA_nr=hS4Qe=n-=HU389S5cvZArt97QJ83jLQ-x2xRKFWQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] configure: Add RISC-V host support
+Date: Mon, 30 Jul 2018 18:38:48 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1777777 <1777777@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152947435461.1911.16896504402050089205.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153297592885.3867.6958781175423605727.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1777777] Re: arm9 clock pending (SP804)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@wdc.com>, Michael Clark <mjc@sifive.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>
+To: qemu-devel@nongnu.org
 
-On 30 July 2018 at 19:20, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> Before this patch:
->
-> $ ./configure
->
-> ERROR: Unsupported CPU =3D riscv64, try --enable-tcg-interpreter
->
-> $ ./configure --enable-tcg-interpreter
-> Unsupported CPU =3D riscv64, will use TCG with TCI (experimental)
->
-> [...]
->
-> WARNING: SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE RELEASES!
+Sorry, I should have been clearer. Please can you provide a test case
+binary and QEMU command line that reproduces the problem (including what
+the expected output is and what the actual output is)?
 
+-- =
 
-> It is unlikely the RISC-V port goes away in the next future releases :)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1777777
 
-...but it is not supported as a *host* CPU.
+Title:
+  arm9 clock pending (SP804)
 
-We should fix this somewhat nonsensical error message by
-completing the deprecate-and-drop cycle for this bit of
-configure, ie by outright rejecting attempts to build on
-host CPU types we don't recognize and support, the same
-way we do with unrecognized host OS types.
+Status in QEMU:
+  New
 
-thanks
--- PMM
+Bug description:
+  Hello all,
+
+  I'm using the versatilepb board and the timer Interrupt Mask Status
+  register (offset 0x14 of the SP804) does not seem to be working
+  properly on the latest qemu-2.12. I tried on the 2.5 (i believe this
+  is the mainstream version that comes with Linux) and it works
+  perfectly.
+
+  What happens is that the pending bit does not seem to be set in some
+  scenarios. In my case, I see the timer value decreasing to 0 and then
+  being reset to the reload value and neither does the interrupt is
+  triggered nor the pending bit is set.
+
+  I believe this is a matter of timing since in the "long" run the
+  system eventually catches up (after a few microseconds).
+
+  Thank you
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1777777/+subscriptions
