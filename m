@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fkAWA-0002bT-BR
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:55:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1fkAZF-0003Sm-0w
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fkAW6-0004Tq-3w
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:55:30 -0400
-Date: Mon, 30 Jul 2018 17:55:19 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180730175519.03dd4bef.cohuck@redhat.com>
-In-Reply-To: <1532959766-53343-1-git-send-email-borntraeger@de.ibm.com>
-References: <1532959766-53343-1-git-send-email-borntraeger@de.ibm.com>
+	(envelope-from <berrange@redhat.com>) id 1fkAZB-00062K-Nf
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:58:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42956 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fkAZB-000622-A9
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 11:58:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AD6E87C6CA
+	for <qemu-devel@nongnu.org>; Mon, 30 Jul 2018 15:58:36 +0000 (UTC)
+Date: Mon, 30 Jul 2018 16:58:31 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180730155831.GM1626@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180730153639.26466-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/sclp: fix maxram calculation
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180730153639.26466-1-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] build-sys: remove glib_subprocess check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +34,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, imbrenda@linux.vnet.ibm.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, 30 Jul 2018 16:09:26 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> We clamp down ram_size to match the sclp increment size. We do
-> not do the same for maxram_size, which means for large guests
-> with some sizes (e.g. -m 50000) maxram_size differs from ram_size.
-> This can break other code (e.g. CMMA migration) which uses maxram_size
-> to calculate the number of pages and then throws some errors.
-> 
-> Fixes: 82fab5c5b90e468f3e9d54c ("s390x/sclp: remove memory hotplug support")
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> CC: qemu-stable@nongnu.org
-> CC: David Hildenbrand <david@redhat.com>
+On Mon, Jul 30, 2018 at 05:36:39PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> The check should be unnecessary since commit
+> e7b3af81597db1a6b55f2c15d030d703c6b2c6ac "glib: bump min required glib
+> library version to 2.40".
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  hw/s390x/sclp.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index bd2a024..4510a80 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -320,6 +320,7 @@ static void sclp_memory_init(SCLPDevice *sclp)
->      initial_mem = initial_mem >> increment_size << increment_size;
->  
->      machine->ram_size = initial_mem;
-> +    machine->maxram_size = initial_mem;
->      /* let's propagate the changed ram size into the global variable. */
->      ram_size = initial_mem;
->  }
+>  tests/test-char.c             | 4 ----
+>  tests/test-x86-cpuid-compat.c | 6 ------
+>  tests/vhost-user-test.c       | 4 ----
+>  configure                     | 3 ---
+>  tests/Makefile.include        | 2 +-
+>  5 files changed, 1 insertion(+), 18 deletions(-)
 
-Thanks, queued to s390-fixes.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
