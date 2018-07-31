@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1fkMPA-0005R8-AJ
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 00:37:05 -0400
+	(envelope-from <mail@sebastianbauer.info>) id 1fkMjE-0001ox-Lc
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 00:57:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1fkMP7-0004UB-7N
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 00:37:04 -0400
+	(envelope-from <mail@sebastianbauer.info>) id 1fkMjD-00045C-Qt
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 00:57:48 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Tue, 31 Jul 2018 06:57:31 +0200
 From: Sebastian Bauer <mail@sebastianbauer.info>
-Date: Tue, 31 Jul 2018 06:36:34 +0200
-Message-Id: <20180731043635.9802-2-mail@sebastianbauer.info>
-In-Reply-To: <20180731043635.9802-1-mail@sebastianbauer.info>
-References: <20180731043635.9802-1-mail@sebastianbauer.info>
-Subject: [Qemu-devel] [PATCH 1/2] ppc: Allow clients of the 440 pcix bus to
- specify the number of interrupts
+In-Reply-To: <20180731001847.GF2708@umbus.fritz.box>
+References: <20180730043904.17023-1-mail@sebastianbauer.info>
+	<alpine.BSF.2.21.1807301254450.49677@zero.eik.bme.hu>
+	<fbaa741e42e50457a0ba9c7654e1d03d@sebastianbauer.info>
+	<alpine.BSF.2.21.1807310009440.24147@zero.eik.bme.hu>
+	<CAFEAcA8VqaqSzc4NBwjR4F8TMAHD2vhdMMi0fwkTj1fiX=wjyQ@mail.gmail.com>
+	<alpine.BSF.2.21.1807310111280.24147@zero.eik.bme.hu>
+	<20180731001847.GF2708@umbus.fritz.box>
+Message-ID: <52bff728ba683daa71e32be776a55ff0@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PATCH] sam460ex: Fix PCI interrupt connections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,98 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mail@sebastianbauer.info
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, agraf@suse.de, qemu-ppc@nongnu.org, balaton@eik.bme.hu
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This can be done by using the newly introduced num_irqs property. In
-particular, this change introduces a special case if num_irqs is 1 in which
-case any interrupt pin will be connected to the single irq. The default
-case is untouched (but note that the only client is the Sam460ex board for
-which the special case was actually created).
+Am 2018-07-31 02:18, schrieb David Gibson:
+>> David, can you please drop this patch, we'll come up with a different 
+>> fix.
+> Done.  Should have looked at that patch a bit closer.
 
-Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
----
- hw/ppc/ppc440_pcix.c | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
+I created a follow up patch, unfortunately, based on the previous patch, 
+as I did not spot your mail earlier than now. Note that the previous 
+patch was an improvement over the old behaviour and under normal 
+conditions the difference was not visible (as the OS serves both 
+interrupts in the same run and at least on AmigaOS the interrupt 
+handling is deferred but IRQs are acked quickly; it is still not correct 
+though). The old implementation was not correct at all, i.e., all 
+interrupts were missed. So it was technical an improvement (and the 
+easiest to come up without deep understanding QEMU) ;)
 
-diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
-index d8af04b70f..cb7d7cfd2b 100644
---- a/hw/ppc/ppc440_pcix.c
-+++ b/hw/ppc/ppc440_pcix.c
-@@ -57,6 +57,7 @@ typedef struct PPC440PCIXState {
-     struct PLBOutMap pom[PPC440_PCIX_NR_POMS];
-     struct PLBInMap pim[PPC440_PCIX_NR_PIMS];
-     uint32_t sts;
-+    uint16_t num_irqs;
-     qemu_irq irq[PCI_NUM_PINS];
-     AddressSpace bm_as;
-     MemoryRegion bm;
-@@ -423,6 +424,12 @@ static int ppc440_pcix_map_irq(PCIDevice *pci_dev, int irq_num)
-     return slot - 1;
- }
- 
-+/* All pins from each slot are tied the same and only board IRQ. */
-+static int ppc440_pcix_map_irq_single(PCIDevice *pci_dev, int irq_num)
-+{
-+    return 0;
-+}
-+
- static void ppc440_pcix_set_irq(void *opaque, int irq_num, int level)
- {
-     qemu_irq *pci_irqs = opaque;
-@@ -469,6 +476,7 @@ const MemoryRegionOps ppc440_pcix_host_data_ops = {
- 
- static int ppc440_pcix_initfn(SysBusDevice *dev)
- {
-+    pci_map_irq_fn map_irq;
-     PPC440PCIXState *s;
-     PCIHostState *h;
-     int i;
-@@ -476,14 +484,22 @@ static int ppc440_pcix_initfn(SysBusDevice *dev)
-     h = PCI_HOST_BRIDGE(dev);
-     s = PPC440_PCIX_HOST_BRIDGE(dev);
- 
--    for (i = 0; i < ARRAY_SIZE(s->irq); i++) {
-+    if (s->num_irqs > 4) {
-+        fprintf(stderr, "%s: Number of irqs must not exceed 4\n", __func__);
-+        return -1;
-+    }
-+
-+    for (i = 0; i < s->num_irqs; i++) {
-         sysbus_init_irq(dev, &s->irq[i]);
-     }
- 
-     memory_region_init(&s->busmem, OBJECT(dev), "pci bus memory", UINT64_MAX);
-+
-+    map_irq = s->num_irqs == 1 ?
-+            ppc440_pcix_map_irq_single : ppc440_pcix_map_irq;
-     h->bus = pci_register_root_bus(DEVICE(dev), NULL, ppc440_pcix_set_irq,
--                         ppc440_pcix_map_irq, s->irq, &s->busmem,
--                         get_system_io(), PCI_DEVFN(0, 0), 4, TYPE_PCI_BUS);
-+                         map_irq, s->irq, &s->busmem, get_system_io(),
-+                         PCI_DEVFN(0, 0), s->num_irqs, TYPE_PCI_BUS);
- 
-     s->dev = pci_create_simple(h->bus, PCI_DEVFN(0, 0), "ppc4xx-host-bridge");
- 
-@@ -507,6 +523,11 @@ static int ppc440_pcix_initfn(SysBusDevice *dev)
-     return 0;
- }
- 
-+static Property ppc440_pcix_properties[] = {
-+    DEFINE_PROP_UINT16("num-irqs", PPC440PCIXState, num_irqs, 4),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void ppc440_pcix_class_init(ObjectClass *klass, void *data)
- {
-     SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
-@@ -514,6 +535,7 @@ static void ppc440_pcix_class_init(ObjectClass *klass, void *data)
- 
-     k->init = ppc440_pcix_initfn;
-     dc->reset = ppc440_pcix_reset;
-+    dc->props = ppc440_pcix_properties;
- }
- 
- static const TypeInfo ppc440_pcix_info = {
--- 
-2.18.0
+Anyway, I don't know if that follow up patch is the right approach. But 
+building the logical or gate seems also be very much code, especially as 
+in pci.c the case of multiple irqs sources are seems to be already 
+handled (if I understand that code correctly). The follow up patch most 
+likely does not model the hardware correctly, but the behaviour should 
+be the same. The logical or gate would model the hardware more closely.
+
+Let me know if I should rebase to the state before my initial patch (I 
+just looked and the previous patch was still not dropped) if you think 
+that the change is fine.
+
+There is also the possibility to make the special (num-irqs == 1) the 
+common case, as the Sam460ex platform is the only user of this bus so 
+far (and probably stays the only one). I'm not sure if it is worth all 
+the hassle. Also note that the entire ppc440_pcix.c source file seems to 
+be created for the sam board. I have no idea why that mapping function 
+based on slots was chosen in the first place so I kept it. I would also 
+be fine to remove that, which would simplify things a lot.
+
+Let me know how to proceed.
+
+Bye
+Sebastian
