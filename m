@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tpiepho@impinj.com>) id 1fkb0D-0007cZ-6A
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 16:12:18 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fkcXW-00026y-7p
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 17:50:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tpiepho@impinj.com>) id 1fkb0C-0000EO-6z
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 16:12:17 -0400
-From: Trent Piepho <tpiepho@impinj.com>
-Date: Tue, 31 Jul 2018 13:10:56 -0700
-Message-ID: <20180731201056.29257-1-tpiepho@impinj.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1fkcXT-00085q-Kh
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 17:50:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1fkcXT-00085I-Ao
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 17:50:43 -0400
+Date: Tue, 31 Jul 2018 15:50:30 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180731155030.2d5fd5b7@t450s.home>
+In-Reply-To: <20180731150746.GH2476@work-vm>
+References: <153299204130.14411.11438396195753743913.stgit@gimli.home>
+	<20180731152716-mutt-send-email-mst@kernel.org>
+	<20180731084414.52e560fa@t450s.home>
+	<20180731150746.GH2476@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] imx_spi: Unset XCH when TX FIFO becomes empty
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] Balloon inhibit enhancements,
+ vfio restriction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,55 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Peter Chubb <peter.chubb@nicta.com.au>, Trent Piepho <tpiepho@impinj.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, cohuck@redhat.com, david@redhat.com
 
-The current emulation will clear the XCH bit when a burst finishes.
-This is not quite correct.  According to the i.MX7d referemce manual,
-Rev 0.1, =C2=A710.1.7.3:
+On Tue, 31 Jul 2018 16:07:46 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-    This bit [XCH] is cleared automatically when all data in the TXFIFO
-    and the shift register has been shifted out.
+> * Alex Williamson (alex.williamson@redhat.com) wrote:
+> > On Tue, 31 Jul 2018 15:29:17 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Mon, Jul 30, 2018 at 05:13:26PM -0600, Alex Williamson wrote:  
+> > > > v2:
+> > > >  - Use atomic ops for balloon inhibit counter (Peter)
+> > > >  - Allow endpoint driver opt-in for ballooning, vfio-ccw opt-in by
+> > > >    default, vfio-pci opt-in by device option, only allowed for mdev
+> > > >    devices, no support added for platform as there are no platform
+> > > >    mdev devices.
+> > > > 
+> > > > See patch 3/4 for detailed explanation why ballooning and device
+> > > > assignment typically don't mix.  If this eventually changes, flags
+> > > > on the iommu info struct or perhaps device info struct can inform
+> > > > us for automatic opt-in.  Thanks,
+> > > > 
+> > > > Alex    
+> > > 
+> > > So this patch seems to block ballooning when vfio is added.
+> > > But what if balloon is added and inflated first?  
+> > 
+> > Good point.
+> >    
+> > > I'd suggest making qemu_balloon_inhibit fail in that case,
+> > > and then vfio realize will fail as well.  
+> > 
+> > That might be the correct behavior for vfio, but I wonder about the
+> > existing postcopy use case.  Dave Gilbert, what do you think?  We might
+> > need a separate interface for callers that cannot tolerate existing
+> > ballooned pages.  Of course we'll also need another atomic counter to
+> > keep a tally of ballooned pages.  Thanks,  
+> 
+> For postcopy, preinflation isn't a problem; our only issue is ballooning
+> during the postcopy phase itself.
 
-So XCH should be cleared when the FIFO empties, not on completion of a
-burst.  The FIFO is 64 x 32 bits =3D 2048 bits, while the max burst size
-is larger at 4096 bits.  So it's possible that the burst is not finished
-after the TXFIFO empties.
+On further consideration, I think device assignment is in the same
+category.  The balloon inhibitor does not actually stop the guest
+balloon driver from grabbing and freeing pages, it only changes whether
+QEMU releases the pages with madvise DONTNEED.  The problem we have
+with ballooning and device assignment is when we have an existing HPA
+mapping in the IOMMU that isn't invalidated on DONTNEED and becomes
+inconsistent when the page is re-populated.  Zapped pages at the time
+an assigned device is added do not trigger this, those pages will be
+repopulated when pages are pinned for the assigned device.  This is the
+identical scenario to a freshly started VM that doesn't use memory
+preallocation and therefore faults in pages on demand.  When an
+assigned device is attached to such a VM, page pinning will fault in
+and lock all of those pages.
 
-Sending a large block (> 2048 bits) with the Linux driver will use a
-burst that is larger than the TXFIFO.  After the TXFIFO has emptied XCH
-does not become unset, as the burst is not yet finished.
+This is observable behavior, for example if I start a VM with 16GB of
+RAM, booted to a command prompt the VM shows less that 1GB of RAM
+resident in the host.  If I set the balloon to 2048, there's no
+observable change in the QEMU process size on the host.  If I hot-add
+an assigned device while we're ballooned down, the resident memory size
+from the host jumps up to 16GB.  All of the zapped pages have been
+reclaimed.  Adjusting ballooning at this point only changes the balloon
+size in the guest, inflating the balloon no longer zaps pages from the
+process.
 
-What should happen after the TXFIFO empties is the driver will refill it
-and set XCH.  The rising edge of XCH will trigger another transfer to
-begin.  However, since the emulation does not set XCH to 0, there is no
-rising edge and the next trasfer never begins.
+The only oddity I see is the one Dave noted in the commit introducing
+balloon inhibiting (371ff5a3f04c):
 
-Signed-off-by: Trent Piepho <tpiepho@impinj.com>
----
- hw/ssi/imx_spi.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+    Queueing the requests until after migration would be nice, but is
+    non-trivial, since the set of inflate/deflate requests have to
+    be compared with the state of the page to know what the final
+    outcome is allowed to be.
 
-diff --git a/hw/ssi/imx_spi.c b/hw/ssi/imx_spi.c
-index b66505ca49..02c38c9e47 100644
---- a/hw/ssi/imx_spi.c
-+++ b/hw/ssi/imx_spi.c
-@@ -208,8 +208,6 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
-         }
-=20
-         if (s->burst_length <=3D 0) {
--            s->regs[ECSPI_CONREG] &=3D ~ECSPI_CONREG_XCH;
--
-             if (!imx_spi_is_multiple_master_burst(s)) {
-                 s->regs[ECSPI_STATREG] |=3D ECSPI_STATREG_TC;
-                 break;
-@@ -219,6 +217,7 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
-=20
-     if (fifo32_is_empty(&s->tx_fifo)) {
-         s->regs[ECSPI_STATREG] |=3D ECSPI_STATREG_TC;
-+        s->regs[ECSPI_CONREG] &=3D ~ECSPI_CONREG_XCH;
-     }
-=20
-     /* TODO: We should also use TDR and RDR bits */
---=20
-2.14.4
+So for this example of a 16GB VM ballooned down to 2GB then an assigned
+device added and subsequently removed, the resident memory remains 16GB
+and I need to deflate the balloon and reinflate it in order to zap them
+from the QEMU process.  Therefore, I think that with respect to this
+inquiry, the series stands as is.  Thanks,
+
+Alex
