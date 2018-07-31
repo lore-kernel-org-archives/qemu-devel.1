@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fkWwK-00048J-QL
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:52:02 -0400
+	(envelope-from <venu.busireddy@oracle.com>) id 1fkX2t-0006o9-UG
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:58:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fkWwJ-00055c-EW
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:52:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56994 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fkWwJ-00055S-8A
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:51:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF5247D84D
-	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 15:51:58 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 31 Jul 2018 17:51:56 +0200
-Message-Id: <20180731155156.25994-2-armbru@redhat.com>
-In-Reply-To: <20180731155156.25994-1-armbru@redhat.com>
-References: <20180731155156.25994-1-armbru@redhat.com>
+	(envelope-from <venu.busireddy@oracle.com>) id 1fkX2p-0007dE-RC
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:58:47 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:39014)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
+	id 1fkX2p-0007d2-Fq
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:58:43 -0400
+Date: Tue, 31 Jul 2018 10:58:37 -0500
+From: Venu Busireddy <venu.busireddy@oracle.com>
+Message-ID: <20180731155837.GA15528@troi>
+References: <20180629221907.3662-1-venu.busireddy@oracle.com>
+	<20180629221907.3662-4-venu.busireddy@oracle.com>
+	<5548ad79-6864-d25a-d78d-bd8328422c04@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/1] monitor: temporary fix for dead-lock on
- event recursion
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5548ad79-6864-d25a-d78d-bd8328422c04@gmail.com>
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 3/3] Add "Group Identifier"
+ support to Red Hat PCI Express bridge.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,172 +30,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 2018-07-07 15:14:11 +0300, Marcel Apfelbaum wrote:
+> Hi Venu,
+> 
+> On 06/30/2018 01:19 AM, Venu Busireddy wrote:
+> > Add a new bridge device "pcie-downstream" with a
+> > Vendor ID of PCI_VENDOR_ID_REDHAT and a Device ID of
+> > PCI_DEVICE_ID_REDHAT_DOWNPORT_FAILOVER.
+> 
+> Can't we use the current pcie-pci-bridge device (see
+> hw/pci-bridge/pcie_pci_bridge.c)
+> by adding the new vendor capability to it so we will not need to support a
+> new bridge?
 
-With a Spice port chardev, it is possible to reenter
-monitor_qapi_event_queue() (when the client disconnects for
-example). This will dead-lock on monitor_lock.
+Sorry for the delayed response. I was away on vacation.
 
-Instead, use some TLS variables to check for recursion and queue the
-events.
+This question is probably better answered by Michael, but me let me try.
+Michael suggested adding a new device to avoid confusion with existing
+bridge devices.
 
-Fixes:
- (gdb) bt
- #0  0x00007fa69e7217fd in __lll_lock_wait () at /lib64/libpthread.so.0
- #1  0x00007fa69e71acf4 in pthread_mutex_lock () at /lib64/libpthread.so.=
-0
- #2  0x0000563303567619 in qemu_mutex_lock_impl (mutex=3D0x563303d3e220 <=
-monitor_lock>, file=3D0x5633036589a8 "/home/elmarco/src/qq/monitor.c", li=
-ne=3D645) at /home/elmarco/src/qq/util/qemu-thread-posix.c:66
- #3  0x0000563302fa6c25 in monitor_qapi_event_queue (event=3DQAPI_EVENT_S=
-PICE_DISCONNECTED, qdict=3D0x56330602bde0, errp=3D0x7ffc6ab5e728) at /hom=
-e/elmarco/src/qq/monitor.c:645
- #4  0x0000563303549aca in qapi_event_send_spice_disconnected (server=3D0=
-x563305afd630, client=3D0x563305745360, errp=3D0x563303d8d0f0 <error_abor=
-t>) at qapi/qapi-events-ui.c:149
- #5  0x00005633033e600f in channel_event (event=3D3, info=3D0x5633061b005=
-0) at /home/elmarco/src/qq/ui/spice-core.c:235
- #6  0x00007fa69f6c86bb in reds_handle_channel_event (reds=3D<optimized o=
-ut>, event=3D3, info=3D0x5633061b0050) at reds.c:316
- #7  0x00007fa69f6b193b in main_dispatcher_self_handle_channel_event (inf=
-o=3D0x5633061b0050, event=3D3, self=3D0x563304e088c0) at main-dispatcher.=
-c:197
- #8  0x00007fa69f6b193b in main_dispatcher_channel_event (self=3D0x563304=
-e088c0, event=3Devent@entry=3D3, info=3D0x5633061b0050) at main-dispatche=
-r.c:197
- #9  0x00007fa69f6d0833 in red_stream_push_channel_event (s=3Ds@entry=3D0=
-x563305ad8f50, event=3Devent@entry=3D3) at red-stream.c:414
- #10 0x00007fa69f6d086b in red_stream_free (s=3D0x563305ad8f50) at red-st=
-ream.c:388
- #11 0x00007fa69f6b7ddc in red_channel_client_finalize (object=3D0x563304=
-df2360) at red-channel-client.c:347
- #12 0x00007fa6a56b7fb9 in g_object_unref () at /lib64/libgobject-2.0.so.=
-0
- #13 0x00007fa69f6ba212 in red_channel_client_push (rcc=3D0x563304df2360)=
- at red-channel-client.c:1341
- #14 0x00007fa69f68b259 in red_char_device_send_msg_to_client (client=3D<=
-optimized out>, msg=3D0x5633059b6310, dev=3D0x563304e08bc0) at char-devic=
-e.c:305
- #15 0x00007fa69f68b259 in red_char_device_send_msg_to_clients (msg=3D0x5=
-633059b6310, dev=3D0x563304e08bc0) at char-device.c:305
- #16 0x00007fa69f68b259 in red_char_device_read_from_device (dev=3D0x5633=
-04e08bc0) at char-device.c:353
- #17 0x000056330317d01d in spice_chr_write (chr=3D0x563304cafe20, buf=3D0=
-x563304cc50b0 "{\"timestamp\": {\"seconds\": 1532944763, \"microseconds\"=
-: 326636}, \"event\": \"SHUTDOWN\", \"data\": {\"guest\": false}}\r\n", l=
-en=3D111) at /home/elmarco/src/qq/chardev/spice.c:199
- #18 0x00005633034deee7 in qemu_chr_write_buffer (s=3D0x563304cafe20, buf=
-=3D0x563304cc50b0 "{\"timestamp\": {\"seconds\": 1532944763, \"microsecon=
-ds\": 326636}, \"event\": \"SHUTDOWN\", \"data\": {\"guest\": false}}\r\n=
-", len=3D111, offset=3D0x7ffc6ab5ea70, write_all=3Dfalse) at /home/elmarc=
-o/src/qq/chardev/char.c:112
- #19 0x00005633034df054 in qemu_chr_write (s=3D0x563304cafe20, buf=3D0x56=
-3304cc50b0 "{\"timestamp\": {\"seconds\": 1532944763, \"microseconds\": 3=
-26636}, \"event\": \"SHUTDOWN\", \"data\": {\"guest\": false}}\r\n", len=3D=
-111, write_all=3Dfalse) at /home/elmarco/src/qq/chardev/char.c:147
- #20 0x00005633034e1e13 in qemu_chr_fe_write (be=3D0x563304dbb800, buf=3D=
-0x563304cc50b0 "{\"timestamp\": {\"seconds\": 1532944763, \"microseconds\=
-": 326636}, \"event\": \"SHUTDOWN\", \"data\": {\"guest\": false}}\r\n", =
-len=3D111) at /home/elmarco/src/qq/chardev/char-fe.c:42
- #21 0x0000563302fa6334 in monitor_flush_locked (mon=3D0x563304dbb800) at=
- /home/elmarco/src/qq/monitor.c:425
- #22 0x0000563302fa6520 in monitor_puts (mon=3D0x563304dbb800, str=3D0x56=
-3305de7e9e "") at /home/elmarco/src/qq/monitor.c:468
- #23 0x0000563302fa680c in qmp_send_response (mon=3D0x563304dbb800, rsp=3D=
-0x563304df5730) at /home/elmarco/src/qq/monitor.c:517
- #24 0x0000563302fa6905 in qmp_queue_response (mon=3D0x563304dbb800, rsp=3D=
-0x563304df5730) at /home/elmarco/src/qq/monitor.c:538
- #25 0x0000563302fa6b5b in monitor_qapi_event_emit (event=3DQAPI_EVENT_SH=
-UTDOWN, qdict=3D0x563304df5730) at /home/elmarco/src/qq/monitor.c:624
- #26 0x0000563302fa6c4b in monitor_qapi_event_queue (event=3DQAPI_EVENT_S=
-HUTDOWN, qdict=3D0x563304df5730, errp=3D0x7ffc6ab5ed00) at /home/elmarco/=
-src/qq/monitor.c:649
- #27 0x0000563303548cce in qapi_event_send_shutdown (guest=3Dfalse, errp=3D=
-0x563303d8d0f0 <error_abort>) at qapi/qapi-events-run-state.c:58
- #28 0x000056330313bcd7 in main_loop_should_exit () at /home/elmarco/src/=
-qq/vl.c:1822
- #29 0x000056330313bde3 in main_loop () at /home/elmarco/src/qq/vl.c:1862
- #30 0x0000563303143781 in main (argc=3D3, argv=3D0x7ffc6ab5f068, envp=3D=
-0x7ffc6ab5f088) at /home/elmarco/src/qq/vl.c:4644
+Venu
 
-Note that error report is now moved to the first caller, which may
-receive an error for a recursed event. This is probably fine (95% of
-callers use &error_abort, the rest have NULL error and ignore it)
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20180731150144.14022-1-marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[*_no_recurse renamed to *_no_reenter, local variables reordered]
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- monitor.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 43 insertions(+), 1 deletion(-)
-
-diff --git a/monitor.c b/monitor.c
-index f75027b09e..77861e96af 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -633,7 +633,7 @@ static void monitor_qapi_event_handler(void *opaque);
-  * applying any rate limiting if required.
-  */
- static void
--monitor_qapi_event_queue(QAPIEvent event, QDict *qdict, Error **errp)
-+monitor_qapi_event_queue_no_reenter(QAPIEvent event, QDict *qdict)
- {
-     MonitorQAPIEventConf *evconf;
-     MonitorQAPIEventState *evstate;
-@@ -688,6 +688,48 @@ monitor_qapi_event_queue(QAPIEvent event, QDict *qdi=
-ct, Error **errp)
-     qemu_mutex_unlock(&monitor_lock);
- }
-=20
-+static void
-+monitor_qapi_event_queue(QAPIEvent event, QDict *qdict, Error **errp)
-+{
-+    /*
-+     * monitor_qapi_event_queue_no_reenter() is not reentrant: it
-+     * would deadlock on monitor_lock.  Work around by queueing
-+     * events in thread-local storage.
-+     * TODO: remove this, make it re-enter safe.
-+     */
-+    typedef struct MonitorQapiEvent {
-+        QAPIEvent event;
-+        QDict *qdict;
-+        QSIMPLEQ_ENTRY(MonitorQapiEvent) entry;
-+    } MonitorQapiEvent;
-+    static __thread QSIMPLEQ_HEAD(, MonitorQapiEvent) event_queue;
-+    static __thread bool reentered;
-+    MonitorQapiEvent *ev;
-+
-+    if (!reentered) {
-+        QSIMPLEQ_INIT(&event_queue);
-+    }
-+
-+    ev =3D g_new(MonitorQapiEvent, 1);
-+    ev->qdict =3D qobject_ref(qdict);
-+    ev->event =3D event;
-+    QSIMPLEQ_INSERT_TAIL(&event_queue, ev, entry);
-+    if (reentered) {
-+        return;
-+    }
-+
-+    reentered =3D true;
-+
-+    while ((ev =3D QSIMPLEQ_FIRST(&event_queue)) !=3D NULL) {
-+        QSIMPLEQ_REMOVE_HEAD(&event_queue, entry);
-+        monitor_qapi_event_queue_no_reenter(ev->event, ev->qdict);
-+        qobject_unref(ev->qdict);
-+        g_free(ev);
-+    }
-+
-+    reentered =3D false;
-+}
-+
- /*
-  * This function runs evconf->rate ns after sending a throttled
-  * event.
---=20
-2.17.1
+> 
+> Thanks,
+> Marcel
+> 
+> >   Also, add the "Vendor-Specific"
+> > capability to the bridge to contain the "Group Identifier" that will be
+> > used to pair a virtio device with the passthrough device attached to
+> > that bridge.
+> > 
+> > This capability is added to the bridge iff the "failover-group-id"
+> > option is specified for the bridge.
+> > 
+> > Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+> > ---
+> >   default-configs/arm-softmmu.mak    |   1 +
+> >   default-configs/i386-softmmu.mak   |   1 +
+> >   default-configs/x86_64-softmmu.mak |   1 +
+> >   hw/pci-bridge/Makefile.objs        |   1 +
+> >   hw/pci-bridge/pcie_downstream.c    | 220 +++++++++++++++++++++++++++++
+> >   hw/pci-bridge/pcie_downstream.h    |  10 ++
+> >   include/hw/pci/pci.h               |   1 +
+> >   7 files changed, 235 insertions(+)
+> >   create mode 100644 hw/pci-bridge/pcie_downstream.c
+> >   create mode 100644 hw/pci-bridge/pcie_downstream.h
+> > 
+> > diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> > index 834d45cfaf..b86c6fb122 100644
+> > --- a/default-configs/arm-softmmu.mak
+> > +++ b/default-configs/arm-softmmu.mak
+> > @@ -139,6 +139,7 @@ CONFIG_IMX_I2C=y
+> >   CONFIG_PCIE_PORT=y
+> >   CONFIG_XIO3130=y
+> >   CONFIG_IOH3420=y
+> > +CONFIG_PCIE_DOWNSTREAM=y
+> >   CONFIG_I82801B11=y
+> >   CONFIG_ACPI=y
+> >   CONFIG_SMBIOS=y
+> > diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+> > index 8c7d4a0fa0..a900c8f052 100644
+> > --- a/default-configs/i386-softmmu.mak
+> > +++ b/default-configs/i386-softmmu.mak
+> > @@ -56,6 +56,7 @@ CONFIG_ACPI_NVDIMM=y
+> >   CONFIG_PCIE_PORT=y
+> >   CONFIG_XIO3130=y
+> >   CONFIG_IOH3420=y
+> > +CONFIG_PCIE_DOWNSTREAM=y
+> >   CONFIG_I82801B11=y
+> >   CONFIG_SMBIOS=y
+> >   CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
+> > diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
+> > index 0390b4303c..481e4764be 100644
+> > --- a/default-configs/x86_64-softmmu.mak
+> > +++ b/default-configs/x86_64-softmmu.mak
+> > @@ -56,6 +56,7 @@ CONFIG_ACPI_NVDIMM=y
+> >   CONFIG_PCIE_PORT=y
+> >   CONFIG_XIO3130=y
+> >   CONFIG_IOH3420=y
+> > +CONFIG_PCIE_DOWNSTREAM=y
+> >   CONFIG_I82801B11=y
+> >   CONFIG_SMBIOS=y
+> >   CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
+> > diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
+> > index 47065f87d9..5b42212edc 100644
+> > --- a/hw/pci-bridge/Makefile.objs
+> > +++ b/hw/pci-bridge/Makefile.objs
+> > @@ -3,6 +3,7 @@ common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o pcie_pci
+> >   common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
+> >   common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
+> >   common-obj-$(CONFIG_IOH3420) += ioh3420.o
+> > +common-obj-$(CONFIG_PCIE_DOWNSTREAM) += pcie_downstream.o
+> >   common-obj-$(CONFIG_I82801B11) += i82801b11.o
+> >   # NewWorld PowerMac
+> >   common-obj-$(CONFIG_DEC_PCI) += dec.o
+> > diff --git a/hw/pci-bridge/pcie_downstream.c b/hw/pci-bridge/pcie_downstream.c
+> > new file mode 100644
+> > index 0000000000..49b0d1e933
+> > --- /dev/null
+> > +++ b/hw/pci-bridge/pcie_downstream.c
+> > @@ -0,0 +1,220 @@
+> > +/*
+> > + * Red Hat PCI Express downstream port.
+> > + *
+> > + * pcie_downstream.c
+> > + * Most of this code is copied from xio3130_downstream.c
+> > + *
+> > + * Copyright (c) 2018 Oracle and/or its affiliates.
+> > + *         Author: Venu Busireddy <venu.busireddy@oracle.com>
+> > + *
+> > + * This program is free software; you can redistribute it and/or modify
+> > + * it under the terms of the GNU General Public License as published by
+> > + * the Free Software Foundation; either version 2 of the License, or
+> > + * (at your option) any later version.
+> > + *
+> > + * This program is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > + * GNU General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License along
+> > + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "hw/pci/pci_ids.h"
+> > +#include "hw/pci/msi.h"
+> > +#include "hw/pci/pcie.h"
+> > +#include "pcie_downstream.h"
+> > +#include "qapi/error.h"
+> > +
+> > +#define REDHAT_PCIE_DOWNSTREAM_REVISION                 0x1
+> > +#define REDHAT_PCIE_DOWNSTREAM_MSI_OFFSET               0x70
+> > +#define REDHAT_PCIE_DOWNSTREAM_MSI_SUPPORTED_FLAGS      PCI_MSI_FLAGS_64BIT
+> > +#define REDHAT_PCIE_DOWNSTREAM_MSI_NR_VECTOR            1
+> > +#define REDHAT_PCIE_DOWNSTREAM_SSVID_OFFSET             0x80
+> > +#define REDHAT_PCIE_DOWNSTREAM_SSVID_SVID               0
+> > +#define REDHAT_PCIE_DOWNSTREAM_SSVID_SSID               0
+> > +#define REDHAT_PCIE_DOWNSTREAM_EXP_OFFSET               0x90
+> > +#define REDHAT_PCIE_DOWNSTREAM_VENDOR_OFFSET            0xCC
+> > +#define REDHAT_PCIE_DOWNSTREAM_AER_OFFSET               0x100
+> > +
+> > +static void pcie_downstream_write_config(PCIDevice *d, uint32_t address,
+> > +                                         uint32_t val, int len)
+> > +{
+> > +    pci_bridge_write_config(d, address, val, len);
+> > +    pcie_cap_flr_write_config(d, address, val, len);
+> > +    pcie_cap_slot_write_config(d, address, val, len);
+> > +    pcie_aer_write_config(d, address, val, len);
+> > +}
+> > +
+> > +static void pcie_downstream_reset(DeviceState *qdev)
+> > +{
+> > +    PCIDevice *d = PCI_DEVICE(qdev);
+> > +
+> > +    pcie_cap_deverr_reset(d);
+> > +    pcie_cap_slot_reset(d);
+> > +    pcie_cap_arifwd_reset(d);
+> > +    pci_bridge_reset(qdev);
+> > +}
+> > +
+> > +static void pcie_downstream_realize(PCIDevice *d, Error **errp)
+> > +{
+> > +    PCIEPort *p = PCIE_PORT(d);
+> > +    PCIESlot *s = PCIE_SLOT(d);
+> > +    int rc;
+> > +
+> > +    pci_bridge_initfn(d, TYPE_PCIE_BUS);
+> > +    pcie_port_init_reg(d);
+> > +
+> > +    rc = pci_bridge_vendor_init(d, REDHAT_PCIE_DOWNSTREAM_VENDOR_OFFSET,
+> > +            PCI_DEVICE_ID_REDHAT_DOWNPORT_FAILOVER, errp);
+> > +    if (rc < 0) {
+> > +        error_append_hint(errp, "Can't init group ID, error %d\n", rc);
+> > +        goto err_bridge;
+> > +    }
+> > +
+> > +    rc = msi_init(d, REDHAT_PCIE_DOWNSTREAM_MSI_OFFSET,
+> > +            REDHAT_PCIE_DOWNSTREAM_MSI_NR_VECTOR,
+> > +            REDHAT_PCIE_DOWNSTREAM_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
+> > +            REDHAT_PCIE_DOWNSTREAM_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
+> > +            errp);
+> > +    if (rc < 0) {
+> > +        assert(rc == -ENOTSUP);
+> > +        goto err_bridge;
+> > +    }
+> > +
+> > +    rc = pci_bridge_ssvid_init(d, REDHAT_PCIE_DOWNSTREAM_SSVID_OFFSET,
+> > +            REDHAT_PCIE_DOWNSTREAM_SSVID_SVID,
+> > +            REDHAT_PCIE_DOWNSTREAM_SSVID_SSID, errp);
+> > +    if (rc < 0) {
+> > +        goto err_bridge;
+> > +    }
+> > +
+> > +    rc = pcie_cap_init(d, REDHAT_PCIE_DOWNSTREAM_EXP_OFFSET,
+> > +            PCI_EXP_TYPE_DOWNSTREAM, p->port, errp);
+> > +    if (rc < 0) {
+> > +        goto err_msi;
+> > +    }
+> > +    pcie_cap_flr_init(d);
+> > +    pcie_cap_deverr_init(d);
+> > +    pcie_cap_slot_init(d, s->slot);
+> > +    pcie_cap_arifwd_init(d);
+> > +
+> > +    pcie_chassis_create(s->chassis);
+> > +    rc = pcie_chassis_add_slot(s);
+> > +    if (rc < 0) {
+> > +        error_setg(errp, "Can't add chassis slot, error %d", rc);
+> > +        goto err_pcie_cap;
+> > +    }
+> > +
+> > +    rc = pcie_aer_init(d, PCI_ERR_VER, REDHAT_PCIE_DOWNSTREAM_AER_OFFSET,
+> > +            PCI_ERR_SIZEOF, errp);
+> > +    if (rc < 0) {
+> > +        goto err;
+> > +    }
+> > +
+> > +    return;
+> > +
+> > +err:
+> > +    pcie_chassis_del_slot(s);
+> > +err_pcie_cap:
+> > +    pcie_cap_exit(d);
+> > +err_msi:
+> > +    msi_uninit(d);
+> > +err_bridge:
+> > +    pci_bridge_exitfn(d);
+> > +}
+> > +
+> > +static void pcie_downstream_exitfn(PCIDevice *d)
+> > +{
+> > +    PCIESlot *s = PCIE_SLOT(d);
+> > +
+> > +    pcie_aer_exit(d);
+> > +    pcie_chassis_del_slot(s);
+> > +    pcie_cap_exit(d);
+> > +    msi_uninit(d);
+> > +    pci_bridge_exitfn(d);
+> > +}
+> > +
+> > +PCIESlot *pcie_downstream_init(PCIBus *bus, int devfn, bool multifunction,
+> > +                               const char *bus_name, pci_map_irq_fn map_irq,
+> > +                               uint8_t port, uint8_t chassis, uint16_t slot)
+> > +{
+> > +    PCIDevice *d;
+> > +    PCIBridge *br;
+> > +    DeviceState *qdev;
+> > +
+> > +    d = pci_create_multifunction(bus, devfn, multifunction, "pcie-downstream");
+> > +    if (!d) {
+> > +        return NULL;
+> > +    }
+> > +    br = PCI_BRIDGE(d);
+> > +
+> > +    qdev = DEVICE(d);
+> > +    pci_bridge_map_irq(br, bus_name, map_irq);
+> > +    qdev_prop_set_uint8(qdev, "port", port);
+> > +    qdev_prop_set_uint8(qdev, "chassis", chassis);
+> > +    qdev_prop_set_uint16(qdev, "slot", slot);
+> > +    qdev_init_nofail(qdev);
+> > +
+> > +    return PCIE_SLOT(d);
+> > +}
+> > +
+> > +static Property pcie_downstream_props[] = {
+> > +    DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+> > +            QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+> > +    DEFINE_PROP_UINT64(COMPAT_PROP_FAILOVER_GROUP_ID,
+> > +            PCIDevice, failover_group_id, ULLONG_MAX),
+> > +    DEFINE_PROP_END_OF_LIST()
+> > +};
+> > +
+> > +static const VMStateDescription vmstate_pcie_ds = {
+> > +    .name = "pcie-downstream-port",
+> > +    .priority = MIG_PRI_PCI_BUS,
+> > +    .version_id = 1,
+> > +    .minimum_version_id = 1,
+> > +    .post_load = pcie_cap_slot_post_load,
+> > +    .fields = (VMStateField[]) {
+> > +        VMSTATE_PCI_DEVICE(parent_obj.parent_obj.parent_obj, PCIESlot),
+> > +        VMSTATE_STRUCT(parent_obj.parent_obj.parent_obj.exp.aer_log,
+> > +                       PCIESlot, 0, vmstate_pcie_aer_log, PCIEAERLog),
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> > +static void pcie_downstream_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc = DEVICE_CLASS(klass);
+> > +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> > +
+> > +    k->is_bridge = 1;
+> > +    k->config_write = pcie_downstream_write_config;
+> > +    k->realize = pcie_downstream_realize;
+> > +    k->exit = pcie_downstream_exitfn;
+> > +    k->vendor_id = PCI_VENDOR_ID_REDHAT;
+> > +    k->device_id = PCI_DEVICE_ID_REDHAT_DOWNPORT_FAILOVER;
+> > +    k->revision = REDHAT_PCIE_DOWNSTREAM_REVISION;
+> > +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> > +    dc->desc = "Red Hat PCIe Downstream Port";
+> > +    dc->reset = pcie_downstream_reset;
+> > +    dc->vmsd = &vmstate_pcie_ds;
+> > +    dc->props = pcie_downstream_props;
+> > +}
+> > +
+> > +static const TypeInfo pcie_downstream_info = {
+> > +    .name          = "pcie-downstream",
+> > +    .parent        = TYPE_PCIE_SLOT,
+> > +    .class_init    = pcie_downstream_class_init,
+> > +    .interfaces = (InterfaceInfo[]) {
+> > +        { INTERFACE_PCIE_DEVICE },
+> > +        { }
+> > +    },
+> > +};
+> > +
+> > +static void pcie_downstream_register_types(void)
+> > +{
+> > +    type_register_static(&pcie_downstream_info);
+> > +}
+> > +
+> > +type_init(pcie_downstream_register_types)
+> > diff --git a/hw/pci-bridge/pcie_downstream.h b/hw/pci-bridge/pcie_downstream.h
+> > new file mode 100644
+> > index 0000000000..a7f1aae4bb
+> > --- /dev/null
+> > +++ b/hw/pci-bridge/pcie_downstream.h
+> > @@ -0,0 +1,10 @@
+> > +#ifndef QEMU_PCIE_DOWNSTREAM_H
+> > +#define QEMU_PCIE_DOWNSTREAM_H
+> > +
+> > +#include "hw/pci/pcie_port.h"
+> > +
+> > +PCIESlot *pcie_downstream_init(PCIBus *bus, int devfn, bool multifunction,
+> > +        const char *bus_name, pci_map_irq_fn map_irq, uint8_t port,
+> > +        uint8_t chassis, uint16_t slot);
+> > +
+> > +#endif /* QEMU_PCIE_DOWNSTREAM_H */
+> > diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> > index bc38032761..bf04ef59f3 100644
+> > --- a/include/hw/pci/pci.h
+> > +++ b/include/hw/pci/pci.h
+> > @@ -103,6 +103,7 @@ extern bool pci_available;
+> >   #define PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE        0x000e
+> >   #define PCI_DEVICE_ID_REDHAT_MDPY               0x000f
+> >   #define PCI_DEVICE_ID_REDHAT_BRIDGE_FAILOVER    0x0010
+> > +#define PCI_DEVICE_ID_REDHAT_DOWNPORT_FAILOVER  0x0011
+> >   #define PCI_DEVICE_ID_REDHAT_QXL                0x0100
+> >   #define FMT_PCIBUS                      PRIx64
+> > 
+> > ---------------------------------------------------------------------
+> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> > 
+> 
