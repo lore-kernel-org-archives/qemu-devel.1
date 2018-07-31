@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fkT2q-0007lL-3L
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:42:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1fkTHG-0002W4-5p
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:57:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fkT2n-0000vZ-Ho
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:42:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50726)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fkT2n-0000v8-7x
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:42:25 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w6VBcvvE056423
-	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 07:42:23 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2kjmepxv6u-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 07:42:23 -0400
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 31 Jul 2018 12:42:21 +0100
-References: <20180731090448.36662-1-borntraeger@de.ibm.com>
-	<20180731132930.7640008f.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 31 Jul 2018 13:42:15 +0200
+	(envelope-from <eblake@redhat.com>) id 1fkTHF-0008RQ-Ag
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:57:22 -0400
+References: <20180731025231.17482-1-programmingkidx@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cdfa1c40-b618-52e8-41b8-a58a67acef66@redhat.com>
+Date: Tue, 31 Jul 2018 06:57:14 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180731132930.7640008f.cohuck@redhat.com>
+In-Reply-To: <20180731025231.17482-1-programmingkidx@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Message-Id: <daf86179-2b25-50c0-87cf-76e3add9594c@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] etoken patch for 3.1
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qemu-img-cmds.hx: Add example usage for
+ create command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,33 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>
+To: John Arbuckle <programmingkidx@gmail.com>, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
 
-
-
-On 07/31/2018 01:29 PM, Cornelia Huck wrote:
-> On Tue, 31 Jul 2018 11:04:46 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 07/30/2018 09:52 PM, John Arbuckle wrote:
+> Add an example on how to use the create command. I believe this will make qemu-img easier to use.
 > 
->> this depends on the current kvms390/next kernel tree.
->>
->> Christian Borntraeger (2):
->>   header sync
->>   s390x/kvm: add etoken facility
->>
->>  linux-headers/asm-s390/kvm.h    |  5 ++++-
->>  target/s390x/cpu.h              |  3 +++
->>  target/s390x/cpu_features.c     |  3 ++-
->>  target/s390x/cpu_features_def.h |  3 ++-
->>  target/s390x/gen-features.c     |  3 ++-
->>  target/s390x/kvm.c              | 11 +++++++++++
->>  target/s390x/machine.c          | 20 +++++++++++++++++++-
->>  7 files changed, 43 insertions(+), 5 deletions(-)
->>
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> ---
+>   qemu-img-cmds.hx | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> I can merge this (with a capital E in the feature name and a real
-> headers update) once the kernel headers update hits Linux master.
-> Please ping me if I forget :)
+> diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+> index 69758fb6e8..92f7437944 100644
+> --- a/qemu-img-cmds.hx
+> +++ b/qemu-img-cmds.hx
+> @@ -50,7 +50,7 @@ STEXI
+>   ETEXI
+>   
+>   DEF("create", img_create,
+> -    "create [--object objectdef] [-q] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]")
+> +    "create [--object objectdef] [-q] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]\nExample: qemu-img create -f qcow2 WindowsXP.qcow2 10G")
 
-Thanks, will do.
+Making a long line longer. It would be worth using C string 
+concatenation and splitting this over two lines, at the \n.
+
+Using the name WindowsXP.qcow2 as the guest is somewhat misleading (that 
+OS is proprietary, and quickly reaching the point of obsolescence from 
+its vendor - furthermore, qemu-img doesn't actually install an OS, but 
+rather creates a blank image for a later install process to utilize); 
+better would be a generic name that won't go out of date, such 
+'image.qcow2'.
+
+
+>   STEXI
+>   @item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
+>   ETEXI
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
