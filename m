@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkYIK-0004Fx-3V
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 13:18:49 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fkYJZ-0005Le-Pz
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 13:20:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkYIJ-0006yv-5u
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 13:18:48 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41328)
+	(envelope-from <richard.henderson@linaro.org>) id 1fkYJV-0007d6-II
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 13:20:05 -0400
+Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:35257)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fkYII-0006y6-WF
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 13:18:47 -0400
-Received: by mail-oi0-x241.google.com with SMTP id k12-v6so29365214oiw.8
-	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 10:18:46 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fkYJV-0007cw-CW
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 13:20:01 -0400
+Received: by mail-ua0-x244.google.com with SMTP id q12-v6so10805511ual.2
+	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 10:20:01 -0700 (PDT)
+References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1532967169-22265-39-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <62fc84c4-0c6e-7cc6-a474-4603f093e722@linaro.org>
+Date: Tue, 31 Jul 2018 13:19:56 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180725085944.11856-4-stefanha@redhat.com>
-References: <20180725085944.11856-1-stefanha@redhat.com>
-	<20180725085944.11856-4-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Jul 2018 18:18:25 +0100
-Message-ID: <CAFEAcA9C9BwPYHeXcX0R2MvEKb=ZKObskaTrHuFi7_0rNnecuA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] hw/arm: make bitbanded IO optional
- on ARM M Profile
+In-Reply-To: <1532967169-22265-39-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 38/76] target/mips: Add emulation of DSP
+ ASE for nanoMIPS - part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +32,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, Alistair Francis <alistair@alistair23.me>, Liviu Ionescu <ilg@livius.net>, qemu-arm <qemu-arm@nongnu.org>, Julia Suvorova <jusual@mail.ru>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Steffen Gortz <qemu.ml@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-On 25 July 2018 at 09:59, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> Some ARM CPUs have bitbanded IO, a memory region that allows convenient
-> bit access via 32-bit memory loads/stores.  This eliminates the need for
-> read-modify-update instruction sequences.
->
-> This patch makes this optional feature a ARMMProfile qdev property,
-> allowing boards to choose whether they want bitbanding or not.
->
-> Status of boards:
->  * iotkit (Cortex M33), no bitband
->  * mps2 (Cortex M3), bitband
->  * msf2 (Cortex M3), bitband
->  * stellaris (Cortex M3), bitband
->  * stm32f205 (Cortex M3), bitband
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 07/30/2018 12:12 PM, Aleksandar Markovic wrote:
+> +    case OPC_CMPGU_EQ_QB:
+> +        check_dsp(ctx);
+> +        gen_helper_cmpgu_eq_qb(cpu_gpr[ret], v1_t, v2_t);
+> +        break;
 
-This fixes a bug in the MPS2 boards, incidentally, where the
-Ethernet controller is inaccessible because it's hidden by
-the shouldn't-be-present bitbanding region...
+Missing a test for ret == 0, here and many other places.
+I believe some (many?) of these have side-effects, so you'll
+probably want to store into e.g. v1_t and gen_store_gpr.
 
-thanks
--- PMM
+
+r~
