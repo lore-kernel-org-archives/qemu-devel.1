@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fkRuD-0001Zp-IT
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:29:30 -0400
+	(envelope-from <mail@sebastianbauer.info>) id 1fkRxG-0003AF-C1
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:32:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fkRu9-0007SO-KN
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:29:29 -0400
-Received: from mga06.intel.com ([134.134.136.31]:39279)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1fkRu9-0007S6-B2
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:29:25 -0400
-From: Wei Wang <wei.w.wang@intel.com>
-Date: Tue, 31 Jul 2018 18:01:18 +0800
-Message-Id: <1533031278-5615-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v2] bitmap: fix BITMAP_LAST_WORD_MASK
+	(envelope-from <mail@sebastianbauer.info>) id 1fkRxF-0000Qg-Ho
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:32:38 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Tue, 31 Jul 2018 12:32:22 +0200
+From: Sebastian Bauer <mail@sebastianbauer.info>
+In-Reply-To: <alpine.BSF.2.21.1807311139550.57924@zero.eik.bme.hu>
+References: <20180730043904.17023-1-mail@sebastianbauer.info>
+	<alpine.BSF.2.21.1807301254450.49677@zero.eik.bme.hu>
+	<fbaa741e42e50457a0ba9c7654e1d03d@sebastianbauer.info>
+	<alpine.BSF.2.21.1807310009440.24147@zero.eik.bme.hu>
+	<CAFEAcA8VqaqSzc4NBwjR4F8TMAHD2vhdMMi0fwkTj1fiX=wjyQ@mail.gmail.com>
+	<alpine.BSF.2.21.1807310111280.24147@zero.eik.bme.hu>
+	<20180731001847.GF2708@umbus.fritz.box>
+	<52bff728ba683daa71e32be776a55ff0@sebastianbauer.info>
+	<alpine.BSF.2.21.1807311139550.57924@zero.eik.bme.hu>
+Message-ID: <dfd55d04ca9cd76ab22bfad5617ef388@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PATCH] sam460ex: Fix PCI interrupt connections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,39 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, quintela@redhat.com
-Cc: mst@redhat.com
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-When "nbits = 0", which means no bits to mask, this macro is expected to
-return 0, instead of 0xffffffff. This patch changes the macro to return
-0 when there is no bit needs to be masked.
+Hi,
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-CC: Juan Quintela <quintela@redhat.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-CC: Peter Xu <peterx@redhat.com>
----
- include/qemu/bitmap.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Am 2018-07-31 11:50, schrieb BALATON Zoltan:
+> On Tue, 31 Jul 2018, Sebastian Bauer wrote:
+>> There is also the possibility to make the special (num-irqs == 1) the 
+>> common case, as the Sam460ex platform is the only user of this bus so 
+>> far (and probably stays the only one). I'm not sure if it is worth all 
+>> the hassle.
+> 
+> I'd vote for this as I've said before. This seems to be the simplest
+> solution so just change ppc440_pcix to have one irq instead of 4.
 
-v1->v2 ChangeLog:
-- fix the macro directly, instead of fixing the callers one by one.
+I now think so too, as, when devising my initial patch, I was not aware 
+of the fact that this bus emulation was only created for the SAM.
 
-diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-index 509eedd..9372423 100644
---- a/include/qemu/bitmap.h
-+++ b/include/qemu/bitmap.h
-@@ -60,7 +60,10 @@
-  */
- 
- #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) & (BITS_PER_LONG - 1)))
--#define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
-+#define BITMAP_LAST_WORD_MASK(nbits)                       \
-+(                                                          \
-+    nbits ? (~0UL >> (-(nbits) & (BITS_PER_LONG - 1))) : 0 \
-+)
- 
- #define DECLARE_BITMAP(name,bits)                  \
-         unsigned long name[BITS_TO_LONGS(bits)]
--- 
-2.7.4
+>> Let me know how to proceed.
+> Will you send an updated patch or should I take and modify your latest
+> one to help with this?
+
+I don't care so much about the how, but I would appreciate it, if the 
+bug can be fixed, so that further PCI cards can be used without too much 
+hassle (e.g., network cards). David seemed to be OK with my 2nd patch 
+after I rebase it if I understood it correctly. My plan is to do this. 
+But I'll also submit another alternative (shorter) patch that tailors 
+the bus to the SAM only.
+
+Bye
+Sebastian
