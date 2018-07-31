@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fkTHG-0002W4-5p
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:57:24 -0400
+	(envelope-from <frankja@linux.ibm.com>) id 1fkTT0-0005ee-4F
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 08:09:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fkTHF-0008RQ-Ag
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:57:22 -0400
-References: <20180731025231.17482-1-programmingkidx@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cdfa1c40-b618-52e8-41b8-a58a67acef66@redhat.com>
-Date: Tue, 31 Jul 2018 06:57:14 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180731025231.17482-1-programmingkidx@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-img-cmds.hx: Add example usage for
- create command
+	(envelope-from <frankja@linux.ibm.com>) id 1fkTSv-0005UV-5f
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 08:09:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51052
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+	id 1fkTSu-0005UF-VK
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 08:09:25 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6VC4LpT117862
+	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 08:09:24 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2kjq5a92bq-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 08:09:23 -0400
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+	Tue, 31 Jul 2018 13:09:21 +0100
+From: Janosch Frank <frankja@linux.ibm.com>
+Date: Tue, 31 Jul 2018 13:09:06 +0100
+Message-Id: <20180731120908.9202-1-frankja@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 0/2] s390x: Enable KVM huge page backing
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +37,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com
 
-On 07/30/2018 09:52 PM, John Arbuckle wrote:
-> Add an example on how to use the create command. I believe this will make qemu-img easier to use.
-> 
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
-> ---
->   qemu-img-cmds.hx | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-> index 69758fb6e8..92f7437944 100644
-> --- a/qemu-img-cmds.hx
-> +++ b/qemu-img-cmds.hx
-> @@ -50,7 +50,7 @@ STEXI
->   ETEXI
->   
->   DEF("create", img_create,
-> -    "create [--object objectdef] [-q] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]")
-> +    "create [--object objectdef] [-q] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]\nExample: qemu-img create -f qcow2 WindowsXP.qcow2 10G")
+v3:
+	* Fixed Cap name
+	* Added mempath page size check and error reporting
 
-Making a long line longer. It would be worth using C string 
-concatenation and splitting this over two lines, at the \n.
+Janosch Frank (2):
+  kvm: sync linux headers
+  s390x: Enable KVM huge page backing support
 
-Using the name WindowsXP.qcow2 as the guest is somewhat misleading (that 
-OS is proprietary, and quickly reaching the point of obsolescence from 
-its vendor - furthermore, qemu-img doesn't actually install an OS, but 
-rather creates a blank image for a later install process to utilize); 
-better would be a generic name that won't go out of date, such 
-'image.qcow2'.
-
-
->   STEXI
->   @item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
->   ETEXI
-> 
+ linux-headers/linux/kvm.h |  1 +
+ target/s390x/kvm.c        | 15 +++++++++++++++
+ 2 files changed, 16 insertions(+)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
