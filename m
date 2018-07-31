@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fkQXz-00036N-DE
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:02:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fkQYK-0003Fs-DO
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:02:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fkQXu-00044f-HL
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:02:27 -0400
-Received: from mga17.intel.com ([192.55.52.151]:54422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1fkQXu-00042s-5q
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:02:22 -0400
-Message-ID: <5B60269E.4040601@intel.com>
-Date: Tue, 31 Jul 2018 17:06:38 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fkQYJ-0004Mh-HK
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:02:48 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:36403)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fkQYJ-0004Lc-7p
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:02:47 -0400
+Received: by mail-oi0-x243.google.com with SMTP id n21-v6so26570394oig.3
+	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 02:02:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <1532934837-5966-1-git-send-email-wei.w.wang@intel.com>	<1532934837-5966-2-git-send-email-wei.w.wang@intel.com>	<5B5EC604.4020301@intel.com>
-	<87zhy8kgil.fsf@trasno.org>
-In-Reply-To: <87zhy8kgil.fsf@trasno.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] bitmap.h: add comments to
- BITMAP_LAST_WORD_MASK
+In-Reply-To: <20180730150958.14607-1-kwolf@redhat.com>
+References: <20180730150958.14607-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 31 Jul 2018 10:02:25 +0100
+Message-ID: <CAFEAcA8e44c71o6mmq6CatU68Pmux6SqRYDgU8kyaJ41rVvBGA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/13] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, mst@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 07/30/2018 09:19 PM, Juan Quintela wrote:
-> Wei Wang <wei.w.wang@intel.com> wrote:
->> On 07/30/2018 03:13 PM, Wei Wang wrote:
->>> This macro was ported from Linux and we've reached an aggreement there
->>> that the corner case "nbits = 0" is not applicable to this macro, because
->>> when "nbits = 0", which means no bits to mask, this macro is expected to
->>> return 0, instead of 0xffffffff. This patch simply adds a comment above
->>> the macro as a note to users about the corner case.
->>>
->>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>> CC: Juan Quintela <quintela@redhat.com>
->>> CC: Peter Xu <peterx@redhat.com>
->>> ---
->>>    include/qemu/bitmap.h | 1 +
->>>    1 file changed, 1 insertion(+)
->>>
->>> diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
->>> index 509eedd..f53c640 100644
->>> --- a/include/qemu/bitmap.h
->>> +++ b/include/qemu/bitmap.h
->>> @@ -60,6 +60,7 @@
->>>     */
->>>      #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) &
->>> (BITS_PER_LONG - 1)))
->>> +/* "nbits = 0" is not applicable to this macro. Callers should avoid that. */
->>>    #define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
->>>      #define DECLARE_BITMAP(name,bits)                  \
->> A better fix would be to directly change the macro to:  nbits ? (~0UL
->>>> (-(nbits) & (BITS_PER_LONG - 1))) : 0,
->> so that we don't need to fix other callers like bitmap_full,
->> bitmap_intersects.
->>
->> So just post this out for a discussion whether it's preferred to just
->> adding note comments as we did for linux or fixing the macro directly.
->>
->> Best,
->> Wei
-> On one hand:
-> a - we have copied it form linux, we don't want to diverge
-> On the other hand:
-> b - it is much easier to use if we change the macro
+On 30 July 2018 at 16:09, Kevin Wolf <kwolf@redhat.com> wrote:
+> The following changes since commit 6d9dd5fb9d0e9f4a174f53a0e20a39fbe809c71e:
 >
-> So, it is a tought one.
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qobject-2018-07-27-v2' into staging (2018-07-30 09:55:47 +0100)
 >
-> I slightly preffer b), but will not object to a either.  As you are the
-> one doing the patch, your choice.
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 1239ac241fe170bb9fcf0be74bfff04f6f1c2560:
+>
+>   qemu-iotests: Test query-blockstats with -drive and -blockdev (2018-07-30 15:35:37 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - qemu-img convert -C is now required to enable copy offloading
+> - file-posix: Fix write_zeroes with unmap on block devices (would fall
+>   back to explicit writes on recent kernels)
+> - Fix query-blockstats interface for use with -blockdev
+> - Minor fixes and documentation updates
+>
+> ----------------------------------------------------------------
 
-Thanks Juan. I plan to choose b - fixing the macro directly.
+Applied, thanks.
 
-Best,
-Wei
+-- PMM
