@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rob@landley.net>) id 1fkXeC-0006Ue-Jl
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 12:37:21 -0400
+	(envelope-from <berto@igalia.com>) id 1fkXoV-0001YY-PF
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 12:48:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rob@landley.net>) id 1fkXe8-0005yh-Jm
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 12:37:20 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:40844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rob@landley.net>) id 1fkXe8-0005yU-9n
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 12:37:16 -0400
-Received: by mail-oi0-x242.google.com with SMTP id w126-v6so29125815oie.7
-	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 09:37:15 -0700 (PDT)
-References: <20180730130234.30020-1-geert+renesas@glider.be>
-	<1115027626.150336.1532963923061@webmail.strato.com>
-From: Rob Landley <rob@landley.net>
-Message-ID: <97622558-a520-6ab2-b61f-8038ae61b451@landley.net>
-Date: Tue, 31 Jul 2018 11:36:46 -0500
+	(envelope-from <berto@igalia.com>) id 1fkXoS-0001D0-Ic
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 12:47:59 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180704145410.794-1-stefanha@redhat.com>
+References: <20180704145410.794-1-stefanha@redhat.com>
+Date: Tue, 31 Jul 2018 18:47:53 +0200
+Message-ID: <w51muu7uzba.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <1115027626.150336.1532963923061@webmail.strato.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH QEMU] hw/char/sh_serial: Add timeout
- handling to unbreak serial input
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix hang when group
+ member leaves
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +22,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ulrich Hecht <uli@fpond.eu>, Geert Uytterhoeven <geert+renesas@glider.be>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Ulrich Hecht <ulrich.hecht+renesas@gmail.com>, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, linux-sh@vger.kernel.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 07/30/2018 10:18 AM, Ulrich Hecht wrote:>> On July 30, 2018 at 3:02 PM Geert
-Uytterhoeven <geert+renesas@glider.be> wrote:
->> Fix this by adding basic timeout handling.  As the QEMU SCIF emulation
->> ignores any serial speed programming, the timeout value used conforms to
->> a default speed of 9600 bps, which is fine for any interative console.
->>
->> Reported-by: Rob Landley <rob@landley.net>
->> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> 
-> Works for me, kernel 4.18-rc7 for rts7751r2dplus.
+On Wed 04 Jul 2018 04:54:10 PM CEST, Stefan Hajnoczi wrote:
+> Throttle groups consist of members sharing one throttling state
+> (including bps/iops limits).  Round-robin scheduling is used to ensure
+> fairness.  If a group member already has a timer pending then other
+> groups members do not schedule their own timers.  The next group
+> member will have its turn when the existing timer expires.
+>
+> A hang may occur when a group member leaves while it had a timer
+> scheduled.
 
-Works for me too.
+Ok, I can reproduce this if I run fio with iodepth=1.
 
-Tested-by: Rob Landley <rob@landley.net>
+We're draining the BDS before removing it from a throttle group, and
+therefore there cannot be any pending requests.
 
-Rob
+So the problem seems to be that when throttle_co_drain_begin() runs the
+pending requests from a member using throttle_group_co_restart_queue(),
+it simply uses qemu_co_queue_next() and doesn't touch the timer at all.
+
+So it can happen that there's a request in the queue waiting for a
+timer, and after that call the request is gone but the timer remains.
+
+The current patch is perhaps not worth touching at this point (we're
+about to release QEMU 3.0), but I think that a better solution would be
+to either
+
+a) cancel the existing timer and reset tg->any_timer_armed on the given
+   tgm after throttle_group_co_restart_queue() and before
+   schedule_next_request() if the queue is empty.
+
+b) force the existing timer to run immediately instead of calling
+   throttle_group_co_restart_queue(). Seems cleaner, but I haven't tried
+   this one yet.
+
+I'll explore them a bit and send a patch.
+
+Berto
