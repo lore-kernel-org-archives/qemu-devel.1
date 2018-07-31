@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fkQU4-00016E-NH
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:58:25 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1fkQXz-00036N-DE
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:02:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fkQU1-0001O5-99
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:58:24 -0400
-Date: Tue, 31 Jul 2018 10:58:15 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180731105815.3a6fc0e9.cohuck@redhat.com>
-In-Reply-To: <20180731084236.184728-1-frankja@linux.ibm.com>
-References: <20180731084236.184728-1-frankja@linux.ibm.com>
+	(envelope-from <wei.w.wang@intel.com>) id 1fkQXu-00044f-HL
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:02:27 -0400
+Received: from mga17.intel.com ([192.55.52.151]:54422)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1fkQXu-00042s-5q
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:02:22 -0400
+Message-ID: <5B60269E.4040601@intel.com>
+Date: Tue, 31 Jul 2018 17:06:38 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <1532934837-5966-1-git-send-email-wei.w.wang@intel.com>	<1532934837-5966-2-git-send-email-wei.w.wang@intel.com>	<5B5EC604.4020301@intel.com>
+	<87zhy8kgil.fsf@trasno.org>
+In-Reply-To: <87zhy8kgil.fsf@trasno.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x: Enable KVM huge page backing support
+Subject: Re: [Qemu-devel] [PATCH 1/2] bitmap.h: add comments to
+ BITMAP_LAST_WORD_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,69 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, david@redhat.com, qemu-s390x@nongnu.org
+To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, mst@redhat.com
 
-On Tue, 31 Jul 2018 09:42:36 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On 07/30/2018 09:19 PM, Juan Quintela wrote:
+> Wei Wang <wei.w.wang@intel.com> wrote:
+>> On 07/30/2018 03:13 PM, Wei Wang wrote:
+>>> This macro was ported from Linux and we've reached an aggreement there
+>>> that the corner case "nbits = 0" is not applicable to this macro, because
+>>> when "nbits = 0", which means no bits to mask, this macro is expected to
+>>> return 0, instead of 0xffffffff. This patch simply adds a comment above
+>>> the macro as a note to users about the corner case.
+>>>
+>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>> CC: Juan Quintela <quintela@redhat.com>
+>>> CC: Peter Xu <peterx@redhat.com>
+>>> ---
+>>>    include/qemu/bitmap.h | 1 +
+>>>    1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+>>> index 509eedd..f53c640 100644
+>>> --- a/include/qemu/bitmap.h
+>>> +++ b/include/qemu/bitmap.h
+>>> @@ -60,6 +60,7 @@
+>>>     */
+>>>      #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) &
+>>> (BITS_PER_LONG - 1)))
+>>> +/* "nbits = 0" is not applicable to this macro. Callers should avoid that. */
+>>>    #define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
+>>>      #define DECLARE_BITMAP(name,bits)                  \
+>> A better fix would be to directly change the macro to:  nbits ? (~0UL
+>>>> (-(nbits) & (BITS_PER_LONG - 1))) : 0,
+>> so that we don't need to fix other callers like bitmap_full,
+>> bitmap_intersects.
+>>
+>> So just post this out for a discussion whether it's preferred to just
+>> adding note comments as we did for linux or fixing the macro directly.
+>>
+>> Best,
+>> Wei
+> On one hand:
+> a - we have copied it form linux, we don't want to diverge
+> On the other hand:
+> b - it is much easier to use if we change the macro
+>
+> So, it is a tought one.
+>
+> I slightly preffer b), but will not object to a either.  As you are the
+> one doing the patch, your choice.
 
-> From: Janosch Frank <frankja@linux.vnet.ibm.com>
-> 
-> QEMU has had huge page support for a longer time already, but KVM
-> memory management under s390x needed some changes to work with huge
-> backings.
-> 
-> Now that we have support, let's enable it if requested and
-> available. Otherwise we now properly tell the user if there is no
-> support and back out instead of failing to run the VM later on.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+Thanks Juan. I plan to choose b - fixing the macro directly.
 
-You may want to change author and signoff to the new, shorter address.
-
-> ---
-> 
-> Right now there's a conflict with arm for the capability, so I guess
-> I'll have to touch the cap number soonish. :)
-
-You can fix this by spitting out the linux-headers update into a patch
-that will be replaced with a proper headers update :)
-
-> 
-> ---
->  linux-headers/linux/kvm.h | 1 +
->  target/s390x/kvm.c        | 6 ++++++
->  2 files changed, 7 insertions(+)
-> 
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index 98f389a5a3..e3b1e3070c 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -949,6 +949,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_GET_MSR_FEATURES 153
->  #define KVM_CAP_HYPERV_EVENTFD 154
->  #define KVM_CAP_HYPERV_TLBFLUSH 155
-> +#define KVM_CAP_S390_HPAGE 156
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index d923cf4240..1ce0b42039 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -285,6 +285,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->  {
->      MachineClass *mc = MACHINE_GET_CLASS(ms);
->  
-> +    if (mem_path && kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE, 0)) {
-> +        error_report("Huge page backing was specified, "
-> +                     "but this KVM does not support huge pages.");
-
-Please drop the trailing '.', as by the documentation for error_report().
-
-> +        return -EINVAL;
-> +    }
-> +
->      mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
->      cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
->      cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+Best,
+Wei
