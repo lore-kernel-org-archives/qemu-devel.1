@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fkSlj-0002Dn-63
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:24:48 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fkSq4-0004Wv-Pw
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:29:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fkSlf-0000gx-VN
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:24:47 -0400
-Date: Tue, 31 Jul 2018 13:24:41 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <dfd55d04ca9cd76ab22bfad5617ef388@sebastianbauer.info>
-Message-ID: <alpine.BSF.2.21.1807311320150.86593@zero.eik.bme.hu>
-References: <20180730043904.17023-1-mail@sebastianbauer.info>
-	<alpine.BSF.2.21.1807301254450.49677@zero.eik.bme.hu>
-	<fbaa741e42e50457a0ba9c7654e1d03d@sebastianbauer.info>
-	<alpine.BSF.2.21.1807310009440.24147@zero.eik.bme.hu>
-	<CAFEAcA8VqaqSzc4NBwjR4F8TMAHD2vhdMMi0fwkTj1fiX=wjyQ@mail.gmail.com>
-	<alpine.BSF.2.21.1807310111280.24147@zero.eik.bme.hu>
-	<20180731001847.GF2708@umbus.fritz.box>
-	<52bff728ba683daa71e32be776a55ff0@sebastianbauer.info>
-	<alpine.BSF.2.21.1807311139550.57924@zero.eik.bme.hu>
-	<dfd55d04ca9cd76ab22bfad5617ef388@sebastianbauer.info>
+	(envelope-from <dgilbert@redhat.com>) id 1fkSq1-0003FZ-Id
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:29:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34704 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fkSq1-0003F5-Bs
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:29:13 -0400
+Date: Tue, 31 Jul 2018 12:29:06 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180731112906.GG2476@work-vm>
+References: <1533026124-6740-1-git-send-email-liq3ea@gmail.com>
+	<1533026124-6740-3-git-send-email-liq3ea@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] sam460ex: Fix PCI interrupt
- connections
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1533026124-6740-3-git-send-email-liq3ea@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Add qmp command for
+ migrate_set_max_cpu_throttle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +28,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sebastian Bauer <mail@sebastianbauer.info>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-ppc <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, quintela@redhat.com, eblake@redhat.com, armbru@redhat.com, liqiang02@corp.netease.com, hzliuyingdong@corp.netease.com, qemu-devel@nongnu.org
 
-On Tue, 31 Jul 2018, Sebastian Bauer wrote:
-> Am 2018-07-31 11:50, schrieb BALATON Zoltan:
->> On Tue, 31 Jul 2018, Sebastian Bauer wrote:
->>> There is also the possibility to make the special (num-irqs == 1) the 
->>> common case, as the Sam460ex platform is the only user of this bus so far 
->>> (and probably stays the only one). I'm not sure if it is worth all the 
->>> hassle.
->> 
->> I'd vote for this as I've said before. This seems to be the simplest
->> solution so just change ppc440_pcix to have one irq instead of 4.
->
-> I now think so too, as, when devising my initial patch, I was not aware of 
-> the fact that this bus emulation was only created for the SAM.
->
->>> Let me know how to proceed.
->> Will you send an updated patch or should I take and modify your latest
->> one to help with this?
->
-> I don't care so much about the how, but I would appreciate it, if the bug can 
-> be fixed, so that further PCI cards can be used without too much hassle 
-> (e.g., network cards). David seemed to be OK with my 2nd patch after I rebase 
-> it if I understood it correctly. My plan is to do this. But I'll also submit 
-> another alternative (shorter) patch that tailors the bus to the SAM only.
+* Li Qiang (liq3ea@gmail.com) wrote:
+> The default max cpu throttle is 99, this is too big that may
+> influence the guest loads. Add a qmp to config it can make it
+> more flexible.
+> 
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
 
-I've sent the shorter version as I think would be the easiest fix, please 
-check if this is acceptable which may save you some work on updating your 
-more complex patch which I think might not be needed at this point until 
-something is found to need more interrupts in the ppc440_pcix model.
+This should be done as a migration parameter rather than a new command.
+For example, follow the cpu-throttle-increment parameter; and this
+should work just like it.
 
-I've checked that this improves sound with ES1370, haven't checked with 
-pci-ohci so you could verify that.
+Dave
 
-Regards,
-BALATON Zoltan
+> ---
+>  cpus.c                |  5 +++++
+>  include/qom/cpu.h     |  8 ++++++++
+>  migration/migration.c | 10 ++++++++++
+>  qapi/migration.json   | 13 +++++++++++++
+>  4 files changed, 36 insertions(+)
+> 
+> diff --git a/cpus.c b/cpus.c
+> index 6569c73d24..0505477086 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -765,6 +765,11 @@ void cpu_throttle_set(int new_throttle_pct)
+>                                         CPU_THROTTLE_TIMESLICE_NS);
+>  }
+>  
+> +void set_cpu_max_throttle(int64_t max_pct)
+> +{
+> +    throttle_percentage_max = max_pct;
+> +}
+> +
+>  void cpu_throttle_stop(void)
+>  {
+>      atomic_set(&throttle_percentage, 0);
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index bd796579ee..4328d2e8ad 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -816,6 +816,14 @@ CPUState *cpu_by_arch_id(int64_t id);
+>  void cpu_throttle_set(int new_throttle_pct);
+>  
+>  /**
+> + * set_cpu_max_throttle:
+> + * @max_pct: the max percent of sleep time. Valid range is 1 to 99.
+> + *
+> + * Set the max throttle percentage.
+> + */
+> +void set_cpu_max_throttle(int64_t max_pct);
+> +
+> +/**
+>   * cpu_throttle_stop:
+>   *
+>   * Stops the vcpu throttling started by cpu_throttle_set.
+> diff --git a/migration/migration.c b/migration/migration.c
+> index b7d9854bda..9c7a6f7477 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1774,6 +1774,16 @@ void qmp_migrate_set_speed(int64_t value, Error **errp)
+>      qmp_migrate_set_parameters(&p, errp);
+>  }
+>  
+> +void qmp_migrate_set_max_cpu_throttle(int64_t value, Error **errp)
+> +{
+> +    if (value > 99 || value < 1) {
+> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, " max cpu throttle",
+> +                        "not in 1 between 99");
+> +        return;
+> +    }
+> +    set_cpu_max_throttle(value);
+> +}
+> +
+>  void qmp_migrate_set_downtime(double value, Error **errp)
+>  {
+>      if (value < 0 || value > MAX_MIGRATE_DOWNTIME_SECONDS) {
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 186e8a7303..2ef3ddfe43 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -997,6 +997,19 @@
+>  { 'command': 'migrate_set_speed', 'data': {'value': 'int'} }
+>  
+>  ##
+> +# @migrate_set_max_cpu_throttle:
+> +#
+> +# Set maximum cpu throttle for migration.
+> +#
+> +# @value: maximum cpu throttle.
+> +#
+> +# Returns: nothing on success
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'command': 'migrate_set_max_cpu_throttle', 'data': {'value': 'int'} }
+> +
+> +##
+>  # @migrate-set-cache-size:
+>  #
+>  # Set cache size to be used by XBZRLE migration
+> -- 
+> 2.11.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
