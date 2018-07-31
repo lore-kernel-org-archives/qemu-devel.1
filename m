@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1fkQ8K-0000FM-HJ
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:35:57 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fkQEj-0003B9-3c
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:42:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1fkQ8J-0000Cc-GK
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:35:56 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43909)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1fkQ8J-0000CK-8y
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:35:55 -0400
-Received: by mail-pg1-x542.google.com with SMTP id d17-v6so4284828pgv.10
-	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 01:35:55 -0700 (PDT)
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 31 Jul 2018 01:35:24 -0700
-Message-Id: <1533026124-6740-4-git-send-email-liq3ea@gmail.com>
-In-Reply-To: <1533026124-6740-1-git-send-email-liq3ea@gmail.com>
-References: <1533026124-6740-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH 3/3] hmp: add hmp for
- migrate_set_max_cpu_throttle
+	(envelope-from <laurent@vivier.eu>) id 1fkQEg-0005pm-12
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:42:33 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:59171)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fkQEf-0005ns-Ix
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:42:29 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Tue, 31 Jul 2018 10:42:02 +0200
+Message-Id: <20180731084203.29959-3-laurent@vivier.eu>
+In-Reply-To: <20180731084203.29959-1-laurent@vivier.eu>
+References: <20180731084203.29959-1-laurent@vivier.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 2/3] tests: add check_invalid_maps to test-mmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, quintela@redhat.com, dgilbert@redhat.com, eblake@redhat.com, armbru@redhat.com
-Cc: liqiang02@corp.netease.com, hzliuyingdong@corp.netease.com, qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, umarcor <1783362@bugs.launchpad.net>
 
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
+From: Alex Bennée <alex.bennee@linaro.org>
+
+This adds a test to make sure we fail properly for a 0 length mmap.
+There are most likely other failure conditions we should also check.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Cc: umarcor <1783362@bugs.launchpad.net>
+Message-Id: <20180730134321.19898-3-alex.bennee@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hmp-commands.hx | 14 ++++++++++++++
- hmp.c           |  6 ++++++
- hmp.h           |  1 +
- 3 files changed, 21 insertions(+)
+ tests/tcg/multiarch/test-mmap.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 91dfe51c37..9d54ecbe4e 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1042,6 +1042,20 @@ Set maximum speed to @var{value} (in bytes) for migrations.
- ETEXI
+diff --git a/tests/tcg/multiarch/test-mmap.c b/tests/tcg/multiarch/test-mmap.c
+index 5c0afe6e49..11d0e777b1 100644
+--- a/tests/tcg/multiarch/test-mmap.c
++++ b/tests/tcg/multiarch/test-mmap.c
+@@ -27,7 +27,7 @@
+ #include <stdint.h>
+ #include <string.h>
+ #include <unistd.h>
+-
++#include <errno.h>
+ #include <sys/mman.h>
  
-     {
-+        .name       = "migrate_set_max_cpu_throttle",
-+        .args_type  = "value:i",
-+        .params     = "value",
-+        .help       = "set maximum cpu throttle  for migrations.",
-+        .cmd        = hmp_migrate_set_max_cpu_throttle,
-+    },
-+
-+STEXI
-+@item hmp_migrate_set_max_cpu_throttle @var{value}
-+@findex migrate_set_max_cpu_throttle
-+Set maximum cpu throttle to @var{value}  for migrations.
-+ETEXI
-+
-+    {
-         .name       = "migrate_set_downtime",
-         .args_type  = "value:T",
-         .params     = "value",
-diff --git a/hmp.c b/hmp.c
-index 2aafb50e8e..4ee9af7165 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1574,6 +1574,12 @@ void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict)
-     qmp_migrate_set_speed(value, NULL);
+ #define D(x)
+@@ -435,6 +435,25 @@ void checked_write(int fd, const void *buf, size_t count)
+     fail_unless(rc == count);
  }
  
-+void hmp_migrate_set_max_cpu_throttle(Monitor *mon, const QDict *qdict)
++void check_invalid_mmaps(void)
 +{
-+    int64_t value = qdict_get_int(qdict, "value");
-+    qmp_migrate_set_max_cpu_throttle(value, NULL);
++    unsigned char *addr;
++
++    /* Attempt to map a zero length page.  */
++    addr = mmap(NULL, 0, PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++    fprintf(stdout, "%s addr=%p", __func__, (void *)addr);
++    fail_unless(addr == MAP_FAILED);
++    fail_unless(errno == EINVAL);
++
++    /* Attempt to map a over length page.  */
++    addr = mmap(NULL, -4, PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++    fprintf(stdout, "%s addr=%p", __func__, (void *)addr);
++    fail_unless(addr == MAP_FAILED);
++    fail_unless(errno == ENOMEM);
++
++    fprintf(stdout, " passed\n");
 +}
 +
- void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict)
+ int main(int argc, char **argv)
  {
-     const char *cap = qdict_get_str(qdict, "capability");
-diff --git a/hmp.h b/hmp.h
-index 33354f1bdd..e57f7e4005 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -73,6 +73,7 @@ void hmp_migrate_recover(Monitor *mon, const QDict *qdict);
- void hmp_migrate_pause(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict);
-+void hmp_migrate_set_max_cpu_throttle(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_cache_size(Monitor *mon, const QDict *qdict);
+ 	char tempname[] = "/tmp/.cmmapXXXXXX";
+@@ -476,6 +495,7 @@ int main(int argc, char **argv)
+ 	check_file_fixed_mmaps();
+ 	check_file_fixed_eof_mmaps();
+ 	check_file_unfixed_eof_mmaps();
++	check_invalid_mmaps();
+ 
+ 	/* Fails at the moment.  */
+ 	/* check_aligned_anonymous_fixed_mmaps_collide_with_host(); */
 -- 
-2.11.0
+2.17.1
