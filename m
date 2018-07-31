@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fkRtb-0001Ha-AW
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:28:52 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1fkRuD-0001Zp-IT
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:29:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fkRtX-0007G5-At
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:28:51 -0400
-Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:34258)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fkRtX-0007Fw-0b
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:28:47 -0400
-Received: by mail-ua0-x243.google.com with SMTP id r10-v6so9913340uao.1
-	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 03:28:46 -0700 (PDT)
-References: <20180730220831.390182-1-eblake@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4c563a59-8e26-90ca-5bfb-30e8604ad865@linaro.org>
-Date: Tue, 31 Jul 2018 06:28:41 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180730220831.390182-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 for-3.0] tests/libqtest: Improve
- kill_qemu()
+	(envelope-from <wei.w.wang@intel.com>) id 1fkRu9-0007SO-KN
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:29:29 -0400
+Received: from mga06.intel.com ([134.134.136.31]:39279)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1fkRu9-0007S6-B2
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:29:25 -0400
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Tue, 31 Jul 2018 18:01:18 +0800
+Message-Id: <1533031278-5615-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v2] bitmap: fix BITMAP_LAST_WORD_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +22,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, armbru@redhat.com, mst@redhat.com, peter.maydell@linaro.org, alex.bennee@linaro.org, f4bug@amsat.org
+To: qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+Cc: mst@redhat.com
 
-On 07/30/2018 06:08 PM, Eric Blake wrote:
-> In kill_qemu() we have an assert that checks that the QEMU process
-> didn't dump core:
->             assert(!WCOREDUMP(wstatus));
-> 
-> Unfortunately the WCOREDUMP macro here means the resulting message
-> is not very easy to comprehend on at least some systems:
-> 
-> ahci-test: tests/libqtest.c:113: kill_qemu: Assertion `!(((__extension__ (((union { __typeof(wstatus) __in; int __i; }) { .__in = (wstatus) }).__i))) & 0x80)' failed.
-> 
-> and it doesn't identify what signal the process took.
-> 
-> Furthermore, we are NOT detecting EINTR (while EINTR shouldn't be
-> happening if we didn't install signal handlers, it's still better
-> to always be robust), and also want to log unexpected non-zero status
-> that was not accompanied by a core dump.
-> 
-> Instead of using a raw assert, print the information in an
-> easier to understand way:
-> 
-> /i386/ahci/sanity: tests/libqtest.c:119: kill_qemu() detected QEMU death with core dump from signal 11 (Segmentation fault)
-> Aborted (core dumped)
-> 
-> (Of course, the really useful information would be why the QEMU
-> process dumped core in the first place, but we don't have that
-> by the time the test program has picked up the exit status.)
-> 
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v3: use TFR() instead of open-coding the retry loop [Thomas]
-> ---
->  tests/libqtest.c | 37 ++++++++++++++++++++++++++++++++++---
->  1 file changed, 34 insertions(+), 3 deletions(-)
+When "nbits = 0", which means no bits to mask, this macro is expected to
+return 0, instead of 0xffffffff. This patch changes the macro to return
+0 when there is no bit needs to be masked.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+CC: Juan Quintela <quintela@redhat.com>
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+CC: Peter Xu <peterx@redhat.com>
+---
+ include/qemu/bitmap.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
+v1->v2 ChangeLog:
+- fix the macro directly, instead of fixing the callers one by one.
 
-r~
+diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+index 509eedd..9372423 100644
+--- a/include/qemu/bitmap.h
++++ b/include/qemu/bitmap.h
+@@ -60,7 +60,10 @@
+  */
+ 
+ #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) & (BITS_PER_LONG - 1)))
+-#define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
++#define BITMAP_LAST_WORD_MASK(nbits)                       \
++(                                                          \
++    nbits ? (~0UL >> (-(nbits) & (BITS_PER_LONG - 1))) : 0 \
++)
+ 
+ #define DECLARE_BITMAP(name,bits)                  \
+         unsigned long name[BITS_TO_LONGS(bits)]
+-- 
+2.7.4
