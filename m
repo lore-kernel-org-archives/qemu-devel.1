@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fkaWM-0007Nq-JJ
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 15:41:27 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fkaY3-00085g-6n
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 15:43:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fkaWJ-0008Ox-Bk
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 15:41:26 -0400
-Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:40913)
+	(envelope-from <richard.henderson@linaro.org>) id 1fkaY0-0001m3-17
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 15:43:11 -0400
+Received: from mail-vk0-x241.google.com ([2607:f8b0:400c:c05::241]:35876)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fkaWJ-0008Og-6B
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 15:41:23 -0400
-Received: by mail-vk0-x243.google.com with SMTP id q184-v6so4870045vke.7
-	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 12:41:23 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+	id 1fkaXz-0001lS-Pr
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 15:43:07 -0400
+Received: by mail-vk0-x241.google.com with SMTP id y9-v6so8112097vky.3
+	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 12:43:07 -0700 (PDT)
 References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1532967169-22265-44-git-send-email-aleksandar.markovic@rt-rk.com>
-	<3205b1ca-8e79-e040-6ed5-494e1895f99b@linaro.org>
-Message-ID: <3d969928-7306-bd2d-564c-d9b5c22fd37a@linaro.org>
-Date: Tue, 31 Jul 2018 15:41:18 -0400
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1ffbef1c-b6ff-b55a-35c2-994314156506@linaro.org>
+Date: Tue, 31 Jul 2018 15:43:03 -0400
 MIME-Version: 1.0
-In-Reply-To: <3205b1ca-8e79-e040-6ed5-494e1895f99b@linaro.org>
+In-Reply-To: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 43/76] target/mips: Add emulation of DSP
- ASE for nanoMIPS - part 6
+Subject: Re: [Qemu-devel] [PATCH v5 00/76] Add nanoMIPS support to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,21 +33,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-On 07/31/2018 02:58 PM, Richard Henderson wrote:
-> On 07/30/2018 12:12 PM, Aleksandar Markovic wrote:
->> +        switch (extract32(ctx->opcode, 12, 1)) {
->> +        case 0:
->> +            /* NM_SHRA_QB */
->> +            check_dspr2(ctx);
->> +            gen_helper_shra_qb(cpu_gpr[ret], t0, v1_t);
-> More unprotected use of cpu_gpr[0].
+On 07/30/2018 12:11 PM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> I think you need some sort of solution that prevents this completely, without
-> having to think about it.  E.g. global replace cpu_gpr[x] -> read_gpr(ctx, x) /
-> dest_gpr(ctx, x), where the two functions allocate tcg temporaries on demand.
+> v4->v5:
+> 
+>   - merged series "Mips maintenance and misc fixes and improvements"
+>     and this one for easier handling (there are build dependencies)
+>   - eliminated shadow variables from translate.c
+>   - replaced shift/mask combination with extract32()
+>   - added new function gen_op_addr_addi()
+>   - added "fall through" comments at appropriate places
+>   - eliminated micromips flag from I7200 definition
+>   - numerous other enhancements originating from reviewer's
+>     comments
+>   - some of the patches split into two or more for easier
+>     handling and review
+>   - rebased to the latest code
 
-I forgot to say... and then poison cpu_gpr so that uses cannot creep back into
-the codebase.  See e.g. include/exec/poison.h.
+That concludes my review of this revision.
+It's quite a bit better, but there is still a lot of work to do.
 
 
 r~
