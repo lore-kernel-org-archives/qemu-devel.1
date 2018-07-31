@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fkOYc-00013q-3a
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:54:59 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fkOc2-0001ou-0u
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:58:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fkOYY-00058l-W9
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:54:58 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:36652)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fkOby-0005yS-VL
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:58:30 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:36926)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fkOYY-00058e-Gv
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:54:54 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fkOby-0005y5-Hd
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:58:26 -0400
 From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
 References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
-	<20180725121400.12867.82957.stgit@pasha-VirtualBox>
-	<20180725145651.GC2365@work-vm>
-In-Reply-To: <20180725145651.GC2365@work-vm>
-Date: Tue, 31 Jul 2018 09:54:54 +0300
-Message-ID: <000001d4289b$62f12600$28d37200$@ru>
+	<20180725121706.12867.98787.stgit@pasha-VirtualBox>
+	<20180725134429.roe7iuzakjywdv7e@var.youpi.perso.aquilenet.fr>
+	<000601d424af$74e5c900$5eb15b00$@ru>
+	<20180726080718.pdzxwxoj4sjjpycm@var.youpi.perso.aquilenet.fr>
+	<000801d424bb$f4b23130$de169390$@ru>
+	<20180726091527.j3zw677cprhpfazu@var.youpi.perso.aquilenet.fr>
+In-Reply-To: <20180726091527.j3zw677cprhpfazu@var.youpi.perso.aquilenet.fr>
+Date: Tue, 31 Jul 2018 09:58:26 +0300
+Message-ID: <000101d4289b$e1874e90$a495ebb0$@ru>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v5 08/24] replay: introduce info hmp/qmp
- command
+Subject: Re: [Qemu-devel] [PATCH v5 24/24] slirp: fix ipv6 timers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,215 +34,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "'Dr. David Alan Gilbert'" <dgilbert@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, rth@twiddle.net
+To: 'Samuel Thibault' <samuel.thibault@gnu.org>
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-> From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
-> * Pavel Dovgalyuk (Pavel.Dovgaluk@ispras.ru) wrote:
-> > This patch introduces 'info replay' monitor command and
-> > corresponding qmp request.
-> > These commands request the current record/replay mode, replay log file name,
-> > and the execution step (number or recorded/replayed instructions).
+> From: Samuel Thibault [mailto:samuel.thibault@gnu.org]
+> Pavel Dovgalyuk, le jeu. 26 juil. 2018 11:37:57 +0300, a ecrit:
+> > > From: Samuel Thibault [mailto:samuel.thibault@gnu.org]
+> > > Pavel Dovgalyuk, le jeu. 26 juil. 2018 10:08:29 +0300, a ecrit:
+> > > > virtual clock should be used by the virtual devices.
+> > > > slirp module is not the virtual device. Therefore processed packets
+> > > > become visible to the guest after passing to the virtual network card.
+> > > > Before that it can create any timers that should not change the state of the guest.
+> > >
+> > > I'm not sure I understand that part correctly. slirp is not a "device"
+> > > strictly speaking, but it has a whole foot in the virtual world. All
+> > > TCP/UDP/ARP/RA timings are related to the guest timing, so
 > >
-> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> > I don't know all details of slirp, so let me ask:
+> > if the virtual timer runs very slowly (when it configured this way with icount option),
+> > should the timings relate this speed?
 > 
-> ACK for HMP
+> Yes. Otherwise the guest will not be fast enough to answer promptly
+> according to slirp's TCP delays.
 > 
-> Note you might want to make an accessor for the filename rather than
-> making it a global?
+> > Or the timers are related to the network devices (e.g., servers in the
+> > outer world)?
+> 
+> No.
+> 
+> > > > > > this service is not related to the guest state.
+> > >
+> > > seems incorrect. At the moment the ip6_icmp timer's current value is not
+> > > saved in the guest state, but in principle it should, so that the guest
+> > > does see the RAs at a regular rate. In practice we don't care because
+> > > the timing is randomized anyway.
+> >
+> > Isn't this just a side effect?
+> > I mean that slirp may be replaced by, say, tap, and the guest should not notice
+> > the difference.
+> 
+> Well, if a guest is connected through a tap, the virtual time should
+> really run as fast as the realtime, and it should not be paused.
+> Otherwise TCP connections will break since the guest won't be able to
+> reply fast enough, without even knowing about the issue. Slirp can
+> compensate this thanks to a buffer between what happens in the real
+> world and what happens in the virtual world. Real world timings are
+> handled by the OS socket implementation, and virtual world timings are
+> handled with the qemu timer.
 
-Good idea, thanks.
+Then maybe the solution is the new clock with the frequency of the virtual
+clock, but which does not affect the replayed core?
+This clock should stop when VM is paused.
+It also could be saved in vmstate. As it does not affect the replay,
+saving and restoring its state won't break anything.
 
-
+> > > > intended to be used for the internal QEMU purposes, but stops when VM
+> > > > is stopped.
+> > >
+> > > I again don't understand this. The ip6_icmp timing is not for internal
+> > > QEMU purpose, its whole point is how often RAs are sent to the guest.
+> > >
+> > > slirp's guest part is not a device as directly seen by guest I/O, but
+> > > it's a router device as seen through guest packets. Think of it like a
+> > > USB device, which is seen by the guest through USB packets.
+> >
+> > Record/replay implementation creates a line between the guest state and
+> > the outer world. Everything crossing this line is saved in the log replayed.
+> > In case of network, this line is implemented with the network filter.
+> > It takes packets from slirp(or anything) and passes(or not) them to the guest nic.
+> > When replaying, the saved packets are injected into the filter directly.
 > 
-> Dave
+> > Slirp is the part of the outer world,
 > 
-> >
-> > --
-> >
-> > v2:
-> >  - renamed info_replay qmp into query-replay (suggested by Eric Blake)
-> > ---
-> >  hmp-commands-info.hx      |   14 ++++++++++++++
-> >  hmp.h                     |    1 +
-> >  qapi/misc.json            |   35 +++++++++++++++++++++++++++++++++++
-> >  replay/Makefile.objs      |    3 ++-
-> >  replay/replay-debugging.c |   41 +++++++++++++++++++++++++++++++++++++++++
-> >  replay/replay-internal.h  |    2 ++
-> >  replay/replay.c           |    3 +--
-> >  7 files changed, 96 insertions(+), 3 deletions(-)
-> >  create mode 100644 replay/replay-debugging.c
-> >
-> > diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> > index 70639f6..1b24714 100644
-> > --- a/hmp-commands-info.hx
-> > +++ b/hmp-commands-info.hx
-> > @@ -896,6 +896,20 @@ STEXI
-> >  Show SEV information.
-> >  ETEXI
-> >
-> > +    {
-> > +        .name       = "replay",
-> > +        .args_type  = "",
-> > +        .params     = "",
-> > +        .help       = "show parameters of the record/replay",
-> > +        .cmd        = hmp_info_replay,
-> > +    },
-> > +
-> > +STEXI
-> > +@item info replay
-> > +@findex info replay
-> > +Display the current record/replay mode and the currently executing step.
-> > +ETEXI
-> > +
-> >  STEXI
-> >  @end table
-> >  ETEXI
-> > diff --git a/hmp.h b/hmp.h
-> > index 33354f1..9d12c63 100644
-> > --- a/hmp.h
-> > +++ b/hmp.h
-> > @@ -147,5 +147,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
-> >  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
-> >  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
-> >  void hmp_info_sev(Monitor *mon, const QDict *qdict);
-> > +void hmp_info_replay(Monitor *mon, const QDict *qdict);
-> >
-> >  #endif
-> > diff --git a/qapi/misc.json b/qapi/misc.json
-> > index d450cfe..e246ce3 100644
-> > --- a/qapi/misc.json
-> > +++ b/qapi/misc.json
-> > @@ -3100,6 +3100,41 @@
-> >    'data': [ 'none', 'record', 'play' ] }
-> >
-> >  ##
-> > +# @ReplayInfo:
-> > +#
-> > +# Status of the record/replay mode.
-> > +#
-> > +# @mode: current mode.
-> > +#
-> > +# @filename: name of the record/replay log file.
-> > +#
-> > +# @step: current step number.
-> > +#
-> > +# Since: 3.1
-> > +#
-> > +##
-> > +{ 'struct': 'ReplayInfo',
-> > +  'data': { 'mode': 'ReplayMode', '*filename': 'str', 'step': 'int' } }
-> > +
-> > +##
-> > +# @query-replay:
-> > +#
-> > +# Retrieves the status of the execution record/replay.
-> > +#
-> > +# Returns: structure with the properties of the record/replay.
-> > +#
-> > +# Since: 3.1
-> > +#
-> > +# Example:
-> > +#
-> > +# -> { "execute": "query-replay" }
-> > +# <- { "return": { "mode": "play", "filename": "log.rr", "step": 220414 } }
-> > +#
-> > +##
-> > +{ 'command': 'query-replay',
-> > +  'returns': 'ReplayInfo' }
-> > +
-> > +##
-> >  # @xen-load-devices-state:
-> >  #
-> >  # Load the state of all devices from file. The RAM and the block devices
-> > diff --git a/replay/Makefile.objs b/replay/Makefile.objs
-> > index cee6539..6694e3e 100644
-> > --- a/replay/Makefile.objs
-> > +++ b/replay/Makefile.objs
-> > @@ -6,4 +6,5 @@ common-obj-y += replay-input.o
-> >  common-obj-y += replay-char.o
-> >  common-obj-y += replay-snapshot.o
-> >  common-obj-y += replay-net.o
-> > -common-obj-y += replay-audio.o
-> > \ No newline at end of file
-> > +common-obj-y += replay-audio.o
-> > +common-obj-y += replay-debugging.o
-> > diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-> > new file mode 100644
-> > index 0000000..03e7db8
-> > --- /dev/null
-> > +++ b/replay/replay-debugging.c
-> > @@ -0,0 +1,41 @@
-> > +/*
-> > + * replay-debugging.c
-> > + *
-> > + * Copyright (c) 2010-2018 Institute for System Programming
-> > + *                         of the Russian Academy of Sciences.
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> > + * See the COPYING file in the top-level directory.
-> > + *
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "qapi/error.h"
-> > +#include "sysemu/replay.h"
-> > +#include "replay-internal.h"
-> > +#include "hmp.h"
-> > +#include "monitor/monitor.h"
-> > +#include "qapi/qapi-commands-misc.h"
-> > +
-> > +void hmp_info_replay(Monitor *mon, const QDict *qdict)
-> > +{
-> > +    if (replay_mode == REPLAY_MODE_NONE) {
-> > +        monitor_printf(mon, "No record/replay\n");
-> > +    } else {
-> > +        monitor_printf(mon, "%s execution '%s': current step = %"PRId64"\n",
-> > +            replay_mode == REPLAY_MODE_RECORD ? "Recording" : "Replaying",
-> > +            replay_filename, replay_get_current_step());
-> > +    }
-> > +}
-> > +
-> > +ReplayInfo *qmp_query_replay(Error **errp)
-> > +{
-> > +    ReplayInfo *retval = g_new0(ReplayInfo, 1);
-> > +    retval->mode = replay_mode;
-> > +    if (replay_filename) {
-> > +        retval->filename = g_strdup(replay_filename);
-> > +        retval->has_filename = true;
-> > +    }
-> > +    retval->step = replay_get_current_step();
-> > +    return retval;
-> > +}
-> > diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-> > index ac4b27b..ef82b5e 100644
-> > --- a/replay/replay-internal.h
-> > +++ b/replay/replay-internal.h
-> > @@ -91,6 +91,8 @@ extern ReplayState replay_state;
-> >
-> >  /* File for replay writing */
-> >  extern FILE *replay_file;
-> > +/*! Name of replay file  */
-> > +extern char *replay_filename;
-> >
-> >  void replay_put_byte(uint8_t byte);
-> >  void replay_put_event(uint8_t event);
-> > diff --git a/replay/replay.c b/replay/replay.c
-> > index 58a986f..8b70d7d 100644
-> > --- a/replay/replay.c
-> > +++ b/replay/replay.c
-> > @@ -29,8 +29,7 @@
-> >  ReplayMode replay_mode = REPLAY_MODE_NONE;
-> >  char *replay_snapshot;
-> >
-> > -/* Name of replay file  */
-> > -static char *replay_filename;
-> > +char *replay_filename;
-> >  ReplayState replay_state;
-> >  static GSList *replay_blockers;
-> >
-> >
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> In normal uses it is not. It is a virtual world (its DHCP server, tftp
+> server, TCP connexions, etc.) that lives along the guest.
+> 
+> Now, I understand that for record/replay it's simpler to put the line
+> after slirp.
+> 
+> Ideally slirp's state should ideally be split it two: the part connected
+> to the real world (data from/to the sockets), and the part connected to
+> the virtual world (TCP buffering with the guest). So that when pausing,
+> going back, going forward etc. the slirp buffers act accordingly, TCP
+> knowing exactly what is supposed to be sent or not (otherwise, TCP
+> would for instance be really astonished if the guest happens to insist
+> requesting old data that it has already ACKed).
+> 
+> But that's tricky, and I understand it's simpler to just put the line
+> after slirp, and let the replay of frames provide the guest (which for
+> instance has been reset to an older time) with the missing data, and TCP
+> will nicely cope with duplicate ACKs and spurious re-emissions from the
+> guest.
+> 
+> That being said, there will be problems with TCP connections if you
+> pause the guest for a long time: slirp's TCP will timeout and reset the
+> connexion. Yes, that happens with tap devices anyway, but slirp acting
+> as a buffer seems more useful to me.
 
 Pavel Dovgalyuk
