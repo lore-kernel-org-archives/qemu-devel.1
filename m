@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fkSQM-0005ls-D8
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:02:43 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fkShO-0000vu-Cr
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:20:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fkSQI-0006v1-6P
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:02:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33884 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fkSQH-0006ur-Vw
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:02:38 -0400
-References: <20180731084236.184728-1-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <3515660f-fcd0-23ed-268b-9de3d574e90b@redhat.com>
-Date: Tue, 31 Jul 2018 13:02:32 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180731084236.184728-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x: Enable KVM huge page backing support
+	(envelope-from <balaton@eik.bme.hu>) id 1fkShL-00074p-4L
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:20:18 -0400
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Tue, 31 Jul 2018 13:08:00 +0200
+Message-Id: <20180731112006.737F77456B6@zero.eik.bme.hu>
+Subject: [Qemu-devel] [PATCH] sam460ex: Fix PCI interrupts with multiple
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +18,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Sebastian Bauer <mail@sebastianbauer.info>, Peter Maydell <peter.maydell@linaro.org>
 
-On 31.07.2018 10:42, Janosch Frank wrote:
-> From: Janosch Frank <frankja@linux.vnet.ibm.com>
-> 
-> QEMU has had huge page support for a longer time already, but KVM
-> memory management under s390x needed some changes to work with huge
-> backings.
-> 
-> Now that we have support, let's enable it if requested and
-> available. Otherwise we now properly tell the user if there is no
-> support and back out instead of failing to run the VM later on.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-> ---
-> 
-> Right now there's a conflict with arm for the capability, so I guess
-> I'll have to touch the cap number soonish. :)
-> 
-> ---
->  linux-headers/linux/kvm.h | 1 +
->  target/s390x/kvm.c        | 6 ++++++
->  2 files changed, 7 insertions(+)
-> 
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index 98f389a5a3..e3b1e3070c 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -949,6 +949,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_GET_MSR_FEATURES 153
->  #define KVM_CAP_HYPERV_EVENTFD 154
->  #define KVM_CAP_HYPERV_TLBFLUSH 155
-> +#define KVM_CAP_S390_HPAGE 156
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index d923cf4240..1ce0b42039 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -285,6 +285,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->  {
->      MachineClass *mc = MACHINE_GET_CLASS(ms);
->  
-> +    if (mem_path && kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE, 0)) {
-> +        error_report("Huge page backing was specified, "
-> +                     "but this KVM does not support huge pages.");
-> +        return -EINVAL;
-> +    }
-> +
->      mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
->      cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
->      cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
-> 
+The four interrupts of the PCI bus are connected to the same UIC pin
+on the real Sam460ex. Evidence for this can be found in the UBoot
+source for the Sam460ex in the Sam460ex.c file where
+PCI_INTERRUPT_LINE is written. Change the ppc440_pcix model to behave
+more like this.
 
-Okay, I wonder if now is the right time to actually detect the pagesize
-instead of relying on mempath pointing at hugetlbfs. I remember Power
-already doing such a detection.
+This fixes the problem that can be observed when adding further PCI
+cards that got their interrupt rotated to other interrupts than PCI
+INT A. In particular, the bug was observed with an additional OHCI PCI
+card or an ES1370 sound device.
 
-mempath is just an indicator.
+Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/ppc/ppc440_pcix.c | 21 ++++++++-------------
+ hw/ppc/sam460ex.c    |  6 ++----
+ 2 files changed, 10 insertions(+), 17 deletions(-)
 
+diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
+index d8af04b..64ed07a 100644
+--- a/hw/ppc/ppc440_pcix.c
++++ b/hw/ppc/ppc440_pcix.c
+@@ -57,7 +57,7 @@ typedef struct PPC440PCIXState {
+     struct PLBOutMap pom[PPC440_PCIX_NR_POMS];
+     struct PLBInMap pim[PPC440_PCIX_NR_PIMS];
+     uint32_t sts;
+-    qemu_irq irq[PCI_NUM_PINS];
++    qemu_irq irq;
+     AddressSpace bm_as;
+     MemoryRegion bm;
+ 
+@@ -418,21 +418,20 @@ static void ppc440_pcix_reset(DeviceState *dev)
+  * This may need further refactoring for other boards. */
+ static int ppc440_pcix_map_irq(PCIDevice *pci_dev, int irq_num)
+ {
+-    int slot = pci_dev->devfn >> 3;
+-    trace_ppc440_pcix_map_irq(pci_dev->devfn, irq_num, slot);
+-    return slot - 1;
++    trace_ppc440_pcix_map_irq(pci_dev->devfn, irq_num, 0);
++    return 0;
+ }
+ 
+ static void ppc440_pcix_set_irq(void *opaque, int irq_num, int level)
+ {
+-    qemu_irq *pci_irqs = opaque;
++    qemu_irq *pci_irq = opaque;
+ 
+     trace_ppc440_pcix_set_irq(irq_num);
+     if (irq_num < 0) {
+         error_report("%s: PCI irq %d", __func__, irq_num);
+         return;
+     }
+-    qemu_set_irq(pci_irqs[irq_num], level);
++    qemu_set_irq(*pci_irq, level);
+ }
+ 
+ static AddressSpace *ppc440_pcix_set_iommu(PCIBus *b, void *opaque, int devfn)
+@@ -471,19 +470,15 @@ static int ppc440_pcix_initfn(SysBusDevice *dev)
+ {
+     PPC440PCIXState *s;
+     PCIHostState *h;
+-    int i;
+ 
+     h = PCI_HOST_BRIDGE(dev);
+     s = PPC440_PCIX_HOST_BRIDGE(dev);
+ 
+-    for (i = 0; i < ARRAY_SIZE(s->irq); i++) {
+-        sysbus_init_irq(dev, &s->irq[i]);
+-    }
+-
++    sysbus_init_irq(dev, &s->irq);
+     memory_region_init(&s->busmem, OBJECT(dev), "pci bus memory", UINT64_MAX);
+     h->bus = pci_register_root_bus(DEVICE(dev), NULL, ppc440_pcix_set_irq,
+-                         ppc440_pcix_map_irq, s->irq, &s->busmem,
+-                         get_system_io(), PCI_DEVFN(0, 0), 4, TYPE_PCI_BUS);
++                         ppc440_pcix_map_irq, &s->irq, &s->busmem,
++                         get_system_io(), PCI_DEVFN(0, 0), 1, TYPE_PCI_BUS);
+ 
+     s->dev = pci_create_simple(h->bus, PCI_DEVFN(0, 0), "ppc4xx-host-bridge");
+ 
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index 0999efc..9c77183 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -515,10 +515,8 @@ static void sam460ex_init(MachineState *machine)
+ 
+     /* PCI bus */
+     ppc460ex_pcie_init(env);
+-    /* FIXME: is this correct? */
+-    dev = sysbus_create_varargs("ppc440-pcix-host", 0xc0ec00000,
+-                                uic[1][0], uic[1][20], uic[1][21], uic[1][22],
+-                                NULL);
++    /* All PCI irqs are connected to the same UIC pin (cf. UBoot source) */
++    dev = sysbus_create_simple("ppc440-pcix-host", 0xc0ec00000, uic[1][0]);
+     pci_bus = (PCIBus *)qdev_get_child_bus(dev, "pci.0");
+     if (!pci_bus) {
+         error_report("couldn't create PCI controller!");
 -- 
-
-Thanks,
-
-David / dhildenb
+2.7.6
