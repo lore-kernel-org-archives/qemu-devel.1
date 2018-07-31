@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fkQzT-0005uJ-4Z
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:30:52 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fkR5v-0007YR-9x
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fkQzQ-0000WC-17
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:30:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58624 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fkQzP-0000Uq-Ry
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:30:47 -0400
-Date: Tue, 31 Jul 2018 10:30:43 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180731093043.GC29167@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <eb8233618cf64aa21c87e2809933f112a7aedf68.1532735306.git.alistair.francis@wdc.com>
-	<9d7f6a73-a00f-ebc1-efb3-18367e3c0f32@amsat.org>
-	<CAFEAcA_nr=hS4Qe=n-=HU389S5cvZArt97QJ83jLQ-x2xRKFWQ@mail.gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1fkR5r-00072W-Tk
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 05:37:31 -0400
+Date: Tue, 31 Jul 2018 11:37:23 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180731113723.65473b77.cohuck@redhat.com>
+In-Reply-To: <20180731090448.36662-3-borntraeger@de.ibm.com>
+References: <20180731090448.36662-1-borntraeger@de.ibm.com>
+	<20180731090448.36662-3-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_nr=hS4Qe=n-=HU389S5cvZArt97QJ83jLQ-x2xRKFWQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] configure: Add RISC-V host support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/kvm: add etoken facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>
 
-On Mon, Jul 30, 2018 at 07:37:55PM +0100, Peter Maydell wrote:
-> On 30 July 2018 at 19:20, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
-> > Before this patch:
-> >
-> > $ ./configure
-> >
-> > ERROR: Unsupported CPU =3D riscv64, try --enable-tcg-interpreter
-> >
-> > $ ./configure --enable-tcg-interpreter
-> > Unsupported CPU =3D riscv64, will use TCG with TCI (experimental)
-> >
-> > [...]
-> >
-> > WARNING: SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE RELEASES!
->=20
->=20
-> > It is unlikely the RISC-V port goes away in the next future releases =
-:)
->=20
-> ...but it is not supported as a *host* CPU.
->=20
-> We should fix this somewhat nonsensical error message by
-> completing the deprecate-and-drop cycle for this bit of
-> configure, ie by outright rejecting attempts to build on
-> host CPU types we don't recognize and support, the same
-> way we do with unrecognized host OS types.
+On Tue, 31 Jul 2018 11:04:48 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Do you mean to imply that we should drop  the TCG intepreter too, or do
-you consider that something that makes it a supported host CPU ?  TCG
-intepretor essentially makes any host supportable, if we keep it.
+> Provide the etoken facility. We need to handle cpu model, migration and
+> clear reset.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  target/s390x/cpu.h              |  3 +++
+>  target/s390x/cpu_features.c     |  3 ++-
+>  target/s390x/cpu_features_def.h |  3 ++-
+>  target/s390x/gen-features.c     |  3 ++-
+>  target/s390x/kvm.c              | 11 +++++++++++
+>  target/s390x/machine.c          | 20 +++++++++++++++++++-
+>  6 files changed, 39 insertions(+), 4 deletions(-)
 
+> @@ -106,6 +106,7 @@ static const S390FeatDef s390_features[] = {
+>      FEAT_INIT("irbm", S390_FEAT_TYPE_STFL, 145, "Insert-reference-bits-multiple facility"),
+>      FEAT_INIT("msa8-base", S390_FEAT_TYPE_STFL, 146, "Message-security-assist-extension-8 facility (excluding subfunctions)"),
+>      FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
+> +    FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "etoken facility"),
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Don't facilities usually start with a capital letter?
+
+>  
+>      /* SCLP SCCB Byte 80 - 98  (bit numbers relative to byte-80) */
+>      FEAT_INIT("gsls", S390_FEAT_TYPE_SCLP_CONF_CHAR, 40, "SIE: Guest-storage-limit-suppression facility"),
