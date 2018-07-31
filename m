@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fkWFj-0002m2-7A
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:08:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1fkWNX-0007DL-LL
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fkWFb-0006Sz-Fu
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:07:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51638 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fkWNU-0001x4-EI
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:16:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58836 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fkWFb-0006SK-AZ
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:07:51 -0400
-Date: Tue, 31 Jul 2018 16:07:46 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180731150746.GH2476@work-vm>
-References: <153299204130.14411.11438396195753743913.stgit@gimli.home>
-	<20180731152716-mutt-send-email-mst@kernel.org>
-	<20180731084414.52e560fa@t450s.home>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fkWNU-0001ww-7n
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:16:00 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180730125746.22794-1-marcandre.lureau@redhat.com>
+	<87pnz3sx5s.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+gUCnruzi4vx=9p09-E_dgbDTkrvrUQrTnF2CG3ukXWA@mail.gmail.com>
+Date: Tue, 31 Jul 2018 17:15:57 +0200
+In-Reply-To: <CAJ+F1C+gUCnruzi4vx=9p09-E_dgbDTkrvrUQrTnF2CG3ukXWA@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 31 Jul 2018
+	16:45:21 +0200")
+Message-ID: <878t5rv3ki.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180731084414.52e560fa@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Balloon inhibit enhancements,
- vfio restriction
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC] monitor: temporary fix for dead-lock
+ on event recursion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +31,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, cohuck@redhat.com, david@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-* Alex Williamson (alex.williamson@redhat.com) wrote:
-> On Tue, 31 Jul 2018 15:29:17 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Mon, Jul 30, 2018 at 05:13:26PM -0600, Alex Williamson wrote:
-> > > v2:
-> > >  - Use atomic ops for balloon inhibit counter (Peter)
-> > >  - Allow endpoint driver opt-in for ballooning, vfio-ccw opt-in by
-> > >    default, vfio-pci opt-in by device option, only allowed for mdev
-> > >    devices, no support added for platform as there are no platform
-> > >    mdev devices.
-> > > 
-> > > See patch 3/4 for detailed explanation why ballooning and device
-> > > assignment typically don't mix.  If this eventually changes, flags
-> > > on the iommu info struct or perhaps device info struct can inform
-> > > us for automatic opt-in.  Thanks,
-> > > 
-> > > Alex  
-> > 
-> > So this patch seems to block ballooning when vfio is added.
-> > But what if balloon is added and inflated first?
-> 
-> Good point.
->  
-> > I'd suggest making qemu_balloon_inhibit fail in that case,
-> > and then vfio realize will fail as well.
-> 
-> That might be the correct behavior for vfio, but I wonder about the
-> existing postcopy use case.  Dave Gilbert, what do you think?  We might
-> need a separate interface for callers that cannot tolerate existing
-> ballooned pages.  Of course we'll also need another atomic counter to
-> keep a tally of ballooned pages.  Thanks,
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-For postcopy, preinflation isn't a problem; our only issue is ballooning
-during the postcopy phase itself.
+> Hi
+>
+> On Tue, Jul 31, 2018 at 9:05 AM, Markus Armbruster <armbru@redhat.com> wr=
+ote:
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>>> With a Spice port chardev, it is possible to reenter
+>>> monitor_qapi_event_queue() (when the client disconnects for
+>>> example). This will dead-lock on monitor_lock.
+>>>
+>>> Instead, use some TLS variables to check for recursion and queue the
+>>> events.
+>> [...]
+>>>
+>>> Note that error report is now moved to the first caller, which may
+>>> receive an error for a recursed event. This is probably fine (95% of
+>>> callers use &error_abort, the rest have NULL error and ignore it)
+>>
+>> I'm not 100% sure I understand this paragraph, but it might be moot; see
+>> [*] below.
+>>
+>>>
+>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> ---
+>>>  monitor.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>>  1 file changed, 50 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/monitor.c b/monitor.c
+>>> index d8d8211ae4..d580c5a79c 100644
+>>> --- a/monitor.c
+>>> +++ b/monitor.c
+>>> @@ -633,7 +633,7 @@ static void monitor_qapi_event_handler(void *opaque=
+);
+>>>   * applying any rate limiting if required.
+>>>   */
+>>>  static void
+>>> -monitor_qapi_event_queue(QAPIEvent event, QDict *qdict, Error **errp)
+>>> +monitor_qapi_event_queue_no_recurse(QAPIEvent event, QDict *qdict, Err=
+or **errp)
+>>>  {
+>>>      MonitorQAPIEventConf *evconf;
+>>>      MonitorQAPIEventState *evstate;
+>>> @@ -688,6 +688,55 @@ monitor_qapi_event_queue(QAPIEvent event, QDict *q=
+dict, Error **errp)
+>>>      qemu_mutex_unlock(&monitor_lock);
+>>>  }
+>>>
+>>> +static void
+>>> +monitor_qapi_event_queue(QAPIEvent event, QDict *qdict, Error **errp)
+>>> +{
+>>> +    Error *local_err =3D NULL;
+>>> +    /*
+>>> +     * If the function recurse, monitor_lock will dead-lock.
+>>> +     * Instead, queue pending events in TLS.
+>>
+>> recurses
+>>
+>> The claim is correct before the patch.  But the comment needs to explain
+>> current code.  Perhaps:
+>>
+>>         * monitor_qapi_event_queue_no_recurse() is not reentrant: it
+>>         * would deadlock on monitor_lock.  Work around by queueing
+>>         * events in thread-local storage.
+>
+> ok
+>
+>>
+>>> +     * TODO: remove this, make it re-enter safe.
+>>> +     */
+>>> +    static __thread bool recurse;
+>>> +    typedef struct MonitorQapiEvent {
+>>> +        QAPIEvent event;
+>>> +        QDict *qdict;
+>>> +        QSIMPLEQ_ENTRY(MonitorQapiEvent) entry;
+>>> +    } MonitorQapiEvent;
+>>> +    MonitorQapiEvent *ev;
+>>> +    static __thread QSIMPLEQ_HEAD(, MonitorQapiEvent) event_queue;
+>>
+>> Let's put the static variables first.
+>
+> ok
+>
+>>> +
+>>> +    if (!recurse) {
+>>> +        QSIMPLEQ_INIT(&event_queue);
+>>> +    }
+>>> +
+>>> +    ev =3D g_new(MonitorQapiEvent, 1);
+>>> +    ev->qdict =3D qobject_ref(qdict);
+>>> +    ev->event =3D event;
+>>> +    QSIMPLEQ_INSERT_TAIL(&event_queue, ev, entry);
+>>> +    if (recurse) {
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    recurse =3D true;
+>>> +
+>>> +    while ((ev =3D QSIMPLEQ_FIRST(&event_queue)) !=3D NULL) {
+>>> +        QSIMPLEQ_REMOVE_HEAD(&event_queue, entry);
+>>
+>> Could we use QSIMPLEQ_FOREACH_SAFE()?
+>
+> I don't think so, the next variable could be NULL, while a recursive
+> call could be adding an element.
+>
+>>
+>>> +        if (!local_err) {
+>>> +            monitor_qapi_event_queue_no_recurse(ev->event, ev->qdict,
+>>> +                                                &local_err);
+>>> +        }
+>>
+>> [*] This looks scary: we silently throw away events after event queuing
+>> fails.
+>>
+>> Fortunately, monitor_qapi_event_queue_no_recurse() cannot fail.  It
+>> takes an Error ** parameter only so you can put it into @qmp_emit.
+>>
+>
+> right
+>
+>> Aside: I wish we'd get rid of the indirection through @qmp_emit.
+>>
+>
+> for later: You would hard code a function name instead?
 
-Dave
+Yes.
 
-> Alex
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+@qmp_emit is always monitor_qapi_event_queue in qemu-system-FOO, and
+event_test_emit in test-qmp-event.  That's a linker job, not an indirect
+call job.
+
+>> Let's pass &error_abort and drop @local_err.
+>
+> actually, we can just ignore errp, right?
+
+Not sure what you mean, but you've since sent v2, so let me figure it
+out there :)
+
+> for later: What about dropping error from the emit function?
+
+Fine with me.  Easy enough to bring back if we find a need.
+
+>
+>>
+>>> +        qobject_unref(ev->qdict);
+>>> +        g_free(ev);
+>>> +    }
+>>> +
+>>> +    recurse =3D false;
+>>
+>> Aha: @recurse means we've reentered the function.
+>>
+>> "Recurse" is imperative mood.  Misleading, as it's not an order to
+>> recurse.
+>>
+>> Rename to @recursed?  @reentered?
+>>
+>
+> ok, let's rename it "reentered"
+>
+>>> +
+>>> +    if (local_err) {
+>>> +        error_propagate(errp, local_err);
+>>> +    }
+>>> +}
+>>> +
+>>>  /*
+>>>   * This function runs evconf->rate ns after sending a throttled
+>>>   * event.
+>>
+>> monitor_lock clearly needs a rethink.  Your TODO comment suggests you
+>> agree.  But that's something for 3.1.
+>>
+>> I hate messing with locks at -rc3, but I also hate shipping known
+>> deadlocks.  Your patch isn't pretty, but probably as simple as we can
+>> make it for 3.0.  A few more review eyeballs would be nice.
+>>
+>
+> thanks, I'll send v2
