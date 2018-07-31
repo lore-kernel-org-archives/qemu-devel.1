@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fkUMR-00017O-5P
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 09:06:51 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fkUQv-0002Nm-Ac
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 09:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fkUML-0001Oe-6W
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 09:06:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48190 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fkUML-0001OI-0c
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 09:06:41 -0400
-Date: Tue, 31 Jul 2018 15:06:36 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180731150636.6ecc8850.cohuck@redhat.com>
-In-Reply-To: <20180731120908.9202-3-frankja@linux.ibm.com>
-References: <20180731120908.9202-1-frankja@linux.ibm.com>
-	<20180731120908.9202-3-frankja@linux.ibm.com>
+	(envelope-from <no-reply@patchew.org>) id 1fkUQr-000335-8N
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 09:11:25 -0400
+Resent-Message-Id: <E1fkUQr-000335-8N@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21028)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fkUQq-00032j-Uj
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 09:11:21 -0400
+In-Reply-To: <20180731084203.29959-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153303988145.29412.13761534940635173122@502c9da6d61e>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] s390x: Enable KVM huge page backing
- support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 31 Jul 2018 05:24:42 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/3] Linux user for 3.0 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, david@redhat.com
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, alex.bennee@linaro.org
 
-On Tue, 31 Jul 2018 13:09:08 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> QEMU has had huge page support for a longer time already, but KVM
-> memory management under s390x needed some changes to work with huge
-> backings.
-> 
-> Now that we have support, let's enable it if requested and
-> available. Otherwise we now properly tell the user if there is no
-> support and back out instead of failing to run the VM later on.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  target/s390x/kvm.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index d923cf4240..f961c3b84a 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -34,6 +34,7 @@
->  #include "qapi/error.h"
->  #include "qemu/error-report.h"
->  #include "qemu/timer.h"
-> +#include "qemu/mmap-alloc.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/hw_accel.h"
->  #include "hw/hw.h"
-> @@ -285,6 +286,20 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->  {
->      MachineClass *mc = MACHINE_GET_CLASS(ms);
->  
-> +    if (mem_path) {
-> +        if (qemu_mempath_getpagesize(mem_path) != (1 << 20)) {
-
-1 * MiB ?
-
-> +            error_report("Huge page backing with pages > 1M was specified, "
-> +                         "but KVM does not support this memory backing");
-> +            return -EINVAL;
-> +
-> +        }
-> +        if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
-> +            error_report("Huge page backing with 1M pages was specified, "
-> +                         "but KVM does not support this memory backing");
-> +            return -EINVAL;
-> +        }
-> +    }
-> +
->      mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
->      cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
->      cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNzMxMDg0MjAzLjI5OTU5LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAvM10gTGludXggdXNlciBmb3IgMy4wIHBhdGNoZXMKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
+JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
+aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
+Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
+IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
+bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
+IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
+ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
+ODA2Mzk4Yzg3NSBsaW51eC11c2VyOiBwcGM2NDogZG9uJ3QgdXNlIHZvbGF0aWxlIHJlZ2lzdGVy
+IGR1cmluZyBzYWZlX3N5c2NhbGwKYmE3ODM0NjY2MiB0ZXN0czogYWRkIGNoZWNrX2ludmFsaWRf
+bWFwcyB0byB0ZXN0LW1tYXAKODBmYzFiZTg2OCBsaW51eC11c2VyL21tYXAuYzogaGFuZGxlIGlu
+dmFsaWQgbGVuIG1hcHMgY29ycmVjdGx5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
+QVRDSCAxLzM6IGxpbnV4LXVzZXIvbW1hcC5jOiBoYW5kbGUgaW52YWxpZCBsZW4gbWFwcyBjb3Jy
+ZWN0bHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8zOiB0ZXN0czogYWRkIGNoZWNrX2ludmFsaWRfbWFw
+cyB0byB0ZXN0LW1tYXAuLi4KRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojNjI6IEZJTEU6IHRlc3RzL3RjZy9tdWx0aWFyY2gvdGVzdC1tbWFwLmM6NDk4OgorXkljaGVj
+a19pbnZhbGlkX21tYXBzKCk7JAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MCBsaW5l
+cyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2lu
+ZyBQQVRDSCAzLzM6IGxpbnV4LXVzZXI6IHBwYzY0OiBkb24ndCB1c2Ugdm9sYXRpbGUgcmVnaXN0
+ZXIgZHVyaW5nIHNhZmVfc3lzY2FsbC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
