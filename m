@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fkSCT-0008Cg-QQ
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:48:22 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fkSDY-0000N1-8b
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:49:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fkSCO-0007oh-Rm
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:48:21 -0400
-Date: Tue, 31 Jul 2018 12:48:09 +0200
+	(envelope-from <cohuck@redhat.com>) id 1fkSDT-0008Sk-8p
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:49:28 -0400
+Date: Tue, 31 Jul 2018 12:49:19 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180731124809.0502bcb9.cohuck@redhat.com>
-In-Reply-To: <20180731085205.2637da26.cohuck@redhat.com>
-References: <1532959766-53343-1-git-send-email-borntraeger@de.ibm.com>
-	<b7bf6a3f-812f-78af-4f5f-832eb460fbf1@de.ibm.com>
-	<153296989359.10934.14853590010864246630@sif>
-	<20180731085205.2637da26.cohuck@redhat.com>
+Message-ID: <20180731124919.28ca4952.cohuck@redhat.com>
+In-Reply-To: <e47ecf52-04a0-6724-0d47-6172628ad845@de.ibm.com>
+References: <20180731090448.36662-1-borntraeger@de.ibm.com>
+	<20180731090448.36662-3-borntraeger@de.ibm.com>
+	<20180731114438.594dd18b.cohuck@redhat.com>
+	<e47ecf52-04a0-6724-0d47-6172628ad845@de.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/sclp: fix maxram calculation
+Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/kvm: add etoken facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, imbrenda@linux.vnet.ibm.com, qemu-stable@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>
 
-On Tue, 31 Jul 2018 08:52:05 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Tue, 31 Jul 2018 12:14:28 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> On Mon, 30 Jul 2018 11:58:13 -0500
-> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> On 07/31/2018 11:44 AM, Cornelia Huck wrote:
+> > On Tue, 31 Jul 2018 11:04:48 +0200
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >   
+> >> Provide the etoken facility. We need to handle cpu model, migration and
+> >> clear reset.  
+> >   ^^^^^^^^^^^  
 > 
-> > Quoting Christian Borntraeger (2018-07-30 10:31:12)  
-> > > Are we still able to get things into 2.12.1 or are we too late?    
+> Clear reset is the "strong one". Here we do a memset of the env structure.
+> So this should be cleared along with the other registers.
+
+I was confused why it was singled out...
+
 > > 
-> > Freeze is EOD today, but I can grab them if they hit master/rc3 tomorrow.  
+> > Hm, anything special for that? I don't see it in the patch.
+> >   
+> >>
+> >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> >> ---
+> >>  target/s390x/cpu.h              |  3 +++
+> >>  target/s390x/cpu_features.c     |  3 ++-
+> >>  target/s390x/cpu_features_def.h |  3 ++-
+> >>  target/s390x/gen-features.c     |  3 ++-
+> >>  target/s390x/kvm.c              | 11 +++++++++++
+> >>  target/s390x/machine.c          | 20 +++++++++++++++++++-
+> >>  6 files changed, 39 insertions(+), 4 deletions(-)  
+> >   
 > 
-> OK, I just sent a pull request with this patch.
-
-...and it is in master now.
