@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fkXoV-0001YY-PF
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 12:48:00 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fkXv9-0004Bw-GQ
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 12:54:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fkXoS-0001D0-Ic
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 12:47:59 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180704145410.794-1-stefanha@redhat.com>
-References: <20180704145410.794-1-stefanha@redhat.com>
-Date: Tue, 31 Jul 2018 18:47:53 +0200
-Message-ID: <w51muu7uzba.fsf@maestria.local.igalia.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fkXv6-0003yT-Ak
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 12:54:51 -0400
+Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:43672)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fkXv6-0003yJ-2b
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 12:54:48 -0400
+Received: by mail-ua0-x243.google.com with SMTP id x24-v6so10728960ual.10
+	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 09:54:47 -0700 (PDT)
+References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1532967169-22265-33-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2a146c97-8dc7-31d8-a0eb-4e92216b16d5@linaro.org>
+Date: Tue, 31 Jul 2018 12:54:42 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix hang when group
- member leaves
+In-Reply-To: <1532967169-22265-33-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 32/76] target/mips: Add emulation of
+ misc nanoMIPS instructions (p_lsx)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +32,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-On Wed 04 Jul 2018 04:54:10 PM CEST, Stefan Hajnoczi wrote:
-> Throttle groups consist of members sharing one throttling state
-> (including bps/iops limits).  Round-robin scheduling is used to ensure
-> fairness.  If a group member already has a timer pending then other
-> groups members do not schedule their own timers.  The next group
-> member will have its turn when the existing timer expires.
->
-> A hang may occur when a group member leaves while it had a timer
-> scheduled.
+On 07/30/2018 12:12 PM, Aleksandar Markovic wrote:
+> +static void gen_p_lsx(DisasContext *ctx, int rd, int rs, int rt)
+> +{
+> +    TCGv t0, t1;
+> +    t0 = tcg_temp_new();
+> +    t1 = tcg_temp_new();
+> +
+> +    gen_load_gpr(t0, rs);
+> +    gen_load_gpr(t1, rt);
+> +
+> +    if ((extract32(ctx->opcode, 6, 1)) == 1) {
+> +        /* PP.LSXS instructions require shifting */
+> +        switch (extract32(ctx->opcode, 7, 4)) {
+> +        case NM_LHXS:
+> +        case NM_SHXS:
+> +        case NM_LHUXS:
+> +            tcg_gen_shli_tl(t0, t0, 1);
+> +            break;
+> +        case NM_LWXS:
+> +        case NM_SWXS:
+> +        case NM_LWC1XS:
+> +        case NM_SWC1XS:
+> +            tcg_gen_shli_tl(t0, t0, 2);
+> +            break;
+> +        case NM_LDC1XS:
+> +        case NM_SDC1XS:
+> +            tcg_gen_shli_tl(t0, t0, 3);
+> +            break;
+> +        }
+> +    }
+> +    gen_op_addr_add(ctx, t0, t0, t1);
+> +
+> +    switch (extract32(ctx->opcode, 7, 4)) {
+> +    case NM_LBX:
+> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
+> +                           MO_SB);
+> +        gen_store_gpr(t0, rd);
+> +        break;
+> +    case NM_LHX:
+> +    /*case NM_LHXS:*/
+> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
+> +                           MO_TESW);
 
-Ok, I can reproduce this if I run fio with iodepth=1.
+Elsewhere in translate you use ctx->default_tcg_memop_mask.
 
-We're draining the BDS before removing it from a throttle group, and
-therefore there cannot be any pending requests.
+You probably should tidy this up with a table or another switch that computes
+the TCGMemOp for the size and sign of the operation.  Then you don't have to
+modify quite so many places fixing this.  Something like
 
-So the problem seems to be that when throttle_co_drain_begin() runs the
-pending requests from a member using throttle_group_co_restart_queue(),
-it simply uses qemu_co_queue_next() and doesn't touch the timer at all.
+    unsigned opc = extract32(ctx->opcode, 7, 4);
+    TCGMemOp mop;
 
-So it can happen that there's a request in the queue waiting for a
-timer, and after that call the request is gone but the timer remains.
+    switch (opc) {
+    case NM_LBX:
+        mop = MO_SB;
+        break;
+    ...
+    }
+    mop |= ctx->default_tcg_memop_mask;
 
-The current patch is perhaps not worth touching at this point (we're
-about to release QEMU 3.0), but I think that a better solution would be
-to either
+    if (extract32(ctx->opcode, 6, 1)) {
+        tcg_gen_shli_tl(t0, t0, mop & MO_SIZE);
+    }
+    gen_op_addr_add(ctx, t0, t0, t1);
 
-a) cancel the existing timer and reset tg->any_timer_armed on the given
-   tgm after throttle_group_co_restart_queue() and before
-   schedule_next_request() if the queue is empty.
+    switch (opc) {
+    case NM_LBX: // and all other integer loads
+       tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, mop);
+       gen_store_gpr(t0, rd);
+       break;
+    case NM_SBX: // and all other integer stores
+       gen_load_gpr(t1, td);
+       tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, mop);
+       break;
+    case NM_LWC1X: // and all other fp ops
+       if (ctx->CP0_Config1...) {
+          ...
+       }
+    }
 
-b) force the existing timer to run immediately instead of calling
-   throttle_group_co_restart_queue(). Seems cleaner, but I haven't tried
-   this one yet.
 
-I'll explore them a bit and send a patch.
-
-Berto
+r~
