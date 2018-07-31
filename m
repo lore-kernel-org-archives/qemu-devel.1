@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fkOc2-0001ou-0u
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:58:31 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fkOeB-0003WT-1v
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 03:00:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fkOby-0005yS-VL
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:58:30 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:36926)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fkOe7-0006zp-Uo
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 03:00:43 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:37082)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fkOby-0005y5-Hd
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:58:26 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fkOe7-0006zZ-Gm
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 03:00:39 -0400
 From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
 References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
-	<20180725121706.12867.98787.stgit@pasha-VirtualBox>
-	<20180725134429.roe7iuzakjywdv7e@var.youpi.perso.aquilenet.fr>
-	<000601d424af$74e5c900$5eb15b00$@ru>
-	<20180726080718.pdzxwxoj4sjjpycm@var.youpi.perso.aquilenet.fr>
-	<000801d424bb$f4b23130$de169390$@ru>
-	<20180726091527.j3zw677cprhpfazu@var.youpi.perso.aquilenet.fr>
-In-Reply-To: <20180726091527.j3zw677cprhpfazu@var.youpi.perso.aquilenet.fr>
-Date: Tue, 31 Jul 2018 09:58:26 +0300
-Message-ID: <000101d4289b$e1874e90$a495ebb0$@ru>
+	<20180725121701.12867.49392.stgit@pasha-VirtualBox>
+	<87y3dxsyq9.fsf@linaro.org>
+In-Reply-To: <87y3dxsyq9.fsf@linaro.org>
+Date: Tue, 31 Jul 2018 10:00:39 +0300
+Message-ID: <000201d4289c$30cff010$926fd030$@ru>
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v5 24/24] slirp: fix ipv6 timers
+Subject: Re: [Qemu-devel] [PATCH v5 23/24] replay: add BH oneshot event for
+ block layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,101 +31,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Samuel Thibault' <samuel.thibault@gnu.org>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 
-> From: Samuel Thibault [mailto:samuel.thibault@gnu.org]
-> Pavel Dovgalyuk, le jeu. 26 juil. 2018 11:37:57 +0300, a ecrit:
-> > > From: Samuel Thibault [mailto:samuel.thibault@gnu.org]
-> > > Pavel Dovgalyuk, le jeu. 26 juil. 2018 10:08:29 +0300, a ecrit:
-> > > > virtual clock should be used by the virtual devices.
-> > > > slirp module is not the virtual device. Therefore processed packets
-> > > > become visible to the guest after passing to the virtual network card.
-> > > > Before that it can create any timers that should not change the state of the guest.
-> > >
-> > > I'm not sure I understand that part correctly. slirp is not a "device"
-> > > strictly speaking, but it has a whole foot in the virtual world. All
-> > > TCP/UDP/ARP/RA timings are related to the guest timing, so
+> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+>=20
+> > Replay is capable of recording normal BH events, but sometimes
+> > there are single use callbacks scheduled with =
+aio_bh_schedule_oneshot
+> > function. This patch enables recording and replaying such callbacks.
+> > Block layer uses these events for calling the completion function.
+> > Replaying these calls makes the execution deterministic.
 > >
-> > I don't know all details of slirp, so let me ask:
-> > if the virtual timer runs very slowly (when it configured this way with icount option),
-> > should the timings relate this speed?
-> 
-> Yes. Otherwise the guest will not be fast enough to answer promptly
-> according to slirp's TCP delays.
-> 
-> > Or the timers are related to the network devices (e.g., servers in the
-> > outer world)?
-> 
-> No.
-> 
-> > > > > > this service is not related to the guest state.
-> > >
-> > > seems incorrect. At the moment the ip6_icmp timer's current value is not
-> > > saved in the guest state, but in principle it should, so that the guest
-> > > does see the RAs at a regular rate. In practice we don't care because
-> > > the timing is randomized anyway.
+> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> > ---
+> >  block/block-backend.c    |    3 ++-
+> >  include/sysemu/replay.h  |    3 +++
+> >  replay/replay-events.c   |   16 ++++++++++++++++
+> >  replay/replay-internal.h |    1 +
+> >  replay/replay.c          |    2 +-
+> >  stubs/replay.c           |    6 ++++++
+> >  6 files changed, 29 insertions(+), 2 deletions(-)
 > >
-> > Isn't this just a side effect?
-> > I mean that slirp may be replaced by, say, tap, and the guest should not notice
-> > the difference.
-> 
-> Well, if a guest is connected through a tap, the virtual time should
-> really run as fast as the realtime, and it should not be paused.
-> Otherwise TCP connections will break since the guest won't be able to
-> reply fast enough, without even knowing about the issue. Slirp can
-> compensate this thanks to a buffer between what happens in the real
-> world and what happens in the virtual world. Real world timings are
-> handled by the OS socket implementation, and virtual world timings are
-> handled with the qemu timer.
+> > diff --git a/block/block-backend.c b/block/block-backend.c
+> > index f2f75a9..232d114 100644
+> > --- a/block/block-backend.c
+> > +++ b/block/block-backend.c
+> > @@ -17,6 +17,7 @@
+> >  #include "block/throttle-groups.h"
+> >  #include "sysemu/blockdev.h"
+> >  #include "sysemu/sysemu.h"
+> > +#include "sysemu/replay.h"
+> >  #include "qapi/error.h"
+> >  #include "qapi/qapi-events-block.h"
+> >  #include "qemu/id.h"
+> > @@ -1370,7 +1371,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend =
+*blk, int64_t offset, int
+> bytes,
+> >
+> >      acb->has_returned =3D true;
+> >      if (acb->rwco.ret !=3D NOT_DONE) {
+> > -        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
+> > +        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
+> >                                  blk_aio_complete_bh, acb);
+> >      }
+> >
+> > diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+> > index 8118b00..945bc74 100644
+> > --- a/include/sysemu/replay.h
+> > +++ b/include/sysemu/replay.h
+> > @@ -152,6 +152,9 @@ bool replay_events_enabled(void);
+> >  void replay_flush_events(void);
+> >  /*! Adds bottom half event to the queue */
+> >  void replay_bh_schedule_event(QEMUBH *bh);
+> > +/*! Adds oneshot bottom half event to the queue */
+> > +void replay_bh_schedule_oneshot_event(AioContext *ctx,
+> > +    QEMUBHFunc *cb, void *opaque);
+> >  /*! Adds input event to the queue */
+> >  void replay_input_event(QemuConsole *src, InputEvent *evt);
+> >  /*! Adds input sync event to the queue */
+> > diff --git a/replay/replay-events.c b/replay/replay-events.c
+> > index 0964a82..0ac8a5c 100644
+> > --- a/replay/replay-events.c
+> > +++ b/replay/replay-events.c
+> > @@ -37,6 +37,9 @@ static void replay_run_event(Event *event)
+> >      case REPLAY_ASYNC_EVENT_BH:
+> >          aio_bh_call(event->opaque);
+> >          break;
+> > +    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
+> > +        ((QEMUBHFunc*)event->opaque)(event->opaque2);
+> > +        break;
+> >      case REPLAY_ASYNC_EVENT_INPUT:
+> >          qemu_input_event_send_impl(NULL, (InputEvent =
+*)event->opaque);
+> >          qapi_free_InputEvent((InputEvent *)event->opaque);
+> > @@ -132,6 +135,17 @@ void replay_bh_schedule_event(QEMUBH *bh)
+> >      }
+> >  }
+> >
+> > +void replay_bh_schedule_oneshot_event(AioContext *ctx,
+> > +    QEMUBHFunc *cb,void *opaque)
+> > +{
+> > +    if (events_enabled) {
+> > +        uint64_t id =3D replay_get_current_step();
+> > +        replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb, opaque, =
+id);
+> > +    } else {
+> > +        aio_bh_schedule_oneshot(ctx, cb, opaque);
+> > +    }
+> > +}
+> > +
+> >  void replay_add_input_event(struct InputEvent *event)
+> >  {
+> >      replay_add_event(REPLAY_ASYNC_EVENT_INPUT, event, NULL, 0);
+> > @@ -162,6 +176,7 @@ static void replay_save_event(Event *event, int =
+checkpoint)
+> >          /* save event-specific data */
+> >          switch (event->event_kind) {
+> >          case REPLAY_ASYNC_EVENT_BH:
+> > +        case REPLAY_ASYNC_EVENT_BH_ONESHOT:
+> >              replay_put_qword(event->id);
+> >              break;
+> >          case REPLAY_ASYNC_EVENT_INPUT:
+> > @@ -216,6 +231,7 @@ static Event *replay_read_event(int checkpoint)
+> >      /* Events that has not to be in the queue */
+> >      switch (replay_state.read_event_kind) {
+> >      case REPLAY_ASYNC_EVENT_BH:
+> > +    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
+> >          if (replay_state.read_event_id =3D=3D -1) {
+> >              replay_state.read_event_id =3D replay_get_qword();
+> >          }
+> > diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+> > index 08ef2ec..0c0ed16 100644
+> > --- a/replay/replay-internal.h
+> > +++ b/replay/replay-internal.h
+> > @@ -51,6 +51,7 @@ enum ReplayEvents {
+> >
+> >  enum ReplayAsyncEventKind {
+> >      REPLAY_ASYNC_EVENT_BH,
+> > +    REPLAY_ASYNC_EVENT_BH_ONESHOT,
+> >      REPLAY_ASYNC_EVENT_INPUT,
+> >      REPLAY_ASYNC_EVENT_INPUT_SYNC,
+> >      REPLAY_ASYNC_EVENT_CHAR_READ,
+> > diff --git a/replay/replay.c b/replay/replay.c
+> > index 6e82764..061b1e2 100644
+> > --- a/replay/replay.c
+> > +++ b/replay/replay.c
+> > @@ -22,7 +22,7 @@
+> >
+> >  /* Current version of the replay mechanism.
+> >     Increase it when file format changes. */
+> > -#define REPLAY_VERSION              0xe02007
+> > +#define REPLAY_VERSION              0xe02008
+> >  /* Size of replay log header */
+> >  #define HEADER_SIZE                 (sizeof(uint32_t) + =
+sizeof(uint64_t))
+> >
+> > diff --git a/stubs/replay.c b/stubs/replay.c
+> > index 781974e..cbdac80 100644
+> > --- a/stubs/replay.c
+> > +++ b/stubs/replay.c
+> > @@ -90,3 +90,9 @@ bool replay_reverse_continue(void)
+> >  {
+> >      return false;
+> >  }
+> > +
+> > +void replay_bh_schedule_oneshot_event(AioContext *ctx,
+> > +    QEMUBHFunc *cb,void *opaque)
+> > +{
+> > +    aio_bh_schedule_oneshot(ctx, cb, opaque);
+> > +}
+>=20
+> It seems wrong to have something in stubs that actively does stuff.
+> Isn't this meant to be a bunch of NOPs?
 
-Then maybe the solution is the new clock with the frequency of the virtual
-clock, but which does not affect the replayed core?
-This clock should stop when VM is paused.
-It also could be saved in vmstate. As it does not affect the replay,
-saving and restoring its state won't break anything.
-
-> > > > intended to be used for the internal QEMU purposes, but stops when VM
-> > > > is stopped.
-> > >
-> > > I again don't understand this. The ip6_icmp timing is not for internal
-> > > QEMU purpose, its whole point is how often RAs are sent to the guest.
-> > >
-> > > slirp's guest part is not a device as directly seen by guest I/O, but
-> > > it's a router device as seen through guest packets. Think of it like a
-> > > USB device, which is seen by the guest through USB packets.
-> >
-> > Record/replay implementation creates a line between the guest state and
-> > the outer world. Everything crossing this line is saved in the log replayed.
-> > In case of network, this line is implemented with the network filter.
-> > It takes packets from slirp(or anything) and passes(or not) them to the guest nic.
-> > When replaying, the saved packets are injected into the filter directly.
-> 
-> > Slirp is the part of the outer world,
-> 
-> In normal uses it is not. It is a virtual world (its DHCP server, tftp
-> server, TCP connexions, etc.) that lives along the guest.
-> 
-> Now, I understand that for record/replay it's simpler to put the line
-> after slirp.
-> 
-> Ideally slirp's state should ideally be split it two: the part connected
-> to the real world (data from/to the sockets), and the part connected to
-> the virtual world (TCP buffering with the guest). So that when pausing,
-> going back, going forward etc. the slirp buffers act accordingly, TCP
-> knowing exactly what is supposed to be sent or not (otherwise, TCP
-> would for instance be really astonished if the guest happens to insist
-> requesting old data that it has already ACKed).
-> 
-> But that's tricky, and I understand it's simpler to just put the line
-> after slirp, and let the replay of frames provide the guest (which for
-> instance has been reset to an older time) with the missing data, and TCP
-> will nicely cope with duplicate ACKs and spurious re-emissions from the
-> guest.
-> 
-> That being said, there will be problems with TCP connections if you
-> pause the guest for a long time: slirp's TCP will timeout and reset the
-> connexion. Yes, that happens with tap devices anyway, but slirp acting
-> as a buffer seems more useful to me.
+I thinks stubs are meant to be functions that are used by qemu-img and =
+other tools.
+As I replaced aio_bh_schedule_oneshot with =
+replay_bh_schedule_oneshot_event,
+the tools should not notice this. Therefore the stub performs this call.
 
 Pavel Dovgalyuk
