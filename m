@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fkUQv-0002Nm-Ac
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 09:11:26 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1fkUUO-0003YE-6x
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 09:15:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fkUQr-000335-8N
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 09:11:25 -0400
-Resent-Message-Id: <E1fkUQr-000335-8N@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fkUQq-00032j-Uj
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 09:11:21 -0400
-In-Reply-To: <20180731084203.29959-1-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153303988145.29412.13761534940635173122@502c9da6d61e>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 31 Jul 2018 05:24:42 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/3] Linux user for 3.0 patches
+	(envelope-from <programmingkidx@gmail.com>) id 1fkUUN-0004WT-D1
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 09:15:00 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20180731123540.GB5197@localhost.localdomain>
+Date: Tue, 31 Jul 2018 09:14:47 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <FD650F16-14BA-4EC8-B14F-66931C5DC956@gmail.com>
+References: <20180731025231.17482-1-programmingkidx@gmail.com>
+	<cdfa1c40-b618-52e8-41b8-a58a67acef66@redhat.com>
+	<20180731123540.GB5197@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img-cmds.hx: Add example usage for
+ create command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, alex.bennee@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNzMxMDg0MjAzLjI5OTU5LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAvM10gTGludXggdXNlciBmb3IgMy4wIHBhdGNoZXMKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
-JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
-aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
-Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
-IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
-bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
-IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
-ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
-MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-ODA2Mzk4Yzg3NSBsaW51eC11c2VyOiBwcGM2NDogZG9uJ3QgdXNlIHZvbGF0aWxlIHJlZ2lzdGVy
-IGR1cmluZyBzYWZlX3N5c2NhbGwKYmE3ODM0NjY2MiB0ZXN0czogYWRkIGNoZWNrX2ludmFsaWRf
-bWFwcyB0byB0ZXN0LW1tYXAKODBmYzFiZTg2OCBsaW51eC11c2VyL21tYXAuYzogaGFuZGxlIGlu
-dmFsaWQgbGVuIG1hcHMgY29ycmVjdGx5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
-QVRDSCAxLzM6IGxpbnV4LXVzZXIvbW1hcC5jOiBoYW5kbGUgaW52YWxpZCBsZW4gbWFwcyBjb3Jy
-ZWN0bHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8zOiB0ZXN0czogYWRkIGNoZWNrX2ludmFsaWRfbWFw
-cyB0byB0ZXN0LW1tYXAuLi4KRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojNjI6IEZJTEU6IHRlc3RzL3RjZy9tdWx0aWFyY2gvdGVzdC1tbWFwLmM6NDk4OgorXkljaGVj
-a19pbnZhbGlkX21tYXBzKCk7JAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MCBsaW5l
-cyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2lu
-ZyBQQVRDSCAzLzM6IGxpbnV4LXVzZXI6IHBwYzY0OiBkb24ndCB1c2Ugdm9sYXRpbGUgcmVnaXN0
-ZXIgZHVyaW5nIHNhZmVfc3lzY2FsbC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+
+> On Jul 31, 2018, at 8:35 AM, Kevin Wolf <kwolf@redhat.com> wrote:
+>=20
+> Am 31.07.2018 um 13:57 hat Eric Blake geschrieben:
+>> On 07/30/2018 09:52 PM, John Arbuckle wrote:
+>>> Add an example on how to use the create command. I believe this will =
+make qemu-img easier to use.
+>>>=20
+>>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>>> ---
+>>>  qemu-img-cmds.hx | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>=20
+>>> diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+>>> index 69758fb6e8..92f7437944 100644
+>>> --- a/qemu-img-cmds.hx
+>>> +++ b/qemu-img-cmds.hx
+>>> @@ -50,7 +50,7 @@ STEXI
+>>>  ETEXI
+>>>  DEF("create", img_create,
+>>> -    "create [--object objectdef] [-q] [-f fmt] [-b backing_file] =
+[-F backing_fmt] [-u] [-o options] filename [size]")
+>>> +    "create [--object objectdef] [-q] [-f fmt] [-b backing_file] =
+[-F backing_fmt] [-u] [-o options] filename [size]\nExample: qemu-img =
+create -f qcow2 WindowsXP.qcow2 10G")
+>>=20
+>> Making a long line longer. It would be worth using C string =
+concatenation
+>> and splitting this over two lines, at the \n.
+>>=20
+>> Using the name WindowsXP.qcow2 as the guest is somewhat misleading =
+(that OS
+>> is proprietary, and quickly reaching the point of obsolescence from =
+its
+>> vendor - furthermore, qemu-img doesn't actually install an OS, but =
+rather
+>> creates a blank image for a later install process to utilize); better =
+would
+>> be a generic name that won't go out of date, such 'image.qcow2'.
+>=20
+> Also, while I like the idea of adding examples to the man page, I =
+don't
+> think adding it here would give the right result. The example would
+> appear in the middle of the subcommand syntax lines.
+
+As it reads now I don't feel its easy for the user to decipher. Having =
+an
+example near by would help the user understand how to use it.
+
+> I'd rather add a whole new section "EXAMPLES" in the man page.
+
+That is a good idea. I would like to have examples in both documents.=20
