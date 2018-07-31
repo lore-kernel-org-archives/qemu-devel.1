@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fkYTs-0001Um-C5
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fkYTs-0001Ud-8k
 	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 13:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fkYTo-0004FJ-6Y
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fkYTo-0004FZ-EH
 	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 13:30:44 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 31 Jul 2018 20:30:23 +0300
-Message-Id: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 00/10] NBD reconnect
+Date: Tue, 31 Jul 2018 20:30:31 +0300
+Message-Id: <20180731173033.75467-9-vsementsov@virtuozzo.com>
+In-Reply-To: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v4 08/10] block/nbd: add cmdline and qapi
+ parameter reconnect-delay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,58 +23,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Hi all.
+Reconnect will be implemented in the following commit, so for now,
+in semantics below, disconnect itself is a "serious error".
 
-Here is NBD reconnect. Previously, if connection failed all current
-and future requests will fail. After the series, nbd-client driver
-will try to reconnect unlimited times. During first @reconnect-delay
-seconds of reconnecting all requests will wait for the connection,
-and if it is established requests will be resent. After
-@reconnect-delay period all requests will be failed (until successful
-reconnect).
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ qapi/block-core.json | 12 +++++++++++-
+ block/nbd-client.h   |  1 +
+ block/nbd-client.c   |  1 +
+ block/nbd.c          | 16 +++++++++++++++-
+ 4 files changed, 28 insertions(+), 2 deletions(-)
 
-v4: - add Eric's r-b to 01.
-    - drop CONNECTING_INIT mode, don't reconnect on _open.
-    - new api: only one parameter @reconnect-delay
-    - new interval scheme between reconnect attempts
-        (1 - 2 - 4 - 8 - 16 - 16 ... seconds)
-    - fixes and refactorings in main patch (09), including merge with
-      old 08 patch
-    
-
-v3:
-06: fix build error in function 'nbd_co_send_request':
-     error: 'i' may be used uninitialized in this function
-
-v2 notes:
-Here is v2 of NBD reconnect, but it is very very different from v1, so,
-forget about v1.
-The series includes my "NBD reconnect: preliminary refactoring", with
-changes in 05: leave asserts (Eric).
-
-Vladimir Sementsov-Ogievskiy (10):
-  block/nbd-client: split channel errors from export errors
-  block/nbd: move connection code from block/nbd to block/nbd-client
-  block/nbd-client: split connection from initialization
-  block/nbd-client: fix nbd_reply_chunk_iter_receive
-  block/nbd-client: don't check ioc
-  block/nbd-client: move from quit to state
-  block/nbd-client: rename read_reply_co to connection_co
-  block/nbd: add cmdline and qapi parameter reconnect-delay
-  block/nbd-client: nbd reconnect
-  iotests: test nbd reconnect
-
- qapi/block-core.json          |  12 +-
- block/nbd-client.h            |  20 +-
- block/nbd-client.c            | 515 +++++++++++++++++++++++++++++++-----------
- block/nbd.c                   |  56 ++---
- tests/qemu-iotests/220        |  67 ++++++
- tests/qemu-iotests/220.out    |   7 +
- tests/qemu-iotests/group      |   1 +
- tests/qemu-iotests/iotests.py |   4 +
- 8 files changed, 512 insertions(+), 170 deletions(-)
- create mode 100755 tests/qemu-iotests/220
- create mode 100644 tests/qemu-iotests/220.out
-
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 5b9084a394..cf03402ec5 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3511,13 +3511,23 @@
+ #                  traditional "base:allocation" block status (see
+ #                  NBD_OPT_LIST_META_CONTEXT in the NBD protocol) (since 3.0)
+ #
++# @reconnect-delay: Reconnect delay. On disconnect, nbd client tries to connect
++#                   again, until success or serious error. During first
++#                   @reconnect-delay seconds of reconnecting loop all requests
++#                   are paused and have a chance to rerun, if successful
++#                   connect occures during this time. After @reconnect-delay
++#                   seconds all delayed requests are failed and all following
++#                   requests will be failed to (until successfull reconnect).
++#                   Default 300 seconds (Since 3.1)
++#
+ # Since: 2.9
+ ##
+ { 'struct': 'BlockdevOptionsNbd',
+   'data': { 'server': 'SocketAddress',
+             '*export': 'str',
+             '*tls-creds': 'str',
+-            '*x-dirty-bitmap': 'str' } }
++            '*x-dirty-bitmap': 'str',
++            '*reconnect-delay': 'uint32' } }
+ 
+ ##
+ # @BlockdevOptionsRaw:
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index e7bda4d3c4..ef8a6a9239 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -53,6 +53,7 @@ int nbd_client_init(BlockDriverState *bs,
+                     QCryptoTLSCreds *tlscreds,
+                     const char *hostname,
+                     const char *x_dirty_bitmap,
++                    uint32_t reconnect_delay,
+                     Error **errp);
+ void nbd_client_close(BlockDriverState *bs);
+ 
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index c184a9f0e9..41e6e6e702 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -1079,6 +1079,7 @@ int nbd_client_init(BlockDriverState *bs,
+                     QCryptoTLSCreds *tlscreds,
+                     const char *hostname,
+                     const char *x_dirty_bitmap,
++                    uint32_t reconnect_delay,
+                     Error **errp)
+ {
+     NBDClientSession *client = nbd_get_client_session(bs);
+diff --git a/block/nbd.c b/block/nbd.c
+index 9db5eded89..b40fb5a977 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -360,6 +360,18 @@ static QemuOptsList nbd_runtime_opts = {
+             .help = "experimental: expose named dirty bitmap in place of "
+                     "block status",
+         },
++        {
++            .name = "reconnect-delay",
++            .type = QEMU_OPT_NUMBER,
++            .help = "Reconnect delay. On disconnect, nbd client tries to"
++                    "connect again, until success or serious error. During"
++                    "first @reconnect-delay seconds of reconnecting loop all"
++                    "requests are paused and have a chance to rerun, if"
++                    "successful connect occures during this time. After"
++                    "@reconnect-delay seconds all delayed requests are failed"
++                    "and all following requests will be failed to (until"
++                    "successfull reconnect). Default 300 seconds",
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -411,7 +423,9 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     /* NBD handshake */
+     ret = nbd_client_init(bs, s->saddr, s->export, tlscreds, hostname,
+-                          qemu_opt_get(opts, "x-dirty-bitmap"), errp);
++                          qemu_opt_get(opts, "x-dirty-bitmap"),
++                          qemu_opt_get_number(opts, "reconnect-delay", 300),
++                          errp);
+ 
+  error:
+     if (tlscreds) {
 -- 
 2.11.1
