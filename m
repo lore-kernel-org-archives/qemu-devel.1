@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fkU0j-0002p1-Pu
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 08:44:22 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fkU0x-0002v6-Hv
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 08:44:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fkU0g-0001et-LR
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 08:44:21 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:37957)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fkU0g-0001eO-9T
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 08:44:18 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-References: <153303988145.29412.13761534940635173122@502c9da6d61e>
-	<48b6bd17-feff-5f4b-05a7-4bc2370ea212@vivier.eu>
-Message-ID: <3d0666b8-f992-c35c-463a-ebb0be10f6ae@vivier.eu>
-Date: Tue, 31 Jul 2018 14:44:02 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fkU0w-0001kW-MW
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 08:44:35 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38038)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fkU0w-0001k7-Co
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 08:44:34 -0400
+Received: by mail-wr1-x443.google.com with SMTP id v14-v6so16520258wro.5
+	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 05:44:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <48b6bd17-feff-5f4b-05a7-4bc2370ea212@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 0/3] Linux user for 3.0 patches
+In-Reply-To: <87tvofr6a8.fsf@dusky.pond.sub.org>
+References: <20180731104258.2459-1-marcandre.lureau@redhat.com>
+	<87tvofr6a8.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 31 Jul 2018 14:44:32 +0200
+Message-ID: <CAJ+F1CJnXYZfKD2Uoy4cFpzEeHKXREdw3_3-f8Sao1PyO4=EFQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] monitor: accept input on resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, riku.voipio@iki.fi, alex.bennee@linaro.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Le 31/07/2018 à 14:40, Laurent Vivier a écrit :
-> Le 31/07/2018 à 14:24, no-reply@patchew.org a écrit :
->> Hi,
->>
->> This series seems to have some coding style problems. See output below for
->> more information:
->>
->> Type: series
->> Message-id: 20180731084203.29959-1-laurent@vivier.eu
->> Subject: [Qemu-devel] [PULL 0/3] Linux user for 3.0 patches
->>
->> === TEST SCRIPT BEGIN ===
->> #!/bin/bash
->>
->> BASE=base
->> n=1
->> total=$(git log --oneline $BASE.. | wc -l)
->> failed=0
->>
->> git config --local diff.renamelimit 0
->> git config --local diff.renames True
->> git config --local diff.algorithm histogram
->>
->> commits="$(git log --format=%H --reverse $BASE..)"
->> for c in $commits; do
->>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
->>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
->>         failed=1
->>         echo
->>     fi
->>     n=$((n+1))
->> done
->>
->> exit $failed
->> === TEST SCRIPT END ===
->>
->> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
->> Switched to a new branch 'test'
->> 806398c875 linux-user: ppc64: don't use volatile register during safe_syscall
->> ba78346662 tests: add check_invalid_maps to test-mmap
->> 80fc1be868 linux-user/mmap.c: handle invalid len maps correctly
->>
->> === OUTPUT BEGIN ===
->> Checking PATCH 1/3: linux-user/mmap.c: handle invalid len maps correctly...
->> Checking PATCH 2/3: tests: add check_invalid_maps to test-mmap...
->> ERROR: code indent should never use tabs
->> #62: FILE: tests/tcg/multiarch/test-mmap.c:498:
->> +^Icheck_invalid_mmaps();$
->>
->> total: 1 errors, 0 warnings, 40 lines checked
-> 
-> I'm going to resend a pull request without the tab.
+Hi
 
-In fact, no, the whole file uses tabulation. I will not change that.
+On Tue, Jul 31, 2018 at 1:30 PM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> A chardev may stop trying to write if the associated can_read()
+>> callback returned 0. This happens when the monitor is suspended.
+>> The frontend is supposed to call qemu_chr_fe_accept_input() when it is
+>> ready to accept data again.
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> Impact?
 
-Peter, could you take the series as-is?
+I have observed the issue with a spice port, all pending commands
+aren't flushed. Most chardev don't use the accept_input() callback,
+and instead poll regularly, like char-socket.c:tcp_chr_read_poll()
 
-Thanks,
-Laurent
+>
+> Is this to be considered for 3.0?
+
+This is not a regression, afaik, and doesn't impact common monitor
+chardev. So it could be delayed. But it's also a small fix for Spice
+chardev that shouldn't create regression, so it should be fine for
+3.0.
+
+thanks
+
+>
+>> ---
+>>  monitor.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/monitor.c b/monitor.c
+>> index d580c5a79c..e1a14e02cf 100644
+>> --- a/monitor.c
+>> +++ b/monitor.c
+>> @@ -4412,6 +4412,7 @@ void monitor_resume(Monitor *mon)
+>>              assert(mon->rs);
+>>              readline_show_prompt(mon->rs);
+>>          }
+>> +        qemu_chr_fe_accept_input(&mon->chr);
+>>      }
+>>      trace_monitor_suspend(mon, -1);
+>>  }
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
