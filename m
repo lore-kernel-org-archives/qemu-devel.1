@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fkWtn-0002L8-5r
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:49:24 -0400
+	(envelope-from <berrange@redhat.com>) id 1fkWvD-0003UV-8G
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:50:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fkWtj-0003uy-9D
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:49:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54492 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fkWvA-0004cL-MD
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:50:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56848 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fkWtj-0003qJ-2g
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:49:19 -0400
-Date: Tue, 31 Jul 2018 16:49:06 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180731154906.GG17816@stefanha-x1.localdomain>
-References: <1531900083-18167-1-git-send-email-junyan.he@gmx.com>
-	<20180727124917.GC28555@stefanha-x1.localdomain>
-	<20180727160529-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fkWvA-0004bj-GN
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 11:50:48 -0400
+Date: Tue, 31 Jul 2018 16:50:43 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180731155043.GK29167@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1533026124-6740-1-git-send-email-liq3ea@gmail.com>
+	<1533026124-6740-3-git-send-email-liq3ea@gmail.com>
+	<20180731112906.GG2476@work-vm> <87o9enqx4s.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="sClP8c1IaQxyux9v"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180727160529-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH 0/7 V11] nvdimm: guarantee persistence of
- QEMU writes to persistent memory
+In-Reply-To: <87o9enqx4s.fsf@trasno.org>
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Add qmp command for
+ migrate_set_max_cpu_throttle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, junyan.he@gmx.com, ehabkost@redhat.com, quintela@redhat.com, rth@twiddle.net, crosthwaite.peter@gmail.com, qemu-devel@nongnu.org, dgilbert@redhat.com, Junyan He <junyan.he@intel.com>, imammedo@redhat.com, pbonzini@redhat.com, yi.z.zhang@intel.com, xiaoguangrong.eric@gmail.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, crosthwaite.peter@gmail.com, Li Qiang <liq3ea@gmail.com>, armbru@redhat.com, qemu-devel@nongnu.org, liqiang02@corp.netease.com, pbonzini@redhat.com, hzliuyingdong@corp.netease.com, rth@twiddle.net
 
+On Tue, Jul 31, 2018 at 04:48:35PM +0200, Juan Quintela wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > * Li Qiang (liq3ea@gmail.com) wrote:
+> >> The default max cpu throttle is 99, this is too big that may
+> >> influence the guest loads. Add a qmp to config it can make it
+> >> more flexible.
+> >> 
+> >> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> >
+> > This should be done as a migration parameter rather than a new command.
+> > For example, follow the cpu-throttle-increment parameter; and this
+> > should work just like it.
+> 
+> I was about to comment this one.
+> 
+> migrate_set_downtime, migrate_set_speed, migrate-set-cache-size,
+> query-migrate-cache-size are marked as deprecated.  Any way that we
+> could have make more clear that one should use
+> migrate_set/get_parameter/capability?
 
---sClP8c1IaQxyux9v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Where are they marked as deprecated ?
 
-On Fri, Jul 27, 2018 at 04:06:23PM +0300, Michael S. Tsirkin wrote:
-> On Fri, Jul 27, 2018 at 01:49:17PM +0100, Stefan Hajnoczi wrote:
-> > On Wed, Jul 18, 2018 at 03:47:56PM +0800, junyan.he@gmx.com wrote:
-> > > From: Junyan He <junyan.he@intel.com>
-> > >=20
-> > > QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and li=
-ve migration.
-> > > If the backend is on the persistent memory, QEMU needs to take proper=
- operations to
-> > > ensure its writes persistent on the persistent memory. Otherwise, a h=
-ost power failure
-> > > may result in the loss the guest data on the persistent memory.
-> >=20
-> > Ping Michael.  Can this go through your tree?
->=20
-> OK but do you really think it's appropriate in this release cycle?
-> If not pls repost after the release including the acks.
+They're not included in our official list of deprecated features, so per
+our deprecation policy, they are still considered supported.
 
-I agree, it's too late for QEMU 3.0.
+  https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features
 
-Have you considered keeping a -next tree?  It's more
-contributor-friendly if you merge patches into a -next tree so they
-don't need to worry about it anymore.
+To deprecate something it needs to be added to qemu-deprecated.texi, and
+ideally also made to print a message to stderr when triggered.
 
-Stefan
-
---sClP8c1IaQxyux9v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbYITyAAoJEJykq7OBq3PIuhUIAI8wTEPDACZrCwHtvM2hU0Cp
-YMfZ0JGPZp7Dl2hUoS9NqGGy+EGHBMrqXJPZGfivAloNC1t1Z2yaVqhFPkPUJS1h
-01EBMBG3uRlDl0jP3uwvOjtgDIEBT38zuyjmFYtVD+DLEte2WLv9SLqDR8Za+EiC
-doLhVDuZ35Zsbd9/zccAchpcepTZ/rznBnozIZqY2PHCIATokWORRBVQsmsRO3uv
-2vT6kYCnCOSoTspDIjuE2E3EPJV3zMv1YdCx3yTdt07LF73iO4La9g8BkPEvOj9o
-waWlX2Wqywrd09JSvETdJ/SZnqTu9IiShIb2BbmI8/fbsnifKChnpFwYCP+xsMI=
-=ftfJ
------END PGP SIGNATURE-----
-
---sClP8c1IaQxyux9v--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
