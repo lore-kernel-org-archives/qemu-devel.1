@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fkQFD-0003QY-Ev
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:43:04 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fkQU4-00016E-NH
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:58:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fkQFA-0006fS-KM
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:43:03 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:50368)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fkQFA-0006eC-7Z
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:43:00 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 31 Jul 2018 10:42:03 +0200
-Message-Id: <20180731084203.29959-4-laurent@vivier.eu>
-In-Reply-To: <20180731084203.29959-1-laurent@vivier.eu>
-References: <20180731084203.29959-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 3/3] linux-user: ppc64: don't use volatile
- register during safe_syscall
+	(envelope-from <cohuck@redhat.com>) id 1fkQU1-0001O5-99
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 04:58:24 -0400
+Date: Tue, 31 Jul 2018 10:58:15 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180731105815.3a6fc0e9.cohuck@redhat.com>
+In-Reply-To: <20180731084236.184728-1-frankja@linux.ibm.com>
+References: <20180731084236.184728-1-frankja@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390x: Enable KVM huge page backing support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +22,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, david@redhat.com, qemu-s390x@nongnu.org
 
-From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+On Tue, 31 Jul 2018 09:42:36 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-r11 is a volatile register on PPC as per calling conventions.
-The safe_syscall code uses it to check if the signal_pending
-is set during the safe_syscall. When a syscall is interrupted
-on return from signal handling, the r11 might be corrupted
-before we retry the syscall leading to a crash. The registers
-r0-r13 are not to be used here as they have
-volatile/designated/reserved usages.
+> From: Janosch Frank <frankja@linux.vnet.ibm.com>
+> 
+> QEMU has had huge page support for a longer time already, but KVM
+> memory management under s390x needed some changes to work with huge
+> backings.
+> 
+> Now that we have support, let's enable it if requested and
+> available. Otherwise we now properly tell the user if there is no
+> support and back out instead of failing to run the VM later on.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 
-Change the code to use r14 which is non-volatile.
-Use SP+16 which is a slot for LR, for save/restore of previous value
-of r14. SP+16 can be used, as LR is preserved across the syscall.
+You may want to change author and signoff to the new, shorter address.
 
-Steps to reproduce:
-On PPC host, issue `qemu-x86_64 /usr/bin/cc -E -`
-Attempt Ctrl-C, the issue is reproduced.
+> ---
+> 
+> Right now there's a conflict with arm for the capability, so I guess
+> I'll have to touch the cap number soonish. :)
 
-Reference:
-https://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.html#REG
-https://openpowerfoundation.org/wp-content/uploads/2016/03/ABI64BitOpenPOWERv1.1_16July2015_pub4.pdf
+You can fix this by spitting out the linux-headers update into a patch
+that will be replaced with a proper headers update :)
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
-Tested-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <153301568965.30312.10498134581068746871.stgit@dhcp-9-109-246-16>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/host/ppc64/safe-syscall.inc.S | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> ---
+>  linux-headers/linux/kvm.h | 1 +
+>  target/s390x/kvm.c        | 6 ++++++
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index 98f389a5a3..e3b1e3070c 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -949,6 +949,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_GET_MSR_FEATURES 153
+>  #define KVM_CAP_HYPERV_EVENTFD 154
+>  #define KVM_CAP_HYPERV_TLBFLUSH 155
+> +#define KVM_CAP_S390_HPAGE 156
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index d923cf4240..1ce0b42039 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -285,6 +285,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>  {
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+>  
+> +    if (mem_path && kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE, 0)) {
+> +        error_report("Huge page backing was specified, "
+> +                     "but this KVM does not support huge pages.");
 
-diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
-index d30050a67c..8ed73a5b86 100644
---- a/linux-user/host/ppc64/safe-syscall.inc.S
-+++ b/linux-user/host/ppc64/safe-syscall.inc.S
-@@ -49,7 +49,9 @@ safe_syscall_base:
- 	 *               and returns the result in r3
- 	 * Shuffle everything around appropriately.
- 	 */
--	mr	11, 3	/* signal_pending */
-+	std     14, 16(1) /* Preserve r14 in SP+16 */
-+	.cfi_offset 14, 16
-+	mr	14, 3	/* signal_pending */
- 	mr	0, 4	/* syscall number */
- 	mr	3, 5	/* syscall arguments */
- 	mr	4, 6
-@@ -67,12 +69,13 @@ safe_syscall_base:
- 	 */
- safe_syscall_start:
- 	/* if signal_pending is non-zero, don't do the call */
--	lwz	12, 0(11)
-+	lwz	12, 0(14)
- 	cmpwi	0, 12, 0
- 	bne-	0f
- 	sc
- safe_syscall_end:
- 	/* code path when we did execute the syscall */
-+	ld 14, 16(1) /* restore r14 to its original value */
- 	bnslr+
- 
- 	/* syscall failed; return negative errno */
-@@ -81,6 +84,7 @@ safe_syscall_end:
- 
- 	/* code path when we didn't execute the syscall */
- 0:	addi	3, 0, -TARGET_ERESTARTSYS
-+	ld 14, 16(1) /* restore r14 to its orginal value */
- 	blr
- 	.cfi_endproc
- 
--- 
-2.17.1
+Please drop the trailing '.', as by the documentation for error_report().
+
+> +        return -EINVAL;
+> +    }
+> +
+>      mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
+>      cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
+>      cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
