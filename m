@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fkSNH-0004Ut-E4
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:59:32 -0400
+	(envelope-from <david@redhat.com>) id 1fkSQM-0005ls-D8
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:02:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fkSNC-0005Dg-Bw
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 06:59:31 -0400
-References: <20180731090448.36662-1-borntraeger@de.ibm.com>
-	<20180731090448.36662-3-borntraeger@de.ibm.com>
+	(envelope-from <david@redhat.com>) id 1fkSQI-0006v1-6P
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:02:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33884 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fkSQH-0006ur-Vw
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 07:02:38 -0400
+References: <20180731084236.184728-1-frankja@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <c33af301-5003-e2be-42ba-b2c3e4c717b3@redhat.com>
-Date: Tue, 31 Jul 2018 12:59:21 +0200
+Message-ID: <3515660f-fcd0-23ed-268b-9de3d574e90b@redhat.com>
+Date: Tue, 31 Jul 2018 13:02:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180731090448.36662-3-borntraeger@de.ibm.com>
+In-Reply-To: <20180731084236.184728-1-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/kvm: add etoken facility
+Subject: Re: [Qemu-devel] [PATCH] s390x: Enable KVM huge page backing support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,187 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com
 
-On 31.07.2018 11:04, Christian Borntraeger wrote:
-> Provide the etoken facility. We need to handle cpu model, migration and
-> clear reset.
+On 31.07.2018 10:42, Janosch Frank wrote:
+> From: Janosch Frank <frankja@linux.vnet.ibm.com>
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> QEMU has had huge page support for a longer time already, but KVM
+> memory management under s390x needed some changes to work with huge
+> backings.
+> 
+> Now that we have support, let's enable it if requested and
+> available. Otherwise we now properly tell the user if there is no
+> support and back out instead of failing to run the VM later on.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 > ---
->  target/s390x/cpu.h              |  3 +++
->  target/s390x/cpu_features.c     |  3 ++-
->  target/s390x/cpu_features_def.h |  3 ++-
->  target/s390x/gen-features.c     |  3 ++-
->  target/s390x/kvm.c              | 11 +++++++++++
->  target/s390x/machine.c          | 20 +++++++++++++++++++-
->  6 files changed, 39 insertions(+), 4 deletions(-)
 > 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 2c3dd2d189..21b2f211fe 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -2,6 +2,7 @@
->   * S/390 virtual CPU header
->   *
->   *  Copyright (c) 2009 Ulrich Hecht
-> + *  Copyright IBM Corp. 2012, 2018
->   *
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
-> @@ -68,6 +69,8 @@ struct CPUS390XState {
->      uint32_t aregs[16];    /* access registers */
->      uint8_t riccb[64];     /* runtime instrumentation control */
->      uint64_t gscb[4];      /* guarded storage control */
-> +    uint64_t etoken;       /* etoken */
-> +    uint64_t etoken_extension; /* etoken extension */
+> Right now there's a conflict with arm for the capability, so I guess
+> I'll have to touch the cap number soonish. :)
+> 
+> ---
+>  linux-headers/linux/kvm.h | 1 +
+>  target/s390x/kvm.c        | 6 ++++++
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index 98f389a5a3..e3b1e3070c 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -949,6 +949,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_GET_MSR_FEATURES 153
+>  #define KVM_CAP_HYPERV_EVENTFD 154
+>  #define KVM_CAP_HYPERV_TLBFLUSH 155
+> +#define KVM_CAP_S390_HPAGE 156
 >  
->      /* Fields up to this point are not cleared by initial CPU reset */
->      struct {} start_initial_reset_fields;
-> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-> index 3b9e2745e9..397960f278 100644
-> --- a/target/s390x/cpu_features.c
-> +++ b/target/s390x/cpu_features.c
-> @@ -1,7 +1,7 @@
->  /*
->   * CPU features/facilities for s390x
->   *
-> - * Copyright 2016 IBM Corp.
-> + * Copyright IBM Corp. 2016, 2018
->   *
->   * Author(s): David Hildenbrand <dahi@linux.vnet.ibm.com>
->   *
-> @@ -106,6 +106,7 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("irbm", S390_FEAT_TYPE_STFL, 145, "Insert-reference-bits-multiple facility"),
->      FEAT_INIT("msa8-base", S390_FEAT_TYPE_STFL, 146, "Message-security-assist-extension-8 facility (excluding subfunctions)"),
->      FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
-> +    FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "etoken facility"),
+>  #ifdef KVM_CAP_IRQ_ROUTING
 >  
->      /* SCLP SCCB Byte 80 - 98  (bit numbers relative to byte-80) */
->      FEAT_INIT("gsls", S390_FEAT_TYPE_SCLP_CONF_CHAR, 40, "SIE: Guest-storage-limit-suppression facility"),
-> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-> index 7c5915c7b2..ac2c947f30 100644
-> --- a/target/s390x/cpu_features_def.h
-> +++ b/target/s390x/cpu_features_def.h
-> @@ -1,7 +1,7 @@
->  /*
->   * CPU features/facilities for s390
->   *
-> - * Copyright 2016 IBM Corp.
-> + * Copyright IBM Corp. 2016, 2018
->   *
->   * Author(s): Michael Mueller <mimu@linux.vnet.ibm.com>
->   *            David Hildenbrand <dahi@linux.vnet.ibm.com>
-> @@ -93,6 +93,7 @@ typedef enum {
->      S390_FEAT_INSERT_REFERENCE_BITS_MULT,
->      S390_FEAT_MSA_EXT_8,
->      S390_FEAT_CMM_NT,
-> +    S390_FEAT_ETOKEN,
->  
->      /* Sclp Conf Char */
->      S390_FEAT_SIE_GSLS,
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index 6626b6f565..5af042c003 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -1,7 +1,7 @@
->  /*
->   * S390 feature list generator
->   *
-> - * Copyright 2016 IBM Corp.
-> + * Copyright IBM Corp. 2016, 2018
->   *
->   * Author(s): Michael Mueller <mimu@linux.vnet.ibm.com>
->   *            David Hildenbrand <dahi@linux.vnet.ibm.com>
-> @@ -471,6 +471,7 @@ static uint16_t full_GEN14_GA1[] = {
->      S390_FEAT_GROUP_MSA_EXT_7,
->      S390_FEAT_GROUP_MSA_EXT_8,
->      S390_FEAT_CMM_NT,
-> +    S390_FEAT_ETOKEN,
->      S390_FEAT_HPMA2,
->      S390_FEAT_SIE_KSS,
->      S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
 > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index d923cf4240..af83955e5f 100644
+> index d923cf4240..1ce0b42039 100644
 > --- a/target/s390x/kvm.c
 > +++ b/target/s390x/kvm.c
-> @@ -493,6 +493,12 @@ int kvm_arch_put_registers(CPUState *cs, int level)
->          cs->kvm_run->kvm_dirty_regs |= KVM_SYNC_BPBC;
->      }
+> @@ -285,6 +285,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>  {
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
 >  
-> +    if (can_sync_regs(cs, KVM_SYNC_ETOKEN)) {
-> +        cs->kvm_run->s.regs.etoken = env->etoken;
-> +        cs->kvm_run->s.regs.etoken_extension  = env->etoken_extension;
-> +        cs->kvm_run->kvm_dirty_regs |= KVM_SYNC_ETOKEN;
+> +    if (mem_path && kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE, 0)) {
+> +        error_report("Huge page backing was specified, "
+> +                     "but this KVM does not support huge pages.");
+> +        return -EINVAL;
 > +    }
 > +
->      /* Finally the prefix */
->      if (can_sync_regs(cs, KVM_SYNC_PREFIX)) {
->          cs->kvm_run->s.regs.prefix = env->psa;
-> @@ -607,6 +613,11 @@ int kvm_arch_get_registers(CPUState *cs)
->          env->bpbc = cs->kvm_run->s.regs.bpbc;
->      }
->  
-> +    if (can_sync_regs(cs, KVM_SYNC_ETOKEN)) {
-> +        env->etoken = cs->kvm_run->s.regs.etoken;
-> +        env->etoken_extension = cs->kvm_run->s.regs.etoken_extension;
-> +    }
-> +
->      /* pfault parameters */
->      if (can_sync_regs(cs, KVM_SYNC_PFAULT)) {
->          env->pfault_token = cs->kvm_run->s.regs.pft;
-> diff --git a/target/s390x/machine.c b/target/s390x/machine.c
-> index bd3230d027..cb792aa103 100644
-> --- a/target/s390x/machine.c
-> +++ b/target/s390x/machine.c
-> @@ -1,7 +1,7 @@
->  /*
->   * S390x machine definitions and functions
->   *
-> - * Copyright IBM Corp. 2014
-> + * Copyright IBM Corp. 2014, 2018
->   *
->   * Authors:
->   *   Thomas Huth <thuth@linux.vnet.ibm.com>
-> @@ -216,6 +216,23 @@ const VMStateDescription vmstate_bpbc = {
->      }
->  };
->  
-> +static bool etoken_needed(void *opaque)
-> +{
-> +    return s390_has_feat(S390_FEAT_ETOKEN);
-> +}
-> +
-> +const VMStateDescription vmstate_etoken = {
-> +    .name = "cpu/etoken",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = etoken_needed,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT64(env.etoken, S390CPU),
-> +        VMSTATE_UINT64(env.etoken_extension, S390CPU),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  const VMStateDescription vmstate_s390_cpu = {
->      .name = "cpu",
->      .post_load = cpu_post_load,
-> @@ -251,6 +268,7 @@ const VMStateDescription vmstate_s390_cpu = {
->          &vmstate_exval,
->          &vmstate_gscb,
->          &vmstate_bpbc,
-> +        &vmstate_etoken,
->          NULL
->      },
->  };
+>      mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
+>      cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
+>      cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
 > 
 
-Apart from the capital letter, this looks good to me!
+Okay, I wonder if now is the right time to actually detect the pagesize
+instead of relying on mempath pointing at hugetlbfs. I remember Power
+already doing such a detection.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+mempath is just an indicator.
 
 -- 
 
