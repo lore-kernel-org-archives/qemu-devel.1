@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fkOVz-0007iK-6T
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:52:16 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fkOYc-00013q-3a
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:54:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fkOVw-00049h-67
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:52:15 -0400
-Date: Tue, 31 Jul 2018 08:52:05 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180731085205.2637da26.cohuck@redhat.com>
-In-Reply-To: <153296989359.10934.14853590010864246630@sif>
-References: <1532959766-53343-1-git-send-email-borntraeger@de.ibm.com>
-	<b7bf6a3f-812f-78af-4f5f-832eb460fbf1@de.ibm.com>
-	<153296989359.10934.14853590010864246630@sif>
+	(envelope-from <dovgaluk@ispras.ru>) id 1fkOYY-00058l-W9
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:54:58 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:36652)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fkOYY-00058e-Gv
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 02:54:54 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
+	<20180725121400.12867.82957.stgit@pasha-VirtualBox>
+	<20180725145651.GC2365@work-vm>
+In-Reply-To: <20180725145651.GC2365@work-vm>
+Date: Tue, 31 Jul 2018 09:54:54 +0300
+Message-ID: <000001d4289b$62f12600$28d37200$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/sclp: fix maxram calculation
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v5 08/24] replay: introduce info hmp/qmp
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,15 +31,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, imbrenda@linux.vnet.ibm.com, qemu-stable@nongnu.org
+To: "'Dr. David Alan Gilbert'" <dgilbert@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, rth@twiddle.net
 
-On Mon, 30 Jul 2018 11:58:13 -0500
-Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-
-> Quoting Christian Borntraeger (2018-07-30 10:31:12)
-> > Are we still able to get things into 2.12.1 or are we too late?  
+> From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
+> * Pavel Dovgalyuk (Pavel.Dovgaluk@ispras.ru) wrote:
+> > This patch introduces 'info replay' monitor command and
+> > corresponding qmp request.
+> > These commands request the current record/replay mode, replay log file name,
+> > and the execution step (number or recorded/replayed instructions).
+> >
+> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 > 
-> Freeze is EOD today, but I can grab them if they hit master/rc3 tomorrow.
+> ACK for HMP
+> 
+> Note you might want to make an accessor for the filename rather than
+> making it a global?
 
-OK, I just sent a pull request with this patch.
+Good idea, thanks.
+
+
+> 
+> Dave
+> 
+> >
+> > --
+> >
+> > v2:
+> >  - renamed info_replay qmp into query-replay (suggested by Eric Blake)
+> > ---
+> >  hmp-commands-info.hx      |   14 ++++++++++++++
+> >  hmp.h                     |    1 +
+> >  qapi/misc.json            |   35 +++++++++++++++++++++++++++++++++++
+> >  replay/Makefile.objs      |    3 ++-
+> >  replay/replay-debugging.c |   41 +++++++++++++++++++++++++++++++++++++++++
+> >  replay/replay-internal.h  |    2 ++
+> >  replay/replay.c           |    3 +--
+> >  7 files changed, 96 insertions(+), 3 deletions(-)
+> >  create mode 100644 replay/replay-debugging.c
+> >
+> > diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> > index 70639f6..1b24714 100644
+> > --- a/hmp-commands-info.hx
+> > +++ b/hmp-commands-info.hx
+> > @@ -896,6 +896,20 @@ STEXI
+> >  Show SEV information.
+> >  ETEXI
+> >
+> > +    {
+> > +        .name       = "replay",
+> > +        .args_type  = "",
+> > +        .params     = "",
+> > +        .help       = "show parameters of the record/replay",
+> > +        .cmd        = hmp_info_replay,
+> > +    },
+> > +
+> > +STEXI
+> > +@item info replay
+> > +@findex info replay
+> > +Display the current record/replay mode and the currently executing step.
+> > +ETEXI
+> > +
+> >  STEXI
+> >  @end table
+> >  ETEXI
+> > diff --git a/hmp.h b/hmp.h
+> > index 33354f1..9d12c63 100644
+> > --- a/hmp.h
+> > +++ b/hmp.h
+> > @@ -147,5 +147,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+> >  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+> >  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+> >  void hmp_info_sev(Monitor *mon, const QDict *qdict);
+> > +void hmp_info_replay(Monitor *mon, const QDict *qdict);
+> >
+> >  #endif
+> > diff --git a/qapi/misc.json b/qapi/misc.json
+> > index d450cfe..e246ce3 100644
+> > --- a/qapi/misc.json
+> > +++ b/qapi/misc.json
+> > @@ -3100,6 +3100,41 @@
+> >    'data': [ 'none', 'record', 'play' ] }
+> >
+> >  ##
+> > +# @ReplayInfo:
+> > +#
+> > +# Status of the record/replay mode.
+> > +#
+> > +# @mode: current mode.
+> > +#
+> > +# @filename: name of the record/replay log file.
+> > +#
+> > +# @step: current step number.
+> > +#
+> > +# Since: 3.1
+> > +#
+> > +##
+> > +{ 'struct': 'ReplayInfo',
+> > +  'data': { 'mode': 'ReplayMode', '*filename': 'str', 'step': 'int' } }
+> > +
+> > +##
+> > +# @query-replay:
+> > +#
+> > +# Retrieves the status of the execution record/replay.
+> > +#
+> > +# Returns: structure with the properties of the record/replay.
+> > +#
+> > +# Since: 3.1
+> > +#
+> > +# Example:
+> > +#
+> > +# -> { "execute": "query-replay" }
+> > +# <- { "return": { "mode": "play", "filename": "log.rr", "step": 220414 } }
+> > +#
+> > +##
+> > +{ 'command': 'query-replay',
+> > +  'returns': 'ReplayInfo' }
+> > +
+> > +##
+> >  # @xen-load-devices-state:
+> >  #
+> >  # Load the state of all devices from file. The RAM and the block devices
+> > diff --git a/replay/Makefile.objs b/replay/Makefile.objs
+> > index cee6539..6694e3e 100644
+> > --- a/replay/Makefile.objs
+> > +++ b/replay/Makefile.objs
+> > @@ -6,4 +6,5 @@ common-obj-y += replay-input.o
+> >  common-obj-y += replay-char.o
+> >  common-obj-y += replay-snapshot.o
+> >  common-obj-y += replay-net.o
+> > -common-obj-y += replay-audio.o
+> > \ No newline at end of file
+> > +common-obj-y += replay-audio.o
+> > +common-obj-y += replay-debugging.o
+> > diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+> > new file mode 100644
+> > index 0000000..03e7db8
+> > --- /dev/null
+> > +++ b/replay/replay-debugging.c
+> > @@ -0,0 +1,41 @@
+> > +/*
+> > + * replay-debugging.c
+> > + *
+> > + * Copyright (c) 2010-2018 Institute for System Programming
+> > + *                         of the Russian Academy of Sciences.
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> > + * See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qapi/error.h"
+> > +#include "sysemu/replay.h"
+> > +#include "replay-internal.h"
+> > +#include "hmp.h"
+> > +#include "monitor/monitor.h"
+> > +#include "qapi/qapi-commands-misc.h"
+> > +
+> > +void hmp_info_replay(Monitor *mon, const QDict *qdict)
+> > +{
+> > +    if (replay_mode == REPLAY_MODE_NONE) {
+> > +        monitor_printf(mon, "No record/replay\n");
+> > +    } else {
+> > +        monitor_printf(mon, "%s execution '%s': current step = %"PRId64"\n",
+> > +            replay_mode == REPLAY_MODE_RECORD ? "Recording" : "Replaying",
+> > +            replay_filename, replay_get_current_step());
+> > +    }
+> > +}
+> > +
+> > +ReplayInfo *qmp_query_replay(Error **errp)
+> > +{
+> > +    ReplayInfo *retval = g_new0(ReplayInfo, 1);
+> > +    retval->mode = replay_mode;
+> > +    if (replay_filename) {
+> > +        retval->filename = g_strdup(replay_filename);
+> > +        retval->has_filename = true;
+> > +    }
+> > +    retval->step = replay_get_current_step();
+> > +    return retval;
+> > +}
+> > diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+> > index ac4b27b..ef82b5e 100644
+> > --- a/replay/replay-internal.h
+> > +++ b/replay/replay-internal.h
+> > @@ -91,6 +91,8 @@ extern ReplayState replay_state;
+> >
+> >  /* File for replay writing */
+> >  extern FILE *replay_file;
+> > +/*! Name of replay file  */
+> > +extern char *replay_filename;
+> >
+> >  void replay_put_byte(uint8_t byte);
+> >  void replay_put_event(uint8_t event);
+> > diff --git a/replay/replay.c b/replay/replay.c
+> > index 58a986f..8b70d7d 100644
+> > --- a/replay/replay.c
+> > +++ b/replay/replay.c
+> > @@ -29,8 +29,7 @@
+> >  ReplayMode replay_mode = REPLAY_MODE_NONE;
+> >  char *replay_snapshot;
+> >
+> > -/* Name of replay file  */
+> > -static char *replay_filename;
+> > +char *replay_filename;
+> >  ReplayState replay_state;
+> >  static GSList *replay_blockers;
+> >
+> >
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Pavel Dovgalyuk
