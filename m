@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fkIQy-0000Ds-4d
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 20:22:41 -0400
+	(envelope-from <dgibson@redhat.com>) id 1fkIkL-000443-6y
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 20:42:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fkIQu-0007rV-V1
-	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 20:22:40 -0400
-Date: Tue, 31 Jul 2018 10:18:47 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180731001847.GF2708@umbus.fritz.box>
-References: <20180730043904.17023-1-mail@sebastianbauer.info>
-	<alpine.BSF.2.21.1807301254450.49677@zero.eik.bme.hu>
-	<fbaa741e42e50457a0ba9c7654e1d03d@sebastianbauer.info>
-	<alpine.BSF.2.21.1807310009440.24147@zero.eik.bme.hu>
-	<CAFEAcA8VqaqSzc4NBwjR4F8TMAHD2vhdMMi0fwkTj1fiX=wjyQ@mail.gmail.com>
-	<alpine.BSF.2.21.1807310111280.24147@zero.eik.bme.hu>
+	(envelope-from <dgibson@redhat.com>) id 1fkIkG-0006bM-CJ
+	for qemu-devel@nongnu.org; Mon, 30 Jul 2018 20:42:41 -0400
+Date: Tue, 31 Jul 2018 10:42:25 +1000
+From: David Gibson <dgibson@redhat.com>
+Message-ID: <20180731104225.30522b28@umbus.fritz.box>
+In-Reply-To: <f20a1874-bcdf-34cf-3c87-e3bc4d386eed@vivier.eu>
+References: <153294521235.6959.12520498748431693809.stgit@dhcp-9-109-246-16>
+	<4a633022-d560-a704-e143-928b8467f09c@linaro.org>
+	<f20a1874-bcdf-34cf-3c87-e3bc4d386eed@vivier.eu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AH+kv8CCoFf6qPuz"
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1807310111280.24147@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH] sam460ex: Fix PCI interrupt connections
+	boundary="Sig_/OohMXSKXQpTj9Kac5aG=ulE";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v3] linux-user: ppc64: don't use volatile
+ register during safe_syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,125 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Sebastian Bauer <mail@sebastianbauer.info>, Alexander Graf <agraf@suse.de>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, riku.voipio@iki.fi, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-
---AH+kv8CCoFf6qPuz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--Sig_/OohMXSKXQpTj9Kac5aG=ulE
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 31, 2018 at 01:31:46AM +0200, BALATON Zoltan wrote:
-> On Tue, 31 Jul 2018, Peter Maydell wrote:
-> > On 30 July 2018 at 23:37, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> > QEMU's implementation of qemu_irq signal lines is that the destination
-> > end provides the qemu_irq, which under the hood is a pointer to a
-> > struct containing a pointer to the function in the destination device
-> > which gets called when the source end says "the line level has changed".
-> > This means that there won't be a compile time or runtime error if you
-> > pass that qemu_irq to multiple sources (ie device outputs) simultaneous=
-ly.
-> > But the behaviour will be wrong, because the destination will see all
-> > the "level is 0", "level is 1" calls from all the sources intermingled,=
- eg
-> >=20
-> > device A output:   ____|^^^^^^^^^^^^^|______
-> >=20
-> > device B output:   _______|^^^^^|___________
-> >=20
-> > destination sees:  ____|^^^^^^^^|___________
-> >=20
-> > (because the destination gets the "level now 0" call when B's output
-> > goes to zero). To get the desired behaviour:
-> >=20
-> > logical OR:        ____|^^^^^^^^^^^^^|_____
-> >=20
-> > you need an OR gate. (I'm assuming wired-OR because that's the
-> > usual thing when several devices share an interrupt.)
-> >=20
-> > If your testing involves a setup which doesn't happen to assert
-> > several of the interrupt lines simultaneously you won't notice this
-> > problem.
->=20
-> I think the testing with SATA and USB mouse on a PCI card is likely to
-> assert several interrupts simultanelously (eg. when moving the mouse while
-> loading stuff from disk) but the OS might have some ways to still recover
-> from this so maybe we won't notice it anyway. As this is now confirmed th=
-at
-> using the same irq multiple times is wrong I think we need a better fix.
->=20
-> David, can you please drop this patch, we'll come up with a different fix.
+On Mon, 30 Jul 2018 21:16:35 +0200
+Laurent Vivier <laurent@vivier.eu> wrote:
 
-Done.  Should have looked at that patch a bit closer.
+> Le 30/07/2018 =C3=A0 14:44, Richard Henderson a =C3=A9crit=C2=A0:
+>  [...] =20
+>  [...] =20
+>  [...] =20
+>  [...] =20
+>  [...] =20
+>  [...] =20
+>  [...] =20
+>=20
+> Tested-by: Laurent Vivier <laurent@vivier.eu>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+>=20
+> I think this patch should go into the next -rc because it fixes a lot of
+> failures in the LTP on ppc64 host (hundreds of failure...).
+>=20
+> David, if you want, I can take it through the linux-user tree.
 
-> > > Probably we can just change the map function in ppc440_pcix.c to alwa=
-ys
-> > > return the first line then what's specified for other lines should not
-> > > matter and the above problem is avoided. We could even get rid of tho=
-se
-> > > additional irqs by changing ppc440_pcix.c to only model a single line=
- but
-> > > I'd need someone with better understanding of this to confirm that I =
-got
-> > > this right.
-> >=20
-> > I think that would also fix the bug. The logically preferable
-> > approach would depend rather on what the actual hardware does:
-> > is there a PCI controller chip with 4 interrupt outputs which
-> > the board wires together to a single interrupt controller line,
-> > or does the PCI controller chip itself have just one output
-> > and do the merging of the different PCI interrupts itself?
+That'd be great, thanks.
+
 >=20
-> Hmm, don't really know. The PCI controller is part of the SoC but we don't
-> have the manual of this SoC. The physical board itself also has a single =
-PCI
-> slot so however it's wired internally it's only using one irq for that. N=
-ot
-> sure what other internal PCI devices are there. A comment in U-Boot sourc=
-es
-> says this (it lists PCIB twice but maybe that's meant to be PCID?):
->=20
-> // IRQ2  =3D PCI_INT (PCIA, PCIB, PCIC, PCIB)
->=20
-> So that suggests probably there are 4 PCI irqs that are wired together but
-> probably this is inside the SoC. It could also be read as there's only a
-> single PCI_INT that delivers all four PCI interrupts. So if we go from th=
-at
-> either adding an OR gate to sam460ex.c that ORs together the PCI lines and
-> connects it to uic[1][0] would work, or changing ppc440_pcix.c to provide=
- a
-> single PCI interrupt? We don't really have definitive info other than this
-> comment so whatever Sebastian prefers and you approve is fine with me.
->=20
-> Thank you,
-> BALATON Zoltan
->=20
+> Thanks,
+> Laurent
+
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+David Gibson <dgibson@redhat.com>
+Principal Software Engineer, Virtualization, Red Hat
 
---AH+kv8CCoFf6qPuz
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/OohMXSKXQpTj9Kac5aG=ulE
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltfquQACgkQbDjKyiDZ
-s5JpXRAAnsM5W6KJYHFuCY9YLDP14hOA632RgjWhDuc4X5RVBjDBjkkfrtELfvJz
-RiWZNzRiyF+g3/sIQLDmAckSLAmvC/OCqmPldCBAGPJa6+4ijftHvAemsOxzobkf
-io4pqdRLqwy9w9OLkFYZ46sN5VFru/ECkeT+HwDtVYycop1C6kxZ4g9Id4r1UsJw
-j4CHIpalO7e12hemMp1r13lD1tQ5/mf/xi7Vio69luM4oRX98w5agbNacwMvB+Og
-6ZCjC4hKeRU1ZBezshZ3de/pK9uB3uc9mjIJQb4da36qS4QUM5XSi/QNn4EUA+IA
-zprgZ+itWOrhCbabL+OBsNjUSfHHzAECSNLxbfiOR74jLsMMBqYIf7Nw0PEZPh16
-enuEH5CPK1W6La53LSYjeaIGyq/Vky7TTFAY+1bn1PkWnJBq+qdGL8brFlnsOgTA
-Yn5LB63gAuaWOkGm4o7YAKTPTank38U0RckJ1t6I9fx+ESix3ZOrDWs9VNgjzS1S
-X1iXivAeNVt64rkJMP0zb7TxH6cLrT4uWA+W9eBGkRF4r0fbEfnmuR4Rettr4FKf
-cdnZhiHV4kLwlXQdcTdXZgOAoqkUQOMjFL4uSCsfbral51ulK76QdSz0J+8G4Cnr
-hzCDQY1FqiPz3tONx/+mk1EPxuwS9HdQO9vcnn5j3vTYa7EIrMU=
-=8jvy
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltfsHEACgkQbDjKyiDZ
+s5JYRRAA4e163a1brRL+OMN6QtaMaWfERNEJHSx3AyK2o0dqw84sROeSFfjsckPm
+1gYVGPghjeH2Fig5Om9hGIBTao6VZ67yZPf2XQ2fQMmYb9tjIr7odPbgQI8b6bl6
+I1Bv29Ze/mr1LBbZXQa7qVMAfM1QOJ7NUaKdZ9ZXEj/55c3wk3Av4s46IQi5CyHA
+Aatdi0kS385PZrd4iGX+ablAk47AdRH4QmtLVd5UdKCxiC3P/3Z69wb56deuC48K
+5c4kJpFN1TF8vgQlPTggjJEunhQ3mE9i7tnyHxGAFCxpxJAvZfyvBTo5p+sZt4Do
+C4wkjHUdtbIYjG2VEiRpIe0+z2I276fTZEJSRuOUxrRLb3vyrwlf+1IavT6SlB6K
+KClCEXYCqd/4/tBBDqmU30o6Okvky9yDYK2XPIQOQBM8y0UMQngKN3ziwijfeXqv
+TypPNZqjcN1cLCOHTjbqD3Xfz+c564NdyTd6rLYGxjP+ECXkg+Uik20HQwq/3a/N
+23y7fgL9YBTaCjy8e2Ud90vJ8sQPb1EAoZj6hGDlumsyktmGJ4FAyJycaZXeVYrM
+jpxrl+imXkaySkHTSZ2OqFs1qUYnD9pHrstl8hbvmxD7lbTF8thOM1MoUPrefhiY
+09lBjnB8PcP+4zw8pOSJ7mN+XmS5+TcyDwckwzFDkJddkbCyMhs=
+=BT12
 -----END PGP SIGNATURE-----
 
---AH+kv8CCoFf6qPuz--
+--Sig_/OohMXSKXQpTj9Kac5aG=ulE--
