@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fkcXW-00026y-7p
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 17:50:47 -0400
+	(envelope-from <mail@sebastianbauer.info>) id 1fkcbs-0003XD-Du
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 17:55:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fkcXT-00085q-Kh
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 17:50:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51480)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fkcXT-00085I-Ao
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 17:50:43 -0400
-Date: Tue, 31 Jul 2018 15:50:30 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180731155030.2d5fd5b7@t450s.home>
-In-Reply-To: <20180731150746.GH2476@work-vm>
-References: <153299204130.14411.11438396195753743913.stgit@gimli.home>
-	<20180731152716-mutt-send-email-mst@kernel.org>
-	<20180731084414.52e560fa@t450s.home>
-	<20180731150746.GH2476@work-vm>
+	(envelope-from <mail@sebastianbauer.info>) id 1fkcbp-0002gr-SM
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 17:55:16 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Balloon inhibit enhancements,
- vfio restriction
+Date: Tue, 31 Jul 2018 23:55:02 +0200
+From: Sebastian Bauer <mail@sebastianbauer.info>
+In-Reply-To: <20180731112006.737F77456B6@zero.eik.bme.hu>
+References: <20180731112006.737F77456B6@zero.eik.bme.hu>
+Message-ID: <c577eb87cb5094a63b58771ac7df6c06@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PATCH] sam460ex: Fix PCI interrupts with multiple
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,84 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, cohuck@redhat.com, david@redhat.com
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>
 
-On Tue, 31 Jul 2018 16:07:46 +0100
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-
-> * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > On Tue, 31 Jul 2018 15:29:17 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Mon, Jul 30, 2018 at 05:13:26PM -0600, Alex Williamson wrote:  
-> > > > v2:
-> > > >  - Use atomic ops for balloon inhibit counter (Peter)
-> > > >  - Allow endpoint driver opt-in for ballooning, vfio-ccw opt-in by
-> > > >    default, vfio-pci opt-in by device option, only allowed for mdev
-> > > >    devices, no support added for platform as there are no platform
-> > > >    mdev devices.
-> > > > 
-> > > > See patch 3/4 for detailed explanation why ballooning and device
-> > > > assignment typically don't mix.  If this eventually changes, flags
-> > > > on the iommu info struct or perhaps device info struct can inform
-> > > > us for automatic opt-in.  Thanks,
-> > > > 
-> > > > Alex    
-> > > 
-> > > So this patch seems to block ballooning when vfio is added.
-> > > But what if balloon is added and inflated first?  
-> > 
-> > Good point.
-> >    
-> > > I'd suggest making qemu_balloon_inhibit fail in that case,
-> > > and then vfio realize will fail as well.  
-> > 
-> > That might be the correct behavior for vfio, but I wonder about the
-> > existing postcopy use case.  Dave Gilbert, what do you think?  We might
-> > need a separate interface for callers that cannot tolerate existing
-> > ballooned pages.  Of course we'll also need another atomic counter to
-> > keep a tally of ballooned pages.  Thanks,  
+Am 2018-07-31 13:08, schrieb BALATON Zoltan:
+> The four interrupts of the PCI bus are connected to the same UIC pin
+> on the real Sam460ex. Evidence for this can be found in the UBoot
+> source for the Sam460ex in the Sam460ex.c file where
+> PCI_INTERRUPT_LINE is written. Change the ppc440_pcix model to behave
+> more like this.
 > 
-> For postcopy, preinflation isn't a problem; our only issue is ballooning
-> during the postcopy phase itself.
+> This fixes the problem that can be observed when adding further PCI
+> cards that got their interrupt rotated to other interrupts than PCI
+> INT A. In particular, the bug was observed with an additional OHCI PCI
+> card or an ES1370 sound device.
+[...]
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index 0999efc..9c77183 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -515,10 +515,8 @@ static void sam460ex_init(MachineState *machine)
+> 
+>      /* PCI bus */
+>      ppc460ex_pcie_init(env);
+> -    /* FIXME: is this correct? */
+> -    dev = sysbus_create_varargs("ppc440-pcix-host", 0xc0ec00000,
+> -                                uic[1][0], uic[1][20], uic[1][21], 
+> uic[1][22],
+> -                                NULL);
+> +    /* All PCI irqs are connected to the same UIC pin (cf. UBoot 
+> source) */
+> +    dev = sysbus_create_simple("ppc440-pcix-host", 0xc0ec00000, 
+> uic[1][0]);
+>      pci_bus = (PCIBus *)qdev_get_child_bus(dev, "pci.0");
+>      if (!pci_bus) {
+>          error_report("couldn't create PCI controller!");
 
-On further consideration, I think device assignment is in the same
-category.  The balloon inhibitor does not actually stop the guest
-balloon driver from grabbing and freeing pages, it only changes whether
-QEMU releases the pages with madvise DONTNEED.  The problem we have
-with ballooning and device assignment is when we have an existing HPA
-mapping in the IOMMU that isn't invalidated on DONTNEED and becomes
-inconsistent when the page is re-populated.  Zapped pages at the time
-an assigned device is added do not trigger this, those pages will be
-repopulated when pages are pinned for the assigned device.  This is the
-identical scenario to a freshly started VM that doesn't use memory
-preallocation and therefore faults in pages on demand.  When an
-assigned device is attached to such a VM, page pinning will fault in
-and lock all of those pages.
+I'm fine with that change. I tested it with an additional OHCI 
+controller on an emulated SAM machine under guest AmigaOS and it works.
 
-This is observable behavior, for example if I start a VM with 16GB of
-RAM, booted to a command prompt the VM shows less that 1GB of RAM
-resident in the host.  If I set the balloon to 2048, there's no
-observable change in the QEMU process size on the host.  If I hot-add
-an assigned device while we're ballooned down, the resident memory size
-from the host jumps up to 16GB.  All of the zapped pages have been
-reclaimed.  Adjusting ballooning at this point only changes the balloon
-size in the guest, inflating the balloon no longer zaps pages from the
-process.
+Tested-by: Sebastian Bauer <mail@sebastianbauer.info>
 
-The only oddity I see is the one Dave noted in the commit introducing
-balloon inhibiting (371ff5a3f04c):
+Better usage of QOM etc. can IMO be done at a later time point as this 
+fixes an unpleasant bug and any side change will just increase the 
+probability to introduce new bugs.
 
-    Queueing the requests until after migration would be nice, but is
-    non-trivial, since the set of inflate/deflate requests have to
-    be compared with the state of the page to know what the final
-    outcome is allowed to be.
-
-So for this example of a 16GB VM ballooned down to 2GB then an assigned
-device added and subsequently removed, the resident memory remains 16GB
-and I need to deflate the balloon and reinflate it in order to zap them
-from the QEMU process.  Therefore, I think that with respect to this
-inquiry, the series stands as is.  Thanks,
-
-Alex
+Bye
+Sebastian
