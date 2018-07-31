@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fkOeB-0003WT-1v
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 03:00:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1fkOiV-0004Of-3Q
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 03:05:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fkOe7-0006zp-Uo
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 03:00:43 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:37082)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fkOe7-0006zZ-Gm
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 03:00:39 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
-	<20180725121701.12867.49392.stgit@pasha-VirtualBox>
-	<87y3dxsyq9.fsf@linaro.org>
-In-Reply-To: <87y3dxsyq9.fsf@linaro.org>
-Date: Tue, 31 Jul 2018 10:00:39 +0300
-Message-ID: <000201d4289c$30cff010$926fd030$@ru>
+	(envelope-from <armbru@redhat.com>) id 1fkOiR-0008WG-V2
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 03:05:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54824 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fkOiR-0008Vh-No
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 03:05:07 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1DE9240216FE
+	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 07:05:07 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180730125746.22794-1-marcandre.lureau@redhat.com>
+Date: Tue, 31 Jul 2018 09:05:03 +0200
+In-Reply-To: <20180730125746.22794-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Mon, 30 Jul 2018 14:57:46 +0200")
+Message-ID: <87pnz3sx5s.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v5 23/24] replay: add BH oneshot event for
- block layer
+Subject: Re: [Qemu-devel] [PATCH RFC] monitor: temporary fix for dead-lock
+ on event recursion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,165 +35,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
->=20
-> > Replay is capable of recording normal BH events, but sometimes
-> > there are single use callbacks scheduled with =
-aio_bh_schedule_oneshot
-> > function. This patch enables recording and replaying such callbacks.
-> > Block layer uses these events for calling the completion function.
-> > Replaying these calls makes the execution deterministic.
-> >
-> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> > ---
-> >  block/block-backend.c    |    3 ++-
-> >  include/sysemu/replay.h  |    3 +++
-> >  replay/replay-events.c   |   16 ++++++++++++++++
-> >  replay/replay-internal.h |    1 +
-> >  replay/replay.c          |    2 +-
-> >  stubs/replay.c           |    6 ++++++
-> >  6 files changed, 29 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/block/block-backend.c b/block/block-backend.c
-> > index f2f75a9..232d114 100644
-> > --- a/block/block-backend.c
-> > +++ b/block/block-backend.c
-> > @@ -17,6 +17,7 @@
-> >  #include "block/throttle-groups.h"
-> >  #include "sysemu/blockdev.h"
-> >  #include "sysemu/sysemu.h"
-> > +#include "sysemu/replay.h"
-> >  #include "qapi/error.h"
-> >  #include "qapi/qapi-events-block.h"
-> >  #include "qemu/id.h"
-> > @@ -1370,7 +1371,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend =
-*blk, int64_t offset, int
-> bytes,
-> >
-> >      acb->has_returned =3D true;
-> >      if (acb->rwco.ret !=3D NOT_DONE) {
-> > -        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
-> > +        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
-> >                                  blk_aio_complete_bh, acb);
-> >      }
-> >
-> > diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-> > index 8118b00..945bc74 100644
-> > --- a/include/sysemu/replay.h
-> > +++ b/include/sysemu/replay.h
-> > @@ -152,6 +152,9 @@ bool replay_events_enabled(void);
-> >  void replay_flush_events(void);
-> >  /*! Adds bottom half event to the queue */
-> >  void replay_bh_schedule_event(QEMUBH *bh);
-> > +/*! Adds oneshot bottom half event to the queue */
-> > +void replay_bh_schedule_oneshot_event(AioContext *ctx,
-> > +    QEMUBHFunc *cb, void *opaque);
-> >  /*! Adds input event to the queue */
-> >  void replay_input_event(QemuConsole *src, InputEvent *evt);
-> >  /*! Adds input sync event to the queue */
-> > diff --git a/replay/replay-events.c b/replay/replay-events.c
-> > index 0964a82..0ac8a5c 100644
-> > --- a/replay/replay-events.c
-> > +++ b/replay/replay-events.c
-> > @@ -37,6 +37,9 @@ static void replay_run_event(Event *event)
-> >      case REPLAY_ASYNC_EVENT_BH:
-> >          aio_bh_call(event->opaque);
-> >          break;
-> > +    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
-> > +        ((QEMUBHFunc*)event->opaque)(event->opaque2);
-> > +        break;
-> >      case REPLAY_ASYNC_EVENT_INPUT:
-> >          qemu_input_event_send_impl(NULL, (InputEvent =
-*)event->opaque);
-> >          qapi_free_InputEvent((InputEvent *)event->opaque);
-> > @@ -132,6 +135,17 @@ void replay_bh_schedule_event(QEMUBH *bh)
-> >      }
-> >  }
-> >
-> > +void replay_bh_schedule_oneshot_event(AioContext *ctx,
-> > +    QEMUBHFunc *cb,void *opaque)
-> > +{
-> > +    if (events_enabled) {
-> > +        uint64_t id =3D replay_get_current_step();
-> > +        replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb, opaque, =
-id);
-> > +    } else {
-> > +        aio_bh_schedule_oneshot(ctx, cb, opaque);
-> > +    }
-> > +}
-> > +
-> >  void replay_add_input_event(struct InputEvent *event)
-> >  {
-> >      replay_add_event(REPLAY_ASYNC_EVENT_INPUT, event, NULL, 0);
-> > @@ -162,6 +176,7 @@ static void replay_save_event(Event *event, int =
-checkpoint)
-> >          /* save event-specific data */
-> >          switch (event->event_kind) {
-> >          case REPLAY_ASYNC_EVENT_BH:
-> > +        case REPLAY_ASYNC_EVENT_BH_ONESHOT:
-> >              replay_put_qword(event->id);
-> >              break;
-> >          case REPLAY_ASYNC_EVENT_INPUT:
-> > @@ -216,6 +231,7 @@ static Event *replay_read_event(int checkpoint)
-> >      /* Events that has not to be in the queue */
-> >      switch (replay_state.read_event_kind) {
-> >      case REPLAY_ASYNC_EVENT_BH:
-> > +    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
-> >          if (replay_state.read_event_id =3D=3D -1) {
-> >              replay_state.read_event_id =3D replay_get_qword();
-> >          }
-> > diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-> > index 08ef2ec..0c0ed16 100644
-> > --- a/replay/replay-internal.h
-> > +++ b/replay/replay-internal.h
-> > @@ -51,6 +51,7 @@ enum ReplayEvents {
-> >
-> >  enum ReplayAsyncEventKind {
-> >      REPLAY_ASYNC_EVENT_BH,
-> > +    REPLAY_ASYNC_EVENT_BH_ONESHOT,
-> >      REPLAY_ASYNC_EVENT_INPUT,
-> >      REPLAY_ASYNC_EVENT_INPUT_SYNC,
-> >      REPLAY_ASYNC_EVENT_CHAR_READ,
-> > diff --git a/replay/replay.c b/replay/replay.c
-> > index 6e82764..061b1e2 100644
-> > --- a/replay/replay.c
-> > +++ b/replay/replay.c
-> > @@ -22,7 +22,7 @@
-> >
-> >  /* Current version of the replay mechanism.
-> >     Increase it when file format changes. */
-> > -#define REPLAY_VERSION              0xe02007
-> > +#define REPLAY_VERSION              0xe02008
-> >  /* Size of replay log header */
-> >  #define HEADER_SIZE                 (sizeof(uint32_t) + =
-sizeof(uint64_t))
-> >
-> > diff --git a/stubs/replay.c b/stubs/replay.c
-> > index 781974e..cbdac80 100644
-> > --- a/stubs/replay.c
-> > +++ b/stubs/replay.c
-> > @@ -90,3 +90,9 @@ bool replay_reverse_continue(void)
-> >  {
-> >      return false;
-> >  }
-> > +
-> > +void replay_bh_schedule_oneshot_event(AioContext *ctx,
-> > +    QEMUBHFunc *cb,void *opaque)
-> > +{
-> > +    aio_bh_schedule_oneshot(ctx, cb, opaque);
-> > +}
->=20
-> It seems wrong to have something in stubs that actively does stuff.
-> Isn't this meant to be a bunch of NOPs?
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-I thinks stubs are meant to be functions that are used by qemu-img and =
-other tools.
-As I replaced aio_bh_schedule_oneshot with =
-replay_bh_schedule_oneshot_event,
-the tools should not notice this. Therefore the stub performs this call.
+> With a Spice port chardev, it is possible to reenter
+> monitor_qapi_event_queue() (when the client disconnects for
+> example). This will dead-lock on monitor_lock.
+>
+> Instead, use some TLS variables to check for recursion and queue the
+> events.
+[...]
+>
+> Note that error report is now moved to the first caller, which may
+> receive an error for a recursed event. This is probably fine (95% of
+> callers use &error_abort, the rest have NULL error and ignore it)
 
-Pavel Dovgalyuk
+I'm not 100% sure I understand this paragraph, but it might be moot; see
+[*] below.
+
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  monitor.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 50 insertions(+), 1 deletion(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index d8d8211ae4..d580c5a79c 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -633,7 +633,7 @@ static void monitor_qapi_event_handler(void *opaque);
+>   * applying any rate limiting if required.
+>   */
+>  static void
+> -monitor_qapi_event_queue(QAPIEvent event, QDict *qdict, Error **errp)
+> +monitor_qapi_event_queue_no_recurse(QAPIEvent event, QDict *qdict, Error=
+ **errp)
+>  {
+>      MonitorQAPIEventConf *evconf;
+>      MonitorQAPIEventState *evstate;
+> @@ -688,6 +688,55 @@ monitor_qapi_event_queue(QAPIEvent event, QDict *qdi=
+ct, Error **errp)
+>      qemu_mutex_unlock(&monitor_lock);
+>  }
+>=20=20
+> +static void
+> +monitor_qapi_event_queue(QAPIEvent event, QDict *qdict, Error **errp)
+> +{
+> +    Error *local_err =3D NULL;
+> +    /*
+> +     * If the function recurse, monitor_lock will dead-lock.
+> +     * Instead, queue pending events in TLS.
+
+recurses
+
+The claim is correct before the patch.  But the comment needs to explain
+current code.  Perhaps:
+
+        * monitor_qapi_event_queue_no_recurse() is not reentrant: it
+        * would deadlock on monitor_lock.  Work around by queueing
+        * events in thread-local storage.
+
+> +     * TODO: remove this, make it re-enter safe.
+> +     */
+> +    static __thread bool recurse;
+> +    typedef struct MonitorQapiEvent {
+> +        QAPIEvent event;
+> +        QDict *qdict;
+> +        QSIMPLEQ_ENTRY(MonitorQapiEvent) entry;
+> +    } MonitorQapiEvent;
+> +    MonitorQapiEvent *ev;
+> +    static __thread QSIMPLEQ_HEAD(, MonitorQapiEvent) event_queue;
+
+Let's put the static variables first.
+
+> +
+> +    if (!recurse) {
+> +        QSIMPLEQ_INIT(&event_queue);
+> +    }
+> +
+> +    ev =3D g_new(MonitorQapiEvent, 1);
+> +    ev->qdict =3D qobject_ref(qdict);
+> +    ev->event =3D event;
+> +    QSIMPLEQ_INSERT_TAIL(&event_queue, ev, entry);
+> +    if (recurse) {
+> +        return;
+> +    }
+> +
+> +    recurse =3D true;
+> +
+> +    while ((ev =3D QSIMPLEQ_FIRST(&event_queue)) !=3D NULL) {
+> +        QSIMPLEQ_REMOVE_HEAD(&event_queue, entry);
+
+Could we use QSIMPLEQ_FOREACH_SAFE()?
+
+> +        if (!local_err) {
+> +            monitor_qapi_event_queue_no_recurse(ev->event, ev->qdict,
+> +                                                &local_err);
+> +        }
+
+[*] This looks scary: we silently throw away events after event queuing
+fails.
+
+Fortunately, monitor_qapi_event_queue_no_recurse() cannot fail.  It
+takes an Error ** parameter only so you can put it into @qmp_emit.
+
+Aside: I wish we'd get rid of the indirection through @qmp_emit.
+
+Let's pass &error_abort and drop @local_err.
+
+> +        qobject_unref(ev->qdict);
+> +        g_free(ev);
+> +    }
+> +
+> +    recurse =3D false;
+
+Aha: @recurse means we've reentered the function.
+
+"Recurse" is imperative mood.  Misleading, as it's not an order to
+recurse.
+
+Rename to @recursed?  @reentered?
+
+> +
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +    }
+> +}
+> +
+>  /*
+>   * This function runs evconf->rate ns after sending a throttled
+>   * event.
+
+monitor_lock clearly needs a rethink.  Your TODO comment suggests you
+agree.  But that's something for 3.1.
+
+I hate messing with locks at -rc3, but I also hate shipping known
+deadlocks.  Your patch isn't pretty, but probably as simple as we can
+make it for 3.0.  A few more review eyeballs would be nice.
