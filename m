@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fksOI-0007pR-VU
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 10:46:19 -0400
+	(envelope-from <armbru@redhat.com>) id 1fkskS-0004KD-NP
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 11:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fksOF-0007WT-0K
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 10:46:19 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <w51muu7uzba.fsf@maestria.local.igalia.com>
-References: <20180704145410.794-1-stefanha@redhat.com>
-	<w51muu7uzba.fsf@maestria.local.igalia.com>
-Date: Wed, 01 Aug 2018 16:45:36 +0200
-Message-ID: <w51sh3ycfhr.fsf@maestria.local.igalia.com>
+	(envelope-from <armbru@redhat.com>) id 1fkskN-0000dZ-OQ
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 11:09:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43932 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fkskN-0000bs-HT
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 11:09:07 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180801093401.9160-1-marcandre.lureau@redhat.com>
+	<871sbi8bsm.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJj=WPs0FOx8QJU76iFqhc11N7m+FnRG2t0USu0Jm6JTA@mail.gmail.com>
+Date: Wed, 01 Aug 2018 17:09:05 +0200
+In-Reply-To: <CAJ+F1CJj=WPs0FOx8QJU76iFqhc11N7m+FnRG2t0USu0Jm6JTA@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 1 Aug 2018
+	15:32:20 +0200")
+Message-ID: <874lge6s4u.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix hang when group
- member leaves
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] monitor: avoid potential dead-lock when
+ cleaning up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +31,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue 31 Jul 2018 06:47:53 PM CEST, Alberto Garcia wrote:
-> On Wed 04 Jul 2018 04:54:10 PM CEST, Stefan Hajnoczi wrote:
->> Throttle groups consist of members sharing one throttling state
->> (including bps/iops limits).  Round-robin scheduling is used to ensure
->> fairness.  If a group member already has a timer pending then other
->> groups members do not schedule their own timers.  The next group
->> member will have its turn when the existing timer expires.
->>
->> A hang may occur when a group member leaves while it had a timer
->> scheduled.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+
+> Hi
 >
-> Ok, I can reproduce this if I run fio with iodepth=1.
+> On Wed, Aug 1, 2018 at 3:19 PM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>>> When a monitor is connected to a Spice chardev, the monitor cleanup
+>>> can dead-lock:
+>>>
+>>>  #0  0x00007f43446637fd in __lll_lock_wait () at /lib64/libpthread.so.0
+>>>  #1  0x00007f434465ccf4 in pthread_mutex_lock () at /lib64/libpthread.s=
+o.0
+>>>  #2  0x0000556dd79f22ba in qemu_mutex_lock_impl (mutex=3D0x556dd81c9220=
+ <monitor_lock>, file=3D0x556dd7ae3648 "/home/elmarco/src/qq/monitor.c", li=
+ne=3D645) at /home/elmarco/src/qq/util/qemu-thread-posix.c:66
+>>>  #3  0x0000556dd7431bd5 in monitor_qapi_event_queue (event=3DQAPI_EVENT=
+_SPICE_DISCONNECTED, qdict=3D0x556dd9abc850, errp=3D0x7fffb7bbddd8) at /hom=
+e/elmarco/src/qq/monitor.c:645
+>>>  #4  0x0000556dd79d476b in qapi_event_send_spice_disconnected (server=
+=3D0x556dd98ee760, client=3D0x556ddaaa8560, errp=3D0x556dd82180d0 <error_ab=
+ort>) at qapi/qapi-events-ui.c:149
+>>>  #5  0x0000556dd7870fc1 in channel_event (event=3D3, info=3D0x556ddad1b=
+590) at /home/elmarco/src/qq/ui/spice-core.c:235
+>>>  #6  0x00007f434560a6bb in reds_handle_channel_event (reds=3D<optimized=
+ out>, event=3D3, info=3D0x556ddad1b590) at reds.c:316
+>>>  #7  0x00007f43455f393b in main_dispatcher_self_handle_channel_event (i=
+nfo=3D0x556ddad1b590, event=3D3, self=3D0x556dd9a7d8c0) at main-dispatcher.=
+c:197
+>>>  #8  0x00007f43455f393b in main_dispatcher_channel_event (self=3D0x556d=
+d9a7d8c0, event=3Devent@entry=3D3, info=3D0x556ddad1b590) at main-dispatche=
+r.c:197
+>>>  #9  0x00007f4345612833 in red_stream_push_channel_event (s=3Ds@entry=
+=3D0x556ddae2ef40, event=3Devent@entry=3D3) at red-stream.c:414
+>>>  #10 0x00007f434561286b in red_stream_free (s=3D0x556ddae2ef40) at red-=
+stream.c:388
+>>>  #11 0x00007f43455f9ddc in red_channel_client_finalize (object=3D0x556d=
+d9bb21a0) at red-channel-client.c:347
+>>>  #12 0x00007f434b5f9fb9 in g_object_unref () at /lib64/libgobject-2.0.s=
+o.0
+>>>  #13 0x00007f43455fc212 in red_channel_client_push (rcc=3D0x556dd9bb21a=
+0) at red-channel-client.c:1341
+>>>  #14 0x0000556dd76081ba in spice_port_set_fe_open (chr=3D0x556dd9925e20=
+, fe_open=3D0) at /home/elmarco/src/qq/chardev/spice.c:241
+>>>  #15 0x0000556dd796d74a in qemu_chr_fe_set_open (be=3D0x556dd9a37c00, f=
+e_open=3D0) at /home/elmarco/src/qq/chardev/char-fe.c:340
+>>>  #16 0x0000556dd796d4d9 in qemu_chr_fe_set_handlers (b=3D0x556dd9a37c00=
+, fd_can_read=3D0x0, fd_read=3D0x0, fd_event=3D0x0, be_change=3D0x0, opaque=
+=3D0x0, context=3D0x0, set_open=3Dtrue) at /home/elmarco/src/qq/chardev/cha=
+r-fe.c:280
+>>>  #17 0x0000556dd796d359 in qemu_chr_fe_deinit (b=3D0x556dd9a37c00, del=
+=3Dfalse) at /home/elmarco/src/qq/chardev/char-fe.c:233
+>>>  #18 0x0000556dd7432240 in monitor_data_destroy (mon=3D0x556dd9a37c00) =
+at /home/elmarco/src/qq/monitor.c:786
+>>>  #19 0x0000556dd743b968 in monitor_cleanup () at /home/elmarco/src/qq/m=
+onitor.c:4683
+>>>  #20 0x0000556dd75ce776 in main (argc=3D3, argv=3D0x7fffb7bbe458, envp=
+=3D0x7fffb7bbe478) at /home/elmarco/src/qq/vl.c:4660
+>>>
+>>> Because spice code tries to emit a "disconnected" signal on the
+>>> monitors. Fix this situation by tightening the monitor lock time to
+>>> the monitor list removal.
+>>>
+>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>
+>> Do you think this should go into 3.0?
+>>
+>>> ---
+>>>  monitor.c | 22 +++++++++++++++-------
+>>>  1 file changed, 15 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/monitor.c b/monitor.c
+>>> index 0fa0910a2a..a16a6c5311 100644
+>>> --- a/monitor.c
+>>> +++ b/monitor.c
+>>> @@ -4702,8 +4702,6 @@ void monitor_init(Chardev *chr, int flags)
+>>>
+>>>  void monitor_cleanup(void)
+>>>  {
+>>> -    Monitor *mon, *next;
+>>> -
+>>>      /*
+>>>       * We need to explicitly stop the I/O thread (but not destroy it),
+>>>       * clean up the monitor resources, then destroy the I/O thread sin=
+ce
+>>> @@ -4719,14 +4717,24 @@ void monitor_cleanup(void)
+>>>      monitor_qmp_bh_responder(NULL);
+>>>
+>>>      /* Flush output buffers and destroy monitors */
+>>> -    qemu_mutex_lock(&monitor_lock);
+>>> -    QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
+>>> -        QTAILQ_REMOVE(&mon_list, mon, entry);
+>>> +    do {
+>>
+>> for (;;), please.
+>>
+>>> +        Monitor *mon;
+>>> +
+>>> +        qemu_mutex_lock(&monitor_lock);
+>>> +        mon =3D QTAILQ_FIRST(&mon_list);
+>>> +        if (mon) {
+>>> +            QTAILQ_REMOVE(&mon_list, mon, entry);
+>>> +        }
+>>> +        qemu_mutex_unlock(&monitor_lock);
+>>> +
+>>> +        if (!mon) {
+>>> +            break;
+>>> +        }
+>>> +
+>>>          monitor_flush(mon);
+>>>          monitor_data_destroy(mon);
+>>>          g_free(mon);
+>>> -    }
+>>> -    qemu_mutex_unlock(&monitor_lock);
+>>> +    } while (true);
+>>>
+>>>      /* QEMUBHs needs to be deleted before destroying the I/O thread */
+>>>      qemu_bh_delete(qmp_dispatcher_bh);
+>>
+>> Iterating safely over a list protected by a lock should be easier than
+>> that.  Sad.
+>>
+>> Hmm, what about this:
+>>
+>> diff --git a/monitor.c b/monitor.c
+>> index 77861e96af..4a23f6c7bc 100644
+>> --- a/monitor.c
+>> +++ b/monitor.c
+>> @@ -4721,9 +4721,11 @@ void monitor_cleanup(void)
+>>      qemu_mutex_lock(&monitor_lock);
+>>      QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
+>>          QTAILQ_REMOVE(&mon_list, mon, entry);
+>> +        qemu_mutex_unlock(&monitor_lock);
+>>          monitor_flush(mon);
+>>          monitor_data_destroy(mon);
+>>          g_free(mon);
+>> +        qemu_mutex_lock(&monitor_lock);
+>
+> Although unlikely, there is a chance the monitor list could be
+> modified while flushing/cleaning up, I suppose, in this case we could
+> miss the new monitors (if next is NULL).
 
-I managed to write a test case for this, but unfortunately it seems that
-this patch is not enough and it's still possible to hang QEMU 3.0.0-rc2.
+Your loop prevents that from happening while it runs, but does nothing
+to stop it from happening afterwards.  If we want to lock out new
+monitors, we need to make monitor_init() fail or impossible to call.
 
-I expect to have a fix for tomorrow.
-
-Berto
+>
+>>      }
+>>      qemu_mutex_unlock(&monitor_lock);
+>>
+>>
