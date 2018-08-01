@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fkwE4-0000hA-LK
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 14:52:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fkwHQ-0001VE-N5
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 14:55:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fkwDz-0003wn-Op
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 14:52:00 -0400
-Received: from mail-eopbgr730131.outbound.protection.outlook.com
-	([40.107.73.131]:61664
-	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fkwDz-0003vp-F3
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 14:51:55 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Wed, 1 Aug 2018 18:51:49 +0000
-Message-ID: <BN7PR08MB4868ECFD24601E06677D4C55C62D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1532967169-22265-8-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<4bc391e5-9aac-57c6-7173-0fdd7a25bccc@vivier.eu>
-In-Reply-To: <4bc391e5-9aac-57c6-7173-0fdd7a25bccc@vivier.eu>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dgilbert@redhat.com>) id 1fkwHP-0006a8-Q3
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 14:55:28 -0400
+Date: Wed, 1 Aug 2018 19:55:16 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180801185515.GE2691@work-vm>
+References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
+	<20180626135035.133432-5-vsementsov@virtuozzo.com>
+	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
+	<20180801102031.GC2691@work-vm>
+	<64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
+	<20180801174005.GD2691@work-vm>
+	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 07/76] elf: Remove duplicate
- preprocessor constant definition
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
+Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
+ loading and migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,118 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
 
-Hi, Laurent.
-
-> From: Laurent Vivier <laurent@vivier.eu>
-> Sent: Monday, July 30, 2018 6:49 PM
->=20
-> Le 30/07/2018 =E0 18:11, Aleksandar Markovic a =E9crit :
-> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
+* Denis V. Lunev (den@openvz.org) wrote:
+> On 08/01/2018 08:40 PM, Dr. David Alan Gilbert wrote:
+> > * John Snow (jsnow@redhat.com) wrote:
+> >>
+> >> On 08/01/2018 06:20 AM, Dr. David Alan Gilbert wrote:
+> >>> * John Snow (jsnow@redhat.com) wrote:
+> >>>
+> >>> <snip>
+> >>>
+> >>>> I'd rather do something like this:
+> >>>> - Always flush bitmaps to disk on inactivate.
+> >>> Does that increase the time taken by the inactivate measurably?
+> >>> If it's small relative to everything else that's fine; it's just I
+> >>> always worry a little since I think this happens after we've stopped the
+> >>> CPU on the source, so is part of the 'downtime'.
+> >>>
+> >>> Dave
+> >>> --
+> >>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >>>
+> >> I'm worried that if we don't, we're leaving behind unusable, partially
+> >> complete files behind us. That's a bad design and we shouldn't push for
+> >> it just because it's theoretically faster.
+> > Oh I don't care about theoretical speed; but if it's actually unusably
+> > slow in practice then it needs fixing.
 > >
-> > Remove duplicate preprocessor constant definition for EF_MIPS_ARCH.
-> >
-> > The duplicate was introduced in commit 45506bdd.
-> >
-> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> > ---
-> >  include/elf.h | 1 -
-> >  1 file changed, 1 deletion(-)
-> >
-> > diff --git a/include/elf.h b/include/elf.h
-> > index 934dbbd..c8aaa2a 100644
-> > --- a/include/elf.h
-> > +++ b/include/elf.h
-> > @@ -33,7 +33,6 @@ typedef int64_t  Elf64_Sxword;
-> >
-> >  /* Flags in the e_flags field of the header */
-> >  /* MIPS architecture level. */
-> > -#define EF_MIPS_ARCH            0xf0000000
-> >
-> >  /* Legal values for MIPS architecture level.  */
-> >  #define EF_MIPS_ARCH_1               0x00000000      /* -mips1 code.  =
-*/
-> >
->=20
-> You should move the comment "MIPS architecture level" where the other
-> EF_MIPS_ARCH is defined (see glibc or system elf.h).
->=20
-> Thanks,
-> Laurent
+> > Dave
+> 
+> This is not "theoretical" speed. This is real practical speed and
+> instability.
+> EACH IO operation can be performed unpredictably slow and thus with
+> IO operations in mind you can not even calculate or predict downtime,
+> which should be done according to the migration protocol.
 
-The comment "/* MIPS architecture level */" was present both before and aft=
-er the commit 45506bdd. The scope of this patch is to rollback a duplicate =
-preprocessor definition originating from the commit 45506bdd. This means th=
-at moving/modifying comments should not be in this patch. Can you please cl=
-arify for me what additional changes you suggest (but these should definite=
-ly be in a separate patch)? Do you want to sync this segment of QEMU's elf.=
-h (copied below) with glibc corresponding section from its elf.h (also belo=
-w)?
+We end up doing some IO anyway, even ignoring these new bitmaps,
+at the end of the migration when we pause the CPU, we do a
+bdrv_inactivate_all to flush any outstanding writes; so we've already
+got that unpredictable slowness.
 
-QEMU's elf.h:
+So, not being a block person, but with some interest in making sure
+downtime doesn't increase, I just wanted to understand whether the
+amount of writes we're talking about here is comparable to that
+which already exists or a lot smaller or a lot larger.
+If the amount of IO you're talking about is much smaller than what
+we typically already do, then John has a point and you may as well
+do the write.
+If the amount of IO for the bitmap is much larger and would slow
+the downtime a lot then you've got a point and that would be unworkable.
 
-/* MIPS architecture level. */
-#define EF_MIPS_ARCH            0xf0000000 <----------------- duplicate
+Dave
 
-/* Legal values for MIPS architecture level.  */
-#define EF_MIPS_ARCH_1		0x00000000	/* -mips1 code.  */
-#define EF_MIPS_ARCH_2		0x10000000	/* -mips2 code.  */
-#define EF_MIPS_ARCH_3		0x20000000	/* -mips3 code.  */
-#define EF_MIPS_ARCH_4		0x30000000	/* -mips4 code.  */
-#define EF_MIPS_ARCH_5		0x40000000	/* -mips5 code.  */
-#define EF_MIPS_ARCH_32		0x50000000	/* MIPS32 code.  */
-#define EF_MIPS_ARCH_64		0x60000000	/* MIPS64 code.  */
-#define EF_MIPS_ARCH_32R2       0x70000000      /* MIPS32r2 code.  */
-#define EF_MIPS_ARCH_64R2       0x80000000      /* MIPS64r2 code.  */
-#define EF_MIPS_ARCH_32R6       0x90000000      /* MIPS32r6 code.  */
-#define EF_MIPS_ARCH_64R6       0xa0000000      /* MIPS64r6 code.  */
+> That is why we have very specifically (for the purpose) improved
+> migration protocol to migrate CBT via postcopy method, which
+> does not influence downtime.
+> 
+> That is why we strictly opposes any CBT writing operation in migration
+> code. It should also be noted, that CBT can be calculated for all discs,
+> including raw but could be written for QCOW2 only. With external CBT storage
+> for such discs the situation during migration would become even worse.
 
-/* The ABI of a file. */
-#define EF_MIPS_ABI_O32		0x00001000	/* O32 ABI.  */
-#define EF_MIPS_ABI_O64		0x00002000	/* O32 extended for 64 bit.  */
-
-#define EF_MIPS_NOREORDER 0x00000001
-#define EF_MIPS_PIC       0x00000002
-#define EF_MIPS_CPIC      0x00000004
-#define EF_MIPS_ABI2		0x00000020
-#define EF_MIPS_OPTIONS_FIRST	0x00000080
-#define EF_MIPS_32BITMODE	0x00000100
-#define EF_MIPS_ABI		0x0000f000
-#define EF_MIPS_FP64      0x00000200
-#define EF_MIPS_NAN2008   0x00000400
-#define EF_MIPS_ARCH      0xf0000000
-
-
-glibc's elf.h:
-
-/* Legal values for e_flags field of Elf32_Ehdr.  */
-
-#define EF_MIPS_NOREORDER	1     /* A .noreorder directive was used.  */
-#define EF_MIPS_PIC		2     /* Contains PIC code.  */
-#define EF_MIPS_CPIC		4     /* Uses PIC calling sequence.  */
-#define EF_MIPS_XGOT		8
-#define EF_MIPS_64BIT_WHIRL	16
-#define EF_MIPS_ABI2		32
-#define EF_MIPS_ABI_ON32	64
-#define EF_MIPS_FP64		512  /* Uses FP64 (12 callee-saved).  */
-#define EF_MIPS_NAN2008	1024  /* Uses IEEE 754-2008 NaN encoding.  */
-#define EF_MIPS_ARCH		0xf0000000 /* MIPS architecture level.  */
-
-/* Legal values for MIPS architecture level.  */
-
-#define EF_MIPS_ARCH_1		0x00000000 /* -mips1 code.  */
-#define EF_MIPS_ARCH_2		0x10000000 /* -mips2 code.  */
-#define EF_MIPS_ARCH_3		0x20000000 /* -mips3 code.  */
-#define EF_MIPS_ARCH_4		0x30000000 /* -mips4 code.  */
-#define EF_MIPS_ARCH_5		0x40000000 /* -mips5 code.  */
-#define EF_MIPS_ARCH_32		0x50000000 /* MIPS32 code.  */
-#define EF_MIPS_ARCH_64		0x60000000 /* MIPS64 code.  */
-#define EF_MIPS_ARCH_32R2	0x70000000 /* MIPS32r2 code.  */
-#define EF_MIPS_ARCH_64R2	0x80000000 /* MIPS64r2 code.  */
-
-
-Regards,
-Aleksandar
+> Den
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
