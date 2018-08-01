@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fknt3-00087N-Dj
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:57:46 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1fko1Q-0002cb-VO
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:06:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fknt2-0000py-JT
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:57:45 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:38186)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1fknt2-0000oS-DS
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:57:44 -0400
-Received: by mail-it0-x244.google.com with SMTP id v71-v6so8513648itb.3
-	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 02:57:44 -0700 (PDT)
+	(envelope-from <gengdongjiu@huawei.com>) id 1fko1P-00051r-U8
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:06:24 -0400
+References: <1532196162-29453-1-git-send-email-gengdongjiu@huawei.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <4beb699e-8e9b-0a3e-01a6-891033ebc7a5@huawei.com>
+Date: Wed, 1 Aug 2018 18:05:55 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-v+tOzub5V1_3stzNYX9M7hHX0c__jhSWM-q14QdtoTA@mail.gmail.com>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA-v+tOzub5V1_3stzNYX9M7hHX0c__jhSWM-q14QdtoTA@mail.gmail.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Wed, 1 Aug 2018 17:57:42 +0800
-Message-ID: <CAHmQWvACMacPDzLgwHX4GRhHOX_0CmaHb0KEkE-F63_faN3zew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] hw/arm: check fw_cfg return value
- before using it
+In-Reply-To: <1532196162-29453-1-git-send-email-gengdongjiu@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 0/3] add support for VCPU event states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: linuxarm@huawei.com
 
-On 31 July 2018 at 02:07, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 25 July 2018 at 06:30, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
->> The fw_cfg value returned from fw_cfg_find() may be NULL, so check it
->> before using.
->>
->> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
->> ---
->>  hw/arm/boot.c | 6 +++---
->>  1 file changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
->> index e09201c..43b217f 100644
->> --- a/hw/arm/boot.c
->> +++ b/hw/arm/boot.c
->> @@ -930,6 +930,7 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->>      hwaddr entry;
->>      static const ARMInsnFixup *primary_loader;
->>      AddressSpace *as = arm_boot_address_space(cpu, info);
->> +    FWCfgState *fw_cfg;
->>
->>      /* CPU objects (unlike devices) are not automatically reset on system
->>       * reset, so we must always register a handler to do so. If we're
->> @@ -960,11 +961,10 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->>              info->dtb_start = info->loader_start;
->>          }
->>
->> -        if (info->kernel_filename) {
->> -            FWCfgState *fw_cfg;
->> +        fw_cfg = fw_cfg_find();
->> +        if (info->kernel_filename && fw_cfg) {
->>              bool try_decompressing_kernel;
->
-> This can only happen if:
->  * the user provided a firmware blob
->  * the user provided a -kernel option
->  * the board does not have a fw_cfg so we can't pass the kernel to
->    the firmware blob
-> right?
->
-Yes.
+Hi Peter,
+   sorry to disturb you, any comments for this series patch? thanks you in advance.
 
-> I think in this situation we should exit with a helpful error
-> message to the user (telling them that this board model does
-> not support using the -kernel option when a guest firmware image
-> is being booted), rather than silently ignoring the option.
->
-The suggestion sounds better.
-Thanks.
-
-> thanks
-> -- PMM
+On 2018/7/22 2:02, Dongjiu Geng wrote:
+> Support for KVM_GET/SET_VCPU_EVENTS to get/set the SError exception
+> state, and support the state migration.
+> 
+> change since v4:
+> 1. update the linux header files to 4.18-rc5 
+> 
+> change since v3:
+> 1. Add a new new subsection with a suitable 'ras_needed' function
+> controlling whether it is present
+> 2. Add a ARM_FEATURE_RAS feature bit for CPUARMState
+> 
+> change since v2:
+> 1. add header definition for arm platform
+> 
+> change since v1:
+> 1. update the code to fix the build errors
+> 
+> The related kernel change has been already applied to kvmarm/next.
+> (https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/log/?h=next)
+> 
+> Dongjiu Geng (3):
+>   Update Linux headers to 4.18-rc5
+>   kvm: sync linux headers
+>   target: arm: Add support for VCPU event states
+> 
+>  include/standard-headers/linux/virtio_config.h | 16 +++++--
+>  linux-headers/asm-arm/kvm.h                    | 13 ++++++
+>  linux-headers/asm-arm64/kvm.h                  | 13 ++++++
+>  linux-headers/asm-mips/unistd.h                | 18 +++++---
+>  linux-headers/asm-powerpc/kvm.h                |  1 +
+>  linux-headers/asm-powerpc/unistd.h             |  1 +
+>  linux-headers/asm-s390/unistd_32.h             |  2 +
+>  linux-headers/asm-s390/unistd_64.h             |  2 +
+>  linux-headers/linux/kvm.h                      |  1 +
+>  target/arm/cpu.h                               |  6 +++
+>  target/arm/kvm64.c                             | 59 ++++++++++++++++++++++++++
+>  target/arm/machine.c                           | 22 ++++++++++
+>  12 files changed, 144 insertions(+), 10 deletions(-)
+> 
