@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fkp1F-0000L5-Ik
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:19 -0400
+	(envelope-from <quintela@redhat.com>) id 1fkp1I-0000Mq-BD
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fkp1E-0006iB-MH
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49106 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fkp1H-0006ks-Eu
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39390 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fkp1E-0006hg-Hu
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:16 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fkp1H-0006kd-9s
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:19 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 361BD402243B
-	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 11:10:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DF4528182D38
+	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 11:10:18 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  1 Aug 2018 13:09:47 +0200
-Message-Id: <20180801110952.5590-14-quintela@redhat.com>
+Date: Wed,  1 Aug 2018 13:09:49 +0200
+Message-Id: <20180801110952.5590-16-quintela@redhat.com>
 In-Reply-To: <20180801110952.5590-1-quintela@redhat.com>
 References: <20180801110952.5590-1-quintela@redhat.com>
-Subject: [Qemu-devel] [[PATH for 3.1] v2 13/18] check: Only test wdt_ib700
- when it is compiled in
+Subject: [Qemu-devel] [[PATH for 3.1] v2 15/18] check: Only test nvme when
+ it is compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,20 +40,19 @@ Reviewed-by: Thomas Huth <thuth@redhat.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 42f09dbfdf..edbd391f04 100644
+index b9fb80b461..2642500659 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -267,9 +267,9 @@ check-qtest-i386-y += tests/ipmi-bt-test$(EXESUF)
- check-qtest-i386-y += tests/i440fx-test$(EXESUF)
- check-qtest-i386-y += tests/fw_cfg-test$(EXESUF)
- check-qtest-i386-y += tests/drive_del-test$(EXESUF)
--check-qtest-i386-y += tests/wdt_ib700-test$(EXESUF)
-+check-qtest-i386-$(CONFIG_WDT_IB700) += tests/wdt_ib700-test$(EXESUF)
-+gcov-files-i386-$(CONFIG_WDT_IB700) += hw/watchdog/watchdog.c hw/watchdog/wdt_ib700.c
- check-qtest-i386-y += tests/tco-test$(EXESUF)
--gcov-files-i386-y += hw/watchdog/watchdog.c hw/watchdog/wdt_ib700.c
- check-qtest-i386-y += $(check-qtest-pci-y)
- gcov-files-i386-y += $(gcov-files-pci-y)
- check-qtest-i386-$(CONFIG_VMXNET3_PCI) += tests/vmxnet3-test$(EXESUF)
+@@ -224,8 +224,8 @@ check-qtest-pci-$(CONFIG_EEPRO100_PCI) += tests/eepro100-test$(EXESUF)
+ gcov-files-pci-$(CONFIG_EEPRO100_PCI) += hw/net/eepro100.c
+ check-qtest-pci-$(CONFIG_NE2000_PCI) += tests/ne2000-test$(EXESUF)
+ gcov-files-pci-$(CONFIG_NE2000_PCI) += hw/net/ne2000.c
+-check-qtest-pci-y += tests/nvme-test$(EXESUF)
+-gcov-files-pci-y += hw/block/nvme.c
++check-qtest-pci-$(CONFIG_NVME_PCI) += tests/nvme-test$(EXESUF)
++gcov-files-pci-$(CONFIG_NVME_PCI) += hw/block/nvme.c
+ check-qtest-pci-$(CONFIG_AC97) += tests/ac97-test$(EXESUF)
+ gcov-files-pci-$(CONFIG_AC97) += hw/audio/ac97.c
+ check-qtest-pci-$(CONFIG_ES1370) += tests/es1370-test$(EXESUF)
 -- 
 2.17.1
