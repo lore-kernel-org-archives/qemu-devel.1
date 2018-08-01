@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fkinV-0000ta-Pb
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 00:31:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fkinX-0000tg-O5
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 00:31:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fkinU-0004I2-Jz
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 00:31:41 -0400
-Date: Wed, 1 Aug 2018 14:27:59 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fkinU-0004I7-KW
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 00:31:43 -0400
+Date: Wed, 1 Aug 2018 14:26:59 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180801042759.GO2708@umbus.fritz.box>
-References: <20180730141134.31153-1-clg@kaod.org>
-	<20180730141134.31153-2-clg@kaod.org>
+Message-ID: <20180801042659.GN2708@umbus.fritz.box>
+References: <1532970557-22894-1-git-send-email-yasmins@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="S0GG+JvAI2G0KxBG"
+	protocol="application/pgp-signature"; boundary="qi3SIpffvxS/TM8d"
 Content-Disposition: inline
-In-Reply-To: <20180730141134.31153-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v6 1/4] spapr: Add a pseries-3.1 machine
- type
+In-Reply-To: <1532970557-22894-1-git-send-email-yasmins@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: simplify bcdadd/sub
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +24,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Yasmin Beatriz <yasmins@linux.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net
 
 
---S0GG+JvAI2G0KxBG
-Content-Type: text/plain; charset=iso-8859-1
+--qi3SIpffvxS/TM8d
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 30, 2018 at 04:11:31PM +0200, C=E9dric Le Goater wrote:
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+On Mon, Jul 30, 2018 at 05:09:17PM +0000, Yasmin Beatriz wrote:
+> After solving a corner case in bcdsub, this patch simplifies the logic
+> of both bcdadd/sub instructions by removing some unnecessary local flags.
+> This commit also rearranges some if-else conditions in bcdadd to make it
+> easier to read.
+>=20
+> Signed-off-by: Yasmin Beatriz <yasmins@linux.ibm.com>
 
 Applied to ppc-for-3.1, thanks.
 
 > ---
->  include/hw/compat.h |  3 +++
->  hw/ppc/spapr.c      | 23 +++++++++++++++++++++--
->  2 files changed, 24 insertions(+), 2 deletions(-)
+>  target/ppc/int_helper.c | 49 ++++++++++++++++++-------------------------=
+------
+>  1 file changed, 18 insertions(+), 31 deletions(-)
 >=20
-> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> index c08f4040bb80..6f4d5fc64704 100644
-> --- a/include/hw/compat.h
-> +++ b/include/hw/compat.h
-> @@ -1,6 +1,9 @@
->  #ifndef HW_COMPAT_H
->  #define HW_COMPAT_H
-> =20
-> +#define HW_COMPAT_3_0 \
-> +    /* empty */
-> +
->  #define HW_COMPAT_2_12 \
->      {\
->          .driver   =3D "migration",\
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 421b2dd09b51..3c72173c7e0f 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4058,19 +4058,38 @@ static const TypeInfo spapr_machine_info =3D {
->      }                                                                \
->      type_init(spapr_machine_register_##suffix)
-> =20
-> + /*
-> + * pseries-3.1
-> + */
-> +static void spapr_machine_3_1_instance_options(MachineState *machine)
-> +{
-> +}
-> +
-> +static void spapr_machine_3_1_class_options(MachineClass *mc)
-> +{
-> +    /* Defaults for the latest behaviour inherited from the base class */
-> +}
-> +
-> +DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
-> +
->  /*
->   * pseries-3.0
->   */
-> +#define SPAPR_COMPAT_3_0                                              \
-> +    HW_COMPAT_3_0
-> +
->  static void spapr_machine_3_0_instance_options(MachineState *machine)
->  {
-> +    spapr_machine_3_1_instance_options(machine);
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index fa18e6e..1906f22 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -2671,16 +2671,14 @@ static int bcd_cmp_mag(ppc_avr_t *a, ppc_avr_t *b)
+>      return 0;
 >  }
 > =20
->  static void spapr_machine_3_0_class_options(MachineClass *mc)
+> -static int bcd_add_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *in=
+valid,
+> +static void bcd_add_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *i=
+nvalid,
+>                         int *overflow)
 >  {
-> -    /* Defaults for the latest behaviour inherited from the base class */
-> +    spapr_machine_3_1_class_options(mc);
-> +    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_0);
+>      int carry =3D 0;
+>      int i;
+> -    int is_zero =3D 1;
+>      for (i =3D 1; i <=3D 31; i++) {
+>          uint8_t digit =3D bcd_get_digit(a, i, invalid) +
+>                          bcd_get_digit(b, i, invalid) + carry;
+> -        is_zero &=3D (digit =3D=3D 0);
+>          if (digit > 9) {
+>              carry =3D 1;
+>              digit -=3D 10;
+> @@ -2689,26 +2687,20 @@ static int bcd_add_mag(ppc_avr_t *t, ppc_avr_t *a=
+, ppc_avr_t *b, int *invalid,
+>          }
+> =20
+>          bcd_put_digit(t, digit, i);
+> -
+> -        if (unlikely(*invalid)) {
+> -            return -1;
+> -        }
+>      }
+> =20
+>      *overflow =3D carry;
+> -    return is_zero;
 >  }
 > =20
-> -DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
-> +DEFINE_SPAPR_MACHINE(3_0, "3.0", false);
+> -static int bcd_sub_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *in=
+valid,
+> +static void bcd_sub_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *i=
+nvalid,
+>                         int *overflow)
+>  {
+>      int carry =3D 0;
+>      int i;
+> -    int is_zero =3D 1;
+> +
+>      for (i =3D 1; i <=3D 31; i++) {
+>          uint8_t digit =3D bcd_get_digit(a, i, invalid) -
+>                          bcd_get_digit(b, i, invalid) + carry;
+> -        is_zero &=3D (digit =3D=3D 0);
+>          if (digit & 0x80) {
+>              carry =3D -1;
+>              digit +=3D 10;
+> @@ -2717,14 +2709,9 @@ static int bcd_sub_mag(ppc_avr_t *t, ppc_avr_t *a,=
+ ppc_avr_t *b, int *invalid,
+>          }
 > =20
->  /*
->   * pseries-2.12
+>          bcd_put_digit(t, digit, i);
+> -
+> -        if (unlikely(*invalid)) {
+> -            return -1;
+> -        }
+>      }
+> =20
+>      *overflow =3D carry;
+> -    return is_zero;
+>  }
+> =20
+>  uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, uint32=
+_t ps)
+> @@ -2734,26 +2721,28 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *=
+a, ppc_avr_t *b, uint32_t ps)
+>      int sgnb =3D bcd_get_sgn(b);
+>      int invalid =3D (sgna =3D=3D 0) || (sgnb =3D=3D 0);
+>      int overflow =3D 0;
+> -    int zero =3D 0;
+>      uint32_t cr =3D 0;
+>      ppc_avr_t result =3D { .u64 =3D { 0, 0 } };
+> =20
+>      if (!invalid) {
+>          if (sgna =3D=3D sgnb) {
+>              result.u8[BCD_DIG_BYTE(0)] =3D bcd_preferred_sgn(sgna, ps);
+> -            zero =3D bcd_add_mag(&result, a, b, &invalid, &overflow);
+> -            cr =3D (sgna > 0) ? CRF_GT : CRF_LT;
+> -        } else if (bcd_cmp_mag(a, b) > 0) {
+> -            result.u8[BCD_DIG_BYTE(0)] =3D bcd_preferred_sgn(sgna, ps);
+> -            zero =3D bcd_sub_mag(&result, a, b, &invalid, &overflow);
+> -            cr =3D (sgna > 0) ? CRF_GT : CRF_LT;
+> -        } else if (bcd_cmp_mag(a, b) =3D=3D 0) {
+> -            result.u8[BCD_DIG_BYTE(0)] =3D bcd_preferred_sgn(0, ps);
+> -            zero =3D bcd_sub_mag(&result, b, a, &invalid, &overflow);
+> +            bcd_add_mag(&result, a, b, &invalid, &overflow);
+> +            cr =3D bcd_cmp_zero(&result);
+>          } else {
+> -            result.u8[BCD_DIG_BYTE(0)] =3D bcd_preferred_sgn(sgnb, ps);
+> -            zero =3D bcd_sub_mag(&result, b, a, &invalid, &overflow);
+> -            cr =3D (sgnb > 0) ? CRF_GT : CRF_LT;
+> +            int magnitude =3D bcd_cmp_mag(a, b);
+> +            if (magnitude > 0) {
+> +                result.u8[BCD_DIG_BYTE(0)] =3D bcd_preferred_sgn(sgna, p=
+s);
+> +                bcd_sub_mag(&result, a, b, &invalid, &overflow);
+> +                cr =3D (sgna > 0) ? CRF_GT : CRF_LT;
+> +            } else if (magnitude < 0) {
+> +                result.u8[BCD_DIG_BYTE(0)] =3D bcd_preferred_sgn(sgnb, p=
+s);
+> +                bcd_sub_mag(&result, b, a, &invalid, &overflow);
+> +                cr =3D (sgnb > 0) ? CRF_GT : CRF_LT;
+> +            } else {
+> +                result.u8[BCD_DIG_BYTE(0)] =3D bcd_preferred_sgn(0, ps);
+> +                cr =3D CRF_EQ;
+> +            }
+>          }
+>      }
+> =20
+> @@ -2762,8 +2751,6 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a,=
+ ppc_avr_t *b, uint32_t ps)
+>          cr =3D CRF_SO;
+>      } else if (overflow) {
+>          cr |=3D CRF_SO;
+> -    } else if (zero) {
+> -        cr =3D CRF_EQ;
+>      }
+> =20
+>      *r =3D result;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -110,24 +183,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---S0GG+JvAI2G0KxBG
+--qi3SIpffvxS/TM8d
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlthNs8ACgkQbDjKyiDZ
-s5It5Q//YZLcKKhOU1E5nUL29oc0o1s2ah1MEUlFTlcRGjLffhUW2WNkGeJ4TBwk
-t33rj1oUywmiPe8ncy1urMWrKlfkCXd4r1HBknQICiNeU8o1OCGjoK0lhtXCl4LC
-HWLrVKHACe530KuMZOhjKnCtT3rpDDXSeaWO5ZMyQCPbSM+Rhv40o6/31W2/qadX
-r8lI/WNuLu6Aaig4+HWBiubl4F4nDNQxmFgkf7v/7OkBsjr7TgmlojyQSUgR0i4Y
-ktI08dnGKOJhgSc/tcRroSCFUn52l/fJEEuS2IS0SbHAOfgzMDT8WDEK3mEZbjKU
-IXL5qLrpyn5VtEqDgD0/x6o1hrv78W0NtPrx/EjQhsOmDkiWBGRJ1sTuDYARr73i
-QyYiMA4uuZG7JIDgs9S0DNn9qzRPb7CH+Cj+tUo2+0oQAIYdm287LwpPZa8Cgzk1
-UCis/xEel2Dw5lJvEPvEveKV4C8XYWZvLPc02lK5xXUhbYzyYHPkks9df0zbshAV
-0dgZvi0hTNKWqxTQxxnKipwoOfQ4idGlO1C5GbKGouWfTWE/LD1ofRwu7YG5RU1h
-ev4f+K4KnahI1jccG67+HLZxMHGiFQQCLG4eeI1b5qXddh2bTfH6oZeqGyzKd1J9
-v7bevomJh3VV4leBHXRPdL2k17yIbKj08g0IKqOW7E2g10CTCAs=
-=7N4f
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlthNpAACgkQbDjKyiDZ
+s5Ja0A//dAkKwcaIsEtqGVLpkIyYB32gRXot7GHGfo9DskoDhHAooruoPK+AUYIc
+rr0Kj5Ye0S/K1KPAsi1HMvUyxtqQyBjNfFel4uX8sYIjXAVB4cUozIkDT5xxYk0V
+It29Kl4iGIpkVVwOf2wRc1wMduoeLg4bujzMUDsLtDXs2FOOpCdpmeg6wSQDgiUX
+CLWuOwGSBGT0AyIxjYNVBCiLoUNtD6WyNozJip7qU3Yj/loH+dxkbCb+5BRRgSY0
++rqwKzZ8i0M0HSf9k7gEJ9n6dmLSTl42Dpwc6rMBKCOxUaf053D7k6aQiEW9Ur3A
+AJwLLj2Jhij84KAEWr/PPnrmL5d8ZD9QdJFbtTjbJTJZeKa5sSj2koXtO2Svaos1
+Xdt2rBG18UNS6Skl3/cUfHbtzONPBcpN3fPdIF/DRIVk3T7T/Hpn/8UNt0waRf/v
+toHAblRerG8ZRbdOE36smrxk5UAdwo3Iwj2nlt73oQ+53g3bEyDrq3V9rvk3Wx5y
+xt2AEzeD4n2Q1nIElX2TUo7BMokqbMZuJElTv1zTBWcOFKaYwXJg06oXfS/5Rsm/
+7PZCDjvvXpNidRyfEHaNOeeLK344uwVrbi9e2qpzXId54TNH3PIg9VU6a7XDKpA1
+sSLZ+8DIALRtXYdSxhRcrh86IVnPWC9KLu+yi0HVxrIyOdUdPD0=
+=IOsc
 -----END PGP SIGNATURE-----
 
---S0GG+JvAI2G0KxBG--
+--qi3SIpffvxS/TM8d--
