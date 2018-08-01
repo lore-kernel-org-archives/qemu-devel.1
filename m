@@ -1,22 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fkr8a-0007wu-Mh
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:26:01 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fkrAJ-0000Ye-W3
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:27:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fkr8X-0004IV-HT
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:26:00 -0400
-References: <20180801131905.148778-1-frankja@linux.ibm.com>
-	<20180801131905.148778-3-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <03cbd6ca-f913-8f89-6806-6bf12ce60090@redhat.com>
-Date: Wed, 1 Aug 2018 15:25:54 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180801131905.148778-3-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] s390x: Enable KVM huge page backing
- support
+	(envelope-from <pbonzini@redhat.com>) id 1fkrAG-0005AQ-J5
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:27:47 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed,  1 Aug 2018 15:27:33 +0200
+Message-Id: <20180801132733.15628-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] tests: virtio: separate ccw tests from libqos
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,106 +17,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, e.emanuelegiuseppe@gmail.com
 
-On 01.08.2018 15:19, Janosch Frank wrote:
-> QEMU has had huge page support for a longer time already, but KVM
-> memory management under s390x needed some changes to work with huge
-> backings.
-> 
-> Now that we have support, let's enable it if requested and
-> available. Otherwise we now properly tell the user if there is no
-> support and back out instead of failing to run the VM later on.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  target/s390x/kvm.c | 34 ++++++++++++++++++++++++++++++++--
->  1 file changed, 32 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index d923cf4240..d1c72975cf 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -34,6 +34,8 @@
->  #include "qapi/error.h"
->  #include "qemu/error-report.h"
->  #include "qemu/timer.h"
-> +#include "qemu/units.h"
-> +#include "qemu/mmap-alloc.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/hw_accel.h"
->  #include "hw/hw.h"
-> @@ -139,6 +141,7 @@ static int cap_mem_op;
->  static int cap_s390_irq;
->  static int cap_ri;
->  static int cap_gs;
-> +static int cap_hpage_1m;
->  
->  static int active_cmma;
->  
-> @@ -220,9 +223,9 @@ static void kvm_s390_enable_cmma(void)
->          .attr = KVM_S390_VM_MEM_ENABLE_CMMA,
->      };
->  
-> -    if (mem_path) {
-> +    if (cap_hpage_1m) {
->          warn_report("CMM will not be enabled because it is not "
-> -                    "compatible with hugetlbfs.");
-> +                    "compatible with huge memory backings.");
+Because qtest does not support s390 channel I/O, s390 only performs smoke tests on
+those few devices that do not have any functional tests.  Therefore, every time we
+add functional tests for a virtio device, the choice is between removing
+those tests from the s390 suite (so that s390 actually _loses_ coverage)
+or sprinkling the test with architecture checks.
 
-This implies some change to certain setups (tmpfs), but as they are
-absolutely not common (and never really were supported/expected to
-work), I think this is fine.
+This patch simply creates a ccw-specific test that only performs smoke tests on
+all virtio-ccw devices.  If channel I/O support is ever added to qtest and libqos,
+then this file can go away.  In the meanwhile, it simplifies maintenance and
+makes sure that all virtio devices are tested.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/Makefile.include  |   5 +-
+ tests/virtio-ccw-test.c | 118 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 120 insertions(+), 3 deletions(-)
+ create mode 100644 tests/virtio-ccw-test.c
 
->          return;
->      }
->      rc = kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
-> @@ -281,10 +284,37 @@ void kvm_s390_crypto_reset(void)
->      }
->  }
->  
-> +static int kvm_s390_configure_mempath_backing(KVMState *s)
-> +{
-> +    size_t path_psize = qemu_mempath_getpagesize(mem_path);
-> +
-> +    if (path_psize == 4 * KiB)
-> +        return 0;
-> +
-> +    if (path_psize != 1 * MiB) {
-> +        error_report("Memory backing with 2G pages was specified, "
-> +                     "but KVM does not support this memory backing");
-> +        return -EINVAL;
-> +    }
-> +
-> +    if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
-> +        error_report("Memory backing with 1M pages was specified, "
-> +                     "but KVM does not support this memory backing");
-> +        return -EINVAL;
-> +    }
-> +
-> +    cap_hpage_1m = 1;
-> +    return 0;
-> +}
-> +
->  int kvm_arch_init(MachineState *ms, KVMState *s)
->  {
->      MachineClass *mc = MACHINE_GET_CLASS(ms);
->  
-> +    if (mem_path && kvm_s390_configure_mempath_backing(s)) {
-> +        return -EINVAL;
-> +    }
-> +
->      mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
->      cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
->      cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
-> 
-
-
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index a49282704e..cf835f2fd0 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -401,9 +401,7 @@ check-qtest-s390x-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
+ check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
+ check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
+ check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
+-check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
+-check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
+-check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
++check-qtest-s390x-y += tests/virtio-ccw-test$(EXESUF)
+ check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
+ 
+ check-qtest-generic-y += tests/machine-none-test$(EXESUF)
+@@ -807,6 +805,7 @@ tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
+ tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
+ tests/virtio-balloon-test$(EXESUF): tests/virtio-balloon-test.o $(libqos-virtio-obj-y)
+ tests/virtio-blk-test$(EXESUF): tests/virtio-blk-test.o $(libqos-virtio-obj-y)
++tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
+ tests/virtio-net-test$(EXESUF): tests/virtio-net-test.o $(libqos-pc-obj-y) $(libqos-virtio-obj-y)
+ tests/virtio-rng-test$(EXESUF): tests/virtio-rng-test.o $(libqos-pc-obj-y)
+ tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
+diff --git a/tests/virtio-ccw-test.c b/tests/virtio-ccw-test.c
+new file mode 100644
+index 0000000000..0af3a7bb31
+--- /dev/null
++++ b/tests/virtio-ccw-test.c
+@@ -0,0 +1,118 @@
++/*
++ * QTest testcase for VirtIO CCW
++ *
++ * Copyright (c) 2014 SUSE LINUX Products GmbH
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++/* Until we have a full libqos implementation of virtio-ccw (which requires
++ * also to add support for I/O channels to qtest), we can only do simple
++ * tests that initialize the devices.
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "libqos/virtio.h"
++
++static void virtio_balloon_nop(void)
++{
++    global_qtest = qtest_startf("-device virtio-balloon-ccw");
++    qtest_end();
++}
++
++static void virtconsole_nop(void)
++{
++    global_qtest = qtest_startf("-device virtio-serial-ccw,id=vser0 "
++                                "-device virtconsole,bus=vser0.0");
++    qtest_end();
++}
++
++static void virtserialport_nop(void)
++{
++    global_qtest = qtest_startf("-device virtio-serial-ccw,id=vser0 "
++                                "-device virtserialport,bus=vser0.0");
++    qtest_end();
++}
++
++static void virtio_serial_nop(void)
++{
++    global_qtest = qtest_startf("-device virtio-serial-ccw");
++    qtest_end();
++}
++
++static void virtio_serial_hotplug(void)
++{
++    global_qtest = qtest_startf("-device virtio-serial-ccw");
++    qtest_qmp_device_add("virtserialport", "hp-port", NULL);
++    qtest_qmp_device_del("hp-port");
++    qtest_end();
++}
++
++static void virtio_blk_nop(void)
++{
++    global_qtest = qtest_startf("-drive if=none,id=drv0,file=null-co://,format=raw "
++                                "-device virtio-blk-ccw,drive=drv0");
++    qtest_end();
++}
++
++static void virtio_net_nop(void)
++{
++    global_qtest = qtest_startf("-device virtio-net-ccw");
++    qtest_end();
++}
++
++static void virtio_9p_nop(void)
++{
++    global_qtest = qtest_startf("-fsdev synth,id=fsdev0 "
++                                "-device virtio-9p-ccw,fsdev=fsdev0,mount_tag=qtest");
++    qtest_end();
++}
++
++static void virtio_rng_nop(void)
++{
++    global_qtest = qtest_startf("-device virtio-rng-ccw");
++    qtest_end();
++}
++
++static void virtio_scsi_nop(void)
++{
++    global_qtest = qtest_startf("-device virtio-scsi-ccw");
++    qtest_end();
++}
++
++static void virtio_scsi_hotplug(void)
++{
++    global_qtest = qtest_startf("-drive if=none,id=drv0,file=null-co://,format=raw "
++                                "-drive if=none,id=drv1,file=null-co://,format=raw "
++                                "-device virtio-scsi-ccw "
++                                "-device scsi-hd,drive=drv0");
++    qtest_qmp_device_add("scsi-hd", "scsihd", "'drive': 'drv1'");
++    qtest_qmp_device_del("scsihd");
++
++    qtest_end();
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++
++    g_test_init(&argc, &argv, NULL);
++    qtest_add_func("/virtio/balloon/nop", virtio_balloon_nop);
++    qtest_add_func("/virtio/console/nop", virtconsole_nop);
++    qtest_add_func("/virtio/serialport/nop", virtserialport_nop);
++    qtest_add_func("/virtio/serial/nop", virtio_serial_nop);
++    qtest_add_func("/virtio/serial/hotplug", virtio_serial_hotplug);
++    qtest_add_func("/virtio/block/nop", virtio_blk_nop);
++    qtest_add_func("/virtio/net/nop", virtio_net_nop);
++    qtest_add_func("/virtio/9p/nop", virtio_9p_nop);
++    qtest_add_func("/virtio/rng/nop", virtio_rng_nop);
++    qtest_add_func("/virtio/scsi/nop", virtio_scsi_nop);
++    qtest_add_func("/virtio/scsi/hotplug", virtio_scsi_hotplug);
++
++    ret = g_test_run();
++
++    return ret;
++}
 -- 
-
-Thanks,
-
-David / dhildenb
+2.17.1
