@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fkp1H-0000LQ-5b
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:20 -0400
+	(envelope-from <quintela@redhat.com>) id 1fkp1J-0000OL-Ml
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fkp1G-0006k9-2f
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51404 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fkp1I-0006lV-On
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51640 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fkp1F-0006im-TS
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:18 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fkp1I-0006lJ-Jw
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:20 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8F0EC40241C0
-	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 11:10:17 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 43DFA7DAC7
+	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 11:10:20 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  1 Aug 2018 13:09:48 +0200
-Message-Id: <20180801110952.5590-15-quintela@redhat.com>
+Date: Wed,  1 Aug 2018 13:09:50 +0200
+Message-Id: <20180801110952.5590-17-quintela@redhat.com>
 In-Reply-To: <20180801110952.5590-1-quintela@redhat.com>
 References: <20180801110952.5590-1-quintela@redhat.com>
-Subject: [Qemu-devel] [[PATH for 3.1] v2 14/18] check: Only test pvpanic
+Subject: [Qemu-devel] [[PATH for 3.1] v2 16/18] check: Only test usb-ohci
  when it is compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,74 +33,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-It was not possible to compile out pvpanic.  Use the same trick
-than applesmc.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/misc/pvpanic.c         | 11 -----------
- include/hw/misc/pvpanic.h | 11 ++++++++++-
- tests/Makefile.include    |  4 ++--
- 3 files changed, 12 insertions(+), 14 deletions(-)
+ tests/Makefile.include | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
-index b26250dec9..9d8961ba0c 100644
---- a/hw/misc/pvpanic.c
-+++ b/hw/misc/pvpanic.c
-@@ -99,17 +99,6 @@ static void pvpanic_isa_realizefn(DeviceState *dev, Error **errp)
-     isa_register_ioport(d, &s->io, s->ioport);
- }
- 
--#define PVPANIC_IOPORT_PROP "ioport"
--
--uint16_t pvpanic_port(void)
--{
--    Object *o = object_resolve_path_type("", TYPE_PVPANIC, NULL);
--    if (!o) {
--        return 0;
--    }
--    return object_property_get_uint(o, PVPANIC_IOPORT_PROP, NULL);
--}
--
- static Property pvpanic_isa_properties[] = {
-     DEFINE_PROP_UINT16(PVPANIC_IOPORT_PROP, PVPanicState, ioport, 0x505),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/include/hw/misc/pvpanic.h b/include/hw/misc/pvpanic.h
-index 36a54e270c..1ee071a703 100644
---- a/include/hw/misc/pvpanic.h
-+++ b/include/hw/misc/pvpanic.h
-@@ -16,6 +16,15 @@
- 
- #define TYPE_PVPANIC "pvpanic"
- 
--uint16_t pvpanic_port(void);
-+#define PVPANIC_IOPORT_PROP "ioport"
-+
-+static inline uint16_t pvpanic_port(void)
-+{
-+    Object *o = object_resolve_path_type("", TYPE_PVPANIC, NULL);
-+    if (!o) {
-+        return 0;
-+    }
-+    return object_property_get_uint(o, PVPANIC_IOPORT_PROP, NULL);
-+}
- 
- #endif
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index edbd391f04..b9fb80b461 100644
+index 2642500659..353f068f3b 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -276,8 +276,8 @@ check-qtest-i386-$(CONFIG_VMXNET3_PCI) += tests/vmxnet3-test$(EXESUF)
- gcov-files-i386-$(CONFIG_VMXNET3_PCI) += hw/net/vmxnet3.c
- gcov-files-i386-y += hw/net/net_rx_pkt.c
- gcov-files-i386-y += hw/net/net_tx_pkt.c
--check-qtest-i386-y += tests/pvpanic-test$(EXESUF)
--gcov-files-i386-y += i386-softmmu/hw/misc/pvpanic.c
-+check-qtest-i386-$(CONFIG_PVPANIC) += tests/pvpanic-test$(EXESUF)
-+gcov-files-i386-$(CONFIG_PVPANIC) += i386-softmmu/hw/misc/pvpanic.c
- check-qtest-i386-$(CONFIG_I82801B11) += tests/i82801b11-test$(EXESUF)
+@@ -282,8 +282,8 @@ check-qtest-i386-$(CONFIG_I82801B11) += tests/i82801b11-test$(EXESUF)
  gcov-files-i386-$(CONFIG_I82801B11) += hw/pci-bridge/i82801b11.c
  check-qtest-i386-$(CONFIG_IOH3420) += tests/ioh3420-test$(EXESUF)
+ gcov-files-i386-$(CONFIG_IOH3420) += hw/pci-bridge/ioh3420.c
+-check-qtest-i386-y += tests/usb-hcd-ohci-test$(EXESUF)
+-gcov-files-i386-y += hw/usb/hcd-ohci.c
++check-qtest-i386-$(CONFIG_USB_OHCI) += tests/usb-hcd-ohci-test$(EXESUF)
++gcov-files-i386-$(CONFIG_USB_OHCI) += hw/usb/hcd-ohci.c
+ check-qtest-i386-y += tests/usb-hcd-uhci-test$(EXESUF)
+ gcov-files-i386-y += hw/usb/hcd-uhci.c
+ check-qtest-i386-y += tests/usb-hcd-ehci-test$(EXESUF)
+@@ -347,8 +347,8 @@ check-qtest-ppc64-y += tests/pnv-xscom-test$(EXESUF)
+ check-qtest-ppc64-y += tests/migration-test$(EXESUF)
+ check-qtest-ppc64-y += tests/rtas-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
+-check-qtest-ppc64-y += tests/usb-hcd-ohci-test$(EXESUF)
+-gcov-files-ppc64-y += hw/usb/hcd-ohci.c
++check-qtest-ppc64-$(CONFIG_USB_OHCI) += tests/usb-hcd-ohci-test$(EXESUF)
++gcov-files-ppc64-$(CONFIG_USB_OHCI) += hw/usb/hcd-ohci.c
+ check-qtest-ppc64-y += tests/usb-hcd-uhci-test$(EXESUF)
+ gcov-files-ppc64-y += hw/usb/hcd-uhci.c
+ check-qtest-ppc64-y += tests/usb-hcd-xhci-test$(EXESUF)
 -- 
 2.17.1
