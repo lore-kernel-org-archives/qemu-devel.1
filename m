@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fkxJu-0004E8-5O
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:02:07 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fkxTC-00073U-3Y
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:11:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fkxJq-0000p8-Ab
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:02:06 -0400
-Received: from mail-bn3nam04on072d.outbound.protection.outlook.com
-	([2a01:111:f400:fe4e::72d]:7904
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fkxJp-0000oy-Ra
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:02:02 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Wed, 1 Aug 2018 20:01:36 +0000
-Message-ID: <BN7PR08MB4868ACB7B1F69351E1A44885C62D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1532967169-22265-8-git-send-email-aleksandar.markovic@rt-rk.com>
-	<4bc391e5-9aac-57c6-7173-0fdd7a25bccc@vivier.eu>
-	<BN7PR08MB4868ECFD24601E06677D4C55C62D0@BN7PR08MB4868.namprd08.prod.outlook.com>,
-	<CAFEAcA9xdOSKY6LRRYM4HZQx=xbFiD1-24zMGn-i7BiDWqTZSA@mail.gmail.com>
-In-Reply-To: <CAFEAcA9xdOSKY6LRRYM4HZQx=xbFiD1-24zMGn-i7BiDWqTZSA@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <no-reply@patchew.org>) id 1fkxT8-0007QO-Tf
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:11:42 -0400
+Resent-Message-Id: <E1fkxT8-0007QO-Tf@eggs.gnu.org>
+In-Reply-To: <20180801123111.3595-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153315427649.11707.15463004332556766783@502c9da6d61e>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 07/76] elf: Remove duplicate
- preprocessor constant definition
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 1 Aug 2018 13:11:17 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm sve fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,22 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Laurent Vivier <laurent@vivier.eu>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paul Burton <pburton@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
 
->=20
-> From: Peter Maydell <peter.maydell@linaro.org>
-> Sent: Wednesday, August 1, 2018 9:37 PM
->=20
-> > The simplest way to do that is just to delete
-> > the second (original) EF_MIPS_ARCH #define, the one just
-> > below the EF_MIPS_NAN2008 define.
-> >
-> > We could line up with the order the glibc headers use, but
-> > that seems like overkill compared to just deleting a line.
->=20
-
-This sounds reasonable to me, and, if nobody disputes it, I will implement =
-it this way in the next version.
-
-Aleksandar=
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODAxMTIzMTExLjM1OTUtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
+b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC80XSB0YXJnZXQvYXJtIHN2ZSBmaXhl
+cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
+IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
+dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
+bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
+ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
+eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
+ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0JwozMTZlZWZkYmM4IHRhcmdldC9hcm06IEZpeCB0eXBvIGluIGhlbHBlcl9zdmVfbW92el9k
+CjRiMTE1YzBjMGQgdGFyZ2V0L2FybTogUmVvcmdhbml6ZSBTVkUgV0hJTEUKYjVmNDk2ZjVlNyB0
+YXJnZXQvYXJtOiBGaXggdHlwbyBpbiBkb19zYXRfYWRkc3ViXzY0Cjc5NWM3YmVlOGQgdGFyZ2V0
+L2FybTogRml4IHNpZ24gb2Ygc3ZlX2NtcGVxX3Bwencvc3ZlX2NtcG5lX3BwencKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDogdGFyZ2V0L2FybTogRml4IHNpZ24gb2Yg
+c3ZlX2NtcGVxX3Bwencvc3ZlX2NtcG5lX3BwencuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
+cm91bmQgdGhhdCAnPT0nIChjdHg6V3hCKQojMzE6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBl
+ci5jOjI0Mzk6CitET19DTVBfUFBaV19CKHN2ZV9jbXBlcV9wcHp3X2IsIGludDhfdCwgIHVpbnQ2
+NF90LCA9PSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJz09JyAoY3R4Old4QikK
+IzMyOiBGSUxFOiB0YXJnZXQvYXJtL3N2ZV9oZWxwZXIuYzoyNDQwOgorRE9fQ01QX1BQWldfSChz
+dmVfY21wZXFfcHB6d19oLCBpbnQxNl90LCB1aW50NjRfdCwgPT0pCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVp
+cmVkIGFyb3VuZCB0aGF0ICc9PScgKGN0eDpXeEIpCiMzMzogRklMRTogdGFyZ2V0L2FybS9zdmVf
+aGVscGVyLmM6MjQ0MToKK0RPX0NNUF9QUFpXX1Moc3ZlX2NtcGVxX3BwendfcywgaW50MzJfdCwg
+dWludDY0X3QsID09KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnIT0nIChjdHg6
+V3hCKQojMzg6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjI0NDM6CitET19DTVBfUFBa
+V19CKHN2ZV9jbXBuZV9wcHp3X2IsIGludDhfdCwgIHVpbnQ2NF90LCAhPSkKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMg
+cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyE9JyAoY3R4Old4QikKIzM5OiBGSUxFOiB0YXJnZXQvYXJt
+L3N2ZV9oZWxwZXIuYzoyNDQ0OgorRE9fQ01QX1BQWldfSChzdmVfY21wbmVfcHB6d19oLCBpbnQx
+Nl90LCB1aW50NjRfdCwgIT0pCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICchPScg
+KGN0eDpXeEIpCiM0MDogRklMRTogdGFyZ2V0L2FybS9zdmVfaGVscGVyLmM6MjQ0NToKK0RPX0NN
+UF9QUFpXX1Moc3ZlX2NtcG5lX3BwendfcywgaW50MzJfdCwgdWludDY0X3QsICE9KQogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDYg
+ZXJyb3JzLCAwIHdhcm5pbmdzLCAxOSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzQ6IHRhcmdldC9hcm06IEZpeCB0
+eXBvIGluIGRvX3NhdF9hZGRzdWJfNjQuLi4KQ2hlY2tpbmcgUEFUQ0ggMy80OiB0YXJnZXQvYXJt
+OiBSZW9yZ2FuaXplIFNWRSBXSElMRS4uLgpDaGVja2luZyBQQVRDSCA0LzQ6IHRhcmdldC9hcm06
+IEZpeCB0eXBvIGluIGhlbHBlcl9zdmVfbW92el9kLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
