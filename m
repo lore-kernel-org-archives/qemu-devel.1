@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fktZu-0004oR-1y
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:02:22 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fktaY-0005FV-Ar
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:03:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fktZo-0002Cs-Dt
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:02:22 -0400
-Received: from mail-sn1nam02on0097.outbound.protection.outlook.com
-	([104.47.36.97]:59840
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fktZo-0002Bk-4L
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:02:16 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Wed, 1 Aug 2018 16:02:10 +0000
-Message-ID: <BN7PR08MB4868954A9B34D08D2DA861F1C62D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1532967169-22265-20-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<3cc80633-3b9f-07a4-1600-ca367dc6f5ba@linaro.org>
-In-Reply-To: <3cc80633-3b9f-07a4-1600-ca367dc6f5ba@linaro.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <pbonzini@redhat.com>) id 1fktaU-0002yM-Hn
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:03:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57202 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fktaU-0002y1-Ai
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:02:58 -0400
+References: <20180801151417.23655-1-pbonzini@redhat.com>
+	<CAFEAcA8WXLyAgesP6n2X7D-Uj46uZbY0209xaLLTJ1M2GojA2Q@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <536ca511-baf6-0f16-3239-0de7743109f3@redhat.com>
+Date: Wed, 1 Aug 2018 18:02:55 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 19/76] target/mips: Add emulation of
- nanoMIPS 16-bit arithmetic instructions
+In-Reply-To: <CAFEAcA8WXLyAgesP6n2X7D-Uj46uZbY0209xaLLTJ1M2GojA2Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] fix "Missing break in switch" coverity
+ reports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi, Richard.
+On 01/08/2018 17:59, Peter Maydell wrote:
+> 
+> We could improve the somewhat cryptic comment:
+>     /*
+>      * 0x41 is documented as setting the output sample rate,
+>      * and 0x42 the input sample rate, but in fact SB16 hardware
+>      * seems to have only a single sample rate under the hood,
+>      * and some (buggy) guest programs such as FT2 will set the
+>      * output rate using 0x42. Compare:
+>      * http://homepages.cae.wisc.edu/~brodskye/sb16doc/sb16doc.html#SamplingRate
+>      */
 
-> > +    case NM_P16_A2:
-> > +        switch (extract32(ctx->opcode, 3, 1)) {
-> > +        case NM_ADDIUR2:
-> > +            rd =3D extract32(ctx->opcode, 0, 3) << 2;
-> > +            gen_arith_imm(ctx, OPC_ADDIU, rt, rs, rd);
-> > +            break;
-> > +        case NM_P_ADDIURS5:
-> > +            rt =3D extract32(ctx->opcode, 5, 5);
-> > +            if (rt !=3D 0) {
-> > +                rs =3D (sextract32(ctx->opcode, 4, 1) << 3) |
-> > +                      extract32(ctx->opcode, 0, 3);
-> > +                /* s =3D sign_extend( s[3] . s[2:0] , from_nbits =3D 4=
-)*/
-> > +                gen_arith_imm(ctx, OPC_ADDIU, rt, rt, rs);
-> > +            }
-> > +            break;
-> > +        }
->=20
-> Now, these re-uses of RD and RS variables are misleading.
-> These are immediates that you are extracting, not register numbers.
->=20
-> I suggest a "target_long imm;" at the top of the function to handle all s=
-uch
-> that will be required when this function is filled out.
+I sometimes enjoy keeping little bits of "old-style QEMU" in these more
+historical devices, but your improvement is just too good, so I'll
+replace it.  Thanks!
 
-gen_arith_imm() and similar functions have "int" as the type of offset/imm =
-parameter (in this case the last parameter) - shouldn't "int" be more appro=
-priate type for local variable than "target_long"?
-
-Aleksandar M.
+Paolo
