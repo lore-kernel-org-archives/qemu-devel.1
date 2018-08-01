@@ -1,20 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fkxTC-00073U-3Y
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:11:43 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fkxcx-0002Ak-Re
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:21:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fkxT8-0007QO-Tf
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:11:42 -0400
-Resent-Message-Id: <E1fkxT8-0007QO-Tf@eggs.gnu.org>
-In-Reply-To: <20180801123111.3595-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153315427649.11707.15463004332556766783@502c9da6d61e>
+	(envelope-from <pasic@linux.ibm.com>) id 1fkxcs-0004dh-UR
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:21:47 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50896)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fkxcs-0004ck-Ig
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:21:42 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w71KJTeD001707
+	for <qemu-devel@nongnu.org>; Wed, 1 Aug 2018 16:21:40 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2kkjjd2y79-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 16:21:40 -0400
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 1 Aug 2018 21:21:37 +0100
+References: <1514626559-162312-1-git-send-email-longpeng2@huawei.com>
+	<1514626559-162312-2-git-send-email-longpeng2@huawei.com>
+	<fcb63fc3-22eb-7f6c-2014-744ee75784eb@linux.vnet.ibm.com>
+	<5B51CF0B.8020706@huawei.com>
+	<a332a516-16dc-1e50-3ea6-b68571880cb7@linux.ibm.com>
+	<20180727144726-mutt-send-email-mst@kernel.org>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Wed, 1 Aug 2018 22:21:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 1 Aug 2018 13:11:17 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm sve fixes
+In-Reply-To: <20180727144726-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <47e5bc06-6b4d-aab6-db77-c91313d36d87@linux.ibm.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [v23 1/2] virtio-crypto: Add
+ virtio crypto device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +46,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: denglingli@chinamobile.com, virtio-dev@lists.oasis-open.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Ola.Liljedahl@arm.com, brian.a.keating@intel.com, Jani.Kokkonen@huawei.com, xin.zeng@intel.com, wangxinxin.wang@huawei.com, liang.j.ma@intel.com, qemu-devel@nongnu.org, john.griffin@intel.com, agraf@suse.de, arei.gonglei@huawei.com, stefanha@redhat.com, jianjay.zhou@huawei.com, cornelia.huck@de.ibm.com, Varun.Sethi@freescale.com, "Longpeng (Mike)" <longpeng2@huawei.com>, vincent.jardin@6wind.com, jasowang@redhat.com, weidong.huang@huawei.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODAxMTIzMTExLjM1OTUtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
-b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC80XSB0YXJnZXQvYXJtIHN2ZSBmaXhl
-cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
-b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
-CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
-IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
-dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
-bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
-ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
-eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
-ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0JwozMTZlZWZkYmM4IHRhcmdldC9hcm06IEZpeCB0eXBvIGluIGhlbHBlcl9zdmVfbW92el9k
-CjRiMTE1YzBjMGQgdGFyZ2V0L2FybTogUmVvcmdhbml6ZSBTVkUgV0hJTEUKYjVmNDk2ZjVlNyB0
-YXJnZXQvYXJtOiBGaXggdHlwbyBpbiBkb19zYXRfYWRkc3ViXzY0Cjc5NWM3YmVlOGQgdGFyZ2V0
-L2FybTogRml4IHNpZ24gb2Ygc3ZlX2NtcGVxX3Bwencvc3ZlX2NtcG5lX3BwencKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDogdGFyZ2V0L2FybTogRml4IHNpZ24gb2Yg
-c3ZlX2NtcGVxX3Bwencvc3ZlX2NtcG5lX3BwencuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
-cm91bmQgdGhhdCAnPT0nIChjdHg6V3hCKQojMzE6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBl
-ci5jOjI0Mzk6CitET19DTVBfUFBaV19CKHN2ZV9jbXBlcV9wcHp3X2IsIGludDhfdCwgIHVpbnQ2
-NF90LCA9PSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJz09JyAoY3R4Old4QikK
-IzMyOiBGSUxFOiB0YXJnZXQvYXJtL3N2ZV9oZWxwZXIuYzoyNDQwOgorRE9fQ01QX1BQWldfSChz
-dmVfY21wZXFfcHB6d19oLCBpbnQxNl90LCB1aW50NjRfdCwgPT0pCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVp
-cmVkIGFyb3VuZCB0aGF0ICc9PScgKGN0eDpXeEIpCiMzMzogRklMRTogdGFyZ2V0L2FybS9zdmVf
-aGVscGVyLmM6MjQ0MToKK0RPX0NNUF9QUFpXX1Moc3ZlX2NtcGVxX3BwendfcywgaW50MzJfdCwg
-dWludDY0X3QsID09KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnIT0nIChjdHg6
-V3hCKQojMzg6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjI0NDM6CitET19DTVBfUFBa
-V19CKHN2ZV9jbXBuZV9wcHp3X2IsIGludDhfdCwgIHVpbnQ2NF90LCAhPSkKICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyE9JyAoY3R4Old4QikKIzM5OiBGSUxFOiB0YXJnZXQvYXJt
-L3N2ZV9oZWxwZXIuYzoyNDQ0OgorRE9fQ01QX1BQWldfSChzdmVfY21wbmVfcHB6d19oLCBpbnQx
-Nl90LCB1aW50NjRfdCwgIT0pCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICchPScg
-KGN0eDpXeEIpCiM0MDogRklMRTogdGFyZ2V0L2FybS9zdmVfaGVscGVyLmM6MjQ0NToKK0RPX0NN
-UF9QUFpXX1Moc3ZlX2NtcG5lX3BwendfcywgaW50MzJfdCwgdWludDY0X3QsICE9KQogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDYg
-ZXJyb3JzLCAwIHdhcm5pbmdzLCAxOSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzQ6IHRhcmdldC9hcm06IEZpeCB0
-eXBvIGluIGRvX3NhdF9hZGRzdWJfNjQuLi4KQ2hlY2tpbmcgUEFUQ0ggMy80OiB0YXJnZXQvYXJt
-OiBSZW9yZ2FuaXplIFNWRSBXSElMRS4uLgpDaGVja2luZyBQQVRDSCA0LzQ6IHRhcmdldC9hcm06
-IEZpeCB0eXBvIGluIGhlbHBlcl9zdmVfbW92el9kLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+
+On 07/27/2018 01:51 PM, Michael S. Tsirkin wrote:
+> On Thu, Jul 26, 2018 at 06:55:44PM +0200, Halil Pasic wrote:
+>> Sorry I did not have any time for this last days. And this
+>> to make it worse this is a follow up to something that was
+>> half a year ago. That means I have to re-familiarize myself
+>> with the topic.
+>>
+>> If I don't get around to answer in couple of weeks, feel
+>> free to ping me.
+>>
+>> Since from what I've seen most of the questions were of type
+>> 'Can we do it like this?', maybe sending out a new version
+>> is the best. So people (like me) can read through the whole
+>> thing and point out problems if any.
+>>
+>> Regards,
+>> Halil
+> 
+> 
+> While two weeks for review is borderline reasonable as an exception, it
+> does trouble me that  we are at v23, for something that is used
+> in the field so it's not like we can just change things at will.
+> So I hope everyone concerned makes an effort to try to converge on a spec
+> ASAP.
+> 
+
+What I tried to say: I'm busy with other stuff, and I'm not too
+happy to resume a complex topic after 6 months hiatus.
+
+The series is now at v24 and has apparently no acks or r-bs. I don't think
+I'm the only one to blame for that.
+
+It seems, I won't have the time to do a conscientious review in a
+timely fashion. If the rest of the bunch thinks what we have is good
+enough, I am happy to abstain when voting on this -- and avoiding
+holding it up any further.
+
+Regards,
+Halil
