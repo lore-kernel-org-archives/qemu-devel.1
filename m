@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fkp1P-0000UT-C1
+	(envelope-from <quintela@redhat.com>) id 1fkp1P-0000US-Bt
 	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fkp1L-0006mf-GN
+	(envelope-from <quintela@redhat.com>) id 1fkp1K-0006m6-4J
 	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51408 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49112 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fkp1L-0006mW-Bb
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:23 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fkp1J-0006lq-W7
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:22 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0362740241C0
-	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 11:10:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 96E38402243B
+	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 11:10:21 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  1 Aug 2018 13:09:52 +0200
-Message-Id: <20180801110952.5590-19-quintela@redhat.com>
+Date: Wed,  1 Aug 2018 13:09:51 +0200
+Message-Id: <20180801110952.5590-18-quintela@redhat.com>
 In-Reply-To: <20180801110952.5590-1-quintela@redhat.com>
 References: <20180801110952.5590-1-quintela@redhat.com>
-Subject: [Qemu-devel] [[PATH for 3.1] v2 18/18] check: Only test usb-ehci
- when it is compiled in
+Subject: [Qemu-devel] [[PATH for 3.1] v2 17/18] check: Only test usb-uhci
+ devices when they are compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +33,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-The ehci test also test uhci.  Welcome to the worderfull world of USB.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/Makefile.include | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/Makefile.include | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f3f8ba48fb..d6f5cc9ccc 100644
+index 353f068f3b..f3f8ba48fb 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -286,8 +286,10 @@ check-qtest-i386-$(CONFIG_USB_OHCI) += tests/usb-hcd-ohci-test$(EXESUF)
+@@ -284,8 +284,8 @@ check-qtest-i386-$(CONFIG_IOH3420) += tests/ioh3420-test$(EXESUF)
+ gcov-files-i386-$(CONFIG_IOH3420) += hw/pci-bridge/ioh3420.c
+ check-qtest-i386-$(CONFIG_USB_OHCI) += tests/usb-hcd-ohci-test$(EXESUF)
  gcov-files-i386-$(CONFIG_USB_OHCI) += hw/usb/hcd-ohci.c
- check-qtest-i386-$(CONFIG_USB_UHCI) += tests/usb-hcd-uhci-test$(EXESUF)
- gcov-files-i386-$(CONFIG_USB_UHCI) += hw/usb/hcd-uhci.c
-+ifeq ($(CONFIG_USB_ECHI)$(CONFIG_USB_UHCI),yy)
+-check-qtest-i386-y += tests/usb-hcd-uhci-test$(EXESUF)
+-gcov-files-i386-y += hw/usb/hcd-uhci.c
++check-qtest-i386-$(CONFIG_USB_UHCI) += tests/usb-hcd-uhci-test$(EXESUF)
++gcov-files-i386-$(CONFIG_USB_UHCI) += hw/usb/hcd-uhci.c
  check-qtest-i386-y += tests/usb-hcd-ehci-test$(EXESUF)
--gcov-files-i386-y += hw/usb/hcd-ehci.c
-+endif
-+gcov-files-i386-$(CONFIG_USB_EHCI) += hw/usb/hcd-ehci.c
+ gcov-files-i386-y += hw/usb/hcd-ehci.c
  gcov-files-i386-y += hw/usb/dev-hid.c
- gcov-files-i386-y += hw/usb/dev-storage.c
- check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
+@@ -349,8 +349,8 @@ check-qtest-ppc64-y += tests/rtas-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_USB_OHCI) += tests/usb-hcd-ohci-test$(EXESUF)
+ gcov-files-ppc64-$(CONFIG_USB_OHCI) += hw/usb/hcd-ohci.c
+-check-qtest-ppc64-y += tests/usb-hcd-uhci-test$(EXESUF)
+-gcov-files-ppc64-y += hw/usb/hcd-uhci.c
++check-qtest-ppc64-$(CONFIG_USB_UHCI) += tests/usb-hcd-uhci-test$(EXESUF)
++gcov-files-ppc64-$(CONFIG_USB_UHCI) += hw/usb/hcd-uhci.c
+ check-qtest-ppc64-y += tests/usb-hcd-xhci-test$(EXESUF)
+ gcov-files-ppc64-y += hw/usb/hcd-xhci.c
+ check-qtest-ppc64-y += $(check-qtest-virtio-y)
 -- 
 2.17.1
