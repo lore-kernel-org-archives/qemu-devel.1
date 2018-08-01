@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkqnj-0005KU-Kq
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:04:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1fkqs3-0007Bq-MN
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:08:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fkqni-0003Wo-77
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:04:27 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34631)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fkqnh-0003WA-RG
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:04:26 -0400
-Received: by mail-oi0-x242.google.com with SMTP id 13-v6so34399379ois.1
-	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 06:04:25 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fkqs0-0005Ng-IB
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:08:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44472 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fkqs0-0005Mm-A6
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:08:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E2F7F40216E8
+	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 13:08:45 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180801092508.4927-1-marcandre.lureau@redhat.com>
+Date: Wed, 01 Aug 2018 15:08:38 +0200
+In-Reply-To: <20180801092508.4927-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 1 Aug 2018 11:25:08 +0200")
+Message-ID: <87bmam8ca1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1808011300070.7488@zero.eik.bme.hu>
-References: <20180801035357.7804-1-david@gibson.dropbear.id.au>
-	<CAFEAcA-FitsqU3kQJTFGSFgOh6Zsf2Zy2fO3OTnL5c+Tzi5pog@mail.gmail.com>
-	<alpine.BSF.2.21.1808011300070.7488@zero.eik.bme.hu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 1 Aug 2018 14:04:04 +0100
-Message-ID: <CAFEAcA-=c7O+h3c-gQ=31q0oyLzJhDNmEBzv4X2Yp_TBfYhC-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 0/2] ppc-for-3.0 queue 20180801
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ui: use enum to string helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +34,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-On 1 August 2018 at 12:24, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> On Wed, 1 Aug 2018, Peter Maydell wrote:
->> So, we've just put out rc3, which in an ideal world is our
->> final release candidate for 3.0. Are these bugs regressions from
->> 2.12 ?
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> Minor code simplification.
+
+It's also a bit more robust: FOO_str(VAL) checks VAL is in range,
+FOO_lookup.array[VAL] doesn't.
+
 >
->
-> I don't know about the macio one but the sam460ex PCI interrupts were broken
-> in 2.12 too. However it's a fix for a device only used in sam460ex which is
-> now fixed by this patch so including it is not high risk for breaking
-> anything else than sam460ex which is known to be not finished yet so I would
-> not worry too much. But which is better? Releasing 3.0 with a known bug or
-> including this fix without an rc4?
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The problem with continuing to delay 3.0 while we have known bugs
-is that bugs generally come in at an even rate, so we *always*
-have known bugs, and so "we found another bug, let's delay 3.0
-again to put in a fix for it" is a recipe for never doing a release.
-That's why we gradually wind up the bar for "should this go in",
-from "any bug" to "regressions" to "really really serious showstopper
-regressions".
-
-We never do a final release without a last rc (it is too risky),
-so that is not an option.
-
-thanks
--- PMM
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
