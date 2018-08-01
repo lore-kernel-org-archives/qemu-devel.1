@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fkuKj-0001Ke-7k
+	(envelope-from <bounces@canonical.com>) id 1fkuKj-0001Kd-7Z
 	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fkuKg-00033x-53
+	(envelope-from <bounces@canonical.com>) id 1fkuKg-000344-6h
 	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:50:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36886)
+Received: from indium.canonical.com ([91.189.90.7]:36870)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fkuKf-00033M-VQ
+	id 1fkuKf-00033G-VY
 	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:50:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fkuKe-0008Qe-Ci
+	id 1fkuKe-0008Qe-2D
 	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 16:50:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5E8192E807E
+	by loganberry.canonical.com (Postfix) with ESMTP id 00C012E8082
 	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 16:50:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Aug 2018 16:40:52 -0000
-From: Daniel Berrange <1784900@bugs.launchpad.net>
+Date: Wed, 01 Aug 2018 16:39:22 -0000
+From: Stefan Berger <1784900@bugs.launchpad.net>
 Reply-To: Bug 1784900 <1784900@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <153314156256.17371.7866837258800403867.malonedeb@soybean.canonical.com>
-Message-Id: <153314165289.29473.11065410443088531238.launchpad@chaenomeles.canonical.com>
+Message-Id: <153314156256.17371.7866837258800403867.malonedeb@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1784900] Re: QEMU (frontend) crashes upon warm
+Subject: [Qemu-devel] [Bug 1784900] [NEW] QEMU (frontend) crashes upon warm
  reboot with virtio-gpu device and vga=775 on Linux cmdline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -39,11 +38,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Summary changed:
+Public bug reported:
 
-- QEMU (frontend) crashes upon warm reboot with vga=3D775 on Linux cmdline
-+ QEMU (frontend) crashes upon warm reboot with virtio-gpu device and vga=
-=3D775 on Linux cmdline
+With vga=3D775 on the Linux command line a first boot of the VM running
+Linux works fine. After a warm reboot it crashes during Linux boot. The
+VM was used remotely via virt-manager and VNC.
+
+Bisecting the code lead to the following patch that introduced the bug:
+
+commit 1fccd7c5a9a722a9cbf1bc91693f4618034f01ac (HEAD, refs/bisect/bad)
+Author: Gerd Hoffmann <kraxel@redhat.com>
+Date:   Mon Jul 2 18:24:43 2018 +0200
+
+    virtio-gpu: disable scanout when backing resource is destroyed
+
+    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+    Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+    Message-id: 20180702162443.16796-4-kraxel@redhat.com
+
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index 336dc59007..08cd567218 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -430,6 +430,16 @@ static void virtio_gpu_disable_scanout(VirtIOGPU *g, i=
+nt scanout_id)
+ static void virtio_gpu_resource_destroy(VirtIOGPU *g,
+                                         struct virtio_gpu_simple_resource =
+*res)
+ {
++    int i;
++
++    if (res->scanout_bitmask) {
++        for (i =3D 0; i < g->conf.max_outputs; i++) {
++            if (res->scanout_bitmask & (1 << i)) {
++                virtio_gpu_disable_scanout(g, i);
++            }
++        }
++    }
++
+     pixman_image_unref(res->image);
+     virtio_gpu_cleanup_mapping(res);
+     QTAILQ_REMOVE(&g->reslist, res, next);
+
+
+Reported backtraces can be found here:  https://paste.fedoraproject.org/pas=
+te/OUDEfCk1IY7xiy0I0PDlkw
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 -- =
 
