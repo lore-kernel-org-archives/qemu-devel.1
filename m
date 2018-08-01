@@ -1,29 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fknWU-0002y5-W8
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:34:28 -0400
+	(envelope-from <laurent.desnogues@gmail.com>) id 1fkna4-0004IJ-2b
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:38:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fknWP-0000LM-4A
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:34:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48346 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fknWO-0000LE-U8
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:34:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7FC3B40241C8
-	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 09:34:20 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  1 Aug 2018 11:34:01 +0200
-Message-Id: <20180801093401.9160-1-marcandre.lureau@redhat.com>
+	(envelope-from <laurent.desnogues@gmail.com>) id 1fkna3-0001W3-FG
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:38:08 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] monitor: avoid potential dead-lock when
- cleaning up
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Wed, 1 Aug 2018 11:38:05 +0200
+Message-ID: <CABoDooMm7+REK+8dbTA1zj2mV-OiiA0w2ib8B7b-1WwVny82PA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] ARM: SVE movprfx issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,112 +19,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-When a monitor is connected to a Spice chardev, the monitor cleanup
-can dead-lock:
+Hello Richard,
 
- #0  0x00007f43446637fd in __lll_lock_wait () at /lib64/libpthread.so.0
- #1  0x00007f434465ccf4 in pthread_mutex_lock () at /lib64/libpthread.so.=
-0
- #2  0x0000556dd79f22ba in qemu_mutex_lock_impl (mutex=3D0x556dd81c9220 <=
-monitor_lock>, file=3D0x556dd7ae3648 "/home/elmarco/src/qq/monitor.c", li=
-ne=3D645) at /home/elmarco/src/qq/util/qemu-thread-posix.c:66
- #3  0x0000556dd7431bd5 in monitor_qapi_event_queue (event=3DQAPI_EVENT_S=
-PICE_DISCONNECTED, qdict=3D0x556dd9abc850, errp=3D0x7fffb7bbddd8) at /hom=
-e/elmarco/src/qq/monitor.c:645
- #4  0x0000556dd79d476b in qapi_event_send_spice_disconnected (server=3D0=
-x556dd98ee760, client=3D0x556ddaaa8560, errp=3D0x556dd82180d0 <error_abor=
-t>) at qapi/qapi-events-ui.c:149
- #5  0x0000556dd7870fc1 in channel_event (event=3D3, info=3D0x556ddad1b59=
-0) at /home/elmarco/src/qq/ui/spice-core.c:235
- #6  0x00007f434560a6bb in reds_handle_channel_event (reds=3D<optimized o=
-ut>, event=3D3, info=3D0x556ddad1b590) at reds.c:316
- #7  0x00007f43455f393b in main_dispatcher_self_handle_channel_event (inf=
-o=3D0x556ddad1b590, event=3D3, self=3D0x556dd9a7d8c0) at main-dispatcher.=
-c:197
- #8  0x00007f43455f393b in main_dispatcher_channel_event (self=3D0x556dd9=
-a7d8c0, event=3Devent@entry=3D3, info=3D0x556ddad1b590) at main-dispatche=
-r.c:197
- #9  0x00007f4345612833 in red_stream_push_channel_event (s=3Ds@entry=3D0=
-x556ddae2ef40, event=3Devent@entry=3D3) at red-stream.c:414
- #10 0x00007f434561286b in red_stream_free (s=3D0x556ddae2ef40) at red-st=
-ream.c:388
- #11 0x00007f43455f9ddc in red_channel_client_finalize (object=3D0x556dd9=
-bb21a0) at red-channel-client.c:347
- #12 0x00007f434b5f9fb9 in g_object_unref () at /lib64/libgobject-2.0.so.=
-0
- #13 0x00007f43455fc212 in red_channel_client_push (rcc=3D0x556dd9bb21a0)=
- at red-channel-client.c:1341
- #14 0x0000556dd76081ba in spice_port_set_fe_open (chr=3D0x556dd9925e20, =
-fe_open=3D0) at /home/elmarco/src/qq/chardev/spice.c:241
- #15 0x0000556dd796d74a in qemu_chr_fe_set_open (be=3D0x556dd9a37c00, fe_=
-open=3D0) at /home/elmarco/src/qq/chardev/char-fe.c:340
- #16 0x0000556dd796d4d9 in qemu_chr_fe_set_handlers (b=3D0x556dd9a37c00, =
-fd_can_read=3D0x0, fd_read=3D0x0, fd_event=3D0x0, be_change=3D0x0, opaque=
-=3D0x0, context=3D0x0, set_open=3Dtrue) at /home/elmarco/src/qq/chardev/c=
-har-fe.c:280
- #17 0x0000556dd796d359 in qemu_chr_fe_deinit (b=3D0x556dd9a37c00, del=3D=
-false) at /home/elmarco/src/qq/chardev/char-fe.c:233
- #18 0x0000556dd7432240 in monitor_data_destroy (mon=3D0x556dd9a37c00) at=
- /home/elmarco/src/qq/monitor.c:786
- #19 0x0000556dd743b968 in monitor_cleanup () at /home/elmarco/src/qq/mon=
-itor.c:4683
- #20 0x0000556dd75ce776 in main (argc=3D3, argv=3D0x7fffb7bbe458, envp=3D=
-0x7fffb7bbe478) at /home/elmarco/src/qq/vl.c:4660
+there's a typo in sve_movz_d where n[1] is used instead of n[i].
 
-Because spice code tries to emit a "disconnected" signal on the
-monitors. Fix this situation by tightening the monitor lock time to
-the monitor list removal.
+Thanks,
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- monitor.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
-
-diff --git a/monitor.c b/monitor.c
-index 0fa0910a2a..a16a6c5311 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4702,8 +4702,6 @@ void monitor_init(Chardev *chr, int flags)
-=20
- void monitor_cleanup(void)
- {
--    Monitor *mon, *next;
--
-     /*
-      * We need to explicitly stop the I/O thread (but not destroy it),
-      * clean up the monitor resources, then destroy the I/O thread since
-@@ -4719,14 +4717,24 @@ void monitor_cleanup(void)
-     monitor_qmp_bh_responder(NULL);
-=20
-     /* Flush output buffers and destroy monitors */
--    qemu_mutex_lock(&monitor_lock);
--    QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
--        QTAILQ_REMOVE(&mon_list, mon, entry);
-+    do {
-+        Monitor *mon;
-+
-+        qemu_mutex_lock(&monitor_lock);
-+        mon =3D QTAILQ_FIRST(&mon_list);
-+        if (mon) {
-+            QTAILQ_REMOVE(&mon_list, mon, entry);
-+        }
-+        qemu_mutex_unlock(&monitor_lock);
-+
-+        if (!mon) {
-+            break;
-+        }
-+
-         monitor_flush(mon);
-         monitor_data_destroy(mon);
-         g_free(mon);
--    }
--    qemu_mutex_unlock(&monitor_lock);
-+    } while (true);
-=20
-     /* QEMUBHs needs to be deleted before destroying the I/O thread */
-     qemu_bh_delete(qmp_dispatcher_bh);
---=20
-2.18.0.321.gffc6fa0e39
+Laurent
