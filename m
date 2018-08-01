@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fktiR-0002E9-Po
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:11:12 -0400
+	(envelope-from <bounces@canonical.com>) id 1fku1g-0002es-CK
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:31:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fktiM-0006V0-TC
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:11:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47408)
+	(envelope-from <bounces@canonical.com>) id 1fku1c-0001JC-E3
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:31:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57640)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fktiM-0006Uu-LI
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:11:06 -0400
+	id 1fku1c-0001In-7Z
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:31:00 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fktiL-0002uN-0k
-	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 16:11:05 +0000
+	id 1fku1Z-0005vj-0l
+	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 16:30:57 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F0C852E8080
-	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 16:11:04 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C9F152E818C
+	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 16:30:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Aug 2018 16:03:18 -0000
+Date: Wed, 01 Aug 2018 16:18:25 -0000
 From: umarcor <1783362@bugs.launchpad.net>
 Reply-To: Bug 1783362 <1783362@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153244909751.11925.3364609945591086988.malonedeb@gac.canonical.com>
-Message-Id: <153313939903.17727.1413656000420504482.launchpad@soybean.canonical.com>
+Message-Id: <153314030523.17817.7083266472723933715.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1783362] Re: qemu-user: mmap should return
  failure (MAP_FAILED, -1) instead of success (NULL, 0) when len==0
@@ -39,11 +39,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+2018-08-01 8:25 GMT+01:00 Laurent Vivier:
+> "Reviewed-By:", it's a tag I've sent in answer to his e-email to say
+I've reviewed his patch, and it is good for me.
 
-** Changed in: qemu (Ubuntu)
-       Status: In Progress =3D> Fix Committed
+It's clear now. Thanks.
+
+> I didn't update the Changelog, but the fix is now committed. It will be
+released soon (07/08 or 14/08). But you should test master now to check
+the commit really fixes your bug.
+
+I tested it, and it is fixed as expected. I changed the status of this
+bug accordingly. I'll change it again once it is released.
+
+> my git repo for linux-user pull request is
+git://github.com/vivier/qemu.git, and generally I prepare my pull
+request on linux-user-for-3.0 branch (the release number changes).
+
+Thanks again.
+
+Regards,
+umarcor
 
 -- =
 
