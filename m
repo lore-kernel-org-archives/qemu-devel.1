@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fknNh-0008SK-Et
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:25:22 -0400
+	(envelope-from <elohimes@gmail.com>) id 1fknSg-00016M-Gb
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:30:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fknNe-0005qP-4v
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:25:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48138 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fknNd-0005qF-T3
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:25:18 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DDE8740241C0
-	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 09:25:16 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  1 Aug 2018 11:25:08 +0200
-Message-Id: <20180801092508.4927-1-marcandre.lureau@redhat.com>
+	(envelope-from <elohimes@gmail.com>) id 1fknSc-0007ZF-OY
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:30:30 -0400
+Received: from mail-yb0-x244.google.com ([2607:f8b0:4002:c09::244]:44831)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1fknSc-0007Yz-It
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:30:26 -0400
+Received: by mail-yb0-x244.google.com with SMTP id l16-v6so7278812ybk.11
+	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 02:30:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] ui: use enum to string helpers
+In-Reply-To: <1531315364-2551-1-git-send-email-xieyongji@baidu.com>
+References: <1531315364-2551-1-git-send-email-xieyongji@baidu.com>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Wed, 1 Aug 2018 17:30:25 +0800
+Message-ID: <CAONzpcasgid2N3iGCTHR7aVFx1MLJaYYZ54y2Jm4uEshGAPHUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] kvmclock: run KVM_KVMCLOCK_CTRL ioctl in
+ vcpu thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: qemu-devel@nongnu.org, =?UTF-8?B?6LCi5rC45ZCJ?= <elohimes@gmail.com>, chaiwen@baidu.com
 
-Minor code simplification.
+Ping...
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- qemu-keymap.c | 2 +-
- ui/console.c  | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/qemu-keymap.c b/qemu-keymap.c
-index 6216371aa1..4d00468747 100644
---- a/qemu-keymap.c
-+++ b/qemu-keymap.c
-@@ -84,7 +84,7 @@ static void walk_map(struct xkb_keymap *map, xkb_keycod=
-e_t code, void *data)
-     }
-     fprintf(outfile, "# evdev %d (0x%x), QKeyCode \"%s\", number 0x%x\n"=
-,
-             evdev, evdev,
--            QKeyCode_lookup.array[qcode],
-+            QKeyCode_str(qcode),
-             qcode_to_number(qcode));
-=20
-     /*
-diff --git a/ui/console.c b/ui/console.c
-index bc58458ee8..3a285bae00 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -2319,7 +2319,7 @@ bool qemu_display_find_default(DisplayOptions *opts=
-)
-=20
-     for (i =3D 0; i < ARRAY_SIZE(prio); i++) {
-         if (dpys[prio[i]] =3D=3D NULL) {
--            ui_module_load_one(DisplayType_lookup.array[prio[i]]);
-+            ui_module_load_one(DisplayType_str(prio[i]));
-         }
-         if (dpys[prio[i]] =3D=3D NULL) {
-             continue;
-@@ -2337,11 +2337,11 @@ void qemu_display_early_init(DisplayOptions *opts=
-)
-         return;
-     }
-     if (dpys[opts->type] =3D=3D NULL) {
--        ui_module_load_one(DisplayType_lookup.array[opts->type]);
-+        ui_module_load_one(DisplayType_str(opts->type));
-     }
-     if (dpys[opts->type] =3D=3D NULL) {
-         error_report("Display '%s' is not available.",
--                     DisplayType_lookup.array[opts->type]);
-+                     DisplayType_str(opts->type));
-         exit(1);
-     }
-     if (dpys[opts->type]->early_init) {
---=20
-2.18.0.321.gffc6fa0e39
+On 11 July 2018 at 21:22, Yongji Xie <elohimes@gmail.com> wrote:
+> According to KVM API Documentation, we should only
+> run vcpu ioctls from the same thread that was used
+> to create the vcpu. This patch makes KVM_KVMCLOCK_CTRL
+> ioctl consistent with the Documentation.
+>
+> No functional change.
+>
+> Signed-off-by: Yongji Xie <xieyongji@baidu.com>
+> Signed-off-by: Chai Wen <chaiwen@baidu.com>
+> ---
+>  hw/i386/kvm/clock.c |   17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
+>
+> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
+> index 0bf1c60..25ea783 100644
+> --- a/hw/i386/kvm/clock.c
+> +++ b/hw/i386/kvm/clock.c
+> @@ -147,6 +147,15 @@ static void kvm_update_clock(KVMClockState *s)
+>      s->clock_is_reliable = kvm_has_adjust_clock_stable();
+>  }
+>
+> +static void do_kvmclock_ctrl(CPUState *cpu, run_on_cpu_data data)
+> +{
+> +    int ret = kvm_vcpu_ioctl(cpu, KVM_KVMCLOCK_CTRL, 0);
+> +
+> +    if (ret && ret != -EINVAL) {
+> +        fprintf(stderr, "%s: %s\n", __func__, strerror(-ret));
+> +    }
+> +}
+> +
+>  static void kvmclock_vm_state_change(void *opaque, int running,
+>                                       RunState state)
+>  {
+> @@ -183,13 +192,7 @@ static void kvmclock_vm_state_change(void *opaque, int running,
+>              return;
+>          }
+>          CPU_FOREACH(cpu) {
+> -            ret = kvm_vcpu_ioctl(cpu, KVM_KVMCLOCK_CTRL, 0);
+> -            if (ret) {
+> -                if (ret != -EINVAL) {
+> -                    fprintf(stderr, "%s: %s\n", __func__, strerror(-ret));
+> -                }
+> -                return;
+> -            }
+> +            run_on_cpu(cpu, do_kvmclock_ctrl, RUN_ON_CPU_NULL);
+>          }
+>      } else {
+>
+> --
+> 1.7.9.5
+>
