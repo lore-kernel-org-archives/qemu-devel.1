@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1fkg1c-0004Pz-JC
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 21:34:05 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fkhh7-0004Qh-BL
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 23:21:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1fkg1X-0001R8-NK
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 21:34:04 -0400
-Received: from eddie.linux-mips.org ([148.251.95.138]:53766
-	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1fkg1X-0001Pu-DZ
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 21:33:59 -0400
-Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
-	with ESMTP id S23993072AbeHABduYNdzY (ORCPT
-	<rfc822;qemu-devel@nongnu.org>); Wed, 1 Aug 2018 03:33:50 +0200
-Date: Wed, 1 Aug 2018 02:33:50 +0100 (BST)
-Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
-From: "Maciej W. Rozycki" <macro@linux-mips.org>
-In-Reply-To: <20180707194137.GB14409@localhost.localdomain>
-Message-ID: <alpine.LFD.2.21.1808010159390.4967@eddie.linux-mips.org>
-References: <20180707194137.GB14409@localhost.localdomain>
+	(envelope-from <dgibson@ozlabs.org>) id 1fkhh4-0002Pv-5u
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 23:21:01 -0400
+Date: Wed, 1 Aug 2018 11:02:11 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180801010211.GL2708@umbus.fritz.box>
+References: <20180731112006.737F77456B6@zero.eik.bme.hu>
+	<c577eb87cb5094a63b58771ac7df6c06@sebastianbauer.info>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [RFC] target/mips: Initial support for MIPS R5900
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="DXIF1lRUlMsbZ3S1"
+Content-Disposition: inline
+In-Reply-To: <c577eb87cb5094a63b58771ac7df6c06@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PATCH] sam460ex: Fix PCI interrupts with multiple
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +25,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>
+To: Sebastian Bauer <mail@sebastianbauer.info>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
 
-On Sat, 7 Jul 2018, Fredrik Noring wrote:
 
-> The MIPS R5900 is normally taken to be MIPS3, but it has MOVN, MOVZ and PREF
-> defined in MIPS4 which is why ISA_MIPS4 is chosen for this patch.
+--DXIF1lRUlMsbZ3S1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- It also has several instructions removed, so I don't think you can really 
-just mark it MIPS IV without special-casing those instructions, or the 
-emulation won't be accurate (and consequently programs that use them won't 
-trigger exceptions that they are supposed to).
+On Tue, Jul 31, 2018 at 11:55:02PM +0200, Sebastian Bauer wrote:
+> Am 2018-07-31 13:08, schrieb BALATON Zoltan:
+> > The four interrupts of the PCI bus are connected to the same UIC pin
+> > on the real Sam460ex. Evidence for this can be found in the UBoot
+> > source for the Sam460ex in the Sam460ex.c file where
+> > PCI_INTERRUPT_LINE is written. Change the ppc440_pcix model to behave
+> > more like this.
+> >=20
+> > This fixes the problem that can be observed when adding further PCI
+> > cards that got their interrupt rotated to other interrupts than PCI
+> > INT A. In particular, the bug was observed with an additional OHCI PCI
+> > card or an ES1370 sound device.
+> [...]
+> > diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> > index 0999efc..9c77183 100644
+> > --- a/hw/ppc/sam460ex.c
+> > +++ b/hw/ppc/sam460ex.c
+> > @@ -515,10 +515,8 @@ static void sam460ex_init(MachineState *machine)
+> >=20
+> >      /* PCI bus */
+> >      ppc460ex_pcie_init(env);
+> > -    /* FIXME: is this correct? */
+> > -    dev =3D sysbus_create_varargs("ppc440-pcix-host", 0xc0ec00000,
+> > -                                uic[1][0], uic[1][20], uic[1][21],
+> > uic[1][22],
+> > -                                NULL);
+> > +    /* All PCI irqs are connected to the same UIC pin (cf. UBoot
+> > source) */
+> > +    dev =3D sysbus_create_simple("ppc440-pcix-host", 0xc0ec00000,
+> > uic[1][0]);
+> >      pci_bus =3D (PCIBus *)qdev_get_child_bus(dev, "pci.0");
+> >      if (!pci_bus) {
+> >          error_report("couldn't create PCI controller!");
+>=20
+> I'm fine with that change. I tested it with an additional OHCI controller=
+ on
+> an emulated SAM machine under guest AmigaOS and it works.
+>=20
+> Tested-by: Sebastian Bauer <mail@sebastianbauer.info>
+>=20
+> Better usage of QOM etc. can IMO be done at a later time point as this fi=
+xes
+> an unpleasant bug and any side change will just increase the probability =
+to
+> introduce new bugs.
 
-> Some flags in the mips_defs array are marked FIXME as I don't know the
-> proper values.
+Thanks, applied to ppc-for-3.0.  I hope to send a pull request for
+that today.
 
- Well, the FPU is non-standard so until you implement it I'd rather kept 
-it disabled and then all the FPU-related settings can go for now.  For the 
-rest see below.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> --- a/target/mips/translate_init.inc.c
-> +++ b/target/mips/translate_init.inc.c
-> @@ -411,6 +411,26 @@ const mips_def_t mips_defs[] =
->          .mmu_type = MMU_TYPE_R4000,
->      },
->      {
-> +        .name = "R5900",
-> +        .CP0_PRid = 0x00003800,
-> +        /* No L2 cache, icache size 32k, dcache size 32k, uncached coherency. */
-> +        .CP0_Config0 = (1 << 17) | (0x3 << 9) | (0x3 << 6) | (0x2 << CP0C0_K0),
-> +        /* Note: Config1 is only used internally, the R5900 has only Config0. */
-> +        .CP0_Config1 = (1 << CP0C1_FP) | (47 << CP0C1_MMU),
+--DXIF1lRUlMsbZ3S1
+Content-Type: application/pgp-signature; name="signature.asc"
 
- So I'd clear CP0C1_FP then; also make sure accessing CP0.Config1 from 
-emulated code does what it does on actual hardware.
+-----BEGIN PGP SIGNATURE-----
 
-> +        .CP0_LLAddr_rw_bitmask = 0xFFFFFFFF,	/* FIXME */
-> +        .CP0_LLAddr_shift = 4,			/* FIXME */
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlthBpEACgkQbDjKyiDZ
+s5J0rw/7BBno/vpQ1/Xm2jrAjLtjXQhaj7ru/l652y3TBIyx8dsCW9gxofUpbWA6
+0SjRXFdRcNRBmK9NTd6yWXYO9AFfydHRseH+i8/pUGPZhP3WctSSEOsy9ATdMGBg
+MnOxBIlhrtEs5/VkpnptZmZgEjmRvvVMlT+jafjpnEtDgdJhuHPcKXz98Fae8XiX
+bdLAnnztQTXAlgPKB16+nkkD9vmAhFrgGFtA/kfSPYqA/1tqBKoJkPdQl8O1bu+b
+LyTYKY9qmXyCHThLmJamjKPqxwKs47EgzJrbXAZmWmO7ysC2Dm8ib6ubnWZqxiKp
+8jAhBNdnQkAPHMt//WuRQgiEm3/87EWgssEHhsMV1sVNo8zihhfnJ5p2+Xdx91pt
+1KP0jQSSEGqP9dbY9K3NGODMW1kD83oz+tbZy/PUr0k32jkR8jD4Lwb8zuwb5HxH
+JV8ZVw+2Ni78KqT6SypfHLBHrWTQMg8usMX6ZImWxIE754KDRHJnUEvKTtZgG58I
+gEqAsxjO3l6nqcDoMAn+0+IJe0R8Hd+8vpvXkcibmHK+LGKDWSdfeCm70W8BmwiH
+16n8ieH7hSDlqVyDaDr9qQH2kDKPU7l227UiHeRKbbwp1uFVRsAnePokED2jiFkE
+HmWm7d6Ctd6xjM8ndNUhUTttYTriNtj3jkCEF+CpyxqpzaWiN2g=
+=IOkT
+-----END PGP SIGNATURE-----
 
- No LL/SC in the R5900, so the LLAddr settings can go.
-
-> +        .SYNCI_Step = 16,			/* FIXME */
-
- SYNCI is MIPS32r2+, so this can go.
-
-> +        .CCRes = 2,				/* FIXME */
-
- Likewise, CCRes is MIPS32r2+, so this can go.
-
-> +        .CP0_Status_rw_bitmask = 0x3678FFFF,	/* FIXME */
-
- This has to indicate which bits in CP0.Status are writable.  Check with 
-the manual and/or actual hardware.
-
-> +        .CP1_fcr0 = (0x38 << FCR0_PRID) | (0x0 << FCR0_REV),
-> +        .CP1_fcr31 = 0,
-> +        .CP1_fcr31_rw_bitmask = 0x0183FFFF,	/* FIXME */
-
- This is all FPU stuff and it can go.
-
-> +        .SEGBITS = 40,				/* FIXME */
-
- This is the number of virtual address bits.  Determined by the highest 
-writable CP0.EntryHi.VPN2 bit.
-
-> +        .PABITS = 36,				/* FIXME */
-
- Likewise physical address bits.  Determined by the highest writable 
-CP0.EntryLo0.PFN and CP0.EntryLo1.PFN bit.
-
-> +        .insn_flags = CPU_R5900,
-> +        .mmu_type = MMU_TYPE_R4000,		/* FIXME */
-
- This looks right to me.
-
- FWIW; I don't have any authority for QEMU maintenance.
-
-  Maciej
+--DXIF1lRUlMsbZ3S1--
