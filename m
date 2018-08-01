@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aoates@google.com>) id 1fke1A-0006FC-Ah
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 19:25:29 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1fkfjd-0000sy-0y
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 21:15:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aoates@google.com>) id 1fke19-0001Je-9J
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 19:25:28 -0400
-Received: from mail-it0-x229.google.com ([2607:f8b0:4001:c0b::229]:55552)
+	(envelope-from <liq3ea@gmail.com>) id 1fkfjb-0003CB-KG
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 21:15:29 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:37198)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aoates@google.com>) id 1fke18-0001J8-Dv
-	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 19:25:26 -0400
-Received: by mail-it0-x229.google.com with SMTP id p7-v6so7041023itf.5
-	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 16:25:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1fkfjb-0003C3-Bt
+	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 21:15:27 -0400
+Received: by mail-it0-x244.google.com with SMTP id h20-v6so7099048itf.2
+	for <qemu-devel@nongnu.org>; Tue, 31 Jul 2018 18:15:27 -0700 (PDT)
 MIME-Version: 1.0
-References: <20180729143545.6978-1-samuel.thibault@ens-lyon.org>
-	<20180729143545.6978-2-samuel.thibault@ens-lyon.org>
-	<CAFEAcA8tX0_MNg99oorgOWarJa8Oy+gFFwoRys-fU7ZX3_Ufng@mail.gmail.com>
-	<CAJ1tprAuf1mWtpw+4M3QFZyrDz22TMcnGS9xkhQn6Q9UQTrwiw@mail.gmail.com>
-	<CAFEAcA_pj4tFE2tyrbRtvJnPoeRekDXtVJCzgSeFiiK=sxg4Aw@mail.gmail.com>
-In-Reply-To: <CAFEAcA_pj4tFE2tyrbRtvJnPoeRekDXtVJCzgSeFiiK=sxg4Aw@mail.gmail.com>
-From: Andrew Oates <aoates@google.com>
-Date: Tue, 31 Jul 2018 19:25:13 -0400
-Message-ID: <CAJ1tprAyHqgH1mHkeLu6qU1Fr8O-B5ebJ3Cfw8e_nHMYSYXfmQ@mail.gmail.com>
+In-Reply-To: <20180731155043.GK29167@redhat.com>
+References: <1533026124-6740-1-git-send-email-liq3ea@gmail.com>
+	<1533026124-6740-3-git-send-email-liq3ea@gmail.com>
+	<20180731112906.GG2476@work-vm>
+	<87o9enqx4s.fsf@trasno.org> <20180731155043.GK29167@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Wed, 1 Aug 2018 09:14:46 +0800
+Message-ID: <CAKXe6S+AyQyyOhwH4b5T+TE5x0_5zQ=KwOYUBwHMfGr3K-dFWg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 1/1] slirp: fix ICMP handling on macOS hosts
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Add qmp command for
+ migrate_set_max_cpu_throttle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, stefanha@redhat.com, "J. Kiszka" <jan.kiszka@siemens.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, liqiang02@corp.netease.com, Paolo Bonzini <pbonzini@redhat.com>, hzliuyingdong@corp.netease.com, rth@twiddle.net
 
-On Tue, Jul 31, 2018 at 6:22 AM Peter Maydell <peter.maydell@linaro.org>
-wrote:
+2018-07-31 23:50 GMT+08:00 Daniel P. Berrang=C3=A9 <berrange@redhat.com>:
 
-> On 31 July 2018 at 02:16, Andrew Oates <aoates@google.com> wrote:
-> > Yeah, I suspect (but haven't tested) that this applies to all BSDs.  We
-> > could switch CONFIG_DARWIN to CONFIG_BSD (happy to resend the patch, just
-> > LMK).
+> On Tue, Jul 31, 2018 at 04:48:35PM +0200, Juan Quintela wrote:
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > * Li Qiang (liq3ea@gmail.com) wrote:
+> > >> The default max cpu throttle is 99, this is too big that may
+> > >> influence the guest loads. Add a qmp to config it can make it
+> > >> more flexible.
+> > >>
+> > >> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> > >
+> > > This should be done as a migration parameter rather than a new comman=
+d.
+> > > For example, follow the cpu-throttle-increment parameter; and this
+> > > should work just like it.
 > >
-> > Agreed that platform-specific ifdefs are gross, but I don't see a better
-> way
-> > here :/  One option would be to look at the packet length and contents to
-> > try to determine if there's an IP header before the ICMP header, but that
-> > seems pretty iffy.  Creating ICMP sockets often requires special
-> privileges
-> > or configuration (e.g. on Linux) so I don't think it could easily be
-> done at
-> > configure-time to test the host machine's configuration.
->
-> Mmm. I guess using CONFIG_BSD, or perhaps even not-CONFIG_LINUX,
-> would be best. Is there an easy way to test this?
-> (Our other two supported host OSes are the Solarises and Haiku;
-> no idea if either of those support ICMP sockets or what their
-> behaviour is here...)
 >
 
-Both CONFIG_BSD and not-CONFIG_LINUX work on macOS.  I unfortunately don't
-have access to any other BSDs to test them, though.
 
-~Andrew
+Hello all,
+
+Thanks for your review. I will prepare another migration parameter version
+patch set
+for this.
+
+
+Thanks,
+Li Qiang
+
+> I was about to comment this one.
+> >
+> > migrate_set_downtime, migrate_set_speed, migrate-set-cache-size,
+> > query-migrate-cache-size are marked as deprecated.  Any way that we
+> > could have make more clear that one should use
+> > migrate_set/get_parameter/capability?
+>
+> Where are they marked as deprecated ?
+>
+They're not included in our official list of deprecated features, so per
+> our deprecation policy, they are still considered supported.
+>
+>   https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features
+
 
 >
-> thanks
-> -- PMM
+> To deprecate something it needs to be added to qemu-deprecated.texi, and
+> ideally also made to print a message to stderr when triggered.
+>
+Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/
+> dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/
+> dberrange :|
 >
