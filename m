@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fko9z-0006PY-1E
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:15:15 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fkoFI-0000C5-FT
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fko9y-0000pj-5o
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:15:14 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38379)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fko9x-0000pG-W2
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:15:14 -0400
-Received: by mail-oi0-x241.google.com with SMTP id v8-v6so33580748oie.5
-	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 03:15:13 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1fkoFH-0003i6-LW
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:20:44 -0400
+Date: Wed, 1 Aug 2018 11:20:32 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180801102031.GC2691@work-vm>
+References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
+	<20180626135035.133432-5-vsementsov@virtuozzo.com>
+	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4beb699e-8e9b-0a3e-01a6-891033ebc7a5@huawei.com>
-References: <1532196162-29453-1-git-send-email-gengdongjiu@huawei.com>
-	<4beb699e-8e9b-0a3e-01a6-891033ebc7a5@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 1 Aug 2018 11:14:53 +0100
-Message-ID: <CAFEAcA8cQQNXcO3FmqGR=txEFxZe8n4+qhdbVR7rvQkuS1_L4A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 0/3] add support for VCPU event states
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
+ loading and migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,15 +25,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>
+To: John Snow <jsnow@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, Eric Blake <eblake@redhat.com>
 
-On 1 August 2018 at 11:05, gengdongjiu <gengdongjiu@huawei.com> wrote:
-> Hi Peter,
->    sorry to disturb you, any comments for this series patch? thanks you in advance.
+* John Snow (jsnow@redhat.com) wrote:
 
-It is on my to-review list, but I'm afraid I have not yet
-got to it.
+<snip>
 
-thanks
--- PMM
+> I'd rather do something like this:
+> - Always flush bitmaps to disk on inactivate.
+
+Does that increase the time taken by the inactivate measurably?
+If it's small relative to everything else that's fine; it's just I
+always worry a little since I think this happens after we've stopped the
+CPU on the source, so is part of the 'downtime'.
+
+Dave
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
