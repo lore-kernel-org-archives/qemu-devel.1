@@ -1,31 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fklLU-0007rM-Iy
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 03:14:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1fklfq-0003sw-DN
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 03:35:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fklLP-0001Ei-DM
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 03:14:56 -0400
-Received: from 2.mo177.mail-out.ovh.net ([178.33.109.80]:54333)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fklLP-0001EM-6m
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 03:14:51 -0400
-Received: from player758.ha.ovh.net (unknown [10.109.159.62])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 6955EC0D19
-	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 09:14:49 +0200 (CEST)
-References: <20180730141134.31153-1-clg@kaod.org>
-	<20180730141134.31153-3-clg@kaod.org>
-	<20180731193945.35360b15@bahia.lan>
-	<20180801063823.GQ2708@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <b510d9a7-fbda-b3c9-98a7-9fffee7a12cf@kaod.org>
-Date: Wed, 1 Aug 2018 09:14:43 +0200
+	(envelope-from <bounces@canonical.com>) id 1fklfn-0002HF-3p
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 03:35:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43078)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fklfm-0002H3-T6
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 03:35:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fklfk-0008ET-Mi
+	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 07:35:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 757782E80E6
+	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 07:35:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180801063823.GQ2708@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 2/4] spapr: introduce a fixed IRQ number
- space
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 01 Aug 2018 07:25:41 -0000
+From: Laurent Vivier <Laurent@vivier.eu>
+Reply-To: Bug 1783362 <1783362@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153244909751.11925.3364609945591086988.malonedeb@gac.canonical.com>
+	<153307783850.9162.1991046157512323707.malone@chaenomeles.canonical.com>
+Message-Id: <c1663070-8466-3397-c6e1-822cf186705c@vivier.eu>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1783362] Re: qemu-user: mmap should return
+ failure (MAP_FAILED, -1) instead of success (NULL, 0) when len==0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +38,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-[ ... ]
+Le 01/08/2018 =C3=A0 00:57, umarcor a =C3=A9crit=C2=A0:
+> Alex, Laurent, I'm new to this management/development system. So, first
+> off, thanks for working on this bug.
+> =
 
->>> +typedef struct sPAPRMachineState sPAPRMachineState;
->>> +
->>
->> Old compilers (GCC < 4.6) might complain about 'redefinition of typedef' if
->> some file, say hw/ppc/spapr.c, includes both this header and "hw/ppc/xics.h".
->> We had several build breaks detected by 'make docker-test-build@centos6'...
->> The correct way to address this would be to move the typedef to the
->> "qemu/typedefs.h" header.
->>
->> This being said, docker-test-build@centos6 vanished with commit e7b3af81597,
->> so I guess we don't support such old distros anymore, and we can live with
->> duplicate typedefs.
+> I have a few (probably silly) questions:
+> =
 
-I have a rhel6 vm for such tests but QEMU now requires python3 and 
-glib-2.40 and maybe more stuff. I am not sure one can compile QEMU 3.1
-on rhel/centos 6 anymore :/
+> 1. What is 'the r-b' that Alex used in #14?
 
+"Reviewed-By:", it's a tag I've sent in answer to his e-email to say
+I've reviewed his patch, and it is good for me.
 
-[ ... ]
+> 2. When should I change the status of the bug? I can already see it in
+GitHub's mirror and in https://git.qemu.org/?p=3Dqemu.git;a=3Dsummary. But
+not in the Changelog: https://wiki.qemu.org/ChangeLog/3.0#User-
+mode_emulation. I am not sure if it is in 'Fix Committed' or 'Fix
+Released' state.
 
->>>      /* Release previous MSIs */
->>>      if (msi) {
->>> +        if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
->>> +            spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
->>> +        }
->>
->> SPAPR_MACHINE_GET_CLASS() does all the recursive type checking, and you
->> call it three times. Even if this isn't a hot path, maybe cache this in
->> an smc variable at the beginning of the function as we do pretty much
->> everywhere else. Also this would give prettier code IMHO.
-> 
-> I agree with Greg that this would be a nice improvement, but it can
-> wait until a followup.
+I didn't update the Changelog, but the fix is now committed. It will be
+released soon (07/08 or 14/08). But you should test master now to check
+the commit really fixes your bug.
 
-The sPAPR code base is very stable so it's not too much work to respin.
-FYI, most of the XIVE v4 patchset still applies without a change.
+> 3. Where did you push these commits to before they where merge in
+https://git.qemu.org/?p=3Dqemu.git;a=3Dsummary? I cannot find your personal
+forks/branches. Are commits automatically created from the mailing list?
 
-Tell me if you find any other issues and I will resend.
+No, sub-system maintainers collect patches from the mailing list. They
+create and send a pull request (in their own git repo) to the QEMU
+maintainers, and he merges the patches into the master.
+
+my git repo for linux-user pull request is
+git://github.com/vivier/qemu.git, and generally I prepare my pull
+request on linux-user-for-3.0 branch (the release number changes).
 
 Thanks,
+Laurent
 
-C.
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1783362
+
+Title:
+  qemu-user: mmap should return failure (MAP_FAILED, -1) instead of
+  success (NULL, 0) when len=3D=3D0
+
+Status in QEMU:
+  In Progress
+Status in qemu package in Ubuntu:
+  In Progress
+
+Bug description:
+  As shown in https://github.com/beehive-
+  lab/mambo/issues/19#issuecomment-407420602, with len=3D=3D0 mmap returns
+  success (NULL, 0) instead of failure (MAP_FAILED, -1) in a x86_64 host
+  executing a ELF 64-bit LSB executable, ARM aarch64 binary.
+
+  Steps to reproduce the bug:
+
+  - (cross-)compile the attached source file:
+
+  $ aarch64-linux-gnu-gcc -static -std=3Dgnu99 -lpthread test/mmap_qemu.c
+  -o mmap_qemu
+
+  - Execute in a x86_64 host with qemu-user and qemu-user-binfmt:
+
+  $ ./mmap_qemu
+  alloc: 0
+  MAP_FAILED: -1
+  errno: 0
+  mmap_qemu: test/mmap_qemu.c:15: main: Assertion `alloc =3D=3D MAP_FAILED'=
+ failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  Aborted (core dumped)
+
+  - Execute in a ARM host without any additional dependecy:
+
+  $ ./mmap_qemu
+  alloc: -1
+  MAP_FAILED: -1
+  errno: 22
+
+  The bug is present in Fedora:
+
+  $ qemu-aarch64 --version
+  qemu-aarch64 version 2.11.2(qemu-2.11.2-1.fc28)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+  $ uname -r
+  4.17.7-200.fc28.x86_64
+
+  And also in Ubuntu:
+
+  $ qemu-aarch64 --version
+  qemu-aarch64 version 2.12.0 (Debian 1:2.12+dfsg-3ubuntu3)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+  $ uname -r
+  4.15.0-23-generic
+
+  Possibly related to:
+
+  - https://lists.freebsd.org/pipermail/freebsd-hackers/2009-July/029109.ht=
+ml
+  - https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=3D203852
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1783362/+subscriptions
