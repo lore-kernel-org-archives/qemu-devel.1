@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fko8i-0005XG-Kr
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:13:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fko9z-0006PY-1E
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:15:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fko8h-0000DP-4Y
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:13:56 -0400
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:46688)
+	(envelope-from <peter.maydell@linaro.org>) id 1fko9y-0000pj-5o
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:15:14 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38379)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fko8g-0000D9-Ui
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:13:55 -0400
-Received: by mail-oi0-x22c.google.com with SMTP id y207-v6so33562293oie.13
-	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 03:13:54 -0700 (PDT)
+	id 1fko9x-0000pG-W2
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:15:14 -0400
+Received: by mail-oi0-x241.google.com with SMTP id v8-v6so33580748oie.5
+	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 03:15:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180801082244.GA11408@debian.sh.intel.com>
-References: <20180720083644.1431-1-tiwei.bie@intel.com>
-	<20180801082244.GA11408@debian.sh.intel.com>
+In-Reply-To: <4beb699e-8e9b-0a3e-01a6-891033ebc7a5@huawei.com>
+References: <1532196162-29453-1-git-send-email-gengdongjiu@huawei.com>
+	<4beb699e-8e9b-0a3e-01a6-891033ebc7a5@huawei.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 1 Aug 2018 11:13:34 +0100
-Message-ID: <CAFEAcA86EkMRMosb55HAoKVYCN=-jA4tvC7JMJf68VsAYoPYug@mail.gmail.com>
+Date: Wed, 1 Aug 2018 11:14:53 +0100
+Message-ID: <CAFEAcA8cQQNXcO3FmqGR=txEFxZe8n4+qhdbVR7rvQkuS1_L4A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] vhost: check region type before casting
+Subject: Re: [Qemu-devel] [PATCH v6 0/3] add support for VCPU event states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +29,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>
 
-On 1 August 2018 at 09:22, Tiwei Bie <tiwei.bie@intel.com> wrote:
-> Ping..
->
-> It seems that the final release for QEMU 3.0 will be
-> out soon [1]. But this fix hasn't been merged yet.
->
-> [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg06004.html
+On 1 August 2018 at 11:05, gengdongjiu <gengdongjiu@huawei.com> wrote:
+> Hi Peter,
+>    sorry to disturb you, any comments for this series patch? thanks you in advance.
 
-:-(
-
-You just missed rc3 (which we tagged yesterday), and I'm
-not sure if this meets the barrier for causing us to put
-out an rc4. It is a regression, but when does it happen?
-The commit message isn't very clear whether this is a
-corner case or not.
+It is on my to-review list, but I'm afraid I have not yet
+got to it.
 
 thanks
 -- PMM
