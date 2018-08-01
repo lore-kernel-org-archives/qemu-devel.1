@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fkp13-0008W7-Nw
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:06 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fkp12-0006Z2-Is
+	(envelope-from <quintela@redhat.com>) id 1fkp12-0008Vs-IX
 	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51630 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fkp12-0006Ys-Dk
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1fkp0x-0006Xv-FG
 	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:10:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49090 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fkp0x-0006Xj-8v
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:09:59 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 121AE7DAC7
-	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 11:10:04 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9622840201BE
+	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 11:09:58 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  1 Aug 2018 13:09:38 +0200
-Message-Id: <20180801110952.5590-5-quintela@redhat.com>
-In-Reply-To: <20180801110952.5590-1-quintela@redhat.com>
-References: <20180801110952.5590-1-quintela@redhat.com>
-Subject: [Qemu-devel] [[PATH for 3.1] v2 04/18] check: Only test pcnet when
- it is compiled in
+Date: Wed,  1 Aug 2018 13:09:34 +0200
+Message-Id: <20180801110952.5590-1-quintela@redhat.com>
+Subject: [Qemu-devel] [[PATH for 3.1] v2 00/18] Don't "check" disabled
+ drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +31,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- tests/Makefile.include | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Hi
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 8cf2c15daf..f234a68345 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -217,9 +217,9 @@ check-qtest-pci-y += tests/e1000e-test$(EXESUF)
- gcov-files-pci-y += hw/net/e1000e.c hw/net/e1000e_core.c
- check-qtest-pci-y += tests/rtl8139-test$(EXESUF)
- gcov-files-pci-y += hw/net/rtl8139.c
--check-qtest-pci-y += tests/pcnet-test$(EXESUF)
--gcov-files-pci-y += hw/net/pcnet.c
--gcov-files-pci-y += hw/net/pcnet-pci.c
-+check-qtest-pci-$(CONFIG_PCNET_PCI) += tests/pcnet-test$(EXESUF)
-+gcov-files-pci-$(CONFIG_PCNET_PCI) += hw/net/pcnet.c
-+gcov-files-pci-$(CONFIG_PCNET_PCI) += hw/net/pcnet-pci.c
- check-qtest-pci-$(CONFIG_EEPRO100_PCI) += tests/eepro100-test$(EXESUF)
- gcov-files-pci-$(CONFIG_EEPRO100_PCI) += hw/net/eepro100.c
- check-qtest-pci-$(CONFIG_NE2000_PCI) += tests/ne2000-test$(EXESUF)
+this are the patches from v1 that have been reviewed.  Minor changes
+in spelled done.  I expect to move those for 3.1.  I will post the
+changes and additons on top of this one.
+
+Complain now, or I will send the pull once 3.1 opens.
+
+ToDo:
+- I am working on virtio-pci being split
+- I plan to integrate virtio-ccw split from Thomas
+- I started trying to "untangle" q35 and piix, but it is really deppe
+  tangled.
+
+Should I sent the pull request directly, or go through maintainers?
+
+Thanks, Juan.
+
+
+[v2]
+We can disable drivers with "<foo>-softmmu/config-devices.mak".  But
+if we remove drivers there and do "make check", we still try to test
+that devices (that are compiled in).  This is a list with the removal
+of the ovbious ones.
+
+While I was doing this I fonund:
+- we remove <foo>-softmmu/config-devices.mak when we do make clean
+  That is an "user" configuration file, we shouldn't do that.
+- Use land/lor for consistence
+- CONFIG_SERIAL was defined twice for all configurations that include
+  pci.mak, fix it.
+- pvpanic: We can do the same tricks that everywhere to be able to
+  compile it out.
+
+To do a better job, we are in trouble because we only have
+"config-devices.mak", but not config-devices.h, so we can't disable
+part of the tests/files when we don't want them.  Bigger culprits here
+are usb and virtio devices, basically all of them depend of the others
+one way or another.
+
+Motivation:
+
+- I compile *lots* of times a day, so it is great to be able to
+  compile less devices, it takes less time.
+- But if I want to do make check, I need to compile basically a full
+  configuration for that platform, so we are at square one.
+
+There are still things that still take too long:
+- e1000*/virtio-net pxe test.  It takes more than one second for each,
+  and we have e1000/virtio-net/e1000p/virtio-net(again).
+- qom tests.  We check _all_ machine types here.  In fast mode, IMHO
+  we would only want something like pc-3.0 and q35-30 in fast mode
+  (in slow mode everything is ok).
+- migration tests: yes, they also took around 5-6 seconds in total,
+  and we are adding new tests.  Something needs to be done here.
+
+Time to do "make check" on my laptop (reasonably fast laptop from this
+Jannuary) is almost 3mins.  This makes it too long to run continously
+for testing that I haven't broken anything.
+
+In another submission I wil send some examples on "how" to disable
+other drivers that we can't do now.  But it requires that we generate
+config-devices.h to be able to apply them (or yet more complicated
+things of registration, see how virtio devices needs to be disabled)
+
+Please review, Juan.
+
+Juan Quintela (18):
+  check: Only test vmxnet3 when it is compiled in
+  check: Only test ne2000 when it is compiled in
+  check: Only test eepro100 when it is compiled in
+  check: Only test pcnet when it is compiled in
+  check: Only test rtl8139 when it is compiled in
+  check: Only test es1370 when it is compiled in
+  check: Only test ac97 when it is compiled in
+  check: Only test hda when it is compiled in
+  check: Only test ipack when it is compiled in
+  check: Only test ioh3420 when it is compiled in
+  check: Only test i82801b11 when it is compiled in
+  check: Only test sdhci when it is compiled in
+  check: Only test wdt_ib700 when it is compiled in
+  check: Only test pvpanic when it is compiled in
+  check: Only test nvme when it is compiled in
+  check: Only test usb-ohci when it is compiled in
+  check: Only test usb-uhci devices when they are compiled in
+  check: Only test usb-ehci when it is compiled in
+
+ hw/misc/pvpanic.c         | 11 -----
+ include/hw/misc/pvpanic.h | 11 ++++-
+ tests/Makefile.include    | 92 ++++++++++++++++++++-------------------
+ 3 files changed, 57 insertions(+), 57 deletions(-)
+
 -- 
 2.17.1
