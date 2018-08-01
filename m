@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fkoFI-0000C5-FT
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:20:45 -0400
+	(envelope-from <famz@redhat.com>) id 1fkoGC-0000be-3M
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:21:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fkoFH-0003i6-LW
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:20:44 -0400
-Date: Wed, 1 Aug 2018 11:20:32 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180801102031.GC2691@work-vm>
-References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
-	<20180626135035.133432-5-vsementsov@virtuozzo.com>
-	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1fkoG7-00047s-6B
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 06:21:40 -0400
+Date: Wed, 1 Aug 2018 18:21:27 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180801102127.GF14577@lemon.usersys.redhat.com>
+References: <20180724092413.5770-1-cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
- loading and migration logic
+In-Reply-To: <20180724092413.5770-1-cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.1] s390x: remove 's390-squash-mcss'
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,21 +23,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, Eric Blake <eblake@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, Xiao Feng Ren <renxiaof@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-* John Snow (jsnow@redhat.com) wrote:
+On Tue, 07/24 11:24, Cornelia Huck wrote:
+> diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
+> index a02d708239..1bd6c8b458 100644
+> --- a/hw/s390x/css-bridge.c
+> +++ b/hw/s390x/css-bridge.c
+> @@ -106,7 +106,6 @@ VirtualCssBus *virtual_css_bus_init(void)
+>      /* Create bus on bridge device */
+>      bus = qbus_create(TYPE_VIRTUAL_CSS_BUS, dev, "virtual-css");
+>      cbus = VIRTUAL_CSS_BUS(bus);
 
-<snip>
+Not used now?
 
-> I'd rather do something like this:
-> - Always flush bitmaps to disk on inactivate.
-
-Does that increase the time taken by the inactivate measurably?
-If it's small relative to everything else that's fine; it's just I
-always worry a little since I think this happens after we've stopped the
-CPU on the source, so is part of the 'downtime'.
-
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Fam
