@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1fkpbB-0001lJ-FE
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:47:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1fkpbN-0001qR-Rs
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:47:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1fkpb8-0007lw-Pb
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:47:23 -0400
-Date: Wed, 1 Aug 2018 13:47:14 +0200
-From: Niels de Vos <ndevos@redhat.com>
-Message-ID: <20180801114714.GA4925@ndevos-x270>
-References: <20180727081939.28185-1-ndevos@redhat.com>
-	<f0a7edbd-f731-7ac5-4aee-ef2ba594ed64@redhat.com>
-	<20180728041839.GA1325070@localhost.localdomain>
-	<20180728075005.GE1827@ndevos-x270>
-	<2bf3b1f9-ab42-5256-8093-7c41aaa9f2d6@redhat.com>
-	<20180730192729.GA443110@localhost.localdomain>
-	<20180731091802.GL17519@ndevos-x270>
-	<20180731195122.GA1748801@localhost.localdomain>
+	(envelope-from <thuth@redhat.com>) id 1fkpbK-0007vx-Or
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:47:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55210 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fkpbK-0007vd-I8
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 07:47:34 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 117067DAC7
+	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 11:47:34 +0000 (UTC)
+References: <20180801110952.5590-1-quintela@redhat.com>
+	<20180801110952.5590-19-quintela@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d5aa6904-10d8-32b5-6b12-fde40dc766af@redhat.com>
+Date: Wed, 1 Aug 2018 13:47:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180731195122.GA1748801@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3] block/gluster: Handle changed
- glfs_ftruncate signature
+In-Reply-To: <20180801110952.5590-19-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [[PATH for 3.1] v2 18/18] check: Only test
+ usb-ehci when it is compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,94 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Prasanna Kumar Kalever <prasanna.kalever@redhat.com>, integration@gluster.org
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, Jul 31, 2018 at 03:51:22PM -0400, Jeff Cody wrote:
-> On Tue, Jul 31, 2018 at 11:18:02AM +0200, Niels de Vos wrote:
-> > On Mon, Jul 30, 2018 at 03:27:29PM -0400, Jeff Cody wrote:
-> > > On Mon, Jul 30, 2018 at 10:07:27AM -0500, Eric Blake wrote:
-> > > > On 07/28/2018 02:50 AM, Niels de Vos wrote:
-> > > > >>
-> > > > >>Part of me wishes that libgfapi had just created a new function
-> > > > >>'glfs_ftruncate2', so that existing users don't need to handle the api
-> > > > >>change.  But I guess in the grand scheme, not a huge deal either way.
-> > > > >
-> > > > >Gluster uses versioned symbols, so older binaries will keep working with
-> > > > >new libraries. It is (hopefully) rare that existing symbols get updated.
-> > > > >We try to send patches for these kind of changes to the projects we know
-> > > > >well in advance, reducing the number of surprises.
-> > > > 
-> > > > >>I can go ahead and add that to the comment in my branch after applying, if
-> > > > >>Niels can let me know what that version is/will be (if known).
-> > > > >
-> > > > >The new glfs_ftruncate() will be part of glusterfs-5 (planned for
-> > > > >October). We're changing the numbering scheme, it was expected to come
-> > > > >in glusterfs-4.2, but that is a version that never will be released.
-> > > > >
-> > > > 
-> > > > Wait - so you're saying gluster has not yet released the incompatible
-> > > > change? Now would be the right time to get rid of the API breakage, before
-> > > > you bake it in, rather than relying solely on the versioned symbols to avoid
-> > > > an ABI breakage but forcing all clients to compensate to the API breakage.
-> > > > 
-> > > 
-> > > If this is not yet in a released version of Gluster, I'm not real eager to
-> > > pollute the QEMU driver codebase with #ifdef's, especially if there is a
-> > > possibility the API change may not actually materialize.
-> > > 
-> > > Is there any reason that this change is being approached in a way that
-> > > breaks API usage, and is it too late in the Gluster development pipeline to
-> > > change that?
-> > 
-> > There recently have been a few changes like this in libgfapi. These have
-> > been introduced to improve performance in common use-cases where an
-> > updated 'struct stat' is needed after an operation. Some functions have
-> > been adapted in previous releases, glfs_ftruncate() landed too late for
-> > that. I hope we'll get a complete coherent API with glusterfs-5 again.
-> > 
+On 08/01/2018 01:09 PM, Juan Quintela wrote:
+> The ehci test also test uhci.  Welcome to the worderfull world of USB.
 > 
-> Am I correct in assuming the API changes that happened in previous libgfapi
-> release are for APIs that QEMU does not use (i.e. no action needed from
-> us?)
-
-Yes, that is correct.
-
-> > For QEMU this means additional changes will come related to
-> > glfs_fallocate(), glfs_zerofill() and probably more. The current
-> > glusterfs-4.1 version will be maintained for one year, after which the
-> > detection/#ifdef can be removed as the than maintained versions should
-> > all have the updated API. I'm sorry for the inconvenience that this
-> > causes.
-> > 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  tests/Makefile.include | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> Understood.  I don't want to make a huge deal out of it.  I guess my
-> recommendation/request is that API enhancements happen in a way that don't
-> break existing APIs (e.g. use parallel APIs), because QEMU version usage and
-> supported glusterfs usage may not always follow supported versions in the
-> wild.  I know versioned symbols helps with this, but it still complicates
-> the code (and couples QEMU's code to gluster support windows).
-
-Once the last Gluster version that has the old API goes out of
-maintenance, we will remove the legacy functions. At that point, we can
-also provide a new patch to QEMU (and other projcets) that removes the
-compatibility #ifdef's.
-
-> > If you prefer, I can wait with sending patches for QEMU with future
-> > Gluster releases until additional changes have landed in libgfapi.
-> >
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index f3f8ba48fb..d6f5cc9ccc 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -286,8 +286,10 @@ check-qtest-i386-$(CONFIG_USB_OHCI) += tests/usb-hcd-ohci-test$(EXESUF)
+>  gcov-files-i386-$(CONFIG_USB_OHCI) += hw/usb/hcd-ohci.c
+>  check-qtest-i386-$(CONFIG_USB_UHCI) += tests/usb-hcd-uhci-test$(EXESUF)
+>  gcov-files-i386-$(CONFIG_USB_UHCI) += hw/usb/hcd-uhci.c
+> +ifeq ($(CONFIG_USB_ECHI)$(CONFIG_USB_UHCI),yy)
+>  check-qtest-i386-y += tests/usb-hcd-ehci-test$(EXESUF)
+> -gcov-files-i386-y += hw/usb/hcd-ehci.c
+> +endif
+> +gcov-files-i386-$(CONFIG_USB_EHCI) += hw/usb/hcd-ehci.c
+>  gcov-files-i386-y += hw/usb/dev-hid.c
+>  gcov-files-i386-y += hw/usb/dev-storage.c
+>  check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
 > 
-> I think generally, we don't want to start introducing #ifdef's and new APi
-> usage for unreleased versions of libgfapi if possible (as unreleased APIs,
-> it could technically change, and then QEMU releases would have 'dead' API
-> support in it).
-> 
-> If glusterfs-5 releases in October, that may line up with 3.1 or 3.2.
 
-Ok, I'll keep these kind of patches in my tree as work-in-progress and
-when the glusterfs-5 gets tagged for alpha/beta send it again.
-
-Even if not optimal, would you accept this as a way going forward?
-
-Thanks,
-Niels
+Reviewed-by: Thomas Huth <thuth@redhat.com>
