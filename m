@@ -1,10 +1,10 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1fkxh5-0003iT-DI
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:26:04 -0400
+	(envelope-from <den@virtuozzo.com>) id 1fkxmU-0005Mu-U8
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:31:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1fkxh4-0007M9-74
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:26:03 -0400
+	(envelope-from <den@virtuozzo.com>) id 1fkxmT-000449-Ul
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 16:31:38 -0400
 References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
 	<20180626135035.133432-5-vsementsov@virtuozzo.com>
 	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
@@ -12,12 +12,12 @@ References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
 	<64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
 	<20180801174005.GD2691@work-vm>
 	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
-	<20180801185515.GE2691@work-vm>
+	<e200102e-f5ae-3dae-42b1-b9f98d92fc46@redhat.com>
 From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <6bfdc952-fb17-feae-f367-be710853d829@openvz.org>
-Date: Wed, 1 Aug 2018 23:25:47 +0300
+Message-ID: <a1cad00a-3053-2103-e4ba-98895f1681e1@openvz.org>
+Date: Wed, 1 Aug 2018 23:31:26 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180801185515.GE2691@work-vm>
+In-Reply-To: <e200102e-f5ae-3dae-42b1-b9f98d92fc46@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -31,11 +31,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
 
-On 08/01/2018 09:55 PM, Dr. David Alan Gilbert wrote:
-> * Denis V. Lunev (den@openvz.org) wrote:
+On 08/01/2018 09:56 PM, John Snow wrote:
+>
+> On 08/01/2018 02:42 PM, Denis V. Lunev wrote:
 >> On 08/01/2018 08:40 PM, Dr. David Alan Gilbert wrote:
 >>> * John Snow (jsnow@redhat.com) wrote:
 >>>> On 08/01/2018 06:20 AM, Dr. David Alan Gilbert wrote:
@@ -63,50 +64,27 @@ On 08/01/2018 09:55 PM, Dr. David Alan Gilbert wrote:
 >>> Dave
 >> This is not "theoretical" speed. This is real practical speed and
 >> instability.
->> EACH IO operation can be performed unpredictably slow and thus with
->> IO operations in mind you can not even calculate or predict downtime,
->> which should be done according to the migration protocol.
-> We end up doing some IO anyway, even ignoring these new bitmaps,
-> at the end of the migration when we pause the CPU, we do a
-> bdrv_inactivate_all to flush any outstanding writes; so we've already
-> got that unpredictable slowness.
+> It's theoretical until I see performance testing numbers; do you have
+> any? How much faster does the pivot happen by avoiding making the qcow2
+> consistent on close?
 >
-> So, not being a block person, but with some interest in making sure
-> downtime doesn't increase, I just wanted to understand whether the
-> amount of writes we're talking about here is comparable to that
-> which already exists or a lot smaller or a lot larger.
-> If the amount of IO you're talking about is much smaller than what
-> we typically already do, then John has a point and you may as well
-> do the write.
-> If the amount of IO for the bitmap is much larger and would slow
-> the downtime a lot then you've got a point and that would be unworkable.
->
-> Dave
-This is not theoretical difference.
+> I don't argue that it's faster to just simply not write data, but what's
+> not obvious is how much time it actually saves in practice and if that's
+> worth doing unintuitive and undocumented things like "the source file
+> loses bitmaps after a migration because it was faster."
+John,
 
-For 1 Tb drive and 64 kb bitmap granularity the size of bitmap is
-2 Mb + some metadata (64 Kb). Thus we will have to write
-2 Mb of data per bitmap. For some case there are 2-3-5 bitmaps
-this we will have 10 Mb of data. With 16 Tb drive the amount of
-data to write will be multiplied by 16 which gives 160 Mb to
-write. More disks and bigger the size - more data to write.
+pls see my letter to Dave. Speaking about theoretical things I can
+avoid waiting of any guest IO. At least we have started research
+in that direction.
 
-Above amount should be multiplied by 2 - x Mb to be written
-on source, x Mb to be read on target which gives 320 Mb to
-write.
+With this code merged we'll have IO when we can avoid it completely.
+That is why this approach should not be taken.
 
-That is why this is not good - we have linear increase with the
-size and amount of disks.
-
-There is also some thoughts on normal guest IO. Theoretically
-we can think on replaying IO on the target closing the file
-immediately or block writes to changed areas and notify
-target upon IO completion or invent other fancy dances.
-At least we think right now on these optimizations for regular
-migration paths.
-
-The problem right that such things are not needed now for CBT
-but will become necessary and pretty much useless upon
-introducing this stuff.
+You should know, as we have discussed things originally, that
+technically we can lost CBT completely and this is just one time
+problem. The data will not be lost. You will just have to call full backup
+once. Thus there is no need to create something much slower
+and complex where there are faster ways.
 
 Den
