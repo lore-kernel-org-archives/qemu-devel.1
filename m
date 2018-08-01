@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fkiDG-0000yu-Qq
+	(envelope-from <dgibson@ozlabs.org>) id 1fkiDG-0000yt-Qf
 	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 23:54:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fkiDF-0005wS-T1
+	(envelope-from <dgibson@ozlabs.org>) id 1fkiDF-0005wM-RI
 	for qemu-devel@nongnu.org; Tue, 31 Jul 2018 23:54:14 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Aug 2018 13:53:56 +1000
-Message-Id: <20180801035357.7804-2-david@gibson.dropbear.id.au>
+Date: Wed,  1 Aug 2018 13:53:57 +1000
+Message-Id: <20180801035357.7804-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20180801035357.7804-1-david@gibson.dropbear.id.au>
 References: <20180801035357.7804-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 1/2] hw/misc/macio: Fix device introspection
- problems in macio devices
+Subject: [Qemu-devel] [PULL 2/2] sam460ex: Fix PCI interrupts with multiple
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,127 +21,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, BALATON Zoltan <balaton@eik.bme.hu>, Sebastian Bauer <mail@sebastianbauer.info>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Thomas Huth <thuth@redhat.com>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-Valgrind reports an error when introspecting the macio devices, e.g.:
+The four interrupts of the PCI bus are connected to the same UIC pin
+on the real Sam460ex. Evidence for this can be found in the UBoot
+source for the Sam460ex in the Sam460ex.c file where
+PCI_INTERRUPT_LINE is written. Change the ppc440_pcix model to behave
+more like this.
 
-echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
- "'arguments':{'typename':'macio-newworld'}}" \
- "{'execute': 'human-monitor-command', " \
- "'arguments': {'command-line': 'info qtree'}}" | \
- valgrind -q ppc64-softmmu/qemu-system-ppc64 -M none,accel=qtest -qmp stdio
-[...]
-==30768== Invalid read of size 8
-==30768==    at 0x5BC1EA: qdev_print (qdev-monitor.c:686)
-==30768==    by 0x5BC1EA: qbus_print (qdev-monitor.c:719)
-==30768==    by 0x43E458: handle_hmp_command (monitor.c:3446)
-[...]
+This fixes the problem that can be observed when adding further PCI
+cards that got their interrupt rotated to other interrupts than PCI
+INT A. In particular, the bug was observed with an additional OHCI PCI
+card or an ES1370 sound device.
 
-Use the new function sysbus_init_child_obj() to initialize the objects
-here, to get the reference counting of the objects right, so that they
-are cleaned up correctly when the parent gets removed.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Tested-by: Sebastian Bauer <mail@sebastianbauer.info>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/misc/macio/cuda.c  |  5 ++---
- hw/misc/macio/macio.c | 24 ++++++++----------------
- hw/misc/macio/pmu.c   |  5 ++---
- 3 files changed, 12 insertions(+), 22 deletions(-)
+ hw/ppc/ppc440_pcix.c | 21 ++++++++-------------
+ hw/ppc/sam460ex.c    |  6 ++----
+ 2 files changed, 10 insertions(+), 17 deletions(-)
 
-diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index 9651ed9744..c4f7a2f39b 100644
---- a/hw/misc/macio/cuda.c
-+++ b/hw/misc/macio/cuda.c
-@@ -554,9 +554,8 @@ static void cuda_init(Object *obj)
-     CUDAState *s = CUDA(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
+index d8af04b70f..64ed07afa6 100644
+--- a/hw/ppc/ppc440_pcix.c
++++ b/hw/ppc/ppc440_pcix.c
+@@ -57,7 +57,7 @@ typedef struct PPC440PCIXState {
+     struct PLBOutMap pom[PPC440_PCIX_NR_POMS];
+     struct PLBInMap pim[PPC440_PCIX_NR_PIMS];
+     uint32_t sts;
+-    qemu_irq irq[PCI_NUM_PINS];
++    qemu_irq irq;
+     AddressSpace bm_as;
+     MemoryRegion bm;
  
--    object_initialize(&s->mos6522_cuda, sizeof(s->mos6522_cuda),
--                      TYPE_MOS6522_CUDA);
--    qdev_set_parent_bus(DEVICE(&s->mos6522_cuda), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "mos6522-cuda", &s->mos6522_cuda,
-+                          sizeof(s->mos6522_cuda), TYPE_MOS6522_CUDA);
- 
-     memory_region_init_io(&s->mem, obj, &mos6522_cuda_ops, s, "cuda", 0x2000);
-     sysbus_init_mmio(sbd, &s->mem);
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index d135e3bc2b..52aa3775f4 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -209,14 +209,11 @@ static void macio_oldworld_realize(PCIDevice *d, Error **errp)
- static void macio_init_ide(MacIOState *s, MACIOIDEState *ide, size_t ide_size,
-                            int index)
+@@ -418,21 +418,20 @@ static void ppc440_pcix_reset(DeviceState *dev)
+  * This may need further refactoring for other boards. */
+ static int ppc440_pcix_map_irq(PCIDevice *pci_dev, int irq_num)
  {
--    gchar *name;
-+    gchar *name = g_strdup_printf("ide[%i]", index);
- 
--    object_initialize(ide, ide_size, TYPE_MACIO_IDE);
--    qdev_set_parent_bus(DEVICE(ide), sysbus_get_default());
-+    sysbus_init_child_obj(OBJECT(s), name, ide, ide_size, TYPE_MACIO_IDE);
-     memory_region_add_subregion(&s->bar, 0x1f000 + ((index + 1) * 0x1000),
-                                 &ide->mem);
--    name = g_strdup_printf("ide[%i]", index);
--    object_property_add_child(OBJECT(s), name, OBJECT(ide), NULL);
-     g_free(name);
+-    int slot = pci_dev->devfn >> 3;
+-    trace_ppc440_pcix_map_irq(pci_dev->devfn, irq_num, slot);
+-    return slot - 1;
++    trace_ppc440_pcix_map_irq(pci_dev->devfn, irq_num, 0);
++    return 0;
  }
  
-@@ -232,9 +229,7 @@ static void macio_oldworld_init(Object *obj)
-                              qdev_prop_allow_set_link_before_realize,
-                              0, NULL);
+ static void ppc440_pcix_set_irq(void *opaque, int irq_num, int level)
+ {
+-    qemu_irq *pci_irqs = opaque;
++    qemu_irq *pci_irq = opaque;
  
--    object_initialize(&s->cuda, sizeof(s->cuda), TYPE_CUDA);
--    qdev_set_parent_bus(DEVICE(&s->cuda), sysbus_get_default());
--    object_property_add_child(obj, "cuda", OBJECT(&s->cuda), NULL);
-+    sysbus_init_child_obj(obj, "cuda", &s->cuda, sizeof(s->cuda), TYPE_CUDA);
- 
-     object_initialize(&os->nvram, sizeof(os->nvram), TYPE_MACIO_NVRAM);
-     dev = DEVICE(&os->nvram);
-@@ -390,8 +385,8 @@ static void macio_newworld_init(Object *obj)
-                              qdev_prop_allow_set_link_before_realize,
-                              0, NULL);
- 
--    object_initialize(&ns->gpio, sizeof(ns->gpio), TYPE_MACIO_GPIO);
--    qdev_set_parent_bus(DEVICE(&ns->gpio), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "gpio", &ns->gpio, sizeof(ns->gpio),
-+                          TYPE_MACIO_GPIO);
- 
-     for (i = 0; i < 2; i++) {
-         macio_init_ide(s, &ns->ide[i], sizeof(ns->ide[i]), i);
-@@ -404,13 +399,10 @@ static void macio_instance_init(Object *obj)
- 
-     memory_region_init(&s->bar, obj, "macio", 0x80000);
- 
--    object_initialize(&s->dbdma, sizeof(s->dbdma), TYPE_MAC_DBDMA);
--    qdev_set_parent_bus(DEVICE(&s->dbdma), sysbus_get_default());
--    object_property_add_child(obj, "dbdma", OBJECT(&s->dbdma), NULL);
-+    sysbus_init_child_obj(obj, "dbdma", &s->dbdma, sizeof(s->dbdma),
-+                          TYPE_MAC_DBDMA);
- 
--    object_initialize(&s->escc, sizeof(s->escc), TYPE_ESCC);
--    qdev_set_parent_bus(DEVICE(&s->escc), sysbus_get_default());
--    object_property_add_child(obj, "escc", OBJECT(&s->escc), NULL);
-+    sysbus_init_child_obj(obj, "escc", &s->escc, sizeof(s->escc), TYPE_ESCC);
+     trace_ppc440_pcix_set_irq(irq_num);
+     if (irq_num < 0) {
+         error_report("%s: PCI irq %d", __func__, irq_num);
+         return;
+     }
+-    qemu_set_irq(pci_irqs[irq_num], level);
++    qemu_set_irq(*pci_irq, level);
  }
  
- static const VMStateDescription vmstate_macio_oldworld = {
-diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
-index e246b0fd41..d25344f888 100644
---- a/hw/misc/macio/pmu.c
-+++ b/hw/misc/macio/pmu.c
-@@ -770,9 +770,8 @@ static void pmu_init(Object *obj)
-                              qdev_prop_allow_set_link_before_realize,
-                              0, NULL);
+ static AddressSpace *ppc440_pcix_set_iommu(PCIBus *b, void *opaque, int devfn)
+@@ -471,19 +470,15 @@ static int ppc440_pcix_initfn(SysBusDevice *dev)
+ {
+     PPC440PCIXState *s;
+     PCIHostState *h;
+-    int i;
  
--    object_initialize(&s->mos6522_pmu, sizeof(s->mos6522_pmu),
--                      TYPE_MOS6522_PMU);
--    qdev_set_parent_bus(DEVICE(&s->mos6522_pmu), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "mos6522-pmu", &s->mos6522_pmu,
-+                          sizeof(s->mos6522_pmu), TYPE_MOS6522_PMU);
+     h = PCI_HOST_BRIDGE(dev);
+     s = PPC440_PCIX_HOST_BRIDGE(dev);
  
-     memory_region_init_io(&s->mem, obj, &mos6522_pmu_ops, s, "via-pmu",
-                           0x2000);
+-    for (i = 0; i < ARRAY_SIZE(s->irq); i++) {
+-        sysbus_init_irq(dev, &s->irq[i]);
+-    }
+-
++    sysbus_init_irq(dev, &s->irq);
+     memory_region_init(&s->busmem, OBJECT(dev), "pci bus memory", UINT64_MAX);
+     h->bus = pci_register_root_bus(DEVICE(dev), NULL, ppc440_pcix_set_irq,
+-                         ppc440_pcix_map_irq, s->irq, &s->busmem,
+-                         get_system_io(), PCI_DEVFN(0, 0), 4, TYPE_PCI_BUS);
++                         ppc440_pcix_map_irq, &s->irq, &s->busmem,
++                         get_system_io(), PCI_DEVFN(0, 0), 1, TYPE_PCI_BUS);
+ 
+     s->dev = pci_create_simple(h->bus, PCI_DEVFN(0, 0), "ppc4xx-host-bridge");
+ 
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index 0999efcc1e..9c77183006 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -515,10 +515,8 @@ static void sam460ex_init(MachineState *machine)
+ 
+     /* PCI bus */
+     ppc460ex_pcie_init(env);
+-    /* FIXME: is this correct? */
+-    dev = sysbus_create_varargs("ppc440-pcix-host", 0xc0ec00000,
+-                                uic[1][0], uic[1][20], uic[1][21], uic[1][22],
+-                                NULL);
++    /* All PCI irqs are connected to the same UIC pin (cf. UBoot source) */
++    dev = sysbus_create_simple("ppc440-pcix-host", 0xc0ec00000, uic[1][0]);
+     pci_bus = (PCIBus *)qdev_get_child_bus(dev, "pci.0");
+     if (!pci_bus) {
+         error_report("couldn't create PCI controller!");
 -- 
 2.17.1
