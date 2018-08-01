@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fkuxZ-0004bj-3Z
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 13:30:54 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fkv0k-0005bC-R6
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 13:34:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fkuxV-0005do-4i
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 13:30:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:32988)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fkuxU-0005cq-Ug
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 13:30:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fkuxT-0007ua-QP
-	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 17:30:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B9DED2E806D
-	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 17:30:47 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1fkv0k-0007bi-32
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 13:34:10 -0400
+References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
+	<20180626135035.133432-5-vsementsov@virtuozzo.com>
+	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
+	<20180801102031.GC2691@work-vm>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
+Date: Wed, 1 Aug 2018 13:34:03 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Aug 2018 17:19:19 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1784900 <1784900@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153314156256.17371.7866837258800403867.malonedeb@soybean.canonical.com>
-Message-Id: <153314395969.3364.7471803076680333841.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1784900] Re: QEMU (frontend) crashes upon warm
- reboot with virtio-gpu device and vga=775 on Linux cmdline
+In-Reply-To: <20180801102031.GC2691@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
+ loading and migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,70 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, Eric Blake <eblake@redhat.com>
 
-I also hit this with gtk frontend rather than vnc althought he backtrace
-looks very different.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1784900
+On 08/01/2018 06:20 AM, Dr. David Alan Gilbert wrote:
+> * John Snow (jsnow@redhat.com) wrote:
+> 
+> <snip>
+> 
+>> I'd rather do something like this:
+>> - Always flush bitmaps to disk on inactivate.
+> 
+> Does that increase the time taken by the inactivate measurably?
+> If it's small relative to everything else that's fine; it's just I
+> always worry a little since I think this happens after we've stopped the
+> CPU on the source, so is part of the 'downtime'.
+> 
+> Dave
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 
-Title:
-  QEMU (frontend) crashes upon warm reboot with virtio-gpu device and
-  vga=3D775 on Linux cmdline
+I'm worried that if we don't, we're leaving behind unusable, partially
+complete files behind us. That's a bad design and we shouldn't push for
+it just because it's theoretically faster.
 
-Status in QEMU:
-  New
-
-Bug description:
-  With vga=3D775 on the Linux command line a first boot of the VM running
-  Linux works fine. After a warm reboot it crashes during Linux boot.
-  The VM was used remotely via virt-manager and VNC.
-
-  Bisecting the code lead to the following patch that introduced the
-  bug:
-
-  commit 1fccd7c5a9a722a9cbf1bc91693f4618034f01ac (HEAD, refs/bisect/bad)
-  Author: Gerd Hoffmann <kraxel@redhat.com>
-  Date:   Mon Jul 2 18:24:43 2018 +0200
-
-      virtio-gpu: disable scanout when backing resource is destroyed
-
-      Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-      Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-      Message-id: 20180702162443.16796-4-kraxel@redhat.com
-
-  diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-  index 336dc59007..08cd567218 100644
-  --- a/hw/display/virtio-gpu.c
-  +++ b/hw/display/virtio-gpu.c
-  @@ -430,6 +430,16 @@ static void virtio_gpu_disable_scanout(VirtIOGPU *g,=
- int scanout_id)
-   static void virtio_gpu_resource_destroy(VirtIOGPU *g,
-                                           struct virtio_gpu_simple_resourc=
-e *res)
-   {
-  +    int i;
-  +
-  +    if (res->scanout_bitmask) {
-  +        for (i =3D 0; i < g->conf.max_outputs; i++) {
-  +            if (res->scanout_bitmask & (1 << i)) {
-  +                virtio_gpu_disable_scanout(g, i);
-  +            }
-  +        }
-  +    }
-  +
-       pixman_image_unref(res->image);
-       virtio_gpu_cleanup_mapping(res);
-       QTAILQ_REMOVE(&g->reslist, res, next);
-
-  =
-
-  Reported backtraces can be found here:  https://paste.fedoraproject.org/p=
-aste/OUDEfCk1IY7xiy0I0PDlkw
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1784900/+subscriptions
+--js
