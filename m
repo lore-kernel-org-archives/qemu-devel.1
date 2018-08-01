@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1fknSg-00016M-Gb
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:30:36 -0400
+	(envelope-from <thuth@redhat.com>) id 1fknVB-0002OK-W8
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:33:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1fknSc-0007ZF-OY
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:30:30 -0400
-Received: from mail-yb0-x244.google.com ([2607:f8b0:4002:c09::244]:44831)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1fknSc-0007Yz-It
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:30:26 -0400
-Received: by mail-yb0-x244.google.com with SMTP id l16-v6so7278812ybk.11
-	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 02:30:26 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1fknV8-0008Ja-TK
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 05:33:06 -0400
+Reply-To: thuth@redhat.com
+References: <20180731090900.187430-1-frankja@linux.ibm.com>
+	<20180731090900.187430-3-frankja@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <07437701-20fa-a1df-ec6a-785f47da50e8@redhat.com>
+Date: Wed, 1 Aug 2018 11:32:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <1531315364-2551-1-git-send-email-xieyongji@baidu.com>
-References: <1531315364-2551-1-git-send-email-xieyongji@baidu.com>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Wed, 1 Aug 2018 17:30:25 +0800
-Message-ID: <CAONzpcasgid2N3iGCTHR7aVFx1MLJaYYZ54y2Jm4uEshGAPHUA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] kvmclock: run KVM_KVMCLOCK_CTRL ioctl in
- vcpu thread
+In-Reply-To: <20180731090900.187430-3-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] s390x: Enable KVM huge page backing
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?B?6LCi5rC45ZCJ?= <elohimes@gmail.com>, chaiwen@baidu.com
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, qemu-s390x@nongnu.org
 
-Ping...
-
-On 11 July 2018 at 21:22, Yongji Xie <elohimes@gmail.com> wrote:
-> According to KVM API Documentation, we should only
-> run vcpu ioctls from the same thread that was used
-> to create the vcpu. This patch makes KVM_KVMCLOCK_CTRL
-> ioctl consistent with the Documentation.
->
-> No functional change.
->
-> Signed-off-by: Yongji Xie <xieyongji@baidu.com>
-> Signed-off-by: Chai Wen <chaiwen@baidu.com>
+On 07/31/2018 11:09 AM, Janosch Frank wrote:
+> QEMU has had huge page support for a longer time already, but KVM
+> memory management under s390x needed some changes to work with huge
+> backings.
+>=20
+> Now that we have support, let's enable it if requested and
+> available. Otherwise we now properly tell the user if there is no
+> support and back out instead of failing to run the VM later on.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  hw/i386/kvm/clock.c |   17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
->
-> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-> index 0bf1c60..25ea783 100644
-> --- a/hw/i386/kvm/clock.c
-> +++ b/hw/i386/kvm/clock.c
-> @@ -147,6 +147,15 @@ static void kvm_update_clock(KVMClockState *s)
->      s->clock_is_reliable = kvm_has_adjust_clock_stable();
->  }
->
-> +static void do_kvmclock_ctrl(CPUState *cpu, run_on_cpu_data data)
-> +{
-> +    int ret = kvm_vcpu_ioctl(cpu, KVM_KVMCLOCK_CTRL, 0);
-> +
-> +    if (ret && ret != -EINVAL) {
-> +        fprintf(stderr, "%s: %s\n", __func__, strerror(-ret));
-> +    }
-> +}
-> +
->  static void kvmclock_vm_state_change(void *opaque, int running,
->                                       RunState state)
+>  target/s390x/kvm.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index d923cf4240..26e6937498 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -285,6 +285,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
 >  {
-> @@ -183,13 +192,7 @@ static void kvmclock_vm_state_change(void *opaque, int running,
->              return;
->          }
->          CPU_FOREACH(cpu) {
-> -            ret = kvm_vcpu_ioctl(cpu, KVM_KVMCLOCK_CTRL, 0);
-> -            if (ret) {
-> -                if (ret != -EINVAL) {
-> -                    fprintf(stderr, "%s: %s\n", __func__, strerror(-ret));
-> -                }
-> -                return;
-> -            }
-> +            run_on_cpu(cpu, do_kvmclock_ctrl, RUN_ON_CPU_NULL);
->          }
->      } else {
->
-> --
-> 1.7.9.5
->
+>      MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+> =20
+> +    if (mem_path && kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE, 0)) {
+> +        error_report("Huge page backing was specified, "
+> +                     "but this KVM does not support huge pages");
+> +        return -EINVAL;
+> +    }
+
+I think you should also check the page size of the mem_path (e.g. with
+qemu_mempath_getpagesize() ?), since a mem_path does not automatically
+mean huge pages, does it?
+
+ Thomas
+
+
+PS: Please CC: qemu-s390x@nongnu.org for s390x patches!
