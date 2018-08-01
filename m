@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fkrkS-0003in-PE
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 10:05:14 -0400
+	(envelope-from <aoates@google.com>) id 1fksIM-0005Qh-Pa
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 10:40:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fkrkP-00015f-JY
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 10:05:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49380 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fkrkP-00015Q-9M
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 10:05:05 -0400
-References: <1533076133-22745-1-git-send-email-linux@roeck-us.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <21e51156-6b14-c0be-f62b-00997d659db5@redhat.com>
-Date: Wed, 1 Aug 2018 16:04:59 +0200
+	(envelope-from <aoates@google.com>) id 1fksIL-0001lb-HG
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 10:40:10 -0400
+Received: from mail-it0-x231.google.com ([2607:f8b0:4001:c0b::231]:40957)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aoates@google.com>) id 1fksIL-0001kE-8t
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 10:40:09 -0400
+Received: by mail-it0-x231.google.com with SMTP id h23-v6so9611199ita.5
+	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 07:40:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1533076133-22745-1-git-send-email-linux@roeck-us.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] scsi: mptsas: Mark as storage device
+References: <20180729143545.6978-1-samuel.thibault@ens-lyon.org>
+	<20180729143545.6978-2-samuel.thibault@ens-lyon.org>
+	<CAFEAcA8tX0_MNg99oorgOWarJa8Oy+gFFwoRys-fU7ZX3_Ufng@mail.gmail.com>
+	<CAJ1tprAuf1mWtpw+4M3QFZyrDz22TMcnGS9xkhQn6Q9UQTrwiw@mail.gmail.com>
+	<CAFEAcA_pj4tFE2tyrbRtvJnPoeRekDXtVJCzgSeFiiK=sxg4Aw@mail.gmail.com>
+	<CAJ1tprAyHqgH1mHkeLu6qU1Fr8O-B5ebJ3Cfw8e_nHMYSYXfmQ@mail.gmail.com>
+	<CAFEAcA8DdkVB6LG=wq10wJDBjZgScdC_6tavtMzEi-UgGXjEKw@mail.gmail.com>
+In-Reply-To: <CAFEAcA8DdkVB6LG=wq10wJDBjZgScdC_6tavtMzEi-UgGXjEKw@mail.gmail.com>
+From: Andrew Oates <aoates@google.com>
+Date: Wed, 1 Aug 2018 10:39:55 -0400
+Message-ID: <CAJ1tprA11Q+kjkdmmpmJRiLbDveWR6qzKY3hz_FbRXAUPpXy6A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 1/1] slirp: fix ICMP handling on macOS hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, stefanha@redhat.com, "J. Kiszka" <jan.kiszka@siemens.com>
 
-On 01/08/2018 00:28, Guenter Roeck wrote:
-> mptsas1068 is currently listed as uncategorized device.
-> Mark it as storage device.
-> 
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> ---
->  hw/scsi/mptsas.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
-> index 4176e87..929404f 100644
-> --- a/hw/scsi/mptsas.c
-> +++ b/hw/scsi/mptsas.c
-> @@ -1431,6 +1431,7 @@ static void mptsas1068_class_init(ObjectClass *oc, void *data)
->      dc->reset = mptsas_reset;
->      dc->vmsd = &vmstate_mptsas;
->      dc->desc = "LSI SAS 1068";
-> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
->  }
->  
->  static const TypeInfo mptsas_info = {
-> 
+On Wed, Aug 1, 2018 at 6:10 AM Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-Queued, thanks.
+> On 1 August 2018 at 00:25, Andrew Oates <aoates@google.com> wrote:
+> > Both CONFIG_BSD and not-CONFIG_LINUX work on macOS.  I unfortunately
+> don't
+> > have access to any other BSDs to test them, though.
+>
+> Is there an easy way to test it? The QEMU makefiles have some
+> runes for setting up a BSD VM...
+>
 
-Paolo
+Ok, it turns out that SOCK_DGRAM+IPPROTO_ICMP isn't actually supported on
+FreeBSD---tested in qemu (thanks for the tip!).
+
+I didn't actually boot up NetBSD or OpenBSD, but poking around the kernel
+source I found for them it appears they have the same restriction:
+https://github.com/freebsd/freebsd/blob/master/sys/netinet/in_proto.c
+https://github.com/openbsd/src/blob/master/sys/netinet/in_proto.c
+http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/netinet/in_proto.c?rev=1.128&content-type=text/x-cvsweb-markup
+
+(search for SOCK_DGRAM and IPPROTO_ICMP in the above).
+
+So I don't think ICMP via SLIRP would work at all in the other BSDs,
+meaning this patch is a no-op for them either way.  If we _were_ to make
+SLIRP+ICMP work in *BSD, we'd presumably want to do it with a
+SOCK_RAW+IPPROTO_ICMP socket (which would require special permissions to
+create), which would mean an included IP header---so I think that #ifdef
+CONFIG_BSD here is defensible.
+
+I did some poking for Solaris and Haiku and didn't find much, though it
+looks like the version of ping included w/ Haiku uses SOCK_RAW rather than
+SOCK_DGRAM, so it may be in the same boat as non-OSX-BSDs (
+https://github.com/haiku/haiku/blob/master/src/bin/network/ping/ping.c#L205
+).
+
+~Andrew
+
+
+>
+> thanks
+> -- PMM
+>
