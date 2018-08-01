@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fkm4k-000173-ED
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 04:01:48 -0400
+	(envelope-from <bharata.rao@gmail.com>) id 1fkmCG-0003I2-3j
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 04:09:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fkm4g-0003rB-Nz
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 04:01:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60190 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fkm4g-0003r3-JS
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 04:01:38 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180731155043.GK29167@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Tue, 31 Jul 2018 16:50:43 +0100")
-References: <1533026124-6740-1-git-send-email-liq3ea@gmail.com>
-	<1533026124-6740-3-git-send-email-liq3ea@gmail.com>
-	<20180731112906.GG2476@work-vm> <87o9enqx4s.fsf@trasno.org>
-	<20180731155043.GK29167@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 01 Aug 2018 10:01:31 +0200
-Message-ID: <878t5q4isk.fsf@trasno.org>
+	(envelope-from <bharata.rao@gmail.com>) id 1fkmCE-000676-Ex
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 04:09:28 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Add qmp command for
- migrate_set_max_cpu_throttle
+In-Reply-To: <20180731122710.142a97c4@redhat.com>
+References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
+	<20180227104708.GA11391@cbox>
+	<ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
+	<20180227124604.GA2373@cbox>
+	<20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
+	<b589d714-4f12-e450-7ca5-e55fed4d1705@oracle.com>
+	<74427c65-b860-d576-04f9-766253285210@arm.com>
+	<20180725122806.g2gpvdbrbdkriprg@kamzik.brq.redhat.com>
+	<202a2c63-1a3e-7f01-850c-4fb5e48f43e7@arm.com>
+	<20180731122710.142a97c4@redhat.com>
+From: Bharata B Rao <bharata.rao@gmail.com>
+Date: Wed, 1 Aug 2018 13:39:24 +0530
+Message-ID: <CAGZKiBqDSz8EAz6hJp9ifRy0SMJj+f-KwGL3ymi6E2Kyt+DWMA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] VCPU hotplug on KVM/ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +30,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, crosthwaite.peter@gmail.com, Li Qiang <liq3ea@gmail.com>, armbru@redhat.com, qemu-devel@nongnu.org, liqiang02@corp.netease.com, pbonzini@redhat.com, hzliuyingdong@corp.netease.com, rth@twiddle.net
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, bthakur@codeaurora.org, Christoffer Dall <cdall@cs.columbia.edu>, Andrew Jones <drjones@redhat.com>, cohuck@redhat.com, Christoffer Dall <cdall@kernel.org>, Maran Wilson <maran.wilson@oracle.com>, Peter Maydell <peter.maydell@linaro.org>, david@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu, David Gibson <david@gibson.dropbear.id.au>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> On Tue, Jul 31, 2018 at 04:48:35PM +0200, Juan Quintela wrote:
->> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
->> > * Li Qiang (liq3ea@gmail.com) wrote:
->> >> The default max cpu throttle is 99, this is too big that may
->> >> influence the guest loads. Add a qmp to config it can make it
->> >> more flexible.
->> >>=20
->> >> Signed-off-by: Li Qiang <liq3ea@gmail.com>
->> >
->> > This should be done as a migration parameter rather than a new command.
->> > For example, follow the cpu-throttle-increment parameter; and this
->> > should work just like it.
->>=20
->> I was about to comment this one.
->>=20
->> migrate_set_downtime, migrate_set_speed, migrate-set-cache-size,
->> query-migrate-cache-size are marked as deprecated.  Any way that we
->> could have make more clear that one should use
->> migrate_set/get_parameter/capability?
+On Tue, Jul 31, 2018 at 3:57 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+
+> On Wed, 25 Jul 2018 14:07:12 +0100
+> Marc Zyngier <marc.zyngier@arm.com> wrote:
 >
-> Where are they marked as deprecated ?
-
-##
-# @migrate_set_downtime:
-#
-# Set maximum tolerated downtime for migration.
-#
-# @value: maximum downtime in seconds
-#
-# Returns: nothing on success
-#
-# Notes: This command is deprecated in favor of 'migrate-set-parameters'
-#
-# Since: 0.14.0
-#
-# Example:
-#
-# -> { "execute": "migrate_set_downtime", "arguments": { "value": 0.1 } }
-# <- { "return": {} }
-#
-##
-{ 'command': 'migrate_set_downtime', 'data': {'value': 'number'} }
-
-Notes: field.  Clearly we need to do still more work there.
-Will change the texi, thanks.
-
+> > On 25/07/18 13:28, Andrew Jones wrote:
+> > > On Wed, Jul 25, 2018 at 11:40:54AM +0100, Marc Zyngier wrote:
+> > >> On 24/07/18 19:35, Maran Wilson wrote:
+> > >>> It's been a few months since this email thread died off. Has anyone
+> > >>> started working on a potential solution that would allow VCPU
+> hotplug on
+> > >>> KVM/ARM ? Or is this a project that is still waiting for an owner
+> who
+> > >>> has the time and inclination to get started?
+> > >>
+> > >> This is typically a project for someone who would have this particular
+> > >> itch to scratch, and who has a demonstrable need for this
+> functionality.
+> > >>
+> > >> Work wise, it would have to include adding physical CPU hotplug
+> support
+> > >> to the arm64 kernel as a precondition, before worrying about doing it
+> in
+> > >> KVM.
+> > >>
+> > >> For KVM itself, particular area of interests would be:
+> > >> - Making GICv3 redistributors magically appear in the IPA space
+> > >> - Live resizing of GICv3 structures
+> > >> - Dynamic allocation of MPIDR, and mapping with vcpu_id
+> > >
+> > > I have CPU topology description patches on the QEMU list now[*]. A next
+> > > step for me is to this MPIDR work. I probably won't get to it until the
+> > > end of August though.
+> > >
+> > > [*] http://lists.nongnu.org/archive/html/qemu-devel/2018-
+> 07/msg01168.html
+> > >
+> > >>
+> > >> This should keep someone busy for a good couple of weeks (give or
+> take a
+> > >> few months).
+> > >
+> > > :-)
+> > >
+> > >>
+> > >> That being said, I'd rather see support in QEMU first, creating all
+> the
+> > >> vcpu/redistributors upfront, and signalling the hotplug event via the
+> > >> virtual firmware. And then post some numbers to show that creating all
+> > >> the vcpus upfront is not acceptable.
+> > >
+> > > I think the upfront allocation, allocating all possible cpus, but only
+> > > activating all present cpus, was the planned approach. What were the
+> > > concerns about that approach? Just vcpu memory overhead for too many
+> > > overly ambitious VM configs?
+> >
+> > I don't have any ARM-specific concern about that, and I think this is
+> > the right approach. It has the good property of not requiring much
+> > change in the kernel (other than actually supporting CPU hotplug).
+> for x86 we allocate VCPUs dynamically (both QEMU and KVM)
+> CCing ppc/s390 folks as I don't recall how it's implemented there.
 >
-> They're not included in our official list of deprecated features, so per
-> our deprecation policy, they are still considered supported.
+> but we do not delete vcpus in KVM after they were created
+> (as it deemed to be too complicated), we are just deleting QEMU part
+> of it and keep kvm's vcpu for reuse with future hotplug.
 >
->   https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features
->
-> To deprecate something it needs to be added to qemu-deprecated.texi, and
-> ideally also made to print a message to stderr when triggered.
 
-will send a patch to add to the texi and the print to stderr, thanks.
+Same with PPC, we too dynamically create vcpus and during unplug keep the
+KVM's vcpus for reuse.
+
+Regards,
+Bharata.
