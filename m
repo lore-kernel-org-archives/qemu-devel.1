@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fkuHQ-0008FQ-O3
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:47:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1fkuKj-0001Ke-7k
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fkuHN-0001XZ-Hc
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:47:20 -0400
-References: <20180801131905.148778-1-frankja@linux.ibm.com>
-	<20180801131905.148778-3-frankja@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2da970ab-276f-f792-54d8-c696e899cac5@redhat.com>
-Date: Wed, 1 Aug 2018 18:47:12 +0200
+	(envelope-from <bounces@canonical.com>) id 1fkuKg-00033x-53
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:50:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36886)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fkuKf-00033M-VQ
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 12:50:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fkuKe-0008Qe-Ci
+	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 16:50:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5E8192E807E
+	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 16:50:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180801131905.148778-3-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 2/2] s390x: Enable KVM huge
- page backing support
+Date: Wed, 01 Aug 2018 16:40:52 -0000
+From: Daniel Berrange <1784900@bugs.launchpad.net>
+Reply-To: Bug 1784900 <1784900@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153314156256.17371.7866837258800403867.malonedeb@soybean.canonical.com>
+Message-Id: <153314165289.29473.11065410443088531238.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1784900] Re: QEMU (frontend) crashes upon warm
+ reboot with virtio-gpu device and vga=775 on Linux cmdline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+To: qemu-devel@nongnu.org
 
-On 08/01/2018 03:19 PM, Janosch Frank wrote:
-> QEMU has had huge page support for a longer time already, but KVM
-> memory management under s390x needed some changes to work with huge
-> backings.
->=20
-> Now that we have support, let's enable it if requested and
-> available. Otherwise we now properly tell the user if there is no
-> support and back out instead of failing to run the VM later on.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  target/s390x/kvm.c | 34 ++++++++++++++++++++++++++++++++--
->  1 file changed, 32 insertions(+), 2 deletions(-)
->=20
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index d923cf4240..d1c72975cf 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -34,6 +34,8 @@
->  #include "qapi/error.h"
->  #include "qemu/error-report.h"
->  #include "qemu/timer.h"
-> +#include "qemu/units.h"
-> +#include "qemu/mmap-alloc.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/hw_accel.h"
->  #include "hw/hw.h"
-> @@ -139,6 +141,7 @@ static int cap_mem_op;
->  static int cap_s390_irq;
->  static int cap_ri;
->  static int cap_gs;
-> +static int cap_hpage_1m;
-> =20
->  static int active_cmma;
-> =20
-> @@ -220,9 +223,9 @@ static void kvm_s390_enable_cmma(void)
->          .attr =3D KVM_S390_VM_MEM_ENABLE_CMMA,
->      };
-> =20
-> -    if (mem_path) {
-> +    if (cap_hpage_1m) {
->          warn_report("CMM will not be enabled because it is not "
-> -                    "compatible with hugetlbfs.");
-> +                    "compatible with huge memory backings.");
->          return;
->      }
->      rc =3D kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
-> @@ -281,10 +284,37 @@ void kvm_s390_crypto_reset(void)
->      }
->  }
-> =20
-> +static int kvm_s390_configure_mempath_backing(KVMState *s)
-> +{
-> +    size_t path_psize =3D qemu_mempath_getpagesize(mem_path);
-> +
-> +    if (path_psize =3D=3D 4 * KiB)
-> +        return 0;
+** Summary changed:
 
-Missing curly braces.
+- QEMU (frontend) crashes upon warm reboot with vga=3D775 on Linux cmdline
++ QEMU (frontend) crashes upon warm reboot with virtio-gpu device and vga=
+=3D775 on Linux cmdline
 
-> +    if (path_psize !=3D 1 * MiB) {
-> +        error_report("Memory backing with 2G pages was specified, "
-> +                     "but KVM does not support this memory backing");
+-- =
 
-May I suggest to use a text that rather matches the condition of the
-if-statement (just in case there will be other sizes in the future...),
-e.g. "Memory backing is only supported for 1 MiB huge pages" or
-something similar.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1784900
 
- Thomas
+Title:
+  QEMU (frontend) crashes upon warm reboot with virtio-gpu device and
+  vga=3D775 on Linux cmdline
+
+Status in QEMU:
+  New
+
+Bug description:
+  With vga=3D775 on the Linux command line a first boot of the VM running
+  Linux works fine. After a warm reboot it crashes during Linux boot.
+  The VM was used remotely via virt-manager and VNC.
+
+  Bisecting the code lead to the following patch that introduced the
+  bug:
+
+  commit 1fccd7c5a9a722a9cbf1bc91693f4618034f01ac (HEAD, refs/bisect/bad)
+  Author: Gerd Hoffmann <kraxel@redhat.com>
+  Date:   Mon Jul 2 18:24:43 2018 +0200
+
+      virtio-gpu: disable scanout when backing resource is destroyed
+
+      Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+      Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+      Message-id: 20180702162443.16796-4-kraxel@redhat.com
+
+  diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+  index 336dc59007..08cd567218 100644
+  --- a/hw/display/virtio-gpu.c
+  +++ b/hw/display/virtio-gpu.c
+  @@ -430,6 +430,16 @@ static void virtio_gpu_disable_scanout(VirtIOGPU *g,=
+ int scanout_id)
+   static void virtio_gpu_resource_destroy(VirtIOGPU *g,
+                                           struct virtio_gpu_simple_resourc=
+e *res)
+   {
+  +    int i;
+  +
+  +    if (res->scanout_bitmask) {
+  +        for (i =3D 0; i < g->conf.max_outputs; i++) {
+  +            if (res->scanout_bitmask & (1 << i)) {
+  +                virtio_gpu_disable_scanout(g, i);
+  +            }
+  +        }
+  +    }
+  +
+       pixman_image_unref(res->image);
+       virtio_gpu_cleanup_mapping(res);
+       QTAILQ_REMOVE(&g->reslist, res, next);
+
+  =
+
+  Reported backtraces can be found here:  https://paste.fedoraproject.org/p=
+aste/OUDEfCk1IY7xiy0I0PDlkw
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1784900/+subscriptions
