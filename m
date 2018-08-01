@@ -1,14 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fkrAJ-0000Ye-W3
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:27:52 -0400
+	(envelope-from <laurent.desnogues@gmail.com>) id 1fkrAz-0000qS-6v
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:28:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fkrAG-0005AQ-J5
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:27:47 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  1 Aug 2018 15:27:33 +0200
-Message-Id: <20180801132733.15628-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests: virtio: separate ccw tests from libqos
+	(envelope-from <laurent.desnogues@gmail.com>) id 1fkrAy-0005ad-A1
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:28:29 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180801123111.3595-2-richard.henderson@linaro.org>
+References: <20180801123111.3595-1-richard.henderson@linaro.org>
+	<20180801123111.3595-2-richard.henderson@linaro.org>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Wed, 1 Aug 2018 15:28:26 +0200
+Message-ID: <CABoDooOvxBww=HeNGt56t3uE_7zvhm70nz=fR54MguxaA49XVg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/4] target/arm: Fix sign of
+ sve_cmpeq_ppzw/sve_cmpne_ppzw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,173 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, e.emanuelegiuseppe@gmail.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Because qtest does not support s390 channel I/O, s390 only performs smoke tests on
-those few devices that do not have any functional tests.  Therefore, every time we
-add functional tests for a virtio device, the choice is between removing
-those tests from the s390 suite (so that s390 actually _loses_ coverage)
-or sprinkling the test with architecture checks.
+On Wed, Aug 1, 2018 at 2:31 PM, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> The normal vector element is sign-extended before
+> comparing with the wide vector element.
+>
+> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-This patch simply creates a ccw-specific test that only performs smoke tests on
-all virtio-ccw devices.  If channel I/O support is ever added to qtest and libqos,
-then this file can go away.  In the meanwhile, it simplifies maintenance and
-makes sure that all virtio devices are tested.
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- tests/Makefile.include  |   5 +-
- tests/virtio-ccw-test.c | 118 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 120 insertions(+), 3 deletions(-)
- create mode 100644 tests/virtio-ccw-test.c
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index a49282704e..cf835f2fd0 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -401,9 +401,7 @@ check-qtest-s390x-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
- check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
- check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
- check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
--check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
--check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
--check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
-+check-qtest-s390x-y += tests/virtio-ccw-test$(EXESUF)
- check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
- 
- check-qtest-generic-y += tests/machine-none-test$(EXESUF)
-@@ -807,6 +805,7 @@ tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
- tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
- tests/virtio-balloon-test$(EXESUF): tests/virtio-balloon-test.o $(libqos-virtio-obj-y)
- tests/virtio-blk-test$(EXESUF): tests/virtio-blk-test.o $(libqos-virtio-obj-y)
-+tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
- tests/virtio-net-test$(EXESUF): tests/virtio-net-test.o $(libqos-pc-obj-y) $(libqos-virtio-obj-y)
- tests/virtio-rng-test$(EXESUF): tests/virtio-rng-test.o $(libqos-pc-obj-y)
- tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
-diff --git a/tests/virtio-ccw-test.c b/tests/virtio-ccw-test.c
-new file mode 100644
-index 0000000000..0af3a7bb31
---- /dev/null
-+++ b/tests/virtio-ccw-test.c
-@@ -0,0 +1,118 @@
-+/*
-+ * QTest testcase for VirtIO CCW
-+ *
-+ * Copyright (c) 2014 SUSE LINUX Products GmbH
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+/* Until we have a full libqos implementation of virtio-ccw (which requires
-+ * also to add support for I/O channels to qtest), we can only do simple
-+ * tests that initialize the devices.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "libqos/virtio.h"
-+
-+static void virtio_balloon_nop(void)
-+{
-+    global_qtest = qtest_startf("-device virtio-balloon-ccw");
-+    qtest_end();
-+}
-+
-+static void virtconsole_nop(void)
-+{
-+    global_qtest = qtest_startf("-device virtio-serial-ccw,id=vser0 "
-+                                "-device virtconsole,bus=vser0.0");
-+    qtest_end();
-+}
-+
-+static void virtserialport_nop(void)
-+{
-+    global_qtest = qtest_startf("-device virtio-serial-ccw,id=vser0 "
-+                                "-device virtserialport,bus=vser0.0");
-+    qtest_end();
-+}
-+
-+static void virtio_serial_nop(void)
-+{
-+    global_qtest = qtest_startf("-device virtio-serial-ccw");
-+    qtest_end();
-+}
-+
-+static void virtio_serial_hotplug(void)
-+{
-+    global_qtest = qtest_startf("-device virtio-serial-ccw");
-+    qtest_qmp_device_add("virtserialport", "hp-port", NULL);
-+    qtest_qmp_device_del("hp-port");
-+    qtest_end();
-+}
-+
-+static void virtio_blk_nop(void)
-+{
-+    global_qtest = qtest_startf("-drive if=none,id=drv0,file=null-co://,format=raw "
-+                                "-device virtio-blk-ccw,drive=drv0");
-+    qtest_end();
-+}
-+
-+static void virtio_net_nop(void)
-+{
-+    global_qtest = qtest_startf("-device virtio-net-ccw");
-+    qtest_end();
-+}
-+
-+static void virtio_9p_nop(void)
-+{
-+    global_qtest = qtest_startf("-fsdev synth,id=fsdev0 "
-+                                "-device virtio-9p-ccw,fsdev=fsdev0,mount_tag=qtest");
-+    qtest_end();
-+}
-+
-+static void virtio_rng_nop(void)
-+{
-+    global_qtest = qtest_startf("-device virtio-rng-ccw");
-+    qtest_end();
-+}
-+
-+static void virtio_scsi_nop(void)
-+{
-+    global_qtest = qtest_startf("-device virtio-scsi-ccw");
-+    qtest_end();
-+}
-+
-+static void virtio_scsi_hotplug(void)
-+{
-+    global_qtest = qtest_startf("-drive if=none,id=drv0,file=null-co://,format=raw "
-+                                "-drive if=none,id=drv1,file=null-co://,format=raw "
-+                                "-device virtio-scsi-ccw "
-+                                "-device scsi-hd,drive=drv0");
-+    qtest_qmp_device_add("scsi-hd", "scsihd", "'drive': 'drv1'");
-+    qtest_qmp_device_del("scsihd");
-+
-+    qtest_end();
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+
-+    g_test_init(&argc, &argv, NULL);
-+    qtest_add_func("/virtio/balloon/nop", virtio_balloon_nop);
-+    qtest_add_func("/virtio/console/nop", virtconsole_nop);
-+    qtest_add_func("/virtio/serialport/nop", virtserialport_nop);
-+    qtest_add_func("/virtio/serial/nop", virtio_serial_nop);
-+    qtest_add_func("/virtio/serial/hotplug", virtio_serial_hotplug);
-+    qtest_add_func("/virtio/block/nop", virtio_blk_nop);
-+    qtest_add_func("/virtio/net/nop", virtio_net_nop);
-+    qtest_add_func("/virtio/9p/nop", virtio_9p_nop);
-+    qtest_add_func("/virtio/rng/nop", virtio_rng_nop);
-+    qtest_add_func("/virtio/scsi/nop", virtio_scsi_nop);
-+    qtest_add_func("/virtio/scsi/hotplug", virtio_scsi_hotplug);
-+
-+    ret = g_test_run();
-+
-+    return ret;
-+}
--- 
-2.17.1
+Laurent
+
+> ---
+>  target/arm/sve_helper.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+> index 54795c9194..9bd0694d55 100644
+> --- a/target/arm/sve_helper.c
+> +++ b/target/arm/sve_helper.c
+> @@ -2436,13 +2436,13 @@ uint32_t HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc) \
+>  #define DO_CMP_PPZW_S(NAME, TYPE, TYPEW, OP) \
+>      DO_CMP_PPZW(NAME, TYPE, TYPEW, OP, H1_4, 0x1111111111111111ull)
+>
+> -DO_CMP_PPZW_B(sve_cmpeq_ppzw_b, uint8_t,  uint64_t, ==)
+> -DO_CMP_PPZW_H(sve_cmpeq_ppzw_h, uint16_t, uint64_t, ==)
+> -DO_CMP_PPZW_S(sve_cmpeq_ppzw_s, uint32_t, uint64_t, ==)
+> +DO_CMP_PPZW_B(sve_cmpeq_ppzw_b, int8_t,  uint64_t, ==)
+> +DO_CMP_PPZW_H(sve_cmpeq_ppzw_h, int16_t, uint64_t, ==)
+> +DO_CMP_PPZW_S(sve_cmpeq_ppzw_s, int32_t, uint64_t, ==)
+>
+> -DO_CMP_PPZW_B(sve_cmpne_ppzw_b, uint8_t,  uint64_t, !=)
+> -DO_CMP_PPZW_H(sve_cmpne_ppzw_h, uint16_t, uint64_t, !=)
+> -DO_CMP_PPZW_S(sve_cmpne_ppzw_s, uint32_t, uint64_t, !=)
+> +DO_CMP_PPZW_B(sve_cmpne_ppzw_b, int8_t,  uint64_t, !=)
+> +DO_CMP_PPZW_H(sve_cmpne_ppzw_h, int16_t, uint64_t, !=)
+> +DO_CMP_PPZW_S(sve_cmpne_ppzw_s, int32_t, uint64_t, !=)
+>
+>  DO_CMP_PPZW_B(sve_cmpgt_ppzw_b, int8_t,   int64_t, >)
+>  DO_CMP_PPZW_H(sve_cmpgt_ppzw_h, int16_t,  int64_t, >)
+> --
+> 2.17.1
+>
