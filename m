@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1fkrCa-0002CG-4D
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:30:12 -0400
+	(envelope-from <laurent.desnogues@gmail.com>) id 1fkrE3-0003hC-OR
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:31:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1fkrCU-00068H-Hy
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:30:08 -0400
+	(envelope-from <laurent.desnogues@gmail.com>) id 1fkrE2-0006yc-RQ
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:31:39 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180801123111.3595-3-richard.henderson@linaro.org>
+In-Reply-To: <20180801123111.3595-1-richard.henderson@linaro.org>
 References: <20180801123111.3595-1-richard.henderson@linaro.org>
-	<20180801123111.3595-3-richard.henderson@linaro.org>
 From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Wed, 1 Aug 2018 15:30:01 +0200
-Message-ID: <CABoDooMKtkuvvgrF9T63-9dMJaCPFX9=P7mCa6zGZk2JXEw2Zg@mail.gmail.com>
+Date: Wed, 1 Aug 2018 15:31:37 +0200
+Message-ID: <CABoDooOS+LgTWwxedNzwNesg_aiZjqbdT-=HaiDBZwj-QN5EQw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/4] target/arm: Fix typo in
- do_sat_addsub_64
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm sve fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +26,35 @@ Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydel
 
 On Wed, Aug 1, 2018 at 2:31 PM, Richard Henderson
 <richard.henderson@linaro.org> wrote:
-> Used the wrong temporary in the computation of subtractive overflow.
->
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> These four patches are minor, reported by Laurent this week.
 
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+This fixes the reported issues, thanks!
+
+> If there happens to be an -rc4 release, it would be nice if
+> they were included.  But if not, no biggie.  I suspect that
+> other minor issues will be found past these four, so I would
+> hope everyone who cares about sve is just as happy working
+> from a branch anyway.
+
+I indeed still have some things to look at.
 
 
 Laurent
 
-> ---
->  target/arm/translate-sve.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-> index 374051cd20..9dd4c38bab 100644
-> --- a/target/arm/translate-sve.c
-> +++ b/target/arm/translate-sve.c
-> @@ -1625,7 +1625,7 @@ static void do_sat_addsub_64(TCGv_i64 reg, TCGv_i64 val, bool u, bool d)
->              /* Detect signed overflow for subtraction.  */
->              tcg_gen_xor_i64(t0, reg, val);
->              tcg_gen_sub_i64(t1, reg, val);
-> -            tcg_gen_xor_i64(reg, reg, t0);
-> +            tcg_gen_xor_i64(reg, reg, t1);
->              tcg_gen_and_i64(t0, t0, reg);
+> r~
 >
->              /* Bound the result.  */
+>
+> Richard Henderson (4):
+>   target/arm: Fix sign of sve_cmpeq_ppzw/sve_cmpne_ppzw
+>   target/arm: Fix typo in do_sat_addsub_64
+>   target/arm: Reorganize SVE WHILE
+>   target/arm: Fix typo in helper_sve_movz_d
+>
+>  target/arm/sve_helper.c    | 19 ++++++--------
+>  target/arm/translate-sve.c | 51 ++++++++++++++++++++++++--------------
+>  2 files changed, 40 insertions(+), 30 deletions(-)
+>
 > --
 > 2.17.1
 >
