@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fkqs3-0007Bq-MN
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:08:56 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fkquc-0000QR-Kv
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:11:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fkqs0-0005Ng-IB
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:08:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44472 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fkqs0-0005Mm-A6
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:08:52 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E2F7F40216E8
-	for <qemu-devel@nongnu.org>; Wed,  1 Aug 2018 13:08:45 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180801092508.4927-1-marcandre.lureau@redhat.com>
-Date: Wed, 01 Aug 2018 15:08:38 +0200
-In-Reply-To: <20180801092508.4927-1-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 1 Aug 2018 11:25:08 +0200")
-Message-ID: <87bmam8ca1.fsf@dusky.pond.sub.org>
+	(envelope-from <cohuck@redhat.com>) id 1fkqub-0006Ht-Qh
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 09:11:34 -0400
+Date: Wed, 1 Aug 2018 15:11:23 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180801151123.5a52e0e6.cohuck@redhat.com>
+In-Reply-To: <20180801145451.2e640621.cohuck@redhat.com>
+References: <20180724092413.5770-1-cohuck@redhat.com>
+	<20180801102127.GF14577@lemon.usersys.redhat.com>
+	<20180801145451.2e640621.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ui: use enum to string helpers
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1] s390x: remove 's390-squash-mcss'
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,17 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-s390x@nongnu.org, Xiao Feng Ren <renxiaof@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On Wed, 1 Aug 2018 14:54:51 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> Minor code simplification.
+> On Wed, 1 Aug 2018 18:21:27 +0800
+> Fam Zheng <famz@redhat.com> wrote:
+> 
+> > On Tue, 07/24 11:24, Cornelia Huck wrote:  
+> > > diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
+> > > index a02d708239..1bd6c8b458 100644
+> > > --- a/hw/s390x/css-bridge.c
+> > > +++ b/hw/s390x/css-bridge.c
+> > > @@ -106,7 +106,6 @@ VirtualCssBus *virtual_css_bus_init(void)
+> > >      /* Create bus on bridge device */
+> > >      bus = qbus_create(TYPE_VIRTUAL_CSS_BUS, dev, "virtual-css");
+> > >      cbus = VIRTUAL_CSS_BUS(bus);    
+> > 
+> > Not used now?
+> > 
+> > Fam  
+> 
+> Indeed, we can ditch the cbus variable.
 
-It's also a bit more robust: FOO_str(VAL) checks VAL is in range,
-FOO_lookup.array[VAL] doesn't.
-
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+...or not :) We still need it for the return value, which is processed
+in ccw_init(). We could change the return code of the function to
+BusState, but I'm not sure it is worth the hassle.
