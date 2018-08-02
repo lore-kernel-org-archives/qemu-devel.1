@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1flAGK-00067D-Vr
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:51:17 -0400
+	(envelope-from <thuth@redhat.com>) id 1flAHu-0006jN-He
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:52:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1flAGF-0004lw-4l
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:51:17 -0400
-Date: Thu, 2 Aug 2018 10:50:57 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180802095056.GB2523@work-vm>
-References: <20180626135035.133432-5-vsementsov@virtuozzo.com>
-	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
-	<20180801102031.GC2691@work-vm>
-	<64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
-	<20180801174005.GD2691@work-vm>
-	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
-	<20180801185515.GE2691@work-vm>
-	<6bfdc952-fb17-feae-f367-be710853d829@openvz.org>
-	<20180802092907.GA2523@work-vm>
-	<202065a2-f9d1-ce31-b12b-437d57095ac1@openvz.org>
+	(envelope-from <thuth@redhat.com>) id 1flAHo-0005kS-Ad
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:52:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37586 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1flAHo-0005kB-2n
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:52:48 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8A65B818B107
+	for <qemu-devel@nongnu.org>; Thu,  2 Aug 2018 09:52:47 +0000 (UTC)
+References: <1533203376-25621-1-git-send-email-thuth@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e67f4ef0-ae10-8384-b7ed-7f2ec5513195@redhat.com>
+Date: Thu, 2 Aug 2018 11:52:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202065a2-f9d1-ce31-b12b-437d57095ac1@openvz.org>
-Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
- loading and migration logic
+In-Reply-To: <1533203376-25621-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests/migration-test: Turn kvm_hv message
+ into a g_debug message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +34,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
-
-* Denis V. Lunev (den@openvz.org) wrote:
+To: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
 
-> > I don't quite understand the last two paragraphs.
-> we are thinking right now to eliminate delay on regular IO
-> for migration. There is some thoughts and internal work in
-> progress. That is why I am worrying.
+Sorry, I forgot to update the patch subject, it should be:
 
-What downtime are you typicaly seeing and what are you aiming for?
+ "tests/migration-test: Silence the kvm_hv message by default"
 
-It would be good if you could explain what you're planning to
-fix there so we can get a feel for it nearer the start of it
-rather than at the end of the reviewing!
+Could you fix it up when picking up the patch, please? (or shall I resend?)
 
-Dave
-
-> 
-> > However, coming back to my question; it was really saying that
-> > normal guest IO during the end of the migration will cause
-> > a delay; I'm expecting that to be fairly unrelated to the size
-> > of the disk; more to do with workload; so I guess in your case
-> > the worry is the case of big large disks giving big large
-> > bitmaps.
-> 
-> exactly!
-> 
-> Den
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ Thomas
