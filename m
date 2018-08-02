@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1flJ2g-0006D3-NK
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:13:47 -0400
+	(envelope-from <alistair23@gmail.com>) id 1flJ8W-0007gh-ME
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:19:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1flJ2b-00009t-Is
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:13:46 -0400
-Received: from mail-vk0-x241.google.com ([2607:f8b0:400c:c05::241]:40915)
+	(envelope-from <alistair23@gmail.com>) id 1flJ8R-0003Pn-RL
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:19:48 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37457)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1flJ2b-00009f-Cm
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:13:41 -0400
-Received: by mail-vk0-x241.google.com with SMTP id q184-v6so1578422vke.7
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 12:13:41 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <CAFEAcA8yrNzEaL5_D79OjHCUUwPQnS4MnQhU9gumR7fpTThyuQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <af0a868b-20d8-a02f-f6c3-eb0d9a56b5ab@amsat.org>
-Date: Thu, 2 Aug 2018 16:13:36 -0300
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1flJ8R-0003Pc-Gs
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:19:43 -0400
+Received: by mail-pg1-x541.google.com with SMTP id n7-v6so1663275pgq.4
+	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 12:19:43 -0700 (PDT)
+Message-ID: <5b63594d.1c69fb81.60370.1c46@mx.google.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8yrNzEaL5_D79OjHCUUwPQnS4MnQhU9gumR7fpTThyuQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] 'make vm-build-freebsd' &c don't work if KVM isn't
- enabled
+From: Alistair <alistair23@gmail.com>
+Date: Thu, 2 Aug 2018 12:18:58 -0700
+In-Reply-To: <mhng-df1b106f-72bb-4857-9acc-4095019307e4@palmer-si-x1c4>
+References: <cover.1529695276.git.alistair.francis@wdc.com>
+	<mhng-df1b106f-72bb-4857-9acc-4095019307e4@palmer-si-x1c4>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 0/5] Connect a PCIe host and graphics
+ support toRISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,25 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+To: Palmer Dabbelt <palmer@sifive.com>, "alistair.francis@wdc.com" <alistair.francis@wdc.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>
 
-Hi Peter,
+Hey,
 
-On 07/30/2018 10:23 AM, Peter Maydell wrote:
-> The tests in tests/vm/ seem to make some attempt to cope with the
-> host system not allowing the user to use KVM, but it doesn't quite
-> work. The problem is that tests/vm/basevm.py always uses "-cpu host"
-> in the QEMU options it uses to run the VM, and that only works if
-> KVM is enabled. If the user can't run KVM then we correctly avoid
-> passing it "-enable-kvm" but then QEMU doesn't run because "-cpu host"
-> isn't supported...
-> 
-> I guess the right fix here is to use "-cpu max" ?
+Sorry for the top post. I=E2=80=99m on holidays at the moment and will be b=
+ack next week.
 
-I think this is the issue I intended to address in this series:
+I have sent a V2 to the list, I don=E2=80=99t think I CCed you as I know yo=
+ur busy. Once the 3.1 merge window opens I=E2=80=99ll send a new version wi=
+th all the comments I have received.
 
-http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg03411.html
-"tests/vm: Improvements when KVM is not available"
-->
-"tests/vm: Use 'host' cpu when KVM is available, else default to 'max'"
+Alistair
+
+From: Palmer Dabbelt
+Sent: Thursday, 2 August 2018 10:44 AM
+To: alistair.francis@wdc.com
+Cc: qemu-devel@nongnu.org; alistair.francis@wdc.com; alistair23@gmail.com; =
+Michael Clark
+Subject: Re: [PATCH v1 0/5] Connect a PCIe host and graphics support toRISC=
+-V
+
+On Fri, 22 Jun 2018 12:28:14 PDT (-0700), alistair.francis@wdc.com wrote:
+> Alistair Francis (5):
+>   hw/riscv/virtio: Set the soc device tree node as a simple-bus
+>   hw/riscv/virt: Increase the number of interrupts
+>   hw/riscv/virt: Connect the Xilinx PCIe
+>   hw/riscv/virt: Connect a VGA PCIe device
+>   riscv64-softmmu.mak: Build Virtio Block support
+>
+>  default-configs/riscv32-softmmu.mak |  6 +++
+>  default-configs/riscv64-softmmu.mak |  8 ++++
+>  hw/riscv/virt.c                     | 73 ++++++++++++++++++++++++++++-
+>  include/hw/riscv/virt.h             |  6 ++-
+>  4 files changed, 90 insertions(+), 3 deletions(-)
+
+Sorry I'm so slow here, I'm still chewing through my patch backlog.  It loo=
+ks=20
+like this hasn't made it upstream yet.  I rebased it on top of master but h=
+ave=20
+yet to figure out how to make it work, though I think that's on the Linux s=
+ide.
+
+I haven't yet looked at the code, but I like the functionality so I don't w=
+ant=20
+to lose this.  Can you submit a v2 that applies cleanly to master, or do yo=
+u=20
+want me to deal with it?
