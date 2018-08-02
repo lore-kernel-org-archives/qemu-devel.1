@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1flJ8W-0007gh-ME
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:19:49 -0400
+	(envelope-from <laurent@vivier.eu>) id 1flJZh-0005Ui-Kr
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1flJ8R-0003Pn-RL
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:19:48 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37457)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1flJ8R-0003Pc-Gs
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:19:43 -0400
-Received: by mail-pg1-x541.google.com with SMTP id n7-v6so1663275pgq.4
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 12:19:43 -0700 (PDT)
-Message-ID: <5b63594d.1c69fb81.60370.1c46@mx.google.com>
+	(envelope-from <laurent@vivier.eu>) id 1flJZe-0003HH-GU
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:47:53 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:45505)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1flJZe-0003EP-57
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:47:50 -0400
+References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
+	<1533219424-7627-78-git-send-email-stefan.markovic@rt-rk.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <0a43387a-f475-874d-2846-46ce38d9d812@vivier.eu>
+Date: Thu, 2 Aug 2018 21:47:02 +0200
 MIME-Version: 1.0
-From: Alistair <alistair23@gmail.com>
-Date: Thu, 2 Aug 2018 12:18:58 -0700
-In-Reply-To: <mhng-df1b106f-72bb-4857-9acc-4095019307e4@palmer-si-x1c4>
-References: <cover.1529695276.git.alistair.francis@wdc.com>
-	<mhng-df1b106f-72bb-4857-9acc-4095019307e4@palmer-si-x1c4>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 0/5] Connect a PCIe host and graphics
- support toRISC-V
+In-Reply-To: <1533219424-7627-78-git-send-email-stefan.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 77/77] linux-user: Add nanoMIPS support
+ in scripts/qemu-binfmt-conf.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>, "alistair.francis@wdc.com" <alistair.francis@wdc.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>
+To: Stefan Markovic <stefan.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com
 
-Hey,
+Le 02/08/2018 à 16:17, Stefan Markovic a écrit :
+> From: Aleksandar Rikalo <arikalo@wavecomp.com>
+> 
+> Add support for nanomips[eb] variant in scripts/qemu-binfmt-conf.sh.
+> 
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  scripts/qemu-binfmt-conf.sh | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+> index b0dc8a7..ecde0c2 100755
+> --- a/scripts/qemu-binfmt-conf.sh
+> +++ b/scripts/qemu-binfmt-conf.sh
+> @@ -2,7 +2,7 @@
+>  # Enable automatic program execution by the kernel.
+>  
+>  qemu_target_list="i386 i486 alpha arm armeb sparc32plus ppc ppc64 ppc64le m68k \
+> -mips mipsel mipsn32 mipsn32el mips64 mips64el \
+> +mips mipsel mipsn32 mipsn32el mips64 mips64el nanomips nanomipseb \
+>  sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb \
+>  microblaze microblazeel or1k"
+>  
+> @@ -76,6 +76,14 @@ mips64el_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\
+>  mips64el_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+>  mips64el_family=mips
+>  
+> +nanomips_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf9\x00'
+> +nanomips_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
+> +nanomips_family=mips
+> +
+> +nanomipseb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf9'
+> +nanomipseb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
+> +nanomipseb_family=mips
 
-Sorry for the top post. I=E2=80=99m on holidays at the moment and will be b=
-ack next week.
+The goal of the family value is not to register the interpreter if the
+kernel can execute the executable directly (without qemu).
+For instance a ppc64 kernel can execute a ppc executable, an x86_64
+kernel can execute a i386 binary.
 
-I have sent a V2 to the list, I don=E2=80=99t think I CCed you as I know yo=
-ur busy. Once the 3.1 merge window opens I=E2=80=99ll send a new version wi=
-th all the comments I have received.
+If you put nanomips in the mips family it means a mips kernel can
+execute directly a nanomips executable: Is that the case?
+If not, I think you can use "nanomips_family=nanomips", and if a
+nanomips kernel cannot execute a nanomipseb executable, you need also a
+nanomipseb family.
 
-Alistair
-
-From: Palmer Dabbelt
-Sent: Thursday, 2 August 2018 10:44 AM
-To: alistair.francis@wdc.com
-Cc: qemu-devel@nongnu.org; alistair.francis@wdc.com; alistair23@gmail.com; =
-Michael Clark
-Subject: Re: [PATCH v1 0/5] Connect a PCIe host and graphics support toRISC=
--V
-
-On Fri, 22 Jun 2018 12:28:14 PDT (-0700), alistair.francis@wdc.com wrote:
-> Alistair Francis (5):
->   hw/riscv/virtio: Set the soc device tree node as a simple-bus
->   hw/riscv/virt: Increase the number of interrupts
->   hw/riscv/virt: Connect the Xilinx PCIe
->   hw/riscv/virt: Connect a VGA PCIe device
->   riscv64-softmmu.mak: Build Virtio Block support
->
->  default-configs/riscv32-softmmu.mak |  6 +++
->  default-configs/riscv64-softmmu.mak |  8 ++++
->  hw/riscv/virt.c                     | 73 ++++++++++++++++++++++++++++-
->  include/hw/riscv/virt.h             |  6 ++-
->  4 files changed, 90 insertions(+), 3 deletions(-)
-
-Sorry I'm so slow here, I'm still chewing through my patch backlog.  It loo=
-ks=20
-like this hasn't made it upstream yet.  I rebased it on top of master but h=
-ave=20
-yet to figure out how to make it work, though I think that's on the Linux s=
-ide.
-
-I haven't yet looked at the code, but I like the functionality so I don't w=
-ant=20
-to lose this.  Can you submit a v2 that applies cleanly to master, or do yo=
-u=20
-want me to deal with it?
+Thanks,
+Laurent
