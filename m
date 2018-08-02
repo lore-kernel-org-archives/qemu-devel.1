@@ -1,15 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1flEwz-0004mB-T2
+	(envelope-from <berto@igalia.com>) id 1flEwz-0004mD-TI
 	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:51:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1flEww-0001LJ-Pa
+	(envelope-from <berto@igalia.com>) id 1flEww-0001LR-QE
 	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:51:37 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu,  2 Aug 2018 17:50:22 +0300
-Message-Id: <cover.1533219143.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 0/4] throttle: Race condition fixes and test
- cases
+Date: Thu,  2 Aug 2018 17:50:23 +0300
+Message-Id: <7b219a0844e8eefdb170eaf3e670cdb65383361b.1533219143.git.berto@igalia.com>
+In-Reply-To: <cover.1533219143.git.berto@igalia.com>
+References: <cover.1533219143.git.berto@igalia.com>
+In-Reply-To: <cover.1533219143.git.berto@igalia.com>
+References: <cover.1533219143.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 1/4] qemu-iotests: Test removing a throttle
+ group member with a pending timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,62 +25,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Hi all,
+A throttle group can have several members, and each one of them can
+have several pending requests in the queue.
 
-here are the patches that I promised yesterday.
+The requests are processed in a round-robin fashion, so the algorithm
+decides the drive that is going to run the next request and sets a
+timer in it. Once the timer fires and the throttled request is run
+then the next drive from the group is selected and a new timer is set.
 
-I was originally thinking to propose this for the v3.0 release, but
-after debugging and fixing the problem I think that it's not
-essential (details below).
+If the user tried to remove a drive from a group and that drive had a
+timer set then the code was not taking care of setting up a new timer
+in one of the remaining members of the group, freezing their I/O.
 
-The important patch is the second one. The first and the third are
-just test cases and the last is an alternative solution for the bug
-that Stefan fixed in 6fccbb475bc6effc313ee9481726a1748b6dae57.
+This problem was fixed in 6fccbb475bc6effc313ee9481726a1748b6dae57,
+and this patch adds a new test case that reproduces this exact
+scenario.
 
-There are details in the patches themselves, but here's an explanation
-of the problem: consider a scenario with two drives A and B that are
-part of the same throttle group. Both of them have throttled requests
-and they're waiting for a timer that is set on drive A.
-
-    (timer here) -->  [A]  ---  req1, req2
-                      [B]  ---  req3
-
-If we drain drive [A] (e.g. by disabling its I/O limits) then its
-queue is restarted. req1 is processed immediately, and before
-finishing it calls schedule_next_request(). This follows the
-round-robin algorithm, selects req3 and puts a timer in [B].
-
-But we're still not done with draining [A], and now we have a
-BDRV_POLL_WHILE() loop at the end of bdrv_do_drained_begin() waiting
-for req2 to finish. That won't happen until the timer in [B] fires and
-req3 is done. If there are more drives in the group and more requests
-in the queue this can take a while. That's why disabling a drive's I/O
-limits can be noticeably slow: we disabled the I/O limits but they're
-still being enforced in practice.
-
-The QEMU I/O tests run in qtest mode (with QEMU_CLOCK_VIRTUAL). The
-clock must be advanced manually, which means that the scenario that I
-just described hangs QEMU because BDRV_POLL_WHILE() loops forever (you
-can reproduce this with patch 3). In a real world scenario this only
-results in the aforementioned slowdown (probably negligible in
-practice), which is not a critical thing, and that's why I think it's
-safe to keep the current code for QEMU 3.
-
-I think that's all. Questions and commend are welcome.
-
-Berto
-
-Alberto Garcia (4):
-  qemu-iotests: Test removing a throttle group member with a pending
-    timer
-  throttle-groups: Skip the round-robin if a member is being drained
-  qemu-iotests: Update 093 to improve the draining test
-  throttle-groups: Don't allow timers without throttled requests
-
- block/throttle-groups.c    | 41 +++++++++++++++++++++++++---------
- tests/qemu-iotests/093     | 55 ++++++++++++++++++++++++++++++++++++++++++++++
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ tests/qemu-iotests/093     | 52 ++++++++++++++++++++++++++++++++++++++++++++++
  tests/qemu-iotests/093.out |  4 ++--
- 3 files changed, 88 insertions(+), 12 deletions(-)
+ 2 files changed, 54 insertions(+), 2 deletions(-)
 
+diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+index 68e344f8c1..b26cd34e32 100755
+--- a/tests/qemu-iotests/093
++++ b/tests/qemu-iotests/093
+@@ -208,6 +208,58 @@ class ThrottleTestCase(iotests.QMPTestCase):
+             limits[tk] = rate
+             self.do_test_throttle(ndrives, 5, limits)
+ 
++    # Test that removing a drive from a throttle group should not
++    # affect the remaining members of the group.
++    # https://bugzilla.redhat.com/show_bug.cgi?id=1535914
++    def test_remove_group_member(self):
++        # Create a throttle group with two drives
++        # and set a 4 KB/s read limit.
++        params = {"bps": 0,
++                  "bps_rd": 4096,
++                  "bps_wr": 0,
++                  "iops": 0,
++                  "iops_rd": 0,
++                  "iops_wr": 0 }
++        self.configure_throttle(2, params)
++
++        # Read 4KB from drive0. This is performed immediately.
++        self.vm.hmp_qemu_io("drive0", "aio_read 0 4096")
++
++        # Read 4KB again. The I/O limit has been exceeded so this
++        # request is throttled and a timer is set to wake it up.
++        self.vm.hmp_qemu_io("drive0", "aio_read 0 4096")
++
++        # Read from drive1. We're still over the I/O limit so this
++        # request is also throttled. There's no timer set in drive1
++        # because there's already one in drive0. Once the timer in
++        # drive0 fires and its throttled request is processed then the
++        # next request in the queue will be scheduled: this one.
++        self.vm.hmp_qemu_io("drive1", "aio_read 0 4096")
++
++        # At this point only the first 4KB have been read from drive0.
++        # The other requests are throttled.
++        self.assertEqual(self.blockstats('drive0')[0], 4096)
++        self.assertEqual(self.blockstats('drive1')[0], 0)
++
++        # Remove drive0 from the throttle group and disable its I/O limits.
++        # drive1 remains in the group with a throttled request.
++        params['bps_rd'] = 0
++        params['device'] = 'drive0'
++        result = self.vm.qmp("block_set_io_throttle", conv_keys=False, **params)
++        self.assert_qmp(result, 'return', {})
++
++        # Removing the I/O limits from drive0 drains its pending request.
++        # The read request in drive1 is still throttled.
++        self.assertEqual(self.blockstats('drive0')[0], 8192)
++        self.assertEqual(self.blockstats('drive1')[0], 0)
++
++        # Advance the clock 5 seconds. This completes the request in drive1
++        self.vm.qtest("clock_step %d" % (5 * nsec_per_sec))
++
++        # Now all requests have been processed.
++        self.assertEqual(self.blockstats('drive0')[0], 8192)
++        self.assertEqual(self.blockstats('drive1')[0], 4096)
++
+ class ThrottleTestCoroutine(ThrottleTestCase):
+     test_img = "null-co://"
+ 
+diff --git a/tests/qemu-iotests/093.out b/tests/qemu-iotests/093.out
+index 594c16f49f..36376bed87 100644
+--- a/tests/qemu-iotests/093.out
++++ b/tests/qemu-iotests/093.out
+@@ -1,5 +1,5 @@
+-........
++..........
+ ----------------------------------------------------------------------
+-Ran 8 tests
++Ran 10 tests
+ 
+ OK
 -- 
 2.11.0
