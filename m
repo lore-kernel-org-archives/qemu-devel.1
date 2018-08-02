@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1flCIn-00056E-Sh
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 08:02:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1flCRn-00081l-Gk
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 08:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1flCIj-0005vU-1r
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 08:01:57 -0400
-Received: from mail-by2nam03on0112.outbound.protection.outlook.com
-	([104.47.42.112]:3680
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1flCIi-0005uY-Km
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 08:01:52 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 2 Aug 2018 12:01:47 +0000
-Message-ID: <BN7PR08MB486824C8AD422E4875DC3AE9C62C0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1532967169-22265-50-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<d976385b-45d7-df12-d965-dc7a4241bb0e@linaro.org>
-In-Reply-To: <d976385b-45d7-df12-d965-dc7a4241bb0e@linaro.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bounces@canonical.com>) id 1flCRj-0007k7-5s
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 08:11:15 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40718)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1flCRi-0007jL-Uu
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 08:11:11 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1flCRh-0002bq-7V
+	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 12:11:09 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 37D2C2E80CC
+	for <qemu-devel@nongnu.org>; Thu,  2 Aug 2018 12:11:09 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 49/76] target/mips: Adjust
- exception_resume_pc() for nanoMIPS
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 02 Aug 2018 12:05:03 -0000
+From: Stefan Berger <1784900@bugs.launchpad.net>
+Reply-To: Bug 1784900 <1784900@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153314156256.17371.7866837258800403867.malonedeb@soybean.canonical.com>
+Message-Id: <153321150379.28572.4771679861864409417.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1784900] Re: QEMU (frontend) crashes upon warm
+ reboot with virtio-gpu device and vga=775 on Linux cmdline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +37,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: qemu-devel@nongnu.org
 
-Hi, Richard.
+Another patch that seems to work tries to remember the old surface:
 
-> From: Richard Henderson <richard.henderson@linaro.org>
-> Sent: Tuesday, July 31, 2018 9:18 PM
-> On 07/30/2018 12:12 PM, Aleksandar Markovic wrote:
-> > -    isa_mode =3D !!(env->hflags & MIPS_HFLAG_M16);
-> > +    isa_mode =3D env->hflags & MIPS_HFLAG_M16 &&
-> > +                !(env->insn_flags & ISA_NANOMIPS32);
->=20
-> Likewise re nanomips not setting M16.
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index ed476e4e80..1aae6a6d3b 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -1554,7 +1554,8 @@ static void vga_draw_graphic(VGACommonState *s, int f=
+ull_update)
+         height !=3D s->last_height ||
+         s->last_depth !=3D depth ||
+         s->last_byteswap !=3D byteswap ||
+-        share_surface !=3D is_buffer_shared(surface)) {
++        share_surface !=3D is_buffer_shared(surface) ||
++        s->last_surface !=3D surface) {
+         /* display parameters changed -> need new display surface */
+         s->last_scr_width =3D disp_width;
+         s->last_scr_height =3D height;
+@@ -1563,8 +1564,10 @@ static void vga_draw_graphic(VGACommonState *s, int =
+full_update)
+         s->last_line_offset =3D s->line_offset;
+         s->last_depth =3D depth;
+         s->last_byteswap =3D byteswap;
++        s->last_surface =3D surface;
+         full_update =3D 1;
+     }
++    fprintf(stderr, "%p vs %p   share_surface: %d   surface: %p\n", surfac=
+e_data(surface), s->vram_ptr + (s->start_addr * 4), share_surface, surface);
+     if (surface_data(surface) !=3D s->vram_ptr + (s->start_addr * 4)
+         && is_buffer_shared(surface)) {
+         /* base address changed (page flip) -> shared display surfaces
+diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
+index f8fcf62a56..91afc52b0e 100644
+--- a/hw/display/vga_int.h
++++ b/hw/display/vga_int.h
+@@ -122,6 +122,7 @@ typedef struct VGACommonState {
+     uint32_t last_width, last_height; /* in chars or pixels */
+     uint32_t last_scr_width, last_scr_height; /* in pixels */
+     uint32_t last_depth; /* in bits */
++    void *last_surface;
+     bool last_byteswap;
+     bool force_shadow;
+     uint8_t cursor_start, cursor_end;
 
-For this group of patches related to M16 we devised a solution, however, so=
-m of the test are failing, and wee need more time to analyze the failures a=
-nd the solution. This means that any fix won't be included in v6, or any la=
-ter version, until we find and verify a good solution. This is just to give=
- you heads up, so that you don't spend time on reviewing patches that did n=
-ot change from the preceding version. Of course, many thanks for all review=
-s so far.
+-- =
 
-Yours,
-Aleksandar
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1784900
+
+Title:
+  QEMU (frontend) crashes upon warm reboot with virtio-gpu device and
+  vga=3D775 on Linux cmdline
+
+Status in QEMU:
+  New
+
+Bug description:
+  With vga=3D775 on the Linux command line a first boot of the VM running
+  Linux works fine. After a warm reboot it crashes during Linux boot.
+  The VM was used remotely via virt-manager and VNC.
+
+  Bisecting the code lead to the following patch that introduced the
+  bug:
+
+  commit 1fccd7c5a9a722a9cbf1bc91693f4618034f01ac (HEAD, refs/bisect/bad)
+  Author: Gerd Hoffmann <kraxel@redhat.com>
+  Date:   Mon Jul 2 18:24:43 2018 +0200
+
+      virtio-gpu: disable scanout when backing resource is destroyed
+
+      Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+      Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+      Message-id: 20180702162443.16796-4-kraxel@redhat.com
+
+  diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+  index 336dc59007..08cd567218 100644
+  --- a/hw/display/virtio-gpu.c
+  +++ b/hw/display/virtio-gpu.c
+  @@ -430,6 +430,16 @@ static void virtio_gpu_disable_scanout(VirtIOGPU *g,=
+ int scanout_id)
+   static void virtio_gpu_resource_destroy(VirtIOGPU *g,
+                                           struct virtio_gpu_simple_resourc=
+e *res)
+   {
+  +    int i;
+  +
+  +    if (res->scanout_bitmask) {
+  +        for (i =3D 0; i < g->conf.max_outputs; i++) {
+  +            if (res->scanout_bitmask & (1 << i)) {
+  +                virtio_gpu_disable_scanout(g, i);
+  +            }
+  +        }
+  +    }
+  +
+       pixman_image_unref(res->image);
+       virtio_gpu_cleanup_mapping(res);
+       QTAILQ_REMOVE(&g->reslist, res, next);
+
+  =
+
+  Reported backtraces can be found here:  https://paste.fedoraproject.org/p=
+aste/OUDEfCk1IY7xiy0I0PDlkw
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1784900/+subscriptions
