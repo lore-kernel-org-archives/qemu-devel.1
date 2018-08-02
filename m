@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1flIun-00036l-Ar
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:05:38 -0400
+	(envelope-from <den@virtuozzo.com>) id 1flIvG-0003L1-Is
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:06:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1flIuk-0001Vo-51
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:05:37 -0400
-Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:41325)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1flIuj-0001Uw-VC
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:05:34 -0400
-Received: by mail-ua0-x241.google.com with SMTP id h1-v6so2184941uao.8
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 12:05:33 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180802180602.22047-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bde6d996-200d-433b-0819-fe9428997f1d@amsat.org>
-Date: Thu, 2 Aug 2018 16:05:29 -0300
+	(envelope-from <den@virtuozzo.com>) id 1flIvF-000257-Ki
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:06:06 -0400
+References: <20180626135035.133432-5-vsementsov@virtuozzo.com>
+	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
+	<20180801102031.GC2691@work-vm>
+	<64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
+	<20180801174005.GD2691@work-vm>
+	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
+	<20180801185515.GE2691@work-vm>
+	<6bfdc952-fb17-feae-f367-be710853d829@openvz.org>
+	<20180802092907.GA2523@work-vm>
+	<202065a2-f9d1-ce31-b12b-437d57095ac1@openvz.org>
+	<20180802095056.GB2523@work-vm>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <86304a35-efd8-a605-f684-2bd3fb3b9815@openvz.org>
+Date: Thu, 2 Aug 2018 22:05:53 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180802180602.22047-1-peter.maydell@linaro.org>
+In-Reply-To: <20180802095056.GB2523@work-vm>
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/timer/m48t59: Move away from old_mmio
- accessors
+Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
+ loading and migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,103 +34,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, patches@linaro.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
 
-On 08/02/2018 03:06 PM, Peter Maydell wrote:
-> Move the m48t59 device away from using old_mmio MemoryRegionOps
-> accessors.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 08/02/2018 12:50 PM, Dr. David Alan Gilbert wrote:
+> * Denis V. Lunev (den@openvz.org) wrote:
+>
+>
+>>> I don't quite understand the last two paragraphs.
+>> we are thinking right now to eliminate delay on regular IO
+>> for migration. There is some thoughts and internal work in
+>> progress. That is why I am worrying.
+> What downtime are you typicaly seeing and what are you aiming for?
+>
+> It would be good if you could explain what you're planning to
+> fix there so we can get a feel for it nearer the start of it
+> rather than at the end of the reviewing!
+>
+> Dave
+The ultimate goal is to reliable reach 100 ms with ongoing IO and
+you are perfectly correct about reviewing :)
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Though the problem is that right now we are just trying to
+invent something suitable :(
 
-> ---
-> Tested with 'make check' and by booting a sparc guest.
-> 
->  hw/timer/m48t59.c | 59 +++++++++--------------------------------------
->  1 file changed, 11 insertions(+), 48 deletions(-)
-> 
-> diff --git a/hw/timer/m48t59.c b/hw/timer/m48t59.c
-> index f2991762ab0..ca3ed445de7 100644
-> --- a/hw/timer/m48t59.c
-> +++ b/hw/timer/m48t59.c
-> @@ -493,66 +493,29 @@ static uint64_t NVRAM_readb(void *opaque, hwaddr addr, unsigned size)
->      return retval;
->  }
->  
-> -static void nvram_writeb (void *opaque, hwaddr addr, uint32_t value)
-> -{
-> -    M48t59State *NVRAM = opaque;
-> -
-> -    m48t59_write(NVRAM, addr, value & 0xff);
-> -}
-> -
-> -static void nvram_writew (void *opaque, hwaddr addr, uint32_t value)
-> -{
-> -    M48t59State *NVRAM = opaque;
-> -
-> -    m48t59_write(NVRAM, addr, (value >> 8) & 0xff);
-> -    m48t59_write(NVRAM, addr + 1, value & 0xff);
-> -}
-> -
-> -static void nvram_writel (void *opaque, hwaddr addr, uint32_t value)
-> -{
-> -    M48t59State *NVRAM = opaque;
-> -
-> -    m48t59_write(NVRAM, addr, (value >> 24) & 0xff);
-> -    m48t59_write(NVRAM, addr + 1, (value >> 16) & 0xff);
-> -    m48t59_write(NVRAM, addr + 2, (value >> 8) & 0xff);
-> -    m48t59_write(NVRAM, addr + 3, value & 0xff);
-> -}
-> -
-> -static uint32_t nvram_readb (void *opaque, hwaddr addr)
-> +static uint64_t nvram_read(void *opaque, hwaddr addr, unsigned size)
->  {
->      M48t59State *NVRAM = opaque;
->  
->      return m48t59_read(NVRAM, addr);
->  }
->  
-> -static uint32_t nvram_readw (void *opaque, hwaddr addr)
-> +static void nvram_write(void *opaque, hwaddr addr, uint64_t value,
-> +                        unsigned size)
->  {
->      M48t59State *NVRAM = opaque;
-> -    uint32_t retval;
->  
-> -    retval = m48t59_read(NVRAM, addr) << 8;
-> -    retval |= m48t59_read(NVRAM, addr + 1);
-> -    return retval;
-> -}
-> -
-> -static uint32_t nvram_readl (void *opaque, hwaddr addr)
-> -{
-> -    M48t59State *NVRAM = opaque;
-> -    uint32_t retval;
-> -
-> -    retval = m48t59_read(NVRAM, addr) << 24;
-> -    retval |= m48t59_read(NVRAM, addr + 1) << 16;
-> -    retval |= m48t59_read(NVRAM, addr + 2) << 8;
-> -    retval |= m48t59_read(NVRAM, addr + 3);
-> -    return retval;
-> +    return m48t59_write(NVRAM, addr, value);
->  }
->  
->  static const MemoryRegionOps nvram_ops = {
-> -    .old_mmio = {
-> -        .read = { nvram_readb, nvram_readw, nvram_readl, },
-> -        .write = { nvram_writeb, nvram_writew, nvram_writel, },
-> -    },
-> -    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .read = nvram_read,
-> +    .write = nvram_write,
-> +    .impl.min_access_size = 1,
-> +    .impl.max_access_size = 1,
-> +    .valid.min_access_size = 1,
-> +    .valid.max_access_size = 4,
-> +    .endianness = DEVICE_BIG_ENDIAN,
->  };
->  
->  static const VMStateDescription vmstate_m48t59 = {
-> 
+Den
+
+>>> However, coming back to my question; it was really saying that
+>>> normal guest IO during the end of the migration will cause
+>>> a delay; I'm expecting that to be fairly unrelated to the size
+>>> of the disk; more to do with workload; so I guess in your case
+>>> the worry is the case of big large disks giving big large
+>>> bitmaps.
+>> exactly!
+>>
+>> Den
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
