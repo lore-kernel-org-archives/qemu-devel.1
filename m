@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flErG-0008Qh-Sf
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:44 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flErQ-0008WU-Gi
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flErD-0006uP-It
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:42 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:59858 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flErP-00077w-Lf
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:52 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:60042 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1flErC-0006r3-QS
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:39 -0400
+	id 1flErP-00077g-DV
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:51 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu,  2 Aug 2018 16:17:03 +0200
-Message-Id: <1533219424-7627-77-git-send-email-stefan.markovic@rt-rk.com>
+Date: Thu,  2 Aug 2018 16:17:04 +0200
+Message-Id: <1533219424-7627-78-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 76/77] linux-user: Add nanoMIPS linux user
- mode configuration support
+Subject: [Qemu-devel] [PATCH v6 77/77] linux-user: Add nanoMIPS support in
+ scripts/qemu-binfmt-conf.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +28,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Add new linux user mode configuration for nanoMIPS.
+Add support for nanomips[eb] variant in scripts/qemu-binfmt-conf.sh.
 
-Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- configure                               | 13 ++++++++++++-
- default-configs/nanomips-linux-user.mak |  1 +
- 2 files changed, 13 insertions(+), 1 deletion(-)
- create mode 100644 default-configs/nanomips-linux-user.mak
+ scripts/qemu-binfmt-conf.sh | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/configure b/configure
-index 2a7796e..86c8b28 100755
---- a/configure
-+++ b/configure
-@@ -742,6 +742,9 @@ case "$cpu" in
-     supported_cpu="yes"
-     cross_cc_mips=$host_cc
-   ;;
-+  nanomips*)
-+    cpu="mips"
-+  ;;
-   sparc|sun4[cdmuv])
-     cpu="sparc"
-     supported_cpu="yes"
-@@ -6883,7 +6886,7 @@ target_name=$(echo $target | cut -d '-' -f 1)
- target_bigendian="no"
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index b0dc8a7..ecde0c2 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -2,7 +2,7 @@
+ # Enable automatic program execution by the kernel.
  
- case "$target_name" in
--  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
-+  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|nanomipseb|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
-   target_bigendian=yes
-   ;;
- esac
-@@ -6999,6 +7002,11 @@ case "$target_name" in
-   moxie)
-     target_compiler=$cross_cc_moxie
-   ;;
-+  nanomips|nanomipseb)
-+    TARGET_ARCH=nanomips
-+    TARGET_BASE_ARCH=mips
-+    echo "TARGET_ABI_MIPSP32=y" >> $config_target_mak
-+  ;;
-   nios2)
-     target_compiler=$cross_cc_nios2
-   ;;
-@@ -7256,6 +7264,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-   moxie*)
-     disas_config "MOXIE"
-   ;;
-+  nanomips*)
-+    disas_config "MIPS"
-+  ;;
-   nios2)
-     disas_config "NIOS2"
-   ;;
-diff --git a/default-configs/nanomips-linux-user.mak b/default-configs/nanomips-linux-user.mak
-new file mode 100644
-index 0000000..68fc1f7
---- /dev/null
-+++ b/default-configs/nanomips-linux-user.mak
-@@ -0,0 +1 @@
-+# Default configuration for nanomips-linux-user
+ qemu_target_list="i386 i486 alpha arm armeb sparc32plus ppc ppc64 ppc64le m68k \
+-mips mipsel mipsn32 mipsn32el mips64 mips64el \
++mips mipsel mipsn32 mipsn32el mips64 mips64el nanomips nanomipseb \
+ sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb \
+ microblaze microblazeel or1k"
+ 
+@@ -76,6 +76,14 @@ mips64el_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\
+ mips64el_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ mips64el_family=mips
+ 
++nanomips_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf9\x00'
++nanomips_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
++nanomips_family=mips
++
++nanomipseb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf9'
++nanomipseb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
++nanomipseb_family=mips
++
+ sh4_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2a\x00'
+ sh4_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ sh4_family=sh4
+@@ -134,7 +142,7 @@ qemu_get_family() {
+     amd64|i386|i486|i586|i686|i86pc|BePC|x86_64)
+         echo "i386"
+         ;;
+-    mips*)
++    mips*|nanomips*)
+         echo "mips"
+         ;;
+     "Power Macintosh"|ppc64|powerpc|ppc)
 -- 
 1.9.1
