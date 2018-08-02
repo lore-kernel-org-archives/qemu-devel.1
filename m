@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1flHo8-0002Am-VB
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:54:41 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1flHzJ-0005S2-Cc
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 14:06:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1flHo3-0007KO-Uk
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:54:40 -0400
-Received: from mail-bl2nam02on0129.outbound.protection.outlook.com
-	([104.47.38.129]:46816
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	(envelope-from <pm215@archaic.org.uk>) id 1flHzD-0004gi-Jd
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 14:06:13 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43968)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1flHo3-0007Jv-HH
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:54:35 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 2 Aug 2018 17:54:31 +0000
-Message-ID: <BN7PR08MB48680C56DDDD8ED505E9DB97C62C0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1532967169-22265-46-git-send-email-aleksandar.markovic@rt-rk.com>
-	<599465e2-9620-61a4-9a73-a8464c06cbab@linaro.org>
-	<BN7PR08MB48688BC84CBE8C74D095A46AC62C0@BN7PR08MB4868.namprd08.prod.outlook.com>,
-	<ec7bec8f-800b-6840-a6e7-c07e4d667f34@linaro.org>
-In-Reply-To: <ec7bec8f-800b-6840-a6e7-c07e4d667f34@linaro.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 45/76] target/mips: Implement emulation
- of nanoMIPS LLWP/SCWP pair
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1flHzD-0004gG-Bt
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 14:06:07 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu,  2 Aug 2018 19:06:02 +0100
+Message-Id: <20180802180602.22047-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] hw/timer/m48t59: Move away from old_mmio
+ accessors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,47 +23,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>
-Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-> From: Richard Henderson <richard.henderson@linaro.org>
-> Sent: Thursday, August 2, 2018 7:28 PM
->=20
-> On 08/02/2018 08:29 AM, Aleksandar Markovic wrote:
-> > Hi, Richard,
-> >
-> > We are going to remove obsoleted helpers, that was just an honest mista=
-ke made in a rush.
-> >
-> > For unprotected access to gpr, we are going to insert if(reg1 !=3D 0) i=
-n two places.
->=20
-> Be careful that you do not eliminate side effects in the process.  This
-> includes things like check_dspr2, and any helper that sets overflow_flag =
-or
-> carry_flag.
->=20
-> I cannot see how you will avoid that when adding only two if statements.
->=20
+Move the m48t59 device away from using old_mmio MemoryRegionOps
+accessors.
 
-I was referring just to SCWP handler function. For DSP patches, for v6, we =
-worked assiduously to eliminate all unprotected accesses to gpr.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Tested with 'make check' and by booting a sparc guest.
 
->=20
-> > However, it looks there is a bigger problem now in SCWP. QEMU crashes w=
-ith this message:
-> >
-> > /qemu/tcg/tcg.c:2862: tcg fatal error
-> >
-> > This happens in user mode only, system mode case runs fine.
-> >
-> > the problem seems to appear as a consequence of using tcg_gen_brcond_*(=
-().
-> >
-> > Do you have any idea what are we doing wrong here?
->=20
-> If you send me a binary that triggers this error, I'll look at it.
+ hw/timer/m48t59.c | 59 +++++++++--------------------------------------
+ 1 file changed, 11 insertions(+), 48 deletions(-)
 
-Will do it tomorrow morning.
-
-Aleksandar=
+diff --git a/hw/timer/m48t59.c b/hw/timer/m48t59.c
+index f2991762ab0..ca3ed445de7 100644
+--- a/hw/timer/m48t59.c
++++ b/hw/timer/m48t59.c
+@@ -493,66 +493,29 @@ static uint64_t NVRAM_readb(void *opaque, hwaddr addr, unsigned size)
+     return retval;
+ }
+ 
+-static void nvram_writeb (void *opaque, hwaddr addr, uint32_t value)
+-{
+-    M48t59State *NVRAM = opaque;
+-
+-    m48t59_write(NVRAM, addr, value & 0xff);
+-}
+-
+-static void nvram_writew (void *opaque, hwaddr addr, uint32_t value)
+-{
+-    M48t59State *NVRAM = opaque;
+-
+-    m48t59_write(NVRAM, addr, (value >> 8) & 0xff);
+-    m48t59_write(NVRAM, addr + 1, value & 0xff);
+-}
+-
+-static void nvram_writel (void *opaque, hwaddr addr, uint32_t value)
+-{
+-    M48t59State *NVRAM = opaque;
+-
+-    m48t59_write(NVRAM, addr, (value >> 24) & 0xff);
+-    m48t59_write(NVRAM, addr + 1, (value >> 16) & 0xff);
+-    m48t59_write(NVRAM, addr + 2, (value >> 8) & 0xff);
+-    m48t59_write(NVRAM, addr + 3, value & 0xff);
+-}
+-
+-static uint32_t nvram_readb (void *opaque, hwaddr addr)
++static uint64_t nvram_read(void *opaque, hwaddr addr, unsigned size)
+ {
+     M48t59State *NVRAM = opaque;
+ 
+     return m48t59_read(NVRAM, addr);
+ }
+ 
+-static uint32_t nvram_readw (void *opaque, hwaddr addr)
++static void nvram_write(void *opaque, hwaddr addr, uint64_t value,
++                        unsigned size)
+ {
+     M48t59State *NVRAM = opaque;
+-    uint32_t retval;
+ 
+-    retval = m48t59_read(NVRAM, addr) << 8;
+-    retval |= m48t59_read(NVRAM, addr + 1);
+-    return retval;
+-}
+-
+-static uint32_t nvram_readl (void *opaque, hwaddr addr)
+-{
+-    M48t59State *NVRAM = opaque;
+-    uint32_t retval;
+-
+-    retval = m48t59_read(NVRAM, addr) << 24;
+-    retval |= m48t59_read(NVRAM, addr + 1) << 16;
+-    retval |= m48t59_read(NVRAM, addr + 2) << 8;
+-    retval |= m48t59_read(NVRAM, addr + 3);
+-    return retval;
++    return m48t59_write(NVRAM, addr, value);
+ }
+ 
+ static const MemoryRegionOps nvram_ops = {
+-    .old_mmio = {
+-        .read = { nvram_readb, nvram_readw, nvram_readl, },
+-        .write = { nvram_writeb, nvram_writew, nvram_writel, },
+-    },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .read = nvram_read,
++    .write = nvram_write,
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 1,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 4,
++    .endianness = DEVICE_BIG_ENDIAN,
+ };
+ 
+ static const VMStateDescription vmstate_m48t59 = {
+-- 
+2.17.1
