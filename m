@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fl9kQ-0003iY-LD
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:18:20 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fl9v6-0006z6-QP
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:29:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fl9kL-00008x-Lc
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:18:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46758 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fl9kL-00007u-FN
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:18:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 85EB740241C0
-	for <qemu-devel@nongnu.org>; Thu,  2 Aug 2018 09:18:12 +0000 (UTC)
-Date: Thu, 2 Aug 2018 11:18:08 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180802111712.7c60e6df@redhat.com>
-In-Reply-To: <20180726185019-mutt-send-email-mst@kernel.org>
-References: <20180710000024.542612-1-mst@redhat.com>
-	<20180725143211.2fe32f43@redhat.com>
-	<20180725153259-mutt-send-email-mst@kernel.org>
-	<20180725175335.4b444e19@redhat.com>
-	<20180726185019-mutt-send-email-mst@kernel.org>
+	(envelope-from <dgilbert@redhat.com>) id 1fl9v5-0000Vj-J0
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:29:20 -0400
+Date: Thu, 2 Aug 2018 10:29:08 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180802092907.GA2523@work-vm>
+References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
+	<20180626135035.133432-5-vsementsov@virtuozzo.com>
+	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
+	<20180801102031.GC2691@work-vm>
+	<64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
+	<20180801174005.GD2691@work-vm>
+	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
+	<20180801185515.GE2691@work-vm>
+	<6bfdc952-fb17-feae-f367-be710853d829@openvz.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH hack dontapply v2 0/7] Dynamic _CST
- generation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6bfdc952-fb17-feae-f367-be710853d829@openvz.org>
+Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
+ loading and migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,159 +31,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
 
-On Thu, 26 Jul 2018 19:09:22 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+* Denis V. Lunev (den@openvz.org) wrote:
+> On 08/01/2018 09:55 PM, Dr. David Alan Gilbert wrote:
+> > * Denis V. Lunev (den@openvz.org) wrote:
+> >> On 08/01/2018 08:40 PM, Dr. David Alan Gilbert wrote:
+> >>> * John Snow (jsnow@redhat.com) wrote:
+> >>>> On 08/01/2018 06:20 AM, Dr. David Alan Gilbert wrote:
+> >>>>> * John Snow (jsnow@redhat.com) wrote:
+> >>>>>
+> >>>>> <snip>
+> >>>>>
+> >>>>>> I'd rather do something like this:
+> >>>>>> - Always flush bitmaps to disk on inactivate.
+> >>>>> Does that increase the time taken by the inactivate measurably?
+> >>>>> If it's small relative to everything else that's fine; it's just I
+> >>>>> always worry a little since I think this happens after we've stopped the
+> >>>>> CPU on the source, so is part of the 'downtime'.
+> >>>>>
+> >>>>> Dave
+> >>>>> --
+> >>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >>>>>
+> >>>> I'm worried that if we don't, we're leaving behind unusable, partially
+> >>>> complete files behind us. That's a bad design and we shouldn't push for
+> >>>> it just because it's theoretically faster.
+> >>> Oh I don't care about theoretical speed; but if it's actually unusably
+> >>> slow in practice then it needs fixing.
+> >>>
+> >>> Dave
+> >> This is not "theoretical" speed. This is real practical speed and
+> >> instability.
+> >> EACH IO operation can be performed unpredictably slow and thus with
+> >> IO operations in mind you can not even calculate or predict downtime,
+> >> which should be done according to the migration protocol.
+> > We end up doing some IO anyway, even ignoring these new bitmaps,
+> > at the end of the migration when we pause the CPU, we do a
+> > bdrv_inactivate_all to flush any outstanding writes; so we've already
+> > got that unpredictable slowness.
+> >
+> > So, not being a block person, but with some interest in making sure
+> > downtime doesn't increase, I just wanted to understand whether the
+> > amount of writes we're talking about here is comparable to that
+> > which already exists or a lot smaller or a lot larger.
+> > If the amount of IO you're talking about is much smaller than what
+> > we typically already do, then John has a point and you may as well
+> > do the write.
+> > If the amount of IO for the bitmap is much larger and would slow
+> > the downtime a lot then you've got a point and that would be unworkable.
+> >
+> > Dave
+> This is not theoretical difference.
+> 
+> For 1 Tb drive and 64 kb bitmap granularity the size of bitmap is
+> 2 Mb + some metadata (64 Kb). Thus we will have to write
+> 2 Mb of data per bitmap.
 
-> On Wed, Jul 25, 2018 at 05:53:35PM +0200, Igor Mammedov wrote:
-> > On Wed, 25 Jul 2018 15:44:37 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Wed, Jul 25, 2018 at 02:32:11PM +0200, Igor Mammedov wrote:  
-> > > > On Tue, 10 Jul 2018 03:01:30 +0300
-> > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > >     
-> > > > > Now that basic support for guest CPU PM is upstream, I started looking
-> > > > > for making it migrateable.  Since a VM can be migrated between different
-> > > > > hosts, PM info needs to change each time with move the VM to a different
-> > > > > host.    
-> > > > Considering notification is async, so there will be a window when
-> > > > guest will be using old Cstates on new host. What will happen if
-> > > > machine is migrated to host that doesn't support a Cstate
-> > > > that was used on source when guest was started?    
-> > > 
-> > > My testing shows mwait with a wrong hint works, presumably it just uses
-> > > a lot of power.
-> > >   
-> > > > > This adds infrastructure - based on Load/Unload - to support exactly
-> > > > > that: QEMU generates AML (changing it on migration) and stores it in
-> > > > > reserved memory, OSPM loads _CST from there on demand.    
-> > > > Cool and very tempting idea but I have 2 worries about this approach:
-> > > > 1. How well does it work with Windows based guests?
-> > > >    (I've tried something similar but generating new AML from AML itself
-> > > >     to get rid of our long if/else chains there to make up Notify target name.
-> > > >     I ditched it (unfortunately I don't recall why) )    
-> > > 
-> > > After trying it, I can tell you why - it's a horrid mess of
-> > > unreadable code, with arbitrary restraints on package
-> > > length etc.  
-> > in my case it was only 4 character NameString, but Windows probably
-> > wasn't happy or just ignored it.
-> > Considering recent development (TPM series) it might have been issue
-> > with SYSTEM_MEMORY not working properly if used as byte buffer field.
-> > 
-> > Even if it's an unreadable mess it's still stable mess and very constrained
-> > one within a single firmware blob that came from source.  
-> 
-> That's exectly the argument we had for keeping ACPI
-> generation in bios. It's just not an interface that scales.
-> 
-> > Hence it's more preferable than split brain in this series.
-> > 
-> > But I don't think we even need dynamic AML for _CST usecase at all,
-> > existing cpuhp interface should work just fine for it and should be
-> > simpler as all infrastructure is already there.  
-> 
-> Not sure I get what you mean. Could you post a patch?
-> 
-> > > > 2. (probably biggest issue) Loading dynamically generated AML
-> > > >    basically would make all AML code ABI, so that static AML
-> > > >    in RAM of old QEMU version would match dynamic generated
-> > > >    one on target side with new QEMU (/me generalizing approach beyond _CST support).
-> > > >    I'd try to keep our AML version less as much as possible
-> > > >    and go this route only if there is no other way to do it.    
-> > > 
-> > > That's a good point, thanks for bringing this up!
-> > > 
-> > > So it seems that we will need to define the ABI, yes. All AML code is
-> > > an over-statement though, there are specific entry points
-> > > we must maintain, right?  
-> > Well, I'm rather unsure what and where could break,
-> > hence I'm afraid of a new beast and it probably won't be easy
-> > to convince me that ABI would be able to keep things manageable
-> > and stable.
-> > Considering big amount of AML code that we already have
-> > I'm not confident eye balling during review and testing the latest
-> > firmware/qemu would be sufficient as we suddenly would have exploded
-> > test matrix where firmware in use is a mixed from old/and new parts.  
-> 
-> Well there's one exported method so far and it relies on one container
-> device in static table set which does not sound too hard to keep stable.
-> 
-> Given how simple the dynamic table is, how about just checking it
-> with a unit test? It is literally a single return statement.
-> If it returns a valid package, that is all that we
-> care about. I can write some firmware to test that constraint.
-> 
-> 
-> > > And that in the end isn't fundamentally different from the ABIs
-> > > mandated by the ACPI spec.
-> > > 
-> > > So I have these ideas to try to mitigate the issues:
-> > > - document the ABI (like we have in the ACPI spec)
-> > > - use a specific prefix for all external calls (like _ for ACPI spec ones)
-> > > - use a specific (different) prefix for all internal loaded calls (like
-> > >   [A-Z] for non-ACPI spec ones)  
-> > ACPI spec horrible mess and bad example (even committee isn't able to keep it consistent)
-> > but it's necessary evil (compared to no spec at all).
-> > Adding ABI requirement will complicate coding/reviewing for
-> > already complex AML compared to current non ABI way.
-> > Hence from maintainability POV we should stay away from this approach
-> > if there is a viable alternative.  
-> 
-> I agree. Not that I see one.
+OK, this was about my starting point; I think your Mb here is Byte not
+Bit; so assuming a drive of 200MByte/s, that's 200/2=1/100th of a
+second = 10ms; now 10ms I'd say is small enough not to worry about downtime
+increases, since the number we normally hope for is in the 300ms ish
+range.
 
-I'll try to come up with a patch to make use of cpuhp registers
-to pass CST values and it's AML counterpart.
-Then you'd need to just wire it up to whatever means you use
-to get these values from host.
+> For some case there are 2-3-5 bitmaps
+> this we will have 10 Mb of data.
 
-BTW:
-I've noticed you have used SystemIO registers in CST
-(my patch used FFH registers) using mmio defeats purpose
-as it causes guest exit instead of mwait that we are targeting.
+OK, remembering I'm not a block person can you just explain why
+you need 5 bitmaps?
+But with 5 bitmaps that's 50ms, that's starting to get worrying.
 
-Is it just for demo purpose of RFC with new AML interface?
+> With 16 Tb drive the amount of
+> data to write will be multiplied by 16 which gives 160 Mb to
+> write. More disks and bigger the size - more data to write.
 
+Yeh and that's going on for a second and way too big.
+
+(Although that feels like you could fix it by adding bitmaps on your
+bitmaps hierarchically so you didn't write them all; but that's
+getting way more complex).
+
+> Above amount should be multiplied by 2 - x Mb to be written
+> on source, x Mb to be read on target which gives 320 Mb to
+> write.
 > 
-> > > 
-> > > Thoughts?
-> > >   
-> > > > > This is a partially functional prototype.
-> > > > > 
-> > > > > What works:
-> > > > >     loading _CST dynamically and reporting it to OSPM
-> > > > > 
-> > > > > What doesn't:
-> > > > >     detecting host configuration and generating correct _CST package
-> > > > >     notifying guest about the change to trigger _CST re-evaluation
-> > > > >     disabling mwait/halt exists as appropriate
-> > > > > 
-> > > > > Michael S. Tsirkin (6):
-> > > > >   acpi: aml: add aml_register()
-> > > > >   acpi: generalize aml_package / aml_varpackage
-> > > > >   acpi: aml_load/aml_unload
-> > > > >   acpi: export acpi_checksum
-> > > > >   acpi: init header without linking
-> > > > >   acpi: aml generation for _CST
-> > > > >   pc: HACK: acpi: tie in _CST object to Processor
-> > > > > 
-> > > > >  include/hw/acpi/acpi.h      |   2 +
-> > > > >  include/hw/acpi/aml-build.h |  14 ++-
-> > > > >  include/hw/acpi/cst.h       |   8 ++
-> > > > >  include/hw/i386/pc.h        |   5 ++
-> > > > >  hw/acpi/aml-build.c         |  81 ++++++++++++++---
-> > > > >  hw/acpi/core.c              |   2 +-
-> > > > >  hw/acpi/cpu.c               |   5 ++
-> > > > >  hw/acpi/cpu_hotplug.c       |  11 +--
-> > > > >  hw/acpi/cst.c               | 173 ++++++++++++++++++++++++++++++++++++
-> > > > >  hw/arm/virt-acpi-build.c    |   2 +-
-> > > > >  hw/i386/acpi-build.c        |  10 ++-
-> > > > >  hw/acpi/Makefile.objs       |   2 +-
-> > > > >  12 files changed, 290 insertions(+), 25 deletions(-)
-> > > > >  create mode 100644 include/hw/acpi/cst.h
-> > > > >  create mode 100644 hw/acpi/cst.c
-> > > > >     
-> > >   
+> That is why this is not good - we have linear increase with the
+> size and amount of disks.
+> 
+> There is also some thoughts on normal guest IO. Theoretically
+> we can think on replaying IO on the target closing the file
+> immediately or block writes to changed areas and notify
+> target upon IO completion or invent other fancy dances.
+> At least we think right now on these optimizations for regular
+> migration paths.
+> 
+> The problem right that such things are not needed now for CBT
+> but will become necessary and pretty much useless upon
+> introducing this stuff.
+
+I don't quite understand the last two paragraphs.
+
+However, coming back to my question; it was really saying that
+normal guest IO during the end of the migration will cause
+a delay; I'm expecting that to be fairly unrelated to the size
+of the disk; more to do with workload; so I guess in your case
+the worry is the case of big large disks giving big large
+bitmaps.
+
+Dave
+
+> Den
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
