@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEoO-0005E3-Gi
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:42:45 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEof-0005V0-6c
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:43:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEoL-0004b1-DE
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:42:44 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55282 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEod-0004oo-UL
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:43:01 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:55853 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1flEoL-0004aX-5m
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:42:41 -0400
+	id 1flEod-0004nm-MI
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:42:59 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu,  2 Aug 2018 16:16:54 +0200
-Message-Id: <1533219424-7627-68-git-send-email-stefan.markovic@rt-rk.com>
+Date: Thu,  2 Aug 2018 16:16:55 +0200
+Message-Id: <1533219424-7627-69-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 67/77] linux-user: Add target_syscall.h
- header for nanoMIPS
+Subject: [Qemu-devel] [PATCH v6 68/77] linux-user: Add target_cpu.h header
+ for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +28,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Dimitrije Nikolic <dnikolic@wavecomp.com>
 
-Add target_syscall.h header for nanoMIPS.
+Add target_cpu.h header for nanoMIPS.
 
 Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/nanomips/target_syscall.h | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
- create mode 100644 linux-user/nanomips/target_syscall.h
+ linux-user/nanomips/target_cpu.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+ create mode 100644 linux-user/nanomips/target_cpu.h
 
-diff --git a/linux-user/nanomips/target_syscall.h b/linux-user/nanomips/target_syscall.h
+diff --git a/linux-user/nanomips/target_cpu.h b/linux-user/nanomips/target_cpu.h
 new file mode 100644
-index 0000000..b40e36b
+index 0000000..bbb51de
 --- /dev/null
-+++ b/linux-user/nanomips/target_syscall.h
-@@ -0,0 +1,30 @@
-+/* this struct defines the way the registers are stored on the
-+   stack during a system call. */
++++ b/linux-user/nanomips/target_cpu.h
+@@ -0,0 +1,21 @@
++#ifndef NANOMIPS_TARGET_CPU_H
++#define NANOMIPS_TARGET_CPU_H
 +
-+struct target_pt_regs {
-+    /* Pad bytes for argument save space on the stack. */
-+    abi_ulong pad0[6];
++static inline void cpu_clone_regs(CPUMIPSState *env, target_ulong newsp)
++{
++    if (newsp) {
++        env->active_tc.gpr[29] = newsp;
++    }
++    env->active_tc.gpr[4] = 0;
++}
 +
-+    /* Saved main processor registers. */
-+    abi_ulong regs[32];
++static inline void cpu_set_tls(CPUMIPSState *env, target_ulong newtls)
++{
++    env->active_tc.CP0_UserLocal = newtls;
++}
 +
-+    /* Saved special registers. */
-+    abi_ulong cp0_status;
-+    abi_ulong lo;
-+    abi_ulong hi;
-+    abi_ulong cp0_badvaddr;
-+    abi_ulong cp0_cause;
-+    abi_ulong cp0_epc;
-+};
-+
-+/* Nasty hack: define a fake errno value for use by sigreturn.  */
-+#undef TARGET_QEMU_ESIGRETURN
-+#define TARGET_QEMU_ESIGRETURN 255
-+
-+#define UNAME_MACHINE "nanomips"
-+#define UNAME_MINIMUM_RELEASE "2.6.32"
-+
-+#define TARGET_CLONE_BACKWARDS
-+#define TARGET_MINSIGSTKSZ 6144
-+#define TARGET_MLOCKALL_MCL_CURRENT 1
-+#define TARGET_MLOCKALL_MCL_FUTURE  2
++static inline abi_ulong get_sp_from_cpustate(CPUMIPSState *state)
++{
++    return state->active_tc.gpr[29];
++}
++#endif
 -- 
 1.9.1
