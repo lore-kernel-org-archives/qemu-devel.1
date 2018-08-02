@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1flJZh-0005Ui-Kr
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:47:55 -0400
+	(envelope-from <no-reply@patchew.org>) id 1flJl4-0007bx-3U
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:59:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1flJZe-0003HH-GU
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:47:53 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:45505)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1flJZe-0003EP-57
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:47:50 -0400
-References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1533219424-7627-78-git-send-email-stefan.markovic@rt-rk.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <0a43387a-f475-874d-2846-46ce38d9d812@vivier.eu>
-Date: Thu, 2 Aug 2018 21:47:02 +0200
+	(envelope-from <no-reply@patchew.org>) id 1flJl1-0001iD-0R
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:59:38 -0400
+Resent-Message-Id: <E1flJl1-0001iD-0R@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21005)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1flJl0-0001hu-Ml
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 15:59:34 -0400
+In-Reply-To: <153321150379.28572.4771679861864409417.malone@chaenomeles.canonical.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153321200842.16999.13235745623948438835@502c9da6d61e>
 MIME-Version: 1.0
-In-Reply-To: <1533219424-7627-78-git-send-email-stefan.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 77/77] linux-user: Add nanoMIPS support
- in scripts/qemu-binfmt-conf.sh
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 2 Aug 2018 05:13:29 -0700 (PDT)
+Subject: Re: [Qemu-devel] [Bug 1784900] Re: QEMU (frontend) crashes upon
+ warm reboot with virtio-gpu device and vga=775 on Linux cmdline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Markovic <stefan.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com
+To: 1784900@bugs.launchpad.net
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Le 02/08/2018 à 16:17, Stefan Markovic a écrit :
-> From: Aleksandar Rikalo <arikalo@wavecomp.com>
-> 
-> Add support for nanomips[eb] variant in scripts/qemu-binfmt-conf.sh.
-> 
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-> ---
->  scripts/qemu-binfmt-conf.sh | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-> index b0dc8a7..ecde0c2 100755
-> --- a/scripts/qemu-binfmt-conf.sh
-> +++ b/scripts/qemu-binfmt-conf.sh
-> @@ -2,7 +2,7 @@
->  # Enable automatic program execution by the kernel.
->  
->  qemu_target_list="i386 i486 alpha arm armeb sparc32plus ppc ppc64 ppc64le m68k \
-> -mips mipsel mipsn32 mipsn32el mips64 mips64el \
-> +mips mipsel mipsn32 mipsn32el mips64 mips64el nanomips nanomipseb \
->  sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb \
->  microblaze microblazeel or1k"
->  
-> @@ -76,6 +76,14 @@ mips64el_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\
->  mips64el_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
->  mips64el_family=mips
->  
-> +nanomips_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf9\x00'
-> +nanomips_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
-> +nanomips_family=mips
-> +
-> +nanomipseb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf9'
-> +nanomipseb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
-> +nanomipseb_family=mips
-
-The goal of the family value is not to register the interpreter if the
-kernel can execute the executable directly (without qemu).
-For instance a ppc64 kernel can execute a ppc executable, an x86_64
-kernel can execute a i386 binary.
-
-If you put nanomips in the mips family it means a mips kernel can
-execute directly a nanomips executable: Is that the case?
-If not, I think you can use "nanomips_family=nanomips", and if a
-nanomips kernel cannot execute a nanomipseb executable, you need also a
-nanomipseb family.
-
-Thanks,
-Laurent
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MzMyMTE1MDM3OS4yODU3Mi40NzcxNjc5ODYxODY0NDA5NDE3Lm1hbG9uZUBj
+aGFlbm9tZWxlcy5jYW5vbmljYWwuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbQnVnIDE3ODQ5
+MDBdIFJlOiBRRU1VIChmcm9udGVuZCkgY3Jhc2hlcyB1cG9uIHdhcm0gcmVib290IHdpdGggdmly
+dGlvLWdwdSBkZXZpY2UgYW5kIHZnYT03NzUgb24gTGludXggY21kbGluZQoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cg
+LS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0
+IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
+bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
+cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
+Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
+ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
+IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
+ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
+bXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTMzMjExNTAzNzkuMjg1NzIu
+NDc3MTY3OTg2MTg2NDQwOTQxNy5tYWxvbmVAY2hhZW5vbWVsZXMuY2Fub25pY2FsLmNvbSAtPiBw
+YXRjaGV3LzE1MzMyMTE1MDM3OS4yODU3Mi40NzcxNjc5ODYxODY0NDA5NDE3Lm1hbG9uZUBjaGFl
+bm9tZWxlcy5jYW5vbmljYWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMWEz
+NjZmZDQwNSBRRU1VIChmcm9udGVuZCkgY3Jhc2hlcyB1cG9uIHdhcm0gcmVib290IHdpdGggdmly
+dGlvLWdwdSBkZXZpY2UgYW5kIHZnYT03NzUgb24gTGludXggY21kbGluZQoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBRRU1VIChmcm9udGVuZCkgY3Jhc2hlcyB1cG9u
+IHdhcm0gcmVib290IHdpdGggdmlydGlvLWdwdSBkZXZpY2UgYW5kIHZnYT03NzUgb24gTGludXgg
+Y21kbGluZS4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzMyOiBGSUxFOiBody9k
+aXNwbGF5L3ZnYS5jOjE1NzE6CisgICAgZnByaW50ZihzdGRlcnIsICIlcCB2cyAlcCAgIHNoYXJl
+X3N1cmZhY2U6ICVkICAgc3VyZmFjZTogJXBcbiIsIHN1cmZhY2VfZGF0YShzdXJmYWNlKSwgcy0+
+dnJhbV9wdHIgKyAocy0+c3RhcnRfYWRkciAqIDQpLCBzaGFyZV9zdXJmYWNlLCBzdXJmYWNlKTsK
+CkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAyIGVycm9ycywg
+MCB3YXJuaW5ncywgMjYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
