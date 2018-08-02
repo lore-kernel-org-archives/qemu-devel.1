@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEnK-000446-Mn
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:41:39 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEng-0004Vl-7h
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:42:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEnI-0004GJ-Sb
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:41:38 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:53112 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEnd-0004MG-5E
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:42:00 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:54125 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1flEnI-0004G0-G5
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:41:36 -0400
+	id 1flEnc-0004Lw-TE
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:41:57 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu,  2 Aug 2018 16:16:51 +0200
-Message-Id: <1533219424-7627-65-git-send-email-stefan.markovic@rt-rk.com>
+Date: Thu,  2 Aug 2018 16:16:52 +0200
+Message-Id: <1533219424-7627-66-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 64/77] linux-user: Update syscall_defs.h
- header for nanoMIPS
+Subject: [Qemu-devel] [PATCH v6 65/77] linux-user: Add target_fcntl.h header
+ for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,139 +28,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Update constants and structures related to linux user syscall support
-in nanoMIPS.
+Add fcntl-related constants and structures for nanoMIPS.
 
 Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/syscall_defs.h | 57 ++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 52 insertions(+), 5 deletions(-)
+ linux-user/nanomips/target_fcntl.h | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+ create mode 100644 linux-user/nanomips/target_fcntl.h
 
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 40bb60e..abf94b8 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -374,7 +374,7 @@ struct target_dirent64 {
- #define TARGET_SIG_IGN	((abi_long)1)	/* ignore signal */
- #define TARGET_SIG_ERR	((abi_long)-1)	/* error return from signal */
- 
--#ifdef TARGET_MIPS
-+#if defined(TARGET_MIPS) && !defined(TARGET_NANOMIPS)
- #define TARGET_NSIG	   128
- #else
- #define TARGET_NSIG	   64
-@@ -445,7 +445,7 @@ struct target_sigaction {
-     target_sigset_t sa_mask;
-     abi_ulong sa_restorer;
- };
--#elif defined(TARGET_MIPS)
-+#elif defined(TARGET_MIPS) && !defined(TARGET_NANOMIPS)
- struct target_sigaction {
- 	uint32_t	sa_flags;
- #if defined(TARGET_ABI_MIPSN32)
-@@ -459,6 +459,14 @@ struct target_sigaction {
-         abi_ulong sa_restorer;
- #endif
- };
-+#elif defined(TARGET_NANOMIPS)
-+struct target_sigaction {
-+    abi_ulong _sa_handler;
-+    abi_uint sa_flags;
-+    target_sigset_t sa_mask;
-+    abi_ulong sa_restorer;
-+};
+diff --git a/linux-user/nanomips/target_fcntl.h b/linux-user/nanomips/target_fcntl.h
+new file mode 100644
+index 0000000..4203825
+--- /dev/null
++++ b/linux-user/nanomips/target_fcntl.h
+@@ -0,0 +1,38 @@
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation, or (at your option) any
++ * later version. See the COPYING file in the top-level directory.
++ */
 +
- #else
- struct target_old_sigaction {
-         abi_ulong _sa_handler;
-@@ -537,7 +545,7 @@ typedef struct {
- #define QEMU_SI_RT 5
- 
- typedef struct target_siginfo {
--#ifdef TARGET_MIPS
-+#if defined(TARGET_MIPS) && !defined(TARGET_NANOMIPS)
- 	int si_signo;
- 	int si_code;
- 	int si_errno;
-@@ -665,13 +673,16 @@ struct target_rlimit {
- 
- #if defined(TARGET_ALPHA)
- #define TARGET_RLIM_INFINITY	0x7fffffffffffffffull
--#elif defined(TARGET_MIPS) || (defined(TARGET_SPARC) && TARGET_ABI_BITS == 32)
-+#elif (defined(TARGET_MIPS) && !defined(TARGET_NANOMIPS)) \
-+      || (defined(TARGET_SPARC) && TARGET_ABI_BITS == 32)
- #define TARGET_RLIM_INFINITY	0x7fffffffUL
-+#elif defined(TARGET_NANOMIPS)
-+#define TARGET_RLIM_INFINITY    0x76ffeec4UL
- #else
- #define TARGET_RLIM_INFINITY	((abi_ulong)-1)
- #endif
- 
--#if defined(TARGET_MIPS)
-+#if defined(TARGET_MIPS) && !defined(TARGET_NANOMIPS)
- #define TARGET_RLIMIT_CPU		0
- #define TARGET_RLIMIT_FSIZE		1
- #define TARGET_RLIMIT_DATA		2
-@@ -687,6 +698,22 @@ struct target_rlimit {
- #define TARGET_RLIMIT_MSGQUEUE		12
- #define TARGET_RLIMIT_NICE		13
- #define TARGET_RLIMIT_RTPRIO		14
-+#elif defined(TARGET_NANOMIPS)
-+#define TARGET_RLIMIT_CPU               0
-+#define TARGET_RLIMIT_FSIZE             1
-+#define TARGET_RLIMIT_DATA              2
-+#define TARGET_RLIMIT_STACK             3
-+#define TARGET_RLIMIT_CORE              4
-+#define TARGET_RLIMIT_RSS               5
-+#define TARGET_RLIMIT_NPROC             6
-+#define TARGET_RLIMIT_NOFILE            7
-+#define TARGET_RLIMIT_MEMLOCK           8
-+#define TARGET_RLIMIT_AS                9
-+#define TARGET_RLIMIT_LOCKS             10
-+#define TARGET_RLIMIT_SIGPENDING        11
-+#define TARGET_RLIMIT_MSGQUEUE          12
-+#define TARGET_RLIMIT_NICE              13
-+#define TARGET_RLIMIT_RTPRIO            14
- #else
- #define TARGET_RLIMIT_CPU		0
- #define TARGET_RLIMIT_FSIZE		1
-@@ -1657,6 +1684,10 @@ struct target_stat64 {
- 	int64_t  	st_blocks;
- };
- 
-+#elif defined(TARGET_ABI_MIPSP32)
++#ifndef NANOMIPS_TARGET_FCNTL_H
++#define NANOMIPS_TARGET_FCNTL_H
 +
-+/* No struct stat and struct stat64 structures */
++#define TARGET_O_APPEND         0x000400
++#define TARGET_O_DSYNC          0x001000
++#define TARGET_O_NONBLOCK       0x000800
++#define TARGET_O_CREAT          0x000040
++#define TARGET_O_TRUNC          0x000200
++#define TARGET_O_EXCL           0x000080
++#define TARGET_O_NOCTTY         0x000100
++#define TARGET_FASYNC           0x002000
++#define TARGET_O_LARGEFILE      0x008000
++#define TARGET___O_SYNC         0x101000
++#define TARGET_O_DIRECT         0x004000
++#define TARGET_O_CLOEXEC        0x080000
 +
- #elif defined(TARGET_ALPHA)
- 
- struct target_stat {
-@@ -2009,6 +2040,22 @@ struct target_statfs {
- 	int32_t			f_flags;
- 	int32_t			f_spare[5];
- };
-+#elif defined(TARGET_ABI_MIPSP32)
-+struct target_statfs {
-+    abi_long    f_type;
-+    abi_long    f_bsize;
-+    abi_long    f_blocks;
-+    abi_long    f_bfree;
-+    abi_long    f_bavail;
-+    abi_long    f_files;
-+    abi_long    f_ffree;
++#define TARGET_F_GETLK         5
++#define TARGET_F_SETLK         6
++#define TARGET_F_SETLKW        7
++#define TARGET_F_SETOWN        8       /*  for sockets. */
++#define TARGET_F_GETOWN        9       /*  for sockets. */
 +
-+    /* Linux specials */
-+    target_fsid_t f_fsid;
-+    abi_long    f_namelen;
-+    abi_llong   f_frsize;   /* Fragment size - unsupported */
-+    abi_long    f_spare[6];
-+};
- #else
- struct target_statfs {
- 	abi_long		f_type;
++#define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
++#define TARGET_ARCH_FLOCK64_PAD
++
++#define TARGET_F_GETLK64       12      /*  using 'struct flock64' */
++#define TARGET_F_SETLK64       13
++#define TARGET_F_SETLKW64      14
++
++#include "../generic/fcntl.h"
++#endif
 -- 
 1.9.1
