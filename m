@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fl7f0-00050m-AM
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:04:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fl7iu-0006Xs-I9
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:08:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fl7ey-0001I0-UQ
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:04:34 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:47653)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fl7ey-00011C-3h
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:04:32 -0400
-Date: Thu, 2 Aug 2018 14:08:30 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fl7it-0005Rd-Cx
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:08:36 -0400
+Date: Thu, 2 Aug 2018 17:08:24 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180802040830.GB11211@umbus.fritz.box>
-References: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
-	<20180727052724.GJ3694@umbus.fritz.box>
-	<20180727095452.45edee8b@bahia>
-	<20180730055715.GD2708@umbus.fritz.box>
-	<20180730104145.109ef196@bahia.lan>
-	<20180731032559.GH2708@umbus.fritz.box>
-	<20180801152430.3f1c5cee@bahia.lan>
+Message-ID: <20180802070824.GC11211@umbus.fritz.box>
+References: <20180801035357.7804-1-david@gibson.dropbear.id.au>
+	<CAFEAcA-FitsqU3kQJTFGSFgOh6Zsf2Zy2fO3OTnL5c+Tzi5pog@mail.gmail.com>
+	<alpine.BSF.2.21.1808011300070.7488@zero.eik.bme.hu>
+	<CAFEAcA-=c7O+h3c-gQ=31q0oyLzJhDNmEBzv4X2Yp_TBfYhC-w@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="GID0FwUMdk1T2AWN"
+	protocol="application/pgp-signature"; boundary="+nBD6E3TurpgldQp"
 Content-Disposition: inline
-In-Reply-To: <20180801152430.3f1c5cee@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH for-3.1] tests/cpu-plug-test: check CPU
- hotplug on ppc64 with KVM
+In-Reply-To: <CAFEAcA-=c7O+h3c-gQ=31q0oyLzJhDNmEBzv4X2Yp_TBfYhC-w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 0/2] ppc-for-3.0 queue 20180801
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,89 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
 
 
---GID0FwUMdk1T2AWN
+--+nBD6E3TurpgldQp
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 01, 2018 at 03:24:30PM +0200, Greg Kurz wrote:
-> On Tue, 31 Jul 2018 13:25:59 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
-> [...]
-> > >=20
-> > > The CPU hotplug test doesn't seem to do anything on the guest side: it
-> > > just checks that 'device_add' returns a response that isn't an
-> > > error. =20
-> >=20
-> > Right, which makes this ill suited to being a qtest test.  The whole
-> > point of qtest is making it easier to test qemu peripherals without
-> > having to have specific test code within the guest, by essentially
-> > replacing the guest's cpu with a stub controlled by the test harness.
-> > That's what the qtest accel is all about.
-> >=20
+On Wed, Aug 01, 2018 at 02:04:04PM +0100, Peter Maydell wrote:
+> On 1 August 2018 at 12:24, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> > On Wed, 1 Aug 2018, Peter Maydell wrote:
+> >> So, we've just put out rc3, which in an ideal world is our
+> >> final release candidate for 3.0. Are these bugs regressions from
+> >> 2.12 ?
+> >
+> >
+> > I don't know about the macio one but the sam460ex PCI interrupts were b=
+roken
+> > in 2.12 too. However it's a fix for a device only used in sam460ex whic=
+h is
+> > now fixed by this patch so including it is not high risk for breaking
+> > anything else than sam460ex which is known to be not finished yet so I =
+would
+> > not worry too much. But which is better? Releasing 3.0 with a known bug=
+ or
+> > including this fix without an rc4?
 >=20
-> I agree with what a qtest test should be, but cpu-plug-test doesn't
-> do anything like that obviously, ie, the guest CPU does nothing at
-> all. Only the hotplug path of the QEMU device model that don't need
-> the guest to run is tested here.
-
-Right, so I'm suggesting this be changed to a non-qtest test.  Those
-are fine to have -machine accel=3Dkvm:tcg.  Of course that doesn't
-prevent later adding a more detailed cpu hotplug qtest that *does* do
-actions on the guest side.
-
-> The more general issue is that paths guarded with kvm_enabled() cannot
-> be tested with a genuine qtest test. That's really unfortunate since
-> these paths are sometimes the one that are mostly used on the field,
-> eg, in-kernel XICS versus emulated XICS.
-
-It makes sense in the context of what qtests are for.  They're
-designed to test the emulated peripherals in isolation from the core
-emulation (whether that's via tcg or kvm).
-
-> > I think it's confusing to have a test which tries things with both
-> > qtest and kvm accelerators.  Looking like a qtest test, people might
-> > reasonably think they can extend/refine the test to check behaviour
-> > when the guest does respond to the hotplug events.  But such an
-> > extension won't work with the kvm accel, because the qtest code used
-> > to simulate that guest response won't have any effect with kvm.
-> >=20
+> The problem with continuing to delay 3.0 while we have known bugs
+> is that bugs generally come in at an even rate, so we *always*
+> have known bugs, and so "we found another bug, let's delay 3.0
+> again to put in a fix for it" is a recipe for never doing a release.
+> That's why we gradually wind up the bar for "should this go in",
+> from "any bug" to "regressions" to "really really serious showstopper
+> regressions".
 >=20
-> If the motivation is to let the test be a true qtest in case someone
-> wants to emulate some guest behavior, I agree the kvm change is wrong.
->=20
-> > > I'm not aware that the guest is expected to have a specific behavior
-> > > during 'device_add', apart from not crashing or hanging. That was the
-> > > initial idea behind passing '-S' to ensure the guest doesn't run. =20
-> >=20
-> > Note that with qtest (or -S) we don't even test that minimal
-> > condition.  We only test that *qemu* doesn't crash - it could fatally
-> > compromise the guest and the test would never know.
-> >=20
->=20
-> True.
->=20
-> > > Your remark seems to be more general though... are you meaning that
-> > > doing something like qtest_start("-machine accel=3Dkvm:tcg") is just
-> > > wrong ? =20
-> >=20
-> > Pretty much, yes.  A non-qtest test which does that is reasonable, but
-> > not a qtest test.
-> >=20
->=20
-> So, instead of hijacking the current qtest, we may add a non-qtest test
-> that would start QEMU with "-machine accel=3Dkvm:tcg -S". This would allow
-> at least to test that QEMU doesn't crash right away. And, as suggested
-> by Thomas, the coverage could include SLOF as well if we don't pass -S.
-> But I would need to understand why SLOF sometimes hits a 0x700 when
-> running cpu-plug-test with this patch applied...
+> We never do a final release without a last rc (it is too risky),
+> so that is not an option.
 
-Yup.
+Ugh, sorry about this.  I made an off-by-one error in my mental
+calculation of whether it would be ok to include non-regression
+bugfixes aet this point.  Also, I originally meant to send this before
+the last -rc, but stuff happened.
 
+So, the sam460 fix is, indeed, not a regression and I'm happy to punt
+it to 3.1.
+
+The macio fix, however, *is* a regression from 2.12.  Whether it's
+severe enough to warrant another -rc, I'm not sure.  It is a bad
+pointer access which is, well, bad.  It doesn't seem to bite
+obviously, needing valgrind to pick it up, but possibly that's just
+luck.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -124,24 +85,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---GID0FwUMdk1T2AWN
+--+nBD6E3TurpgldQp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltig74ACgkQbDjKyiDZ
-s5I15w//WRkV9UAyliXvKZ7todRYPh94yHGFKf0ZQrDhV4N2Tk1KsQM/AuP/1dDV
-q6uEABCimj5VZ1ETgHk/69yF8JqP0FIr7VilWiZHybyI1bNMQSg14Yglzvdhk75v
-shWXNtNaSz1jzDZdONSqRH5K7PgVsq0ntq2R/b4iuBf+ywm99IrOmvxwkM+VwBwy
-mBPC2+JeSDah3Zad8OQMdqJhDnJdh5J4EB+4Fv1MEevxyPfKx0pLhEczMWeFepwH
-cJ45/Tc/Uqdp03l/eFYNbuG1UJJ20WBLxtlHBIooNDdIp5dGPHMX+3OHQY1tzhIE
-TtVOAJb13HinSVvERwtjPbXPNUTcOO1RRpORcjZHx4xJhwOKb0Du2cSy7mf3v8U9
-0HdA3lQ1av3LeiGGF4OmFzFGyWLa3SQAzBPSJcxYV5n4gmP8CI9V5E6vuiIjGFiH
-VFrVhymOOTV/YCmjzIbL5xrZ1Mz8Bjuk1TxiXOnBiiJCFHhsPgi/zVcRdX8/pEaU
-xRF1H4IvwlKxaCszbVCzbSP0KOXo1u7B3JEupChCxqlX+gQJyYslwCBjh2d1Kwz6
-7zU4lXCvybWUUTcAmxTmqr9e5Lo6P/DCe6jHnKfAO6Q7WgTJZ1ik3NXSN5vyswk6
-x6LG/sotZtsyMn3fpdIH8tF2cv4UNho46/Uso/zz2ktC7AoN+Gc=
-=s0M7
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltireYACgkQbDjKyiDZ
+s5LiHRAAi3AImBIJMJrCILuHcjFrgaPcyUnOSLl98YZti/8Qcb0wyoCZHthXeVVp
+WUhdNM1sQviIr1xZPd0NRXIVYc+TWLXOwPpoaBjlSOYoM0EfifNcWZil8qmuR6jo
+HrS1YC61y2KyAWr5qWDe08WFNXqm19p+LrdjwUUSTvg9v46Bd2zpsuggvFaaXztk
+YoGRotxzfu3ERFtPUFJOViICoK6xP9AYEfaehGKuEdmJVgoyRT3tE3SZEnMHmFpw
+o6e0PzRHoaGV8F8ZbfoquK9qrx8wBDJgSBXLLlhIkKyqJYAL1KF+SvbkPslU8IY2
+9046tFVyU8ASyZ9YgoVTf9m4HX2YrtsXArkfc5kPFFGH1EvuI+QOzUHmWlZT35l2
+HnUtpHBUzoH3KTVBkLH2syX96Og+Qlkv1rxOZna9rA3lntwx4LXTD0sT2BmSIQZe
+ZCWM2XuGA9BkP23CjA6vr7DLm572RZwGI1daEd+gfIizwNSoOw3uTg2axntbEU+z
+Ij+zwzJtNLZYl5z7gK5KV2p9HCRuoQ7hJhViG+1F0geRIj6n7pw0RmkKHbmxdC1+
+hQodKbyBrm8WVFCUUbTjmOW8ONUjbk3Q3Z6OYRYCoJfC8rjTTk3E7uASSvjv8qz6
+lWbOdiEtTbKCa+Gxpk8ut7Kp0ScurII7IyDkjoVvji91guXjyHs=
+=oYvu
 -----END PGP SIGNATURE-----
 
---GID0FwUMdk1T2AWN--
+--+nBD6E3TurpgldQp--
