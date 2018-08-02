@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1flGGR-0006ot-I7
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:15:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1flGLT-0008Ky-UN
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:21:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1flGGQ-0003qB-Fu
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:15:47 -0400
-Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:42329)
+	(envelope-from <bounces@canonical.com>) id 1flGLP-0006AQ-Ru
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:20:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35592)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1flGGQ-0003pw-9e
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:15:46 -0400
-Received: by mail-ua0-x243.google.com with SMTP id w7-v6so1829320uan.9
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 09:15:46 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180802155147.1863-1-peter.maydell@linaro.org>
-	<20180802155147.1863-2-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c499af1e-c0fd-1e54-6732-237330801b4d@amsat.org>
-Date: Thu, 2 Aug 2018 13:15:31 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1flGLP-00067u-KN
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:20:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1flGLM-0005kW-IY
+	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 16:20:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8B0C82E80CD
+	for <qemu-devel@nongnu.org>; Thu,  2 Aug 2018 16:20:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180802155147.1863-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw/display/vga-isa-mm: Convert away
- from old_mmio
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 02 Aug 2018 16:06:37 -0000
+From: Stefan Berger <1784900@bugs.launchpad.net>
+Reply-To: Bug 1784900 <1784900@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153314156256.17371.7866837258800403867.malonedeb@soybean.canonical.com>
+Message-Id: <153322599766.28919.17028027304649587418.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1784900] Re: QEMU (frontend) crashes upon warm
+ reboot with virtio-gpu device and vga=775 on Linux cmdline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,104 +37,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Gerd Hoffmann <kraxel@redhat.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, patches@linaro.org
+To: qemu-devel@nongnu.org
 
-On 08/02/2018 12:51 PM, Peter Maydell wrote:
-> Convert the vga-isa-mm device away from the old_mmio
-> MemoryRegion accessors.
-> 
-> This device is only used by the MIPS 'jazz' boards
-> "magnum" and "pica61".
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On my system vga_draw_graphic is called with a surface_width(surface) =3D
+1280, the next time surface_width(surface) =3D 1024, and then the next
+time again with surface_width(surface) =3D 1280. So it's a quick
+resolution change. Each time the surface pointer changes as well as
+surface_width(surface) and surface_data(surface). Do NOT try to access
+the s->last_surface with surface_data(s->last_surface) -- it likely has
+been freed already.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+So my guess is we could add (a subset of) checks like this one here:
 
-> ---
->  hw/display/vga-isa-mm.c | 60 +++++++++--------------------------------
->  1 file changed, 13 insertions(+), 47 deletions(-)
-> 
-> diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
-> index 232216cad0a..215e6497190 100644
-> --- a/hw/display/vga-isa-mm.c
-> +++ b/hw/display/vga-isa-mm.c
-> @@ -36,64 +36,30 @@ typedef struct ISAVGAMMState {
->  } ISAVGAMMState;
->  
->  /* Memory mapped interface */
-> -static uint32_t vga_mm_readb (void *opaque, hwaddr addr)
-> +static uint64_t vga_mm_read(void *opaque, hwaddr addr, unsigned size)
->  {
->      ISAVGAMMState *s = opaque;
->  
-> -    return vga_ioport_read(&s->vga, addr >> s->it_shift) & 0xff;
-> +    return vga_ioport_read(&s->vga, addr >> s->it_shift) &
-> +        MAKE_64BIT_MASK(0, size * 8);
->  }
->  
-> -static void vga_mm_writeb (void *opaque,
-> -                           hwaddr addr, uint32_t value)
-> +static void vga_mm_write(void *opaque, hwaddr addr, uint64_t value,
-> +                         unsigned size)
->  {
->      ISAVGAMMState *s = opaque;
->  
-> -    vga_ioport_write(&s->vga, addr >> s->it_shift, value & 0xff);
-> -}
-> -
-> -static uint32_t vga_mm_readw (void *opaque, hwaddr addr)
-> -{
-> -    ISAVGAMMState *s = opaque;
-> -
-> -    return vga_ioport_read(&s->vga, addr >> s->it_shift) & 0xffff;
-> -}
-> -
-> -static void vga_mm_writew (void *opaque,
-> -                           hwaddr addr, uint32_t value)
-> -{
-> -    ISAVGAMMState *s = opaque;
-> -
-> -    vga_ioport_write(&s->vga, addr >> s->it_shift, value & 0xffff);
-> -}
-> -
-> -static uint32_t vga_mm_readl (void *opaque, hwaddr addr)
-> -{
-> -    ISAVGAMMState *s = opaque;
-> -
-> -    return vga_ioport_read(&s->vga, addr >> s->it_shift);
-> -}
-> -
-> -static void vga_mm_writel (void *opaque,
-> -                           hwaddr addr, uint32_t value)
-> -{
-> -    ISAVGAMMState *s = opaque;
-> -
-> -    vga_ioport_write(&s->vga, addr >> s->it_shift, value);
-> +    vga_ioport_write(&s->vga, addr >> s->it_shift,
-> +                     value & MAKE_64BIT_MASK(0, size * 8));
->  }
->  
->  static const MemoryRegionOps vga_mm_ctrl_ops = {
-> -    .old_mmio = {
-> -        .read = {
-> -            vga_mm_readb,
-> -            vga_mm_readw,
-> -            vga_mm_readl,
-> -        },
-> -        .write = {
-> -            vga_mm_writeb,
-> -            vga_mm_writew,
-> -            vga_mm_writel,
-> -        },
-> -    },
-> +    .read = vga_mm_read,
-> +    .write = vga_mm_write,
-> +    .valid.min_access_size = 1,
-> +    .valid.max_access_size = 4,
-> +    .impl.min_access_size = 1,
-> +    .impl.max_access_size = 4,
->      .endianness = DEVICE_NATIVE_ENDIAN,
->  };
->  
-> 
+if (s->last_surface !=3D surface ||
+    s->last_surface_width !=3D surface_width(surface) ||
+    s->last_surface_height !=3D surface_height(surface) ||
+    s->last_surface_data !=3D surface_data(surface)) {
+
+    s->last_surface =3D surface;
+    s->last_surface_width =3D surface_width(surface);
+    ...
+    full_update =3D 1;
+}
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1784900
+
+Title:
+  QEMU (frontend) crashes upon warm reboot with virtio-gpu device and
+  vga=3D775 on Linux cmdline
+
+Status in QEMU:
+  New
+
+Bug description:
+  With vga=3D775 on the Linux command line a first boot of the VM running
+  Linux works fine. After a warm reboot it crashes during Linux boot.
+  The VM was used remotely via virt-manager and VNC.
+
+  Bisecting the code lead to the following patch that introduced the
+  bug:
+
+  commit 1fccd7c5a9a722a9cbf1bc91693f4618034f01ac (HEAD, refs/bisect/bad)
+  Author: Gerd Hoffmann <kraxel@redhat.com>
+  Date:   Mon Jul 2 18:24:43 2018 +0200
+
+      virtio-gpu: disable scanout when backing resource is destroyed
+
+      Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+      Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+      Message-id: 20180702162443.16796-4-kraxel@redhat.com
+
+  diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+  index 336dc59007..08cd567218 100644
+  --- a/hw/display/virtio-gpu.c
+  +++ b/hw/display/virtio-gpu.c
+  @@ -430,6 +430,16 @@ static void virtio_gpu_disable_scanout(VirtIOGPU *g,=
+ int scanout_id)
+   static void virtio_gpu_resource_destroy(VirtIOGPU *g,
+                                           struct virtio_gpu_simple_resourc=
+e *res)
+   {
+  +    int i;
+  +
+  +    if (res->scanout_bitmask) {
+  +        for (i =3D 0; i < g->conf.max_outputs; i++) {
+  +            if (res->scanout_bitmask & (1 << i)) {
+  +                virtio_gpu_disable_scanout(g, i);
+  +            }
+  +        }
+  +    }
+  +
+       pixman_image_unref(res->image);
+       virtio_gpu_cleanup_mapping(res);
+       QTAILQ_REMOVE(&g->reslist, res, next);
+
+  =
+
+  Reported backtraces can be found here:  https://paste.fedoraproject.org/p=
+aste/OUDEfCk1IY7xiy0I0PDlkw
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1784900/+subscriptions
