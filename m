@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frankja@linux.ibm.com>) id 1fl7cj-0003in-Bo
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:02:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1fl7cg-0003il-Qf
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:02:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frankja@linux.ibm.com>) id 1fl7ch-0005dW-3k
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:02:13 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51598
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
-	id 1fl7cg-0005cD-Tb
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:02:11 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w726wc6t108919
-	for <qemu-devel@nongnu.org>; Thu, 2 Aug 2018 03:02:09 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2kksh6fpru-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 03:02:09 -0400
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
-	Thu, 2 Aug 2018 08:02:07 +0100
-From: Janosch Frank <frankja@linux.ibm.com>
-Date: Thu,  2 Aug 2018 08:02:01 +0100
-In-Reply-To: <20180801131905.148778-3-frankja@linux.ibm.com>
-References: <20180801131905.148778-3-frankja@linux.ibm.com>
-Message-Id: <20180802070201.257406-1-frankja@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v5] s390x: Enable KVM huge page backing support
+	(envelope-from <thuth@redhat.com>) id 1fl7cd-0005XB-JW
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:02:10 -0400
+References: <20180801131905.148778-1-frankja@linux.ibm.com>
+	<20180801131905.148778-3-frankja@linux.ibm.com>
+	<2da970ab-276f-f792-54d8-c696e899cac5@redhat.com>
+	<1889220a-b804-23a2-26ef-1a319da01d26@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <99fae744-4f55-7ffd-56b7-1cc2796269de@redhat.com>
+Date: Thu, 2 Aug 2018 09:01:52 +0200
+MIME-Version: 1.0
+In-Reply-To: <1889220a-b804-23a2-26ef-1a319da01d26@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="Xkt2FILYJa02993vSH9Vvgl3P5gSGRI6e"
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 2/2] s390x: Enable KVM huge
+ page backing support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,98 +27,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com, qemu-s390x@nongnu.org
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
 
-QEMU has had huge page support for a longer time already, but KVM
-memory management under s390x needed some changes to work with huge
-backings.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Xkt2FILYJa02993vSH9Vvgl3P5gSGRI6e
+From: Thomas Huth <thuth@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
+ david@redhat.com
+Message-ID: <99fae744-4f55-7ffd-56b7-1cc2796269de@redhat.com>
+Subject: Re: [qemu-s390x] [PATCH v4 2/2] s390x: Enable KVM huge page backing
+ support
+References: <20180801131905.148778-1-frankja@linux.ibm.com>
+ <20180801131905.148778-3-frankja@linux.ibm.com>
+ <2da970ab-276f-f792-54d8-c696e899cac5@redhat.com>
+ <1889220a-b804-23a2-26ef-1a319da01d26@linux.ibm.com>
+In-Reply-To: <1889220a-b804-23a2-26ef-1a319da01d26@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Now that we have support, let's enable it if requested and
-available. Otherwise we now properly tell the user if there is no
-support and back out instead of failing to run the VM later on.
+On 08/02/2018 08:53 AM, Janosch Frank wrote:
+> On 01.08.2018 18:47, Thomas Huth wrote:
+>> On 08/01/2018 03:19 PM, Janosch Frank wrote:
+>>> +static int kvm_s390_configure_mempath_backing(KVMState *s)
+>>> +{
+>>> +    size_t path_psize =3D qemu_mempath_getpagesize(mem_path);
+>>> +
+>>> +    if (path_psize =3D=3D 4 * KiB)
+>>> +        return 0;
+>>
+>> Missing curly braces.
+>=20
+> urgh, right, this is not the kernel.
+>=20
+>>
+>>> +    if (path_psize !=3D 1 * MiB) {
+>>> +        error_report("Memory backing with 2G pages was specified, "
+>>> +                     "but KVM does not support this memory backing")=
+;
+>>
+>> May I suggest to use a text that rather matches the condition of the
+>> if-statement (just in case there will be other sizes in the future...)=
+,
+>> e.g. "Memory backing is only supported for 1 MiB huge pages" or
+>> something similar.
+>>
+>>  Thomas
+>>
+>=20
+> That's actually the gist of it. s390 supports 4k, 1M and 2G and looking=
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
----
+> at the POP I don't see a big chance of having any more sizes, as there
+> are not a lot of software bits left and adding support in OSs is a pain=
+=2E
+> Also don't hold your breath for 2G, it would need a rewrite of gmap.c.
 
-Now featuring all of the required braces.
+Well, never say never ... but if you want to keep the current text,
+that's fine for me, too.
 
----
- target/s390x/kvm.c | 35 +++++++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
+ Thomas
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index d923cf4240..8ba948c324 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -34,6 +34,8 @@
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/timer.h"
-+#include "qemu/units.h"
-+#include "qemu/mmap-alloc.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/hw_accel.h"
- #include "hw/hw.h"
-@@ -139,6 +141,7 @@ static int cap_mem_op;
- static int cap_s390_irq;
- static int cap_ri;
- static int cap_gs;
-+static int cap_hpage_1m;
- 
- static int active_cmma;
- 
-@@ -220,9 +223,9 @@ static void kvm_s390_enable_cmma(void)
-         .attr = KVM_S390_VM_MEM_ENABLE_CMMA,
-     };
- 
--    if (mem_path) {
-+    if (cap_hpage_1m) {
-         warn_report("CMM will not be enabled because it is not "
--                    "compatible with hugetlbfs.");
-+                    "compatible with huge memory backings.");
-         return;
-     }
-     rc = kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
-@@ -281,10 +284,38 @@ void kvm_s390_crypto_reset(void)
-     }
- }
- 
-+static int kvm_s390_configure_mempath_backing(KVMState *s)
-+{
-+    size_t path_psize = qemu_mempath_getpagesize(mem_path);
-+
-+    if (path_psize == 4 * KiB) {
-+        return 0;
-+    }
-+
-+    if (path_psize != 1 * MiB) {
-+        error_report("Memory backing with 2G pages was specified, "
-+                     "but KVM does not support this memory backing");
-+        return -EINVAL;
-+    }
-+
-+    if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
-+        error_report("Memory backing with 1M pages was specified, "
-+                     "but KVM does not support this memory backing");
-+        return -EINVAL;
-+    }
-+
-+    cap_hpage_1m = 1;
-+    return 0;
-+}
-+
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
- 
-+    if (mem_path && kvm_s390_configure_mempath_backing(s)) {
-+        return -EINVAL;
-+    }
-+
-     mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
-     cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
-     cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
--- 
-2.14.3
+
+--Xkt2FILYJa02993vSH9Vvgl3P5gSGRI6e
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJbYqxnAAoJEC7Z13T+cC21Ui8QAIDiQPalZ63qqY7p+DSgTXfu
+8DqxI9mBSXGyVjJikxmUrv+MOFhJ5rM36QD7IkbkUMVxWseTuf00jKsVVOoraj6o
+N5hTiAX3h/46AlMvhj96qPhAz6wbW7yIk8RgEt9mD3m9Bhy0K84SPMzv6/Qq9t1Z
+eh3uEKSom4G8nWFn7qbRVOsnNEOqolwjacQrmiV32E142+wd8REHrzS4/J6BP1Fw
+nMPn4KyXbRs/PVo1AGKkaxvcZchaBDONilCkDPqXpkqcsAfs+gDtValz//le/3vs
+c/OnmvyRu0WBxajlu786J7WrCxn983Mou9fSrNUm34LYsSZ1LJFtmhxvsHssijKZ
+L1VfzfA271R13jv6aGRHvK0tohJ1XgEDsCU17cxdDx9XIc92GtFxOemk59st/JlN
+V7uvsGR10lHPNG7IIRfgeRn5cPB+goWof4oL6J2M6Awd6dgGs5SDYGBlUzu41YRp
+bCeDJJQ26+SPzmOrvWdgebNAH5Vy+tT1Lb3x+HrAG0evi6iF3WxDDvxMZwH/9r5d
+vG28AOk9AkoupOpPnCBg10+BaOincI5/AjPsmz+w38H+kEPF0K1+nAJRpZFUKV5A
+Ch08NU4VoRRfT8fVgPvuPhLlv+wO/GRIng54Vw+/nzqRYmp4XgkqMlEbZFb+fMkw
+zP6AFC9DPLCMVOZkfC5w
+=qevV
+-----END PGP SIGNATURE-----
+
+--Xkt2FILYJa02993vSH9Vvgl3P5gSGRI6e--
