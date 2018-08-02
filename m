@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEZa-0008Rj-QY
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:27:30 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEa2-0000R8-9r
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:27:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEZW-0001mj-Sh
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:27:26 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:53894 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEZy-0002St-Bu
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:27:54 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:55065 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1flEZW-0001lG-Ks
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:27:22 -0400
+	id 1flEZx-0002Q9-Vk
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:27:50 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu,  2 Aug 2018 16:16:11 +0200
-Message-Id: <1533219424-7627-25-git-send-email-stefan.markovic@rt-rk.com>
+Date: Thu,  2 Aug 2018 16:16:12 +0200
+Message-Id: <1533219424-7627-26-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 24/77] target/mips: Add emulation of
- nanoMIPS 16-bit logic instructions
+Subject: [Qemu-devel] [PATCH v6 25/77] target/mips: Add emulation of
+ nanoMIPS 16-bit save and restore instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +28,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Matthew Fortune <matthew.fortune@mips.com>
 
-Add emulation of NOT16, AND16, XOR16, OR16 instructions.
+Add emulation of SAVE16 and RESTORE.JRC16 instructions. Routines
+gen_save(), gen_restore(), and gen_adjust_sp() are provided to support
+this feature.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ target/mips/translate.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index c78f3a1..78d17b9 100644
+index 78d17b9..0297354 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16520,6 +16520,27 @@ static inline int decode_gpr_gpr4_zero(int r)
+@@ -16520,6 +16520,62 @@ static inline int decode_gpr_gpr4_zero(int r)
  #define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
  
  
-+static void gen_pool16c_nanomips_insn(DisasContext *ctx)
++static void gen_adjust_sp(DisasContext *ctx, int u)
 +{
-+    int rt = decode_gpr_gpr3(NANOMIPS_EXTRACT_RD(ctx->opcode));
-+    int rs = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS(ctx->opcode));
-+
-+    switch (extract32(ctx->opcode, 2, 2)) {
-+    case NM_NOT16:
-+        gen_logic(ctx, OPC_NOR, rt, rs, 0);
-+        break;
-+    case NM_AND16:
-+        gen_logic(ctx, OPC_AND, rt, rt, rs);
-+        break;
-+    case NM_XOR16:
-+        gen_logic(ctx, OPC_XOR, rt, rt, rs);
-+        break;
-+    case NM_OR16:
-+        gen_logic(ctx, OPC_OR, rt, rt, rs);
-+        break;
-+    }
++    gen_op_addr_addi(ctx, cpu_gpr[29], cpu_gpr[29], u);
 +}
 +
- static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
++static void gen_save(DisasContext *ctx, uint8_t rt, uint8_t count,
++                     uint8_t gp, uint16_t u)
++{
++    int counter = 0;
++    TCGv va = tcg_temp_new();
++    TCGv t0 = tcg_temp_new();
++
++    while (counter != count) {
++        bool use_gp = gp && (counter == count - 1);
++        int this_rt = use_gp ? 28 : (rt & 0x10) | ((rt + counter) & 0x1f);
++        int this_offset = -((counter + 1) << 2);
++        gen_base_offset_addr(ctx, va, 29, this_offset);
++        gen_load_gpr(t0, this_rt);
++        tcg_gen_qemu_st_tl(t0, va, ctx->mem_idx,
++                           (MO_TEUL | ctx->default_tcg_memop_mask));
++        counter++;
++    }
++
++    /* adjust stack pointer */
++    gen_adjust_sp(ctx, -u);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(va);
++}
++
++static void gen_restore(DisasContext *ctx, uint8_t rt, uint8_t count,
++                        uint8_t gp, uint16_t u)
++{
++    int counter = 0;
++    TCGv va = tcg_temp_new();
++    TCGv t0 = tcg_temp_new();
++
++    while (counter != count) {
++        bool use_gp = gp && (counter == count - 1);
++        int this_rt = use_gp ? 28 : (rt & 0x10) | ((rt + counter) & 0x1f);
++        int this_offset = u - ((counter + 1) << 2);
++        gen_base_offset_addr(ctx, va, 29, this_offset);
++        tcg_gen_qemu_ld_tl(t0, va, ctx->mem_idx, MO_TESL |
++                        ctx->default_tcg_memop_mask);
++        tcg_gen_ext32s_tl(t0, t0);
++        gen_store_gpr(t0, this_rt);
++        counter++;
++    }
++
++    /* adjust stack pointer */
++    gen_adjust_sp(ctx, u);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(va);
++}
++
+ static void gen_pool16c_nanomips_insn(DisasContext *ctx)
  {
-     uint32_t op;
-@@ -16596,6 +16617,7 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-     case NM_P16C:
-         switch (ctx->opcode & 1) {
-         case NM_POOL16C_0:
-+            gen_pool16c_nanomips_insn(ctx);
-             break;
-         case NM_LWXS16:
-             gen_ldxs(ctx, rt, rs, rd);
-@@ -16670,6 +16692,12 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+     int rt = decode_gpr_gpr3(NANOMIPS_EXTRACT_RD(ctx->opcode));
+@@ -16839,6 +16895,21 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
          }
          break;
-     case NM_ANDI16:
+     case NM_P16_SR:
 +        {
-+            uint32_t u = extract32(ctx->opcode, 0, 4);
-+            u = (u == 12) ? 0xff :
-+                (u == 13) ? 0xffff : u;
-+            gen_logic_imm(ctx, OPC_ANDI, rt, rs, u);
++            int count = extract32(ctx->opcode, 0, 4);
++            int u = extract32(ctx->opcode, 4, 4) << 4;
++
++            rt = 30 + extract32(ctx->opcode, 9, 1);
++            switch (extract32(ctx->opcode, 8, 1)) {
++            case NM_SAVE16:
++                gen_save(ctx, rt, count, 0, u);
++                break;
++            case NM_RESTORE_JRC16:
++                gen_restore(ctx, rt, count, 0, u);
++                gen_compute_branch(ctx, OPC_JR, 2, 31, 0, 0, 0);
++                break;
++            }
 +        }
          break;
-     case NM_P16_LB:
-         switch (extract32(ctx->opcode, 2, 2)) {
+     case NM_MOVEP:
+         break;
 -- 
 1.9.1
