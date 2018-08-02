@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1flFnJ-0000M2-NA
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 11:45:42 -0400
+	(envelope-from <david@redhat.com>) id 1flFnc-0000Wb-Nl
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 11:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1flFnI-0004EA-NZ
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 11:45:41 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180802144430.13870-1-peter.maydell@linaro.org>
-	<20180802144430.13870-2-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <511b7c57-b182-43a0-44ce-e0e95cbbf5ca@amsat.org>
-Date: Thu, 2 Aug 2018 12:45:25 -0300
+	(envelope-from <david@redhat.com>) id 1flFnZ-0004Hx-JY
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 11:46:00 -0400
+References: <20180801131905.148778-3-frankja@linux.ibm.com>
+	<20180802070201.257406-1-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <c1d4e1a7-7074-694c-b15d-197a5fa291f5@redhat.com>
+Date: Thu, 2 Aug 2018 17:45:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180802144430.13870-2-peter.maydell@linaro.org>
+In-Reply-To: <20180802070201.257406-1-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] hw/ppc/prep: Remove ifdeffed-out stub
- of XCSR code
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5] s390x: Enable KVM huge page backing
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,142 +25,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, patches@linaro.org
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, qemu-s390x@nongnu.org
 
-On 08/02/2018 11:44 AM, Peter Maydell wrote:
-> The prep machine has some code which is stubs of accessors
-> for XCSR registers. This has been disabled via #if 0
-> since commit b6b8bd1819ff in 2004, and doesn't have any
-> actual interesting content. It also uses the deprecated
-> old_mmio accessor functions. Remove it entirely.
+On 02.08.2018 09:02, Janosch Frank wrote:
+> QEMU has had huge page support for a longer time already, but KVM
+> memory management under s390x needed some changes to work with huge
+> backings.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Now that we have support, let's enable it if requested and
+> available. Otherwise we now properly tell the user if there is no
+> support and back out instead of failing to run the VM later on.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
 > ---
->  hw/ppc/prep.c | 97 +++------------------------------------------------
->  1 file changed, 4 insertions(+), 93 deletions(-)
 > 
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 3401570d981..b26138e5c47 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -78,94 +78,6 @@ static int ne2000_irq[NE2000_NB_MAX] = { 9, 10, 11, 3, 4, 5 };
->  /* ISA IO ports bridge */
->  #define PPC_IO_BASE 0x80000000
->  
-> -/* PowerPC control and status registers */
-> -#if 0 // Not used
-> -static struct {
-> -    /* IDs */
-> -    uint32_t veni_devi;
-> -    uint32_t revi;
-> -    /* Control and status */
-> -    uint32_t gcsr;
-> -    uint32_t xcfr;
-> -    uint32_t ct32;
-> -    uint32_t mcsr;
-> -    /* General purpose registers */
-> -    uint32_t gprg[6];
-> -    /* Exceptions */
-> -    uint32_t feen;
-> -    uint32_t fest;
-> -    uint32_t fema;
-> -    uint32_t fecl;
-> -    uint32_t eeen;
-> -    uint32_t eest;
-> -    uint32_t eecl;
-> -    uint32_t eeint;
-> -    uint32_t eemck0;
-> -    uint32_t eemck1;
-> -    /* Error diagnostic */
-> -} XCSR;
-> -
-> -static void PPC_XCSR_writeb (void *opaque,
-> -                             hwaddr addr, uint32_t value)
-> -{
-> -    printf("%s: 0x" TARGET_FMT_plx " => 0x%08" PRIx32 "\n", __func__, addr,
-> -           value);
-> -}
-> -
-> -static void PPC_XCSR_writew (void *opaque,
-> -                             hwaddr addr, uint32_t value)
-> -{
-> -    printf("%s: 0x" TARGET_FMT_plx " => 0x%08" PRIx32 "\n", __func__, addr,
-> -           value);
-> -}
-> -
-> -static void PPC_XCSR_writel (void *opaque,
-> -                             hwaddr addr, uint32_t value)
-> -{
-> -    printf("%s: 0x" TARGET_FMT_plx " => 0x%08" PRIx32 "\n", __func__, addr,
-> -           value);
-> -}
-> -
-> -static uint32_t PPC_XCSR_readb (void *opaque, hwaddr addr)
-> -{
-> -    uint32_t retval = 0;
-> -
-> -    printf("%s: 0x" TARGET_FMT_plx " <= %08" PRIx32 "\n", __func__, addr,
-> -           retval);
-> -
-> -    return retval;
-> -}
-> -
-> -static uint32_t PPC_XCSR_readw (void *opaque, hwaddr addr)
-> -{
-> -    uint32_t retval = 0;
-> -
-> -    printf("%s: 0x" TARGET_FMT_plx " <= %08" PRIx32 "\n", __func__, addr,
-> -           retval);
-> -
-> -    return retval;
-> -}
-> -
-> -static uint32_t PPC_XCSR_readl (void *opaque, hwaddr addr)
-> -{
-> -    uint32_t retval = 0;
-> -
-> -    printf("%s: 0x" TARGET_FMT_plx " <= %08" PRIx32 "\n", __func__, addr,
-> -           retval);
-> -
-> -    return retval;
-> -}
-> -
-> -static const MemoryRegionOps PPC_XCSR_ops = {
-> -    .old_mmio = {
-> -        .read = { PPC_XCSR_readb, PPC_XCSR_readw, PPC_XCSR_readl, },
-> -        .write = { PPC_XCSR_writeb, PPC_XCSR_writew, PPC_XCSR_writel, },
-> -    },
-> -    .endianness = DEVICE_LITTLE_ENDIAN,
-> -};
-> -
-> -#endif
-> -
->  /* Fake super-io ports for PREP platform (Intel 82378ZB) */
->  typedef struct sysctrl_t {
->      qemu_irq reset_irq;
-> @@ -648,11 +560,10 @@ static void ppc_prep_init(MachineState *machine)
->      portio_list_init(&prep_port_list, NULL, prep_portio_list, sysctrl, "prep");
->      portio_list_add(&prep_port_list, isa_address_space_io(isa), 0x0);
->  
-> -    /* PowerPC control and status register group */
-> -#if 0
-> -    memory_region_init_io(xcsr, NULL, &PPC_XCSR_ops, NULL, "ppc-xcsr", 0x1000);
-> -    memory_region_add_subregion(sysmem, 0xFEFF0000, xcsr);
-> -#endif
-> +    /*
-> +     * PowerPC control and status register group: unimplemented,
-> +     * would be at address 0xFEFF0000.
-> +     */
-
-While not directly use the harmless UnimplementedDevice?
-
-       create_unimplemented_device("ppc-xcsr", 0xfeff0000, 0x1000);
-
-Anyway,
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
->  
->      if (machine_usb(machine)) {
->          pci_create_simple(pci_bus, -1, "pci-ohci");
+> Now featuring all of the required braces.
 > 
+> ---
+>  target/s390x/kvm.c | 35 +++++++++++++++++++++++++++++++++--
+>  1 file changed, 33 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index d923cf4240..8ba948c324 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -34,6 +34,8 @@
+>  #include "qapi/error.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/timer.h"
+> +#include "qemu/units.h"
+> +#include "qemu/mmap-alloc.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/hw_accel.h"
+>  #include "hw/hw.h"
+> @@ -139,6 +141,7 @@ static int cap_mem_op;
+>  static int cap_s390_irq;
+>  static int cap_ri;
+>  static int cap_gs;
+> +static int cap_hpage_1m;
+>  
+>  static int active_cmma;
+>  
+> @@ -220,9 +223,9 @@ static void kvm_s390_enable_cmma(void)
+>          .attr = KVM_S390_VM_MEM_ENABLE_CMMA,
+>      };
+>  
+> -    if (mem_path) {
+> +    if (cap_hpage_1m) {
+>          warn_report("CMM will not be enabled because it is not "
+> -                    "compatible with hugetlbfs.");
+> +                    "compatible with huge memory backings.");
+>          return;
+>      }
+>      rc = kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
+> @@ -281,10 +284,38 @@ void kvm_s390_crypto_reset(void)
+>      }
+>  }
+>  
+> +static int kvm_s390_configure_mempath_backing(KVMState *s)
+> +{
+> +    size_t path_psize = qemu_mempath_getpagesize(mem_path);
+> +
+> +    if (path_psize == 4 * KiB) {
+> +        return 0;
+> +    }
+> +
+> +    if (path_psize != 1 * MiB) {
+> +        error_report("Memory backing with 2G pages was specified, "
+> +                     "but KVM does not support this memory backing");
+> +        return -EINVAL;
+> +    }
+> +
+> +    if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
+> +        error_report("Memory backing with 1M pages was specified, "
+> +                     "but KVM does not support this memory backing");
+> +        return -EINVAL;
+> +    }
+> +
+> +    cap_hpage_1m = 1;
+> +    return 0;
+> +}
+> +
+>  int kvm_arch_init(MachineState *ms, KVMState *s)
+>  {
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+>  
+> +    if (mem_path && kvm_s390_configure_mempath_backing(s)) {
+> +        return -EINVAL;
+> +    }
+> +
+>      mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
+>      cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
+>      cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+> 
+
+Looks good to me.
+
+-- 
+
+Thanks,
+
+David / dhildenb
