@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fl7SN-0007qu-Ql
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 02:51:33 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fl7UX-00006D-Lr
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 02:53:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fl7SK-00042c-Nt
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 02:51:31 -0400
-Date: Thu, 2 Aug 2018 07:51:25 +0100
+	(envelope-from <stefanha@gmail.com>) id 1fl7UU-0005PS-Ky
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 02:53:45 -0400
+Date: Thu, 2 Aug 2018 07:53:39 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180802065125.GB13481@stefanha-x1.localdomain>
+Message-ID: <20180802065339.GC13481@stefanha-x1.localdomain>
 References: <20180725085944.11856-1-stefanha@redhat.com>
-	<20180725085944.11856-7-stefanha@redhat.com>
-	<CAFEAcA8m2f-DRiDNF0ry4nMH9bzZ1gODV4MTgtLwR5jTNdgeJA@mail.gmail.com>
+	<20180725085944.11856-8-stefanha@redhat.com>
+	<0c2c23f3-5ec9-5446-17ca-683d267d0f4c@amsat.org>
+	<6c1020b8.17461.164de2dc109.Coremail.suhang16@mails.ucas.ac.cn>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ADZbWkCsHQ7r3kzd"
+	protocol="application/pgp-signature"; boundary="YD3LsXFS42OYHhNZ"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA8m2f-DRiDNF0ry4nMH9bzZ1gODV4MTgtLwR5jTNdgeJA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] loader: Implement .hex file loader
+In-Reply-To: <6c1020b8.17461.164de2dc109.Coremail.suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 7/7] Add QTest testcase for
+ the Intel Hexadecimal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +27,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>, Su Hang <suhang16@mails.ucas.ac.cn>, Liviu Ionescu <ilg@livius.net>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>
+To: Su Hang <suhang16@mails.ucas.ac.cn>
+Cc: philippe =?iso-8859-1?Q?mathieu-daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org, jim@groklearning.com, mail@steffen-goertz.de, ilg@livius.net, alistair@alistair23.me, sundeep.lkml@gmail.com, qemu.ml@steffen-goertz.de, qemu-arm@nongnu.org, joel@jms.id.au, stefanha@redhat.com, jusual@mail.ru
 
 
---ADZbWkCsHQ7r3kzd
+--YD3LsXFS42OYHhNZ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 30, 2018 at 07:01:53PM +0100, Peter Maydell wrote:
-> On 25 July 2018 at 09:59, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > From: Su Hang <suhang16@mails.ucas.ac.cn>
-> >
-> > This patch adds Intel Hexadecimal Object File format support to the
-> > loader.  The file format specification is available here:
-> > http://www.piclist.com/techref/fileext/hex/intel.htm
-> >
-> > This file format is often used with microcontrollers such as the
-> > micro:bit, Arduino, STM32, etc.  Users expect to be able to run them
-> > directly with qemu -kernel program.hex instead of converting to ELF or
-> > binary.
+On Sat, Jul 28, 2018 at 07:58:17AM +0800, Su Hang wrote:
+> > > +#define BIN_SIZE 146
+> > > +
+> > > +static unsigned char pre_store[BIN_SIZE] =3D {
+> > > +    4,   208, 159, 229, 22,  0,   0,   235, 254, 255, 255, 234, 152,=
+ 16,  1,
+> > > +    0,   4,   176, 45,  229, 0,   176, 141, 226, 12,  208, 77,  226,=
+ 8,   0,
+> > > +    11,  229, 6,   0,   0,   234, 8,   48,  27,  229, 0,   32,  211,=
+ 229, 44,
+> > > +    48,  159, 229, 0,   32,  131, 229, 8,   48,  27,  229, 1,   48, =
+ 131, 226,
+> > > +    8,   48,  11,  229, 8,   48,  27,  229, 0,   48,  211, 229, 0,  =
+ 0,   83,
+> > > +    227, 244, 255, 255, 26,  0,   0,   160, 225, 0,   208, 139, 226,=
+ 4,   176,
+> > > +    157, 228, 30,  255, 47,  225, 0,   16,  31,  16,  0,   72,  45, =
+ 233, 4,
+> > > +    176, 141, 226, 8,   0,   159, 229, 230, 255, 255, 235, 0,   0,  =
+ 160, 225,
+> > > +    0,   136, 189, 232, 132, 0,   1,   0,   0,   16,  31,  16,  72, =
+ 101, 108,
+> > > +    108, 111, 32,  119, 111, 114, 108, 100, 33,  10,  0};
+> >=20
+> > Can this be:
+> >=20
+> >   0x04, 0xd0, 0x9f, 0xe5,   0x16, 0x00, 0x00, 0xeb,   0xfe, 0xff, 0xff,
+> > 0xea,
+> >   0x98, 0x10, 0x01, 0x00,   0x04, 0xb0, 0x2d, 0xe5,   0x00, 0xb0, 0x8d,
+> > 0xe2,
+> >   0x0c, 0xd0, 0x4d, 0xe2,   0x08, 0x00, 0x0b, 0xe5,   0x06, 0x00, 0x00,
+> > 0xea,
+> >   0x08, 0x30, 0x1b, 0xe5,   0x00, 0x20, 0xd3, 0xe5,   0x2c, 0x30, 0x9f,
+> > 0xe5,
+> >   0x00, 0x20, 0x83, 0xe5,   0x08, 0x30, 0x1b, 0xe5,   0x01, 0x30, 0x83,
+> > 0xe2,
+> >   0x08, 0x30, 0x0b, 0xe5,   0x08, 0x30, 0x1b, 0xe5,   0x00, 0x30, 0xd3,
+> > 0xe5,
+> >   0x00, 0x00, 0x53, 0xe3,   0xf4, 0xff, 0xff, 0x1a,   0x00, 0x00, 0xa0,
+> > 0xe1,
+> >   0x00, 0xd0, 0x8b, 0xe2,   0x04, 0xb0, 0x9d, 0xe4,   0x1e, 0xff, 0x2f,
+> > 0xe1,
+> >   0x00, 0x10, 0x1f, 0x10,   0x00, 0x48, 0x2d, 0xe9,   0x04, 0xb0, 0x8d,
+> > 0xe2,
+> >   0x08, 0x00, 0x9f, 0xe5,   0xe6, 0xff, 0xff, 0xeb,   0x00, 0x00, 0xa0,
+> > 0xe1,
+> >   0x00, 0x88, 0xbd, 0xe8,   0x84, 0x00, 0x01, 0x00,   0x00, 0x10, 0x1f,
+> > 0x10,
+> >   'H',  'e',  'l',  'l',    'o',  ' ',  'w',  'o',    'r',  'l',  'd', =
+ '!',
+> >   '\n', '\0'
+> > };
+> >=20
+> > ?
 >=20
-> I'm still not convinced we want to add another random
-> special case only-works-on-one-architecture-and-some-boards
-> feature to the -kernel command line option.
->=20
-> Adding it to the "generic loader" device might be more plausible?
+> Yes, good suggestion. Your version is clearer and more readable for human=
+s.
 
-I'll look into this and let you know what I find.
-
-> Or just get the user to create ELF files or plain binary files,
-> both of which we already handle.
-
-Plain binary definitely won't work because the .hex files contain sparse
-(discontiguous) data.
-
-But even using ELF would be very inconvenient to users since .hex is
-*the* format that micro:bit IDEs and toolchains use.  Our goal is for
-less technical users (even kids learning to program) to use QEMU has a
-micro:bit simulator, so the ability to directly use .hex files is very
-important.
+Okay, I will make the change in v4.
 
 Stefan
 
---ADZbWkCsHQ7r3kzd
+--YD3LsXFS42OYHhNZ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJbYqntAAoJEJykq7OBq3PIdiEH/jy1o2ThFcTcodswmRHfDola
-11bsGUd7lpfi1BB02D96OCFpJfG6Jt7GoquvacYExSS2kGs4QLL9RWsTnbP2RHWL
-xJ7mG/5gOmLoj+BJSqWwgGtgrbJpK4veViuV+ZN/so9FXEch0fm7eN8TWK3tPU0b
-kijUqEKWT7/49Y2/xbu8+CVnZ1J3SxZMr93IjTQffiRBsjqAnybCycfehWbxpH+C
-hbcaXulAs1Mwni67eUJybIRwf8TSSmILs5isTeWyR6W3Mg3AGV7UF59xl1aTMSvz
-LO99EasIM1tAx8O2QpOvy8UiwbaSyP5FkNhCyFrWSa/TLch35FvA96CWOOkrb7A=
-=h5Ss
+iQEcBAEBAgAGBQJbYqpzAAoJEJykq7OBq3PIucsH/i/6nbBSxRUzHrEqowxUtaIC
+SILGnmKDnPlxA26G427khVm8q7YFM3A5C3NZfaw79c8Atf3PlPIpTNUeBT0LlwkE
+sldce5/f0wJK6nsH7W8jfozuqWIX5e0PTj01TgD76Qmf12j7e5OCsQ+4fGIwSdml
+HQz3/dr714sv5fKP2hUoCEcMFY3A+YywUFuXLkIlF3/D6XnQ4qwD6sryVEdPZtdD
+XQBpjwNK0+bzR/nBHtVpAmKh/O6SzSbIb62B7bJgsvvOEu4RgmPbhh6oakuPsGaj
+kML5dLwbMBLenUSjWIMgsdGVtmXZWSyH6ChFpl9Xu8Ye3zBiQiiEtqRILouAj4M=
+=npAU
 -----END PGP SIGNATURE-----
 
---ADZbWkCsHQ7r3kzd--
+--YD3LsXFS42OYHhNZ--
