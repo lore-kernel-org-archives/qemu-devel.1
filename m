@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEYS-0007Ma-B1
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:26:17 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEZ2-0007wT-Hj
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:26:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEYO-0000ew-9a
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:26:16 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:51441 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEYs-00015u-KL
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:26:52 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:52890 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1flEYO-0000cC-2X
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:26:12 -0400
+	id 1flEYs-00013i-6o
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:26:42 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu,  2 Aug 2018 16:16:08 +0200
-Message-Id: <1533219424-7627-22-git-send-email-stefan.markovic@rt-rk.com>
+Date: Thu,  2 Aug 2018 16:16:09 +0200
+Message-Id: <1533219424-7627-23-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 21/77] target/mips: Add emulation of
- nanoMIPS 16-bit shift instructions
+Subject: [Qemu-devel] [PATCH v6 22/77] target/mips: Add emulation of
+ nanoMIPS 16-bit misc instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +30,74 @@ Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aur
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add emulation of nanoMIPS 16-bit shift instructions.
+Add emulation of misc nanoMIPS 16-bit instructions.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ target/mips/translate.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 9c6c3e1b..edbb439 100644
+index edbb439..b56b7e2 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16542,6 +16542,21 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+@@ -16540,6 +16540,40 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+     op = extract32(ctx->opcode, 10, 6);
+     switch (op) {
      case NM_P16_MV:
-         break;
-     case NM_P16_SHIFT:
-+        {
-+            int shift = extract32(ctx->opcode, 0, 3);
-+            uint32_t opc = 0;
-+            shift = (shift == 0) ? 8 : shift;
-+
-+            switch (extract32(ctx->opcode, 3, 1)) {
-+            case NM_SLL16:
-+                opc = OPC_SLL;
++        rt = NANOMIPS_EXTRACT_RD5(ctx->opcode);
++        if (rt != 0) {
++            /* MOVE */
++            rs = NANOMIPS_EXTRACT_RS5(ctx->opcode);
++            gen_arith(ctx, OPC_ADDU, rt, rs, 0);
++        } else {
++            /* P16.RI */
++            switch (extract32(ctx->opcode, 3, 2)) {
++            case NM_P16_SYSCALL:
++                if (extract32(ctx->opcode, 2, 1) == 0) {
++                    generate_exception_end(ctx, EXCP_SYSCALL);
++                } else {
++                    generate_exception_end(ctx, EXCP_RI);
++                }
 +                break;
-+            case NM_SRL16:
-+                opc = OPC_SRL;
++            case NM_BREAK16:
++                generate_exception_end(ctx, EXCP_BREAK);
++                break;
++            case NM_SDBBP16:
++                if (is_uhi(extract32(ctx->opcode, 0, 3))) {
++                    gen_helper_do_semihosting(cpu_env);
++                } else {
++                    if (ctx->hflags & MIPS_HFLAG_SBRI) {
++                        generate_exception_end(ctx, EXCP_RI);
++                    } else {
++                        generate_exception_end(ctx, EXCP_DBp);
++                    }
++                }
++                break;
++            default:
++                generate_exception_end(ctx, EXCP_RI);
 +                break;
 +            }
-+            gen_shift_imm(ctx, opc, rt, rs, shift);
 +        }
          break;
-     case NM_P16C:
+     case NM_P16_SHIFT:
+         {
+@@ -16619,6 +16653,13 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case NM_LI16:
++        {
++            int imm = extract32(ctx->opcode, 0, 7);
++            imm = (imm == 0x7f ? -1 : imm);
++            if (rt != 0) {
++                tcg_gen_movi_tl(cpu_gpr[rt], imm);
++            }
++        }
+         break;
+     case NM_ANDI16:
          break;
 -- 
 1.9.1
