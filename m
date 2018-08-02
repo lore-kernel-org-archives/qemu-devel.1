@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1flFHs-0006oU-UM
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 11:13:13 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1flFhD-0005MB-C8
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 11:39:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1flFHo-0000F7-0p
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 11:13:12 -0400
-Date: Thu, 2 Aug 2018 17:13:00 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180802171300.6bfc5247.cohuck@redhat.com>
-In-Reply-To: <20180725091233.3300-1-david@redhat.com>
-References: <20180725091233.3300-1-david@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1flFhC-00074F-Fb
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 11:39:23 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180801123111.3595-1-richard.henderson@linaro.org>
+	<20180801123111.3595-5-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <72c08000-d0fa-1b02-a1f1-d0cb2c6d6566@amsat.org>
+Date: Thu, 2 Aug 2018 12:39:07 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpu_models: Add "-cpu max" support
+In-Reply-To: <20180801123111.3595-5-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 4/4] target/arm: Fix typo in
+ helper_sve_movz_d
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,48 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, "Daniel P .
-	=?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-On Wed, 25 Jul 2018 11:12:33 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> The "max" CPU model behaves like "-cpu host" when KVM is enabled, and like
-> a CPU with the maximum possible feature set when TCG is enabled.
-> 
-> While the "host" model can not be used under TCG ("kvm_required"), the
-> "max" model can and "Enables all features supported by the accelerator in
-> the current host".
-> 
-> So we can treat "host" just as a special case of "max" (like x86 does).
-> It differs to the "qemu" CPU model under TCG such that compatibility
-> handling will not be performed and that some experimental CPU features
-> not yet part of the "qemu" model might be indicated.
-> 
-> These are right now under TCG (see "qemu_MAX"):
-> - stfle53
-> - msa5-base
-> - zpci
-> 
-> This will result right now in the following warning when starting QEMU TCG
-> with the "max" model:
->     "qemu-system-s390x: warning: 'msa5-base' requires 'kimd-sha-512'."
-> 
-> The "qemu" model (used as default in QEMU under TCG) will continue to
-> work without such warnings. The "max" mdel in the current form
-> might be interesting for kvm-unit-tests (where we would e.g. now also
-> test "msa5-base").
-> 
-> The "max" model is neither static nor migration safe (like the "host"
-> model). It is independent of the machine but dependends on the accelerator.
-> It can be used to detect the maximum CPU model also under TCG from upper
-> layers without having to care about CPU model names for CPU model
-> expansion.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On 08/01/2018 09:31 AM, Richard Henderson wrote:
+> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/s390x/cpu_models.c | 81 +++++++++++++++++++++++++++------------
->  1 file changed, 56 insertions(+), 25 deletions(-)
+>  target/arm/sve_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+> index 87594a8adb..c3cbec9cf5 100644
+> --- a/target/arm/sve_helper.c
+> +++ b/target/arm/sve_helper.c
+> @@ -1042,7 +1042,7 @@ void HELPER(sve_movz_d)(void *vd, void *vn, void *vg, uint32_t desc)
+>      uint64_t *d = vd, *n = vn;
+>      uint8_t *pg = vg;
+>      for (i = 0; i < opr_sz; i += 1) {
+> -        d[i] = n[1] & -(uint64_t)(pg[H1(i)] & 1);
+> +        d[i] = n[i] & -(uint64_t)(pg[H1(i)] & 1);
 
-Thanks, applied.
+:)))
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+>      }
+>  }
+>  
+> 
