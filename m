@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1flHeR-0006x2-4N
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:44:40 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1flHo8-0002Am-VB
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:54:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1flHeO-0007Of-0U
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:44:39 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:37714)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1flHeN-0007N6-Os
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:44:35 -0400
-Received: by mail-pf1-x441.google.com with SMTP id a26-v6so1731039pfo.4
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 10:44:35 -0700 (PDT)
-Date: Thu, 02 Aug 2018 10:44:32 -0700 (PDT)
-In-Reply-To: <cover.1529695276.git.alistair.francis@wdc.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-df1b106f-72bb-4857-9acc-4095019307e4@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/5] Connect a PCIe host and graphics
- support to RISC-V
+	(envelope-from <amarkovic@wavecomp.com>) id 1flHo3-0007KO-Uk
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:54:40 -0400
+Received: from mail-bl2nam02on0129.outbound.protection.outlook.com
+	([104.47.38.129]:46816
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1flHo3-0007Jv-HH
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:54:35 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 2 Aug 2018 17:54:31 +0000
+Message-ID: <BN7PR08MB48680C56DDDD8ED505E9DB97C62C0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1532967169-22265-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1532967169-22265-46-git-send-email-aleksandar.markovic@rt-rk.com>
+	<599465e2-9620-61a4-9a73-a8464c06cbab@linaro.org>
+	<BN7PR08MB48688BC84CBE8C74D095A46AC62C0@BN7PR08MB4868.namprd08.prod.outlook.com>,
+	<ec7bec8f-800b-6840-a6e7-c07e4d667f34@linaro.org>
+In-Reply-To: <ec7bec8f-800b-6840-a6e7-c07e4d667f34@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v5 45/76] target/mips: Implement emulation
+ of nanoMIPS LLWP/SCWP pair
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +35,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, alistair.francis@wdc.com, alistair23@gmail.com, Michael Clark <mjc@sifive.com>
+To: Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>
+Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-On Fri, 22 Jun 2018 12:28:14 PDT (-0700), alistair.francis@wdc.com wrote:
-> Alistair Francis (5):
->   hw/riscv/virtio: Set the soc device tree node as a simple-bus
->   hw/riscv/virt: Increase the number of interrupts
->   hw/riscv/virt: Connect the Xilinx PCIe
->   hw/riscv/virt: Connect a VGA PCIe device
->   riscv64-softmmu.mak: Build Virtio Block support
->
->  default-configs/riscv32-softmmu.mak |  6 +++
->  default-configs/riscv64-softmmu.mak |  8 ++++
->  hw/riscv/virt.c                     | 73 ++++++++++++++++++++++++++++-
->  include/hw/riscv/virt.h             |  6 ++-
->  4 files changed, 90 insertions(+), 3 deletions(-)
+> From: Richard Henderson <richard.henderson@linaro.org>
+> Sent: Thursday, August 2, 2018 7:28 PM
+>=20
+> On 08/02/2018 08:29 AM, Aleksandar Markovic wrote:
+> > Hi, Richard,
+> >
+> > We are going to remove obsoleted helpers, that was just an honest mista=
+ke made in a rush.
+> >
+> > For unprotected access to gpr, we are going to insert if(reg1 !=3D 0) i=
+n two places.
+>=20
+> Be careful that you do not eliminate side effects in the process.  This
+> includes things like check_dspr2, and any helper that sets overflow_flag =
+or
+> carry_flag.
+>=20
+> I cannot see how you will avoid that when adding only two if statements.
+>=20
 
-Sorry I'm so slow here, I'm still chewing through my patch backlog.  It looks 
-like this hasn't made it upstream yet.  I rebased it on top of master but have 
-yet to figure out how to make it work, though I think that's on the Linux side.
+I was referring just to SCWP handler function. For DSP patches, for v6, we =
+worked assiduously to eliminate all unprotected accesses to gpr.
 
-I haven't yet looked at the code, but I like the functionality so I don't want 
-to lose this.  Can you submit a v2 that applies cleanly to master, or do you 
-want me to deal with it?
+>=20
+> > However, it looks there is a bigger problem now in SCWP. QEMU crashes w=
+ith this message:
+> >
+> > /qemu/tcg/tcg.c:2862: tcg fatal error
+> >
+> > This happens in user mode only, system mode case runs fine.
+> >
+> > the problem seems to appear as a consequence of using tcg_gen_brcond_*(=
+().
+> >
+> > Do you have any idea what are we doing wrong here?
+>=20
+> If you send me a binary that triggers this error, I'll look at it.
+
+Will do it tomorrow morning.
+
+Aleksandar=
