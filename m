@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEgl-0006O7-9A
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:34:52 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEh5-0006iW-VX
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:35:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEgh-00084z-BF
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:34:51 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:38723 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEh3-0008Es-Cq
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:35:11 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:39177 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1flEgh-00084R-3F
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:34:47 -0400
+	id 1flEh3-0008Dw-4t
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:35:09 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu,  2 Aug 2018 16:16:30 +0200
-Message-Id: <1533219424-7627-44-git-send-email-stefan.markovic@rt-rk.com>
+Date: Thu,  2 Aug 2018 16:16:31 +0200
+Message-Id: <1533219424-7627-45-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 43/77] target/mips: Add emulation of DSP ASE
- for nanoMIPS - part 6
+Subject: [Qemu-devel] [PATCH v6 44/77] target/mips: Add handling of branch
+ delay slots for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,97 +28,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Matthew Fortune <matthew.fortune@mips.com>
 
-Add emulation of DSP ASE instructions for nanoMIPS - part 6.
+ISA mode bit (LSB of address) is no longer required but is also
+masked to allow for tools transition. The flag has_isa_mode has the
+key role in the implementation.
 
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ target/mips/translate.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 2a45302..7e495d2 100644
+index 7e495d2..8da3fb5 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -17558,6 +17558,66 @@ static void gen_pool32axf_4_nanomips_insn(DisasContext *ctx, uint32_t opc,
-     tcg_temp_free(v0_t);
- }
+@@ -1458,6 +1458,7 @@ typedef struct DisasContext {
+     bool mrp;
+     bool nan2008;
+     bool abs2008;
++    bool has_isa_mode;
+ } DisasContext;
  
-+static void gen_pool32axf_7_nanomips_insn(DisasContext *ctx, uint32_t opc,
-+                                          int ret, int v1, int v2)
-+{
-+    if (ret == 0) {
-+        /* Treat as NOP. */
-+        return;
-+    }
-+
-+    int16_t imm;
-+
-+    TCGv t0;
-+    TCGv v1_t;
-+
-+    t0 = tcg_temp_new();
-+    v1_t = tcg_temp_new();
-+
-+    gen_load_gpr(v1_t, v1);
-+
-+    switch (opc) {
-+    case NM_SHRA_R_QB:
-+        tcg_gen_movi_tl(t0, v2 >> 2);
-+        switch (extract32(ctx->opcode, 12, 1)) {
-+        case 0:
-+            /* NM_SHRA_QB */
-+            check_dspr2(ctx);
-+            gen_helper_shra_qb(cpu_gpr[ret], t0, v1_t);
-+            break;
-+        case 1:
-+            /* NM_SHRA_R_QB */
-+            check_dspr2(ctx);
-+            gen_helper_shra_r_qb(cpu_gpr[ret], t0, v1_t);
-+            break;
-+        }
-+        break;
-+    case NM_SHRL_PH:
-+        check_dspr2(ctx);
-+        tcg_gen_movi_tl(t0, v2 >> 1);
-+        gen_helper_shrl_ph(cpu_gpr[ret], t0, v1_t);
-+        break;
-+    case NM_REPL_QB:
-+        {
-+            check_dsp(ctx);
-+            target_long result;
-+            imm = extract32(ctx->opcode, 13, 8);
-+            result = (uint32_t)imm << 24 |
-+                     (uint32_t)imm << 16 |
-+                    (uint32_t)imm << 8  |
-+                     (uint32_t)imm;
-+            result = (int32_t)result;
-+            tcg_gen_movi_tl(cpu_gpr[ret], result);
-+        }
-+        break;
-+    default:
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    }
-+    tcg_temp_free(t0);
-+    tcg_temp_free(v1_t);
-+}
-+
+ #define DISAS_STOP       DISAS_TARGET_0
+@@ -4550,7 +4551,7 @@ static void gen_compute_branch (DisasContext *ctx, uint32_t opc,
  
- static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
- {
-@@ -17653,6 +17713,10 @@ static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case NM_POOL32AXF_7:
-+        {
-+            int32_t op1 = extract32(ctx->opcode, 9, 3);
-+            gen_pool32axf_7_nanomips_insn(ctx, op1, rt, rs, rd);
-+        }
-         break;
-     default:
-         generate_exception_end(ctx, EXCP_RI);
+     if (blink > 0) {
+         int post_delay = insn_bytes + delayslot_size;
+-        int lowbit = !!(ctx->hflags & MIPS_HFLAG_M16);
++        int lowbit = ctx->has_isa_mode && !!(ctx->hflags & MIPS_HFLAG_M16);
+ 
+         tcg_gen_movi_tl(cpu_gpr[blink],
+                         ctx->base.pc_next + post_delay + lowbit);
+@@ -11039,7 +11040,7 @@ static void gen_compute_compact_branch(DisasContext *ctx, uint32_t opc,
+     int bcond_compute = 0;
+     TCGv t0 = tcg_temp_new();
+     TCGv t1 = tcg_temp_new();
+-    int m16_lowbit = (ctx->hflags & MIPS_HFLAG_M16) != 0;
++    int m16_lowbit = ctx->has_isa_mode && ((ctx->hflags & MIPS_HFLAG_M16) != 0);
+ 
+     if (ctx->hflags & MIPS_HFLAG_BMASK) {
+ #ifdef MIPS_DEBUG_DISAS
+@@ -24756,6 +24757,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->mrp = (env->CP0_Config5 >> CP0C5_MRP) & 1;
+     ctx->nan2008 = (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
+     ctx->abs2008 = (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
++    ctx->has_isa_mode = ((env->CP0_Config3 >> CP0C3_MMAR) & 0x7) < 3;
+     restore_cpu_state(env, ctx);
+ #ifdef CONFIG_USER_ONLY
+         ctx->mem_idx = MIPS_HFLAG_UM;
 -- 
 1.9.1
