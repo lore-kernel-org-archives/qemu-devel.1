@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1flA8I-0003No-BD
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:42:59 -0400
+	(envelope-from <thuth@redhat.com>) id 1flAEq-0005Fz-RP
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:49:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1flA8H-0005ug-HM
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:42:58 -0400
-References: <20180726023645.13927-1-joel@jms.id.au>
-	<20180726023645.13927-3-joel@jms.id.au>
-	<94bc2d11-7916-bc4e-02d8-da62e3ed303b@mail.ru>
-	<CACPK8XfYvU8+0s+FBGe7NuAst38ska0vpS8HVPWkM8OHyLFpdQ@mail.gmail.com>
-From: Julia Suvorova <jusual@mail.ru>
-Message-ID: <c2432d29-fb24-924a-4df2-2abf5d52afca@mail.ru>
-Date: Thu, 2 Aug 2018 12:42:44 +0300
-MIME-Version: 1.0
-In-Reply-To: <CACPK8XfYvU8+0s+FBGe7NuAst38ska0vpS8HVPWkM8OHyLFpdQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] arm: Add Nordic Semiconductor nRF51
- SoC
+	(envelope-from <thuth@redhat.com>) id 1flAEn-0003WM-NT
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:49:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45888 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1flAEn-0003Vl-JB
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:49:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EA5534023444
+	for <qemu-devel@nongnu.org>; Thu,  2 Aug 2018 09:49:40 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu,  2 Aug 2018 11:49:36 +0200
+Message-Id: <1533203376-25621-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] tests/migration-test: Turn kvm_hv message into
+ a g_debug message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>
+To: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 30.07.2018 17:02, Joel Stanley wrote:
-> On 26 July 2018 at 20:31, Julia Suvorova <jusual@mail.ru> wrote:
-> 
->>> +++ b/hw/arm/nrf51_soc.c
-> 
->>> +static void nrf51_soc_init(Object *obj)
->>> +{
->>> +    NRF51State *s = NRF51_SOC(obj);
->>> +
->>> +    memory_region_init(&s->container, obj, "nrf51-container",
->>> UINT64_MAX);
->>> +
->>> +    object_initialize(&s->cpu, sizeof(s->cpu), TYPE_ARM_M_PROFILE);
->>> +    object_property_add_child(OBJECT(s), "armv6m", OBJECT(&s->cpu),
->>> &error_abort);
->>> +    qdev_set_parent_bus(DEVICE(&s->cpu), sysbus_get_default());
->>> +    qdev_prop_set_string(DEVICE(&s->cpu), "cpu-type",
->>> ARM_CPU_TYPE_NAME("cortex-m0"));
->>> +    qdev_prop_set_uint32(DEVICE(&s->cpu), "num-irq", 96);
->>
->>
->> Where did this number come from? ARMv6-M NVIC supports only 32 interrupts.
-> 
-> I think this was left over from when I was first creating a m0 based
-> system (efm32hg) over a year ago. Good catch.
-> 
-> I couldn't see a table of valid interrupts in the nrf51 datasheet. Are
-> you able to find this information?
-> 
-> If not, I will re-spin with the number of irqs set to 32.
+When running "make check" on a non-POWER host, there is currently an ugly
+line in the output like this:
 
-The only information in the nRF51 Reference Manual is given in
-paragraph 10.1.6:
-A peripheral only occupies one interrupt, and the interrupt number
-follows the peripheral ID, for example, the peripheral with ID=4 is
-connected to interrupt number 4 in the Nested Vector Interrupt
-Controller (NVIC).
+  [...]
+  GTESTER check-qtest-nios2
+  GTESTER check-qtest-or1k
+  GTESTER check-qtest-ppc64
+Skipping test: kvm_hv not available Skipping test: kvm_hv not available Skipping test: kvm_hv not available Skipping test: kvm_hv not available   GTESTER check-qtest-ppcemb
+  GTESTER check-qtest-ppc
+  GTESTER check-qtest-riscv32
+  GTESTER check-qtest-riscv64
+  [...]
 
-Thus, Table 2 in 5.2 can be used as an interrupt table.
+Move the check to the beginning of the main function instead, so that
+we do not have to test the condition again and again for each test,
+and better use g_test_message() instead of g_print() here, like it is
+also done in ufd_version_check() already.
 
-In any case, unextended ARMv6-M limits the number of interrupts to 32.
-And efm32hg is based on M0+ and can have additional features.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/migration-test.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-Best regards, Julia Suvorova.
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index e079e0b..cb795b2 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -445,15 +445,6 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+                                   " -incoming %s",
+                                   accel, tmpfs, bootpath, uri);
+     } else if (strcmp(arch, "ppc64") == 0) {
+-
+-        /* On ppc64, the test only works with kvm-hv, but not with kvm-pr
+-         * and TCG is touchy due to race conditions on dirty bits
+-         * (especially on PPC for some reason)
+-         */
+-        if (access("/sys/module/kvm_hv", F_OK)) {
+-            g_print("Skipping test: kvm_hv not available ");
+-            return -1;
+-        }
+         cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
+                                   " -name source,debug-threads=on"
+                                   " -serial file:%s/src_serial"
+@@ -769,6 +760,17 @@ int main(int argc, char **argv)
+         return 0;
+     }
+ 
++    /*
++     * On ppc64, the test only works with kvm-hv, but not with kvm-pr and TCG
++     * is touchy due to race conditions on dirty bits (especially on PPC for
++     * some reason)
++     */
++    if (g_str_equal(qtest_get_arch(), "ppc64") &&
++        access("/sys/module/kvm_hv", F_OK)) {
++        g_test_message("Skipping test: kvm_hv not available");
++        return 0;
++    }
++
+     tmpfs = mkdtemp(template);
+     if (!tmpfs) {
+         g_test_message("mkdtemp on path (%s): %s\n", template, strerror(errno));
+-- 
+1.8.3.1
