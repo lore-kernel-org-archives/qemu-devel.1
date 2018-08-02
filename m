@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fl2DV-0000oh-EX
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 21:15:50 -0400
+	(envelope-from <fzheng@redhat.com>) id 1fl2WP-0004LP-Go
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 21:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fl2DQ-0007UV-GI
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 21:15:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43698)
+	(envelope-from <fzheng@redhat.com>) id 1fl2WL-0005g8-ID
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 21:35:21 -0400
+Received: from mail-ua0-f196.google.com ([209.85.217.196]:41915)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fl2DP-0007TD-Qo
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 21:15:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fl2DN-0007Oh-OJ
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 01:15:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B3CEF2E8070
-	for <qemu-devel@nongnu.org>; Thu,  2 Aug 2018 01:15:41 +0000 (UTC)
+	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1fl2WL-0005e0-Dm
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 21:35:17 -0400
+Received: by mail-ua0-f196.google.com with SMTP id h1-v6so367097uao.8
+	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 18:35:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Aug 2018 01:00:42 -0000
-From: Stefan Berger <1784900@bugs.launchpad.net>
-Reply-To: Bug 1784900 <1784900@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153314156256.17371.7866837258800403867.malonedeb@soybean.canonical.com>
-Message-Id: <153317164276.31694.3285562530321698831.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1784900] Re: QEMU (frontend) crashes upon warm
- reboot with virtio-gpu device and vga=775 on Linux cmdline
+References: <20180724092413.5770-1-cohuck@redhat.com>
+	<20180801102127.GF14577@lemon.usersys.redhat.com>
+	<20180801145451.2e640621.cohuck@redhat.com>
+	<20180801151123.5a52e0e6.cohuck@redhat.com>
+	<20180801151821.324f06d0.cohuck@redhat.com>
+In-Reply-To: <20180801151821.324f06d0.cohuck@redhat.com>
+From: Fam Zheng <famz@redhat.com>
+Date: Thu, 2 Aug 2018 09:34:37 +0800
+Message-ID: <CAK1Eb9mud-=J_kL-i=ZKiD8E+4AyOzudR=_+6JN-LXseSsXvcQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.1] s390x: remove 's390-squash-mcss'
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,104 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: "open list:virtio-ccw" <qemu-s390x@nongnu.org>, renxiaof@linux.ibm.com, Thomas Huth <thuth@redhat.com>, david@redhat.com, libvir-list@redhat.com, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, pasic@linux.ibm.com, Christian Borntraeger <borntraeger@de.ibm.com>, rth@twiddle.net
 
-This patch here fixes the issue, but is likely introducing inefficiency.
-There are two if statements above the patch that should set full_update
-=3D 1 due to 'some change', but none of them triggers it. So I think the
-surface is wrong and needs to be recreated.
+On Wed, Aug 1, 2018 at 9:18 PM Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> On Wed, 1 Aug 2018 15:11:23 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> > On Wed, 1 Aug 2018 14:54:51 +0200
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >
+> > > On Wed, 1 Aug 2018 18:21:27 +0800
+> > > Fam Zheng <famz@redhat.com> wrote:
+> > >
+> > > > On Tue, 07/24 11:24, Cornelia Huck wrote:
+> > > > > diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
+> > > > > index a02d708239..1bd6c8b458 100644
+> > > > > --- a/hw/s390x/css-bridge.c
+> > > > > +++ b/hw/s390x/css-bridge.c
+> > > > > @@ -106,7 +106,6 @@ VirtualCssBus *virtual_css_bus_init(void)
+> > > > >      /* Create bus on bridge device */
+> > > > >      bus = qbus_create(TYPE_VIRTUAL_CSS_BUS, dev, "virtual-css");
+> > > > >      cbus = VIRTUAL_CSS_BUS(bus);
+> > > >
+> > > > Not used now?
+> > > >
+> > > > Fam
+> > >
+> > > Indeed, we can ditch the cbus variable.
+> >
+> > ...or not :) We still need it for the return value, which is processed
+> > in ccw_init(). We could change the return code of the function to
+> > BusState, but I'm not sure it is worth the hassle.
+>
+> ...but we can indeed get rid of the cbus and qbus variables in
+> s390_ccw_realize().
 
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index ed476e4e80..71b5684994 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -1571,6 +1571,7 @@ static void vga_draw_graphic(VGACommonState *s, int f=
-ull_update)
-          * must be updated with the new base address */
-         full_update =3D 1;
-     }
-+    full_update =3D 1;
+I got this from a patchew.org test (make docker-test-clang@ubuntu):
 
-     if (full_update) {
-         if (share_surface) {
-
-
-A better solution may be this one here:
-
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index ed476e4e80..4f365b6d43 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -1566,7 +1566,7 @@ static void vga_draw_graphic(VGACommonState *s, int f=
-ull_update)
-         full_update =3D 1;
-     }
-     if (surface_data(surface) !=3D s->vram_ptr + (s->start_addr * 4)
--        && is_buffer_shared(surface)) {
-+        /*&& is_buffer_shared(surface)*/) {
-         /* base address changed (page flip) -> shared display surfaces
-          * must be updated with the new base address */
-         full_update =3D 1;
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1784900
-
-Title:
-  QEMU (frontend) crashes upon warm reboot with virtio-gpu device and
-  vga=3D775 on Linux cmdline
-
-Status in QEMU:
-  New
-
-Bug description:
-  With vga=3D775 on the Linux command line a first boot of the VM running
-  Linux works fine. After a warm reboot it crashes during Linux boot.
-  The VM was used remotely via virt-manager and VNC.
-
-  Bisecting the code lead to the following patch that introduced the
-  bug:
-
-  commit 1fccd7c5a9a722a9cbf1bc91693f4618034f01ac (HEAD, refs/bisect/bad)
-  Author: Gerd Hoffmann <kraxel@redhat.com>
-  Date:   Mon Jul 2 18:24:43 2018 +0200
-
-      virtio-gpu: disable scanout when backing resource is destroyed
-
-      Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-      Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-      Message-id: 20180702162443.16796-4-kraxel@redhat.com
-
-  diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-  index 336dc59007..08cd567218 100644
-  --- a/hw/display/virtio-gpu.c
-  +++ b/hw/display/virtio-gpu.c
-  @@ -430,6 +430,16 @@ static void virtio_gpu_disable_scanout(VirtIOGPU *g,=
- int scanout_id)
-   static void virtio_gpu_resource_destroy(VirtIOGPU *g,
-                                           struct virtio_gpu_simple_resourc=
-e *res)
-   {
-  +    int i;
-  +
-  +    if (res->scanout_bitmask) {
-  +        for (i =3D 0; i < g->conf.max_outputs; i++) {
-  +            if (res->scanout_bitmask & (1 << i)) {
-  +                virtio_gpu_disable_scanout(g, i);
-  +            }
-  +        }
-  +    }
-  +
-       pixman_image_unref(res->image);
-       virtio_gpu_cleanup_mapping(res);
-       QTAILQ_REMOVE(&g->reslist, res, next);
-
-  =
-
-  Reported backtraces can be found here:  https://paste.fedoraproject.org/p=
-aste/OUDEfCk1IY7xiy0I0PDlkw
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1784900/+subscriptions
+/tmp/qemu-test/src/hw/s390x/3270-ccw.c:103:20: error: unused variable
+'cbus' [-Werror,-Wunused-variable]
+    VirtualCssBus *cbus = VIRTUAL_CSS_BUS(qbus);
+                   ^
+1 error generated.
+/tmp/qemu-test/src/rules.mak:69: recipe for target 'hw/s390x/3270-ccw.o' failed
