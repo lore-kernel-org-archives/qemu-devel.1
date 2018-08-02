@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1flAEq-0005Fz-RP
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:49:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1flAGK-00067D-Vr
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:51:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1flAEn-0003WM-NT
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:49:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45888 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1flAEn-0003Vl-JB
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:49:41 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EA5534023444
-	for <qemu-devel@nongnu.org>; Thu,  2 Aug 2018 09:49:40 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  2 Aug 2018 11:49:36 +0200
-Message-Id: <1533203376-25621-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests/migration-test: Turn kvm_hv message into
- a g_debug message
+	(envelope-from <dgilbert@redhat.com>) id 1flAGF-0004lw-4l
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:51:17 -0400
+Date: Thu, 2 Aug 2018 10:50:57 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180802095056.GB2523@work-vm>
+References: <20180626135035.133432-5-vsementsov@virtuozzo.com>
+	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
+	<20180801102031.GC2691@work-vm>
+	<64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
+	<20180801174005.GD2691@work-vm>
+	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
+	<20180801185515.GE2691@work-vm>
+	<6bfdc952-fb17-feae-f367-be710853d829@openvz.org>
+	<20180802092907.GA2523@work-vm>
+	<202065a2-f9d1-ce31-b12b-437d57095ac1@openvz.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202065a2-f9d1-ce31-b12b-437d57095ac1@openvz.org>
+Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
+ loading and migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
 
-When running "make check" on a non-POWER host, there is currently an ugly
-line in the output like this:
+* Denis V. Lunev (den@openvz.org) wrote:
 
-  [...]
-  GTESTER check-qtest-nios2
-  GTESTER check-qtest-or1k
-  GTESTER check-qtest-ppc64
-Skipping test: kvm_hv not available Skipping test: kvm_hv not available Skipping test: kvm_hv not available Skipping test: kvm_hv not available   GTESTER check-qtest-ppcemb
-  GTESTER check-qtest-ppc
-  GTESTER check-qtest-riscv32
-  GTESTER check-qtest-riscv64
-  [...]
 
-Move the check to the beginning of the main function instead, so that
-we do not have to test the condition again and again for each test,
-and better use g_test_message() instead of g_print() here, like it is
-also done in ufd_version_check() already.
+> > I don't quite understand the last two paragraphs.
+> we are thinking right now to eliminate delay on regular IO
+> for migration. There is some thoughts and internal work in
+> progress. That is why I am worrying.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/migration-test.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+What downtime are you typicaly seeing and what are you aiming for?
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index e079e0b..cb795b2 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -445,15 +445,6 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-                                   " -incoming %s",
-                                   accel, tmpfs, bootpath, uri);
-     } else if (strcmp(arch, "ppc64") == 0) {
--
--        /* On ppc64, the test only works with kvm-hv, but not with kvm-pr
--         * and TCG is touchy due to race conditions on dirty bits
--         * (especially on PPC for some reason)
--         */
--        if (access("/sys/module/kvm_hv", F_OK)) {
--            g_print("Skipping test: kvm_hv not available ");
--            return -1;
--        }
-         cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
-                                   " -name source,debug-threads=on"
-                                   " -serial file:%s/src_serial"
-@@ -769,6 +760,17 @@ int main(int argc, char **argv)
-         return 0;
-     }
- 
-+    /*
-+     * On ppc64, the test only works with kvm-hv, but not with kvm-pr and TCG
-+     * is touchy due to race conditions on dirty bits (especially on PPC for
-+     * some reason)
-+     */
-+    if (g_str_equal(qtest_get_arch(), "ppc64") &&
-+        access("/sys/module/kvm_hv", F_OK)) {
-+        g_test_message("Skipping test: kvm_hv not available");
-+        return 0;
-+    }
-+
-     tmpfs = mkdtemp(template);
-     if (!tmpfs) {
-         g_test_message("mkdtemp on path (%s): %s\n", template, strerror(errno));
--- 
-1.8.3.1
+It would be good if you could explain what you're planning to
+fix there so we can get a feel for it nearer the start of it
+rather than at the end of the reviewing!
+
+Dave
+
+> 
+> > However, coming back to my question; it was really saying that
+> > normal guest IO during the end of the migration will cause
+> > a delay; I'm expecting that to be fairly unrelated to the size
+> > of the disk; more to do with workload; so I guess in your case
+> > the worry is the case of big large disks giving big large
+> > bitmaps.
+> 
+> exactly!
+> 
+> Den
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
