@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1flGLT-0008Ky-UN
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:21:01 -0400
+	(envelope-from <no-reply@patchew.org>) id 1flGXA-0002W9-0z
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:33:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1flGLP-0006AQ-Ru
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:20:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35592)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1flGLP-00067u-KN
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:20:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1flGLM-0005kW-IY
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 16:20:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8B0C82E80CD
-	for <qemu-devel@nongnu.org>; Thu,  2 Aug 2018 16:20:52 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1flGX6-0004sS-PJ
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:33:04 -0400
+Resent-Message-Id: <E1flGX6-0004sS-PJ@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21143)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1flGX6-0004rd-EW
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 12:33:00 -0400
+In-Reply-To: <20180801123111.3595-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153322755030.17698.15162402362626066674@502c9da6d61e>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Aug 2018 16:06:37 -0000
-From: Stefan Berger <1784900@bugs.launchpad.net>
-Reply-To: Bug 1784900 <1784900@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153314156256.17371.7866837258800403867.malonedeb@soybean.canonical.com>
-Message-Id: <153322599766.28919.17028027304649587418.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1784900] Re: QEMU (frontend) crashes upon warm
- reboot with virtio-gpu device and vga=775 on Linux cmdline
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 2 Aug 2018 09:32:31 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm sve fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,88 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-On my system vga_draw_graphic is called with a surface_width(surface) =3D
-1280, the next time surface_width(surface) =3D 1024, and then the next
-time again with surface_width(surface) =3D 1280. So it's a quick
-resolution change. Each time the surface pointer changes as well as
-surface_width(surface) and surface_data(surface). Do NOT try to access
-the s->last_surface with surface_data(s->last_surface) -- it likely has
-been freed already.
-
-So my guess is we could add (a subset of) checks like this one here:
-
-if (s->last_surface !=3D surface ||
-    s->last_surface_width !=3D surface_width(surface) ||
-    s->last_surface_height !=3D surface_height(surface) ||
-    s->last_surface_data !=3D surface_data(surface)) {
-
-    s->last_surface =3D surface;
-    s->last_surface_width =3D surface_width(surface);
-    ...
-    full_update =3D 1;
-}
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1784900
-
-Title:
-  QEMU (frontend) crashes upon warm reboot with virtio-gpu device and
-  vga=3D775 on Linux cmdline
-
-Status in QEMU:
-  New
-
-Bug description:
-  With vga=3D775 on the Linux command line a first boot of the VM running
-  Linux works fine. After a warm reboot it crashes during Linux boot.
-  The VM was used remotely via virt-manager and VNC.
-
-  Bisecting the code lead to the following patch that introduced the
-  bug:
-
-  commit 1fccd7c5a9a722a9cbf1bc91693f4618034f01ac (HEAD, refs/bisect/bad)
-  Author: Gerd Hoffmann <kraxel@redhat.com>
-  Date:   Mon Jul 2 18:24:43 2018 +0200
-
-      virtio-gpu: disable scanout when backing resource is destroyed
-
-      Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-      Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-      Message-id: 20180702162443.16796-4-kraxel@redhat.com
-
-  diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-  index 336dc59007..08cd567218 100644
-  --- a/hw/display/virtio-gpu.c
-  +++ b/hw/display/virtio-gpu.c
-  @@ -430,6 +430,16 @@ static void virtio_gpu_disable_scanout(VirtIOGPU *g,=
- int scanout_id)
-   static void virtio_gpu_resource_destroy(VirtIOGPU *g,
-                                           struct virtio_gpu_simple_resourc=
-e *res)
-   {
-  +    int i;
-  +
-  +    if (res->scanout_bitmask) {
-  +        for (i =3D 0; i < g->conf.max_outputs; i++) {
-  +            if (res->scanout_bitmask & (1 << i)) {
-  +                virtio_gpu_disable_scanout(g, i);
-  +            }
-  +        }
-  +    }
-  +
-       pixman_image_unref(res->image);
-       virtio_gpu_cleanup_mapping(res);
-       QTAILQ_REMOVE(&g->reslist, res, next);
-
-  =
-
-  Reported backtraces can be found here:  https://paste.fedoraproject.org/p=
-aste/OUDEfCk1IY7xiy0I0PDlkw
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1784900/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODAxMTIzMTExLjM1OTUtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
+b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC80XSB0YXJnZXQvYXJtIHN2ZSBmaXhl
+cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
+IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
+dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
+bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
+ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
+eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
+ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0JwplNGM1ZWU5MjYwIHRhcmdldC9hcm06IEZpeCB0eXBvIGluIGhlbHBlcl9zdmVfbW92el9k
+CjlhMzdhYzU5MDggdGFyZ2V0L2FybTogUmVvcmdhbml6ZSBTVkUgV0hJTEUKYzUyOWI3NWZlYyB0
+YXJnZXQvYXJtOiBGaXggdHlwbyBpbiBkb19zYXRfYWRkc3ViXzY0CmZiNzI3NTVmYWEgdGFyZ2V0
+L2FybTogRml4IHNpZ24gb2Ygc3ZlX2NtcGVxX3Bwencvc3ZlX2NtcG5lX3BwencKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDogdGFyZ2V0L2FybTogRml4IHNpZ24gb2Yg
+c3ZlX2NtcGVxX3Bwencvc3ZlX2NtcG5lX3BwencuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
+cm91bmQgdGhhdCAnPT0nIChjdHg6V3hCKQojMzE6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBl
+ci5jOjI0Mzk6CitET19DTVBfUFBaV19CKHN2ZV9jbXBlcV9wcHp3X2IsIGludDhfdCwgIHVpbnQ2
+NF90LCA9PSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJz09JyAoY3R4Old4QikK
+IzMyOiBGSUxFOiB0YXJnZXQvYXJtL3N2ZV9oZWxwZXIuYzoyNDQwOgorRE9fQ01QX1BQWldfSChz
+dmVfY21wZXFfcHB6d19oLCBpbnQxNl90LCB1aW50NjRfdCwgPT0pCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVp
+cmVkIGFyb3VuZCB0aGF0ICc9PScgKGN0eDpXeEIpCiMzMzogRklMRTogdGFyZ2V0L2FybS9zdmVf
+aGVscGVyLmM6MjQ0MToKK0RPX0NNUF9QUFpXX1Moc3ZlX2NtcGVxX3BwendfcywgaW50MzJfdCwg
+dWludDY0X3QsID09KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnIT0nIChjdHg6
+V3hCKQojMzg6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjI0NDM6CitET19DTVBfUFBa
+V19CKHN2ZV9jbXBuZV9wcHp3X2IsIGludDhfdCwgIHVpbnQ2NF90LCAhPSkKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMg
+cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyE9JyAoY3R4Old4QikKIzM5OiBGSUxFOiB0YXJnZXQvYXJt
+L3N2ZV9oZWxwZXIuYzoyNDQ0OgorRE9fQ01QX1BQWldfSChzdmVfY21wbmVfcHB6d19oLCBpbnQx
+Nl90LCB1aW50NjRfdCwgIT0pCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICchPScg
+KGN0eDpXeEIpCiM0MDogRklMRTogdGFyZ2V0L2FybS9zdmVfaGVscGVyLmM6MjQ0NToKK0RPX0NN
+UF9QUFpXX1Moc3ZlX2NtcG5lX3BwendfcywgaW50MzJfdCwgdWludDY0X3QsICE9KQogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDYg
+ZXJyb3JzLCAwIHdhcm5pbmdzLCAxOSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzQ6IHRhcmdldC9hcm06IEZpeCB0
+eXBvIGluIGRvX3NhdF9hZGRzdWJfNjQuLi4KQ2hlY2tpbmcgUEFUQ0ggMy80OiB0YXJnZXQvYXJt
+OiBSZW9yZ2FuaXplIFNWRSBXSElMRS4uLgpDaGVja2luZyBQQVRDSCA0LzQ6IHRhcmdldC9hcm06
+IEZpeCB0eXBvIGluIGhlbHBlcl9zdmVfbW92el9kLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
