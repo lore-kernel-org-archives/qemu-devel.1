@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fl3cz-0003xZ-S5
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:46:22 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fl3kC-0001EG-35
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:53:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fl3cx-0001hn-Qb
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:46:13 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:51968)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
-	id 1fl3cx-0001fq-FW
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:46:11 -0400
-Received: by mail-wm0-x244.google.com with SMTP id y2-v6so735197wma.1
-	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 19:46:11 -0700 (PDT)
-From: Zihan Yang <whois.zihan.yang@gmail.com>
-Date: Thu,  2 Aug 2018 10:45:24 +0800
-Message-Id: <1533177924-24765-7-git-send-email-whois.zihan.yang@gmail.com>
-In-Reply-To: <1533177924-24765-1-git-send-email-whois.zihan.yang@gmail.com>
-References: <1533177924-24765-1-git-send-email-whois.zihan.yang@gmail.com>
-Subject: [Qemu-devel] [RFC v3 6/6] pci_expander_bridge: add start_bus
- property
+	(envelope-from <no-reply@patchew.org>) id 1fl3k8-0007Rw-3m
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:53:40 -0400
+Resent-Message-Id: <E1fl3k8-0007Rw-3m@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21074)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fl3k7-0007Qf-PA
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:53:36 -0400
+In-Reply-To: <1533177743-20894-1-git-send-email-whois.zihan.yang@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153317839108.13170.12329537557784711644@502c9da6d61e>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 1 Aug 2018 19:53:12 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC v3 0/6] pci_expander_brdige: Put pxb-pcie
+ host bridge into separate pci domain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,195 +29,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Zihan Yang <whois.zihan.yang@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: whois.zihan.yang@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-The former bus_nr property indicates the bus number of pxb-pcie device on
-pcie.0 bus, not the Base Bus Number of pxb-pcie host bridge. Use start_bus
-property to represent this BBN when building acpi table
-
-Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
----
- hw/i386/acpi-build.c                        | 22 +++++++++++-----------
- hw/pci-bridge/pci_expander_bridge.c         | 25 ++++++++++++++-----------
- include/hw/pci-bridge/pci_expander_bridge.h |  2 +-
- 3 files changed, 26 insertions(+), 23 deletions(-)
-
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 4b6ef78..874e0fa 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -91,7 +91,7 @@ typedef struct AcpiMcfgInfo {
-     uint64_t mcfg_base;
-     uint32_t mcfg_size;
-     uint32_t domain_nr;
--    uint8_t bus_nr; // start bus number
-+    uint8_t start_bus; // start bus number
-     struct AcpiMcfgInfo *next;
- } AcpiMcfgInfo;
- 
-@@ -2129,7 +2129,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         QObject *o;
-         PCIBus *bus = NULL;
-         uint32_t domain_nr;
--        uint8_t bus_nr;
-+        uint8_t start_bus;
-         int index = 0;
- 
-         pci_host = acpi_get_i386_pci_host();
-@@ -2145,12 +2145,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-             domain_nr = qnum_get_uint(qobject_to(QNum, o));
-             qobject_unref(o);
- 
--            o = object_property_get_qobject(pci_host, "bus_nr", NULL);
-+            o = object_property_get_qobject(pci_host, "start_bus", NULL);
-             if (!o) {
-                 /* we are in q35 host */
--                bus_nr = 0;
-+                start_bus = 0;
-             } else {
--                bus_nr = qnum_get_uint(qobject_to(QNum, o));
-+                start_bus = qnum_get_uint(qobject_to(QNum, o));
-                 qobject_unref(o);
-             }
- 
-@@ -2158,7 +2158,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-             if (bus) {
-                 Aml *scope = aml_scope("PCI%d", index);
-                 aml_append(scope, aml_name_decl("_SEG", aml_int(domain_nr)));
--                aml_append(scope, aml_name_decl("_BBN", aml_int(bus_nr)));
-+                aml_append(scope, aml_name_decl("_BBN", aml_int(start_bus)));
-                 /* Scan all PCI buses. Generate tables to support hotplug. */
-                 build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
- 
-@@ -2486,8 +2486,8 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-     while (info) {
-         mcfg[count].allocation[0].address = cpu_to_le64(info->mcfg_base);
-         mcfg[count].allocation[0].pci_segment = cpu_to_le16(info->domain_nr);
--        mcfg[count].allocation[0].start_bus_number = info->bus_nr;
--        mcfg[count++].allocation[0].end_bus_number = info->bus_nr + \
-+        mcfg[count].allocation[0].start_bus_number = info->start_bus;
-+        mcfg[count++].allocation[0].end_bus_number = info->start_bus + \
-                                     PCIE_MMCFG_BUS(info->mcfg_size - 1);
-         info = info->next;
-     }
-@@ -2710,12 +2710,12 @@ static AcpiMcfgInfo *acpi_get_mcfg(void)
-         mcfg->mcfg_size = qnum_get_uint(qobject_to(QNum, o));
-         qobject_unref(o);
- 
--        o = object_property_get_qobject(obj, PROP_PXB_BUS_NR, NULL);
-+        o = object_property_get_qobject(obj, PROP_PXB_PCIE_START_BUS, NULL);
-         if (!o) {
-             /* we are in q35 host again */
--            mcfg->bus_nr = 0;
-+            mcfg->start_bus = 0;
-         } else {
--            mcfg->bus_nr = qnum_get_uint(qobject_to(QNum, o));
-+            mcfg->start_bus = qnum_get_uint(qobject_to(QNum, o));
-             qobject_unref(o);
-         }
- 
-diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
-index 38212db..85630ff 100644
---- a/hw/pci-bridge/pci_expander_bridge.c
-+++ b/hw/pci-bridge/pci_expander_bridge.c
-@@ -46,6 +46,7 @@ typedef struct PXBBus {
- #define TYPE_PXB_PCIE_DEVICE "pxb-pcie"
- #define PXB_PCIE_DEV(obj) OBJECT_CHECK(PXBDev, (obj), TYPE_PXB_PCIE_DEVICE)
- 
-+#define PROP_PXB_BUS_NR "bus_nr"
- #define PROP_PXB_PCIE_MAX_BUS "max_bus"
- #define PROP_PXB_NUMA_NODE "numa_node"
- 
-@@ -62,8 +63,9 @@ typedef struct PXBDev {
-     PXBPCIEHost *pxbhost;
- 
-     uint32_t domain_nr; /* PCI domain number, non-zero means separate domain */
-+    uint8_t start_bus;  /* indicates the BBN of pxb-pcie-host bridge */
-     uint8_t max_bus;    /* max bus number to use(including this one) */
--    uint8_t bus_nr;
-+    uint8_t bus_nr;     /* bus number of pxb-pcie device on pcei.0 bus */
-     uint16_t numa_node;
- } PXBDev;
- 
-@@ -137,8 +139,8 @@ static void pxb_pcie_foreach(gpointer data, gpointer user_data)
- 
-     if (pxb->domain_nr > 0) {
-         /* only reserve what users ask for to reduce memory cost. Plus one
--         * as the interval [bus_nr, max_bus] has (max_bus-bus_nr+1) buses */
--        pxb_mcfg_hole_size += ((pxb->max_bus - pxb->bus_nr + 1ULL) * MiB);
-+         * as the interval [start_bus, max_bus] has (max_bus-start_bus+1) buses */
-+        pxb_mcfg_hole_size += ((pxb->max_bus - pxb->start_bus + 1ULL) * MiB);
-     }
- }
- 
-@@ -333,11 +335,11 @@ static gint pxb_compare(gconstpointer a, gconstpointer b)
- {
-     const PXBDev *pxb_a = a, *pxb_b = b;
- 
--    /* check domain_nr, then bus_nr */
-+    /* check domain_nr, then start_bus */
-     return pxb_a->domain_nr < pxb_b->domain_nr ? -1 :
-            pxb_a->domain_nr > pxb_b->domain_nr ?  1 :
--           pxb_a->bus_nr < pxb_b->bus_nr ? -1 :
--           pxb_a->bus_nr > pxb_b->bus_nr ?  1 :
-+           pxb_a->start_bus < pxb_b->start_bus ? -1 :
-+           pxb_a->start_bus > pxb_b->start_bus ?  1 :
-            0;
- }
- 
-@@ -362,7 +364,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
-     }
- 
-     if (pcie) {
--        g_assert (pxb->max_bus >= pxb->bus_nr);
-+        g_assert (pxb->max_bus >= pxb->start_bus);
-         ds = qdev_create(NULL, TYPE_PXB_PCIE_HOST);
-         /* attach it under /machine, so that we can resolve a valid path in
-          * object_property_set_link below */
-@@ -377,9 +379,9 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
-         /* will be overwritten by firmware, but kept for readability */
-         qdev_prop_set_uint64(ds, PCIE_HOST_MCFG_BASE,
-             pxb->domain_nr ? pxb_pcie_mcfg_base : MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT);
--        /* +1 because [bus_nr, max_bus] has (max_bus-bus_nr+1) buses */
-+        /* +1 because [start_bus, max_bus] has (max_bus-start_bus+1) buses */
-         qdev_prop_set_uint64(ds, PCIE_HOST_MCFG_SIZE,
--            pxb->domain_nr ? (pxb->max_bus - pxb->bus_nr + 1ULL) * MiB : 0);
-+            pxb->domain_nr ? (pxb->max_bus - pxb->start_bus + 1ULL) * MiB : 0);
-         if (pxb->domain_nr)
-             pxb_pcie_mcfg_base += ((pxb->max_bus + 1ULL) * MiB);
- 
-@@ -389,7 +391,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
-         bus = pci_root_bus_new(ds, "pxb-internal", NULL, NULL, 0, TYPE_PXB_BUS);
-         bds = qdev_create(BUS(bus), "pci-bridge");
-         bds->id = dev_name;
--        qdev_prop_set_uint8(bds, PCI_BRIDGE_DEV_PROP_CHASSIS_NR, pxb->bus_nr);
-+        qdev_prop_set_uint8(bds, PCI_BRIDGE_DEV_PROP_CHASSIS_NR, pxb->start_bus);
-         qdev_prop_set_bit(bds, PCI_BRIDGE_DEV_PROP_SHPC, false);
-     }
- 
-@@ -482,7 +484,8 @@ static Property pxb_pcie_dev_properties[] = {
-     DEFINE_PROP_UINT8(PROP_PXB_BUS_NR, PXBDev, bus_nr, 0),
-     DEFINE_PROP_UINT16(PROP_PXB_NUMA_NODE, PXBDev, numa_node, NUMA_NODE_UNASSIGNED),
-     DEFINE_PROP_UINT32(PROP_PXB_PCIE_DOMAIN_NR, PXBDev, domain_nr, 0),
--    /* set a small default value, bus interval is [bus_nr, max_bus] */
-+    DEFINE_PROP_UINT8(PROP_PXB_PCIE_START_BUS, PXBDev, start_bus, 0),
-+    /* set a small default value, bus interval is [start_bus, max_bus] */
-     DEFINE_PROP_UINT8(PROP_PXB_PCIE_MAX_BUS, PXBDev, max_bus, 16),
- 
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/include/hw/pci-bridge/pci_expander_bridge.h b/include/hw/pci-bridge/pci_expander_bridge.h
-index e6d3b67..54b050c 100644
---- a/include/hw/pci-bridge/pci_expander_bridge.h
-+++ b/include/hw/pci-bridge/pci_expander_bridge.h
-@@ -5,7 +5,7 @@
- #define PROP_PXB_PCIE_HOST "x-pxb-host"
- 
- #define PROP_PXB_PCIE_DOMAIN_NR "domain_nr"
--#define PROP_PXB_BUS_NR "bus_nr"
-+#define PROP_PXB_PCIE_START_BUS "start_bus"
- 
- #define PXB_PCIE_HOST_BRIDGE_CONFIG_ADDR_BASE 0x1000
- #define PXB_PCIE_HOST_BRIDGE_CONFIG_DATA_BASE 0x1004
--- 
-2.7.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MzMxNzc3NDMtMjA4OTQtMS1naXQtc2VuZC1lbWFpbC13aG9pcy56aWhhbi55
+YW5nQGdtYWlsLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyB2MyAwLzZdIHBjaV9leHBh
+bmRlcl9icmRpZ2U6IFB1dCBweGItcGNpZSBob3N0IGJyaWRnZSBpbnRvIHNlcGFyYXRlIHBjaSBk
+b21haW4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
+PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
+cmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpm
+b3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDog
+JChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAt
+LWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhl
+bgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9u
+ZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVh
+OWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29t
+L3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcv
+MTUzMzE3Nzc0My0yMDg5NC0xLWdpdC1zZW5kLWVtYWlsLXdob2lzLnppaGFuLnlhbmdAZ21haWwu
+Y29tIC0+IHBhdGNoZXcvMTUzMzE3Nzc0My0yMDg5NC0xLWdpdC1zZW5kLWVtYWlsLXdob2lzLnpp
+aGFuLnlhbmdAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTJjZWM5
+MzlkYSBwY2lfZXhwYW5kZXJfYnJpZGdlOiBhZGQgc3RhcnRfYnVzIHByb3BlcnR5CjA4MjAwNDI5
+NGMgcGNpX2V4cGFuZGVyX2JyaWRnZTogQWRkIGlvcG9ydCBmb3IgcHhiIGhvc3QgYnVzCjNmZWQ0
+YjAwYjYgcGNpX2V4cGFuZGVyX2JyaWRnZTogQWRkIGNvbmZpZ19yZWFkIGNhbGxiYWNrCmJjMDQ1
+YjU4MmMgaTM4Ni9hY3BpLWJ1aWxkOiBkZXNjcmliZSBuZXcgcGNpIGRvbWFpbiBpbiBBTUwKNWRj
+ZjU2ZTMyMCBhY3BpLWJ1aWxkOiBhbGxvY2F0ZSBtY2ZnIGZvciBweGItcGNpZSBob3N0IGJyaWRn
+ZXMKNjFhNWMwYjJiOSBwY2lfZXhwYW5kZXJfYnJpZGdlOiBhZGQgdHlwZSBUWVBFX1BYQl9QQ0lF
+X0hPU1QKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNjogcGNpX2V4cGFu
+ZGVyX2JyaWRnZTogYWRkIHR5cGUgVFlQRV9QWEJfUENJRV9IT1NULi4uCldBUk5JTkc6IGxpbmUg
+b3ZlciA4MCBjaGFyYWN0ZXJzCiM5MjogRklMRTogaHcvcGNpLWJyaWRnZS9wY2lfZXhwYW5kZXJf
+YnJpZGdlLmM6MTU2Ogorc3RhdGljIHZvaWQgcHhiX3BjaWVfaG9zdF9nZXRfbW1jZmdfc2l6ZShP
+YmplY3QgKm9iaiwgVmlzaXRvciAqdiwgY29uc3QgY2hhciAqbmFtZSwKCkVSUk9SOiBzcGFjZSBw
+cm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcK
+IzE4ODogRklMRTogaHcvcGNpLWJyaWRnZS9wY2lfZXhwYW5kZXJfYnJpZGdlLmM6MzMyOgorICAg
+ICAgICBnX2Fzc2VydCAocHhiLT5tYXhfYnVzID49IHB4Yi0+YnVzX25yKTsKCldBUk5JTkc6IGxp
+bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMDc6IEZJTEU6IGh3L3BjaS1icmlkZ2UvcGNpX2V4cGFu
+ZGVyX2JyaWRnZS5jOjM5OToKKyAgICBERUZJTkVfUFJPUF9VSU5UMTYoUFJPUF9QWEJfTlVNQV9O
+T0RFLCBQWEJEZXYsIG51bWFfbm9kZSwgTlVNQV9OT0RFX1VOQVNTSUdORUQpLAoKV0FSTklORzog
+bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIxMzogRklMRTogaHcvcGNpLWJyaWRnZS9wY2lfZXhw
+YW5kZXJfYnJpZGdlLmM6NDA1OgorICAgIERFRklORV9QUk9QX1VJTlQxNihQUk9QX1BYQl9OVU1B
+X05PREUsIFBYQkRldiwgbnVtYV9ub2RlLCBOVU1BX05PREVfVU5BU1NJR05FRCksCgp0b3RhbDog
+MSBlcnJvcnMsIDMgd2FybmluZ3MsIDIxMSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzY6IGFjcGktYnVpbGQ6IGFs
+bG9jYXRlIG1jZmcgZm9yIHB4Yi1wY2llIGhvc3QgYnJpZGdlcy4uLgpFUlJPUjogZG8gbm90IHVz
+ZSBDOTkgLy8gY29tbWVudHMKIzM0OiBGSUxFOiBody9pMzg2L2FjcGktYnVpbGQuYzo5NDoKKyAg
+ICB1aW50OF90IGJ1c19ucjsgLy8gc3RhcnQgYnVzIG51bWJlcgoKRVJST1I6IGRvIG5vdCB1c2Ug
+YXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzE4OTogRklMRTogaHcvaTM4Ni9hY3BpLWJ1aWxk
+LmM6Mjc5MDoKKyAgICBpZiAoKG1jZmcgPSBhY3BpX2dldF9tY2ZnKCkpICE9IE5VTEwpIHsKCkVS
+Uk9SOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIDAgb3IgTlVMTAojMjc4OiBGSUxFOiBo
+dy9wY2ktYnJpZGdlL3BjaV9leHBhbmRlcl9icmlkZ2UuYzoxMjU6CitzdGF0aWMgdWludDY0X3Qg
+cHhiX21jZmdfaG9sZV9zaXplID0gMDsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
+CiMzNTM6IEZJTEU6IGh3L3BjaS1icmlkZ2UvcGNpX2V4cGFuZGVyX2JyaWRnZS5jOjM1MToKKyAg
+ICAgICAgICAgIHB4Yi0+ZG9tYWluX25yID8gcHhiX3BjaWVfbWNmZ19iYXNlIDogTUNIX0hPU1Rf
+QlJJREdFX1BDSUVYQkFSX0RFRkFVTFQpOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5
+IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMzU3OiBGSUxFOiBody9wY2ktYnJpZGdl
+L3BjaV9leHBhbmRlcl9icmlkZ2UuYzozNTU6CisgICAgICAgIGlmIChweGItPmRvbWFpbl9ucikK
+Wy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhp
+cyBzdGF0ZW1lbnQKIzM2NjogRklMRTogaHcvcGNpLWJyaWRnZS9wY2lfZXhwYW5kZXJfYnJpZGdl
+LmM6NDY4OgorICAgIGlmICgwID09IHB4Yl9wY2llX21jZmdfYmFzZSkKWy4uLl0KCldBUk5JTkc6
+IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
+cGRhdGluZz8KIzQzOTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogNSBlcnJvcnMsIDIg
+d2FybmluZ3MsIDM5OSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzY6IGkzODYvYWNwaS1idWlsZDogZGVzY3JpYmUg
+bmV3IHBjaSBkb21haW4gaW4gQU1MLi4uCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50
+cwojMjg6IEZJTEU6IGh3L2kzODYvYWNwaS1idWlsZC5jOjE4Nzk6CisgICAgaSA9IDE7IC8vIFBD
+STAgaXMgcTM1IGhvc3QsIHB4YiBzdGFydHMgZnJvbSAxCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojMTExOiBGSUxFOiBody9pMzg2L2FjcGktYnVpbGQuYzoyMTY4OgorICAgICAg
+ICAgICAgICAgICAgICBhbWxfYXBwZW5kKGRldiwgYW1sX25hbWVfZGVjbCgiX0hJRCIsIGFtbF9l
+aXNhaWQoIlBOUDBDMzEiKSkpOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMTIgbGlu
+ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
+bmcgUEFUQ0ggNC82OiBwY2lfZXhwYW5kZXJfYnJpZGdlOiBBZGQgY29uZmlnX3JlYWQgY2FsbGJh
+Y2suLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0MzogRklMRTogaHcvcGNpLWJy
+aWRnZS9wY2lfZXhwYW5kZXJfYnJpZGdlLmM6MzU0OgorICAgICAgICBvYmplY3RfcHJvcGVydHlf
+YWRkX2NoaWxkKHFkZXZfZ2V0X21hY2hpbmUoKSwgInB4Yi1wY2llLWhvc3RbKl0iLCBPQkpFQ1Qo
+ZHMpLCBOVUxMKTsKCkVSUk9SOiBzd2l0Y2ggYW5kIGNhc2Ugc2hvdWxkIGJlIGF0IHRoZSBzYW1l
+IGluZGVudAojNjM6IEZJTEU6IGh3L3BjaS1icmlkZ2UvcGNpX2V4cGFuZGVyX2JyaWRnZS5jOjQz
+NToKKyAgIHN3aXRjaCAoYWRkcmVzcykgeworICAgIGNhc2UgTUNIX0hPU1RfQlJJREdFX1BDSUVY
+QkFSOgpbLi4uXQorICAgIGNhc2UgTUNIX0hPU1RfQlJJREdFX1BDSUVYQkFSICsgNDoKWy4uLl0K
+KyAgICBjYXNlIE1DSF9IT1NUX0JSSURHRV9QQ0lFWEJBUiArIDg6ICAvLyBGaXggbWUhClsuLi5d
+CisgICAgZGVmYXVsdDoKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2NzogRklM
+RTogaHcvcGNpLWJyaWRnZS9wY2lfZXhwYW5kZXJfYnJpZGdlLmM6NDM5OgorICAgICAgICB2YWwg
+PSBvYmplY3RfcHJvcGVydHlfZ2V0X3VpbnQoaG9zdCwgUENJRV9IT1NUX01DRkdfQkFTRSwgTlVM
+TCkgJiAweEZGRkZGRkZGOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM3MjogRklM
+RTogaHcvcGNpLWJyaWRnZS9wY2lfZXhwYW5kZXJfYnJpZGdlLmM6NDQ0OgorICAgICAgICB2YWwg
+PSAob2JqZWN0X3Byb3BlcnR5X2dldF91aW50KGhvc3QsIFBDSUVfSE9TVF9NQ0ZHX0JBU0UsIE5V
+TEwpID4+IDMyKSAmIDB4RkZGRkZGRkY7CgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVu
+dHMKIzc0OiBGSUxFOiBody9wY2ktYnJpZGdlL3BjaV9leHBhbmRlcl9icmlkZ2UuYzo0NDY6Cisg
+ICAgY2FzZSBNQ0hfSE9TVF9CUklER0VfUENJRVhCQVIgKyA4OiAgLy8gRml4IG1lIQoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc3OiBGSUxFOiBody9wY2ktYnJpZGdlL3BjaV9l
+eHBhbmRlcl9icmlkZ2UuYzo0NDk6CisgICAgICAgIHZhbCA9IG9iamVjdF9wcm9wZXJ0eV9nZXRf
+dWludChob3N0LCBQQ0lFX0hPU1RfTUNGR19TSVpFLCBOVUxMKSAmIDB4RkZGRkZGRkY7Cgp0b3Rh
+bDogNCBlcnJvcnMsIDIgd2FybmluZ3MsIDEwNiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzY6IHBjaV9leHBhbmRl
+cl9icmlkZ2U6IEFkZCBpb3BvcnQgZm9yIHB4YiBob3N0IGJ1cy4uLgpFUlJPUjogZG8gbm90IHVz
+ZSBDOTkgLy8gY29tbWVudHMKIzI0OiBGSUxFOiBody9wY2ktYnJpZGdlL3BjaV9leHBhbmRlcl9i
+cmlkZ2UuYzoyMzQ6CisgICAgLy8gRklYIE1FISBVc2Ugc3BlY2lmaWMgcG9ydCBudW1iZXIgZm9y
+IHB4Yi1wY2llIGhvc3QgYnJpZGdlLCBub3Qgc2NhbGFibGUhCgpFUlJPUjogbGluZSBvdmVyIDkw
+IGNoYXJhY3RlcnMKIzI3OiBGSUxFOiBody9wY2ktYnJpZGdlL3BjaV9leHBhbmRlcl9icmlkZ2Uu
+YzoyMzc6CisgICAgc3lzYnVzX2luaXRfaW9wb3J0cyhzYmQsIFBYQl9QQ0lFX0hPU1RfQlJJREdF
+X0NPTkZJR19BRERSX0JBU0UgKyBnX2xpc3RfbGVuZ3RoKHB4Yl9kZXZfbGlzdCkgKiA4LCA0KTsK
+CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzA6IEZJTEU6IGh3L3BjaS1icmlkZ2Uv
+cGNpX2V4cGFuZGVyX2JyaWRnZS5jOjI0MDoKKyAgICBzeXNidXNfaW5pdF9pb3BvcnRzKHNiZCwg
+UFhCX1BDSUVfSE9TVF9CUklER0VfQ09ORklHX0RBVEFfQkFTRSArIGdfbGlzdF9sZW5ndGgocHhi
+X2Rldl9saXN0KSAqIDgsIDQpOwoKdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAzNiBsaW5l
+cyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2lu
+ZyBQQVRDSCA2LzY6IHBjaV9leHBhbmRlcl9icmlkZ2U6IGFkZCBzdGFydF9idXMgcHJvcGVydHku
+Li4KRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMyMjogRklMRTogaHcvaTM4Ni9h
+Y3BpLWJ1aWxkLmM6OTQ6CisgICAgdWludDhfdCBzdGFydF9idXM7IC8vIHN0YXJ0IGJ1cyBudW1i
+ZXIKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTY6IEZJTEU6IGh3L3BjaS1i
+cmlkZ2UvcGNpX2V4cGFuZGVyX2JyaWRnZS5jOjE0MjoKKyAgICAgICAgICogYXMgdGhlIGludGVy
+dmFsIFtzdGFydF9idXMsIG1heF9idXNdIGhhcyAobWF4X2J1cy1zdGFydF9idXMrMSkgYnVzZXMg
+Ki8KCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3Bl
+biBwYXJlbnRoZXNpcyAnKCcKIzE0MTogRklMRTogaHcvcGNpLWJyaWRnZS9wY2lfZXhwYW5kZXJf
+YnJpZGdlLmM6MzY3OgorICAgICAgICBnX2Fzc2VydCAocHhiLT5tYXhfYnVzID49IHB4Yi0+c3Rh
+cnRfYnVzKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjI6IEZJTEU6IGh3
+L3BjaS1icmlkZ2UvcGNpX2V4cGFuZGVyX2JyaWRnZS5jOjM5NDoKKyAgICAgICAgcWRldl9wcm9w
+X3NldF91aW50OChiZHMsIFBDSV9CUklER0VfREVWX1BST1BfQ0hBU1NJU19OUiwgcHhiLT5zdGFy
+dF9idXMpOwoKdG90YWw6IDIgZXJyb3JzLCAyIHdhcm5pbmdzLCAxNDkgbGluZXMgY2hlY2tlZAoK
+WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09
+CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
+YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
+bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
