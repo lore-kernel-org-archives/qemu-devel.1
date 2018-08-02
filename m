@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1flHZe-0003QD-MN
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:39:43 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1flHav-0004T0-JD
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1flHZb-0001vX-Jg
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:39:42 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40072)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1flHZb-0001u7-7U
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:39:39 -0400
-Received: by mail-pg1-x544.google.com with SMTP id x5-v6so1538386pgp.7
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 10:39:38 -0700 (PDT)
-References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1533219424-7627-24-git-send-email-stefan.markovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1a3c354d-4cdf-935a-2d6b-aa4fbc2bf100@linaro.org>
-Date: Thu, 2 Aug 2018 13:39:27 -0400
-MIME-Version: 1.0
-In-Reply-To: <1533219424-7627-24-git-send-email-stefan.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 23/77] target/mips: Add emulation of
- nanoMIPS 16-bit load and store instructions
+	(envelope-from <pm215@archaic.org.uk>) id 1flHau-0003Zu-Gt
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:41:01 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43954)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1flHah-0003Ke-SI
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:41:00 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu,  2 Aug 2018 18:40:40 +0100
+Message-Id: <20180802174042.29234-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/2] hw/net/pcnet-pci: Convert away from
+ old_mmio accessors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Markovic <stefan.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Jason Wang <jasowang@redhat.com>
 
-On 08/02/2018 10:16 AM, Stefan Markovic wrote:
->      case NM_P16_LB:
-> +        switch (extract32(ctx->opcode, 2, 2)) {
-> +        case NM_LB16:
-> +            offset = extract32(ctx->opcode, 0, 2);
-> +            gen_ld(ctx, OPC_LB, rt, rs, offset);
-> +            break;
-> +        case NM_SB16:
-> +            offset = decode_gpr_gpr3_src_store(
-> +                         NANOMIPS_EXTRACT_RD(ctx->opcode));
-> +            gen_st(ctx, OPC_SB, rt, rs, offset);
+This patchset converts the pcnet-pci's MMIO BAR MemoryRegionOps
+away from the old_mmio accessors.
 
-That looks wrong.  I think you want
+It does it in two stages:
+ * patch 1 is a no-behaviour-change patch which replaces the old
+   split byte/word/long accessor functions with single read and
+   write functions which take the size, and look suspiciously
+   similar but not identical to the existing pcnet_ioport_read/write
+   functions
+ * patch 2 then drops the new read and write functions and just
+   uses the ioport read/write functions
 
-    rt = decode_gpr_gpr3_src_store(...);
-    offset = extract32(ctx->opcode, 0, 2);
+My reason for structuring it like this is that I'm pretty sure
+that the discrepancy between the MMIO BAR accessors and the
+IO BAR accessors is just a bug (one which we fixed for the
+IO BAR accessors in commit 7ba79741970 in 2011). But if I'm
+wrong I want us to be able to revert the behaviour change
+easily without that bringing back a use of the old_mmio accessors
+(which might not even compile if we need to revert after we've
+finally managed to drop those entirely).
 
-here.
+The bug as fixed in patch 2 is that for the MMIO BAR we were
+not honouring the DWIO bit (which indicates whether the device
+is in 16-bit or 32-bit IO mode) when doing accesses to the
+aprom range 0x0..0xf. We were already honouring DWIO for accesses
+to the 0x10..0x1f range, and my trawling through datasheets
+indicates that DWIO applies identically to MMIO and IO BARs
+(see patch 2's commit message for details and references).
 
->      case NM_P16_LH:
-> +        switch ((extract32(ctx->opcode, 3, 1) << 1) | (ctx->opcode & 1)) {
-> +        case NM_LH16:
-> +            offset = extract32(ctx->opcode, 1, 2) << 1;
-> +            gen_ld(ctx, OPC_LH, rt, rs, offset);
-> +            break;
-> +        case NM_SH16:
-> +            offset = decode_gpr_gpr3_src_store(
-> +                         NANOMIPS_EXTRACT_RD(ctx->opcode));
-> +            gen_st(ctx, OPC_SH, rt, rs, offset);
+This is awkwardly hard to test, though, because Linux's
+pcnet driver only uses port IO as far as I can tell. (Likely
+this is why the bug has remained unnoticed for so long.)
 
-Similarly.
+thanks
+-- PMM
 
+Peter Maydell (2):
+  hw/net/pcnet-pci: Convert away from old_mmio accessors
+  hw/net/pcnet-pci: Unify pcnet_ioport_read/write and
+    pcnet_mmio_read/write
 
-r~
+ hw/net/pcnet-pci.c  | 98 +++------------------------------------------
+ hw/net/trace-events |  6 ---
+ 2 files changed, 6 insertions(+), 98 deletions(-)
+
+-- 
+2.17.1
