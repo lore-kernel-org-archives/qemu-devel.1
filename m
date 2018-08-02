@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1flAlq-0006y2-43
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 06:23:51 -0400
+	(envelope-from <david@redhat.com>) id 1flAsd-0000ho-6K
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 06:30:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1flAlo-0001iH-QN
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 06:23:50 -0400
-References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
-	<20180626135035.133432-5-vsementsov@virtuozzo.com>
-	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
-	<20180801102031.GC2691@work-vm>
-	<64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
-	<20180801174005.GD2691@work-vm>
-	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
-	<e200102e-f5ae-3dae-42b1-b9f98d92fc46@redhat.com>
-	<30c90ae6-b747-7da8-9f9c-93511fd95a7b@openvz.org>
-	<d42a47b0-9f45-7dba-98b4-49253916c590@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <69c2d76b-8755-d63d-49be-75b789d07e1f@virtuozzo.com>
-Date: Thu, 2 Aug 2018 13:23:32 +0300
+	(envelope-from <david@redhat.com>) id 1flAsZ-0007me-Uj
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 06:30:51 -0400
+References: <20180801133444.11269-1-david@redhat.com>
+	<20180802121704.21fc4357@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <def8395b-ba15-b49c-1e89-1b3ba4e8a526@redhat.com>
+Date: Thu, 2 Aug 2018 12:30:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <d42a47b0-9f45-7dba-98b4-49253916c590@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180802121704.21fc4357@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
- loading and migration logic
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] pc-dimm: pre_plug "slot" and "addr"
+ assignment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,114 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "Denis V. Lunev" <den@openvz.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, Eric Auger <eric.auger@redhat.com>
 
-02.08.2018 01:28, John Snow wrote:
->
-> On 08/01/2018 04:47 PM, Denis V. Lunev wrote:
->> On 08/01/2018 09:56 PM, John Snow wrote:
->>> On 08/01/2018 02:42 PM, Denis V. Lunev wrote:
->>>> On 08/01/2018 08:40 PM, Dr. David Alan Gilbert wrote:
->>>>> * John Snow (jsnow@redhat.com) wrote:
->>>>>> On 08/01/2018 06:20 AM, Dr. David Alan Gilbert wrote:
->>>>>>> * John Snow (jsnow@redhat.com) wrote:
->>>>>>>
->>>>>>> <snip>
->>>>>>>
->>>>>>>> I'd rather do something like this:
->>>>>>>> - Always flush bitmaps to disk on inactivate.
->>>>>>> Does that increase the time taken by the inactivate measurably?
->>>>>>> If it's small relative to everything else that's fine; it's just I
->>>>>>> always worry a little since I think this happens after we've stoppe=
-d the
->>>>>>> CPU on the source, so is part of the 'downtime'.
->>>>>>>
->>>>>>> Dave
->>>>>>> --
->>>>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>>>>>>
->>>>>> I'm worried that if we don't, we're leaving behind unusable, partial=
-ly
->>>>>> complete files behind us. That's a bad design and we shouldn't push =
-for
->>>>>> it just because it's theoretically faster.
->>>>> Oh I don't care about theoretical speed; but if it's actually unusabl=
-y
->>>>> slow in practice then it needs fixing.
->>>>>
->>>>> Dave
->>>> This is not "theoretical" speed. This is real practical speed and
->>>> instability.
->>> It's theoretical until I see performance testing numbers; do you have
->>> any? How much faster does the pivot happen by avoiding making the qcow2
->>> consistent on close?
->>>
->>> I don't argue that it's faster to just simply not write data, but what'=
-s
->>> not obvious is how much time it actually saves in practice and if that'=
-s
->>> worth doing unintuitive and undocumented things like "the source file
->>> loses bitmaps after a migration because it was faster."
->> Also, frankly speaking, I do not understand the goal of this purism.
+On 02.08.2018 12:17, Igor Mammedov wrote:
+> On Wed,  1 Aug 2018 15:34:40 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> This is basically a resend of v3 with commit message changes.
 >>
-> The goal of my series originally was just to limit some corner cases. At
-> the time it was not evident that avoiding a flush was a *goal* of that
-> series rather than a *side-effect* or a means to an end (avoiding
-> migrating a bitmap over two different channels).
+>> Paolo, if there are no further comments, can you please pick this up for
+>> 3.1? Thanks!
+>>
+>> ---
+>>
+>> As requested by Igor, assign and verify "slot" and "addr" in the
+>> pre_plug handler. Factor out the compatibility handling/configuration
+>> for detecting the alignment to be used when searching for an address
+>> in guest physical memory for a memory device.
+>>
+>> This is another part of the original series
+>>     [PATCH v4 00/14] MemoryDevice: use multi stage hotplug handlers
+> does it depend on
+>    [PATCH v1 00/11] memory-device: complete refactoring
+> that's still on my review queue?
+> or it's other way around?
 
-It's not a goal and its not a side-effect. Flush is already avoided=20
-currently, in upstream code. And your series is degradation.
-The goal is another: make the whole thing more obvious and make it=20
-possible to restore bitmaps persistance after failed migration.
-
->
-> It was not immediately obvious to me that intentionally leaving behind
-> partially flushed qcow2 files was expected behavior. I still think it's
-> probably not the best behavior in general, but it's also not really
-> catastrophic either. If you had benchmarks it'd be useful to show an
-> obvious benefit to doing something unconventional.
->
-> In this case, I *do* consider not writing metadata back out to disk on
-> close something "unconventional."
->
-> Clearly my series missed missed an important case, so it can't be used
-> at all, and the status quo is also broken for several cases and also
-> cannot be used. With your performance concerns in mind, I'm looking at
-> Vladimir's series again. It might just require some more concise
-> comments explaining why you're taking the exact approach that you are.
->
-> --js
->
->> There 2 main cases - shared and non-shared storage. On shared
->> storage:
->> - normally migration is finished successfully. Source is shut down,
->>  =C2=A0 target is started. The data in the file on shared storage would =
-be
->>  =C2=A0 __IMMEDIATELY__ marked as stale on target, i.e. you will save CB=
-T
->>  =C2=A0on source (with IO over networked fs), load CBT on target (with I=
-O
->>  =C2=A0over networked FS), mark CBT as stale (IO again). CBT data writte=
-n
->>  =C2=A0is marked as lost
->> - failed migration. OK, we have CBT data written on source, CBT
->>  =C2=A0 data read on source, CBT data marked stale. Thus any CBT on
->>  =C2=A0 disk while VM is running is pure overhead.
->>
->> The same situation is when we use non-shared migration. In this
->> case the situation is even worse. You save CBT and put it to trash
->> upon migration complete.
->>
->> Please also note, that CBT saving almost does not protect us
->> from powerlosses as the power should be lost at the very
->> specific moment to allow data to survive and most likely
->> we will have to drop CBT completely.
->>
->> Den
->>
+The other way around, "[PATCH v1 00/11] memory-device: complete
+refactoring" is based on this series.
 
 
---=20
-Best regards,
-Vladimir
+-- 
+
+Thanks,
+
+David / dhildenb
