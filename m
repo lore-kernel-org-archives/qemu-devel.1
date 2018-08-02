@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1flHTL-0001bp-Ki
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:33:12 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1flHUs-0002IT-Up
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:34:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1flHTH-0000Uc-J5
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:33:11 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:46738)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1flHTH-0000Sc-BK
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:33:07 -0400
-Received: by mail-oi0-x242.google.com with SMTP id y207-v6so4995538oie.13
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 10:33:07 -0700 (PDT)
-References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1533219424-7627-20-git-send-email-stefan.markovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ca8e1d74-6d7e-86b3-3a45-aa60239d3f49@linaro.org>
-Date: Thu, 2 Aug 2018 13:32:54 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1flHUs-0002co-6S
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:34:46 -0400
+References: <20180802144430.13870-1-peter.maydell@linaro.org>
+	<20180802144430.13870-2-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <3a7931a8-e28d-5b10-c7a8-5df5651234fe@reactos.org>
+Date: Thu, 2 Aug 2018 19:34:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <1533219424-7627-20-git-send-email-stefan.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180802144430.13870-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 19/77] target/mips: Add emulation of
- nanoMIPS 16-bit arithmetic instructions
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] hw/ppc/prep: Remove ifdeffed-out stub
+ of XCSR code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +25,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Markovic <stefan.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-On 08/02/2018 10:16 AM, Stefan Markovic wrote:
-> From: Yongbok Kim <yongbok.kim@mips.com>
+Le 02/08/2018 à 16:44, Peter Maydell a écrit :
+> The prep machine has some code which is stubs of accessors
+> for XCSR registers. This has been disabled via #if 0
+> since commit b6b8bd1819ff in 2004, and doesn't have any
+> actual interesting content. It also uses the deprecated
+> old_mmio accessor functions. Remove it entirely.
 > 
-> Add emulation of nanoMIPS 16-bit arithmetic instructions.
-> 
-> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/mips/translate.c | 125 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 125 insertions(+)
+>   hw/ppc/prep.c | 97 +++------------------------------------------------
+>   1 file changed, 4 insertions(+), 93 deletions(-)
+> 
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
