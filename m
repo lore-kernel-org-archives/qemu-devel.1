@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1fl2rY-0000hF-Q4
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 21:57:13 -0400
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fl3Zu-0001Ex-Qp
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:43:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1fl2rV-00052h-PN
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 21:57:12 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2639 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <longpeng2@huawei.com>)
-	id 1fl2rV-0004x0-Am
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 21:57:09 -0400
-Message-ID: <5B6264E2.2060407@huawei.com>
-Date: Thu, 2 Aug 2018 09:56:50 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
-MIME-Version: 1.0
-References: <1514626559-162312-1-git-send-email-longpeng2@huawei.com>
-	<1514626559-162312-2-git-send-email-longpeng2@huawei.com>
-	<fcb63fc3-22eb-7f6c-2014-744ee75784eb@linux.vnet.ibm.com>
-	<5B51CF0B.8020706@huawei.com>
-	<a332a516-16dc-1e50-3ea6-b68571880cb7@linux.ibm.com>
-	<20180727144726-mutt-send-email-mst@kernel.org>
-	<47e5bc06-6b4d-aab6-db77-c91313d36d87@linux.ibm.com>
-In-Reply-To: <47e5bc06-6b4d-aab6-db77-c91313d36d87@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [v23 1/2] virtio-crypto: Add
- virtio crypto device specification
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fl3Zp-00075R-M3
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:43:02 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:37078)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
+	id 1fl3Zp-00074O-EM
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:42:57 -0400
+Received: by mail-wm0-x244.google.com with SMTP id n11-v6so723941wmc.2
+	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 19:42:56 -0700 (PDT)
+From: Zihan Yang <whois.zihan.yang@gmail.com>
+Date: Thu,  2 Aug 2018 10:42:17 +0800
+Message-Id: <1533177743-20894-1-git-send-email-whois.zihan.yang@gmail.com>
+Subject: [Qemu-devel] [RFC v3 0/6] pci_expander_brdige: Put pxb-pcie host
+ bridge into separate pci domain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, arei.gonglei@huawei.com, stefanha@redhat.com
-Cc: denglingli@chinamobile.com, virtio-dev@lists.oasis-open.org, Halil
-	Pasic <pasic@linux.vnet.ibm.com>, Ola.Liljedahl@arm.com, brian.a.keating@intel.com, Jani.Kokkonen@huawei.com, xin.zeng@intel.com, wangxinxin.wang@huawei.com, liang.j.ma@intel.com, qemu-devel@nongnu.org, john.griffin@intel.com, agraf@suse.de, jianjay.zhou@huawei.com, cornelia.huck@de.ibm.com, Varun.Sethi@freescale.com, vincent.jardin@6wind.com, jasowang@redhat.com, weidong.huang@huawei.com
+To: qemu-devel@nongnu.org
+Cc: Zihan Yang <whois.zihan.yang@gmail.com>
 
-Hi Halil,
+NOTE: This patch set relies on seabios change. Unfortunately, I haven't got
+it fully working in seabios, but I still post them here because patches
+involve some port layout change to be reviewed, and it has been a long delay
+since my last version. I'm trying to catch things up recently.
 
-On 2018/8/2 4:21, Halil Pasic wrote:
+If you would like to see current status of seabios part, please refer to
+https://mail.coreboot.org/pipermail/seabios/2018-August/012385.html
 
-> 
-> 
-> On 07/27/2018 01:51 PM, Michael S. Tsirkin wrote:
->> On Thu, Jul 26, 2018 at 06:55:44PM +0200, Halil Pasic wrote:
->>> Sorry I did not have any time for this last days. And this
->>> to make it worse this is a follow up to something that was
->>> half a year ago. That means I have to re-familiarize myself
->>> with the topic.
->>>
->>> If I don't get around to answer in couple of weeks, feel
->>> free to ping me.
->>>
->>> Since from what I've seen most of the questions were of type
->>> 'Can we do it like this?', maybe sending out a new version
->>> is the best. So people (like me) can read through the whole
->>> thing and point out problems if any.
->>>
->>> Regards,
->>> Halil
->>
->>
->> While two weeks for review is borderline reasonable as an exception, it
->> does trouble me that  we are at v23, for something that is used
->> in the field so it's not like we can just change things at will.
->> So I hope everyone concerned makes an effort to try to converge on a spec
->> ASAP.
->>
-> 
-> What I tried to say: I'm busy with other stuff, and I'm not too
-> happy to resume a complex topic after 6 months hiatus.
-> 
-> The series is now at v24 and has apparently no acks or r-bs. I don't think
-> I'm the only one to blame for that.
-> 
+Currently only q35 host bridge is allocated an item in MCFG table, all pxb
+host bridges stay within pci domain 0. This series of patches put each pxb
+host bridge in separate pci domain, allocating a new MCFG table item for it.
 
-> It seems, I won't have the time to do a conscientious review in a
-> timely fashion. If the rest of the bunch thinks what we have is good
-> enough, I am happy to abstain when voting on this -- and avoiding
-> holding it up any further.
-> 
+Users can configure whether to put pxb host bridge into separate domain
+by passing parameter domain_nr to pxb pcie device. start_bus property
+indicates the Base Bus Number(BBN) of the pxb host bridge. Another property
+max_bus specifies the maximum desired bus numbers to reduce MCFG space cost.
+Example command is
 
-Thanks for your conscientious reviews on previous versions and your suggestions
-are really useful to make the spec better. I'm sorry that I should be to blame
-for the half a year hiatus, not you.
+    -device pxb-pcie,id=br3,bus="pcie.0",start_bus=0,domain_nr=1,max_bus=15
 
-I've do some offline discussions with Gonglei and Intel guys, it seems that
-there is no big arguments on v23 and the following small problems can be fixed
-by follow-up patches.
+Then this pxb-pcie host bridge is placed at pci domain 1, and only reserve
+(15+1)=16 buses, which is much smaller than the default 256 buses.
 
-I hope guys who care about this spec could post your opinion, I'll suggest
-Gonglei to start a vote for the spec if no.
+The pxb host does not have an mch in it, as q35 host already has one. All
+pxb host bridges just serve as expander bridges in QEMU, which makes them
+a little simpler than q35 host bridge.
 
-> Regards,
-> Halil
-> 
-> 
-> .
-> 
+v3 <- v2:
+- Replace duplicate properties in pxb pcie host with link property to PXBDev
+- Allow seabios to access config space and data space of expander bridge
+  through a different ioport, because 0xcf8 is attached only to sysbus.
+- Add a new property start_bus to indicate the BBN of pxb host bridge. The
+  bus_nr property is used as the bus number of pxb-pcie device on pcie.0 bus
 
+v2 <- v1:
+- Allow user to configure whether to put pxb-pcie into seperate domain
+- Add AML description part of each host bridge
+- Modify the location of MCFG space to between RAM hotplug and pci hole64
+
+
+
+Zihan Yang (6):
+  pci_expander_bridge: add type TYPE_PXB_PCIE_HOST
+  acpi-build: allocate mcfg for pxb-pcie host bridges
+  i386/acpi-build: describe new pci domain in AML
+  pci_expander_bridge: Add config_read callback
+  pci_expander_bridge: Add ioport for pxb host bus
+  pci_expander_bridge: add start_bus property
+
+ hw/i386/acpi-build.c                        | 193 +++++++++++++++++------
+ hw/i386/pc.c                                |  14 +-
+ hw/pci-bridge/pci_expander_bridge.c         | 229 +++++++++++++++++++++++++++-
+ hw/pci-host/q35.c                           |   2 +
+ hw/pci/pci.c                                |   9 +-
+ include/hw/i386/pc.h                        |   1 +
+ include/hw/pci-bridge/pci_expander_bridge.h |  15 ++
+ include/hw/pci-host/q35.h                   |   1 +
+ include/hw/pci/pci_host.h                   |   2 +-
+ 9 files changed, 406 insertions(+), 60 deletions(-)
+ create mode 100644 include/hw/pci-bridge/pci_expander_bridge.h
 
 -- 
-Regards,
-Longpeng(Mike)
+2.7.4
