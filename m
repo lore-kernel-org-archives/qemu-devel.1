@@ -1,24 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fl7UX-00006D-Lr
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 02:53:46 -0400
+	(envelope-from <frankja@linux.ibm.com>) id 1fl7Uc-00008S-0J
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 02:53:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fl7UU-0005PS-Ky
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 02:53:45 -0400
-Date: Thu, 2 Aug 2018 07:53:39 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180802065339.GC13481@stefanha-x1.localdomain>
-References: <20180725085944.11856-1-stefanha@redhat.com>
-	<20180725085944.11856-8-stefanha@redhat.com>
-	<0c2c23f3-5ec9-5446-17ca-683d267d0f4c@amsat.org>
-	<6c1020b8.17461.164de2dc109.Coremail.suhang16@mails.ucas.ac.cn>
+	(envelope-from <frankja@linux.ibm.com>) id 1fl7UY-0005Rk-Sb
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 02:53:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33342
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+	id 1fl7UY-0005RT-Ku
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 02:53:46 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w726ml0a106079
+	for <qemu-devel@nongnu.org>; Thu, 2 Aug 2018 02:53:45 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2kktprvxk6-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 02:53:45 -0400
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+	Thu, 2 Aug 2018 07:53:43 +0100
+References: <20180801131905.148778-1-frankja@linux.ibm.com>
+	<20180801131905.148778-3-frankja@linux.ibm.com>
+	<2da970ab-276f-f792-54d8-c696e899cac5@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Date: Thu, 2 Aug 2018 08:53:18 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="YD3LsXFS42OYHhNZ"
-Content-Disposition: inline
-In-Reply-To: <6c1020b8.17461.164de2dc109.Coremail.suhang16@mails.ucas.ac.cn>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 7/7] Add QTest testcase for
- the Intel Hexadecimal
+In-Reply-To: <2da970ab-276f-f792-54d8-c696e899cac5@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kTWHupgxdByrEm3BDLrgxo8ee5kIft0bG"
+Message-Id: <1889220a-b804-23a2-26ef-1a319da01d26@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 2/2] s390x: Enable KVM huge
+ page backing support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +45,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Su Hang <suhang16@mails.ucas.ac.cn>
-Cc: philippe =?iso-8859-1?Q?mathieu-daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org, jim@groklearning.com, mail@steffen-goertz.de, ilg@livius.net, alistair@alistair23.me, sundeep.lkml@gmail.com, qemu.ml@steffen-goertz.de, qemu-arm@nongnu.org, joel@jms.id.au, stefanha@redhat.com, jusual@mail.ru
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
 
-
---YD3LsXFS42OYHhNZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kTWHupgxdByrEm3BDLrgxo8ee5kIft0bG
+From: Janosch Frank <frankja@linux.ibm.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
+ david@redhat.com
+Message-ID: <1889220a-b804-23a2-26ef-1a319da01d26@linux.ibm.com>
+Subject: Re: [qemu-s390x] [PATCH v4 2/2] s390x: Enable KVM huge page backing
+ support
+References: <20180801131905.148778-1-frankja@linux.ibm.com>
+ <20180801131905.148778-3-frankja@linux.ibm.com>
+ <2da970ab-276f-f792-54d8-c696e899cac5@redhat.com>
+In-Reply-To: <2da970ab-276f-f792-54d8-c696e899cac5@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jul 28, 2018 at 07:58:17AM +0800, Su Hang wrote:
-> > > +#define BIN_SIZE 146
-> > > +
-> > > +static unsigned char pre_store[BIN_SIZE] =3D {
-> > > +    4,   208, 159, 229, 22,  0,   0,   235, 254, 255, 255, 234, 152,=
- 16,  1,
-> > > +    0,   4,   176, 45,  229, 0,   176, 141, 226, 12,  208, 77,  226,=
- 8,   0,
-> > > +    11,  229, 6,   0,   0,   234, 8,   48,  27,  229, 0,   32,  211,=
- 229, 44,
-> > > +    48,  159, 229, 0,   32,  131, 229, 8,   48,  27,  229, 1,   48, =
- 131, 226,
-> > > +    8,   48,  11,  229, 8,   48,  27,  229, 0,   48,  211, 229, 0,  =
- 0,   83,
-> > > +    227, 244, 255, 255, 26,  0,   0,   160, 225, 0,   208, 139, 226,=
- 4,   176,
-> > > +    157, 228, 30,  255, 47,  225, 0,   16,  31,  16,  0,   72,  45, =
- 233, 4,
-> > > +    176, 141, 226, 8,   0,   159, 229, 230, 255, 255, 235, 0,   0,  =
- 160, 225,
-> > > +    0,   136, 189, 232, 132, 0,   1,   0,   0,   16,  31,  16,  72, =
- 101, 108,
-> > > +    108, 111, 32,  119, 111, 114, 108, 100, 33,  10,  0};
-> >=20
-> > Can this be:
-> >=20
-> >   0x04, 0xd0, 0x9f, 0xe5,   0x16, 0x00, 0x00, 0xeb,   0xfe, 0xff, 0xff,
-> > 0xea,
-> >   0x98, 0x10, 0x01, 0x00,   0x04, 0xb0, 0x2d, 0xe5,   0x00, 0xb0, 0x8d,
-> > 0xe2,
-> >   0x0c, 0xd0, 0x4d, 0xe2,   0x08, 0x00, 0x0b, 0xe5,   0x06, 0x00, 0x00,
-> > 0xea,
-> >   0x08, 0x30, 0x1b, 0xe5,   0x00, 0x20, 0xd3, 0xe5,   0x2c, 0x30, 0x9f,
-> > 0xe5,
-> >   0x00, 0x20, 0x83, 0xe5,   0x08, 0x30, 0x1b, 0xe5,   0x01, 0x30, 0x83,
-> > 0xe2,
-> >   0x08, 0x30, 0x0b, 0xe5,   0x08, 0x30, 0x1b, 0xe5,   0x00, 0x30, 0xd3,
-> > 0xe5,
-> >   0x00, 0x00, 0x53, 0xe3,   0xf4, 0xff, 0xff, 0x1a,   0x00, 0x00, 0xa0,
-> > 0xe1,
-> >   0x00, 0xd0, 0x8b, 0xe2,   0x04, 0xb0, 0x9d, 0xe4,   0x1e, 0xff, 0x2f,
-> > 0xe1,
-> >   0x00, 0x10, 0x1f, 0x10,   0x00, 0x48, 0x2d, 0xe9,   0x04, 0xb0, 0x8d,
-> > 0xe2,
-> >   0x08, 0x00, 0x9f, 0xe5,   0xe6, 0xff, 0xff, 0xeb,   0x00, 0x00, 0xa0,
-> > 0xe1,
-> >   0x00, 0x88, 0xbd, 0xe8,   0x84, 0x00, 0x01, 0x00,   0x00, 0x10, 0x1f,
-> > 0x10,
-> >   'H',  'e',  'l',  'l',    'o',  ' ',  'w',  'o',    'r',  'l',  'd', =
- '!',
-> >   '\n', '\0'
-> > };
-> >=20
-> > ?
+On 01.08.2018 18:47, Thomas Huth wrote:
+> On 08/01/2018 03:19 PM, Janosch Frank wrote:
+>> +static int kvm_s390_configure_mempath_backing(KVMState *s)
+>> +{
+>> +    size_t path_psize =3D qemu_mempath_getpagesize(mem_path);
+>> +
+>> +    if (path_psize =3D=3D 4 * KiB)
+>> +        return 0;
 >=20
-> Yes, good suggestion. Your version is clearer and more readable for human=
-s.
+> Missing curly braces.
 
-Okay, I will make the change in v4.
+urgh, right, this is not the kernel.
 
-Stefan
+>=20
+>> +    if (path_psize !=3D 1 * MiB) {
+>> +        error_report("Memory backing with 2G pages was specified, "
+>> +                     "but KVM does not support this memory backing");=
 
---YD3LsXFS42OYHhNZ
+>=20
+> May I suggest to use a text that rather matches the condition of the
+> if-statement (just in case there will be other sizes in the future...),=
+
+> e.g. "Memory backing is only supported for 1 MiB huge pages" or
+> something similar.
+>=20
+>  Thomas
+>=20
+
+That's actually the gist of it. s390 supports 4k, 1M and 2G and looking
+at the POP I don't see a big chance of having any more sizes, as there
+are not a lot of software bits left and adding support in OSs is a pain.
+Also don't hold your breath for 2G, it would need a rewrite of gmap.c.
+
+Also this is more explicit.
+
+
+
+
+--kTWHupgxdByrEm3BDLrgxo8ee5kIft0bG
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQEcBAEBAgAGBQJbYqpzAAoJEJykq7OBq3PIucsH/i/6nbBSxRUzHrEqowxUtaIC
-SILGnmKDnPlxA26G427khVm8q7YFM3A5C3NZfaw79c8Atf3PlPIpTNUeBT0LlwkE
-sldce5/f0wJK6nsH7W8jfozuqWIX5e0PTj01TgD76Qmf12j7e5OCsQ+4fGIwSdml
-HQz3/dr714sv5fKP2hUoCEcMFY3A+YywUFuXLkIlF3/D6XnQ4qwD6sryVEdPZtdD
-XQBpjwNK0+bzR/nBHtVpAmKh/O6SzSbIb62B7bJgsvvOEu4RgmPbhh6oakuPsGaj
-kML5dLwbMBLenUSjWIMgsdGVtmXZWSyH6ChFpl9Xu8Ye3zBiQiiEtqRILouAj4M=
-=npAU
+iQIcBAEBCAAGBQJbYqpzAAoJEBcO/8Q8ZEV5lmwQALCgGh4TVbBWGmDxuKQn9Ljw
+b7HekXwGQ0S7eyj709javFXiVZUdWSN5oVLc8lNN9vQlt/C5eQsab3rb84QUhgjx
+CInTyfO7SmFR7/K+kcqQoQXrcTZXHXhoo5MtyQRhAk2UvzljxMrNGXtZBuvW7qj5
+VCe//oj0iThcvAi9Iq2r374uWjM84xZ71wiCFyaec5PJHfilbQdXnMNaBeTsLHaB
+QXI2xHsZniqX2j/mT6sJqLO606IeZ8dvAUoVCnyEHguMk8N0c6dJkzAL5ip1G1re
+ukp92rlmkSpxOx1V/30ZEiWa5J+/zbkEKzNAzesR61P6UwWIwEW0LRup7RAgwfLu
+FYe0l9Zu1BMj8xd48j3V6Ymz35cnJHu7EgbDlItE+Q8+zIMdJP8UMMpAaInE+cJA
+WDeN0+2PD6Mps51QpX214PJoCmxW76MwzCCfspHTia0yyUKl7TRId6v7CmKorFQi
+lFXirR3rJiRukro4FPTIhUrRXi/D+IP4iRjBSkloQS2k8J6u9+iTiNMO/2DQ99au
+23RMz974M0toaKrWhL8ml/1yXI7UdgzRytsAG6oigLi3aQwoTYADOPyOrLAyL8Kx
+ZnsNH/40lp2mdSYG5SH09RFZZ0G6iQ6hMgkRFWsawIZRbitHwhFhp0LqD6MXWIrz
+xWxjZQQjm8ksQbsCql+O
+=TVvS
 -----END PGP SIGNATURE-----
 
---YD3LsXFS42OYHhNZ--
+--kTWHupgxdByrEm3BDLrgxo8ee5kIft0bG--
