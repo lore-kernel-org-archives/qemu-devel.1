@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1flA1y-0001Hh-Tq
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:36:28 -0400
+	(envelope-from <den@virtuozzo.com>) id 1flA4H-000209-BL
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1flA1v-0007eC-0M
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:36:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59118 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1flA1u-0007dw-Op
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:36:22 -0400
-Date: Thu, 2 Aug 2018 11:36:19 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180802113619.308800a3@redhat.com>
-In-Reply-To: <20180801152430.3f1c5cee@bahia.lan>
-References: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
-	<20180727052724.GJ3694@umbus.fritz.box>
-	<20180727095452.45edee8b@bahia>
-	<20180730055715.GD2708@umbus.fritz.box>
-	<20180730104145.109ef196@bahia.lan>
-	<20180731032559.GH2708@umbus.fritz.box>
-	<20180801152430.3f1c5cee@bahia.lan>
+	(envelope-from <den@virtuozzo.com>) id 1flA4G-00017v-2F
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 05:38:49 -0400
+References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
+	<20180626135035.133432-5-vsementsov@virtuozzo.com>
+	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
+	<20180801102031.GC2691@work-vm>
+	<64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
+	<20180801174005.GD2691@work-vm>
+	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
+	<20180801185515.GE2691@work-vm>
+	<6bfdc952-fb17-feae-f367-be710853d829@openvz.org>
+	<20180802092907.GA2523@work-vm>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <202065a2-f9d1-ce31-b12b-437d57095ac1@openvz.org>
+Date: Thu, 2 Aug 2018 12:38:35 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180802092907.GA2523@work-vm>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1] tests/cpu-plug-test: check CPU
- hotplug on ppc64 with KVM
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
+ loading and migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +33,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
 
-On Wed, 1 Aug 2018 15:24:30 +0200
-Greg Kurz <groug@kaod.org> wrote:
+On 08/02/2018 12:29 PM, Dr. David Alan Gilbert wrote:
+> * Denis V. Lunev (den@openvz.org) wrote:
+>> On 08/01/2018 09:55 PM, Dr. David Alan Gilbert wrote:
+>>> * Denis V. Lunev (den@openvz.org) wrote:
+>>>> On 08/01/2018 08:40 PM, Dr. David Alan Gilbert wrote:
+>>>>> * John Snow (jsnow@redhat.com) wrote:
+>>>>>> On 08/01/2018 06:20 AM, Dr. David Alan Gilbert wrote:
+>>>>>>> * John Snow (jsnow@redhat.com) wrote:
+>>>>>>>
+>>>>>>> <snip>
+>>>>>>>
+>>>>>>>> I'd rather do something like this:
+>>>>>>>> - Always flush bitmaps to disk on inactivate.
+>>>>>>> Does that increase the time taken by the inactivate measurably?
+>>>>>>> If it's small relative to everything else that's fine; it's just I
+>>>>>>> always worry a little since I think this happens after we've stopped the
+>>>>>>> CPU on the source, so is part of the 'downtime'.
+>>>>>>>
+>>>>>>> Dave
+>>>>>>> --
+>>>>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>>>>>
+>>>>>> I'm worried that if we don't, we're leaving behind unusable, partially
+>>>>>> complete files behind us. That's a bad design and we shouldn't push for
+>>>>>> it just because it's theoretically faster.
+>>>>> Oh I don't care about theoretical speed; but if it's actually unusably
+>>>>> slow in practice then it needs fixing.
+>>>>>
+>>>>> Dave
+>>>> This is not "theoretical" speed. This is real practical speed and
+>>>> instability.
+>>>> EACH IO operation can be performed unpredictably slow and thus with
+>>>> IO operations in mind you can not even calculate or predict downtime,
+>>>> which should be done according to the migration protocol.
+>>> We end up doing some IO anyway, even ignoring these new bitmaps,
+>>> at the end of the migration when we pause the CPU, we do a
+>>> bdrv_inactivate_all to flush any outstanding writes; so we've already
+>>> got that unpredictable slowness.
+>>>
+>>> So, not being a block person, but with some interest in making sure
+>>> downtime doesn't increase, I just wanted to understand whether the
+>>> amount of writes we're talking about here is comparable to that
+>>> which already exists or a lot smaller or a lot larger.
+>>> If the amount of IO you're talking about is much smaller than what
+>>> we typically already do, then John has a point and you may as well
+>>> do the write.
+>>> If the amount of IO for the bitmap is much larger and would slow
+>>> the downtime a lot then you've got a point and that would be unworkable.
+>>>
+>>> Dave
+>> This is not theoretical difference.
+>>
+>> For 1 Tb drive and 64 kb bitmap granularity the size of bitmap is
+>> 2 Mb + some metadata (64 Kb). Thus we will have to write
+>> 2 Mb of data per bitmap.
+> OK, this was about my starting point; I think your Mb here is Byte not
+> Bit; so assuming a drive of 200MByte/s, that's 200/2=1/100th of a
+> second = 10ms; now 10ms I'd say is small enough not to worry about downtime
+> increases, since the number we normally hope for is in the 300ms ish
+> range.
+>
+>> For some case there are 2-3-5 bitmaps
+>> this we will have 10 Mb of data.
+> OK, remembering I'm not a block person can you just explain why
+> you need 5 bitmaps?
+> But with 5 bitmaps that's 50ms, that's starting to get worrying.
+>
+>> With 16 Tb drive the amount of
+>> data to write will be multiplied by 16 which gives 160 Mb to
+>> write. More disks and bigger the size - more data to write.
+> Yeh and that's going on for a second and way too big.
+>
+> (Although that feels like you could fix it by adding bitmaps on your
+> bitmaps hierarchically so you didn't write them all; but that's
+> getting way more complex).
+>
+>> Above amount should be multiplied by 2 - x Mb to be written
+>> on source, x Mb to be read on target which gives 320 Mb to
+>> write.
+>>
+>> That is why this is not good - we have linear increase with the
+>> size and amount of disks.
+>>
+>> There is also some thoughts on normal guest IO. Theoretically
+>> we can think on replaying IO on the target closing the file
+>> immediately or block writes to changed areas and notify
+>> target upon IO completion or invent other fancy dances.
+>> At least we think right now on these optimizations for regular
+>> migration paths.
+>>
+>> The problem right that such things are not needed now for CBT
+>> but will become necessary and pretty much useless upon
+>> introducing this stuff.
+> I don't quite understand the last two paragraphs.
+we are thinking right now to eliminate delay on regular IO
+for migration. There is some thoughts and internal work in
+progress. That is why I am worrying.
 
-> On Tue, 31 Jul 2018 13:25:59 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
-> [...]
-> > > 
-> > > The CPU hotplug test doesn't seem to do anything on the guest side: it
-> > > just checks that 'device_add' returns a response that isn't an
-> > > error.    
-> > 
-> > Right, which makes this ill suited to being a qtest test.  The whole
-> > point of qtest is making it easier to test qemu peripherals without
-> > having to have specific test code within the guest, by essentially
-> > replacing the guest's cpu with a stub controlled by the test harness.
-> > That's what the qtest accel is all about.
-> >   
-> 
-> I agree with what a qtest test should be, but cpu-plug-test doesn't
-> do anything like that obviously, ie, the guest CPU does nothing at
-> all. Only the hotplug path of the QEMU device model that don't need
-> the guest to run is tested here.
-> 
-> The more general issue is that paths guarded with kvm_enabled() cannot
-> be tested with a genuine qtest test. That's really unfortunate since
-> these paths are sometimes the one that are mostly used on the field,
-> eg, in-kernel XICS versus emulated XICS.
-> 
-> > I think it's confusing to have a test which tries things with both
-> > qtest and kvm accelerators.  Looking like a qtest test, people might
-> > reasonably think they can extend/refine the test to check behaviour
-> > when the guest does respond to the hotplug events.  But such an
-> > extension won't work with the kvm accel, because the qtest code used
-> > to simulate that guest response won't have any effect with kvm.
-> >   
-> 
-> If the motivation is to let the test be a true qtest in case someone
-> wants to emulate some guest behavior, I agree the kvm change is wrong.
-> 
-> > > I'm not aware that the guest is expected to have a specific behavior
-> > > during 'device_add', apart from not crashing or hanging. That was the
-> > > initial idea behind passing '-S' to ensure the guest doesn't run.    
-> > 
-> > Note that with qtest (or -S) we don't even test that minimal
-> > condition.  We only test that *qemu* doesn't crash - it could fatally
-> > compromise the guest and the test would never know.
-> >   
-> 
-> True.
-> 
-> > > Your remark seems to be more general though... are you meaning that
-> > > doing something like qtest_start("-machine accel=kvm:tcg") is just
-> > > wrong ?    
-> > 
-> > Pretty much, yes.  A non-qtest test which does that is reasonable, but
-> > not a qtest test.
-> >   
-> 
-> So, instead of hijacking the current qtest, we may add a non-qtest test
-> that would start QEMU with "-machine accel=kvm:tcg -S". This would allow
-> at least to test that QEMU doesn't crash right away. And, as suggested
-> by Thomas, the coverage could include SLOF as well if we don't pass -S.
-> But I would need to understand why SLOF sometimes hits a 0x700 when
-> running cpu-plug-test with this patch applied...
-Is cpu-plug-test a qtest one?
-I was under impression it was using tcg accelerator.
+> However, coming back to my question; it was really saying that
+> normal guest IO during the end of the migration will cause
+> a delay; I'm expecting that to be fairly unrelated to the size
+> of the disk; more to do with workload; so I guess in your case
+> the worry is the case of big large disks giving big large
+> bitmaps.
 
-we can switch it to accel=kvm:tcg like bios-tables-test did and
-probably reuse boot_sector_init() to make sure that firmware part
-at boot is exercised. Trying to do functional hotplug test on top
-of that (guest side) probably is out of scope of this unit test (too complex)
-and should be left to avocado or likes.
+exactly!
+
+Den
