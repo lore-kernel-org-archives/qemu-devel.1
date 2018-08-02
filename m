@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1flKpI-0006yP-1C
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 17:08:04 -0400
+	(envelope-from <stefanha@gmail.com>) id 1flLOR-0006bf-79
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 17:44:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1flKpC-0006kq-SL
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 17:08:01 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:40180)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1flKpC-0006kg-L8
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 17:07:58 -0400
-Received: by mail-pf1-x441.google.com with SMTP id e13-v6so2003669pff.7
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 14:07:58 -0700 (PDT)
-Date: Thu, 02 Aug 2018 14:07:56 -0700 (PDT)
-In-Reply-To: <CAKmqyKNmBeY0BZNuQ3o+XTzdtN6QCm8qPhi1VHz4XTNg=Q3=Ng@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-7a78b931-d225-4006-bbc7-707c9d471ef0@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] RISC-V platform
+	(envelope-from <stefanha@gmail.com>) id 1flLOM-0005Uu-C6
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 17:44:23 -0400
+Date: Thu, 2 Aug 2018 13:43:45 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180802124345.GA25289@stefanha-x1.localdomain>
+References: <20180725085944.11856-1-stefanha@redhat.com>
+	<20180725085944.11856-7-stefanha@redhat.com>
+	<CAFEAcA8m2f-DRiDNF0ry4nMH9bzZ1gODV4MTgtLwR5jTNdgeJA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="fUYQa+Pmc3FrFX/N"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8m2f-DRiDNF0ry4nMH9bzZ1gODV4MTgtLwR5jTNdgeJA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] loader: Implement .hex file loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,26 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alistair23@gmail.com, programmingkidx@gmail.com
-Cc: alistair.francis@wdc.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>, Su Hang <suhang16@mails.ucas.ac.cn>, Liviu Ionescu <ilg@livius.net>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>
 
-On Fri, 29 Jun 2018 14:20:34 PDT (-0700), alistair23@gmail.com wrote:
-> On Fri, Jun 29, 2018 at 2:05 PM, G 3 <programmingkidx@gmail.com> wrote:
->> Hi, I noticed your RISC-V patches on the mailing list and had a question
->> that I think you may be able to answer. Has anyone defined a RISC-V platform
->> yet? What I mean is defining what devices would be found on a RISC-V
->> motherboard. I do hope to see RISC-V based desktop systems one day. But
->> before that day can come the platform for this chip would have to be
->> established. Could the SiFive board be the basis for such a standard?
->
-> It really depends what you mean by a standard platform. At the moment
-> the SiFive HiFive Unleased board is the only ASIC that can boot Linux.
-> So that really is the "standard" RISC-V board. It is a pretty basic
-> embedded board though, so it can't be considered a "standard" RISC-V
-> desktop. There is a virt board in QEMU (which is similar to the HiFive
-> Unleashed) that is a good go to for QEMU work.
 
-The HiFive Unleashed is the defacto standard RISC-V embedded Linux platform 
-right now, but there will be a RISC-V platform specification that defines 
-proper standard platforms of various types.  This effort hasn't been started 
-yet, but it should be done sooner rather than later.
+--fUYQa+Pmc3FrFX/N
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Jul 30, 2018 at 07:01:53PM +0100, Peter Maydell wrote:
+> On 25 July 2018 at 09:59, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > From: Su Hang <suhang16@mails.ucas.ac.cn>
+> >
+> > This patch adds Intel Hexadecimal Object File format support to the
+> > loader.  The file format specification is available here:
+> > http://www.piclist.com/techref/fileext/hex/intel.htm
+> >
+> > This file format is often used with microcontrollers such as the
+> > micro:bit, Arduino, STM32, etc.  Users expect to be able to run them
+> > directly with qemu -kernel program.hex instead of converting to ELF or
+> > binary.
+>=20
+> I'm still not convinced we want to add another random
+> special case only-works-on-one-architecture-and-some-boards
+> feature to the -kernel command line option.
+>=20
+> Adding it to the "generic loader" device might be more plausible?
+
+I'm not sure I understand the purpose of the generic loader.
+
+As a user -kernel <myfile> is easier than -device
+loader,file=3D<myfile>,cpu-num=3D1.
+
+Can you explain the advantage to moving hex file loading to the generic
+loader?
+
+Stefan
+
+--fUYQa+Pmc3FrFX/N
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbYvyBAAoJEJykq7OBq3PIHOsH/0NIl2L/Bj0r1WKdxLUFCWP7
+lMsdYvs6cXmRo6UfgtjR6QIuAG54YSQn0lzVlHlH1Hxp76yT0Tql5XJOatRUp0A8
+Rc83O0mdwT9CsxAzD3PTHjXH0kfYo/D6AHSfUsCzuO0h3V5GTz0S+WwSD69wRxmg
+ICif0rwO92TQfQkyYoofEy0VtesofE6o/1vIXDZSJyzWwKMW5BMVFLct5FoO4UqO
+uUP6pu/gHTHqwd3gAmr6KQ5e61EVYwaPfvAl5Ga3PclovQ0K8H18ngte8XT4lonB
+L8I9e2+yp0sti/PwT2dUJE0zj0XsD4K5gDYLwrY3KlLj2Q+DiNhp7izBDleh6K8=
+=bq7k
+-----END PGP SIGNATURE-----
+
+--fUYQa+Pmc3FrFX/N--
