@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fl6Sa-0003YL-Bh
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 01:47:41 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fl6W0-0004ld-Ey
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 01:51:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fl6SX-0004MD-9B
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 01:47:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38720 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fl6SX-0004Kb-3P
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 01:47:37 -0400
-Date: Thu, 2 Aug 2018 13:47:32 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180802054732.GB11859@lemon.usersys.redhat.com>
-References: <CAFEAcA8yrNzEaL5_D79OjHCUUwPQnS4MnQhU9gumR7fpTThyuQ@mail.gmail.com>
-	<CAFEAcA-uzB1KQqX-mZF2yVYO0sknkQL0+jWtCwrwbXYqrY-6vw@mail.gmail.com>
-	<CAFEAcA883Ts4W-Ks+h7Ds4_SAdAYYab9GYO94Whcqg5FJuoZkg@mail.gmail.com>
-	<CAFEAcA-iB7_hU2KNUS3rra4FD_P7PzXtXW1BaP37zp=OKZkv3w@mail.gmail.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1fl6Vx-0007as-CA
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 01:51:12 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:52060)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fl6Vw-0007ZG-TY
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 01:51:09 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
+	<20180725121701.12867.49392.stgit@pasha-VirtualBox>
+	<87zhyerotn.fsf@linaro.org> <000301d42565$aeeb2e40$0cc18ac0$@ru>
+	<87sh44sk5j.fsf@linaro.org>
+In-Reply-To: <87sh44sk5j.fsf@linaro.org>
+Date: Thu, 2 Aug 2018 08:50:59 +0300
+Message-ID: <000001d42a24$ca6df4e0$5f49dea0$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-iB7_hU2KNUS3rra4FD_P7PzXtXW1BaP37zp=OKZkv3w@mail.gmail.com>
-Subject: Re: [Qemu-devel] 'make vm-build-freebsd' &c don't work if KVM isn't
- enabled
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v5 23/24] replay: add BH oneshot event for
+ block layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +32,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 
-On Mon, 07/30 16:20, Peter Maydell wrote:
-> On 30 July 2018 at 14:40, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > On 30 July 2018 at 14:36, Peter Maydell <peter.maydell@linaro.org> wrote:
-> >> On 30 July 2018 at 14:23, Peter Maydell <peter.maydell@linaro.org> wrote:
-> >>> The tests in tests/vm/ seem to make some attempt to cope with the
-> >>> host system not allowing the user to use KVM, but it doesn't quite
-> >>> work.
+
+> -----Original Message-----
+> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> Sent: Friday, July 27, 2018 7:45 PM
+> To: Pavel Dovgalyuk
+> Cc: 'Pavel Dovgalyuk'; qemu-devel@nongnu.org; kwolf@redhat.com; =
+peter.maydell@linaro.org;
+> war2jordan@live.com; crosthwaite.peter@gmail.com; =
+boost.lists@gmail.com; quintela@redhat.com;
+> ciro.santilli@gmail.com; jasowang@redhat.com; mst@redhat.com; =
+zuban32s@gmail.com;
+> armbru@redhat.com; maria.klimushenkova@ispras.ru; kraxel@redhat.com;
+> thomas.dullien@googlemail.com; pbonzini@redhat.com; mreitz@redhat.com; =
+dgilbert@redhat.com;
+> rth@twiddle.net
+> Subject: Re: [PATCH v5 23/24] replay: add BH oneshot event for block =
+layer
+>=20
+>=20
+> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+>=20
+> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> >> > Replay is capable of recording normal BH events, but sometimes
+> >> > there are single use callbacks scheduled with =
+aio_bh_schedule_oneshot
+> >> > function. This patch enables recording and replaying such =
+callbacks.
+> >> > Block layer uses these events for calling the completion =
+function.
+> >> > Replaying these calls makes the execution deterministic.
+> >> >
+> >> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 > >>
-> >> Also, passing V=1 to the outer make command like:
-> >>  make vm-build-freebsd J=16 V=1
-> >> isn't propagated through to the VM: test output looks like
-> >>   GTESTER check-qtest-aarch64
-> >>   GTESTER check-qtest-alpha
-> >> instead of the proper verbose output with a line per subtest.
+> >> I'm not sure what about this commit causes the compile breakage I'm
+> >> seeing:
+> >>
+> >>   LINK    aarch64-linux-user/qemu-aarch64
+> >> ../libqemuutil.a(cpu-get-icount.o):(.bss+0x0): multiple definition =
+of `use_icount'
+> >> exec.o:(.bss+0x58): first defined here
+> >> collect2: error: ld returned 1 exit status
+> >> Makefile:199: recipe for target 'qemu-aarch64' failed
+> >> make[1]: *** [qemu-aarch64] Error 1
+> >> Makefile:481: recipe for target 'subdir-aarch64-linux-user' failed
+> >> make: *** [subdir-aarch64-linux-user] Error 2
+> >>
+> >> It only occurs on a make clean && make -j on that commit though. =
+It's
+> >> hidden if you do incremental builds.
 > >
-> > Nor is the J=16 option passed through to "make check":
-> 
-> Patches for these things on the way, once I've completed a test run.
+> > make distclean works for me in such cases.
+>=20
+> Hmmm
+>=20
+> make distclean
+> ./configure
+> make
+>=20
+> And I get:
+>=20
+> LINK    aarch64-linux-user/qemu-aarch64
+> ../libqemuutil.a(cpu-get-icount.o):(.bss+0x0): multiple definition of =
+`use_icount'
+> exec.o:(.bss+0x58): first defined here
+> collect2: error: ld returned 1 exit status
+> Makefile:199: recipe for target 'qemu-aarch64' failed
+> make[1]: *** [qemu-aarch64] Error 1
+> Makefile:481: recipe for target 'subdir-aarch64-linux-user' failed
+> make: *** [subdir-aarch64-linux-user] Error 2
 
-All good catches! Looking forward to the fixes. Thanks.
+That's strange. As I understand, linux-user emulators does not include =
+block layer.
+They also don't include record/replay.
+Why then block- and record-related stub affects the build?
 
-Fam
+Pavel Dovgalyuk
