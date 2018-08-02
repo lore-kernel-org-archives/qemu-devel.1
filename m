@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEbg-0001sk-1O
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:29:37 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEc3-0002V2-GG
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:30:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEbc-0003nj-Ir
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:29:36 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:59826 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEbz-00043f-Iw
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:29:59 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:60823 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1flEbc-0003mf-6t
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:29:32 -0400
+	id 1flEbz-00042u-7S
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:29:55 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu,  2 Aug 2018 16:16:17 +0200
-Message-Id: <1533219424-7627-31-git-send-email-stefan.markovic@rt-rk.com>
+Date: Thu,  2 Aug 2018 16:16:18 +0200
+Message-Id: <1533219424-7627-32-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 30/77] target/mips: Add emulation of misc
- nanoMIPS instructions (pool32a0)
+Subject: [Qemu-devel] [PATCH v6 31/77] target/mips: Add emulation of misc
+ nanoMIPS instructions (pool32axf)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,192 +30,99 @@ Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aur
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add emulation of nanoMIPS instructions that are situated in pool32a0.
+Add emulation of misc nanoMIPS instructions situated in pool32axf.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 185 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 185 insertions(+)
+ target/mips/translate.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 89 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 6739b39..19f011e 100644
+index 19f011e..7cc1a92 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16597,6 +16597,181 @@ static void gen_pool16c_nanomips_insn(DisasContext *ctx)
+@@ -16772,6 +16772,87 @@ static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
      }
  }
  
-+static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
++static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
 +{
 +    int rt = extract32(ctx->opcode, 21, 5);
 +    int rs = extract32(ctx->opcode, 16, 5);
-+    int rd = extract32(ctx->opcode, 11, 5);
 +
-+    switch (extract32(ctx->opcode, 3, 7)) {
-+    case NM_P_TRAP:
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case NM_TEQ:
-+            gen_trap(ctx, OPC_TEQ, rs, rt, -1);
-+            break;
-+        case NM_TNE:
-+            gen_trap(ctx, OPC_TNE, rs, rt, -1);
-+            break;
-+        }
-+        break;
-+    case NM_RDHWR:
-+        gen_rdhwr(ctx, rt, rs, extract32(ctx->opcode, 11, 3));
-+        break;
-+    case NM_SEB:
-+        gen_bshfl(ctx, OPC_SEB, rs, rt);
-+        break;
-+    case NM_SEH:
-+        gen_bshfl(ctx, OPC_SEH, rs, rt);
-+        break;
-+    case NM_SLLV:
-+        gen_shift(ctx, OPC_SLLV, rd, rt, rs);
-+        break;
-+    case NM_SRLV:
-+        gen_shift(ctx, OPC_SRLV, rd, rt, rs);
-+        break;
-+    case NM_SRAV:
-+        gen_shift(ctx, OPC_SRAV, rd, rt, rs);
-+        break;
-+    case NM_ROTRV:
-+        gen_shift(ctx, OPC_ROTRV, rd, rt, rs);
-+        break;
-+    case NM_ADD:
-+        gen_arith(ctx, OPC_ADD, rd, rs, rt);
-+        break;
-+    case NM_ADDU:
-+        gen_arith(ctx, OPC_ADDU, rd, rs, rt);
-+        break;
-+    case NM_SUB:
-+        gen_arith(ctx, OPC_SUB, rd, rs, rt);
-+        break;
-+    case NM_SUBU:
-+        gen_arith(ctx, OPC_SUBU, rd, rs, rt);
-+        break;
-+    case NM_P_CMOVE:
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case NM_MOVZ:
-+            gen_cond_move(ctx, OPC_MOVZ, rd, rs, rt);
-+            break;
-+        case NM_MOVN:
-+            gen_cond_move(ctx, OPC_MOVN, rd, rs, rt);
-+            break;
-+        }
-+        break;
-+    case NM_AND:
-+        gen_logic(ctx, OPC_AND, rd, rs, rt);
-+        break;
-+    case NM_OR:
-+        gen_logic(ctx, OPC_OR, rd, rs, rt);
-+        break;
-+    case NM_NOR:
-+        gen_logic(ctx, OPC_NOR, rd, rs, rt);
-+        break;
-+    case NM_XOR:
-+        gen_logic(ctx, OPC_XOR, rd, rs, rt);
-+        break;
-+    case NM_SLT:
-+        gen_slt(ctx, OPC_SLT, rd, rs, rt);
-+        break;
-+    case NM_P_SLTU:
-+        if (rd == 0) {
-+            /* P_DVP */
++    switch (extract32(ctx->opcode, 6, 3)) {
++    case NM_POOL32AXF_4:
++    case NM_POOL32AXF_5:
++        switch (extract32(ctx->opcode, 9, 7)) {
 +#ifndef CONFIG_USER_ONLY
-+            TCGv t0 = tcg_temp_new();
-+            switch (extract32(ctx->opcode, 10, 1)) {
-+            case NM_DVP:
-+                if (ctx->vp) {
-+                    check_cp0_enabled(ctx);
-+                    gen_helper_dvp(t0, cpu_env);
-+                    gen_store_gpr(t0, rt);
-+                }
-+                break;
-+            case NM_EVP:
-+                if (ctx->vp) {
-+                    check_cp0_enabled(ctx);
-+                    gen_helper_evp(t0, cpu_env);
-+                    gen_store_gpr(t0, rt);
-+                }
-+                break;
++        case NM_TLBP:
++            gen_cp0(env, ctx, OPC_TLBP, 0, 0);
++            break;
++        case NM_TLBR:
++            gen_cp0(env, ctx, OPC_TLBR, 0, 0);
++            break;
++        case NM_TLBWI:
++            gen_cp0(env, ctx, OPC_TLBWI, 0, 0);
++            break;
++        case NM_TLBWR:
++            gen_cp0(env, ctx, OPC_TLBWR, 0, 0);
++            break;
++        case NM_TLBINV:
++            gen_cp0(env, ctx, OPC_TLBINV, 0, 0);
++            break;
++        case NM_TLBINVF:
++            gen_cp0(env, ctx, OPC_TLBINVF, 0, 0);
++            break;
++        case NM_DI:
++            check_cp0_enabled(ctx);
++            {
++                TCGv t0 = tcg_temp_new();
++
++                save_cpu_state(ctx, 1);
++                gen_helper_di(t0, cpu_env);
++                gen_store_gpr(t0, rt);
++            /* Stop translation as we may have switched the execution mode */
++                ctx->base.is_jmp = DISAS_STOP;
++                tcg_temp_free(t0);
 +            }
-+            tcg_temp_free(t0);
++            break;
++        case NM_EI:
++            check_cp0_enabled(ctx);
++            {
++                TCGv t0 = tcg_temp_new();
++
++                save_cpu_state(ctx, 1);
++                gen_helper_ei(t0, cpu_env);
++                gen_store_gpr(t0, rt);
++            /* Stop translation as we may have switched the execution mode */
++                ctx->base.is_jmp = DISAS_STOP;
++                tcg_temp_free(t0);
++            }
++            break;
++        case NM_RDPGPR:
++            gen_load_srsgpr(rs, rt);
++            break;
++        case NM_WRPGPR:
++            gen_store_srsgpr(rs, rt);
++            break;
++        case NM_WAIT:
++            gen_cp0(env, ctx, OPC_WAIT, 0, 0);
++            break;
++        case NM_DERET:
++            gen_cp0(env, ctx, OPC_DERET, 0, 0);
++            break;
++        case NM_ERETX:
++            gen_cp0(env, ctx, OPC_ERET, 0, 0);
++            break;
 +#endif
-+        } else {
-+            gen_slt(ctx, OPC_SLTU, rd, rs, rt);
-+        }
-+        break;
-+    case NM_SOV:
-+        {
-+            TCGv t0 = tcg_temp_new();
-+            TCGv t1 = tcg_temp_new();
-+            TCGv t2 = tcg_temp_new();
-+
-+            gen_load_gpr(t1, rs);
-+            gen_load_gpr(t2, rt);
-+            tcg_gen_add_tl(t0, t1, t2);
-+            tcg_gen_ext32s_tl(t0, t0);
-+            tcg_gen_xor_tl(t1, t1, t2);
-+            tcg_gen_xor_tl(t2, t0, t2);
-+            tcg_gen_andc_tl(t1, t2, t1);
-+
-+            /* operands of same sign, result different sign */
-+            tcg_gen_setcondi_tl(TCG_COND_LT, t0, t1, 0);
-+            gen_store_gpr(t0, rd);
-+
-+            tcg_temp_free(t0);
-+            tcg_temp_free(t1);
-+            tcg_temp_free(t2);
-+        }
-+        break;
-+    case NM_MUL:
-+        gen_r6_muldiv(ctx, R6_OPC_MUL, rd, rs, rt);
-+        break;
-+    case NM_MUH:
-+        gen_r6_muldiv(ctx, R6_OPC_MUH, rd, rs, rt);
-+        break;
-+    case NM_MULU:
-+        gen_r6_muldiv(ctx, R6_OPC_MULU, rd, rs, rt);
-+        break;
-+    case NM_MUHU:
-+        gen_r6_muldiv(ctx, R6_OPC_MUHU, rd, rs, rt);
-+        break;
-+    case NM_DIV:
-+        gen_r6_muldiv(ctx, R6_OPC_DIV, rd, rs, rt);
-+        break;
-+    case NM_MOD:
-+        gen_r6_muldiv(ctx, R6_OPC_MOD, rd, rs, rt);
-+        break;
-+    case NM_DIVU:
-+        gen_r6_muldiv(ctx, R6_OPC_DIVU, rd, rs, rt);
-+        break;
-+    case NM_MODU:
-+        gen_r6_muldiv(ctx, R6_OPC_MODU, rd, rs, rt);
-+        break;
-+#ifndef CONFIG_USER_ONLY
-+    case NM_MFC0:
-+        check_cp0_enabled(ctx);
-+        if (rt == 0) {
-+            /* Treat as NOP. */
++        default:
++            generate_exception_end(ctx, EXCP_RI);
 +            break;
 +        }
-+        gen_mfc0(ctx, cpu_gpr[rt], rs, extract32(ctx->opcode, 11, 3));
 +        break;
-+    case NM_MTC0:
-+        check_cp0_enabled(ctx);
-+        {
-+            TCGv t0 = tcg_temp_new();
-+
-+            gen_load_gpr(t0, rt);
-+            gen_mtc0(ctx, t0, rs, extract32(ctx->opcode, 11, 3));
-+            tcg_temp_free(t0);
-+        }
-+        break;
-+#endif
 +    default:
 +        generate_exception_end(ctx, EXCP_RI);
 +        break;
@@ -225,22 +132,20 @@ index 6739b39..19f011e 100644
  static void gen_pool32f_nanomips_insn(DisasContext *ctx)
  {
      int rt, rs, rd;
-@@ -16961,6 +17136,16 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case NM_POOL32A:
-+        switch (ctx->opcode & 0x07) {
-+        case NM_POOL32A0:
-+            gen_pool32a0_nanomips_insn(ctx);
-+            break;
-+        case NM_POOL32A7:
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-         break;
-     case NM_P_GP_W:
-         switch (ctx->opcode & 0x03) {
+@@ -17141,6 +17222,14 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+             gen_pool32a0_nanomips_insn(ctx);
+             break;
+         case NM_POOL32A7:
++            switch (extract32(ctx->opcode, 3, 3)) {
++            case NM_POOL32AXF:
++                gen_pool32axf_nanomips_insn(env, ctx);
++                break;
++            default:
++                generate_exception_end(ctx, EXCP_RI);
++                break;
++            }
+             break;
+         default:
+             generate_exception_end(ctx, EXCP_RI);
 -- 
 1.9.1
