@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1flEwz-0004mC-Sw
+	(envelope-from <berto@igalia.com>) id 1flEwz-0004mF-U2
 	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1flEww-0001LW-RE
+	(envelope-from <berto@igalia.com>) id 1flEww-0001LE-QD
 	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:51:37 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu,  2 Aug 2018 17:50:26 +0300
-Message-Id: <cd7d54f6646eb206567eeba9a102fa4264c39bec.1533219143.git.berto@igalia.com>
+Date: Thu,  2 Aug 2018 17:50:25 +0300
+Message-Id: <8fb28f638bd31f509d0db800c3fd8e9874ef2caa.1533219143.git.berto@igalia.com>
 In-Reply-To: <cover.1533219143.git.berto@igalia.com>
 References: <cover.1533219143.git.berto@igalia.com>
 In-Reply-To: <cover.1533219143.git.berto@igalia.com>
 References: <cover.1533219143.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 4/4] throttle-groups: Don't allow timers
- without throttled requests
+Subject: [Qemu-devel] [PATCH 3/4] qemu-iotests: Update 093 to improve the
+ draining test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,87 +25,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Commit 6fccbb475bc6effc313ee9481726a1748b6dae57 fixed a bug caused by
-QEMU attempting to remove a throttle group member with no pending
-requests but an active timer set. This was the result of a previous
-bdrv_drained_begin() call processing the throttled requests but
-leaving the timer untouched.
+The previous patch fixes a problem in which draining a block device
+with more than one throttled request can make it wait first for the
+completion of requests in other members of the same group.
 
-Although the commit does solve the problem, the situation shouldn't
-happen in the first place. If we try to drain a throttle group member
-which has a timer set, we should cancel the timer instead of ignoring
-it.
+This patch updates test_remove_group_member() in iotest 093 to
+reproduce that scenario. This updated test would hang QEMU without the
+fix from the previous patch.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/throttle-groups.c | 32 ++++++++++++++++++++++----------
- 1 file changed, 22 insertions(+), 10 deletions(-)
+ tests/qemu-iotests/093 | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index d46c56b31e..5d8213a443 100644
---- a/block/throttle-groups.c
-+++ b/block/throttle-groups.c
-@@ -36,6 +36,7 @@
+diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+index b26cd34e32..9d1971a56c 100755
+--- a/tests/qemu-iotests/093
++++ b/tests/qemu-iotests/093
+@@ -225,15 +225,18 @@ class ThrottleTestCase(iotests.QMPTestCase):
+         # Read 4KB from drive0. This is performed immediately.
+         self.vm.hmp_qemu_io("drive0", "aio_read 0 4096")
  
- static void throttle_group_obj_init(Object *obj);
- static void throttle_group_obj_complete(UserCreatable *obj, Error **errp);
-+static void timer_cb(ThrottleGroupMember *tgm, bool is_write);
+-        # Read 4KB again. The I/O limit has been exceeded so this
++        # Read 2KB. The I/O limit has been exceeded so this
+         # request is throttled and a timer is set to wake it up.
+-        self.vm.hmp_qemu_io("drive0", "aio_read 0 4096")
++        self.vm.hmp_qemu_io("drive0", "aio_read 0 2048")
  
- /* The ThrottleGroup structure (with its ThrottleState) is shared
-  * among different ThrottleGroupMembers and it's independent from
-@@ -424,15 +425,31 @@ static void throttle_group_restart_queue(ThrottleGroupMember *tgm, bool is_write
-     rd->tgm = tgm;
-     rd->is_write = is_write;
- 
-+    /* This function is called when a timer is fired or when
-+     * throttle_group_restart_tgm() is called. Either way, there can
-+     * be no timer pending on this tgm at this point */
-+    assert(!timer_pending(tgm->throttle_timers.timers[is_write]));
+-        # Read from drive1. We're still over the I/O limit so this
+-        # request is also throttled. There's no timer set in drive1
+-        # because there's already one in drive0. Once the timer in
+-        # drive0 fires and its throttled request is processed then the
+-        # next request in the queue will be scheduled: this one.
++        # Read 2KB again. We're still over the I/O limit so this is
++        # request is also throttled, but no new timer is set since
++        # there's already one.
++        self.vm.hmp_qemu_io("drive0", "aio_read 0 2048")
 +
-     co = qemu_coroutine_create(throttle_group_restart_queue_entry, rd);
-     aio_co_enter(tgm->aio_context, co);
- }
++        # Read from drive1. This request is also throttled, and no
++        # timer is set in drive1 because there's already one in
++        # drive0.
+         self.vm.hmp_qemu_io("drive1", "aio_read 0 4096")
  
- void throttle_group_restart_tgm(ThrottleGroupMember *tgm)
- {
-+    int i;
-+
-     if (tgm->throttle_state) {
--        throttle_group_restart_queue(tgm, 0);
--        throttle_group_restart_queue(tgm, 1);
-+        for (i = 0; i < 2; i++) {
-+            QEMUTimer *t = tgm->throttle_timers.timers[i];
-+            if (timer_pending(t)) {
-+                /* If there's a pending timer on this tgm, fire it now */
-+                timer_del(t);
-+                timer_cb(tgm, i);
-+            } else {
-+                /* Else run the next request from the queue manually */
-+                throttle_group_restart_queue(tgm, i);
-+            }
-+        }
-     }
- }
+         # At this point only the first 4KB have been read from drive0.
+@@ -248,7 +251,7 @@ class ThrottleTestCase(iotests.QMPTestCase):
+         result = self.vm.qmp("block_set_io_throttle", conv_keys=False, **params)
+         self.assert_qmp(result, 'return', {})
  
-@@ -567,16 +584,11 @@ void throttle_group_unregister_tgm(ThrottleGroupMember *tgm)
-         return;
-     }
- 
--    assert(tgm->pending_reqs[0] == 0 && tgm->pending_reqs[1] == 0);
--    assert(qemu_co_queue_empty(&tgm->throttled_reqs[0]));
--    assert(qemu_co_queue_empty(&tgm->throttled_reqs[1]));
--
-     qemu_mutex_lock(&tg->lock);
-     for (i = 0; i < 2; i++) {
--        if (timer_pending(tgm->throttle_timers.timers[i])) {
--            tg->any_timer_armed[i] = false;
--            schedule_next_request(tgm, i);
--        }
-+        assert(tgm->pending_reqs[i] == 0);
-+        assert(qemu_co_queue_empty(&tgm->throttled_reqs[i]));
-+        assert(!timer_pending(tgm->throttle_timers.timers[i]));
-         if (tg->tokens[i] == tgm) {
-             token = throttle_group_next_tgm(tgm);
-             /* Take care of the case where this is the last tgm in the group */
+-        # Removing the I/O limits from drive0 drains its pending request.
++        # Removing the I/O limits from drive0 drains its two pending requests.
+         # The read request in drive1 is still throttled.
+         self.assertEqual(self.blockstats('drive0')[0], 8192)
+         self.assertEqual(self.blockstats('drive1')[0], 0)
 -- 
 2.11.0
