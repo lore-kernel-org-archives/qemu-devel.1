@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1flHax-0004TY-Be
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:41:05 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1flHay-0004Tb-B3
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:41:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1flHav-0003db-I3
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:41:03 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1flHaw-0003g9-HF
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:41:04 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43954)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1flHav-0003Ke-6q
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:41:01 -0400
+	id 1flHaw-0003Ke-7n
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 13:41:02 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  2 Aug 2018 18:40:42 +0100
-Message-Id: <20180802174042.29234-3-peter.maydell@linaro.org>
+Date: Thu,  2 Aug 2018 18:40:41 +0100
+Message-Id: <20180802174042.29234-2-peter.maydell@linaro.org>
 In-Reply-To: <20180802174042.29234-1-peter.maydell@linaro.org>
 References: <20180802174042.29234-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/2] hw/net/pcnet-pci: Unify
- pcnet_ioport_read/write and pcnet_mmio_read/write
+Subject: [Qemu-devel] [PATCH 1/2] hw/net/pcnet-pci: Convert away from
+ old_mmio accessors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,128 +28,205 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Jason Wang <jasowang@redhat.com>
 
-The only difference between our implementation of the pcnet ioport
-accessors and the mmio accessors is that the former check BCR_DWIO to
-see what access widths are permitted for addresses in the aprom range
-(0x0..0xf). In fact our failure to do this in the mmio accessors
-is a bug (one which was fixed for the ioport accessors in
-commit 7ba79741970 in 2011).
+Convert the pcnet-pci device away from using the old_mmio
+MemoryRegionOps accessor functions.
 
-The data sheet for the Am79C970A does not describe the DWIO
-bit as only applying for I/O space mapped I/O resources and
-not memory mapped I/O resources, and our MMIO accessors already
-honour DWIO for accesses in the 0x10..0x1f range (since the
-pcnet_ioport_{read,write}{w,l} functions check it).
+This commit is a no-behaviour-change API conversion.
+(Since PCNET_PNPMMIO_SIZE is 0x20, the old "addr & 0x10"
+check and the new "addr < 0x10" check are exact opposites;
+the new code is phrased to be parallel with the
+pcnet_io_read/write functions.)
 
-The data sheet for the later but compatible Am79C976 is clearer:
-it states specifically "DWIO mode applies to both I/O- and
-memory-mapped acceses." This seems to be reasonable evidence
-in favour of interpretating the Am79C970A spec as being the same.
-
-(NB: Linux's pcnet driver only supports I/O accesses, so the
-MMIO access part of this device is probably untested anyway.)
+I have left a TODO comment marker because the similarity
+between the MMIO and IO accessor behaviour is suspicious
+and they could be combined, but this will be left to a
+different patch.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/net/pcnet-pci.c  | 67 ++-------------------------------------------
- hw/net/trace-events |  2 --
- 2 files changed, 2 insertions(+), 67 deletions(-)
+ hw/net/pcnet-pci.c  | 133 ++++++++++++++++++--------------------------
+ hw/net/trace-events |   8 +--
+ 2 files changed, 57 insertions(+), 84 deletions(-)
 
 diff --git a/hw/net/pcnet-pci.c b/hw/net/pcnet-pci.c
-index 248fb3ba299..7c738557830 100644
+index 70dc8b3f0cd..248fb3ba299 100644
 --- a/hw/net/pcnet-pci.c
 +++ b/hw/net/pcnet-pci.c
-@@ -139,69 +139,6 @@ static const MemoryRegionOps pcnet_io_ops = {
+@@ -139,92 +139,67 @@ static const MemoryRegionOps pcnet_io_ops = {
      .endianness = DEVICE_LITTLE_ENDIAN,
  };
  
--/*
-- * TODO: should MMIO accesses to the addresses corresponding to the
-- * APROM also honour the BCR_DWIO() setting? If so, then these functions
-- * and pcnet_ioport_write/pcnet_ioport_read could be merged.
-- * If not, then should pcnet_ioport_{read,write}{w,l} really check
-- * BCR_DWIO() for MMIO writes ?
-- */
--static void pcnet_mmio_write(void *opaque, hwaddr addr, uint64_t value,
--                             unsigned size)
+-static void pcnet_mmio_writeb(void *opaque, hwaddr addr, uint32_t val)
++/*
++ * TODO: should MMIO accesses to the addresses corresponding to the
++ * APROM also honour the BCR_DWIO() setting? If so, then these functions
++ * and pcnet_ioport_write/pcnet_ioport_read could be merged.
++ * If not, then should pcnet_ioport_{read,write}{w,l} really check
++ * BCR_DWIO() for MMIO writes ?
++ */
++static void pcnet_mmio_write(void *opaque, hwaddr addr, uint64_t value,
++                             unsigned size)
+ {
+     PCNetState *d = opaque;
+ 
+-    trace_pcnet_mmio_writeb(opaque, addr, val);
+-    if (!(addr & 0x10))
+-        pcnet_aprom_writeb(d, addr & 0x0f, val);
+-}
++    trace_pcnet_mmio_write(opaque, addr, size, val);
+ 
+-static uint32_t pcnet_mmio_readb(void *opaque, hwaddr addr)
+-{
+-    PCNetState *d = opaque;
+-    uint32_t val = -1;
+-
+-    if (!(addr & 0x10))
+-        val = pcnet_aprom_readb(d, addr & 0x0f);
+-    trace_pcnet_mmio_readb(opaque, addr, val);
+-    return val;
+-}
+-
+-static void pcnet_mmio_writew(void *opaque, hwaddr addr, uint32_t val)
 -{
 -    PCNetState *d = opaque;
 -
--    trace_pcnet_mmio_write(opaque, addr, size, val);
--
--    if (addr < 0x10) {
--        if (size == 1) {
--            pcnet_aprom_writeb(d, addr, data);
--        } else if ((addr & 1) == 0 && size == 2) {
--            pcnet_aprom_writeb(d, addr, data & 0xff);
--            pcnet_aprom_writeb(d, addr + 1, data >> 8);
--        } else if ((addr & 3) == 0 && size == 4) {
--            pcnet_aprom_writeb(d, addr, data & 0xff);
--            pcnet_aprom_writeb(d, addr + 1, (data >> 8) & 0xff);
--            pcnet_aprom_writeb(d, addr + 2, (data >> 16) & 0xff);
--            pcnet_aprom_writeb(d, addr + 3, data >> 24);
--        }
--    } else {
--        if (size == 2) {
--            pcnet_ioport_writew(d, addr, data);
--        } else if (size == 4) {
--            pcnet_ioport_writel(d, addr, data);
--        }
--    }
--}
--
--static uint64_t pcnet_mmio_read(void *opque, hwaddr addr, unsigned size)
+-    trace_pcnet_mmio_writew(opaque, addr, val);
+-    if (addr & 0x10)
+-        pcnet_ioport_writew(d, addr & 0x0f, val);
+-    else {
+-        addr &= 0x0f;
+-        pcnet_aprom_writeb(d, addr, val & 0xff);
+-        pcnet_aprom_writeb(d, addr+1, (val & 0xff00) >> 8);
++    if (addr < 0x10) {
++        if (size == 1) {
++            pcnet_aprom_writeb(d, addr, data);
++        } else if ((addr & 1) == 0 && size == 2) {
++            pcnet_aprom_writeb(d, addr, data & 0xff);
++            pcnet_aprom_writeb(d, addr + 1, data >> 8);
++        } else if ((addr & 3) == 0 && size == 4) {
++            pcnet_aprom_writeb(d, addr, data & 0xff);
++            pcnet_aprom_writeb(d, addr + 1, (data >> 8) & 0xff);
++            pcnet_aprom_writeb(d, addr + 2, (data >> 16) & 0xff);
++            pcnet_aprom_writeb(d, addr + 3, data >> 24);
++        }
++    } else {
++        if (size == 2) {
++            pcnet_ioport_writew(d, addr, data);
++        } else if (size == 4) {
++            pcnet_ioport_writel(d, addr, data);
++        }
+     }
+ }
+ 
+-static uint32_t pcnet_mmio_readw(void *opaque, hwaddr addr)
 -{
 -    PCNetState *d = opaque;
+-    uint32_t val = -1;
 -
--    trace_pcnet_ioport_read(opaque, addr, size);
--
--    if (addr < 0x10) {
--        if (size == 1) {
--            return pcnet_aprom_readb(d, addr);
--        } else if ((addr & 1) == 0 && size == 2) {
--            return pcnet_aprom_readb(d, addr) |
--                   (pcnet_aprom_readb(d, addr + 1) << 8);
--        } else if ((addr & 3) == 0 && size == 4) {
--            return pcnet_aprom_readb(d, addr) |
--                   (pcnet_aprom_readb(d, addr + 1) << 8) |
--                   (pcnet_aprom_readb(d, addr + 2) << 16) |
--                   (pcnet_aprom_readb(d, addr + 3) << 24);
--        }
--    } else {
--        if (size == 2) {
--            return pcnet_ioport_readw(d, addr);
--        } else if (size == 4) {
--            return pcnet_ioport_readl(d, addr);
--        }
+-    if (addr & 0x10)
+-        val = pcnet_ioport_readw(d, addr & 0x0f);
+-    else {
+-        addr &= 0x0f;
+-        val = pcnet_aprom_readb(d, addr+1);
+-        val <<= 8;
+-        val |= pcnet_aprom_readb(d, addr);
 -    }
--    return ((uint64_t)1 << (size * 8)) - 1;
+-    trace_pcnet_mmio_readw(opaque, addr, val);
+-    return val;
 -}
 -
+-static void pcnet_mmio_writel(void *opaque, hwaddr addr, uint32_t val)
++static uint64_t pcnet_mmio_read(void *opque, hwaddr addr, unsigned size)
+ {
+     PCNetState *d = opaque;
+ 
+-    trace_pcnet_mmio_writel(opaque, addr, val);
+-    if (addr & 0x10)
+-        pcnet_ioport_writel(d, addr & 0x0f, val);
+-    else {
+-        addr &= 0x0f;
+-        pcnet_aprom_writeb(d, addr, val & 0xff);
+-        pcnet_aprom_writeb(d, addr+1, (val & 0xff00) >> 8);
+-        pcnet_aprom_writeb(d, addr+2, (val & 0xff0000) >> 16);
+-        pcnet_aprom_writeb(d, addr+3, (val & 0xff000000) >> 24);
+-    }
+-}
++    trace_pcnet_ioport_read(opaque, addr, size);
+ 
+-static uint32_t pcnet_mmio_readl(void *opaque, hwaddr addr)
+-{
+-    PCNetState *d = opaque;
+-    uint32_t val;
+-
+-    if (addr & 0x10)
+-        val = pcnet_ioport_readl(d, addr & 0x0f);
+-    else {
+-        addr &= 0x0f;
+-        val = pcnet_aprom_readb(d, addr+3);
+-        val <<= 8;
+-        val |= pcnet_aprom_readb(d, addr+2);
+-        val <<= 8;
+-        val |= pcnet_aprom_readb(d, addr+1);
+-        val <<= 8;
+-        val |= pcnet_aprom_readb(d, addr);
++    if (addr < 0x10) {
++        if (size == 1) {
++            return pcnet_aprom_readb(d, addr);
++        } else if ((addr & 1) == 0 && size == 2) {
++            return pcnet_aprom_readb(d, addr) |
++                   (pcnet_aprom_readb(d, addr + 1) << 8);
++        } else if ((addr & 3) == 0 && size == 4) {
++            return pcnet_aprom_readb(d, addr) |
++                   (pcnet_aprom_readb(d, addr + 1) << 8) |
++                   (pcnet_aprom_readb(d, addr + 2) << 16) |
++                   (pcnet_aprom_readb(d, addr + 3) << 24);
++        }
++    } else {
++        if (size == 2) {
++            return pcnet_ioport_readw(d, addr);
++        } else if (size == 4) {
++            return pcnet_ioport_readl(d, addr);
++        }
+     }
+-    trace_pcnet_mmio_readl(opaque, addr, val);
+-    return val;
++    return ((uint64_t)1 << (size * 8)) - 1;
+ }
+ 
  static const VMStateDescription vmstate_pci_pcnet = {
-     .name = "pcnet",
-     .version_id = 3,
-@@ -216,8 +153,8 @@ static const VMStateDescription vmstate_pci_pcnet = {
+@@ -241,10 +216,12 @@ static const VMStateDescription vmstate_pci_pcnet = {
  /* PCI interface */
  
  static const MemoryRegionOps pcnet_mmio_ops = {
--    .read = pcnet_mmio_read,
--    .write = pcnet_mmio_write,
-+    .read = pcnet_ioport_read,
-+    .write = pcnet_ioport_write,
-     .valid.min_access_size = 1,
-     .valid.max_access_size = 4,
-     .impl.min_access_size = 1,
+-    .old_mmio = {
+-        .read = { pcnet_mmio_readb, pcnet_mmio_readw, pcnet_mmio_readl },
+-        .write = { pcnet_mmio_writeb, pcnet_mmio_writew, pcnet_mmio_writel },
+-    },
++    .read = pcnet_mmio_read,
++    .write = pcnet_mmio_write,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 4,
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 4,
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
 diff --git a/hw/net/trace-events b/hw/net/trace-events
-index 5cd0ad50ce2..c1dea4b1562 100644
+index 663bea1b748..5cd0ad50ce2 100644
 --- a/hw/net/trace-events
 +++ b/hw/net/trace-events
-@@ -61,8 +61,6 @@ pcnet_aprom_writeb(void *opaque, uint32_t addr, uint32_t val) "opaque=%p addr=0x
+@@ -61,12 +61,8 @@ pcnet_aprom_writeb(void *opaque, uint32_t addr, uint32_t val) "opaque=%p addr=0x
  pcnet_aprom_readb(void *opaque, uint32_t addr, uint32_t val) "opaque=%p addr=0x%08x val=0x%02x"
  pcnet_ioport_read(void *opaque, uint64_t addr, unsigned size) "opaque=%p addr=0x%"PRIx64" size=%d"
  pcnet_ioport_write(void *opaque, uint64_t addr, uint64_t data, unsigned size) "opaque=%p addr=0x%"PRIx64" data=0x%"PRIx64" size=%d"
--pcnet_mmio_write(void *opaque, uint64_t addr, uint32_t val, unsigned size) "opaque=%p addr=0x%"PRIx64" val=0x%x size=%d"
--pcnet_mmio_read(void *opaque, uint64_t addr, unsigned size) "opaque=%p addr=0x%"PRIx64" size=%d"
+-pcnet_mmio_writeb(void *opaque, uint64_t addr, uint32_t val) "opaque=%p addr=0x%"PRIx64" val=0x%x"
+-pcnet_mmio_writew(void *opaque, uint64_t addr, uint32_t val) "opaque=%p addr=0x%"PRIx64" val=0x%x"
+-pcnet_mmio_writel(void *opaque, uint64_t addr, uint32_t val) "opaque=%p addr=0x%"PRIx64" val=0x%x"
+-pcnet_mmio_readb(void *opaque, uint64_t addr, uint32_t val) "opaque=%p addr=0x%"PRIx64" val=0x%x"
+-pcnet_mmio_readw(void *opaque, uint64_t addr, uint32_t val) "opaque=%p addr=0x%"PRIx64" val=0x%x"
+-pcnet_mmio_readl(void *opaque, uint64_t addr, uint32_t val) "opaque=%p addr=0x%"PRIx64" val=0x%x"
++pcnet_mmio_write(void *opaque, uint64_t addr, uint32_t val, unsigned size) "opaque=%p addr=0x%"PRIx64" val=0x%x size=%d"
++pcnet_mmio_read(void *opaque, uint64_t addr, unsigned size) "opaque=%p addr=0x%"PRIx64" size=%d"
  
  # hw/net/net_rx_pkt.c
  net_rx_pkt_parsed(bool ip4, bool ip6, bool udp, bool tcp, size_t l3o, size_t l4o, size_t l5o) "RX packet parsed: ip4: %d, ip6: %d, udp: %d, tcp: %d, l3 offset: %zu, l4 offset: %zu, l5 offset: %zu"
