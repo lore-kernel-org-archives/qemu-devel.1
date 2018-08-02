@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1flKLf-0008Bo-PW
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 16:37:28 -0400
+	(envelope-from <palmer@sifive.com>) id 1flKpI-0006yP-1C
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 17:08:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1flKLe-00052N-MC
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 16:37:27 -0400
-Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:44843)
+	(envelope-from <palmer@sifive.com>) id 1flKpC-0006kq-SL
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 17:08:01 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:40180)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1flKLe-00052D-Fz
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 16:37:26 -0400
-Received: by mail-oi0-x22f.google.com with SMTP id s198-v6so5888595oih.11
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 13:37:26 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <af0a868b-20d8-a02f-f6c3-eb0d9a56b5ab@amsat.org>
-References: <CAFEAcA8yrNzEaL5_D79OjHCUUwPQnS4MnQhU9gumR7fpTThyuQ@mail.gmail.com>
-	<af0a868b-20d8-a02f-f6c3-eb0d9a56b5ab@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Aug 2018 21:37:05 +0100
-Message-ID: <CAFEAcA-T=kByrL13i3ujemaJKeKo-6g=Dc0e=Vg4=5dCJXtaBQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] 'make vm-build-freebsd' &c don't work if KVM isn't
- enabled
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1flKpC-0006kg-L8
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 17:07:58 -0400
+Received: by mail-pf1-x441.google.com with SMTP id e13-v6so2003669pff.7
+	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 14:07:58 -0700 (PDT)
+Date: Thu, 02 Aug 2018 14:07:56 -0700 (PDT)
+In-Reply-To: <CAKmqyKNmBeY0BZNuQ3o+XTzdtN6QCm8qPhi1VHz4XTNg=Q3=Ng@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-7a78b931-d225-4006-bbc7-707c9d471ef0@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] RISC-V platform
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +27,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+To: alistair23@gmail.com, programmingkidx@gmail.com
+Cc: alistair.francis@wdc.com, qemu-devel@nongnu.org
 
-On 2 August 2018 at 20:13, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
-ote:
-> Hi Peter,
+On Fri, 29 Jun 2018 14:20:34 PDT (-0700), alistair23@gmail.com wrote:
+> On Fri, Jun 29, 2018 at 2:05 PM, G 3 <programmingkidx@gmail.com> wrote:
+>> Hi, I noticed your RISC-V patches on the mailing list and had a question
+>> that I think you may be able to answer. Has anyone defined a RISC-V platform
+>> yet? What I mean is defining what devices would be found on a RISC-V
+>> motherboard. I do hope to see RISC-V based desktop systems one day. But
+>> before that day can come the platform for this chip would have to be
+>> established. Could the SiFive board be the basis for such a standard?
 >
-> On 07/30/2018 10:23 AM, Peter Maydell wrote:
->> The tests in tests/vm/ seem to make some attempt to cope with the
->> host system not allowing the user to use KVM, but it doesn't quite
->> work. The problem is that tests/vm/basevm.py always uses "-cpu host"
->> in the QEMU options it uses to run the VM, and that only works if
->> KVM is enabled. If the user can't run KVM then we correctly avoid
->> passing it "-enable-kvm" but then QEMU doesn't run because "-cpu host"
->> isn't supported...
->>
->> I guess the right fix here is to use "-cpu max" ?
->
-> I think this is the issue I intended to address in this series:
->
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg03411.html
-> "tests/vm: Improvements when KVM is not available"
-> ->
-> "tests/vm: Use 'host' cpu when KVM is available, else default to 'max'"
+> It really depends what you mean by a standard platform. At the moment
+> the SiFive HiFive Unleased board is the only ASIC that can boot Linux.
+> So that really is the "standard" RISC-V board. It is a pretty basic
+> embedded board though, so it can't be considered a "standard" RISC-V
+> desktop. There is a virt board in QEMU (which is similar to the HiFive
+> Unleashed) that is a good go to for QEMU work.
 
-Just using "max" seems more straightforward, since the point
-is that it works everywhere.
-
-I thought I'd sent my tests/vm series out earlier this week,
-but I must have managed to only do the dry-run or something --
-I'll send them tomorrow.
-
-thanks
--- PMM
+The HiFive Unleashed is the defacto standard RISC-V embedded Linux platform 
+right now, but there will be a RISC-V platform specification that defines 
+proper standard platforms of various types.  This effort hasn't been started 
+yet, but it should be done sooner rather than later.
