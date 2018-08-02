@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEqs-0007zk-BD
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:19 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flErG-0008Qh-Sf
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1flEqp-0006YY-87
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:18 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:59601 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1flErD-0006uP-It
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:42 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59858 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1flEqo-0006Wb-S6
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:15 -0400
+	id 1flErC-0006r3-QS
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:45:39 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu,  2 Aug 2018 16:17:02 +0200
-Message-Id: <1533219424-7627-76-git-send-email-stefan.markovic@rt-rk.com>
+Date: Thu,  2 Aug 2018 16:17:03 +0200
+Message-Id: <1533219424-7627-77-git-send-email-stefan.markovic@rt-rk.com>
 In-Reply-To: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
 References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 75/77] linux-user: Add support for statx()
- syscall for all platforms
+Subject: [Qemu-devel] [PATCH v6 76/77] linux-user: Add nanoMIPS linux user
+ mode configuration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,184 +28,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Implement support for syscall statx(). The implementation is based on
-invoking other (more mature) syscalls (from the same 'stat' family)
-on the host side. This way, problems of availability of statx() on the
-host are avoided.
+Add new linux user mode configuration for nanoMIPS.
 
+Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/syscall.c      | 100 +++++++++++++++++++++++++++++++++++++++++++++-
- linux-user/syscall_defs.h |  38 ++++++++++++++++++
- 2 files changed, 137 insertions(+), 1 deletion(-)
+ configure                               | 13 ++++++++++++-
+ default-configs/nanomips-linux-user.mak |  1 +
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+ create mode 100644 default-configs/nanomips-linux-user.mak
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index bced9b8..8be3d45 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -8002,7 +8002,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-     abi_long ret;
- #if defined(TARGET_NR_stat) || defined(TARGET_NR_stat64) \
-     || defined(TARGET_NR_lstat) || defined(TARGET_NR_lstat64) \
--    || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64)
-+    || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64) \
-+    || defined(TARGET_NR_statx)
-     struct stat st;
- #endif
- #if defined(TARGET_NR_statfs) || defined(TARGET_NR_statfs64) \
-@@ -10025,6 +10026,103 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-         }
-         break;
- #endif
-+#if defined(TARGET_NR_statx)
-+    case TARGET_NR_statx:
-+        {
-+#if defined(__NR_statx)
-+            /* We assume that struct statx is arhitecture independed */
-+            struct target_statx host_stx;
-+            int mask = tswap32(arg4);
-+#endif
-+            struct target_statx *target_stx;
-+            int dirfd = tswap32(arg1);
-+            int flags = tswap32(arg3);
-+
-+            p = lock_user_string(arg2);
-+            if (p == NULL) {
-+                goto efault;
-+            }
-+#if defined(__NR_statx)
-+            ret = get_errno(syscall(__NR_statx, dirfd, p, flags, mask,
-+                                    &host_stx));
-+            if (!is_error(ret)) {
-+                unlock_user(p, arg2, 0);
-+                if (!lock_user_struct(VERIFY_WRITE, target_stx, arg5, 0)) {
-+                    goto efault;
-+                }
-+                memset(target_stx, 0, sizeof(*target_stx));
-+                __put_user(host_stx.stx_dev_major, &target_stx->stx_dev_major);
-+                __put_user(host_stx.stx_dev_minor, &target_stx->stx_dev_minor);
-+                __put_user(host_stx.stx_ino, &target_stx->stx_ino);
-+                __put_user(host_stx.stx_mode, &target_stx->stx_mode);
-+                __put_user(host_stx.stx_uid, &target_stx->stx_uid);
-+                __put_user(host_stx.stx_gid, &target_stx->stx_gid);
-+                __put_user(host_stx.stx_nlink, &target_stx->stx_nlink);
-+                __put_user(host_stx.stx_rdev_major,
-+                           &target_stx->stx_rdev_major);
-+                __put_user(host_stx.stx_rdev_minor,
-+                           &target_stx->stx_rdev_minor);
-+                __put_user(host_stx.stx_size, &target_stx->stx_size);
-+                __put_user(host_stx.stx_blksize, &target_stx->stx_blksize);
-+                __put_user(host_stx.stx_blocks, &target_stx->stx_blocks);
-+                __put_user(host_stx.stx_atime.tv_sec,
-+                           &target_stx->stx_atime.tv_sec);
-+                __put_user(host_stx.stx_mtime.tv_sec,
-+                           &target_stx->stx_mtime.tv_sec);
-+                __put_user(host_stx.stx_ctime.tv_sec,
-+                           &target_stx->stx_ctime.tv_sec);
-+                unlock_user_struct(target_stx, arg5, 1);
-+            }
-+
-+            if (ret != TARGET_ENOSYS) {
-+                break;
-+            }
-+#endif
-+            if ((p == NULL) || (*((char *)p) == 0)) {
-+                /* By file descriptor */
-+                ret = get_errno(fstat(dirfd, &st));
-+                unlock_user(p, arg2, 0);
-+            } else if (*((char *)p) == '/') {
-+                /* An absolute pathname */
-+                ret = get_errno(stat(path(p), &st));
-+                unlock_user(p, arg2, 0);
-+            } else {
-+                if (dirfd == AT_FDCWD) {
-+                    /* A relative pathname */
-+                    ret = get_errno(stat(path(p), &st));
-+                    unlock_user(p, arg2, 0);
-+                } else {
-+                    /* A directory-relative pathname */
-+                    ret = get_errno(fstatat(dirfd, path(p), &st, flags));
-+                    unlock_user(p, arg2, 0);
-+                }
-+            }
-+
-+            if (!is_error(ret)) {
-+                if (!lock_user_struct(VERIFY_WRITE, target_stx, arg5, 0)) {
-+                    goto efault;
-+                }
-+                memset(target_stx, 0, sizeof(*target_stx));
-+                __put_user(major(st.st_dev), &target_stx->stx_dev_major);
-+                __put_user(minor(st.st_dev), &target_stx->stx_dev_minor);
-+                __put_user(st.st_ino, &target_stx->stx_ino);
-+                __put_user(st.st_mode, &target_stx->stx_mode);
-+                __put_user(st.st_uid, &target_stx->stx_uid);
-+                __put_user(st.st_gid, &target_stx->stx_gid);
-+                __put_user(st.st_nlink, &target_stx->stx_nlink);
-+                __put_user(major(st.st_rdev), &target_stx->stx_rdev_major);
-+                __put_user(minor(st.st_rdev), &target_stx->stx_rdev_minor);
-+                __put_user(st.st_size, &target_stx->stx_size);
-+                __put_user(st.st_blksize, &target_stx->stx_blksize);
-+                __put_user(st.st_blocks, &target_stx->stx_blocks);
-+                __put_user(st.st_atime, &target_stx->stx_atime.tv_sec);
-+                __put_user(st.st_mtime, &target_stx->stx_mtime.tv_sec);
-+                __put_user(st.st_ctime, &target_stx->stx_ctime.tv_sec);
-+                unlock_user_struct(target_stx, arg5, 1);
-+            }
-+        }
-+        break;
-+#endif
- #ifdef TARGET_NR_olduname
-     case TARGET_NR_olduname:
-         goto unimplemented;
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index abf94b8..34cc6e0 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -2530,4 +2530,42 @@ struct target_user_cap_data {
- /* Return size of the log buffer */
- #define TARGET_SYSLOG_ACTION_SIZE_BUFFER   10
+diff --git a/configure b/configure
+index 2a7796e..86c8b28 100755
+--- a/configure
++++ b/configure
+@@ -742,6 +742,9 @@ case "$cpu" in
+     supported_cpu="yes"
+     cross_cc_mips=$host_cc
+   ;;
++  nanomips*)
++    cpu="mips"
++  ;;
+   sparc|sun4[cdmuv])
+     cpu="sparc"
+     supported_cpu="yes"
+@@ -6883,7 +6886,7 @@ target_name=$(echo $target | cut -d '-' -f 1)
+ target_bigendian="no"
  
-+struct target_statx_timestamp {
-+   int64_t tv_sec;
-+   uint32_t tv_nsec;
-+   int32_t __reserved;
-+};
-+
-+struct target_statx {
-+   /* 0x00 */
-+   uint32_t stx_mask;       /* What results were written [uncond] */
-+   uint32_t stx_blksize;    /* Preferred general I/O size [uncond] */
-+   uint64_t stx_attributes; /* Flags conveying information about the file */
-+   /* 0x10 */
-+   uint32_t stx_nlink;      /* Number of hard links */
-+   uint32_t stx_uid;        /* User ID of owner */
-+   uint32_t stx_gid;        /* Group ID of owner */
-+   uint16_t stx_mode;       /* File mode */
-+   uint16_t __spare0[1];
-+   /* 0x20 */
-+   uint64_t stx_ino;        /* Inode number */
-+   uint64_t stx_size;       /* File size */
-+   uint64_t stx_blocks;     /* Number of 512-byte blocks allocated */
-+   uint64_t stx_attributes_mask; /* Mask to show what's supported in
-+                                    stx_attributes */
-+   /* 0x40 */
-+   struct target_statx_timestamp  stx_atime;  /* Last access time */
-+   struct target_statx_timestamp  stx_btime;  /* File creation time */
-+   struct target_statx_timestamp  stx_ctime;  /* Last attribute change time */
-+   struct target_statx_timestamp  stx_mtime;  /* Last data modification time */
-+   /* 0x80 */
-+   uint32_t stx_rdev_major;   /* Device ID of special file [if bdev/cdev] */
-+   uint32_t stx_rdev_minor;
-+   uint32_t stx_dev_major; /* ID of device containing file [uncond] */
-+   uint32_t stx_dev_minor;
-+   /* 0x90 */
-+   uint64_t __spare2[14];  /* Spare space for future expansion */
-+   /* 0x100 */
-+};
-+
- #endif
+ case "$target_name" in
+-  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
++  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|nanomipseb|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
+   target_bigendian=yes
+   ;;
+ esac
+@@ -6999,6 +7002,11 @@ case "$target_name" in
+   moxie)
+     target_compiler=$cross_cc_moxie
+   ;;
++  nanomips|nanomipseb)
++    TARGET_ARCH=nanomips
++    TARGET_BASE_ARCH=mips
++    echo "TARGET_ABI_MIPSP32=y" >> $config_target_mak
++  ;;
+   nios2)
+     target_compiler=$cross_cc_nios2
+   ;;
+@@ -7256,6 +7264,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+   moxie*)
+     disas_config "MOXIE"
+   ;;
++  nanomips*)
++    disas_config "MIPS"
++  ;;
+   nios2)
+     disas_config "NIOS2"
+   ;;
+diff --git a/default-configs/nanomips-linux-user.mak b/default-configs/nanomips-linux-user.mak
+new file mode 100644
+index 0000000..68fc1f7
+--- /dev/null
++++ b/default-configs/nanomips-linux-user.mak
+@@ -0,0 +1 @@
++# Default configuration for nanomips-linux-user
 -- 
 1.9.1
