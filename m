@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1flAgw-0005RO-Ff
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 06:18:47 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1flAlq-0006y2-43
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 06:23:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1flAgs-00034P-E0
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 06:18:46 -0400
-Date: Thu, 2 Aug 2018 12:18:39 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180802121839.38755595@redhat.com>
-In-Reply-To: <20180801133444.11269-3-david@redhat.com>
-References: <20180801133444.11269-1-david@redhat.com>
-	<20180801133444.11269-3-david@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1flAlo-0001iH-QN
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 06:23:50 -0400
+References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
+	<20180626135035.133432-5-vsementsov@virtuozzo.com>
+	<700dffe4-f3a8-8f70-052c-9f6f8ffbe3d3@redhat.com>
+	<20180801102031.GC2691@work-vm>
+	<64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
+	<20180801174005.GD2691@work-vm>
+	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
+	<e200102e-f5ae-3dae-42b1-b9f98d92fc46@redhat.com>
+	<30c90ae6-b747-7da8-9f9c-93511fd95a7b@openvz.org>
+	<d42a47b0-9f45-7dba-98b4-49253916c590@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <69c2d76b-8755-d63d-49be-75b789d07e1f@virtuozzo.com>
+Date: Thu, 2 Aug 2018 13:23:32 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] util/oslib-win32: indicate
- alignment for qemu_anon_ram_alloc()
+In-Reply-To: <d42a47b0-9f45-7dba-98b4-49253916c590@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
+ loading and migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,78 +33,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
-	. Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, Eric Auger <eric.auger@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: John Snow <jsnow@redhat.com>, "Denis V. Lunev" <den@openvz.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
 
-On Wed,  1 Aug 2018 15:34:42 +0200
-David Hildenbrand <david@redhat.com> wrote:
+02.08.2018 01:28, John Snow wrote:
+>
+> On 08/01/2018 04:47 PM, Denis V. Lunev wrote:
+>> On 08/01/2018 09:56 PM, John Snow wrote:
+>>> On 08/01/2018 02:42 PM, Denis V. Lunev wrote:
+>>>> On 08/01/2018 08:40 PM, Dr. David Alan Gilbert wrote:
+>>>>> * John Snow (jsnow@redhat.com) wrote:
+>>>>>> On 08/01/2018 06:20 AM, Dr. David Alan Gilbert wrote:
+>>>>>>> * John Snow (jsnow@redhat.com) wrote:
+>>>>>>>
+>>>>>>> <snip>
+>>>>>>>
+>>>>>>>> I'd rather do something like this:
+>>>>>>>> - Always flush bitmaps to disk on inactivate.
+>>>>>>> Does that increase the time taken by the inactivate measurably?
+>>>>>>> If it's small relative to everything else that's fine; it's just I
+>>>>>>> always worry a little since I think this happens after we've stoppe=
+d the
+>>>>>>> CPU on the source, so is part of the 'downtime'.
+>>>>>>>
+>>>>>>> Dave
+>>>>>>> --
+>>>>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>>>>>
+>>>>>> I'm worried that if we don't, we're leaving behind unusable, partial=
+ly
+>>>>>> complete files behind us. That's a bad design and we shouldn't push =
+for
+>>>>>> it just because it's theoretically faster.
+>>>>> Oh I don't care about theoretical speed; but if it's actually unusabl=
+y
+>>>>> slow in practice then it needs fixing.
+>>>>>
+>>>>> Dave
+>>>> This is not "theoretical" speed. This is real practical speed and
+>>>> instability.
+>>> It's theoretical until I see performance testing numbers; do you have
+>>> any? How much faster does the pivot happen by avoiding making the qcow2
+>>> consistent on close?
+>>>
+>>> I don't argue that it's faster to just simply not write data, but what'=
+s
+>>> not obvious is how much time it actually saves in practice and if that'=
+s
+>>> worth doing unintuitive and undocumented things like "the source file
+>>> loses bitmaps after a migration because it was faster."
+>> Also, frankly speaking, I do not understand the goal of this purism.
+>>
+> The goal of my series originally was just to limit some corner cases. At
+> the time it was not evident that avoiding a flush was a *goal* of that
+> series rather than a *side-effect* or a means to an end (avoiding
+> migrating a bitmap over two different channels).
 
-> Let's set the alignment just like for the posix variant. This will
-> implicitly set the alignment of the underlying memory region and
-> therefore make memory_region_get_alignment(mr) return something > 0 for
-> all memory backends applicable to PCDIMM/NVDIMM.
-> 
-> The allocation granularity is ususally 64k, while the page size is 4k.
-> The documentation of VirtualAlloc is not really comprehensible in case
-> only MEM_COMMIT is specified without an address. We'll detect the actual
-> values and then go for the bigger one. The expection is, that it will
-> always be 64k aligned. (The assumption is that MEM_COMMIT does an
-> implicit MEM_RESERVE, so the address will always be aligned to the
-> allocation granularity. And the allocation granularity is always bigger
-> than the page size).
-> 
-> This will allow us to drop special handling in pc.c for
-> memory_region_get_alignment(mr) == 0, as we can then assume that it is
-> always set (and AFAICS >= getpagesize()).
-> 
-> For pc in pc_memory_plug(), under Windows TARGET_PAGE_SIZE == getpagesize(),
-> therefore alignment of DIMMs will not change, and therefore also not the
-> guest physical memory layout.
-> 
-> For spapr in spapr_memory_plug(), an alignment of 0 would have been used
-> until now. As QEMU_ALIGN_UP will crash with the alignment being 0, this
-> never worked, so we don't have to care about compatibility handling.
-> 
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+It's not a goal and its not a side-effect. Flush is already avoided=20
+currently, in upstream code. And your series is degradation.
+The goal is another: make the whole thing more obvious and make it=20
+possible to restore bitmaps persistance after failed migration.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>
+> It was not immediately obvious to me that intentionally leaving behind
+> partially flushed qcow2 files was expected behavior. I still think it's
+> probably not the best behavior in general, but it's also not really
+> catastrophic either. If you had benchmarks it'd be useful to show an
+> obvious benefit to doing something unconventional.
+>
+> In this case, I *do* consider not writing metadata back out to disk on
+> close something "unconventional."
+>
+> Clearly my series missed missed an important case, so it can't be used
+> at all, and the status quo is also broken for several cases and also
+> cannot be used. With your performance concerns in mind, I'm looking at
+> Vladimir's series again. It might just require some more concise
+> comments explaining why you're taking the exact approach that you are.
+>
+> --js
+>
+>> There 2 main cases - shared and non-shared storage. On shared
+>> storage:
+>> - normally migration is finished successfully. Source is shut down,
+>>  =C2=A0 target is started. The data in the file on shared storage would =
+be
+>>  =C2=A0 __IMMEDIATELY__ marked as stale on target, i.e. you will save CB=
+T
+>>  =C2=A0on source (with IO over networked fs), load CBT on target (with I=
+O
+>>  =C2=A0over networked FS), mark CBT as stale (IO again). CBT data writte=
+n
+>>  =C2=A0is marked as lost
+>> - failed migration. OK, we have CBT data written on source, CBT
+>>  =C2=A0 data read on source, CBT data marked stale. Thus any CBT on
+>>  =C2=A0 disk while VM is running is pure overhead.
+>>
+>> The same situation is when we use non-shared migration. In this
+>> case the situation is even worse. You save CBT and put it to trash
+>> upon migration complete.
+>>
+>> Please also note, that CBT saving almost does not protect us
+>> from powerlosses as the power should be lost at the very
+>> specific moment to allow data to survive and most likely
+>> we will have to drop CBT completely.
+>>
+>> Den
+>>
 
 
-> ---
->  util/oslib-win32.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-> index bb5ad28bd3..25dd1595ad 100644
-> --- a/util/oslib-win32.c
-> +++ b/util/oslib-win32.c
-> @@ -67,15 +67,24 @@ void *qemu_memalign(size_t alignment, size_t size)
->      return qemu_oom_check(qemu_try_memalign(alignment, size));
->  }
->  
-> +static int get_allocation_granularity(void)
-> +{
-> +    SYSTEM_INFO system_info;
-> +
-> +    GetSystemInfo(&system_info);
-> +    return system_info.dwAllocationGranularity;
-> +}
-> +
->  void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared)
->  {
->      void *ptr;
->  
-> -    /* FIXME: this is not exactly optimal solution since VirtualAlloc
-> -       has 64Kb granularity, but at least it guarantees us that the
-> -       memory is page aligned. */
->      ptr = VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
->      trace_qemu_anon_ram_alloc(size, ptr);
-> +
-> +    if (ptr && align) {
-> +        *align = MAX(get_allocation_granularity(), getpagesize());
-> +    }
->      return ptr;
->  }
->  
+--=20
+Best regards,
+Vladimir
