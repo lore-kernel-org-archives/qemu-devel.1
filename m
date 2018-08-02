@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fl3cX-0003cX-CT
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:45:48 -0400
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fl3ca-0003dJ-Bc
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:45:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fl3cU-0001Ii-RN
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:45:45 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40200)
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fl3cZ-0001Ky-3f
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:45:48 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:53182)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
-	id 1fl3cU-0001I9-JU
-	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:45:42 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h15-v6so531902wrs.7
-	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 19:45:42 -0700 (PDT)
+	id 1fl3cY-0001KO-RG
+	for qemu-devel@nongnu.org; Wed, 01 Aug 2018 22:45:47 -0400
+Received: by mail-wm0-x244.google.com with SMTP id o11-v6so725790wmh.2
+	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 19:45:46 -0700 (PDT)
 From: Zihan Yang <whois.zihan.yang@gmail.com>
-Date: Thu,  2 Aug 2018 10:45:18 +0800
-Message-Id: <1533177924-24765-1-git-send-email-whois.zihan.yang@gmail.com>
-Subject: [Qemu-devel] [RFC v3 0/6] pci_expander_brdige: Put pxb-pcie host
- bridge into separate pci domain
+Date: Thu,  2 Aug 2018 10:45:19 +0800
+Message-Id: <1533177924-24765-2-git-send-email-whois.zihan.yang@gmail.com>
+In-Reply-To: <1533177924-24765-1-git-send-email-whois.zihan.yang@gmail.com>
+References: <1533177924-24765-1-git-send-email-whois.zihan.yang@gmail.com>
+Subject: [Qemu-devel] [RFC v3 1/6] pci_expander_bridge: add type
+ TYPE_PXB_PCIE_HOST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +28,241 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Zihan Yang <whois.zihan.yang@gmail.com>
+Cc: Zihan Yang <whois.zihan.yang@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-(Forgot about the cc, repost it here)
+The inner host bridge created by pxb-pcie is TYPE_PXB_PCI_HOST by default,
+change it to a new type TYPE_PXB_PCIE_HOST to better utilize ECAM of PCIe
 
-NOTE: This patch set relies on seabios change. Unfortunately, I haven't got
-it fully working in seabios, but I still post them here because patches
-involve some port layout change to be reviewed, and it has been a long delay
-since my last version. I'm trying to catch things up recently.
+Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
+---
+ hw/pci-bridge/pci_expander_bridge.c | 127 ++++++++++++++++++++++++++++++++++--
+ 1 file changed, 122 insertions(+), 5 deletions(-)
 
-If you would like to see current status of seabios part, please refer to
-https://mail.coreboot.org/pipermail/seabios/2018-August/012385.html
-
-Currently only q35 host bridge is allocated an item in MCFG table, all pxb
-host bridges stay within pci domain 0. This series of patches put each pxb
-host bridge in separate pci domain, allocating a new MCFG table item for it.
-
-Users can configure whether to put pxb host bridge into separate domain
-by passing parameter domain_nr to pxb pcie device. start_bus property
-indicates the Base Bus Number(BBN) of the pxb host bridge. Another property
-max_bus specifies the maximum desired bus numbers to reduce MCFG space cost.
-Example command is
-
-    -device pxb-pcie,id=br3,bus="pcie.0",start_bus=0,domain_nr=1,max_bus=15
-
-Then this pxb-pcie host bridge is placed at pci domain 1, and only reserve
-(15+1)=16 buses, which is much smaller than the default 256 buses.
-
-The pxb host does not have an mch in it, as q35 host already has one. All
-pxb host bridges just serve as expander bridges in QEMU, which makes them
-a little simpler than q35 host bridge.
-
-v3 <- v2:
-- Replace duplicate properties in pxb pcie host with link property to PXBDev
-- Allow seabios to access config space and data space of expander bridge
-  through a different ioport, because 0xcf8 is attached only to sysbus.
-- Add a new property start_bus to indicate the BBN of pxb host bridge. The
-  bus_nr property is used as the bus number of pxb-pcie device on pcie.0 bus
-
-v2 <- v1:
-- Allow user to configure whether to put pxb-pcie into seperate domain
-- Add AML description part of each host bridge
-- Modify the location of MCFG space to between RAM hotplug and pci hole64
-
-
-
-Zihan Yang (6):
-  pci_expander_bridge: add type TYPE_PXB_PCIE_HOST
-  acpi-build: allocate mcfg for pxb-pcie host bridges
-  i386/acpi-build: describe new pci domain in AML
-  pci_expander_bridge: Add config_read callback
-  pci_expander_bridge: Add ioport for pxb host bus
-  pci_expander_bridge: add start_bus property
-
- hw/i386/acpi-build.c                        | 193 +++++++++++++++++------
- hw/i386/pc.c                                |  14 +-
- hw/pci-bridge/pci_expander_bridge.c         | 229 +++++++++++++++++++++++++++-
- hw/pci-host/q35.c                           |   2 +
- hw/pci/pci.c                                |   9 +-
- include/hw/i386/pc.h                        |   1 +
- include/hw/pci-bridge/pci_expander_bridge.h |  15 ++
- include/hw/pci-host/q35.h                   |   1 +
- include/hw/pci/pci_host.h                   |   2 +-
- 9 files changed, 406 insertions(+), 60 deletions(-)
- create mode 100644 include/hw/pci-bridge/pci_expander_bridge.h
-
+diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
+index e62de42..6dd38de 100644
+--- a/hw/pci-bridge/pci_expander_bridge.c
++++ b/hw/pci-bridge/pci_expander_bridge.c
+@@ -15,10 +15,12 @@
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_bus.h"
+ #include "hw/pci/pci_host.h"
++#include "hw/pci/pcie_host.h"
+ #include "hw/pci/pci_bridge.h"
+ #include "qemu/range.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/numa.h"
++#include "qapi/visitor.h"
+ 
+ #define TYPE_PXB_BUS "pxb-bus"
+ #define PXB_BUS(obj) OBJECT_CHECK(PXBBus, (obj), TYPE_PXB_BUS)
+@@ -40,11 +42,20 @@ typedef struct PXBBus {
+ #define TYPE_PXB_PCIE_DEVICE "pxb-pcie"
+ #define PXB_PCIE_DEV(obj) OBJECT_CHECK(PXBDev, (obj), TYPE_PXB_PCIE_DEVICE)
+ 
++#define PROP_PXB_PCIE_DEV "pxbdev"
++
++#define PROP_PXB_PCIE_DOMAIN_NR "domain_nr"
++#define PROP_PXB_PCIE_MAX_BUS "max_bus"
++#define PROP_PXB_BUS_NR "bus_nr"
++#define PROP_PXB_NUMA_NODE "numa_node"
++
+ typedef struct PXBDev {
+     /*< private >*/
+     PCIDevice parent_obj;
+     /*< public >*/
+ 
++    uint32_t domain_nr; /* PCI domain number, non-zero means separate domain */
++    uint8_t max_bus;    /* max bus number to use(including this one) */
+     uint8_t bus_nr;
+     uint16_t numa_node;
+ } PXBDev;
+@@ -58,6 +69,16 @@ static PXBDev *convert_to_pxb(PCIDevice *dev)
+ static GList *pxb_dev_list;
+ 
+ #define TYPE_PXB_HOST "pxb-host"
++#define TYPE_PXB_PCIE_HOST "pxb-pcie-host"
++#define PXB_PCIE_HOST_DEVICE(obj) \
++     OBJECT_CHECK(PXBPCIEHost, (obj), TYPE_PXB_PCIE_HOST)
++
++typedef struct PXBPCIEHost {
++    PCIExpressHost parent_obj;
++
++    /* pointers to PXBDev */
++    PXBDev *pxbdev;
++} PXBPCIEHost;
+ 
+ static int pxb_bus_num(PCIBus *bus)
+ {
+@@ -111,6 +132,35 @@ static const char *pxb_host_root_bus_path(PCIHostState *host_bridge,
+     return bus->bus_path;
+ }
+ 
++/* Use a dedicated function for PCIe since pxb-host does
++ * not have a domain_nr field */
++static const char *pxb_pcie_host_root_bus_path(PCIHostState *host_bridge,
++                                          PCIBus *rootbus)
++{
++    if (!pci_bus_is_express(rootbus)) {
++        /* pxb-pcie-host cannot reside on a PCI bus */
++        return NULL;
++    }
++    PXBBus *bus = PXB_PCIE_BUS(rootbus);
++
++    /* get the pointer to PXBDev */
++    Object *obj = object_property_get_link(OBJECT(host_bridge),
++                                           PROP_PXB_PCIE_DEV, NULL);
++
++    snprintf(bus->bus_path, 8, "%04lx:%02x",
++             object_property_get_uint(obj, PROP_PXB_PCIE_DOMAIN_NR, NULL),
++             pxb_bus_num(rootbus));
++    return bus->bus_path;
++}
++
++static void pxb_pcie_host_get_mmcfg_size(Object *obj, Visitor *v, const char *name,
++                                    void *opaque, Error **errp)
++{
++    PCIExpressHost *e = PCIE_HOST_BRIDGE(obj);
++
++    visit_type_uint64(v, name, &e->size, errp);
++}
++
+ static char *pxb_host_ofw_unit_address(const SysBusDevice *dev)
+ {
+     const PCIHostState *pxb_host;
+@@ -142,6 +192,31 @@ static char *pxb_host_ofw_unit_address(const SysBusDevice *dev)
+     return NULL;
+ }
+ 
++static void pxb_pcie_host_initfn(Object *obj)
++{
++    PXBPCIEHost *s = PXB_PCIE_HOST_DEVICE(obj);
++    PCIHostState *phb = PCI_HOST_BRIDGE(obj);
++
++    memory_region_init_io(&phb->conf_mem, obj, &pci_host_conf_le_ops, phb,
++                          "pci-conf-idx", 4);
++    memory_region_init_io(&phb->data_mem, obj, &pci_host_data_le_ops, phb,
++                          "pci-conf-data", 4);
++
++    object_property_add(obj, PCIE_HOST_MCFG_SIZE, "uint64",
++                         pxb_pcie_host_get_mmcfg_size,
++                         NULL, NULL, NULL, NULL);
++
++    object_property_add_link(obj, PROP_PXB_PCIE_DEV, TYPE_PXB_PCIE_DEVICE,
++                         (Object **)&s->pxbdev,
++                         qdev_prop_allow_set_link_before_realize, 0, NULL);
++}
++
++static Property pxb_pcie_host_props[] = {
++    DEFINE_PROP_UINT64(PCIE_HOST_MCFG_BASE, PXBPCIEHost, parent_obj.base_addr,
++                        PCIE_BASE_ADDR_UNMAPPED),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void pxb_host_class_init(ObjectClass *class, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(class);
+@@ -155,12 +230,34 @@ static void pxb_host_class_init(ObjectClass *class, void *data)
+     hc->root_bus_path = pxb_host_root_bus_path;
+ }
+ 
++static void pxb_pcie_host_class_init(ObjectClass *class, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(class);
++    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(class);
++    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_CLASS(class);
++
++    dc->fw_name = "pcie";
++    dc->props = pxb_pcie_host_props;
++    /* Reason: Internal part of the pxb/pxb-pcie device, not usable by itself */
++    dc->user_creatable = false;
++    sbc->explicit_ofw_unit_address = pxb_host_ofw_unit_address;
++    hc->root_bus_path = pxb_pcie_host_root_bus_path;
++}
++
+ static const TypeInfo pxb_host_info = {
+     .name          = TYPE_PXB_HOST,
+     .parent        = TYPE_PCI_HOST_BRIDGE,
+     .class_init    = pxb_host_class_init,
+ };
+ 
++static const TypeInfo pxb_pcie_host_info = {
++    .name          = TYPE_PXB_PCIE_HOST,
++    .parent        = TYPE_PCIE_HOST_BRIDGE,
++    .instance_size = sizeof(PXBPCIEHost),
++    .instance_init = pxb_pcie_host_initfn,
++    .class_init    = pxb_pcie_host_class_init,
++};
++
+ /*
+  * Registers the PXB bus as a child of pci host root bus.
+  */
+@@ -205,7 +302,10 @@ static gint pxb_compare(gconstpointer a, gconstpointer b)
+ {
+     const PXBDev *pxb_a = a, *pxb_b = b;
+ 
+-    return pxb_a->bus_nr < pxb_b->bus_nr ? -1 :
++    /* check domain_nr, then bus_nr */
++    return pxb_a->domain_nr < pxb_b->domain_nr ? -1 :
++           pxb_a->domain_nr > pxb_b->domain_nr ?  1 :
++           pxb_a->bus_nr < pxb_b->bus_nr ? -1 :
+            pxb_a->bus_nr > pxb_b->bus_nr ?  1 :
+            0;
+ }
+@@ -228,10 +328,16 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
+         dev_name = dev->qdev.id;
+     }
+ 
+-    ds = qdev_create(NULL, TYPE_PXB_HOST);
+     if (pcie) {
++        g_assert (pxb->max_bus >= pxb->bus_nr);
++        ds = qdev_create(NULL, TYPE_PXB_PCIE_HOST);
++
++        object_property_set_link(OBJECT(ds), OBJECT(pxb),
++                                 PROP_PXB_PCIE_DEV, NULL);
++
+         bus = pci_root_bus_new(ds, dev_name, NULL, NULL, 0, TYPE_PXB_PCIE_BUS);
+     } else {
++        ds = qdev_create(NULL, TYPE_PXB_HOST);
+         bus = pci_root_bus_new(ds, "pxb-internal", NULL, NULL, 0, TYPE_PXB_BUS);
+         bds = qdev_create(BUS(bus), "pci-bridge");
+         bds->id = dev_name;
+@@ -289,8 +395,18 @@ static void pxb_dev_exitfn(PCIDevice *pci_dev)
+ 
+ static Property pxb_dev_properties[] = {
+     /* Note: 0 is not a legal PXB bus number. */
+-    DEFINE_PROP_UINT8("bus_nr", PXBDev, bus_nr, 0),
+-    DEFINE_PROP_UINT16("numa_node", PXBDev, numa_node, NUMA_NODE_UNASSIGNED),
++    DEFINE_PROP_UINT8(PROP_PXB_BUS_NR, PXBDev, bus_nr, 0),
++    DEFINE_PROP_UINT16(PROP_PXB_NUMA_NODE, PXBDev, numa_node, NUMA_NODE_UNASSIGNED),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static Property pxb_pcie_dev_properties[] = {
++    DEFINE_PROP_UINT8(PROP_PXB_BUS_NR, PXBDev, bus_nr, 0),
++    DEFINE_PROP_UINT16(PROP_PXB_NUMA_NODE, PXBDev, numa_node, NUMA_NODE_UNASSIGNED),
++    DEFINE_PROP_UINT32(PROP_PXB_PCIE_DOMAIN_NR, PXBDev, domain_nr, 0),
++    /* set a small default value, bus interval is [bus_nr, max_bus] */
++    DEFINE_PROP_UINT8(PROP_PXB_PCIE_MAX_BUS, PXBDev, max_bus, 16),
++
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -344,7 +460,7 @@ static void pxb_pcie_dev_class_init(ObjectClass *klass, void *data)
+     k->class_id = PCI_CLASS_BRIDGE_HOST;
+ 
+     dc->desc = "PCI Express Expander Bridge";
+-    dc->props = pxb_dev_properties;
++    dc->props = pxb_pcie_dev_properties;
+     dc->hotpluggable = false;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+@@ -365,6 +481,7 @@ static void pxb_register_types(void)
+     type_register_static(&pxb_bus_info);
+     type_register_static(&pxb_pcie_bus_info);
+     type_register_static(&pxb_host_info);
++    type_register_static(&pxb_pcie_host_info);
+     type_register_static(&pxb_dev_info);
+     type_register_static(&pxb_pcie_dev_info);
+ }
 -- 
 2.7.4
