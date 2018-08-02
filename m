@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fl7cg-0003il-Qf
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:02:16 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fl7f0-00050m-AM
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:04:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fl7cd-0005XB-JW
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:02:10 -0400
-References: <20180801131905.148778-1-frankja@linux.ibm.com>
-	<20180801131905.148778-3-frankja@linux.ibm.com>
-	<2da970ab-276f-f792-54d8-c696e899cac5@redhat.com>
-	<1889220a-b804-23a2-26ef-1a319da01d26@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <99fae744-4f55-7ffd-56b7-1cc2796269de@redhat.com>
-Date: Thu, 2 Aug 2018 09:01:52 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1fl7ey-0001I0-UQ
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:04:34 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:47653)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fl7ey-00011C-3h
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 03:04:32 -0400
+Date: Thu, 2 Aug 2018 14:08:30 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180802040830.GB11211@umbus.fritz.box>
+References: <153252992640.319494.8451297710133862507.stgit@bahia.lan>
+	<20180727052724.GJ3694@umbus.fritz.box>
+	<20180727095452.45edee8b@bahia>
+	<20180730055715.GD2708@umbus.fritz.box>
+	<20180730104145.109ef196@bahia.lan>
+	<20180731032559.GH2708@umbus.fritz.box>
+	<20180801152430.3f1c5cee@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <1889220a-b804-23a2-26ef-1a319da01d26@linux.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="Xkt2FILYJa02993vSH9Vvgl3P5gSGRI6e"
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 2/2] s390x: Enable KVM huge
- page backing support
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="GID0FwUMdk1T2AWN"
+Content-Disposition: inline
+In-Reply-To: <20180801152430.3f1c5cee@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH for-3.1] tests/cpu-plug-test: check CPU
+ hotplug on ppc64 with KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +34,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Xkt2FILYJa02993vSH9Vvgl3P5gSGRI6e
-From: Thomas Huth <thuth@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- david@redhat.com
-Message-ID: <99fae744-4f55-7ffd-56b7-1cc2796269de@redhat.com>
-Subject: Re: [qemu-s390x] [PATCH v4 2/2] s390x: Enable KVM huge page backing
- support
-References: <20180801131905.148778-1-frankja@linux.ibm.com>
- <20180801131905.148778-3-frankja@linux.ibm.com>
- <2da970ab-276f-f792-54d8-c696e899cac5@redhat.com>
- <1889220a-b804-23a2-26ef-1a319da01d26@linux.ibm.com>
-In-Reply-To: <1889220a-b804-23a2-26ef-1a319da01d26@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+
+--GID0FwUMdk1T2AWN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 08/02/2018 08:53 AM, Janosch Frank wrote:
-> On 01.08.2018 18:47, Thomas Huth wrote:
->> On 08/01/2018 03:19 PM, Janosch Frank wrote:
->>> +static int kvm_s390_configure_mempath_backing(KVMState *s)
->>> +{
->>> +    size_t path_psize =3D qemu_mempath_getpagesize(mem_path);
->>> +
->>> +    if (path_psize =3D=3D 4 * KiB)
->>> +        return 0;
->>
->> Missing curly braces.
+On Wed, Aug 01, 2018 at 03:24:30PM +0200, Greg Kurz wrote:
+> On Tue, 31 Jul 2018 13:25:59 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+> [...]
+> > >=20
+> > > The CPU hotplug test doesn't seem to do anything on the guest side: it
+> > > just checks that 'device_add' returns a response that isn't an
+> > > error. =20
+> >=20
+> > Right, which makes this ill suited to being a qtest test.  The whole
+> > point of qtest is making it easier to test qemu peripherals without
+> > having to have specific test code within the guest, by essentially
+> > replacing the guest's cpu with a stub controlled by the test harness.
+> > That's what the qtest accel is all about.
+> >=20
 >=20
-> urgh, right, this is not the kernel.
+> I agree with what a qtest test should be, but cpu-plug-test doesn't
+> do anything like that obviously, ie, the guest CPU does nothing at
+> all. Only the hotplug path of the QEMU device model that don't need
+> the guest to run is tested here.
+
+Right, so I'm suggesting this be changed to a non-qtest test.  Those
+are fine to have -machine accel=3Dkvm:tcg.  Of course that doesn't
+prevent later adding a more detailed cpu hotplug qtest that *does* do
+actions on the guest side.
+
+> The more general issue is that paths guarded with kvm_enabled() cannot
+> be tested with a genuine qtest test. That's really unfortunate since
+> these paths are sometimes the one that are mostly used on the field,
+> eg, in-kernel XICS versus emulated XICS.
+
+It makes sense in the context of what qtests are for.  They're
+designed to test the emulated peripherals in isolation from the core
+emulation (whether that's via tcg or kvm).
+
+> > I think it's confusing to have a test which tries things with both
+> > qtest and kvm accelerators.  Looking like a qtest test, people might
+> > reasonably think they can extend/refine the test to check behaviour
+> > when the guest does respond to the hotplug events.  But such an
+> > extension won't work with the kvm accel, because the qtest code used
+> > to simulate that guest response won't have any effect with kvm.
+> >=20
 >=20
->>
->>> +    if (path_psize !=3D 1 * MiB) {
->>> +        error_report("Memory backing with 2G pages was specified, "
->>> +                     "but KVM does not support this memory backing")=
-;
->>
->> May I suggest to use a text that rather matches the condition of the
->> if-statement (just in case there will be other sizes in the future...)=
-,
->> e.g. "Memory backing is only supported for 1 MiB huge pages" or
->> something similar.
->>
->>  Thomas
->>
+> If the motivation is to let the test be a true qtest in case someone
+> wants to emulate some guest behavior, I agree the kvm change is wrong.
 >=20
-> That's actually the gist of it. s390 supports 4k, 1M and 2G and looking=
+> > > I'm not aware that the guest is expected to have a specific behavior
+> > > during 'device_add', apart from not crashing or hanging. That was the
+> > > initial idea behind passing '-S' to ensure the guest doesn't run. =20
+> >=20
+> > Note that with qtest (or -S) we don't even test that minimal
+> > condition.  We only test that *qemu* doesn't crash - it could fatally
+> > compromise the guest and the test would never know.
+> >=20
+>=20
+> True.
+>=20
+> > > Your remark seems to be more general though... are you meaning that
+> > > doing something like qtest_start("-machine accel=3Dkvm:tcg") is just
+> > > wrong ? =20
+> >=20
+> > Pretty much, yes.  A non-qtest test which does that is reasonable, but
+> > not a qtest test.
+> >=20
+>=20
+> So, instead of hijacking the current qtest, we may add a non-qtest test
+> that would start QEMU with "-machine accel=3Dkvm:tcg -S". This would allow
+> at least to test that QEMU doesn't crash right away. And, as suggested
+> by Thomas, the coverage could include SLOF as well if we don't pass -S.
+> But I would need to understand why SLOF sometimes hits a 0x700 when
+> running cpu-plug-test with this patch applied...
 
-> at the POP I don't see a big chance of having any more sizes, as there
-> are not a lot of software bits left and adding support in OSs is a pain=
-=2E
-> Also don't hold your breath for 2G, it would need a rewrite of gmap.c.
-
-Well, never say never ... but if you want to keep the current text,
-that's fine for me, too.
-
- Thomas
+Yup.
 
 
---Xkt2FILYJa02993vSH9Vvgl3P5gSGRI6e
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--GID0FwUMdk1T2AWN
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQIcBAEBAgAGBQJbYqxnAAoJEC7Z13T+cC21Ui8QAIDiQPalZ63qqY7p+DSgTXfu
-8DqxI9mBSXGyVjJikxmUrv+MOFhJ5rM36QD7IkbkUMVxWseTuf00jKsVVOoraj6o
-N5hTiAX3h/46AlMvhj96qPhAz6wbW7yIk8RgEt9mD3m9Bhy0K84SPMzv6/Qq9t1Z
-eh3uEKSom4G8nWFn7qbRVOsnNEOqolwjacQrmiV32E142+wd8REHrzS4/J6BP1Fw
-nMPn4KyXbRs/PVo1AGKkaxvcZchaBDONilCkDPqXpkqcsAfs+gDtValz//le/3vs
-c/OnmvyRu0WBxajlu786J7WrCxn983Mou9fSrNUm34LYsSZ1LJFtmhxvsHssijKZ
-L1VfzfA271R13jv6aGRHvK0tohJ1XgEDsCU17cxdDx9XIc92GtFxOemk59st/JlN
-V7uvsGR10lHPNG7IIRfgeRn5cPB+goWof4oL6J2M6Awd6dgGs5SDYGBlUzu41YRp
-bCeDJJQ26+SPzmOrvWdgebNAH5Vy+tT1Lb3x+HrAG0evi6iF3WxDDvxMZwH/9r5d
-vG28AOk9AkoupOpPnCBg10+BaOincI5/AjPsmz+w38H+kEPF0K1+nAJRpZFUKV5A
-Ch08NU4VoRRfT8fVgPvuPhLlv+wO/GRIng54Vw+/nzqRYmp4XgkqMlEbZFb+fMkw
-zP6AFC9DPLCMVOZkfC5w
-=qevV
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltig74ACgkQbDjKyiDZ
+s5I15w//WRkV9UAyliXvKZ7todRYPh94yHGFKf0ZQrDhV4N2Tk1KsQM/AuP/1dDV
+q6uEABCimj5VZ1ETgHk/69yF8JqP0FIr7VilWiZHybyI1bNMQSg14Yglzvdhk75v
+shWXNtNaSz1jzDZdONSqRH5K7PgVsq0ntq2R/b4iuBf+ywm99IrOmvxwkM+VwBwy
+mBPC2+JeSDah3Zad8OQMdqJhDnJdh5J4EB+4Fv1MEevxyPfKx0pLhEczMWeFepwH
+cJ45/Tc/Uqdp03l/eFYNbuG1UJJ20WBLxtlHBIooNDdIp5dGPHMX+3OHQY1tzhIE
+TtVOAJb13HinSVvERwtjPbXPNUTcOO1RRpORcjZHx4xJhwOKb0Du2cSy7mf3v8U9
+0HdA3lQ1av3LeiGGF4OmFzFGyWLa3SQAzBPSJcxYV5n4gmP8CI9V5E6vuiIjGFiH
+VFrVhymOOTV/YCmjzIbL5xrZ1Mz8Bjuk1TxiXOnBiiJCFHhsPgi/zVcRdX8/pEaU
+xRF1H4IvwlKxaCszbVCzbSP0KOXo1u7B3JEupChCxqlX+gQJyYslwCBjh2d1Kwz6
+7zU4lXCvybWUUTcAmxTmqr9e5Lo6P/DCe6jHnKfAO6Q7WgTJZ1ik3NXSN5vyswk6
+x6LG/sotZtsyMn3fpdIH8tF2cv4UNho46/Uso/zz2ktC7AoN+Gc=
+=s0M7
 -----END PGP SIGNATURE-----
 
---Xkt2FILYJa02993vSH9Vvgl3P5gSGRI6e--
+--GID0FwUMdk1T2AWN--
