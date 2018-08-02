@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fl5B4-0003r1-AG
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 00:25:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1fl5ca-0008PM-F3
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 00:53:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fl5B2-0002tc-RP
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 00:25:30 -0400
-Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:35428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fl5B2-0002s0-AB
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 00:25:28 -0400
-Received: by mail-oi0-x236.google.com with SMTP id m11-v6so1612648oic.2
-	for <qemu-devel@nongnu.org>; Wed, 01 Aug 2018 21:25:28 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fl5cX-0003eQ-DI
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 00:53:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37446 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fl5cX-0003du-8o
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 00:53:53 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180727151359.29061-1-armbru@redhat.com>
+	<20180727151359.29061-22-armbru@redhat.com>
+	<55305ddb-0551-6296-c98a-c3af1228b2d5@redhat.com>
+	<9244e265-82fe-42b4-330c-9005bde0a983@redhat.com>
+	<87in4x1bfb.fsf@dusky.pond.sub.org>
+	<3f3d6599-0b3c-8a2f-88a7-895d5dfe35ed@redhat.com>
+Date: Thu, 02 Aug 2018 06:53:51 +0200
+In-Reply-To: <3f3d6599-0b3c-8a2f-88a7-895d5dfe35ed@redhat.com> (Thomas Huth's
+	message of "Wed, 1 Aug 2018 08:46:46 +0200")
+Message-ID: <87k1p98j34.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <24c01558-7352-74a6-31b8-9a495aa9fc13@amsat.org>
-References: <9cd33f65-c0df-637c-4d7e-90c8c4227216@amsat.org>
-	<20180731104059.55s76c2ent772z4b@toto>
-	<24c01558-7352-74a6-31b8-9a495aa9fc13@amsat.org>
-From: Michael Clark <mjc@sifive.com>
-Date: Thu, 2 Aug 2018 16:25:26 +1200
-Message-ID: <CAHNT7Nv_1JjzUT+go-9b_7jZ0H4K6g_uy8CbGdUa=tRZVCvyjg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] microblaze build failure due to definition clash
- on riscv
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 21/23] libqtest: Remove
+ qtest_qmp_discard_response() & friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,113 +32,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <alistair23@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, f4bug@amsat.org
 
-On Thu, Aug 2, 2018 at 3:57 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g>
-wrote:
+Thomas Huth <thuth@redhat.com> writes:
 
-> Oops I just realized I forgot to Cc the QEMU list, doing it now.
+> On 07/30/2018 08:32 AM, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>> 
+>>> On 07/27/2018 11:46 AM, Thomas Huth wrote:
+>>>> On 07/27/2018 05:13 PM, Markus Armbruster wrote:
+>>>>> qtest_qmp_discard_response(...) is shorthand for
+>>>>> qobject_unref(qtest_qmp(...), except it's not actually shorter.
+>>>>
+>>>> But the latter is IMHO harder to read.
+>> 
+>> Doing things sloppily looks a bit uglier now.  That's a feature.
+>> 
+>>> Maybe, but then it lends itself well to:
+>>>
+>>> QObject *rsp = qtest_qmp(...);
+>>> qobject_unref(rsp);
+>>>
+>>> which is where you do insert tests for valid responses.
+>>>
+>>>> And it might be shorter in the compiled binary (one function call vs. two).
+>> 
+>> I'd be quite sympathetic to this argument...
+>> 
+>>> The size of the test binaries is not our biggest concern.
+>> 
+>> ... outside tests/.
+>> 
+>>>>> Moreover, the presence of these functions encourage sloppy testing.
+>>>>
+>>>> Shouldn't we then rather fix the tests to check for valid responses
+>>>> instead of replacing this function with harder-to-read code?
+>> 
+>> I'd welcome such patches, but this series is already pretty long.
 >
-> On 07/31/2018 07:40 AM, Edgar E. Iglesias wrote:
-> > On Mon, Jul 30, 2018 at 03:22:46PM -0300, Philippe Mathieu-Daud=C3=A9 w=
-rote:
-> >> Hi, I'm getting this error while building microblaze on riscv host:
-> >>
-> >>   ...
-> >>   CC      disas/microblaze.o
-> >> disas/microblaze.c:179:0: error: "REG_SP" redefined [-Werror]
-> >>
-> >>  #define REG_SP  1 /* stack pointer */
-> >>
-> >> In file included from /usr/include/signal.h:306:0,
-> >>                  from include/qemu/osdep.h:101,
-> >>                  from disas/microblaze.c:36:
-> >> /usr/include/sys/ucontext.h:36:0: note: this is the location of the
-> >> previous definition
-> >>  # define REG_SP 2
-> >>
-> >> cc1: all warnings being treated as errors
-> >> make: *** [rules.mak:69: disas/microblaze.o] Error 1
-> >>
-> >>
-> >> Having /usr/include/sys/ucontext.h:
-> >>
-> >>      31 #ifdef __USE_MISC
-> >>      32 # define NGREG  32
-> >>      33
-> >>      34 # define REG_PC 0
-> >>      35 # define REG_RA 1
-> >>      36 # define REG_SP 2
-> >>      37 # define REG_TP 4
-> >>      38 # define REG_S0 8
-> >>      39 # define REG_S1 9
-> >>      40 # define REG_A0 10
-> >>      41 # define REG_S2 18
-> >>      42 # define REG_NARGS 8
-> >>
-> >> Edgar is it OK to rename REG_* -> MB_REG_*?
-> >
-> > Yes, no problems with me!
-> >
-> > Allthough it doesn't seem to be a good idea to have such generic names
-> in riscv system header files.
->
-> OK this might be a Linux problem indeed, maybe this file lacks some
-> #ifdef __riscv (previous to the __USE_MISC?).
->
-> I'll wait for the riscv folks before to send a dumb rename patch.
->
+> Then maybe rather drop this patch from this series, and fix the issues
+> in a separate series instead?
 
-It seems to be a generic Linux problem or perhaps even a microblaze problem
-in this case, where QEMU microblaze definitions just happen to clash with
-system definitions. It depends on which way around you look at the problem.
+Do you insist?
 
-x86_64 has REG_R8, REG_R9, REG_R10, etc so RISC-V is just following the
-Linux scheme.
+I fail to see how changing
 
-Indeed RISC-V in QEMU unlike microblaze has this in disas/riscv.c
+    qmp_discard_response("{ 'execute': 'system_reset' }");
 
-typedef enum {
-    rv_ireg_zero,
-    rv_ireg_ra,
-    rv_ireg_sp,
-    rv_ireg_gp,
-    rv_ireg_tp,
-    rv_ireg_t0,
-    rv_ireg_t1,
-    rv_ireg_t2,
-    rv_ireg_s0,
-    rv_ireg_s1,
-    rv_ireg_a0,
-    rv_ireg_a1,
-    rv_ireg_a2,
-    rv_ireg_a3,
-    rv_ireg_a4,
-    rv_ireg_a5,
-    rv_ireg_a6,
-    rv_ireg_a7,
-    rv_ireg_s2,
-    rv_ireg_s3,
-    rv_ireg_s4,
-    rv_ireg_s5,
-    rv_ireg_s6,
-    rv_ireg_s7,
-    rv_ireg_s8,
-    rv_ireg_s9,
-    rv_ireg_s10,
-    rv_ireg_s11,
-    rv_ireg_t3,
-    rv_ireg_t4,
-    rv_ireg_t5,
-    rv_ireg_t6,
-} rv_ireg;
+to
 
-So from that perspective, one could suggest to change microblaze. It will
-be a lot harder to change glibc given it is already baked into a large
-number of binary images, and they are system headers.
+    qobject_unref(qmp("{ 'execute': 'system_reset' }"));
 
-Prefixing the definitions inside the mircoblaze disassembler would cause
-the least havoc. Changing system headers in glibc will take a long time to
-propagate via the current distros.
+is so awful it would justify demanding I pause my work on libqtest to
+first figure out which parts of ignored responses are worth checking,
+then code up the checks.
+
+Would you accept
+
+    rsp = qmp("{ 'execute': 'system_reset' }"));
+    qobject_unref(rsp);
+
+?
+
+If none of the above is acceptable to you, then I'll push the crap that
+needs to go from libqtest into the crap-using tests, like this:
+
+    /* TODO actually test the results and get rid of this */
+    #define qmp_discard_response(...) qobject_unref(qmp(__VA_ARGS__));
