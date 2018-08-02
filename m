@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1flF01-0007EL-Fk
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:54:46 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1flF05-0007JK-Mi
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1flF00-00031S-Kz
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:54:45 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1flF01-000323-Kb
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 10:54:49 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  2 Aug 2018 15:44:29 +0100
-Message-Id: <20180802144430.13870-3-peter.maydell@linaro.org>
+Date: Thu,  2 Aug 2018 15:44:28 +0100
+Message-Id: <20180802144430.13870-2-peter.maydell@linaro.org>
 In-Reply-To: <20180802144430.13870-1-peter.maydell@linaro.org>
 References: <20180802144430.13870-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/3] hw/ppc/ppc_boards: Don't use old_mmio for
- ref405ep_fpga
+Subject: [Qemu-devel] [PATCH 1/3] hw/ppc/prep: Remove ifdeffed-out stub of
+ XCSR code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,99 +23,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, qemu-ppc@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-Switch the ref405ep_fpga device away from using the old_mmio
-MemoryRegion accessors.
+The prep machine has some code which is stubs of accessors
+for XCSR registers. This has been disabled via #if 0
+since commit b6b8bd1819ff in 2004, and doesn't have any
+actual interesting content. It also uses the deprecated
+old_mmio accessor functions. Remove it entirely.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/ppc/ppc405_boards.c | 60 +++++++-----------------------------------
- 1 file changed, 10 insertions(+), 50 deletions(-)
+ hw/ppc/prep.c | 97 +++------------------------------------------------
+ 1 file changed, 4 insertions(+), 93 deletions(-)
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index 70111075b33..f5a9c24b6ce 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -66,7 +66,7 @@ struct ref405ep_fpga_t {
-     uint8_t reg1;
- };
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index 3401570d981..b26138e5c47 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -78,94 +78,6 @@ static int ne2000_irq[NE2000_NB_MAX] = { 9, 10, 11, 3, 4, 5 };
+ /* ISA IO ports bridge */
+ #define PPC_IO_BASE 0x80000000
  
--static uint32_t ref405ep_fpga_readb (void *opaque, hwaddr addr)
-+static uint64_t ref405ep_fpga_readb(void *opaque, hwaddr addr, unsigned size)
- {
-     ref405ep_fpga_t *fpga;
-     uint32_t ret;
-@@ -87,8 +87,8 @@ static uint32_t ref405ep_fpga_readb (void *opaque, hwaddr addr)
-     return ret;
- }
- 
--static void ref405ep_fpga_writeb (void *opaque,
--                                  hwaddr addr, uint32_t value)
-+static void ref405ep_fpga_writeb(void *opaque, hwaddr addr, uint64_t value,
-+                                 unsigned size)
- {
-     ref405ep_fpga_t *fpga;
- 
-@@ -105,54 +105,14 @@ static void ref405ep_fpga_writeb (void *opaque,
-     }
- }
- 
--static uint32_t ref405ep_fpga_readw (void *opaque, hwaddr addr)
+-/* PowerPC control and status registers */
+-#if 0 // Not used
+-static struct {
+-    /* IDs */
+-    uint32_t veni_devi;
+-    uint32_t revi;
+-    /* Control and status */
+-    uint32_t gcsr;
+-    uint32_t xcfr;
+-    uint32_t ct32;
+-    uint32_t mcsr;
+-    /* General purpose registers */
+-    uint32_t gprg[6];
+-    /* Exceptions */
+-    uint32_t feen;
+-    uint32_t fest;
+-    uint32_t fema;
+-    uint32_t fecl;
+-    uint32_t eeen;
+-    uint32_t eest;
+-    uint32_t eecl;
+-    uint32_t eeint;
+-    uint32_t eemck0;
+-    uint32_t eemck1;
+-    /* Error diagnostic */
+-} XCSR;
+-
+-static void PPC_XCSR_writeb (void *opaque,
+-                             hwaddr addr, uint32_t value)
 -{
--    uint32_t ret;
--
--    ret = ref405ep_fpga_readb(opaque, addr) << 8;
--    ret |= ref405ep_fpga_readb(opaque, addr + 1);
--
--    return ret;
+-    printf("%s: 0x" TARGET_FMT_plx " => 0x%08" PRIx32 "\n", __func__, addr,
+-           value);
 -}
 -
--static void ref405ep_fpga_writew (void *opaque,
--                                  hwaddr addr, uint32_t value)
+-static void PPC_XCSR_writew (void *opaque,
+-                             hwaddr addr, uint32_t value)
 -{
--    ref405ep_fpga_writeb(opaque, addr, (value >> 8) & 0xFF);
--    ref405ep_fpga_writeb(opaque, addr + 1, value & 0xFF);
+-    printf("%s: 0x" TARGET_FMT_plx " => 0x%08" PRIx32 "\n", __func__, addr,
+-           value);
 -}
 -
--static uint32_t ref405ep_fpga_readl (void *opaque, hwaddr addr)
+-static void PPC_XCSR_writel (void *opaque,
+-                             hwaddr addr, uint32_t value)
 -{
--    uint32_t ret;
--
--    ret = ref405ep_fpga_readb(opaque, addr) << 24;
--    ret |= ref405ep_fpga_readb(opaque, addr + 1) << 16;
--    ret |= ref405ep_fpga_readb(opaque, addr + 2) << 8;
--    ret |= ref405ep_fpga_readb(opaque, addr + 3);
--
--    return ret;
+-    printf("%s: 0x" TARGET_FMT_plx " => 0x%08" PRIx32 "\n", __func__, addr,
+-           value);
 -}
 -
--static void ref405ep_fpga_writel (void *opaque,
--                                  hwaddr addr, uint32_t value)
+-static uint32_t PPC_XCSR_readb (void *opaque, hwaddr addr)
 -{
--    ref405ep_fpga_writeb(opaque, addr, (value >> 24) & 0xFF);
--    ref405ep_fpga_writeb(opaque, addr + 1, (value >> 16) & 0xFF);
--    ref405ep_fpga_writeb(opaque, addr + 2, (value >> 8) & 0xFF);
--    ref405ep_fpga_writeb(opaque, addr + 3, value & 0xFF);
+-    uint32_t retval = 0;
+-
+-    printf("%s: 0x" TARGET_FMT_plx " <= %08" PRIx32 "\n", __func__, addr,
+-           retval);
+-
+-    return retval;
 -}
 -
- static const MemoryRegionOps ref405ep_fpga_ops = {
+-static uint32_t PPC_XCSR_readw (void *opaque, hwaddr addr)
+-{
+-    uint32_t retval = 0;
+-
+-    printf("%s: 0x" TARGET_FMT_plx " <= %08" PRIx32 "\n", __func__, addr,
+-           retval);
+-
+-    return retval;
+-}
+-
+-static uint32_t PPC_XCSR_readl (void *opaque, hwaddr addr)
+-{
+-    uint32_t retval = 0;
+-
+-    printf("%s: 0x" TARGET_FMT_plx " <= %08" PRIx32 "\n", __func__, addr,
+-           retval);
+-
+-    return retval;
+-}
+-
+-static const MemoryRegionOps PPC_XCSR_ops = {
 -    .old_mmio = {
--        .read = {
--            ref405ep_fpga_readb, ref405ep_fpga_readw, ref405ep_fpga_readl,
--        },
--        .write = {
--            ref405ep_fpga_writeb, ref405ep_fpga_writew, ref405ep_fpga_writel,
--        },
+-        .read = { PPC_XCSR_readb, PPC_XCSR_readw, PPC_XCSR_readl, },
+-        .write = { PPC_XCSR_writeb, PPC_XCSR_writew, PPC_XCSR_writel, },
 -    },
--    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .read = ref405ep_fpga_readb,
-+    .write = ref405ep_fpga_writeb,
-+    .impl.min_access_size = 1,
-+    .impl.max_access_size = 1,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 4,
-+    .endianness = DEVICE_BIG_ENDIAN,
- };
+-    .endianness = DEVICE_LITTLE_ENDIAN,
+-};
+-
+-#endif
+-
+ /* Fake super-io ports for PREP platform (Intel 82378ZB) */
+ typedef struct sysctrl_t {
+     qemu_irq reset_irq;
+@@ -648,11 +560,10 @@ static void ppc_prep_init(MachineState *machine)
+     portio_list_init(&prep_port_list, NULL, prep_portio_list, sysctrl, "prep");
+     portio_list_add(&prep_port_list, isa_address_space_io(isa), 0x0);
  
- static void ref405ep_fpga_reset (void *opaque)
+-    /* PowerPC control and status register group */
+-#if 0
+-    memory_region_init_io(xcsr, NULL, &PPC_XCSR_ops, NULL, "ppc-xcsr", 0x1000);
+-    memory_region_add_subregion(sysmem, 0xFEFF0000, xcsr);
+-#endif
++    /*
++     * PowerPC control and status register group: unimplemented,
++     * would be at address 0xFEFF0000.
++     */
+ 
+     if (machine_usb(machine)) {
+         pci_create_simple(pci_bus, -1, "pci-ohci");
 -- 
 2.17.1
