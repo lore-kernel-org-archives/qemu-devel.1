@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fleAJ-00007Q-EW
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fleAJ-00007O-E5
 	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 13:47:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fleAE-0008Q8-Go
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fleAE-0008Q6-GM
 	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 13:47:03 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  3 Aug 2018 20:46:52 +0300
-Message-Id: <20180803174654.278336-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20180803174654.278336-1-vsementsov@virtuozzo.com>
-References: <20180803174654.278336-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 4/6] Revert "block/dirty-bitmap: Add
- bdrv_dirty_iter_next_area"
+Date: Fri,  3 Aug 2018 20:46:48 +0300
+Message-Id: <20180803174654.278336-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 0/6] dirty-bitmap: rewrite
+ bdrv_dirty_iter_next_area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +21,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-This reverts commit 72d10a94213a954ad569095cb4491f2ae0853c40.
+Hi all.
 
-The function is unused now.
+1. bdrv_dirty_iter_next_area don't use hbitmap_next_zero and uses
+inefficient loop instead. Let's improve it.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/dirty-bitmap.h |  2 --
- block/dirty-bitmap.c         | 55 --------------------------------------------
- 2 files changed, 57 deletions(-)
+2. bdrv_dirty_iter_next_area don't handle unaligned offset and
+max_offset correctly. I'm not sure that it is a real bug. But if it is,
+we need these series in 3.0.
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index c02be67564..3cab01eb4c 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -83,8 +83,6 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
- void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                     int64_t offset, int64_t bytes);
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
--bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
--                               uint64_t *offset, int *bytes);
- void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
- int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index c24aa0e229..35987e66a8 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -528,61 +528,6 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
-     return hbitmap_iter_next(&iter->hbi, true);
- }
- 
--/**
-- * Return the next consecutively dirty area in the dirty bitmap
-- * belonging to the given iterator @iter.
-- *
-- * @max_offset: Maximum value that may be returned for
-- *              *offset + *bytes
-- * @offset:     Will contain the start offset of the next dirty area
-- * @bytes:      Will contain the length of the next dirty area
-- *
-- * Returns: True if a dirty area could be found before max_offset
-- *          (which means that *offset and *bytes then contain valid
-- *          values), false otherwise.
-- *
-- * Note that @iter is never advanced if false is returned.  If an area
-- * is found (which means that true is returned), it will be advanced
-- * past that area.
-- */
--bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
--                               uint64_t *offset, int *bytes)
--{
--    uint32_t granularity = bdrv_dirty_bitmap_granularity(iter->bitmap);
--    uint64_t gran_max_offset;
--    int64_t ret;
--    int size;
--
--    if (max_offset == iter->bitmap->size) {
--        /* If max_offset points to the image end, round it up by the
--         * bitmap granularity */
--        gran_max_offset = ROUND_UP(max_offset, granularity);
--    } else {
--        gran_max_offset = max_offset;
--    }
--
--    ret = hbitmap_iter_next(&iter->hbi, false);
--    if (ret < 0 || ret + granularity > gran_max_offset) {
--        return false;
--    }
--
--    *offset = ret;
--    size = 0;
--
--    assert(granularity <= INT_MAX);
--
--    do {
--        /* Advance iterator */
--        ret = hbitmap_iter_next(&iter->hbi, true);
--        size += granularity;
--    } while (ret + granularity <= gran_max_offset &&
--             hbitmap_iter_next(&iter->hbi, false) == ret + granularity &&
--             size <= INT_MAX - granularity);
--
--    *bytes = MIN(size, max_offset - *offset);
--    return true;
--}
--
- /* Called within bdrv_dirty_bitmap_lock..unlock */
- void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                   int64_t offset, int64_t bytes)
+Details are in 03 commit message.
+
+Vladimir Sementsov-Ogievskiy (6):
+  dirty-bitmap: improve bdrv_dirty_bitmap_next_zero
+  dirty-bitmap: add bdrv_dirty_bitmap_next_dirty_area
+  block/mirror: fix and improve do_sync_target_write
+  Revert "block/dirty-bitmap: Add bdrv_dirty_iter_next_area"
+  Revert "test-hbitmap: Add non-advancing iter_next tests"
+  Revert "hbitmap: Add @advance param to hbitmap_iter_next()"
+
+ include/block/dirty-bitmap.h |  8 +++--
+ include/qemu/hbitmap.h       | 27 +++++++++++++----
+ block/backup.c               |  4 +--
+ block/dirty-bitmap.c         | 69 +++++++-------------------------------------
+ block/mirror.c               | 16 +++++-----
+ nbd/server.c                 |  2 +-
+ tests/test-hbitmap.c         | 38 +++++++++---------------
+ util/hbitmap.c               | 62 ++++++++++++++++++++++++++++++++-------
+ 8 files changed, 112 insertions(+), 114 deletions(-)
+
 -- 
 2.11.1
