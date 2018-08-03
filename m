@@ -1,40 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1flWYq-0003uH-Rz
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:39:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1flWjN-00081Z-7p
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1flWYq-0007Tr-3Z
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:39:52 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:38495)
+	(envelope-from <bounces@canonical.com>) id 1flWjK-0000Ol-4O
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:50:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34492)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1flWYp-0007Sv-Ub
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:39:52 -0400
-Received: by mail-oi0-x244.google.com with SMTP id v8-v6so8745460oie.5
-	for <qemu-devel@nongnu.org>; Fri, 03 Aug 2018 02:39:51 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1flWjJ-0000NQ-UX
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:50:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1flWjI-00051D-1N
+	for <qemu-devel@nongnu.org>; Fri, 03 Aug 2018 09:50:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 078C02E80C7
+	for <qemu-devel@nongnu.org>; Fri,  3 Aug 2018 09:50:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu8sCjfL=uKy4nM6pcRneUzw2YG79CuOVBH3TeNOXf689A@mail.gmail.com>
-References: <20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
-	<CAHmQWvCKkzim+-Z4Y69fWg6igZ7V6gaWhjKJZ0m0G0dhbwOFyw@mail.gmail.com>
-	<20180725112621.imdzdkntpmh3n5og@kamzik.brq.redhat.com>
-	<CAHmQWvCfHFSU7RGKG5t6=m7ZSWZjf3TeqOo3cX2KT-GSiN3mPw@mail.gmail.com>
-	<20180726102855.x6ffdoqjpejpyae7@kamzik.brq.redhat.com>
-	<CAKv+Gu-ffZRNmACH6YieNsg=AHxJxYoXHsBGf6C=nOvFfTu7Sg@mail.gmail.com>
-	<20180726111109.w24jk6ehklimige7@kamzik.brq.redhat.com>
-	<CAKv+Gu80KfwZft4t1HtOXPuijuPLV80K9iW+BsTgs7WcnosMXA@mail.gmail.com>
-	<20180726114158.am7kgc3jekxg55i5@kamzik.brq.redhat.com>
-	<CAFEAcA8YH4p__zT1o0s3vNZOsyWZn3XPLgkNeT+jSJpmjvFTUw@mail.gmail.com>
-	<20180726123509.qyadwbz4skwashcj@kamzik.brq.redhat.com>
-	<CAFEAcA-Zv5xV2VwMCfGXUv8oT+gC_dgn8Q3M1v3FBjry7TbXVA@mail.gmail.com>
-	<CAHmQWvB1zgaLi++BhGEs1Emb0-5HOrzCcPrHJDoxx-8Be9df1g@mail.gmail.com>
-	<CAFEAcA_mVGSicjN=wwJY8OCJ-j=DtdLjDvM9U-dC3dQ=RQQXMQ@mail.gmail.com>
-	<CAKv+Gu8sCjfL=uKy4nM6pcRneUzw2YG79CuOVBH3TeNOXf689A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Aug 2018 10:39:30 +0100
-Message-ID: <CAFEAcA9WM0Z_JgGZH_oynJYgo-F-Z18uKvz9rJjDQEtGy=Z6Hw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 03 Aug 2018 09:42:27 -0000
+From: Serge Belyshev <1785203@bugs.launchpad.net>
+Reply-To: Bug 1785203 <1785203@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153328934781.28538.2265879315975123435.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1785203] [NEW] accel/tcg/translate-all.c:2511:
+ page_check_range: Assertion `start < ((target_ulong)1 <<
+ L1_MAP_ADDR_SPACE_BITS)' failed.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,27 +37,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, Andrew Jones <drjones@redhat.com>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 3 August 2018 at 10:26, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> On 3 August 2018 at 11:23, Peter Maydell <peter.maydell@linaro.org> wrote:
->> Would the real hardware you are trying to be an example
->> for use DT for this? It seems a bit unlikely to me.
->>
->
-> Yes, as a matter of fact. There is work underway both on the EDK2 and
-> the ARM-TF side to rely less on static descriptions, and more on DT to
-> instantiate drivers and ACPI tables at runtime rather than at build
-> time.
+Public bug reported:
 
-Cool. (My motivation here is mostly to make sure that we
-build a model in QEMU that makes the right design choices to
-be an accurate reference platform, rather than doing things
-simply because 'virt' happens to do them.)
+qemu-riscv64 version 2.12.93 crashes when mincore() is called with
+invalid pointer with the following message:
 
-Where would the hardware version of this put its DT ?
-In a flash memory ?
+qemu-riscv64: /opt/qemu/accel/tcg/translate-all.c:2511: page_check_range: A=
+ssertion `start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS)' failed.
+qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x600014=
+ef
 
-thanks
--- PMM
+Testcase:
+
+#include <sys/mman.h>
+
+int main (void)
+{
+  unsigned char v;
+  return mincore ((void *) 0x00000010000000000, 1, &v);
+}
+
+Backtrace:
+
+#0  raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:50
+#1  0x000000006000140a in abort () at abort.c:79
+#2  0x00000000600012ec in __assert_fail_base (
+    fmt=3D0x6024eae8 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", =
+
+    assertion=3D0x601b9758 "start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_B=
+ITS)", =
+
+    file=3D0x601b9658 "/opt/qemu/accel/tcg/translate-all.c", line=3D2511, =
+
+    function=3D0x601b9810 <__PRETTY_FUNCTION__.23867> "page_check_range") a=
+t assert.c:92
+#3  0x000000006010e10e in __assert_fail (
+    assertion=3Dassertion@entry=3D0x601b9758 "start < ((target_ulong)1 << L=
+1_MAP_ADDR_SPACE_BITS)", file=3Dfile@entry=3D0x601b9658 "/opt/qemu/accel/tc=
+g/translate-all.c", line=3Dline@entry=3D2511, =
+
+    function=3Dfunction@entry=3D0x601b9810 <__PRETTY_FUNCTION__.23867> "pag=
+e_check_range")
+    at assert.c:101
+#4  0x000000006003e916 in page_check_range (start=3Dstart@entry=3D109951162=
+7776, len=3Dlen@entry=3D1, =
+
+    flags=3Dflags@entry=3D1) at /opt/qemu/accel/tcg/translate-all.c:2511
+#5  0x0000000060057717 in access_ok (size=3D1, addr=3D1099511627776, type=
+=3D0)
+    at /opt/qemu/linux-user/qemu.h:567
+#6  lock_user (copy=3D0, len=3D1, guest_addr=3D1099511627776, type=3D0)
+    at /opt/qemu/linux-user/qemu.h:567
+#7  do_syscall (cpu_env=3Dcpu_env@entry=3D0x622fca28, num=3D232, arg1=3D109=
+9511627776, arg2=3D1, =
+
+    arg3=3D274886298751, arg4=3D0, arg5=3D274886298808, arg6=3D66518, arg7=
+=3D0, arg8=3D0)
+    at /opt/qemu/linux-user/syscall.c:11635
+#8  0x0000000060066c5c in cpu_loop (env=3Denv@entry=3D0x622fca28)
+    at /opt/qemu/linux-user/riscv/cpu_loop.c:55
+#9  0x0000000060002156 in main (argc=3D<optimized out>, argv=3D0x7fffffffed=
+68, =
+
+    envp=3D<optimized out>) at /opt/qemu/linux-user/main.c:819
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1785203
+
+Title:
+  accel/tcg/translate-all.c:2511: page_check_range: Assertion `start <
+  ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS)' failed.
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu-riscv64 version 2.12.93 crashes when mincore() is called with
+  invalid pointer with the following message:
+
+  qemu-riscv64: /opt/qemu/accel/tcg/translate-all.c:2511: page_check_range:=
+ Assertion `start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS)' failed.
+  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6000=
+14ef
+
+  Testcase:
+
+  #include <sys/mman.h>
+
+  int main (void)
+  {
+    unsigned char v;
+    return mincore ((void *) 0x00000010000000000, 1, &v);
+  }
+
+  Backtrace:
+
+  #0  raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:50
+  #1  0x000000006000140a in abort () at abort.c:79
+  #2  0x00000000600012ec in __assert_fail_base (
+      fmt=3D0x6024eae8 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", =
+
+      assertion=3D0x601b9758 "start < ((target_ulong)1 << L1_MAP_ADDR_SPACE=
+_BITS)", =
+
+      file=3D0x601b9658 "/opt/qemu/accel/tcg/translate-all.c", line=3D2511, =
+
+      function=3D0x601b9810 <__PRETTY_FUNCTION__.23867> "page_check_range")=
+ at assert.c:92
+  #3  0x000000006010e10e in __assert_fail (
+      assertion=3Dassertion@entry=3D0x601b9758 "start < ((target_ulong)1 <<=
+ L1_MAP_ADDR_SPACE_BITS)", file=3Dfile@entry=3D0x601b9658 "/opt/qemu/accel/=
+tcg/translate-all.c", line=3Dline@entry=3D2511, =
+
+      function=3Dfunction@entry=3D0x601b9810 <__PRETTY_FUNCTION__.23867> "p=
+age_check_range")
+      at assert.c:101
+  #4  0x000000006003e916 in page_check_range (start=3Dstart@entry=3D1099511=
+627776, len=3Dlen@entry=3D1, =
+
+      flags=3Dflags@entry=3D1) at /opt/qemu/accel/tcg/translate-all.c:2511
+  #5  0x0000000060057717 in access_ok (size=3D1, addr=3D1099511627776, type=
+=3D0)
+      at /opt/qemu/linux-user/qemu.h:567
+  #6  lock_user (copy=3D0, len=3D1, guest_addr=3D1099511627776, type=3D0)
+      at /opt/qemu/linux-user/qemu.h:567
+  #7  do_syscall (cpu_env=3Dcpu_env@entry=3D0x622fca28, num=3D232, arg1=3D1=
+099511627776, arg2=3D1, =
+
+      arg3=3D274886298751, arg4=3D0, arg5=3D274886298808, arg6=3D66518, arg=
+7=3D0, arg8=3D0)
+      at /opt/qemu/linux-user/syscall.c:11635
+  #8  0x0000000060066c5c in cpu_loop (env=3Denv@entry=3D0x622fca28)
+      at /opt/qemu/linux-user/riscv/cpu_loop.c:55
+  #9  0x0000000060002156 in main (argc=3D<optimized out>, argv=3D0x7fffffff=
+ed68, =
+
+      envp=3D<optimized out>) at /opt/qemu/linux-user/main.c:819
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1785203/+subscriptions
