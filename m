@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1flShL-0005qk-95
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 01:32:24 -0400
+	(envelope-from <thuth@redhat.com>) id 1flSxp-0000TB-DF
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 01:49:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1flShI-0000zO-66
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 01:32:23 -0400
-Date: Fri, 3 Aug 2018 15:31:43 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180803053143.GE11211@umbus.fritz.box>
-References: <20180802144430.13870-1-peter.maydell@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1flSxm-0007yO-C0
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 01:49:25 -0400
+References: <20180801035357.7804-1-david@gibson.dropbear.id.au>
+	<CAFEAcA-FitsqU3kQJTFGSFgOh6Zsf2Zy2fO3OTnL5c+Tzi5pog@mail.gmail.com>
+	<alpine.BSF.2.21.1808011300070.7488@zero.eik.bme.hu>
+	<CAFEAcA-=c7O+h3c-gQ=31q0oyLzJhDNmEBzv4X2Yp_TBfYhC-w@mail.gmail.com>
+	<20180802070824.GC11211@umbus.fritz.box>
+	<CAFEAcA8sGVjGgXxR8ivSWJ6oDKJPfEGnWUuHh_quZK2GDSgU2A@mail.gmail.com>
+	<20180802140744.GD11211@umbus.fritz.box>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <21de1d73-448a-36c2-0989-3de1f9d64a02@redhat.com>
+Date: Fri, 3 Aug 2018 07:49:12 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="N1GIdlSm9i+YlY4t"
-Content-Disposition: inline
-In-Reply-To: <20180802144430.13870-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 0/3] hw/ppc: Convert various devices away
- from old_mmio
+In-Reply-To: <20180802140744.GD11211@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="vhDYEKLfzPaHF9lVPEeKjzd2pTbaOhmt4"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 0/2] ppc-for-3.0 queue 20180801
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, qemu-ppc@nongnu.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Alexander Graf <agraf@suse.de>
+To: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Greg Kurz <groug@kaod.org>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, BALATON Zoltan <balaton@eik.bme.hu>
 
-
---N1GIdlSm9i+YlY4t
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vhDYEKLfzPaHF9lVPEeKjzd2pTbaOhmt4
+From: Thomas Huth <thuth@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ Peter Maydell <peter.maydell@linaro.org>
+Cc: Greg Kurz <groug@kaod.org>, qemu-ppc <qemu-ppc@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, BALATON Zoltan <balaton@eik.bme.hu>
+Message-ID: <21de1d73-448a-36c2-0989-3de1f9d64a02@redhat.com>
+Subject: Re: [Qemu-ppc] [PULL 0/2] ppc-for-3.0 queue 20180801
+References: <20180801035357.7804-1-david@gibson.dropbear.id.au>
+ <CAFEAcA-FitsqU3kQJTFGSFgOh6Zsf2Zy2fO3OTnL5c+Tzi5pog@mail.gmail.com>
+ <alpine.BSF.2.21.1808011300070.7488@zero.eik.bme.hu>
+ <CAFEAcA-=c7O+h3c-gQ=31q0oyLzJhDNmEBzv4X2Yp_TBfYhC-w@mail.gmail.com>
+ <20180802070824.GC11211@umbus.fritz.box>
+ <CAFEAcA8sGVjGgXxR8ivSWJ6oDKJPfEGnWUuHh_quZK2GDSgU2A@mail.gmail.com>
+ <20180802140744.GD11211@umbus.fritz.box>
+In-Reply-To: <20180802140744.GD11211@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 02, 2018 at 03:44:27PM +0100, Peter Maydell wrote:
-> This patchset removes various uses of old_mmio from minor PPC
-> devices:
->  * hw/ppc/prep had an entirely ifdeffed-out stub of an XCSR device,
->    which we remove
->  * hw/ppc/ppc_boards had ref405ep_fpga
->  * hw/ppc/ppc405_uc had three minor devices
+On 08/02/2018 04:07 PM, David Gibson wrote:
+> On Thu, Aug 02, 2018 at 10:16:32AM +0100, Peter Maydell wrote:
+>> On 2 August 2018 at 08:08, David Gibson <david@gibson.dropbear.id.au> =
+wrote:
+>>> The macio fix, however, *is* a regression from 2.12.  Whether it's
+>>> severe enough to warrant another -rc, I'm not sure.  It is a bad
+>>> pointer access which is, well, bad.  It doesn't seem to bite
+>>> obviously, needing valgrind to pick it up, but possibly that's just
+>>> luck.
+>>
+>> I thought those introspection-bugs like the macio ones weren't
+>> regressions ?
 >=20
-> As you can see from the diffstat, the new API provides much
-> cleaner ways to handle the various different access sizes.
->=20
-> This knocks another five old_mmio uses out of the codebase,
-> leaving us with just five to go.
->=20
-> NB: Tested only with 'make check'.
+> Well, I ran Thomas's testcase on master and it generates several
+> valgrind warnings, which don't appear on either 2.12 or master+the
+> patch.
 
-Applied to ppc-for-3.1, thanks.
+Maybe the macio bug is something new, but we had plenty of these
+introspetion bugs in the other code (mainly the ARM code) which were
+clearly there since a looong time already and nobody ever complained. So
+it seems quite unusual that upper layer tools / the users are using the
+introspection feature of QEMU. Thus I'd say this bug is not important
+enough to block the release. We could fix it in the stable branch instead=
+=2E
 
->=20
-> thanks
-> -- PMM
->=20
-> Peter Maydell (3):
->   hw/ppc/prep: Remove ifdeffed-out stub of XCSR code
->   hw/ppc/ppc_boards: Don't use old_mmio for ref405ep_fpga
->   hw/ppc/ppc405_uc: Convert away from old_mmio
->=20
->  hw/ppc/ppc405_boards.c |  60 +++-----------
->  hw/ppc/ppc405_uc.c     | 173 ++++++-----------------------------------
->  hw/ppc/prep.c          |  97 +----------------------
->  3 files changed, 39 insertions(+), 291 deletions(-)
->=20
+ Thomas
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---N1GIdlSm9i+YlY4t
+--vhDYEKLfzPaHF9lVPEeKjzd2pTbaOhmt4
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltj6LwACgkQbDjKyiDZ
-s5JNjw//Y4WzbVxCM18EU4Sd4Cf6JZ2wYGO7xIwXFBBUZGBzJxeBMYdxfS50iaEl
-z/a8eXDwzuLV0Ithwjortd1vn41y5jB1rLmGsOjUcmcECTaDMfLya0CSozOvsesH
-UlXFXPsbY48H9nUizQ1/JQ3lENxXKCjzeDEIRi4UzMKR7djS/G8F9bix6lwS51iH
-lXtZgjX9InQrGM/kNQXwfPXDLoNH4OynWztXOzgx8oQ9COsTcCJLOdB+jvwauO/T
-V78jPym0Y11uEOV2v4gvfi9UVfovkICikhjyoSbbBTUPWBEsusIqR4333jyEaNxi
-ggl4jlwDhJLOJ3y15vHEl/0WMPkyyroeFJibQfllPuk8GIgfUcei4Ugqa87mZjda
-EGwXr4yzir4iaYxljvGMcpM8Ox5hAI7gnGk6ugMIzLu7gpDa/YUBiSYYNhup2KwP
-JX17f+QRF+QK3BqyHm5o3VXN/mt7APQh9nZ8JLGpmPFlRzkbKLhognb6drHSSoVx
-Ohz7DyieB0swBxS9WhBl6t1UKe8yKoPapn8Y9jdHAKl9R8HNCkkDNWc2hvF8viVt
-ZChxmiJVDh9rwS28o4w/HO+Iv1Qycju6VTGyHNaip/YuqOTz0ikZIDKeHHniYjoo
-pTfXVUz/tpAuRkqQUIl57Fxr+eSQ2KHvxc3/w1aGubSBgbn0Oss=
-=P5xx
+iQIcBAEBAgAGBQJbY+zeAAoJEC7Z13T+cC21xjcP/imK+XUzEVMzhiAs44WRKrq+
+lnBh7jNKsfs9HN4VM3YFNeWl63Gsr7hyTC4I1vGktTKcAFo2KkJEHdHxe/euXLTN
+PZyrCwxdHqQBZilBsZQ7WVGHy3FXPmRQcTqrovHiyw1hoqRwS0/L/G8rsa8tEd7M
+P50etPFk4LNHrwgUyyn4rsralnTp7g5GGIw59TWtzGj510YHjEeg4HP7vYqjDq4d
+Amu/S8gCXyRuNfBcOnJ2sqb2eWQhhK6/5JYV3b4l6HlmQ3sIQHNYj28JSHzEkYUd
+jo1PrDSnnFwgRHesxkBVyReryR9V++Nm7W+HnwjRyaWVSHBLovwM6uNM/HXg6G7d
+0vhy2e+VpQ/aj2SVnxSutoR7fjuVD8AH0JeA2hv4BQaHAQEZFJskRmPajjEolkYf
+K9wHNxRyPWe8v3GEfme2iJw7hqk4Wbb5WIb1la9cY2ijDhG8f9rO0XhayKWz1VFH
+N0x+YZNg5AmZSQYh0IKF4l2z73at/7B+TrIHkjOiTku1qxwLo9P3gDut3puIfJQN
+DJqaDAyN9fmCDcWPVU9pX/B7wKrHk7MioD9enbe5Ve7M4A3L06yLrlkwR3XxEEp2
+Clc7Z9rgP1k6Kb7qZOtQTa1sUh4FkiW396rmjg46o4Y1AWZvpYDjyFGUFWoXbTMy
+2B1wbouWllMk38x4gwqj
+=eOGs
 -----END PGP SIGNATURE-----
 
---N1GIdlSm9i+YlY4t--
+--vhDYEKLfzPaHF9lVPEeKjzd2pTbaOhmt4--
