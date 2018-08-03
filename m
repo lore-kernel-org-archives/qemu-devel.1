@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1flW6o-0008E1-4B
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:10:55 -0400
+	(envelope-from <changlimin@h3c.com>) id 1flW7U-0000By-Hf
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:11:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1flW6m-0003Bw-U5
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:10:54 -0400
-Date: Fri, 3 Aug 2018 10:10:34 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180803091034.GD2802@work-vm>
-References: <20180801174005.GD2691@work-vm>
-	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
-	<20180801185515.GE2691@work-vm>
-	<6bfdc952-fb17-feae-f367-be710853d829@openvz.org>
-	<20180802092907.GA2523@work-vm>
-	<202065a2-f9d1-ce31-b12b-437d57095ac1@openvz.org>
-	<20180802095056.GB2523@work-vm>
-	<86304a35-efd8-a605-f684-2bd3fb3b9815@openvz.org>
-	<20180803083343.GB2802@work-vm>
-	<37953739-c697-2c61-3b83-b58a32710b15@openvz.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <37953739-c697-2c61-3b83-b58a32710b15@openvz.org>
+	(envelope-from <changlimin@h3c.com>) id 1flW7P-0004Yp-FM
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:11:36 -0400
+Received: from smtp.h3c.com ([60.191.123.56]:13070 helo=h3cmg01-ex.h3c.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <changlimin@h3c.com>) id 1flW7O-0004QH-Jv
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:11:31 -0400
+From: Changlimin <changlimin@h3c.com>
+Date: Fri, 3 Aug 2018 09:11:16 +0000
+Message-ID: <BC29A004BA570342A4CC0044A384557201784EDE3E@H3CMLB14-EX.srv.huawei-3com.com>
+References: <BC29A004BA570342A4CC0044A384557201784EDDA1@H3CMLB14-EX.srv.huawei-3com.com>
+	<BC29A004BA570342A4CC0044A384557201784EDDD6@H3CMLB14-EX.srv.huawei-3com.com>
+In-Reply-To: <BC29A004BA570342A4CC0044A384557201784EDDD6@H3CMLB14-EX.srv.huawei-3com.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
- loading and migration logic
+MIME-Version: 1.0
+Subject: [Qemu-devel] qemu 2.12.0 crash during install windows 10 with vga.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,99 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
+To: "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
 
-* Denis V. Lunev (den@openvz.org) wrote:
-> On 08/03/2018 11:33 AM, Dr. David Alan Gilbert wrote:
-> > * Denis V. Lunev (den@openvz.org) wrote:
-> >> On 08/02/2018 12:50 PM, Dr. David Alan Gilbert wrote:
-> >>> * Denis V. Lunev (den@openvz.org) wrote:
-> >>>
-> >>>
-> >>>>> I don't quite understand the last two paragraphs.
-> >>>> we are thinking right now to eliminate delay on regular IO
-> >>>> for migration. There is some thoughts and internal work in
-> >>>> progress. That is why I am worrying.
-> >>> What downtime are you typicaly seeing and what are you aiming for?
-> >>>
-> >>> It would be good if you could explain what you're planning to
-> >>> fix there so we can get a feel for it nearer the start of it
-> >>> rather than at the end of the reviewing!
-> >>>
-> >>> Dave
-> >> The ultimate goal is to reliable reach 100 ms with ongoing IO and
-> >> you are perfectly correct about reviewing :)
-> > That would be neat.
-> >
-> >> Though the problem is that right now we are just trying to
-> >> invent something suitable :(
-> > OK, some brain-storm level ideas:
-> >
-> >   a) Throttle the write bandwidth at later stages of migration
-> >      (I think that's been suggested before)
-> yes
->=20
-> >   b) Switch to some active-sync like behaviour where the writes
-> >      are sent over the network as they happen to the destination
-> >      (mreitz has some prototype code for that type of behaviour
-> >      for postcopy)
-> will not work. Even with the sync mirror (which we have submitted
-> 2 years ago, but not accepted), usual downtime will be around 1 sec
-> due to requests in flight.
+Hi,
+I have the same issue as https://www.qubes-os.org/doc/windows-vm/ , it's no=
+t easy to reproduce.
+cpu_physical_memory_snapshot_get_dirty: Assertion `start + length <=3D snap=
+->end' failed
 
-I'm confused why it would be that high; are you saying that would be
-longer than the downtime with the current writes near the end of
-migration on the source?
+Qemu version is 2.12.0.=20
+(gdb) bt
+#0  0x00007f504ed6fc37 in raise () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f504ed73028 in abort () from /lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007f504ed68bf6 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#3  0x00007f504ed68ca2 in __assert_fail () from /lib/x86_64-linux-gnu/libc.=
+so.6
+#4  0x00005585bbdc9641 in cpu_physical_memory_snapshot_get_dirty (snap=3Dsn=
+ap@entry=3D0x5585bfdc2ff0, start=3D<optimized out>, length=3D<optimized out=
+>)
+    at /qemu-2.12/exec.c:1264
+#5  0x00005585bbe2b4de in memory_region_snapshot_get_dirty (mr=3Dmr@entry=
+=3D0x5585c06e3d10, snap=3Dsnap@entry=3D0x5585bfdc2ff0, addr=3D<optimized ou=
+t>,
+    size=3D<optimized out>) at /qemu-2.12/memory.c:1997
+#6  0x00005585bbe552a4 in vga_draw_graphic (full_update=3D0, s=3D0x5585c06e=
+3d00) at /qemu-2.12/hw/display/vga.c:1671
+#7  vga_update_display (opaque=3D0x5585c06e3d00) at /qemu-2.12/hw/display/v=
+ga.c:1767
+#8  0x00005585bc0d9a8f in qemu_spice_display_refresh (ssd=3D0x5585c06e3930)=
+ at /qemu-2.12/ui/spice-display.c:478
+#9  0x00005585bc0ced72 in dpy_refresh (s=3D0x5585c081b2a0) at /qemu-2.12/ui=
+/console.c:1629
+#10 gui_update (opaque=3D0x5585c081b2a0) at /qemu-2.12/ui/console.c:203
+#11 0x00005585bc1d333c in timerlist_run_timers (timer_list=3D0x5585bee1f950=
+) at /qemu-2.12/util/qemu-timer.c:536
+#12 0x00005585bc1d35a3 in qemu_clock_run_timers (type=3DQEMU_CLOCK_REALTIME=
+) at /qemu-2.12/util/qemu-timer.c:547
+#13 qemu_clock_run_all_timers () at /qemu-2.12/util/qemu-timer.c:674
+#14 0x00005585bc1d3aa4 in main_loop_wait (nonblocking=3D<optimized out>) at=
+ /qemu-2.12/util/main-loop.c:528
+#15 0x00005585bbdc2f8a in main_loop () at /qemu-2.12/vl.c:1973
+#16 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimized=
+ out>) at /qemu-2.12/vl.c:4804=20
 
-> >   c) Write the writes into a buffer that gets migrated over the
-> >     migration stream to get committed on the destination side.
-> yes. this is an option but the buffer can be too big.
+(gdb) frame 5
+(gdb) p/x *snap
+$1 =3D {start =3D 0x1000c0000, end =3D 0x1000c0000, dirty =3D 0x5585bfdc300=
+0}
 
-Combined with some throttling you should be able to bound the size;
-especially since it should be done only for the very last part of the
-migration.
+Here the snap->start is identical to snap->end , I think something is wrong=
+.=20
+In function vga_draw_graphic, the snap is allocated from region_start/regio=
+n_end.
+        snap =3D memory_region_snapshot_and_clear_dirty(&s->vram, region_st=
+art,
+                                                      region_end - region_s=
+tart,
+                                                      DIRTY_MEMORY_VGA);
 
-> For the shared disk migration the options are the following:
-> - without metadata updates writes could be just passed to finish, there
-> =A0 is no need to wait. But completions should be reported to destinati=
-on
-> - metadata updates are not allowed, they should be transferred to the
-> =A0 destination
->=20
-> For non-shared disk migration we do not need to wait local IO, we just =
-need
-> to restart them on target. Alternatively these areas could be marked as
-> blocked for IO and re-sync again once writes are completed.
->=20
-> These are raw ideas, which should be improved and tweaked.
+Is that possible for region_start=3D=3D region_end ?=20
 
-Nod; it needs some thinking about.
-
-Dave
-
-> Den
->=20
-> > As I say, brainstorm level ideas only!
-> >
-> > Dave
-> >
-> >
-> >> Den
-> >>
-> >>>>> However, coming back to my question; it was really saying that
-> >>>>> normal guest IO during the end of the migration will cause
-> >>>>> a delay; I'm expecting that to be fairly unrelated to the size
-> >>>>> of the disk; more to do with workload; so I guess in your case
-> >>>>> the worry is the case of big large disks giving big large
-> >>>>> bitmaps.
-> >>>> exactly!
-> >>>>
-> >>>> Den
-> >>> --
-> >>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+BR,
+Chang Limin
