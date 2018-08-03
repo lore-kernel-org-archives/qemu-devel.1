@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fleAJ-00007M-DJ
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fleAJ-00007J-Cz
 	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 13:47:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fleAE-0008QH-IA
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fleAE-0008Pz-GH
 	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 13:47:03 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  3 Aug 2018 20:46:51 +0300
-Message-Id: <20180803174654.278336-4-vsementsov@virtuozzo.com>
+Date: Fri,  3 Aug 2018 20:46:53 +0300
+Message-Id: <20180803174654.278336-6-vsementsov@virtuozzo.com>
 In-Reply-To: <20180803174654.278336-1-vsementsov@virtuozzo.com>
 References: <20180803174654.278336-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 3/6] block/mirror: fix and improve
- do_sync_target_write
+Subject: [Qemu-devel] [PATCH 5/6] Revert "test-hbitmap: Add non-advancing
+ iter_next tests"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,92 +23,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Use bdrv_dirty_bitmap_next_dirty_area() instead of
-bdrv_dirty_iter_next_area(), because of the following problems of
-bdrv_dirty_iter_next_area():
+This reverts commit 269576848ec3d57d2d958cf5ac69b08c44adf816.
 
-1. Using HBitmap iterators we should carefully handle unaligned offset,
-as first call to hbitmap_iter_next() may return a value less than
-original offset (actually, it will be original offset rounded down to
-bitmap granularity). This handling is not done in
-do_sync_target_write().
-
-2. bdrv_dirty_iter_next_area() handles unaligned max_offset
-incorrectly:
-
-look at the code:
-    if (max_offset == iter->bitmap->size) {
-        /* If max_offset points to the image end, round it up by the
-         * bitmap granularity */
-        gran_max_offset = ROUND_UP(max_offset, granularity);
-    } else {
-        gran_max_offset = max_offset;
-    }
-
-    ret = hbitmap_iter_next(&iter->hbi, false);
-    if (ret < 0 || ret + granularity > gran_max_offset) {
-        return false;
-    }
-
-and assume that max_offset != iter->bitmap->size but still unaligned.
-if 0 < ret < max_offset we found dirty area, but the function can
-return false in this case (if ret + granularity > max_offset).
-
-3. bdrv_dirty_iter_next_area() uses inefficient loop to find the end of
-the dirty area. Let's use more efficient hbitmap_next_zero instead
-(bdrv_dirty_bitmap_next_dirty_area() do so)
+The functionality is unused. Drop tests.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/mirror.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ tests/test-hbitmap.c | 36 ++++++++++++------------------------
+ 1 file changed, 12 insertions(+), 24 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index b48c3f8cf5..d2806812c8 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1167,25 +1167,22 @@ static void do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
-                                  uint64_t offset, uint64_t bytes,
-                                  QEMUIOVector *qiov, int flags)
- {
--    BdrvDirtyBitmapIter *iter;
-     QEMUIOVector target_qiov;
--    uint64_t dirty_offset;
--    int dirty_bytes;
-+    uint64_t dirty_offset = offset;
-+    uint64_t dirty_bytes;
+diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+index 5e67ac1d3a..f2158f767d 100644
+--- a/tests/test-hbitmap.c
++++ b/tests/test-hbitmap.c
+@@ -30,18 +30,6 @@ typedef struct TestHBitmapData {
+ } TestHBitmapData;
  
-     if (qiov) {
-         qemu_iovec_init(&target_qiov, qiov->niov);
-     }
  
--    iter = bdrv_dirty_iter_new(job->dirty_bitmap);
--    bdrv_set_dirty_iter(iter, offset);
+-static int64_t check_hbitmap_iter_next(HBitmapIter *hbi)
+-{
+-    int next0, next1;
 -
-     while (true) {
-         bool valid_area;
-         int ret;
+-    next0 = hbitmap_iter_next(hbi, false);
+-    next1 = hbitmap_iter_next(hbi, true);
+-
+-    g_assert_cmpint(next0, ==, next1);
+-
+-    return next0;
+-}
+-
+ /* Check that the HBitmap and the shadow bitmap contain the same data,
+  * ignoring the same "first" bits.
+  */
+@@ -58,7 +46,7 @@ static void hbitmap_test_check(TestHBitmapData *data,
  
-         bdrv_dirty_bitmap_lock(job->dirty_bitmap);
--        valid_area = bdrv_dirty_iter_next_area(iter, offset + bytes,
--                                               &dirty_offset, &dirty_bytes);
-+        valid_area = bdrv_dirty_bitmap_next_dirty_area(
-+            job->dirty_bitmap, &dirty_offset,
-+            MIN(offset + bytes, dirty_offset + INT_MAX), &dirty_bytes);
-         if (!valid_area) {
-             bdrv_dirty_bitmap_unlock(job->dirty_bitmap);
-             break;
-@@ -1241,9 +1238,10 @@ static void do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
-                 break;
-             }
+     i = first;
+     for (;;) {
+-        next = check_hbitmap_iter_next(&hbi);
++        next = hbitmap_iter_next(&hbi, true);
+         if (next < 0) {
+             next = data->size;
          }
-+
-+        dirty_offset += dirty_bytes;
-     }
+@@ -447,25 +435,25 @@ static void test_hbitmap_iter_granularity(TestHBitmapData *data,
+     /* Note that hbitmap_test_check has to be invoked manually in this test.  */
+     hbitmap_test_init(data, 131072 << 7, 7);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
  
--    bdrv_dirty_iter_free(iter);
-     if (qiov) {
-         qemu_iovec_destroy(&target_qiov);
-     }
+     hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
+-    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ 
+     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
+     g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ 
+     hbitmap_test_set(data, (131072 << 7) - 8, 8);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
+-    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, 131071 << 7);
+-    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ 
+     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
+-    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, 131071 << 7);
+-    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ }
+ 
+ static void hbitmap_test_set_boundary_bits(TestHBitmapData *data, ssize_t diff)
+@@ -905,7 +893,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmapData *data,
+     for (i = 0; i < num_positions; i++) {
+         hbitmap_deserialize_zeroes(data->hb, positions[i], min_l1, true);
+         hbitmap_iter_init(&iter, data->hb, 0);
+-        next = check_hbitmap_iter_next(&iter);
++        next = hbitmap_iter_next(&iter, true);
+         if (i == num_positions - 1) {
+             g_assert_cmpint(next, ==, -1);
+         } else {
+@@ -931,10 +919,10 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
+ 
+     hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
+ 
+-    check_hbitmap_iter_next(&hbi);
++    hbitmap_iter_next(&hbi, true);
+ 
+     hbitmap_reset_all(data->hb);
+-    check_hbitmap_iter_next(&hbi);
++    hbitmap_iter_next(&hbi, true);
+ }
+ 
+ static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
 -- 
 2.11.1
