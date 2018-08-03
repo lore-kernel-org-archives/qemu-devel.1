@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fld4Z-0004PY-Gr
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 12:37:04 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fld4a-0004Qj-HP
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 12:37:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fld4X-0006YN-Os
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 12:37:03 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fld4Z-0006Zn-Ll
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 12:37:04 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  3 Aug 2018 17:36:46 +0100
-Message-Id: <20180803163646.31068-4-peter.maydell@linaro.org>
+Date: Fri,  3 Aug 2018 17:36:44 +0100
+Message-Id: <20180803163646.31068-2-peter.maydell@linaro.org>
 In-Reply-To: <20180803163646.31068-1-peter.maydell@linaro.org>
 References: <20180803163646.31068-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 3/3] target/arm: Add dummy needed functions to
- M profile vmstate subsections
+Subject: [Qemu-devel] [PATCH 1/3] hw/intc/arm_gicv3_common: Give
+ no-migration-shift-bug subsection a needed function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +26,37 @@ Cc: patches@linaro.org, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gi
 Currently the migration code incorrectly treats a subsection with
 no .needed function pointer as if it was the subsection list
 terminator -- it is ignored and so is everything after it.
-Work around this by giving various M profile vmstate structs
+Work around this by giving vmstate_gicv3_gicd_no_migration_shift_bug
 a 'needed' function that always returns true.
-We reuse m_needed() for this, since it's always true here.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-Not strictly a regression as it only affects M profile CPUs
-with the security extensions, and migration of those was
-broken anyway in 2.12 due to a different bug.
+This should go into 3.0 to avoid awkward migration compat problems:
+the no-migration-shift-bug subsection is new in 3.0.
 ---
- target/arm/machine.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/intc/arm_gicv3_common.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 2e28d086bdf..ff4ec22bf75 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -184,6 +184,7 @@ static const VMStateDescription vmstate_m_faultmask_primask = {
-     .name = "cpu/m/faultmask-primask",
+diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+index ff326b374ad..e58bc8b8105 100644
+--- a/hw/intc/arm_gicv3_common.c
++++ b/hw/intc/arm_gicv3_common.c
+@@ -203,10 +203,16 @@ static int gicv3_gicd_no_migration_shift_bug_post_load(void *opaque,
+     return 0;
+ }
+ 
++static bool needed_always(void *opaque)
++{
++    return true;
++}
++
+ const VMStateDescription vmstate_gicv3_gicd_no_migration_shift_bug = {
+     .name = "arm_gicv3/gicd_no_migration_shift_bug",
      .version_id = 1,
      .minimum_version_id = 1,
-+    .needed = m_needed,
++    .needed = needed_always,
+     .pre_load = gicv3_gicd_no_migration_shift_bug_pre_load,
+     .post_load = gicv3_gicd_no_migration_shift_bug_post_load,
      .fields = (VMStateField[]) {
-         VMSTATE_UINT32(env.v7m.faultmask[M_REG_NS], ARMCPU),
-         VMSTATE_UINT32(env.v7m.primask[M_REG_NS], ARMCPU),
-@@ -230,6 +231,7 @@ static const VMStateDescription vmstate_m_scr = {
-     .name = "cpu/m/scr",
-     .version_id = 1,
-     .minimum_version_id = 1,
-+    .needed = m_needed,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(env.v7m.scr[M_REG_NS], ARMCPU),
-         VMSTATE_END_OF_LIST()
-@@ -240,6 +242,7 @@ static const VMStateDescription vmstate_m_other_sp = {
-     .name = "cpu/m/other-sp",
-     .version_id = 1,
-     .minimum_version_id = 1,
-+    .needed = m_needed,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(env.v7m.other_sp, ARMCPU),
-         VMSTATE_END_OF_LIST()
 -- 
 2.17.1
