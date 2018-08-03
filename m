@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1flWNV-00042W-Ov
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:28:14 -0400
+	(envelope-from <famz@redhat.com>) id 1flWP5-0005d9-Rl
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:29:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1flWNU-0002IJ-T0
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:28:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47968 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1flWP0-0005qR-Tu
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:29:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52670 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1flWNU-0002H0-Mf
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:28:08 -0400
-Date: Fri, 3 Aug 2018 12:28:06 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180803083830.775669-6-mst@redhat.com>
-References: <20180803083830.775669-1-mst@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1flWP0-0005o6-Q0
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:29:42 -0400
+Date: Fri, 3 Aug 2018 17:29:39 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180803092939.GF16395@lemon.usersys.redhat.com>
+References: <20180803085230.30574-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180803083830.775669-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 5/5] tests/acpi: update tables after memory
- hotplug changes
+In-Reply-To: <20180803085230.30574-1-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 0/5] tests/vm: various minor improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, patches@linaro.org
 
-Previous patch changes acpi tables, update expected
-files accordingly.
+On Fri, 08/03 09:52, Peter Maydell wrote:
+> The setup I had for my BSD VMs broke today, so I thought I'd
+> have a look at using the tests/vm/ support for building QEMU
+> inside BSD VMs rather than re-rolling my own. This patchset
+> fixes some rough edges I ran into along the way:
+>  * fixes support for non-KVM accelerators
+>  * propagates J=n setting into 'make check' in the VM
+>  * propagates V=1 setting into 'make' and 'make check' in the VM
+>  * uses --output-sync so that J=n settings don't mangle output
+>  * bumps the RAM settings so J=n doesn't cause the guest to
+>    run out of memory and kill the compiler
+> 
+> Ideally I'd like to be able to separately invoke commands
+> for "build in VM" and "run make check in VM for that build"; for
+> instance I only want V=1 on the make-check, not the make, and in
+> some cases might want to do a build but not check, and so on.
+> But that seemed too complicated for the moment.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- tests/acpi-test-data/pc/SRAT.dimmpxm  | Bin 472 -> 472 bytes
- tests/acpi-test-data/pc/SRAT.memhp    | Bin 264 -> 264 bytes
- tests/acpi-test-data/q35/SRAT.dimmpxm | Bin 472 -> 472 bytes
- tests/acpi-test-data/q35/SRAT.memhp   | Bin 264 -> 264 bytes
- 4 files changed, 0 insertions(+), 0 deletions(-)
+If we can limit the abstraction to "build" and "check" (or "test"), it shouldn't
+be hard to add a --build-only option to the Python main() and VM_BUILD_ONLY=1 to
+Makefile.
 
-diff --git a/tests/acpi-test-data/pc/SRAT.dimmpxm b/tests/acpi-test-data/pc/SRAT.dimmpxm
-index 3b10a607d5bba6cebb97d9174c2a54a577bba9a8..5aa6f693ef9819b3d30cbd76cafb0ee8b5fc5534 100644
-GIT binary patch
-delta 52
-qcmcb?e1n-QILI;N1|tIl<F1Wd>lhXO|Ns9T$YTIu7+{7mfHVMsX$lem
+> 
+> Is it possible for the VMs to be persistent? Currently it
+> looks like they throw away their contents and start afresh
+> for every invocation. Doing build tests as incremental is
+> faster than doing every one as a from-clean...
 
-delta 52
-scmcb?e1n-QILI;N1|tIl<MxeQ>lhUn7#IYAJP>#Rp%@sLVGJM*038_z5&!@I
+Yes, we'll do that in 3.1.
 
-diff --git a/tests/acpi-test-data/pc/SRAT.memhp b/tests/acpi-test-data/pc/SRAT.memhp
-index e508b4ae3cd9e3000209a4f9597913faa4206ec1..5de8a100a4adf968b79a7b154a7f98123d583474 100644
-GIT binary patch
-delta 51
-pcmeBR>R{pu4ss0PU}RumTso2Kp2GkC|Gxt{3?K{x%rFL!1^_r@2$}!@
+> 
+> Also, I notice that the OpenBSD VM setup is using SDL 1.2,
+> which means that configure complains and suggests switching
+> to SDL 2.0. How do we update the base image?
 
-delta 51
-pcmeBR>R{pu4ss0PU}RumTr`pEo&p09068G=141z{FvA!?8UWLX1)2Z=
+I prepared the image by hand and uploaded it because I couldn't find a better
+way. So the easist way to update is probably booting the image by hand, do the
+modifications, then upload it again.
 
-diff --git a/tests/acpi-test-data/q35/SRAT.dimmpxm b/tests/acpi-test-data/q35/SRAT.dimmpxm
-index 3b10a607d5bba6cebb97d9174c2a54a577bba9a8..5aa6f693ef9819b3d30cbd76cafb0ee8b5fc5534 100644
-GIT binary patch
-delta 52
-qcmcb?e1n-QILI;N1|tIl<F1Wd>lhXO|Ns9T$YTIu7+{7mfHVMsX$lem
-
-delta 52
-scmcb?e1n-QILI;N1|tIl<MxeQ>lhUn7#IYAJP>#Rp%@sLVGJM*038_z5&!@I
-
-diff --git a/tests/acpi-test-data/q35/SRAT.memhp b/tests/acpi-test-data/q35/SRAT.memhp
-index e508b4ae3cd9e3000209a4f9597913faa4206ec1..5de8a100a4adf968b79a7b154a7f98123d583474 100644
-GIT binary patch
-delta 51
-pcmeBR>R{pu4ss0PU}RumTso2Kp2GkC|Gxt{3?K{x%rFL!1^_r@2$}!@
-
-delta 51
-pcmeBR>R{pu4ss0PU}RumTr`pEo&p09068G=141z{FvA!?8UWLX1)2Z=
-
--- 
-MST
+> 
+> thanks
+> -- PMM
+> 
+> Peter Maydell (5):
+>   tests/vm: Use -cpu max rather than -cpu host
+>   tests/vm: Pass the jobs parallelism setting to 'make check'
+>   tests/vm: Propagate V=1 down into the make inside the VM
+>   tests/vm: Bump guest RAM up from 2G to 4G
+>   tests/vm: Use make's --output-sync option
+> 
+>  tests/vm/Makefile.include | 1 +
+>  docs/devel/testing.rst    | 1 +
+>  tests/vm/basevm.py        | 9 ++++++---
+>  tests/vm/freebsd          | 4 ++--
+>  tests/vm/netbsd           | 4 ++--
+>  tests/vm/openbsd          | 4 ++--
+>  tests/vm/ubuntu.i386      | 4 ++--
+>  7 files changed, 16 insertions(+), 11 deletions(-)
+> 
+> -- 
+> 2.17.1
+> 
+> 
