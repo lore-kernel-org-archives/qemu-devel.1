@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pahome.chen@mirlab.org>) id 1flRyn-0002Vx-KM
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 00:46:22 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1flSXC-0001Wr-04
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 01:21:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pahome.chen@mirlab.org>) id 1flRym-0002zz-Ut
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 00:46:21 -0400
-Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:38473)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pahome.chen@mirlab.org>)
-	id 1flRym-0002zS-O6
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 00:46:20 -0400
-Received: by mail-ua0-x22d.google.com with SMTP id o11-v6so3001163uak.5
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 21:46:20 -0700 (PDT)
-MIME-Version: 1.0
-From: lampahome <pahome.chen@mirlab.org>
-Date: Fri, 3 Aug 2018 12:46:19 +0800
-Message-ID: <CAB3eZfudS9D3G-JSNcaeZO_vWYBQytSbSLzDSLd+abGU9mLeoA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Can I create img more thant 16TB?
+	(envelope-from <joel.stan@gmail.com>) id 1flSX7-0004p0-Fx
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 01:21:52 -0400
+Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Fri,  3 Aug 2018 14:51:34 +0930
+Message-Id: <20180803052137.10602-1-joel@jms.id.au>
+Subject: [Qemu-devel] [PATCH v4 0/3] arm: Add nRF51 SoC and micro:bit machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,10 +18,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
-There's file size maximum in ext4 and it's 16TB
+v4: Fix number of IRQs
+Based-on: 20180725085944.11856-1-stefanha@redhat.com
 
-Can I create qcow2 ex:32TB and write more than 16TB?
+This short series implements a minimal definition of the Nordic
+Semiconductor nRF51, a Cortex-M0 ARM SoC, and the BBC micro:bit, a
+machine that will use this SoC.
 
-thx
+This work will serve as the base for our Google Summer of Code and
+Outreachy interns who will work on implementing a number of features on
+top of this base.
+
+I've tested this with a microbit micropython firmware, and checked that
+it starts running by looking at it with gdb.
+
+I chose to keep the nrf51 and the microbit seperate, to not confuse the
+peripherals that are on the microbit but are not part of the nrf51, and
+vice versa.
+
+Joel Stanley (3):
+  MAINTAINERS: Add NRF51 entry
+  arm: Add Nordic Semiconductor nRF51 SoC
+  arm: Add BBC micro:bit machine
+
+ MAINTAINERS                     |   8 +++
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/Makefile.objs            |   1 +
+ hw/arm/microbit.c               |  54 +++++++++++++++
+ hw/arm/nrf51_soc.c              | 119 ++++++++++++++++++++++++++++++++
+ include/hw/arm/nrf51_soc.h      |  42 +++++++++++
+ 6 files changed, 225 insertions(+)
+ create mode 100644 hw/arm/microbit.c
+ create mode 100644 hw/arm/nrf51_soc.c
+ create mode 100644 include/hw/arm/nrf51_soc.h
+
+-- 
+2.17.1
