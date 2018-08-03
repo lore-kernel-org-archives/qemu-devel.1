@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1flWUh-0001Wn-6C
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:35:37 -0400
+	(envelope-from <drjones@redhat.com>) id 1flWX2-00030Z-Ep
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:38:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1flWUc-0008Il-6f
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:35:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1flWUb-0008Fi-T9
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:35:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1flWUa-0003e8-Ma
-	for <qemu-devel@nongnu.org>; Fri, 03 Aug 2018 09:35:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 99D622E80C9
-	for <qemu-devel@nongnu.org>; Fri,  3 Aug 2018 09:35:28 +0000 (UTC)
+	(envelope-from <drjones@redhat.com>) id 1flWX1-000458-La
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:38:00 -0400
+Date: Fri, 3 Aug 2018 11:37:48 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180803093748.2s563javprolaqsi@kamzik.brq.redhat.com>
+References: <CAKv+Gu-ffZRNmACH6YieNsg=AHxJxYoXHsBGf6C=nOvFfTu7Sg@mail.gmail.com>
+	<20180726111109.w24jk6ehklimige7@kamzik.brq.redhat.com>
+	<CAKv+Gu80KfwZft4t1HtOXPuijuPLV80K9iW+BsTgs7WcnosMXA@mail.gmail.com>
+	<20180726114158.am7kgc3jekxg55i5@kamzik.brq.redhat.com>
+	<CAFEAcA8YH4p__zT1o0s3vNZOsyWZn3XPLgkNeT+jSJpmjvFTUw@mail.gmail.com>
+	<20180726123509.qyadwbz4skwashcj@kamzik.brq.redhat.com>
+	<CAFEAcA-Zv5xV2VwMCfGXUv8oT+gC_dgn8Q3M1v3FBjry7TbXVA@mail.gmail.com>
+	<CAHmQWvB1zgaLi++BhGEs1Emb0-5HOrzCcPrHJDoxx-8Be9df1g@mail.gmail.com>
+	<CAFEAcA_mVGSicjN=wwJY8OCJ-j=DtdLjDvM9U-dC3dQ=RQQXMQ@mail.gmail.com>
+	<CAKv+Gu8sCjfL=uKy4nM6pcRneUzw2YG79CuOVBH3TeNOXf689A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Aug 2018 09:25:56 -0000
-From: changlimin <changlimin@h3c.com>
-Reply-To: Bug 1785197 <1785197@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153328835680.29549.10888277891028750813.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1785197] [NEW] qemu 2.12.0 crash during install
- windows 10 with vga
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu8sCjfL=uKy4nM6pcRneUzw2YG79CuOVBH3TeNOXf689A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,230 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Hongbo Zhang <hongbo.zhang@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, lersek@redhat.com
 
-Public bug reported:
+On Fri, Aug 03, 2018 at 11:26:41AM +0200, Ard Biesheuvel wrote:
+> On 3 August 2018 at 11:23, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 3 August 2018 at 10:21, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+> >> The 'sbsa' machine won't consume QEMU generated ACPI, so it won't
+> >> touch or add new ACPI tables.
+> >>
+> >> UEFI relies on its ACPI to load OS, but currently it still needs DT
+> >> from QEMU to pass some info, one example is CPU number.
+> >>
+> >> So, the 'sbsa' code implementation should be like this:
+> >> A separate file, no ACPI codes, a little necessary DT codes.
+> >>
+> >> "Necessary DT codes" doesn't include so many peripheral devices nodes,
+> >> so the code overlap with virt won't be so much (contrary to sbsa.c
+> >> with all the DT codes), then no need to separate the common part to a
+> >> third file, and virt.c can be untouched or only a minor change with
+> >> few lines.
+> >
+> > Would the real hardware you are trying to be an example
+> > for use DT for this? It seems a bit unlikely to me.
+> >
+> 
+> Yes, as a matter of fact. There is work underway both on the EDK2 and
+> the ARM-TF side to rely less on static descriptions, and more on DT to
+> instantiate drivers and ACPI tables at runtime rather than at build
+> time.
 
-Same issue as https://www.qubes-os.org/doc/windows-vm/ , it's not easy to r=
-eproduced.
-cpu_physical_memory_snapshot_get_dirty: Assertion `start + length <=3D snap=
-->end=E2=80=99 failed
+Hi Ard,
 
-Qemu version is 2.12.0. =
+(A bit off-topic, but related to your comment above.)
 
-(gdb) bt
-#0  0x00007f504ed6fc37 in raise () from /lib/x86_64-linux-gnu/libc.so.6
-#1  0x00007f504ed73028 in abort () from /lib/x86_64-linux-gnu/libc.so.6
-#2  0x00007f504ed68bf6 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
-#3  0x00007f504ed68ca2 in __assert_fail () from /lib/x86_64-linux-gnu/libc.=
-so.6
-#4  0x00005585bbdc9641 in cpu_physical_memory_snapshot_get_dirty (snap=3Dsn=
-ap@entry=3D0x5585bfdc2ff0, start=3D<optimized out>, length=3D<optimized out=
->)
-    at /qemu-2.12/exec.c:1264
-#5  0x00005585bbe2b4de in memory_region_snapshot_get_dirty (mr=3Dmr@entry=
-=3D0x5585c06e3d10, snap=3Dsnap@entry=3D0x5585bfdc2ff0, addr=3D<optimized ou=
-t>,
-    size=3D<optimized out>) at /qemu-2.12/memory.c:1997
-#6  0x00005585bbe552a4 in vga_draw_graphic (full_update=3D0, s=3D0x5585c06e=
-3d00) at /qemu-2.12/hw/display/vga.c:1671
-#7  vga_update_display (opaque=3D0x5585c06e3d00) at /qemu-2.12/hw/display/v=
-ga.c:1767
-#8  0x00005585bc0d9a8f in qemu_spice_display_refresh (ssd=3D0x5585c06e3930)=
- at /qemu-2.12/ui/spice-display.c:478
-#9  0x00005585bc0ced72 in dpy_refresh (s=3D0x5585c081b2a0) at /qemu-2.12/ui=
-/console.c:1629
-#10 gui_update (opaque=3D0x5585c081b2a0) at /qemu-2.12/ui/console.c:203
-#11 0x00005585bc1d333c in timerlist_run_timers (timer_list=3D0x5585bee1f950=
-) at /qemu-2.12/util/qemu-timer.c:536
-#12 0x00005585bc1d35a3 in qemu_clock_run_timers (type=3DQEMU_CLOCK_REALTIME=
-) at /qemu-2.12/util/qemu-timer.c:547
-#13 qemu_clock_run_all_timers () at /qemu-2.12/util/qemu-timer.c:674
-#14 0x00005585bc1d3aa4 in main_loop_wait (nonblocking=3D<optimized out>) at=
- /qemu-2.12/util/main-loop.c:528
-#15 0x00005585bbdc2f8a in main_loop () at /qemu-2.12/vl.c:1973
-#16 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimized=
- out>) at /qemu-2.12/vl.c:4804 =
+I started poking at teaching ArmVirtQemu how to get the base of RAM
+from the DTB, where the DTB is passed to it through x1 (QEMU needed a
+few new lines to ensure x1 had it in the firmware=y,-kernel=no case
+too). I have the assembler written, but I got hung up on the integration
+with edk2, because I don't understand the build files well enough yet to
+swap in ArmVirtPkg/PrePi/AArch64/ModuleEntryPoint.S for the ArmVirtQemu
+platform. I would also need to clean up the assembler a bit before
+posting. I'll be out-of-office for all next week, but if you send me
+some edk2 pointers in the meantime, then I should be able to post an
+RFC the following week.
 
-
-(gdb) frame 5
-(gdb) p/x *snap
-$1 =3D {start =3D 0x1000c0000, end =3D 0x1000c0000, dirty =3D 0x5585bfdc300=
-0}
-
-Here the snap->start is identical to snap->end , I think something is wrong=
-. =
-
-In function vga_draw_graphic, the snap is allocated from region_start/regio=
-n_end.
-        snap =3D memory_region_snapshot_and_clear_dirty(&s->vram, region_st=
-art,
-                                                      region_end - region_s=
-tart,
-                                                      DIRTY_MEMORY_VGA);
-Is that possible for region_start=3D=3D region_end ? =
-
-
-Commandline:
-/usr/bin/kvm -name guest=3Dwin10-2,debug-threads=3Don -S -object secret,id=
-=3DmasterKey0,format=3Draw,file=3D/run/lib/libvirt/qemu/domain-51-win10-2/m=
-aster-key.aes -machine pc-i440fx-2.12,accel=3Dkvm,usb=3Doff,system=3Dwindow=
-s,dump-guest-core=3Doff -cpu qemu64,hv_time,hv_relaxed,hv_spinlocks=3D0x200=
-0 -m size=3D4194304k,slots=3D10,maxmem=3D34359738368k -realtime mlock=3Doff=
- -smp 2,maxcpus=3D24,sockets=3D24,cores=3D1,threads=3D1 -numa node,nodeid=
-=3D0,cpus=3D0-23,mem=3D4096 -uuid cb871760-e684-4926-8f0b-270f7ff35539 -no-=
-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/run/lib/li=
-bvirt/qemu/domain-51-win10-2/monitor.sock,server,nowait -mon chardev=3Dchar=
-monitor,id=3Dmonitor,mode=3Dcontrol -chardev socket,id=3Dcharmonitor_cas,pa=
-th=3D/run/lib/libvirt/qemu/domain-51-win10-2/monitor.sock.cas,server,nowait=
- -mon chardev=3Dcharmonitor_cas,id=3Dmonitor_cas,mode=3Dcontrol -rtc base=
-=3Dlocaltime,clock=3Dvm,driftfix=3Dslew -no-hpet -no-shutdown -global PIIX4=
-_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1 -boot strict=3Don -devic=
-e piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device usb-ehci,id=3D=
-usb1,bus=3Dpci.0,addr=3D0x4 -device nec-usb-xhci,id=3Dusb2,bus=3Dpci.0,addr=
-=3D0x5 -device virtio-scsi-pci,id=3Dscsi1,bus=3Dpci.0,addr=3D0x6 -device vi=
-rtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x7 -device usb-hub,=
-id=3Dhub0,bus=3Dusb.0,port=3D1 -drive file=3D/vms/images/win10-2,format=3Dq=
-cow2,if=3Dnone,id=3Ddrive-virtio-disk0,cache=3Ddirectsync,aio=3Dnative -dev=
-ice virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x8,pci_hotpluggable=3Don,=
-drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive file=3D/v=
-ms/isos/virtio-win10.vfd,format=3Draw,if=3Dnone,id=3Ddrive-fdc0-0-0,readonl=
-y=3Don,cache=3Ddirectsync,aio=3Dnative -global isa-fdc.driveA=3Ddrive-fdc0-=
-0-0 -global isa-fdc.bootindexA=3D4 -drive file=3D/vms/nfs/windows_msdn_iso/=
-cn_windows_10_multi-edition_version_1709_updated_sept_2017_x64_dvd_10009080=
-4.iso,format=3Draw,if=3Dnone,id=3Ddrive-ide0-0-0,readonly=3Don -device ide-=
-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive-ide0-0-0,id=3Dide0-0-0,bootindex=3D2 =
--netdev tap,fd=3D62,id=3Dhostnet0,vhost=3Don,vhostfd=3D63 -device virtio-ne=
-t-pci,pci_hotpluggable=3Don,netdev=3Dhostnet0,id=3Dnet0,mac=3D0c:da:41:1d:1=
-1:5b,bus=3Dpci.0,addr=3D0x3,bootindex=3D3 -chardev pty,id=3Dcharserial0 -de=
-vice isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dcha=
-rchannel0,path=3D/var/lib/libvirt/qemu/win10-2.agent,server,nowait -device =
-virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dch=
-annel0,name=3Dorg.qemu.guest_agent.0 -device usb-tablet,id=3Dinput0,bus=3Du=
-sb.0,port=3D2 -vnc 0.0.0.0:0 -spice port=3D5901,tls-port=3D5902,addr=3D0.0.=
-0.0,disable-ticketing,x509-dir=3D/etc/pki/libvirt-spice,seamless-migration=
-=3Don -device qxl-vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D16777216,=
-vram64_size_mb=3D0,vgamem_mb=3D16,bus=3Dpci.0,addr=3D0x2 -device virtio-bal=
-loon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=3Don
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1785197
-
-Title:
-  qemu 2.12.0 crash during install windows 10 with vga
-
-Status in QEMU:
-  New
-
-Bug description:
-  Same issue as https://www.qubes-os.org/doc/windows-vm/ , it's not easy to=
- reproduced.
-  cpu_physical_memory_snapshot_get_dirty: Assertion `start + length <=3D sn=
-ap->end=E2=80=99 failed
-
-  Qemu version is 2.12.0. =
-
-  (gdb) bt
-  #0  0x00007f504ed6fc37 in raise () from /lib/x86_64-linux-gnu/libc.so.6
-  #1  0x00007f504ed73028 in abort () from /lib/x86_64-linux-gnu/libc.so.6
-  #2  0x00007f504ed68bf6 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
-  #3  0x00007f504ed68ca2 in __assert_fail () from /lib/x86_64-linux-gnu/lib=
-c.so.6
-  #4  0x00005585bbdc9641 in cpu_physical_memory_snapshot_get_dirty (snap=3D=
-snap@entry=3D0x5585bfdc2ff0, start=3D<optimized out>, length=3D<optimized o=
-ut>)
-      at /qemu-2.12/exec.c:1264
-  #5  0x00005585bbe2b4de in memory_region_snapshot_get_dirty (mr=3Dmr@entry=
-=3D0x5585c06e3d10, snap=3Dsnap@entry=3D0x5585bfdc2ff0, addr=3D<optimized ou=
-t>,
-      size=3D<optimized out>) at /qemu-2.12/memory.c:1997
-  #6  0x00005585bbe552a4 in vga_draw_graphic (full_update=3D0, s=3D0x5585c0=
-6e3d00) at /qemu-2.12/hw/display/vga.c:1671
-  #7  vga_update_display (opaque=3D0x5585c06e3d00) at /qemu-2.12/hw/display=
-/vga.c:1767
-  #8  0x00005585bc0d9a8f in qemu_spice_display_refresh (ssd=3D0x5585c06e393=
-0) at /qemu-2.12/ui/spice-display.c:478
-  #9  0x00005585bc0ced72 in dpy_refresh (s=3D0x5585c081b2a0) at /qemu-2.12/=
-ui/console.c:1629
-  #10 gui_update (opaque=3D0x5585c081b2a0) at /qemu-2.12/ui/console.c:203
-  #11 0x00005585bc1d333c in timerlist_run_timers (timer_list=3D0x5585bee1f9=
-50) at /qemu-2.12/util/qemu-timer.c:536
-  #12 0x00005585bc1d35a3 in qemu_clock_run_timers (type=3DQEMU_CLOCK_REALTI=
-ME) at /qemu-2.12/util/qemu-timer.c:547
-  #13 qemu_clock_run_all_timers () at /qemu-2.12/util/qemu-timer.c:674
-  #14 0x00005585bc1d3aa4 in main_loop_wait (nonblocking=3D<optimized out>) =
-at /qemu-2.12/util/main-loop.c:528
-  #15 0x00005585bbdc2f8a in main_loop () at /qemu-2.12/vl.c:1973
-  #16 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
-ed out>) at /qemu-2.12/vl.c:4804 =
-
-
-  (gdb) frame 5
-  (gdb) p/x *snap
-  $1 =3D {start =3D 0x1000c0000, end =3D 0x1000c0000, dirty =3D 0x5585bfdc3=
-000}
-
-  Here the snap->start is identical to snap->end , I think something is wro=
-ng. =
-
-  In function vga_draw_graphic, the snap is allocated from region_start/reg=
-ion_end.
-          snap =3D memory_region_snapshot_and_clear_dirty(&s->vram, region_=
-start,
-                                                        region_end - region=
-_start,
-                                                        DIRTY_MEMORY_VGA);
-  Is that possible for region_start=3D=3D region_end ? =
-
-
-  Commandline:
-  /usr/bin/kvm -name guest=3Dwin10-2,debug-threads=3Don -S -object secret,i=
-d=3DmasterKey0,format=3Draw,file=3D/run/lib/libvirt/qemu/domain-51-win10-2/=
-master-key.aes -machine pc-i440fx-2.12,accel=3Dkvm,usb=3Doff,system=3Dwindo=
-ws,dump-guest-core=3Doff -cpu qemu64,hv_time,hv_relaxed,hv_spinlocks=3D0x20=
-00 -m size=3D4194304k,slots=3D10,maxmem=3D34359738368k -realtime mlock=3Dof=
-f -smp 2,maxcpus=3D24,sockets=3D24,cores=3D1,threads=3D1 -numa node,nodeid=
-=3D0,cpus=3D0-23,mem=3D4096 -uuid cb871760-e684-4926-8f0b-270f7ff35539 -no-=
-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/run/lib/li=
-bvirt/qemu/domain-51-win10-2/monitor.sock,server,nowait -mon chardev=3Dchar=
-monitor,id=3Dmonitor,mode=3Dcontrol -chardev socket,id=3Dcharmonitor_cas,pa=
-th=3D/run/lib/libvirt/qemu/domain-51-win10-2/monitor.sock.cas,server,nowait=
- -mon chardev=3Dcharmonitor_cas,id=3Dmonitor_cas,mode=3Dcontrol -rtc base=
-=3Dlocaltime,clock=3Dvm,driftfix=3Dslew -no-hpet -no-shutdown -global PIIX4=
-_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1 -boot strict=3Don -devic=
-e piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device usb-ehci,id=3D=
-usb1,bus=3Dpci.0,addr=3D0x4 -device nec-usb-xhci,id=3Dusb2,bus=3Dpci.0,addr=
-=3D0x5 -device virtio-scsi-pci,id=3Dscsi1,bus=3Dpci.0,addr=3D0x6 -device vi=
-rtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x7 -device usb-hub,=
-id=3Dhub0,bus=3Dusb.0,port=3D1 -drive file=3D/vms/images/win10-2,format=3Dq=
-cow2,if=3Dnone,id=3Ddrive-virtio-disk0,cache=3Ddirectsync,aio=3Dnative -dev=
-ice virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x8,pci_hotpluggable=3Don,=
-drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive file=3D/v=
-ms/isos/virtio-win10.vfd,format=3Draw,if=3Dnone,id=3Ddrive-fdc0-0-0,readonl=
-y=3Don,cache=3Ddirectsync,aio=3Dnative -global isa-fdc.driveA=3Ddrive-fdc0-=
-0-0 -global isa-fdc.bootindexA=3D4 -drive file=3D/vms/nfs/windows_msdn_iso/=
-cn_windows_10_multi-edition_version_1709_updated_sept_2017_x64_dvd_10009080=
-4.iso,format=3Draw,if=3Dnone,id=3Ddrive-ide0-0-0,readonly=3Don -device ide-=
-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive-ide0-0-0,id=3Dide0-0-0,bootindex=3D2 =
--netdev tap,fd=3D62,id=3Dhostnet0,vhost=3Don,vhostfd=3D63 -device virtio-ne=
-t-pci,pci_hotpluggable=3Don,netdev=3Dhostnet0,id=3Dnet0,mac=3D0c:da:41:1d:1=
-1:5b,bus=3Dpci.0,addr=3D0x3,bootindex=3D3 -chardev pty,id=3Dcharserial0 -de=
-vice isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dcha=
-rchannel0,path=3D/var/lib/libvirt/qemu/win10-2.agent,server,nowait -device =
-virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dch=
-annel0,name=3Dorg.qemu.guest_agent.0 -device usb-tablet,id=3Dinput0,bus=3Du=
-sb.0,port=3D2 -vnc 0.0.0.0:0 -spice port=3D5901,tls-port=3D5902,addr=3D0.0.=
-0.0,disable-ticketing,x509-dir=3D/etc/pki/libvirt-spice,seamless-migration=
-=3Don -device qxl-vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D16777216,=
-vram64_size_mb=3D0,vgamem_mb=3D16,bus=3Dpci.0,addr=3D0x2 -device virtio-bal=
-loon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=3Don
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1785197/+subscriptions
+Thanks,
+drew
