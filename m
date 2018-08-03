@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1flYiP-0000Ee-D8
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 07:57:54 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1flYkq-00026e-PY
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 08:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1flYiK-0005D3-Fj
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 07:57:53 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:38486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1flYiK-0005Bl-4h
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 07:57:48 -0400
-References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1533219424-7627-78-git-send-email-stefan.markovic@rt-rk.com>
-	<0a43387a-f475-874d-2846-46ce38d9d812@vivier.eu>
-	<CY4PR08MB2486543AECEBFAEE4D608EF1D2230@CY4PR08MB2486.namprd08.prod.outlook.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <3da517d7-dfff-5c61-5c38-7d11710fd665@vivier.eu>
-Date: Fri, 3 Aug 2018 13:57:07 +0200
-MIME-Version: 1.0
-In-Reply-To: <CY4PR08MB2486543AECEBFAEE4D608EF1D2230@CY4PR08MB2486.namprd08.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1flYkl-00075X-B6
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 08:00:24 -0400
+Received: from mail-bn3nam01on0721.outbound.protection.outlook.com
+	([2a01:111:f400:fe41::721]:59996
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1flYkl-00074u-57
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 08:00:19 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 3 Aug 2018 12:00:13 +0000
+Message-ID: <SN6PR08MB4879775CC6CC8C50D9743B38C6230@SN6PR08MB4879.namprd08.prod.outlook.com>
+References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>,
+	<1533219424-7627-44-git-send-email-stefan.markovic@rt-rk.com>
+In-Reply-To: <1533219424-7627-44-git-send-email-stefan.markovic@rt-rk.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 77/77] linux-user: Add nanoMIPS support
- in scripts/qemu-binfmt-conf.sh
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v6 43/77] target/mips: Add emulation of DSP
+ ASE for nanoMIPS - part 6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Rikalo <arikalo@wavecomp.com>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Le 03/08/2018 à 13:23, Aleksandar Rikalo a écrit :
-> Hi, Laurent,
-> 
-> Thank You for the explanation.
-> 
-> We will correct this in the next version.
-> We will also fix family values for the regular mips architectures in
-> separate patch.
+>=20
+> From: Stefan Markovic <stefan.markovic@rt-rk.com>
+> Sent: Thursday, August 2, 2018 4:16 PM
+> Subject: [PATCH v6 43/77] target/mips: Add emulation of DSP ASE for nanoM=
+IPS - part 6
+>=20
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+>=20
+> Add emulation of DSP ASE instructions for nanoMIPS - part 6.
+>=20
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  target/mips/translate.c | 64 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 64 insertions(+)
 
-It's a good idea.
+> +    case NM_REPL_QB:
+> +        {
+> +            check_dsp(ctx);
+> +            target_long result;
+> +            imm =3D extract32(ctx->opcode, 13, 8);
+> +            result =3D (uint32_t)imm << 24 |
+> +                     (uint32_t)imm << 16 |
+> +                    (uint32_t)imm << 8  |
+=20
+Missalignment. Otherwise:
 
-Thanks,
-Laurent
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
