@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1flWA4-0001Xa-OK
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:14:18 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1flWA9-0001Zr-4T
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:14:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1flWA3-0001hs-C7
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:14:16 -0400
-Received: from mail-pl0-x232.google.com ([2607:f8b0:400e:c01::232]:43714)
+	(envelope-from <jemmy858585@gmail.com>) id 1flWA6-0001pT-AO
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:14:21 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:38336)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1flWA3-0001fu-2U
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:14:15 -0400
-Received: by mail-pl0-x232.google.com with SMTP id x6-v6so2297874plv.10
-	for <qemu-devel@nongnu.org>; Fri, 03 Aug 2018 02:14:15 -0700 (PDT)
+	id 1flWA6-0001ng-4o
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:14:18 -0400
+Received: by mail-pl0-x244.google.com with SMTP id u11-v6so2310480plq.5
+	for <qemu-devel@nongnu.org>; Fri, 03 Aug 2018 02:14:18 -0700 (PDT)
 From: Lidong Chen <jemmy858585@gmail.com>
-Date: Fri,  3 Aug 2018 17:13:47 +0800
-Message-Id: <1533287630-4221-10-git-send-email-lidongchen@tencent.com>
+Date: Fri,  3 Aug 2018 17:13:49 +0800
+Message-Id: <1533287630-4221-12-git-send-email-lidongchen@tencent.com>
 In-Reply-To: <1533287630-4221-1-git-send-email-lidongchen@tencent.com>
 References: <1533287630-4221-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v6 09/12] migration: implement the shutdown for
- RDMA QIOChannel
+Subject: [Qemu-devel] [PATCH v6 11/12] migration: remove the unnecessary
+ RDMA_CONTROL_ERROR message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +28,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: zhang.zhanghailiang@huawei.com, quintela@redhat.com, dgilbert@redhat.com
-Cc: qemu-devel@nongnu.org, Lidong Chen <jemmy858585@gmail.com>, Lidong Chen <lidongchen@tencent.com>
+Cc: qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-From: Lidong Chen <jemmy858585@gmail.com>
-
-Because RDMA QIOChannel not implement shutdown function,
-If the to_dst_file was set error, the return path thread
-will wait forever. and the migration thread will wait
-return path thread exit.
-
-the backtrace of return path thread is:
-
-(gdb) bt
-    #0  0x00007f372a76bb0f in ppoll () from /lib64/libc.so.6
-    #1  0x000000000071dc24 in qemu_poll_ns (fds=0x7ef7091d0580, nfds=2, timeout=100000000)
-        at qemu-timer.c:325
-    #2  0x00000000006b2fba in qemu_rdma_wait_comp_channel (rdma=0xd424000)
-        at migration/rdma.c:1501
-    #3  0x00000000006b3191 in qemu_rdma_block_for_wrid (rdma=0xd424000, wrid_requested=4000,
-        byte_len=0x7ef7091d0640) at migration/rdma.c:1580
-    #4  0x00000000006b3638 in qemu_rdma_exchange_get_response (rdma=0xd424000,
-        head=0x7ef7091d0720, expecting=3, idx=0) at migration/rdma.c:1726
-    #5  0x00000000006b3ad6 in qemu_rdma_exchange_recv (rdma=0xd424000, head=0x7ef7091d0720,
-        expecting=3) at migration/rdma.c:1903
-    #6  0x00000000006b5d03 in qemu_rdma_get_buffer (opaque=0x6a57dc0, buf=0x5c80030 "", pos=8,
-        size=32768) at migration/rdma.c:2714
-    #7  0x00000000006a9635 in qemu_fill_buffer (f=0x5c80000) at migration/qemu-file.c:232
-    #8  0x00000000006a9ecd in qemu_peek_byte (f=0x5c80000, offset=0)
-        at migration/qemu-file.c:502
-    #9  0x00000000006a9f1f in qemu_get_byte (f=0x5c80000) at migration/qemu-file.c:515
-    #10 0x00000000006aa162 in qemu_get_be16 (f=0x5c80000) at migration/qemu-file.c:591
-    #11 0x00000000006a46d3 in source_return_path_thread (
-        opaque=0xd826a0 <current_migration.37100>) at migration/migration.c:1331
-    #12 0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
-    #13 0x00007f372a77635d in clone () from /lib64/libc.so.6
-
-the backtrace of migration thread is:
-
-(gdb) bt
-    #0  0x00007f372aa4af57 in pthread_join () from /lib64/libpthread.so.0
-    #1  0x00000000007d5711 in qemu_thread_join (thread=0xd826f8 <current_migration.37100+88>)
-        at util/qemu-thread-posix.c:504
-    #2  0x00000000006a4bc5 in await_return_path_close_on_source (
-        ms=0xd826a0 <current_migration.37100>) at migration/migration.c:1460
-    #3  0x00000000006a53e4 in migration_completion (s=0xd826a0 <current_migration.37100>,
-        current_active_state=4, old_vm_running=0x7ef7089cf976, start_time=0x7ef7089cf980)
-        at migration/migration.c:1695
-    #4  0x00000000006a5c54 in migration_thread (opaque=0xd826a0 <current_migration.37100>)
-        at migration/migration.c:1837
-    #5  0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
-    #6  0x00007f372a77635d in clone () from /lib64/libc.so.6
+It's not necessary to send RDMA_CONTROL_ERROR when clean up rdma resource.
+If rdma->error_state is ture, the message may not send successfully.
+and the cm event can also notify the peer qemu.
 
 Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/rdma.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ migration/rdma.c | 11 -----------
+ 1 file changed, 11 deletions(-)
 
 diff --git a/migration/rdma.c b/migration/rdma.c
-index 673f126..1affc46 100644
+index 62de2ec..14cdf82 100644
 --- a/migration/rdma.c
 +++ b/migration/rdma.c
-@@ -3039,6 +3039,45 @@ static int qio_channel_rdma_close(QIOChannel *ioc,
-     return 0;
- }
+@@ -2305,17 +2305,6 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
+     int idx;
  
-+static int
-+qio_channel_rdma_shutdown(QIOChannel *ioc,
-+                            QIOChannelShutdown how,
-+                            Error **errp)
-+{
-+    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
-+    RDMAContext *rdmain, *rdmaout;
-+
-+    rcu_read_lock();
-+
-+    rdmain = atomic_rcu_read(&rioc->rdmain);
-+    rdmaout = atomic_rcu_read(&rioc->rdmain);
-+
-+    switch (how) {
-+    case QIO_CHANNEL_SHUTDOWN_READ:
-+        if (rdmain) {
-+            rdmain->error_state = -1;
-+        }
-+        break;
-+    case QIO_CHANNEL_SHUTDOWN_WRITE:
-+        if (rdmaout) {
-+            rdmaout->error_state = -1;
-+        }
-+        break;
-+    case QIO_CHANNEL_SHUTDOWN_BOTH:
-+    default:
-+        if (rdmain) {
-+            rdmain->error_state = -1;
-+        }
-+        if (rdmaout) {
-+            rdmaout->error_state = -1;
-+        }
-+        break;
-+    }
-+
-+    rcu_read_unlock();
-+    return 0;
-+}
-+
- /*
-  * Parameters:
-  *    @offset == 0 :
-@@ -3865,6 +3904,7 @@ static void qio_channel_rdma_class_init(ObjectClass *klass,
-     ioc_klass->io_close = qio_channel_rdma_close;
-     ioc_klass->io_create_watch = qio_channel_rdma_create_watch;
-     ioc_klass->io_set_aio_fd_handler = qio_channel_rdma_set_aio_fd_handler;
-+    ioc_klass->io_shutdown = qio_channel_rdma_shutdown;
- }
- 
- static const TypeInfo qio_channel_rdma_info = {
+     if (rdma->cm_id && rdma->connected) {
+-        if ((rdma->error_state ||
+-             migrate_get_current()->state == MIGRATION_STATUS_CANCELLING) &&
+-            !rdma->received_error) {
+-            RDMAControlHeader head = { .len = 0,
+-                                       .type = RDMA_CONTROL_ERROR,
+-                                       .repeat = 1,
+-                                     };
+-            error_report("Early error. Sending error.");
+-            qemu_rdma_post_send_control(rdma, NULL, &head);
+-        }
+-
+         rdma_disconnect(rdma->cm_id);
+         trace_qemu_rdma_cleanup_disconnect();
+         rdma->connected = false;
 -- 
 1.8.3.1
