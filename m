@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1flPMO-0002Wz-5r
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 21:58:33 -0400
+	(envelope-from <famz@redhat.com>) id 1flPYF-0005AI-Q9
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 22:10:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1flPML-0006hH-3w
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 21:58:32 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1flPMK-0006gR-TJ
-	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 21:58:29 -0400
-Received: by mail-pg1-x542.google.com with SMTP id f14-v6so1551558pgv.13
-	for <qemu-devel@nongnu.org>; Thu, 02 Aug 2018 18:58:28 -0700 (PDT)
-Date: Thu, 02 Aug 2018 18:58:26 -0700 (PDT)
-In-Reply-To: <CAHNT7Nt4m-6wAtHNtArGFV0PP0f5se5R9U=KCHHv65kw7oqHcw@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-aedff193-4b11-4e25-9b37-220712cf5e24@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL v4 0/7] riscv-pull queue
+	(envelope-from <famz@redhat.com>) id 1flPYE-0006wp-W7
+	for qemu-devel@nongnu.org; Thu, 02 Aug 2018 22:10:47 -0400
+Date: Fri, 3 Aug 2018 10:10:36 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180803021036.GB16395@lemon.usersys.redhat.com>
+References: <20180803005015.5116-1-programmingkidx@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180803005015.5116-1-programmingkidx@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img.c: Add examples section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +22,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: alistair23@gmail.com, schwab@suse.de, f4bug@amsat.org, alistair.francis@wdc.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: John Arbuckle <programmingkidx@gmail.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 09 Jul 2018 16:04:48 PDT (-0700), Michael Clark wrote:
-> On Tue, Jul 10, 2018 at 9:52 AM, Alistair Francis <alistair23@gmail.com>
-> wrote:
->
->> On Mon, Jul 9, 2018 at 3:00 AM, Andreas Schwab <schwab@suse.de> wrote:
->> > What is the state of the sifive_u emulation?  When I tried to boot a bbl
->> > with an included kernel I get these errors:
->> >
->> > qemu-system-riscv64: plic: invalid register write: 00002090
->> > qemu-system-riscv64: plic: invalid register write: 00002094
->> > qemu-system-riscv64: plic: invalid register write: 00002098
->> > qemu-system-riscv64: plic: invalid register write: 0000209c
->> > qemu-system-riscv64: plic: invalid register write: 000020a0
->> > qemu-system-riscv64: plic: invalid register write: 000020a4
->> > qemu-system-riscv64: plic: invalid register write: 000020a8
->> > qemu-system-riscv64: plic: invalid register write: 000020ac
->> > qemu-system-riscv64: plic: invalid register write: 000020b0
->> > qemu-system-riscv64: plic: invalid register write: 000020b4
->>
->> I see those as well. I haven't investigated but I assume we are just
->> not completely modelling the PLIC. In saying that it should still
->> boot. Do you not see the kernel booting?
+On Thu, 08/02 20:50, John Arbuckle wrote:
+> Add an examples section to the help output.
+> 
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> ---
+>  qemu-img.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 1acddf693c..f77c82695d 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -199,6 +199,17 @@ static void QEMU_NORETURN help(void)
+>  
+>      printf("%s\nSupported formats:", help_msg);
+>      bdrv_iterate_format(format_print, NULL);
+> +
+> +    printf("\n\nExamples:\n\n"
+> +           "Create: qemu-img create -f qcow2 image.qcow2 10G\n\n"
+> +           "Info: qemu-img info image.qcow2\n\n"
+> +           "Resize: qemu-img resize image.qcow2 20G\n\n"
+> +           "Convert: qemu-img convert -f raw -O qcow2 image.img image.qcow2\n\n"
+> +           "Check: qemu-img check image.qcow2\n\n"
+> +           "Map: qemu-img map -f qcow2 --output=human image.qcow2\n\n"
+> +           "Rebase: qemu-img rebase -b new_backing_file.qcow2 image.qcow2"
+> +           );
 
-FWIW, I see similar looking messages on QEMU master but get a booting kernel.  
-Thanks to some of the WD guys our Linux port is rapidly approaching "bootable 
-on master", so we should start pushing on the QEMU patch queue a bit as well.
+The text looks good but maybe it's better to condense the section by using only
+one \n between command lines instead of two?
 
-Is there anything in particular I can do to help get patches reviewed?  Michael 
-has taken most of the burden here, but I'm trying to schedule much more time 
-for code review on my end (which I say while replying to a thread that's been 
-dead for a month... :)).
+Fam
+
+> +
+>      printf("\n\n" QEMU_HELP_BOTTOM "\n");
+>      exit(EXIT_SUCCESS);
+>  }
+> -- 
+> 2.14.3 (Apple Git-98)
+> 
+> 
