@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fldK2-000111-Mg
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 12:53:27 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fldYk-0005G8-IV
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 13:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fldJR-0002VQ-JK
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 12:53:02 -0400
-References: <20180803154955.25251-1-famz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4ac9be27-7775-1863-c34c-cdce85eab53e@redhat.com>
-Date: Fri, 3 Aug 2018 18:51:35 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fldYj-0006lh-Mb
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 13:08:14 -0400
+Date: Fri, 3 Aug 2018 18:08:04 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180803170804.GE2802@work-vm>
+References: <20180803163646.31068-1-peter.maydell@linaro.org>
+	<20180803163646.31068-3-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180803154955.25251-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] async: Fix aio_notify_accept
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180803163646.31068-3-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 2/3] hw/intc/arm_gicv3_common: Combine
+ duplicate .subsections in vmstate_gicv3_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Juan Quintela <quintela@redhat.com>
 
-On 03/08/2018 17:49, Fam Zheng wrote:
->  void aio_notify_accept(AioContext *ctx)
->  {
-> -    if (atomic_xchg(&ctx->notified, false)) {
-> +    /* If ctx->notify_me >=3D 2, another aio_poll() is waiting which m=
-ay need the
-> +     * ctx->notifier event to wake up, so don't already clear it just =
-because "we" are
-> +     * done iterating. */
-> +    if (atomic_read(&ctx->notify_me) < 2
-> +        && atomic_xchg(&ctx->notified, false)) {
->          event_notifier_test_and_clear(&ctx->notifier);
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> Commit 6692aac411199064 accidentally introduced a second initialization
+> of the .subsections field of vmstate_gicv3_cpu, instead of adding
+> the new subsection to the existing list. The effect of this was
+> probably that migration of GICv3 with virtualization enabled was
+> broken (or alternatively that migration of ICC_SRE_EL1 was broken,
+> depending on which of the two initializers the compiler used).
+> Combine the two into a single list.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+> Not strictly a 2.12 regression.
+> ---
+>  hw/intc/arm_gicv3_common.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+> index e58bc8b8105..e1a8999cf5b 100644
+> --- a/hw/intc/arm_gicv3_common.c
+> +++ b/hw/intc/arm_gicv3_common.c
+> @@ -134,9 +134,6 @@ static const VMStateDescription vmstate_gicv3_cpu = {
+>      },
+>      .subsections = (const VMStateDescription * []) {
+>          &vmstate_gicv3_cpu_virt,
+> -        NULL
+> -    },
+> -    .subsections = (const VMStateDescription * []) {
+>          &vmstate_gicv3_cpu_sre_el1,
+>          NULL
 >      }
->  }
-
-I'm worried that this would this cause a busy wait, and I don't
-understand the issue.
-
-When aio_poll()s are nested, outer calls are in the "dispatch" phase and
-therefore do not need notification.
-
-In your situation is notify_me actually ever >2?
-
-Paolo
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
