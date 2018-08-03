@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1flWM8-0003E3-3A
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:26:44 -0400
+	(envelope-from <berto@igalia.com>) id 1flWNM-0003v2-8n
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:28:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1flWM7-0008HD-Ad
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:26:44 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:40198)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1flWM7-0008FL-3g
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:26:43 -0400
-Received: by mail-it0-x243.google.com with SMTP id h23-v6so7475606ita.5
-	for <qemu-devel@nongnu.org>; Fri, 03 Aug 2018 02:26:42 -0700 (PDT)
+	(envelope-from <berto@igalia.com>) id 1flWNH-0001pw-FP
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:28:00 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <8966138a-1663-fdcf-e49e-df7e9c802c3e@redhat.com>
+References: <20180724121753.5753-1-lbloch@janustech.com>
+	<20180724121753.5753-2-lbloch@janustech.com>
+	<8966138a-1663-fdcf-e49e-df7e9c802c3e@redhat.com>
+Date: Fri, 03 Aug 2018 11:27:48 +0200
+Message-ID: <w51in4rlrzf.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_mVGSicjN=wwJY8OCJ-j=DtdLjDvM9U-dC3dQ=RQQXMQ@mail.gmail.com>
-References: <20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
-	<CAHmQWvCKkzim+-Z4Y69fWg6igZ7V6gaWhjKJZ0m0G0dhbwOFyw@mail.gmail.com>
-	<20180725112621.imdzdkntpmh3n5og@kamzik.brq.redhat.com>
-	<CAHmQWvCfHFSU7RGKG5t6=m7ZSWZjf3TeqOo3cX2KT-GSiN3mPw@mail.gmail.com>
-	<20180726102855.x6ffdoqjpejpyae7@kamzik.brq.redhat.com>
-	<CAKv+Gu-ffZRNmACH6YieNsg=AHxJxYoXHsBGf6C=nOvFfTu7Sg@mail.gmail.com>
-	<20180726111109.w24jk6ehklimige7@kamzik.brq.redhat.com>
-	<CAKv+Gu80KfwZft4t1HtOXPuijuPLV80K9iW+BsTgs7WcnosMXA@mail.gmail.com>
-	<20180726114158.am7kgc3jekxg55i5@kamzik.brq.redhat.com>
-	<CAFEAcA8YH4p__zT1o0s3vNZOsyWZn3XPLgkNeT+jSJpmjvFTUw@mail.gmail.com>
-	<20180726123509.qyadwbz4skwashcj@kamzik.brq.redhat.com>
-	<CAFEAcA-Zv5xV2VwMCfGXUv8oT+gC_dgn8Q3M1v3FBjry7TbXVA@mail.gmail.com>
-	<CAHmQWvB1zgaLi++BhGEs1Emb0-5HOrzCcPrHJDoxx-8Be9df1g@mail.gmail.com>
-	<CAFEAcA_mVGSicjN=wwJY8OCJ-j=DtdLjDvM9U-dC3dQ=RQQXMQ@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Fri, 3 Aug 2018 11:26:41 +0200
-Message-ID: <CAKv+Gu8sCjfL=uKy4nM6pcRneUzw2YG79CuOVBH3TeNOXf689A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/4] qcow2: Introduce an option for
+ sufficient L2 cache for the entire image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,31 +24,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, Andrew Jones <drjones@redhat.com>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Eric Blake <eblake@redhat.com>, Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 3 August 2018 at 11:23, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 3 August 2018 at 10:21, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
->> The 'sbsa' machine won't consume QEMU generated ACPI, so it won't
->> touch or add new ACPI tables.
->>
->> UEFI relies on its ACPI to load OS, but currently it still needs DT
->> from QEMU to pass some info, one example is CPU number.
->>
->> So, the 'sbsa' code implementation should be like this:
->> A separate file, no ACPI codes, a little necessary DT codes.
->>
->> "Necessary DT codes" doesn't include so many peripheral devices nodes,
->> so the code overlap with virt won't be so much (contrary to sbsa.c
->> with all the DT codes), then no need to separate the common part to a
->> third file, and virt.c can be untouched or only a minor change with
->> few lines.
+On Tue 24 Jul 2018 04:52:17 PM CEST, Eric Blake wrote:
+>>   @item refcount-cache-size
+>>   The maximum size of the refcount block cache in bytes
+>>   (default: 1/5 of the total cache size)
 >
-> Would the real hardware you are trying to be an example
-> for use DT for this? It seems a bit unlikely to me.
->
+> Alberto, looks like we missed this documentation in your changes to
+> the defaults.
 
-Yes, as a matter of fact. There is work underway both on the EDK2 and
-the ARM-TF side to rely less on static descriptions, and more on DT to
-instantiate drivers and ACPI tables at runtime rather than at build
-time.
+Oh, indeed!
+
+Berto
