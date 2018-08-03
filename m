@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1flVmG-0006lN-Hy
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 04:49:41 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1flVp8-0007w1-AY
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 04:52:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1flVmF-0007vi-GM
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 04:49:40 -0400
-Date: Fri, 3 Aug 2018 09:49:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180803084921.GC2802@work-vm>
-References: <20180801174005.GD2691@work-vm>
-	<cbdecba1-925c-5f6e-bf3c-a27cc4d944da@openvz.org>
-	<20180801185515.GE2691@work-vm>
-	<6bfdc952-fb17-feae-f367-be710853d829@openvz.org>
-	<20180802092907.GA2523@work-vm>
-	<202065a2-f9d1-ce31-b12b-437d57095ac1@openvz.org>
-	<20180802095056.GB2523@work-vm>
-	<86304a35-efd8-a605-f684-2bd3fb3b9815@openvz.org>
-	<20180803083343.GB2802@work-vm>
-	<2bf76f54-0ab2-3928-540d-df6da86b956f@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2bf76f54-0ab2-3928-540d-df6da86b956f@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
- loading and migration logic
+	(envelope-from <pm215@archaic.org.uk>) id 1flVp7-0003X8-Gu
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 04:52:38 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43986)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1flVp7-0003Tb-8i
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 04:52:37 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  3 Aug 2018 09:52:26 +0100
+Message-Id: <20180803085230.30574-2-peter.maydell@linaro.org>
+In-Reply-To: <20180803085230.30574-1-peter.maydell@linaro.org>
+References: <20180803085230.30574-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/5] tests/vm: Use -cpu max rather than -cpu
+ host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: "Denis V. Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> 03.08.2018 11:33, Dr. David Alan Gilbert wrote:
-> > * Denis V. Lunev (den@openvz.org) wrote:
-> > > On 08/02/2018 12:50 PM, Dr. David Alan Gilbert wrote:
-> > > > * Denis V. Lunev (den@openvz.org) wrote:
-> > > > 
-> > > > 
-> > > > > > I don't quite understand the last two paragraphs.
-> > > > > we are thinking right now to eliminate delay on regular IO
-> > > > > for migration. There is some thoughts and internal work in
-> > > > > progress. That is why I am worrying.
-> > > > What downtime are you typicaly seeing and what are you aiming for?
-> > > > 
-> > > > It would be good if you could explain what you're planning to
-> > > > fix there so we can get a feel for it nearer the start of it
-> > > > rather than at the end of the reviewing!
-> > > > 
-> > > > Dave
-> > > The ultimate goal is to reliable reach 100 ms with ongoing IO and
-> > > you are perfectly correct about reviewing :)
-> > That would be neat.
-> > 
-> > > Though the problem is that right now we are just trying to
-> > > invent something suitable :(
-> > OK, some brain-storm level ideas:
-> > 
-> >    a) Throttle the write bandwidth at later stages of migration
-> >       (I think that's been suggested before)
-> >    b) Switch to some active-sync like behaviour where the writes
-> >       are sent over the network as they happen to the destination
-> >       (mreitz has some prototype code for that type of behaviour
-> >       for postcopy)
-> >    c) Write the writes into a buffer that gets migrated over the
-> >      migration stream to get committed on the destination side.
-> > 
-> > As I say, brainstorm level ideas only!
-> > 
-> > Dave
-> 
-> Do you say about bitmaps migration? With current approach (postcopy) there
-> should not be problems with downtime, as data can be sent after target vm
-> start
+Currently attempting to run the vm-build-* tests on a system
+where the user does not have access to KVM will fail, because
+although they avoid using -enable-kvm, they use "-cpu host",
+which only works with KVM. Switch to "-cpu max" instead, which
+works with any accelerator.
 
-The ideas above were meant to suggest ways to reduce the downtime due to
-*write data* not bitmaps.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ tests/vm/basevm.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Dave
-
-> > 
-> > > Den
-> > > 
-> > > > > > However, coming back to my question; it was really saying that
-> > > > > > normal guest IO during the end of the migration will cause
-> > > > > > a delay; I'm expecting that to be fairly unrelated to the size
-> > > > > > of the disk; more to do with workload; so I guess in your case
-> > > > > > the worry is the case of big large disks giving big large
-> > > > > > bitmaps.
-> > > > > exactly!
-> > > > > 
-> > > > > Den
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
-> 
-> -- 
-> Best regards,
-> Vladimir
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 36431178161..ae9ab128c7b 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -65,7 +65,7 @@ class BaseVM(object):
+             self._stdout = self._devnull
+         self._args = [ \
+             "-nodefaults", "-m", "2G",
+-            "-cpu", "host",
++            "-cpu", "max",
+             "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22",
+             "-device", "virtio-net-pci,netdev=vnet",
+             "-vnc", "127.0.0.1:0,to=20",
+-- 
+2.17.1
