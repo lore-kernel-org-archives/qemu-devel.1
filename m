@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1flT6Z-0003HX-OK
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 01:58:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1flTLk-0007h9-TU
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 02:14:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1flT6W-00052X-Mx
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 01:58:27 -0400
-References: <20180801131905.148778-3-frankja@linux.ibm.com>
-	<20180802070201.257406-1-frankja@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ba21a203-d95b-b42d-3be2-38878df2ccb6@redhat.com>
-Date: Fri, 3 Aug 2018 07:58:21 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1flTLf-0002GA-UP
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 02:14:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43298 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1flTLf-0002FK-Nl
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 02:14:03 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 67A7C40216F4
+	for <qemu-devel@nongnu.org>; Fri,  3 Aug 2018 06:14:00 +0000 (UTC)
+References: <20180803024217.GC16395@lemon.usersys.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2b1415a5-9553-386b-6cb5-8da000ac71da@redhat.com>
+Date: Fri, 3 Aug 2018 08:13:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180802070201.257406-1-frankja@linux.ibm.com>
+In-Reply-To: <20180803024217.GC16395@lemon.usersys.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v5] s390x: Enable KVM huge
- page backing support
+Subject: Re: [Qemu-devel] Node deletion in aio_set_fd_handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,99 +33,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 08/02/2018 09:02 AM, Janosch Frank wrote:
-> QEMU has had huge page support for a longer time already, but KVM
-> memory management under s390x needed some changes to work with huge
-> backings.
+On 03/08/2018 04:42, Fam Zheng wrote:
+> Paolo, is this else branch dead code (or bug?):
 > 
-> Now that we have support, let's enable it if requested and
-> available. Otherwise we now properly tell the user if there is no
-> support and back out instead of failing to run the VM later on.
+>         /* If the lock is held, just mark the node as deleted */
+>         if (qemu_lockcnt_count(&ctx->list_lock)) {
+>             node->deleted = 1;
+>             node->pfd.revents = 0;
+>         } else {
+>             /* Otherwise, delete it for real.  We can't just mark it as
+>              * deleted because deleted nodes are only cleaned up while
+>              * no one is walking the handlers list.
+>              */
+>             QLIST_REMOVE(node, node);
+>             deleted = true;
+>         }
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> ---
-> 
-> Now featuring all of the required braces.
-> 
-> ---
->  target/s390x/kvm.c | 35 +++++++++++++++++++++++++++++++++--
->  1 file changed, 33 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index d923cf4240..8ba948c324 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -34,6 +34,8 @@
->  #include "qapi/error.h"
->  #include "qemu/error-report.h"
->  #include "qemu/timer.h"
-> +#include "qemu/units.h"
-> +#include "qemu/mmap-alloc.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/hw_accel.h"
->  #include "hw/hw.h"
-> @@ -139,6 +141,7 @@ static int cap_mem_op;
->  static int cap_s390_irq;
->  static int cap_ri;
->  static int cap_gs;
-> +static int cap_hpage_1m;
->  
->  static int active_cmma;
->  
-> @@ -220,9 +223,9 @@ static void kvm_s390_enable_cmma(void)
->          .attr = KVM_S390_VM_MEM_ENABLE_CMMA,
->      };
->  
-> -    if (mem_path) {
-> +    if (cap_hpage_1m) {
->          warn_report("CMM will not be enabled because it is not "
-> -                    "compatible with hugetlbfs.");
-> +                    "compatible with huge memory backings.");
->          return;
->      }
->      rc = kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
-> @@ -281,10 +284,38 @@ void kvm_s390_crypto_reset(void)
->      }
->  }
->  
-> +static int kvm_s390_configure_mempath_backing(KVMState *s)
-> +{
-> +    size_t path_psize = qemu_mempath_getpagesize(mem_path);
-> +
-> +    if (path_psize == 4 * KiB) {
-> +        return 0;
-> +    }
-> +
-> +    if (path_psize != 1 * MiB) {
-> +        error_report("Memory backing with 2G pages was specified, "
-> +                     "but KVM does not support this memory backing");
-> +        return -EINVAL;
-> +    }
-> +
-> +    if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
-> +        error_report("Memory backing with 1M pages was specified, "
-> +                     "but KVM does not support this memory backing");
-> +        return -EINVAL;
-> +    }
-> +
-> +    cap_hpage_1m = 1;
-> +    return 0;
-> +}
-> +
->  int kvm_arch_init(MachineState *ms, KVMState *s)
->  {
->      MachineClass *mc = MACHINE_GET_CLASS(ms);
->  
-> +    if (mem_path && kvm_s390_configure_mempath_backing(s)) {
-> +        return -EINVAL;
-> +    }
-> +
->      mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
->      cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
->      cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+> Since we are in a qemu_lockcnt_lock/unlock section?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+No, qemu_lockcnt_count returns the number of nested qemu_lockcnt_inc/dec
+(read-side) sections.  lock/unlock is for the write side.
+
+The comment should be improved (e.g. "if a read is in progress, just
+mark the node as deleted").
+
+Paolo
