@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1flZtJ-0007je-OW
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 09:13:14 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1flaB5-0004lB-S2
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 09:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1flZtF-0004L8-D1
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 09:13:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58358 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1flZtF-0004KK-7e
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 09:13:09 -0400
-Date: Fri, 3 Aug 2018 15:13:05 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180803131305.rshrvokhexqpwu5y@kamzik.brq.redhat.com>
-References: <20180720153942.26821-1-andre.przywara@arm.com>
-	<20180720153942.26821-5-andre.przywara@arm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1flaB5-0007dH-6Y
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 09:31:35 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:46361)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1flaB5-0007cw-0Y
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 09:31:35 -0400
+Received: by mail-oi0-x242.google.com with SMTP id y207-v6so9741803oie.13
+	for <qemu-devel@nongnu.org>; Fri, 03 Aug 2018 06:31:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180720153942.26821-5-andre.przywara@arm.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v2 4/4] arm/arm64: GICv2:
- add GICD_ITARGETSR testing
+In-Reply-To: <20180801123111.3595-1-richard.henderson@linaro.org>
+References: <20180801123111.3595-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Aug 2018 14:31:13 +0100
+Message-ID: <CAFEAcA8nYGquX_AT6i8ZMKfYnP=TuSGfhA6q6btgbPkUUW9NDw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm sve fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Laurent Desnogues <laurent.desnogues@gmail.com>
 
-On Fri, Jul 20, 2018 at 04:39:42PM +0100, Andre Przywara wrote:
-> Some tests for the ITARGETS registers.
-> Bits corresponding to non-existent CPUs must be RAZ/WI.
-> These registers must be byte-accessible, also check that accesses beyond
-> the implemented IRQ limit are actually read-as-zero/write-ignore.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  arm/gic.c         | 43 +++++++++++++++++++++++++++++++++++++++++++
->  lib/arm/asm/gic.h |  1 +
->  2 files changed, 44 insertions(+)
+On 1 August 2018 at 13:31, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> These four patches are minor, reported by Laurent this week.
 >
+> If there happens to be an -rc4 release, it would be nice if
+> they were included.  But if not, no biggie.  I suspect that
+> other minor issues will be found past these four, so I would
+> hope everyone who cares about sve is just as happy working
+> from a branch anyway.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Applied to target-arm.for-3.1, thanks.
+
+(I currently expect there will be an -rc4, but I only
+want to put in fixes for regressions from 2.12.)
+
+-- PMM
