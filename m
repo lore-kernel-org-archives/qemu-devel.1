@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fldbZ-00076T-Ty
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 13:11:11 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fldtZ-0003CI-PP
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 13:29:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fldbV-0000oB-Qc
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 13:11:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46990 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fldbV-0000nT-LB
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 13:11:05 -0400
-References: <20180730220831.390182-1-eblake@redhat.com>
-	<874lgbih3r.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0786b49a-6adf-0986-8970-135d27bc344a@redhat.com>
-Date: Fri, 3 Aug 2018 12:11:03 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1fldtZ-0005pj-0f
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 13:29:45 -0400
+Date: Fri, 3 Aug 2018 18:29:36 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180803172936.GF2802@work-vm>
+References: <20180803163646.31068-1-peter.maydell@linaro.org>
+	<20180803163646.31068-2-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <874lgbih3r.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 for-3.0] tests/libqtest: Improve
- kill_qemu()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180803163646.31068-2-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 1/3] hw/intc/arm_gicv3_common: Give
+ no-migration-shift-bug subsection a needed function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, thuth@redhat.com, mst@redhat.com, f4bug@amsat.org, alex.bennee@linaro.org, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Juan Quintela <quintela@redhat.com>
 
-On 08/03/2018 10:51 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> Currently the migration code incorrectly treats a subsection with
+> no .needed function pointer as if it was the subsection list
+> terminator -- it is ignored and so is everything after it.
+> Work around this by giving vmstate_gicv3_gicd_no_migration_shift_bug
+> a 'needed' function that always returns true.
 > 
->> In kill_qemu() we have an assert that checks that the QEMU process
->> didn't dump core:
->>              assert(!WCOREDUMP(wstatus));
->>
->> Unfortunately the WCOREDUMP macro here means the resulting message
->> is not very easy to comprehend on at least some systems:
->>
->> ahci-test: tests/libqtest.c:113: kill_qemu: Assertion `!(((__extension__ (((union { __typeof(wstatus) __in; int __i; }) { .__in = (wstatus) }).__i))) & 0x80)' failed.
->>
->> and it doesn't identify what signal the process took.
->>
->> -        if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
->> -            assert(!WCOREDUMP(wstatus));
->> +        assert(pid == s->qemu_pid);
->> +        /*
->> +         * We expect qemu to exit with status 0; anything else is
->> +         * fishy and should be logged.  Abort except when death by
->> +         * signal is not accompanied by a coredump (as that's the only
->> +         * time it was likely that the user is trying to kill the
->> +         * testsuite early).
->> +         */
->> +        if (wstatus) {
->> +            die = true;
->> +            if (WIFEXITED(wstatus)) {
->> +                fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
->> +                        "process but encountered exit status %d\n",
->> +                        __FILE__, __LINE__, WEXITSTATUS(wstatus));
->> +            } else if (WIFSIGNALED(wstatus)) {
->> +                int sig = WTERMSIG(wstatus);
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-> 
-> In review of v2, we found that WCOREDUMP() depends on the user's
-> environment.  I doubt we should use it this way.
-> 
-> Why is suppressing the abort() when "the user is trying to kill the
-> testsuite early" important?
-> 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Only because the old code was special-casing based on whether WCOREDUMP. 
-I'm not particularly attached to it, and am just fine submitting a v4 
-that just quits on ALL death-by-signal, rather than caring whether a 
-core dump was present.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> ---
+> This should go into 3.0 to avoid awkward migration compat problems:
+> the no-migration-shift-bug subsection is new in 3.0.
+> ---
+>  hw/intc/arm_gicv3_common.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+> index ff326b374ad..e58bc8b8105 100644
+> --- a/hw/intc/arm_gicv3_common.c
+> +++ b/hw/intc/arm_gicv3_common.c
+> @@ -203,10 +203,16 @@ static int gicv3_gicd_no_migration_shift_bug_post_load(void *opaque,
+>      return 0;
+>  }
+>  
+> +static bool needed_always(void *opaque)
+> +{
+> +    return true;
+> +}
+> +
+>  const VMStateDescription vmstate_gicv3_gicd_no_migration_shift_bug = {
+>      .name = "arm_gicv3/gicd_no_migration_shift_bug",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+> +    .needed = needed_always,
+>      .pre_load = gicv3_gicd_no_migration_shift_bug_pre_load,
+>      .post_load = gicv3_gicd_no_migration_shift_bug_post_load,
+>      .fields = (VMStateField[]) {
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
