@@ -1,13 +1,10 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1flVX2-000209-HZ
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 04:33:57 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1flVhL-0004d6-Sm
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 04:44:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1flVX1-0007Qa-L3
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 04:33:56 -0400
-Date: Fri, 3 Aug 2018 09:33:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180803083343.GB2802@work-vm>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1flVhK-00087c-RQ
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 04:44:35 -0400
 References: <20180801102031.GC2691@work-vm>
 	<64aad02b-3d5c-70d6-0f5a-93dd5b88e4bc@redhat.com>
 	<20180801174005.GD2691@work-vm>
@@ -18,10 +15,15 @@ References: <20180801102031.GC2691@work-vm>
 	<202065a2-f9d1-ce31-b12b-437d57095ac1@openvz.org>
 	<20180802095056.GB2523@work-vm>
 	<86304a35-efd8-a605-f684-2bd3fb3b9815@openvz.org>
+	<20180803083343.GB2802@work-vm>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2bf76f54-0ab2-3928-540d-df6da86b956f@virtuozzo.com>
+Date: Fri, 3 Aug 2018 11:44:22 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86304a35-efd8-a605-f684-2bd3fb3b9815@openvz.org>
+In-Reply-To: <20180803083343.GB2802@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Subject: Re: [Qemu-devel] [PATCH 4/6] dirty-bitmaps: clean-up bitmaps
  loading and migration logic
 List-Id: <qemu-devel.nongnu.org>
@@ -32,62 +34,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Eric Blake <eblake@redhat.com>
 
-* Denis V. Lunev (den@openvz.org) wrote:
-> On 08/02/2018 12:50 PM, Dr. David Alan Gilbert wrote:
-> > * Denis V. Lunev (den@openvz.org) wrote:
-> >
-> >
-> >>> I don't quite understand the last two paragraphs.
-> >> we are thinking right now to eliminate delay on regular IO
-> >> for migration. There is some thoughts and internal work in
-> >> progress. That is why I am worrying.
-> > What downtime are you typicaly seeing and what are you aiming for?
-> >
-> > It would be good if you could explain what you're planning to
-> > fix there so we can get a feel for it nearer the start of it
-> > rather than at the end of the reviewing!
-> >
-> > Dave
-> The ultimate goal is to reliable reach 100 ms with ongoing IO and
-> you are perfectly correct about reviewing :)
+03.08.2018 11:33, Dr. David Alan Gilbert wrote:
+> * Denis V. Lunev (den@openvz.org) wrote:
+>> On 08/02/2018 12:50 PM, Dr. David Alan Gilbert wrote:
+>>> * Denis V. Lunev (den@openvz.org) wrote:
+>>>
+>>>
+>>>>> I don't quite understand the last two paragraphs.
+>>>> we are thinking right now to eliminate delay on regular IO
+>>>> for migration. There is some thoughts and internal work in
+>>>> progress. That is why I am worrying.
+>>> What downtime are you typicaly seeing and what are you aiming for?
+>>>
+>>> It would be good if you could explain what you're planning to
+>>> fix there so we can get a feel for it nearer the start of it
+>>> rather than at the end of the reviewing!
+>>>
+>>> Dave
+>> The ultimate goal is to reliable reach 100 ms with ongoing IO and
+>> you are perfectly correct about reviewing :)
+> That would be neat.
+>
+>> Though the problem is that right now we are just trying to
+>> invent something suitable :(
+> OK, some brain-storm level ideas:
+>
+>    a) Throttle the write bandwidth at later stages of migration
+>       (I think that's been suggested before)
+>    b) Switch to some active-sync like behaviour where the writes
+>       are sent over the network as they happen to the destination
+>       (mreitz has some prototype code for that type of behaviour
+>       for postcopy)
+>    c) Write the writes into a buffer that gets migrated over the
+>      migration stream to get committed on the destination side.
+>
+> As I say, brainstorm level ideas only!
+>
+> Dave
 
-That would be neat.
+Do you say about bitmaps migration? With current approach (postcopy) 
+there should not be problems with downtime, as data can be sent after 
+target vm start
 
-> Though the problem is that right now we are just trying to
-> invent something suitable :(
+>
+>> Den
+>>
+>>>>> However, coming back to my question; it was really saying that
+>>>>> normal guest IO during the end of the migration will cause
+>>>>> a delay; I'm expecting that to be fairly unrelated to the size
+>>>>> of the disk; more to do with workload; so I guess in your case
+>>>>> the worry is the case of big large disks giving big large
+>>>>> bitmaps.
+>>>> exactly!
+>>>>
+>>>> Den
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-OK, some brain-storm level ideas:
 
-  a) Throttle the write bandwidth at later stages of migration
-     (I think that's been suggested before)
-  b) Switch to some active-sync like behaviour where the writes
-     are sent over the network as they happen to the destination
-     (mreitz has some prototype code for that type of behaviour
-     for postcopy)
-  c) Write the writes into a buffer that gets migrated over the
-    migration stream to get committed on the destination side.
-
-As I say, brainstorm level ideas only!
-
-Dave
-
-
-> Den
-> 
-> >>> However, coming back to my question; it was really saying that
-> >>> normal guest IO during the end of the migration will cause
-> >>> a delay; I'm expecting that to be fairly unrelated to the size
-> >>> of the disk; more to do with workload; so I guess in your case
-> >>> the worry is the case of big large disks giving big large
-> >>> bitmaps.
-> >> exactly!
-> >>
-> >> Den
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Best regards,
+Vladimir
