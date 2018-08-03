@@ -1,24 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1flWA5-0001Yd-R2
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:14:21 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1flWH4-0007nG-3n
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:21:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1flWA4-0001lZ-Ne
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:14:17 -0400
-Received: from mail-pl0-x231.google.com ([2607:f8b0:400e:c01::231]:45562)
+	(envelope-from <hongbo.zhang@linaro.org>) id 1flWH3-00077Y-78
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:21:30 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:34406)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1flWA4-0001jy-Gu
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:14:16 -0400
-Received: by mail-pl0-x231.google.com with SMTP id j8-v6so2292912pll.12
-	for <qemu-devel@nongnu.org>; Fri, 03 Aug 2018 02:14:16 -0700 (PDT)
-From: Lidong Chen <jemmy858585@gmail.com>
-Date: Fri,  3 Aug 2018 17:13:48 +0800
-Message-Id: <1533287630-4221-11-git-send-email-lidongchen@tencent.com>
-In-Reply-To: <1533287630-4221-1-git-send-email-lidongchen@tencent.com>
-References: <1533287630-4221-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v6 10/12] migration: poll the cm event for
- destination qemu
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1flWH2-00076E-V2
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 05:21:29 -0400
+Received: by mail-it0-x243.google.com with SMTP id d70-v6so5037640ith.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Aug 2018 02:21:28 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-Zv5xV2VwMCfGXUv8oT+gC_dgn8Q3M1v3FBjry7TbXVA@mail.gmail.com>
+References: <20180725095426.f7kv4ftngeje6pkx@kamzik.brq.redhat.com>
+	<CAHmQWvCKkzim+-Z4Y69fWg6igZ7V6gaWhjKJZ0m0G0dhbwOFyw@mail.gmail.com>
+	<20180725112621.imdzdkntpmh3n5og@kamzik.brq.redhat.com>
+	<CAHmQWvCfHFSU7RGKG5t6=m7ZSWZjf3TeqOo3cX2KT-GSiN3mPw@mail.gmail.com>
+	<20180726102855.x6ffdoqjpejpyae7@kamzik.brq.redhat.com>
+	<CAKv+Gu-ffZRNmACH6YieNsg=AHxJxYoXHsBGf6C=nOvFfTu7Sg@mail.gmail.com>
+	<20180726111109.w24jk6ehklimige7@kamzik.brq.redhat.com>
+	<CAKv+Gu80KfwZft4t1HtOXPuijuPLV80K9iW+BsTgs7WcnosMXA@mail.gmail.com>
+	<20180726114158.am7kgc3jekxg55i5@kamzik.brq.redhat.com>
+	<CAFEAcA8YH4p__zT1o0s3vNZOsyWZn3XPLgkNeT+jSJpmjvFTUw@mail.gmail.com>
+	<20180726123509.qyadwbz4skwashcj@kamzik.brq.redhat.com>
+	<CAFEAcA-Zv5xV2VwMCfGXUv8oT+gC_dgn8Q3M1v3FBjry7TbXVA@mail.gmail.com>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Fri, 3 Aug 2018 17:21:27 +0800
+Message-ID: <CAHmQWvB1zgaLi++BhGEs1Emb0-5HOrzCcPrHJDoxx-8Be9df1g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +40,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhang.zhanghailiang@huawei.com, quintela@redhat.com, dgilbert@redhat.com
-Cc: qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jones <drjones@redhat.com>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-The destination qemu only poll the comp_channel->fd in
-qemu_rdma_wait_comp_channel. But when source qemu disconnnect
-the rdma connection, the destination qemu should be notified.
+On 26 July 2018 at 20:43, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 26 July 2018 at 13:35, Andrew Jones <drjones@redhat.com> wrote:
+>> On Thu, Jul 26, 2018 at 01:10:34PM +0100, Peter Maydell wrote:
+>>> On 26 July 2018 at 12:41, Andrew Jones <drjones@redhat.com> wrote:
+>>> > The patch guards the generation. It'll only modify DT and ACPI for the
+>>> > new machine type. But, while modifying the DT makes sense, as that
+>>> > generated DT will get consumed
+>>>
+>>> ...will it? Why would we want the firmware to read the
+>>> QEMU-generated DT? Real hardware doesn't work that way.
+>>>
+>>
+>> Good point. If the plan for this reference software is to always
+>> prepare its own DTB and ACPI tables, then this patch shouldn't
+>> touch the DT generation either. Of course a lot of the device
+>> and fdt node creation is intertwined in mach-virt, so it's going
+>> to create a DTB anyway.
+>
+> I haven't yet looked at this patch so I might change my mind
+> once I've had time to look at the code, but my initial
+> thought is to prefer it to be in its own file rather than
+> trying to share code with the virt board. There's a lot
+> of stuff 'virt' needs that this doesn't (DT generation,
+> ACPI generation, switches to disable virtualization or
+> trustzone support, options to select GICv2, etc etc).
+>
+The 'sbsa' machine won't consume QEMU generated ACPI, so it won't
+touch or add new ACPI tables.
 
-Signed-off-by: Lidong Chen <lidongchen@tencent.com>
----
- migration/migration.c |  3 ++-
- migration/rdma.c      | 31 ++++++++++++++++++++++++++++++-
- 2 files changed, 32 insertions(+), 2 deletions(-)
+UEFI relies on its ACPI to load OS, but currently it still needs DT
+from QEMU to pass some info, one example is CPU number.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index f190964..360ee94 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -389,6 +389,7 @@ static void process_incoming_migration_co(void *opaque)
-     int ret;
- 
-     assert(mis->from_src_file);
-+    mis->migration_incoming_co = qemu_coroutine_self();
-     mis->largest_page_size = qemu_ram_pagesize_largest();
-     postcopy_state_set(POSTCOPY_INCOMING_NONE);
-     migrate_set_state(&mis->state, MIGRATION_STATUS_NONE,
-@@ -418,7 +419,6 @@ static void process_incoming_migration_co(void *opaque)
- 
-     /* we get COLO info, and know if we are in COLO mode */
-     if (!ret && migration_incoming_enable_colo()) {
--        mis->migration_incoming_co = qemu_coroutine_self();
-         qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
-              colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
-         mis->have_colo_incoming_thread = true;
-@@ -442,6 +442,7 @@ static void process_incoming_migration_co(void *opaque)
-     }
-     mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
-     qemu_bh_schedule(mis->bh);
-+    mis->migration_incoming_co = NULL;
- }
- 
- static void migration_incoming_setup(QEMUFile *f)
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 1affc46..62de2ec 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -3226,6 +3226,34 @@ err:
- 
- static void rdma_accept_incoming_migration(void *opaque);
- 
-+static void rdma_cm_poll_handler(void *opaque)
-+{
-+    RDMAContext *rdma = opaque;
-+    int ret;
-+    struct rdma_cm_event *cm_event;
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+
-+    ret = rdma_get_cm_event(rdma->channel, &cm_event);
-+    if (ret) {
-+        return;
-+    }
-+
-+    if (cm_event->event == RDMA_CM_EVENT_DISCONNECTED ||
-+        cm_event->event == RDMA_CM_EVENT_DEVICE_REMOVAL) {
-+        rdma_ack_cm_event(cm_event);
-+        error_report("receive cm event, cm event is %d", cm_event->event);
-+        rdma->error_state = -EPIPE;
-+        if (rdma->return_path) {
-+            rdma->return_path->error_state = -EPIPE;
-+        }
-+
-+        if (mis->migration_incoming_co) {
-+            qemu_coroutine_enter(mis->migration_incoming_co);
-+        }
-+        return;
-+    }
-+}
-+
- static int qemu_rdma_accept(RDMAContext *rdma)
- {
-     RDMACapabilities cap;
-@@ -3326,7 +3354,8 @@ static int qemu_rdma_accept(RDMAContext *rdma)
-                             NULL,
-                             (void *)(intptr_t)rdma->return_path);
-     } else {
--        qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-+        qemu_set_fd_handler(rdma->channel->fd, rdma_cm_poll_handler,
-+                            NULL, rdma);
-     }
- 
-     ret = rdma_accept(rdma->cm_id, &conn_param);
--- 
-1.8.3.1
+So, the 'sbsa' code implementation should be like this:
+A separate file, no ACPI codes, a little necessary DT codes.
+
+"Necessary DT codes" doesn't include so many peripheral devices nodes,
+so the code overlap with virt won't be so much (contrary to sbsa.c
+with all the DT codes), then no need to separate the common part to a
+third file, and virt.c can be untouched or only a minor change with
+few lines.
+
+Any comments please?
+
+> Q: is this new board model intended to be able to work
+> under KVM, or is that out of scope? (You wouldn't be able
+> to run guest EL3 firmware under KVM, certainly.)
+>
+> thanks
+> -- PMM
