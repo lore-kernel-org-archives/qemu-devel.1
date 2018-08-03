@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1flbMh-0002iY-Cq
+	(envelope-from <stefanha@redhat.com>) id 1flbMh-0002iZ-Cv
 	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 10:47:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1flbMe-0007fX-Oz
+	(envelope-from <stefanha@redhat.com>) id 1flbMe-0007f7-Ea
 	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 10:47:37 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  3 Aug 2018 15:47:18 +0100
-Message-Id: <20180803144721.17036-4-stefanha@redhat.com>
+Date: Fri,  3 Aug 2018 15:47:16 +0100
+Message-Id: <20180803144721.17036-2-stefanha@redhat.com>
 In-Reply-To: <20180803144721.17036-1-stefanha@redhat.com>
 References: <20180803144721.17036-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 3/6] loader: extract rom_free() function
+Subject: [Qemu-devel] [PATCH v4 1/6] hw/arm: make bitbanded IO optional on
+ ARMv7-M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,63 +23,158 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: jim@groklearning.com, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-arm@nongnu.org, jusual@mail.ru, Alistair Francis <alistair@alistair23.me>, mail@steffen-goertz.de, ilg@livius.net, Su Hang <suhang16@mails.ucas.ac.cn>, Steffen Gortz <qemu.ml@steffen-goertz.de>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The next patch will need to free a rom.  There is already code to do
-this in rom_add_file().
+Some ARM CPUs have bitbanded IO, a memory region that allows convenient
+bit access via 32-bit memory loads/stores.  This eliminates the need for
+read-modify-update instruction sequences.
 
-Note that rom_add_file() uses:
+This patch makes this optional feature an ARMv7MState qdev property,
+allowing boards to choose whether they want bitbanding or not.
 
-  rom = g_malloc0(sizeof(*rom));
-  ...
-  if (rom->fw_dir) {
-      g_free(rom->fw_dir);
-      g_free(rom->fw_file);
-  }
+Status of boards:
+ * iotkit (Cortex M33), no bitband
+ * mps2 (Cortex M3), bitband
+ * msf2 (Cortex M3), bitband
+ * stellaris (Cortex M3), bitband
+ * stm32f205 (Cortex M3), bitband
 
-The conditional is unnecessary since g_free(NULL) is a no-op.
+As a side-effect of this patch, Peter Maydell noted that the Ethernet
+controller on mps2 board is now accessible.  Previously they were hidden
+by the bitband region (which does not exist on the real board).
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/core/loader.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ include/hw/arm/armv7m.h |  2 ++
+ hw/arm/armv7m.c         | 37 ++++++++++++++++++++-----------------
+ hw/arm/mps2.c           |  1 +
+ hw/arm/msf2-soc.c       |  1 +
+ hw/arm/stellaris.c      |  1 +
+ hw/arm/stm32f205_soc.c  |  1 +
+ 6 files changed, 26 insertions(+), 17 deletions(-)
 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index bbb6e65bb5..0c72e7c05a 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -847,6 +847,17 @@ struct Rom {
- static FWCfgState *fw_cfg;
- static QTAILQ_HEAD(, Rom) roms = QTAILQ_HEAD_INITIALIZER(roms);
+diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
+index 78308d1484..2ba24953b6 100644
+--- a/include/hw/arm/armv7m.h
++++ b/include/hw/arm/armv7m.h
+@@ -43,6 +43,7 @@ typedef struct {
+  *   devices will be automatically layered on top of this view.)
+  * + Property "idau": IDAU interface (forwarded to CPU object)
+  * + Property "init-svtor": secure VTOR reset value (forwarded to CPU object)
++ * + Property "enable-bitband": expose bitbanded IO
+  */
+ typedef struct ARMv7MState {
+     /*< private >*/
+@@ -63,6 +64,7 @@ typedef struct ARMv7MState {
+     MemoryRegion *board_memory;
+     Object *idau;
+     uint32_t init_svtor;
++    bool enable_bitband;
+ } ARMv7MState;
  
-+/* rom->data must be heap-allocated (do not use with rom_add_elf_program()) */
-+static void rom_free(Rom *rom)
-+{
-+    g_free(rom->data);
-+    g_free(rom->path);
-+    g_free(rom->name);
-+    g_free(rom->fw_dir);
-+    g_free(rom->fw_file);
-+    g_free(rom);
-+}
-+
- static inline bool rom_order_compare(Rom *rom, Rom *item)
- {
-     return ((uintptr_t)(void *)rom->as > (uintptr_t)(void *)item->as) ||
-@@ -995,15 +1006,7 @@ err:
-     if (fd != -1)
-         close(fd);
+ #endif
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index 6b07666057..878613994d 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -211,25 +211,27 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+     memory_region_add_subregion(&s->container, 0xe000e000,
+                                 sysbus_mmio_get_region(sbd, 0));
  
--    g_free(rom->data);
--    g_free(rom->path);
--    g_free(rom->name);
--    if (fw_dir) {
--        g_free(rom->fw_dir);
--        g_free(rom->fw_file);
--    }
--    g_free(rom);
--
-+    rom_free(rom);
-     return -1;
+-    for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
+-        Object *obj = OBJECT(&s->bitband[i]);
+-        SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
++    if (s->enable_bitband) {
++        for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
++            Object *obj = OBJECT(&s->bitband[i]);
++            SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
+ 
+-        object_property_set_int(obj, bitband_input_addr[i], "base", &err);
+-        if (err != NULL) {
+-            error_propagate(errp, err);
+-            return;
+-        }
+-        object_property_set_link(obj, OBJECT(s->board_memory),
+-                                 "source-memory", &error_abort);
+-        object_property_set_bool(obj, true, "realized", &err);
+-        if (err != NULL) {
+-            error_propagate(errp, err);
+-            return;
+-        }
++            object_property_set_int(obj, bitband_input_addr[i], "base", &err);
++            if (err != NULL) {
++                error_propagate(errp, err);
++                return;
++            }
++            object_property_set_link(obj, OBJECT(s->board_memory),
++                                     "source-memory", &error_abort);
++            object_property_set_bool(obj, true, "realized", &err);
++            if (err != NULL) {
++                error_propagate(errp, err);
++                return;
++            }
+ 
+-        memory_region_add_subregion(&s->container, bitband_output_addr[i],
+-                                    sysbus_mmio_get_region(sbd, 0));
++            memory_region_add_subregion(&s->container, bitband_output_addr[i],
++                                        sysbus_mmio_get_region(sbd, 0));
++        }
+     }
  }
  
+@@ -239,6 +241,7 @@ static Property armv7m_properties[] = {
+                      MemoryRegion *),
+     DEFINE_PROP_LINK("idau", ARMv7MState, idau, TYPE_IDAU_INTERFACE, Object *),
+     DEFINE_PROP_UINT32("init-svtor", ARMv7MState, init_svtor, 0),
++    DEFINE_PROP_BOOL("enable-bitband", ARMv7MState, enable_bitband, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index c3946da317..0a0ae867d9 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -186,6 +186,7 @@ static void mps2_common_init(MachineState *machine)
+         g_assert_not_reached();
+     }
+     qdev_prop_set_string(armv7m, "cpu-type", machine->cpu_type);
++    qdev_prop_set_bit(armv7m, "enable-bitband", true);
+     object_property_set_link(OBJECT(&mms->armv7m), OBJECT(system_memory),
+                              "memory", &error_abort);
+     object_property_set_bool(OBJECT(&mms->armv7m), true, "realized",
+diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+index dbefade644..2702e90b45 100644
+--- a/hw/arm/msf2-soc.c
++++ b/hw/arm/msf2-soc.c
+@@ -117,6 +117,7 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
+     armv7m = DEVICE(&s->armv7m);
+     qdev_prop_set_uint32(armv7m, "num-irq", 81);
+     qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
++    qdev_prop_set_bit(armv7m, "enable-bitband", true);
+     object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+                                      "memory", &error_abort);
+     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+index dc521b4a5a..6c69ce79b2 100644
+--- a/hw/arm/stellaris.c
++++ b/hw/arm/stellaris.c
+@@ -1304,6 +1304,7 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
+     nvic = qdev_create(NULL, TYPE_ARMV7M);
+     qdev_prop_set_uint32(nvic, "num-irq", NUM_IRQ_LINES);
+     qdev_prop_set_string(nvic, "cpu-type", ms->cpu_type);
++    qdev_prop_set_bit(nvic, "enable-bitband", true);
+     object_property_set_link(OBJECT(nvic), OBJECT(get_system_memory()),
+                                      "memory", &error_abort);
+     /* This will exit with an error if the user passed us a bad cpu_type */
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index c486d06a8b..980e5af13c 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -109,6 +109,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+     armv7m = DEVICE(&s->armv7m);
+     qdev_prop_set_uint32(armv7m, "num-irq", 96);
+     qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
++    qdev_prop_set_bit(armv7m, "enable-bitband", true);
+     object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+                                      "memory", &error_abort);
+     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
 -- 
 2.17.1
