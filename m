@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1flXak-0005z4-2a
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 06:45:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1flXap-0005zj-5f
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 06:46:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1flXag-0005Ex-N7
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 06:45:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35834 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1flXag-0005ET-HV
-	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 06:45:50 -0400
-Date: Fri, 3 Aug 2018 18:45:46 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180803104546.GA21719@lemon.usersys.redhat.com>
-References: <20180803085230.30574-1-peter.maydell@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1flXao-0005Jc-7l
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 06:45:59 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:38145)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1flXan-0005JN-Vg
+	for qemu-devel@nongnu.org; Fri, 03 Aug 2018 06:45:58 -0400
+Received: by mail-oi0-x244.google.com with SMTP id v8-v6so9022207oie.5
+	for <qemu-devel@nongnu.org>; Fri, 03 Aug 2018 03:45:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180803085230.30574-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 0/5] tests/vm: various minor improvements
+In-Reply-To: <20180803083830.775669-1-mst@redhat.com>
+References: <20180803083830.775669-1-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Aug 2018 11:45:36 +0100
+Message-ID: <CAFEAcA9r4K9qgFFqvRKqTFMUowyAAEV=QZEnhk3eheQRodbnvA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] pc, virtio: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, patches@linaro.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, 08/03 09:52, Peter Maydell wrote:
-> The setup I had for my BSD VMs broke today, so I thought I'd
-> have a look at using the tests/vm/ support for building QEMU
-> inside BSD VMs rather than re-rolling my own. This patchset
-> fixes some rough edges I ran into along the way:
->  * fixes support for non-KVM accelerators
->  * propagates J=n setting into 'make check' in the VM
->  * propagates V=1 setting into 'make' and 'make check' in the VM
->  * uses --output-sync so that J=n settings don't mangle output
->  * bumps the RAM settings so J=n doesn't cause the guest to
->    run out of memory and kill the compiler
+On 3 August 2018 at 10:27, Michael S. Tsirkin <mst@redhat.com> wrote:
+> Please consider for 3.0 if there is another rc.
+>
+> The following changes since commit f7502360397d291be04bc040e9f96c92ff2d8030:
+>
+>   Update version for v3.0.0-rc3 release (2018-07-31 19:30:17 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 1c707d6990eaf3db0c9dc4557bba5458977e9f8d:
+>
+>   tests/acpi: update tables after memory hotplug changes (2018-08-03 11:35:21 +0300)
+>
+> ----------------------------------------------------------------
+> pc, virtio: fixes
+>
+> A couple of last minute fixes.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> ----------------------------------------------------------------
+> Dou Liyang (2):
+>       hw/acpi-build: Add a check for memory-less NUMA nodes
+>       tests/acpi-test: update ACPI tables test blobs
+>
+> Igor Mammedov (1):
+>       pc: acpi: fix memory hotplug regression by reducing stub SRAT entry size
+>
+> Michael S. Tsirkin (1):
+>       tests/acpi: update tables after memory hotplug changes
+>
+> Tiwei Bie (1):
+>       vhost: check region type before casting
 
-Queued for 3.1. Thanks!
+Can you clarify which of these are regressions from 2.12, please?
+At this point in the release cycle I only want to apply fixes
+for regressions. (Test only updates might also be OK, but I
+need more information than just the commit message subject line.)
 
-Fam
+thanks
+-- PMM
