@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1flv7B-0006qe-3t
-	for qemu-devel@nongnu.org; Sat, 04 Aug 2018 07:52:58 -0400
+	(envelope-from <lbloch@janustech.com>) id 1flv8N-0007SB-Nf
+	for qemu-devel@nongnu.org; Sat, 04 Aug 2018 07:54:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1flv7A-00027z-Du
-	for qemu-devel@nongnu.org; Sat, 04 Aug 2018 07:52:57 -0400
+	(envelope-from <lbloch@janustech.com>) id 1flv8M-00033n-Pi
+	for qemu-devel@nongnu.org; Sat, 04 Aug 2018 07:54:11 -0400
 References: <20180729212744.23709-1-lbloch@janustech.com>
-	<20180729212744.23709-4-lbloch@janustech.com>
-	<w51ftzvlmfc.fsf@maestria.local.igalia.com>
+	<20180729212744.23709-7-lbloch@janustech.com>
+	<w51a7q3liy6.fsf@maestria.local.igalia.com>
 From: Leonid Bloch <lbloch@janustech.com>
-Message-ID: <af4dc507-0bfe-b5a8-5d4d-7ade7c673656@janustech.com>
-Date: Sat, 4 Aug 2018 14:52:28 +0300
+Message-ID: <a6b39d5f-90d8-2b04-aa85-fc16cfad93a2@janustech.com>
+Date: Sat, 4 Aug 2018 14:53:48 +0300
 MIME-Version: 1.0
-In-Reply-To: <w51ftzvlmfc.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51a7q3liy6.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-GB-large
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/6 for-3.0] qcow2: Options'
- documentation fixes
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 6/6] qcow2: Resize the cache
+ upon image resizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +29,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 08/03/2018 02:27 PM, Alberto Garcia wrote:
-> On Sun 29 Jul 2018 11:27:41 PM CEST, Leonid Bloch wrote:
+On 08/03/2018 03:42 PM, Alberto Garcia wrote:
+> On Sun 29 Jul 2018 11:27:44 PM CEST, Leonid Bloch wrote:
+>> The caches are now recalculated upon image resizing. This is done
+>> because the new default behavior of assigning a sufficient L2 cache to
+>> cover the entire image implies that the cache will still be sufficient
+>> after image resizing. To put a limit on the cache, the options
+>> cache-size and l2-cache-size can be used.
+>>
 >> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
 >> ---
->>   docs/qcow2-cache.txt |  9 ++++++---
->>   qapi/block-core.json |  6 +++---
->>   qemu-options.hx      | 15 +++++++++------
->>   3 files changed, 18 insertions(+), 12 deletions(-)
+>>   block/qcow2.c | 6 ++++++
+>>   1 file changed, 6 insertions(+)
 >>
->> diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
->> index 8a09a5cc5f..fd9a6911cc 100644
->> --- a/docs/qcow2-cache.txt
->> +++ b/docs/qcow2-cache.txt
->> @@ -112,9 +112,9 @@ command-line, or the 'blockdev-add' QMP command.
+>> diff --git a/block/qcow2.c b/block/qcow2.c
+>> index 74f2cb10a4..06fac1bb8c 100644
+>> --- a/block/qcow2.c
+>> +++ b/block/qcow2.c
+>> @@ -3656,6 +3656,12 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+>>       }
 >>   
->>   There are three options available, and all of them take bytes:
->>   
->> -"l2-cache-size":         maximum size of the L2 table cache
->> -"refcount-cache-size":   maximum size of the refcount block cache
->> -"cache-size":            maximum size of both caches combined
->> +"l2-cache-size":         maximal size of the L2 table cache
->> +"refcount-cache-size":   maximal size of the refcount block cache
->> +"cache-size":            maximal size of both caches combined
+>>       s->l1_vm_state_index = new_l1_size;
+>> +    /* Update cache sizes */
+>> +    QDict *options = qdict_clone_shallow(bs->options);
+>> +    ret = qcow2_update_options(bs, options, s->flags, errp);
+>> +    if (ret < 0) {
+>> +        goto fail;
+>> +    }
 > 
-> Why is 'maximum' not clear in this context?
+> Perhaps this could be merged with the "Update total_sectors when
+> resizing" patch. When you put both changes together it is quite clear
+> why you need to update bs->total_sectors, and doing it is only necessary
+> if you want to do this afterwards.
 
-It seemed to me that it is grammatically incorrect, because maximum is a 
-noun and maximal is an adjective. But after a quick check now I see that 
-maximum can be used as an adjective as well, so indeed this change is 
-not needed. Will update in the next version.
+Indeed. I agree.
 
-Thanks,
 Leonid.
 
-> 
-> Otherwise the patch looks good to me.
 > 
 > Berto
 > 
