@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fm0Z8-00071T-S3
-	for qemu-devel@nongnu.org; Sat, 04 Aug 2018 13:42:11 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fmHDk-00067R-3n
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 07:29:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fm0Z4-0005FE-VM
-	for qemu-devel@nongnu.org; Sat, 04 Aug 2018 13:42:10 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:37650)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fm0Z4-0005EM-MX
-	for qemu-devel@nongnu.org; Sat, 04 Aug 2018 13:42:06 -0400
-Received: by mail-pl0-x241.google.com with SMTP id d5-v6so3920805pll.4
-	for <qemu-devel@nongnu.org>; Sat, 04 Aug 2018 10:42:06 -0700 (PDT)
-References: <20180802155147.1863-1-peter.maydell@linaro.org>
-	<20180802155147.1863-3-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <785a0974-bfad-a128-e8a2-9b4f1533e2f4@linaro.org>
-Date: Sat, 4 Aug 2018 10:42:01 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180802155147.1863-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] hw/pci-host/bonito: Move away from
- old_mmio accessors
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fmHDh-00053P-1B
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 07:29:12 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:60355
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1fmHDg-0004n2-PL
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 07:29:08 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Sun,  5 Aug 2018 12:28:48 +0100
+Message-Id: <20180805112850.26063-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 0/2] machine: preparation for adding
+ SPARC64/PPC bootindex support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,21 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Gerd Hoffmann <kraxel@redhat.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, patches@linaro.org
+To: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, lersek@redhat.com, qemu-devel@nongnu.org
 
-On 08/02/2018 08:51 AM, Peter Maydell wrote:
-> Move away from the old_mmio MemoryRegion accessors in the
-> bonito pci controller.
-> 
-> This device is used only in the MIPS "fulong2e" machine.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/pci-host/bonito.c | 145 +++++--------------------------------------
->  1 file changed, 15 insertions(+), 130 deletions(-)
+Here is a patchset that contains the preparatory work to enable upcoming
+bootindex support in OpenBIOS for SPARC64/PPC.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Patch 1 enables the OFW address generated via the sysbus explicit_ofw_unit_address()
+method to always take precendence when generating fw paths, and has already been
+discussed on-list with a R-B from Laszlo.
+
+Patch 2 may require further review and discussion and is a consequence of older
+device trees having irregular naming conventions for disk nodes. Rather than add
+extra string handling complexity in OpenBIOS for handling "/disk" nodes on a
+per-interface basis, it is much easier to provide a per-machine option to remove
+them completely for these machines and handle the logic in QEMU via a custom
+FWPathProvider instead.
+
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 
-r~
+Mark Cave-Ayland (2):
+  sysbus: always allow explicit_ofw_unit_address() to override address
+    generation
+  fw_cfg: set the get_boot_devices_list() ignore_suffixes parameter from
+    machine property
+
+ hw/core/machine.c   |  3 +++
+ hw/core/sysbus.c    | 15 +++++++--------
+ hw/nvram/fw_cfg.c   |  5 ++++-
+ include/hw/boards.h |  1 +
+ 4 files changed, 15 insertions(+), 9 deletions(-)
+
+-- 
+2.11.0
