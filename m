@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fmHDk-00067T-46
-	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 07:29:13 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fmHPV-0002ne-T8
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 07:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fmHDh-00054T-Gg
-	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 07:29:12 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:60359
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1fmHDh-0004pa-9L
-	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 07:29:09 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fmHPS-0003rF-Pq
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 07:41:21 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun,  5 Aug 2018 12:28:49 +0100
-Message-Id: <20180805112850.26063-2-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180805112850.26063-1-mark.cave-ayland@ilande.co.uk>
-References: <20180805112850.26063-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 1/2] sysbus: always allow
- explicit_ofw_unit_address() to override address generation
+References: <20180703151732.29843-1-richard.henderson@linaro.org>
+	<20180703151732.29843-8-richard.henderson@linaro.org>
+	<B9095EFA-A3D5-4EEE-A5DA-E4284FD8881E@gmail.com>
+	<128b92a6-7b0e-5e27-2bad-63da14bb3a6a@linaro.org>
+	<3ed18a14-886b-a40b-7c63-176297b5171b@ilande.co.uk>
+Message-ID: <9809e9bc-7fca-5555-f738-5c848d36bbf3@ilande.co.uk>
+Date: Sun, 5 Aug 2018 12:41:08 +0100
+MIME-Version: 1.0
+In-Reply-To: <3ed18a14-886b-a40b-7c63-176297b5171b@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 7/7] target/ppc: Use
+ non-arithmetic conversions for fp load/store
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +28,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, lersek@redhat.com, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>, Programmingkid <programmingkidx@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-Some SysBusDevices either use sysbus_init_mmio() without
-sysbus_mmio_map() or the first MMIO memory region doesn't represent the
-bus address, causing a firmware device path with an invalid address to
-be generated.
+On 06/07/18 10:03, Mark Cave-Ayland wrote:
 
-SysBusDeviceClass does provide a virtual explicit_ofw_unit_address()
-method that can be used to override this process, but it was originally intended
-only as as a fallback option meaning that any existing MMIO memory regions still
-take priority whilst determining the firmware device address.
+> On 05/07/18 17:48, Richard Henderson wrote:
+> 
+>> On 07/05/2018 09:31 AM, Programmingkid wrote:
+>>>> On Jul 3, 2018, at 11:17 AM, Richard Henderson 
+>>>> <richard.henderson@linaro.org> wrote:
+>>>>
+>>>> Memory operations have no side effects on fp state.
+>>>> The use of a "real" conversions between float64 and float32
+>>>> would raise exceptions for SNaN and out-of-range inputs.
+>>>
+>>> Would you have any documentation that tells us about converting
+>>> between 64 bit and 32 bit floating points?
+>>
+>> Spelled out right at the beginning of sections 4.6 (load) and 4.7 
+>> (store) of
+>> Book 1 of the Power ISA manual (version 3.0B) [0].
+>>
+>> I've double-checked vs RISU[1] testing of LFS and STFS, with master 
+>> traces
+>> generated on Power 8 ppc64le, so I don't see anything immediately 
+>> wrong with
+>> the patch.  But I haven't had time to look further than that.
+> 
+> I've had a quick look at this with the attached patch to compare the 
+> helper results before your patch and after, writing any differences to 
+> the console.
+> 
+> With this patch applied to ppc-for-3.1 I've booted MacOS 9 and recorded 
+> the output below:
+> 
+> 
+> $ ./qemu-system-ppc -cdrom MacOS921-macsbug.iso -boot d -M mac99
+> 
+> helper_todouble diff for arg: 3f800000  d.ll: 3ff0000000000000  ret: 
+> 3bf0000000000000
+> helper_todouble diff for arg: 3f800000  d.ll: 3ff0000000000000  ret: 
+> 3bf0000000000000
+> 
+> (note: MacOS 9 will hang here unless the line marked "Uncommenting this 
+> allows MacOS to run" in my patch is enabled)
+> 
+> helper_todouble diff for arg: 3f000000  d.ll: 3fe0000000000000  ret: 
+> 3be0000000000000
+> helper_todouble diff for arg: 3f000000  d.ll: 3fe0000000000000  ret: 
+> 3be0000000000000
+> helper_todouble diff for arg: 3f800000  d.ll: 3ff0000000000000  ret: 
+> 3bf0000000000000
+> helper_todouble diff for arg: 3f800000  d.ll: 3ff0000000000000  ret: 
+> 3bf0000000000000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_todouble diff for arg: be61b08a  d.ll: bfcc361140000000  ret: 
+> bbcc361140000000
+> helper_todouble diff for arg: 3fdf81a5  d.ll: 3ffbf034a0000000  ret: 
+> 3bfbf034a0000000
+> helper_todouble diff for arg: bf402647  d.ll: bfe804c8e0000000  ret: 
+> bbe804c8e0000000
+> helper_todouble diff for arg: 3e61b08a  d.ll: 3fcc361140000000  ret: 
+> 3bcc361140000000
+> helper_tosingle diff for arg: bfcc361140000000  f.l: be61b08a  ret: 
+> 9e61b08a
+> helper_todouble diff for arg: 3f0ccccd  d.ll: 3fe19999a0000000  ret: 
+> 3be19999a0000000
+> helper_tosingle diff for arg: 3ffbf034a0000000  f.l: 3fdf81a5  ret: 
+> 1fdf81a5
+> helper_tosingle diff for arg: bfe804c8e0000000  f.l: bf402647  ret: 
+> 9f402647
+> helper_tosingle diff for arg: 3fcc361140000000  f.l: 3e61b08a  ret: 
+> 1e61b08a
+> helper_tosingle diff for arg: 3fe19999a0000000  f.l: 3f0ccccd  ret: 
+> 1f0ccccd
+> helper_todouble diff for arg: 3b800000  d.ll: 3f70000000000000  ret: 
+> 3b70000000000000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_todouble diff for arg: 3b800000  d.ll: 3f70000000000000  ret: 
+> 3b70000000000000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
+> 1f800000
+> 
+> 
+> It looks like the differences are related to a flag or flags in the MSB 
+> byte of ret.
 
-There is currently only one user of explicit_ofw_unit_address() and that
-is the PCI expander bridge (PXB) device which has no MMIO/PIO resources
-defined. This enables us to allow explicit_ofw_unit_address() to take
-priority without affecting backwards compatibility, allowing the address
-to be customised as required.
+Hi Richard,
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
----
- hw/core/sysbus.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+Have you had a chance to look at this yet? I've been working on top of 
+David's ppc-for-3.1 branch over the weekend and ran into this again 
+during my testing :/
 
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 3c8e53b188..7ac36ad3e7 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -293,16 +293,8 @@ static char *sysbus_get_fw_dev_path(DeviceState *dev)
- {
-     SysBusDevice *s = SYS_BUS_DEVICE(dev);
-     SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(s);
--    /* for the explicit unit address fallback case: */
-     char *addr, *fw_dev_path;
- 
--    if (s->num_mmio) {
--        return g_strdup_printf("%s@" TARGET_FMT_plx, qdev_fw_name(dev),
--                               s->mmio[0].addr);
--    }
--    if (s->num_pio) {
--        return g_strdup_printf("%s@i%04x", qdev_fw_name(dev), s->pio[0]);
--    }
-     if (sbc->explicit_ofw_unit_address) {
-         addr = sbc->explicit_ofw_unit_address(s);
-         if (addr) {
-@@ -311,6 +303,13 @@ static char *sysbus_get_fw_dev_path(DeviceState *dev)
-             return fw_dev_path;
-         }
-     }
-+    if (s->num_mmio) {
-+        return g_strdup_printf("%s@" TARGET_FMT_plx, qdev_fw_name(dev),
-+                               s->mmio[0].addr);
-+    }
-+    if (s->num_pio) {
-+        return g_strdup_printf("%s@i%04x", qdev_fw_name(dev), s->pio[0]);
-+    }
-     return g_strdup(qdev_fw_name(dev));
- }
- 
--- 
-2.11.0
+
+ATB,
+
+Mark.
