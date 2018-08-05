@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1fmL4f-00074W-Es
-	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 11:36:06 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1fmL4o-0007Cn-4I
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 11:36:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1fmL4d-0006RQ-RU
-	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 11:36:05 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:35630)
+	(envelope-from <yuval.shaia@oracle.com>) id 1fmL4j-0006Tg-6t
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 11:36:14 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:35676)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1fmL4d-0006RH-IZ
-	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 11:36:03 -0400
+	id 1fmL4i-0006So-Sc
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 11:36:09 -0400
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Sun,  5 Aug 2018 18:35:11 +0300
-Message-Id: <20180805153518.2983-7-yuval.shaia@oracle.com>
+Date: Sun,  5 Aug 2018 18:35:14 +0300
+Message-Id: <20180805153518.2983-10-yuval.shaia@oracle.com>
 In-Reply-To: <20180805153518.2983-1-yuval.shaia@oracle.com>
 References: <20180805153518.2983-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v2 06/13] hw/rdma: Delete useless structure
- RdmaRmUserMR
+Subject: [Qemu-devel] [PATCH v2 09/13] hw/pvrdma: Cosmetic change - indent
+ right
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +27,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com
 
-The structure RdmaRmUserMR has no benefits, remove it an move all its
-fields to struct RdmaRmMR.
-
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_backend.c |  3 +--
- hw/rdma/rdma_rm.c      | 16 ++++++++--------
- hw/rdma/rdma_rm_defs.h | 10 +++-------
- 3 files changed, 12 insertions(+), 17 deletions(-)
+ hw/rdma/vmw/pvrdma_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index 647e16399f..52981d652d 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -271,8 +271,7 @@ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
-             return VENDOR_ERR_INVLKEY | ssge[ssge_idx].lkey;
+diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+index 1b1330e113..3d448bffc4 100644
+--- a/hw/rdma/vmw/pvrdma_main.c
++++ b/hw/rdma/vmw/pvrdma_main.c
+@@ -430,7 +430,7 @@ static void regs_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+             reset_device(dev);
+             break;
          }
- 
--        dsge->addr = (uintptr_t)mr->user_mr.host_virt + ssge[ssge_idx].addr -
--                     mr->user_mr.guest_start;
-+        dsge->addr = (uintptr_t)mr->virt + ssge[ssge_idx].addr - mr->start;
-         dsge->length = ssge[ssge_idx].length;
-         dsge->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
- 
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index 415da15efe..7403d24674 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -165,15 +165,15 @@ int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
-         length = TARGET_PAGE_SIZE;
-         addr = g_malloc(length);
-     } else {
--        mr->user_mr.host_virt = host_virt;
--        pr_dbg("host_virt=0x%p\n", mr->user_mr.host_virt);
--        mr->user_mr.length = guest_length;
-+        mr->virt = host_virt;
-+        pr_dbg("host_virt=0x%p\n", mr->virt);
-+        mr->length = guest_length;
-         pr_dbg("length=%zu\n", guest_length);
--        mr->user_mr.guest_start = guest_start;
--        pr_dbg("guest_start=0x%" PRIx64 "\n", mr->user_mr.guest_start);
-+        mr->start = guest_start;
-+        pr_dbg("guest_start=0x%" PRIx64 "\n", mr->start);
- 
--        length = mr->user_mr.length;
--        addr = mr->user_mr.host_virt;
-+        length = mr->length;
-+        addr = mr->virt;
+-    break;
++        break;
+     case PVRDMA_REG_IMR:
+         pr_dbg("Interrupt mask=0x%" PRIx64 "\n", val);
+         dev->interrupt_mask = val;
+@@ -439,7 +439,7 @@ static void regs_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+         if (val == 0) {
+             execute_command(dev);
+         }
+-    break;
++        break;
+     default:
+         break;
      }
- 
-     ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, addr, length,
-@@ -214,7 +214,7 @@ void rdma_rm_dealloc_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle)
- 
-     if (mr) {
-         rdma_backend_destroy_mr(&mr->backend_mr);
--        munmap(mr->user_mr.host_virt, mr->user_mr.length);
-+        munmap(mr->virt, mr->length);
-         res_tbl_dealloc(&dev_res->mr_tbl, mr_handle);
-     }
- }
-diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
-index 226011176d..7228151239 100644
---- a/hw/rdma/rdma_rm_defs.h
-+++ b/hw/rdma/rdma_rm_defs.h
-@@ -55,16 +55,12 @@ typedef struct RdmaRmCQ {
-     bool notify;
- } RdmaRmCQ;
- 
--typedef struct RdmaRmUserMR {
--    void *host_virt;
--    uint64_t guest_start;
--    size_t length;
--} RdmaRmUserMR;
--
- /* MR (DMA region) */
- typedef struct RdmaRmMR {
-     RdmaBackendMR backend_mr;
--    RdmaRmUserMR user_mr;
-+    void *virt;
-+    uint64_t start;
-+    size_t length;
-     uint32_t pd_handle;
-     uint32_t lkey;
-     uint32_t rkey;
 -- 
 2.17.1
