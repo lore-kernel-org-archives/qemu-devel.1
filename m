@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fmL7V-0001Od-Qf
-	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 11:39:02 -0400
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1fmNkg-0005I1-9i
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 14:27:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fmL7Q-00085d-U2
-	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 11:39:01 -0400
-Date: Sun, 5 Aug 2018 17:38:47 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA-=c7O+h3c-gQ=31q0oyLzJhDNmEBzv4X2Yp_TBfYhC-w@mail.gmail.com>
-Message-ID: <alpine.BSF.2.21.1808051732420.22072@zero.eik.bme.hu>
-References: <20180801035357.7804-1-david@gibson.dropbear.id.au>
-	<CAFEAcA-FitsqU3kQJTFGSFgOh6Zsf2Zy2fO3OTnL5c+Tzi5pog@mail.gmail.com>
-	<alpine.BSF.2.21.1808011300070.7488@zero.eik.bme.hu>
-	<CAFEAcA-=c7O+h3c-gQ=31q0oyLzJhDNmEBzv4X2Yp_TBfYhC-w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 0/2] ppc-for-3.0 queue 20180801
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1fmNkb-0003xp-CD
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 14:27:38 -0400
+From: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
+Date: Sun,  5 Aug 2018 14:26:19 -0400
+Message-Id: <20180805182625.13540-1-pavel.zbitskiy@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/6] Some improvements in z/Arch instructions
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +18,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
 
-On Wed, 1 Aug 2018, Peter Maydell wrote:
-> On 1 August 2018 at 12:24, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->> On Wed, 1 Aug 2018, Peter Maydell wrote:
->>> So, we've just put out rc3, which in an ideal world is our
->>> final release candidate for 3.0. Are these bugs regressions from
->>> 2.12 ?
->>
->>
->> I don't know about the macio one but the sam460ex PCI interrupts were broken
->> in 2.12 too. However it's a fix for a device only used in sam460ex which is
->> now fixed by this patch so including it is not high risk for breaking
->> anything else than sam460ex which is known to be not finished yet so I would
->> not worry too much. But which is better? Releasing 3.0 with a known bug or
->> including this fix without an rc4?
->
-> The problem with continuing to delay 3.0 while we have known bugs
-> is that bugs generally come in at an even rate, so we *always*
-> have known bugs, and so "we found another bug, let's delay 3.0
-> again to put in a fix for it" is a recipe for never doing a release.
-> That's why we gradually wind up the bar for "should this go in",
-> from "any bug" to "regressions" to "really really serious showstopper
-> regressions".
->
-> We never do a final release without a last rc (it is too risky),
-> so that is not an option.
+Add BAL, BALR, CVB instructions
+Fix few bugs in PACK, CSST
 
-Now that it looks like we'll have an rc4 due to other fixes can these be 
-included as well despite not being regressions? These may not have been 
-serious enough to fix when we wouldn't have rc4 otherwise but holding on 
-to broken implementation just because they were also broken in the 
-previous release does not make sense if we'll have another rc anyway.
+Pavel Zbitskiy (6):
+  target/s390x: add BAL and BALR instructions
+  target/s390x: fix CSST decoding and runtime alignment check
+  target/s390x: fix ipm polluting irrelevant bits
+  target/s390x: add EX support for TRT and TRTR
+  target/s390x: fix PACK reading 1 byte less and writing 1 byte more
+  target/s390x: implement CVB, CVBY and CVBG
 
-Regards,
-BALATON Zoltan
+ target/s390x/helper.h      |  2 ++
+ target/s390x/insn-data.def |  7 ++++++
+ target/s390x/int_helper.c  | 58 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/mem_helper.c  | 24 +++++++++++++++----
+ target/s390x/translate.c   | 52 +++++++++++++++++++++++++++++++++++++----
+ 5 files changed, 135 insertions(+), 8 deletions(-)
+
+-- 
+2.16.2.windows.1
