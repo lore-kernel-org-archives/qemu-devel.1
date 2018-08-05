@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fmHPV-0002ne-T8
-	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 07:41:23 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1fmKSe-00058Q-Hq
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 10:56:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fmHPS-0003rF-Pq
-	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 07:41:21 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-References: <20180703151732.29843-1-richard.henderson@linaro.org>
-	<20180703151732.29843-8-richard.henderson@linaro.org>
-	<B9095EFA-A3D5-4EEE-A5DA-E4284FD8881E@gmail.com>
-	<128b92a6-7b0e-5e27-2bad-63da14bb3a6a@linaro.org>
-	<3ed18a14-886b-a40b-7c63-176297b5171b@ilande.co.uk>
-Message-ID: <9809e9bc-7fca-5555-f738-5c848d36bbf3@ilande.co.uk>
-Date: Sun, 5 Aug 2018 12:41:08 +0100
+	(envelope-from <yuval.shaia@oracle.com>) id 1fmKSb-00066E-C1
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 10:56:48 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:49576)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1fmKSb-000655-0T
+	for qemu-devel@nongnu.org; Sun, 05 Aug 2018 10:56:45 -0400
+Date: Sun, 5 Aug 2018 17:56:34 +0300
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20180805145634.GA22209@lap1>
+References: <20180716074038.3364-1-yuval.shaia@oracle.com>
+	<20180716074038.3364-8-yuval.shaia@oracle.com>
+	<42b81675-ea89-e9e9-f84c-ad723372fc1c@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <3ed18a14-886b-a40b-7c63-176297b5171b@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 7/7] target/ppc: Use
- non-arithmetic conversions for fp load/store
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <42b81675-ea89-e9e9-f84c-ad723372fc1c@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 07/13] hw/rdma: Do not allocate memory for
+ non-dma MR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,136 +30,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Programmingkid <programmingkidx@gmail.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: qemu-devel@nongnu.org, yuval.shaia@oracle.com
 
-On 06/07/18 10:03, Mark Cave-Ayland wrote:
+On Tue, Jul 24, 2018 at 03:19:52PM +0300, Marcel Apfelbaum wrote:
+> 
+> Hi Yuval,
+> 
+> On 07/16/2018 10:40 AM, Yuval Shaia wrote:
+> > There is no use in the memory allocated for non-dma MR (one with
+> > host_virt equals to NULL).
+> 
+> No need for the (one with...)
 
-> On 05/07/18 17:48, Richard Henderson wrote:
-> 
->> On 07/05/2018 09:31 AM, Programmingkid wrote:
->>>> On Jul 3, 2018, at 11:17 AM, Richard Henderson 
->>>> <richard.henderson@linaro.org> wrote:
->>>>
->>>> Memory operations have no side effects on fp state.
->>>> The use of a "real" conversions between float64 and float32
->>>> would raise exceptions for SNaN and out-of-range inputs.
->>>
->>> Would you have any documentation that tells us about converting
->>> between 64 bit and 32 bit floating points?
->>
->> Spelled out right at the beginning of sections 4.6 (load) and 4.7 
->> (store) of
->> Book 1 of the Power ISA manual (version 3.0B) [0].
->>
->> I've double-checked vs RISU[1] testing of LFS and STFS, with master 
->> traces
->> generated on Power 8 ppc64le, so I don't see anything immediately 
->> wrong with
->> the patch.  But I haven't had time to look further than that.
-> 
-> I've had a quick look at this with the attached patch to compare the 
-> helper results before your patch and after, writing any differences to 
-> the console.
-> 
-> With this patch applied to ppc-for-3.1 I've booted MacOS 9 and recorded 
-> the output below:
-> 
-> 
-> $ ./qemu-system-ppc -cdrom MacOS921-macsbug.iso -boot d -M mac99
-> 
-> helper_todouble diff for arg: 3f800000  d.ll: 3ff0000000000000  ret: 
-> 3bf0000000000000
-> helper_todouble diff for arg: 3f800000  d.ll: 3ff0000000000000  ret: 
-> 3bf0000000000000
-> 
-> (note: MacOS 9 will hang here unless the line marked "Uncommenting this 
-> allows MacOS to run" in my patch is enabled)
-> 
-> helper_todouble diff for arg: 3f000000  d.ll: 3fe0000000000000  ret: 
-> 3be0000000000000
-> helper_todouble diff for arg: 3f000000  d.ll: 3fe0000000000000  ret: 
-> 3be0000000000000
-> helper_todouble diff for arg: 3f800000  d.ll: 3ff0000000000000  ret: 
-> 3bf0000000000000
-> helper_todouble diff for arg: 3f800000  d.ll: 3ff0000000000000  ret: 
-> 3bf0000000000000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_todouble diff for arg: be61b08a  d.ll: bfcc361140000000  ret: 
-> bbcc361140000000
-> helper_todouble diff for arg: 3fdf81a5  d.ll: 3ffbf034a0000000  ret: 
-> 3bfbf034a0000000
-> helper_todouble diff for arg: bf402647  d.ll: bfe804c8e0000000  ret: 
-> bbe804c8e0000000
-> helper_todouble diff for arg: 3e61b08a  d.ll: 3fcc361140000000  ret: 
-> 3bcc361140000000
-> helper_tosingle diff for arg: bfcc361140000000  f.l: be61b08a  ret: 
-> 9e61b08a
-> helper_todouble diff for arg: 3f0ccccd  d.ll: 3fe19999a0000000  ret: 
-> 3be19999a0000000
-> helper_tosingle diff for arg: 3ffbf034a0000000  f.l: 3fdf81a5  ret: 
-> 1fdf81a5
-> helper_tosingle diff for arg: bfe804c8e0000000  f.l: bf402647  ret: 
-> 9f402647
-> helper_tosingle diff for arg: 3fcc361140000000  f.l: 3e61b08a  ret: 
-> 1e61b08a
-> helper_tosingle diff for arg: 3fe19999a0000000  f.l: 3f0ccccd  ret: 
-> 1f0ccccd
-> helper_todouble diff for arg: 3b800000  d.ll: 3f70000000000000  ret: 
-> 3b70000000000000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_todouble diff for arg: 3b800000  d.ll: 3f70000000000000  ret: 
-> 3b70000000000000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> helper_tosingle diff for arg: 3ff0000000000000  f.l: 3f800000  ret: 
-> 1f800000
-> 
-> 
-> It looks like the differences are related to a flag or flags in the MSB 
-> byte of ret.
+Will remove.
 
-Hi Richard,
+> 
+> > Delete the code that allocates it.
+> > 
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > ---
+> >   hw/rdma/rdma_rm.c | 52 +++++++++++++++++++----------------------------
+> >   1 file changed, 21 insertions(+), 31 deletions(-)
+> > 
+> > diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> > index 7403d24674..bf4a5c71b4 100644
+> > --- a/hw/rdma/rdma_rm.c
+> > +++ b/hw/rdma/rdma_rm.c
+> > @@ -144,8 +144,6 @@ int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
+> >       RdmaRmMR *mr;
+> >       int ret = 0;
+> >       RdmaRmPD *pd;
+> > -    void *addr;
+> > -    size_t length;
+> >       pd = rdma_rm_get_pd(dev_res, pd_handle);
+> >       if (!pd) {
+> > @@ -158,40 +156,29 @@ int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
+> >           pr_dbg("Failed to allocate obj in table\n");
+> >           return -ENOMEM;
+> >       }
+> > +    pr_dbg("mr_handle=%d\n", *mr_handle);
+> > -    if (!host_virt) {
+> > -        /* TODO: This is my guess but not so sure that this needs to be
+> > -         * done */
+> > -        length = TARGET_PAGE_SIZE;
+> > -        addr = g_malloc(length);
+> > -    } else {
+> > +    pr_dbg("host_virt=0x%p\n", host_virt);
+> > +    pr_dbg("guest_start=0x%" PRIx64 "\n", guest_start);
+> > +    pr_dbg("length=%zu\n", guest_length);
+> > +
+> > +    if (host_virt) {
+> >           mr->virt = host_virt;
+> > -        pr_dbg("host_virt=0x%p\n", mr->virt);
+> > -        mr->length = guest_length;
+> > -        pr_dbg("length=%zu\n", guest_length);
+> >           mr->start = guest_start;
 
-Have you had a chance to look at this yet? I've been working on top of 
-David's ppc-for-3.1 branch over the weekend and ran into this again 
-during my testing :/
+[1]
 
+> > -        pr_dbg("guest_start=0x%" PRIx64 "\n", mr->start);
+> > -
+> > -        length = mr->length;
+> > -        addr = mr->virt;
+> > -    }
+> > +        mr->length = guest_length;
+> > -    ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, addr, length,
+> > -                                 access_flags);
+> > -    if (ret) {
+> > -        pr_dbg("Fail in rdma_backend_create_mr, err=%d\n", ret);
+> > -        ret = -EIO;
+> > -        goto out_dealloc_mr;
+> > +        ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, mr->virt,
+> > +                                     mr->length, access_flags);
+> > +        if (ret) {
+> > +            pr_dbg("Fail in rdma_backend_create_mr, err=%d\n", ret);
+> > +            ret = -EIO;
+> > +            goto out_dealloc_mr;
+> > +        }
+> >       }
+> > -    if (!host_virt) {
+> > -        *lkey = mr->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
+> > -        *rkey = mr->rkey = rdma_backend_mr_rkey(&mr->backend_mr);
+> > -    } else {
+> > -        /* We keep mr_handle in lkey so send and recv get get mr ptr */
+> > -        *lkey = *mr_handle;
+> > -        *rkey = -1;
+> > -    }
+> > +    /* We keep mr_handle in lkey so send and recv get get mr ptr */
+> > +    *lkey = *mr_handle;
+> > +    *rkey = -1;
+> 
+> Before this change rkey whould get a value when !host_virt.
+> But I suppose is OK since Remote DMA operations are not implemented yet.
 
-ATB,
+The entire code that handled the case where host_virt is NULL was wrong
+thus removed.
+And yes, RDMA verb is not yet implemented so rkey is anyway not needed.
 
-Mark.
+> 
+> >       mr->pd_handle = pd_handle;
+> > @@ -214,7 +201,10 @@ void rdma_rm_dealloc_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle)
+> >       if (mr) {
+> >           rdma_backend_destroy_mr(&mr->backend_mr);
+> > -        munmap(mr->virt, mr->length);
+> > +        pr_dbg("start=0x%" PRIx64 "\n", mr->start);
+> > +        if (mr->start) {
+> 
+> When is the mr->start inited?
+
+res_tbl_alloc cleans the MR before giving it to caller so we expect
+mr->start to be NULL.
+Then if host_virt is given then mr->start is set to guest virtual address
+[1].
+
+> 
+> Thanks,
+> Marcel
+> 
+> > +            munmap(mr->virt, mr->length);
+> > +        }
+> >           res_tbl_dealloc(&dev_res->mr_tbl, mr_handle);
+> >       }
+> >   }
+> 
