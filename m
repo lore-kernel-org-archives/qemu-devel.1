@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHH-0008ME-Mo
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHH-0008Ly-Lp
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHF-0002qj-Qa
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHE-0002n9-8b
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:47451 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:47393 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fmjHF-0002nq-Cd
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:41 -0400
+	id 1fmjHD-0002l8-LJ
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:40 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  6 Aug 2018 19:00:45 +0200
-Message-Id: <1533574847-19294-79-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  6 Aug 2018 19:00:35 +0200
+Message-Id: <1533574847-19294-69-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 78/80] linux-user: Add nanoMIPS support in
- scripts/qemu-binfmt-conf.sh
+Subject: [Qemu-devel] [PATCH v7 68/80] linux-user: Add target_syscall.h
+ header for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +30,51 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Add support for nanomips[eb] variant in scripts/qemu-binfmt-conf.sh.
+Add target_syscall.h header for nanoMIPS.
 
+Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- scripts/qemu-binfmt-conf.sh | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ linux-user/nanomips/target_syscall.h | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+ create mode 100644 linux-user/nanomips/target_syscall.h
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index b0dc8a7..adb96ac 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -2,7 +2,7 @@
- # Enable automatic program execution by the kernel.
- 
- qemu_target_list="i386 i486 alpha arm armeb sparc32plus ppc ppc64 ppc64le m68k \
--mips mipsel mipsn32 mipsn32el mips64 mips64el \
-+mips mipsel mipsn32 mipsn32el mips64 mips64el nanomips nanomipseb \
- sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb \
- microblaze microblazeel or1k"
- 
-@@ -76,6 +76,14 @@ mips64el_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\
- mips64el_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
- mips64el_family=mips
- 
-+nanomips_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf9\x00'
-+nanomips_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
-+nanomips_family=nanomips
+diff --git a/linux-user/nanomips/target_syscall.h b/linux-user/nanomips/target_syscall.h
+new file mode 100644
+index 0000000..b40e36b
+--- /dev/null
++++ b/linux-user/nanomips/target_syscall.h
+@@ -0,0 +1,30 @@
++/* this struct defines the way the registers are stored on the
++   stack during a system call. */
 +
-+nanomipseb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf9'
-+nanomipseb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
-+nanomipseb_family=nanomipseb
++struct target_pt_regs {
++    /* Pad bytes for argument save space on the stack. */
++    abi_ulong pad0[6];
 +
- sh4_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2a\x00'
- sh4_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
- sh4_family=sh4
-@@ -137,6 +145,12 @@ qemu_get_family() {
-     mips*)
-         echo "mips"
-         ;;
-+    nanomips)
-+        echo "nanomips"
-+        ;;
-+    nanomipseb)
-+        echo "nanomipseb"
-+        ;;
-     "Power Macintosh"|ppc64|powerpc|ppc)
-         echo "ppc"
-         ;;
++    /* Saved main processor registers. */
++    abi_ulong regs[32];
++
++    /* Saved special registers. */
++    abi_ulong cp0_status;
++    abi_ulong lo;
++    abi_ulong hi;
++    abi_ulong cp0_badvaddr;
++    abi_ulong cp0_cause;
++    abi_ulong cp0_epc;
++};
++
++/* Nasty hack: define a fake errno value for use by sigreturn.  */
++#undef TARGET_QEMU_ESIGRETURN
++#define TARGET_QEMU_ESIGRETURN 255
++
++#define UNAME_MACHINE "nanomips"
++#define UNAME_MINIMUM_RELEASE "2.6.32"
++
++#define TARGET_CLONE_BACKWARDS
++#define TARGET_MINSIGSTKSZ 6144
++#define TARGET_MLOCKALL_MCL_CURRENT 1
++#define TARGET_MLOCKALL_MCL_FUTURE  2
 -- 
 2.7.4
