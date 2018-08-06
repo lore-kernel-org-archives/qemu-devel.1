@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGL-0007Tk-0C
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:49 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGQ-0007Ye-FT
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGK-0001tz-0d
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:44 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45290 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGP-000214-9Y
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:50 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45414 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fmjGJ-0001qs-Pm
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:43 -0400
+	id 1fmjGP-0001ze-1k
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:49 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  6 Aug 2018 19:00:20 +0200
-Message-Id: <1533574847-19294-54-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  6 Aug 2018 19:00:22 +0200
+Message-Id: <1533574847-19294-56-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 53/80] elf: Add nanoMIPS specific variations
- in ELF header fields
+Subject: [Qemu-devel] [PATCH v7 55/80] elf: Don't check FCR31_NAN2008 bit
+ for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +28,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add nanoMIPS-related values in ELF header fields as specified in
-nanoMIPS' "ELF ABI Supplement".
+nanoMIPS is always NaN2008 compliant, and rules for checking
+FCR31's NAN2008 bit are obsoleted.
 
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- include/elf.h | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ linux-user/mips/cpu_loop.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/elf.h b/include/elf.h
-index 002a002..3f74fba 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -62,6 +62,24 @@ typedef int64_t  Elf64_Sxword;
- #define EF_MIPS_FP64      0x00000200
- #define EF_MIPS_NAN2008   0x00000400
- 
-+/* nanoMIPS architecture bits, EF_NANOMIPS_ARCH */
-+#define EF_NANOMIPS_ARCH_32R6 0x00000000  /* 32-bit nanoMIPS Release 6 ISA   */
-+#define EF_NANOMIPS_ARCH_64R6 0x10000000  /* 62-bit nanoMIPS Release 6 ISA   */
-+
-+/* nanoMIPS ABI bits, EF_NANOMIPS_ABI */
-+#define EF_NANOMIPS_ABI_P32   0x00001000  /* 32-bit nanoMIPS ABI             */
-+#define EF_NANOMIPS_ABI_P64   0x00002000  /* 64-bit nanoMIPS ABI             */
-+
-+/* nanoMIPS processor specific flags, e_flags */
-+#define EF_NANOMIPS_LINKRELAX 0x00000001  /* Link-time relaxation            */
-+#define EF_NANOMIPS_PIC       0x00000002  /* Position independant code       */
-+#define EF_NANOMIPS_32BITMODE 0x00000004  /* 32-bit object for 64-bit arch.  */
-+#define EF_NANOMIPS_PID       0x00000008  /* Position independant data       */
-+#define EF_NANOMIPS_PCREL     0x00000010  /* PC-relative mode                */
-+#define EF_NANOMIPS_ABI       0x0000f000  /* nanoMIPS ABI                    */
-+#define EF_NANOMIPS_MACH      0x00ff0000  /* Machine variant                 */
-+#define EF_NANOMIPS_ARCH      0xf0000000  /* nanoMIPS architecture           */
-+
- /* MIPS machine variant */
- #define EF_MIPS_MACH_NONE     0x00000000  /* A standard MIPS implementation  */
- #define EF_MIPS_MACH_3900     0x00810000  /* Toshiba R3900                   */
-@@ -143,6 +161,8 @@ typedef int64_t  Elf64_Sxword;
- 
- #define EM_RISCV        243     /* RISC-V */
- 
-+#define EM_NANOMIPS     249     /* Wave Computing nanoMIPS */
-+
- /*
-  * This is an interim value that we will use until the committee comes
-  * up with a final number.
+diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+index 1d3dc9e..c9c20cf 100644
+--- a/linux-user/mips/cpu_loop.c
++++ b/linux-user/mips/cpu_loop.c
+@@ -747,6 +747,9 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+     if (regs->cp0_epc & 1) {
+         env->hflags |= MIPS_HFLAG_M16;
+     }
++    if (env->insn_flags & ISA_NANOMIPS32) {
++        return;
++    }
+     if (((info->elf_flags & EF_MIPS_NAN2008) != 0) !=
+         ((env->active_fpu.fcr31 & (1 << FCR31_NAN2008)) != 0)) {
+         if ((env->active_fpu.fcr31_rw_bitmask &
 -- 
 2.7.4
