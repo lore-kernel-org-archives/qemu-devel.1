@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fmeaD-0007oL-5m
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:25:57 -0400
+	(envelope-from <lersek@redhat.com>) id 1fmeb0-0008A3-H2
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:26:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fmeaC-0002OL-DS
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:25:57 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44938)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fmeaC-0002OA-8V
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:25:56 -0400
-Received: by mail-oi0-x241.google.com with SMTP id s198-v6so21747858oih.11
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 05:25:55 -0700 (PDT)
+	(envelope-from <lersek@redhat.com>) id 1fmeax-0002XZ-2v
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:26:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51844 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fmeaw-0002Vm-T2
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:26:43 -0400
+References: <20180805112850.26063-1-mark.cave-ayland@ilande.co.uk>
+	<20180805112850.26063-3-mark.cave-ayland@ilande.co.uk>
+	<ebc16b0b-d318-119a-4d89-6e84c0c9df57@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <3af58a91-2d76-2dc6-0617-58b4e4dd8566@redhat.com>
+Date: Mon, 6 Aug 2018 14:26:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180806121304.9440-1-dgilbert@redhat.com>
-References: <20180806121304.9440-1-dgilbert@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 6 Aug 2018 13:25:34 +0100
-Message-ID: <CAFEAcA_jWy+uT6ALXZGF3dMBi_rkgrs6i0VK9jUh7nPUdo4AVQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] docs/migration: Clarify pre_load in
- subsections
+In-Reply-To: <ebc16b0b-d318-119a-4d89-6e84c0c9df57@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] fw_cfg: set the
+ get_boot_devices_list() ignore_suffixes parameter from machine property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, ehabkost@redhat.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
 
-On 6 August 2018 at 13:13, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Clarify that the pre_load function in a subsection is only called if
-> the subsection is found; to handle a missing subsection you may
-> set values in the pre_load of the parent vmsd.
+On 08/06/18 07:50, Thomas Huth wrote:
+> On 08/05/2018 01:28 PM, Mark Cave-Ayland wrote:
+>> For the older machines (such as Mac and SPARC) the DT nodes representing
+>> bootdevices for disk nodes are irregular for mainly historical reasons, and
+>> should be handled on an individual basis via a custom FWPathProvider.
+>>
+>> Since the majority of bootdevice nodes for these machines either do not have a
+>> separate disk node or require different (custom) names then it is much easier
+>> to allow the ignore_suffixes parameter to be set on a per-machine basis via
+>> a machine property.
+>>
+>> The default value for this new fwcfg_bootdevice_ignore_suffixes machine
+>> property is false to preserve compatibility for existing machines.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>  hw/core/machine.c   | 3 +++
+>>  hw/nvram/fw_cfg.c   | 5 ++++-
+>>  include/hw/boards.h | 1 +
+>>  3 files changed, 8 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/core/machine.c b/hw/core/machine.c
+>> index a9aeb22f03..fbadb35865 100644
+>> --- a/hw/core/machine.c
+>> +++ b/hw/core/machine.c
+>> @@ -525,6 +525,9 @@ static void machine_class_init(ObjectClass *oc, void *data)
+>>      mc->default_ram_size = 128 * MiB;
+>>      mc->rom_file_has_mr = true;
+>>  
+>> +    /* Default to using fwcfg bootdevice suffixes */
+>> +    mc->fwcfg_bootdevice_ignore_suffixes = false;
+> 
+> I guess you could omit this line since the memory for the machine class
+> is pre-initialized to zero.
 
-NB: I did a quick audit of all the uses of pre_load in the tree:
+I was about to make the same recommendation.
 
-These uses rely on the hook not being called unless the
-subsection is found:
-hw/acpi/ich9.c
-hw/acpi/piix4.c
-hw/net/vmxnet3.c
+I believe the patch should be respun for this; while the assignment is
+correct / harmless, I believe we should stay consistent with the rest of
+the code, and assign machine class fields when really necessary.
 
-These are buggy (and I have a patch I'm testing to fix it)
-hw/intc/arm_gicv3_common.c:    .pre_load = vmstate_gicv3_cpu_pre_load,
-hw/intc/arm_gicv3_common.c:    .pre_load = gicv3_pre_load,
 
-and all the rest are not in VMSDs for subsections.
+Another remark: I think the subject line is a bit too long (87
+characters). How about:
 
-(I didn't audit the post_load uses; gicv3 has a wrong
-use of that too.)
+  fw_cfg: ignore suffixes in the bootdev list dependent on machine class
 
-thanks
--- PMM
+(70 chars -- hopefully still precise enough)
+
+Apologies about the bike-shedding, of course.
+
+Thanks!
+Laszlo
+
+> Anyway:
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
