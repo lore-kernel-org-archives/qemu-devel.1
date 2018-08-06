@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1fmcKJ-00022u-Ih
+	(envelope-from <contrib@steffen-goertz.de>) id 1fmcKM-000258-Ks
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 06:01:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1fmcKH-0003E4-Iu
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 06:01:23 -0400
-Received: from steffen-goertz.de ([88.198.119.201]:33126)
+	(envelope-from <contrib@steffen-goertz.de>) id 1fmcKK-0003Gt-SC
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 06:01:26 -0400
+Received: from steffen-goertz.de ([88.198.119.201]:33210)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1fmcKH-0003Dh-85
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 06:01:21 -0400
+	(envelope-from <contrib@steffen-goertz.de>) id 1fmcKK-0003GI-Fw
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 06:01:24 -0400
 From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Date: Mon,  6 Aug 2018 12:01:08 +0200
-Message-Id: <20180806100114.21410-2-contrib@steffen-goertz.de>
+Date: Mon,  6 Aug 2018 12:01:14 +0200
+Message-Id: <20180806100114.21410-8-contrib@steffen-goertz.de>
 In-Reply-To: <20180806100114.21410-1-contrib@steffen-goertz.de>
 References: <20180806100114.21410-1-contrib@steffen-goertz.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/7] hw/misc/nrf51_rng: Add NRF51 random number
- generator peripheral
+Subject: [Qemu-devel] [PATCH 7/7] hw/display/led_matrix: Add LED matrix
+ display device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +30,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
 
-Add a model of the NRF51 random number generator peripheral.
-This is a simple random generator that continuously generates
-new random values after startup.
+The LEDs are not individually connected to the output
+pins of the microcontroller. Instead, the LEDs share pins
+for rows and columns.
+The pattern for a row or a column is only displayed for a short moment.
+The slowness of the human eye results in a complete and
+flicker-free image (persistence of vision). More information
+can be found here: https://en.wikipedia.org/wiki/Multiplexed_display .
 
-Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
+This device demultiplexes the dot-matrix pattern to a grayscale
+image as it would be perceived by the human eye.
+The number of rows, columns and the refresh period can be configured.
+
+At the moment it is assumed that the LEDs are connected in forward
+direction from rows to columns.
+
+The demultiplexed LEDs are drawn to the canvas of a graphics console.
+In the future it is planed to send QMP events with the updated
+matrix image.
 
 Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
 ---
- hw/misc/Makefile.objs       |   1 +
- hw/misc/nrf51_rng.c         | 273 ++++++++++++++++++++++++++++++++++++
- include/hw/misc/nrf51_rng.h |  71 ++++++++++
- 3 files changed, 345 insertions(+)
- create mode 100644 hw/misc/nrf51_rng.c
- create mode 100644 include/hw/misc/nrf51_rng.h
+ hw/display/Makefile.objs        |   2 +
+ hw/display/led_matrix.c         | 262 ++++++++++++++++++++++++++++++++
+ include/hw/display/led_matrix.h |  38 +++++
+ 3 files changed, 302 insertions(+)
+ create mode 100644 hw/display/led_matrix.c
+ create mode 100644 include/hw/display/led_matrix.h
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 9350900845..fc3fe57e13 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -72,3 +72,4 @@ obj-$(CONFIG_AUX) +=3D auxbus.o
- obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_scu.o aspeed_sdmc.o
- obj-y +=3D mmio_interface.o
- obj-$(CONFIG_MSF2) +=3D msf2-sysreg.o
-+obj-$(CONFIG_NRF51_SOC) +=3D nrf51_rng.o
-diff --git a/hw/misc/nrf51_rng.c b/hw/misc/nrf51_rng.c
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index fb8408c6d0..c423f1eb1a 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -23,6 +23,8 @@ common-obj-$(CONFIG_FRAMEBUFFER) +=3D framebuffer.o
+ common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-vgafb.o
+ common-obj-$(CONFIG_ZAURUS) +=3D tc6393xb.o
+=20
++common-obj-$(CONFIG_NRF51_SOC) +=3D led_matrix.o
++
+ common-obj-$(CONFIG_MILKYMIST_TMU2) +=3D milkymist-tmu2.o
+ milkymist-tmu2.o-cflags :=3D $(X11_CFLAGS)
+ milkymist-tmu2.o-libs :=3D $(X11_LIBS)
+diff --git a/hw/display/led_matrix.c b/hw/display/led_matrix.c
 new file mode 100644
-index 0000000000..7dad5d0cc4
+index 0000000000..34c3ad9bde
 --- /dev/null
-+++ b/hw/misc/nrf51_rng.c
-@@ -0,0 +1,273 @@
++++ b/hw/display/led_matrix.c
+@@ -0,0 +1,262 @@
 +/*
-+ * nRF51 Random Number Generator
-+ *
-+ * Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.=
-pdf
++ * LED Matrix Demultiplexer
 + *
 + * Copyright 2018 Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
 + *
@@ -75,354 +89,308 @@ pdf
 +#include "qemu/osdep.h"
 +#include "qemu/log.h"
 +#include "qapi/error.h"
-+#include "hw/misc/nrf51_rng.h"
-+#include "crypto/random.h"
++#include "ui/console.h"
++#include "hw/display/led_matrix.h"
++#include "ui/pixel_ops.h"
 +
-+#define NRF51_RNG_SIZE         0x1000
-+
-+#define NRF51_RNG_TASK_START   0x000
-+#define NRF51_RNG_TASK_STOP    0x004
-+#define NRF51_RNG_EVENT_VALRDY 0x100
-+#define NRF51_RNG_REG_SHORTS   0x200
-+#define NRF51_RNG_REG_SHORTS_VALRDY_STOP 0
-+#define NRF51_RNG_REG_INTEN    0x300
-+#define NRF51_RNG_REG_INTEN_VALRDY 0
-+#define NRF51_RNG_REG_INTENSET 0x304
-+#define NRF51_RNG_REG_INTENCLR 0x308
-+#define NRF51_RNG_REG_CONFIG   0x504
-+#define NRF51_RNG_REG_CONFIG_DECEN 0
-+#define NRF51_RNG_REG_VALUE    0x508
-+
-+#define NRF51_TRIGGER_TASK 0x01
-+#define NRF51_EVENT_CLEAR  0x00
-+
-+static void update_irq(Nrf51RNGState *s)
++static bool led_was_on(LEDMatrixState *s, size_t x, size_t y)
 +{
-+    bool irq =3D false;
-+    irq |=3D s->interrupt_enabled && s->event_valrdy;
-+    qemu_set_irq(s->irq, irq);
++    /* TODO implying Direction is ROW |-> COL */
++    /* TODO add direction flag and generalize */
++    bool row_level =3D extract64(s->row, x, 1);
++    bool col_level =3D extract64(s->col, y, 1);
++
++    return row_level && !col_level;
 +}
 +
-+static uint64_t rng_read(void *opaque, hwaddr offset, unsigned int size)
++static void update_on_times(LEDMatrixState *s)
 +{
-+    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-+    uint64_t r =3D 0;
++    size_t x;
++    int64_t now =3D qemu_clock_get_us(QEMU_CLOCK_VIRTUAL);
++    int64_t diff =3D now - s->timestamp;
++    s->timestamp =3D now;
 +
-+    switch (offset) {
-+    case NRF51_RNG_EVENT_VALRDY:
-+        r =3D s->event_valrdy;
-+        break;
-+    case NRF51_RNG_REG_SHORTS:
-+        r =3D s->shortcut_stop_on_valrdy;
-+        break;
-+    case NRF51_RNG_REG_INTEN:
-+    case NRF51_RNG_REG_INTENSET:
-+    case NRF51_RNG_REG_INTENCLR:
-+        r =3D s->interrupt_enabled;
-+        break;
-+    case NRF51_RNG_REG_CONFIG:
-+        r =3D s->filter_enabled;
-+        break;
-+    case NRF51_RNG_REG_VALUE:
-+        r =3D s->value;
-+        break;
++    for (x =3D 0; x < s->nrows ; x++) {
++        for (size_t y =3D 0; y < s->ncols; y++) {
++            if (led_was_on(s, x, y)) {
++                s->led_working_dc[x * s->ncols + y] +=3D diff;
++            }
++        }
++    }
++}
 +
++static void led_timer_expire(void *opaque)
++{
++    LEDMatrixState *s =3D LED_MATRIX(opaque);
++/*
++    uint8_t divider =3D s->strobe_row ? s->nrows : s->ncols;
++    int64_t max_on =3D (s->refresh_period * 1000) / divider;
++*/
++
++    update_on_times(s);
++
++    memcpy(s->led_frame_dc, s->led_working_dc,
++           sizeof(int64_t) * s->nrows * s->ncols);
++    memset(s->led_working_dc, 0x00, sizeof(int64_t) * s->nrows * s->ncol=
+s);
++
++    timer_mod(&s->timer,
++            qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + s->refresh_period);
++    s->redraw =3D true;
++}
++
++static void set_row(void *opaque, int line, int value)
++{
++    LEDMatrixState *s =3D LED_MATRIX(opaque);
++
++    update_on_times(s);
++
++    s->row =3D deposit32(s->row, line, 1, value > 0);
++}
++
++static void set_column(void *opaque, int line, int value)
++{
++    LEDMatrixState *s =3D LED_MATRIX(opaque);
++
++    update_on_times(s);
++
++    s->col =3D deposit32(s->col, line, 1, value > 0);
++}
++
++static void draw_pixel(DisplaySurface *ds, int x, int y, uint32_t color)
++{
++    int bpp;
++    uint8_t *d;
++    bpp =3D (surface_bits_per_pixel(ds) + 7) >> 3;
++    d =3D surface_data(ds) + surface_stride(ds) * y + bpp * x;
++    switch (bpp) {
++    case 1:
++        *((uint8_t *) d) =3D color;
++        d++;
++        break;
++    case 2:
++        *((uint16_t *) d) =3D color;
++        d +=3D 2;
++        break;
++    case 4:
++        *((uint32_t *) d) =3D color;
++        d +=3D 4;
++        break;
++    }
++}
++
++static void draw_box(DisplaySurface *ds,
++                     int x0, int y0, int w, int h, uint32_t color)
++{
++    int x, y;
++    for (x =3D 0; x < w; x++) {
++        for (y =3D 0; y < h; y++) {
++            draw_pixel(ds, x0 + x, y0 + y, color);
++        }
++    }
++}
++
++typedef unsigned int (*color_func)(unsigned int, unsigned int, unsigned =
+int);
++
++static void led_invalidate_display(void *opaque)
++{
++    LEDMatrixState *s =3D LED_MATRIX(opaque);
++    s->redraw =3D true;
++}
++
++static void led_update_display(void *opaque)
++{
++    LEDMatrixState *s =3D LED_MATRIX(opaque);
++    DisplaySurface *surface =3D qemu_console_surface(s->con);
++    color_func colorfunc;
++    uint32_t color_led;
++    int bpp;
++    uint8_t *d1;
++    uint8_t red;
++    size_t x, y, idx;
++
++    if (!s->redraw) {
++        return;
++    }
++
++    /* clear screen */
++    bpp =3D (surface_bits_per_pixel(surface) + 7) >> 3;
++    d1 =3D surface_data(surface);
++    for (y =3D 0; y < surface_height(surface); y++) {
++        memset(d1, 0x00, surface_width(surface) * bpp);
++        d1 +=3D surface_stride(surface);
++    }
++
++    /* set colors according to bpp */
++    switch (surface_bits_per_pixel(surface)) {
++    case 8:
++        colorfunc =3D rgb_to_pixel8;
++        break;
++    case 15:
++        colorfunc =3D rgb_to_pixel15;
++        break;
++    case 16:
++        colorfunc =3D rgb_to_pixel16;
++        break;
++    case 24:
++        colorfunc =3D rgb_to_pixel24;
++        break;
++    case 32:
++        colorfunc =3D rgb_to_pixel32;
++        break;
 +    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: bad read offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
++        return;
 +    }
 +
-+    return r;
-+}
++    for (x =3D 0; x < s->nrows ; x++) {
++        for (y =3D 0; y < s->ncols; y++) {
++            idx =3D x * s->ncols + y;
++            red =3D (s->led_frame_dc[idx] * 0xFF) / (s->refresh_period *=
+ 1000);
++            color_led =3D colorfunc(red, 0x00, 0x00);
 +
-+static int64_t calc_next_timeout(Nrf51RNGState *s)
-+{
-+    int64_t timeout =3D qemu_clock_get_us(QEMU_CLOCK_VIRTUAL);
-+    if (s->filter_enabled) {
-+        timeout +=3D s->period_filtered_us;
-+    } else {
-+        timeout +=3D s->period_unfiltered_us;
++            draw_box(surface, idx * 10, 0, 5, 10, color_led);
++        }
 +    }
 +
-+    return timeout;
++    s->redraw =3D 0;
++    dpy_gfx_update(s->con, 0, 0, 500, 500);
 +}
 +
-+
-+static void rng_update_timer(Nrf51RNGState *s)
-+{
-+    if (s->active) {
-+        timer_mod(&s->timer, calc_next_timeout(s));
-+    } else {
-+        timer_del(&s->timer);
-+    }
-+}
-+
-+
-+static void rng_write(void *opaque, hwaddr offset,
-+                       uint64_t value, unsigned int size)
-+{
-+    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-+
-+    switch (offset) {
-+    case NRF51_RNG_TASK_START:
-+        if (value =3D=3D NRF51_TRIGGER_TASK) {
-+            s->active =3D 1;
-+            rng_update_timer(s);
-+        }
-+        break;
-+    case NRF51_RNG_TASK_STOP:
-+        if (value =3D=3D NRF51_TRIGGER_TASK) {
-+            s->active =3D 0;
-+            rng_update_timer(s);
-+        }
-+        break;
-+    case NRF51_RNG_EVENT_VALRDY:
-+        if (value =3D=3D NRF51_EVENT_CLEAR) {
-+            s->event_valrdy =3D 0;
-+        }
-+        break;
-+    case NRF51_RNG_REG_SHORTS:
-+        s->shortcut_stop_on_valrdy =3D
-+                (value & BIT_MASK(NRF51_RNG_REG_SHORTS_VALRDY_STOP)) ? 1=
- : 0;
-+        break;
-+    case NRF51_RNG_REG_INTEN:
-+        s->interrupt_enabled =3D
-+                (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) ? 1 : 0;
-+        break;
-+    case NRF51_RNG_REG_INTENSET:
-+        if (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) {
-+            s->interrupt_enabled =3D 1;
-+        }
-+        break;
-+    case NRF51_RNG_REG_INTENCLR:
-+        if (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) {
-+            s->interrupt_enabled =3D 0;
-+        }
-+        break;
-+    case NRF51_RNG_REG_CONFIG:
-+        s->filter_enabled =3D
-+                      (value & BIT_MASK(NRF51_RNG_REG_CONFIG_DECEN)) ? 1=
- : 0;
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: bad write offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
-+    }
-+
-+    update_irq(s);
-+}
-+
-+static const MemoryRegionOps rng_ops =3D {
-+    .read =3D  rng_read,
-+    .write =3D rng_write,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-+    .impl.min_access_size =3D 4,
-+    .impl.max_access_size =3D 4
++static const GraphicHwOps graphic_ops =3D {
++    .invalidate  =3D led_invalidate_display,
++    .gfx_update  =3D led_update_display,
 +};
 +
-+static void nrf51_rng_timer_expire(void *opaque)
++static void led_matrix_init(Object *obj)
 +{
-+    Nrf51RNGState *s =3D NRF51_RNG(opaque);
++    LEDMatrixState *s =3D LED_MATRIX(obj);
 +
-+    qcrypto_random_bytes(&s->value, 1, &error_abort);
-+
-+    s->event_valrdy =3D 1;
-+    qemu_set_irq(s->eep_valrdy, 1);
-+
-+    if (s->shortcut_stop_on_valrdy) {
-+        s->active =3D 0;
-+    }
-+
-+    rng_update_timer(s);
-+    update_irq(s);
++    timer_init_ms(&s->timer, QEMU_CLOCK_VIRTUAL, led_timer_expire, s);
 +}
 +
-+static void nrf51_rng_tep_start(void *opaque, int n, int level)
++static void led_matrix_realize(DeviceState *dev, Error **errp)
 +{
-+    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-+
-+    if (level) {
-+        s->active =3D 1;
-+        rng_update_timer(s);
++    LEDMatrixState *s =3D LED_MATRIX(dev);
++    if (!s->nrows || (s->nrows > 64)) {
++        error_setg(errp, "rows not set or larger than 64");
++        return;
 +    }
-+}
 +
-+static void nrf51_rng_tep_stop(void *opaque, int n, int level)
-+{
-+    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-+
-+    if (level) {
-+        s->active =3D 0;
-+        rng_update_timer(s);
++    if (!s->ncols || (s->ncols > 64)) {
++        error_setg(errp, "cols not set or larger than 64");
++        return;
 +    }
-+}
 +
-+
-+static void nrf51_rng_init(Object *obj)
-+{
-+    Nrf51RNGState *s =3D NRF51_RNG(obj);
-+    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->mmio, obj, &rng_ops, s,
-+            TYPE_NRF51_RNG, NRF51_RNG_SIZE);
-+    sysbus_init_mmio(sbd, &s->mmio);
-+
-+    timer_init_us(&s->timer, QEMU_CLOCK_VIRTUAL, nrf51_rng_timer_expire,=
- s);
-+
-+    qdev_init_gpio_out_named(DEVICE(s), &s->irq, "irq", 1);
-+
-+    /* Tasks */
-+    qdev_init_gpio_in_named(DEVICE(s), nrf51_rng_tep_start, "tep_start",=
- 1);
-+    qdev_init_gpio_in_named(DEVICE(s), nrf51_rng_tep_stop, "tep_stop", 1=
++    s->led_working_dc =3D g_malloc0_n(s->ncols * s->nrows, sizeof(int64_=
+t));
++    s->led_frame_dc =3D g_malloc0_n(s->ncols * s->nrows, sizeof(int64_t)=
 );
 +
-+    /* Events */
-+    qdev_init_gpio_out_named(DEVICE(s), &s->eep_valrdy, "eep_valrdy", 1)=
-;
++    qdev_init_gpio_in_named(dev, set_row, "row", s->nrows);
++    qdev_init_gpio_in_named(dev, set_column, "col", s->ncols);
++
++    s->con =3D graphic_console_init(NULL, 0, &graphic_ops, s);
++    qemu_console_resize(s->con, 500, 500);
 +}
 +
-+static void nrf51_rng_reset(DeviceState *dev)
++static void led_matrix_reset(DeviceState *dev)
 +{
-+    Nrf51RNGState *s =3D NRF51_RNG(dev);
++    LEDMatrixState *s =3D LED_MATRIX(dev);
 +
-+    rng_update_timer(s);
++    timer_mod(&s->timer,
++            qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + s->refresh_period);
 +}
 +
++static void led_matrix_unrealize(DeviceState *dev, Error **errp)
++{
++    LEDMatrixState *s =3D LED_MATRIX(dev);
 +
-+static Property nrf51_rng_properties[] =3D {
-+    DEFINE_PROP_UINT16("period_unfiltered_us", Nrf51RNGState,
-+            period_unfiltered_us, 167),
-+    DEFINE_PROP_UINT16("period_filtered_us", Nrf51RNGState,
-+            period_filtered_us, 660),
++    g_free(s->led_working_dc);
++    s->led_working_dc =3D NULL;
++}
++
++static Property led_matrix_properties[] =3D {
++    DEFINE_PROP_UINT32("refresh_period", LEDMatrixState, refresh_period,=
+ 500),
++    DEFINE_PROP_UINT8("rows", LEDMatrixState, nrows, 0),
++    DEFINE_PROP_UINT8("cols", LEDMatrixState, ncols, 0),
++    DEFINE_PROP_BOOL("strobe_row", LEDMatrixState, strobe_row, true),
++    /* TODO Save/restore state of led_state matrix */
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static const VMStateDescription vmstate_rng =3D {
-+    .name =3D "nrf51_soc.rng",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(active, Nrf51RNGState),
-+        VMSTATE_UINT32(event_valrdy, Nrf51RNGState),
-+        VMSTATE_UINT32(shortcut_stop_on_valrdy, Nrf51RNGState),
-+        VMSTATE_UINT32(interrupt_enabled, Nrf51RNGState),
-+        VMSTATE_UINT32(filter_enabled, Nrf51RNGState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void nrf51_rng_class_init(ObjectClass *klass, void *data)
++static void led_matrix_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc =3D DEVICE_CLASS(klass);
 +
-+    dc->props =3D nrf51_rng_properties;
-+    dc->vmsd =3D &vmstate_rng;
-+    dc->reset =3D nrf51_rng_reset;
++    dc->props =3D led_matrix_properties;
++    dc->realize =3D led_matrix_realize;
++    dc->reset =3D led_matrix_reset;
++    dc->unrealize =3D led_matrix_unrealize;
 +}
 +
-+static const TypeInfo nrf51_rng_info =3D {
-+    .name =3D TYPE_NRF51_RNG,
++static const TypeInfo led_matrix_info =3D {
++    .name =3D TYPE_LED_MATRIX,
 +    .parent =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(Nrf51RNGState),
-+    .instance_init =3D nrf51_rng_init,
-+    .class_init =3D nrf51_rng_class_init
++    .instance_size =3D sizeof(LEDMatrixState),
++    .instance_init =3D led_matrix_init,
++    .class_init =3D led_matrix_class_init
 +};
 +
-+static void nrf51_rng_register_types(void)
++static void led_matrix_register_types(void)
 +{
-+    type_register_static(&nrf51_rng_info);
++    type_register_static(&led_matrix_info);
 +}
 +
-+type_init(nrf51_rng_register_types)
-diff --git a/include/hw/misc/nrf51_rng.h b/include/hw/misc/nrf51_rng.h
++type_init(led_matrix_register_types)
+diff --git a/include/hw/display/led_matrix.h b/include/hw/display/led_mat=
+rix.h
 new file mode 100644
-index 0000000000..b0a3b93d67
+index 0000000000..4a43b69f5b
 --- /dev/null
-+++ b/include/hw/misc/nrf51_rng.h
-@@ -0,0 +1,71 @@
++++ b/include/hw/display/led_matrix.h
+@@ -0,0 +1,38 @@
 +/*
-+ * nRF51 Random Number Generator
++ * LED Matrix Demultiplexer
 + *
 + * Copyright 2018 Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
 + *
 + * This code is licensed under the GPL version 2 or later.  See
 + * the COPYING file in the top-level directory.
-+ *
-+ * See NRF51 reference manual section 21 Random Number Generator
-+ * See NRF51 product specification section 8.16 Random Number Generator
-+ *
-+ * QEMU interface:
-+ * + Property "period_unfiltered_us": Time between two biased values in
-+ *   microseconds.
-+ * + Property "period_filtered_us": Time between two unbiased values in
-+ *   microseconds.
-+ * + sysbus MMIO regions 0: Memory Region with tasks, events and registe=
-rs
-+ *   to be mapped to the peripherals instance address by the SOC.
-+ * + Named GPIO output "irq": Interrupt line of the peripheral. Must be
-+ *   connected to the associated peripheral interrupt line of the NVIC.
-+ * + Named GPIO output "eep_valrdy": Event set when new random value is =
-ready
-+ *   to be read.
-+ * + Named GPIO input "tep_start": Task that triggers start of continuou=
-s
-+ *   generation of random values.
-+ * + Named GPIO input "tep_stop": Task that ends continuous generation o=
-f
-+ *   random values.
-+ *
-+ * Accuracy of the peripheral model:
-+ * + Stochastic properties of different configurations of the random sou=
-rce
-+ *   are not modeled.
-+ * + Generation of unfiltered and filtered random values take at least t=
-he
-+ *   average generation time stated in the production specification;
-+ *   non-deterministic generation times are not modeled.
-+ *
 + */
-+#ifndef NRF51_RNG_H
-+#define NRF51_RNG_H
++#ifndef LED_MATRIX_H
++#define LED_MATRIX_H
 +
 +#include "hw/sysbus.h"
 +#include "qemu/timer.h"
-+#define TYPE_NRF51_RNG "nrf51_soc.rng"
-+#define NRF51_RNG(obj) OBJECT_CHECK(Nrf51RNGState, (obj), TYPE_NRF51_RNG=
-)
++#define TYPE_LED_MATRIX "led_matrix"
++#define LED_MATRIX(obj) OBJECT_CHECK(LEDMatrixState, (obj), TYPE_LED_MAT=
+RIX)
 +
-+typedef struct Nrf51RNGState {
++typedef struct LEDMatrixState {
 +    SysBusDevice parent_obj;
 +
-+    MemoryRegion mmio;
-+    qemu_irq irq;
++    QemuConsole *con;
++    bool redraw;
 +
-+    /* Event End Points */
-+    qemu_irq eep_valrdy;
++    uint32_t refresh_period; /* refresh period in ms */
++    uint8_t nrows;
++    uint8_t ncols;
++    bool strobe_row;
 +
 +    QEMUTimer timer;
++    int64_t timestamp;
 +
-+    /* Time between generation of successive unfiltered values in us */
-+    uint16_t period_unfiltered_us;
-+    /* Time between generation of successive filtered values in us */
-+    uint16_t period_filtered_us;
-+
-+    uint8_t value;
-+
-+    uint32_t active;
-+    uint32_t event_valrdy;
-+    uint32_t shortcut_stop_on_valrdy;
-+    uint32_t interrupt_enabled;
-+    uint32_t filter_enabled;
-+
-+} Nrf51RNGState;
++    uint64_t row;
++    uint64_t col;
++    int64_t *led_working_dc; /* Current LED duty cycle acquisition */
++    int64_t *led_frame_dc; /* Last complete LED duty cycle acquisition *=
+/
++} LEDMatrixState;
 +
 +
-+#endif /* NRF51_RNG_H_ */
++#endif
 --=20
 2.18.0
