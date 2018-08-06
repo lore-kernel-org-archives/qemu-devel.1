@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGB-0007CQ-Ju
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:39 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGF-0007P6-Tw
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGA-0001i6-N7
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:35 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44012 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGE-0001me-J6
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:39 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:44480 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fmjGA-0001gO-Et
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:34 -0400
+	id 1fmjGE-0001lS-Bh
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:38 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  6 Aug 2018 19:00:18 +0200
-Message-Id: <1533574847-19294-52-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  6 Aug 2018 19:00:19 +0200
+Message-Id: <1533574847-19294-53-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 51/80] target/mips: Adjust set_pc() for
- nanoMIPS
+Subject: [Qemu-devel] [PATCH v7 52/80] target/mips: Fix ERET/ERETNC behavior
+ related to ADEL exception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +28,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
 
-From: James Hogan <james.hogan@mips.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-ERET and ERETNC shouldn't clear MIPS_HFLAG_M16 for nanoMIPS since there
-is no ISA bit, so fix set_pc() to skip the hflags update.
+Fix ERET/ERETNC so that ADEL exception can be raised.
 
-Signed-off-by: James Hogan <james.hogan@mips.com>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/op_helper.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ target/mips/op_helper.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index b3eef9f..6dc6bb6 100644
+index 6dc6bb6..65935e7 100644
 --- a/target/mips/op_helper.c
 +++ b/target/mips/op_helper.c
-@@ -2392,6 +2392,10 @@ static void debug_post_eret(CPUMIPSState *env)
- static void set_pc(CPUMIPSState *env, target_ulong error_pc)
+@@ -2393,7 +2393,6 @@ static void set_pc(CPUMIPSState *env, target_ulong error_pc)
  {
      env->active_tc.PC = error_pc & ~(target_ulong)1;
-+    if (env->insn_flags & ISA_NANOMIPS32) {
-+        /* Don't clear MIPS_HFLAG_M16 */
-+        return;
-+    }
+     if (env->insn_flags & ISA_NANOMIPS32) {
+-        /* Don't clear MIPS_HFLAG_M16 */
+         return;
+     }
      if (error_pc & 1) {
-         env->hflags |= MIPS_HFLAG_M16;
-     } else {
+@@ -2431,10 +2430,12 @@ void helper_eretnc(CPUMIPSState *env)
+ void helper_deret(CPUMIPSState *env)
+ {
+     debug_pre_eret(env);
+-    set_pc(env, env->CP0_DEPC);
+ 
+     env->hflags &= ~MIPS_HFLAG_DM;
+     compute_hflags(env);
++
++    set_pc(env, env->CP0_DEPC);
++
+     debug_post_eret(env);
+ }
+ #endif /* !CONFIG_USER_ONLY */
 -- 
 2.7.4
