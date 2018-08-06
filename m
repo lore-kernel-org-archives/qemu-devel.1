@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fmluZ-0006OZ-AR
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 16:15:28 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fmlub-0006SX-Tg
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 16:15:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fmluW-0006nd-JX
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 16:15:27 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fmlua-0006uJ-NG
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 16:15:29 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  6 Aug 2018 22:14:36 +0200
-Message-Id: <1533586484-5737-9-git-send-email-eric.auger@redhat.com>
+Date: Mon,  6 Aug 2018 22:14:38 +0200
+Message-Id: <1533586484-5737-11-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1533586484-5737-1-git-send-email-eric.auger@redhat.com>
 References: <1533586484-5737-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v7 08/16] virtio-iommu: Implement translate
+Subject: [Qemu-devel] [RFC v7 10/16] virtio-iommu: Add an msi_bypass property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,100 +22,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, jean-philippe.brucker@arm.com
 Cc: will.deacon@arm.com, kevin.tian@intel.com, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com, linuc.decode@gmail.com
 
-This patch implements the translate callback
+In case the msi_bypass property is set, it means we need
+to register the IOAPIC MSI window as a reserved region:
+0xFEE00000 - 0xFEEFFFFF.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
-
-v5 -> v6:
-- replace error_report by qemu_log_mask
-
-v4 -> v5:
-- check the device domain is not NULL
-- s/printf/error_report
-- set flags to IOMMU_NONE in case of all translation faults
 ---
- hw/virtio/trace-events   |  1 +
- hw/virtio/virtio-iommu.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 45 insertions(+), 1 deletion(-)
+ hw/virtio/virtio-iommu.c         | 52 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/virtio/virtio-iommu.h |  1 +
+ 2 files changed, 53 insertions(+)
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 926c50b..4041af6 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -66,3 +66,4 @@ virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
- virtio_iommu_unmap_left_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap left [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
- virtio_iommu_unmap_right_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap right [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
- virtio_iommu_unmap_inc_interval(uint64_t low, uint64_t high) "Unmap inc [0x%"PRIx64",0x%"PRIx64"]"
-+virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
 diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index f3a6799..6f44d15 100644
+index 0291a04..ec0cf1e 100644
 --- a/hw/virtio/virtio-iommu.c
 +++ b/hw/virtio/virtio-iommu.c
-@@ -489,19 +489,62 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-                                             int iommu_idx)
- {
-     IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
-+    VirtIOIOMMU *s = sdev->viommu;
-     uint32_t sid;
-+    viommu_endpoint *ep;
-+    viommu_mapping *mapping;
-+    viommu_interval interval;
-+
-+    interval.low = addr;
-+    interval.high = addr + 1;
+@@ -42,6 +42,9 @@
+ #define VIOMMU_DEFAULT_QUEUE_SIZE 256
+ #define VIOMMU_PROBE_SIZE 512
  
-     IOMMUTLBEntry entry = {
-         .target_as = &address_space_memory,
-         .iova = addr,
-         .translated_addr = addr,
--        .addr_mask = ~(hwaddr)0,
-+        .addr_mask = (1 << ctz32(s->config.page_size_mask)) - 1,
-         .perm = IOMMU_NONE,
-     };
- 
-     sid = virtio_iommu_get_sid(sdev);
- 
-     trace_virtio_iommu_translate(mr->parent_obj.name, sid, addr, flag);
-+    qemu_mutex_lock(&s->mutex);
++#define IOAPIC_RANGE_START      (0xfee00000)
++#define IOAPIC_RANGE_SIZE       (0x100000)
 +
-+    ep = g_tree_lookup(s->endpoints, GUINT_TO_POINTER(sid));
-+    if (!ep) {
-+        error_report("%s sid=%d is not known!!", __func__, sid);
-+        goto unlock;
-+    }
-+
-+    if (!ep->domain) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s %02x:%02x.%01x not attached to any domain\n",
-+                      __func__, PCI_BUS_NUM(sid), PCI_SLOT(sid), PCI_FUNC(sid));
-+        goto unlock;
-+    }
-+
-+    mapping = g_tree_lookup(ep->domain->mappings, (gpointer)(&interval));
-+    if (!mapping) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s no mapping for 0x%"PRIx64" for sid=%d\n",
-+                      __func__, addr, sid);
-+        goto unlock;
-+    }
-+
-+    if (((flag & IOMMU_RO) && !(mapping->flags & VIRTIO_IOMMU_MAP_F_READ)) ||
-+        ((flag & IOMMU_WO) && !(mapping->flags & VIRTIO_IOMMU_MAP_F_WRITE))) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "Permission error on 0x%"PRIx64"(%d): allowed=%d\n",
-+                      addr, flag, mapping->flags);
-+        goto unlock;
-+    }
-+    entry.translated_addr = addr - mapping->virt_addr + mapping->phys_addr;
-+    entry.perm = flag;
-+    trace_virtio_iommu_translate_out(addr, entry.translated_addr, sid);
-+
-+unlock:
-+    qemu_mutex_unlock(&s->mutex);
-     return entry;
+ #define SUPPORTED_PROBE_PROPERTIES (\
+     VIRTIO_IOMMU_PROBE_T_NONE | \
+     VIRTIO_IOMMU_PROBE_T_RESV_MEM)
+@@ -104,6 +107,25 @@ static void virtio_iommu_detach_endpoint_from_domain(viommu_endpoint *ep)
+     ep->domain = NULL;
  }
  
++static void virtio_iommu_register_resv_region(viommu_endpoint *ep,
++                                              uint8_t subtype,
++                                              uint64_t start, uint64_t end)
++{
++    viommu_interval *interval;
++    struct virtio_iommu_probe_resv_mem *reg;
++
++    interval = g_malloc0(sizeof(*interval));
++    interval->low = start;
++    interval->high = end;
++
++    reg = g_malloc0(sizeof(*reg));
++    reg->subtype = subtype;
++    reg->start = cpu_to_le64(start);
++    reg->end = cpu_to_le64(end);
++
++    g_tree_insert(ep->reserved_regions, interval, reg);
++}
++
+ static viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
+                                                   uint32_t ep_id)
+ {
+@@ -121,6 +143,12 @@ static viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
+     ep->reserved_regions = g_tree_new_full((GCompareDataFunc)interval_cmp,
+                                             NULL, (GDestroyNotify)g_free,
+                                             (GDestroyNotify)g_free);
++    if (s->msi_bypass) {
++        virtio_iommu_register_resv_region(ep, VIRTIO_IOMMU_RESV_MEM_T_MSI,
++                                          IOAPIC_RANGE_START,
++                                          IOAPIC_RANGE_SIZE);
++    }
++
+     return ep;
+ }
+ 
+@@ -841,8 +869,32 @@ static void virtio_iommu_set_status(VirtIODevice *vdev, uint8_t status)
+     trace_virtio_iommu_device_status(status);
+ }
+ 
++static bool virtio_iommu_get_msi_bypass(Object *obj, Error **errp)
++{
++    VirtIOIOMMU *s = VIRTIO_IOMMU(obj);
++
++    return s->msi_bypass;
++}
++
++static void virtio_iommu_set_msi_bypass(Object *obj, bool value, Error **errp)
++{
++    VirtIOIOMMU *s = VIRTIO_IOMMU(obj);
++
++    s->msi_bypass = value;
++}
++
+ static void virtio_iommu_instance_init(Object *obj)
+ {
++    VirtIOIOMMU *s = VIRTIO_IOMMU(obj);
++
++    object_property_add_bool(obj, "msi_bypass", virtio_iommu_get_msi_bypass,
++                             virtio_iommu_set_msi_bypass, NULL);
++    object_property_set_description(obj, "msi_bypass",
++                                    "Indicates whether msis are bypassed by "
++                                    "the IOMMU. Default is YES",
++                                    NULL);
++
++    s->msi_bypass = true;
+ }
+ 
+ static const VMStateDescription vmstate_virtio_iommu = {
+diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
+index 913e96b..aa20ba4 100644
+--- a/include/hw/virtio/virtio-iommu.h
++++ b/include/hw/virtio/virtio-iommu.h
+@@ -58,6 +58,7 @@ typedef struct VirtIOIOMMU {
+     GTree *domains;
+     QemuMutex mutex;
+     GTree *endpoints;
++    bool msi_bypass;
+ } VirtIOIOMMU;
+ 
+ #endif
 -- 
 2.5.5
