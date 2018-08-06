@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHH-0008Ly-Lp
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHH-0008MF-N6
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHE-0002n9-8b
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHD-0002mQ-OY
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:47393 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:47374 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fmjHD-0002l8-LJ
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:40 -0400
+	id 1fmjHD-0002kY-7q
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:39 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  6 Aug 2018 19:00:35 +0200
-Message-Id: <1533574847-19294-69-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  6 Aug 2018 19:00:33 +0200
+Message-Id: <1533574847-19294-67-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 68/80] linux-user: Add target_syscall.h
- header for nanoMIPS
+Subject: [Qemu-devel] [PATCH v7 66/80] linux-user: Add target_fcntl.h header
+ for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +30,59 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Add target_syscall.h header for nanoMIPS.
+Add fcntl-related constants and structures for nanoMIPS.
 
 Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/nanomips/target_syscall.h | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
- create mode 100644 linux-user/nanomips/target_syscall.h
+ linux-user/nanomips/target_fcntl.h | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+ create mode 100644 linux-user/nanomips/target_fcntl.h
 
-diff --git a/linux-user/nanomips/target_syscall.h b/linux-user/nanomips/target_syscall.h
+diff --git a/linux-user/nanomips/target_fcntl.h b/linux-user/nanomips/target_fcntl.h
 new file mode 100644
-index 0000000..b40e36b
+index 0000000..4203825
 --- /dev/null
-+++ b/linux-user/nanomips/target_syscall.h
-@@ -0,0 +1,30 @@
-+/* this struct defines the way the registers are stored on the
-+   stack during a system call. */
++++ b/linux-user/nanomips/target_fcntl.h
+@@ -0,0 +1,38 @@
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation, or (at your option) any
++ * later version. See the COPYING file in the top-level directory.
++ */
 +
-+struct target_pt_regs {
-+    /* Pad bytes for argument save space on the stack. */
-+    abi_ulong pad0[6];
++#ifndef NANOMIPS_TARGET_FCNTL_H
++#define NANOMIPS_TARGET_FCNTL_H
 +
-+    /* Saved main processor registers. */
-+    abi_ulong regs[32];
++#define TARGET_O_APPEND         0x000400
++#define TARGET_O_DSYNC          0x001000
++#define TARGET_O_NONBLOCK       0x000800
++#define TARGET_O_CREAT          0x000040
++#define TARGET_O_TRUNC          0x000200
++#define TARGET_O_EXCL           0x000080
++#define TARGET_O_NOCTTY         0x000100
++#define TARGET_FASYNC           0x002000
++#define TARGET_O_LARGEFILE      0x008000
++#define TARGET___O_SYNC         0x101000
++#define TARGET_O_DIRECT         0x004000
++#define TARGET_O_CLOEXEC        0x080000
 +
-+    /* Saved special registers. */
-+    abi_ulong cp0_status;
-+    abi_ulong lo;
-+    abi_ulong hi;
-+    abi_ulong cp0_badvaddr;
-+    abi_ulong cp0_cause;
-+    abi_ulong cp0_epc;
-+};
++#define TARGET_F_GETLK         5
++#define TARGET_F_SETLK         6
++#define TARGET_F_SETLKW        7
++#define TARGET_F_SETOWN        8       /*  for sockets. */
++#define TARGET_F_GETOWN        9       /*  for sockets. */
 +
-+/* Nasty hack: define a fake errno value for use by sigreturn.  */
-+#undef TARGET_QEMU_ESIGRETURN
-+#define TARGET_QEMU_ESIGRETURN 255
++#define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
++#define TARGET_ARCH_FLOCK64_PAD
 +
-+#define UNAME_MACHINE "nanomips"
-+#define UNAME_MINIMUM_RELEASE "2.6.32"
++#define TARGET_F_GETLK64       12      /*  using 'struct flock64' */
++#define TARGET_F_SETLK64       13
++#define TARGET_F_SETLKW64      14
 +
-+#define TARGET_CLONE_BACKWARDS
-+#define TARGET_MINSIGSTKSZ 6144
-+#define TARGET_MLOCKALL_MCL_CURRENT 1
-+#define TARGET_MLOCKALL_MCL_FUTURE  2
++#include "../generic/fcntl.h"
++#endif
 -- 
 2.7.4
