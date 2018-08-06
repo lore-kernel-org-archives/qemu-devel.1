@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGb-0007k3-Lf
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGc-0007ku-Lm
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGa-0002F1-2F
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:01 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45853 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjGb-0002Gw-LD
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:02 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45948 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fmjGZ-0002Db-M1
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:25:59 -0400
+	id 1fmjGb-0002FT-9X
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:01 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  6 Aug 2018 19:00:27 +0200
-Message-Id: <1533574847-19294-61-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  6 Aug 2018 19:00:28 +0200
+Message-Id: <1533574847-19294-62-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 60/80] gdbstub: Add XML support for GDB for
- nanoMIPS
+Subject: [Qemu-devel] [PATCH v7 61/80] target/mips: Add definition of
+ nanoMIPS I7200 CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,216 +30,64 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add XML support files for GDB for nanoMIPS.
+Add definition of the first nanoMIPS processor in QEMU.
 
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- MAINTAINERS                |  3 ++-
- gdb-xml/nanomips-cp0.xml   | 13 +++++++++++++
- gdb-xml/nanomips-cpu.xml   | 44 ++++++++++++++++++++++++++++++++++++++++++++
- gdb-xml/nanomips-dsp.xml   | 20 ++++++++++++++++++++
- gdb-xml/nanomips-fpu.xml   | 45 +++++++++++++++++++++++++++++++++++++++++++++
- gdb-xml/nanomips-linux.xml | 20 ++++++++++++++++++++
- 6 files changed, 144 insertions(+), 1 deletion(-)
- create mode 100644 gdb-xml/nanomips-cp0.xml
- create mode 100644 gdb-xml/nanomips-cpu.xml
- create mode 100644 gdb-xml/nanomips-dsp.xml
- create mode 100644 gdb-xml/nanomips-fpu.xml
- create mode 100644 gdb-xml/nanomips-linux.xml
+ target/mips/translate_init.inc.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7130807..a4907d0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -190,6 +190,8 @@ M: Aurelien Jarno <aurelien@aurel32.net>
- M: Aleksandar Markovic <amarkovic@wavecomp.com>
- S: Maintained
- F: target/mips/
-+F: disas/mips.c
-+F: gdb-xml/*ips*.xml
- F: hw/mips/
- F: hw/misc/mips_*
- F: hw/intc/mips_gic.c
-@@ -199,7 +201,6 @@ F: include/hw/misc/mips_*
- F: include/hw/intc/mips_gic.h
- F: include/hw/timer/mips_gictimer.h
- F: tests/tcg/mips/
--F: disas/mips.c
- 
- Moxie
- M: Anthony Green <green@moxielogic.com>
-diff --git a/gdb-xml/nanomips-cp0.xml b/gdb-xml/nanomips-cp0.xml
-new file mode 100644
-index 0000000..8095dc6
---- /dev/null
-+++ b/gdb-xml/nanomips-cp0.xml
-@@ -0,0 +1,13 @@
-+<?xml version="1.0"?>
-+<!-- Copyright (C) 2007-2015 Free Software Foundation, Inc.
-+
-+     Copying and distribution of this file, with or without modification,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
-+
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name="org.gnu.gdb.nanomips.cp0">
-+  <reg name="status" bitsize="32"/>
-+  <reg name="badvaddr" bitsize="32"/>
-+  <reg name="cause" bitsize="32"/>
-+</feature>
-diff --git a/gdb-xml/nanomips-cpu.xml b/gdb-xml/nanomips-cpu.xml
-new file mode 100644
-index 0000000..6bba224
---- /dev/null
-+++ b/gdb-xml/nanomips-cpu.xml
-@@ -0,0 +1,44 @@
-+<?xml version="1.0"?>
-+<!-- Copyright (C) 2007-2015 Free Software Foundation, Inc.
-+
-+     Copying and distribution of this file, with or without modification,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
-+
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name="org.gnu.gdb.nanomips.cpu">
-+  <reg name="r0" bitsize="32" regnum="0"/>
-+  <reg name="r1" bitsize="32"/>
-+  <reg name="r2" bitsize="32"/>
-+  <reg name="r3" bitsize="32"/>
-+  <reg name="r4" bitsize="32"/>
-+  <reg name="r5" bitsize="32"/>
-+  <reg name="r6" bitsize="32"/>
-+  <reg name="r7" bitsize="32"/>
-+  <reg name="r8" bitsize="32"/>
-+  <reg name="r9" bitsize="32"/>
-+  <reg name="r10" bitsize="32"/>
-+  <reg name="r11" bitsize="32"/>
-+  <reg name="r12" bitsize="32"/>
-+  <reg name="r13" bitsize="32"/>
-+  <reg name="r14" bitsize="32"/>
-+  <reg name="r15" bitsize="32"/>
-+  <reg name="r16" bitsize="32"/>
-+  <reg name="r17" bitsize="32"/>
-+  <reg name="r18" bitsize="32"/>
-+  <reg name="r19" bitsize="32"/>
-+  <reg name="r20" bitsize="32"/>
-+  <reg name="r21" bitsize="32"/>
-+  <reg name="r22" bitsize="32"/>
-+  <reg name="r23" bitsize="32"/>
-+  <reg name="r24" bitsize="32"/>
-+  <reg name="r25" bitsize="32"/>
-+  <reg name="r26" bitsize="32"/>
-+  <reg name="r27" bitsize="32"/>
-+  <reg name="r28" bitsize="32"/>
-+  <reg name="r29" bitsize="32"/>
-+  <reg name="r30" bitsize="32"/>
-+  <reg name="r31" bitsize="32"/>
-+
-+  <reg name="pc" bitsize="32"/>
-+</feature>
-diff --git a/gdb-xml/nanomips-dsp.xml b/gdb-xml/nanomips-dsp.xml
-new file mode 100644
-index 0000000..950910f
---- /dev/null
-+++ b/gdb-xml/nanomips-dsp.xml
-@@ -0,0 +1,20 @@
-+<?xml version="1.0"?>
-+<!-- Copyright (C) 2012-2015 Free Software Foundation, Inc.
-+
-+     Copying and distribution of this file, with or without modification,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
-+
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name="org.gnu.gdb.nanomips.dsp">
-+  <reg name="hi0" bitsize="32"/>
-+  <reg name="lo0" bitsize="32"/>
-+  <reg name="hi1" bitsize="32"/>
-+  <reg name="lo1" bitsize="32"/>
-+  <reg name="hi2" bitsize="32"/>
-+  <reg name="lo2" bitsize="32"/>
-+  <reg name="hi3" bitsize="32"/>
-+  <reg name="lo3" bitsize="32"/>
-+
-+  <reg name="dspctl" bitsize="32"/>
-+</feature>
-diff --git a/gdb-xml/nanomips-fpu.xml b/gdb-xml/nanomips-fpu.xml
-new file mode 100644
-index 0000000..fd225a5
---- /dev/null
-+++ b/gdb-xml/nanomips-fpu.xml
-@@ -0,0 +1,45 @@
-+<?xml version="1.0"?>
-+<!-- Copyright (C) 2007-2015 Free Software Foundation, Inc.
-+
-+     Copying and distribution of this file, with or without modification,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
-+
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name="org.gnu.gdb.nanomips.fpu">
-+  <reg name="f0" bitsize="64" type="ieee_double"/>
-+  <reg name="f1" bitsize="64" type="ieee_double"/>
-+  <reg name="f2" bitsize="64" type="ieee_double"/>
-+  <reg name="f3" bitsize="64" type="ieee_double"/>
-+  <reg name="f4" bitsize="64" type="ieee_double"/>
-+  <reg name="f5" bitsize="64" type="ieee_double"/>
-+  <reg name="f6" bitsize="64" type="ieee_double"/>
-+  <reg name="f7" bitsize="64" type="ieee_double"/>
-+  <reg name="f8" bitsize="64" type="ieee_double"/>
-+  <reg name="f9" bitsize="64" type="ieee_double"/>
-+  <reg name="f10" bitsize="64" type="ieee_double"/>
-+  <reg name="f11" bitsize="64" type="ieee_double"/>
-+  <reg name="f12" bitsize="64" type="ieee_double"/>
-+  <reg name="f13" bitsize="64" type="ieee_double"/>
-+  <reg name="f14" bitsize="64" type="ieee_double"/>
-+  <reg name="f15" bitsize="64" type="ieee_double"/>
-+  <reg name="f16" bitsize="64" type="ieee_double"/>
-+  <reg name="f17" bitsize="64" type="ieee_double"/>
-+  <reg name="f18" bitsize="64" type="ieee_double"/>
-+  <reg name="f19" bitsize="64" type="ieee_double"/>
-+  <reg name="f20" bitsize="64" type="ieee_double"/>
-+  <reg name="f21" bitsize="64" type="ieee_double"/>
-+  <reg name="f22" bitsize="64" type="ieee_double"/>
-+  <reg name="f23" bitsize="64" type="ieee_double"/>
-+  <reg name="f24" bitsize="64" type="ieee_double"/>
-+  <reg name="f25" bitsize="64" type="ieee_double"/>
-+  <reg name="f26" bitsize="64" type="ieee_double"/>
-+  <reg name="f27" bitsize="64" type="ieee_double"/>
-+  <reg name="f28" bitsize="64" type="ieee_double"/>
-+  <reg name="f29" bitsize="64" type="ieee_double"/>
-+  <reg name="f30" bitsize="64" type="ieee_double"/>
-+  <reg name="f31" bitsize="64" type="ieee_double"/>
-+
-+  <reg name="fcsr" bitsize="32" group="float"/>
-+  <reg name="fir" bitsize="32" group="float"/>
-+</feature>
-diff --git a/gdb-xml/nanomips-linux.xml b/gdb-xml/nanomips-linux.xml
-new file mode 100644
-index 0000000..8a04634
---- /dev/null
-+++ b/gdb-xml/nanomips-linux.xml
-@@ -0,0 +1,20 @@
-+<?xml version="1.0"?>
-+<!-- Copyright (C) 2007-2015 Free Software Foundation, Inc.
-+
-+     Copying and distribution of this file, with or without modification,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
-+
-+<!DOCTYPE target SYSTEM "gdb-target.dtd">
-+<target>
-+  <architecture>nanomips</architecture>
-+  <osabi>GNU/Linux</osabi>
-+  <xi:include href="nanomips-cpu.xml"/>
-+  <xi:include href="nanomips-cp0.xml"/>
-+  <xi:include href="nanomips-fpu.xml"/>
-+  <xi:include href="nanomips-dsp.xml"/>
-+
-+  <feature name="org.gnu.gdb.nanomips.linux">
-+    <reg name="restart" bitsize="32" group="system"/>
-+  </feature>
-+</target>
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
+index c7ba6ee..b3320b9 100644
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -449,6 +449,45 @@ const mips_def_t mips_defs[] =
+         .insn_flags = CPU_MIPS32R6 | ASE_MICROMIPS,
+         .mmu_type = MMU_TYPE_R4000,
+     },
++    {
++        .name = "I7200",
++        .CP0_PRid = 0x00010000,
++        .CP0_Config0 = MIPS_CONFIG0 | (1 << CP0C0_MM) | (0x2 << CP0C0_AR) |
++                        (MMU_TYPE_R4000 << CP0C0_MT),
++        .CP0_Config1 = (1U << CP0C1_M) | (15 << CP0C1_MMU) | (2 << CP0C1_IS) |
++                       (4 << CP0C1_IL) | (3 << CP0C1_IA) | (2 << CP0C1_DS) |
++                       (4 << CP0C1_DL) | (3 << CP0C1_DA) | (1 << CP0C1_PC) |
++                       (1 << CP0C1_EP),
++        .CP0_Config2 = MIPS_CONFIG2,
++        .CP0_Config3 = MIPS_CONFIG3 | (1U << CP0C3_M) | (1 << CP0C3_CMGCR) |
++                       (1 << CP0C3_BI) | (1 << CP0C3_SC) | (3 << CP0C3_MMAR) |
++                       (1 << CP0C3_ISA_ON_EXC) | (1 << CP0C3_ISA) |
++                       (1 << CP0C3_ULRI) | (1 << CP0C3_RXI) |
++                       (1 << CP0C3_DSP2P) | (1 << CP0C3_DSPP) |
++                       (1 << CP0C3_CTXTC) | (1 << CP0C3_VInt) |
++                       (1 << CP0C3_CDMM) | (1 << CP0C3_MT) | (1 << CP0C3_TL),
++        .CP0_Config4 = MIPS_CONFIG4 | (0xfc << CP0C4_KScrExist) |
++                       (2 << CP0C4_IE) | (1U << CP0C4_M),
++        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_MVH) | (1 << CP0C5_LLB),
++        .CP0_Config5_rw_bitmask = (1 << CP0C5_SBRI) | (1 << CP0C5_FRE) |
++                                  (1 << CP0C5_UFE),
++        .CP0_LLAddr_rw_bitmask = 0,
++        .CP0_LLAddr_shift = 0,
++        .SYNCI_Step = 32,
++        .CCRes = 2,
++        .CP0_Status_rw_bitmask = 0x3158FF1F,
++        .CP0_PageGrain = (1 << CP0PG_IEC) | (1 << CP0PG_XIE) |
++                         (1U << CP0PG_RIE),
++        .CP0_PageGrain_rw_bitmask = 0,
++        .CP1_fcr0 = (1 << FCR0_FREP) | (1 << FCR0_HAS2008) | (1 << FCR0_F64) |
++                    (1 << FCR0_L) | (1 << FCR0_W) | (1 << FCR0_D) |
++                    (1 << FCR0_S) | (0x02 << FCR0_PRID) | (0x0 << FCR0_REV),
++        .CP1_fcr31 = (1 << FCR31_ABS2008) | (1 << FCR31_NAN2008),
++        .SEGBITS = 32,
++        .PABITS = 32,
++        .insn_flags = CPU_NANOMIPS32 | ASE_DSP | ASE_DSPR2 | ASE_MT,
++        .mmu_type = MMU_TYPE_R4000,
++    },
+ #if defined(TARGET_MIPS64)
+     {
+         .name = "R4000",
 -- 
 2.7.4
