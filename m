@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fmg3R-0002eI-FO
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:00:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fmg9l-0004gX-BE
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:06:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fmg3L-0003Jm-Uw
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:00:13 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46643)
+	(envelope-from <richard.henderson@linaro.org>) id 1fmg9h-0006l3-Cz
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:06:45 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37361)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fmg3L-0003J9-NO
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:00:07 -0400
-Received: by mail-wr1-x444.google.com with SMTP id h14-v6so12450104wrw.13
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 07:00:06 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fmg9h-0006kj-62
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:06:41 -0400
+Received: by mail-pg1-x544.google.com with SMTP id n7-v6so6286905pgq.4
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 07:06:40 -0700 (PDT)
+References: <20180806123445.1459-1-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <f9f955a3-001e-aa12-97ef-97a085b8dc6d@linaro.org>
+Date: Mon, 6 Aug 2018 07:06:36 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180806100114.21410-2-contrib@steffen-goertz.de>
-References: <20180806100114.21410-1-contrib@steffen-goertz.de>
-	<20180806100114.21410-2-contrib@steffen-goertz.de>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Mon, 6 Aug 2018 15:00:03 +0100
-Message-ID: <CAJSP0QXO5z9OCjFY5zgbWOeAUcpo1h-_Sqb1MQrZOiETRDntnQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/7] hw/misc/nrf51_rng: Add NRF51 random
- number generator peripheral
+In-Reply-To: <20180806123445.1459-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.0 v2 0/5] Arm migration fixes for 3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,16 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Shannon Zhao <zhaoshenglong@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, patches@linaro.org
 
-On Mon, Aug 6, 2018 at 11:01 AM, Steffen G=C3=B6rtz
-<contrib@steffen-goertz.de> wrote:
-> +#define NRF51_TRIGGER_TASK 0x01
-> +#define NRF51_EVENT_CLEAR  0x00
+On 08/06/2018 05:34 AM, Peter Maydell wrote:
+> Peter Maydell (5):
+>   hw/intc/arm_gicv3_common: Give no-migration-shift-bug subsection a
+>     needed function
+>   hw/intc/arm_gicv3_common: Combine duplicate .subsections in
+>     vmstate_gicv3_cpu
+>   target/arm: Add dummy needed functions to M profile vmstate
+>     subsections
+>   hw/intc/arm_gicv3_common: Move post_load hooks to top-level VMSD
+>   hw/intc/arm_gicv3_common: Move gicd shift bug handling to
+>     gicv3_post_load
 
-Please consider putting these generic constants into hw/arm/nrf51.h or
-a similar file that all nRF51 devices can include.  That way code
-duplication is eliminated.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+r~
