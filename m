@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fmhbd-0006uE-77
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:39:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fmhuE-0005QC-WA
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fmhbb-0003tf-Vz
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:39:37 -0400
-Date: Mon, 6 Aug 2018 16:39:25 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180806153925.GF2473@work-vm>
-References: <20180806123445.1459-1-peter.maydell@linaro.org>
-	<20180806123445.1459-6-peter.maydell@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1fmhuE-0002IG-2b
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:58:51 -0400
+Date: Mon, 6 Aug 2018 17:58:41 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180806155840.GF4631@localhost.localdomain>
+References: <20180806141322.14427-1-berto@igalia.com>
+	<20180806150541.GE4631@localhost.localdomain>
+	<w51mutzo730.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180806123445.1459-6-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH for-3.0 v2 5/5] hw/intc/arm_gicv3_common:
- Move gicd shift bug handling to gicv3_post_load
+In-Reply-To: <w51mutzo730.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Release dirty entries with
+ cache-clean-interval
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,136 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Juan Quintela <quintela@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> The code currently in gicv3_gicd_no_migration_shift_bug_post_load()
-> that handles migration from older QEMU versions with a particular
-> bug is misplaced. We need to run this after migration in all cases,
-> not just the cases where the "arm_gicv3/gicd_no_migration_shift_bug"
-> subsection is present, so it must go in a post_load hook for the
-> top level VMSD, not for the subsection. Move it.
+Am 06.08.2018 um 17:20 hat Alberto Garcia geschrieben:
+> On Mon 06 Aug 2018 05:05:41 PM CEST, Kevin Wolf wrote:
+> > Am 06.08.2018 um 16:13 hat Alberto Garcia geschrieben:
+> >> -static inline bool can_clean_entry(Qcow2Cache *c, int i)
+> >> +static inline bool can_clean_entry(BlockDriverState *bs, Qcow2Cache *c, int i)
+> >>  {
+> >>      Qcow2CachedTable *t = &c->entries[i];
+> >> -    return t->ref == 0 && !t->dirty && t->offset != 0 &&
+> >> -        t->lru_counter <= c->cache_clean_lru_counter;
+> >> +    if (t->ref || !t->offset || t->lru_counter > c->cache_clean_lru_counter) {
+> >> +        return false;
+> >> +    }
+> >> +
+> >> +    if (qcow2_cache_entry_flush(bs, c, i) < 0) {
+> >> +        return false;
+> >> +    }
+> >
+> > We're not in coroutine context here, so qcow2_cache_entry_flush() will
+> > be blocking. I don't think that's acceptable in a timer callback.
+> >
+> > On the other hand, if we made it non-blocking by moving it into a
+> > coroutine that could yield, we would have to consider races with other
+> > parts of the code and at least take s->lock and implement
+> > .bdrv_co_drain_begin/end callbacks.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Oh, I see... it's probably not worth complicating the code for this then.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On second thoughts, I actually think we can do without the drain
+callbacks if we just add a bdrv_inc/dec_in_flight() pair around
+qcow2_cache_clean_unused().
 
-> ---
->  hw/intc/arm_gicv3_common.c | 77 ++++++++++++++++++--------------------
->  1 file changed, 37 insertions(+), 40 deletions(-)
-> 
-> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-> index 8175889f1e7..52480c3b4cf 100644
-> --- a/hw/intc/arm_gicv3_common.c
-> +++ b/hw/intc/arm_gicv3_common.c
-> @@ -29,6 +29,41 @@
->  #include "hw/arm/linux-boot-if.h"
->  #include "sysemu/kvm.h"
->  
-> +
-> +static void gicv3_gicd_no_migration_shift_bug_post_load(GICv3State *cs)
-> +{
-> +    if (cs->gicd_no_migration_shift_bug) {
-> +        return;
-> +    }
-> +
-> +    /* Older versions of QEMU had a bug in the handling of state save/restore
-> +     * to the KVM GICv3: they got the offset in the bitmap arrays wrong,
-> +     * so that instead of the data for external interrupts 32 and up
-> +     * starting at bit position 32 in the bitmap, it started at bit
-> +     * position 64. If we're receiving data from a QEMU with that bug,
-> +     * we must move the data down into the right place.
-> +     */
-> +    memmove(cs->group, (uint8_t *)cs->group + GIC_INTERNAL / 8,
-> +            sizeof(cs->group) - GIC_INTERNAL / 8);
-> +    memmove(cs->grpmod, (uint8_t *)cs->grpmod + GIC_INTERNAL / 8,
-> +            sizeof(cs->grpmod) - GIC_INTERNAL / 8);
-> +    memmove(cs->enabled, (uint8_t *)cs->enabled + GIC_INTERNAL / 8,
-> +            sizeof(cs->enabled) - GIC_INTERNAL / 8);
-> +    memmove(cs->pending, (uint8_t *)cs->pending + GIC_INTERNAL / 8,
-> +            sizeof(cs->pending) - GIC_INTERNAL / 8);
-> +    memmove(cs->active, (uint8_t *)cs->active + GIC_INTERNAL / 8,
-> +            sizeof(cs->active) - GIC_INTERNAL / 8);
-> +    memmove(cs->edge_trigger, (uint8_t *)cs->edge_trigger + GIC_INTERNAL / 8,
-> +            sizeof(cs->edge_trigger) - GIC_INTERNAL / 8);
-> +
-> +    /*
-> +     * While this new version QEMU doesn't have this kind of bug as we fix it,
-> +     * so it needs to set the flag to true to indicate that and it's necessary
-> +     * for next migration to work from this new version QEMU.
-> +     */
-> +    cs->gicd_no_migration_shift_bug = true;
-> +}
-> +
->  static int gicv3_pre_save(void *opaque)
->  {
->      GICv3State *s = (GICv3State *)opaque;
-> @@ -46,6 +81,8 @@ static int gicv3_post_load(void *opaque, int version_id)
->      GICv3State *s = (GICv3State *)opaque;
->      ARMGICv3CommonClass *c = ARM_GICV3_COMMON_GET_CLASS(s);
->  
-> +    gicv3_gicd_no_migration_shift_bug_post_load(s);
-> +
->      if (c->post_load) {
->          c->post_load(s);
->      }
-> @@ -161,45 +198,6 @@ static int gicv3_pre_load(void *opaque)
->      return 0;
->  }
->  
-> -static int gicv3_gicd_no_migration_shift_bug_post_load(void *opaque,
-> -                                                       int version_id)
-> -{
-> -    GICv3State *cs = opaque;
-> -
-> -    if (cs->gicd_no_migration_shift_bug) {
-> -        return 0;
-> -    }
-> -
-> -    /* Older versions of QEMU had a bug in the handling of state save/restore
-> -     * to the KVM GICv3: they got the offset in the bitmap arrays wrong,
-> -     * so that instead of the data for external interrupts 32 and up
-> -     * starting at bit position 32 in the bitmap, it started at bit
-> -     * position 64. If we're receiving data from a QEMU with that bug,
-> -     * we must move the data down into the right place.
-> -     */
-> -    memmove(cs->group, (uint8_t *)cs->group + GIC_INTERNAL / 8,
-> -            sizeof(cs->group) - GIC_INTERNAL / 8);
-> -    memmove(cs->grpmod, (uint8_t *)cs->grpmod + GIC_INTERNAL / 8,
-> -            sizeof(cs->grpmod) - GIC_INTERNAL / 8);
-> -    memmove(cs->enabled, (uint8_t *)cs->enabled + GIC_INTERNAL / 8,
-> -            sizeof(cs->enabled) - GIC_INTERNAL / 8);
-> -    memmove(cs->pending, (uint8_t *)cs->pending + GIC_INTERNAL / 8,
-> -            sizeof(cs->pending) - GIC_INTERNAL / 8);
-> -    memmove(cs->active, (uint8_t *)cs->active + GIC_INTERNAL / 8,
-> -            sizeof(cs->active) - GIC_INTERNAL / 8);
-> -    memmove(cs->edge_trigger, (uint8_t *)cs->edge_trigger + GIC_INTERNAL / 8,
-> -            sizeof(cs->edge_trigger) - GIC_INTERNAL / 8);
-> -
-> -    /*
-> -     * While this new version QEMU doesn't have this kind of bug as we fix it,
-> -     * so it needs to set the flag to true to indicate that and it's necessary
-> -     * for next migration to work from this new version QEMU.
-> -     */
-> -    cs->gicd_no_migration_shift_bug = true;
-> -
-> -    return 0;
-> -}
-> -
->  static bool needed_always(void *opaque)
->  {
->      return true;
-> @@ -210,7 +208,6 @@ const VMStateDescription vmstate_gicv3_gicd_no_migration_shift_bug = {
->      .version_id = 1,
->      .minimum_version_id = 1,
->      .needed = needed_always,
-> -    .post_load = gicv3_gicd_no_migration_shift_bug_post_load,
->      .fields = (VMStateField[]) {
->          VMSTATE_BOOL(gicd_no_migration_shift_bug, GICv3State),
->          VMSTATE_END_OF_LIST()
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+We'd still have to create a coroutine in cache_clean_timer_cb() and take
+the lock, but that sounds more managable.
+
+Kevin
