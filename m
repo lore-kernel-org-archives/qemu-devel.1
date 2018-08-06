@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fmfp6-0006D6-Lf
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:45:29 -0400
+	(envelope-from <mlureau@redhat.com>) id 1fmfrU-0006yX-Br
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:47:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fmfp1-0005X0-Uv
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:45:24 -0400
-Received: from mail-co1nam04on0712.outbound.protection.outlook.com
-	([2a01:111:f400:fe4d::712]:65248
-	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fmfp1-0005Vb-GZ
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:45:19 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 6 Aug 2018 13:45:12 +0000
-Message-ID: <BN7PR08MB48684CB85A7CF2E3E1996EB4C6200@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1533219424-7627-1-git-send-email-stefan.markovic@rt-rk.com>,
-	<1533219424-7627-62-git-send-email-stefan.markovic@rt-rk.com>
-In-Reply-To: <1533219424-7627-62-git-send-email-stefan.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mlureau@redhat.com>) id 1fmfrQ-0006fm-4u
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:47:52 -0400
+Received: from mail-it0-f67.google.com ([209.85.214.67]:53446)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fmfrP-0006fQ-Uo
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:47:48 -0400
+Received: by mail-it0-f67.google.com with SMTP id 72-v6so17461015itw.3
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 06:47:47 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v6 61/77] linux-user: Add syscall numbers
- for nanoMIPS
+In-Reply-To: <CAFEAcA-bM7KiPp5P5S-UAT5b6v7X0ETVqCA01WOSihTyW37WMQ@mail.gmail.com>
+References: <20180803153235.4134-1-marcandre.lureau@redhat.com>
+	<CAFEAcA-bM7KiPp5P5S-UAT5b6v7X0ETVqCA01WOSihTyW37WMQ@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 6 Aug 2018 15:47:45 +0200
+Message-ID: <CAMxuvazgmdke+bvnyY5RZJW=-vPXC6KAz9p9bmK+uVPcYF-coA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: fix crashes upon warm reboot
+ with vga mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-ping
+On Mon, Aug 6, 2018 at 3:39 PM, Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+> On 3 August 2018 at 16:32, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+>> With vga=3D775 on the Linux command line a first boot of the VM running
+>> Linux works fine. After a warm reboot it crashes during Linux boot.
+>>
+>> Before that, valgrind points out bad memory write to console
+>> surface. The VGA code is not aware that virtio-gpu got a message
+>> surface scanout when the display is disabled. Let's reset VGA graphic
+>> mode when it is the case, so that a new display surface is created
+>> when doing further VGA operations.
+>>
+>> https://bugs.launchpad.net/qemu/+bug/1784900/
+>>
+>> Reported-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  include/hw/virtio/virtio-gpu.h |  1 +
+>>  hw/display/virtio-gpu.c        |  5 +++++
+>>  hw/display/virtio-vga.c        | 11 +++++++++++
+>>  3 files changed, 17 insertions(+)
+>>
+>> diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-g=
+pu.h
+>> index 9780f755ef..d0321672f4 100644
+>> --- a/include/hw/virtio/virtio-gpu.h
+>> +++ b/include/hw/virtio/virtio-gpu.h
+>> @@ -125,6 +125,7 @@ typedef struct VirtIOGPU {
+>>          uint32_t bytes_3d;
+>>      } stats;
+>>
+>> +    void (*disable_scanout)(struct VirtIOGPU *g, int scanout_id);
+>>      Error *migration_blocker;
+>>  } VirtIOGPU;
+>
+> I guess for a last-minute 3.0 fix this is ok, but it looks
+> a bit weird to have a function pointer in a device instance
+> struct, which the user of the device has reached in and
+> set in order to modify the behaviour of the object...
 
-(Riku, Laurent?)
+It's not much different than pointing to a static const structure with
+function pointers (I thought that was unnecessary for just one
+function)
 
-> From: Stefan Markovic <stefan.markovic@rt-rk.com>
-> Sent: Thursday, August 2, 2018 4:16 PM
-> To: qemu-devel@nongnu.org
->=20
-> Subject: [PATCH v6 61/77] linux-user: Add syscall numbers for nanoMIPS
->=20
-> From: Aleksandar Rikalo <arikalo@wavecomp.com>
->=20
-> Add syscall numbers for nanoMIPS. nanoMIPS redefines its ABI
-> compared to preceding MIPS architectures, and its set of
-> supported system calls is significantly different.
->=20
-> Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-> ---
->  linux-user/nanomips/syscall_nr.h | 275 +++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 275 insertions(+)
->  create mode 100644 linux-user/nanomips/syscall_nr.h
+We could also have a VirtioGPUClass with virtual methods, and subclass
+TYPE_VIRTIO_GPU. Also a bit over-complicated, and conflicting with my
+vhost-user-gpu series. So we may eventually get there in 3.1 though.
+
+>
+> thanks
+> -- PMM
