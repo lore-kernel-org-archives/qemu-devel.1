@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgbE-0005AT-2X
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:35:09 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgbE-0005BC-Pd
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:35:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgbA-0000zG-Tl
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgbD-0000zh-CS
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:35:08 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:39562)
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:33044)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
-	id 1fmgbA-0000z0-Iv
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:35:04 -0400
-Received: by mail-ed1-x541.google.com with SMTP id h4-v6so5253526edi.6
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 07:35:04 -0700 (PDT)
+	id 1fmgbD-0000zb-1j
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:35:07 -0400
+Received: by mail-ed1-x542.google.com with SMTP id x5-v6so5274715edr.0
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 07:35:06 -0700 (PDT)
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon,  6 Aug 2018 16:34:00 +0200
-Message-Id: <20180806143412.27722-23-e.emanuelegiuseppe@gmail.com>
+Date: Mon,  6 Aug 2018 16:34:02 +0200
+Message-Id: <20180806143412.27722-25-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
 References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 22/34] test/qgraph: virtio-9p driver and
- interface nodes
+Subject: [Qemu-devel] [PATCH v2 24/34] test/qgraph: virtio-balloon driver
+ and interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +30,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Laurent Vivier <lvivier@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add qgraph nodes for virtio-9p-pci and virtio-9p-device.
-Both nodes produce virtio-9p, but virtio-9p-pci receives
-a pci-bus and overrides virtio-pci QOSGraphObject and its functions,
-while virtio-9p-device receives a virtio and implements
+Add qgraph nodes for virtio-balloon-pci and virtio-balloon-device.
+Both nodes produce virtio-balloon, but virtio-balloon-pci receives
+a pci-bus and uses virtio-pci QOSGraphObject and functions,
+while virtio-balloon-device receives a virtio and implements
 its own functions
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
- tests/Makefile.include   |   1 +
- tests/libqos/virtio-9p.c | 164 +++++++++++++++++++++++++++++++++++++++
- tests/libqos/virtio-9p.h |  42 ++++++++++
- 3 files changed, 207 insertions(+)
- create mode 100644 tests/libqos/virtio-9p.c
- create mode 100644 tests/libqos/virtio-9p.h
+ tests/Makefile.include        |   1 +
+ tests/libqos/virtio-balloon.c | 111 ++++++++++++++++++++++++++++++++++
+ tests/libqos/virtio-balloon.h |  39 ++++++++++++
+ 3 files changed, 151 insertions(+)
+ create mode 100644 tests/libqos/virtio-balloon.c
+ create mode 100644 tests/libqos/virtio-balloon.h
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f258a7778e..e4385555e3 100644
+index f367e9e321..a3d425918f 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -770,6 +770,7 @@ libqgraph-machines-obj-y += tests/libqos/ppc64_pseries-machine.o
- libqgraph-machines-obj-y += tests/libqos/virt-machine.o
+@@ -770,6 +770,7 @@ libqgraph-machines-obj-y += tests/libqos/virt-machine.o
  
  libqgraph-virtio-obj-y = tests/libqos/virtio-serial.o
-+libqgraph-virtio-obj-y += tests/libqos/virtio-9p.o
+ libqgraph-virtio-obj-y += tests/libqos/virtio-9p.o
++libqgraph-virtio-obj-y += tests/libqos/virtio-balloon.o
  
  libqgraph-pci-obj-y = $(libqos-virtio-obj-y)
  libqgraph-pci-obj-y += $(libqgraph-machines-obj-y)
-diff --git a/tests/libqos/virtio-9p.c b/tests/libqos/virtio-9p.c
+diff --git a/tests/libqos/virtio-balloon.c b/tests/libqos/virtio-balloon.c
 new file mode 100644
-index 0000000000..88437d58af
+index 0000000000..e97a9038fc
 --- /dev/null
-+++ b/tests/libqos/virtio-9p.c
-@@ -0,0 +1,164 @@
++++ b/tests/libqos/virtio-balloon.c
+@@ -0,0 +1,111 @@
 +/*
 + * libqos driver framework
 + *
@@ -83,156 +83,103 @@ index 0000000000..88437d58af
 +
 +#include "qemu/osdep.h"
 +#include "libqtest.h"
-+#include "standard-headers/linux/virtio_ids.h"
-+#include "libqos/virtio-9p.h"
 +#include "libqos/qgraph.h"
++#include "libqos/virtio-balloon.h"
 +
-+static QGuestAllocator *alloc;
-+
-+static void virtio_9p_cleanup(QVirtio9P *interface)
++/* virtio-balloon-device */
++static void qvirtio_balloon_device_destroy(QOSGraphObject *obj)
 +{
-+    qvirtqueue_cleanup(interface->vdev->bus, interface->vq, alloc);
++    QVirtioBalloonDevice *v_balloon = (QVirtioBalloonDevice *) obj;
++
++    g_free(v_balloon);
 +}
 +
-+static void virtio_9p_setup(QVirtio9P *interface)
++static void *qvirtio_balloon_device_get_driver(void *object,
++                                               const char *interface)
 +{
-+    interface->vq = qvirtqueue_setup(interface->vdev, alloc, 0);
-+}
-+
-+/* virtio-9p-device */
-+static void virtio_9p_device_destroy(QOSGraphObject *obj)
-+{
-+    QVirtio9PDevice *v_9p = (QVirtio9PDevice *) obj;
-+    QVirtio9P *interface = &v_9p->v9p;
-+    virtio_9p_cleanup(interface);
-+
-+    g_free(v_9p);
-+}
-+
-+static void virtio_9p_device_start_hw(QOSGraphObject *obj)
-+{
-+    QVirtio9PDevice *v_9p = (QVirtio9PDevice *) obj;
-+    QVirtio9P *interface = &v_9p->v9p;
-+
-+    virtio_9p_setup(interface);
-+}
-+
-+static void *virtio_9p_device_get_driver(void *object, const char *interface)
-+{
-+    QVirtio9PDevice *v_9p = object;
-+    if (!g_strcmp0(interface, "virtio-9p")) {
-+        return &v_9p->v9p;
++    QVirtioBalloonDevice *v_balloon = object;
++    if (!g_strcmp0(interface, "virtio-balloon")) {
++        return &v_balloon->balloon;
 +    }
 +
-+    printf("%s not present in virtio-9p-device\n", interface);
++    printf("%s not present in virtio-balloon-device\n", interface);
 +    abort();
 +}
 +
-+static void *virtio_9p_device_create(void *virtio_dev,
-+                                     QGuestAllocator *t_alloc,
-+                                     void *addr)
++static void *virtio_balloon_device_create(void *virtio_dev,
++                                          QGuestAllocator *t_alloc,
++                                          void *addr)
 +{
-+    QVirtio9PDevice *virtio_device = g_new0(QVirtio9PDevice, 1);
-+    QVirtio9P *interface = &virtio_device->v9p;
++    QVirtioBalloonDevice *virtio_bdevice = g_new0(QVirtioBalloonDevice, 1);
++    QVirtioBalloon *interface = &virtio_bdevice->balloon;
 +
 +    interface->vdev = virtio_dev;
-+    alloc = t_alloc;
 +
-+    virtio_device->obj.destructor = virtio_9p_device_destroy;
-+    virtio_device->obj.get_driver = virtio_9p_device_get_driver;
-+    virtio_device->obj.start_hw = virtio_9p_device_start_hw;
++    virtio_bdevice->obj.destructor = qvirtio_balloon_device_destroy;
++    virtio_bdevice->obj.get_driver = qvirtio_balloon_device_get_driver;
 +
-+    return &virtio_device->obj;
++    return &virtio_bdevice->obj;
 +}
 +
-+/* virtio-9p-pci */
-+static void virtio_9p_pci_destroy(QOSGraphObject *obj)
++/* virtio-balloon-pci */
++static void *qvirtio_balloon_pci_get_driver(void *object,
++                                            const char *interface)
 +{
-+    QVirtio9PPCI *v9_pci = (QVirtio9PPCI *) obj;
-+    QVirtio9P *interface = &v9_pci->v9p;
-+    QOSGraphObject *pci_vobj =  &v9_pci->pci_vdev.obj;
-+
-+    virtio_9p_cleanup(interface);
-+    qvirtio_pci_destroy(pci_vobj);
-+    g_free(v9_pci);
-+}
-+
-+static void virtio_9p_pci_start_hw(QOSGraphObject *obj)
-+{
-+    QVirtio9PPCI *v9_pci = (QVirtio9PPCI *) obj;
-+    QVirtio9P *interface = &v9_pci->v9p;
-+    QOSGraphObject *pci_vobj =  &v9_pci->pci_vdev.obj;
-+
-+    qvirtio_pci_start_hw(pci_vobj);
-+    virtio_9p_setup(interface);
-+}
-+
-+static void *virtio_9p_pci_get_driver(void *object, const char *interface)
-+{
-+    QVirtio9PPCI *v9p = object;
-+    if (!g_strcmp0(interface, "virtio-9p")) {
-+        return &v9p->v9p;
++    QVirtioBalloonPCI *v_balloon = object;
++    if (!g_strcmp0(interface, "virtio-balloon")) {
++        return &v_balloon->balloon;
 +    }
 +
-+    printf("%s not present in virtio-9p-pci\n", interface);
++    printf("%s not present in virtio-balloon-pci\n", interface);
 +    abort();
 +}
 +
-+static void *virtio_9p_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
++static void *virtio_balloon_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
 +                                  void *addr)
 +{
-+    QVirtio9PPCI *v9_pci = g_new0(QVirtio9PPCI, 1);
-+    QVirtio9P *interface = &v9_pci->v9p;
-+    QOSGraphObject *obj = &v9_pci->pci_vdev.obj;
++    QVirtioBalloonPCI *virtio_bpci = g_new0(QVirtioBalloonPCI, 1);
++    QVirtioBalloon *interface = &virtio_bpci->balloon;
++    QOSGraphObject *obj = &virtio_bpci->pci_vdev.obj;
 +
-+    virtio_pci_init(&v9_pci->pci_vdev, pci_bus, addr);
-+    interface->vdev = &v9_pci->pci_vdev.vdev;
-+    alloc = t_alloc;
 +
-+    g_assert_cmphex(interface->vdev->device_type, ==, VIRTIO_ID_9P);
++    virtio_pci_init(&virtio_bpci->pci_vdev, pci_bus, addr);
++    interface->vdev = &virtio_bpci->pci_vdev.vdev;
 +
-+    obj->destructor = virtio_9p_pci_destroy;
-+    obj->start_hw = virtio_9p_pci_start_hw;
-+    obj->get_driver = virtio_9p_pci_get_driver;
++    obj->get_driver = qvirtio_balloon_pci_get_driver;
 +
 +    return obj;
 +}
 +
-+static void virtio_9p(void)
++static void virtio_balloon(void)
 +{
-+    const char *str_simple = "fsdev=fsdev0,mount_tag=" MOUNT_TAG;
-+    const char *str_addr = "fsdev=fsdev0,addr=04.0,mount_tag=" MOUNT_TAG;
-+
 +    QPCIAddress addr = {
 +        .devfn = QPCI_DEVFN(4, 0),
 +    };
 +
 +    QOSGraphEdgeOptions opts = {
-+        .before_cmd_line = "-fsdev synth,id=fsdev0",
++        .extra_device_opts = "addr=04.0",
 +    };
 +
-+    /* virtio-9p-device */
-+    opts.extra_device_opts = str_simple,
-+    qos_node_create_driver("virtio-9p-device", virtio_9p_device_create);
-+    qos_node_consumes("virtio-9p-device", "virtio", &opts);
-+    qos_node_produces("virtio-9p-device", "virtio-9p");
++    /* virtio-balloon-device */
++    qos_node_create_driver("virtio-balloon-device",
++                            virtio_balloon_device_create);
++    qos_node_consumes("virtio-balloon-device", "virtio", NULL);
++    qos_node_produces("virtio-balloon-device", "virtio-balloon");
 +
-+    /* virtio-9p-pci */
-+    opts.extra_device_opts = str_addr;
++    /* virtio-balloon-pci */
 +    add_qpci_address(&opts, &addr);
-+    qos_node_create_driver("virtio-9p-pci", virtio_9p_pci_create);
-+    qos_node_consumes("virtio-9p-pci", "pci-bus", &opts);
-+    qos_node_produces("virtio-9p-pci", "virtio-9p");
-+
++    qos_node_create_driver("virtio-balloon-pci", virtio_balloon_pci_create);
++    qos_node_consumes("virtio-balloon-pci", "pci-bus", &opts);
++    qos_node_produces("virtio-balloon-pci", "virtio-balloon");
 +}
 +
-+libqos_init(virtio_9p);
-diff --git a/tests/libqos/virtio-9p.h b/tests/libqos/virtio-9p.h
++libqos_init(virtio_balloon);
+diff --git a/tests/libqos/virtio-balloon.h b/tests/libqos/virtio-balloon.h
 new file mode 100644
-index 0000000000..dba22772b5
+index 0000000000..e8066c42bb
 --- /dev/null
-+++ b/tests/libqos/virtio-9p.h
-@@ -0,0 +1,42 @@
++++ b/tests/libqos/virtio-balloon.h
+@@ -0,0 +1,39 @@
 +/*
 + * libqos driver framework
 + *
@@ -255,25 +202,22 @@ index 0000000000..dba22772b5
 +#include "libqos/virtio.h"
 +#include "libqos/virtio-pci.h"
 +
-+typedef struct QVirtio9P QVirtio9P;
-+typedef struct QVirtio9PPCI QVirtio9PPCI;
-+typedef struct QVirtio9PDevice QVirtio9PDevice;
++typedef struct QVirtioBalloon QVirtioBalloon;
++typedef struct QVirtioBalloonPCI QVirtioBalloonPCI;
++typedef struct QVirtioBalloonDevice QVirtioBalloonDevice;
 +
-+#define MOUNT_TAG "qtest"
-+
-+struct QVirtio9P {
++struct QVirtioBalloon {
 +    QVirtioDevice *vdev;
-+    QVirtQueue *vq;
 +};
 +
-+struct QVirtio9PPCI {
++struct QVirtioBalloonPCI {
 +    QVirtioPCIDevice pci_vdev;
-+    QVirtio9P v9p;
++    QVirtioBalloon balloon;
 +};
 +
-+struct QVirtio9PDevice {
++struct QVirtioBalloonDevice {
 +    QOSGraphObject obj;
-+    QVirtio9P v9p;
++    QVirtioBalloon balloon;
 +};
 -- 
 2.17.1
