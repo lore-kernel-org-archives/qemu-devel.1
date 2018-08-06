@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fmfaA-0003KT-Oi
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:59 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fmfa9-0008Hb-S3
+	(envelope-from <jemmy858585@gmail.com>) id 1fmfa9-0003JB-0s
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:58 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:42904)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <jemmy858585@gmail.com>) id 1fmfa6-0008GS-8I
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:57 -0400
+Received: from mail-pl0-x233.google.com ([2607:f8b0:400e:c01::233]:44032)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fmfa9-0008HI-M4
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:57 -0400
-Received: by mail-pg1-x542.google.com with SMTP id y4-v6so6233467pgp.9
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 06:29:57 -0700 (PDT)
+	id 1fmfa6-0008G9-2X
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:54 -0400
+Received: by mail-pl0-x233.google.com with SMTP id ba4-v6so5655936plb.11
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 06:29:53 -0700 (PDT)
 From: Lidong Chen <jemmy858585@gmail.com>
-Date: Mon,  6 Aug 2018 21:29:33 +0800
-Message-Id: <1533562177-16447-8-git-send-email-lidongchen@tencent.com>
+Date: Mon,  6 Aug 2018 21:29:31 +0800
+Message-Id: <1533562177-16447-6-git-send-email-lidongchen@tencent.com>
 In-Reply-To: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
 References: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v6 07/11] migration: poll the cm event while
- wait RDMA work request completion
+Subject: [Qemu-devel] [PATCH v6 05/11] migration: implement
+ io_set_aio_fd_handler function for RDMA QIOChannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +28,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: zhang.zhanghailiang@huawei.com, quintela@redhat.com, dgilbert@redhat.com
-Cc: qemu-devel@nongnu.org, Lidong Chen <jemmy858585@gmail.com>, Lidong Chen <lidongchen@tencent.com>, Gal Shachaf <galsha@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>
+Cc: qemu-devel@nongnu.org, Lidong Chen <jemmy858585@gmail.com>, Lidong Chen <lidongchen@tencent.com>
 
 From: Lidong Chen <jemmy858585@gmail.com>
 
-If the peer qemu is crashed, the qemu_rdma_wait_comp_channel function
-maybe loop forever. so we should also poll the cm event fd, and when
-receive RDMA_CM_EVENT_DISCONNECTED and RDMA_CM_EVENT_DEVICE_REMOVAL,
-we consider some error happened.
+if qio_channel_rdma_readv return QIO_CHANNEL_ERR_BLOCK, the destination qemu
+crash.
+
+The backtrace is:
+(gdb) bt
+    #0  0x0000000000000000 in ?? ()
+    #1  0x00000000008db50e in qio_channel_set_aio_fd_handler (ioc=0x38111e0, ctx=0x3726080,
+        io_read=0x8db841 <qio_channel_restart_read>, io_write=0x0, opaque=0x38111e0) at io/channel.c:
+    #2  0x00000000008db952 in qio_channel_set_aio_fd_handlers (ioc=0x38111e0) at io/channel.c:438
+    #3  0x00000000008dbab4 in qio_channel_yield (ioc=0x38111e0, condition=G_IO_IN) at io/channel.c:47
+    #4  0x00000000007a870b in channel_get_buffer (opaque=0x38111e0, buf=0x440c038 "", pos=0, size=327
+        at migration/qemu-file-channel.c:83
+    #5  0x00000000007a70f6 in qemu_fill_buffer (f=0x440c000) at migration/qemu-file.c:299
+    #6  0x00000000007a79d0 in qemu_peek_byte (f=0x440c000, offset=0) at migration/qemu-file.c:562
+    #7  0x00000000007a7a22 in qemu_get_byte (f=0x440c000) at migration/qemu-file.c:575
+    #8  0x00000000007a7c78 in qemu_get_be32 (f=0x440c000) at migration/qemu-file.c:655
+    #9  0x00000000007a0508 in qemu_loadvm_state (f=0x440c000) at migration/savevm.c:2126
+    #10 0x0000000000794141 in process_incoming_migration_co (opaque=0x0) at migration/migration.c:366
+    #11 0x000000000095c598 in coroutine_trampoline (i0=84033984, i1=0) at util/coroutine-ucontext.c:1
+    #12 0x00007f9c0db56d40 in ?? () from /lib64/libc.so.6
+    #13 0x00007f96fe858760 in ?? ()
+    #14 0x0000000000000000 in ?? ()
+
+RDMA QIOChannel not implement io_set_aio_fd_handler. so
+qio_channel_set_aio_fd_handler will access NULL pointer.
 
 Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-Signed-off-by: Gal Shachaf <galsha@mellanox.com>
-Signed-off-by: Aviad Yehezkel <aviadye@mellanox.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/rdma.c | 33 ++++++++++++++++++++++++++++++---
- 1 file changed, 30 insertions(+), 3 deletions(-)
+ migration/rdma.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
 diff --git a/migration/rdma.c b/migration/rdma.c
-index d6bbf28..673f126 100644
+index cfb0671..d6bbf28 100644
 --- a/migration/rdma.c
 +++ b/migration/rdma.c
-@@ -1489,6 +1489,9 @@ static uint64_t qemu_rdma_poll(RDMAContext *rdma, uint64_t *wr_id_out,
-  */
- static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
- {
-+    struct rdma_cm_event *cm_event;
-+    int ret = -1;
-+
-     /*
-      * Coroutine doesn't start until migration_fd_process_incoming()
-      * so don't yield unless we know we're running inside of a coroutine.
-@@ -1505,13 +1508,37 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
-          * without hanging forever.
-          */
-         while (!rdma->error_state  && !rdma->received_error) {
--            GPollFD pfds[1];
-+            GPollFD pfds[2];
-             pfds[0].fd = rdma->comp_channel->fd;
-             pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-+            pfds[0].revents = 0;
-+
-+            pfds[1].fd = rdma->channel->fd;
-+            pfds[1].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-+            pfds[1].revents = 0;
-+
-             /* 0.1s timeout, should be fine for a 'cancel' */
--            switch (qemu_poll_ns(pfds, 1, 100 * 1000 * 1000)) {
-+            switch (qemu_poll_ns(pfds, 2, 100 * 1000 * 1000)) {
-+            case 2:
-             case 1: /* fd active */
--                return 0;
-+                if (pfds[0].revents) {
-+                    return 0;
-+                }
-+
-+                if (pfds[1].revents) {
-+                    ret = rdma_get_cm_event(rdma->channel, &cm_event);
-+                    if (!ret) {
-+                        rdma_ack_cm_event(cm_event);
-+                    }
-+
-+                    error_report("receive cm event while wait comp channel,"
-+                                 "cm event is %d", cm_event->event);
-+                    if (cm_event->event == RDMA_CM_EVENT_DISCONNECTED ||
-+                        cm_event->event == RDMA_CM_EVENT_DEVICE_REMOVAL) {
-+                        return -EPIPE;
-+                    }
-+                }
-+                break;
+@@ -2963,6 +2963,21 @@ static GSource *qio_channel_rdma_create_watch(QIOChannel *ioc,
+     return source;
+ }
  
-             case 0: /* Timeout, go around again */
-                 break;
++static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
++                                                  AioContext *ctx,
++                                                  IOHandler *io_read,
++                                                  IOHandler *io_write,
++                                                  void *opaque)
++{
++    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
++    if (io_read) {
++        aio_set_fd_handler(ctx, rioc->rdmain->comp_channel->fd,
++                           false, io_read, io_write, NULL, opaque);
++    } else {
++        aio_set_fd_handler(ctx, rioc->rdmaout->comp_channel->fd,
++                           false, io_read, io_write, NULL, opaque);
++    }
++}
+ 
+ static int qio_channel_rdma_close(QIOChannel *ioc,
+                                   Error **errp)
+@@ -3822,6 +3837,7 @@ static void qio_channel_rdma_class_init(ObjectClass *klass,
+     ioc_klass->io_set_blocking = qio_channel_rdma_set_blocking;
+     ioc_klass->io_close = qio_channel_rdma_close;
+     ioc_klass->io_create_watch = qio_channel_rdma_create_watch;
++    ioc_klass->io_set_aio_fd_handler = qio_channel_rdma_set_aio_fd_handler;
+ }
+ 
+ static const TypeInfo qio_channel_rdma_info = {
 -- 
 1.8.3.1
