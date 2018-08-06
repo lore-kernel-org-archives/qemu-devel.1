@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fmhIo-00055f-Cn
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:20:11 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fmhNO-0006Kj-19
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:24:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fmhIk-0003Km-W4
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:20:10 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180806150541.GE4631@localhost.localdomain>
-References: <20180806141322.14427-1-berto@igalia.com>
-	<20180806150541.GE4631@localhost.localdomain>
-Date: Mon, 06 Aug 2018 17:20:03 +0200
-Message-ID: <w51mutzo730.fsf@maestria.local.igalia.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fmhNK-0005Ml-RD
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:24:54 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44927)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fmhNK-0005MS-KL
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:24:50 -0400
+Received: by mail-oi0-x241.google.com with SMTP id s198-v6so22841155oih.11
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 08:24:50 -0700 (PDT)
+References: <20180805182832.3012-1-pavel.zbitskiy@gmail.com>
+	<20180805182832.3012-4-pavel.zbitskiy@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <15c06ae1-5262-85fe-df70-afd570f7efa7@linaro.org>
+Date: Mon, 6 Aug 2018 08:24:44 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Release dirty entries with
- cache-clean-interval
+In-Reply-To: <20180805182832.3012-4-pavel.zbitskiy@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/6] target/s390x: fix ipm polluting
+ irrelevant bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,33 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, qemu-devel@nongnu.org
+Cc: David Hildenbrand <david@redhat.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, "open list:S390" <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On Mon 06 Aug 2018 05:05:41 PM CEST, Kevin Wolf wrote:
-> Am 06.08.2018 um 16:13 hat Alberto Garcia geschrieben:
->> -static inline bool can_clean_entry(Qcow2Cache *c, int i)
->> +static inline bool can_clean_entry(BlockDriverState *bs, Qcow2Cache *c, int i)
->>  {
->>      Qcow2CachedTable *t = &c->entries[i];
->> -    return t->ref == 0 && !t->dirty && t->offset != 0 &&
->> -        t->lru_counter <= c->cache_clean_lru_counter;
->> +    if (t->ref || !t->offset || t->lru_counter > c->cache_clean_lru_counter) {
->> +        return false;
->> +    }
->> +
->> +    if (qcow2_cache_entry_flush(bs, c, i) < 0) {
->> +        return false;
->> +    }
->
-> We're not in coroutine context here, so qcow2_cache_entry_flush() will
-> be blocking. I don't think that's acceptable in a timer callback.
->
-> On the other hand, if we made it non-blocking by moving it into a
-> coroutine that could yield, we would have to consider races with other
-> parts of the code and at least take s->lock and implement
-> .bdrv_co_drain_begin/end callbacks.
+On 08/05/2018 11:28 AM, Pavel Zbitskiy wrote:
+> +    tcg_gen_andi_i64(t1, psw_mask, 0x00000f0000000000);
+> +    tcg_gen_shri_i64(t1, t1, 16);
 
-Oh, I see... it's probably not worth complicating the code for this then.
+It would be better to swap these two operations, so that a 64-bit constant
+isn't needed for the mask, e.g:
 
-Berto
+    tcg_gen_shri_i64(t1, psw_mask, 16);
+    tcg_gen_andi_i64(t1, t1, 0xf000000);
+
+Or maybe rewrite this whole function with extract/deposit:
+
+    tcg_gen_extract_i64(t1, psw_mask, 40, 4);
+    tcg_gen_extu_i32_i64(t2, cc_op);
+    tcg_gen_deposit_i64(t1, t1, t2, 4, 60);
+    tcg_gen_deposit_i64(o->out, o->out, t1, 24, 8);
+
+But what you have is not wrong so,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
