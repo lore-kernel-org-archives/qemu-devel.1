@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHH-0008M0-Le
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:45 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHH-0008MG-Nr
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHD-0002lt-9G
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjHE-0002or-WE
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:47353 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:47440 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fmjHD-0002k5-1e
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:39 -0400
+	id 1fmjHE-0002mG-L2
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:26:40 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  6 Aug 2018 19:00:31 +0200
-Message-Id: <1533574847-19294-65-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  6 Aug 2018 19:00:37 +0200
+Message-Id: <1533574847-19294-71-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 64/80] linux-user: Add termbits.h header for
- nanoMIPS
+Subject: [Qemu-devel] [PATCH v7 70/80] linux-user: Add target_structs.h
+ header for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +28,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Dimitrije Nikolic <dnikolic@wavecomp.com>
 
-Add termbits.h header for nanoMIPS. Reuse MIPS' termbits.h as
-the functionalities are almost identical.
+Add target_structs.h header for nanoMIPS, that in fact only redirects
+to the corresponding MIPS header.
 
 Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/mips/termbits.h     | 4 ++++
- linux-user/nanomips/termbits.h | 1 +
- 2 files changed, 5 insertions(+)
- create mode 100644 linux-user/nanomips/termbits.h
+ linux-user/nanomips/target_structs.h | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 linux-user/nanomips/target_structs.h
 
-diff --git a/linux-user/mips/termbits.h b/linux-user/mips/termbits.h
-index 49a72c5..c7254f4 100644
---- a/linux-user/mips/termbits.h
-+++ b/linux-user/mips/termbits.h
-@@ -1,6 +1,10 @@
- /* from asm/termbits.h */
- 
-+#ifdef TARGET_NANOMIPS
-+#define TARGET_NCCS 32
-+#else
- #define TARGET_NCCS 23
-+#endif
- 
- struct target_termios {
-     unsigned int c_iflag;               /* input mode flags */
-diff --git a/linux-user/nanomips/termbits.h b/linux-user/nanomips/termbits.h
+diff --git a/linux-user/nanomips/target_structs.h b/linux-user/nanomips/target_structs.h
 new file mode 100644
-index 0000000..ea4e962
+index 0000000..cc6c6ea
 --- /dev/null
-+++ b/linux-user/nanomips/termbits.h
++++ b/linux-user/nanomips/target_structs.h
 @@ -0,0 +1 @@
-+#include "../mips/termbits.h"
++#include "../mips/target_structs.h"
 -- 
 2.7.4
