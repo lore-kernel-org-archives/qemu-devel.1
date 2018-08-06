@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjEl-0005RE-7M
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:24:08 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjFA-0005nM-Nh
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjEg-0008KL-W3
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:24:07 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:40384 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmjF9-0000Um-Jw
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:24:32 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:41330 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fmjEg-0008IO-N0
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:24:02 -0400
+	id 1fmjF9-0000TT-8V
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:24:31 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  6 Aug 2018 19:00:13 +0200
-Message-Id: <1533574847-19294-47-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  6 Aug 2018 19:00:14 +0200
+Message-Id: <1533574847-19294-48-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 46/80] target/mips: Add handling of branch
- delay slots for nanoMIPS
+Subject: [Qemu-devel] [PATCH v7 47/80] target/mips: Add updating BadInstr,
+ BadInstrP, BadInstrX for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +28,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
 
-From: Matthew Fortune <matthew.fortune@mips.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-ISA mode bit (LSB of address) is no longer required but is also
-masked to allow for tools transition. The flag has_isa_mode has the
-key role in the implementation.
+Update BadInstr, BadInstrP,and BadInstrX registers for nanoMIPS.
+The same support for pre-nanoMIPS remains unimplemented.
 
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ target/mips/helper.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e1534cd..da03978 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -1459,6 +1459,7 @@ typedef struct DisasContext {
-     bool nan2008;
-     bool abs2008;
-     bool xnp;
-+    bool has_isa_mode;
- } DisasContext;
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index e215af9..b25e000 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -682,6 +682,31 @@ static void set_hflags_for_handler (CPUMIPSState *env)
  
- #define DISAS_STOP       DISAS_TARGET_0
-@@ -4621,7 +4622,7 @@ static void gen_compute_branch (DisasContext *ctx, uint32_t opc,
- 
-     if (blink > 0) {
-         int post_delay = insn_bytes + delayslot_size;
--        int lowbit = !!(ctx->hflags & MIPS_HFLAG_M16);
-+        int lowbit = ctx->has_isa_mode && !!(ctx->hflags & MIPS_HFLAG_M16);
- 
-         tcg_gen_movi_tl(cpu_gpr[blink],
-                         ctx->base.pc_next + post_delay + lowbit);
-@@ -11110,7 +11111,7 @@ static void gen_compute_compact_branch(DisasContext *ctx, uint32_t opc,
-     int bcond_compute = 0;
-     TCGv t0 = tcg_temp_new();
-     TCGv t1 = tcg_temp_new();
--    int m16_lowbit = (ctx->hflags & MIPS_HFLAG_M16) != 0;
-+    int m16_lowbit = ctx->has_isa_mode && ((ctx->hflags & MIPS_HFLAG_M16) != 0);
- 
-     if (ctx->hflags & MIPS_HFLAG_BMASK) {
- #ifdef MIPS_DEBUG_DISAS
-@@ -24982,6 +24983,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     ctx->nan2008 = (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
-     ctx->abs2008 = (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
-     ctx->xnp = (env->CP0_Config5 >> CP0C5_XNP) & 1;
-+    ctx->has_isa_mode = ((env->CP0_Config3 >> CP0C3_MMAR) & 0x7) < 3;
-     restore_cpu_state(env, ctx);
- #ifdef CONFIG_USER_ONLY
-         ctx->mem_idx = MIPS_HFLAG_UM;
+ static inline void set_badinstr_registers(CPUMIPSState *env)
+ {
++    if (env->insn_flags & ISA_NANOMIPS32) {
++        if (env->CP0_Config3 & (1 << CP0C3_BI)) {
++            uint32_t instr = (cpu_lduw_code(env, env->active_tc.PC)) << 16;
++            if ((instr & 0x10000000) == 0) {
++                instr |= cpu_lduw_code(env, env->active_tc.PC + 2);
++            }
++            env->CP0_BadInstr = instr;
++
++            if ((instr & 0xFC000000) == 0x60000000) {
++                instr = cpu_lduw_code(env, env->active_tc.PC + 4) << 16;
++                env->CP0_BadInstrX = instr;
++            }
++        }
++        if ((env->CP0_Config3 & (1 << CP0C3_BP)) &&
++            (env->hflags & MIPS_HFLAG_BMASK)) {
++            if (!(env->hflags & MIPS_HFLAG_B16)) {
++                env->CP0_BadInstrP = cpu_ldl_code(env, env->active_tc.PC - 4);
++            } else {
++                env->CP0_BadInstrP =
++                    (cpu_lduw_code(env, env->active_tc.PC - 2)) << 16;
++            }
++        }
++        return;
++    }
++
+     if (env->hflags & MIPS_HFLAG_M16) {
+         /* TODO: add BadInstr support for microMIPS */
+         return;
 -- 
 2.7.4
