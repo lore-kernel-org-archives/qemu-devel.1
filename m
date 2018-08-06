@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fmfa5-0003Hc-Cc
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:54 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fmfa9-0003JC-0q
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fmfa4-0008Fg-Ei
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:53 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38300)
+	(envelope-from <jemmy858585@gmail.com>) id 1fmfa7-0008Gt-WA
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:57 -0400
+Received: from mail-pg1-x536.google.com ([2607:f8b0:4864:20::536]:45777)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fmfa4-0008FR-8V
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:52 -0400
-Received: by mail-pg1-x542.google.com with SMTP id k3-v6so6239760pgq.5
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 06:29:52 -0700 (PDT)
+	id 1fmfa7-0008Gl-Oz
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:55 -0400
+Received: by mail-pg1-x536.google.com with SMTP id f1-v6so6224119pgq.12
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 06:29:55 -0700 (PDT)
 From: Lidong Chen <jemmy858585@gmail.com>
-Date: Mon,  6 Aug 2018 21:29:30 +0800
-Message-Id: <1533562177-16447-5-git-send-email-lidongchen@tencent.com>
+Date: Mon,  6 Aug 2018 21:29:32 +0800
+Message-Id: <1533562177-16447-7-git-send-email-lidongchen@tencent.com>
 In-Reply-To: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
 References: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v6 04/11] migration: Stop rdma yielding during
- incoming postcopy
+Subject: [Qemu-devel] [PATCH v6 06/11] migration: invoke qio_channel_yield
+ only when qemu_in_coroutine()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +32,63 @@ Cc: qemu-devel@nongnu.org, Lidong Chen <jemmy858585@gmail.com>, Lidong Chen <lid
 
 From: Lidong Chen <jemmy858585@gmail.com>
 
-During incoming postcopy, the destination qemu will invoke
-qemu_rdma_wait_comp_channel in a seprate thread. So does not use rdma
-yield, and poll the completion channel fd instead.
+when qio_channel_read return QIO_CHANNEL_ERR_BLOCK, the source qemu crash.
+
+The backtrace is:
+    (gdb) bt
+    #0  0x00007fb20aba91d7 in raise () from /lib64/libc.so.6
+    #1  0x00007fb20abaa8c8 in abort () from /lib64/libc.so.6
+    #2  0x00007fb20aba2146 in __assert_fail_base () from /lib64/libc.so.6
+    #3  0x00007fb20aba21f2 in __assert_fail () from /lib64/libc.so.6
+    #4  0x00000000008dba2d in qio_channel_yield (ioc=0x22f9e20, condition=G_IO_IN) at io/channel.c:460
+    #5  0x00000000007a870b in channel_get_buffer (opaque=0x22f9e20, buf=0x3d54038 "", pos=0, size=32768)
+        at migration/qemu-file-channel.c:83
+    #6  0x00000000007a70f6 in qemu_fill_buffer (f=0x3d54000) at migration/qemu-file.c:299
+    #7  0x00000000007a79d0 in qemu_peek_byte (f=0x3d54000, offset=0) at migration/qemu-file.c:562
+    #8  0x00000000007a7a22 in qemu_get_byte (f=0x3d54000) at migration/qemu-file.c:575
+    #9  0x00000000007a7c46 in qemu_get_be16 (f=0x3d54000) at migration/qemu-file.c:647
+    #10 0x0000000000796db7 in source_return_path_thread (opaque=0x2242280) at migration/migration.c:1794
+    #11 0x00000000009428fa in qemu_thread_start (args=0x3e58420) at util/qemu-thread-posix.c:504
+    #12 0x00007fb20af3ddc5 in start_thread () from /lib64/libpthread.so.0
+    #13 0x00007fb20ac6b74d in clone () from /lib64/libc.so.6
+
+This patch fixed by invoke qio_channel_yield only when qemu_in_coroutine().
 
 Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/rdma.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ migration/qemu-file-channel.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/migration/rdma.c b/migration/rdma.c
-index a5535fb..cfb0671 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -1493,11 +1493,13 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
-      * Coroutine doesn't start until migration_fd_process_incoming()
-      * so don't yield unless we know we're running inside of a coroutine.
-      */
--    if (rdma->migration_started_on_destination) {
-+    if (rdma->migration_started_on_destination &&
-+        migration_incoming_get_current()->state == MIGRATION_STATUS_ACTIVE) {
-         yield_until_fd_readable(rdma->comp_channel->fd);
-     } else {
-         /* This is the source side, we're in a separate thread
-          * or destination prior to migration_fd_process_incoming()
-+         * after postcopy, the destination also in a seprate thread.
-          * we can't yield; so we have to poll the fd.
-          * But we need to be able to handle 'cancel' or an error
-          * without hanging forever.
+diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.c
+index e202d73..8e639eb 100644
+--- a/migration/qemu-file-channel.c
++++ b/migration/qemu-file-channel.c
+@@ -49,7 +49,11 @@ static ssize_t channel_writev_buffer(void *opaque,
+         ssize_t len;
+         len = qio_channel_writev(ioc, local_iov, nlocal_iov, NULL);
+         if (len == QIO_CHANNEL_ERR_BLOCK) {
+-            qio_channel_wait(ioc, G_IO_OUT);
++            if (qemu_in_coroutine()) {
++                qio_channel_yield(ioc, G_IO_OUT);
++            } else {
++                qio_channel_wait(ioc, G_IO_OUT);
++            }
+             continue;
+         }
+         if (len < 0) {
+@@ -80,7 +84,11 @@ static ssize_t channel_get_buffer(void *opaque,
+         ret = qio_channel_read(ioc, (char *)buf, size, NULL);
+         if (ret < 0) {
+             if (ret == QIO_CHANNEL_ERR_BLOCK) {
+-                qio_channel_yield(ioc, G_IO_IN);
++                if (qemu_in_coroutine()) {
++                    qio_channel_yield(ioc, G_IO_IN);
++                } else {
++                    qio_channel_wait(ioc, G_IO_IN);
++                }
+             } else {
+                 /* XXX handle Error * object */
+                 return -EIO;
 -- 
 1.8.3.1
