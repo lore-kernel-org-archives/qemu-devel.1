@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fmh49-0007PA-Sz
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:05:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fmh4x-00084c-LE
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:05:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fmh45-0004y9-TT
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:05:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46024 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1fmh45-0004wa-M9
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:04:57 -0400
-References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
-	<20180806143412.27722-3-e.emanuelegiuseppe@gmail.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <f8d53890-79ea-f1f7-3110-386e7eea1c5a@redhat.com>
-Date: Mon, 6 Aug 2018 17:04:48 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fmh4w-0005Tf-Hg
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 11:05:51 -0400
+Date: Mon, 6 Aug 2018 17:05:41 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180806150541.GE4631@localhost.localdomain>
+References: <20180806141322.14427-1-berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20180806143412.27722-3-e.emanuelegiuseppe@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/34] tests/qgraph: rename qpci_init_pc
- functions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180806141322.14427-1-berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Release dirty entries with
+ cache-clean-interval
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 06/08/2018 16:33, Emanuele Giuseppe Esposito wrote:
-> Rename qpci_init_pc in qpci_new_pc, since the function actually
-> allocates a new QPCIBusPC and initialize it.
+Am 06.08.2018 um 16:13 hat Alberto Garcia geschrieben:
+> The cache-clean-interval option is used to periodically release unused
+> entries from the L2 and refcount caches. Dirty cache entries are left
+> untouched, even if they are otherwise valid candidates for removal.
 > 
-> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> This patch allows releasing those entries by flushing them to disk
+> first.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  tests/e1000e-test.c       | 2 +-
->  tests/i440fx-test.c       | 2 +-
->  tests/ide-test.c          | 2 +-
->  tests/libqos/ahci.c       | 2 +-
->  tests/libqos/libqos-pc.c  | 2 +-
->  tests/libqos/pci-pc.c     | 2 +-
->  tests/libqos/pci-pc.h     | 9 ++++++++-
->  tests/q35-test.c          | 4 ++--
->  tests/rtl8139-test.c      | 2 +-
->  tests/sdhci-test.c        | 2 +-
->  tests/tco-test.c          | 2 +-
->  tests/usb-hcd-ehci-test.c | 2 +-
->  tests/vhost-user-test.c   | 2 +-
->  13 files changed, 21 insertions(+), 14 deletions(-)
+>  block/qcow2-cache.c | 21 +++++++++++++++------
+>  block/qcow2.c       |  4 ++--
+>  block/qcow2.h       |  2 +-
+>  3 files changed, 18 insertions(+), 9 deletions(-)
 > 
-...
-> diff --git a/tests/libqos/libqos-pc.c b/tests/libqos/libqos-pc.c
-> index a9c1aceaa7..72b3eb46f5 100644
-> --- a/tests/libqos/libqos-pc.c
-> +++ b/tests/libqos/libqos-pc.c
-> @@ -6,7 +6,7 @@
->  static QOSOps qos_ops = {
->      .init_allocator = pc_alloc_init_flags,
->      .uninit_allocator = pc_alloc_uninit,
-> -    .qpci_init = qpci_init_pc,
-> +    .qpci_init = qpci_pc_new,
->      .qpci_free = qpci_free_pc,
->      .shutdown = qtest_pc_shutdown,
+> diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+> index d9dafa31e5..0812164e46 100644
+> --- a/block/qcow2-cache.c
+> +++ b/block/qcow2-cache.c
+> @@ -46,6 +46,8 @@ struct Qcow2Cache {
+>      uint64_t                cache_clean_lru_counter;
 >  };
+>  
+> +static int qcow2_cache_entry_flush(BlockDriverState *bs, Qcow2Cache *c, int i);
+> +
+>  static inline void *qcow2_cache_get_table_addr(Qcow2Cache *c, int table)
+>  {
+>      return (uint8_t *) c->table_array + (size_t) table * c->table_size;
+> @@ -86,26 +88,33 @@ static void qcow2_cache_table_release(Qcow2Cache *c, int i, int num_tables)
+>  #endif
+>  }
+>  
+> -static inline bool can_clean_entry(Qcow2Cache *c, int i)
+> +static inline bool can_clean_entry(BlockDriverState *bs, Qcow2Cache *c, int i)
+>  {
+>      Qcow2CachedTable *t = &c->entries[i];
+> -    return t->ref == 0 && !t->dirty && t->offset != 0 &&
+> -        t->lru_counter <= c->cache_clean_lru_counter;
+> +    if (t->ref || !t->offset || t->lru_counter > c->cache_clean_lru_counter) {
+> +        return false;
+> +    }
+> +
+> +    if (qcow2_cache_entry_flush(bs, c, i) < 0) {
+> +        return false;
+> +    }
 
-I think you should also rename the "qpci_init" field to "qpci_new".
-And as we have "qpci_free_pc", it should be "qpci_new_pc", and you
-should do the same for qpci_init_spapr -> qpci_new_spapr.
+We're not in coroutine context here, so qcow2_cache_entry_flush() will
+be blocking. I don't think that's acceptable in a timer callback.
 
-Thanks,
-Laurent
+On the other hand, if we made it non-blocking by moving it into a
+coroutine that could yield, we would have to consider races with other
+parts of the code and at least take s->lock and implement
+.bdrv_co_drain_begin/end callbacks.
+
+Kevin
