@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fmfa9-0003JB-0s
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:58 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fmfaH-0003SC-Er
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:30:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fmfa6-0008GS-8I
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:57 -0400
-Received: from mail-pl0-x233.google.com ([2607:f8b0:400e:c01::233]:44032)
+	(envelope-from <jemmy858585@gmail.com>) id 1fmfaG-0008L4-GZ
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:30:05 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33210)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fmfa6-0008G9-2X
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:54 -0400
-Received: by mail-pl0-x233.google.com with SMTP id ba4-v6so5655936plb.11
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 06:29:53 -0700 (PDT)
+	id 1fmfaG-0008Ku-9A
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:30:04 -0400
+Received: by mail-pf1-x441.google.com with SMTP id d4-v6so6891253pfn.0
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 06:30:04 -0700 (PDT)
 From: Lidong Chen <jemmy858585@gmail.com>
-Date: Mon,  6 Aug 2018 21:29:31 +0800
-Message-Id: <1533562177-16447-6-git-send-email-lidongchen@tencent.com>
+Date: Mon,  6 Aug 2018 21:29:37 +0800
+Message-Id: <1533562177-16447-12-git-send-email-lidongchen@tencent.com>
 In-Reply-To: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
 References: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v6 05/11] migration: implement
- io_set_aio_fd_handler function for RDMA QIOChannel
+Subject: [Qemu-devel] [PATCH v6 11/11] migration: create a dedicated thread
+ to release rdma resource
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +28,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: zhang.zhanghailiang@huawei.com, quintela@redhat.com, dgilbert@redhat.com
-Cc: qemu-devel@nongnu.org, Lidong Chen <jemmy858585@gmail.com>, Lidong Chen <lidongchen@tencent.com>
+Cc: qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-From: Lidong Chen <jemmy858585@gmail.com>
+ibv_dereg_mr wait for a long time for big memory size virtual server.
 
-if qio_channel_rdma_readv return QIO_CHANNEL_ERR_BLOCK, the destination qemu
-crash.
+The test result is:
+  10GB  326ms
+  20GB  699ms
+  30GB  1021ms
+  40GB  1387ms
+  50GB  1712ms
+  60GB  2034ms
+  70GB  2457ms
+  80GB  2807ms
+  90GB  3107ms
+  100GB 3474ms
+  110GB 3735ms
+  120GB 4064ms
+  130GB 4567ms
+  140GB 4886ms
 
-The backtrace is:
-(gdb) bt
-    #0  0x0000000000000000 in ?? ()
-    #1  0x00000000008db50e in qio_channel_set_aio_fd_handler (ioc=0x38111e0, ctx=0x3726080,
-        io_read=0x8db841 <qio_channel_restart_read>, io_write=0x0, opaque=0x38111e0) at io/channel.c:
-    #2  0x00000000008db952 in qio_channel_set_aio_fd_handlers (ioc=0x38111e0) at io/channel.c:438
-    #3  0x00000000008dbab4 in qio_channel_yield (ioc=0x38111e0, condition=G_IO_IN) at io/channel.c:47
-    #4  0x00000000007a870b in channel_get_buffer (opaque=0x38111e0, buf=0x440c038 "", pos=0, size=327
-        at migration/qemu-file-channel.c:83
-    #5  0x00000000007a70f6 in qemu_fill_buffer (f=0x440c000) at migration/qemu-file.c:299
-    #6  0x00000000007a79d0 in qemu_peek_byte (f=0x440c000, offset=0) at migration/qemu-file.c:562
-    #7  0x00000000007a7a22 in qemu_get_byte (f=0x440c000) at migration/qemu-file.c:575
-    #8  0x00000000007a7c78 in qemu_get_be32 (f=0x440c000) at migration/qemu-file.c:655
-    #9  0x00000000007a0508 in qemu_loadvm_state (f=0x440c000) at migration/savevm.c:2126
-    #10 0x0000000000794141 in process_incoming_migration_co (opaque=0x0) at migration/migration.c:366
-    #11 0x000000000095c598 in coroutine_trampoline (i0=84033984, i1=0) at util/coroutine-ucontext.c:1
-    #12 0x00007f9c0db56d40 in ?? () from /lib64/libc.so.6
-    #13 0x00007f96fe858760 in ?? ()
-    #14 0x0000000000000000 in ?? ()
-
-RDMA QIOChannel not implement io_set_aio_fd_handler. so
-qio_channel_set_aio_fd_handler will access NULL pointer.
+this will cause the guest os hang for a while when migration finished.
+So create a dedicated thread to release rdma resource.
 
 Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/rdma.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ migration/migration.c |  6 ++++++
+ migration/migration.h |  3 +++
+ migration/rdma.c      | 47 +++++++++++++++++++++++++++++++----------------
+ 3 files changed, 40 insertions(+), 16 deletions(-)
 
+diff --git a/migration/migration.c b/migration/migration.c
+index f7d6e26..25d9009 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1499,6 +1499,7 @@ void migrate_init(MigrationState *s)
+     s->vm_was_running = false;
+     s->iteration_initial_bytes = 0;
+     s->threshold_size = 0;
++    s->rdma_cleanup_thread_quit = true;
+ }
+ 
+ static GSList *migration_blockers;
+@@ -1660,6 +1661,10 @@ static bool migrate_prepare(MigrationState *s, bool blk, bool blk_inc,
+         return false;
+     }
+ 
++    if (s->rdma_cleanup_thread_quit != true) {
++        return false;
++    }
++
+     if (runstate_check(RUN_STATE_INMIGRATE)) {
+         error_setg(errp, "Guest is waiting for an incoming migration");
+         return false;
+@@ -3213,6 +3218,7 @@ static void migration_instance_init(Object *obj)
+ 
+     ms->state = MIGRATION_STATUS_NONE;
+     ms->mbps = -1;
++    ms->rdma_cleanup_thread_quit = true;
+     qemu_sem_init(&ms->pause_sem, 0);
+     qemu_mutex_init(&ms->error_mutex);
+ 
+diff --git a/migration/migration.h b/migration/migration.h
+index 64a7b33..60138dd 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -224,6 +224,9 @@ struct MigrationState
+      * do not trigger spurious decompression errors.
+      */
+     bool decompress_error_check;
++
++    /* Set this when rdma resource have released */
++    bool rdma_cleanup_thread_quit;
+ };
+ 
+ void migrate_set_state(int *state, int old_state, int new_state);
 diff --git a/migration/rdma.c b/migration/rdma.c
-index cfb0671..d6bbf28 100644
+index e1498f2..3282f35 100644
 --- a/migration/rdma.c
 +++ b/migration/rdma.c
-@@ -2963,6 +2963,21 @@ static GSource *qio_channel_rdma_create_watch(QIOChannel *ioc,
-     return source;
+@@ -2995,35 +2995,50 @@ static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
+     }
  }
  
-+static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
-+                                                  AioContext *ctx,
-+                                                  IOHandler *io_read,
-+                                                  IOHandler *io_write,
-+                                                  void *opaque)
-+{
-+    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
-+    if (io_read) {
-+        aio_set_fd_handler(ctx, rioc->rdmain->comp_channel->fd,
-+                           false, io_read, io_write, NULL, opaque);
-+    } else {
-+        aio_set_fd_handler(ctx, rioc->rdmaout->comp_channel->fd,
-+                           false, io_read, io_write, NULL, opaque);
-+    }
+-static int qio_channel_rdma_close(QIOChannel *ioc,
+-                                  Error **errp)
++static void *qio_channel_rdma_close_thread(void *arg)
+ {
+-    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
+-    RDMAContext *rdmain, *rdmaout;
+-    trace_qemu_rdma_close();
+-
+-    rdmain = rioc->rdmain;
+-    if (rdmain) {
+-        atomic_rcu_set(&rioc->rdmain, NULL);
+-    }
++    RDMAContext **rdma = arg;
++    RDMAContext *rdmain = rdma[0];
++    RDMAContext *rdmaout = rdma[1];
++    MigrationState *s = migrate_get_current();
+ 
+-    rdmaout = rioc->rdmaout;
+-    if (rdmaout) {
+-        atomic_rcu_set(&rioc->rdmaout, NULL);
+-    }
++    rcu_register_thread();
+ 
+     synchronize_rcu();
+-
+     if (rdmain) {
+         qemu_rdma_cleanup(rdmain);
+     }
+-
+     if (rdmaout) {
+         qemu_rdma_cleanup(rdmaout);
+     }
+ 
+     g_free(rdmain);
+     g_free(rdmaout);
++    g_free(rdma);
++
++    rcu_unregister_thread();
++    s->rdma_cleanup_thread_quit = true;
++    return NULL;
 +}
++
++static int qio_channel_rdma_close(QIOChannel *ioc,
++                                  Error **errp)
++{
++    QemuThread t;
++    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
++    RDMAContext **rdma = g_new0(RDMAContext*, 2);
++    MigrationState *s = migrate_get_current();
++
++    trace_qemu_rdma_close();
++    if (rioc->rdmain || rioc->rdmaout) {
++        rdma[0] =  rioc->rdmain;
++        rdma[1] =  rioc->rdmaout;
++        atomic_rcu_set(&rioc->rdmain, NULL);
++        atomic_rcu_set(&rioc->rdmaout, NULL);
++        s->rdma_cleanup_thread_quit = false;
++        qemu_thread_create(&t, "rdma cleanup", qio_channel_rdma_close_thread,
++                           rdma, QEMU_THREAD_DETACHED);
++    }
  
- static int qio_channel_rdma_close(QIOChannel *ioc,
-                                   Error **errp)
-@@ -3822,6 +3837,7 @@ static void qio_channel_rdma_class_init(ObjectClass *klass,
-     ioc_klass->io_set_blocking = qio_channel_rdma_set_blocking;
-     ioc_klass->io_close = qio_channel_rdma_close;
-     ioc_klass->io_create_watch = qio_channel_rdma_create_watch;
-+    ioc_klass->io_set_aio_fd_handler = qio_channel_rdma_set_aio_fd_handler;
+     return 0;
  }
- 
- static const TypeInfo qio_channel_rdma_info = {
 -- 
 1.8.3.1
