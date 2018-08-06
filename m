@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmj6Y-0006h6-HA
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:15:40 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmj6c-0006kM-K3
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:15:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmj6T-0007Js-N1
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:15:38 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:53605 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmj6a-0007R9-SP
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:15:42 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:53929 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fmj6S-0007Ho-K6
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:15:33 -0400
+	id 1fmj6a-0007OZ-1a
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:15:40 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  6 Aug 2018 19:00:03 +0200
-Message-Id: <1533574847-19294-37-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  6 Aug 2018 19:00:04 +0200
+Message-Id: <1533574847-19294-38-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 36/80] target/mips: Implement emulation of
- nanoMIPS LLWP/SCWP pair
+Subject: [Qemu-devel] [PATCH v7 37/80] target/mips: Add emulation of
+ nanoMIPS 32-bit branch instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,216 +28,308 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Implement support for nanoMIPS LLWP/SCWP instruction pair.
+Add emulation of various flavors of nanoMIPS 32-bit branch
+instructions.
 
-Signed-off-by: Dimitrije Nikolic <dnikolic@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/mips/cpu_loop.c | 25 +++++++++++---
- target/mips/cpu.h          |  2 ++
- target/mips/translate.c    | 84 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 106 insertions(+), 5 deletions(-)
+ target/mips/translate.c | 262 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 262 insertions(+)
 
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 084ad6a..1d3dc9e 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -397,10 +397,13 @@ static int do_store_exclusive(CPUMIPSState *env)
-     target_ulong addr;
-     target_ulong page_addr;
-     target_ulong val;
-+    uint32_t val_wp = 0;
-+    uint32_t llnewval_wp = 0;
-     int flags;
-     int segv = 0;
-     int reg;
-     int d;
-+    int wp;
- 
-     addr = env->lladdr;
-     page_addr = addr & TARGET_PAGE_MASK;
-@@ -412,19 +415,31 @@ static int do_store_exclusive(CPUMIPSState *env)
-     } else {
-         reg = env->llreg & 0x1f;
-         d = (env->llreg & 0x20) != 0;
--        if (d) {
--            segv = get_user_s64(val, addr);
-+        wp = (env->llreg & 0x40) != 0;
-+        if (!wp) {
-+            if (d) {
-+                segv = get_user_s64(val, addr);
-+            } else {
-+                segv = get_user_s32(val, addr);
-+            }
-         } else {
-             segv = get_user_s32(val, addr);
-+            segv |= get_user_s32(val_wp, addr);
-+            llnewval_wp = env->llnewval_wp;
-         }
-         if (!segv) {
--            if (val != env->llval) {
-+            if (val != env->llval && val_wp == llnewval_wp) {
-                 env->active_tc.gpr[reg] = 0;
-             } else {
--                if (d) {
--                    segv = put_user_u64(env->llnewval, addr);
-+                if (!wp) {
-+                    if (d) {
-+                        segv = put_user_u64(env->llnewval, addr);
-+                    } else {
-+                        segv = put_user_u32(env->llnewval, addr);
-+                    }
-                 } else {
-                     segv = put_user_u32(env->llnewval, addr);
-+                    segv |= put_user_u32(env->llnewval_wp, addr + 4);
-                 }
-                 if (!segv) {
-                     env->active_tc.gpr[reg] = 1;
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 009202c..28af4d1 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -506,6 +506,8 @@ struct CPUMIPSState {
-     uint64_t lladdr;
-     target_ulong llval;
-     target_ulong llnewval;
-+    uint64_t llval_wp;
-+    uint32_t llnewval_wp;
-     target_ulong llreg;
-     uint64_t CP0_LLAddr_rw_bitmask;
-     int CP0_LLAddr_shift;
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index cf8b748..945dd73 100644
+index 945dd73..c1f80e7 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1458,6 +1458,7 @@ typedef struct DisasContext {
-     bool mrp;
-     bool nan2008;
-     bool abs2008;
-+    bool xnp;
- } DisasContext;
- 
- #define DISAS_STOP       DISAS_TARGET_0
-@@ -2347,6 +2348,31 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
-     tcg_temp_free(t0);
+@@ -17013,6 +17013,155 @@ static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
+     }
  }
  
-+static void gen_llwp(DisasContext *ctx, uint32_t base, int16_t offset,
-+                    uint32_t reg1, uint32_t reg2)
++/* Immediate Value Compact Branches */
++static void gen_compute_imm_branch(DisasContext *ctx, uint32_t opc,
++                                   int rt, int32_t imm, int32_t offset)
 +{
-+    TCGv taddr = tcg_temp_new();
-+    TCGv_i64 tval = tcg_temp_new_i64();
-+    TCGv tmp1 = tcg_temp_new();
-+    TCGv tmp2 = tcg_temp_new();
++    TCGCond cond;
++    int bcond_compute = 0;
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
 +
-+    gen_base_offset_addr(ctx, taddr, base, offset);
-+    tcg_gen_qemu_ld64(tval, taddr, ctx->mem_idx);
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    tcg_gen_extr_i64_tl(tmp2, tmp1, tval);
-+#else
-+    tcg_gen_extr_i64_tl(tmp1, tmp2, tval);
++    if (ctx->hflags & MIPS_HFLAG_BMASK) {
++#ifdef MIPS_DEBUG_DISAS
++        LOG_DISAS("Branch in delay / forbidden slot at PC 0x" TARGET_FMT_lx
++                  "\n", ctx->base.pc_next);
 +#endif
-+    gen_store_gpr(tmp1, reg1);
-+    tcg_temp_free(tmp1);
-+    gen_store_gpr(tmp2, reg2);
-+    tcg_temp_free(tmp2);
-+    tcg_gen_st_i64(tval, cpu_env, offsetof(CPUMIPSState, llval_wp));
-+    tcg_temp_free_i64(tval);
-+    tcg_gen_st_tl(taddr, cpu_env, offsetof(CPUMIPSState, lladdr));
-+    tcg_temp_free(taddr);
++        generate_exception_end(ctx, EXCP_RI);
++        goto out;
++    }
++
++    gen_load_gpr(t0, rt);
++    tcg_gen_movi_tl(t1, imm);
++    ctx->btarget = addr_add(ctx, ctx->base.pc_next + 4, offset);
++
++    /* Load needed operands and calculate btarget */
++    switch (opc) {
++    case NM_BEQIC:
++        if (rt == 0 && imm == 0) {
++            /* Unconditional branch */
++        } else if (rt == 0 && imm != 0) {
++            /* Treat as NOP */
++            goto out;
++        } else {
++            bcond_compute = 1;
++            cond = TCG_COND_EQ;
++        }
++        break;
++    case NM_BBEQZC:
++    case NM_BBNEZC:
++        if (imm >= 32 && !(ctx->hflags & MIPS_HFLAG_64)) {
++            generate_exception_end(ctx, EXCP_RI);
++            goto out;
++        } else if (rt == 0 && opc == NM_BBEQZC) {
++            /* Unconditional branch */
++        } else if (rt == 0 && opc == NM_BBNEZC) {
++            /* Treat as NOP */
++            goto out;
++        } else {
++            tcg_gen_shri_tl(t0, t0, imm);
++            tcg_gen_andi_tl(t0, t0, 1);
++            tcg_gen_movi_tl(t1, 0);
++            bcond_compute = 1;
++            if (opc == NM_BBEQZC) {
++                cond = TCG_COND_EQ;
++            } else {
++                cond = TCG_COND_NE;
++            }
++        }
++        break;
++    case NM_BNEIC:
++        if (rt == 0 && imm == 0) {
++            /* Treat as NOP */
++            goto out;
++        } else if (rt == 0 && imm != 0) {
++            /* Unconditional branch */
++        } else {
++            bcond_compute = 1;
++            cond = TCG_COND_NE;
++        }
++        break;
++    case NM_BGEIC:
++        if (rt == 0 && imm == 0) {
++            /* Unconditional branch */
++        } else  {
++            bcond_compute = 1;
++            cond = TCG_COND_GE;
++        }
++        break;
++    case NM_BLTIC:
++        bcond_compute = 1;
++        cond = TCG_COND_LT;
++        break;
++    case NM_BGEIUC:
++        if (rt == 0 && imm == 0) {
++            /* Unconditional branch */
++        } else  {
++            bcond_compute = 1;
++            cond = TCG_COND_GEU;
++        }
++        break;
++    case NM_BLTIUC:
++        bcond_compute = 1;
++        cond = TCG_COND_LTU;
++        break;
++    default:
++        MIPS_INVAL("Immediate Value Compact branch");
++        generate_exception_end(ctx, EXCP_RI);
++        goto out;
++    }
++
++    if (bcond_compute == 0) {
++        /* Uncoditional compact branch */
++        ctx->hflags |= MIPS_HFLAG_B;
++        /* Generating branch here as compact branches don't have delay slot */
++        gen_branch(ctx, 4);
++    } else {
++        /* Conditional compact branch */
++        TCGLabel *fs = gen_new_label();
++        save_cpu_state(ctx, 0);
++
++        tcg_gen_brcond_tl(tcg_invert_cond(cond), t0, t1, fs);
++
++        /* Generating branch here as compact branches don't have delay slot */
++        gen_goto_tb(ctx, 1, ctx->btarget);
++        gen_set_label(fs);
++
++        ctx->hflags |= MIPS_HFLAG_FBNSLOT;
++    }
++
++out:
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
 +}
 +
- /* Store */
- static void gen_st (DisasContext *ctx, uint32_t opc, int rt,
-                     int base, int offset)
-@@ -2443,6 +2469,51 @@ static void gen_st_cond (DisasContext *ctx, uint32_t opc, int rt,
-     tcg_temp_free(t0);
- }
++/* P.BALRSC type nanoMIPS R6 branches: BALRSC and BRSC */
++static void gen_compute_nanomips_pbalrsc_branch(DisasContext *ctx, int rs,
++                                                int rt)
++{
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++
++    /* load rs */
++    gen_load_gpr(t0, rs);
++
++    /* link */
++    if (rt != 0) {
++        tcg_gen_movi_tl(cpu_gpr[rt], ctx->base.pc_next + 4);
++    }
++
++    /* calculate btarget */
++    tcg_gen_shli_tl(t0, t0, 1);
++    tcg_gen_movi_tl(t1, ctx->base.pc_next + 4);
++    gen_op_addr_add(ctx, btarget, t1, t0);
++
++    ctx->hflags |= MIPS_HFLAG_BR;
++    /* Generating branch here as compact branches don't have delay slot */
++    gen_branch(ctx, 4);
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++}
  
-+static void gen_scwp(DisasContext *ctx, uint32_t base, int16_t offset,
-+                    uint32_t reg1, uint32_t reg2)
-+{
-+    TCGv taddr = tcg_temp_local_new();
-+    TCGv lladdr = tcg_temp_local_new();
-+    TCGv_i64 tval = tcg_temp_new_i64();
-+    TCGv_i64 llval = tcg_temp_new_i64();
-+    TCGv_i64 val = tcg_temp_new_i64();
-+    TCGv tmp1 = tcg_temp_new();
-+    TCGv tmp2 = tcg_temp_new();
-+    TCGLabel *lab_fail = gen_new_label();
-+    TCGLabel *lab_done = gen_new_label();
+ static void gen_p_lsx(DisasContext *ctx, int rd, int rs, int rt)
+ {
+@@ -18079,16 +18228,129 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case NM_MOVE_BALC:
++        {
++            TCGv t0 = tcg_temp_new();
++            int32_t s = sextract32(ctx->opcode, 0, 1) << 21 |
++                        extract32(ctx->opcode, 1, 20) << 1;
++            rd = (extract32(ctx->opcode, 24, 1)) == 0 ? 4 : 5;
++            rt = decode_gpr_gpr4_zero(extract32(ctx->opcode, 25, 1) << 3 |
++                            extract32(ctx->opcode, 21, 3));
++            gen_load_gpr(t0, rt);
++            tcg_gen_mov_tl(cpu_gpr[rd], t0);
++            gen_compute_branch(ctx, OPC_BGEZAL, 4, 0, 0, s, 0);
++            tcg_temp_free(t0);
++        }
+         break;
+     case NM_P_BAL:
++        {
++            int32_t s = sextract32(ctx->opcode, 0, 1) << 25 |
++                        extract32(ctx->opcode, 1, 24) << 1;
 +
-+    gen_base_offset_addr(ctx, taddr, base, offset);
++            if ((extract32(ctx->opcode, 25, 1)) == 0) {
++                /* BC */
++                gen_compute_branch(ctx, OPC_BEQ, 4, 0, 0, s, 0);
++            } else {
++                /* BALC */
++                gen_compute_branch(ctx, OPC_BGEZAL, 4, 0, 0, s, 0);
++            }
++        }
+         break;
+     case NM_P_J:
++        switch (extract32(ctx->opcode, 12, 4)) {
++        case NM_JALRC:
++        case NM_JALRC_HB:
++            gen_compute_branch(ctx, OPC_JALR, 4, rs, rt, 0, 0);
++            break;
++        case NM_P_BALRSC:
++            gen_compute_nanomips_pbalrsc_branch(ctx, rs, rt);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
+         break;
+     case NM_P_BR1:
++        {
++            int32_t s = sextract32(ctx->opcode, 0, 1) << 14 |
++                        extract32(ctx->opcode, 1, 13) << 1;
++            switch (extract32(ctx->opcode, 14, 2)) {
++            case NM_BEQC:
++                gen_compute_branch(ctx, OPC_BEQ, 4, rs, rt, s, 0);
++                break;
++            case NM_P_BR3A:
++                s = sextract32(ctx->opcode, 0, 1) << 14 |
++                    extract32(ctx->opcode, 1, 13) << 1;
++                check_cp1_enabled(ctx);
++                switch (extract32(ctx->opcode, 16, 5)) {
++                case NM_BC1EQZC:
++                    gen_compute_branch1_r6(ctx, OPC_BC1EQZ, rt, s, 0);
++                    break;
++                case NM_BC1NEZC:
++                    gen_compute_branch1_r6(ctx, OPC_BC1NEZ, rt, s, 0);
++                    break;
++                default:
++                    generate_exception_end(ctx, EXCP_RI);
++                    break;
++                }
++                break;
++            case NM_BGEC:
++                if (rs == rt) {
++                    gen_compute_compact_branch(ctx, OPC_BC, rs, rt, s);
++                } else {
++                    gen_compute_compact_branch(ctx, OPC_BGEC, rs, rt, s);
++                }
++                break;
++            case NM_BGEUC:
++                if (rs == rt || rt == 0) {
++                    gen_compute_compact_branch(ctx, OPC_BC, 0, 0, s);
++                } else if (rs == 0) {
++                    gen_compute_compact_branch(ctx, OPC_BEQZC, rt, 0, s);
++                } else {
++                    gen_compute_compact_branch(ctx, OPC_BGEUC, rs, rt, s);
++                }
++                break;
++            }
++        }
+         break;
+     case NM_P_BR2:
++        {
++            int32_t s = sextract32(ctx->opcode, 0, 1) << 14 |
++                        extract32(ctx->opcode, 1, 13) << 1;
++            switch (extract32(ctx->opcode, 14, 2)) {
++            case NM_BNEC:
++                gen_compute_branch(ctx, OPC_BNE, 4, rs, rt, s, 0);
++                break;
++            case NM_BLTC:
++                if (rs != 0 && rt != 0 && rs == rt) {
++                    /* NOP */
++                    ctx->hflags |= MIPS_HFLAG_FBNSLOT;
++                } else {
++                    gen_compute_compact_branch(ctx, OPC_BLTC, rs, rt, s);
++                }
++                break;
++            case NM_BLTUC:
++                if (rs == 0 || rs == rt) {
++                    /* NOP */
++                    ctx->hflags |= MIPS_HFLAG_FBNSLOT;
++                } else {
++                    gen_compute_compact_branch(ctx, OPC_BLTUC, rs, rt, s);
++                }
++                break;
++            default:
++                generate_exception_end(ctx, EXCP_RI);
++                break;
++            }
++        }
+         break;
+     case NM_P_BRI:
++        {
++            int32_t s = sextract32(ctx->opcode, 0, 1) << 11 |
++                        extract32(ctx->opcode, 1, 10) << 1;
++            uint32_t u = extract32(ctx->opcode, 11, 7);
 +
-+    tcg_gen_ld_tl(lladdr, cpu_env, offsetof(CPUMIPSState, lladdr));
-+    tcg_gen_brcond_tl(TCG_COND_NE, taddr, lladdr, lab_fail);
-+
-+    gen_load_gpr(tmp1, reg1);
-+    gen_load_gpr(tmp2, reg2);
-+
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    tcg_gen_concat_tl_i64(tval, tmp2, tmp1);
-+#else
-+    tcg_gen_concat_tl_i64(tval, tmp1, tmp2);
-+#endif
-+
-+    tcg_gen_ld_i64(llval, cpu_env, offsetof(CPUMIPSState, llval_wp));
-+    tcg_gen_atomic_cmpxchg_i64(val, taddr, llval, tval,
-+                               ctx->mem_idx, MO_64);
-+    if (reg1 != 0) {
-+        tcg_gen_movi_tl(cpu_gpr[reg1], 1);
-+    }
-+    tcg_gen_brcond_i64(TCG_COND_EQ, val, llval, lab_done);
-+
-+    gen_set_label(lab_fail);
-+
-+    if (reg1 != 0) {
-+        tcg_gen_movi_tl(cpu_gpr[reg1], 0);
-+    }
-+    gen_set_label(lab_done);
-+    tcg_gen_movi_tl(lladdr, -1);
-+    tcg_gen_st_tl(lladdr, cpu_env, offsetof(CPUMIPSState, lladdr));
-+}
-+
- /* Load and store */
- static void gen_flt_ldst (DisasContext *ctx, uint32_t opc, int ft,
-                           TCGv t0)
-@@ -17926,6 +17997,12 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                         gen_ld(ctx, OPC_LL, rt, rs, s);
-                         break;
-                     case NM_LLWP:
-+                        if (ctx->xnp) {
-+                            generate_exception_end(ctx, EXCP_RI);
-+                        } else {
-+                            gen_llwp(ctx, rs, 0, rt,
-+                                     extract32(ctx->opcode, 3, 5));
-+                        }
-                         break;
-                     }
-                     break;
-@@ -17935,6 +18012,12 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                         gen_st_cond(ctx, OPC_SC, rt, rs, s);
-                         break;
-                     case NM_SCWP:
-+                        if (ctx->xnp) {
-+                            generate_exception_end(ctx, EXCP_RI);
-+                        } else {
-+                            gen_scwp(ctx, rs, 0, rt,
-+                                     extract32(ctx->opcode, 3, 5));
-+                        }
-                         break;
-                     }
-                     break;
-@@ -23123,6 +23206,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     ctx->mrp = (env->CP0_Config5 >> CP0C5_MRP) & 1;
-     ctx->nan2008 = (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
-     ctx->abs2008 = (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
-+    ctx->xnp = (env->CP0_Config5 >> CP0C5_XNP) & 1;
-     restore_cpu_state(env, ctx);
- #ifdef CONFIG_USER_ONLY
-         ctx->mem_idx = MIPS_HFLAG_UM;
++            gen_compute_imm_branch(ctx, extract32(ctx->opcode, 18, 3),
++                                   rt, u, s);
++        }
+         break;
+     default:
+         generate_exception_end(ctx, EXCP_RI);
 -- 
 2.7.4
