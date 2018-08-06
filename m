@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fmb3V-0007CS-GK
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 04:39:58 -0400
+	(envelope-from <thuth@redhat.com>) id 1fmbF3-0002Q2-HX
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 04:51:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fmb3U-0002HP-Kh
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 04:39:57 -0400
-Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:40263)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fmb3U-0002H0-FB
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 04:39:56 -0400
-Received: by mail-oi0-x232.google.com with SMTP id w126-v6so20757035oie.7
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 01:39:56 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1fmbEy-0005zk-JE
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 04:51:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32808 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fmbEy-0005yT-CW
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 04:51:48 -0400
+References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
+	<d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
+	<8bf07395-4872-ce74-c201-9fca232edd01@gmail.com>
+	<80532e46-ffbf-9c87-5296-741bbb6f83ac@redhat.com>
+	<d5ad3096-86b1-29e4-47bd-1ca71b8e7879@bluestop.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1feb3cc1-86ee-f708-6dc7-b9e20a7588ac@redhat.com>
+Date: Mon, 6 Aug 2018 10:51:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1808051732420.22072@zero.eik.bme.hu>
-References: <20180801035357.7804-1-david@gibson.dropbear.id.au>
-	<CAFEAcA-FitsqU3kQJTFGSFgOh6Zsf2Zy2fO3OTnL5c+Tzi5pog@mail.gmail.com>
-	<alpine.BSF.2.21.1808011300070.7488@zero.eik.bme.hu>
-	<CAFEAcA-=c7O+h3c-gQ=31q0oyLzJhDNmEBzv4X2Yp_TBfYhC-w@mail.gmail.com>
-	<alpine.BSF.2.21.1808051732420.22072@zero.eik.bme.hu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 6 Aug 2018 09:39:35 +0100
-Message-ID: <CAFEAcA-vcEDJww3kLXEr=C93M2z9KnB502=erakDgpvoojp0Cg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 0/2] ppc-for-3.0 queue 20180801
+In-Reply-To: <d5ad3096-86b1-29e4-47bd-1ca71b8e7879@bluestop.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
+To: Rebecca Cran <rebecca@bluestop.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yuval Shaia <yuval.shaia@oracle.com>, Kamil Rytarowski <kamil@netbsd.org>, Brad Smith <brad@comstyle.com>
 
-On 5 August 2018 at 16:38, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> Now that it looks like we'll have an rc4 due to other fixes can these be
-> included as well despite not being regressions? These may not have been
-> serious enough to fix when we wouldn't have rc4 otherwise but holding on to
-> broken implementation just because they were also broken in the previous
-> release does not make sense if we'll have another rc anyway.
+On 07/28/2018 05:50 AM, Rebecca Cran wrote:
+> On 7/25/18 5:14 AM, Thomas Huth wrote:
+>=20
+>>
+>> Note that the error has been reported to happen on FreeBSD - so I doub=
+t
+>> that this <linux/types.h> header should be here.
+>>
+>> Anyway, our include/standard-headers/linux/types.h is also empty ... s=
+o
+>> could you try whether it compiles if you simply remove this #include
+>> line, Rebecca?
+>=20
+>=20
+> Sorry for the delay, I'm just getting back to this. Removing the includ=
+e
+> causes it to fail later on, with:
+>=20
+> /home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning:
+> implicit declaration of function 'mremap' is invalid in C99
+> [-Wimplicit-function-declaration]
+> =C2=A0=C2=A0=C2=A0 host_virt =3D mremap(curr_page, 0, length, MREMAP_MA=
+YMOVE);
 
-I'm considering it, yes, but it increases risk, so it is not
-a completely trivial decision. (All changes later in the release
-cycle increase the risk of something unexpected breaking as a result
-of the change.)
+OK, thanks for checking. According to
 
-thanks
--- PMM
+ https://www.freebsd.org/cgi/man.cgi?query=3Dmremap&manpath=3DNetBSD+5.0
+
+that syscall should also be available on FreeBSD. So could you please do
+one more test and see whether it works when you add the following line
+somewhere at the beginning of the file:
+
+  #include <sys/mman.h>
+
+ Thanks,
+  Thomas
