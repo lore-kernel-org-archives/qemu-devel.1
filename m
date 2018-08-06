@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fmZOp-0001XS-6Q
+	(envelope-from <armbru@redhat.com>) id 1fmZOq-0001Xa-SG
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 02:53:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fmZOm-00087c-D3
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 02:53:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35600 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fmZOn-00089Y-Sv
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 02:53:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58362 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fmZOm-000876-5O
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 02:53:48 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fmZOn-00088f-HZ
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 02:53:49 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  6 Aug 2018 08:53:26 +0200
-Message-Id: <20180806065344.7103-6-armbru@redhat.com>
+Date: Mon,  6 Aug 2018 08:53:38 +0200
+Message-Id: <20180806065344.7103-18-armbru@redhat.com>
 In-Reply-To: <20180806065344.7103-1-armbru@redhat.com>
 References: <20180806065344.7103-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 05/23] libqtest: Document calling conventions
+Subject: [Qemu-devel] [PATCH v3 17/23] migration-test: Make wait_command()
+ cope with '%'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,120 +25,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com
+Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Eric Blake <eblake@redhat.com>
+wait_command() passes its argument @command to qtest_qmp_send().
+Falls apart if @command contain '%'.  Two ways to disarm this trap:
+suppress interpretation of '%' by passing @command as argument to
+format string "%s", or fix it by having wait_command() take the
+variable arguments to go with @command.  Do the latter.
 
-We have two flavors of vararg usage in qtest: qtest_hmp() etc. work
-like sprintf(), and qtest_qmp() etc. work like qobject_from_jsonf().
-Spell that out in the comments.
+This is another step towards compile-time format string checking
+without triggering -Wformat-nonliteral.
 
-Also add GCC_FMT_ATTR() to qtest_hmp() etc. so that the compiler can
-flag incorrect use.
-
-We have some cleanup work to do before we can do the same for
-qtest_qmp() etc.  This would get us the same better-than-nothing
-checking we already have for qobject_from_jsonf(): common incorrect
-uses of supported conversion specifications will be flagged
-(e.g. passing a double for %d), but use of unsupported ones won't.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Rebased, comment wording tweaked, commit message rewritten]
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.h | 29 +++++++++++++++++++++--------
- 1 file changed, 21 insertions(+), 8 deletions(-)
+ tests/migration-test.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 3eecd5e9a7..da13ea00ef 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -76,7 +76,9 @@ void qtest_quit(QTestState *s);
- /**
-  * qtest_qmp:
-  * @s: #QTestState instance to operate on.
-- * @fmt...: QMP message to send to qemu
-+ * @fmt...: QMP message to send to qemu, formatted like
-+ * qobject_from_jsonf().  See parse_escape() for what's supported
-+ * after '%'.
-  *
-  * Sends a QMP message to QEMU and returns the response.
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 402c82bdc4..7bffcd2e4d 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -159,9 +159,14 @@ static void stop_cb(void *opaque, const char *name, QDict *data)
+ /*
+  * Events can get in the way of responses we are actually waiting for.
   */
-@@ -85,7 +87,9 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
- /**
-  * qtest_qmp_send:
-  * @s: #QTestState instance to operate on.
-- * @fmt...: QMP message to send to qemu
-+ * @fmt...: QMP message to send to qemu, formatted like
-+ * qobject_from_jsonf().  See parse_escape() for what's supported
-+ * after '%'.
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-  */
-@@ -94,7 +98,9 @@ void qtest_qmp_send(QTestState *s, const char *fmt, ...);
- /**
-  * qtest_qmpv:
-  * @s: #QTestState instance to operate on.
-- * @fmt: QMP message to send to QEMU
-+ * @fmt: QMP message to send to QEMU, formatted like
-+ * qobject_from_jsonf().  See parse_escape() for what's supported
-+ * after '%'.
-  * @ap: QMP message arguments
-  *
-  * Sends a QMP message to QEMU and returns the response.
-@@ -104,7 +110,9 @@ QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap);
- /**
-  * qtest_qmp_vsend:
-  * @s: #QTestState instance to operate on.
-- * @fmt: QMP message to send to QEMU
-+ * @fmt: QMP message to send to QEMU, formatted like
-+ * qobject_from_jsonf().  See parse_escape() for what's supported
-+ * after '%'.
-  * @ap: QMP message arguments
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-@@ -153,7 +161,7 @@ char *qtest_hmp(QTestState *s, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
- /**
-  * qtest_hmpv:
-  * @s: #QTestState instance to operate on.
-- * @fmt: HMP command to send to QEMU
-+ * @fmt: HMP command to send to QEMU, formats arguments like vsprintf().
-  * @ap: HMP command arguments
-  *
-  * Send HMP command to QEMU via QMP's human-monitor-command.
-@@ -161,7 +169,8 @@ char *qtest_hmp(QTestState *s, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
-  *
-  * Returns: the command's output.  The caller should g_free() it.
-  */
--char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap);
-+char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
-+    GCC_FMT_ATTR(2, 0);
+-static QDict *wait_command(QTestState *who, const char *command)
++static QDict *wait_command(QTestState *who, const char *command, ...)
+ {
+-    qtest_qmp_send(who, command);
++    va_list ap;
++
++    va_start(ap, command);
++    qtest_qmp_vsend(who, command, ap);
++    va_end(ap);
++
+     return qtest_qmp_receive_success(who, stop_cb, NULL);
+ }
  
- /**
-  * qtest_get_irq:
-@@ -542,7 +551,9 @@ static inline void qtest_end(void)
- 
- /**
-  * qmp:
-- * @fmt...: QMP message to send to qemu
-+ * @fmt...: QMP message to send to qemu, formatted like
-+ * qobject_from_jsonf().  See parse_escape() for what's supported
-+ * after '%'.
-  *
-  * Sends a QMP message to QEMU and returns the response.
-  */
-@@ -550,7 +561,9 @@ QDict *qmp(const char *fmt, ...);
- 
- /**
-  * qmp_send:
-- * @fmt...: QMP message to send to qemu
-+ * @fmt...: QMP message to send to qemu, formatted like
-+ * qobject_from_jsonf().  See parse_escape() for what's supported
-+ * after '%'.
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-  */
 -- 
 2.17.1
