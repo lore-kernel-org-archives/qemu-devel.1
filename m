@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fmZOp-0001XT-Lu
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 02:53:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1fmZOq-0001Xd-Tl
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 02:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fmZOn-00089R-Sw
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 02:53:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42578 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fmZOn-00088z-7m
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 02:53:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58358 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fmZOn-00088w-Gd
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fmZOm-00088D-T0
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 02:53:49 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  6 Aug 2018 08:53:37 +0200
-Message-Id: <20180806065344.7103-17-armbru@redhat.com>
+Date: Mon,  6 Aug 2018 08:53:35 +0200
+Message-Id: <20180806065344.7103-15-armbru@redhat.com>
 In-Reply-To: <20180806065344.7103-1-armbru@redhat.com>
 References: <20180806065344.7103-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 16/23] tests: New helper
- qtest_qmp_receive_success()
+Subject: [Qemu-devel] [PATCH v3 14/23] tests: Clean up string interpolation
+ around qtest_qmp_device_add()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,259 +25,406 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: thuth@redhat.com, f4bug@amsat.org, eblake@redhat.com
 
-Commit b21373d0713 copied wait_command() from tests/migration-test.c
-to tests/tpm-util.c.  Replace both copies by new libqtest helper
-qtest_qmp_receive_success().  Also use it to simplify
-qtest_qmp_device_del().
+Leaving interpolation into JSON to qmp() is more robust than building
+QMP input manually, as explained in the commit before previous.
+
+qtest_qmp_device_add() and its wrappers interpolate into JSON as
+follows:
+
+* qtest_qmp_device_add() interpolates members into a JSON object.
+
+* So do its wrappers qpci_plug_device_test() and usb_test_hotplug().
+
+* usb_test_hotplug() additionally interpolates strings and numbers
+  into JSON strings.
+
+Clean them up:
+
+* Have qtest_qmp_device_add() take its extra device properties as
+  arguments for qdict_from_jsonf_nofail() instead of a string
+  containing JSON members.
+
+* Drop qpci_plug_device_test(), use qtest_qmp_device_add()
+  directly.
+
+* Change usb_test_hotplug() parameter @port to string, to avoid
+  interpolation.  Interpolate @hcd_id separately.
 
 Bonus: gets rid of a non-literal format string.  A step towards
 compile-time format string checking without triggering
 -Wformat-nonliteral.
 
 Cc: Thomas Huth <thuth@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.c       | 69 ++++++++++++++++++++++++++++++------------
- tests/libqtest.h       | 17 +++++++++++
- tests/migration-test.c | 29 ++++++------------
- tests/tpm-util.c       | 32 +++-----------------
- 4 files changed, 80 insertions(+), 67 deletions(-)
+ tests/cpu-plug-test.c      |  7 ++++---
+ tests/e1000e-test.c        |  6 ++----
+ tests/ivshmem-test.c       |  8 +++-----
+ tests/libqos/pci.c         |  7 -------
+ tests/libqos/pci.h         |  2 --
+ tests/libqos/usb.c         | 10 ++++++----
+ tests/libqos/usb.h         |  2 +-
+ tests/libqtest.c           | 27 +++++++++++----------------
+ tests/libqtest.h           |  4 +++-
+ tests/usb-hcd-ehci-test.c  |  2 +-
+ tests/usb-hcd-ohci-test.c  |  2 +-
+ tests/usb-hcd-uhci-test.c  |  4 ++--
+ tests/usb-hcd-xhci-test.c  | 10 +++++-----
+ tests/virtio-blk-test.c    |  5 +++--
+ tests/virtio-net-test.c    |  3 ++-
+ tests/virtio-rng-test.c    |  3 ++-
+ tests/virtio-scsi-test.c   |  2 +-
+ tests/virtio-serial-test.c |  2 +-
+ 18 files changed, 48 insertions(+), 58 deletions(-)
 
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 17c91f5c47..2f81bc6382 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -1004,6 +1004,35 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
-     qobject_unref(response);
+diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+index ab3bf6df90..f5d57da60e 100644
+--- a/tests/cpu-plug-test.c
++++ b/tests/cpu-plug-test.c
+@@ -88,8 +88,9 @@ static void test_plug_with_device_add_x86(gconstpointer data)
+         for (c = 0; c < td->cores; c++) {
+             for (t = 0; t < td->threads; t++) {
+                 char *id = g_strdup_printf("id-%i-%i-%i", s, c, t);
+-                qtest_qmp_device_add(td->device_model, id, "'socket-id':%u, "
+-                                     "'core-id':%u, 'thread-id':%u",
++                qtest_qmp_device_add(td->device_model, id,
++                                     "{'socket-id':%u, 'core-id':%u,"
++                                     " 'thread-id':%u}",
+                                      s, c, t);
+                 g_free(id);
+             }
+@@ -114,7 +115,7 @@ static void test_plug_with_device_add_coreid(gconstpointer data)
+ 
+     for (c = td->cores; c < td->maxcpus / td->sockets / td->threads; c++) {
+         char *id = g_strdup_printf("id-%i", c);
+-        qtest_qmp_device_add(td->device_model, id, "'core-id':%u", c);
++        qtest_qmp_device_add(td->device_model, id, "{'core-id':%u}", c);
+         g_free(id);
+     }
+ 
+diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
+index 32aa738b72..c9408a5d1f 100644
+--- a/tests/e1000e-test.c
++++ b/tests/e1000e-test.c
+@@ -456,12 +456,10 @@ static void test_e1000e_multiple_transfers(gconstpointer data)
+ 
+ static void test_e1000e_hotplug(gconstpointer data)
+ {
+-    static const uint8_t slot = 0x06;
+-
+     qtest_start("-device e1000e");
+ 
+-    qpci_plug_device_test("e1000e", "e1000e_net", slot, NULL);
+-    qpci_unplug_acpi_device_test("e1000e_net", slot);
++    qtest_qmp_device_add("e1000e", "e1000e_net", "{'addr': '0x06'}");
++    qpci_unplug_acpi_device_test("e1000e_net", 0x06);
+ 
+     qtest_end();
+ }
+diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+index 9b407a3e42..c37b196b32 100644
+--- a/tests/ivshmem-test.c
++++ b/tests/ivshmem-test.c
+@@ -420,19 +420,17 @@ static void test_ivshmem_server_irq(void)
+ static void test_ivshmem_hotplug(void)
+ {
+     const char *arch = qtest_get_arch();
+-    gchar *opts;
+ 
+     qtest_start("");
+ 
+-    opts = g_strdup_printf("'shm': '%s', 'size': '1M'", tmpshm);
+-
+-    qpci_plug_device_test("ivshmem", "iv1", PCI_SLOT_HP, opts);
++    qtest_qmp_device_add("ivshmem",
++                         "iv1", "{'addr': %s, 'shm': %s, 'size': '1M'}",
++                         stringify(PCI_SLOT_HP), tmpshm);
+     if (strcmp(arch, "ppc64") != 0) {
+         qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
+     }
+ 
+     qtest_end();
+-    g_free(opts);
  }
  
-+QDict *qtest_qmp_receive_success(QTestState *s,
-+                                 void (*event_cb)(void *opaque,
-+                                                  const char *event,
-+                                                  QDict *data),
-+                                 void *opaque)
-+{
-+    QDict *response, *ret, *data;
-+    const char *event;
-+
-+    for (;;) {
-+        response = qtest_qmp_receive(s);
-+        g_assert(!qdict_haskey(response, "error"));
-+        ret = qdict_get_qdict(response, "return");
-+        if (ret) {
-+            break;
-+        }
-+        event = qdict_get_str(response, "event");
-+        data = qdict_get_qdict(response, "data");
-+        if (event_cb) {
-+            event_cb(opaque, event, data);
-+        }
-+        qobject_unref(response);
-+    }
-+
-+    qobject_ref(ret);
-+    qobject_unref(response);
-+    return ret;
-+}
-+
+ static void test_ivshmem_memdev(void)
+diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
+index 0b73cb23d0..e8c342c257 100644
+--- a/tests/libqos/pci.c
++++ b/tests/libqos/pci.c
+@@ -395,10 +395,3 @@ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr)
+     QPCIBar bar = { .addr = addr };
+     return bar;
+ }
+-
+-void qpci_plug_device_test(const char *driver, const char *id,
+-                           uint8_t slot, const char *opts)
+-{
+-    qtest_qmp_device_add(driver, id, "'addr': '%d'%s%s", slot,
+-                         opts ? ", " : "", opts ? opts : "");
+-}
+diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
+index 429c382282..0b7e936174 100644
+--- a/tests/libqos/pci.h
++++ b/tests/libqos/pci.h
+@@ -109,7 +109,5 @@ QPCIBar qpci_iomap(QPCIDevice *dev, int barno, uint64_t *sizeptr);
+ void qpci_iounmap(QPCIDevice *dev, QPCIBar addr);
+ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr);
+ 
+-void qpci_plug_device_test(const char *driver, const char *id,
+-                           uint8_t slot, const char *opts);
+ void qpci_unplug_acpi_device_test(const char *id, uint8_t slot);
+ #endif
+diff --git a/tests/libqos/usb.c b/tests/libqos/usb.c
+index 2a476049a8..49e2f4bc0a 100644
+--- a/tests/libqos/usb.c
++++ b/tests/libqos/usb.c
+@@ -37,13 +37,14 @@ void uhci_port_test(struct qhc *hc, int port, uint16_t expect)
+     g_assert((value & mask) == (expect & mask));
+ }
+ 
+-void usb_test_hotplug(const char *hcd_id, const int port,
++void usb_test_hotplug(const char *hcd_id, const char *port,
+                       void (*port_check)(void))
+ {
+-    char  *id = g_strdup_printf("usbdev%d", port);
++    char *id = g_strdup_printf("usbdev%s", port);
++    char *bus = g_strdup_printf("%s.0", hcd_id);
+ 
+-    qtest_qmp_device_add("usb-tablet", id, "'port': '%d', 'bus': '%s.0'",
+-                         port, hcd_id);
++    qtest_qmp_device_add("usb-tablet", id, "{'port': %s, 'bus': %s}",
++                         port, bus);
+ 
+     if (port_check) {
+         port_check();
+@@ -51,5 +52,6 @@ void usb_test_hotplug(const char *hcd_id, const int port,
+ 
+     qtest_qmp_device_del(id);
+ 
++    g_free(bus);
+     g_free(id);
+ }
+diff --git a/tests/libqos/usb.h b/tests/libqos/usb.h
+index 297cfc564d..c506418a13 100644
+--- a/tests/libqos/usb.h
++++ b/tests/libqos/usb.h
+@@ -13,6 +13,6 @@ void qusb_pci_init_one(QPCIBus *pcibus, struct qhc *hc,
+ void uhci_port_test(struct qhc *hc, int port, uint16_t expect);
+ void uhci_deinit(struct qhc *hc);
+ 
+-void usb_test_hotplug(const char *bus_name, const int port,
++void usb_test_hotplug(const char *bus_name, const char *port,
+                       void (*port_check)(void));
+ #endif
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 81b17f6fc9..17c91f5c47 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -1007,26 +1007,21 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
  /*
   * Generic hot-plugging test via the device_add QMP command.
   */
-@@ -1028,6 +1057,14 @@ void qtest_qmp_device_add(const char *driver, const char *id,
-     qobject_unref(response);
- }
- 
-+static void device_deleted_cb(void *opaque, const char *name, QDict *data)
-+{
-+    bool *got_event = opaque;
-+
-+    g_assert_cmpstr(name, ==, "DEVICE_DELETED");
-+    *got_event = true;
-+}
-+
- /*
-  * Generic hot-unplugging test via the device_del QMP command.
-  * Device deletion will get one response and one event. For example:
-@@ -1048,27 +1085,21 @@ void qtest_qmp_device_add(const char *driver, const char *id,
-  */
- void qtest_qmp_device_del(const char *id)
+-void qtest_qmp_device_add(const char *driver, const char *id, const char *fmt,
+-                          ...)
++void qtest_qmp_device_add(const char *driver, const char *id,
++                          const char *fmt, ...)
  {
--    QDict *response1, *response2, *event = NULL;
-+    bool got_event = false;
-+    QDict *rsp;
+-    QDict *response;
+-    char *cmd, *opts = NULL;
+-    va_list va;
++    QDict *args, *response;
++    va_list ap;
  
--    response1 = qmp("{'execute': 'device_del', 'arguments': {'id': %s}}",
--                    id);
--    g_assert(response1);
--    g_assert(!qdict_haskey(response1, "error"));
--
--    response2 = qmp_receive();
--    g_assert(response2);
--    g_assert(!qdict_haskey(response2, "error"));
--
--    if (qdict_haskey(response1, "event")) {
--        event = response1;
--    } else if (qdict_haskey(response2, "event")) {
--        event = response2;
-+    qtest_qmp_send(global_qtest,
-+                   "{'execute': 'device_del', 'arguments': {'id': %s}}",
-+                   id);
-+    rsp = qtest_qmp_receive_success(global_qtest, device_deleted_cb,
-+                                    &got_event);
-+    qobject_unref(rsp);
-+    if (!got_event) {
-+        rsp = qmp_receive();
-+        g_assert_cmpstr(qdict_get_try_str(rsp, "event"),
-+                        ==, "DEVICE_DELETED");
-+        qobject_unref(rsp);
-     }
--    g_assert(event);
--    g_assert_cmpstr(qdict_get_str(event, "event"), ==, "DEVICE_DELETED");
--
--    qobject_unref(response1);
--    qobject_unref(response2);
- }
+-    if (fmt) {
+-        va_start(va, fmt);
+-        opts = g_strdup_vprintf(fmt, va);
+-        va_end(va);
+-    }
++    va_start(ap, fmt);
++    args = qdict_from_vjsonf_nofail(fmt, ap);
++    va_end(ap);
  
- bool qmp_rsp_is_err(QDict *rsp)
+-    cmd = g_strdup_printf("{'execute': 'device_add',"
+-                          " 'arguments': { 'driver': '%s', 'id': '%s'%s%s }}",
+-                          driver, id, opts ? ", " : "", opts ? opts : "");
+-    g_free(opts);
++    g_assert(!qdict_haskey(args, "driver") && !qdict_haskey(args, "id"));
++    qdict_put_str(args, "driver", driver);
++    qdict_put_str(args, "id", id);
+ 
+-    response = qmp(cmd);
+-    g_free(cmd);
++    response = qmp("{'execute': 'device_add', 'arguments': %p}", args);
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "event")); /* We don't expect any events */
+     g_assert(!qdict_haskey(response, "error"));
 diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 70e9c5157c..d3da42623e 100644
+index 0eff8763ce..70e9c5157c 100644
 --- a/tests/libqtest.h
 +++ b/tests/libqtest.h
-@@ -146,6 +146,23 @@ void qtest_qmp_eventwait(QTestState *s, const char *event);
+@@ -943,7 +943,9 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine));
+  * qtest_qmp_device_add:
+  * @driver: Name of the device that should be added
+  * @id: Identification string
+- * @fmt: printf-like format string for further options to device_add
++ * @fmt...: QMP message to send to qemu, formatted like
++ * qobject_from_jsonf_nofail().  See parse_escape() for what's
++ * supported after '%'.
+  *
+  * Generic hot-plugging test via the device_add QMP command.
   */
- QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
+diff --git a/tests/usb-hcd-ehci-test.c b/tests/usb-hcd-ehci-test.c
+index 55d4743a2a..f28ea27f37 100644
+--- a/tests/usb-hcd-ehci-test.c
++++ b/tests/usb-hcd-ehci-test.c
+@@ -139,7 +139,7 @@ static void pci_ehci_port_3_hotplug(void)
  
-+/**
-+ * qtest_qmp_receive_success:
-+ * @s: #QTestState instance to operate on
-+ * @event_cb: Event callback
-+ * @opaque: Argument for @event_cb
-+ *
-+ * Poll QMP messages until a command success response is received.
-+ * If @event_cb, call it for each event received, passing @opaque,
-+ * the event's name and data.
-+ * Return the success response's "return" member.
-+ */
-+QDict *qtest_qmp_receive_success(QTestState *s,
-+                                 void (*event_cb)(void *opaque,
-+                                                  const char *name,
-+                                                  QDict *data),
-+                                 void *opaque);
-+
- /**
-  * qtest_hmp:
-  * @s: #QTestState instance to operate on.
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index db652e30a0..402c82bdc4 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -149,31 +149,20 @@ static void wait_for_serial(const char *side)
-     } while (true);
- }
- 
-+static void stop_cb(void *opaque, const char *name, QDict *data)
-+{
-+    if (!strcmp(name, "STOP")) {
-+        got_stop = true;
-+    }
-+}
-+
- /*
-  * Events can get in the way of responses we are actually waiting for.
-  */
- static QDict *wait_command(QTestState *who, const char *command)
+ static void pci_ehci_port_hotplug(void)
  {
--    const char *event_string;
--    QDict *response, *ret;
--
--    response = qtest_qmp(who, command);
--
--    while (qdict_haskey(response, "event")) {
--        /* OK, it was an event */
--        event_string = qdict_get_str(response, "event");
--        if (!strcmp(event_string, "STOP")) {
--            got_stop = true;
--        }
--        qobject_unref(response);
--        response = qtest_qmp_receive(who);
--    }
--
--    ret = qdict_get_qdict(response, "return");
--    g_assert(ret);
--    qobject_ref(ret);
--    qobject_unref(response);
--    return ret;
-+    qtest_qmp_send(who, command);
-+    return qtest_qmp_receive_success(who, stop_cb, NULL);
+-    usb_test_hotplug("ich9-ehci-1", 3, pci_ehci_port_3_hotplug);
++    usb_test_hotplug("ich9-ehci-1", "3", pci_ehci_port_3_hotplug);
  }
  
- /*
-diff --git a/tests/tpm-util.c b/tests/tpm-util.c
-index 3bd2887f1e..9f3f156e42 100644
---- a/tests/tpm-util.c
-+++ b/tests/tpm-util.c
-@@ -22,8 +22,6 @@
- #define TIS_REG(LOCTY, REG) \
-     (TPM_TIS_ADDR_BASE + ((LOCTY) << 12) + REG)
  
--static bool got_stop;
--
- void tpm_util_crb_transfer(QTestState *s,
-                            const unsigned char *req, size_t req_size,
-                            unsigned char *rsp, size_t rsp_size)
-@@ -247,41 +245,19 @@ void tpm_util_migrate(QTestState *who, const char *uri)
-     qobject_unref(rsp);
- }
+diff --git a/tests/usb-hcd-ohci-test.c b/tests/usb-hcd-ohci-test.c
+index 4758813d78..48ddbfd26d 100644
+--- a/tests/usb-hcd-ohci-test.c
++++ b/tests/usb-hcd-ohci-test.c
+@@ -19,7 +19,7 @@ static void test_ohci_init(void)
  
--/*
-- * Events can get in the way of responses we are actually waiting for.
-- */
--static QDict *tpm_util_wait_command(QTestState *who, const char *command)
--{
--    const char *event_string;
--    QDict *response;
--
--    response = qtest_qmp(who, command);
--
--    while (qdict_haskey(response, "event")) {
--        /* OK, it was an event */
--        event_string = qdict_get_str(response, "event");
--        if (!strcmp(event_string, "STOP")) {
--            got_stop = true;
--        }
--        qobject_unref(response);
--        response = qtest_qmp_receive(who);
--    }
--    return response;
--}
--
- void tpm_util_wait_for_migration_complete(QTestState *who)
+ static void test_ohci_hotplug(void)
  {
-     while (true) {
--        QDict *rsp, *rsp_return;
-+        QDict *rsp_return;
-         bool completed;
-         const char *status;
+-    usb_test_hotplug("ohci", 1, NULL);
++    usb_test_hotplug("ohci", "1", NULL);
+ }
  
--        rsp = tpm_util_wait_command(who, "{ 'execute': 'query-migrate' }");
--        rsp_return = qdict_get_qdict(rsp, "return");
-+        qtest_qmp_send(who, "{ 'execute': 'query-migrate' }");
-+        rsp_return = qtest_qmp_receive_success(who, NULL, NULL);
-         status = qdict_get_str(rsp_return, "status");
-         completed = strcmp(status, "completed") == 0;
-         g_assert_cmpstr(status, !=,  "failed");
--        qobject_unref(rsp);
-+        qobject_unref(rsp_return);
-         if (completed) {
-             return;
-         }
+ int main(int argc, char **argv)
+diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
+index 6a7e5a2fed..a119d6d5c8 100644
+--- a/tests/usb-hcd-uhci-test.c
++++ b/tests/usb-hcd-uhci-test.c
+@@ -43,12 +43,12 @@ static void test_port_2(void)
+ 
+ static void test_uhci_hotplug(void)
+ {
+-    usb_test_hotplug("uhci", 2, test_port_2);
++    usb_test_hotplug("uhci", "2", test_port_2);
+ }
+ 
+ static void test_usb_storage_hotplug(void)
+ {
+-    qtest_qmp_device_add("usb-storage", "usbdev0", "'drive': 'drive0'");
++    qtest_qmp_device_add("usb-storage", "usbdev0", "{'drive': 'drive0'}");
+ 
+     qtest_qmp_device_del("usbdev0");
+ }
+diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
+index 5b1b681bf2..9eb24b00e4 100644
+--- a/tests/usb-hcd-xhci-test.c
++++ b/tests/usb-hcd-xhci-test.c
+@@ -18,13 +18,13 @@ static void test_xhci_init(void)
+ 
+ static void test_xhci_hotplug(void)
+ {
+-    usb_test_hotplug("xhci", 1, NULL);
++    usb_test_hotplug("xhci", "1", NULL);
+ }
+ 
+ static void test_usb_uas_hotplug(void)
+ {
+-    qtest_qmp_device_add("usb-uas", "uas", NULL);
+-    qtest_qmp_device_add("scsi-hd", "scsihd", "'drive': 'drive0'");
++    qtest_qmp_device_add("usb-uas", "uas", "{}");
++    qtest_qmp_device_add("scsi-hd", "scsihd", "{'drive': 'drive0'}");
+ 
+     /* TODO:
+         UAS HBA driver in libqos, to check that
+@@ -37,10 +37,10 @@ static void test_usb_uas_hotplug(void)
+ 
+ static void test_usb_ccid_hotplug(void)
+ {
+-    qtest_qmp_device_add("usb-ccid", "ccid", NULL);
++    qtest_qmp_device_add("usb-ccid", "ccid", "{}");
+     qtest_qmp_device_del("ccid");
+     /* check the device can be added again */
+-    qtest_qmp_device_add("usb-ccid", "ccid", NULL);
++    qtest_qmp_device_add("usb-ccid", "ccid", "{}");
+     qtest_qmp_device_del("ccid");
+ }
+ 
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 06226b8717..571489d763 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -666,8 +666,9 @@ static void pci_hotplug(void)
+     qs = pci_test_start();
+ 
+     /* plug secondary disk */
+-    qpci_plug_device_test("virtio-blk-pci", "drv1", PCI_SLOT_HP,
+-                          "'drive': 'drive1'");
++    qtest_qmp_device_add("virtio-blk-pci", "drv1",
++                         "{'addr': %s, 'drive': 'drive1'}",
++                         stringify(PCI_SLOT_HP));
+ 
+     dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT_HP);
+     g_assert(dev);
+diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
+index b285a262e9..dcb87a8b6e 100644
+--- a/tests/virtio-net-test.c
++++ b/tests/virtio-net-test.c
+@@ -249,7 +249,8 @@ static void hotplug(void)
+ 
+     qtest_start("-device virtio-net-pci");
+ 
+-    qpci_plug_device_test("virtio-net-pci", "net1", PCI_SLOT_HP, NULL);
++    qtest_qmp_device_add("virtio-net-pci", "net1",
++                         "{'addr': %s}", stringify(PCI_SLOT_HP));
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         qpci_unplug_acpi_device_test("net1", PCI_SLOT_HP);
+diff --git a/tests/virtio-rng-test.c b/tests/virtio-rng-test.c
+index dcecf77463..657d9a4105 100644
+--- a/tests/virtio-rng-test.c
++++ b/tests/virtio-rng-test.c
+@@ -22,7 +22,8 @@ static void hotplug(void)
+ {
+     const char *arch = qtest_get_arch();
+ 
+-    qpci_plug_device_test("virtio-rng-pci", "rng1", PCI_SLOT_HP, NULL);
++    qtest_qmp_device_add("virtio-rng-pci", "rng1",
++                         "{'addr': %s}", stringify(PCI_SLOT_HP));
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         qpci_unplug_acpi_device_test("rng1", PCI_SLOT_HP);
+diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
+index 037872bb98..0d4f25d369 100644
+--- a/tests/virtio-scsi-test.c
++++ b/tests/virtio-scsi-test.c
+@@ -199,7 +199,7 @@ static void hotplug(void)
+ 
+     qs = qvirtio_scsi_start(
+             "-drive id=drv1,if=none,file=null-co://,format=raw");
+-    qtest_qmp_device_add("scsi-hd", "scsihd", "'drive': 'drv1'");
++    qtest_qmp_device_add("scsi-hd", "scsihd", "{'drive': 'drv1'}");
+     qtest_qmp_device_del("scsihd");
+     qvirtio_scsi_stop(qs);
+ }
+diff --git a/tests/virtio-serial-test.c b/tests/virtio-serial-test.c
+index 7cc7060264..e4b18b1c8a 100644
+--- a/tests/virtio-serial-test.c
++++ b/tests/virtio-serial-test.c
+@@ -18,7 +18,7 @@ static void virtio_serial_nop(void)
+ 
+ static void hotplug(void)
+ {
+-    qtest_qmp_device_add("virtserialport", "hp-port", NULL);
++    qtest_qmp_device_add("virtserialport", "hp-port", "{}");
+ 
+     qtest_qmp_device_del("hp-port");
+ }
 -- 
 2.17.1
