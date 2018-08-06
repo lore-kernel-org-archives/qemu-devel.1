@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgap-0004ck-1b
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:44 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgaq-0004i3-2j
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgan-0000mF-Ep
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:43 -0400
-Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:34832)
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgao-0000mb-HI
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:44 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:38251)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
-	id 1fmgan-0000lt-55
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:41 -0400
-Received: by mail-ed1-x533.google.com with SMTP id e6-v6so5262232edr.2
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 07:34:41 -0700 (PDT)
+	id 1fmgao-0000mJ-7I
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:42 -0400
+Received: by mail-ed1-x542.google.com with SMTP id t2-v6so5249262edr.5
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 07:34:42 -0700 (PDT)
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon,  6 Aug 2018 16:33:41 +0200
-Message-Id: <20180806143412.27722-4-e.emanuelegiuseppe@gmail.com>
+Date: Mon,  6 Aug 2018 16:33:42 +0200
+Message-Id: <20180806143412.27722-5-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
 References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 03/34] tests/qgraph: pci-pc driver and
- interface nodes
+Subject: [Qemu-devel] [PATCH v2 04/34] tests/qgraph: x86_64/pc machine node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,286 +29,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Laurent Vivier <lvivier@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add pci-bus-pc node, move QPCIBusPC struct declaration in its header
-(since it will be needed by other drivers) and introduce a setter method
-for drivers that do not need to allocate but have to initialize QPCIBusPC.
+Add pc machine for the x86_64 QEMU binary. This machine contains an i440FX-pcihost
+driver, that contains itself a pci-bus-pc that produces the pci-bus interface.
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
- tests/Makefile.include |  4 +++-
- tests/libqos/pci-pc.c  | 41 +++++++++++++++++++++++++++++-------
- tests/libqos/pci-pc.h  | 15 ++++++++++++-
- tests/libqos/pci.c     | 48 +++++++++++++++++++++++++++++++++++++++---
- tests/libqos/pci.h     | 15 +++++++++++++
- 5 files changed, 110 insertions(+), 13 deletions(-)
+ tests/Makefile.include           |   3 +
+ tests/libqos/x86_64_pc-machine.c | 110 +++++++++++++++++++++++++++++++
+ 2 files changed, 113 insertions(+)
+ create mode 100644 tests/libqos/x86_64_pc-machine.c
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index eabf9ed8b4..f04f9fbc3a 100644
+index f04f9fbc3a..4e7b4bb614 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -771,11 +771,13 @@ libqos-imx-obj-y = $(libqos-obj-y) tests/libqos/i2c-imx.o
+@@ -771,7 +771,10 @@ libqos-imx-obj-y = $(libqos-obj-y) tests/libqos/i2c-imx.o
  libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
  libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virtio.o tests/libqos/virtio-pci.o tests/libqos/virtio-mmio.o tests/libqos/malloc-generic.o
  
-+libqgraph-pci-obj-y = $(libqos-pc-obj-y)
++libqgraph-machines-obj-y = tests/libqos/x86_64_pc-machine.o
 +
+ libqgraph-pci-obj-y = $(libqos-pc-obj-y)
++libqgraph-pci-obj-y += $(libqgraph-machines-obj-y)
+ 
  check-unit-y += tests/test-qgraph$(EXESUF)
  tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
- 
- check-qtest-pci-y += tests/qos-test$(EXESUF)
--tests/qos-test$(EXESUF): tests/qos-test.o $(libqgraph-obj-y)
-+tests/qos-test$(EXESUF): tests/qos-test.o $(libqgraph-pci-obj-y)
- 
- tests/qmp-test$(EXESUF): tests/qmp-test.o
- tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
-diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
-index 83a3a32129..f5fb94eabc 100644
---- a/tests/libqos/pci-pc.c
-+++ b/tests/libqos/pci-pc.c
-@@ -18,15 +18,9 @@
- 
- #include "qemu-common.h"
- 
--
- #define ACPI_PCIHP_ADDR         0xae00
- #define PCI_EJ_BASE             0x0008
- 
--typedef struct QPCIBusPC
--{
--    QPCIBus bus;
--} QPCIBusPC;
--
- static uint8_t qpci_pc_pio_readb(QPCIBus *bus, uint32_t addr)
- {
-     return inb(addr);
-@@ -115,12 +109,23 @@ static void qpci_pc_config_writel(QPCIBus *bus, int devfn, uint8_t offset, uint3
-     outl(0xcfc, value);
- }
- 
--QPCIBus *qpci_pc_new(QTestState *qts, QGuestAllocator *alloc)
-+static void *qpci_get_driver(void *obj, const char *interface)
- {
--    QPCIBusPC *ret = g_new0(QPCIBusPC, 1);
-+    QPCIBusPC *qpci = obj;
-+    if (!g_strcmp0(interface, "pci-bus")) {
-+        return &qpci->bus;
-+    }
-+    printf("%s not present in pci-bus-pc\n", interface);
-+    abort();
-+}
- 
-+void qpci_init_pc(QPCIBusPC *ret, QTestState *qts, QGuestAllocator *alloc)
-+{
-     assert(qts);
- 
-+    /* tests can use pci-bus */
-+    ret->bus.has_buggy_msi = FALSE;
-+
-     ret->bus.pio_readb = qpci_pc_pio_readb;
-     ret->bus.pio_readw = qpci_pc_pio_readw;
-     ret->bus.pio_readl = qpci_pc_pio_readl;
-@@ -147,11 +152,23 @@ QPCIBus *qpci_pc_new(QTestState *qts, QGuestAllocator *alloc)
-     ret->bus.mmio_alloc_ptr = 0xE0000000;
-     ret->bus.mmio_limit = 0x100000000ULL;
- 
-+    ret->obj.get_driver = qpci_get_driver;
-+}
-+
-+QPCIBus *qpci_pc_new(QTestState *qts, QGuestAllocator *alloc)
-+{
-+    QPCIBusPC *ret = g_new0(QPCIBusPC, 1);
-+    qpci_init_pc(ret, qts, alloc);
-+
-     return &ret->bus;
- }
- 
- void qpci_free_pc(QPCIBus *bus)
- {
-+    if (!bus) {
-+        return;
-+    }
-+
-     QPCIBusPC *s = container_of(bus, QPCIBusPC, bus);
- 
-     g_free(s);
-@@ -176,3 +193,11 @@ void qpci_unplug_acpi_device_test(const char *id, uint8_t slot)
- 
-     qmp_eventwait("DEVICE_DELETED");
- }
-+
-+static void qpci_pc(void)
-+{
-+    qos_node_create_driver("pci-bus-pc", NULL);
-+    qos_node_produces("pci-bus-pc", "pci-bus");
-+}
-+
-+libqos_init(qpci_pc);
-diff --git a/tests/libqos/pci-pc.h b/tests/libqos/pci-pc.h
-index 88be29eaf3..a3754c1c86 100644
---- a/tests/libqos/pci-pc.h
-+++ b/tests/libqos/pci-pc.h
-@@ -15,9 +15,22 @@
- 
- #include "libqos/pci.h"
- #include "libqos/malloc.h"
-+#include "libqos/qgraph.h"
- 
-+typedef struct QPCIBusPC {
-+    QOSGraphObject obj;
-+    QPCIBus bus;
-+} QPCIBusPC;
-+
-+/* qpci_init_pc():
-+ * this function initialize an already allocated
-+ * QPCIBusPC object.
+diff --git a/tests/libqos/x86_64_pc-machine.c b/tests/libqos/x86_64_pc-machine.c
+new file mode 100644
+index 0000000000..e3eddf2eba
+--- /dev/null
++++ b/tests/libqos/x86_64_pc-machine.c
+@@ -0,0 +1,110 @@
++/*
++ * libqos driver framework
 + *
-+ * @ret must be a valid QPCIBusPC * pointer.
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
 + */
-+void qpci_init_pc(QPCIBusPC *ret, QTestState *qts, QGuestAllocator *alloc);
- /* qpci_pc_new():
--* this function creates a new QPCIBusPC object,
-+ * this function creates a new QPCIBusPC object,
-  * and properly initialize its fields.
-  *
-  * returns the QPCIBus *bus field of a newly
-diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
-index 0b73cb23d0..91440ece5c 100644
---- a/tests/libqos/pci.c
-+++ b/tests/libqos/pci.c
-@@ -15,6 +15,7 @@
- 
- #include "hw/pci/pci_regs.h"
- #include "qemu/host-utils.h"
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
 +#include "libqos/qgraph.h"
- 
- void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
-                          void (*func)(QPCIDevice *dev, int devfn, void *data),
-@@ -50,15 +51,31 @@ void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
-     }
- }
- 
--QPCIDevice *qpci_device_find(QPCIBus *bus, int devfn)
-+bool qpci_has_buggy_msi(QPCIDevice *dev)
- {
--    QPCIDevice *dev;
-+    return dev->bus->has_buggy_msi;
-+}
- 
--    dev = g_malloc0(sizeof(*dev));
-+/* returns TRUE if everything goes fine, FALSE if not */
-+static bool qpci_device_set(QPCIDevice *dev, QPCIBus *bus, int devfn)
-+{
-     dev->bus = bus;
-     dev->devfn = devfn;
- 
-     if (qpci_config_readw(dev, PCI_VENDOR_ID) == 0xFFFF) {
-+        return FALSE;
-+    }
++#include "pci-pc.h"
++#include "malloc-pc.h"
 +
-+    return TRUE;
-+}
++typedef struct QX86_64_PCMachine QX86_64_PCMachine;
++typedef struct i440FX_pcihost i440FX_pcihost;
++typedef struct QSDHCI_PCI  QSDHCI_PCI;
 +
-+QPCIDevice *qpci_device_find(QPCIBus *bus, int devfn)
-+{
-+    QPCIDevice *dev;
-+
-+    dev = g_malloc0(sizeof(*dev));
-+
-+    if (!qpci_device_set(dev, bus, devfn)) {
-         g_free(dev);
-         return NULL;
-     }
-@@ -66,6 +83,21 @@ QPCIDevice *qpci_device_find(QPCIBus *bus, int devfn)
-     return dev;
- }
- 
-+void qpci_device_init(QPCIDevice *dev, QPCIBus *bus, QPCIAddress *addr)
-+{
-+    uint16_t vendor_id, device_id;
-+
-+    if (!qpci_device_set(dev, bus, addr->devfn)) {
-+        printf("PCI Device not found\n");
-+        abort();
-+    }
-+
-+    vendor_id = qpci_config_readw(dev, PCI_VENDOR_ID);
-+    device_id = qpci_config_readw(dev, PCI_DEVICE_ID);
-+    g_assert(vendor_id == addr->vendor_id);
-+    g_assert(device_id == addr->device_id);
-+}
-+
- void qpci_device_enable(QPCIDevice *dev)
- {
-     uint16_t cmd;
-@@ -402,3 +434,13 @@ void qpci_plug_device_test(const char *driver, const char *id,
-     qtest_qmp_device_add(driver, id, "'addr': '%d'%s%s", slot,
-                          opts ? ", " : "", opts ? opts : "");
- }
-+
-+void add_qpci_address(QOSGraphEdgeOptions *opts, QPCIAddress *addr)
-+{
-+    if (!addr || !opts) {
-+        return;
-+    }
-+
-+    opts->arg = addr;
-+    opts->size_arg = sizeof(QPCIAddress);
-+}
-diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
-index 429c382282..5fb3c550c5 100644
---- a/tests/libqos/pci.h
-+++ b/tests/libqos/pci.h
-@@ -14,6 +14,7 @@
- #define LIBQOS_PCI_H
- 
- #include "libqtest.h"
-+#include "libqos/qgraph.h"
- 
- #define QPCI_PIO_LIMIT    0x10000
- 
-@@ -22,6 +23,7 @@
- typedef struct QPCIDevice QPCIDevice;
- typedef struct QPCIBus QPCIBus;
- typedef struct QPCIBar QPCIBar;
-+typedef struct QPCIAddress QPCIAddress;
- 
- struct QPCIBus {
-     uint8_t (*pio_readb)(QPCIBus *bus, uint32_t addr);
-@@ -51,6 +53,8 @@ struct QPCIBus {
-     QTestState *qts;
-     uint16_t pio_alloc_ptr;
-     uint64_t mmio_alloc_ptr, mmio_limit;
-+    bool has_buggy_msi; /* TRUE for spapr, FALSE for pci */
-+
- };
- 
- struct QPCIBar {
-@@ -66,10 +70,19 @@ struct QPCIDevice
-     uint64_t msix_table_off, msix_pba_off;
- };
- 
-+struct QPCIAddress {
-+    uint32_t devfn;
-+    uint16_t vendor_id;
-+    uint16_t device_id;
++struct i440FX_pcihost {
++    QOSGraphObject obj;
++    QPCIBusPC pci;
 +};
 +
- void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
-                          void (*func)(QPCIDevice *dev, int devfn, void *data),
-                          void *data);
- QPCIDevice *qpci_device_find(QPCIBus *bus, int devfn);
-+void qpci_device_init(QPCIDevice *dev, QPCIBus *bus, QPCIAddress *addr);
-+/* returns the bus has_buggy_msi flag */
-+bool qpci_has_buggy_msi(QPCIDevice *dev);
- 
- void qpci_device_enable(QPCIDevice *dev);
- uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id);
-@@ -112,4 +125,6 @@ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr);
- void qpci_plug_device_test(const char *driver, const char *id,
-                            uint8_t slot, const char *opts);
- void qpci_unplug_acpi_device_test(const char *id, uint8_t slot);
++struct QX86_64_PCMachine {
++    QOSGraphObject obj;
++    QGuestAllocator *alloc;
++    i440FX_pcihost bridge;
++};
 +
-+void add_qpci_address(QOSGraphEdgeOptions *opts, QPCIAddress *addr);
- #endif
++/* i440FX_pcihost */
++
++static QOSGraphObject *i440FX_host_get_device(void *obj, const char *device)
++{
++    i440FX_pcihost *host = obj;
++    if (!g_strcmp0(device, "pci-bus-pc")) {
++        return &host->pci.obj;
++    }
++    printf("%s not present in i440FX-pcihost\n", device);
++    abort();
++}
++
++static void qos_create_i440FX_host(i440FX_pcihost *host,
++                                   QGuestAllocator *alloc)
++{
++    host->obj.get_device = i440FX_host_get_device;
++    qpci_init_pc(&host->pci, global_qtest, alloc);
++}
++
++/* x86_64/pc machine */
++
++static void pc_destroy(QOSGraphObject *obj)
++{
++    QX86_64_PCMachine *machine = (QX86_64_PCMachine *) obj;
++    pc_alloc_uninit(machine->alloc);
++    g_free(machine);
++}
++
++static void *pc_get_driver(void *object, const char *interface)
++{
++    QX86_64_PCMachine *machine = object;
++    if (!g_strcmp0(interface, "guest_allocator")) {
++        return machine->alloc;
++    }
++
++    printf("%s not present in x86_64/pc\n", interface);
++    abort();
++}
++
++static QOSGraphObject *pc_get_device(void *obj, const char *device)
++{
++    QX86_64_PCMachine *machine = obj;
++    if (!g_strcmp0(device, "i440FX-pcihost")) {
++        return &machine->bridge.obj;
++    }
++
++    printf("%s not present in x86_64/pc\n", device);
++    abort();
++}
++
++static void *qos_create_machine_pc(void)
++{
++    QX86_64_PCMachine *machine = g_new0(QX86_64_PCMachine, 1);
++    machine->obj.get_device = pc_get_device;
++    machine->obj.get_driver = pc_get_driver;
++    machine->obj.destructor = pc_destroy;
++    machine->alloc = pc_alloc_init_flags(global_qtest, ALLOC_NO_FLAGS);
++    qos_create_i440FX_host(&machine->bridge, machine->alloc);
++
++    return &machine->obj;
++}
++
++static void pc_machine(void)
++{
++    qos_node_create_machine("x86_64/pc", qos_create_machine_pc);
++    qos_node_create_driver("i440FX-pcihost", NULL);
++    qos_node_contains("x86_64/pc", "i440FX-pcihost", NULL);
++    qos_node_contains("i440FX-pcihost", "pci-bus-pc", NULL);
++}
++
++libqos_init(pc_machine);
 -- 
 2.17.1
