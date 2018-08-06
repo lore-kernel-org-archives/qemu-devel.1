@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fmgM4-0008VK-J5
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:19:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fmgRA-0001sE-57
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:24:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fmgM3-00043L-NB
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:19:28 -0400
-References: <20180806123728.13658-1-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cdc871bd-f8c4-0102-2d5c-ca1443ff1684@redhat.com>
-Date: Mon, 6 Aug 2018 09:19:15 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1fmgR9-0005pB-Bl
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:24:44 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34686)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fmgR9-0005p3-4f
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:24:43 -0400
+Received: by mail-oi0-x242.google.com with SMTP id 13-v6so22533462ois.1
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 07:24:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180806123728.13658-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qapi/block: Document restrictions for node
- names
+In-Reply-To: <CABoDooNeBaYo46FVii0vjT-K5QtTx+Bg34WETrJcLJpPRHoV6w@mail.gmail.com>
+References: <20180805233258.31892-1-richard.henderson@linaro.org>
+	<CABoDooNeBaYo46FVii0vjT-K5QtTx+Bg34WETrJcLJpPRHoV6w@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Aug 2018 15:24:21 +0100
+Message-ID: <CAFEAcA87q0+vmVM_VSw5q8e21fcoCX7zB49LrksDrokP=PA-fg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] tcg/optimize: Do not skip default
+ processing of dup_vec
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: coli@redhat.com, qemu-devel@nongnu.org
+To: Laurent Desnogues <laurent.desnogues@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 08/06/2018 07:37 AM, Kevin Wolf wrote:
-> blockdev-add fails if an invalid node name is given, so we should
-> document what a valid node name even is.
-> 
-> Reported-by: Cong Li <coli@redhat.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   qapi/block-core.json | 3 +++
->   1 file changed, 3 insertions(+)
+On 6 August 2018 at 06:29, Laurent Desnogues
+<laurent.desnogues@gmail.com> wrote:
+> Hello,
+>
+> On Mon, Aug 6, 2018 at 1:32 AM, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> If we do not opimize away dup_vec, we must mark its output as changed.
+>>
+>> Fixes: 170ba88f45b
+>> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
+> Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+>
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Applied to master for rc4, thanks.
 
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 62a92fa4f4..fe565ebfaf 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -3563,6 +3563,9 @@
->   # @driver:        block driver name
->   # @node-name:     the node name of the new node (Since 2.0).
->   #                 This option is required on the top level of blockdev-add.
-> +#                 Valid node names start with an alphabetic character and may
-> +#                 contain only alphanumeric characters, '-', '.' and '_'. Their
-> +#                 maximum length is 31 characters.
->   # @discard:       discard-related options (default: ignore)
->   # @cache:         cache-related options
->   # @read-only:     whether the block device should be read-only (default: false).
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-- PMM
