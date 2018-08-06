@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fml3q-0003Oo-7b
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:21:01 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fmlN5-0000zF-1l
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:40:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fml3n-0004UU-27
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:20:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35620)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fml3m-0004S0-OD
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:20:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fml3i-0002hV-3X
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 19:20:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 862DB2E80CB
-	for <qemu-devel@nongnu.org>; Mon,  6 Aug 2018 19:20:49 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <amarkovic@wavecomp.com>) id 1fmlN0-0004vk-4I
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:40:51 -0400
+Received: from mail-by2nam01on0116.outbound.protection.outlook.com
+	([104.47.34.116]:30784
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fmlMz-0004tf-Mz
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:40:46 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 6 Aug 2018 19:40:40 +0000
+Message-ID: <BN7PR08MB4868A5017093BCE115D9C9F0C6200@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1533574847-19294-57-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1533574847-19294-57-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Aug 2018 19:11:44 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1785670 <1785670@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153357530568.2634.11935730297153408386.malonedeb@wampee.canonical.com>
-Message-Id: <153358270466.31539.18031066779850584851.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1785670] Re: Guest(ubuntu 18.04) crashes when
- trying uploading file
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v7 56/80] mips_malta: Add basic nanoMIPS
+ boot code for MIPS' Malta
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,580 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Looks like it might be e1000e specific?
-I can recreate it with either q35 with no extra options (it has e1000e by d=
-efault), pc or q35 specifying e1000e, but plain pc works fine.
-
-Simple test;  scp bigfile from guest to user@10.0.2.2: (i.e. host)
-
-Dave
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1785670
-
-Title:
-  Guest(ubuntu 18.04) crashes when trying uploading file
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  I speficy slirp network, and I can open websites, git clone repos. But
-  when I try to upload a file to slack, or try to do a git push, it
-  crashes.
-
-  My host is ubuntu 16.04 with kernel 4.15.0-29-generic, and qemu is
-  latest source in git(commit 1fb57da72ae0886e). The command I use is
-
-  ./x86_64-softmmu/qemu-system-x86_64 -machine q35,accel=3Dkvm -m 2048
-  -drive file=3D../qcow2/guest.qcow2  -netdev user,id=3Drealnet0 -device
-  e1000e,netdev=3Drealnet0
-
-  The trace is as follows
-
-  *** Error in `./x86_64-softmmu/qemu-system-x86_64': free(): invalid next =
-size (normal): 0x00007f66d80b7300 ***
-  =3D=3D=3D=3D=3D=3D=3D Backtrace: =3D=3D=3D=3D=3D=3D=3D=3D=3D
-  /lib/x86_64-linux-gnu/libc.so.6(+0x777e5)[0x7f66fb7967e5]
-  /lib/x86_64-linux-gnu/libc.so.6(+0x8037a)[0x7f66fb79f37a]
-  /lib/x86_64-linux-gnu/libc.so.6(cfree+0x4c)[0x7f66fb7a353c]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x6a8549)[0x55dc10c7d549]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x6a99d4)[0x55dc10c7e9d4]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x6ad09a)[0x55dc10c8209a]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x6a3feb)[0x55dc10c78feb]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x6a746e)[0x55dc10c7c46e]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x68fe2c)[0x55dc10c64e2c]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x685b3b)[0x55dc10c5ab3b]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x685bfd)[0x55dc10c5abfd]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x6885a8)[0x55dc10c5d5a8]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x688717)[0x55dc10c5d717]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x685d27)[0x55dc10c5ad27]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x685d54)[0x55dc10c5ad54]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x586bb8)[0x55dc10b5bbb8]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x586d92)[0x55dc10b5bd92]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x586ecd)[0x55dc10b5becd]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x593ea8)[0x55dc10b68ea8]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x59419d)[0x55dc10b6919d]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x5947df)[0x55dc10b697df]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x597ddf)[0x55dc10b6cddf]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x5989e7)[0x55dc10b6d9e7]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x58ae11)[0x55dc10b5fe11]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x30d4f6)[0x55dc108e24f6]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x30d70e)[0x55dc108e270e]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x310336)[0x55dc108e5336]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x2ac368)[0x55dc10881368]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x2ac4b2)[0x55dc108814b2]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x2ac7b8)[0x55dc108817b8]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x2ac809)[0x55dc10881809]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x32b673)[0x55dc10900673]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x2f2875)[0x55dc108c7875]
-  ./x86_64-softmmu/qemu-system-x86_64(+0x81b91c)[0x55dc10df091c]
-  /lib/x86_64-linux-gnu/libpthread.so.0(+0x76ba)[0x7f66fbaf06ba]
-  /lib/x86_64-linux-gnu/libc.so.6(clone+0x6d)[0x7f66fb82641d]
-  =3D=3D=3D=3D=3D=3D=3D Memory map: =3D=3D=3D=3D=3D=3D=3D=3D
-  55dc105d5000-55dc112a9000 r-xp 00000000 103:02 5767220                   =
-/home/biggerfish/src/qemu/x86_64-softmmu/qemu-system-x86_64
-  55dc114a9000-55dc115bd000 r--p 00cd4000 103:02 5767220                   =
-/home/biggerfish/src/qemu/x86_64-softmmu/qemu-system-x86_64
-  55dc115bd000-55dc11773000 rw-p 00de8000 103:02 5767220                   =
-/home/biggerfish/src/qemu/x86_64-softmmu/qemu-system-x86_64
-  55dc11773000-55dc117b5000 rw-p 00000000 00:00 0 =
-
-  55dc134d6000-55dc14e20000 rw-p 00000000 00:00 0                          =
-[heap]
-  7f6634000000-7f6634021000 rw-p 00000000 00:00 0 =
-
-  7f6634021000-7f6638000000 ---p 00000000 00:00 0 =
-
-  7f663c000000-7f663c021000 rw-p 00000000 00:00 0 =
-
-  7f663c021000-7f6640000000 ---p 00000000 00:00 0 =
-
-  7f6642000000-7f6644000000 rw-s 00000000 00:05 4882443                    =
-/SYSV00000000 (deleted)
-  7f6644000000-7f6644021000 rw-p 00000000 00:00 0 =
-
-  7f6644021000-7f6648000000 ---p 00000000 00:00 0 =
-
-  7f66491cc000-7f66491cd000 ---p 00000000 00:00 0 =
-
-  7f66491cd000-7f66499cd000 rw-p 00000000 00:00 0 =
-
-  7f66499cd000-7f66499ce000 ---p 00000000 00:00 0 =
-
-  7f66499ce000-7f664a1ce000 rw-p 00000000 00:00 0 =
-
-  7f664a1ce000-7f664a1cf000 ---p 00000000 00:00 0 =
-
-  7f664a1cf000-7f664a9cf000 rw-p 00000000 00:00 0 =
-
-  7f664a9cf000-7f664a9d0000 ---p 00000000 00:00 0 =
-
-  7f664a9d0000-7f664b1d0000 rw-p 00000000 00:00 0 =
-
-  7f664b1d0000-7f664b1d1000 ---p 00000000 00:00 0 =
-
-  7f664b1d1000-7f664b9d1000 rw-p 00000000 00:00 0 =
-
-  7f664b9d1000-7f664b9d2000 ---p 00000000 00:00 0 =
-
-  7f664b9d2000-7f664bad2000 rw-p 00000000 00:00 0 =
-
-  7f664bad2000-7f664bad3000 ---p 00000000 00:00 0 =
-
-  7f664bad3000-7f664bbd3000 rw-p 00000000 00:00 0 =
-
-  7f664bbd3000-7f664bbd4000 ---p 00000000 00:00 0 =
-
-  7f664bbd4000-7f664bcd4000 rw-p 00000000 00:00 0 =
-
-  7f664bcd4000-7f664bcd5000 ---p 00000000 00:00 0 =
-
-  7f664bcd5000-7f664c4d5000 rw-p 00000000 00:00 0 =
-
-  7f664c4d5000-7f664c4d6000 ---p 00000000 00:00 0 =
-
-  7f664c4d6000-7f664c5d6000 rw-p 00000000 00:00 0 =
-
-  7f664c5d6000-7f664c5d7000 ---p 00000000 00:00 0 =
-
-  7f664c5d7000-7f664c6d7000 rw-p 00000000 00:00 0 =
-
-  7f664c6d7000-7f664c6d8000 ---p 00000000 00:00 0 =
-
-  7f664c6d8000-7f664c7d8000 rw-p 00000000 00:00 0 =
-
-  7f664c7d8000-7f664c7d9000 ---p 00000000 00:00 0 =
-
-  7f664c7d9000-7f664c8d9000 rw-p 00000000 00:00 0 =
-
-  7f664c8d9000-7f664c8da000 ---p 00000000 00:00 0 =
-
-  7f664c8da000-7f664c9da000 rw-p 00000000 00:00 0 =
-
-  7f664c9da000-7f664c9db000 ---p 00000000 00:00 0 =
-
-  7f664c9db000-7f664cadb000 rw-p 00000000 00:00 0 =
-
-  7f664cadb000-7f664cadc000 ---p 00000000 00:00 0 =
-
-  7f664cadc000-7f664cbdc000 rw-p 00000000 00:00 0 =
-
-  7f664cbdc000-7f664cbdd000 ---p 00000000 00:00 0 =
-
-  7f664cbdd000-7f664ccdd000 rw-p 00000000 00:00 0 =
-
-  7f664ccdd000-7f664ccde000 ---p 00000000 00:00 0 =
-
-  7f664ccde000-7f664cdde000 rw-p 00000000 00:00 0 =
-
-  7f664cdde000-7f664cddf000 ---p 00000000 00:00 0 =
-
-  7f664cddf000-7f664cedf000 rw-p 00000000 00:00 0 =
-
-  7f664cedf000-7f664cee0000 ---p 00000000 00:00 0 =
-
-  7f664cee0000-7f664cfe0000 rw-p 00000000 00:00 0 =
-
-  7f664cfe0000-7f664cfe1000 ---p 00000000 00:00 0 =
-
-  7f664cfe1000-7f664d0e1000 rw-p 00000000 00:00 0 =
-
-  7f664d0e1000-7f664d0e2000 ---p 00000000 00:00 0 =
-
-  7f664d0e2000-7f664d1e2000 rw-p 00000000 00:00 0 =
-
-  7f664d1e2000-7f664d1e3000 ---p 00000000 00:00 0 =
-
-  7f664d1e3000-7f664d2e3000 rw-p 00000000 00:00 0 =
-
-  7f664d2e3000-7f664d2e4000 ---p 00000000 00:00 0 =
-
-  7f664d2e4000-7f664d3e4000 rw-p 00000000 00:00 0 =
-
-  7f664d3e4000-7f664d3e5000 ---p 00000000 00:00 0 =
-
-  7f664d3e5000-7f664d4e5000 rw-p 00000000 00:00 0 =
-
-  7f664d4e5000-7f664d4e6000 ---p 00000000 00:00 0 =
-
-  7f664d4e6000-7f664d5e6000 rw-p 00000000 00:00 0 =
-
-  7f664d5e6000-7f664d5e7000 ---p 00000000 00:00 0 =
-
-  7f664d5e7000-7f664d6e7000 rw-p 00000000 00:00 0 =
-
-  7f664d6e7000-7f664d6e8000 ---p 00000000 00:00 0 =
-
-  7f664d6e8000-7f664d7e8000 rw-p 00000000 00:00 0 =
-
-  7f664d7e8000-7f664d7e9000 ---p 00000000 00:00 0 =
-
-  7f664d7e9000-7f664d8e9000 rw-p 00000000 00:00 0 =
-
-  7f664d8e9000-7f664d8ea000 ---p 00000000 00:00 0 =
-
-  7f664d8ea000-7f664d9ea000 rw-p 00000000 00:00 0 =
-
-  7f664d9ea000-7f664d9eb000 ---p 00000000 00:00 0 =
-
-  7f664d9eb000-7f664daeb000 rw-p 00000000 00:00 0 =
-
-  7f664daeb000-7f664daec000 ---p 00000000 00:00 0 =
-
-  7f664daec000-7f664dbec000 rw-p 00000000 00:00 0 =
-
-  7f664dbec000-7f664dbed000 ---p 00000000 00:00 0 =
-
-  7f664dbed000-7f664dced000 rw-p 00000000 00:00 0 =
-
-  7f664dced000-7f664dcee000 ---p 00000000 00:00 0 =
-
-  7f664dcee000-7f664ddee000 rw-p 00000000 00:00 0 =
-
-  7f664ddee000-7f664ddef000 ---p 00000000 00:00 0 =
-
-  7f664ddef000-7f664deef000 rw-p 00000000 00:00 0 =
-
-  7f664deef000-7f664def0000 ---p 00000000 00:00 0 =
-
-  7f664def0000-7f664dff0000 rw-p 00000000 00:00 0 =
-
-  7f664dff0000-7f664dff1000 ---p 00000000 00:00 0 =
-
-  7f664dff1000-7f664e0f1000 rw-p 00000000 00:00 0 =
-
-  7f664e0f1000-7f664e0f2000 ---p 00000000 00:00 0 =
-
-  7f664e0f2000-7f664e1f2000 rw-p 00000000 00:00 0 =
-
-  7f664e1f2000-7f664e1f3000 ---p 00000000 00:00 0 =
-
-  7f664e1f3000-7f664e2f3000 rw-p 00000000 00:00 0 =
-
-  7f664e2f3000-7f664e2f4000 ---p 00000000 00:00 0 =
-
-  7f664e2f4000-7f664e3f4000 rw-p 00000000 00:00 0 =
-
-  7f664e3f4000-7f664e3f5000 ---p 00000000 00:00 0 =
-
-  7f664e3f5000-7f664e4f5000 rw-p 00000000 00:00 0 =
-
-  7f664e4f5000-7f664e4f6000 ---p 00000000 00:00 0 =
-
-  7f664e4f6000-7f664e5f6000 rw-p 00000000 00:00 0 =
-
-  7f664e5f6000-7f664e5f7000 ---p 00000000 00:00 0 =
-
-  7f664e5f7000-7f664e6f7000 rw-p 00000000 00:00 0 =
-
-  7f664e6f7000-7f664e6f8000 ---p 00000000 00:00 0 =
-
-  7f664e6f8000-7f664e7f8000 rw-p 00000000 00:00 0 =
-
-  7f664e7f8000-7f664e7f9000 ---p 00000000 00:00 0 =
-
-  7f664e7f9000-7f664e8f9000 rw-p 00000000 00:00 0 =
-
-  7f664e8f9000-7f664e8fa000 ---p 00000000 00:00 0 =
-
-  7f664e8fa000-7f664e9fa000 rw-p 00000000 00:00 0 =
-
-  7f664e9fa000-7f664e9fb000 ---p 00000000 00:00 0 =
-
-  7f664e9fb000-7f664eafb000 rw-p 00000000 00:00 0 =
-
-  7f664eafb000-7f664eafc000 ---p 00000000 00:00 0 =
-
-  7f664eafc000-7f664ebfc000 rw-p 00000000 00:00 0 =
-
-  7f664ebfc000-7f664ebfd000 ---p 00000000 00:00 0 =
-
-  7f664ebfd000-7f664ecfd000 rw-p 00000000 00:00 0 =
-
-  7f664ecfd000-7f664ecfe000 ---p 00000000 00:00 0 =
-
-  7f664ecfe000-7f664edfe000 rw-p 00000000 00:00 0 =
-
-  7f664edfe000-7f664edff000 ---p 00000000 00:00 0 =
-
-  7f664edff000-7f664eeff000 rw-p 00000000 00:00 0 =
-
-  7f664eeff000-7f664ef00000 ---p 00000000 00:00 0 =
-
-  7f664ef00000-7f664f000000 rw-p 00000000 00:00 0 =
-
-  7f664f6fe000-7f664f6ff000 ---p 00000000 00:00 0 =
-
-  7f664f6ff000-7f664f7ff000 rw-p 00000000 00:00 0 =
-
-  7f664f7ff000-7f664f800000 ---p 00000000 00:00 0 =
-
-  7f664f800000-7f6650000000 rw-p 00000000 00:00 0 =
-
-  7f6650000000-7f6650022000 rw-p 00000000 00:00 0 =
-
-  7f6650022000-7f6654000000 ---p 00000000 00:00 0 =
-
-  7f66540f5000-7f66540f6000 ---p 00000000 00:00 0 =
-
-  7f66540f6000-7f66541f6000 rw-p 00000000 00:00 0 =
-
-  7f66541f6000-7f66541f7000 ---p 00000000 00:00 0 =
-
-  7f66541f7000-7f66542f7000 rw-p 00000000 00:00 0 =
-
-  7f66542f7000-7f66542f8000 ---p 00000000 00:00 0 =
-
-  7f66542f8000-7f66543f8000 rw-p 00000000 00:00 0 =
-
-  7f66543f8000-7f66543f9000 ---p 00000000 00:00 0 =
-
-  7f66543f9000-7f66544f9000 rw-p 00000000 00:00 0 =
-
-  7f66544f9000-7f66544fa000 ---p 00000000 00:00 0 =
-
-  7f66544fa000-7f66545fa000 rw-p 00000000 00:00 0 =
-
-  7f66545fa000-7f66545fb000 ---p 00000000 00:00 0 =
-
-  7f66545fb000-7f66546fb000 rw-p 00000000 00:00 0 =
-
-  7f66546fb000-7f66546fc000 ---p 00000000 00:00 0 =
-
-  7f66546fc000-7f66547fc000 rw-p 00000000 00:00 0 =
-
-  7f66547fc000-7f66547fd000 ---p 00000000 00:00 0 =
-
-  7f66547fd000-7f66548fd000 rw-p 00000000 00:00 0 =
-
-  7f66548fd000-7f66548fe000 ---p 00000000 00:00 0 =
-
-  7f66548fe000-7f66549fe000 rw-p 00000000 00:00 0 =
-
-  7f66549fe000-7f66549ff000 ---p 00000000 00:00 0 =
-
-  7f66549ff000-7f6654aff000 rw-p 00000000 00:00 0 =
-
-  7f6654aff000-7f6654b00000 ---p 00000000 00:00 0 =
-
-  7f6654b00000-7f6654c00000 rw-p 00000000 00:00 0 =
-
-  7f6654c00000-7f6654c01000 rw-p 00000000 00:00 0 =
-
-  7f6654c01000-7f6654c02000 ---p 00000000 00:00 0 =
-
-  7f6654cff000-7f6654d00000 ---p 00000000 00:00 0 =
-
-  7f6654d00000-7f6654e00000 rw-p 00000000 00:00 0 =
-
-  7f6654e00000-7f6654e01000 rw-p 00000000 00:00 0 =
-
-  7f6654e01000-7f6654e02000 ---p 00000000 00:00 0 =
-
-  7f6654eff000-7f6654f00000 ---p 00000000 00:00 0 =
-
-  7f6654f00000-7f6655000000 rw-p 00000000 00:00 0 =
-
-  7f6655000000-7f6655200000 rw-p 00000000 00:00 0 =
-
-  7f6655200000-7f6655201000 ---p 00000000 00:00 0 =
-
-  7f665523b000-7f6656af1000 r-xp 00000000 103:02 2233416                   =
-/usr/lib/x86_64-linux-gnu/libicudata.so.55.1
-  7f6656af1000-7f6656cf0000 ---p 018b6000 103:02 2233416                   =
-/usr/lib/x86_64-linux-gnu/libicudata.so.55.1
-  7f6656cf0000-7f6656cf1000 r--p 018b5000 103:02 2233416                   =
-/usr/lib/x86_64-linux-gnu/libicudata.so.55.1
-  7f6656cf1000-7f6656cf2000 rw-p 018b6000 103:02 2233416                   =
-/usr/lib/x86_64-linux-gnu/libicudata.so.55.1
-  7f6656cf2000-7f6656e71000 r-xp 00000000 103:02 2233420                   =
-/usr/lib/x86_64-linux-gnu/libicuuc.so.55.1
-  7f6656e71000-7f6657071000 ---p 0017f000 103:02 2233420                   =
-/usr/lib/x86_64-linux-gnu/libicuuc.so.55.1
-  7f6657071000-7f6657081000 r--p 0017f000 103:02 2233420                   =
-/usr/lib/x86_64-linux-gnu/libicuuc.so.55.1
-  7f6657081000-7f6657082000 rw-p 0018f000 103:02 2233420                   =
-/usr/lib/x86_64-linux-gnu/libicuuc.so.55.1
-  7f6657082000-7f6657086000 rw-p 00000000 00:00 0 =
-
-  7f6657086000-7f6657237000 r-xp 00000000 103:02 2237922                   =
-/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.3
-  7f6657237000-7f6657436000 ---p 001b1000 103:02 2237922                   =
-/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.3
-  7f6657436000-7f665743e000 r--p 001b0000 103:02 2237922                   =
-/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.3
-  7f665743e000-7f6657440000 rw-p 001b8000 103:02 2237922                   =
-/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.3
-  7f6657440000-7f6657441000 rw-p 00000000 00:00 0 =
-
-  7f6657441000-7f6657e00000 r--p 00000000 103:02 2235565                   =
-/usr/lib/locale/locale-archive
-  7f6657e00000-7f66d7e00000 rw-p 00000000 00:00 0 =
-
-  7f66d7e00000-7f66d7e01000 ---p 00000000 00:00 0 =
-
-  7f66d7eff000-7f66d7f00000 ---p 00000000 00:00 0 =
-
-  7f66d7f00000-7f66d8000000 rw-p 00000000 00:00 0 =
-
-  7f66d8000000-7f66d8b29000 rw-p 00000000 00:00 0 =
-
-  7f66d8b29000-7f66dc000000 ---p 00000000 00:00 0 =
-
-  7f66dc000000-7f66dc022000 rw-p 00000000 00:00 0 =
-
-  7f66dc022000-7f66e0000000 ---p 00000000 00:00 0 =
-
-  7f66e008a000-7f66e008b000 ---p 00000000 00:00 0 =
-
-  7f66e008b000-7f66e018b000 rw-p 00000000 00:00 0 =
-
-  7f66e018b000-7f66e01c2000 r-xp 00000000 103:02 2236734                   =
-/usr/lib/x86_64-linux-gnu/libcroco-0.6.so.3.0.1
-  7f66e01c2000-7f66e03c2000 ---p 00037000 103:02 2236734                   =
-/usr/lib/x86_64-linux-gnu/libcroco-0.6.so.3.0.1
-  7f66e03c2000-7f66e03c5000 r--p 00037000 103:02 2236734                   =
-/usr/lib/x86_64-linux-gnu/libcroco-0.6.so.3.0.1
-  7f66e03c5000-7f66e03c6000 rw-p 0003a000 103:02 2236734                   =
-/usr/lib/x86_64-linux-gnu/libcroco-0.6.so.3.0.1
-  7f66e03c6000-7f66e03fb000 r-xp 00000000 103:02 2237572                   =
-/usr/lib/x86_64-linux-gnu/librsvg-2.so.2.40.13
-  7f66e03fb000-7f66e05fb000 ---p 00035000 103:02 2237572                   =
-/usr/lib/x86_64-linux-gnu/librsvg-2.so.2.40.13
-  7f66e05fb000-7f66e05fc000 r--p 00035000 103:02 2237572                   =
-/usr/lib/x86_64-linux-gnu/librsvg-2.so.2.40.13
-  7f66e05fc000-7f66e05fd000 rw-p 00036000 103:02 2237572                   =
-/usr/lib/x86_64-linux-gnu/librsvg-2.so.2.40.13
-  7f66e05fd000-7f66e05ff000 r-xp 00000000 103:02 2493292                   =
-/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg=
-.so
-  7f66e05ff000-7f66e07fe000 ---p 00002000 103:02 2493292                   =
-/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg=
-.so
-  7f66e07fe000-7f66e07ff000 r--p 00001000 103:02 2493292                   =
-/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg=
-.so
-  7f66e07ff000-7f66e0800000 rw-p 00002000 103:02 2493292                   =
-/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg=
-.so
-  7f66e0800000-7f66e0840000 rw-p 00000000 00:00 0 =
-
-  7f66e0840000-7f66e0841000 ---p 00000000 00:00 0 =
-
-  7f66e08ff000-7f66e0900000 ---p 00000000 00:00 0 =
-
-  7f66e0900000-7f66e0a00000 rw-p 00000000 00:00 0 =
-
-  7f66e0a00000-7f66e0a10000 rw-p 00000000 00:00 0 =
-
-  7f66e0a10000-7f66e0a11000 ---p 00000000 00:00 0 =
-
-  7f66e0aff000-7f66e0b00000 ---p 00000000 00:00 0 =
-
-  7f66e0b00000-7f66e0c00000 rw-p 00000000 00:00 0 =
-
-  7f66e0c00000-7f66e1c00000 rw-p 00000000 00:00 0 =
-
-  7f66e1c00000-7f66e1c01000 ---p 00000000 00:00 0 =
-
-  7f66e1cff000-7f66e1d00000 ---p 00000000 00:00 0 =
-
-  7f66e1d00000-7f66e1e00000 rw-p 00000000 00:00 0 =
-
-  7f66e1e00000-7f66e1e20000 rw-p 00000000 00:00 0 =
-
-  7f66e1e20000-7f66e1e21000 ---p 00000000 00:00 0 =
-
-  7f66e1e5c000-7f66e1eb3000 r--p 00000000 103:02 3277771                   =
-/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-R.ttf
-  7f66e1eb3000-7f66e1ebe000 r--s 00000000 103:02 3019418                   =
-/var/cache/fontconfig/945677eb7aeaf62f1d50efc3fb3ec7d8-le64.cache-6
-  7f66e1ebe000-7f66e1ed3000 r--s 00000000 103:02 3019394                   =
-/var/cache/fontconfig/04aabc0a78ac019cf9454389977116d2-le64.cache-6
-  7f66e1eff000-7f66e1f00000 ---p 00000000 00:00 0 =
-
-  7f66e1f00000-7f66e2000000 rw-p 00000000 00:00 0 =
-
-  7f66e2000000-7f66e2040000 rw-p 00000000 00:00 0 =
-
-  7f66e2040000-7f66e2041000 ---p 00000000 00:00 0 =
-
-  7f66e204a000-7f66e204b000 rw-p 00000000 00:00 0 =
-
-  7f66e204b000-7f66e2051000 r--s 00000000 103:02 3019400                   =
-/var/cache/fontconfig/2cd17615ca594fa2959ae173292e504c-le64.cache-6
-  7f66e2051000-7f66e2052000 r--s 00000000 103:02 3019397                   =
-/var/cache/fontconfig/0d8c3b2ac0904cb8a57a757ad11a4a08-le64.cache-6
-  7f66e2052000-7f66e2053000 r--s 00000000 103:02 3019399                   =
-/var/cache/fontconfig/1ac9eb803944fde146138c791f5cc56a-le64.cache-6
-  7f66e2053000-7f66e2057000 r--s 00000000 103:02 3019404                   =
-/var/cache/fontconfig/385c0604a188198f04d133e54aba7fe7-le64.cache-6
-  7f66e2057000-7f66e2058000 r--s 00000000 103:02 3019431                   =
-/var/cache/fontconfig/dc05db6664285cc2f12bf69c139ae4c3-le64.cache-6
-  7f66e2058000-7f66e205b000 r--s 00000000 103:02 3019414                   =
-/var/cache/fontconfig/767a8244fc0220cfb567a839d0392e0b-le64.cache-6
-  7f66e205b000-7f66e2060000 r--s 00000000 103:02 3019417                   =
-/var/cache/fontconfig/8801497958630a81b71ace7c5f9b32a8-le64.cache-6
-  7f66e2060000-7f66e2067000 r--s 00000000 103:02 3019401                   =
-/var/cache/fontconfig/3047814df9a2f067bd2d96a2b9c36e5a-le64.cache-6
-  7f66e2067000-7f66e206d000 r--s 00000000 103:02 3019422                   =
-/var/cache/fontconfig/b47c4e1ecd0709278f4910c18777a504-le64.cache-6
-  7f66e206d000-7f66e2080000 r--s 00000000 103:02 3019428                   =
-/var/cache/fontconfig/d52a8644073d54c13679302ca1180695-le64.cache-6
-  7f66e2080000-7f66e208b000 r--s 00000000 103:02 3019416                   =
-/var/cache/fontconfig/83bf95040141907cd45bb53cf7c1c148-le64.cache-6
-  7f66e208b000-7f66e209d000 r--s 00000000 103:02 3019420                   =
-/var/cache/fontconfig/9b89f8e3dae116d678bbf48e5f21f69b-le64.cache-6
-  7f66e209d000-7f66e20bc000 r--s 00000000 103:02 2752558                   =
-/usr/share/mime/mime.cache
-  7f66e20bc000-7f66e20bd000 ---p 00000000 00:00 0 =
-
-  7f66e20bd000-7f66e21bd000 rw-p 00000000 00:00 0 =
-
-  7f66e21bd000-7f66e21be000 ---p 00000000 00:00 0 =
-
-  7f66e21be000-7f66e2ca2000 rw-p 00000000 00:00 0 =
-
-  7f66e2ca2000-7f66e2ca3000 ---p 00000000 00:00 0 =
-
-  7f66e2ca3000-7f66e2da3000 rw-p 00000000 00:00 0 =
-
-  7f66e2da3000-7f66e2da4000 ---p 00000000 00:00 0 =
-
-  7f66e2da4000-7f66e35a4000 rw-p 00000000 00:00 0 =
-
-  7f66e35a4000-7f66e35ab000 r-xp 00000000 103:02 2237425                   =
-/usr/lib/x86_64-linux-gnu/libogg.so.0.8.2
-  7f66e35ab000-7f66e37ab000 ---p 00007000 103:02 2237425                   =
-/usr/lib/x86_64-linux-gnu/libogg.so.0.8.2
-  7f66e37ab000-7f66e37ac000 r--p 00007000 103:02 2237425                   =
-/usr/lib/x86_64-linux-gnu/libogg.so.0.8.2
-  7f66e37ac000-7f66e37ad000 rw-p 00008000 103:02 2237425                   =
-/usr/lib/x86_64-linux-gnu/libogg.so.0.8.2
-  7f66e37ad000-7f66e37d7000 r-xp 00000000 103:02 2233113                   =
-/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.8
-  7f66e37d7000-7f66e39d6000 ---p 0002a000 103:02 2233113                   =
-/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.8
-  7f66e39d6000-7f66e39d7000 r--p 00029000 103:02 2233113                   =
-/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.8
-  7f66e39d7000-7f66e39d8000 rw-p 0002a000 103:02 2233113                   =
-/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.8
-  7f66e39d8000-7f66e39e1000 r-xp 00000000 103:02 2237286                   =
-/usr/lib/x86_64-linux-gnu/libltdl.so.7.3.1
-  7f66e39e1000-7f66e3be0000 ---p 00009000 103:02 2237286                   =
-/usr/lib/x86_64-linux-gnu/libltdl.so.7.3.1
-  7f66e3be0000-7f66e3be1000 r--p 00008000 103:02 2237286                   =
-/usr/lib/x86_64-linux-gnu/libltdl.so.7.3.1
-  7f66e3be1000-7f66e3be2000 rw-p 00009000 103:02 2237286                   =
-/usr/lib/x86_64-linux-gnu/libltdl.so.7.3.1
-  7f66e3be2000-7f66e3bf6000 r-xp 00000000 103:02 2237676                   =
-/usr/lib/x86_64-linux-gnu/libtdb.so.1.3.8Aborted (core dumped)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1785670/+subscriptions
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, "thuth@redhat.com" <thuth@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
+
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Monday, August 6, 2018 7:00 PM
+> Subject: [PATCH v7 56/80] mips_malta: Add basic nanoMIPS boot code for MI=
+PS' Malta
+>=20
+> From: Matthew Fortune <matthew.fortune@mips.com>
+>=20
+> Added very very basic nanoMIPS boot code but this is hacked in
+> unconditionally currently.
+>=20
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  hw/mips/mips_malta.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++=
++-----
+>  1 file changed, 69 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+>=20
+> @@ -813,10 +865,16 @@ static int64_t load_kernel (void)
+>                             NULL, (uint64_t *)&kernel_entry, NULL,
+>                             (uint64_t *)&kernel_high, big_endian, EM_MIPS=
+, 1, 0);
+>      if (kernel_size < 0) {
+> -        error_report("could not load kernel '%s': %s",
+> -                     loaderparams.kernel_filename,
+> -                     load_elf_strerror(kernel_size));
+> -        exit(1);
+> +        kernel_size =3D load_elf(loaderparams.kernel_filename,
+> +                    cpu_mips_kseg0_to_phys, NULL,
+> +                    (uint64_t *)&kernel_entry, NULL,
+> +                    (uint64_t *)&kernel_high, big_endian, EM_NANOMIPS, 1=
+, 0);
+> +        if (kernel_size < 0) {
+> +            error_report("could not load kernel '%s': %s",
+> +                         loaderparams.kernel_filename,
+> +                         load_elf_strerror(kernel_size));
+> +            exit(1);
+> +        }
+>      }
+>=20
+
+Instead of invoking load_elf() twice, in load_elf32 (aka glue(load_elf, SZ)=
+), there should be something like this:
+
+        case EM_MIPS:
+        case EM_NANOMIPS:
+            if ((ehdr.e_machine !=3D EM_MIPS) &&
+                (ehdr.e_machine !=3D EM_NANOMIPS)) {
+                    ret =3D ELF_LOAD_WRONG_ARCH;
+                    goto fail;
+                }
+            }
+            break;
+
+In any case, Malta board should work with both EM_MIPS and EM_NANOMIPS. Ple=
+ase make sure both cases are well understood and tested.
