@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgav-0004wo-Qf
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:51 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgaz-00050M-7d
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgau-0000qI-P9
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:49 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:44105)
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fmgax-0000rc-Ao
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:53 -0400
+Received: from mail-ed1-x530.google.com ([2a00:1450:4864:20::530]:40014)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
-	id 1fmgau-0000ot-FB
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:48 -0400
-Received: by mail-ed1-x541.google.com with SMTP id f23-v6so5237143edr.11
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 07:34:48 -0700 (PDT)
+	id 1fmgax-0000rF-0e
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 10:34:51 -0400
+Received: by mail-ed1-x530.google.com with SMTP id e19-v6so5244807edq.7
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 07:34:50 -0700 (PDT)
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon,  6 Aug 2018 16:33:47 +0200
-Message-Id: <20180806143412.27722-10-e.emanuelegiuseppe@gmail.com>
+Date: Mon,  6 Aug 2018 16:33:49 +0200
+Message-Id: <20180806143412.27722-12-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
 References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 09/34] tests/qgraph: pci-spapr driver and
+Subject: [Qemu-devel] [PATCH v2 11/34] test/qgraph: e1000e driver and
  interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,164 +30,357 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Laurent Vivier <lvivier@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add pci-bus-spapr node, that produces pci-bus. Move QPCIBusSPAPR struct
-declaration in its header (since it will be needed by other drivers)
-and introduce a setter method for drivers that do not need to allocate
-but have to initialize QPCIBusSPAPR.
+Add qgraph nodes for virtio-e1000e.
+It consumes a pci-bus, and it's directly used by tests
+(e1000e is pci based).
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
- tests/Makefile.include   |  2 +-
- tests/libqos/pci-spapr.c | 57 ++++++++++++++++++++++++----------------
- tests/libqos/pci-spapr.h | 24 +++++++++++++++++
- 3 files changed, 59 insertions(+), 24 deletions(-)
+ tests/Makefile.include |   1 +
+ tests/libqos/e1000e.c  | 262 +++++++++++++++++++++++++++++++++++++++++
+ tests/libqos/e1000e.h  |  53 +++++++++
+ 3 files changed, 316 insertions(+)
+ create mode 100644 tests/libqos/e1000e.c
+ create mode 100644 tests/libqos/e1000e.h
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index d826a09919..5ce905bd82 100644
+index b86aa52546..66d6270ace 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -771,7 +771,7 @@ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virt
- libqgraph-machines-obj-y = tests/libqos/x86_64_pc-machine.o
- libqgraph-machines-obj-y += tests/libqos/raspi2-machine.o
- 
--libqgraph-pci-obj-y = $(libqos-pc-obj-y)
-+libqgraph-pci-obj-y = $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+@@ -775,6 +775,7 @@ libqgraph-machines-obj-y += tests/libqos/ppc64_pseries-machine.o
+ libqgraph-pci-obj-y = $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
  libqgraph-pci-obj-y += $(libqgraph-machines-obj-y)
  libqgraph-pci-obj-y += tests/libqos/sdhci.o
++libqgraph-pci-obj-y += tests/libqos/e1000e.o
  
-diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
-index 30b6d5b5a7..108db6c9b6 100644
---- a/tests/libqos/pci-spapr.c
-+++ b/tests/libqos/pci-spapr.c
-@@ -9,33 +9,13 @@
- #include "libqtest.h"
- #include "libqos/pci-spapr.h"
- #include "libqos/rtas.h"
+ libqgraph-tests-obj-y = $(libqgraph-pci-obj-y)
+ libqgraph-tests-obj-y += tests/sdhci-test.o
+diff --git a/tests/libqos/e1000e.c b/tests/libqos/e1000e.c
+new file mode 100644
+index 0000000000..8aec82e7c2
+--- /dev/null
++++ b/tests/libqos/e1000e.c
+@@ -0,0 +1,262 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "qemu-common.h"
++#include "libqos/pci-pc.h"
++#include "qemu/sockets.h"
++#include "qemu/iov.h"
++#include "qemu/bitops.h"
++#include "libqos/malloc.h"
++#include "libqos/malloc-pc.h"
++#include "libqos/malloc-generic.h"
 +#include "libqos/qgraph.h"
- 
- #include "hw/pci/pci_regs.h"
- 
- #include "qemu-common.h"
- #include "qemu/host-utils.h"
- 
--
--/* From include/hw/pci-host/spapr.h */
--
--typedef struct QPCIWindow {
--    uint64_t pci_base;    /* window address in PCI space */
--    uint64_t size;        /* window size */
--} QPCIWindow;
--
--typedef struct QPCIBusSPAPR {
--    QPCIBus bus;
--    QGuestAllocator *alloc;
--
--    uint64_t buid;
--
--    uint64_t pio_cpu_base;
--    QPCIWindow pio;
--
--    uint64_t mmio32_cpu_base;
--    QPCIWindow mmio32;
--} QPCIBusSPAPR;
--
- /*
-  * PCI devices are always little-endian
-  * SPAPR by default is big-endian
-@@ -160,12 +140,23 @@ static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
- #define SPAPR_PCI_MMIO32_WIN_SIZE    0x80000000 /* 2 GiB */
- #define SPAPR_PCI_IO_WIN_SIZE        0x10000
- 
--QPCIBus *qpci_spapr_new(QTestState *qts, QGuestAllocator *alloc)
-+static void *qspapr_get_driver(void *obj, const char *interface)
- {
--    QPCIBusSPAPR *ret = g_new0(QPCIBusSPAPR, 1);
-+    QPCIBusSPAPR *qpci = obj;
-+    if (!g_strcmp0(interface, "pci-bus")) {
-+        return &qpci->bus;
++#include "e1000e.h"
++
++#define E1000E_IMS      (0x00d0)
++
++#define E1000E_STATUS   (0x0008)
++#define E1000E_STATUS_LU BIT(1)
++#define E1000E_STATUS_ASDV1000 BIT(9)
++
++#define E1000E_CTRL     (0x0000)
++#define E1000E_CTRL_RESET BIT(26)
++
++#define E1000E_RCTL     (0x0100)
++#define E1000E_RCTL_EN  BIT(1)
++#define E1000E_RCTL_UPE BIT(3)
++#define E1000E_RCTL_MPE BIT(4)
++
++#define E1000E_RFCTL     (0x5008)
++#define E1000E_RFCTL_EXTEN  BIT(15)
++
++#define E1000E_TCTL     (0x0400)
++#define E1000E_TCTL_EN  BIT(1)
++
++#define E1000E_CTRL_EXT             (0x0018)
++#define E1000E_CTRL_EXT_DRV_LOAD    BIT(28)
++#define E1000E_CTRL_EXT_TXLSFLOW    BIT(22)
++
++#define E1000E_IVAR                 (0x00E4)
++#define E1000E_IVAR_TEST_CFG        ((E1000E_RX0_MSG_ID << 0)    | BIT(3)  | \
++                                     (E1000E_TX0_MSG_ID << 8)    | BIT(11) | \
++                                     (E1000E_OTHER_MSG_ID << 16) | BIT(19) | \
++                                     BIT(31))
++
++#define E1000E_RING_LEN             (0x1000)
++
++#define E1000E_TDBAL    (0x3800)
++
++#define E1000E_TDBAH    (0x3804)
++#define E1000E_TDH      (0x3810)
++
++#define E1000E_RDBAL    (0x2800)
++#define E1000E_RDBAH    (0x2804)
++#define E1000E_RDH      (0x2810)
++
++#define E1000E_TXD_LEN              (16)
++#define E1000E_RXD_LEN              (16)
++
++static void e1000e_macreg_write(QE1000E *d, uint32_t reg, uint32_t val)
++{
++    QE1000E_PCI *d_pci = container_of(d, QE1000E_PCI, e1000e);
++    qpci_io_writel(&d_pci->pci_dev, d_pci->mac_regs, reg, val);
++}
++
++static uint32_t e1000e_macreg_read(QE1000E *d, uint32_t reg)
++{
++    QE1000E_PCI *d_pci = container_of(d, QE1000E_PCI, e1000e);
++    return qpci_io_readl(&d_pci->pci_dev, d_pci->mac_regs, reg);
++}
++
++void e1000e_tx_ring_push(QE1000E *d, void *descr)
++{
++    uint32_t tail = e1000e_macreg_read(d, E1000E_TDT);
++    uint32_t len = e1000e_macreg_read(d, E1000E_TDLEN) / E1000E_TXD_LEN;
++
++    memwrite(d->tx_ring + tail * E1000E_TXD_LEN, descr, E1000E_TXD_LEN);
++    e1000e_macreg_write(d, E1000E_TDT, (tail + 1) % len);
++
++    /* Read WB data for the packet transmitted */
++    memread(d->tx_ring + tail * E1000E_TXD_LEN, descr, E1000E_TXD_LEN);
++}
++
++void e1000e_rx_ring_push(QE1000E *d, void *descr)
++{
++    uint32_t tail = e1000e_macreg_read(d, E1000E_RDT);
++    uint32_t len = e1000e_macreg_read(d, E1000E_RDLEN) / E1000E_RXD_LEN;
++
++    memwrite(d->rx_ring + tail * E1000E_RXD_LEN, descr, E1000E_RXD_LEN);
++    e1000e_macreg_write(d, E1000E_RDT, (tail + 1) % len);
++
++    /* Read WB data for the packet received */
++    memread(d->rx_ring + tail * E1000E_RXD_LEN, descr, E1000E_RXD_LEN);
++}
++
++static void e1000e_foreach_callback(QPCIDevice *dev, int devfn, void *data)
++{
++    QPCIDevice *res = data;
++    memcpy(res, dev, sizeof(QPCIDevice));
++}
++
++void e1000e_wait_isr(QE1000E *d, uint16_t msg_id)
++{
++    QE1000E_PCI *d_pci = container_of(d, QE1000E_PCI, e1000e);
++    guint64 end_time = g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
++
++    do {
++        if (qpci_msix_pending(&d_pci->pci_dev, msg_id)) {
++            return;
++        }
++        clock_step(10000);
++    } while (g_get_monotonic_time() < end_time);
++
++    g_error("Timeout expired");
++}
++
++static void e1000e_pci_destroy(QOSGraphObject *obj)
++{
++    QE1000E_PCI *epci = (QE1000E_PCI *) obj;
++    qpci_iounmap(&epci->pci_dev, epci->mac_regs);
++    qpci_msix_disable(&epci->pci_dev);
++    g_free(epci);
++}
++
++static void e1000e_pci_start_hw(QOSGraphObject *obj)
++{
++    QE1000E_PCI *d = (QE1000E_PCI *) obj;
++    uint32_t val;
++
++    /* Enable the device */
++    qpci_device_enable(&d->pci_dev);
++
++    /* Reset the device */
++    val = e1000e_macreg_read(&d->e1000e, E1000E_CTRL);
++    e1000e_macreg_write(&d->e1000e, E1000E_CTRL, val | E1000E_CTRL_RESET);
++
++    /* Enable and configure MSI-X */
++    qpci_msix_enable(&d->pci_dev);
++    e1000e_macreg_write(&d->e1000e, E1000E_IVAR, E1000E_IVAR_TEST_CFG);
++
++    /* Check the device status - link and speed */
++    val = e1000e_macreg_read(&d->e1000e, E1000E_STATUS);
++    g_assert_cmphex(val & (E1000E_STATUS_LU | E1000E_STATUS_ASDV1000),
++        ==, E1000E_STATUS_LU | E1000E_STATUS_ASDV1000);
++
++    /* Initialize TX/RX logic */
++    e1000e_macreg_write(&d->e1000e, E1000E_RCTL, 0);
++    e1000e_macreg_write(&d->e1000e, E1000E_TCTL, 0);
++
++    /* Notify the device that the driver is ready */
++    val = e1000e_macreg_read(&d->e1000e, E1000E_CTRL_EXT);
++    e1000e_macreg_write(&d->e1000e, E1000E_CTRL_EXT,
++        val | E1000E_CTRL_EXT_DRV_LOAD | E1000E_CTRL_EXT_TXLSFLOW);
++
++    e1000e_macreg_write(&d->e1000e, E1000E_TDBAL,
++                           (uint32_t) d->e1000e.tx_ring);
++    e1000e_macreg_write(&d->e1000e, E1000E_TDBAH,
++                           (uint32_t) (d->e1000e.tx_ring >> 32));
++    e1000e_macreg_write(&d->e1000e, E1000E_TDLEN, E1000E_RING_LEN);
++    e1000e_macreg_write(&d->e1000e, E1000E_TDT, 0);
++    e1000e_macreg_write(&d->e1000e, E1000E_TDH, 0);
++
++    /* Enable transmit */
++    e1000e_macreg_write(&d->e1000e, E1000E_TCTL, E1000E_TCTL_EN);
++    e1000e_macreg_write(&d->e1000e, E1000E_RDBAL,
++                           (uint32_t)d->e1000e.rx_ring);
++    e1000e_macreg_write(&d->e1000e, E1000E_RDBAH,
++                           (uint32_t)(d->e1000e.rx_ring >> 32));
++    e1000e_macreg_write(&d->e1000e, E1000E_RDLEN, E1000E_RING_LEN);
++    e1000e_macreg_write(&d->e1000e, E1000E_RDT, 0);
++    e1000e_macreg_write(&d->e1000e, E1000E_RDH, 0);
++
++    /* Enable receive */
++    e1000e_macreg_write(&d->e1000e, E1000E_RFCTL, E1000E_RFCTL_EXTEN);
++    e1000e_macreg_write(&d->e1000e, E1000E_RCTL, E1000E_RCTL_EN  |
++                                        E1000E_RCTL_UPE |
++                                        E1000E_RCTL_MPE);
++
++    /* Enable all interrupts */
++    e1000e_macreg_write(&d->e1000e, E1000E_IMS, 0xFFFFFFFF);
++
++}
++
++static void *e1000e_pci_get_driver(void *obj, const char *interface)
++{
++    QE1000E_PCI *epci = obj;
++    if (!g_strcmp0(interface, "e1000e-if")) {
++        return &epci->e1000e;
 +    }
-+    printf("%s not present in pci-bus-spapr", interface);
++
++    /* implicit contains */
++    if (!g_strcmp0(interface, "pci-device")) {
++        return &epci->pci_dev;
++    }
++
++    printf("%s not present in e1000e\n", interface);
 +    abort();
 +}
- 
-+void qpci_init_spapr(QPCIBusSPAPR *ret, QTestState *qts, QGuestAllocator *alloc)
-+{
-     assert(qts);
- 
-+    /* tests cannot use spapr, needs to be fixed first */
-+    ret->bus.has_buggy_msi = TRUE;
 +
-     ret->alloc = alloc;
- 
-     ret->bus.pio_readb = qpci_spapr_pio_readb;
-@@ -208,12 +199,32 @@ QPCIBus *qpci_spapr_new(QTestState *qts, QGuestAllocator *alloc)
-     ret->bus.mmio_alloc_ptr = ret->mmio32.pci_base;
-     ret->bus.mmio_limit = ret->mmio32.pci_base + ret->mmio32.size;
- 
-+    ret->obj.get_driver = qspapr_get_driver;
++static void *e1000e_pci_create(void *pci_bus, QGuestAllocator *alloc,
++                               void *addr)
++{
++    QE1000E_PCI *d = g_new0(QE1000E_PCI, 1);
++    QPCIBus *bus = pci_bus;
++    QPCIAddress *address = addr;
++
++    qpci_device_foreach(bus, address->vendor_id, address->device_id,
++                        e1000e_foreach_callback, &d->pci_dev);
++
++    /* Map BAR0 (mac registers) */
++    d->mac_regs = qpci_iomap(&d->pci_dev, 0, NULL);
++
++    /* Allocate and setup TX ring */
++    d->e1000e.tx_ring = guest_alloc(alloc, E1000E_RING_LEN);
++    g_assert(d->e1000e.tx_ring != 0);
++
++    /* Allocate and setup RX ring */
++    d->e1000e.rx_ring = guest_alloc(alloc, E1000E_RING_LEN);
++    g_assert(d->e1000e.rx_ring != 0);
++
++    d->obj.get_driver = e1000e_pci_get_driver;
++    d->obj.start_hw = e1000e_pci_start_hw;
++    d->obj.destructor = e1000e_pci_destroy;
++
++    return &d->obj;
 +}
 +
-+QPCIBus *qpci_spapr_new(QTestState *qts, QGuestAllocator *alloc)
++static void e1000e(void)
 +{
-+    QPCIBusSPAPR *ret = g_new0(QPCIBusSPAPR, 1);
-+    qpci_init_spapr(ret, qts, alloc);
++    QPCIAddress addr = {
++        .vendor_id = 0x8086,
++        .device_id = 0x10D3,
++    };
 +
-     return &ret->bus;
- }
- 
- void qpci_free_spapr(QPCIBus *bus)
- {
-+    if (!bus) {
-+        return;
-+    }
++    /* FIXME: every test using this node needs to setup a -netdev socket,id=hs0
++     * otherwise QEMU is not going to start */
++    QOSGraphEdgeOptions opts = {
++        .extra_device_opts = "netdev=hs0",
++    };
++    add_qpci_address(&opts, &addr);
 +
-     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
- 
-     g_free(s);
- }
-+
-+static void qpci_spapr(void)
-+{
-+    qos_node_create_driver("pci-bus-spapr", NULL);
-+    qos_node_produces("pci-bus-spapr", "pci-bus");
++    qos_node_create_driver("e1000e", e1000e_pci_create);
++    qos_node_consumes("e1000e", "pci-bus", &opts);
 +}
 +
-+libqos_init(qpci_spapr);
-diff --git a/tests/libqos/pci-spapr.h b/tests/libqos/pci-spapr.h
-index d5305d16f8..74cd183c9a 100644
---- a/tests/libqos/pci-spapr.h
-+++ b/tests/libqos/pci-spapr.h
-@@ -10,7 +10,31 @@
- 
- #include "libqos/malloc.h"
- #include "libqos/pci.h"
++libqos_init(e1000e);
+diff --git a/tests/libqos/e1000e.h b/tests/libqos/e1000e.h
+new file mode 100644
+index 0000000000..9d37094f43
+--- /dev/null
++++ b/tests/libqos/e1000e.h
+@@ -0,0 +1,53 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#ifndef QGRAPH_E1000E
++#define QGRAPH_E1000E
++
 +#include "libqos/qgraph.h"
- 
-+/* From include/hw/pci-host/spapr.h */
++#include "pci.h"
 +
-+typedef struct QPCIWindow {
-+    uint64_t pci_base;    /* window address in PCI space */
-+    uint64_t size;        /* window size */
-+} QPCIWindow;
++#define E1000E_RX0_MSG_ID           (0)
++#define E1000E_TX0_MSG_ID           (1)
++#define E1000E_OTHER_MSG_ID         (2)
 +
-+typedef struct QPCIBusSPAPR {
++#define E1000E_TDLEN    (0x3808)
++#define E1000E_TDT      (0x3818)
++#define E1000E_RDLEN    (0x2808)
++#define E1000E_RDT      (0x2818)
++
++typedef struct QE1000E QE1000E;
++typedef struct QE1000E_PCI QE1000E_PCI;
++
++struct QE1000E {
++    uint64_t tx_ring;
++    uint64_t rx_ring;
++};
++
++struct QE1000E_PCI {
 +    QOSGraphObject obj;
-+    QPCIBus bus;
-+    QGuestAllocator *alloc;
++    QPCIDevice pci_dev;
++    QPCIBar mac_regs;
++    QE1000E e1000e;
++};
 +
-+    uint64_t buid;
++void e1000e_wait_isr(QE1000E *d, uint16_t msg_id);
++void e1000e_tx_ring_push(QE1000E *d, void *descr);
++void e1000e_rx_ring_push(QE1000E *d, void *descr);
 +
-+    uint64_t pio_cpu_base;
-+    QPCIWindow pio;
-+
-+    uint64_t mmio32_cpu_base;
-+    QPCIWindow mmio32;
-+} QPCIBusSPAPR;
-+
-+void qpci_init_spapr(QPCIBusSPAPR *ret, QTestState *qts,
-+                     QGuestAllocator *alloc);
- QPCIBus *qpci_spapr_new(QTestState *qts, QGuestAllocator *alloc);
- void     qpci_free_spapr(QPCIBus *bus);
- 
++#endif
 -- 
 2.17.1
