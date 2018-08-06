@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fmcTc-00011j-C6
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 06:11:01 -0400
+	(envelope-from <bounces@canonical.com>) id 1fmcdJ-0004sp-Gs
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 06:21:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fmcTZ-0006xI-76
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 06:11:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47794)
+	(envelope-from <bounces@canonical.com>) id 1fmcdE-00036h-Jp
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 06:21:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50760)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fmcTZ-0006w1-0A
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 06:10:57 -0400
+	id 1fmcdE-000369-DJ
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 06:20:56 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fmcTW-0008Qh-CH
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 10:10:54 +0000
+	id 1fmcdB-0001c8-6x
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 10:20:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CE9D32E80D7
-	for <qemu-devel@nongnu.org>; Mon,  6 Aug 2018 10:10:53 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 42BBF2E80D3
+	for <qemu-devel@nongnu.org>; Mon,  6 Aug 2018 10:20:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Aug 2018 09:57:37 -0000
-From: elmarco <marcandre.lureau@gmail.com>
-Reply-To: Bug 1784900 <1784900@bugs.launchpad.net>
+Date: Mon, 06 Aug 2018 10:09:29 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1785308 <1785308@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <153314156256.17371.7866837258800403867.malonedeb@soybean.canonical.com>
-Message-Id: <153354945713.31978.6017108613458404656.malone@gac.canonical.com>
+References: <153332397534.32176.3210060625384706087.malonedeb@gac.canonical.com>
+Message-Id: <153355016942.18255.3991590070189390985.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1784900] Re: QEMU (frontend) crashes upon warm
- reboot with virtio-gpu device and vga=775 on Linux cmdline
+Subject: [Qemu-devel] [Bug 1785308] Re: 0x8 exception encountered but not
+ handled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,68 +39,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-see also "[PATCH] virtio-gpu: fix crashes upon warm reboot with vga
-mode" for a potential fix
+Hi Ra,
+  We'll need a bit more detail to be able to help here.
+The fact something works in Bochs but doesn't work in qemu doesn't necessar=
+ily mean it's a qemu bug - for example the OS might be hitting something un=
+defined or a timing issue; so we'd need some information on how the double =
+page fault happened.
+Does it work with KVM enabled? With tcg? What version of qemu are you using?
+
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1784900
+https://bugs.launchpad.net/bugs/1785308
 
 Title:
-  QEMU (frontend) crashes upon warm reboot with virtio-gpu device and
-  vga=3D775 on Linux cmdline
+  0x8 exception encountered but not handled
 
 Status in QEMU:
-  New
+  Incomplete
 
 Bug description:
-  With vga=3D775 on the Linux command line a first boot of the VM running
-  Linux works fine. After a warm reboot it crashes during Linux boot.
-  The VM was used remotely via virt-manager and VNC.
+  Present in all QEMU versions.
 
-  Bisecting the code lead to the following patch that introduced the
-  bug:
-
-  commit 1fccd7c5a9a722a9cbf1bc91693f4618034f01ac (HEAD, refs/bisect/bad)
-  Author: Gerd Hoffmann <kraxel@redhat.com>
-  Date:   Mon Jul 2 18:24:43 2018 +0200
-
-      virtio-gpu: disable scanout when backing resource is destroyed
-
-      Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-      Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-      Message-id: 20180702162443.16796-4-kraxel@redhat.com
-
-  diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-  index 336dc59007..08cd567218 100644
-  --- a/hw/display/virtio-gpu.c
-  +++ b/hw/display/virtio-gpu.c
-  @@ -430,6 +430,16 @@ static void virtio_gpu_disable_scanout(VirtIOGPU *g,=
- int scanout_id)
-   static void virtio_gpu_resource_destroy(VirtIOGPU *g,
-                                           struct virtio_gpu_simple_resourc=
-e *res)
-   {
-  +    int i;
-  +
-  +    if (res->scanout_bitmask) {
-  +        for (i =3D 0; i < g->conf.max_outputs; i++) {
-  +            if (res->scanout_bitmask & (1 << i)) {
-  +                virtio_gpu_disable_scanout(g, i);
-  +            }
-  +        }
-  +    }
-  +
-       pixman_image_unref(res->image);
-       virtio_gpu_cleanup_mapping(res);
-       QTAILQ_REMOVE(&g->reslist, res, next);
-
-  =
-
-  Reported backtraces can be found here:  https://paste.fedoraproject.org/p=
-aste/OUDEfCk1IY7xiy0I0PDlkw
+  OS is triple page faulting and crashing rather than handling the
+  expected double page fault properly. The same OS works in Bochs so I
+  know its not the problem.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1784900/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1785308/+subscriptions
