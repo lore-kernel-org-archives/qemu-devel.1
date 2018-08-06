@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fmej0-00032G-IX
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:35:03 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fmej2-00033k-L8
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:35:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fmeiz-0006da-J8
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:35:02 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fmej1-0006g3-Nm
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:35:04 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  6 Aug 2018 13:34:40 +0100
-Message-Id: <20180806123445.1459-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-3.0 v2 0/5] Arm migration fixes for 3.0
+Date: Mon,  6 Aug 2018 13:34:44 +0100
+Message-Id: <20180806123445.1459-5-peter.maydell@linaro.org>
+In-Reply-To: <20180806123445.1459-1-peter.maydell@linaro.org>
+References: <20180806123445.1459-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-3.0 v2 4/5] hw/intc/arm_gicv3_common: Move
+ post_load hooks to top-level VMSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,57 +23,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-This patchset primarily fixes problems with Arm migration
-induced by a bug in the core vmstate handling of subsections:
-currently the migration code incorrectly treats a subsection with
-no .needed function pointer as if it was the subsection list
-terminator -- it is ignored and so is everything after it.
+Contrary to the the impression given in docs/devel/migration.rst,
+the migration code does not run the pre_load hook for a
+subsection unless the subsection appears on the wire, and so
+this is not a place where you can set the default value for
+state for the "subsection not present" case. Instead this needs
+to be done in a pre_load hook for whatever is the parent VMSD
+of the subsection.
 
-I did an audit of all uses of subsections in QEMU, and found
-that we had four which didn't define a .needed function (assuming
-that this meant "always needed", same as the semantics for
-not providing a .needed function for a toplevel vmsd).
-This patchset fixes them all up by providing a dummy needed
-function.
+We got this wrong in two of the subsection definitions in
+the GICv3 migration structs; fix this.
 
-It also fixes an error in vmstate_gicv3_cpu which was accidentally
-initializing .subsections twice and so ignoring one of the subsections.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/intc/arm_gicv3_common.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Patches 1..3 are the same as for v1 and have been reviewed.
-Patches 4 and 5 fix a further bug which I discovered during
-testing of 1..3: the GICv3 migration structs had several
-uses of the pre_load and post_load hooks which assumed that the
-hooks were run whether the subsection was present or not. In
-fact the migration code only runs the hooks when the subsection
-is present in the incoming migration stream, and so for correct
-behaviour we need to move the code we were running in the hooks
-up to the parent VMSDs.
-
-I've now tested this by doing a save/load of:
- 2.12.0 QEMU -> new QEMU
- new QEMU -> new QEMU
-
-An on-trunk QEMU prior to these bugfixes won't migrate
-to a QEMU with the bugfixes, but we never released any
-final QEMU version with the bugs in.
-
-thanks
--- PMM
-
-Peter Maydell (5):
-  hw/intc/arm_gicv3_common: Give no-migration-shift-bug subsection a
-    needed function
-  hw/intc/arm_gicv3_common: Combine duplicate .subsections in
-    vmstate_gicv3_cpu
-  target/arm: Add dummy needed functions to M profile vmstate
-    subsections
-  hw/intc/arm_gicv3_common: Move post_load hooks to top-level VMSD
-  hw/intc/arm_gicv3_common: Move gicd shift bug handling to
-    gicv3_post_load
-
- hw/intc/arm_gicv3_common.c | 284 ++++++++++++++++++-------------------
- target/arm/machine.c       |   3 +
- 2 files changed, 145 insertions(+), 142 deletions(-)
-
+diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+index e1a8999cf5b..8175889f1e7 100644
+--- a/hw/intc/arm_gicv3_common.c
++++ b/hw/intc/arm_gicv3_common.c
+@@ -73,7 +73,7 @@ static const VMStateDescription vmstate_gicv3_cpu_virt = {
+     }
+ };
+ 
+-static int icc_sre_el1_reg_pre_load(void *opaque)
++static int vmstate_gicv3_cpu_pre_load(void *opaque)
+ {
+     GICv3CPUState *cs = opaque;
+ 
+@@ -97,7 +97,6 @@ const VMStateDescription vmstate_gicv3_cpu_sre_el1 = {
+     .name = "arm_gicv3_cpu/sre_el1",
+     .version_id = 1,
+     .minimum_version_id = 1,
+-    .pre_load = icc_sre_el1_reg_pre_load,
+     .needed = icc_sre_el1_reg_needed,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT64(icc_sre_el1, GICv3CPUState),
+@@ -109,6 +108,7 @@ static const VMStateDescription vmstate_gicv3_cpu = {
+     .name = "arm_gicv3_cpu",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .pre_load = vmstate_gicv3_cpu_pre_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(level, GICv3CPUState),
+         VMSTATE_UINT32(gicr_ctlr, GICv3CPUState),
+@@ -139,7 +139,7 @@ static const VMStateDescription vmstate_gicv3_cpu = {
+     }
+ };
+ 
+-static int gicv3_gicd_no_migration_shift_bug_pre_load(void *opaque)
++static int gicv3_pre_load(void *opaque)
+ {
+     GICv3State *cs = opaque;
+ 
+@@ -210,7 +210,6 @@ const VMStateDescription vmstate_gicv3_gicd_no_migration_shift_bug = {
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .needed = needed_always,
+-    .pre_load = gicv3_gicd_no_migration_shift_bug_pre_load,
+     .post_load = gicv3_gicd_no_migration_shift_bug_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_BOOL(gicd_no_migration_shift_bug, GICv3State),
+@@ -222,6 +221,7 @@ static const VMStateDescription vmstate_gicv3 = {
+     .name = "arm_gicv3",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .pre_load = gicv3_pre_load,
+     .pre_save = gicv3_pre_save,
+     .post_load = gicv3_post_load,
+     .priority = MIG_PRI_GICV3,
 -- 
 2.17.1
