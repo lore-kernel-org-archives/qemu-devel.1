@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fmkkc-0003CS-Su
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:01:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1fmklM-0003bO-8U
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:01:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fmkkZ-0005Mv-Np
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:01:06 -0400
-Received: from mail-bn3nam01on0104.outbound.protection.outlook.com
-	([104.47.33.104]:53440
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fmkkZ-0005Kc-8o
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:01:03 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 6 Aug 2018 19:00:38 +0000
-Message-ID: <BN7PR08MB48680E7FAC242C2A2E8B2BF1C6200@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1533574847-19294-40-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1533574847-19294-40-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bounces@canonical.com>) id 1fmklI-0006Eu-Nz
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:01:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58574)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fmklI-0006CW-Br
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:01:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fmklF-0008AN-MG
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 19:01:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 872152E81F3
+	for <qemu-devel@nongnu.org>; Mon,  6 Aug 2018 19:01:39 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v7 39/80] target/mips: Add emulation of DSP
- ASE for nanoMIPS - part 1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Aug 2018 18:45:51 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1775555 <1775555@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152836238216.25020.6334059622433678386.malonedeb@gac.canonical.com>
+Message-Id: <153358115157.28644.9544427866983983262.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1775555] Re: guest migration 100% cpu freeze bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,681 +36,670 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, "thuth@redhat.com" <thuth@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
-
-> +    case NM_APPEND:
-> +        gen_load_gpr(t0, rs);
-> +
-> +        if (rd !=3D 0) {
-> +            tcg_gen_deposit_tl(cpu_gpr[rt], t0, cpu_gpr[rt], rd, 32 - rd=
-);
-> +        }
-> +        tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
-> +        break;
-
-Missing check_dspr2(). Please fix in next version.
-
-________________________________________
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Sent: Monday, August 6, 2018 7:00:06 PM
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org; laurent@vivier.eu; riku.voipio@iki.fi; philip=
-pe.mathieu.daude@gmail.com; aurelien@aurel32.net; richard.henderson@linaro.=
-org; Aleksandar Markovic; Stefan Markovic; Petar Jovanovic; Paul Burton; Al=
-eksandar Rikalo; thuth@redhat.com; armbru@redhat.com
-Subject: [PATCH v7 39/80] target/mips: Add emulation of DSP ASE for nanoMIP=
-S - part 1
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+as per the last two comments, this fix is already in 2.12
 
-Add emulation of DSP ASE instructions for nanoMIPS - part 1.
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
----
- target/mips/translate.c | 619 ++++++++++++++++++++++++++++++++++++++++++++=
-++++
- 1 file changed, 619 insertions(+)
+-- =
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 441431d..78b1c72 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -17661,6 +17661,619 @@ static void gen_pool32f_nanomips_insn(DisasContex=
-t *ctx)
-     }
- }
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1775555
 
-+static void gen_pool32a5_nanomips_insn(DisasContext *ctx, int opc,
-+                                       int rd, int rs, int rt)
-+{
-+    int ret =3D rd;
-+
-+    TCGv t0;
-+    TCGv v1_t;
-+    TCGv v2_t;
-+
-+    t0 =3D tcg_temp_new();
-+    v1_t =3D tcg_temp_new();
-+    v2_t =3D tcg_temp_new();
-+
-+    gen_load_gpr(v1_t, rs);
-+    gen_load_gpr(v2_t, rt);
-+
-+    switch (opc) {
-+    case NM_CMP_EQ_PH:
-+        check_dsp(ctx);
-+        gen_helper_cmp_eq_ph(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMP_LT_PH:
-+        check_dsp(ctx);
-+        gen_helper_cmp_lt_ph(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMP_LE_PH:
-+        check_dsp(ctx);
-+        gen_helper_cmp_le_ph(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMPU_EQ_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpu_eq_qb(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMPU_LT_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpu_lt_qb(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMPU_LE_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpu_le_qb(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMPGU_EQ_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpgu_eq_qb(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_CMPGU_LT_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpgu_lt_qb(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_CMPGU_LE_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpgu_le_qb(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_CMPGDU_EQ_QB:
-+        check_dspr2(ctx);
-+        gen_helper_cmpgu_eq_qb(v1_t, v1_t, v2_t);
-+        tcg_gen_deposit_tl(cpu_dspctrl, cpu_dspctrl, v1_t, 24, 4);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_CMPGDU_LT_QB:
-+        check_dspr2(ctx);
-+        gen_helper_cmpgu_lt_qb(v1_t, v1_t, v2_t);
-+        tcg_gen_deposit_tl(cpu_dspctrl, cpu_dspctrl, v1_t, 24, 4);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_CMPGDU_LE_QB:
-+        check_dspr2(ctx);
-+        gen_helper_cmpgu_le_qb(v1_t, v1_t, v2_t);
-+        tcg_gen_deposit_tl(cpu_dspctrl, cpu_dspctrl, v1_t, 24, 4);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PACKRL_PH:
-+        check_dsp(ctx);
-+        gen_helper_packrl_ph(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PICK_QB:
-+        check_dsp(ctx);
-+        gen_helper_pick_qb(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PICK_PH:
-+        check_dsp(ctx);
-+        gen_helper_pick_ph(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_ADDQ_S_W:
-+        check_dsp(ctx);
-+        gen_helper_addq_s_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SUBQ_S_W:
-+        check_dsp(ctx);
-+        gen_helper_subq_s_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_ADDSC:
-+        check_dsp(ctx);
-+        gen_helper_addsc(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_ADDWC:
-+        check_dsp(ctx);
-+        gen_helper_addwc(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_ADDQ_S_PH:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDQ_PH */
-+            gen_helper_addq_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDQ_S_PH */
-+            gen_helper_addq_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_ADDQH_R_PH:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDQH_PH */
-+            gen_helper_addqh_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDQH_R_PH */
-+            gen_helper_addqh_r_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_ADDQH_R_W:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDQH_W */
-+            gen_helper_addqh_w(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDQH_R_W */
-+            gen_helper_addqh_r_w(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_ADDU_S_QB:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDU_QB */
-+            gen_helper_addu_qb(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDU_S_QB */
-+            gen_helper_addu_s_qb(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_ADDU_S_PH:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDU_PH */
-+            gen_helper_addu_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDU_S_PH */
-+            gen_helper_addu_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_ADDUH_R_QB:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDUH_QB */
-+            gen_helper_adduh_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDUH_R_QB */
-+            gen_helper_adduh_r_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SHRAV_R_PH:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SHRAV_PH */
-+            gen_helper_shra_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SHRAV_R_PH */
-+            gen_helper_shra_r_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SHRAV_R_QB:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SHRAV_QB */
-+            gen_helper_shra_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SHRAV_R_QB */
-+            gen_helper_shra_r_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SUBQ_S_PH:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBQ_PH */
-+            gen_helper_subq_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBQ_S_PH */
-+            gen_helper_subq_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SUBQH_R_PH:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBQH_PH */
-+            gen_helper_subqh_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBQH_R_PH */
-+            gen_helper_subqh_r_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SUBQH_R_W:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBQH_W */
-+            gen_helper_subqh_w(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBQH_R_W */
-+            gen_helper_subqh_r_w(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SUBU_S_QB:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBU_QB */
-+            gen_helper_subu_qb(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBU_S_QB */
-+            gen_helper_subu_s_qb(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SUBU_S_PH:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBU_PH */
-+            gen_helper_subu_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBU_S_PH */
-+            gen_helper_subu_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SUBUH_R_QB:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBUH_QB */
-+            gen_helper_subuh_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBUH_R_QB */
-+            gen_helper_subuh_r_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SHLLV_S_PH:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SHLLV_PH */
-+            gen_helper_shll_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SHLLV_S_PH */
-+            gen_helper_shll_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_PRECR_SRA_R_PH_W:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* PRECR_SRA_PH_W */
-+            {
-+                TCGv_i32 sa_t =3D tcg_const_i32(rd);
-+                gen_helper_precr_sra_ph_w(v1_t, sa_t, v1_t,
-+                                          cpu_gpr[rt]);
-+                gen_store_gpr(v1_t, rt);
-+                tcg_temp_free_i32(sa_t);
-+            }
-+            break;
-+        case 1:
-+            /* PRECR_SRA_R_PH_W */
-+            {
-+                TCGv_i32 sa_t =3D tcg_const_i32(rd);
-+                gen_helper_precr_sra_r_ph_w(v1_t, sa_t, v1_t,
-+                                            cpu_gpr[rt]);
-+                gen_store_gpr(v1_t, rt);
-+                tcg_temp_free_i32(sa_t);
-+            }
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_MULEU_S_PH_QBL:
-+        check_dsp(ctx);
-+        gen_helper_muleu_s_ph_qbl(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULEU_S_PH_QBR:
-+        check_dsp(ctx);
-+        gen_helper_muleu_s_ph_qbr(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULQ_RS_PH:
-+        check_dsp(ctx);
-+        gen_helper_mulq_rs_ph(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULQ_S_PH:
-+        check_dspr2(ctx);
-+        gen_helper_mulq_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULQ_RS_W:
-+        check_dspr2(ctx);
-+        gen_helper_mulq_rs_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULQ_S_W:
-+        check_dspr2(ctx);
-+        gen_helper_mulq_s_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_APPEND:
-+        gen_load_gpr(t0, rs);
-+
-+        if (rd !=3D 0) {
-+            tcg_gen_deposit_tl(cpu_gpr[rt], t0, cpu_gpr[rt], rd, 32 - rd);
-+        }
-+        tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
-+        break;
-+    case NM_MODSUB:
-+        check_dsp(ctx);
-+        gen_helper_modsub(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHRAV_R_W:
-+        check_dsp(ctx);
-+        gen_helper_shra_r_w(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHRLV_PH:
-+        check_dspr2(ctx);
-+        gen_helper_shrl_ph(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHRLV_QB:
-+        check_dsp(ctx);
-+        gen_helper_shrl_qb(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHLLV_QB:
-+        check_dsp(ctx);
-+        gen_helper_shll_qb(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHLLV_S_W:
-+        check_dsp(ctx);
-+        gen_helper_shll_s_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHILO:
-+        {
-+            TCGv tv0;
-+            TCGv tv1;
-+            tv0 =3D tcg_temp_new();
-+            tv1 =3D tcg_temp_new();
-+
-+            int16_t imm =3D extract32(ctx->opcode, 16, 7);
-+
-+            check_dsp(ctx);
-+            tcg_gen_movi_tl(tv0, rd >> 3);
-+            tcg_gen_movi_tl(tv1, imm);
-+
-+            gen_helper_shilo(tv0, tv1, cpu_env);
-+        }
-+        break;
-+    case NM_MULEQ_S_W_PHL:
-+        check_dsp(ctx);
-+        gen_helper_muleq_s_w_phl(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULEQ_S_W_PHR:
-+        check_dsp(ctx);
-+        gen_helper_muleq_s_w_phr(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MUL_S_PH:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* MUL_PH */
-+            gen_helper_mul_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* MUL_S_PH */
-+            gen_helper_mul_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_PRECR_QB_PH:
-+        check_dspr2(ctx);
-+        gen_helper_precr_qb_ph(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PRECRQ_QB_PH:
-+        check_dsp(ctx);
-+        gen_helper_precrq_qb_ph(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PRECRQ_PH_W:
-+        check_dsp(ctx);
-+        gen_helper_precrq_ph_w(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PRECRQ_RS_PH_W:
-+        check_dsp(ctx);
-+        gen_helper_precrq_rs_ph_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PRECRQU_S_QB_PH:
-+        check_dsp(ctx);
-+        gen_helper_precrqu_s_qb_ph(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHRA_R_W:
-+        tcg_gen_movi_tl(t0, rd);
-+        check_dsp(ctx);
-+        gen_helper_shra_r_w(v1_t, t0, v1_t);
-+        gen_store_gpr(v1_t, rt);
-+        break;
-+    case NM_SHRA_R_PH:
-+        check_dsp(ctx);
-+        tcg_gen_movi_tl(t0, rd >> 1);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SHRA_PH */
-+            gen_helper_shra_ph(v1_t, t0, v1_t);
-+            break;
-+            gen_store_gpr(v1_t, rt);
-+        case 1:
-+            /* SHRA_R_PH */
-+            gen_helper_shra_r_ph(v1_t, t0, v1_t);
-+            gen_store_gpr(v1_t, rt);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SHLL_S_PH:
-+        check_dsp(ctx);
-+        tcg_gen_movi_tl(t0, rd >> 1);
-+        switch (extract32(ctx->opcode, 10, 2)) {
-+        case 0:
-+            /* SHLL_PH */
-+            gen_helper_shll_ph(v1_t, t0, v1_t, cpu_env);
-+            gen_store_gpr(v1_t, rt);
-+            break;
-+        case 2:
-+            /* SHLL_S_PH */
-+            gen_helper_shll_s_ph(v1_t, t0, v1_t, cpu_env);
-+            gen_store_gpr(v1_t, rt);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SHLL_S_W:
-+        check_dsp(ctx);
-+        tcg_gen_movi_tl(t0, rd);
-+        gen_helper_shll_s_w(v1_t, t0, v1_t, cpu_env);
-+        gen_store_gpr(v1_t, rt);
-+        break;
-+    case NM_REPL_PH:
-+        check_dsp(ctx);
-+        {
-+            int16_t imm;
-+            imm =3D extract32(ctx->opcode, 11, 11);
-+            imm =3D (int16_t)(imm << 6) >> 6;
-+            if (rt !=3D 0) {
-+                tcg_gen_movi_tl(cpu_gpr[rt], \
-+                                (target_long)((int32_t)imm << 16 | \
-+                                (uint16_t)imm));
-+            }
-+        }
-+        break;
-+    default:
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    }
-+}
-+
- static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint16_t insn;
-@@ -17731,6 +18344,12 @@ static int decode_nanomips_32_48_opc(CPUMIPSState =
-*env, DisasContext *ctx)
-         case NM_POOL32A0:
-             gen_pool32a0_nanomips_insn(env, ctx);
-             break;
-+        case NM_POOL32A5:
-+            {
-+                int32_t op1 =3D extract32(ctx->opcode, 3, 7);
-+                gen_pool32a5_nanomips_insn(ctx, op1, rd, rs, rt);
-+            }
-+            break;
-         case NM_POOL32A7:
-             switch (extract32(ctx->opcode, 3, 3)) {
-             case NM_P_LSX:
---
-2.7.4
+Title:
+  guest migration 100% cpu freeze bug
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  # Investigate migration cpu hog(100%) bug
+
+  I have some issues when migrating from qemu 2.6.2 to qemu 2.11.1.
+  The hypervisors are running kernel 4.9.92 on debian stretch with libvirt =
+v4.0.0.
+  Linux, libvirt and qemu are all custom compiled.
+
+  I migrated around 21.000 vms from qemu 2.6.2 to qemu 2.11.1 and every
+  once in a while a vm is stuck at 100% cpu after the migration from
+  2.6.2 to 2.11.1. This happend with about 50-60 vms so far.
+
+  I attached gdb to a vcpu thread of one stuck vm, and a bt showed the foll=
+owing info:
+  #0  0x00007f4f19949dd7 in ioctl () at ../sysdeps/unix/syscall-template.S:=
+84
+  #1  0x0000557c9edede47 in kvm_vcpu_ioctl (cpu=3Dcpu@entry=3D0x557ca105884=
+0, type=3Dtype@entry=3D0xae80) at /home/dbosschieter/src/qemu-pkg/src/accel=
+/kvm/kvm-all.c:2050
+  #2  0x0000557c9ededfb6 in kvm_cpu_exec (cpu=3Dcpu@entry=3D0x557ca1058840)=
+ at /home/dbosschieter/src/qemu-pkg/src/accel/kvm/kvm-all.c:1887
+  #3  0x0000557c9edcab44 in qemu_kvm_cpu_thread_fn (arg=3D0x557ca1058840) a=
+t /home/dbosschieter/src/qemu-pkg/src/cpus.c:1128
+  #4  0x00007f4f19c0f494 in start_thread (arg=3D0x7f4f053f3700) at pthread_=
+create.c:333
+  #5  0x00007f4f19951acf in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:97
+
+  The ioctl call is a ioctl(18, KVM_RUN and it looks like it is looping
+  inside the vm itself.
+
+  I saved the state of the VM (with `virsh save`) after I found it was hang=
+ing on its vcpu threads. Then I restored this vm on a test environment runn=
+ing the same kernel, QEMU and libvirt version). After the restore the VM st=
+ill was haning at 100% cpu usage on all the vcpus.
+  I tried to use the perf kvm guest option to trace the guest vm with a cop=
+y of the kernel, modules and kallsyms files from inside the guest vm and I =
+got the following trace:
+
+  $ perf kvm --guest --guestkallsyms=3Dkallsyms --guestmodules=3Dmodules re=
+cord -g -p 14471 -o perf.data
+  $ perf kvm --guest --guestkallsyms=3Dkallsyms --guestmodules=3Dmodules re=
+port -i perf.data --stdio > analyze
+
+  # To display the perf.data header info, please use --header/--header-only=
+ options.
+  #
+  #
+  # Total Lost Samples: 0
+  #
+  # Samples: 105K of event 'cycles'
+  # Event count (approx.): 67588147605
+  #
+  # Children      Self  Command  Shared Object            Symbol           =
+                           Parent symbol
+  # ........  ........  .......  .......................  .................=
+.........................  .............
+  #
+      28.79%    28.79%  :16028   [guest.kernel.kallsyms]  [g] fuse_get_root=
+_inode                     [other]
+      23.48%    23.48%  :16030   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_hrtimer_init          [other]
+       7.32%     7.32%  :16029   [guest.kernel.kallsyms]  [g] do_sysfs_unre=
+gistration                 [other]
+       4.82%     4.82%  :16029   [guest.kernel.kallsyms]  [g] posix_cpu_clo=
+ck_get                     [other]
+       4.20%     4.20%  :16030   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_timer_expire_entry    [other]
+       3.87%     3.87%  :16029   [guest.kernel.kallsyms]  [g] kvm_init_debu=
+gfs                        [other]
+       3.66%     3.66%  :16029   [guest.kernel.kallsyms]  [g] fat_msg      =
+                           [other]
+       3.11%     3.11%  :16029   [guest.kernel.kallsyms]  [g] match_token  =
+                           [other]
+       3.07%     3.07%  :16029   [guest.kernel.kallsyms]  [g] load_balance =
+                           [other]
+       1.87%     1.87%  :16029   [guest.kernel.kallsyms]  [g] kvm_pv_guest_=
+cpu_reboot                 [other]
+       1.69%     1.69%  :16031   [guest.kernel.kallsyms]  [g] kvm_init_debu=
+gfs                        [other]
+       1.59%     1.59%  :16029   [guest.kernel.kallsyms]  [g] sys_kcmp     =
+                           [other]
+       1.19%     1.19%  :16031   [guest.kernel.kallsyms]  [g] save_paranoid=
+                           [other]
+       0.82%     0.82%  :16031   [guest.kernel.kallsyms]  [g] kvm_pv_guest_=
+cpu_reboot                 [other]
+       0.69%     0.69%  :16031   [guest.kernel.kallsyms]  [g] kvm_cpu_notif=
+y                          [other]
+       0.54%     0.54%  :16031   [guest.kernel.kallsyms]  [g] rcu_process_c=
+allbacks                   [other]
+       0.46%     0.46%  :16030   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_hrtimer_start         [other]
+       0.43%     0.43%  :16031   [guest.kernel.kallsyms]  [g] tg_set_cfs_ba=
+ndwidth                    [other]
+       0.42%     0.42%  :16030   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_hrtimer_expire_entry  [other]
+       0.37%     0.37%  :16029   [guest.kernel.kallsyms]  [g] amd_get_mmcon=
+fig_range                  [other]
+       0.35%     0.35%  :16031   [guest.kernel.kallsyms]  [g] sys_kcmp     =
+                           [other]
+       0.35%     0.35%  :16031   [guest.kernel.kallsyms]  [g] console_unloc=
+k                          [other]
+       0.34%     0.34%  :16029   [guest.kernel.kallsyms]  [g] __fat_fs_erro=
+r                          [other]
+       0.31%     0.31%  :16031   [guest.kernel.kallsyms]  [g] do_sysfs_unre=
+gistration                 [other]
+       0.24%     0.24%  :16031   [guest.kernel.kallsyms]  [g] paravirt_writ=
+e_msr                      [other]
+       0.24%     0.24%  :16029   [guest.kernel.kallsyms]  [g] parse_no_kvmc=
+lock                       [other]
+       0.24%     0.24%  :16029   [guest.kernel.kallsyms]  [g] kvm_save_sche=
+d_clock_state              [other]
+       0.21%     0.21%  :16030   [guest.kernel.kallsyms]  [g] ptrace_reques=
+t                          [other]
+       0.20%     0.20%  :16031   [guest.kernel.kallsyms]  [g] print_stack_t=
+race                       [other]
+       0.20%     0.20%  :16031   [guest.kernel.kallsyms]  [g] build_sched_d=
+omains                     [other]
+       0.20%     0.20%  :16031   [guest.kernel.kallsyms]  [g] __synchronize=
+_srcu                      [other]
+       0.17%     0.17%  :16031   [guest.kernel.kallsyms]  [g] do_cpu_nanosl=
+eep                        [other]
+       0.16%     0.16%  :16031   [guest.kernel.kallsyms]  [g] amd_get_mmcon=
+fig_range                  [other]
+       0.16%     0.16%  :16031   [guest.kernel.kallsyms]  [g] irq_node_proc=
+_show                      [other]
+       0.15%     0.15%  :16031   [guest.kernel.kallsyms]  [g] __srcu_read_l=
+ock                        [other]
+       0.15%     0.15%  :16031   [guest.kernel.kallsyms]  [g] posix_cpu_nsl=
+eep_restart                [other]
+       0.11%     0.11%  :16031   [guest.kernel.kallsyms]  [g] parse_no_kvmc=
+lock                       [other]
+       0.11%     0.11%  :16031   [guest.kernel.kallsyms]  [g] __irq_domain_=
+add                        [other]
+       0.11%     0.11%  :16031   [guest.kernel.kallsyms]  [g] print_tickdev=
+ice.isra.4                 [other]
+       0.10%     0.10%  :16031   [guest.kernel.kallsyms]  [g] kvm_save_sche=
+d_clock_state              [other]
+       0.09%     0.09%  :16031   [guest.kernel.kallsyms]  [g] sysfs_unbind_=
+tick_dev                   [other]
+       0.09%     0.09%  :16029   [guest.kernel.kallsyms]  [g] __sched_setsc=
+heduler                    [other]
+       0.09%     0.09%  :16031   [guest.kernel.kallsyms]  [g] process_srcu =
+                           [other]
+       0.08%     0.08%  :16031   [guest.kernel.kallsyms]  [g] avc_compute_a=
+v                          [other]
+       0.08%     0.08%  :16031   [guest.kernel.kallsyms]  [g] arch_remove_r=
+eservations                [other]
+       0.08%     0.08%  :16031   [guest.kernel.kallsyms]  [g] __switch_to_x=
+tra                        [other]
+       0.08%     0.08%  :16031   [guest.kernel.kallsyms]  [g] __create_irqs=
+                           [other]
+       0.08%     0.08%  :16031   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_irq_handler_exit      [other]
+       0.07%     0.07%  :16031   [guest.kernel.kallsyms]  [g] posix_clock_r=
+ead                        [other]
+       0.07%     0.07%  :16031   [guest.kernel.kallsyms]  [g] posix_clock_p=
+oll                        [other]
+       0.07%     0.07%  :16031   [guest.kernel.kallsyms]  [g] native_cpu_up=
+                           [other]
+       0.06%     0.06%  :16031   [guest.kernel.kallsyms]  [g] do_nmi       =
+                           [other]
+       0.06%     0.06%  :16031   [guest.kernel.kallsyms]  [g] rcu_try_advan=
+ce_all_cbs                 [other]
+       0.06%     0.06%  :16031   [guest.kernel.kallsyms]  [g] fat_msg      =
+                           [other]
+       0.05%     0.05%  :16031   [guest.kernel.kallsyms]  [g] check_tsc_war=
+p                          [other]
+       0.04%     0.04%  :16031   [guest.kernel.kallsyms]  [g] tick_handle_o=
+neshot_broadcast           [other]
+       0.03%     0.03%  :16031   [guest.kernel.kallsyms]  [g] set_cpu_itime=
+r                          [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] arp_ignore   =
+                           [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] store_powersa=
+ve_bias_gov_sys            [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] cleanup_srcu_=
+struct                     [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] create_prof_c=
+pu_mask                    [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] alarm_timer_n=
+sleep                      [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] time_cpufreq_=
+notifier                   [other]
+       0.02%     0.02%  :16030   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_itimer_state          [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] tick_check_ne=
+w_device                   [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] init_timer_ke=
+y                          [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] tick_setup_de=
+vice                       [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] clockevents_r=
+egister_device             [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] __srcu_read_u=
+nlock                      [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] hpet_rtc_inte=
+rrupt                      [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] init_srcu_str=
+uct                        [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] irq_spurious_=
+proc_show                  [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] rcu_jiffies_t=
+ill_stall_check            [other]
+       0.02%     0.02%  :16031   [guest.kernel.kallsyms]  [g] ksoftirqd_sho=
+uld_run                    [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_irq_handler_entry     [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] avc_denied.is=
+ra.0                       [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] __fat_fs_erro=
+r                          [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] wakeme_after_=
+rcu                        [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] prof_cpu_mask=
+_proc_write                [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] srcu_barrier =
+                           [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] tick_get_devi=
+ce                         [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] irq_domain_ad=
+d_simple                   [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] synchronize_s=
+rcu_expedited              [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] sysfs_show_cu=
+rrent_tick_dev             [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] tick_is_onesh=
+ot_available               [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] tick_check_re=
+placement                  [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] clockevents_n=
+otify                      [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] show_stack   =
+                           [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] debug_kfree  =
+                           [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] tick_do_broad=
+cast.constprop.6           [other]
+       0.01%     0.01%  :16031   [guest.kernel.kallsyms]  [g] sock_rps_save=
+_rxhash.isra.28.part.29    [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] store_ignore_=
+nice_load.isra.3           [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] perf_trace_it=
+imer_expire                [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] hrtick_start =
+                           [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] parse_probe_a=
+rg                         [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] wakeup_softir=
+qd                         [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] tick_install_=
+replacement                [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] detach_if_pen=
+ding                       [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] default_affin=
+ity_show                   [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] tick_do_perio=
+dic_broadcast              [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_softirq               [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] tasklet_kill =
+                           [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] update_rq_clo=
+ck                         [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] tasklet_init =
+                           [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] arch_local_ir=
+q_enable                   [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] irq_affinity_=
+proc_show                  [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] store_samplin=
+g_down_factor.isra.4       [other]
+       0.00%     0.00%  :16031   [guest.kernel.kallsyms]  [g] amd_get_subca=
+ches                       [other]
+
+  Also tried a `virsh restore` with the `--bypass-cache` option and ran
+  a perf trace. Noticable is the different trace. See output below:
+
+  # perf trace without filesystem cache:
+  # To display the perf.data header info, please use --header/--header-only=
+ options.
+  #
+  #
+  # Total Lost Samples: 0
+  #
+  # Samples: 1M of event 'cycles'
+  # Event count (approx.): 798928823821
+  #
+  # Children      Self  Command  Shared Object            Symbol
+  # ........  ........  .......  .......................  .................=
+.........................
+  #
+      25.32%    25.32%  :34335   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_hrtimer_init
+       9.55%     9.55%  :34334   [guest.kernel.kallsyms]  [g] do_sysfs_unre=
+gistration
+       5.83%     5.83%  :34335   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_timer_expire_entry
+       5.60%     5.60%  :34334   [guest.kernel.kallsyms]  [g] posix_cpu_clo=
+ck_get
+       4.37%     4.37%  :34334   [guest.kernel.kallsyms]  [g] kvm_init_debu=
+gfs
+       4.30%     4.30%  :34334   [guest.kernel.kallsyms]  [g] fat_msg
+       3.63%     3.63%  :34334   [guest.kernel.kallsyms]  [g] match_token
+       3.44%     3.44%  :34334   [guest.kernel.kallsyms]  [g] load_balance
+       3.28%     3.28%  :34333   [guest.kernel.kallsyms]  [g] save_paranoid
+       2.25%     2.25%  :34334   [guest.kernel.kallsyms]  [g] kvm_pv_guest_=
+cpu_reboot
+       2.19%     2.19%  :34335   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_hrtimer_expire_entry
+       1.89%     1.89%  :34334   [guest.kernel.kallsyms]  [g] sys_kcmp
+       1.73%     1.73%  :34336   [guest.kernel.kallsyms]  [g] kvm_init_debu=
+gfs
+       1.58%     1.58%  :34335   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_hrtimer_start
+       1.26%     1.26%  :34336   [guest.kernel.kallsyms]  [g] save_paranoid
+       1.09%     1.09%  :34333   [guest.kernel.kallsyms]  [g] kvm_init_debu=
+gfs
+       1.01%     1.01%  :34333   [unknown]                [u] 0x00000000004=
+34c1b
+       0.94%     0.94%  :34336   [guest.kernel.kallsyms]  [g] tg_set_cfs_ba=
+ndwidth
+       0.88%     0.88%  :34333   [guest.kernel.kallsyms]  [g] avc_denied.is=
+ra.0
+       0.87%     0.87%  :34336   [guest.kernel.kallsyms]  [g] kvm_pv_guest_=
+cpu_reboot
+       0.73%     0.73%  :34333   [guest.kernel.kallsyms]  [g] kvm_pv_guest_=
+cpu_reboot
+       0.68%     0.68%  :34336   [guest.kernel.kallsyms]  [g] kvm_cpu_notify
+       0.65%     0.65%  :34336   [guest.kernel.kallsyms]  [g] rcu_process_c=
+allbacks
+       0.57%     0.57%  :34333   [guest.kernel.kallsyms]  [g] paravirt_writ=
+e_msr
+       0.56%     0.56%  :34333   [guest.kernel.kallsyms]  [g] avc_compute_av
+       0.40%     0.40%  :34334   [guest.kernel.kallsyms]  [g] __fat_fs_error
+       0.39%     0.39%  :34334   [guest.kernel.kallsyms]  [g] amd_get_mmcon=
+fig_range
+       0.39%     0.39%  :34335   [guest.kernel.kallsyms]  [g] ptrace_request
+       0.38%     0.38%  :34336   [guest.kernel.kallsyms]  [g] sys_kcmp
+       0.34%     0.34%  :34333   [guest.kernel.kallsyms]  [g] posix_cpu_nsl=
+eep_restart
+       0.32%     0.32%  :34336   [guest.kernel.kallsyms]  [g] do_sysfs_unre=
+gistration
+       0.31%     0.31%  :34336   [guest.kernel.kallsyms]  [g] console_unlock
+       0.30%     0.30%  :34334   [guest.kernel.kallsyms]  [g] kvm_save_sche=
+d_clock_state
+       0.29%     0.29%  :34334   [guest.kernel.kallsyms]  [g] parse_no_kvmc=
+lock
+       0.27%     0.27%  :34333   [guest.kernel.kallsyms]  [g] do_sysfs_unre=
+gistration
+       0.27%     0.27%  :34333   [guest.kernel.kallsyms]  [g] check_tsc_warp
+       0.26%     0.26%  :34333   [guest.kernel.kallsyms]  [g] ksoftirqd_sho=
+uld_run
+       0.26%     0.26%  :34336   [guest.kernel.kallsyms]  [g] paravirt_writ=
+e_msr
+       0.26%     0.26%  :34333   [guest.kernel.kallsyms]  [g] amd_get_mmcon=
+fig_range
+       0.25%     0.25%  :34333   [guest.kernel.kallsyms]  [g] sys_kcmp
+       0.22%     0.22%  :34336   [guest.kernel.kallsyms]  [g] build_sched_d=
+omains
+       0.22%     0.22%  :34333   [guest.kernel.kallsyms]  [g] do_cpu_nanosl=
+eep
+       0.22%     0.22%  :34333   [guest.kernel.kallsyms]  [g] print_stack_t=
+race
+       0.21%     0.21%  :34336   [guest.kernel.kallsyms]  [g] irq_node_proc=
+_show
+       0.19%     0.19%  :34336   [guest.kernel.kallsyms]  [g] print_stack_t=
+race
+       0.19%     0.19%  :34336   [guest.kernel.kallsyms]  [g] __srcu_read_l=
+ock
+       0.18%     0.18%  :34336   [guest.kernel.kallsyms]  [g] __synchronize=
+_srcu
+       0.17%     0.17%  :34333   [guest.kernel.kallsyms]  [g] __create_irqs
+       0.17%     0.17%  :34336   [guest.kernel.kallsyms]  [g] do_cpu_nanosl=
+eep
+       0.17%     0.17%  :34336   [guest.kernel.kallsyms]  [g] amd_get_mmcon=
+fig_range
+       0.15%     0.15%  :34336   [guest.kernel.kallsyms]  [g] posix_cpu_nsl=
+eep_restart
+       0.14%     0.14%  :34333   [guest.kernel.kallsyms]  [g] rcu_process_c=
+allbacks
+       0.14%     0.14%  :34333   [guest.kernel.kallsyms]  [g] rcu_try_advan=
+ce_all_cbs
+       0.13%     0.13%  :34336   [guest.kernel.kallsyms]  [g] parse_no_kvmc=
+lock
+       0.11%     0.11%  :34333   [guest.kernel.kallsyms]  [g] tasklet_init
+       0.11%     0.11%  :34336   [guest.kernel.kallsyms]  [g] process_srcu
+       0.11%     0.11%  :34336   [guest.kernel.kallsyms]  [g] kvm_save_sche=
+d_clock_state
+       0.11%     0.11%  :34333   [guest.kernel.kallsyms]  [g] sysfs_unbind_=
+tick_dev
+       0.10%     0.10%  :34336   [guest.kernel.kallsyms]  [g] __switch_to_x=
+tra
+       0.10%     0.10%  :34334   [guest.kernel.kallsyms]  [g] __sched_setsc=
+heduler
+       0.10%     0.10%  :34333   [guest.kernel.kallsyms]  [g] print_tickdev=
+ice.isra.4
+       0.10%     0.10%  :34336   [guest.kernel.kallsyms]  [g] sysfs_unbind_=
+tick_dev
+       0.10%     0.10%  :34336   [guest.kernel.kallsyms]  [g] print_tickdev=
+ice.isra.4
+       0.10%     0.10%  :34336   [guest.kernel.kallsyms]  [g] posix_clock_r=
+ead
+       0.09%     0.09%  :34333   [guest.kernel.kallsyms]  [g] parse_no_kvmc=
+lock
+       0.09%     0.09%  :34333   [guest.kernel.kallsyms]  [g] posix_clock_p=
+oll
+       0.09%     0.09%  :34336   [guest.kernel.kallsyms]  [g] __irq_domain_=
+add
+       0.09%     0.09%  :34336   [guest.kernel.kallsyms]  [g] avc_compute_av
+       0.09%     0.09%  :34333   [guest.kernel.kallsyms]  [g] posix_clock_r=
+ead
+       0.09%     0.09%  :34333   [guest.kernel.kallsyms]  [g] hpet_rtc_inte=
+rrupt
+       0.09%     0.09%  :34336   [guest.kernel.kallsyms]  [g] __create_irqs
+       0.08%     0.08%  :34336   [guest.kernel.kallsyms]  [g] posix_clock_p=
+oll
+       0.08%     0.08%  :34336   [guest.kernel.kallsyms]  [g] rcu_try_advan=
+ce_all_cbs
+       0.07%     0.07%  :34336   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_irq_handler_exit
+       0.07%     0.07%  :34336   [guest.kernel.kallsyms]  [g] arch_remove_r=
+eservations
+       0.07%     0.07%  :34333   [guest.kernel.kallsyms]  [g] native_cpu_up
+       0.07%     0.07%  :34336   [guest.kernel.kallsyms]  [g] native_cpu_up
+       0.07%     0.07%  :34336   [guest.kernel.kallsyms]  [g] check_tsc_warp
+       0.07%     0.07%  :34333   [guest.kernel.kallsyms]  [g] kvm_save_sche=
+d_clock_state
+       0.07%     0.07%  :34333   [guest.kernel.kallsyms]  [g] do_nmi
+       0.06%     0.06%  :34336   [guest.kernel.kallsyms]  [g] do_nmi
+       0.06%     0.06%  :34335   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_itimer_state
+       0.05%     0.05%  :34336   [guest.kernel.kallsyms]  [g] fat_msg
+       0.04%     0.04%  :34336   [guest.kernel.kallsyms]  [g] store_powersa=
+ve_bias_gov_sys
+       0.04%     0.04%  :34336   [guest.kernel.kallsyms]  [g] tick_handle_o=
+neshot_broadcast
+       0.04%     0.04%  :34336   [guest.kernel.kallsyms]  [g] set_cpu_itimer
+       0.04%     0.04%  :34336   [guest.kernel.kallsyms]  [g] cleanup_srcu_=
+struct
+       0.03%     0.03%  :34336   [guest.kernel.kallsyms]  [g] __srcu_read_u=
+nlock
+       0.03%     0.03%  :34336   [guest.kernel.kallsyms]  [g] time_cpufreq_=
+notifier
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] irq_spurious_=
+proc_show
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] alarm_timer_n=
+sleep
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] ksoftirqd_sho=
+uld_run
+       0.02%     0.02%  :34333   [guest.kernel.kallsyms]  [g] tg_set_cfs_ba=
+ndwidth
+       0.02%     0.02%  :34333   [guest.kernel.kallsyms]  [g] create_prof_c=
+pu_mask
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] create_prof_c=
+pu_mask
+       0.02%     0.02%  :34333   [guest.kernel.kallsyms]  [g] fat_msg
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] tick_check_ne=
+w_device
+       0.02%     0.02%  :34333   [guest.kernel.kallsyms]  [g] __switch_to_x=
+tra
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] tick_setup_de=
+vice
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] init_timer_key
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] rcu_jiffies_t=
+ill_stall_check
+       0.02%     0.02%  :34333   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_irq_handler_exit
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] arp_ignore
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] clockevents_r=
+egister_device
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] hpet_rtc_inte=
+rrupt
+       0.02%     0.02%  :34336   [guest.kernel.kallsyms]  [g] init_srcu_str=
+uct
+       0.01%     0.01%  :34333   [guest.kernel.kallsyms]  [g] irq_node_proc=
+_show
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] __fat_fs_error
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] tick_check_re=
+placement
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] avc_denied.is=
+ra.0
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] tick_get_devi=
+ce
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] irq_affinity_=
+proc_show
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] sysfs_show_cu=
+rrent_tick_dev
+       0.01%     0.01%  :34333   [guest.kernel.kallsyms]  [g] __fat_fs_error
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_irq_handler_entry
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] tick_is_onesh=
+ot_available
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] irq_domain_ad=
+d_simple
+       0.01%     0.01%  :34333   [guest.kernel.kallsyms]  [g] irq_spurious_=
+proc_show
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] tick_do_broad=
+cast.constprop.6
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] sock_rps_save=
+_rxhash.isra.28.part.29
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] prof_cpu_mask=
+_proc_write
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] perf_trace_it=
+imer_expire
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] srcu_barrier
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] store_ignore_=
+nice_load.isra.3
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] wakeme_after_=
+rcu
+       0.01%     0.01%  :34333   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_irq_handler_entry
+       0.01%     0.01%  :34333   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_softirq
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] debug_kfree
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] clockevents_n=
+otify
+       0.01%     0.01%  :34336   [guest.kernel.kallsyms]  [g] parse_probe_a=
+rg
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] hrtick_start
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] detach_if_pen=
+ding
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] tasklet_init
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] show_stack
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] wakeup_softir=
+qd
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] arch_local_ir=
+q_enable
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] tasklet_kill
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] default_affin=
+ity_show
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] ftrace_raw_ou=
+tput_softirq
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] store_samplin=
+g_down_factor.isra.4
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] synchronize_s=
+rcu_expedited
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] update_rq_clo=
+ck
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] tick_do_perio=
+dic_broadcast
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] tick_install_=
+replacement
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] amd_get_subca=
+ches
+       0.00%     0.00%  :34334   [guest.kernel.kallsyms]  [g] amd_get_subca=
+ches
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] tick_handle_p=
+eriodic
+       0.00%     0.00%  :34336   [guest.kernel.kallsyms]  [g] __page_cache_=
+alloc
+
+  I am not sure how correct the symbol mapping of perf is, so I don't
+  know if this is usable at all.
+
+  I have dumped info registers with the `qemu-monitor-command` command
+  after the  migration problematic VM and this gave the following
+  output:
+
+  RAX=3D0000000000001975 RBX=3Dffff8802342fc000 RCX=3D000000000000beac RDX=
+=3D000000000000beaa
+  RSI=3D000000000000beac RDI=3Dffff8802342fc000 RBP=3Dffff880233d3fb18 RSP=
+=3Dffff880233d3fb18
+  R8 =3D0000000000000286 R9 =3Dffff8800a71eee40 R10=3Dffff8800a71eeed4 R11=
+=3D000000000000000a
+  R12=3Dffff8802342fc000 R13=3Dffffffff81cdf010 R14=3Dffff880233d3fb58 R15=
+=3Dffff88003672b200
+  RIP=3Dffffffff817360b7 RFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SM=
+M=3D0 HLT=3D0
+  ES =3D0000 0000000000000000 000fffff 00000000
+  CS =3D0010 0000000000000000 ffffffff 00a09b00 DPL=3D0 CS64 [-RA]
+  SS =3D0018 0000000000000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
+  DS =3D0000 0000000000000000 000fffff 00000000
+  FS =3D0000 0000000000000000 000fffff 00000000
+  GS =3D0000 ffff88023fc00000 000fffff 00000000
+  LDT=3D0000 0000000000000000 000fffff 00000000
+  TR =3D0040 ffff88023fc04440 00002087 00008b00 DPL=3D0 TSS64-busy
+  GDT=3D     ffff88023fc0c000 0000007f
+  IDT=3D     ffffffffff576000 00000fff
+  CR0=3D8005003b CR2=3D0000000000408950 CR3=3D0000000232098000 CR4=3D000006=
+70
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000
+  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+  EFER=3D0000000000000d01
+  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001fa0
+  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
+  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
+  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
+  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
+  XMM00=3Dffffffffff0000ff0000000000000000 XMM01=3D0000010101000000ffffffff=
+ffffffff
+  XMM02=3D00007fe302de17006776615f64616f6c XMM03=3D000000000000000000000000=
+00000000
+  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
+00ff0000
+  XMM06=3D5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b XMM07=3D202020202020202020202020=
+20202020
+  XMM08=3D00000000000000000000000000000000 XMM09=3D000000000000000000000000=
+00000000
+  XMM10=3D00000000000000000000000000000000 XMM11=3D000000000000000000000000=
+00000000
+  XMM12=3D00ff000000ff0000000000000000ff00 XMM13=3D000000000000000000000000=
+00000000
+  XMM14=3D00000000000000000000000000000000 XMM15=3D000000000000000000000000=
+00000000
+
+  And I looped this for a minute to check were the RIP is changing to:
+  136 RIP=3D0000000000434c1b
+  173 RIP=3Dffffffff8105144a
+    2 RIP=3Dffffffff810521ff
+    1 RIP=3Dffffffff81070816
+
+  =
+
+  I tried to reproduce this with some manual actions prior to migrating bet=
+ween qemu 2.6.2 and 2.11.1 on our testing environment using similar hardwar=
+e (56 core model name: Intel(R) Xeon(R) Gold 6126 CPU @ 2.60GHz)
+  And I was not able to reproduce this, i tried the following:
+  - restore without filesystem caches (see new perf traces below)
+  - create vm with same kernel as stuck vm
+  - restore paused detach net device and virtio block device (detach doesn'=
+t work)
+  - try to do a lot of network and disk io while migrating
+  - ecrypt fs actions during migration
+  - migrate 4000 times between 2.6.2 -> 2.11 using loop
+  - add extra timer calls inside guest for migrate loop (done using cyclict=
+est)
+  - try with guest kernel 3.13.0-145-generic, same kernel vm was running wi=
+th this issue
+  - try host clock/timer calls on 2.11.1 host prior and during migration bo=
+und on first cpu core (cyclictest -a 0 -c 1 -d 200 -H -l 1 -t 2)
+
+  I asked the vm owner what he is doing on his vm, and he told me that
+  he is using 80% of his mem around 14G of the 16G, the vm is running a
+  tomcat 7 server and a libreoffice deamon the vm has a load of 1.0 and
+  runs Ubuntu 14.04 with kernel 3.13.0-145.
+
+  The other vms were running centos 6, centos 7, debian 7, debian 8,
+  ubuntu 13.10, ubuntu 14.04, ubuntu 12.04 the majority of these vms are
+  running linux kernel 3.*.
+
+  The thing is I am actually out of ideas for reproducing this, and I am
+  not sure how to pinpoint this issue, I would like some help and
+  possible some extra tips on debugging.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1775555/+subscriptions
