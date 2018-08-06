@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiong.y.zhang@intel.com>) id 1fmYC1-00081V-Vr
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 01:36:35 -0400
+	(envelope-from <thuth@redhat.com>) id 1fmYLL-000277-0k
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 01:46:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiong.y.zhang@intel.com>) id 1fmYBy-0003rQ-1F
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 01:36:34 -0400
-Received: from mga01.intel.com ([192.55.52.88]:26954)
+	(envelope-from <thuth@redhat.com>) id 1fmYLH-0007He-Sc
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 01:46:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43678 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xiong.y.zhang@intel.com>)
-	id 1fmYBx-0003r3-P2
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 01:36:29 -0400
-From: Xiong Zhang <xiong.y.zhang@intel.com>
-Date: Mon,  6 Aug 2018 13:37:10 +0800
-Message-Id: <1533533830-2618-1-git-send-email-xiong.y.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH] Revert "Revert "vfio/pci-quirks.c: Disable
- stolen memory for igd VFIO""
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fmYLH-0007HN-LM
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 01:46:07 -0400
+References: <20180805112850.26063-1-mark.cave-ayland@ilande.co.uk>
+	<20180805112850.26063-2-mark.cave-ayland@ilande.co.uk>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ded9736c-2445-2e9d-7fcd-d1fd1f849f73@redhat.com>
+Date: Mon, 6 Aug 2018 07:46:03 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180805112850.26063-2-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] sysbus: always allow
+ explicit_ofw_unit_address() to override address generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,135 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.williamson@redhat.com, zhi.a.wang@intel.com, Xiong Zhang <xiong.y.zhang@intel.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, ehabkost@redhat.com, marcel.apfelbaum@gmail.com, lersek@redhat.com, qemu-devel@nongnu.org
 
-This reverts commit 93587e3af3a259deac89c12863d93653d69d22b8
+On 08/05/2018 01:28 PM, Mark Cave-Ayland wrote:
+> Some SysBusDevices either use sysbus_init_mmio() without
+> sysbus_mmio_map() or the first MMIO memory region doesn't represent the
+> bus address, causing a firmware device path with an invalid address to
+> be generated.
+> 
+> SysBusDeviceClass does provide a virtual explicit_ofw_unit_address()
+> method that can be used to override this process, but it was originally intended
+> only as as a fallback option meaning that any existing MMIO memory regions still
+> take priority whilst determining the firmware device address.
+> 
+> There is currently only one user of explicit_ofw_unit_address() and that
+> is the PCI expander bridge (PXB) device which has no MMIO/PIO resources
+> defined. This enables us to allow explicit_ofw_unit_address() to take
+> priority without affecting backwards compatibility, allowing the address
+> to be customised as required.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> ---
+>  hw/core/sysbus.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
 
-The original patch "c2b2e158cc7b vfio/pci-quirks.c: Disable stolen memory
-for igd VFIO" intend to fix an issue that linux guest couldn't work under
-igd passthrough. But this patch breaks windows guest which will unload
-igd windows driver when stolen memory is disabled. So the original patch
-was reverted by 93587e3af3a2.
+Looks reasonable.
 
-After we fixed igd windows driver, it could work well when stolen memory
-is disabled since 15.45.4860 version. So let's disable stolen memory,
-then both windows guest and linux guest could work under igd passthrough.
-
-Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
----
- hw/vfio/pci-quirks.c | 65 ++++++++++++++++++++++++++++++----------------------
- 1 file changed, 38 insertions(+), 27 deletions(-)
-
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index 481fd08..dcaebcb 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -1569,14 +1569,45 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     uint16_t cmd_orig, cmd;
-     Error *err = NULL;
- 
-+    /* This must be an Intel VGA device. */
-+    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
-+        !vfio_is_vga(vdev) || nr != 4) {
-+        return;
-+    }
-+
-     /*
--     * This must be an Intel VGA device at address 00:02.0 for us to even
--     * consider enabling legacy mode.  The vBIOS has dependencies on the
--     * PCI bus address.
-+     * IGD is not a standard, they like to change their specs often.  We
-+     * only attempt to support back to SandBridge and we hope that newer
-+     * devices maintain compatibility with generation 8.
-      */
--    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
--        !vfio_is_vga(vdev) || nr != 4 ||
--        &vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
-+    gen = igd_gen(vdev);
-+    if (gen != 6 && gen != 8) {
-+        error_report("IGD device %s is unsupported by IGD quirks, "
-+                     "try SandyBridge or newer", vdev->vbasedev.name);
-+        return;
-+    }
-+
-+    /*
-+     * Regardless of running in UPT or legacy mode, the guest graphics
-+     * driver may attempt to use stolen memory, however only legacy mode
-+     * has BIOS support for reserving stolen memory in the guest VM.
-+     * Emulate the GMCH register in all cases and zero out the stolen
-+     * memory size here. Legacy mode may request allocation and re-write
-+     * this below.
-+     */
-+    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
-+    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
-+
-+    /* GMCH is read-only, emulated */
-+    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
-+    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
-+    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
-+
-+    /*
-+     * This must be at address 00:02.0 for us to even onsider enabling
-+     * legacy mode.  The vBIOS has dependencies on the PCI bus address.
-+     */
-+    if (&vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
-                                        0, PCI_DEVFN(0x2, 0))) {
-         return;
-     }
-@@ -1596,18 +1627,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     }
- 
-     /*
--     * IGD is not a standard, they like to change their specs often.  We
--     * only attempt to support back to SandBridge and we hope that newer
--     * devices maintain compatibility with generation 8.
--     */
--    gen = igd_gen(vdev);
--    if (gen != 6 && gen != 8) {
--        error_report("IGD device %s is unsupported in legacy mode, "
--                     "try SandyBridge or newer", vdev->vbasedev.name);
--        return;
--    }
--
--    /*
-      * Most of what we're doing here is to enable the ROM to run, so if
-      * there's no ROM, there's no point in setting up this quirk.
-      * NB. We only seem to get BIOS ROMs, so a UEFI VM would need CSM support.
-@@ -1662,8 +1681,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-         goto out;
-     }
- 
--    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
--
-     /*
-      * If IGD VGA Disable is clear (expected) and VGA is not already enabled,
-      * try to enable it.  Probably shouldn't be using legacy mode without VGA,
-@@ -1732,12 +1749,11 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-      * when IVD (IGD VGA Disable) is clear, but the claim is that it's unused,
-      * so let's not waste VM memory for it.
-      */
--    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
--
-     if (vdev->igd_gms) {
-         if (vdev->igd_gms <= 0x10) {
-             gms_mb = vdev->igd_gms * 32;
-             gmch |= vdev->igd_gms << (gen < 8 ? 3 : 8);
-+            pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
-         } else {
-             error_report("Unsupported IGD GMS value 0x%x", vdev->igd_gms);
-             vdev->igd_gms = 0;
-@@ -1757,11 +1773,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     fw_cfg_add_file(fw_cfg_find(), "etc/igd-bdsm-size",
-                     bdsm_size, sizeof(*bdsm_size));
- 
--    /* GMCH is read-only, emulated */
--    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
--    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
--    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
--
-     /* BDSM is read-write, emulated.  The BIOS needs to be able to write it */
-     pci_set_long(vdev->pdev.config + IGD_BDSM, 0);
-     pci_set_long(vdev->pdev.wmask + IGD_BDSM, ~0);
--- 
-2.7.4
+Reviewed-by: Thomas Huth <thuth@redhat.com>
