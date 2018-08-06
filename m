@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmj4j-0004Or-DX
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:13:46 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmj57-0004le-M0
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:14:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmj4i-0005lZ-7w
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:13:45 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49429 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmj54-00066q-TV
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:14:09 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49522 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fmj4h-0005kO-T6
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:13:44 -0400
+	id 1fmj54-00065C-GU
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:14:06 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  6 Aug 2018 18:59:58 +0200
-Message-Id: <1533574847-19294-32-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  6 Aug 2018 19:00:00 +0200
+Message-Id: <1533574847-19294-34-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v7 31/80] target/mips: Add emulation of misc
- nanoMIPS instructions (pool32axf)
+Subject: [Qemu-devel] [PATCH v7 33/80] target/mips: Implement emulation of
+ nanoMIPS ROTX instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,124 +28,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Matthew Fortune <matthew.fortune@mips.com>
 
-Add emulation of misc nanoMIPS instructions situated in pool32axf.
+Added a helper for ROTX based on the pseudocode from the
+architecture spec. This instraction was not present in previous
+MIPS instruction sets.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/mips/translate.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 89 insertions(+)
+ target/mips/helper.h    |  2 ++
+ target/mips/op_helper.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++
+ target/mips/translate.c | 15 ++++++++
+ 3 files changed, 111 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 6ef5e2e..76424c6 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -16845,6 +16845,87 @@ static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
-     }
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index 5f49234..b2a780a 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -40,6 +40,8 @@ DEF_HELPER_FLAGS_1(bitswap, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_FLAGS_1(dbitswap, TCG_CALL_NO_RWG_SE, tl, tl)
+ #endif
+ 
++DEF_HELPER_FLAGS_4(rotx, TCG_CALL_NO_RWG_SE, tl, tl, i32, i32, i32)
++
+ #ifndef CONFIG_USER_ONLY
+ /* CP0 helpers */
+ DEF_HELPER_1(mfc0_mvpcontrol, tl, env)
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 0b2663b..b3eef9f 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -249,6 +249,100 @@ target_ulong helper_bitswap(target_ulong rt)
+     return (int32_t)bitswap(rt);
  }
  
-+static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
++target_ulong helper_rotx(target_ulong rs, uint32_t shift, uint32_t shiftx,
++                        uint32_t stripe)
 +{
-+    int rt = extract32(ctx->opcode, 21, 5);
-+    int rs = extract32(ctx->opcode, 16, 5);
-+
-+    switch (extract32(ctx->opcode, 6, 3)) {
-+    case NM_POOL32AXF_4:
-+    case NM_POOL32AXF_5:
-+        switch (extract32(ctx->opcode, 9, 7)) {
-+#ifndef CONFIG_USER_ONLY
-+        case NM_TLBP:
-+            gen_cp0(env, ctx, OPC_TLBP, 0, 0);
-+            break;
-+        case NM_TLBR:
-+            gen_cp0(env, ctx, OPC_TLBR, 0, 0);
-+            break;
-+        case NM_TLBWI:
-+            gen_cp0(env, ctx, OPC_TLBWI, 0, 0);
-+            break;
-+        case NM_TLBWR:
-+            gen_cp0(env, ctx, OPC_TLBWR, 0, 0);
-+            break;
-+        case NM_TLBINV:
-+            gen_cp0(env, ctx, OPC_TLBINV, 0, 0);
-+            break;
-+        case NM_TLBINVF:
-+            gen_cp0(env, ctx, OPC_TLBINVF, 0, 0);
-+            break;
-+        case NM_DI:
-+            check_cp0_enabled(ctx);
-+            {
-+                TCGv t0 = tcg_temp_new();
-+
-+                save_cpu_state(ctx, 1);
-+                gen_helper_di(t0, cpu_env);
-+                gen_store_gpr(t0, rt);
-+            /* Stop translation as we may have switched the execution mode */
-+                ctx->base.is_jmp = DISAS_STOP;
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case NM_EI:
-+            check_cp0_enabled(ctx);
-+            {
-+                TCGv t0 = tcg_temp_new();
-+
-+                save_cpu_state(ctx, 1);
-+                gen_helper_ei(t0, cpu_env);
-+                gen_store_gpr(t0, rt);
-+            /* Stop translation as we may have switched the execution mode */
-+                ctx->base.is_jmp = DISAS_STOP;
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case NM_RDPGPR:
-+            gen_load_srsgpr(rs, rt);
-+            break;
-+        case NM_WRPGPR:
-+            gen_store_srsgpr(rs, rt);
-+            break;
-+        case NM_WAIT:
-+            gen_cp0(env, ctx, OPC_WAIT, 0, 0);
-+            break;
-+        case NM_DERET:
-+            gen_cp0(env, ctx, OPC_DERET, 0, 0);
-+            break;
-+        case NM_ERETX:
-+            gen_cp0(env, ctx, OPC_ERET, 0, 0);
-+            break;
-+#endif
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
++    int i;
++    uint64_t tmp0 = ((uint64_t)rs) << 32 | ((uint64_t)rs & 0xffffffff);
++    uint64_t tmp1 = tmp0;
++    for (i = 0; i <= 46; i++) {
++        int s;
++        if (i & 0x8) {
++            s = shift;
++        } else {
++            s = shiftx;
 +        }
-+        break;
-+    default:
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
++
++        if (stripe != 0 && !(i & 0x4)) {
++            s = ~s;
++        }
++        if (s & 0x10) {
++            if (tmp0 & (1LL << (i + 16))) {
++                tmp1 |= 1LL << i;
++            } else {
++                tmp1 &= ~(1LL << i);
++            }
++        }
 +    }
++
++    uint64_t tmp2 = tmp1;
++    for (i = 0; i <= 38; i++) {
++        int s;
++        if (i & 0x4) {
++            s = shift;
++        } else {
++            s = shiftx;
++        }
++
++        if (s & 0x8) {
++            if (tmp1 & (1LL << (i + 8))) {
++                tmp2 |= 1LL << i;
++            } else {
++                tmp2 &= ~(1LL << i);
++            }
++        }
++    }
++
++    uint64_t tmp3 = tmp2;
++    for (i = 0; i <= 34; i++) {
++        int s;
++        if (i & 0x2) {
++            s = shift;
++        } else {
++            s = shiftx;
++        }
++        if (s & 0x4) {
++            if (tmp2 & (1LL << (i + 4))) {
++                tmp3 |= 1LL << i;
++            } else {
++                tmp3 &= ~(1LL << i);
++            }
++        }
++    }
++
++    uint64_t tmp4 = tmp3;
++    for (i = 0; i <= 32; i++) {
++        int s;
++        if (i & 0x1) {
++            s = shift;
++        } else {
++            s = shiftx;
++        }
++        if (s & 0x2) {
++            if (tmp3 & (1LL << (i + 2))) {
++                tmp4 |= 1LL << i;
++            } else {
++                tmp4 &= ~(1LL << i);
++            }
++        }
++    }
++
++    uint64_t tmp5 = tmp4;
++    for (i = 0; i <= 31; i++) {
++        int s;
++        s = shift;
++        if (s & 0x1) {
++            if (tmp4 & (1LL << (i + 1))) {
++                tmp5 |= 1LL << i;
++            } else {
++                tmp5 &= ~(1LL << i);
++            }
++        }
++    }
++
++    return (int64_t)(int32_t)(uint32_t)tmp5;
 +}
 +
- static void gen_pool32f_nanomips_insn(DisasContext *ctx)
- {
-     int rt, rs, rd;
-@@ -17214,6 +17295,14 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-             gen_pool32a0_nanomips_insn(ctx);
+ #ifndef CONFIG_USER_ONLY
+ 
+ static inline hwaddr do_translate_address(CPUMIPSState *env,
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 657e9c0..c171bb8 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -17621,6 +17621,21 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+             }
              break;
-         case NM_POOL32A7:
-+            switch (extract32(ctx->opcode, 3, 3)) {
-+            case NM_POOL32AXF:
-+                gen_pool32axf_nanomips_insn(env, ctx);
-+                break;
-+            default:
-+                generate_exception_end(ctx, EXCP_RI);
-+                break;
+         case NM_P_ROTX:
++            if (rt != 0) {
++                TCGv t0 = tcg_temp_new();
++                TCGv_i32 shift = tcg_const_i32(extract32(ctx->opcode, 0, 5));
++                TCGv_i32 shiftx = tcg_const_i32(extract32(ctx->opcode, 7, 4)
++                                                << 1);
++                TCGv_i32 stripe = tcg_const_i32(extract32(ctx->opcode, 6, 1));
++
++                gen_load_gpr(t0, rs);
++                gen_helper_rotx(cpu_gpr[rt], t0, shift, shiftx, stripe);
++                tcg_temp_free(t0);
++
++                tcg_temp_free_i32(shift);
++                tcg_temp_free_i32(shiftx);
++                tcg_temp_free_i32(stripe);
 +            }
              break;
-         default:
-             generate_exception_end(ctx, EXCP_RI);
+         case NM_P_INS:
+             switch (((ctx->opcode >> 10) & 2) |
 -- 
 2.7.4
