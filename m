@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fmlu7-0005p0-Fz
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 16:15:04 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fmluF-0005wn-A9
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 16:15:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fmlu6-0006VP-6E
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 16:14:59 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fmluE-0006bm-1K
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 16:15:07 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  6 Aug 2018 22:14:29 +0200
-Message-Id: <1533586484-5737-2-git-send-email-eric.auger@redhat.com>
+Date: Mon,  6 Aug 2018 22:14:31 +0200
+Message-Id: <1533586484-5737-4-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1533586484-5737-1-git-send-email-eric.auger@redhat.com>
 References: <1533586484-5737-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v7 01/16] linux-headers: Partial update for
- virtio-iommu v0.7
+Subject: [Qemu-devel] [RFC v7 03/16] virtio-iommu: Decode the command payload
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,213 +22,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, jean-philippe.brucker@arm.com
 Cc: will.deacon@arm.com, kevin.tian@intel.com, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com, linuc.decode@gmail.com
 
-Partial sync against Jean-Philippe's branch:
-git://linux-arm.org/linux-jpb.git virtio-iommu/v0.7
+This patch adds the command payload decoding and
+introduces the functions that will do the actual
+command handling. Those functions are not yet implemented.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- include/standard-headers/linux/virtio_ids.h   |   1 +
- include/standard-headers/linux/virtio_iommu.h | 172 ++++++++++++++++++++++++++
- linux-headers/linux/virtio_iommu.h            |   1 +
- 3 files changed, 174 insertions(+)
- create mode 100644 include/standard-headers/linux/virtio_iommu.h
- create mode 100644 linux-headers/linux/virtio_iommu.h
 
-diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
-index 6d5c3b2..cfe47c5 100644
---- a/include/standard-headers/linux/virtio_ids.h
-+++ b/include/standard-headers/linux/virtio_ids.h
-@@ -43,5 +43,6 @@
- #define VIRTIO_ID_INPUT        18 /* virtio input */
- #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
- #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
-+#define VIRTIO_ID_IOMMU        23 /* virtio IOMMU */
+---
+v5 -> v6:
+- change map/unmap semantics (remove size)
+
+v4 -> v5:
+- adopt new v0.5 terminology
+
+v3 -> v4:
+- no flags field anymore in struct virtio_iommu_req_unmap
+- test reserved on attach/detach, change trace proto
+- rebase on v2.10.0.
+---
+ hw/virtio/trace-events   |   6 ++-
+ hw/virtio/virtio-iommu.c | 104 +++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 105 insertions(+), 5 deletions(-)
+
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 01dc20f..f6675cf 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -52,4 +52,8 @@ virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: 0
+ virtio_iommu_set_features(uint64_t features) "features accepted by the driver =0x%"PRIx64
+ virtio_iommu_device_reset(void) "reset!"
+ virtio_iommu_device_status(uint8_t status) "driver status = %d"
+-virtio_iommu_get_config(uint64_t page_size_mask, uint64_t start, uint64_t end, uint8_t ioasid_bits, uint32_t probe_size) "page_size_mask=0x%"PRIx64" start=0x%"PRIx64" end=0x%"PRIx64" ioasid_bits=%d probe_size=0x%x"
++virtio_iommu_get_config(uint64_t page_size_mask, uint64_t start, uint64_t end, uint8_t domain_bits, uint32_t probe_size) "page_size_mask=0x%"PRIx64" start=0x%"PRIx64" end=0x%"PRIx64" domain_bits=%d probe_size=0x%x"
++virtio_iommu_attach(uint32_t domain_id, uint32_t ep_id) "domain=%d endpoint=%d"
++virtio_iommu_detach(uint32_t ep_id) "endpoint=%d"
++virtio_iommu_map(uint32_t domain_id, uint64_t virt_start, uint64_t virt_end, uint64_t phys_start, uint32_t flags) "domain=%d virt_start=0x%"PRIx64" virt_end=0x%"PRIx64 " phys_start=0x%"PRIx64" flags=%d"
++virtio_iommu_unmap(uint32_t domain_id, uint64_t virt_start, uint64_t virt_end) "domain=%d virt_start=0x%"PRIx64" virt_end=0x%"PRIx64
+diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+index 34c7584..492cf22 100644
+--- a/hw/virtio/virtio-iommu.c
++++ b/hw/virtio/virtio-iommu.c
+@@ -34,29 +34,125 @@
+ /* Max size */
+ #define VIOMMU_DEFAULT_QUEUE_SIZE 256
  
- #endif /* _LINUX_VIRTIO_IDS_H */
-diff --git a/include/standard-headers/linux/virtio_iommu.h b/include/standard-headers/linux/virtio_iommu.h
-new file mode 100644
-index 0000000..a233206
---- /dev/null
-+++ b/include/standard-headers/linux/virtio_iommu.h
-@@ -0,0 +1,172 @@
-+/* SPDX-License-Identifier: BSD-3-Clause */
-+/*
-+ * Virtio-iommu definition v0.7
-+ *
-+ * Copyright (C) 2018 Arm Ltd.
-+ */
-+#ifndef _LINUX_VIRTIO_IOMMU_H
-+#define _LINUX_VIRTIO_IOMMU_H
++static int virtio_iommu_attach(VirtIOIOMMU *s,
++                               struct virtio_iommu_req_attach *req)
++{
++    uint32_t domain_id = le32_to_cpu(req->domain);
++    uint32_t ep_id = le32_to_cpu(req->endpoint);
++    uint32_t reserved = le32_to_cpu(req->reserved);
 +
-+#include "standard-headers/linux/types.h"
++    trace_virtio_iommu_attach(domain_id, ep_id);
 +
-+/* Feature bits */
-+#define VIRTIO_IOMMU_F_INPUT_RANGE		0
-+#define VIRTIO_IOMMU_F_DOMAIN_BITS		1
-+#define VIRTIO_IOMMU_F_MAP_UNMAP		2
-+#define VIRTIO_IOMMU_F_BYPASS			3
-+#define VIRTIO_IOMMU_F_PROBE			4
++    if (reserved) {
++        return VIRTIO_IOMMU_S_INVAL;
++    }
 +
-+struct virtio_iommu_config {
-+	/* Supported page sizes */
-+	uint64_t					page_size_mask;
-+	/* Supported IOVA range */
-+	struct virtio_iommu_range {
-+		uint64_t				start;
-+		uint64_t				end;
-+	} input_range;
-+	/* Max domain ID size */
-+	uint8_t					domain_bits;
-+	uint8_t					padding[3];
-+	/* Probe buffer size */
-+	uint32_t					probe_size;
-+} QEMU_PACKED;
++    return VIRTIO_IOMMU_S_UNSUPP;
++}
 +
-+/* Request types */
-+#define VIRTIO_IOMMU_T_ATTACH			0x01
-+#define VIRTIO_IOMMU_T_DETACH			0x02
-+#define VIRTIO_IOMMU_T_MAP			0x03
-+#define VIRTIO_IOMMU_T_UNMAP			0x04
-+#define VIRTIO_IOMMU_T_PROBE			0x05
++static int virtio_iommu_detach(VirtIOIOMMU *s,
++                               struct virtio_iommu_req_detach *req)
++{
++    uint32_t ep_id = le32_to_cpu(req->endpoint);
++    uint32_t reserved = le32_to_cpu(req->reserved);
 +
-+/* Status types */
-+#define VIRTIO_IOMMU_S_OK			0x00
-+#define VIRTIO_IOMMU_S_IOERR			0x01
-+#define VIRTIO_IOMMU_S_UNSUPP			0x02
-+#define VIRTIO_IOMMU_S_DEVERR			0x03
-+#define VIRTIO_IOMMU_S_INVAL			0x04
-+#define VIRTIO_IOMMU_S_RANGE			0x05
-+#define VIRTIO_IOMMU_S_NOENT			0x06
-+#define VIRTIO_IOMMU_S_FAULT			0x07
++    trace_virtio_iommu_detach(ep_id);
 +
-+struct virtio_iommu_req_head {
-+	uint8_t					type;
-+	uint8_t					reserved[3];
-+} QEMU_PACKED;
++    if (reserved) {
++        return VIRTIO_IOMMU_S_INVAL;
++    }
 +
-+struct virtio_iommu_req_tail {
-+	uint8_t					status;
-+	uint8_t					reserved[3];
-+} QEMU_PACKED;
++    return VIRTIO_IOMMU_S_UNSUPP;
++}
 +
-+struct virtio_iommu_req_attach {
-+	struct virtio_iommu_req_head		head;
++static int virtio_iommu_map(VirtIOIOMMU *s,
++                            struct virtio_iommu_req_map *req)
++{
++    uint32_t domain_id = le32_to_cpu(req->domain);
++    uint64_t phys_start = le64_to_cpu(req->phys_start);
++    uint64_t virt_start = le64_to_cpu(req->virt_start);
++    uint64_t virt_end = le64_to_cpu(req->virt_end);
++    uint32_t flags = le32_to_cpu(req->flags);
 +
-+	uint32_t					domain;
-+	uint32_t					endpoint;
-+	uint32_t					reserved;
++    trace_virtio_iommu_map(domain_id, virt_start, virt_end, phys_start, flags);
 +
-+	struct virtio_iommu_req_tail		tail;
-+} QEMU_PACKED;
++    return VIRTIO_IOMMU_S_UNSUPP;
++}
 +
-+struct virtio_iommu_req_detach {
-+	struct virtio_iommu_req_head		head;
++static int virtio_iommu_unmap(VirtIOIOMMU *s,
++                              struct virtio_iommu_req_unmap *req)
++{
++    uint32_t domain_id = le32_to_cpu(req->domain);
++    uint64_t virt_start = le64_to_cpu(req->virt_start);
++    uint64_t virt_end = le64_to_cpu(req->virt_end);
 +
-+	uint32_t					endpoint;
-+	uint32_t					reserved;
++    trace_virtio_iommu_unmap(domain_id, virt_start, virt_end);
 +
-+	struct virtio_iommu_req_tail		tail;
-+} QEMU_PACKED;
++    return VIRTIO_IOMMU_S_UNSUPP;
++}
 +
-+#define VIRTIO_IOMMU_MAP_F_READ			(1 << 0)
-+#define VIRTIO_IOMMU_MAP_F_WRITE		(1 << 1)
-+#define VIRTIO_IOMMU_MAP_F_EXEC			(1 << 2)
-+#define VIRTIO_IOMMU_MAP_F_MMIO			(1 << 3)
++#define get_payload_size(req) (\
++sizeof((req)) - sizeof(struct virtio_iommu_req_tail))
 +
-+#define VIRTIO_IOMMU_MAP_F_MASK			(VIRTIO_IOMMU_MAP_F_READ |	\
-+						 VIRTIO_IOMMU_MAP_F_WRITE |	\
-+						 VIRTIO_IOMMU_MAP_F_EXEC |	\
-+						 VIRTIO_IOMMU_MAP_F_MMIO)
+ static int virtio_iommu_handle_attach(VirtIOIOMMU *s,
+                                       struct iovec *iov,
+                                       unsigned int iov_cnt)
+ {
+-    return -ENOENT;
++    struct virtio_iommu_req_attach req;
++    size_t sz, payload_sz;
 +
-+struct virtio_iommu_req_map {
-+	struct virtio_iommu_req_head		head;
++    payload_sz = get_payload_size(req);
 +
-+	uint32_t					domain;
-+	uint64_t					virt_start;
-+	uint64_t					virt_end;
-+	uint64_t					phys_start;
-+	uint32_t					flags;
++    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
++    if (sz != payload_sz) {
++        return VIRTIO_IOMMU_S_INVAL;
++    }
++    return virtio_iommu_attach(s, &req);
+ }
+ static int virtio_iommu_handle_detach(VirtIOIOMMU *s,
+                                       struct iovec *iov,
+                                       unsigned int iov_cnt)
+ {
+-    return -ENOENT;
++    struct virtio_iommu_req_detach req;
++    size_t sz, payload_sz;
 +
-+	struct virtio_iommu_req_tail		tail;
-+} QEMU_PACKED;
++    payload_sz = get_payload_size(req);
 +
-+struct virtio_iommu_req_unmap {
-+	struct virtio_iommu_req_head		head;
++    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
++    if (sz != payload_sz) {
++        return VIRTIO_IOMMU_S_INVAL;
++    }
++    return virtio_iommu_detach(s, &req);
+ }
+ static int virtio_iommu_handle_map(VirtIOIOMMU *s,
+                                    struct iovec *iov,
+                                    unsigned int iov_cnt)
+ {
+-    return -ENOENT;
++    struct virtio_iommu_req_map req;
++    size_t sz, payload_sz;
 +
-+	uint32_t					domain;
-+	uint64_t					virt_start;
-+	uint64_t					virt_end;
-+	uint32_t					reserved;
++    payload_sz = get_payload_size(req);
 +
-+	struct virtio_iommu_req_tail		tail;
-+} QEMU_PACKED;
++    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
++    if (sz != payload_sz) {
++        return VIRTIO_IOMMU_S_INVAL;
++    }
++    return virtio_iommu_map(s, &req);
+ }
+ static int virtio_iommu_handle_unmap(VirtIOIOMMU *s,
+                                      struct iovec *iov,
+                                      unsigned int iov_cnt)
+ {
+-    return -ENOENT;
++    struct virtio_iommu_req_unmap req;
++    size_t sz, payload_sz;
 +
-+#define VIRTIO_IOMMU_RESV_MEM_T_RESERVED	0
-+#define VIRTIO_IOMMU_RESV_MEM_T_MSI		1
++    payload_sz = get_payload_size(req);
 +
-+struct virtio_iommu_probe_resv_mem {
-+	uint8_t					subtype;
-+	uint8_t					reserved[3];
-+	uint64_t					start;
-+	uint64_t					end;
-+} QEMU_PACKED;
-+
-+#define VIRTIO_IOMMU_PROBE_T_NONE		0
-+#define VIRTIO_IOMMU_PROBE_T_RESV_MEM		1
-+
-+#define VIRTIO_IOMMU_PROBE_T_MASK		0xfff
-+
-+struct virtio_iommu_probe_property {
-+	uint16_t					type;
-+	uint16_t					length;
-+	uint8_t					value[];
-+} QEMU_PACKED;
-+
-+struct virtio_iommu_req_probe {
-+	struct virtio_iommu_req_head		head;
-+	uint32_t					endpoint;
-+	uint8_t					reserved[64];
-+
-+	uint8_t					properties[];
-+
-+	/* Tail follows the variable-length properties array (no padding) */
-+} QEMU_PACKED;
-+
-+union virtio_iommu_req {
-+	struct virtio_iommu_req_head		head;
-+
-+	struct virtio_iommu_req_attach		attach;
-+	struct virtio_iommu_req_detach		detach;
-+	struct virtio_iommu_req_map		map;
-+	struct virtio_iommu_req_unmap		unmap;
-+	struct virtio_iommu_req_probe		probe;
-+};
-+
-+/* Fault types */
-+#define VIRTIO_IOMMU_FAULT_R_UNKNOWN		0
-+#define VIRTIO_IOMMU_FAULT_R_DOMAIN		1
-+#define VIRTIO_IOMMU_FAULT_R_MAPPING		2
-+
-+#define VIRTIO_IOMMU_FAULT_F_READ		(1 << 0)
-+#define VIRTIO_IOMMU_FAULT_F_WRITE		(1 << 1)
-+#define VIRTIO_IOMMU_FAULT_F_EXEC		(1 << 2)
-+#define VIRTIO_IOMMU_FAULT_F_ADDRESS		(1 << 8)
-+
-+struct virtio_iommu_fault {
-+	uint8_t					reason;
-+	uint8_t					padding[3];
-+	uint32_t					flags;
-+	uint32_t					endpoint;
-+	uint64_t					address;
-+} QEMU_PACKED;
-+
-+#endif
-diff --git a/linux-headers/linux/virtio_iommu.h b/linux-headers/linux/virtio_iommu.h
-new file mode 100644
-index 0000000..2dc4609
---- /dev/null
-+++ b/linux-headers/linux/virtio_iommu.h
-@@ -0,0 +1 @@
-+#include "standard-headers/linux/virtio_iommu.h"
++    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
++    if (sz != payload_sz) {
++        return VIRTIO_IOMMU_S_INVAL;
++    }
++    return virtio_iommu_unmap(s, &req);
+ }
+ 
+ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
 -- 
 2.5.5
