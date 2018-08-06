@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fmkuB-0007F5-AF
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:11:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1fmkuB-0007F6-Ny
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:11:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fmku8-0005AV-2u
+	(envelope-from <bounces@canonical.com>) id 1fmku8-0005Ah-OH
 	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:10:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60084)
+Received: from indium.canonical.com ([91.189.90.7]:60140)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fmku7-0005A9-3B
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:10:55 -0400
+	id 1fmku8-0005AM-Bu
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 15:10:56 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fmku6-00018X-1E
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 19:10:54 +0000
+	id 1fmku7-00018d-5J
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 19:10:55 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 06AEB2E806B
-	for <qemu-devel@nongnu.org>; Mon,  6 Aug 2018 19:10:54 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2589F2E80C9
+	for <qemu-devel@nongnu.org>; Mon,  6 Aug 2018 19:10:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Aug 2018 19:02:00 -0000
+Date: Mon, 06 Aug 2018 19:04:16 -0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Reply-To: Bug 1785670 <1785670@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153357530568.2634.11935730297153408386.malonedeb@wampee.canonical.com>
-Message-Id: <153358212035.29114.1851025763009599104.malone@chaenomeles.canonical.com>
+Message-Id: <153358225682.18255.5813613025039919791.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1785670] Re: Guest(ubuntu 18.04) crashes when
  trying uploading file
@@ -39,10 +39,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I can recreate this here.
+#0  0x00007fffec275feb in raise () at /lib64/libc.so.6
+#1  0x00007fffec2605c1 in abort () at /lib64/libc.so.6
+#2  0x00007fffec2b89d7 in __libc_message () at /lib64/libc.so.6
+#3  0x00007fffec2beeac in  () at /lib64/libc.so.6
+#4  0x00007fffec2c091c in _int_free () at /lib64/libc.so.6
+#5  0x00007ffff725b4d2 in g_free () at /lib64/libglib-2.0.so.0
+#6  0x0000555555b49551 in m_free (m=3D0x7fffc44b0dd0) at /home/dgilbert/git=
+/qemu/slirp/mbuf.c:114
+#7  0x0000555555b4a33d in sbappend (so=3D<optimized out>, m=3D<optimized ou=
+t>) at /home/dgilbert/git/qemu/slirp/sbuf.c:82
+#8  0x0000555555b4d6ae in tcp_input (m=3D0x7fffc44b0dd0, iphlen=3D<optimize=
+d out>, inso=3D<optimized out>, af=3D<optimized out>)
+    at /home/dgilbert/git/qemu/slirp/tcp_input.c:1300
+#9  0x0000555555b48d98 in slirp_input (slirp=3D<optimized out>, pkt=3D0x7ff=
+fc44ad900 "RU\n", pkt_len=3Dpkt_len@entry=3D66)
+    at /home/dgilbert/git/qemu/slirp/slirp.c:875
+#10 0x0000555555b378e0 in net_slirp_receive (nc=3D<optimized out>, buf=3D<o=
+ptimized out>, size=3D66) at /home/dgilbert/git/qemu/net/slirp.c:121
+#11 0x0000555555b2ff4e in nc_sendv_compat (flags=3D<optimized out>, iovcnt=
+=3D3, iov=3D0x7fffceff9a40, nc=3D0x5555567d5e60)
+    at /home/dgilbert/git/qemu/net/net.c:701
+#12 0x0000555555b2ff4e in qemu_deliver_packet_iov (sender=3D<optimized out>=
+, flags=3D<optimized out>, iov=3D0x7fffceff9a40, iovcnt=3D3, opaque=3D0x555=
+5567d5e60)
+    at /home/dgilbert/git/qemu/net/net.c:728
+#13 0x0000555555b32744 in qemu_net_queue_deliver_iov (iovcnt=3D3, iov=3D0x7=
+fffceff9a40, flags=3D0, sender=3D0x555557a70ae0, queue=3D0x5555567d6010)
+    at /home/dgilbert/git/qemu/net/queue.c:179
+#14 0x0000555555b32744 in qemu_net_queue_send_iov (queue=3D0x5555567d6010, =
+sender=3D0x555557a70ae0, flags=3D0, iov=3D0x7fffceff9a40, iovcnt=3D3, sent_=
+cb=3D<optimized out>) at /home/dgilbert/git/qemu/net/queue.c:224
+#15 0x0000555555a6ec61 in net_tx_pkt_sendv (pkt=3D0x555557a71010, iov_cnt=
+=3D3, iov=3D0x7fffceff9a40, nc=3D0x555557a70ae0)
+    at /home/dgilbert/git/qemu/hw/net/net_tx_pkt.c:546
+#16 0x0000555555a6ec61 in net_tx_pkt_do_sw_fragmentation (pkt=3Dpkt@entry=
+=3D0x555557a71010, nc=3Dnc@entry=3D0x555557a70ae0)
+    at /home/dgilbert/git/qemu/hw/net/net_tx_pkt.c:588
+#17 0x0000555555a6f87f in net_tx_pkt_send (pkt=3D0x555557a71010, nc=3Dnc@en=
+try=3D0x555557a70ae0) at /home/dgilbert/git/qemu/hw/net/net_tx_pkt.c:625
+#18 0x0000555555a78ff8 in e1000e_tx_pkt_send (queue_index=3D<optimized out>=
+, tx=3D0x555557a1d1e8, core=3D0x5555579fcf80)
+    at /home/dgilbert/git/qemu/hw/net/e1000e_core.c:665
+#19 0x0000555555a78ff8 in e1000e_process_tx_desc (queue_index=3D<optimized =
+out>, dp=3D0x7fffceff9f30, tx=3D0x555557a1d1e8, core=3D0x5555579fcf80)
+    at /home/dgilbert/git/qemu/hw/net/e1000e_core.c:742
+#20 0x0000555555a78ff8 in e1000e_start_xmit (core=3D0x5555579fcf80, txr=3D<=
+optimized out>, txr=3D<optimized out>)
+    at /home/dgilbert/git/qemu/hw/net/e1000e_core.c:933
+#21 0x0000555555a792b9 in e1000e_set_tdt (core=3D<optimized out>, index=3D<=
+optimized out>, val=3D<optimized out>)
+    at /home/dgilbert/git/qemu/hw/net/e1000e_core.c:2450
+#22 0x0000555555a7c0a5 in e1000e_core_write (core=3D0x5555579fcf80, addr=3D=
+<optimized out>, val=3D220, size=3D4)
+    at /home/dgilbert/git/qemu/hw/net/e1000e_core.c:3255
+#23 0x0000555555876c37 in memory_region_write_accessor (mr=3D0x5555579fcbb0=
+, addr=3D14360, value=3D<optimized out>, size=3D4, shift=3D<optimized out>,=
+ mask=3D<optimized out>, attrs=3D...) at /home/dgilbert/git/qemu/memory.c:5=
+27
+---Type <return> to continue, or q <return> to quit---
+ out>, access_size_max=3D<optimized out>, access_fn=3D0x555555876bc0 <memor=
+y_region_write_accessor>, mr=3D0x5555579fcbb0, attrs=3D...) at /home/dgilbe=
+rt/git/qemu/memory.c:594
+#25 0x00005555558794c1 in memory_region_dispatch_write (mr=3Dmr@entry=3D0x5=
+555579fcbb0, addr=3D14360, data=3D<optimized out>, size=3D4, attrs=3Dattrs@=
+entry=3D...) at /home/dgilbert/git/qemu/memory.c:1479
+#26 0x0000555555823833 in flatview_write_continue (fv=3Dfv@entry=3D0x7fffc5=
+0aebc0, addr=3Daddr@entry=3D4273485848, attrs=3D..., buf=3Dbuf@entry=3D0x7f=
+fff7ff3028 <incomplete sequence \334>, len=3Dlen@entry=3D4, addr1=3D<optimi=
+zed out>, l=3D<optimized out>, mr=3D0x5555579fcbb0) at /home/dgilbert/git/q=
+emu/exec.c:3255
+#27 0x0000555555823a59 in flatview_write (fv=3D0x7fffc50aebc0, addr=3D42734=
+85848, attrs=3D..., buf=3D0x7ffff7ff3028 <incomplete sequence \334>, len=3D=
+4) at /home/dgilbert/git/qemu/exec.c:3294
+#28 0x000055555582737f in address_space_write (as=3D<optimized out>, addr=
+=3D<optimized out>, attrs=3D..., buf=3Dbuf@entry=3D0x7ffff7ff3028 <incomple=
+te sequence \334>, len=3D<optimized out>) at /home/dgilbert/git/qemu/exec.c=
+:3384
+#29 0x000055555582740a in address_space_rw (as=3D<optimized out>, addr=3D<o=
+ptimized out>, attrs=3D..., attrs@entry=3D..., buf=3Dbuf@entry=3D0x7ffff7ff=
+3028 <incomplete sequence \334>, len=3D<optimized out>, is_write=3D<optimiz=
+ed out>)
+    at /home/dgilbert/git/qemu/exec.c:3395
+#30 0x000055555588b7b8 in kvm_cpu_exec (cpu=3Dcpu@entry=3D0x55555683ddf0) a=
+t /home/dgilbert/git/qemu/accel/kvm/kvm-all.c:1979
+#31 0x0000555555862896 in qemu_kvm_cpu_thread_fn (arg=3D0x55555683ddf0) at =
+/home/dgilbert/git/qemu/cpus.c:1215
+#32 0x00007fffec605594 in start_thread () at /lib64/libpthread.so.0
+#33 0x00007fffec3390df in clone () at /lib64/libc.so.6
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+(This is with a fedora guest, so that's irrelevant)
 
 -- =
 
