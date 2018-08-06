@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fmizZ-0007aT-Um
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:08:27 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmizy-0007yv-VZ
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:08:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fmizX-0008RU-69
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:08:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48650 helo=mx1.redhat.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fmizw-0000Vg-6n
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:08:50 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:46882 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fmizX-0008Qd-01
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:08:23 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F06F5401EF09
-	for <qemu-devel@nongnu.org>; Mon,  6 Aug 2018 17:08:21 +0000 (UTC)
-Date: Mon, 6 Aug 2018 18:08:18 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180806170818.GG20807@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180718120334.27138-1-berrange@redhat.com>
-	<20180718120334.27138-2-berrange@redhat.com>
-	<21544428-4494-da5c-41c6-e72056db2bca@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <21544428-4494-da5c-41c6-e72056db2bca@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] crypto: require gnutls >= 3.1.18 for
- building QEMU
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1fmizv-0000Ta-RU
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 13:08:48 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Mon,  6 Aug 2018 18:59:46 +0200
+Message-Id: <1533574847-19294-20-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v7 19/80] target/mips: Add emulation of
+ nanoMIPS 16-bit arithmetic instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,73 +25,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
 
-On Mon, Aug 06, 2018 at 11:58:41AM -0500, Eric Blake wrote:
-> On 07/18/2018 07:03 AM, Daniel P. Berrang=C3=A9 wrote:
-> > gnutls 3.0.0 was released in 2011 and all the distros that are build
-> > target platforms for QEMU [1] include it:
-> >=20
-> >    RHEL-7: 3.1.18
-> >    Debian (Stretch): 3.5.8
-> >    Debian (Jessie): 3.3.8
-> >    OpenBSD (ports): 3.5.18
-> >    FreeBSD (ports): 3.5.18
-> >    OpenSUSE Leap 15: 3.6.2
-> >    Ubuntu (Xenial): 3.4.10
-> >    macOS (Homebrew): 3.5.19
-> >=20
-> > Based on this, it is reasonable to require gnutls >=3D 3.1.18 in QEMU
-> > which allows for all conditional version checks in the code to be
-> > removed.
->=20
-> Looks reasonable.
->=20
-> >=20
-> > [1] https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-platfo=
-rms
-> >=20
->=20
-> Any chance we can get http builds of the docs hosted directly on qemu.o=
-rg
-> someday?  But unrelated to your patch.
->=20
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > ---
-> > @@ -2675,79 +2674,28 @@ fi
-> >   ##########################################
-> >   # GNUTLS probe
-> > -gnutls_works() {
-> > -    # Unfortunately some distros have bad pkg-config information for=
- gnutls
-> > -    # such that it claims to exist but you get a compiler error if y=
-ou try
-> > -    # to use the options returned by --libs. Specifically, Ubuntu fo=
-r --static
-> > -    # builds doesn't work:
-> > -    # https://bugs.launchpad.net/ubuntu/+source/gnutls26/+bug/147803=
-5
->=20
-> This bug is still in state NEW, but targets Ubuntu 14.04 and "Package:
-> libgnutls-dev 2.12.23-12ubuntu2.2", so is probably indeed old enough th=
-at it
-> is hopefully a non-issue for gnutls > 3 in the versions of Ubuntu we
-> specifically support. However, I'm not enough of an Ubuntu user myself =
-to
-> confirm whether things still work, so you'll probably want to collect
-> additional R-b or Tested-by before accepting this for qemu 3.1.
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-FYI, I checked the pkg-config file with gnutls 3 on ubuntu and it did not
-appear to have the bug that existed in gnutls 2, so I believe removing
-this cruft is safe.
+Add emulation of nanoMIPS 16-bit arithmetic instructions.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+---
+ target/mips/translate.c | 125 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 125 insertions(+)
+
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 756eb40..53c92f6 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -16595,6 +16595,131 @@ static inline int decode_gpr_gpr4_zero(int r)
+ 
+ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+ {
++    uint32_t op;
++    int rt = decode_gpr_gpr3(NANOMIPS_EXTRACT_RD(ctx->opcode));
++    int rs = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS(ctx->opcode));
++    int rd = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS1(ctx->opcode));
++    int imm;
++
++    /* make sure instructions are on a halfword boundary */
++    if (ctx->base.pc_next & 0x1) {
++        TCGv tmp = tcg_const_tl(ctx->base.pc_next);
++        tcg_gen_st_tl(tmp, cpu_env, offsetof(CPUMIPSState, CP0_BadVAddr));
++        tcg_temp_free(tmp);
++        generate_exception_end(ctx, EXCP_AdEL);
++        return 2;
++    }
++
++    op = extract32(ctx->opcode, 10, 6);
++    switch (op) {
++    case NM_P16_MV:
++        break;
++    case NM_P16_SHIFT:
++        break;
++    case NM_P16C:
++        break;
++    case NM_P16_A1:
++        switch (extract32(ctx->opcode, 6, 1)) {
++        case NM_ADDIUR1SP:
++            imm = extract32(ctx->opcode, 0, 6) << 2;
++            gen_arith_imm(ctx, OPC_ADDIU, rt, 29, imm);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++        break;
++    case NM_P16_A2:
++        switch (extract32(ctx->opcode, 3, 1)) {
++        case NM_ADDIUR2:
++            imm = extract32(ctx->opcode, 0, 3) << 2;
++            gen_arith_imm(ctx, OPC_ADDIU, rt, rs, imm);
++            break;
++        case NM_P_ADDIURS5:
++            rt = extract32(ctx->opcode, 5, 5);
++            if (rt != 0) {
++                /* imm = sign_extend(s[3] . s[2:0] , from_nbits = 4) */
++                imm = (sextract32(ctx->opcode, 4, 1) << 3) |
++                      (extract32(ctx->opcode, 0, 3));
++                gen_arith_imm(ctx, OPC_ADDIU, rt, rt, imm);
++            }
++            break;
++        }
++        break;
++    case NM_P16_ADDU:
++        switch (ctx->opcode & 0x1) {
++        case NM_ADDU16:
++            gen_arith(ctx, OPC_ADDU, rd, rs, rt);
++            break;
++        case NM_SUBU16:
++            gen_arith(ctx, OPC_SUBU, rd, rs, rt);
++            break;
++        }
++        break;
++    case NM_P16_4X4:
++        rt = (extract32(ctx->opcode, 9, 1) << 3) |
++              extract32(ctx->opcode, 5, 3);
++        rs = (extract32(ctx->opcode, 4, 1) << 3) |
++              extract32(ctx->opcode, 0, 3);
++        rt = decode_gpr_gpr4(rt);
++        rs = decode_gpr_gpr4(rs);
++        switch ((extract32(ctx->opcode, 7, 2) & 0x2) |
++                (extract32(ctx->opcode, 3, 1))) {
++        case NM_ADDU4X4:
++            gen_arith(ctx, OPC_ADDU, rt, rs, rt);
++            break;
++        case NM_MUL4X4:
++            gen_r6_muldiv(ctx, R6_OPC_MUL, rt, rs, rt);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++        break;
++    case NM_LI16:
++        break;
++    case NM_ANDI16:
++        break;
++    case NM_P16_LB:
++        break;
++    case NM_P16_LH:
++        break;
++    case NM_LW16:
++        break;
++    case NM_LWSP16:
++        break;
++    case NM_LW4X4:
++        break;
++    case NM_SW4X4:
++        break;
++    case NM_LWGP16:
++        break;
++    case NM_SWSP16:
++        break;
++    case NM_SW16:
++        break;
++    case NM_SWGP16:
++        break;
++    case NM_BC16:
++        break;
++    case NM_BALC16:
++        break;
++    case NM_BEQZC16:
++        break;
++    case NM_BNEZC16:
++        break;
++    case NM_P16_BR:
++        break;
++    case NM_P16_SR:
++        break;
++    case NM_MOVEP:
++        break;
++    case NM_MOVEPREV:
++        break;
++    default:
++        break;
++    }
++
+     return 2;
+ }
+ 
+-- 
+2.7.4
