@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fmeNs-0004AG-2a
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:13:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fmeaD-0007oL-5m
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fmeNn-0005iS-Sf
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:13:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53794 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fmeNn-0005hs-N2
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:13:07 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon,  6 Aug 2018 13:13:04 +0100
-Message-Id: <20180806121304.9440-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH] docs/migration: Clarify pre_load in subsections
+	(envelope-from <peter.maydell@linaro.org>) id 1fmeaC-0002OL-DS
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:25:57 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44938)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fmeaC-0002OA-8V
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:25:56 -0400
+Received: by mail-oi0-x241.google.com with SMTP id s198-v6so21747858oih.11
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 05:25:55 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180806121304.9440-1-dgilbert@redhat.com>
+References: <20180806121304.9440-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Aug 2018 13:25:34 +0100
+Message-ID: <CAFEAcA_jWy+uT6ALXZGF3dMBi_rkgrs6i0VK9jUh7nPUdo4AVQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] docs/migration: Clarify pre_load in
+ subsections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,51 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com, peter.maydell@linaro.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 6 August 2018 at 13:13, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Clarify that the pre_load function in a subsection is only called if
+> the subsection is found; to handle a missing subsection you may
+> set values in the pre_load of the parent vmsd.
 
-Clarify that the pre_load function in a subsection is only called if
-the subsection is found; to handle a missing subsection you may
-set values in the pre_load of the parent vmsd.
+NB: I did a quick audit of all the uses of pre_load in the tree:
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- docs/devel/migration.rst | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+These uses rely on the hook not being called unless the
+subsection is found:
+hw/acpi/ich9.c
+hw/acpi/piix4.c
+hw/net/vmxnet3.c
 
-diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
-index 6ed3fce061..687570754d 100644
---- a/docs/devel/migration.rst
-+++ b/docs/devel/migration.rst
-@@ -240,10 +240,13 @@ should succeed even with the data missing.  To support this the
- subsection can be connected to a device property and from there
- to a versioned machine type.
- 
--One important note is that the post_load() function is called "after"
--loading all subsections, because a newer subsection could change same
--value that it uses.  A flag, and the combination of pre_load and post_load
--can be used to detect whether a subsection was loaded, and to
-+The 'pre_load' and 'post_load' functions on subsections are only
-+called if the subsection is loaded.
-+
-+One important note is that the outer post_load() function is called "after"
-+loading all subsections, because a newer subsection could change the same
-+value that it uses.  A flag, and the combination of outer pre_load and
-+post_load can be used to detect whether a subsection was loaded, and to
- fall back on default behaviour when the subsection isn't present.
- 
- Example:
-@@ -315,8 +318,8 @@ For example:
-       the property to false.
-    c) Add a static bool  support_foo function that tests the property.
-    d) Add a subsection with a .needed set to the support_foo function
--   e) (potentially) Add a pre_load that sets up a default value for 'foo'
--      to be used if the subsection isn't loaded.
-+   e) (potentially) Add an outer pre_load that sets up a default value
-+      for 'foo' to be used if the subsection isn't loaded.
- 
- Now that subsection will not be generated when using an older
- machine type and the migration stream will be accepted by older
--- 
-2.17.1
+These are buggy (and I have a patch I'm testing to fix it)
+hw/intc/arm_gicv3_common.c:    .pre_load = vmstate_gicv3_cpu_pre_load,
+hw/intc/arm_gicv3_common.c:    .pre_load = gicv3_pre_load,
+
+and all the rest are not in VMSDs for subsections.
+
+(I didn't audit the post_load uses; gicv3 has a wrong
+use of that too.)
+
+thanks
+-- PMM
