@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fmf2Z-0002o2-Dg
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:55:16 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fmfa0-0003FN-8Y
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fmf2V-00036O-8T
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:55:15 -0400
-References: <20180805182832.3012-1-pavel.zbitskiy@gmail.com>
-	<20180805182832.3012-7-pavel.zbitskiy@gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <c50dd722-3fd0-6ec7-79ec-f956ff185299@redhat.com>
-Date: Mon, 6 Aug 2018 14:55:07 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180805182832.3012-7-pavel.zbitskiy@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/6] target/s390x: implement CVB,
- CVBY and CVBG
+	(envelope-from <jemmy858585@gmail.com>) id 1fmfZx-0008CW-Hb
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:48 -0400
+Received: from mail-pg1-x536.google.com ([2607:f8b0:4864:20::536]:46597)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
+	id 1fmfZx-0008C1-Bn
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 09:29:45 -0400
+Received: by mail-pg1-x536.google.com with SMTP id f14-v6so5716250pgv.13
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 06:29:45 -0700 (PDT)
+From: Lidong Chen <jemmy858585@gmail.com>
+Date: Mon,  6 Aug 2018 21:29:26 +0800
+Message-Id: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
+Subject: [Qemu-devel] [PATCH v6 00/11] Enable postcopy RDMA live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,172 +24,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, "open list:S390" <qemu-s390x@nongnu.org>
+To: zhang.zhanghailiang@huawei.com, quintela@redhat.com, dgilbert@redhat.com
+Cc: qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-On 05.08.2018 20:28, Pavel Zbitskiy wrote:
-> Convert to Binary - counterparts of the already implemented Convert
-> to Decimal (CVD*) instructions.
-> Example from the Principles of Operation: 25594C becomes 63FA.
->=20
-> Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
-> ---
->  target/s390x/helper.h      |  2 ++
->  target/s390x/insn-data.def |  4 ++++
->  target/s390x/int_helper.c  | 58 ++++++++++++++++++++++++++++++++++++++=
-++++++++
->  target/s390x/translate.c   | 12 ++++++++++
->  4 files changed, 76 insertions(+)
->=20
-> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> index 97c60ca7bc..20e0c424f9 100644
-> --- a/target/s390x/helper.h
-> +++ b/target/s390x/helper.h
-> @@ -88,6 +88,8 @@ DEF_HELPER_FLAGS_4(tcxb, TCG_CALL_NO_RWG_SE, i32, env=
-, i64, i64, i64)
->  DEF_HELPER_FLAGS_2(sqeb, TCG_CALL_NO_WG, i64, env, i64)
->  DEF_HELPER_FLAGS_2(sqdb, TCG_CALL_NO_WG, i64, env, i64)
->  DEF_HELPER_FLAGS_3(sqxb, TCG_CALL_NO_WG, i64, env, i64, i64)
-> +DEF_HELPER_FLAGS_2(cvb, TCG_CALL_NO_WG, i64, env, i64)
-> +DEF_HELPER_FLAGS_2(cvbg, TCG_CALL_NO_WG, i64, env, i64)
->  DEF_HELPER_FLAGS_1(cvd, TCG_CALL_NO_RWG_SE, i64, s32)
->  DEF_HELPER_FLAGS_4(pack, TCG_CALL_NO_WG, void, env, i32, i64, i64)
->  DEF_HELPER_FLAGS_4(pka, TCG_CALL_NO_WG, void, env, i64, i64, i32)
-> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-> index 9c7b434fca..f0b1cbc4b2 100644
-> --- a/target/s390x/insn-data.def
-> +++ b/target/s390x/insn-data.def
-> @@ -284,6 +284,10 @@
->      D(0xec73, CLFIT,   RIE_a, GIE, r1_32u, i2_32u, 0, 0, ct, 0, 1)
->      D(0xec71, CLGIT,   RIE_a, GIE, r1_o, i2_32u, 0, 0, ct, 0, 1)
-> =20
-> +/* CONVERT TO BINARY */
-> +    C(0x4f00, CVB,     RX_a,  Z,   0, a2, new, r1_32, cvb, 0)
-> +    C(0xe306, CVBY,    RXY_a, LD,  0, a2, new, r1_32, cvb, 0)
-> +    C(0xe30e, CVBG,    RXY_a, Z,   0, a2, r1, 0, cvbg, 0)
+The RDMA QIOChannel does not support bi-directional communication, so when RDMA 
+live migration with postcopy enabled, the source qemu return path get qemu file 
+error.
 
-Instead, use the "D" variant and pass e.g. 1/2 (or 4/8) as data ("length"=
-).
+These patches implement bi-directional communication for RDMA QIOChannel and 
+disable the RDMA WRITE during the postcopy phase.
 
-OR (better) access and test "s->fields->op" in op_cvb to detect the lengt=
-h.
+This patch just make postcopy works, and will improve performance later.
 
-You can then forward (e.g. the length) to the helper and avoid
-op/cvbg/cvbg and inline do_cvb.
+[v6]
+ - rebase
+ - add the check whether release rdma resource has finished(David)
+ - remove unnecessary RDMA_CONTROL_ERROR when cleanup(David)
+ - poll the cm event for destination qemu
 
->  /* CONVERT TO DECIMAL */
->      C(0x4e00, CVD,     RX_a,  Z,   r1_o, a2, 0, 0, cvd, 0)
->      C(0xe326, CVDY,    RXY_a, LD,  r1_o, a2, 0, 0, cvd, 0)
+[v5]
+ - rebase
+ - fix bug for create a dedicated thread to release rdma resource(David)
+ - fix bug for poll the cm event while wait RDMA work request completion(David,Gal)
 
-Time to also implement CVDG in a similar fashion ? :)
+[v4]
+ - not wait RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect
+ - implement io_set_aio_fd_handler function for RDMA QIOChannel (Juan Quintela)
+ - invoke qio_channel_yield only when qemu_in_coroutine() (Juan Quintela)
+ - create a dedicated thread to release rdma resource
+ - poll the cm event while wait RDMA work request completion
+ - implement the shutdown function for RDMA QIOChannel
 
-> diff --git a/target/s390x/int_helper.c b/target/s390x/int_helper.c
-> index abf77a94e6..2d67347d08 100644
-> --- a/target/s390x/int_helper.c
-> +++ b/target/s390x/int_helper.c
-> @@ -24,6 +24,7 @@
->  #include "exec/exec-all.h"
->  #include "qemu/host-utils.h"
->  #include "exec/helper-proto.h"
-> +#include "exec/cpu_ldst.h"
-> =20
->  /* #define DEBUG_HELPER */
->  #ifdef DEBUG_HELPER
-> @@ -118,6 +119,63 @@ uint64_t HELPER(divu64)(CPUS390XState *env, uint64=
-_t ah, uint64_t al,
->      return ret;
->  }
-> =20
-> +static void general_operand_exception(CPUS390XState *env, uintptr_t ra=
-)
-> +{
-> +    LowCore *lowcore;
-> +
-> +    lowcore =3D cpu_map_lowcore(env);
-> +    lowcore->data_exc_code =3D 0;
-> +    cpu_unmap_lowcore(lowcore);
-> +    s390_program_interrupt(env, PGM_DATA, ILEN_AUTO, ra);
-> +}
-> +
-> +static int64_t do_cvb(CPUS390XState *env, uint64_t src, int n)
-> +{
-> +    int i, j;
-> +    uintptr_t ra =3D GETPC();
-> +    int64_t dec, sign, digit, val, pow10;
-> +
-> +    for (i =3D 0; i < n; i++) {
-> +        dec =3D cpu_ldq_data_ra(env, src + (n - i - 1) * 8, ra);
-> +        for (j =3D 0; j < 16; j++, dec >>=3D 4) {
-> +            if (i =3D=3D 0 && j =3D=3D 0) {
-> +                sign =3D dec & 0xf;
-> +                if (sign < 0xa) {
-> +                    general_operand_exception(env, ra);
-> +                }
-> +                continue;
-> +            }
-> +            digit =3D dec & 0xf;
-> +            if (digit > 0x9) {
-> +                general_operand_exception(env, ra);
-> +            }
-> +            if (i =3D=3D 0 && j =3D=3D 1) {
-> +                if (sign =3D=3D 0xb || sign =3D=3D 0xd) {
-> +                    val =3D -digit;
-> +                    pow10 =3D -10;
-> +                } else {
-> +                    val =3D digit;
-> +                    pow10 =3D 10;
-> +                }
-> +            } else {
-> +                val +=3D digit * pow10;
-> +                pow10 *=3D 10;
-> +            }
-> +        }
-> +    }
-> +    return val;
-> +}
-> +
-> +uint64_t HELPER(cvb)(CPUS390XState *env, uint64_t src)
-> +{
-> +    return do_cvb(env, src, 1);
-> +}
-> +
-> +uint64_t HELPER(cvbg)(CPUS390XState *env, uint64_t src)
-> +{
-> +    return do_cvb(env, src, 2);
-> +}
-> +
->  uint64_t HELPER(cvd)(int32_t reg)
->  {
->      /* positive 0 */
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 05442dff36..83d71815d4 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -2106,6 +2106,18 @@ static DisasJumpType op_csp(DisasContext *s, Dis=
-asOps *o)
->  }
->  #endif
-> =20
-> +static DisasJumpType op_cvb(DisasContext *s, DisasOps *o)
-> +{
-> +    gen_helper_cvb(o->out, cpu_env, o->in2);
-> +    return DISAS_NEXT;
-> +}
-> +
-> +static DisasJumpType op_cvbg(DisasContext *s, DisasOps *o)
-> +{
-> +    gen_helper_cvbg(o->out, cpu_env, o->in2);
-> +    return DISAS_NEXT;
-> +}
-> +
->  static DisasJumpType op_cvd(DisasContext *s, DisasOps *o)
->  {
->      TCGv_i64 t1 =3D tcg_temp_new_i64();
->=20
+[v3]
+ - add a mutex in QEMUFile struct to avoid concurrent channel close (Daniel)
+ - destroy the mutex before free QEMUFile (David)
+ - use rdmain and rmdaout instead of rdma->return_path (Daniel)
 
+[v2]
+ - does not update bytes_xfer when disable RDMA WRITE (David)
+ - implement bi-directional communication for RDMA QIOChannel (Daniel)
 
---=20
+Lidong Chen (11):
+  migration: disable RDMA WRITE after postcopy started
+  migration: create a dedicated connection for rdma return path
+  migration: implement bi-directional RDMA QIOChannel
+  migration: Stop rdma yielding during incoming postcopy
+  migration: implement io_set_aio_fd_handler function for RDMA
+    QIOChannel
+  migration: invoke qio_channel_yield only when qemu_in_coroutine()
+  migration: poll the cm event while wait RDMA work request completion
+  migration: implement the shutdown for RDMA QIOChannel
+  migration: poll the cm event for destination qemu
+  migration: remove the unnecessary RDMA_CONTROL_ERROR message
+  migration: create a dedicated thread to release rdma resource
 
-Thanks,
+ migration/colo.c              |   2 +
+ migration/migration.c         |  11 +-
+ migration/migration.h         |   3 +
+ migration/postcopy-ram.c      |   2 +
+ migration/qemu-file-channel.c |  12 +-
+ migration/qemu-file.c         |   8 +-
+ migration/ram.c               |   4 +
+ migration/rdma.c              | 449 ++++++++++++++++++++++++++++++++++++++----
+ migration/savevm.c            |   3 +
+ 9 files changed, 446 insertions(+), 48 deletions(-)
 
-David / dhildenb
+-- 
+1.8.3.1
