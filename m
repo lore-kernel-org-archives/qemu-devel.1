@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fmej2-00033g-IW
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:35:05 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fmej3-00034b-9G
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fmej1-0006fq-D2
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:35:04 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fmej2-0006gW-F8
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 08:35:05 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  6 Aug 2018 13:34:45 +0100
-Message-Id: <20180806123445.1459-6-peter.maydell@linaro.org>
+Date: Mon,  6 Aug 2018 13:34:43 +0100
+Message-Id: <20180806123445.1459-4-peter.maydell@linaro.org>
 In-Reply-To: <20180806123445.1459-1-peter.maydell@linaro.org>
 References: <20180806123445.1459-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-3.0 v2 5/5] hw/intc/arm_gicv3_common: Move
- gicd shift bug handling to gicv3_post_load
+Subject: [Qemu-devel] [PATCH for-3.0 v2 3/5] target/arm: Add dummy needed
+ functions to M profile vmstate subsections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,126 +23,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-The code currently in gicv3_gicd_no_migration_shift_bug_post_load()
-that handles migration from older QEMU versions with a particular
-bug is misplaced. We need to run this after migration in all cases,
-not just the cases where the "arm_gicv3/gicd_no_migration_shift_bug"
-subsection is present, so it must go in a post_load hook for the
-top level VMSD, not for the subsection. Move it.
+Currently the migration code incorrectly treats a subsection with
+no .needed function pointer as if it was the subsection list
+terminator -- it is ignored and so is everything after it.
+Work around this by giving various M profile vmstate structs
+a 'needed' function that always returns true.
+We reuse m_needed() for this, since it's always true here.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/intc/arm_gicv3_common.c | 77 ++++++++++++++++++--------------------
- 1 file changed, 37 insertions(+), 40 deletions(-)
+Not strictly a regression as it only affects M profile CPUs
+with the security extensions, and migration of those was
+broken anyway in 2.12 due to a different bug.
+---
+ target/arm/machine.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-index 8175889f1e7..52480c3b4cf 100644
---- a/hw/intc/arm_gicv3_common.c
-+++ b/hw/intc/arm_gicv3_common.c
-@@ -29,6 +29,41 @@
- #include "hw/arm/linux-boot-if.h"
- #include "sysemu/kvm.h"
- 
-+
-+static void gicv3_gicd_no_migration_shift_bug_post_load(GICv3State *cs)
-+{
-+    if (cs->gicd_no_migration_shift_bug) {
-+        return;
-+    }
-+
-+    /* Older versions of QEMU had a bug in the handling of state save/restore
-+     * to the KVM GICv3: they got the offset in the bitmap arrays wrong,
-+     * so that instead of the data for external interrupts 32 and up
-+     * starting at bit position 32 in the bitmap, it started at bit
-+     * position 64. If we're receiving data from a QEMU with that bug,
-+     * we must move the data down into the right place.
-+     */
-+    memmove(cs->group, (uint8_t *)cs->group + GIC_INTERNAL / 8,
-+            sizeof(cs->group) - GIC_INTERNAL / 8);
-+    memmove(cs->grpmod, (uint8_t *)cs->grpmod + GIC_INTERNAL / 8,
-+            sizeof(cs->grpmod) - GIC_INTERNAL / 8);
-+    memmove(cs->enabled, (uint8_t *)cs->enabled + GIC_INTERNAL / 8,
-+            sizeof(cs->enabled) - GIC_INTERNAL / 8);
-+    memmove(cs->pending, (uint8_t *)cs->pending + GIC_INTERNAL / 8,
-+            sizeof(cs->pending) - GIC_INTERNAL / 8);
-+    memmove(cs->active, (uint8_t *)cs->active + GIC_INTERNAL / 8,
-+            sizeof(cs->active) - GIC_INTERNAL / 8);
-+    memmove(cs->edge_trigger, (uint8_t *)cs->edge_trigger + GIC_INTERNAL / 8,
-+            sizeof(cs->edge_trigger) - GIC_INTERNAL / 8);
-+
-+    /*
-+     * While this new version QEMU doesn't have this kind of bug as we fix it,
-+     * so it needs to set the flag to true to indicate that and it's necessary
-+     * for next migration to work from this new version QEMU.
-+     */
-+    cs->gicd_no_migration_shift_bug = true;
-+}
-+
- static int gicv3_pre_save(void *opaque)
- {
-     GICv3State *s = (GICv3State *)opaque;
-@@ -46,6 +81,8 @@ static int gicv3_post_load(void *opaque, int version_id)
-     GICv3State *s = (GICv3State *)opaque;
-     ARMGICv3CommonClass *c = ARM_GICV3_COMMON_GET_CLASS(s);
- 
-+    gicv3_gicd_no_migration_shift_bug_post_load(s);
-+
-     if (c->post_load) {
-         c->post_load(s);
-     }
-@@ -161,45 +198,6 @@ static int gicv3_pre_load(void *opaque)
-     return 0;
- }
- 
--static int gicv3_gicd_no_migration_shift_bug_post_load(void *opaque,
--                                                       int version_id)
--{
--    GICv3State *cs = opaque;
--
--    if (cs->gicd_no_migration_shift_bug) {
--        return 0;
--    }
--
--    /* Older versions of QEMU had a bug in the handling of state save/restore
--     * to the KVM GICv3: they got the offset in the bitmap arrays wrong,
--     * so that instead of the data for external interrupts 32 and up
--     * starting at bit position 32 in the bitmap, it started at bit
--     * position 64. If we're receiving data from a QEMU with that bug,
--     * we must move the data down into the right place.
--     */
--    memmove(cs->group, (uint8_t *)cs->group + GIC_INTERNAL / 8,
--            sizeof(cs->group) - GIC_INTERNAL / 8);
--    memmove(cs->grpmod, (uint8_t *)cs->grpmod + GIC_INTERNAL / 8,
--            sizeof(cs->grpmod) - GIC_INTERNAL / 8);
--    memmove(cs->enabled, (uint8_t *)cs->enabled + GIC_INTERNAL / 8,
--            sizeof(cs->enabled) - GIC_INTERNAL / 8);
--    memmove(cs->pending, (uint8_t *)cs->pending + GIC_INTERNAL / 8,
--            sizeof(cs->pending) - GIC_INTERNAL / 8);
--    memmove(cs->active, (uint8_t *)cs->active + GIC_INTERNAL / 8,
--            sizeof(cs->active) - GIC_INTERNAL / 8);
--    memmove(cs->edge_trigger, (uint8_t *)cs->edge_trigger + GIC_INTERNAL / 8,
--            sizeof(cs->edge_trigger) - GIC_INTERNAL / 8);
--
--    /*
--     * While this new version QEMU doesn't have this kind of bug as we fix it,
--     * so it needs to set the flag to true to indicate that and it's necessary
--     * for next migration to work from this new version QEMU.
--     */
--    cs->gicd_no_migration_shift_bug = true;
--
--    return 0;
--}
--
- static bool needed_always(void *opaque)
- {
-     return true;
-@@ -210,7 +208,6 @@ const VMStateDescription vmstate_gicv3_gicd_no_migration_shift_bug = {
+diff --git a/target/arm/machine.c b/target/arm/machine.c
+index 2e28d086bdf..ff4ec22bf75 100644
+--- a/target/arm/machine.c
++++ b/target/arm/machine.c
+@@ -184,6 +184,7 @@ static const VMStateDescription vmstate_m_faultmask_primask = {
+     .name = "cpu/m/faultmask-primask",
      .version_id = 1,
      .minimum_version_id = 1,
-     .needed = needed_always,
--    .post_load = gicv3_gicd_no_migration_shift_bug_post_load,
++    .needed = m_needed,
      .fields = (VMStateField[]) {
-         VMSTATE_BOOL(gicd_no_migration_shift_bug, GICv3State),
+         VMSTATE_UINT32(env.v7m.faultmask[M_REG_NS], ARMCPU),
+         VMSTATE_UINT32(env.v7m.primask[M_REG_NS], ARMCPU),
+@@ -230,6 +231,7 @@ static const VMStateDescription vmstate_m_scr = {
+     .name = "cpu/m/scr",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .needed = m_needed,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(env.v7m.scr[M_REG_NS], ARMCPU),
+         VMSTATE_END_OF_LIST()
+@@ -240,6 +242,7 @@ static const VMStateDescription vmstate_m_other_sp = {
+     .name = "cpu/m/other-sp",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .needed = m_needed,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(env.v7m.other_sp, ARMCPU),
          VMSTATE_END_OF_LIST()
 -- 
 2.17.1
