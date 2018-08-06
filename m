@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fmaFq-0001r6-23
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 03:48:39 -0400
+	(envelope-from <jingqi.liu@intel.com>) id 1fmamY-0001hR-3q
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 04:22:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fmaFm-00032l-Vq
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 03:48:38 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180803145542.GF4380@localhost.localdomain>
-References: <20180729212744.23709-1-lbloch@janustech.com>
-	<20180730105522.GC3775@localhost.localdomain>
-	<w51600rlgey.fsf@maestria.local.igalia.com>
-	<20180803145542.GF4380@localhost.localdomain>
-Date: Mon, 06 Aug 2018 09:47:51 +0200
-Message-ID: <w51va8ondg8.fsf@maestria.local.igalia.com>
+	(envelope-from <jingqi.liu@intel.com>) id 1fmamU-0001DM-4I
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 04:22:26 -0400
+Received: from mga06.intel.com ([134.134.136.31]:50402)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
+	id 1fmamT-0001Bd-Je
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 04:22:22 -0400
+References: <1531213054-63327-1-git-send-email-jingqi.liu@intel.com>
+	<83838432-354e-d504-a988-aa7672814822@redhat.com>
+From: "Liu, Jingqi" <jingqi.liu@intel.com>
+Message-ID: <54526497-76bb-eba2-a4f9-b381f2436452@intel.com>
+Date: Mon, 6 Aug 2018 16:21:58 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/6] qcow2: Make the L2 cache cover the
- whole image by default
+In-Reply-To: <83838432-354e-d504-a988-aa7672814822@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] x86/cpu: Enable a few new cpu features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net, ehabkost@redhat.com
+Cc: qemu-devel@nongnu.org, wei.w.wang@intel.com
 
-On Fri 03 Aug 2018 04:55:42 PM CEST, Kevin Wolf wrote:
-> By the way, weren't you working on subclusters a while ago? How did
-> that go? Because I think those would enable us to use larger cluster
-> sizes and therefore reduce the metadata sizes as well.
+Hi Paolo & Eduardo,
 
-I had a working prototype, but the changes to both the code and the
-on-disk format were not trivial. I would need to re-evaluate its
-performance impact after all the changes that we have had since then,
-and then see if it's worth trying again.
+Do you have any comments for the series ?
+Thanks
 
-I suppose that the main benefit of having subclusters is that
-allocations are much faster. Everything else remains more or less the
-same, and in particular you can already use larger clusters if you want
-to reduce the metadata sizes. Plus, with the l2-cache-entry-size option
-you can already solve some of the problems of having large clusters.
-
->> > Another thing I just noticed while looking at the code is that
->> > cache-clean-interval only considers blocks that aren't dirty, but
->> > doesn't take measures to get dirty blocks written out, so we depend
->> > on the guest flushing the cache before we can get free the
->> > memory. Should we attempt to write unused dirty entries back?
->> > Berto?
->> 
->> I never thought about it, but sounds like worth exploring.
+On 7/16/2018 10:59 PM, Paolo Bonzini wrote:
+> On 10/07/2018 10:57, Jingqi Liu wrote:
+>> Enable a few new cpu features including UMONITOR, UMWAIT, TPAUSE,
+>> MOVDIRI and MOVDIR64B.
+>>
+>> UMONITOR, UMWAIT, and TPAUSE are a set of user wait instructions.
+>> MOVDIRI moves doubleword or quadword from register to memory through
+>> direct store.
+>> MOVDIR64B moves 64-bytes as direct-store with 64-bytes write atomicity.
+> Do you have corresponding KVM changes?
 >
-> Are you planning to do that or should I add it to my own todo list?
-
-I can do that.
-
->> And thinking about this, perhaps this could be the simplest approach of
->> them all: let the user pass any value to l2-cache-size but then in
->> read_cache_sizes() do something like
->> 
->>     if (l2_cache_size_set && *l2_cache_size > max_l2_cache) {
->>         *l2_cache_size = max_l2_cache;
->>     }
->> 
->> Then if the image is resized you can recalculate this.
->> 
->> This way the user can make l2-cache-size the hard maximum that they ever
->> are willing to use for an image's L2 cache, and QEMU guarantees that it
->> won't allocate that much memory if it can cover the whole image with
->> less.
->> 
->> How does that sound?
+> Paolo
 >
-> Yes. When you read the rest of the thread, you'll see that Leonid
-> suggested the same and I agree. And if someone really wants cover the
-> full image no matter how much memory it requires, they can just pass
-> INT64_MAX and get the right thing.
-
-I wonder why it took so long to think about this, it sounds rather
-simple when you think about it...
-
-Berto
+>> The bits definition:
+>> CPUID.(EAX=7,ECX=0):ECX[bit 05] WAITPKG
+>> CPUID.(EAX=7,ECX=0):ECX[bit 27] MOVDIRI
+>> CPUID.(EAX=7,ECX=0):ECX[bit 28] MOVDIR64B
+>>
+>> The release document ref below link:
+>> https://software.intel.com/sites/default/files/managed/c5/15/\
+>> architecture-instruction-set-extensions-programming-reference.pdf
+>>
+>> Jingqi Liu (3):
+>>    x86/cpu: Enable UMONITOR/UMWAIT/TPAUSE cpu features
+>>    x86/cpu: Enable MOVDIRI cpu feature
+>>    x86/cpu: Enable MOVDIR64B cpu feature
+>>
+>>   target/i386/cpu.c | 6 +++---
+>>   target/i386/cpu.h | 3 +++
+>>   2 files changed, 6 insertions(+), 3 deletions(-)
+>>
