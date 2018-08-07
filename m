@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fn33v-0003O4-6O
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:34:17 -0400
+	(envelope-from <quintela@redhat.com>) id 1fn348-0003XP-BL
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:34:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fn33u-0001xF-CF
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:34:15 -0400
+	(envelope-from <quintela@redhat.com>) id 1fn347-00027Q-83
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:34:28 -0400
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180806123445.1459-2-peter.maydell@linaro.org> (Peter Maydell's
-	message of "Mon, 6 Aug 2018 13:34:41 +0100")
+In-Reply-To: <20180806123445.1459-3-peter.maydell@linaro.org> (Peter Maydell's
+	message of "Mon, 6 Aug 2018 13:34:42 +0100")
 References: <20180806123445.1459-1-peter.maydell@linaro.org>
-	<20180806123445.1459-2-peter.maydell@linaro.org>
+	<20180806123445.1459-3-peter.maydell@linaro.org>
 Reply-To: quintela@redhat.com
-Date: Tue, 07 Aug 2018 16:34:05 +0200
-Message-ID: <87effa2qle.fsf@trasno.org>
+Date: Tue, 07 Aug 2018 16:34:18 +0200
+Message-ID: <87a7py2ql1.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-3.0 v2 1/5] hw/intc/arm_gicv3_common:
- Give no-migration-shift-bug subsection a needed function
+Subject: Re: [Qemu-devel] [PATCH for-3.0 v2 2/5] hw/intc/arm_gicv3_common:
+ Combine duplicate .subsections in vmstate_gicv3_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,11 +29,13 @@ To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
 Peter Maydell <peter.maydell@linaro.org> wrote:
-> Currently the migration code incorrectly treats a subsection with
-> no .needed function pointer as if it was the subsection list
-> terminator -- it is ignored and so is everything after it.
-> Work around this by giving vmstate_gicv3_gicd_no_migration_shift_bug
-> a 'needed' function that always returns true.
+> Commit 6692aac411199064 accidentally introduced a second initialization
+> of the .subsections field of vmstate_gicv3_cpu, instead of adding
+> the new subsection to the existing list. The effect of this was
+> probably that migration of GICv3 with virtualization enabled was
+> broken (or alternatively that migration of ICC_SRE_EL1 was broken,
+> depending on which of the two initializers the compiler used).
+> Combine the two into a single list.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
