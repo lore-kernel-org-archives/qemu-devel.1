@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy3C-0003Q6-Oq
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:11 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy3E-0003Rf-Dn
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy39-0005Bk-Fd
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:10 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35842)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy3D-0005Cl-Cs
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:12 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:42158)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fmy39-0005Ba-8x
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:07 -0400
-Received: by mail-pg1-x544.google.com with SMTP id h12-v6so7556892pgs.3
-	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 02:13:07 -0700 (PDT)
+	id 1fmy3D-0005Cb-62
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:11 -0400
+Received: by mail-pl0-x244.google.com with SMTP id g6-v6so3295886plq.9
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 02:13:11 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Tue,  7 Aug 2018 17:12:07 +0800
-Message-Id: <20180807091209.13531-9-xiaoguangrong@tencent.com>
+Date: Tue,  7 Aug 2018 17:12:08 +0800
+Message-Id: <20180807091209.13531-10-xiaoguangrong@tencent.com>
 In-Reply-To: <20180807091209.13531-1-xiaoguangrong@tencent.com>
 References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH v3 08/10] migration: handle the error condition
- properly
+Subject: [Qemu-devel] [PATCH v3 09/10] migration: fix calculating
+ xbzrle_counters.cache_miss_rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,77 +32,92 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-ram_find_and_save_block() can return negative if any error hanppens,
-however, it is completely ignored in current code
+As Peter pointed out:
+| - xbzrle_counters.cache_miss is done in save_xbzrle_page(), so it's
+|   per-guest-page granularity
+|
+| - RAMState.iterations is done for each ram_find_and_save_block(), so
+|   it's per-host-page granularity
+|
+| An example is that when we migrate a 2M huge page in the guest, we
+| will only increase the RAMState.iterations by 1 (since
+| ram_find_and_save_block() will be called once), but we might increase
+| xbzrle_counters.cache_miss for 2M/4K=512 times (we'll call
+| save_xbzrle_page() that many times) if all the pages got cache miss.
+| Then IMHO the cache miss rate will be 512/1=51200% (while it should
+| actually be just 100% cache miss).
 
+And he also suggested as xbzrle_counters.cache_miss_rate is the only
+user of rs->iterations we can adapt it to count guest page numbers
+
+After that, rename 'iterations' to 'handle_pages' to better reflect
+its meaning
+
+Suggested-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 ---
- migration/ram.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+ migration/ram.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 55966bc2c1..09be01dca2 100644
+index 09be01dca2..bd7c18d1f9 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -2367,7 +2367,8 @@ static int ram_save_host_page(RAMState *rs, PageSearchStatus *pss,
-  *
-  * Called within an RCU critical section.
-  *
-- * Returns the number of pages written where zero means no dirty pages
-+ * Returns the number of pages written where zero means no dirty pages,
-+ * or negative on error
-  *
-  * @rs: current RAM state
-  * @last_stage: if we are at the completion stage
-@@ -3202,6 +3203,12 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-             done = 1;
-             break;
-         }
-+
-+        if (pages < 0) {
-+            qemu_file_set_error(f, pages);
-+            break;
-+        }
-+
-         rs->iterations++;
+@@ -300,10 +300,10 @@ struct RAMState {
+     uint64_t num_dirty_pages_period;
+     /* xbzrle misses since the beginning of the period */
+     uint64_t xbzrle_cache_miss_prev;
+-    /* number of iterations at the beginning of period */
+-    uint64_t iterations_prev;
+-    /* Iterations since start */
+-    uint64_t iterations;
++    /* total handled pages at the beginning of period */
++    uint64_t handle_pages_prev;
++    /* total handled pages since start */
++    uint64_t handle_pages;
+     /* number of dirty bits in the bitmap */
+     uint64_t migration_dirty_pages;
+     /* last dirty_sync_count we have seen */
+@@ -1587,19 +1587,19 @@ uint64_t ram_pagesize_summary(void)
  
-         /* we want to check in the 1st loop, just in case it was the 1st time
-@@ -3243,7 +3250,7 @@ out:
- /**
-  * ram_save_complete: function called to send the remaining amount of ram
-  *
-- * Returns zero to indicate success
-+ * Returns zero to indicate success or negative on error
-  *
-  * Called with iothread lock
-  *
-@@ -3254,6 +3261,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+ static void migration_update_rates(RAMState *rs, int64_t end_time)
  {
-     RAMState **temp = opaque;
-     RAMState *rs = *temp;
-+    int ret = 0;
+-    uint64_t iter_count = rs->iterations - rs->iterations_prev;
++    uint64_t page_count = rs->handle_pages - rs->handle_pages_prev;
  
-     rcu_read_lock();
+     /* calculate period counters */
+     ram_counters.dirty_pages_rate = rs->num_dirty_pages_period * 1000
+                 / (end_time - rs->time_last_bitmap_sync);
  
-@@ -3274,6 +3282,10 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
-         if (pages == 0) {
-             break;
-         }
-+        if (pages < 0) {
-+            ret = pages;
-+            break;
-+        }
+-    if (!iter_count) {
++    if (!page_count) {
+         return;
      }
  
-     flush_compressed_data(rs);
-@@ -3285,7 +3297,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-     qemu_fflush(f);
- 
--    return 0;
-+    return ret;
+     if (migrate_use_xbzrle()) {
+         xbzrle_counters.cache_miss_rate = (double)(xbzrle_counters.cache_miss -
+-            rs->xbzrle_cache_miss_prev) / iter_count;
++            rs->xbzrle_cache_miss_prev) / page_count;
+         rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
+     }
  }
+@@ -1657,7 +1657,7 @@ static void migration_bitmap_sync(RAMState *rs)
  
- static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+         migration_update_rates(rs, end_time);
+ 
+-        rs->iterations_prev = rs->iterations;
++        rs->handle_pages_prev = rs->handle_pages;
+ 
+         /* reset period counters */
+         rs->time_last_bitmap_sync = end_time;
+@@ -3209,7 +3209,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+             break;
+         }
+ 
+-        rs->iterations++;
++        rs->handle_pages += pages;
+ 
+         /* we want to check in the 1st loop, just in case it was the 1st time
+            and we had to sync the dirty bitmap.
 -- 
 2.14.4
