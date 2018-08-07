@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fn1TW-0002og-0s
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:52:35 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fn1Ww-0004cX-0f
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:56:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fn1TR-0001m8-Op
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:52:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51504 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1fn1Wr-000313-4h
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:56:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51640 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fn1TR-0001ln-JX
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:52:29 -0400
-Date: Tue, 7 Aug 2018 13:52:24 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180807125223.GF2556@work-vm>
-References: <20180807114501.12370-1-peter.maydell@linaro.org>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fn1Wq-00030j-Vx
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:56:01 -0400
+Date: Tue, 7 Aug 2018 14:55:58 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180807125558.2g7nl5zhgrdblrwh@sirius.home.kraxel.org>
+References: <20180803153235.4134-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180807114501.12370-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH for-3.0] slirp: Correct size check in
- m_inc()
+In-Reply-To: <20180803153235.4134-1-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: fix crashes upon warm reboot
+ with vga mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +28,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, jasowang@redhat.com, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, Prasad J Pandit <pjp@fedoraproject.org>, liqsub1 <liqsub1@163.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, stefanb@linux.vnet.ibm.com, "Michael S. Tsirkin" <mst@redhat.com>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> The data in an mbuf buffer is not necessarily at the start of the
-> allocated buffer. (For instance m_adj() allows data to be trimmed
-> from the start by just advancing the pointer and reducing the length.)
-> This means that the allocated buffer size (m->m_size) and the
-> amount of space from the m_data pointer to the end of the
-> buffer (M_ROOM(m)) are not necessarily the same.
-> 
-> Commit 864036e251f54c9 tried to change the m_inc() function from
-> taking the new allocated-buffer-size to taking the new room-size,
-> but forgot to change the initial "do we already have enough space"
-> check. This meant that if we were trying to extend a buffer which
-> had a leading gap between the buffer start and the data, we might
-> incorrectly decide it didn't need to be extended, and then
-> overrun the end of the buffer, causing memory corruption and
-> an eventual crash.
-> 
-> Change the "already big enough?" condition from checking the
-> argument against m->m_size to checking against M_ROOM().
-> This only makes a difference for the callsite in m_cat();
-> the other three callsites all start with a freshly allocated
-> mbuf from m_get(), which will have m->m_size == M_ROOM(m).
-> 
-> Fixes: 864036e251f54c9
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1785670
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Fri, Aug 03, 2018 at 05:32:35PM +0200, Marc-Andr=E9 Lureau wrote:
+> With vga=3D775 on the Linux command line a first boot of the VM running
+> Linux works fine. After a warm reboot it crashes during Linux boot.
+>=20
+> Before that, valgrind points out bad memory write to console
+> surface. The VGA code is not aware that virtio-gpu got a message
+> surface scanout when the display is disabled. Let's reset VGA graphic
+> mode when it is the case, so that a new display surface is created
+> when doing further VGA operations.
 
-Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+I guess we should simply call vga_common_reset() in virtio_vga_reset()
+instead, can you try that?
 
-> ---
->  slirp/mbuf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/slirp/mbuf.c b/slirp/mbuf.c
-> index 0c189e1a7bf..1b7868355a3 100644
-> --- a/slirp/mbuf.c
-> +++ b/slirp/mbuf.c
-> @@ -154,7 +154,7 @@ m_inc(struct mbuf *m, int size)
->      int datasize;
->  
->      /* some compilers throw up on gotos.  This one we can fake. */
-> -    if (m->m_size > size) {
-> +    if (M_ROOM(m) > size) {
->          return;
->      }
->  
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks,
+  Gerd
