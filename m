@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fn2GT-0002Ve-Uf
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:43:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fn2J1-0004Ei-OK
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:45:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fn2GS-0000tY-W7
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:43:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34766 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fn2GS-0000tP-OS
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:43:08 -0400
-Date: Tue, 7 Aug 2018 14:43:05 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180807134304.GH2556@work-vm>
-References: <20180807130355.29780-1-peter.maydell@linaro.org>
-	<87muty2u57.fsf@trasno.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fn2J0-0002CV-Ik
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:45:47 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:40037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fn2J0-0002CI-CY
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:45:46 -0400
+Received: by mail-oi0-x241.google.com with SMTP id w126-v6so28481572oie.7
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 06:45:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87muty2u57.fsf@trasno.org>
-Subject: Re: [Qemu-devel] [PATCH] migration: Correctly handle subsections
- with no 'needed' function
+In-Reply-To: <20180807114501.12370-1-peter.maydell@linaro.org>
+References: <20180807114501.12370-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Aug 2018 14:45:24 +0100
+Message-ID: <CAFEAcA-c+kEJgmSr98Q-gYO6=9Y=6Ndj_rs4JVAovUXB9wmtvA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.0] slirp: Correct size check in
+ m_inc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, patches@linaro.org
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Prasad J Pandit <pjp@fedoraproject.org>, "patches@linaro.org" <patches@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, liqsub1 <liqsub1@163.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Peter Maydell <peter.maydell@linaro.org> wrote:
-> > Currently the vmstate subsection handling code treats a subsection
-> > with no 'needed' function pointer as if it were the subsection
-> > list terminator, so the subsection is never transferred and nor
-> > is any subsection following it in the list.
-> >
-> > Handle NULL 'needed' function pointers in subsections in the same
-> > way that we do for top level VMStateDescription structures:
-> > treat the subsection as always being needed.
-> >
-> > This doesn't change behaviour for the current set of devices
-> > in the tree, because all subsections declare a 'needed' function.
-> >
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> > NB: last para in the commit message is only true once the
-> > "Arm migration fixes for 3.0" patchset has been committed.
-> > We could optionally drop some of the "use a dummy needed fn"
-> > changes once this is in...
-> >
-> > I thought I'd sent this out a few days back, but apparently not,
-> > since it's not on-list...
-> >
-> >  migration/vmstate.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/migration/vmstate.c b/migration/vmstate.c
-> > index 6b9079bb51e..0bc240a3175 100644
-> > --- a/migration/vmstate.c
-> > +++ b/migration/vmstate.c
-> > @@ -418,7 +418,7 @@ int vmstate_save_state_v(QEMUFile *f, const VMStateDescription *vmsd,
-> >  static const VMStateDescription *
-> >  vmstate_get_subsection(const VMStateDescription **sub, char *idstr)
-> >  {
-> > -    while (sub && *sub && (*sub)->needed) {
-> > +    while (sub && *sub) {
-> >          if (strcmp(idstr, (*sub)->name) == 0) {
-> >              return *sub;
-> >          }
-> 
-> Ack to this one.  Code supposed that needed was alwasy !=0.  We don't
-> really care on the reception side.  Good spotted.
-> 
-> > @@ -486,8 +486,8 @@ static int vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
-> >      int ret = 0;
-> >  
-> >      trace_vmstate_subsection_save_top(vmsd->name);
-> > -    while (sub && *sub && (*sub)->needed) {
-> > -        if ((*sub)->needed(opaque)) {
-> > +    while (sub && *sub) {
-> > +        if (vmstate_save_needed(*sub, opaque)) {
-> >              const VMStateDescription *vmsdsub = *sub;
-> >              uint8_t len;
-> 
-> 
-> I am not so sure about this one.  Why are we having a subsection without
-> a ->needed function?  I don't know why that it is useful for.  if we
-> don't have a needed function, then it is just better to just add that
-> "subsection" to the normal section, increase the version number and live
-> with that, no?
+On 7 August 2018 at 12:45, Peter Maydell <peter.maydell@linaro.org> wrote:
+> The data in an mbuf buffer is not necessarily at the start of the
+> allocated buffer. (For instance m_adj() allows data to be trimmed
+> from the start by just advancing the pointer and reducing the length.)
+> This means that the allocated buffer size (m->m_size) and the
+> amount of space from the m_data pointer to the end of the
+> buffer (M_ROOM(m)) are not necessarily the same.
+>
+> Commit 864036e251f54c9 tried to change the m_inc() function from
+> taking the new allocated-buffer-size to taking the new room-size,
+> but forgot to change the initial "do we already have enough space"
+> check. This meant that if we were trying to extend a buffer which
+> had a leading gap between the buffer start and the data, we might
+> incorrectly decide it didn't need to be extended, and then
+> overrun the end of the buffer, causing memory corruption and
+> an eventual crash.
+>
+> Change the "already big enough?" condition from checking the
+> argument against m->m_size to checking against M_ROOM().
+> This only makes a difference for the callsite in m_cat();
+> the other three callsites all start with a freshly allocated
+> mbuf from m_get(), which will have m->m_size == M_ROOM(m).
+>
+> Fixes: 864036e251f54c9
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1785670
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
 
-I think people are probably preferring adding a subsection comparing to 
-using the _V macros everywhere.  It's also a lot more robust.
+Applied to master, thanks.
 
-Dave
-
-> Later, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
