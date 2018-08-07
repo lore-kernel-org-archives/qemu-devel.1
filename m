@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fn1ZE-00065T-G2
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:58:29 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fn1dZ-0000RK-Hp
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:02:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fn1ZA-0003sn-RX
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:58:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38122 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fn1ZA-0003sW-Lw
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:58:24 -0400
-Date: Tue, 7 Aug 2018 13:58:19 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180807125819.GP7335@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180807114501.12370-1-peter.maydell@linaro.org>
-	<20180807125223.GF2556@work-vm>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fn1dT-0005pR-SR
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:02:57 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38475)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fn1dT-0005pF-Jv
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:02:51 -0400
+Received: by mail-wm0-x242.google.com with SMTP id t25-v6so18004299wmi.3
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 06:02:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180807125223.GF2556@work-vm>
-Subject: Re: [Qemu-devel] [PATCH for-3.0] slirp: Correct size check in
- m_inc()
+In-Reply-To: <20180807125558.2g7nl5zhgrdblrwh@sirius.home.kraxel.org>
+References: <20180803153235.4134-1-marcandre.lureau@redhat.com>
+	<20180807125558.2g7nl5zhgrdblrwh@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 7 Aug 2018 15:02:49 +0200
+Message-ID: <CAJ+F1C+cU-LKd_t-tn9jW86A8aV4CnQXUpA1NM+SPkB1rbrfoQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: fix crashes upon warm reboot
+ with vga mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Prasad J Pandit <pjp@fedoraproject.org>, patches@linaro.org, Jan Kiszka <jan.kiszka@siemens.com>, jasowang@redhat.com, qemu-devel@nongnu.org, liqsub1 <liqsub1@163.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On Tue, Aug 07, 2018 at 01:52:24PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Maydell (peter.maydell@linaro.org) wrote:
-> > The data in an mbuf buffer is not necessarily at the start of the
-> > allocated buffer. (For instance m_adj() allows data to be trimmed
-> > from the start by just advancing the pointer and reducing the length.)
-> > This means that the allocated buffer size (m->m_size) and the
-> > amount of space from the m_data pointer to the end of the
-> > buffer (M_ROOM(m)) are not necessarily the same.
-> > 
-> > Commit 864036e251f54c9 tried to change the m_inc() function from
-> > taking the new allocated-buffer-size to taking the new room-size,
-> > but forgot to change the initial "do we already have enough space"
-> > check. This meant that if we were trying to extend a buffer which
-> > had a leading gap between the buffer start and the data, we might
-> > incorrectly decide it didn't need to be extended, and then
-> > overrun the end of the buffer, causing memory corruption and
-> > an eventual crash.
-> > 
-> > Change the "already big enough?" condition from checking the
-> > argument against m->m_size to checking against M_ROOM().
-> > This only makes a difference for the callsite in m_cat();
-> > the other three callsites all start with a freshly allocated
-> > mbuf from m_get(), which will have m->m_size == M_ROOM(m).
-> > 
-> > Fixes: 864036e251f54c9
+Hi
 
-IIUC, this changeset was a security fix for CVE-2018-11806.
+On Tue, Aug 7, 2018 at 2:55 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> On Fri, Aug 03, 2018 at 05:32:35PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+>> With vga=3D775 on the Linux command line a first boot of the VM running
+>> Linux works fine. After a warm reboot it crashes during Linux boot.
+>>
+>> Before that, valgrind points out bad memory write to console
+>> surface. The VGA code is not aware that virtio-gpu got a message
+>> surface scanout when the display is disabled. Let's reset VGA graphic
+>> mode when it is the case, so that a new display surface is created
+>> when doing further VGA operations.
+>
+> I guess we should simply call vga_common_reset() in virtio_vga_reset()
+> instead, can you try that?
+>
+Yes I tried, and it still fails. However I think the call is missing
+and I was planning to send it for 3.1 later, since I don't think it's
+RC material.
+The ordering of events is not completely obvious to me, but it's still
+crashing/corrupting memory after the reset occurs. The scanout get's
+disable after it iirc.
 
-Given that the fix was flawed and allowed guest to crash the host
-with a new buffer overrun, it seems we need to get a new CVE allocated
-too.
 
-> > Fixes: https://bugs.launchpad.net/qemu/+bug/1785670
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> 
-> Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
-> > ---
-> >  slirp/mbuf.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/slirp/mbuf.c b/slirp/mbuf.c
-> > index 0c189e1a7bf..1b7868355a3 100644
-> > --- a/slirp/mbuf.c
-> > +++ b/slirp/mbuf.c
-> > @@ -154,7 +154,7 @@ m_inc(struct mbuf *m, int size)
-> >      int datasize;
-> >  
-> >      /* some compilers throw up on gotos.  This one we can fake. */
-> > -    if (m->m_size > size) {
-> > +    if (M_ROOM(m) > size) {
-> >          return;
-> >      }
-> >  
-> > -- 
-> > 2.17.1
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+Marc-Andr=C3=A9 Lureau
