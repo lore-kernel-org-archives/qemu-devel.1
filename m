@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fn1kW-0004Df-GB
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:10:09 -0400
+	(envelope-from <peterx@redhat.com>) id 1fn1ky-0004ZG-0n
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:10:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fn1kS-0000wc-L8
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:10:08 -0400
-Date: Tue, 7 Aug 2018 14:09:58 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180807130958.GQ7335@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180807114501.12370-1-peter.maydell@linaro.org>
-	<20180807125223.GF2556@work-vm> <20180807125819.GP7335@redhat.com>
-	<00ac9577-52cc-bf48-f0b8-7d15abb2c21f@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1fn1kv-0001Dd-FP
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:10:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38836 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fn1kv-0001Cc-81
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:10:33 -0400
+Date: Tue, 7 Aug 2018 21:10:21 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180807131021.GF7265@xz-mi>
+References: <153299204130.14411.11438396195753743913.stgit@gimli.home>
+	<153299246170.14411.6197545037372422542.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <00ac9577-52cc-bf48-f0b8-7d15abb2c21f@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.0] slirp: Correct size check in
- m_inc()
+In-Reply-To: <153299246170.14411.6197545037372422542.stgit@gimli.home>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] vfio: Inhibit ballooning based on
+ group attachment to a container
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +28,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Prasad J Pandit <pjp@fedoraproject.org>, patches@linaro.org, Jan Kiszka <jan.kiszka@siemens.com>, jasowang@redhat.com, qemu-devel@nongnu.org, liqsub1 <liqsub1@163.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-stable@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, cohuck@redhat.com, mst@redhat.com, david@redhat.com
 
-On Tue, Aug 07, 2018 at 03:07:07PM +0200, Thomas Huth wrote:
-> On 08/07/2018 02:58 PM, Daniel P. Berrang=C3=A9 wrote:
-> > On Tue, Aug 07, 2018 at 01:52:24PM +0100, Dr. David Alan Gilbert wrot=
-e:
-> >> * Peter Maydell (peter.maydell@linaro.org) wrote:
-> >>> The data in an mbuf buffer is not necessarily at the start of the
-> >>> allocated buffer. (For instance m_adj() allows data to be trimmed
-> >>> from the start by just advancing the pointer and reducing the lengt=
-h.)
-> >>> This means that the allocated buffer size (m->m_size) and the
-> >>> amount of space from the m_data pointer to the end of the
-> >>> buffer (M_ROOM(m)) are not necessarily the same.
-> >>>
-> >>> Commit 864036e251f54c9 tried to change the m_inc() function from
-> >>> taking the new allocated-buffer-size to taking the new room-size,
-> >>> but forgot to change the initial "do we already have enough space"
-> >>> check. This meant that if we were trying to extend a buffer which
-> >>> had a leading gap between the buffer start and the data, we might
-> >>> incorrectly decide it didn't need to be extended, and then
-> >>> overrun the end of the buffer, causing memory corruption and
-> >>> an eventual crash.
-> >>>
-> >>> Change the "already big enough?" condition from checking the
-> >>> argument against m->m_size to checking against M_ROOM().
-> >>> This only makes a difference for the callsite in m_cat();
-> >>> the other three callsites all start with a freshly allocated
-> >>> mbuf from m_get(), which will have m->m_size =3D=3D M_ROOM(m).
-> >>>
-> >>> Fixes: 864036e251f54c9
-> >=20
-> > IIUC, this changeset was a security fix for CVE-2018-11806.
-> >=20
-> > Given that the fix was flawed and allowed guest to crash the host
-> > with a new buffer overrun, it seems we need to get a new CVE allocate=
-d
-> > too.
->=20
-> But 864036e251f54c9 was never part of an official QEMU release, was it?
-> Or did it go into a stable release already? If not, I think you simply
-> need both patches to fix the CVE instead.
+On Mon, Jul 30, 2018 at 05:14:21PM -0600, Alex Williamson wrote:
+> We use a VFIOContainer to associate an AddressSpace to one or more
+> VFIOGroups.  The VFIOContainer represents the DMA context for that
+> AdressSpace for those VFIOGroups and is synchronized to changes in
+> that AddressSpace via a MemoryListener.  For IOMMU backed devices,
+> maintaining the DMA context for a VFIOGroup generally involves
+> pinning a host virtual address in order to create a stable host
+> physical address and then mapping a translation from the associated
+> guest physical address to that host physical address into the IOMMU.
+> 
+> While the above maintains the VFIOContainer synchronized to the QEMU
+> memory API of the VM, memory ballooning occurs outside of that API.
+> Inflating the memory balloon (ie. cooperatively capturing pages from
+> the guest for use by the host) simply uses MADV_DONTNEED to "zap"
+> pages from QEMU's host virtual address space.  The page pinning and
+> IOMMU mapping above remains in place, negating the host's ability to
+> reuse the page, but the host virtual to host physical mapping of the
+> page is invalidated outside of QEMU's memory API.
+> 
+> When the balloon is later deflated, attempting to cooperatively
+> return pages to the guest, the page is simply freed by the guest
+> balloon driver, allowing it to be used in the guest and incurring a
+> page fault when that occurs.  The page fault maps a new host physical
+> page backing the existing host virtual address, meanwhile the
+> VFIOContainer still maintains the translation to the original host
+> physical address.  At this point the guest vCPU and any assigned
+> devices will map different host physical addresses to the same guest
+> physical address.  Badness.
+> 
+> The IOMMU typically does not have page level granularity with which
+> it can track this mapping without also incurring inefficiencies in
+> using page size mappings throughout.  MMU notifiers in the host
+> kernel also provide indicators for invalidating the mapping on
+> balloon inflation, not for updating the mapping when the balloon is
+> deflated.  For these reasons we assume a default behavior that the
+> mapping of each VFIOGroup into the VFIOContainer is incompatible
+> with memory ballooning and increment the balloon inhibitor to match
+> the attached VFIOGroups.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  hw/vfio/common.c |    5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index fb396cf00ac4..4881b691a659 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -32,6 +32,7 @@
+>  #include "hw/hw.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/range.h"
+> +#include "sysemu/balloon.h"
+>  #include "sysemu/kvm.h"
+>  #include "trace.h"
+>  #include "qapi/error.h"
+> @@ -1049,6 +1050,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>              group->container = container;
+>              QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+>              vfio_kvm_device_add_group(group);
+> +            qemu_balloon_inhibit(true);
 
-Ah possibly - I  didn't look at where 864036e251f54c9 was actually
-release or not. If its onyl git master, then yeah, we can use the
-same CVE we already have.
+[1]
+
+>              return 0;
+>          }
+>      }
+> @@ -1198,6 +1200,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>      }
+>  
+>      vfio_kvm_device_add_group(group);
+> +    qemu_balloon_inhibit(true);
+
+AFAIU there is a very critical information that this
+qemu_balloon_inhibit() call must be before the call to:
+
+    memory_listener_register(&container->listener, container->space->as);
+
+Since the memory listener registeration is the point when we do the
+pinning of the pages.  So to make sure we won't have stale pages we
+must call qemu_balloon_inhibit() before memory_listener_register()
+(which is what this patch does).  However this is not that obvious,
+not sure whether that might worth a comment.
+
+Considering this, not sure whether we can just do this per-container
+instead of per-group, then we also don't need to bother with extra
+group-add paths like [1].
+
+No matter what, this patch looks good to me (and it is correct AFAIK),
+so I'm leaving r-b and I'll leave Alex to decide:
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+>  
+>      QLIST_INIT(&container->group_list);
+>      QLIST_INSERT_HEAD(&space->containers, container, next);
+> @@ -1222,6 +1225,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>  listener_release_exit:
+>      QLIST_REMOVE(group, container_next);
+>      QLIST_REMOVE(container, next);
+> +    qemu_balloon_inhibit(false);
+>      vfio_kvm_device_del_group(group);
+>      vfio_listener_release(container);
+>  
+> @@ -1352,6 +1356,7 @@ void vfio_put_group(VFIOGroup *group)
+>          return;
+>      }
+>  
+> +    qemu_balloon_inhibit(false);
+>      vfio_kvm_device_del_group(group);
+>      vfio_disconnect_container(group);
+>      QLIST_REMOVE(group, next);
+> 
 
 Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+
+-- 
+Peter Xu
