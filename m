@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fmth4-0004gk-0E
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 00:34:05 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fmth7-0004lB-9n
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 00:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fmth1-0001HW-Jb
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 00:34:01 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fmth4-0001Lj-KY
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 00:34:05 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue,  7 Aug 2018 00:33:30 -0400
-Message-Id: <20180807043349.27196-3-jsnow@redhat.com>
+Date: Tue,  7 Aug 2018 00:33:46 -0400
+Message-Id: <20180807043349.27196-19-jsnow@redhat.com>
 In-Reply-To: <20180807043349.27196-1-jsnow@redhat.com>
 References: <20180807043349.27196-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 02/21] jobs: add exit shim
+Subject: [Qemu-devel] [PATCH 18/21] block/commit: refactor stream to use job
+ callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,81 +23,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 
-Most jobs do the same thing when they leave their running loop:
-- Store the return code in a structure
-- wait to receive this structure in the main thread
-- signal job completion via job_completed
-
-More seriously, when we utilize job_defer_to_main_loop_bh to call
-a function that calls job_completed, job_finalize_single will run
-in a context where it has recursively taken the aio_context lock,
-which can cause hangs if it puts down a reference that causes a flush.
-
-The job infrastructure is perfectly capable of registering job
-completion itself when we leave the job's entry point. In this
-context, we can signal job completion from outside of the aio_context,
-which should allow for job cleanup code to run with only one lock.
-
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- include/qemu/job.h |  7 +++++++
- job.c              | 19 +++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ block/stream.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 845ad00c03..0c24e8704f 100644
---- a/include/qemu/job.h
-+++ b/include/qemu/job.h
-@@ -204,6 +204,13 @@ struct JobDriver {
-      */
-     void (*drain)(Job *job);
- 
-+    /**
-+     * If the callback is not NULL, exit will be invoked from the main thread
-+     * when the job's coroutine has finished, but before transactional
-+     * convergence; before @prepare or @abort.
-+     */
-+    void (*exit)(Job *job);
-+
-     /**
-      * If the callback is not NULL, prepare will be invoked when all the jobs
-      * belonging to the same transaction complete; or upon this job's completion
-diff --git a/job.c b/job.c
-index b281f30375..cc5ac9ac30 100644
---- a/job.c
-+++ b/job.c
-@@ -535,6 +535,19 @@ void job_drain(Job *job)
-     }
+diff --git a/block/stream.c b/block/stream.c
+index af0a1d5d0c..20192fac77 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -54,16 +54,16 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
+     return blk_co_preadv(blk, offset, qiov.size, &qiov, BDRV_REQ_COPY_ON_READ);
  }
  
-+static void job_exit(void *opaque)
-+{
-+    Job *job = (Job *)opaque;
-+    AioContext *aio_context = job->aio_context;
-+
-+    if (job->driver->exit) {
-+        aio_context_acquire(aio_context);
-+        job->driver->exit(job);
-+        aio_context_release(aio_context);
-+    }
-+    job_completed(job, job->ret);
+-static void stream_exit(Job *job)
++static int stream_prepare(Job *job)
+ {
+     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
+     BlockJob *bjob = &s->common;
+     BlockDriverState *bs = blk_bs(bjob->blk);
+     BlockDriverState *base = s->base;
+     Error *local_err = NULL;
+-    int ret = job->ret;
++    int ret = 0;
+ 
+-    if (!job_is_cancelled(job) && bs->backing && ret == 0) {
++    if (bs->backing) {
+         const char *base_id = NULL, *base_fmt = NULL;
+         if (base) {
+             base_id = s->backing_file_str;
+@@ -75,12 +75,19 @@ static void stream_exit(Job *job)
+         bdrv_set_backing_hd(bs, base, &local_err);
+         if (local_err) {
+             error_report_err(local_err);
+-            ret = -EPERM;
+-            goto out;
++            return -EPERM;
+         }
+     }
+ 
+-out:
++    return ret;
 +}
 +
- /**
-  * All jobs must allow a pause point before entering their job proper. This
-  * ensures that jobs can be paused prior to being started, then resumed later.
-@@ -546,6 +559,12 @@ static void coroutine_fn job_co_entry(void *opaque)
-     assert(job && job->driver && job->driver->start);
-     job_pause_point(job);
-     job->driver->start(job);
-+    if (!job->deferred_to_main_loop) {
-+        job->deferred_to_main_loop = true;
-+        aio_bh_schedule_oneshot(qemu_get_aio_context(),
-+                                job_exit,
-+                                job);
-+    }
++static void stream_clean(Job *job)
++{
++    StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
++    BlockJob *bjob = &s->common;
++    BlockDriverState *bs = blk_bs(bjob->blk);
++
+     /* Reopen the image back in read-only mode if necessary */
+     if (s->bs_flags != bdrv_get_flags(bs)) {
+         /* Give up write permissions before making it read-only */
+@@ -89,7 +96,6 @@ out:
+     }
+ 
+     g_free(s->backing_file_str);
+-    job->ret = ret;
  }
  
- 
+ static int coroutine_fn stream_run(Job *job)
+@@ -206,7 +212,8 @@ static const BlockJobDriver stream_job_driver = {
+         .job_type      = JOB_TYPE_STREAM,
+         .free          = block_job_free,
+         .start         = stream_run,
+-        .exit          = stream_exit,
++        .prepare       = stream_prepare,
++        .clean         = stream_clean,
+         .user_resume   = block_job_user_resume,
+         .drain         = block_job_drain,
+     },
 -- 
 2.14.4
