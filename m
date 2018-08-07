@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fn2KP-0004rH-N3
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:47:14 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fn2Ks-0005B1-A2
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:47:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fn2KK-0002lD-P3
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:47:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35056 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fn2KK-0002ks-Ig
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:47:08 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 06EAA805A530
-	for <qemu-devel@nongnu.org>; Tue,  7 Aug 2018 13:47:08 +0000 (UTC)
-Date: Tue, 7 Aug 2018 15:47:06 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180807134706.il5ckcgdpxpqx32r@sirius.home.kraxel.org>
-References: <20180803173614.12358-1-marcandre.lureau@redhat.com>
-	<20180803173614.12358-5-marcandre.lureau@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fn2Kr-00033G-KB
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:47:42 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:41823)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fn2Kr-00032V-Dj
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:47:41 -0400
+Received: by mail-oi0-x243.google.com with SMTP id k12-v6so28466739oiw.8
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 06:47:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180803173614.12358-5-marcandre.lureau@redhat.com>
+In-Reply-To: <20180807130958.GQ7335@redhat.com>
+References: <20180807114501.12370-1-peter.maydell@linaro.org>
+	<20180807125223.GF2556@work-vm> <20180807125819.GP7335@redhat.com>
+	<00ac9577-52cc-bf48-f0b8-7d15abb2c21f@redhat.com>
+	<20180807130958.GQ7335@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Aug 2018 14:47:20 +0100
+Message-ID: <CAFEAcA99ybqO=f+s2_S8ypU6-Hy5iRGwviFceaN8Trne+MA8jw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/10] spice: avoid spice runtime assert
+Subject: Re: [Qemu-devel] [PATCH for-3.0] slirp: Correct size check in
+ m_inc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,20 +33,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>, "patches@linaro.org" <patches@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, liqsub1 <liqsub1@163.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-stable <qemu-stable@nongnu.org>
 
-On Fri, Aug 03, 2018 at 07:36:08PM +0200, Marc-Andr=E9 Lureau wrote:
-> The Spice server doesn't like to be started or stopped twice . It
-> aborts with:
->=20
-> (process:6191): Spice-ERROR **: 19:29:35.912: red-worker.c:623:handle_d=
-ev_start: assertion `!worker->running' failed
->=20
-> It's easy to avoid that situation since qemu spice_display_is_running
-> tracks the server state.
+On 7 August 2018 at 14:09, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wr=
+ote:
+> On Tue, Aug 07, 2018 at 03:07:07PM +0200, Thomas Huth wrote:
+>> But 864036e251f54c9 was never part of an official QEMU release, was it?
+>> Or did it go into a stable release already? If not, I think you simply
+>> need both patches to fix the CVE instead.
+>
+> Ah possibly - I  didn't look at where 864036e251f54c9 was actually
+> release or not. If its onyl git master, then yeah, we can use the
+> same CVE we already have.
 
-How do you trigger this?  qemu should not do that in the first place.
+Yeah, we haven't released anything with 864036e251f54c9 in it yet.
+(In particular we did not flag it up for stable and so it is not
+in 2.12.1...)
 
-cheers,
-  Gerd
+thanks
+-- PMM
