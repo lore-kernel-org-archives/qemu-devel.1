@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy2z-0003Gj-Iu
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:01 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy32-0003Hc-V3
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy2x-00058h-Vj
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:12:57 -0400
-Received: from mail-pl0-x234.google.com ([2607:f8b0:400e:c01::234]:34187)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy31-00059s-Mn
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:00 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:39881)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fmy2x-00058S-Md
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:12:55 -0400
-Received: by mail-pl0-x234.google.com with SMTP id f6-v6so6863005plo.1
-	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 02:12:55 -0700 (PDT)
+	id 1fmy31-00059Y-F6
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:12:59 -0400
+Received: by mail-pl0-x244.google.com with SMTP id w14-v6so1273406plp.6
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 02:12:59 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Tue,  7 Aug 2018 17:12:04 +0800
-Message-Id: <20180807091209.13531-6-xiaoguangrong@tencent.com>
+Date: Tue,  7 Aug 2018 17:12:05 +0800
+Message-Id: <20180807091209.13531-7-xiaoguangrong@tencent.com>
 In-Reply-To: <20180807091209.13531-1-xiaoguangrong@tencent.com>
 References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH v3 05/10] migration: move handle of zero page
- to the thread
+Subject: [Qemu-devel] [PATCH v3 06/10] migration: hold the lock only if it
+ is really needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,204 +32,43 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Detecting zero page is not a light work, moving it to the thread to
-speed the main thread up, btw, handling ram_release_pages() for the
-zero page is moved to the thread as well
+Try to hold src_page_req_mutex only if the queue is not
+empty
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 ---
- migration/ram.c | 96 +++++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 70 insertions(+), 26 deletions(-)
+ include/qemu/queue.h | 1 +
+ migration/ram.c      | 4 ++++
+ 2 files changed, 5 insertions(+)
 
+diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+index 59fd1203a1..ac418efc43 100644
+--- a/include/qemu/queue.h
++++ b/include/qemu/queue.h
+@@ -341,6 +341,7 @@ struct {                                                                \
+ /*
+  * Simple queue access methods.
+  */
++#define QSIMPLEQ_EMPTY_ATOMIC(head) (atomic_read(&((head)->sqh_first)) == NULL)
+ #define QSIMPLEQ_EMPTY(head)        ((head)->sqh_first == NULL)
+ #define QSIMPLEQ_FIRST(head)        ((head)->sqh_first)
+ #define QSIMPLEQ_NEXT(elm, field)   ((elm)->field.sqe_next)
 diff --git a/migration/ram.c b/migration/ram.c
-index e463de4f69..d804d01aae 100644
+index d804d01aae..99ecf9b315 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -340,6 +340,7 @@ typedef struct PageSearchStatus PageSearchStatus;
- struct CompressParam {
-     bool done;
-     bool quit;
-+    bool zero_page;
-     QEMUFile *file;
-     QemuMutex mutex;
-     QemuCond cond;
-@@ -381,7 +382,7 @@ static QemuThread *decompress_threads;
- static QemuMutex decomp_done_lock;
- static QemuCond decomp_done_cond;
- 
--static void do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
-+static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
-                                  ram_addr_t offset, uint8_t *source_buf);
- 
- static void *do_data_compress(void *opaque)
-@@ -389,6 +390,7 @@ static void *do_data_compress(void *opaque)
-     CompressParam *param = opaque;
-     RAMBlock *block;
-     ram_addr_t offset;
-+    bool zero_page;
- 
-     qemu_mutex_lock(&param->mutex);
-     while (!param->quit) {
-@@ -398,11 +400,12 @@ static void *do_data_compress(void *opaque)
-             param->block = NULL;
-             qemu_mutex_unlock(&param->mutex);
- 
--            do_compress_ram_page(param->file, &param->stream, block, offset,
--                                 param->originbuf);
-+            zero_page = do_compress_ram_page(param->file, &param->stream,
-+                                             block, offset, param->originbuf);
- 
-             qemu_mutex_lock(&comp_done_lock);
-             param->done = true;
-+            param->zero_page = zero_page;
-             qemu_cond_signal(&comp_done_cond);
-             qemu_mutex_unlock(&comp_done_lock);
- 
-@@ -1842,13 +1845,19 @@ static int ram_save_multifd_page(RAMState *rs, RAMBlock *block,
-     return 1;
- }
- 
--static void do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
-+static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
-                                  ram_addr_t offset, uint8_t *source_buf)
+@@ -2026,6 +2026,10 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset)
  {
-     RAMState *rs = ram_state;
-     uint8_t *p = block->host + (offset & TARGET_PAGE_MASK);
-+    bool zero_page = false;
-     int ret;
+     RAMBlock *block = NULL;
  
-+    if (save_zero_page_to_file(rs, f, block, offset)) {
-+        zero_page = true;
-+        goto exit;
++    if (QSIMPLEQ_EMPTY_ATOMIC(&rs->src_page_requests)) {
++        return NULL;
 +    }
 +
-     save_page_header(rs, f, block, offset | RAM_SAVE_FLAG_COMPRESS_PAGE);
- 
-     /*
-@@ -1861,10 +1870,21 @@ static void do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
-     if (ret < 0) {
-         qemu_file_set_error(migrate_get_current()->to_dst_file, ret);
-         error_report("compressed data failed!");
--        return;
-+        return false;
-     }
- 
-+exit:
-     ram_release_pages(block->idstr, offset & TARGET_PAGE_MASK, 1);
-+    return zero_page;
-+}
-+
-+static void
-+update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
-+{
-+    if (param->zero_page) {
-+        ram_counters.duplicate++;
-+    }
-+    ram_counters.transferred += bytes_xmit;
- }
- 
- static void flush_compressed_data(RAMState *rs)
-@@ -1888,7 +1908,12 @@ static void flush_compressed_data(RAMState *rs)
-         qemu_mutex_lock(&comp_param[idx].mutex);
-         if (!comp_param[idx].quit) {
-             len = qemu_put_qemu_file(rs->f, comp_param[idx].file);
--            ram_counters.transferred += len;
-+            /*
-+             * it's safe to fetch zero_page without holding comp_done_lock
-+             * as there is no further request submitted to the thread,
-+             * i.e, the thread should be waiting for a request at this point.
-+             */
-+            update_compress_thread_counts(&comp_param[idx], len);
-         }
-         qemu_mutex_unlock(&comp_param[idx].mutex);
-     }
-@@ -1919,7 +1944,7 @@ retry:
-             qemu_cond_signal(&comp_param[idx].cond);
-             qemu_mutex_unlock(&comp_param[idx].mutex);
-             pages = 1;
--            ram_counters.transferred += bytes_xmit;
-+            update_compress_thread_counts(&comp_param[idx], bytes_xmit);
-             break;
-         }
-     }
-@@ -2193,6 +2218,39 @@ static bool save_page_use_compression(RAMState *rs)
-     return false;
- }
- 
-+/*
-+ * try to compress the page before posting it out, return true if the page
-+ * has been properly handled by compression, otherwise needs other
-+ * paths to handle it
-+ */
-+static bool save_compress_page(RAMState *rs, RAMBlock *block, ram_addr_t offset)
-+{
-+    if (!save_page_use_compression(rs)) {
-+        return false;
-+    }
-+
-+    /*
-+     * When starting the process of a new block, the first page of
-+     * the block should be sent out before other pages in the same
-+     * block, and all the pages in last block should have been sent
-+     * out, keeping this order is important, because the 'cont' flag
-+     * is used to avoid resending the block name.
-+     *
-+     * We post the fist page as normal page as compression will take
-+     * much CPU resource.
-+     */
-+    if (block != rs->last_sent_block) {
-+        flush_compressed_data(rs);
-+        return false;
-+    }
-+
-+    if (compress_page_with_multi_thread(rs, block, offset) > 0) {
-+        return true;
-+    }
-+
-+    return false;
-+}
-+
- /**
-  * ram_save_target_page: save one target page
-  *
-@@ -2213,15 +2271,8 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-         return res;
-     }
- 
--    /*
--     * When starting the process of a new block, the first page of
--     * the block should be sent out before other pages in the same
--     * block, and all the pages in last block should have been sent
--     * out, keeping this order is important, because the 'cont' flag
--     * is used to avoid resending the block name.
--     */
--    if (block != rs->last_sent_block && save_page_use_compression(rs)) {
--            flush_compressed_data(rs);
-+    if (save_compress_page(rs, block, offset)) {
-+        return 1;
-     }
- 
-     res = save_zero_page(rs, block, offset);
-@@ -2239,17 +2290,10 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-     }
- 
-     /*
--     * Make sure the first page is sent out before other pages.
--     *
--     * we post it as normal page as compression will take much
--     * CPU resource.
-+     * do not use multifd for compression as the first page in the new
-+     * block should be posted out before sending the compressed page
-      */
--    if (block == rs->last_sent_block && save_page_use_compression(rs)) {
--        res = compress_page_with_multi_thread(rs, block, offset);
--        if (res > 0) {
--            return res;
--        }
--    } else if (migrate_use_multifd()) {
-+    if (!save_page_use_compression(rs) && migrate_use_multifd()) {
-         return ram_save_multifd_page(rs, block, offset);
-     }
- 
+     qemu_mutex_lock(&rs->src_page_req_mutex);
+     if (!QSIMPLEQ_EMPTY(&rs->src_page_requests)) {
+         struct RAMSrcPageRequest *entry =
 -- 
 2.14.4
