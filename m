@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fn3Zw-0007ZU-Pl
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:07:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fn3aQ-000856-FB
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:07:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fn3Zv-00033A-O7
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:07:20 -0400
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:41986)
+	(envelope-from <peter.maydell@linaro.org>) id 1fn3aP-0003Fp-MA
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:07:50 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:37884)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fn3Zv-00032w-FV
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:07:19 -0400
-Received: by mail-oi0-x22e.google.com with SMTP id b16-v6so15632618oic.9
-	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 08:07:19 -0700 (PDT)
+	id 1fn3aP-0003FZ-FC
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:07:49 -0400
+Received: by mail-oi0-x243.google.com with SMTP id j205-v6so29038953oib.4
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 08:07:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180807145701.GK2556@work-vm>
-References: <20180720081948.23644-1-remy.noel@blade-group.com>
-	<20180807131918.22bgcmfv2wu4bjda@sirius.home.kraxel.org>
-	<20180807145701.GK2556@work-vm>
+In-Reply-To: <20180807134137.xepoakofn5e222nv@sirius.home.kraxel.org>
+References: <20180803153235.4134-1-marcandre.lureau@redhat.com>
+	<20180807125558.2g7nl5zhgrdblrwh@sirius.home.kraxel.org>
+	<CAJ+F1C+cU-LKd_t-tn9jW86A8aV4CnQXUpA1NM+SPkB1rbrfoQ@mail.gmail.com>
+	<20180807134137.xepoakofn5e222nv@sirius.home.kraxel.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Aug 2018 16:06:58 +0100
-Message-ID: <CAFEAcA9mgyCzR7-ANw0YvKdzz-0H50vETrr_sw5bH5D_2PUeNg@mail.gmail.com>
+Date: Tue, 7 Aug 2018 16:07:28 +0100
+Message-ID: <CAFEAcA-TfwYbgwKDPmXq=a=sGyY-qjzHcu9CQwpnZ8tRMBaB1A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] secondary-vga: unregister vram on unplug.
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: fix crashes upon warm reboot
+ with vga mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, remy.noel@blade-group.com, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On 7 August 2018 at 15:57, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> * Gerd Hoffmann (kraxel@redhat.com) wrote:
->> On Fri, Jul 20, 2018 at 10:19:48AM +0200, remy.noel@blade-group.com wrote:
->> > From: "Remy Noel" <remy.noel@blade-group.com>
+On 7 August 2018 at 14:41, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> On Tue, Aug 07, 2018 at 03:02:49PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+>> Hi
+>>
+>> On Tue, Aug 7, 2018 at 2:55 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>> > On Fri, Aug 03, 2018 at 05:32:35PM +0200, Marc-Andr=C3=A9 Lureau wrote=
+:
+>> >> With vga=3D775 on the Linux command line a first boot of the VM runni=
+ng
+>> >> Linux works fine. After a warm reboot it crashes during Linux boot.
+>> >>
+>> >> Before that, valgrind points out bad memory write to console
+>> >> surface. The VGA code is not aware that virtio-gpu got a message
+>> >> surface scanout when the display is disabled. Let's reset VGA graphic
+>> >> mode when it is the case, so that a new display surface is created
+>> >> when doing further VGA operations.
 >> >
->> > When removing a secondary-vga device and then adding it back (or adding
->> > an other one), qemu aborts with:
->> >     "RAMBlock "0000:00:02.0/vga.vram" already registered, abort!".
+>> > I guess we should simply call vga_common_reset() in virtio_vga_reset()
+>> > instead, can you try that?
 >> >
->> > It is caused by the vram staying registered, preventing vga replugging.
->>
->> David?  Does that look ok?
->>
->> This balances the
->>
->>      vmstate_register_ram(&s->vram, s->global_vmstate ?  NULL : DEVICE(obj));
->>
->> call in vga_common_init().  I'm wondering whenever the manual cleanup is
->> actually needed in case owner is not NULL?
+>> Yes I tried, and it still fails. However I think the call is missing
+>> and I was planning to send it for 3.1 later, since I don't think it's
+>> RC material.
+>> The ordering of events is not completely obvious to me, but it's still
+>> crashing/corrupting memory after the reset occurs. The scanout get's
+>> disable after it iirc.
 >
-> I can't see anyone who is calling unregister_ram or the functions it
-> calls as part of generic device cleanup, so I think it IS needed
-> to manually do it.
+> Ok, lets go with this patch for -rc4 and figure the reset issues later.
+> It is correct, even though I think there must be a simpler way to do it.
+> When we have a better fix we can revert it.
 >
-> Which is a bit worrying since we have vastly more register's than
-> unregister's.
+> Peter, can you apply it directly?
+>
+> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Paolo suggested in an email last month that vmstate_unregister_ram()
-should simply not exist, because it doesn't actually do anything useful:
-https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg01125.html
+Applied to master, thanks.
 
-(ie it was added in the first place because we'd ended up with
-two identically named ramblocks, but that only happened because
-a reference-counting bug meant we hadn't deleted the first one
-properly before creating the second.)
-
-So I think that the bug reported in this thread is similar:
-the problem is not that we're not calling vmstate_unregister_ram(),
-but that when the first instance of secondary-vga is removed
-it is not correctly destroying the ramblock.
-
-thanks
 -- PMM
