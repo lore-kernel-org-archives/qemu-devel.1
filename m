@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fn82f-0007ai-I1
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 15:53:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1fn86c-0000sG-G5
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 15:57:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fn82b-0000yN-Mi
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 15:53:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49792)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fn82b-0000xX-Fl
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 15:53:13 -0400
-Date: Tue, 7 Aug 2018 13:53:03 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180807135303.3938b3a2@t450s.home>
-In-Reply-To: <20180807224033-mutt-send-email-mst@kernel.org>
-References: <20180807193125.30378-1-alex.williamson@redhat.com>
-	<20180807224033-mutt-send-email-mst@kernel.org>
+	(envelope-from <eblake@redhat.com>) id 1fn86b-0006xz-8x
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 15:57:22 -0400
+References: <20180618164504.24488-1-kwolf@redhat.com>
+	<20180618164504.24488-22-kwolf@redhat.com>
+	<fd4b2077-448f-2b62-8880-b2a3dcca586a@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <28f44beb-e19b-3e26-254a-4678eacf30c2@redhat.com>
+Date: Tue, 7 Aug 2018 14:57:13 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Balloon inhibit enhancements,
- vfio restriction
+In-Reply-To: <fd4b2077-448f-2b62-8880-b2a3dcca586a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 21/35] block: fix QEMU crash with scsi-hd
+ and drive_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +26,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org, david@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Tue, 7 Aug 2018 22:44:56 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 08/06/2018 05:04 PM, Eric Blake wrote:
+> On 06/18/2018 11:44 AM, Kevin Wolf wrote:
+>> From: Greg Kurz <groug@kaod.org>
+>>
+>> Removing a drive with drive_del while it is being used to run an I/O
+>> intensive workload can cause QEMU to crash.
+>>
+> ...
 
-> On Tue, Aug 07, 2018 at 01:31:21PM -0600, Alex Williamson wrote:
-> > v3:
-> >  - Drop "nested" term in commit log (David)
-> >  - Adopt suggested wording in ccw code (Cornelia)
-> >  - Explain balloon inhibitor usage in vfio common (Peter)
-> >  - Fix to call inhibitor prior to re-using existing containers
-> >    to avoid gap that pinning may have occurred in set container
-> >    ioctl (self) - Peter, this change is the reason I didn't
-> >    include your R-b.
-> >  - Add R-b to patches 1 & 2
-> > 
-> > v2:
-> >  - Use atomic ops for balloon inhibit counter (Peter)
-> >  - Allow endpoint driver opt-in for ballooning, vfio-ccw opt-in by
-> >    default, vfio-pci opt-in by device option, only allowed for mdev
-> >    devices, no support added for platform as there are no platform
-> >    mdev devices.
-> > 
-> > See patch 3/4 for detailed explanation why ballooning and device
-> > assignment typically don't mix.  If this eventually changes, flags
-> > on the iommu info struct or perhaps device info struct can inform
-> > us for automatic opt-in.  Thanks,
-> > 
-> > Alex  
-> 
-> One of the issues with pass-through is that it breaks overcommit
-> through swap. ballooning seems to offer one solution, instead of
-> making it work this patch just attempts to block ballooning.
-> 
-> I guess it's better than corrupting memory but I personally find this
-> approach disappointing.
+>=20
+> Test 83 sets up a client that intentionally disconnects at critical=20
+> points in the NBD protocol exchange, to ensure that the server reacts=20
+> sanely.
 
-Memory hotplug is the way to achieve variable density with assigned
-device VMs, otherwise look towards approaches like mdev and shared
-virtual addresses with PASID support.  We cannot shoehorn page faulting
-without both hardware and software support.  Some class of "legacy"
-device assignment will always have this incompatibility.  Thanks,
+Rather, nbd-fault-injector.py is a server that disconnects at critical=20
+points, and the test is of client reaction.
 
-Alex
+>=C2=A0 I suspect that somewhere in the NBD code, the server detects=20
+> the disconnect and was somehow calling into blk_remove_bs() (although I=
+=20
+> could not quickly find the backtrace); and that prior to this patch, th=
+e=20
+> 'Connection closed' message resulted from other NBD coroutines getting =
+a=20
+> shot at the (now-closed) connection, while after this patch, the=20
+> additional blk_drain() somehow tweaks things in a way that prevents the=
+=20
+> other NBD coroutines from printing a message.=C2=A0 If so, then the cha=
+nge in=20
+> 83 reference output is probably intentional, and we should update it.
+
+It seems like this condition is racy, and that the race is more likely=20
+to be lost prior to this patch than after. It's a question of whether=20
+the client has time to start a request to the server prior to the server=20
+hanging up, as the message is generated during=20
+nbd_co_do_receive_one_chunk.  Here's a demonstration of the fact that=20
+things are racy:
+
+$ git revert f45280cbf
+$ make
+$ cd tests/qemu-iotests
+$ cat fault.txt
+[inject-error "a"]
+event=3Dneg2
+when=3Dafter
+$ python nbd-fault-injector.py localhost:10809 ./fault.txt &
+Listening on 127.0.0.1:10809
+$ ../../qemu-io -f raw nbd://localhost:10809 -c 'r 0 512'
+Closing connection on rule match inject-error "a"
+Connection closed
+read failed: Input/output error
+$ python nbd-fault-injector.py localhost:10809 ./fault.txt &
+Listening on 127.0.0.1:10809
+$ ../../qemu-io -f raw nbd://localhost:10809
+Closing connection on rule match inject-error "a"
+qemu-io> r 0 512
+read failed: Input/output error
+qemu-io> q
+
+So, depending on whether the read command is kicked off quickly (via -c)=20
+or slowly (via typing into qemu-io) determines whether the message appear=
+s.
+
+What's more, in commit f140e300, we specifically called out in the=20
+commit message that maybe it was better to trace when we detect=20
+connection closed rather than log it to stdout, and in all cases in that=20
+commit, the additional 'Connection closed' messages do not add any=20
+information to the error message already displayed by the rest of the cod=
+e.
+
+I don't know how much the proposed NBD reconnect code will change things=20
+in 3.1.  Meanwhile, we've missed any chance for 3.0 to fix test 83.
+
+>=20
+> But I'm having a hard time convincing myself that this is the case,=20
+> particularly since I'm not even sure how to easily debug the assumption=
+s=20
+> I made above.
+>=20
+> Since I'm very weak on the whole notion of what blk_drain() vs.=20
+> blk_remove_bs() is really supposed to be doing, and could easily be=20
+> persuaded that the change in output is a regression instead of a fix.
+
+At this point, I don't think we have a regression, just merely a bad=20
+iotests reference output. The extra blk_drain() merely adds more time=20
+before the NBD code can send out its first request, and thus makes it=20
+more likely that the fault injector has closed the connection before the=20
+read request is issued rather than after (the message only appears when=20
+read beats the race), but the NBD code shouldn't be printing the error=20
+message in the first place, and 083 needs to be tweaked to remove the=20
+noisy lines added in f140e300 (not just the three lines that are=20
+reliably different due to this patch, but all other such lines due to=20
+strategic server drops at other points in the NBD protocol).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
