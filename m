@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fn2Ks-0005B1-A2
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:47:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1fn2Pj-0008B9-NN
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:52:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fn2Kr-00033G-KB
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:47:42 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:41823)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fn2Kr-00032V-Dj
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:47:41 -0400
-Received: by mail-oi0-x243.google.com with SMTP id k12-v6so28466739oiw.8
-	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 06:47:41 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fn2Pf-0005rT-OQ
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:52:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57052 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fn2Pf-0005qS-IW
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:52:39 -0400
+References: <cover.1533639095.git.tgolembi@redhat.com>
+	<23ca1636f8e238b2ffaded962519d2be1e3b5d3a.1533639095.git.tgolembi@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e91a6eb7-d5b2-93e6-05bf-65270ccb8736@redhat.com>
+Date: Tue, 7 Aug 2018 08:52:37 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180807130958.GQ7335@redhat.com>
-References: <20180807114501.12370-1-peter.maydell@linaro.org>
-	<20180807125223.GF2556@work-vm> <20180807125819.GP7335@redhat.com>
-	<00ac9577-52cc-bf48-f0b8-7d15abb2c21f@redhat.com>
-	<20180807130958.GQ7335@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Aug 2018 14:47:20 +0100
-Message-ID: <CAFEAcA99ybqO=f+s2_S8ypU6-Hy5iRGwviFceaN8Trne+MA8jw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <23ca1636f8e238b2ffaded962519d2be1e3b5d3a.1533639095.git.tgolembi@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.0] slirp: Correct size check in
- m_inc()
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] qga: report serial ID and device
+ node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,23 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>, "patches@linaro.org" <patches@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, liqsub1 <liqsub1@163.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-stable <qemu-stable@nongnu.org>
+To: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 7 August 2018 at 14:09, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wr=
-ote:
-> On Tue, Aug 07, 2018 at 03:07:07PM +0200, Thomas Huth wrote:
->> But 864036e251f54c9 was never part of an official QEMU release, was it?
->> Or did it go into a stable release already? If not, I think you simply
->> need both patches to fix the CVE instead.
->
-> Ah possibly - I  didn't look at where 864036e251f54c9 was actually
-> release or not. If its onyl git master, then yeah, we can use the
-> same CVE we already have.
+On 08/07/2018 05:51 AM, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD wrote:
+> On Linux the functionality depends on libudev.
+>=20
+> Example from Linux:
+>=20
+>      {
+>        "name": "dm-2",
+>        "mountpoint": "/",
+>        ...
+>        "disk": [
+>          {
+>            "serial": "SAMSUNG_MZ7LN512HCHP-000L1_S1ZKNXAG822493",
+>            "dev": "/dev/sda2",
+>            ...
+>          }
+>        ],
+>      }
+>=20
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+> ---
 
-Yeah, we haven't released anything with 864036e251f54c9 in it yet.
-(In particular we did not flag it up for stable and so it is not
-in 2.12.1...)
+> +++ b/qga/commands-posix.c
+> @@ -47,6 +47,7 @@ extern char **environ;
+>   #include <sys/socket.h>
+>   #include <net/if.h>
+>   #include <sys/statvfs.h>
+> +#include <libudev.h>
 
-thanks
--- PMM
+Is libudev universally available on BSD systems and always preinstalled=20
+on Linux systems, or does this need a configure probe?
+
+> +++ b/qga/qapi-schema.json
+> @@ -834,13 +834,15 @@
+>   # @bus: bus id
+>   # @target: target id
+>   # @unit: unit id
+> +# @serial: serial number
+
+Mails crossed; you posted v2 before my v1 comment that this needs a=20
+'since 3.1' tag.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
