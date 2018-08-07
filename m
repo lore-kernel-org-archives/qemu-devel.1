@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fn2F8-0001OO-4l
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:41:46 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fn2GT-0002Ve-Uf
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:43:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fn2F3-0000Pz-52
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:41:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34356 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fn2GS-0000tY-W7
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:43:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34766 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fn2F2-0000Pl-Vh
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:41:41 -0400
-Date: Tue, 7 Aug 2018 15:41:37 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180807134137.xepoakofn5e222nv@sirius.home.kraxel.org>
-References: <20180803153235.4134-1-marcandre.lureau@redhat.com>
-	<20180807125558.2g7nl5zhgrdblrwh@sirius.home.kraxel.org>
-	<CAJ+F1C+cU-LKd_t-tn9jW86A8aV4CnQXUpA1NM+SPkB1rbrfoQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fn2GS-0000tP-OS
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:43:08 -0400
+Date: Tue, 7 Aug 2018 14:43:05 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180807134304.GH2556@work-vm>
+References: <20180807130355.29780-1-peter.maydell@linaro.org>
+	<87muty2u57.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJ+F1C+cU-LKd_t-tn9jW86A8aV4CnQXUpA1NM+SPkB1rbrfoQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: fix crashes upon warm reboot
- with vga mode
+In-Reply-To: <87muty2u57.fsf@trasno.org>
+Subject: Re: [Qemu-devel] [PATCH] migration: Correctly handle subsections
+ with no 'needed' function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, patches@linaro.org
 
-On Tue, Aug 07, 2018 at 03:02:49PM +0200, Marc-Andr=E9 Lureau wrote:
-> Hi
->=20
-> On Tue, Aug 7, 2018 at 2:55 PM, Gerd Hoffmann <kraxel@redhat.com> wrote=
-:
-> > On Fri, Aug 03, 2018 at 05:32:35PM +0200, Marc-Andr=E9 Lureau wrote:
-> >> With vga=3D775 on the Linux command line a first boot of the VM runn=
-ing
-> >> Linux works fine. After a warm reboot it crashes during Linux boot.
-> >>
-> >> Before that, valgrind points out bad memory write to console
-> >> surface. The VGA code is not aware that virtio-gpu got a message
-> >> surface scanout when the display is disabled. Let's reset VGA graphi=
-c
-> >> mode when it is the case, so that a new display surface is created
-> >> when doing further VGA operations.
+* Juan Quintela (quintela@redhat.com) wrote:
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+> > Currently the vmstate subsection handling code treats a subsection
+> > with no 'needed' function pointer as if it were the subsection
+> > list terminator, so the subsection is never transferred and nor
+> > is any subsection following it in the list.
 > >
-> > I guess we should simply call vga_common_reset() in virtio_vga_reset(=
-)
-> > instead, can you try that?
+> > Handle NULL 'needed' function pointers in subsections in the same
+> > way that we do for top level VMStateDescription structures:
+> > treat the subsection as always being needed.
 > >
-> Yes I tried, and it still fails. However I think the call is missing
-> and I was planning to send it for 3.1 later, since I don't think it's
-> RC material.
-> The ordering of events is not completely obvious to me, but it's still
-> crashing/corrupting memory after the reset occurs. The scanout get's
-> disable after it iirc.
+> > This doesn't change behaviour for the current set of devices
+> > in the tree, because all subsections declare a 'needed' function.
+> >
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > ---
+> > NB: last para in the commit message is only true once the
+> > "Arm migration fixes for 3.0" patchset has been committed.
+> > We could optionally drop some of the "use a dummy needed fn"
+> > changes once this is in...
+> >
+> > I thought I'd sent this out a few days back, but apparently not,
+> > since it's not on-list...
+> >
+> >  migration/vmstate.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/migration/vmstate.c b/migration/vmstate.c
+> > index 6b9079bb51e..0bc240a3175 100644
+> > --- a/migration/vmstate.c
+> > +++ b/migration/vmstate.c
+> > @@ -418,7 +418,7 @@ int vmstate_save_state_v(QEMUFile *f, const VMStateDescription *vmsd,
+> >  static const VMStateDescription *
+> >  vmstate_get_subsection(const VMStateDescription **sub, char *idstr)
+> >  {
+> > -    while (sub && *sub && (*sub)->needed) {
+> > +    while (sub && *sub) {
+> >          if (strcmp(idstr, (*sub)->name) == 0) {
+> >              return *sub;
+> >          }
+> 
+> Ack to this one.  Code supposed that needed was alwasy !=0.  We don't
+> really care on the reception side.  Good spotted.
+> 
+> > @@ -486,8 +486,8 @@ static int vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
+> >      int ret = 0;
+> >  
+> >      trace_vmstate_subsection_save_top(vmsd->name);
+> > -    while (sub && *sub && (*sub)->needed) {
+> > -        if ((*sub)->needed(opaque)) {
+> > +    while (sub && *sub) {
+> > +        if (vmstate_save_needed(*sub, opaque)) {
+> >              const VMStateDescription *vmsdsub = *sub;
+> >              uint8_t len;
+> 
+> 
+> I am not so sure about this one.  Why are we having a subsection without
+> a ->needed function?  I don't know why that it is useful for.  if we
+> don't have a needed function, then it is just better to just add that
+> "subsection" to the normal section, increase the version number and live
+> with that, no?
 
-Ok, lets go with this patch for -rc4 and figure the reset issues later.
-It is correct, even though I think there must be a simpler way to do it.
-When we have a better fix we can revert it.
+I think people are probably preferring adding a subsection comparing to 
+using the _V macros everywhere.  It's also a lot more robust.
 
-Peter, can you apply it directly?
+Dave
 
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-
-thanks,
-  Gerd
+> Later, Juan.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
