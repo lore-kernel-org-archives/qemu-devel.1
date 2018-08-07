@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fmth7-0004l2-8O
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 00:34:08 -0400
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fmuOi-000274-C0
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 01:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fmth5-0001MS-EJ
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 00:34:05 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Tue,  7 Aug 2018 00:33:49 -0400
-Message-Id: <20180807043349.27196-22-jsnow@redhat.com>
-In-Reply-To: <20180807043349.27196-1-jsnow@redhat.com>
-References: <20180807043349.27196-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 21/21] qapi/block-stream: expose new job
- properties
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fmuOh-0005V2-Bg
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 01:19:08 -0400
+Received: from mail-lj1-x230.google.com ([2a00:1450:4864:20::230]:40554)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
+	id 1fmuOh-0005Tm-2r
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 01:19:07 -0400
+Received: by mail-lj1-x230.google.com with SMTP id j19-v6so12374470ljc.7
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 22:19:06 -0700 (PDT)
+MIME-Version: 1.0
+References: <1533177924-24765-1-git-send-email-whois.zihan.yang@gmail.com>
+	<1533177924-24765-2-git-send-email-whois.zihan.yang@gmail.com>
+	<91bb56d1-39bb-813a-55e6-67020670e94d@gmail.com>
+In-Reply-To: <91bb56d1-39bb-813a-55e6-67020670e94d@gmail.com>
+From: Zihan Yang <whois.zihan.yang@gmail.com>
+Date: Tue, 7 Aug 2018 13:18:53 +0800
+Message-ID: <CAKwiv-jmuFNb=v52L=asRtcL7Ohe3zSCjChegQcUk7GWofEeKw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v3 1/6] pci_expander_bridge: add type
+ TYPE_PXB_PCIE_HOST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,72 +32,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- blockdev.c           | 9 +++++++++
- hmp.c                | 5 +++--
- qapi/block-core.json | 3 ++-
- 3 files changed, 14 insertions(+), 3 deletions(-)
+Marcel Apfelbaum <marcel.apfelbaum@gmail.com> =E4=BA=8E2018=E5=B9=B48=E6=9C=
+=886=E6=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=887:46=E5=86=99=E9=81=93=EF=
+=BC=9A
+>
+>
+>
+> On 08/02/2018 05:45 AM, Zihan Yang wrote:
+> > The inner host bridge created by pxb-pcie is TYPE_PXB_PCI_HOST by defau=
+lt,
+> > change it to a new type TYPE_PXB_PCIE_HOST to better utilize ECAM of PC=
+Ie
+>
+> After an offline conversation we decided to not review this version
+> and wait for the next one, that will come with a SeaBIOS counterpart seri=
+es.
 
-diff --git a/blockdev.c b/blockdev.c
-index bbb3279020..806531dc20 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3226,6 +3226,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-                       bool has_backing_file, const char *backing_file,
-                       bool has_speed, int64_t speed,
-                       bool has_on_error, BlockdevOnError on_error,
-+                      bool has_auto_finalize, bool auto_finalize,
-+                      bool has_auto_dismiss, bool auto_dismiss,
-                       Error **errp)
- {
-     BlockDriverState *bs, *iter;
-@@ -3295,6 +3297,13 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-     /* backing_file string overrides base bs filename */
-     base_name = has_backing_file ? backing_file : base_name;
- 
-+    if (has_auto_finalize && !auto_finalize) {
-+        job_flags |= JOB_MANUAL_FINALIZE;
-+    }
-+    if (has_auto_dismiss && !auto_dismiss) {
-+        job_flags |= JOB_MANUAL_DISMISS;
-+    }
-+
-     stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
-                  job_flags, has_speed ? speed : 0, on_error, &local_err);
-     if (local_err) {
-diff --git a/hmp.c b/hmp.c
-index 2aafb50e8e..e3c3ecd76f 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1865,8 +1865,9 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
-     int64_t speed = qdict_get_try_int(qdict, "speed", 0);
- 
-     qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
--                     false, NULL, qdict_haskey(qdict, "speed"), speed,
--                     true, BLOCKDEV_ON_ERROR_REPORT, &error);
-+                     false, NULL, qdict_haskey(qdict, "speed"), speed, true,
-+                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
-+                     &error);
- 
-     hmp_handle_error(mon, &error);
- }
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index bc53eaf2c0..9d06509d0d 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2298,7 +2298,8 @@
- { 'command': 'block-stream',
-   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
-             '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
--            '*on-error': 'BlockdevOnError' } }
-+            '*on-error': 'BlockdevOnError',
-+            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
- 
- ##
- # @block-job-set-speed:
--- 
-2.14.4
+Yes, there are also a few trivial bugs that I fix later. I'm preparing
+for a new patch set,
+and a patch set in seabios.
+
+> Zihan, please be sure to add 'patch 0 ' to the series where we can discus=
+s
+> the series status.
+
+There actually is a patch 0, but it seems the cccmd does not apply the
+patch 0 automatically,
+I will cc you the cover letter too next time.
+
+Thanks,
+Zihan
