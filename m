@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fmy7O-0007In-Pp
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:17:32 -0400
+	(envelope-from <rka@sysgo.com>) id 1fmySV-0008Hx-Pv
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:39:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fmy7N-0007EY-ES
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:17:30 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue,  7 Aug 2018 17:16:55 +0800
-Message-Id: <20180807091655.32472-3-famz@redhat.com>
-In-Reply-To: <20180807091655.32472-1-famz@redhat.com>
-References: <20180807091655.32472-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] aio: Do aio_notify_accept only during
- blocking aio_poll
+	(envelope-from <rka@sysgo.com>) id 1fmySR-0006kY-MC
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:39:19 -0400
+From: Roman Kapl <rka@sysgo.com>
+Date: Tue,  7 Aug 2018 11:29:48 +0200
+Message-Id: <20180807092948.28134-1-rka@sysgo.com>
+Subject: [Qemu-devel] [PATCH] ppc: add DBCR based debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,108 +17,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, lersek@redhat.com, qemu-block@nongnu.org
+Cc: Roman Kapl <rka@sysgo.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:PowerPC" <qemu-ppc@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-An aio_notify() pairs with an aio_notify_accept(). The former should
-happen in the main thread or a vCPU thread, and the latter should be
-done in the IOThread.
+Add support for DBCR (debug control register) based debugging as used on
+BookE ppc. So far supports only branch and single-step events, but these are
+the important ones. GDB in Linux guest can now do single-stepping.
 
-There is one rare case that the main thread or vCPU thread may "steal"
-the aio_notify() event just raised by itself, in bdrv_set_aio_context()
-[1]. The sequence is like this:
-
-    main thread                     IO Thread
-    ===============================================================
-    bdrv_drained_begin()
-      aio_disable_external(ctx)
-                                    aio_poll(ctx, true)
-                                      ctx->notify_me += 2
-                                      ppoll() /* blocked */
-    ...
-    bdrv_drained_end()
-      ...
-        aio_notify()
-    ...
-    bdrv_set_aio_context()
-      aio_poll(ctx, false)
-[1]     aio_notify_accept(ctx)
-                                      /* Hang! */
-
-[1] is problematic. It will clear the ctx->notifier event so that
-the blocked ppoll() will not return.
-
-(For the curious, this bug was noticed when booting a number of VMs
-simultaneously in RHV.  One or two of the VMs will hit this race
-condition, making the VIRTIO device unresponsive to I/O commands. When
-it hangs, Seabios is busy waiting for a read request to complete (read
-MBR), right after initializing the virtio-blk-pci device, using 100%
-guest CPU. See also https://bugzilla.redhat.com/show_bug.cgi?id=1562750
-for the original bug analysis.)
-
-aio_notify() only injects an event when ctx->notify_me is set,
-correspondingly aio_notify_accept() is only useful when ctx->notify_me
-_was_ set. Move the call to it into the "blocking" branch. This will
-effectively skip [1] and fix the hang.
-
-Furthermore, blocking aio_poll is only allowed on home thread
-(in_aio_context_home_thread), because otherwise two blocking
-aio_poll()'s can steal each other's ctx->notifier event and cause
-hanging just like described above.
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Roman Kapl <rka@sysgo.com>
 ---
- util/aio-posix.c | 4 ++--
- util/aio-win32.c | 3 ++-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ target/ppc/cpu.h                |   5 ++
+ target/ppc/excp_helper.c        |   3 +-
+ target/ppc/translate.c          | 107 ++++++++++++++++++++++++++++++----------
+ target/ppc/translate_init.inc.c |  17 +++++++
+ 4 files changed, 104 insertions(+), 28 deletions(-)
 
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index b5c7f463aa..b5c609b68b 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -591,6 +591,7 @@ bool aio_poll(AioContext *ctx, bool blocking)
-      * so disable the optimization now.
-      */
-     if (blocking) {
-+        assert(in_aio_context_home_thread(ctx));
-         atomic_add(&ctx->notify_me, 2);
-     }
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 4edcf62cf7..ec149349e2 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -481,6 +481,11 @@ struct ppc_slb_t {
+ #define msr_ts   ((env->msr >> MSR_TS1)  & 3)
+ #define msr_tm   ((env->msr >> MSR_TM)   & 1)
  
-@@ -633,6 +634,7 @@ bool aio_poll(AioContext *ctx, bool blocking)
- 
-     if (blocking) {
-         atomic_sub(&ctx->notify_me, 2);
-+        aio_notify_accept(ctx);
-     }
- 
-     /* Adjust polling time */
-@@ -676,8 +678,6 @@ bool aio_poll(AioContext *ctx, bool blocking)
++#define DBCR0_ICMP (1 << 27)
++#define DBCR0_BRT (1 << 26)
++#define DBSR_ICMP (1 << 27)
++#define DBSR_BRT (1 << 26)
++
+ /* Hypervisor bit is more specific */
+ #if defined(TARGET_PPC64)
+ #define MSR_HVB (1ULL << MSR_SHV)
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index d6e97a90e0..3463efaf4e 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -359,8 +359,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+         default:
+             break;
          }
-     }
+-        /* XXX: TODO */
+-        cpu_abort(cs, "Debug exception is not implemented yet !\n");
++        /* DBSR already modified by caller */
+         break;
+     case POWERPC_EXCP_SPEU:      /* SPE/embedded floating-point unavailable  */
+         env->spr[SPR_BOOKE_ESR] = ESR_SPV;
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 9eaa10b421..69cd45dd81 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -211,6 +211,7 @@ struct DisasContext {
+     bool gtse;
+     ppc_spr_t *spr_cb; /* Needed to check rights for mfspr/mtspr */
+     int singlestep_enabled;
++    uint32_t flags;
+     uint64_t insns_flags;
+     uint64_t insns_flags2;
+ };
+@@ -251,6 +252,17 @@ struct opc_handler_t {
+ #endif
+ };
  
--    aio_notify_accept(ctx);
++/* SPR load/store helpers */
++static inline void gen_load_spr(TCGv t, int reg)
++{
++    tcg_gen_ld_tl(t, cpu_env, offsetof(CPUPPCState, spr[reg]));
++}
++
++static inline void gen_store_spr(int reg, TCGv t)
++{
++    tcg_gen_st_tl(t, cpu_env, offsetof(CPUPPCState, spr[reg]));
++}
++
+ static inline void gen_set_access_type(DisasContext *ctx, int access_type)
+ {
+     if (ctx->need_access_type && ctx->access_type != access_type) {
+@@ -313,6 +325,38 @@ static void gen_exception_nip(DisasContext *ctx, uint32_t excp,
+     ctx->exception = (excp);
+ }
+ 
++/* Translates the EXCP_TRACE/BRANCH to an appropriate exception depending
++ * on processor version (BookE vs regular)
++ */
++static uint32_t gen_prep_dbgex(DisasContext *ctx, uint32_t excp)
++{
++    if ((ctx->singlestep_enabled & CPU_SINGLE_STEP)
++        && (excp == POWERPC_EXCP_BRANCH)) {
++        /* Trace excpt. has priority */
++        excp = POWERPC_EXCP_TRACE;
++    }
++    if (ctx->flags & POWERPC_FLAG_DE) {
++        target_ulong dbsr = 0;
++        switch (excp) {
++        case POWERPC_EXCP_TRACE:
++            dbsr = DBCR0_ICMP;
++            break;
++        case POWERPC_EXCP_BRANCH:
++            dbsr = DBCR0_BRT;
++            break;
++        }
++        TCGv t0 = tcg_temp_new();
++        gen_load_spr(t0, SPR_BOOKE_DBSR);
++        tcg_gen_ori_tl(t0, t0, dbsr);
++        gen_store_spr(SPR_BOOKE_DBSR, t0);
++        tcg_temp_free(t0);
++        return POWERPC_EXCP_DEBUG;
++    } else {
++        return excp;
++    }
++    return POWERPC_EXCP_NONE;
++}
++
+ static void gen_debug_exception(DisasContext *ctx)
+ {
+     TCGv_i32 t0;
+@@ -575,17 +619,6 @@ typedef struct opcode_t {
+ }
+ #endif
+ 
+-/* SPR load/store helpers */
+-static inline void gen_load_spr(TCGv t, int reg)
+-{
+-    tcg_gen_ld_tl(t, cpu_env, offsetof(CPUPPCState, spr[reg]));
+-}
 -
-     /* if we have any readable fds, dispatch event */
-     if (ret > 0) {
-         for (i = 0; i < npfd; i++) {
-diff --git a/util/aio-win32.c b/util/aio-win32.c
-index e676a8d9b2..c58957cc4b 100644
---- a/util/aio-win32.c
-+++ b/util/aio-win32.c
-@@ -373,11 +373,12 @@ bool aio_poll(AioContext *ctx, bool blocking)
-         ret = WaitForMultipleObjects(count, events, FALSE, timeout);
-         if (blocking) {
-             assert(first);
-+            assert(in_aio_context_home_thread(ctx));
-             atomic_sub(&ctx->notify_me, 2);
-+            aio_notify_accept(ctx);
-         }
+-static inline void gen_store_spr(int reg, TCGv t)
+-{
+-    tcg_gen_st_tl(t, cpu_env, offsetof(CPUPPCState, spr[reg]));
+-}
+-
+ /* Invalid instruction */
+ static void gen_invalid(DisasContext *ctx)
+ {
+@@ -3602,6 +3635,24 @@ static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
+ #endif
+ }
  
-         if (first) {
--            aio_notify_accept(ctx);
-             progress |= aio_bh_poll(ctx);
-             first = false;
++static void gen_lookup_and_goto_ptr(DisasContext *ctx)
++{
++    int sse = ctx->singlestep_enabled;
++    if (unlikely(sse)) {
++        if (sse & GDBSTUB_SINGLE_STEP) {
++            gen_debug_exception(ctx);
++        } else if (sse & (CPU_SINGLE_STEP | CPU_BRANCH_STEP)) {
++            uint32_t excp = gen_prep_dbgex(ctx, POWERPC_EXCP_BRANCH);
++            if (excp != POWERPC_EXCP_NONE) {
++                gen_exception(ctx, excp);
++            }
++        }
++        tcg_gen_exit_tb(NULL, 0);
++    } else {
++        tcg_gen_lookup_and_goto_ptr();
++    }
++}
++
+ /***                                Branch                                 ***/
+ static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+ {
+@@ -3614,18 +3665,7 @@ static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+         tcg_gen_exit_tb(ctx->base.tb, n);
+     } else {
+         tcg_gen_movi_tl(cpu_nip, dest & ~3);
+-        if (unlikely(ctx->singlestep_enabled)) {
+-            if ((ctx->singlestep_enabled &
+-                (CPU_BRANCH_STEP | CPU_SINGLE_STEP)) &&
+-                (ctx->exception == POWERPC_EXCP_BRANCH ||
+-                 ctx->exception == POWERPC_EXCP_TRACE)) {
+-                gen_exception_nip(ctx, POWERPC_EXCP_TRACE, dest);
+-            }
+-            if (ctx->singlestep_enabled & GDBSTUB_SINGLE_STEP) {
+-                gen_debug_exception(ctx);
+-            }
+-        }
+-        tcg_gen_lookup_and_goto_ptr();
++        gen_lookup_and_goto_ptr(ctx);
+     }
+ }
+ 
+@@ -3668,8 +3708,8 @@ static void gen_bcond(DisasContext *ctx, int type)
+     uint32_t bo = BO(ctx->opcode);
+     TCGLabel *l1;
+     TCGv target;
+-
+     ctx->exception = POWERPC_EXCP_BRANCH;
++
+     if (type == BCOND_LR || type == BCOND_CTR || type == BCOND_TAR) {
+         target = tcg_temp_local_new();
+         if (type == BCOND_CTR)
+@@ -3733,10 +3773,11 @@ static void gen_bcond(DisasContext *ctx, int type)
+         } else {
+             tcg_gen_andi_tl(cpu_nip, target, ~3);
          }
+-        tcg_gen_lookup_and_goto_ptr();
++        gen_lookup_and_goto_ptr(ctx);
+         tcg_temp_free(target);
+     }
+     if ((bo & 0x14) != 0x14) {
++        /* fallthrough case */
+         gen_set_label(l1);
+         gen_goto_tb(ctx, 1, ctx->base.pc_next);
+     }
+@@ -7419,6 +7460,7 @@ static void ppc_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->need_access_type = !(env->mmu_model & POWERPC_MMU_64B);
+     ctx->le_mode = !!(env->hflags & (1 << MSR_LE));
+     ctx->default_tcg_memop_mask = ctx->le_mode ? MO_LE : MO_BE;
++    ctx->flags = env->flags;
+ #if defined(TARGET_PPC64)
+     ctx->sf_mode = msr_is_64bit(env, env->msr);
+     ctx->has_cfar = !!(env->flags & POWERPC_FLAG_CFAR);
+@@ -7455,6 +7497,17 @@ static void ppc_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+         ctx->singlestep_enabled = 0;
+     if ((env->flags & POWERPC_FLAG_BE) && msr_be)
+         ctx->singlestep_enabled |= CPU_BRANCH_STEP;
++    if ((env->flags & POWERPC_FLAG_DE) && msr_de) {
++        ctx->singlestep_enabled = 0;
++        target_ulong dbcr0 = env->spr[SPR_BOOKE_DBCR0];
++        if (dbcr0 & DBCR0_ICMP) {
++            ctx->singlestep_enabled |= CPU_SINGLE_STEP;
++        }
++        if (dbcr0 & DBCR0_BRT) {
++            ctx->singlestep_enabled |= CPU_BRANCH_STEP;
++        }
++
++    }
+     if (unlikely(ctx->base.singlestep_enabled)) {
+         ctx->singlestep_enabled |= GDBSTUB_SINGLE_STEP;
+     }
+@@ -7565,7 +7618,9 @@ static void ppc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+                  ctx->exception != POWERPC_SYSCALL &&
+                  ctx->exception != POWERPC_EXCP_TRAP &&
+                  ctx->exception != POWERPC_EXCP_BRANCH)) {
+-        gen_exception_nip(ctx, POWERPC_EXCP_TRACE, ctx->base.pc_next);
++        uint32_t excp = gen_prep_dbgex(ctx, POWERPC_EXCP_TRACE);
++        if (excp != POWERPC_EXCP_NONE)
++            gen_exception_nip(ctx, excp, ctx->base.pc_next);
+     }
+ 
+     if (tcg_check_temp_count()) {
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 7813b1b004..f1be7b7953 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -498,6 +498,7 @@ static void spr_write_40x_pit(DisasContext *ctx, int sprn, int gprn)
+ 
+ static void spr_write_40x_dbcr0(DisasContext *ctx, int sprn, int gprn)
+ {
++    gen_store_spr(sprn, cpu_gpr[gprn]);
+     gen_helper_store_40x_dbcr0(cpu_env, cpu_gpr[gprn]);
+     /* We must stop translation as we may have rebooted */
+     gen_stop_exception(ctx);
+@@ -1769,6 +1770,14 @@ static void gen_spr_BookE(CPUPPCState *env, uint64_t ivor_mask)
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  &spr_read_generic, &spr_write_generic,
+                  0x00000000);
++    spr_register(env, SPR_BOOKE_DSRR0, "DSRR0",
++                 SPR_NOACCESS, SPR_NOACCESS,
++                 &spr_read_generic, &spr_write_generic,
++                 0x00000000);
++    spr_register(env, SPR_BOOKE_DSRR1, "DSRR1",
++                 SPR_NOACCESS, SPR_NOACCESS,
++                 &spr_read_generic, &spr_write_generic,
++                 0x00000000);
+     /* XXX : not implemented */
+     spr_register(env, SPR_BOOKE_DBSR, "DBSR",
+                  SPR_NOACCESS, SPR_NOACCESS,
+@@ -1841,6 +1850,14 @@ static void gen_spr_BookE(CPUPPCState *env, uint64_t ivor_mask)
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  &spr_read_generic, &spr_write_generic,
+                  0x00000000);
++    spr_register(env, SPR_BOOKE_SPRG8, "SPRG8",
++                 SPR_NOACCESS, SPR_NOACCESS,
++                 &spr_read_generic, &spr_write_generic,
++                 0x00000000);
++    spr_register(env, SPR_BOOKE_SPRG9, "SPRG9",
++                 SPR_NOACCESS, SPR_NOACCESS,
++                 &spr_read_generic, &spr_write_generic,
++                 0x00000000);
+ }
+ 
+ static inline uint32_t gen_tlbncfg(uint32_t assoc, uint32_t minsize,
 -- 
-2.17.1
+2.11.0
