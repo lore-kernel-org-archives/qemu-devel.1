@@ -1,28 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fnAei-0000kC-Pj
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 18:40:46 -0400
+	(envelope-from <akrowiak@linux.ibm.com>) id 1fnAfk-0001Hl-0b
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 18:41:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fnAef-0003MX-Lz
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 18:40:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53770)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fnAef-0003KZ-EN
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 18:40:41 -0400
-Date: Tue, 7 Aug 2018 16:40:33 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180807164033.575b5ff8@t450s.home>
-In-Reply-To: <20180808004929-mutt-send-email-mst@kernel.org>
-References: <20180807193125.30378-1-alex.williamson@redhat.com>
-	<20180807224033-mutt-send-email-mst@kernel.org>
-	<20180807135303.3938b3a2@t450s.home>
-	<20180808004929-mutt-send-email-mst@kernel.org>
+	(envelope-from <akrowiak@linux.ibm.com>) id 1fnAfg-0004lc-Kf
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 18:41:47 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57028)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1fnAfg-0004ei-AJ
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 18:41:44 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w77Md7R0099772
+	for <qemu-devel@nongnu.org>; Tue, 7 Aug 2018 18:41:41 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2kqgm7r27j-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 18:41:41 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Tue, 7 Aug 2018 16:41:40 -0600
+References: <1530312483-23864-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Tue, 7 Aug 2018 18:41:29 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1530312483-23864-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Balloon inhibit enhancements,
- vfio restriction
+Content-Language: en-US
+Message-Id: <4305b179-bcaa-9373-5b5c-41cd79122d5c@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v6 0/5] s390x: vfio-ap: guest dedicated
+ crypto adapters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,97 +42,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org, david@redhat.com
+To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-On Wed, 8 Aug 2018 00:58:32 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+Ping
 
-> On Tue, Aug 07, 2018 at 01:53:03PM -0600, Alex Williamson wrote:
-> > On Tue, 7 Aug 2018 22:44:56 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Tue, Aug 07, 2018 at 01:31:21PM -0600, Alex Williamson wrote:  
-> > > > v3:
-> > > >  - Drop "nested" term in commit log (David)
-> > > >  - Adopt suggested wording in ccw code (Cornelia)
-> > > >  - Explain balloon inhibitor usage in vfio common (Peter)
-> > > >  - Fix to call inhibitor prior to re-using existing containers
-> > > >    to avoid gap that pinning may have occurred in set container
-> > > >    ioctl (self) - Peter, this change is the reason I didn't
-> > > >    include your R-b.
-> > > >  - Add R-b to patches 1 & 2
-> > > > 
-> > > > v2:
-> > > >  - Use atomic ops for balloon inhibit counter (Peter)
-> > > >  - Allow endpoint driver opt-in for ballooning, vfio-ccw opt-in by
-> > > >    default, vfio-pci opt-in by device option, only allowed for mdev
-> > > >    devices, no support added for platform as there are no platform
-> > > >    mdev devices.
-> > > > 
-> > > > See patch 3/4 for detailed explanation why ballooning and device
-> > > > assignment typically don't mix.  If this eventually changes, flags
-> > > > on the iommu info struct or perhaps device info struct can inform
-> > > > us for automatic opt-in.  Thanks,
-> > > > 
-> > > > Alex    
-> > > 
-> > > One of the issues with pass-through is that it breaks overcommit
-> > > through swap. ballooning seems to offer one solution, instead of
-> > > making it work this patch just attempts to block ballooning.
-> > > 
-> > > I guess it's better than corrupting memory but I personally find this
-> > > approach disappointing.  
-> > 
-> > Memory hotplug is the way to achieve variable density with assigned
-> > device VMs, otherwise look towards approaches like mdev and shared
-> > virtual addresses with PASID support.  We cannot shoehorn page faulting
-> > without both hardware and software support.  Some class of "legacy"
-> > device assignment will always have this incompatibility.  Thanks,
-> > 
-> > Alex  
-> 
-> I'm not sure I agree.
-> 
-> At least with VTD, it seems entirely possible to change e.g. a PMD
-> atomically to point to a different set of PTEs, then flush.
-> That will allow removing memory at high granularity for
-> an arbitrary device without mdev or PASID dependency.
-> 
-> I suspect most IOMMUs are like this.
-> 
-> IIUC doing that within guest right now will cause a range to be unmapped
-> and them mapped again, which I suspect only works if we are lucky and
-> device does not access the range during this time.
-> 
-> So at some level it's a theoretical bug we would do well to fix,
-> and then we can support ballooning better.
-
-Being able to unmap the page atomically from the IOMMU is one aspect,
-the other is re-mapping the page when the balloon is deflated, which is
-currently done only via a page fault.  We cannot guarantee that a vCPU
-will touch a page before the IO device does, so something needs to
-fault in that page for the IOMMU.  So we have:
-
- - How do we handle re-mapping pages as the balloon is deflated?
-   - IOMMU page faults?  Requires PRI, IOMMU & endpoint support.
-   - Some new MMU notifier hook?  Not sure WILLNEED is appropriate here.
-
- - How do we handle un-mapping pages as the balloon is inflated?
-   - Rewrite the kernel IOMMU API and IOMMU drivers to allow unmapping
-     sub-pages within previous mappings.
-   - MMU notifier hook to trigger above non-existent code?
-   - Alternatively, sacrificing IOTLB performance and probably kernel
-     bloat by using only PAGE_SIZE IOMMU mappings.
-
-Maybe some of these will evolve over time, SVA efforts are working on
-some of these interfaces, but apparently device assignment users have
-been getting along just fine without ballooning for many years.  With
-physical devices, or even modern VFs, it seems hard to push density
-beyond what we can handle with memory hotplug.  Perhaps as we get into
-scalable IOV type approaches we can opt-in more mediated devices by
-default.  It seems like we're just going around in circles here though,
-anything more than preventing QEMU from shooting itself is a long term
-goal touching multiple levels of the stack. Thanks,
-
-Alex
+On 06/29/2018 06:47 PM, Tony Krowiak wrote:
+> From: Tony Krowiak <akrowiak@linux.ibm.com>
+>
+> This patch series is the QEMU counterpart to the KVM/kernel support for
+> guest dedicated crypto adapters. The KVM/kernel model is built on the
+> VFIO mediated device framework and provides the infrastructure for
+> granting exclusive guest access to crypto devices installed on the linux
+> host. This patch series introduces a new QEMU command line option, QEMU
+> object model and CPU model features to exploit the KVM/kernel model.
+>
+> See the detailed specifications for AP virtualization provided by this
+> patch set in docs/vfio-ap.txt for a more complete discussion of the
+> design introduced by this patch series.
+>
+> Note: This series implements the minimal viable product (MVP) and does not
+>        provide support for hot plug/unplug or migration. The goal
+>        of the MVP model is to solidify a base upon which these additional
+>        features will be built.
+>
+> --
+> v5 => v6 Change log:
+> ===================
+> * Added reset handling fo vfio-ap device
+> * Added a bridge/bus to AP device object model - thanks to Halil Pasic
+>
+> v4 => v5 Change log:
+> ===================
+> * Added MAINTAINERS entries for VFIO AP
+> * Added explanation for why we are only supporting zEC12 and newer CPU
+>    models.
+> * Changed CPU model feature qci=on|off to apqci=on|off
+> * Misc. minor changes
+>
+> v3 => v4 Change log:
+> ===================
+> * Made vfio-ap device unpluggable for now
+> * Renamed command line CPU model feature for QCI: qci=on -> apqci=on
+> * Removed call to KVM_S390_VM_CRYPTO_INTERPRET_AP ioctl - ioctl was
+>    removed from kernel and AP instruction interpretation is set from the
+>    VFIO device driver
+> * Added check to ensure only one vfio-ap device can be configured per
+>    guest
+> * Removed AP instruction interception handlers: AP instructions will be
+>    interpreted by default if AP facilities are installed to handle the case
+>    where feature ap=on and no vfio-ap device is configured for the guest.
+>
+>
+> Tony Krowiak (5):
+>    linux-headers: linux header updates for AP support
+>    s390x/cpumodel: Set up CPU model for AP device support
+>    s390x/ap: base Adjunct Processor (AP) object model
+>    s390x/vfio: ap: Introduce VFIO AP device
+>    s390: doc: detailed specifications for AP virtualization
+>
+>   MAINTAINERS                       |   14 +
+>   default-configs/s390x-softmmu.mak |    1 +
+>   docs/vfio-ap.txt                  |  649 +++++++++++++++++++++++++++++++++++++
+>   hw/s390x/Makefile.objs            |    2 +
+>   hw/s390x/ap-bridge.c              |   76 +++++
+>   hw/s390x/ap-device.c              |   39 +++
+>   hw/s390x/s390-virtio-ccw.c        |    4 +
+>   hw/vfio/Makefile.objs             |    1 +
+>   hw/vfio/ap.c                      |  183 +++++++++++
+>   include/hw/s390x/ap-bridge.h      |   37 +++
+>   include/hw/s390x/ap-device.h      |   38 +++
+>   include/hw/vfio/vfio-common.h     |    1 +
+>   linux-headers/asm-s390/kvm.h      |    2 +
+>   linux-headers/linux/vfio.h        |    2 +
+>   target/s390x/cpu_features.c       |    3 +
+>   target/s390x/cpu_features_def.h   |    3 +
+>   target/s390x/cpu_models.c         |    2 +
+>   target/s390x/gen-features.c       |    3 +
+>   target/s390x/kvm.c                |    1 +
+>   19 files changed, 1061 insertions(+), 0 deletions(-)
+>   create mode 100644 docs/vfio-ap.txt
+>   create mode 100644 hw/s390x/ap-bridge.c
+>   create mode 100644 hw/s390x/ap-device.c
+>   create mode 100644 hw/vfio/ap.c
+>   create mode 100644 include/hw/s390x/ap-bridge.h
+>   create mode 100644 include/hw/s390x/ap-device.h
+>
