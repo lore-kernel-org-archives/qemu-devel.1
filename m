@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fn6Sl-0004PM-As
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 14:12:09 -0400
+	(envelope-from <bsd@redhat.com>) id 1fn6Vu-0007Dx-Vr
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 14:15:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fn6Sg-0006r6-3d
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 14:12:07 -0400
-References: <20180807043349.27196-1-jsnow@redhat.com>
-	<20180807043349.27196-20-jsnow@redhat.com>
-	<83f634a8-ddab-2eb1-419a-fd2e8a6b815f@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <24a6e7f3-13be-4162-8860-95805b617732@redhat.com>
-Date: Tue, 7 Aug 2018 14:11:49 -0400
+	(envelope-from <bsd@redhat.com>) id 1fn6Vq-0002iW-0v
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 14:15:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50568 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1fn6Vp-0002dk-SE
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 14:15:17 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A43F3402315B
+	for <qemu-devel@nongnu.org>; Tue,  7 Aug 2018 18:15:16 +0000 (UTC)
+From: Bandan Das <bsd@redhat.com>
+References: <20180720214020.22897-1-bsd@redhat.com>
+	<20180720214020.22897-4-bsd@redhat.com>
+	<20180807132847.gavgozyrmtmyol7u@sirius.home.kraxel.org>
+Date: Tue, 07 Aug 2018 14:15:14 -0400
+In-Reply-To: <20180807132847.gavgozyrmtmyol7u@sirius.home.kraxel.org> (Gerd
+	Hoffmann's message of "Tue, 7 Aug 2018 15:28:47 +0200")
+Message-ID: <jpgtvo69h71.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-In-Reply-To: <83f634a8-ddab-2eb1-419a-fd2e8a6b815f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 19/21] qapi/block-commit: expose new job
- properties
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 3/5] dev-mtp: retry write for incomplete
+ transfers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +35,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jtc@redhat.com, Max Reitz <mreitz@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Gerd Hoffmann <kraxel@redhat.com> writes:
 
+> On Fri, Jul 20, 2018 at 05:40:18PM -0400, Bandan Das wrote:
+>> For large buffers, write may not copy the full buffer. For example,
+>> on Linux, write imposes a limit of 0x7ffff000. Note that this does
+>> not fix >4G transfers but ~>2G files will transfer successfully.
+>
+> Hmm, I guess it would be a good idea to write the file in smaller
+> pieces, so we don't need a 2G host buffer to let the guest write
+> a 2G file ...
+>
+> (as incremental improvement on top of this series).
+>
 
-On 08/07/2018 10:52 AM, Eric Blake wrote:
-> On 08/06/2018 11:33 PM, John Snow wrote:
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 8 ++++++++
->> =C2=A0 qapi/block-core.json | 3 ++-
->> =C2=A0 2 files changed, 10 insertions(+), 1 deletion(-)
->>
->=20
->> +++ b/qapi/block-core.json
->> @@ -1518,7 +1518,8 @@
->> =C2=A0 { 'command': 'block-commit',
->> =C2=A0=C2=A0=C2=A0 'data': { '*job-id': 'str', 'device': 'str', '*base=
-': 'str',
->> '*top': 'str',
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 '*backing-file': 'str', '*speed': 'int',
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*=
-filter-node-name': 'str' } }
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*=
-filter-node-name': 'str',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*=
-auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
->=20
-> Missing documentation, including a 'since 3.1' tag.
->=20
+Sounds good, I will add this to my todo list.
 
-OK, will fix for V2 but I won't respin until I get more feedback.
-
---js
+> cheers,
+>   Gerd
