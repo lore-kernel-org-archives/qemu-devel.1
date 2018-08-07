@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fn4xB-0001Xh-0f
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 12:35:26 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fn5fr-0001Dd-6E
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 13:21:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fn4x6-0000tS-Oe
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 12:35:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fn4x6-0000t7-63
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 12:35:20 -0400
-Date: Tue, 7 Aug 2018 10:35:05 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180807103505.4c182f4d@t450s.home>
-In-Reply-To: <20180807131021.GF7265@xz-mi>
-References: <153299204130.14411.11438396195753743913.stgit@gimli.home>
-	<153299246170.14411.6197545037372422542.stgit@gimli.home>
-	<20180807131021.GF7265@xz-mi>
+	(envelope-from <eric.auger@redhat.com>) id 1fn5fp-0002uZ-SJ
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 13:21:35 -0400
+References: <20180725143413.9728-1-geert+renesas@glider.be>
+	<20180725143413.9728-5-geert+renesas@glider.be>
+	<e52bfdab-5c23-a617-8bef-0c17ab831ec1@redhat.com>
+	<CAMuHMdUuHcoZxFVFivBwD3LveeE8yQ+AnaWFr76kATG+rCzd=w@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <9305142a-8b88-8beb-dd95-02dd84881aa8@redhat.com>
+Date: Tue, 7 Aug 2018 19:21:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAMuHMdUuHcoZxFVFivBwD3LveeE8yQ+AnaWFr76kATG+rCzd=w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] vfio: Inhibit ballooning based on
- group attachment to a container
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] hw/arm/sysbus-fdt: Add support for
+ instantiating generic devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +26,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, cohuck@redhat.com, mst@redhat.com, david@redhat.com
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <damm+renesas@opensource.se>, QEMU Developers <qemu-devel@nongnu.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Alex Williamson <alex.williamson@redhat.com>, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, qemu-arm <qemu-arm@nongnu.org>
 
-On Tue, 7 Aug 2018 21:10:21 +0800
-Peter Xu <peterx@redhat.com> wrote:
+Hi Geert,
 
-> On Mon, Jul 30, 2018 at 05:14:21PM -0600, Alex Williamson wrote:
-> > We use a VFIOContainer to associate an AddressSpace to one or more
-> > VFIOGroups.  The VFIOContainer represents the DMA context for that
-> > AdressSpace for those VFIOGroups and is synchronized to changes in
-> > that AddressSpace via a MemoryListener.  For IOMMU backed devices,
-> > maintaining the DMA context for a VFIOGroup generally involves
-> > pinning a host virtual address in order to create a stable host
-> > physical address and then mapping a translation from the associated
-> > guest physical address to that host physical address into the IOMMU.
-> > 
-> > While the above maintains the VFIOContainer synchronized to the QEMU
-> > memory API of the VM, memory ballooning occurs outside of that API.
-> > Inflating the memory balloon (ie. cooperatively capturing pages from
-> > the guest for use by the host) simply uses MADV_DONTNEED to "zap"
-> > pages from QEMU's host virtual address space.  The page pinning and
-> > IOMMU mapping above remains in place, negating the host's ability to
-> > reuse the page, but the host virtual to host physical mapping of the
-> > page is invalidated outside of QEMU's memory API.
-> > 
-> > When the balloon is later deflated, attempting to cooperatively
-> > return pages to the guest, the page is simply freed by the guest
-> > balloon driver, allowing it to be used in the guest and incurring a
-> > page fault when that occurs.  The page fault maps a new host physical
-> > page backing the existing host virtual address, meanwhile the
-> > VFIOContainer still maintains the translation to the original host
-> > physical address.  At this point the guest vCPU and any assigned
-> > devices will map different host physical addresses to the same guest
-> > physical address.  Badness.
-> > 
-> > The IOMMU typically does not have page level granularity with which
-> > it can track this mapping without also incurring inefficiencies in
-> > using page size mappings throughout.  MMU notifiers in the host
-> > kernel also provide indicators for invalidating the mapping on
-> > balloon inflation, not for updating the mapping when the balloon is
-> > deflated.  For these reasons we assume a default behavior that the
-> > mapping of each VFIOGroup into the VFIOContainer is incompatible
-> > with memory ballooning and increment the balloon inhibitor to match
-> > the attached VFIOGroups.
-> > 
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > ---
-> >  hw/vfio/common.c |    5 +++++
-> >  1 file changed, 5 insertions(+)
-> > 
-> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > index fb396cf00ac4..4881b691a659 100644
-> > --- a/hw/vfio/common.c
-> > +++ b/hw/vfio/common.c
-> > @@ -32,6 +32,7 @@
-> >  #include "hw/hw.h"
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/range.h"
-> > +#include "sysemu/balloon.h"
-> >  #include "sysemu/kvm.h"
-> >  #include "trace.h"
-> >  #include "qapi/error.h"
-> > @@ -1049,6 +1050,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-> >              group->container = container;
-> >              QLIST_INSERT_HEAD(&container->group_list, group, container_next);
-> >              vfio_kvm_device_add_group(group);
-> > +            qemu_balloon_inhibit(true);  
+On 08/07/2018 05:32 PM, Geert Uytterhoeven wrote:
+> Hi Eric,
 > 
-> [1]
+> On Tue, Aug 7, 2018 at 4:19 PM Auger Eric <eric.auger@redhat.com> wrote:
+>> On 07/25/2018 04:34 PM, Geert Uytterhoeven wrote:
+>>> Add a fallback for instantiating generic devices without a type-specific
+>>> or compatible-specific instantation method.  This will be used when no
+>>> other match is found.
+>>>
+>>> The generic instantation method creates a device node with "reg" and
+>>> (optional) "interrupts" properties, and copies the "compatible"
+>>> property and other optional properties from the host.
+>>> For now the following optional properties are copied, if found:
+>>>   - "#gpio-cells",
+>>>   - "gpio-controller",
+>>>   - "#interrupt-cells",
+>>>   - "interrupt-controller",
+>>>   - "interrupt-names".
+>>>
+>>> More can be added when needed.
+>>>
+>>> This avoids having to write device-specific instantation methods for
+>> instantiation
 > 
-> >              return 0;
-> >          }
-> >      }
-> > @@ -1198,6 +1200,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-> >      }
-> >  
-> >      vfio_kvm_device_add_group(group);
-> > +    qemu_balloon_inhibit(true);  
+> Thanks, will fix.
 > 
-> AFAIU there is a very critical information that this
-> qemu_balloon_inhibit() call must be before the call to:
+>>> each and every "simple" device using only a set of generic properties.
+>>> Devices that need more specialized handling can still provide their
+>>> own instantation method.
 > 
->     memory_listener_register(&container->listener, container->space->as);
+> Arghl, one more.
 > 
-> Since the memory listener registeration is the point when we do the
-> pinning of the pages.  So to make sure we won't have stale pages we
-> must call qemu_balloon_inhibit() before memory_listener_register()
-> (which is what this patch does).  However this is not that obvious,
-> not sure whether that might worth a comment.
+>>> --- a/hw/arm/sysbus-fdt.c
+>>> +++ b/hw/arm/sysbus-fdt.c
+>>> @@ -415,6 +415,99 @@ static int add_amd_xgbe_fdt_node(SysBusDevice *sbdev, void *opaque)
+>>>      return 0;
+>>>  }
+>>>
+>>> +static HostProperty generic_copied_properties[] = {
+>>> +    {"compatible", false},
+>>> +    {"#gpio-cells", true},
+>>> +    {"gpio-controller", true},
+>>> +    {"#interrupt-cells", true},
+>>> +    {"interrupt-controller", true},
+>>> +    {"interrupt-names", true},
+>>
+>> I think we would need to enumerate the other source properties which
+>> were not copied to the guest fdt and either warn the userspace those
+>> were omitted or fail. We may end up generating an incomplete guest dt
+>> node that may not work properly.
 > 
-> Considering this, not sure whether we can just do this per-container
-> instead of per-group, then we also don't need to bother with extra
-> group-add paths like [1].
+> The list above is quite generic, so it is expected that some of the optional
+> properties (marked "true") cannot be copied. Hence warning about them
+> will be noisy, and confuse users.  Failing is definitely the wrong thing
+> to do.
+I was not talking about those listed here and optional. Those ones are
+taken care of. I was rather talking about potential other ones, present
+on host side and not copied on guest side. For instance, let's say your
+host dt node has a clocks property. You will attempt to create a guest
+dt node without this property and obviously the device will not work
+properly on guest side. The end user attempting this assignment does not
+get any warning on guest launch. Maybe the driver on guest side will be
+cool enough to issue a warning but we cannot really rely on this
+assumption. So from a maintenance point of view, it looks not
+manageable. I think we should checl all props found in the host dt node
+are considered and copied into the guest node. Otherwise this means the
+host dt node does not belong to the category of a "simple" one and thus
+cannot use this creation function.
 > 
-> No matter what, this patch looks good to me (and it is correct AFAIK),
-> so I'm leaving r-b and I'll leave Alex to decide:
+> If the host lacks a property that is mandatory for a specific device, the
+> device won't have worked on the host before neither, right?
+> 
+> The major issue remains that an incomplete guest DT node may be generated
+> if the list above lacks certain needed properties, or if subnodes are
+> needed.
+> I expect the guest OS driver would complain about the missing parts, though.
+> In that case, either the list should be extended, or a device-specific
+> instantiation method should be written.
+> 
+>>> +/**
+>>> + * add_generic_fdt_node
+>>> + *
+>>> + * Generates a generic DT node by copying properties from the host
+>>> + */
+>>> +static int add_generic_fdt_node(SysBusDevice *sbdev, void *opaque)
+>>> +{
+> 
+>>> +    /* Copy interrupts (remapped) */
+>>> +    if (vbasedev->num_irqs) {
+>>> +        irq_attr = g_new(uint32_t, vbasedev->num_irqs * 3);
+>>> +        for (i = 0; i < vbasedev->num_irqs; i++) {
+>>> +            irq_number = platform_bus_get_irqn(pbus, sbdev , i)
+>>> +                             + data->irq_start;
+>>> +            irq_attr[3 * i] = cpu_to_be32(GIC_FDT_IRQ_TYPE_SPI);
+>>> +            irq_attr[3 * i + 1] = cpu_to_be32(irq_number);
+>>> +            irq_attr[3 * i + 2] = cpu_to_be32(GIC_FDT_IRQ_FLAGS_LEVEL_HI);
+>>
+>> I think this part is not generic enough. How can you assume the IRQs are
+>> level or edge? Can't you copy the source interrupt properties and just
+>> overwrite the IRQ number?
+> 
+> I have to check that. I wouldn't be surprised if the virtualized GIC supports
+> only a subset of all possible flags and/or remaps interrupt types too.
+> 
+> I see the AMD XGBE driver looks at VFIO_IRQ_INFO_AUTOMASKED to choose
+> between GIC_FDT_IRQ_FLAGS_LEVEL_HI and GIC_FDT_IRQ_FLAGS_EDGE_LO_HI.
+> The VFIO_IRQ_INFO_* don't seem to provide more details.
+Yep it tells you whether this is edge or level. That's why I initially
+suggested to keep the copied values for the type.
 
-Thanks Peter.  I agree, I'll add more commentary.  A minor correction,
-we won't have "stale" pages at the time we pin, the act of pinning will
-make those valid (same as I discussed in reply to mst why we don't need
-to worry about pages ballooned before the device is added), but once a
-page is pinned, we need to make sure it's not madvised dontneed, so we
-need to be sure there's no possible race there, which effectively means
-inhibiting before the memory listener can do any pinning.
+Thanks
 
-The reason I chose to inhibit per group is that it becomes easier to
-allow endpoint drivers to opt-in.  For instance if we could have ccw
-and vfio-pci in the same VM, they would by default share a container.
-If ccw releases the inhibit, we'd need to somehow reinstate it for the
-vfio-pci device and remember which did what if one is hot unplugged.
-Doing the inhibit at the group level resolves this, the ccw group adds
-an inhibit by default, then releases it, the vfio-pci group adds an
-inhibit and maintains it so long as attached.  I struggled with whether
-this should actually be a per-device inhibit, but then there's a gap
-that the container listener is active before the device is retrieved,
-so again the per-group inhibit was a better fit.  Thanks,
-
-Alex
+Eric
+> There are also no users of GIC_FDT_IRQ_FLAGS_LEVEL_LO and
+> GIC_FDT_IRQ_FLAGS_EDGE_HI_LO in the Qemu sources...
+> 
+> So probably following the AMD XGBE example is the way forward?
+> 
+> Thanks!
+> 
+> Gr{oetje,eeting}s,
+> 
+>                         Geert
+> 
