@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy36-0003KW-MY
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:05 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy3C-0003Q6-Oq
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy35-0005Ay-MS
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:04 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:43405)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fmy39-0005Bk-Fd
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:10 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fmy35-0005Al-FU
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:03 -0400
-Received: by mail-pl0-x242.google.com with SMTP id x6-v6so6846602plv.10
-	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 02:13:03 -0700 (PDT)
+	id 1fmy39-0005Ba-8x
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:13:07 -0400
+Received: by mail-pg1-x544.google.com with SMTP id h12-v6so7556892pgs.3
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 02:13:07 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Tue,  7 Aug 2018 17:12:06 +0800
-Message-Id: <20180807091209.13531-8-xiaoguangrong@tencent.com>
+Date: Tue,  7 Aug 2018 17:12:07 +0800
+Message-Id: <20180807091209.13531-9-xiaoguangrong@tencent.com>
 In-Reply-To: <20180807091209.13531-1-xiaoguangrong@tencent.com>
 References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH v3 07/10] migration: do not
- flush_compressed_data at the end of each iteration
+Subject: [Qemu-devel] [PATCH v3 08/10] migration: handle the error condition
+ properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +32,77 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-flush_compressed_data() needs to wait all compression threads to
-finish their work, after that all threads are free until the
-migration feeds new request to them, reducing its call can improve
-the throughput and use CPU resource more effectively
-
-We do not need to flush all threads at the end of iteration, the
-data can be kept locally until the memory block is changed or
-memory migration starts over in that case we will meet a dirtied
-page which may still exists in compression threads's ring
+ram_find_and_save_block() can return negative if any error hanppens,
+however, it is completely ignored in current code
 
 Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 ---
- migration/ram.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ migration/ram.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 99ecf9b315..55966bc2c1 100644
+index 55966bc2c1..09be01dca2 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -306,6 +306,8 @@ struct RAMState {
-     uint64_t iterations;
-     /* number of dirty bits in the bitmap */
-     uint64_t migration_dirty_pages;
-+    /* last dirty_sync_count we have seen */
-+    uint64_t dirty_sync_count_prev;
-     /* protects modification of the bitmap */
-     QemuMutex bitmap_mutex;
-     /* The RAMBlock used in the last src_page_requests */
-@@ -3173,6 +3175,17 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
- 
-     ram_control_before_iterate(f, RAM_CONTROL_ROUND);
- 
-+    /*
-+     * if memory migration starts over, we will meet a dirtied page which
-+     * may still exists in compression threads's ring, so we should flush
-+     * the compressed data to make sure the new page is not overwritten by
-+     * the old one in the destination.
-+     */
-+    if (ram_counters.dirty_sync_count != rs->dirty_sync_count_prev) {
-+        rs->dirty_sync_count_prev = ram_counters.dirty_sync_count;
-+        flush_compressed_data(rs);
-+    }
-+
-     t0 = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-     i = 0;
-     while ((ret = qemu_file_rate_limit(f)) == 0 ||
-@@ -3205,7 +3218,6 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+@@ -2367,7 +2367,8 @@ static int ram_save_host_page(RAMState *rs, PageSearchStatus *pss,
+  *
+  * Called within an RCU critical section.
+  *
+- * Returns the number of pages written where zero means no dirty pages
++ * Returns the number of pages written where zero means no dirty pages,
++ * or negative on error
+  *
+  * @rs: current RAM state
+  * @last_stage: if we are at the completion stage
+@@ -3202,6 +3203,12 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+             done = 1;
+             break;
          }
-         i++;
-     }
--    flush_compressed_data(rs);
-     rcu_read_unlock();
++
++        if (pages < 0) {
++            qemu_file_set_error(f, pages);
++            break;
++        }
++
+         rs->iterations++;
  
-     /*
+         /* we want to check in the 1st loop, just in case it was the 1st time
+@@ -3243,7 +3250,7 @@ out:
+ /**
+  * ram_save_complete: function called to send the remaining amount of ram
+  *
+- * Returns zero to indicate success
++ * Returns zero to indicate success or negative on error
+  *
+  * Called with iothread lock
+  *
+@@ -3254,6 +3261,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+ {
+     RAMState **temp = opaque;
+     RAMState *rs = *temp;
++    int ret = 0;
+ 
+     rcu_read_lock();
+ 
+@@ -3274,6 +3282,10 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+         if (pages == 0) {
+             break;
+         }
++        if (pages < 0) {
++            ret = pages;
++            break;
++        }
+     }
+ 
+     flush_compressed_data(rs);
+@@ -3285,7 +3297,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+     qemu_fflush(f);
+ 
+-    return 0;
++    return ret;
+ }
+ 
+ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
 -- 
 2.14.4
