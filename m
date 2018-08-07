@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fmr8x-0006i7-Ot
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 21:50:41 -0400
+	(envelope-from <coli@redhat.com>) id 1fmrte-00029B-PP
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 22:38:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fmr8t-0008W9-T4
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 21:50:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34826)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fmr8t-0008W1-MM
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 21:50:35 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fmr8s-0007qU-Hl
-	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 01:50:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7C9BF2E80C8
-	for <qemu-devel@nongnu.org>; Tue,  7 Aug 2018 01:50:34 +0000 (UTC)
+	(envelope-from <coli@redhat.com>) id 1fmrte-0002Gz-05
+	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 22:38:54 -0400
+Date: Mon, 6 Aug 2018 22:38:45 -0400 (EDT)
+From: Cong Li <coli@redhat.com>
+Message-ID: <199002085.38975596.1533609525821.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20180806123728.13658-1-kwolf@redhat.com>
+References: <20180806123728.13658-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Aug 2018 01:44:01 -0000
-From: Fabian Hemmer <1785734@bugs.launchpad.net>
-Reply-To: Bug 1785734 <1785734@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153360624183.17489.10217918293787091045.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1785734] [NEW] movdqu partial write at page
- boundary
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qapi/block: Document restrictions for node
+ names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,204 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Public bug reported:
 
-In TCG mode, when a 16-byte write instruction (such as movdqu) is
-executed at a page boundary and causes a page fault, a partial write is
-executed in the first page. See the attached code for an example.
+----- Original Message -----
+> From: "Kevin Wolf" <kwolf@redhat.com>
+> To: qemu-block@nongnu.org
+> Cc: kwolf@redhat.com, coli@redhat.com, qemu-devel@nongnu.org
+> Sent: Monday, August 6, 2018 8:37:28 PM
+> Subject: [PATCH] qapi/block: Document restrictions for node names
+> 
+> blockdev-add fails if an invalid node name is given, so we should
+> document what a valid node name even is.
+> 
+> Reported-by: Cong Li <coli@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-Tested on the qemu-3.0.0-rc1 release.
+Reviewed-by: Cong Li <coli@redhat.com>
 
-% gcc -m32 qemu-bug2.c && ./a.out && echo && qemu-i386 ./a.out
-[snip]
-page fault: addr=3D0x70001000 err=3D0x7
-*(0x70000ff8+ 0) =3D aa
-*(0x70000ff8+ 1) =3D aa
-*(0x70000ff8+ 2) =3D aa
-*(0x70000ff8+ 3) =3D aa
-*(0x70000ff8+ 4) =3D aa
-*(0x70000ff8+ 5) =3D aa
-*(0x70000ff8+ 6) =3D aa
-*(0x70000ff8+ 7) =3D aa
-*(0x70000ff8+ 8) =3D 55
-*(0x70000ff8+ 9) =3D 55
-*(0x70000ff8+10) =3D 55
-*(0x70000ff8+11) =3D 55
-*(0x70000ff8+12) =3D 55
-*(0x70000ff8+13) =3D 55
-*(0x70000ff8+14) =3D 55
-*(0x70000ff8+15) =3D 55
-
-[snip]
-page fault: addr=3D0x70001000 err=3D0x6
-*(0x70000ff8+ 0) =3D 77
-*(0x70000ff8+ 1) =3D 66
-*(0x70000ff8+ 2) =3D 55
-*(0x70000ff8+ 3) =3D 44
-*(0x70000ff8+ 4) =3D 33
-*(0x70000ff8+ 5) =3D 22
-*(0x70000ff8+ 6) =3D 11
-*(0x70000ff8+ 7) =3D 0
-*(0x70000ff8+ 8) =3D 55
-*(0x70000ff8+ 9) =3D 55
-*(0x70000ff8+10) =3D 55
-*(0x70000ff8+11) =3D 55
-*(0x70000ff8+12) =3D 55
-*(0x70000ff8+13) =3D 55
-*(0x70000ff8+14) =3D 55
-*(0x70000ff8+15) =3D 55
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "qemu-bug2.c"
-   https://bugs.launchpad.net/bugs/1785734/+attachment/5172358/+files/qemu-=
-bug2.c
-
-** Description changed:
-
-  In TCG mode, when a 16-byte write instruction (such as movdqu) is
-  executed at a page boundary and causes a page fault, a partial write is
-  executed in the first page. See the attached code for an example.
-  =
-
-  Tested on the qemu-3.0.0-rc1 release.
-  =
-
-- =
-
-  % gcc -m32 qemu-bug2.c && ./a.out && echo && qemu-i386 ./a.out
-- *(0x70000ff8+ 0) =3D aa
-- *(0x70000ff8+ 1) =3D aa
-- *(0x70000ff8+ 2) =3D aa
-- *(0x70000ff8+ 3) =3D aa
-- *(0x70000ff8+ 4) =3D aa
-- *(0x70000ff8+ 5) =3D aa
-- *(0x70000ff8+ 6) =3D aa
-- *(0x70000ff8+ 7) =3D aa
-- *(0x70000ff8+ 8) =3D 55
-- *(0x70000ff8+ 9) =3D 55
-- *(0x70000ff8+10) =3D 55
-- *(0x70000ff8+11) =3D 55
-- *(0x70000ff8+12) =3D 55
-- *(0x70000ff8+13) =3D 55
-- *(0x70000ff8+14) =3D 55
-- *(0x70000ff8+15) =3D 55
-+ [snip]
-  page fault: addr=3D0x70001000 err=3D0x7
-  *(0x70000ff8+ 0) =3D aa
-  *(0x70000ff8+ 1) =3D aa
-  *(0x70000ff8+ 2) =3D aa
-  *(0x70000ff8+ 3) =3D aa
-  *(0x70000ff8+ 4) =3D aa
-  *(0x70000ff8+ 5) =3D aa
-  *(0x70000ff8+ 6) =3D aa
-  *(0x70000ff8+ 7) =3D aa
-  *(0x70000ff8+ 8) =3D 55
-  *(0x70000ff8+ 9) =3D 55
-  *(0x70000ff8+10) =3D 55
-  *(0x70000ff8+11) =3D 55
-  *(0x70000ff8+12) =3D 55
-  *(0x70000ff8+13) =3D 55
-  *(0x70000ff8+14) =3D 55
-  *(0x70000ff8+15) =3D 55
-  =
-
-- *(0x70000ff8+ 0) =3D aa
-- *(0x70000ff8+ 1) =3D aa
-- *(0x70000ff8+ 2) =3D aa
-- *(0x70000ff8+ 3) =3D aa
-- *(0x70000ff8+ 4) =3D aa
-- *(0x70000ff8+ 5) =3D aa
-- *(0x70000ff8+ 6) =3D aa
-- *(0x70000ff8+ 7) =3D aa
-- *(0x70000ff8+ 8) =3D 55
-- *(0x70000ff8+ 9) =3D 55
-- *(0x70000ff8+10) =3D 55
-- *(0x70000ff8+11) =3D 55
-- *(0x70000ff8+12) =3D 55
-- *(0x70000ff8+13) =3D 55
-- *(0x70000ff8+14) =3D 55
-- *(0x70000ff8+15) =3D 55
-+ [snip]
-  page fault: addr=3D0x70001000 err=3D0x6
-  *(0x70000ff8+ 0) =3D 77
-  *(0x70000ff8+ 1) =3D 66
-  *(0x70000ff8+ 2) =3D 55
-  *(0x70000ff8+ 3) =3D 44
-  *(0x70000ff8+ 4) =3D 33
-  *(0x70000ff8+ 5) =3D 22
-  *(0x70000ff8+ 6) =3D 11
-  *(0x70000ff8+ 7) =3D 0
-  *(0x70000ff8+ 8) =3D 55
-  *(0x70000ff8+ 9) =3D 55
-  *(0x70000ff8+10) =3D 55
-  *(0x70000ff8+11) =3D 55
-  *(0x70000ff8+12) =3D 55
-  *(0x70000ff8+13) =3D 55
-  *(0x70000ff8+14) =3D 55
-  *(0x70000ff8+15) =3D 55
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1785734
-
-Title:
-  movdqu partial write at page boundary
-
-Status in QEMU:
-  New
-
-Bug description:
-  In TCG mode, when a 16-byte write instruction (such as movdqu) is
-  executed at a page boundary and causes a page fault, a partial write
-  is executed in the first page. See the attached code for an example.
-
-  Tested on the qemu-3.0.0-rc1 release.
-
-  % gcc -m32 qemu-bug2.c && ./a.out && echo && qemu-i386 ./a.out
-  [snip]
-  page fault: addr=3D0x70001000 err=3D0x7
-  *(0x70000ff8+ 0) =3D aa
-  *(0x70000ff8+ 1) =3D aa
-  *(0x70000ff8+ 2) =3D aa
-  *(0x70000ff8+ 3) =3D aa
-  *(0x70000ff8+ 4) =3D aa
-  *(0x70000ff8+ 5) =3D aa
-  *(0x70000ff8+ 6) =3D aa
-  *(0x70000ff8+ 7) =3D aa
-  *(0x70000ff8+ 8) =3D 55
-  *(0x70000ff8+ 9) =3D 55
-  *(0x70000ff8+10) =3D 55
-  *(0x70000ff8+11) =3D 55
-  *(0x70000ff8+12) =3D 55
-  *(0x70000ff8+13) =3D 55
-  *(0x70000ff8+14) =3D 55
-  *(0x70000ff8+15) =3D 55
-
-  [snip]
-  page fault: addr=3D0x70001000 err=3D0x6
-  *(0x70000ff8+ 0) =3D 77
-  *(0x70000ff8+ 1) =3D 66
-  *(0x70000ff8+ 2) =3D 55
-  *(0x70000ff8+ 3) =3D 44
-  *(0x70000ff8+ 4) =3D 33
-  *(0x70000ff8+ 5) =3D 22
-  *(0x70000ff8+ 6) =3D 11
-  *(0x70000ff8+ 7) =3D 0
-  *(0x70000ff8+ 8) =3D 55
-  *(0x70000ff8+ 9) =3D 55
-  *(0x70000ff8+10) =3D 55
-  *(0x70000ff8+11) =3D 55
-  *(0x70000ff8+12) =3D 55
-  *(0x70000ff8+13) =3D 55
-  *(0x70000ff8+14) =3D 55
-  *(0x70000ff8+15) =3D 55
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1785734/+subscriptions
+> ---
+>  qapi/block-core.json | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 62a92fa4f4..fe565ebfaf 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3563,6 +3563,9 @@
+>  # @driver:        block driver name
+>  # @node-name:     the node name of the new node (Since 2.0).
+>  #                 This option is required on the top level of blockdev-add.
+> +#                 Valid node names start with an alphabetic character and
+> may
+> +#                 contain only alphanumeric characters, '-', '.' and '_'.
+> Their
+> +#                 maximum length is 31 characters.
+>  # @discard:       discard-related options (default: ignore)
+>  # @cache:         cache-related options
+>  # @read-only:     whether the block device should be read-only (default:
+>  false).
+> --
+> 2.13.6
+> 
+> 
