@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fn3cE-0001js-1d
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:09:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fn3cm-0002mW-6m
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:10:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fn3cC-000421-7H
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:09:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58226 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fn3cC-00041j-1V
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:09:40 -0400
-Date: Tue, 7 Aug 2018 16:09:35 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180807150935.GL2556@work-vm>
-References: <20180720081948.23644-1-remy.noel@blade-group.com>
-	<20180807131918.22bgcmfv2wu4bjda@sirius.home.kraxel.org>
-	<20180807145701.GK2556@work-vm>
-	<CAFEAcA9mgyCzR7-ANw0YvKdzz-0H50vETrr_sw5bH5D_2PUeNg@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fn3cl-0004Jl-3k
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:10:16 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:42195)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fn3ck-0004JV-PL
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:10:14 -0400
+Received: by mail-oi0-x244.google.com with SMTP id b16-v6so15651204oic.9
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 08:10:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9mgyCzR7-ANw0YvKdzz-0H50vETrr_sw5bH5D_2PUeNg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] secondary-vga: unregister vram on unplug.
+In-Reply-To: <87o9ee1aka.fsf@trasno.org>
+References: <20180807130355.29780-1-peter.maydell@linaro.org>
+	<87muty2u57.fsf@trasno.org>
+	<CAFEAcA_m+81aDQR=n=8gXhcifYp0L6n9KZA5COQsRejeqZe2FQ@mail.gmail.com>
+	<87in4m2qni.fsf@trasno.org>
+	<CAFEAcA81Xr6_eUV5247JtZRnN9Ms7fau1iwhHkmW-gnwH9y8JA@mail.gmail.com>
+	<87wot21bbt.fsf@trasno.org>
+	<CAFEAcA_y1qKsC8kSDee+FEpqZstz9UHTeyP6ABuGfXf_aDMRHw@mail.gmail.com>
+	<87o9ee1aka.fsf@trasno.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Aug 2018 16:09:53 +0100
+Message-ID: <CAFEAcA_XJGWPioUDUR0+9v16Xj_osDwk7OYEK3vkqdg_SacMXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] migration: Correctly handle subsections
+ with no 'needed' function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +36,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, remy.noel@blade-group.com, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 7 August 2018 at 15:57, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> > * Gerd Hoffmann (kraxel@redhat.com) wrote:
-> >> On Fri, Jul 20, 2018 at 10:19:48AM +0200, remy.noel@blade-group.com wrote:
-> >> > From: "Remy Noel" <remy.noel@blade-group.com>
-> >> >
-> >> > When removing a secondary-vga device and then adding it back (or adding
-> >> > an other one), qemu aborts with:
-> >> >     "RAMBlock "0000:00:02.0/vga.vram" already registered, abort!".
-> >> >
-> >> > It is caused by the vram staying registered, preventing vga replugging.
-> >>
-> >> David?  Does that look ok?
-> >>
-> >> This balances the
-> >>
-> >>      vmstate_register_ram(&s->vram, s->global_vmstate ?  NULL : DEVICE(obj));
-> >>
-> >> call in vga_common_init().  I'm wondering whenever the manual cleanup is
-> >> actually needed in case owner is not NULL?
-> >
-> > I can't see anyone who is calling unregister_ram or the functions it
-> > calls as part of generic device cleanup, so I think it IS needed
-> > to manually do it.
-> >
-> > Which is a bit worrying since we have vastly more register's than
-> > unregister's.
-> 
-> Paolo suggested in an email last month that vmstate_unregister_ram()
-> should simply not exist, because it doesn't actually do anything useful:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg01125.html
-> 
-> (ie it was added in the first place because we'd ended up with
-> two identically named ramblocks, but that only happened because
-> a reference-counting bug meant we hadn't deleted the first one
-> properly before creating the second.)
-> 
-> So I think that the bug reported in this thread is similar:
-> the problem is not that we're not calling vmstate_unregister_ram(),
-> but that when the first instance of secondary-vga is removed
-> it is not correctly destroying the ramblock.
+On 7 August 2018 at 16:05, Juan Quintela <quintela@redhat.com> wrote:
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+>> So it's better to use a needed-always subsection, which will give
+>> the desired behaviour:
+>>  * new QEMU -> new QEMU: state is always migrated
+>>  * old QEMU -> new QEMU: migration doesn't fail, and guest
+>>    will work assuming it didn't care about this corner of the
+>>    device's functionality (the device will end up with state
+>>    as it was at reset, or possibly special-cased via
+>>    pre_load/post_load hooks for the "section not present" case)
+>
+> we break by definiton new QEMU -M <old machine type> into old QEMU.
 
-Ah yes that makes more sense; I remember there was another similar bug
-where a device screwed up and didn't delete it's RAM causing similar
-problems.
+Is that supposed to work? I always thought that we never
+supported migration back to an older QEMU version like that.
 
-Dave
+In any case, for all the devices here the machine types are
+not versioned.
 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
