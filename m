@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fmth5-0004ix-Fu
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 00:34:05 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fmth3-0001KH-MS
+	(envelope-from <jsnow@redhat.com>) id 1fmth2-0004fe-QU
 	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 00:34:03 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <jsnow@redhat.com>) id 1fmth0-0001GW-8e
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 00:34:00 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue,  7 Aug 2018 00:33:41 -0400
-Message-Id: <20180807043349.27196-14-jsnow@redhat.com>
+Date: Tue,  7 Aug 2018 00:33:33 -0400
+Message-Id: <20180807043349.27196-6-jsnow@redhat.com>
 In-Reply-To: <20180807043349.27196-1-jsnow@redhat.com>
 References: <20180807043349.27196-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 13/21] block/commit: add block job creation
- flags
+Subject: [Qemu-devel] [PATCH 05/21] block/mirror: utilize job_exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,91 +22,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 
-Add support for taking and passing forward job creation flags.
+Change the manual deferment to mirror_exit into the implicit
+callback to job_exit and the mirror_exit callback.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/commit.c            | 5 +++--
- blockdev.c                | 7 ++++---
- include/block/block_int.h | 5 ++++-
- 3 files changed, 11 insertions(+), 6 deletions(-)
+ block/mirror.c | 27 +++++++++++----------------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index 22712cac2d..1a4a56795f 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -256,7 +256,8 @@ static BlockDriver bdrv_commit_top = {
- };
+diff --git a/block/mirror.c b/block/mirror.c
+index 7c2c6ba67e..e3404e2518 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -607,21 +607,17 @@ static void mirror_wait_for_all_io(MirrorBlockJob *s)
+     }
+ }
  
- void commit_start(const char *job_id, BlockDriverState *bs,
--                  BlockDriverState *base, BlockDriverState *top, int64_t speed,
-+                  BlockDriverState *base, BlockDriverState *top,
-+                  int creation_flags, int64_t speed,
-                   BlockdevOnError on_error, const char *backing_file_str,
-                   const char *filter_node_name, Error **errp)
+-typedef struct {
+-    int ret;
+-} MirrorExitData;
+-
+-static void mirror_exit(Job *job, void *opaque)
++static void mirror_exit(Job *job)
  {
-@@ -274,7 +275,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
+     BlockJob *bjob = &s->common;
+-    MirrorExitData *data = opaque;
+     MirrorBDSOpaque *bs_opaque = s->mirror_top_bs->opaque;
+     AioContext *replace_aio_context = NULL;
+     BlockDriverState *src = s->mirror_top_bs->backing->bs;
+     BlockDriverState *target_bs = blk_bs(s->target);
+     BlockDriverState *mirror_top_bs = s->mirror_top_bs;
+     Error *local_err = NULL;
++    int ret = job->ret;
+ 
+     bdrv_release_dirty_bitmap(src, s->dirty_bitmap);
+ 
+@@ -652,7 +648,7 @@ static void mirror_exit(Job *job, void *opaque)
+             bdrv_set_backing_hd(target_bs, backing, &local_err);
+             if (local_err) {
+                 error_report_err(local_err);
+-                data->ret = -EPERM;
++                ret = -EPERM;
+             }
+         }
+     }
+@@ -662,7 +658,7 @@ static void mirror_exit(Job *job, void *opaque)
+         aio_context_acquire(replace_aio_context);
      }
  
-     s = block_job_create(job_id, &commit_job_driver, NULL, bs, 0, BLK_PERM_ALL,
--                         speed, JOB_DEFAULT, NULL, NULL, errp);
-+                         speed, creation_flags, NULL, NULL, errp);
-     if (!s) {
-         return;
+-    if (s->should_complete && data->ret == 0) {
++    if (s->should_complete && ret == 0) {
+         BlockDriverState *to_replace = src;
+         if (s->to_replace) {
+             to_replace = s->to_replace;
+@@ -679,7 +675,7 @@ static void mirror_exit(Job *job, void *opaque)
+         bdrv_drained_end(target_bs);
+         if (local_err) {
+             error_report_err(local_err);
+-            data->ret = -EPERM;
++            ret = -EPERM;
+         }
      }
-diff --git a/blockdev.c b/blockdev.c
-index dcf8c8d2ab..88ad8d96e5 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3324,6 +3324,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-      * BlockdevOnError change for blkmirror makes it in
-      */
-     BlockdevOnError on_error = BLOCKDEV_ON_ERROR_REPORT;
-+    int job_flags = JOB_DEFAULT;
+     if (s->to_replace) {
+@@ -710,12 +706,12 @@ static void mirror_exit(Job *job, void *opaque)
+     blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
  
-     if (!has_speed) {
-         speed = 0;
-@@ -3405,15 +3406,15 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-             goto out;
-         }
-         commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
--                            JOB_DEFAULT, speed, on_error,
-+                            job_flags, speed, on_error,
-                             filter_node_name, NULL, NULL, false, &local_err);
-     } else {
-         BlockDriverState *overlay_bs = bdrv_find_overlay(bs, top_bs);
-         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
-             goto out;
-         }
--        commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, speed,
--                     on_error, has_backing_file ? backing_file : NULL,
-+        commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, job_flags,
-+                     speed, on_error, has_backing_file ? backing_file : NULL,
-                      filter_node_name, &local_err);
+     bs_opaque->job = NULL;
+-    job_completed(job, data->ret);
+ 
+-    g_free(data);
+     bdrv_drained_end(src);
+     bdrv_unref(mirror_top_bs);
+     bdrv_unref(src);
++
++    job->ret = ret;
+ }
+ 
+ static void mirror_throttle(MirrorBlockJob *s)
+@@ -815,7 +811,6 @@ static int mirror_flush(MirrorBlockJob *s)
+ static void coroutine_fn mirror_run(void *opaque)
+ {
+     MirrorBlockJob *s = opaque;
+-    MirrorExitData *data;
+     BlockDriverState *bs = s->mirror_top_bs->backing->bs;
+     BlockDriverState *target_bs = blk_bs(s->target);
+     bool need_drain = true;
+@@ -1035,13 +1030,11 @@ immediate_exit:
+     g_free(s->in_flight_bitmap);
+     bdrv_dirty_iter_free(s->dbi);
+ 
+-    data = g_malloc(sizeof(*data));
+-    data->ret = ret;
+-
+     if (need_drain) {
+         bdrv_drained_begin(bs);
      }
-     if (local_err != NULL) {
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 903b9c1034..ffab0b4d3e 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -980,6 +980,8 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-  * @bs: Active block device.
-  * @top: Top block device to be committed.
-  * @base: Block device that will be written into, and become the new top.
-+ * @creation_flags: Flags that control the behavior of the Job lifetime.
-+ *                  See @BlockJobCreateFlags
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @on_error: The action to take upon error.
-  * @backing_file_str: String to use as the backing file in @top's overlay
-@@ -990,7 +992,8 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-  *
-  */
- void commit_start(const char *job_id, BlockDriverState *bs,
--                  BlockDriverState *base, BlockDriverState *top, int64_t speed,
-+                  BlockDriverState *base, BlockDriverState *top,
-+                  int creation_flags, int64_t speed,
-                   BlockdevOnError on_error, const char *backing_file_str,
-                   const char *filter_node_name, Error **errp);
- /**
+-    job_defer_to_main_loop(&s->common.job, mirror_exit, data);
++
++    s->common.job.ret = ret;
+ }
+ 
+ static void mirror_complete(Job *job, Error **errp)
+@@ -1139,6 +1132,7 @@ static const BlockJobDriver mirror_job_driver = {
+         .user_resume            = block_job_user_resume,
+         .drain                  = block_job_drain,
+         .start                  = mirror_run,
++        .exit                   = mirror_exit,
+         .pause                  = mirror_pause,
+         .complete               = mirror_complete,
+     },
+@@ -1155,6 +1149,7 @@ static const BlockJobDriver commit_active_job_driver = {
+         .user_resume            = block_job_user_resume,
+         .drain                  = block_job_drain,
+         .start                  = mirror_run,
++        .exit                   = mirror_exit,
+         .pause                  = mirror_pause,
+         .complete               = mirror_complete,
+     },
 -- 
 2.14.4
