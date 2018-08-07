@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fn1dZ-0000RK-Hp
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:02:59 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fn1ek-0000wq-Qn
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:04:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fn1dT-0005pR-SR
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:02:57 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38475)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fn1dT-0005pF-Jv
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:02:51 -0400
-Received: by mail-wm0-x242.google.com with SMTP id t25-v6so18004299wmi.3
-	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 06:02:51 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180807125558.2g7nl5zhgrdblrwh@sirius.home.kraxel.org>
-References: <20180803153235.4134-1-marcandre.lureau@redhat.com>
-	<20180807125558.2g7nl5zhgrdblrwh@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 7 Aug 2018 15:02:49 +0200
-Message-ID: <CAJ+F1C+cU-LKd_t-tn9jW86A8aV4CnQXUpA1NM+SPkB1rbrfoQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: fix crashes upon warm reboot
- with vga mode
+	(envelope-from <pm215@archaic.org.uk>) id 1fn1eg-0006CV-RW
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:04:10 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44168)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fn1eg-00069l-HO
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 09:04:06 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  7 Aug 2018 14:03:55 +0100
+Message-Id: <20180807130355.29780-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] migration: Correctly handle subsections with
+ no 'needed' function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi
+Currently the vmstate subsection handling code treats a subsection
+with no 'needed' function pointer as if it were the subsection
+list terminator, so the subsection is never transferred and nor
+is any subsection following it in the list.
 
-On Tue, Aug 7, 2018 at 2:55 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> On Fri, Aug 03, 2018 at 05:32:35PM +0200, Marc-Andr=C3=A9 Lureau wrote:
->> With vga=3D775 on the Linux command line a first boot of the VM running
->> Linux works fine. After a warm reboot it crashes during Linux boot.
->>
->> Before that, valgrind points out bad memory write to console
->> surface. The VGA code is not aware that virtio-gpu got a message
->> surface scanout when the display is disabled. Let's reset VGA graphic
->> mode when it is the case, so that a new display surface is created
->> when doing further VGA operations.
->
-> I guess we should simply call vga_common_reset() in virtio_vga_reset()
-> instead, can you try that?
->
-Yes I tried, and it still fails. However I think the call is missing
-and I was planning to send it for 3.1 later, since I don't think it's
-RC material.
-The ordering of events is not completely obvious to me, but it's still
-crashing/corrupting memory after the reset occurs. The scanout get's
-disable after it iirc.
+Handle NULL 'needed' function pointers in subsections in the same
+way that we do for top level VMStateDescription structures:
+treat the subsection as always being needed.
 
+This doesn't change behaviour for the current set of devices
+in the tree, because all subsections declare a 'needed' function.
 
---=20
-Marc-Andr=C3=A9 Lureau
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+NB: last para in the commit message is only true once the
+"Arm migration fixes for 3.0" patchset has been committed.
+We could optionally drop some of the "use a dummy needed fn"
+changes once this is in...
+
+I thought I'd sent this out a few days back, but apparently not,
+since it's not on-list...
+
+ migration/vmstate.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index 6b9079bb51e..0bc240a3175 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -418,7 +418,7 @@ int vmstate_save_state_v(QEMUFile *f, const VMStateDescription *vmsd,
+ static const VMStateDescription *
+ vmstate_get_subsection(const VMStateDescription **sub, char *idstr)
+ {
+-    while (sub && *sub && (*sub)->needed) {
++    while (sub && *sub) {
+         if (strcmp(idstr, (*sub)->name) == 0) {
+             return *sub;
+         }
+@@ -486,8 +486,8 @@ static int vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
+     int ret = 0;
+ 
+     trace_vmstate_subsection_save_top(vmsd->name);
+-    while (sub && *sub && (*sub)->needed) {
+-        if ((*sub)->needed(opaque)) {
++    while (sub && *sub) {
++        if (vmstate_save_needed(*sub, opaque)) {
+             const VMStateDescription *vmsdsub = *sub;
+             uint8_t len;
+ 
+-- 
+2.17.1
