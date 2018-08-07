@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fn3D9-00021O-OZ
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:43:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fn3Ep-0003N2-Hx
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:45:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fn3D6-0008AQ-MI
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:43:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59032 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fn3D6-0008A6-Fe
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:43:44 -0400
-References: <20180803173614.12358-1-marcandre.lureau@redhat.com>
-	<20180803173614.12358-11-marcandre.lureau@redhat.com>
-	<20180807101505.GF7335@redhat.com>
-	<CAJ+F1C+=aucconH7EZ8D2g_Wir2wEeq4GMobK+jNPZ8b0LbZKA@mail.gmail.com>
-	<20180807143055.pkx7l2ufb36lyq3b@sirius.home.kraxel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3a227950-7825-e8ee-f6c1-35c6f05d61b3@redhat.com>
-Date: Tue, 7 Aug 2018 16:43:39 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fn3Eo-0000G3-Pe
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:45:31 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34495)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fn3Eo-0000Fp-KJ
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:45:30 -0400
+Received: by mail-oi0-x243.google.com with SMTP id 13-v6so28898120ois.1
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 07:45:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180807143055.pkx7l2ufb36lyq3b@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/10] display: add -display app launching
- external application
+In-Reply-To: <87600m2qb2.fsf@trasno.org>
+References: <20180806123445.1459-1-peter.maydell@linaro.org>
+	<20180806123445.1459-4-peter.maydell@linaro.org>
+	<87600m2qb2.fsf@trasno.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Aug 2018 15:45:09 +0100
+Message-ID: <CAFEAcA8O-SL4Bg4ar3QLLFCPcF8A7W7mRu4D8bbXvJkFUsXTKQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.0 v2 3/5] target/arm: Add dummy
+ needed functions to M profile vmstate subsections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-On 07/08/2018 16:30, Gerd Hoffmann wrote:
->>>
->>>    -display spice,client=yes
->> There is no -display spice, atm.
->>
->> However there is a -display vnc.
-> That should not be there.  Now that we have a deprecation process
-> I should probably actually deprecate it in favor of -vnc.
-> 
->> It's a bit unclear to me the relation between -display and
->> -vnc/-spice/-curses etc. In the end, I tend to think of -display foo
->> as a shortcut for a longer -foo configuration.
-> -display is for builtin UIs.  You can have exactly one of these.
-> 
-> -spice and -vnc is for remote protocols.  They can be used together with
-> builtin UIs (even though that isn't a typical use case).  Configuring
-> both spice and vnc works too.
-> 
-> -sdl and -curses are shortcuts for -display sdl and -display curses.
-> 
+On 7 August 2018 at 15:40, Juan Quintela <quintela@redhat.com> wrote:
+> But having 3 subsections with the same needed function ... we could have
+> a single subsection.
 
-Why not allow multiple -display options, but give an error if more than
-one builtin UI is specified?
+I wanted to keep the change small here since we're very
+late in the release cycle, so I kept it to a change
+that restores the intent of the code, ie "always transfer
+the subsection".
 
-Paolo
+thanks
+-- PMM
