@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fn60u-0007U3-Lm
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fn60u-0007To-8J
 	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 13:43:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fn60r-000232-SX
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fn60r-00021q-DE
 	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 13:43:20 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  7 Aug 2018 20:43:04 +0300
-Message-Id: <20180807174311.32454-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 0/7] qcow2: async handling of fragmented io
+Date: Tue,  7 Aug 2018 20:43:09 +0300
+Message-Id: <20180807174311.32454-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20180807174311.32454-1-vsementsov@virtuozzo.com>
+References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 5/7] qcow2: refactor qcow2_co_pwritev: split
+ out qcow2_co_do_pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,120 +23,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Hi all!
+Split out block which will be reused in async scheme.
 
-Here is an asynchronous scheme for handling fragmented qcow2
-reads and writes. Both qcow2 read and write functions loops through
-sequential portions of data. The series aim it to parallelize these
-loops iterations.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/qcow2.c | 138 ++++++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 86 insertions(+), 52 deletions(-)
 
-It improves performance for fragmented qcow2 images, I've tested it
-as follows:
-
-I have four 4G qcow2 images (with default 64k block size) on my ssd disk:
-t-seq.qcow2 - sequentially written qcow2 image
-t-reverse.qcow2 - filled by writing 64k portions from end to the start
-t-rand.qcow2 - filled by writing 64k portions (aligned) in random order
-t-part-rand.qcow2 - filled by shuffling order of 64k writes in 1m clusters
-(see source code of image generation in the end for details)
-
-and the test (sequential io by 1mb chunks):
-
-test write:
-    for t in /ssd/t-*; \
-        do sync; echo 1 > /proc/sys/vm/drop_caches; echo ===  $t  ===; \
-        ./qemu-img bench -c 4096 -d 1 -f qcow2 -n -s 1m -t none -w $t; \
-    done
-
-test read (same, just drop -w parameter):
-    for t in /ssd/t-*; \
-        do sync; echo 1 > /proc/sys/vm/drop_caches; echo ===  $t  ===; \
-        ./qemu-img bench -c 4096 -d 1 -f qcow2 -n -s 1m -t none $t; \
-    done
-
-short info about parameters:
-  -w - do writes (otherwise do reads)
-  -c - count of blocks
-  -s - block size
-  -t none - disable cache
-  -n - native aio
-  -d 1 - don't use parallel requests provided by qemu-img bench itself
-
-results:
-    +-----------+-----------+----------+-----------+----------+
-    |   file    | wr before | wr after | rd before | rd after |
-    +-----------+-----------+----------+-----------+----------+
-    | seq       |     8.605 |    8.636 |     9.043 |    9.010 |
-    | reverse   |     9.934 |    8.654 |    17.162 |    8.662 |
-    | rand      |     9.983 |    8.687 |    19.775 |    9.010 |
-    | part-rand |     9.871 |    8.650 |    14.241 |    8.669 |
-    +-----------+-----------+----------+-----------+----------+
-
-Performance gain is obvious, especially for read.
-
-how images are generated:
-
- === gen-writes file ===
-    #!/usr/bin/env python
-    import random
-    import sys
-
-    size = 4 * 1024 * 1024 * 1024
-    block = 64 * 1024
-    block2 = 1024 * 1024
-
-    arg = sys.argv[1]
-
-    if arg in ('rand', 'reverse', 'seq'):
-        writes = list(range(0, size, block))
-
-    if arg == 'rand':
-        random.shuffle(writes)
-    elif arg == 'reverse':
-        writes.reverse()
-    elif arg == 'part-rand':
-        writes = []
-        for off in range(0, size, block2):
-            wr = list(range(off, off + block2, block))
-            random.shuffle(wr)
-            writes.extend(wr)
-    elif arg != 'seq':
-        sys.exit(1)
-
-    for w in writes:
-        print 'write -P 0xff {} {}'.format(w, block)
-
-    print 'q'
-
-
- === gen-test-images.sh file ===
-    #!/bin/bash
-
-    IMG_PATH=/ssd
-
-    for name in seq reverse rand part-rand; do
-        IMG=$IMG_PATH/t-$name.qcow2
-        echo createing $IMG ...
-        rm -f $IMG
-        qemu-img create -f qcow2 $IMG 4G
-        gen-writes $name | qemu-io $IMG
-    done
-
-Denis V. Lunev (1):
-  qcow2: move qemu_co_mutex_lock below decryption procedure
-
-Vladimir Sementsov-Ogievskiy (6):
-  qcow2: bdrv_co_pwritev: move encryption code out of lock
-  qcow2: split out reading normal clusters from qcow2_co_preadv
-  qcow2: async scheme for qcow2_co_preadv
-  qcow2: refactor qcow2_co_pwritev: split out qcow2_co_do_pwritev
-  qcow2: refactor qcow2_co_pwritev locals scope
-  qcow2: async scheme for qcow2_co_pwritev
-
- block/qcow2.c                      | 506 +++++++++++++++++++++++++++++--------
- tests/qemu-iotests/026.out         |  18 +-
- tests/qemu-iotests/026.out.nocache |  20 +-
- 3 files changed, 415 insertions(+), 129 deletions(-)
-
+diff --git a/block/qcow2.c b/block/qcow2.c
+index a0df8d4e50..4d669432d1 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2210,6 +2210,85 @@ static bool merge_cow(uint64_t offset, unsigned bytes,
+     return false;
+ }
+ 
++/* qcow2_co_do_pwritev
++ * Called without s->lock unlocked
++ * hd_qiov - temp qiov for any use. It is initialized so it is empty and
++ *           support adding up to qiov->niov + 2 elements
++ * l2meta  - if not NULL, qcow2_co_do_pwritev() will consume it. Caller must not
++ *           use it somehow after qcow2_co_do_pwritev() call
++ */
++static coroutine_fn int qcow2_co_do_pwritev(BlockDriverState *bs,
++                                            uint64_t file_cluster_offset,
++                                            uint64_t offset,
++                                            uint64_t bytes,
++                                            QEMUIOVector *qiov,
++                                            uint64_t qiov_offset,
++                                            QCowL2Meta *l2meta)
++{
++    int ret;
++    BDRVQcow2State *s = bs->opaque;
++    void *crypt_buf = NULL;
++    QEMUIOVector hd_qiov;
++    int offset_in_cluster = offset_into_cluster(s, offset);
++
++    qemu_iovec_reset(&hd_qiov);
++    qemu_iovec_init(&hd_qiov, qiov->niov);
++
++    if (bs->encrypted) {
++        assert(s->crypto);
++        assert(bytes <= QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
++        crypt_buf = qemu_try_blockalign(bs->file->bs, bytes);
++        qemu_iovec_to_buf(qiov, qiov_offset, crypt_buf, bytes);
++
++        if (qcrypto_block_encrypt(s->crypto,
++                                  (s->crypt_physical_offset ?
++                                   file_cluster_offset + offset_in_cluster :
++                                   offset),
++                                  crypt_buf,
++                                  bytes, NULL) < 0) {
++            ret = -EIO;
++            goto fail;
++        }
++
++        qemu_iovec_add(&hd_qiov, crypt_buf, bytes);
++    } else {
++        qemu_iovec_concat(&hd_qiov, qiov, qiov_offset, bytes);
++    }
++
++    /* If we need to do COW, check if it's possible to merge the
++     * writing of the guest data together with that of the COW regions.
++     * If it's not possible (or not necessary) then write the
++     * guest data now. */
++    if (!merge_cow(offset, bytes, &hd_qiov, l2meta)) {
++        BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
++        trace_qcow2_writev_data(qemu_coroutine_self(),
++                                file_cluster_offset + offset_in_cluster);
++        ret = bdrv_co_pwritev(bs->file,
++                              file_cluster_offset + offset_in_cluster,
++                              bytes, &hd_qiov, 0);
++        if (ret < 0) {
++            qemu_co_mutex_lock(&s->lock);
++            goto fail;
++        }
++    }
++
++    qemu_co_mutex_lock(&s->lock);
++
++    ret = qcow2_handle_l2meta(bs, &l2meta, true);
++    if (ret) {
++        goto fail;
++    }
++
++fail:
++    qcow2_handle_l2meta(bs, &l2meta, false);
++    qemu_co_mutex_unlock(&s->lock);
++
++    qemu_vfree(crypt_buf);
++    qemu_iovec_destroy(&hd_qiov);
++
++    return ret;
++}
++
+ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+                                          uint64_t bytes, QEMUIOVector *qiov,
+                                          int flags)
+@@ -2262,63 +2341,16 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+ 
+         qemu_co_mutex_unlock(&s->lock);
+ 
+-        qemu_iovec_reset(&hd_qiov);
+-        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, cur_bytes);
+ 
+-        if (bs->encrypted) {
+-            assert(s->crypto);
+-            if (!cluster_data) {
+-                cluster_data = qemu_try_blockalign(bs->file->bs,
+-                                                   QCOW_MAX_CRYPT_CLUSTERS
+-                                                   * s->cluster_size);
+-                if (cluster_data == NULL) {
+-                    ret = -ENOMEM;
+-                    goto fail;
+-                }
+-            }
+-
+-            assert(hd_qiov.size <=
+-                   QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
+-            qemu_iovec_to_buf(&hd_qiov, 0, cluster_data, hd_qiov.size);
+-
+-            if (qcrypto_block_encrypt(s->crypto,
+-                                      (s->crypt_physical_offset ?
+-                                       cluster_offset + offset_in_cluster :
+-                                       offset),
+-                                      cluster_data,
+-                                      cur_bytes, NULL) < 0) {
+-                ret = -EIO;
+-                goto fail;
+-            }
+-
+-            qemu_iovec_reset(&hd_qiov);
+-            qemu_iovec_add(&hd_qiov, cluster_data, cur_bytes);
+-        }
+-
+-        /* If we need to do COW, check if it's possible to merge the
+-         * writing of the guest data together with that of the COW regions.
+-         * If it's not possible (or not necessary) then write the
+-         * guest data now. */
+-        if (!merge_cow(offset, cur_bytes, &hd_qiov, l2meta)) {
+-            BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+-            trace_qcow2_writev_data(qemu_coroutine_self(),
+-                                    cluster_offset + offset_in_cluster);
+-            ret = bdrv_co_pwritev(bs->file,
+-                                  cluster_offset + offset_in_cluster,
+-                                  cur_bytes, &hd_qiov, 0);
+-            if (ret < 0) {
+-                qemu_co_mutex_lock(&s->lock);
+-                goto fail;
+-            }
++        ret = qcow2_co_do_pwritev(bs, cluster_offset, offset, cur_bytes,
++                                  qiov, bytes_done, l2meta);
++        l2meta = NULL; /* l2meta is consumed by qcow2_co_do_pwritev() */
++        if (ret < 0) {
++            goto fail_nometa;
+         }
+ 
+         qemu_co_mutex_lock(&s->lock);
+ 
+-        ret = qcow2_handle_l2meta(bs, &l2meta, true);
+-        if (ret) {
+-            goto fail;
+-        }
+-
+         bytes -= cur_bytes;
+         offset += cur_bytes;
+         bytes_done += cur_bytes;
+@@ -2331,6 +2363,8 @@ fail:
+ 
+     qemu_co_mutex_unlock(&s->lock);
+ 
++fail_nometa:
++
+     qemu_iovec_destroy(&hd_qiov);
+     qemu_vfree(cluster_data);
+     trace_qcow2_writev_done_req(qemu_coroutine_self(), ret);
 -- 
 2.11.1
