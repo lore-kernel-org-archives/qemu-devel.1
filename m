@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fn7ui-0004Qy-5a
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 15:45:05 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fn7vj-0005JL-AX
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 15:46:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fn7ud-0002WX-86
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 15:45:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54498 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fn7ve-0003Id-Ce
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 15:46:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40708)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fn7ud-0002WC-2y
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 15:44:59 -0400
-Date: Tue, 7 Aug 2018 22:44:56 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180807224033-mutt-send-email-mst@kernel.org>
-References: <20180807193125.30378-1-alex.williamson@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fn7ve-0003I9-4M
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 15:46:02 -0400
+Date: Tue, 7 Aug 2018 16:45:58 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180807194558.GZ23195@localhost.localdomain>
+References: <20180805112850.26063-1-mark.cave-ayland@ilande.co.uk>
+	<20180805112850.26063-3-mark.cave-ayland@ilande.co.uk>
+	<20180806201128.GB12341@localhost.localdomain>
+	<987d9b7e-afdb-e954-4aae-ec192b2b51c9@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180807193125.30378-1-alex.williamson@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Balloon inhibit enhancements,
- vfio restriction
+In-Reply-To: <987d9b7e-afdb-e954-4aae-ec192b2b51c9@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 2/2] fw_cfg: set the
+ get_boot_devices_list() ignore_suffixes parameter from machine property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org, david@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: lersek@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Aug 07, 2018 at 01:31:21PM -0600, Alex Williamson wrote:
-> v3:
->  - Drop "nested" term in commit log (David)
->  - Adopt suggested wording in ccw code (Cornelia)
->  - Explain balloon inhibitor usage in vfio common (Peter)
->  - Fix to call inhibitor prior to re-using existing containers
->    to avoid gap that pinning may have occurred in set container
->    ioctl (self) - Peter, this change is the reason I didn't
->    include your R-b.
->  - Add R-b to patches 1 & 2
+On Tue, Aug 07, 2018 at 08:27:30PM +0100, Mark Cave-Ayland wrote:
+> On 06/08/18 21:11, Eduardo Habkost wrote:
+> > On Sun, Aug 05, 2018 at 12:28:50PM +0100, Mark Cave-Ayland wrote:
+> > > For the older machines (such as Mac and SPARC) the DT nodes representing
+> > > bootdevices for disk nodes are irregular for mainly historical reasons, and
+> > > should be handled on an individual basis via a custom FWPathProvider.
+> > > 
+> > > Since the majority of bootdevice nodes for these machines either do not have a
+> > > separate disk node or require different (custom) names then it is much easier
+> > > to allow the ignore_suffixes parameter to be set on a per-machine basis via
+> > > a machine property.
+> > > 
+> > > The default value for this new fwcfg_bootdevice_ignore_suffixes machine
+> > > property is false to preserve compatibility for existing machines.
+> > > 
+> > > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+[...]
+> > > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > > index d139a431a6..2cf76d82a6 100644
+> > > --- a/include/hw/boards.h
+> > > +++ b/include/hw/boards.h
+> > > @@ -204,6 +204,7 @@ struct MachineClass {
+> > >       const char **valid_cpu_types;
+> > >       strList *allowed_dynamic_sysbus_devices;
+> > >       bool auto_enable_numa_with_memhp;
+> > > +    bool fwcfg_bootdevice_ignore_suffixes;
+> > 
+> > We add MachineClass field when there's no obvious place for a
+> > device property (that we could set using compat_props).
+> > 
+> > In this case you are controlling behavior of TYPE_FW_CFG, so I
+> > suggest adding a compat property to TYPE_FW_CFG, and setting it
+> > on MachineClass::compat_props.  This way we avoid adding a
+> > fw_cfg-specific field to MachineClass.
 > 
-> v2:
->  - Use atomic ops for balloon inhibit counter (Peter)
->  - Allow endpoint driver opt-in for ballooning, vfio-ccw opt-in by
->    default, vfio-pci opt-in by device option, only allowed for mdev
->    devices, no support added for platform as there are no platform
->    mdev devices.
+> Ah I see, thanks for the pointer! Just out of curiosity, is there any
+> documentation anywhere regarding compat_props?
 > 
-> See patch 3/4 for detailed explanation why ballooning and device
-> assignment typically don't mix.  If this eventually changes, flags
-> on the iommu info struct or perhaps device info struct can inform
-> us for automatic opt-in.  Thanks,
+> I've managed to get something working using a fw_cfg property (patch for
+> follow shortly) and the relevant section of the machine code looks like
+> this:
 > 
-> Alex
+> 
+> #define HEATHROW_COMPAT \
+>     {\
+>         .driver = "fw_cfg",\
+>         .property = "bootdevice_ignore_suffixes",\
+>         .value = "on",\
+>     },
+> 
+> static void heathrow_class_init(ObjectClass *oc, void *data)
+> {
+>     MachineClass *mc = MACHINE_CLASS(oc);
+> 
+>     ....
+>     ....
+>     SET_MACHINE_COMPAT(mc, HEATHROW_COMPAT);
+> }
+> 
+> 
+> Is this sufficient, or are the compat properties supposed to be versioned
+> according to the QEMU machine version?
 
-One of the issues with pass-through is that it breaks overcommit
-through swap. ballooning seems to offer one solution, instead of
-making it work this patch just attempts to block ballooning.
+I never saw compat_properties being used for non-versioned
+machines, but it should work for this use case as well.
 
-I guess it's better than corrupting memory but I personally find this
-approach disappointing.
+But, I'm not sure this is the best option.  If the machine type
+is not versioned, you can simply manually set the device property
+to the desired value when creating the device inside your machine
+init function.  See how the "data_width" and "dma_enabled"
+properties are set by existing machines, for an example.
 
+I think moving towards more introspectable/data-driven machine
+initialization may be nice, but the existing SET_MACHINE_COMPAT
+interface isn't pretty.  Maybe we should refactor that interface
+before increasing its usage.
 
-> Alex Williamson (4):
->   balloon: Allow multiple inhibit users
->   kvm: Use inhibit to prevent ballooning without synchronous mmu
->   vfio: Inhibit ballooning based on group attachment to a container
->   vfio/ccw/pci: Allow devices to opt-in for ballooning
-> 
->  accel/kvm/kvm-all.c           |  4 +++
->  balloon.c                     | 13 ++++++---
->  hw/vfio/ccw.c                 |  9 +++++++
->  hw/vfio/common.c              | 51 +++++++++++++++++++++++++++++++++++
->  hw/vfio/pci.c                 | 26 +++++++++++++++++-
->  hw/vfio/trace-events          |  1 +
->  hw/virtio/virtio-balloon.c    |  4 +--
->  include/hw/vfio/vfio-common.h |  2 ++
->  8 files changed, 103 insertions(+), 7 deletions(-)
-> 
-> -- 
-> 2.18.0
+-- 
+Eduardo
