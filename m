@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fn4Fy-0000kn-ND
+	(envelope-from <bounces@canonical.com>) id 1fn4Fy-0000kp-O2
 	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:50:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fn4Fu-0003zz-MQ
+	(envelope-from <bounces@canonical.com>) id 1fn4Fu-000405-VZ
 	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:50:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42410)
+Received: from indium.canonical.com ([91.189.90.7]:42440)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fn4Fu-0003zQ-CV
+	id 1fn4Fu-0003zY-Mb
 	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 11:50:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fn4Ft-0008Ol-4E
+	id 1fn4Ft-0008Pe-L8
 	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 15:50:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F38EE2E80CB
-	for <qemu-devel@nongnu.org>; Tue,  7 Aug 2018 15:50:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 92E5E2E80CB
+	for <qemu-devel@nongnu.org>; Tue,  7 Aug 2018 15:50:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Aug 2018 15:41:21 -0000
+Date: Tue, 07 Aug 2018 15:45:13 -0000
 From: Michele Denber <1785698@bugs.launchpad.net>
 Reply-To: Bug 1785698 <1785698@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153358448492.29549.3601216229452882398.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153365648116.28998.10170147738375617044.malone@chaenomeles.canonical.com>
+Message-Id: <153365671329.28572.399595692571272651.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] =?utf-8?q?=5BBug_1785698=5D_Re=3A_Solaris_build_erro?=
  =?utf-8?b?cjogdW5rbm93biB0eXBlIG5hbWUg4oCYZ2NyeV9lcnJvcl904oCZ?=
@@ -39,33 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Ah, I see:
+"The libgcrypt-config command should be in $PATH"
 
-"in a future QEMU release we may drop support for those hosts unless
-somebody volunteers to help us with maintaining them (and can provide
-build/CI machines)."
-
-OK, so I happily volunteer an account on my machine to help maintain
-this.
-
-"What's the content of the $solaris variable at that point in time?"
-
-How do I tell that?
-
-$solaris seems to be set in a line earlier on:
-
-case $targetos in
-...
-SunOS)
-  solaris=3D"yes"
-
-and targetos is set before that by
-
-elif check_define __sun__ ; then
-  targetos=3D'SunOS'
-
-but I don't know what "check_define __sun__" is.  I am not a good
-Makefile reader.
+I'm sorry - I don't understand.  Isn't $PATH a list of directories?  I
+need to put a command in there?  I'm clearly missing something here.
 
 -- =
 
