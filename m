@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fn3K2-0005z0-2i
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:50:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1fn3Lg-00076R-1Q
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:52:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fn3K1-0002hC-BC
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:50:54 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <CAFEAcA8O-SL4Bg4ar3QLLFCPcF8A7W7mRu4D8bbXvJkFUsXTKQ@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 7 Aug 2018 15:45:09 +0100")
-References: <20180806123445.1459-1-peter.maydell@linaro.org>
-	<20180806123445.1459-4-peter.maydell@linaro.org>
-	<87600m2qb2.fsf@trasno.org>
-	<CAFEAcA8O-SL4Bg4ar3QLLFCPcF8A7W7mRu4D8bbXvJkFUsXTKQ@mail.gmail.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 07 Aug 2018 16:50:42 +0200
-Message-ID: <87sh3q1b99.fsf@trasno.org>
+	(envelope-from <eblake@redhat.com>) id 1fn3Lf-0003Q9-59
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:52:36 -0400
+References: <20180807043349.27196-1-jsnow@redhat.com>
+	<20180807043349.27196-20-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <83f634a8-ddab-2eb1-419a-fd2e8a6b815f@redhat.com>
+Date: Tue, 7 Aug 2018 09:52:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-3.0 v2 3/5] target/arm: Add dummy
- needed functions to M profile vmstate subsections
+In-Reply-To: <20180807043349.27196-20-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 19/21] qapi/block-commit: expose new job
+ properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,22 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 7 August 2018 at 15:40, Juan Quintela <quintela@redhat.com> wrote:
->> But having 3 subsections with the same needed function ... we could have
->> a single subsection.
->
-> I wanted to keep the change small here since we're very
-> late in the release cycle, so I kept it to a change
-> that restores the intent of the code, ie "always transfer
-> the subsection".
+On 08/06/2018 11:33 PM, John Snow wrote:
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>   blockdev.c           | 8 ++++++++
+>   qapi/block-core.json | 3 ++-
+>   2 files changed, 10 insertions(+), 1 deletion(-)
+> 
 
-ok with minimizing changes.  But I can't understand why that is going
-that way.  Seeing this, I am making a patch that at registration time
-check that we are not doing something stupid, like not having needed
-function, bad names, whatever.
+> +++ b/qapi/block-core.json
+> @@ -1518,7 +1518,8 @@
+>   { 'command': 'block-commit',
+>     'data': { '*job-id': 'str', 'device': 'str', '*base': 'str', '*top': 'str',
+>               '*backing-file': 'str', '*speed': 'int',
+> -            '*filter-node-name': 'str' } }
+> +            '*filter-node-name': 'str',
+> +            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
 
-Thanks.
+Missing documentation, including a 'since 3.1' tag.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
