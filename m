@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fmz1J-0003ns-0M
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:15:18 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fmz1K-0003on-St
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fmz1F-0006ZX-W2
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:15:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32872 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fmz1F-0006ZR-P9
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:15:13 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 658D8402242D
-	for <qemu-devel@nongnu.org>; Tue,  7 Aug 2018 10:15:13 +0000 (UTC)
-Date: Tue, 7 Aug 2018 11:15:05 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180807101505.GF7335@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180803173614.12358-1-marcandre.lureau@redhat.com>
-	<20180803173614.12358-11-marcandre.lureau@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fmz1K-0006bg-1y
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:15:18 -0400
+References: <20180807091655.32472-1-famz@redhat.com>
+	<20180807091655.32472-3-famz@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3ca9cf3e-6b95-76f4-e729-8abdc9a2c0b8@redhat.com>
+Date: Tue, 7 Aug 2018 12:15:08 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180807091655.32472-3-famz@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180803173614.12358-11-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 10/10] display: add -display app launching
- external application
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] aio: Do aio_notify_accept only
+ during blocking aio_poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,64 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, lersek@redhat.com, qemu-block@nongnu.org
 
-On Fri, Aug 03, 2018 at 07:36:14PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> Add a new display backend that will configure Spice to allow a remote
-> client to control QEMU in a similar fashion as other display backend
-> like GTK.
->=20
-> For this to work, we set up Spice server with a unix socket, and
-> register a VC chardev that will be exposed as Spice ports. A QMP
-> monitor is also exposed as a Spice port, this allows the remote client
-> fuller qemu control and state handling.
->=20
-> - doesn't handle VC set_echo() - this doesn't seem a strong
->   requirement, very few front-end use it
-> - spice options can be tweaked with other -spice arguments
-> - Windows support shouldn't be hard to do, but will probably use a TCP
->   port instead
-> - we may want to watch the child process to quit automatically if it
->   crashed
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 07/08/2018 11:16, Fam Zheng wrote:
+>     main thread                     IO Thread
+>     ===============================================================
+>     bdrv_drained_begin()
+>       aio_disable_external(ctx)
+>                                     aio_poll(ctx, true)
+>                                       ctx->notify_me += 2
+>                                       ppoll() /* blocked */
+>     ...
+>     bdrv_drained_end()
+>       ...
+>         aio_notify()
+>     ...
+>     bdrv_set_aio_context()
+>       aio_poll(ctx, false)
+> [1]     aio_notify_accept(ctx)
+>                                       /* Hang! */
 
-> +    type_register(&char_vc_type_info);
-> +
-> +    sock_path =3D g_strjoin("", tmp_dir, "/", "spice.sock", NULL);
-> +    qopts =3D qemu_opts_create(qemu_find_opts("spice"), NULL, 0, &erro=
-r_abort);
-> +    qemu_opt_set(qopts, "disable-ticketing", "on", &error_abort);
-> +    qemu_opt_set(qopts, "unix", "on", &error_abort);
-> +    qemu_opt_set(qopts, "addr", sock_path, &error_abort);
-> +    qemu_opt_set(qopts, "image-compression", "off", &error_abort);
-> +    qemu_opt_set(qopts, "streaming-video", "off", &error_abort);
-> +    qemu_opt_set(qopts, "gl", opts->has_gl ? "on" : "off", &error_abor=
-t);
+Should ppoll() rather be after [1]?  Otherwise the new commit message
+and patches look great.
 
-Hmm, so ultimately "-display app" is just syntactic sugar for a hardcoded
-set of "-display spice" arguments, plus automatic launching of the client
-app.  I'm thinking users may well ask for ability to control some of thos=
-e
-spice arguments over time.  So if we want auto-launching of a remote app,
-I think it is preferrable to do it via extra args to the existing
-"-display spice" format. eg we could add a "client=3Dyes|no" to control
-launching the client
+> aio_notify() only injects an event when ctx->notify_me is set,
+> correspondingly aio_notify_accept() is only useful when ctx->notify_me
+> _was_ set.
 
-   -display spice,client=3Dyes
+Very good point.
 
-would do what your "-display app" proposes, and still let users tweak
-all the other spice args as desired.  Another option "autoquit=3Dyes|no"
-could control whether QEMU automatically exits when the client quits,
-vs whether it stays alive.
+(Please Cc qemu-stable on the second patch too).
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Paolo
