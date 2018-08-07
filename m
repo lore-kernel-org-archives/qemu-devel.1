@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fn1Ww-0004cX-0f
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:56:06 -0400
+	(envelope-from <peterx@redhat.com>) id 1fn1XB-0004k4-U9
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fn1Wr-000313-4h
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:56:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51640 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fn1X7-00035E-3Z
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:56:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53828 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fn1Wq-00030j-Vx
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:56:01 -0400
-Date: Tue, 7 Aug 2018 14:55:58 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180807125558.2g7nl5zhgrdblrwh@sirius.home.kraxel.org>
-References: <20180803153235.4134-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fn1X6-000354-Uh
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 08:56:17 -0400
+Date: Tue, 7 Aug 2018 20:56:05 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180807125605.GD7265@xz-mi>
+References: <153299204130.14411.11438396195753743913.stgit@gimli.home>
+	<153299242656.14411.14216251294160965283.stgit@gimli.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180803153235.4134-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: fix crashes upon warm reboot
- with vga mode
+In-Reply-To: <153299242656.14411.14216251294160965283.stgit@gimli.home>
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] balloon: Allow nested inhibits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,21 +27,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, stefanb@linux.vnet.ibm.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, cohuck@redhat.com, mst@redhat.com, david@redhat.com
 
-On Fri, Aug 03, 2018 at 05:32:35PM +0200, Marc-Andr=E9 Lureau wrote:
-> With vga=3D775 on the Linux command line a first boot of the VM running
-> Linux works fine. After a warm reboot it crashes during Linux boot.
->=20
-> Before that, valgrind points out bad memory write to console
-> surface. The VGA code is not aware that virtio-gpu got a message
-> surface scanout when the display is disabled. Let's reset VGA graphic
-> mode when it is the case, so that a new display surface is created
-> when doing further VGA operations.
+On Mon, Jul 30, 2018 at 05:13:46PM -0600, Alex Williamson wrote:
+> A simple true/false internal state does not allow multiple users.  Fix
+> this within the existing interface by converting to a counter, so long
+> as the counter is elevated, ballooning is inhibited.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-I guess we should simply call vga_common_reset() in virtio_vga_reset()
-instead, can you try that?
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-thanks,
-  Gerd
+Regards,
+
+-- 
+Peter Xu
