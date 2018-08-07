@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fmz0G-0002e9-LS
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:14:13 -0400
+	(envelope-from <berrange@redhat.com>) id 1fmz1J-0003ns-0M
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:15:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fmz0D-00069J-UC
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:14:12 -0400
-Received: from 10.mo3.mail-out.ovh.net ([87.98.165.232]:36369)
+	(envelope-from <berrange@redhat.com>) id 1fmz1F-0006ZX-W2
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:15:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32872 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fmz0D-00067X-Mt
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:14:09 -0400
-Received: from player773.ha.ovh.net (unknown [10.109.146.211])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id CD3B71C333C
-	for <qemu-devel@nongnu.org>; Tue,  7 Aug 2018 12:14:07 +0200 (CEST)
-References: <20180807075757.7242-1-joel@jms.id.au>
-	<20180807075757.7242-4-joel@jms.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <20662f46-f6ca-1c05-e2c5-b7c80692b77d@kaod.org>
-Date: Tue, 7 Aug 2018 12:13:57 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fmz1F-0006ZR-P9
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:15:13 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 658D8402242D
+	for <qemu-devel@nongnu.org>; Tue,  7 Aug 2018 10:15:13 +0000 (UTC)
+Date: Tue, 7 Aug 2018 11:15:05 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180807101505.GF7335@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180803173614.12358-1-marcandre.lureau@redhat.com>
+	<20180803173614.12358-11-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180807075757.7242-4-joel@jms.id.au>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180803173614.12358-11-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/7] aspeed_sdmc: Set 'cache initial
- sequence' always true
+Subject: Re: [Qemu-devel] [PATCH 10/10] display: add -display app launching
+ external application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +36,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 08/07/2018 09:57 AM, Joel Stanley wrote:
-> The SDRAM training routine sets the 'Enable cache initial' bit, and the=
-n
-> waits for the 'cache initial sequence' to be done.
+On Fri, Aug 03, 2018 at 07:36:14PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> Add a new display backend that will configure Spice to allow a remote
+> client to control QEMU in a similar fashion as other display backend
+> like GTK.
 >=20
-> Have it always return done, as there is no other side effects that the
-> model needs to implement. This allows the upstream u-boot training to
-> proceed on the ast2500-evb board.
+> For this to work, we set up Spice server with a unix socket, and
+> register a VC chardev that will be exposed as Spice ports. A QMP
+> monitor is also exposed as a Spice port, this allows the remote client
+> fuller qemu control and state handling.
 >=20
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-
-
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-Thanks,
-
-C.
-
-> ---
->  hw/misc/aspeed_sdmc.c | 1 +
->  1 file changed, 1 insertion(+)
+> - doesn't handle VC set_echo() - this doesn't seem a strong
+>   requirement, very few front-end use it
+> - spice options can be tweaked with other -spice arguments
+> - Windows support shouldn't be hard to do, but will probably use a TCP
+>   port instead
+> - we may want to watch the child process to quit automatically if it
+>   crashed
 >=20
-> diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-> index 24fd4aee2d82..9ece545c4ffa 100644
-> --- a/hw/misc/aspeed_sdmc.c
-> +++ b/hw/misc/aspeed_sdmc.c
-> @@ -226,6 +226,7 @@ static void aspeed_sdmc_realize(DeviceState *dev, E=
-rror **errp)
->          s->ram_bits =3D ast2500_rambits(s);
->          s->fixed_conf =3D ASPEED_SDMC_HW_VERSION(1) |
->              ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
-> +            ASPEED_SDMC_CACHE_INITIAL_DONE |
->              ASPEED_SDMC_DRAM_SIZE(s->ram_bits);
->          break;
->      default:
->=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+> +    type_register(&char_vc_type_info);
+> +
+> +    sock_path =3D g_strjoin("", tmp_dir, "/", "spice.sock", NULL);
+> +    qopts =3D qemu_opts_create(qemu_find_opts("spice"), NULL, 0, &erro=
+r_abort);
+> +    qemu_opt_set(qopts, "disable-ticketing", "on", &error_abort);
+> +    qemu_opt_set(qopts, "unix", "on", &error_abort);
+> +    qemu_opt_set(qopts, "addr", sock_path, &error_abort);
+> +    qemu_opt_set(qopts, "image-compression", "off", &error_abort);
+> +    qemu_opt_set(qopts, "streaming-video", "off", &error_abort);
+> +    qemu_opt_set(qopts, "gl", opts->has_gl ? "on" : "off", &error_abor=
+t);
+
+Hmm, so ultimately "-display app" is just syntactic sugar for a hardcoded
+set of "-display spice" arguments, plus automatic launching of the client
+app.  I'm thinking users may well ask for ability to control some of thos=
+e
+spice arguments over time.  So if we want auto-launching of a remote app,
+I think it is preferrable to do it via extra args to the existing
+"-display spice" format. eg we could add a "client=3Dyes|no" to control
+launching the client
+
+   -display spice,client=3Dyes
+
+would do what your "-display app" proposes, and still let users tweak
+all the other spice args as desired.  Another option "autoquit=3Dyes|no"
+could control whether QEMU automatically exits when the client quits,
+vs whether it stays alive.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
