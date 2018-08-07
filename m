@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fn2pL-00012v-Qm
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:19:18 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fn2pR-000171-N4
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:19:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fn2pK-0002Ld-F6
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:19:11 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fn2pN-0002NR-OJ
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 10:19:17 -0400
 References: <20180725143413.9728-1-geert+renesas@glider.be>
-	<20180725143413.9728-5-geert+renesas@glider.be>
+	<20180725143413.9728-4-geert+renesas@glider.be>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <e52bfdab-5c23-a617-8bef-0c17ab831ec1@redhat.com>
-Date: Tue, 7 Aug 2018 16:19:03 +0200
+Message-ID: <2d36dfa2-744b-1570-d2c2-51352ce98e23@redhat.com>
+Date: Tue, 7 Aug 2018 16:18:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180725143413.9728-5-geert+renesas@glider.be>
+In-Reply-To: <20180725143413.9728-4-geert+renesas@glider.be>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] hw/arm/sysbus-fdt: Add support for
- instantiating generic devices
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] hw/arm/virt: Allow dynamic sysbus
+ devices again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,181 +30,40 @@ Cc: Magnus Damm <damm+renesas@opensource.se>, Laurent Pinchart <laurent.pinchart
 Hi Geert,
 
 On 07/25/2018 04:34 PM, Geert Uytterhoeven wrote:
-> Add a fallback for instantiating generic devices without a type-specific
-> or compatible-specific instantation method.  This will be used when no
-> other match is found.
-> 
-> The generic instantation method creates a device node with "reg" and
-> (optional) "interrupts" properties, and copies the "compatible"
-> property and other optional properties from the host.
-> For now the following optional properties are copied, if found:
->   - "#gpio-cells",
->   - "gpio-controller",
->   - "#interrupt-cells",
->   - "interrupt-controller",
->   - "interrupt-names".
-> 
-> More can be added when needed.
-> 
-> This avoids having to write device-specific instantation methods for
-instantiation
-> each and every "simple" device using only a set of generic properties.
-> Devices that need more specialized handling can still provide their
-> own instantation method.
-> 
-> This has been tested on a Renesas Salvator-XS board with R-Car H3 ES2.0
-> with SATA:
-> 
->     -device vfio-platform,host=ee300000.sata
-> 
-> and GPIO (needs VFIO No-IOMMU support):
-> 
->     -device vfio-platform,host=e6055400.gpio
-> 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
-> v3:
->   - New.
-> ---
->  hw/arm/sysbus-fdt.c | 102 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 102 insertions(+)
-> 
-> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-> index 0e24c803a1c2c734..8040af00ccf131d7 100644
-> --- a/hw/arm/sysbus-fdt.c
-> +++ b/hw/arm/sysbus-fdt.c
-> @@ -415,6 +415,99 @@ static int add_amd_xgbe_fdt_node(SysBusDevice *sbdev, void *opaque)
->      return 0;
->  }
->  
-> +static HostProperty generic_copied_properties[] = {
-> +    {"compatible", false},
-> +    {"#gpio-cells", true},
-> +    {"gpio-controller", true},
-> +    {"#interrupt-cells", true},
-> +    {"interrupt-controller", true},
-> +    {"interrupt-names", true},
-I think we would need to enumerate the other source properties which
-were not copied to the guest fdt and either warn the userspace those
-were omitted or fail. We may end up generating an incomplete guest dt
-node that may not work properly.
-> +};
-> +
-> +/**
-> + * add_generic_fdt_node
-> + *
-> + * Generates a generic DT node by copying properties from the host
-> + */
-> +static int add_generic_fdt_node(SysBusDevice *sbdev, void *opaque)
-> +{
-> +    PlatformBusFDTData *data = opaque;
-> +    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(sbdev);
-> +    const char *parent_node = data->pbus_node_name;
-> +    void *guest_fdt = data->fdt, *host_fdt;
-> +    VFIODevice *vbasedev = &vdev->vbasedev;
-> +    char **node_path, *node_name, *dt_name;
-> +    PlatformBusDevice *pbus = data->pbus;
-> +    int i, irq_number;
-> +    uint32_t *reg_attr, *irq_attr;
-> +    uint64_t mmio_base;
-> +
-> +    host_fdt = load_device_tree_from_sysfs();
-> +
-> +    dt_name = sysfs_to_dt_name(vbasedev->name);
-> +    if (!dt_name) {
-> +        error_report("%s incorrect sysfs device name %s", __func__,
-> +                     vbasedev->name);
-> +        exit(1);
-> +    }
-> +    node_path = qemu_fdt_node_path(host_fdt, dt_name, vdev->compat,
-> +                                   &error_fatal);
-> +    if (!node_path || !node_path[0]) {
-> +        error_report("%s unable to retrieve node path for %s/%s", __func__,
-> +                     dt_name, vdev->compat);
-> +        exit(1);
-> +    }
-> +
-> +    if (node_path[1]) {
-> +        error_report("%s more than one node matching %s/%s!", __func__, dt_name,
-> +                     vdev->compat);
-> +        exit(1);
-> +    }
-> +
-> +    mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, 0);
-> +    node_name = g_strdup_printf("%s/%s@%" PRIx64, parent_node,
-> +                               vbasedev->name, mmio_base);
-> +    qemu_fdt_add_subnode(guest_fdt, node_name);
-> +
-> +    /* Copy generic properties */
-> +    copy_properties_from_host(generic_copied_properties,
-> +                              ARRAY_SIZE(generic_copied_properties), host_fdt,
-> +                              guest_fdt, node_path[0], node_name);
-> +
-> +    /* Copy reg (remapped) */
-> +    reg_attr = g_new(uint32_t, vbasedev->num_regions * 2);
-> +    for (i = 0; i < vbasedev->num_regions; i++) {
-> +        mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, i);
-> +        reg_attr[2 * i] = cpu_to_be32(mmio_base);
-> +        reg_attr[2 * i + 1] = cpu_to_be32(
-> +                                memory_region_size(vdev->regions[i]->mem));
-> +    }
-> +    qemu_fdt_setprop(guest_fdt, node_name, "reg", reg_attr,
-> +                     vbasedev->num_regions * 2 * sizeof(uint32_t));
-> +
-> +    /* Copy interrupts (remapped) */
-> +    if (vbasedev->num_irqs) {
-> +        irq_attr = g_new(uint32_t, vbasedev->num_irqs * 3);
-> +        for (i = 0; i < vbasedev->num_irqs; i++) {
-> +            irq_number = platform_bus_get_irqn(pbus, sbdev , i)
-> +                             + data->irq_start;
-> +            irq_attr[3 * i] = cpu_to_be32(GIC_FDT_IRQ_TYPE_SPI);
-> +            irq_attr[3 * i + 1] = cpu_to_be32(irq_number);
-> +            irq_attr[3 * i + 2] = cpu_to_be32(GIC_FDT_IRQ_FLAGS_LEVEL_HI);
-I think this part is not generic enough. How can you assume the IRQs are
-level or edge? Can't you copy the source interrupt properties and just
-overwrite the IRQ number?
+> Allow the instantation of generic dynamic sysbus devices again, without
+> the need to create a new device-specific vfio type.
+The patch title and commit message need to be updated as we allow the
+dynamic instantiation of VFIO PLATFORM devices.
 
 Thanks
 
 Eric
-> +        }
-> +        qemu_fdt_setprop(guest_fdt, node_name, "interrupts",
-> +                         irq_attr, vbasedev->num_irqs * 3 * sizeof(uint32_t));
-> +        g_free(irq_attr);
-> +    }
-> +
-> +    g_free(reg_attr);
-> +    g_free(node_name);
-> +    g_strfreev(node_path);
-> +    g_free(dt_name);
-> +    g_free(host_fdt);
-> +    return 0;
-> +}
-> +
->  /* DT compatible matching */
->  static bool vfio_platform_match(SysBusDevice *sbdev,
->                                  const BindingEntry *entry)
-> @@ -423,6 +516,11 @@ static bool vfio_platform_match(SysBusDevice *sbdev,
->      const char *compat;
->      unsigned int n;
->  
-> +    if (!entry->compat) {
-> +        /* Generic DT fallback */
-> +        return true;
-> +    }
-> +
->      for (n = vdev->num_compat, compat = vdev->compat; n > 0;
->           n--, compat += strlen(compat) + 1) {
->          if (!strcmp(entry->compat, compat)) {
-> @@ -459,6 +557,10 @@ static const BindingEntry bindings[] = {
->      VFIO_PLATFORM_BINDING("amd,xgbe-seattle-v1a", add_amd_xgbe_fdt_node),
->  #endif
->      TYPE_BINDING(TYPE_RAMFB_DEVICE, no_fdt_node),
-> +#ifdef CONFIG_LINUX
-> +    /* Generic DT fallback must be last */
-> +    VFIO_PLATFORM_BINDING(NULL, add_generic_fdt_node),
-> +#endif
->      TYPE_BINDING("", NULL), /* last element */
->  };
->  
+> 
+> This is more or less a partial revert of commit 6f2062b9758ebc64
+> ("hw/arm/virt: Allow only supported dynamic sysbus devices").
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+> v3:
+>   - Drop RFC state,
+> 
+> v2:
+>   - Restrict from TYPE_SYS_BUS_DEVICE to TYPE_VFIO_PLATFORM, as
+>     suggested by Eric Auger.
+> ---
+>  hw/arm/virt.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 281ddcdf6e26236d..24c1d8e28c7c4285 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1724,6 +1724,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
+>      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
+>      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_RAMFB_DEVICE);
+> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_PLATFORM);
+>      mc->block_default_type = IF_VIRTIO;
+>      mc->no_cdrom = 1;
+>      mc->pci_allow_0_address = true;
 > 
