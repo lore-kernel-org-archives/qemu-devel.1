@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fmy7E-0007Am-MG
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:17:21 -0400
+	(envelope-from <famz@redhat.com>) id 1fmy7G-0007C1-4N
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:17:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fmy7D-00078d-ST
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:17:20 -0400
+	(envelope-from <famz@redhat.com>) id 1fmy7F-00079z-8u
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 05:17:22 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue,  7 Aug 2018 17:16:53 +0800
-Message-Id: <20180807091655.32472-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] Fix aio_notify_accept()
+Date: Tue,  7 Aug 2018 17:16:54 +0800
+Message-Id: <20180807091655.32472-2-famz@redhat.com>
+In-Reply-To: <20180807091655.32472-1-famz@redhat.com>
+References: <20180807091655.32472-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] aio-posix: Don't count ctx->notifier as
+ progress when polling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,21 +23,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, lersek@redhat.com, qemu-block@nongnu.org
 
-v2: Implement the fix following Paolo's idea.
-    Testing is still in progress.
+The same logic exists in fd polling. This change is especially important
+to avoid busy loop once we limit aio_notify_accept() to blocking
+aio_poll().
 
-Calling aio_notify_accept(iothread->ctx) from main loop when it does
-aio_poll(iothread->ctx, false) is a bug because it may steal the event needed
-by aio_poll(iothread->ctx, true) in the IOThread. This can cause IOThread
-hanging.
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ util/aio-posix.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Fam Zheng (2):
-  aio-posix: Don't count ctx->notifier as progress when polling
-  aio: Do aio_notify_accept only during blocking aio_poll
-
- util/aio-posix.c | 7 ++++---
- util/aio-win32.c | 3 ++-
- 2 files changed, 6 insertions(+), 4 deletions(-)
-
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 118bf5784b..b5c7f463aa 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -494,7 +494,8 @@ static bool run_poll_handlers_once(AioContext *ctx)
+     QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
+         if (!node->deleted && node->io_poll &&
+             aio_node_check(ctx, node->is_external) &&
+-            node->io_poll(node->opaque)) {
++            node->io_poll(node->opaque) &&
++            node->opaque != &ctx->notifier) {
+             progress = true;
+         }
+ 
 -- 
 2.17.1
