@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fmuOi-000274-C0
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 01:19:09 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1fmvA4-0004XO-UD
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 02:08:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fmuOh-0005V2-Bg
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 01:19:08 -0400
-Received: from mail-lj1-x230.google.com ([2a00:1450:4864:20::230]:40554)
+	(envelope-from <liq3ea@gmail.com>) id 1fmvA2-00025j-I4
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 02:08:04 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:46693)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
-	id 1fmuOh-0005Tm-2r
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 01:19:07 -0400
-Received: by mail-lj1-x230.google.com with SMTP id j19-v6so12374470ljc.7
-	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 22:19:06 -0700 (PDT)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1fmvA2-000251-6w
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 02:08:02 -0400
+Received: by mail-io0-x243.google.com with SMTP id i18-v6so13036013ioj.13
+	for <qemu-devel@nongnu.org>; Mon, 06 Aug 2018 23:08:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <1533177924-24765-1-git-send-email-whois.zihan.yang@gmail.com>
-	<1533177924-24765-2-git-send-email-whois.zihan.yang@gmail.com>
-	<91bb56d1-39bb-813a-55e6-67020670e94d@gmail.com>
-In-Reply-To: <91bb56d1-39bb-813a-55e6-67020670e94d@gmail.com>
-From: Zihan Yang <whois.zihan.yang@gmail.com>
-Date: Tue, 7 Aug 2018 13:18:53 +0800
-Message-ID: <CAKwiv-jmuFNb=v52L=asRtcL7Ohe3zSCjChegQcUk7GWofEeKw@mail.gmail.com>
+In-Reply-To: <20180802104738.GB2524@work-vm>
+References: <1533128420-2745-1-git-send-email-liq3ea@gmail.com>
+	<20180802104738.GB2524@work-vm>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 7 Aug 2018 14:07:21 +0800
+Message-ID: <CAKXe6SJ21J=T2YbOHRuZr2Xr-c0U5WumYDA16_P8_7XsYd+8ng@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v3 1/6] pci_expander_bridge: add type
- TYPE_PXB_PCIE_HOST
+Subject: Re: [Qemu-devel] [PATCH] migrate/cpu-throttle: Add max-cpu-throttle
+ migration parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +29,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, liqiang02@corp.netease.com, hzliuyingdong@corp.netease.com
 
-Marcel Apfelbaum <marcel.apfelbaum@gmail.com> =E4=BA=8E2018=E5=B9=B48=E6=9C=
-=886=E6=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=887:46=E5=86=99=E9=81=93=EF=
-=BC=9A
->
->
->
-> On 08/02/2018 05:45 AM, Zihan Yang wrote:
-> > The inner host bridge created by pxb-pcie is TYPE_PXB_PCI_HOST by defau=
-lt,
-> > change it to a new type TYPE_PXB_PCIE_HOST to better utilize ECAM of PC=
-Ie
->
-> After an offline conversation we decided to not review this version
-> and wait for the next one, that will come with a SeaBIOS counterpart seri=
-es.
+ Hello Dave,
 
-Yes, there are also a few trivial bugs that I fix later. I'm preparing
-for a new patch set,
-and a patch set in seabios.
-
-> Zihan, please be sure to add 'patch 0 ' to the series where we can discus=
-s
-> the series status.
-
-There actually is a patch 0, but it seems the cccmd does not apply the
-patch 0 automatically,
-I will cc you the cover letter too next time.
+What's status of this patch, Do you gonna merge it?
 
 Thanks,
-Zihan
+Li Qiang
+
+
+2018-08-02 18:47 GMT+08:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
+
+> * Li Qiang (liq3ea@gmail.com) wrote:
+> > Currently, the default maximum CPU throttle for migration is
+> > 99(CPU_THROTTLE_PCT_MAX). This is too big and can make a remarkable
+> > performance effect for the guest. We see a lot of packets latency
+> > exceed 500ms when the CPU_THROTTLE_PCT_MAX reached. This patch set
+> > adds a new max-cpu-throttle parameter to limit the CPU throttle.
+>
+> I think this is OK, so
+>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+> but I do have one comment below which made me think
+>
+> > Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> > ---
+> >  hmp.c                 |  8 ++++++++
+> >  migration/migration.c | 23 ++++++++++++++++++++++-
+> >  migration/migration.h |  1 +
+> >  migration/ram.c       |  4 +++-
+> >  qapi/migration.json   | 21 ++++++++++++++++++---
+> >  5 files changed, 52 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/hmp.c b/hmp.c
+> > index 2aafb50e8e..c38e8b1f78 100644
+> > --- a/hmp.c
+> > +++ b/hmp.c
+> > @@ -339,6 +339,10 @@ void hmp_info_migrate_parameters(Monitor *mon,
+> const QDict *qdict)
+> >          monitor_printf(mon, "%s: %u\n",
+> >              MigrationParameter_str(MIGRATION_PARAMETER_CPU_
+> THROTTLE_INCREMENT),
+> >              params->cpu_throttle_increment);
+> > +        assert(params->has_max_cpu_throttle);
+> > +        monitor_printf(mon, "%s: %u\n",
+> > +            MigrationParameter_str(MIGRATION_PARAMETER_MAX_CPU_
+> THROTTLE),
+> > +            params->max_cpu_throttle);
+> >          assert(params->has_tls_creds);
+> >          monitor_printf(mon, "%s: '%s'\n",
+> >              MigrationParameter_str(MIGRATION_PARAMETER_TLS_CREDS),
+> > @@ -1635,6 +1639,10 @@ void hmp_migrate_set_parameter(Monitor *mon,
+> const QDict *qdict)
+> >          p->has_cpu_throttle_increment = true;
+> >          visit_type_int(v, param, &p->cpu_throttle_increment, &err);
+> >          break;
+> > +    case MIGRATION_PARAMETER_MAX_CPU_THROTTLE:
+> > +        p->has_max_cpu_throttle = true;
+> > +        visit_type_int(v, param, &p->max_cpu_throttle, &err);
+> > +        break;
+> >      case MIGRATION_PARAMETER_TLS_CREDS:
+> >          p->has_tls_creds = true;
+> >          p->tls_creds = g_new0(StrOrNull, 1);
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index b7d9854bda..570da6c0e7 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -71,6 +71,7 @@
+> >  /* Define default autoconverge cpu throttle migration parameters */
+> >  #define DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL 20
+> >  #define DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT 10
+> > +#define DEFAULT_MIGRATE_MAX_CPU_THROTTLE 99
+> >
+> >  /* Migration XBZRLE default cache size */
+> >  #define DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE (64 * 1024 * 1024)
+> > @@ -697,6 +698,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error
+> **errp)
+> >      params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
+> >      params->has_max_postcopy_bandwidth = true;
+> >      params->max_postcopy_bandwidth = s->parameters.max_postcopy_
+> bandwidth;
+> > +    params->has_max_cpu_throttle = true;
+> > +    params->max_cpu_throttle = s->parameters.max_cpu_throttle;
+> >
+> >      return params;
+> >  }
+> > @@ -1043,6 +1046,15 @@ static bool migrate_params_check(MigrationParameters
+> *params, Error **errp)
+> >          return false;
+> >      }
+> >
+> > +    if (params->has_max_cpu_throttle &&
+> > +        (params->max_cpu_throttle < params->cpu_throttle_initial ||
+> > +         params->max_cpu_throttle > 99)) {
+> > +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+> > +                   "max_cpu_throttle",
+> > +                   "an integer in the range of cpu_throttle_initial to
+> 99");
+> > +        return false;
+> > +    }
+> > +
+> >      return true;
+> >  }
+> >
+> > @@ -1110,6 +1122,9 @@ static void migrate_params_test_apply(MigrateSetParameters
+> *params,
+> >      if (params->has_max_postcopy_bandwidth) {
+> >          dest->max_postcopy_bandwidth = params->max_postcopy_bandwidth;
+> >      }
+> > +    if (params->has_max_cpu_throttle) {
+> > +        dest->max_cpu_throttle = params->max_cpu_throttle;
+> > +    }
+> >  }
+> >
+> >  static void migrate_params_apply(MigrateSetParameters *params, Error
+> **errp)
+> > @@ -1185,6 +1200,9 @@ static void migrate_params_apply(MigrateSetParameters
+> *params, Error **errp)
+> >      if (params->has_max_postcopy_bandwidth) {
+> >          s->parameters.max_postcopy_bandwidth = params->max_postcopy_
+> bandwidth;
+> >      }
+> > +    if (params->has_max_cpu_throttle) {
+> > +        s->parameters.max_cpu_throttle = params->max_cpu_throttle;
+> > +    }
+> >  }
+> >
+> >  void qmp_migrate_set_parameters(MigrateSetParameters *params, Error
+> **errp)
+> > @@ -1962,7 +1980,6 @@ static int64_t migrate_max_postcopy_
+> bandwidth(void)
+> >      return s->parameters.max_postcopy_bandwidth;
+> >  }
+> >
+> > -
+> >  bool migrate_use_block(void)
+> >  {
+> >      MigrationState *s;
+> > @@ -3160,6 +3177,9 @@ static Property migration_properties[] = {
+> >      DEFINE_PROP_SIZE("max-postcopy-bandwidth", MigrationState,
+> >                        parameters.max_postcopy_bandwidth,
+> >                        DEFAULT_MIGRATE_MAX_POSTCOPY_BANDWIDTH),
+> > +    DEFINE_PROP_UINT8("max-cpu-throttle", MigrationState,
+> > +                      parameters.max_cpu_throttle,
+> > +                      DEFAULT_MIGRATE_MAX_CPU_THROTTLE),
+> >
+> >      /* Migration capabilities */
+> >      DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
+> > @@ -3230,6 +3250,7 @@ static void migration_instance_init(Object *obj)
+> >      params->has_x_multifd_page_count = true;
+> >      params->has_xbzrle_cache_size = true;
+> >      params->has_max_postcopy_bandwidth = true;
+> > +    params->has_max_cpu_throttle = true;
+> >
+> >      qemu_sem_init(&ms->postcopy_pause_sem, 0);
+> >      qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
+> > diff --git a/migration/migration.h b/migration/migration.h
+> > index 64a7b33735..eb0c04a7b4 100644
+> > --- a/migration/migration.h
+> > +++ b/migration/migration.h
+> > @@ -266,6 +266,7 @@ bool migrate_colo_enabled(void);
+> >
+> >  bool migrate_use_block(void);
+> >  bool migrate_use_block_incremental(void);
+> > +int migrate_max_cpu_throttle(void);
+> >  bool migrate_use_return_path(void);
+> >
+> >  bool migrate_use_compression(void);
+> > diff --git a/migration/ram.c b/migration/ram.c
+> > index 24dea2730c..cdd4349177 100644
+> > --- a/migration/ram.c
+> > +++ b/migration/ram.c
+> > @@ -1390,13 +1390,15 @@ static void mig_throttle_guest_down(void)
+> >      MigrationState *s = migrate_get_current();
+> >      uint64_t pct_initial = s->parameters.cpu_throttle_initial;
+> >      uint64_t pct_icrement = s->parameters.cpu_throttle_increment;
+> > +    int pct_max = s->parameters.max_cpu_throttle;
+> >
+> >      /* We have not started throttling yet. Let's start it. */
+> >      if (!cpu_throttle_active()) {
+> >          cpu_throttle_set(pct_initial);
+> >      } else {
+> >          /* Throttling already on, just increase the rate */
+> > -        cpu_throttle_set(cpu_throttle_get_percentage() + pct_icrement);
+> > +        cpu_throttle_set(MIN(cpu_throttle_get_percentage() +
+> pct_icrement,
+> > +                         pct_max));
+>
+> I wondered whether we should just make this change inside
+> cpu_throttle_set and remove the CPU_THROTTLE_PCT_MAX define; but in the
+> end I decided you're code is probably better, because the
+> cpu_throttle_set code is generic, where as this limitation is specific
+> to why we're throttling it for migration.
+>
+> Dave
+>
+> >      }
+> >  }
+> >
+> > diff --git a/qapi/migration.json b/qapi/migration.json
+> > index 186e8a7303..865064e18c 100644
+> > --- a/qapi/migration.json
+> > +++ b/qapi/migration.json
+> > @@ -523,6 +523,9 @@
+> >  # @max-postcopy-bandwidth: Background transfer bandwidth during
+> postcopy.
+> >  #                     Defaults to 0 (unlimited).  In bytes per second.
+> >  #                     (Since 3.0)
+> > +#
+> > +# @max-cpu-throttle: maximum cpu throttle percentage.
+> > +#                    Defaults to 99. (Since 3.1)
+> >  # Since: 2.4
+> >  ##
+> >  { 'enum': 'MigrationParameter',
+> > @@ -531,7 +534,8 @@
+> >             'tls-creds', 'tls-hostname', 'max-bandwidth',
+> >             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+> >             'x-multifd-channels', 'x-multifd-page-count',
+> > -           'xbzrle-cache-size', 'max-postcopy-bandwidth' ] }
+> > +           'xbzrle-cache-size', 'max-postcopy-bandwidth',
+> > +           'max-cpu-throttle' ] }
+> >
+> >  ##
+> >  # @MigrateSetParameters:
+> > @@ -603,6 +607,10 @@
+> >  # @max-postcopy-bandwidth: Background transfer bandwidth during
+> postcopy.
+> >  #                     Defaults to 0 (unlimited).  In bytes per second.
+> >  #                     (Since 3.0)
+> > +#
+> > +# @max-cpu-throttle: maximum cpu throttle percentage.
+> > +#                    The default value is 99. (Since 3.1)
+> > +#
+> >  # Since: 2.4
+> >  ##
+> >  # TODO either fuse back into MigrationParameters, or make
+> > @@ -622,7 +630,8 @@
+> >              '*x-multifd-channels': 'int',
+> >              '*x-multifd-page-count': 'int',
+> >              '*xbzrle-cache-size': 'size',
+> > -            '*max-postcopy-bandwidth': 'size' } }
+> > +            '*max-postcopy-bandwidth': 'size',
+> > +         '*max-cpu-throttle': 'int' } }
+> >
+> >  ##
+> >  # @migrate-set-parameters:
+> > @@ -709,6 +718,11 @@
+> >  # @max-postcopy-bandwidth: Background transfer bandwidth during
+> postcopy.
+> >  #                     Defaults to 0 (unlimited).  In bytes per second.
+> >  #                     (Since 3.0)
+> > +#
+> > +# @max-cpu-throttle: maximum cpu throttle percentage.
+> > +#                    Defaults to 99.
+> > +#                     (Since 3.1)
+> > +#
+> >  # Since: 2.4
+> >  ##
+> >  { 'struct': 'MigrationParameters',
+> > @@ -726,7 +740,8 @@
+> >              '*x-multifd-channels': 'uint8',
+> >              '*x-multifd-page-count': 'uint32',
+> >              '*xbzrle-cache-size': 'size',
+> > -            '*max-postcopy-bandwidth': 'size'  } }
+> > +         '*max-postcopy-bandwidth': 'size',
+> > +            '*max-cpu-throttle':'uint8'} }
+> >
+> >  ##
+> >  # @query-migrate-parameters:
+> > --
+> > 2.11.0
+> >
+> >
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
