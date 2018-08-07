@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <coli@redhat.com>) id 1fmrte-00029B-PP
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 22:38:55 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fmth4-0004gk-0E
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 00:34:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <coli@redhat.com>) id 1fmrte-0002Gz-05
-	for qemu-devel@nongnu.org; Mon, 06 Aug 2018 22:38:54 -0400
-Date: Mon, 6 Aug 2018 22:38:45 -0400 (EDT)
-From: Cong Li <coli@redhat.com>
-Message-ID: <199002085.38975596.1533609525821.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20180806123728.13658-1-kwolf@redhat.com>
-References: <20180806123728.13658-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qapi/block: Document restrictions for node
- names
+	(envelope-from <jsnow@redhat.com>) id 1fmth1-0001HW-Jb
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 00:34:01 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Tue,  7 Aug 2018 00:33:30 -0400
+Message-Id: <20180807043349.27196-3-jsnow@redhat.com>
+In-Reply-To: <20180807043349.27196-1-jsnow@redhat.com>
+References: <20180807043349.27196-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/21] jobs: add exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +19,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 
+Most jobs do the same thing when they leave their running loop:
+- Store the return code in a structure
+- wait to receive this structure in the main thread
+- signal job completion via job_completed
 
------ Original Message -----
-> From: "Kevin Wolf" <kwolf@redhat.com>
-> To: qemu-block@nongnu.org
-> Cc: kwolf@redhat.com, coli@redhat.com, qemu-devel@nongnu.org
-> Sent: Monday, August 6, 2018 8:37:28 PM
-> Subject: [PATCH] qapi/block: Document restrictions for node names
-> 
-> blockdev-add fails if an invalid node name is given, so we should
-> document what a valid node name even is.
-> 
-> Reported-by: Cong Li <coli@redhat.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+More seriously, when we utilize job_defer_to_main_loop_bh to call
+a function that calls job_completed, job_finalize_single will run
+in a context where it has recursively taken the aio_context lock,
+which can cause hangs if it puts down a reference that causes a flush.
 
-Reviewed-by: Cong Li <coli@redhat.com>
+The job infrastructure is perfectly capable of registering job
+completion itself when we leave the job's entry point. In this
+context, we can signal job completion from outside of the aio_context,
+which should allow for job cleanup code to run with only one lock.
 
-> ---
->  qapi/block-core.json | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 62a92fa4f4..fe565ebfaf 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -3563,6 +3563,9 @@
->  # @driver:        block driver name
->  # @node-name:     the node name of the new node (Since 2.0).
->  #                 This option is required on the top level of blockdev-add.
-> +#                 Valid node names start with an alphabetic character and
-> may
-> +#                 contain only alphanumeric characters, '-', '.' and '_'.
-> Their
-> +#                 maximum length is 31 characters.
->  # @discard:       discard-related options (default: ignore)
->  # @cache:         cache-related options
->  # @read-only:     whether the block device should be read-only (default:
->  false).
-> --
-> 2.13.6
-> 
-> 
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ include/qemu/job.h |  7 +++++++
+ job.c              | 19 +++++++++++++++++++
+ 2 files changed, 26 insertions(+)
+
+diff --git a/include/qemu/job.h b/include/qemu/job.h
+index 845ad00c03..0c24e8704f 100644
+--- a/include/qemu/job.h
++++ b/include/qemu/job.h
+@@ -204,6 +204,13 @@ struct JobDriver {
+      */
+     void (*drain)(Job *job);
+ 
++    /**
++     * If the callback is not NULL, exit will be invoked from the main thread
++     * when the job's coroutine has finished, but before transactional
++     * convergence; before @prepare or @abort.
++     */
++    void (*exit)(Job *job);
++
+     /**
+      * If the callback is not NULL, prepare will be invoked when all the jobs
+      * belonging to the same transaction complete; or upon this job's completion
+diff --git a/job.c b/job.c
+index b281f30375..cc5ac9ac30 100644
+--- a/job.c
++++ b/job.c
+@@ -535,6 +535,19 @@ void job_drain(Job *job)
+     }
+ }
+ 
++static void job_exit(void *opaque)
++{
++    Job *job = (Job *)opaque;
++    AioContext *aio_context = job->aio_context;
++
++    if (job->driver->exit) {
++        aio_context_acquire(aio_context);
++        job->driver->exit(job);
++        aio_context_release(aio_context);
++    }
++    job_completed(job, job->ret);
++}
++
+ /**
+  * All jobs must allow a pause point before entering their job proper. This
+  * ensures that jobs can be paused prior to being started, then resumed later.
+@@ -546,6 +559,12 @@ static void coroutine_fn job_co_entry(void *opaque)
+     assert(job && job->driver && job->driver->start);
+     job_pause_point(job);
+     job->driver->start(job);
++    if (!job->deferred_to_main_loop) {
++        job->deferred_to_main_loop = true;
++        aio_bh_schedule_oneshot(qemu_get_aio_context(),
++                                job_exit,
++                                job);
++    }
+ }
+ 
+ 
+-- 
+2.14.4
