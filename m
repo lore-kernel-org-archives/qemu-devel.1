@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1fmzYN-00087H-VY
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:49:28 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1fmzYP-00089e-FW
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:49:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1fmzYJ-00034n-3E
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:49:28 -0400
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:33725)
+	(envelope-from <tgolembi@redhat.com>) id 1fmzYK-000358-If
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:49:29 -0400
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:54209)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1fmzYI-00034W-TL
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:49:23 -0400
-Received: by mail-wm0-f42.google.com with SMTP id r24-v6so14004997wmh.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 03:49:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1fmzYK-00034v-Ad
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:49:24 -0400
+Received: by mail-wm0-f45.google.com with SMTP id s9-v6so16926164wmh.3
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 03:49:24 -0700 (PDT)
 From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
-Date: Tue,  7 Aug 2018 12:49:15 +0200
-Message-Id: <65e1a15b5c2bb532a26a4fe908c67f4c9ea5f138.1533638952.git.tgolembi@redhat.com>
+Date: Tue,  7 Aug 2018 12:49:16 +0200
+Message-Id: <9fcdb4fc0d467b1e0f0a4b2e299305e05a62e7eb.1533638952.git.tgolembi@redhat.com>
 In-Reply-To: <cover.1533638952.git.tgolembi@redhat.com>
 References: <cover.1533638952.git.tgolembi@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/4] build: rename CONFIG_QGA_NTDDDISK to
- CONFIG_QGA_NTDDSCSI
+Subject: [Qemu-devel] [PATCH 2/4] qga: win32: add debugging information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +31,90 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-There was inconsistency between commits:
-
-  50cbebb9a3 configure: add configure check for ntdddisk.h
-  a3ef3b2272 qga: added bus type and disk location path
-
-The first commit added #define CONFIG_QGA_NTDDDISK but the second commit
-expected the name to be CONFIG_QGA_NTDDSCSI. As a result the code in
-second patch was never used.
-
-Renaming the option to CONFIG_QGA_NTDDSCSI to match the name of header
-file that is being checked for.
+The windows code generaly lacks debug information (compared to posix
+code). This patch adds some related to HW info in guest-get-fsinfo
+command.
 
 Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
 ---
- configure | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ qga/commands-win32.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/configure b/configure
-index 2a7796ea80..b31f37ed50 100755
---- a/configure
-+++ b/configure
-@@ -6111,7 +6111,7 @@ if test "$mingw32" = "yes" ; then
-     echo "WIN_SDK=\"$win_sdk\"" >> $config_host_mak
-   fi
-   if test "$guest_agent_ntddscsi" = "yes" ; then
--    echo "CONFIG_QGA_NTDDDISK=y" >> $config_host_mak
-+    echo "CONFIG_QGA_NTDDSCSI=y" >> $config_host_mak
-   fi
-   if test "$guest_agent_msi" = "yes"; then
-     echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 318d760a74..36d76c22c0 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -498,6 +498,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+         goto out;
+     }
+ 
++    g_debug("enumerating devices");
+     dev_info_data.cbSize = sizeof(SP_DEVINFO_DATA);
+     for (i = 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data); i++) {
+         DWORD addr, bus, slot, func, dev, data, size2;
+@@ -522,6 +523,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+         if (g_strcmp0(buffer, dev_name)) {
+             continue;
+         }
++        g_debug("found device %s", dev_name);
+ 
+         /* There is no need to allocate buffer in the next functions. The size
+          * is known and ULONG according to
+@@ -530,6 +532,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+          */
+         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+                    SPDRP_BUSNUMBER, &data, (PBYTE)&bus, size, NULL)) {
++            g_debug("failed to get bus");
+             break;
+         }
+ 
+@@ -537,6 +540,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+          * transformed into device function and number */
+         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+                    SPDRP_ADDRESS, &data, (PBYTE)&addr, size, NULL)) {
++            g_debug("failed to get address");
+             break;
+         }
+ 
+@@ -544,6 +548,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+          * This number is typically a user-perceived slot number. */
+         if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+                    SPDRP_UI_NUMBER, &data, (PBYTE)&slot, size, NULL)) {
++            g_debug("failed to get slot");
+             break;
+         }
+ 
+@@ -608,6 +613,7 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+     scsi_ad = &addr;
+     char *name = g_strndup(guid, strlen(guid)-1);
+ 
++    g_debug("getting disk info for: %s", name);
+     vol_h = CreateFile(name, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                        0, NULL);
+     if (vol_h == INVALID_HANDLE_VALUE) {
+@@ -615,6 +621,7 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+         goto out_free;
+     }
+ 
++    g_debug("getting bus type");
+     bus = get_disk_bus_type(vol_h, errp);
+     if (bus < 0) {
+         goto out_close;
+@@ -622,6 +629,7 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+ 
+     disk = g_malloc0(sizeof(*disk));
+     disk->bus_type = find_bus_type(bus);
++    g_debug("bus type %d", disk->bus_type);
+     if (bus == BusTypeScsi || bus == BusTypeAta || bus == BusTypeRAID
+ #if (_WIN32_WINNT >= 0x0600)
+             /* This bus type is not supported before Windows Server 2003 SP1 */
+@@ -631,6 +639,7 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+         /* We are able to use the same ioctls for different bus types
+          * according to Microsoft docs
+          * https://technet.microsoft.com/en-us/library/ee851589(v=ws.10).aspx */
++        g_debug("getting pci-controller info");
+         if (DeviceIoControl(vol_h, IOCTL_SCSI_GET_ADDRESS, NULL, 0, scsi_ad,
+                             sizeof(SCSI_ADDRESS), &len, NULL)) {
+             disk->unit = addr.Lun;
 -- 
 2.18.0
