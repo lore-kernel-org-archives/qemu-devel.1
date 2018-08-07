@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fmz1K-0003on-St
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:15:21 -0400
+	(envelope-from <clg@kaod.org>) id 1fmzDL-00083j-62
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:27:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fmz1K-0006bg-1y
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:15:18 -0400
-References: <20180807091655.32472-1-famz@redhat.com>
-	<20180807091655.32472-3-famz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3ca9cf3e-6b95-76f4-e729-8abdc9a2c0b8@redhat.com>
-Date: Tue, 7 Aug 2018 12:15:08 +0200
+	(envelope-from <clg@kaod.org>) id 1fmzDG-0003zX-Ve
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:27:43 -0400
+Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:38279)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fmzDG-0003yN-OS
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 06:27:38 -0400
+Received: from player695.ha.ovh.net (unknown [10.109.143.225])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id EAB69E18A6
+	for <qemu-devel@nongnu.org>; Tue,  7 Aug 2018 12:27:36 +0200 (CEST)
+References: <20180807075757.7242-1-joel@jms.id.au>
+	<20180807075757.7242-5-joel@jms.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <6fd6639f-9399-ffea-9924-9ccf85efd6ec@kaod.org>
+Date: Tue, 7 Aug 2018 12:27:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180807091655.32472-3-famz@redhat.com>
+In-Reply-To: <20180807075757.7242-5-joel@jms.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] aio: Do aio_notify_accept only
- during blocking aio_poll
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/7] aspeed_sdmc: Init status alwlays idle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, lersek@redhat.com, qemu-block@nongnu.org
+To: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On 07/08/2018 11:16, Fam Zheng wrote:
->     main thread                     IO Thread
->     ===============================================================
->     bdrv_drained_begin()
->       aio_disable_external(ctx)
->                                     aio_poll(ctx, true)
->                                       ctx->notify_me += 2
->                                       ppoll() /* blocked */
->     ...
->     bdrv_drained_end()
->       ...
->         aio_notify()
->     ...
->     bdrv_set_aio_context()
->       aio_poll(ctx, false)
-> [1]     aio_notify_accept(ctx)
->                                       /* Hang! */
+On 08/07/2018 09:57 AM, Joel Stanley wrote:
+> The ast2500 SDRAM training routine busy waits on the 'init cycle busy
+> state' bit in DDR PHY Control/Status register #1 (MCR60).
+>=20
+> This ensures the bit always reads zero, and allows training to
+> complete with upstream u-boot on the ast2500-evb.
+>=20
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
 
-Should ppoll() rather be after [1]?  Otherwise the new commit message
-and patches look great.
 
-> aio_notify() only injects an event when ctx->notify_me is set,
-> correspondingly aio_notify_accept() is only useful when ctx->notify_me
-> _was_ set.
 
-Very good point.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-(Please Cc qemu-stable on the second patch too).
+One comment below, no need to resend for that.
 
-Paolo
+> ---
+>  hw/misc/aspeed_sdmc.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+>=20
+> diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
+> index 9ece545c4ffa..522e01ef8c0d 100644
+> --- a/hw/misc/aspeed_sdmc.c
+> +++ b/hw/misc/aspeed_sdmc.c
+> @@ -23,6 +23,10 @@
+>  /* Configuration Register */
+>  #define R_CONF            (0x04 / 4)
+> =20
+> +/* Control/Status Register #1 (ast2500) */
+> +#define R_STATUS1         (0x60 / 4)
+> +#define   PHY_BUSY_STATE      BIT(0)
+> +
+>  /*
+>   * Configuration register Ox4 (for Aspeed AST2400 SOC)
+>   *
+> @@ -137,6 +141,17 @@ static void aspeed_sdmc_write(void *opaque, hwaddr=
+ addr, uint64_t data,
+>              g_assert_not_reached();
+>          }
+>      }
+> +    if (s->silicon_rev =3D=3D AST2500_A0_SILICON_REV ||
+> +            s->silicon_rev =3D=3D AST2500_A1_SILICON_REV) {
+
+Maybe use the ASPEED_IS_AST2500() ?=20
+
+It would be nice to have a set of macros we could use in the different
+models testing the SoC silicon revision. How about :
+
+#define ASPEED_AST2400 0x2
+#define ASPEED_AST2500 0x4
+#define ASPEED_AST2600 0x6
+
+#define ASPEED_REVISION_MAJOR(si_rev)     (((si_rev) >> 24) & 0xff)
+
+#define ASPEED_IS_AST2400(si_rev)  (ASPEED_REVISION_MAJOR(si_rev) =3D=3D =
+ASPEED_AST2400)
+#define ASPEED_IS_AST2500(si_rev)  (ASPEED_REVISION_MAJOR(si_rev) =3D=3D =
+ASPEED_AST2500)
+#define ASPEED_IS_AST2600(si_rev)  (ASPEED_REVISION_MAJOR(si_rev) =3D=3D =
+ASPEED_AST2600)
+
+
+Thanks,
+
+C.
+
+
+> +        switch (addr) {
+> +        case R_STATUS1:
+> +            /* Will never return 'busy' */
+> +            data &=3D ~PHY_BUSY_STATE;
+> +            break;
+> +        default:
+> +            break;
+> +        }
+> +    }
+> =20
+>      s->regs[addr] =3D data;
+>  }
+>=20
