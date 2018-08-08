@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fnBvX-0005rJ-6Q
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 20:02:12 -0400
+	(envelope-from <mst@redhat.com>) id 1fnC0f-0007D9-4C
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 20:07:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fnBvU-0006LU-3s
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 20:02:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46498 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fnC0b-0007c9-UX
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 20:07:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54016 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fnBvT-0006Kt-UN
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 20:02:08 -0400
-Date: Wed, 8 Aug 2018 03:02:04 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fnC0b-0007c5-Nm
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 20:07:25 -0400
+Date: Wed, 8 Aug 2018 03:07:22 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180808025009-mutt-send-email-mst@kernel.org>
+Message-ID: <20180808030316-mutt-send-email-mst@kernel.org>
 References: <20180807193125.30378-1-alex.williamson@redhat.com>
-	<20180807224033-mutt-send-email-mst@kernel.org>
-	<20180807135303.3938b3a2@t450s.home>
-	<20180808004929-mutt-send-email-mst@kernel.org>
-	<20180807164033.575b5ff8@t450s.home>
+	<20180807193125.30378-2-alex.williamson@redhat.com>
+	<20180807224339-mutt-send-email-mst@kernel.org>
+	<20180807140826.653e8faa@t450s.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180807164033.575b5ff8@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Balloon inhibit enhancements,
- vfio restriction
+In-Reply-To: <20180807140826.653e8faa@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] balloon: Allow multiple inhibit
+ users
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +33,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alex Williamson <alex.williamson@redhat.com>
 Cc: qemu-devel@nongnu.org, peterx@redhat.com, Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org, david@redhat.com
 
-On Tue, Aug 07, 2018 at 04:40:33PM -0600, Alex Williamson wrote:
-> Maybe some of these will evolve over time, SVA efforts are working on
-> some of these interfaces, but apparently device assignment users have
-> been getting along just fine without ballooning for many years.
+On Tue, Aug 07, 2018 at 02:08:26PM -0600, Alex Williamson wrote:
+> On Tue, 7 Aug 2018 22:44:11 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Tue, Aug 07, 2018 at 01:31:22PM -0600, Alex Williamson wrote:
+> > > A simple true/false internal state does not allow multiple users.  Fix
+> > > this within the existing interface by converting to a counter, so long
+> > > as the counter is elevated, ballooning is inhibited.
+> > > 
+> > > Reviewed-by: David Hildenbrand <david@redhat.com>
+> > > Reviewed-by: Peter Xu <peterx@redhat.com>
+> > > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> > > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > > ---
+> > >  balloon.c | 13 ++++++++++---
+> > >  1 file changed, 10 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/balloon.c b/balloon.c
+> > > index 6bf0a9681377..931987983858 100644
+> > > --- a/balloon.c
+> > > +++ b/balloon.c
+> > > @@ -26,6 +26,7 @@
+> > >  
+> > >  #include "qemu/osdep.h"
+> > >  #include "qemu-common.h"
+> > > +#include "qemu/atomic.h"
+> > >  #include "exec/cpu-common.h"
+> > >  #include "sysemu/kvm.h"
+> > >  #include "sysemu/balloon.h"
+> > > @@ -37,16 +38,22 @@
+> > >  static QEMUBalloonEvent *balloon_event_fn;
+> > >  static QEMUBalloonStatus *balloon_stat_fn;
+> > >  static void *balloon_opaque;
+> > > -static bool balloon_inhibited;
+> > > +static int balloon_inhibit_count;
+> > >  
+> > >  bool qemu_balloon_is_inhibited(void)
+> > >  {
+> > > -    return balloon_inhibited;
+> > > +    return atomic_read(&balloon_inhibit_count) > 0;
+> > >  }
+> > >  
+> > >  void qemu_balloon_inhibit(bool state)
+> > >  {
+> > > -    balloon_inhibited = state;
+> > > +    if (state) {
+> > > +        atomic_inc(&balloon_inhibit_count);
+> > > +    } else {
+> > > +        atomic_dec(&balloon_inhibit_count);
+> > > +    }
+> > > +
+> > > +    assert(atomic_read(&balloon_inhibit_count) >= 0);
+> > >  }
+> > >  
+> > >  static bool have_balloon(Error **errp)  
+> > 
+> > This blocks QEMU_MADV_WONTNEED but it also blocks QEMU_MADV_WILLNEED.
+> > Is this necessarily a good idea?
+> 
+> This is existing balloon inhibitor behavior, but do you have some
+> reason to suspect WILLNEED is necessary?  It's my impression that
+> WILLNEED is a purely optional prefetch directive that's entirely
+> unnecessary if the page wasn't previously zapped with WONTNEED.  If the
+> page was zapped, it will fault in on demand, potentially with higher
+> latency, but functionally correct.  With vfio usage of the inhibitor,
+> we expect pinning to fault in any previously ballooned pages, so
+> calling WILLNEED on pages where the inhibit count is elevated due to an
+> assigned device seems unnecessary.  Thanks,
+> 
+> Alex
 
-But not any more I think.  It takes all the running you can do, to keep
-in the same place.
+So inhibit interface isn't great - it was designed for a single
+user: the post-copy. My point is generalizing it by reference counting does
+not seem to make for a sensible interface.
+I agree vfio itself pages in all guest memory but how will
+other users of this interface handle it?
 
-Overcommit with device specific drivers is one of the things that
-containers do better than VMs. If VMs had a better overcommit story with
-PT devices, it would be interesting IMHO.
-
-> With
-> physical devices, or even modern VFs, it seems hard to push density
-> beyond what we can handle with memory hotplug.  Perhaps as we get into
-> scalable IOV type approaches we can opt-in more mediated devices by
-> default.
-
-I'm not sure what does mediated have to do with it though.  It seems
-weird to fix internal Linux or even system call interfaces being
-inadequate with custom hardware.
-
-> It seems like we're just going around in circles here though,
-> anything more than preventing QEMU from shooting itself is a long term
-> goal touching multiple levels of the stack.
-
-It's just QEMU and the kernel, I don't see why any other levels would be
-involved. And it looks like we both agree it is a bug in the current VTD
-emulation even though current guests do not trigger it.
-
-I agree it's more work than just blocking things out, I am not making an
-argument for nacking this specific patch, but I do hope this thread
-motivates someone to look into it.
+What would a sensible interface look like, and how it would account
+for post-copy requirements, I'm not yet sure.
+Ideas welcome.
 
 -- 
 MST
