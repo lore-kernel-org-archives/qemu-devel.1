@@ -1,33 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fnIXO-0002CD-0K
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:05:43 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fnIcy-0003yZ-9i
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:11:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fnIXJ-0007z9-VN
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:05:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33204)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fnIXJ-0007yX-Mw
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:05:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fnIXI-0008Qu-CF
-	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 07:05:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 518E62E80C0
-	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 07:05:36 +0000 (UTC)
+	(envelope-from <lbloch@janustech.com>) id 1fnIcv-00035E-1z
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:11:28 -0400
+From: Leonid Bloch <lbloch@janustech.com>
+Date: Wed,  8 Aug 2018 10:10:46 +0300
+Message-Id: <20180808071051.30628-1-lbloch@janustech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Aug 2018 06:56:00 -0000
-From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Reply-To: Bug 1785972 <1785972@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153371136089.29473.12663307170219083138.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1785972] [NEW] v3.0.0-rc4: VM fails to start
- after vcpuhotunplug, managedsave sequence
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 0/5] qcow2: Make the L2 cache cover the
+ whole image by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,151 +21,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>
 
-Public bug reported:
+This series makes the qcow2 L2 cache cover the entire image by default.
+The importance of this change is in noticeable performance improvement,
+especially with heavy random I/O. The memory overhead is not big in most
+cases, as only 1 MB of cache for every 8 GB of image size is used.
+For cases with very large images and/or small cluster sizes, or systems
+with limited RAM resources, there is an upper limit on the default L2
+cache: 32 MB. To modify this limit one can use the already existing
+'l2-cache-size' and 'cache-size' options. Moreover, this fixes the
+behavior of 'l2-cache-size', as it was documented as the *maximum* L2
+cache size, but in practice behaved as the absolute size.
 
-VM fails to start after vcpu hot un-plug, managedsave sequence
+To compensate the memory overhead which may be increased following this
+behavior, the default cache-clean-interval is set to 30 seconds by
+default (was disabled by default before).
 
-Host info:
-Kernel: 4.18.0-rc8-00002-g1236568ee3cb
+The L2 cache is also resized accordingly, by default, if the image is
+resized.
 
-qemu: commit 6ad90805383e6d04b3ff49681b8519a48c9f4410 (HEAD -> master, tag:=
- v3.0.0-rc4)
-QEMU emulator version 2.12.94 (v3.0.0-rc4-dirty)
+Additionally, few minor changes are made (refactoring and documentation
+fixes).
 
-libvirt: commit 087de2f5a3dffb27d2eeb0c50a86d5d6984e5a5e (HEAD -> master)
-libvirtd (libvirt) 4.6.0
+Differences from v1:
+* .gitignore modification patch removed (unneeded).
+* The grammar fix in conflicting cache sizing patch removed (merged).
+* The update total_sectors when resizing patch squashed with the
+  resizing patch.
+* L2 cache is now capped at 32 MB.
+* The default cache-clean-interval is set to 30 seconds.
 
-Guest Kernel: 4.18.0-rc8-00002-g1236568ee3cb
+Differences from v2:
+* Made it clear in the documentation that setting cache-clean-interval
+  to 0 disables this feature.
 
+Leonid Bloch (5):
+  qcow2: Options' documentation fixes
+  qcow2: Make the default L2 cache sufficient to cover the entire image
+  qcow2: Resize the cache upon image resizing
+  qcow2: Set the default cache-clean-interval to 30 seconds
+  qcow2: Explicit number replaced by a constant
 
-Steps to reproduce:
-1. Start a guest(VM) with 2 current , 4 max vcpus
-virsh start vm1
-Domain vm1 started
+ block/qcow2.c              | 47 +++++++++++++++++++-------------------
+ block/qcow2.h              |  5 ++--
+ docs/qcow2-cache.txt       | 31 +++++++++++++++----------
+ qapi/block-core.json       |  3 ++-
+ qemu-options.hx            | 11 +++++----
+ tests/qemu-iotests/137     |  1 -
+ tests/qemu-iotests/137.out |  1 -
+ 7 files changed, 54 insertions(+), 45 deletions(-)
 
-2. Hotplug 2 vcpus
-virsh setvcpus vm1 4 --live
-
-3. Hot unplug 2 vcpus
-virsh setvcpus vm1 2 --live
-
-4. Managedsave the VM
-virsh managedsave vm1
-
-Domain vm1 state saved by libvirt
-
-5. Start the VM ---Fails to start
-virsh start vm1
-
-error: Failed to start domain avocado-vt-vm1
-error: internal error: qemu unexpectedly closed the monitor: 2018-08-08T06:=
-27:53.853818Z qemu: Unknown savevm section or instance 'spapr_cpu' 2
-2018-08-08T06:27:53.854949Z qemu: load of migration failed: Invalid argument
-
-
-Testcase:
-avocado run libvirt_vcpu_plug_unplug.positive_test.vcpu_set.live.vm_operate=
-.managedsave_with_unplug --vt-type libvirt --vt-extra-params emulator_path=
-=3D/usr/share/avocado-plugins-vt/bin/qemu create_vm_libvirt=3Dyes kill_vm_l=
-ibvirt=3Dyes env_cleanup=3Dyes smp=3D8 backup_image_before_testing=3Dno lib=
-virt_controller=3Dvirtio-scsi scsi_hba=3Dvirtio-scsi-pci drive_format=3Dscs=
-i-hd use_os_variant=3Dno restore_image_after_testing=3Dno vga=3Dnone displa=
-y=3Dnographic kernel=3D/home/kvmci/linux/vmlinux kernel_args=3D'root=3D/dev=
-/sda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init  initcall_=
-debug' take_regular_screendumps=3Dno --vt-guest-os JeOS.27.ppc64le
-JOB ID     : 1f869477ad87e7d7e7e7777f631ae08965f41a74
-JOB LOG    : /root/avocado/job-results/job-2018-08-08T02.42-1f86947/job.log
- (1/1) type_specific.io-github-autotest-libvirt.libvirt_vcpu_plug_unplug.po=
-sitive_test.vcpu_set.live.vm_operate.managedsave_with_unplug: ERROR (91.58 =
-s)
-RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CA=
-NCEL 0
-JOB TIME   : 95.89 s
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "avocado test log"
-   https://bugs.launchpad.net/bugs/1785972/+attachment/5172872/+files/job.l=
-og
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1785972
-
-Title:
-  v3.0.0-rc4: VM fails to start after vcpuhotunplug, managedsave
-  sequence
-
-Status in QEMU:
-  New
-
-Bug description:
-  VM fails to start after vcpu hot un-plug, managedsave sequence
-
-  Host info:
-  Kernel: 4.18.0-rc8-00002-g1236568ee3cb
-
-  qemu: commit 6ad90805383e6d04b3ff49681b8519a48c9f4410 (HEAD -> master, ta=
-g: v3.0.0-rc4)
-  QEMU emulator version 2.12.94 (v3.0.0-rc4-dirty)
-
-  libvirt: commit 087de2f5a3dffb27d2eeb0c50a86d5d6984e5a5e (HEAD -> master)
-  libvirtd (libvirt) 4.6.0
-
-  Guest Kernel: 4.18.0-rc8-00002-g1236568ee3cb
-
-  =
-
-  Steps to reproduce:
-  1. Start a guest(VM) with 2 current , 4 max vcpus
-  virsh start vm1
-  Domain vm1 started
-
-  2. Hotplug 2 vcpus
-  virsh setvcpus vm1 4 --live
-
-  3. Hot unplug 2 vcpus
-  virsh setvcpus vm1 2 --live
-
-  4. Managedsave the VM
-  virsh managedsave vm1
-
-  Domain vm1 state saved by libvirt
-
-  5. Start the VM ---Fails to start
-  virsh start vm1
-
-  error: Failed to start domain avocado-vt-vm1
-  error: internal error: qemu unexpectedly closed the monitor: 2018-08-08T0=
-6:27:53.853818Z qemu: Unknown savevm section or instance 'spapr_cpu' 2
-  2018-08-08T06:27:53.854949Z qemu: load of migration failed: Invalid argum=
-ent
-
-
-  Testcase:
-  avocado run libvirt_vcpu_plug_unplug.positive_test.vcpu_set.live.vm_opera=
-te.managedsave_with_unplug --vt-type libvirt --vt-extra-params emulator_pat=
-h=3D/usr/share/avocado-plugins-vt/bin/qemu create_vm_libvirt=3Dyes kill_vm_=
-libvirt=3Dyes env_cleanup=3Dyes smp=3D8 backup_image_before_testing=3Dno li=
-bvirt_controller=3Dvirtio-scsi scsi_hba=3Dvirtio-scsi-pci drive_format=3Dsc=
-si-hd use_os_variant=3Dno restore_image_after_testing=3Dno vga=3Dnone displ=
-ay=3Dnographic kernel=3D/home/kvmci/linux/vmlinux kernel_args=3D'root=3D/de=
-v/sda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init  initcall=
-_debug' take_regular_screendumps=3Dno --vt-guest-os JeOS.27.ppc64le
-  JOB ID     : 1f869477ad87e7d7e7e7777f631ae08965f41a74
-  JOB LOG    : /root/avocado/job-results/job-2018-08-08T02.42-1f86947/job.l=
-og
-   (1/1) type_specific.io-github-autotest-libvirt.libvirt_vcpu_plug_unplug.=
-positive_test.vcpu_set.live.vm_operate.managedsave_with_unplug: ERROR (91.5=
-8 s)
-  RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | =
-CANCEL 0
-  JOB TIME   : 95.89 s
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1785972/+subscriptions
+-- 
+2.17.1
