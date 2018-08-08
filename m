@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fnQCK-00062V-1K
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:16:32 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fnQJ0-00027r-N1
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:23:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fnQCG-0002oy-3c
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:16:28 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <350a86fa-5341-ddc2-e2c4-f75648830248@janustech.com>
-References: <20180808071051.30628-1-lbloch@janustech.com>
-	<20180808071051.30628-3-lbloch@janustech.com>
-	<w51d0utt4kk.fsf@maestria.local.igalia.com>
-	<f1197908-f00f-1c2b-b63c-3339e39488c5@janustech.com>
-	<w517el1t0yd.fsf@maestria.local.igalia.com>
-	<350a86fa-5341-ddc2-e2c4-f75648830248@janustech.com>
-Date: Wed, 08 Aug 2018 17:16:19 +0200
-Message-ID: <w511sb8ubwc.fsf@maestria.local.igalia.com>
+	(envelope-from <kwolf@redhat.com>) id 1fnQIu-0005v9-In
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:23:22 -0400
+Date: Wed, 8 Aug 2018 17:23:01 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180808152301.GC15410@localhost.localdomain>
+References: <20180807043349.27196-1-jsnow@redhat.com>
+	<20180807043349.27196-3-jsnow@redhat.com>
+	<20180808040253.GE755222@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] qcow2: Make the default L2 cache
- sufficient to cover the entire image
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180808040253.GE755222@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 02/21] jobs: add exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Wed 08 Aug 2018 04:35:19 PM CEST, Leonid Bloch wrote:
->>>> The way I see it: there are two simple changes from the user's point of
->>>> view (they can even be two separate patches).
->>>>
->>>> 1) The default l2-cache-size is now 32MB. DEFAULT_L2_CACHE_CLUSTERS is
->>>>      useless now and disappears.
->>> I don't think that it can be a separate patch, because unless the other
->>> logic is changed, the cache will occupy 32 MB *always*, regardless of
->>> the image size, and that's quite a big and unneeded overhead.
->> 
->> Change the order of both patches then :-)
->
-> Do you really think it's necessary? The increase of the default max
-> size is directly tied to the functionality change: it will be harmful
-> to increase the maximum before the new functionality is implemented,
-> and there is no need to change the functionality if the default max is
-> not increased.
+Am 08.08.2018 um 06:02 hat Jeff Cody geschrieben:
+> On Tue, Aug 07, 2018 at 12:33:30AM -0400, John Snow wrote:
+> > Most jobs do the same thing when they leave their running loop:
+> > - Store the return code in a structure
+> > - wait to receive this structure in the main thread
+> > - signal job completion via job_completed
+> > 
+> > More seriously, when we utilize job_defer_to_main_loop_bh to call
+> > a function that calls job_completed, job_finalize_single will run
+> > in a context where it has recursively taken the aio_context lock,
+> > which can cause hangs if it puts down a reference that causes a flush.
+> > 
+> > The job infrastructure is perfectly capable of registering job
+> > completion itself when we leave the job's entry point. In this
+> > context, we can signal job completion from outside of the aio_context,
+> > which should allow for job cleanup code to run with only one lock.
+> > 
+> > Signed-off-by: John Snow <jsnow@redhat.com>
+> 
+> I like the simplification, both in SLOC and in exit logic (as seen in
+> patches 3-7).
 
-I think that we're looking at this from two different perspectives.
+I agree, unifying this seems like a good idea.
 
-a) If I understand you correctly, you see this as a way to make the user
-   forget about the L2 cache: we guarantee that it's going to be big
-   enough for the entire image, so simply forget about it. Exception: if
-   you're using very large images you will have to set its size
-   manually, but for the vast majority of cases you'll be alright with
-   the default (32MB).
+Like in the first patch, I'm not convinced of the details, though.
+Essentially, this is my objection regarding job->err extended to
+job->ret: You rely on jobs setting job->ret and job->err, but the
+interfaces don't really show this.
 
-b) The way I see it: setting the right L2 cache size is not trivial, it
-   depends on the image and cluster sizes, and it involves a trade-off
-   between how much memory you want to use and how much performance
-   you're willing to sacrifice. QEMU has many use cases and there's no
-   good default, you need to make the numbers yourself if you want to
-   fine-tune it. Don't blindly trust the new default size (32MB) because
-   it won't be enough for many cases. But we can promise you this: make
-   l2-cache-size the maximum amount of memory you're willing to spend on
-   this disk image's cache, and we guarantee that we'll only use the
-   amount that we need to give you the best performance.
+> > @@ -546,6 +559,12 @@ static void coroutine_fn job_co_entry(void *opaque)
+> >      assert(job && job->driver && job->driver->start);
+> >      job_pause_point(job);
+> >      job->driver->start(job);
+> 
+> One nit-picky observation here, that is unrelated to this patch: reading
+> through, it may not be so obvious that 'start' is really a 'run' or
+> 'execute', (linguistically, to me 'start' implies a kick-off rather than
+> ongoing execution).
 
-I hope (a) was a fair description of what you're trying to achieve with
-these patches. But I also hope that you can see why making l2_cache_size
-= MIN(l2_cache_size, virtual_disk_size / (s->cluster_size / 8)) is a
-worthwhile change on its own, even if we didn't increase the default
-cache size to 32MB.
+I had exactly the same thought. My proposal is to change the existing...
 
-Berto
+    CoroutineEntry *start;
+
+...which is just short for...
+
+    void coroutine_fn start(void *opaque);
+
+...into this one:
+
+    int coroutine_fn run(void *opaque, Error **errp);
+
+I see that at the end of the series, you actually introduced an int
+return value already. I would have done that from the start, but as long
+the final state makes sense, I won't insist.
+
+But can we have the Error **errp addition, too? Pretty please?
+
+Kevin
