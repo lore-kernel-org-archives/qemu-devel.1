@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geert.uytterhoeven@gmail.com>) id 1fnOmn-0001Ju-OQ
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 09:46:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fnOop-0002SQ-4b
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 09:48:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geert.uytterhoeven@gmail.com>) id 1fnOmk-0004YH-Lq
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 09:46:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fnOoo-0005qA-Ar
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 09:48:07 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:46824)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fnOoo-0005q1-40
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 09:48:06 -0400
+Received: by mail-oi0-x243.google.com with SMTP id y207-v6so3733364oie.13
+	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 06:48:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <20180725143413.9728-1-geert+renesas@glider.be>
-	<20180725143413.9728-5-geert+renesas@glider.be>
-	<e52bfdab-5c23-a617-8bef-0c17ab831ec1@redhat.com>
-	<CAMuHMdUuHcoZxFVFivBwD3LveeE8yQ+AnaWFr76kATG+rCzd=w@mail.gmail.com>
-	<9305142a-8b88-8beb-dd95-02dd84881aa8@redhat.com>
-	<CAMuHMdVFT5PuXGVuT7wobJd_m1X8SvY+XohJWNtB7b-59JXKhQ@mail.gmail.com>
-	<ea6551f6-517b-4f51-4a50-72430efaad41@redhat.com>
-In-Reply-To: <ea6551f6-517b-4f51-4a50-72430efaad41@redhat.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 8 Aug 2018 15:45:44 +0200
-Message-ID: <CAMuHMdWG3WWU7mve9P_kupj=O-OJZF8V1xkoh1XEEpDu0vNStA@mail.gmail.com>
+In-Reply-To: <87k1p11foc.fsf@trasno.org>
+References: <20180807130355.29780-1-peter.maydell@linaro.org>
+	<87muty2u57.fsf@trasno.org>
+	<CAFEAcA_m+81aDQR=n=8gXhcifYp0L6n9KZA5COQsRejeqZe2FQ@mail.gmail.com>
+	<87in4m2qni.fsf@trasno.org>
+	<CAFEAcA81Xr6_eUV5247JtZRnN9Ms7fau1iwhHkmW-gnwH9y8JA@mail.gmail.com>
+	<87wot21bbt.fsf@trasno.org>
+	<CAFEAcA_y1qKsC8kSDee+FEpqZstz9UHTeyP6ABuGfXf_aDMRHw@mail.gmail.com>
+	<87o9ee1aka.fsf@trasno.org>
+	<CAFEAcA_XJGWPioUDUR0+9v16Xj_osDwk7OYEK3vkqdg_SacMXA@mail.gmail.com>
+	<87k1p11foc.fsf@trasno.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 8 Aug 2018 14:47:44 +0100
+Message-ID: <CAFEAcA_HVcjORfefJXMB3cG=cCt5njDQVCeOFjF-h_KSPOT22w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] hw/arm/sysbus-fdt: Add support for
- instantiating generic devices
+Subject: Re: [Qemu-devel] [PATCH] migration: Correctly handle subsections
+ with no 'needed' function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +38,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <damm+renesas@opensource.se>, QEMU Developers <qemu-devel@nongnu.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Alex Williamson <alex.williamson@redhat.com>, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, qemu-arm <qemu-arm@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi Eric,
+On 8 August 2018 at 08:27, Juan Quintela <quintela@redhat.com> wrote:
+>
+> This is part of the problem.  For some architectures, we don't even care
+> about migraiton.  For others, we care about migration but not
+> cross-version.  And yet in others we care very much (downstream
+> specially).
 
-On Wed, Aug 8, 2018 at 3:16 PM Auger Eric <eric.auger@redhat.com> wrote:
-> On 08/08/2018 02:59 PM, Geert Uytterhoeven wrote:
-> > On Tue, Aug 7, 2018 at 7:21 PM Auger Eric <eric.auger@redhat.com> wrote:
-> >> On 08/07/2018 05:32 PM, Geert Uytterhoeven wrote:
-> >>> On Tue, Aug 7, 2018 at 4:19 PM Auger Eric <eric.auger@redhat.com> wrote:
-> >>>> On 07/25/2018 04:34 PM, Geert Uytterhoeven wrote:
-> >>>>> Add a fallback for instantiating generic devices without a type-specific
-> >>>>> or compatible-specific instantation method.  This will be used when no
-> >>>>> other match is found.
-> >>>>>
-> >>>>> The generic instantation method creates a device node with "reg" and
-> >>>>> (optional) "interrupts" properties, and copies the "compatible"
-> >>>>> property and other optional properties from the host.
+I think we should care about migration on all architectures
+and devices, in the sense that we want savevm/loadvm to work.
+This is a really useful debugging and user tool, and when
+I'm reviewing devices it's the minimum bar I think new
+devices should clear. You then get migration "for free" but
+I don't particularly expect it to be used compared to
+snapshot save/restore. (Of course some of our existing code
+doesn't support this, and we don't have a good way of testing
+so bugs creep in easily, but as a principle I think it's
+good.)
 
-[...]
-
-> Wouldn't it make sense to try getting 1-3 upstream separately as this
-> last patch seems more controversial and independent?
-
-I agree. I will rework and resubmit after my holidays.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+thanks
+-- PMM
