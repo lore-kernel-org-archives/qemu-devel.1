@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fnKqI-0006zv-S2
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:33:24 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fnKqU-000757-8s
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:33:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fnKqF-000100-Lv
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:33:22 -0400
-References: <20180618164504.24488-1-kwolf@redhat.com>
-	<20180618164504.24488-22-kwolf@redhat.com>
-	<fd4b2077-448f-2b62-8880-b2a3dcca586a@redhat.com>
-	<28f44beb-e19b-3e26-254a-4678eacf30c2@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <bfd7fd9e-11ad-3aa3-68b8-b9b46df36f1a@virtuozzo.com>
-Date: Wed, 8 Aug 2018 12:33:10 +0300
+	(envelope-from <eric.auger@redhat.com>) id 1fnKqT-00016x-9P
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:33:34 -0400
+References: <43c1349e-1ca6-4890-07c0-7bfa35ab914d@redhat.com>
+	<5311fed5-7f13-a177-b967-db6e3ed028b9@redhat.com>
+	<405e3f2b-3044-d7fc-8df4-b07a8487470f@redhat.com>
+	<f2d61062-21df-4478-bc61-c32e92329cf8@redhat.com>
+	<57030c9f-c3d1-49a8-090e-d6b316e7a818@redhat.com>
+	<fc6a29d4-1094-8d29-d415-fc30d5e30c31@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA838712003@FRAEML521-MBX.china.huawei.com>
+	<fd7e2831-86a8-c2a1-fe0c-d9784bc2d3cb@redhat.com>
+	<20180711151740.3d119e95@redhat.com>
+	<5e65f669-69f6-53aa-0337-2825ce353b5e@redhat.com>
+	<20180712144516.zsjvfrruduirzqug@kamzik.brq.redhat.com>
+	<6047361a-be99-fc7f-5270-5ab3b4ab84e2@redhat.com>
+	<20180718150044.4c542d21@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <20e89178-2ba6-b752-bac5-c208d608a02a@redhat.com>
+Date: Wed, 8 Aug 2018 11:33:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <28f44beb-e19b-3e26-254a-4678eacf30c2@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PULL 21/35] block: fix QEMU crash with scsi-hd
- and drive_del
+In-Reply-To: <20180718150044.4c542d21@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 06/15] hw/arm/virt: Allocate device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,107 +34,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>, "wei@redhat.com" <wei@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "agraf@suse.de" <agraf@suse.de>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 
-07.08.2018 22:57, Eric Blake wrote:
-> On 08/06/2018 05:04 PM, Eric Blake wrote:
->> On 06/18/2018 11:44 AM, Kevin Wolf wrote:
->>> From: Greg Kurz <groug@kaod.org>
+Hi Igor,
+
+On 07/18/2018 03:00 PM, Igor Mammedov wrote:
+[...]
 >>>
->>> Removing a drive with drive_del while it is being used to run an I/O
->>> intensive workload can cause QEMU to crash.
->>>
->> ...
->
->>
->> Test 83 sets up a client that intentionally disconnects at critical=20
->> points in the NBD protocol exchange, to ensure that the server reacts=20
->> sanely.
->
-> Rather, nbd-fault-injector.py is a server that disconnects at critical=20
-> points, and the test is of client reaction.
->
->> =C2=A0 I suspect that somewhere in the NBD code, the server detects the=
-=20
->> disconnect and was somehow calling into blk_remove_bs() (although I=20
->> could not quickly find the backtrace); and that prior to this patch,=20
->> the 'Connection closed' message resulted from other NBD coroutines=20
->> getting a shot at the (now-closed) connection, while after this=20
->> patch, the additional blk_drain() somehow tweaks things in a way that=20
->> prevents the other NBD coroutines from printing a message.=C2=A0 If so,=
-=20
->> then the change in 83 reference output is probably intentional, and=20
->> we should update it.
->
-> It seems like this condition is racy, and that the race is more likely=20
-> to be lost prior to this patch than after. It's a question of whether=20
-> the client has time to start a request to the server prior to the=20
-> server hanging up, as the message is generated during=20
-> nbd_co_do_receive_one_chunk.=C2=A0 Here's a demonstration of the fact tha=
-t=20
-> things are racy:
->
-> $ git revert f45280cbf
-> $ make
-> $ cd tests/qemu-iotests
-> $ cat fault.txt
-> [inject-error "a"]
-> event=3Dneg2
-> when=3Dafter
-> $ python nbd-fault-injector.py localhost:10809 ./fault.txt &
-> Listening on 127.0.0.1:10809
-> $ ../../qemu-io -f raw nbd://localhost:10809 -c 'r 0 512'
-> Closing connection on rule match inject-error "a"
-> Connection closed
-> read failed: Input/output error
-> $ python nbd-fault-injector.py localhost:10809 ./fault.txt &
-> Listening on 127.0.0.1:10809
-> $ ../../qemu-io -f raw nbd://localhost:10809
-> Closing connection on rule match inject-error "a"
-> qemu-io> r 0 512
-> read failed: Input/output error
-> qemu-io> q
->
-> So, depending on whether the read command is kicked off quickly (via=20
-> -c) or slowly (via typing into qemu-io) determines whether the message=20
-> appears.
->
-> What's more, in commit f140e300, we specifically called out in the=20
-> commit message that maybe it was better to trace when we detect=20
-> connection closed rather than log it to stdout, and in all cases in=20
-> that commit, the additional 'Connection closed' messages do not add=20
-> any information to the error message already displayed by the rest of=20
-> the code.
->
-> I don't know how much the proposed NBD reconnect code will change=20
-> things in 3.1.=C2=A0 Meanwhile, we've missed any chance for 3.0 to fix te=
-st=20
-> 83.
->
->>
->> But I'm having a hard time convincing myself that this is the case,=20
->> particularly since I'm not even sure how to easily debug the=20
->> assumptions I made above.
->>
->> Since I'm very weak on the whole notion of what blk_drain() vs.=20
->> blk_remove_bs() is really supposed to be doing, and could easily be=20
->> persuaded that the change in output is a regression instead of a fix.
->
-> At this point, I don't think we have a regression, just merely a bad=20
-> iotests reference output. The extra blk_drain() merely adds more time=20
-> before the NBD code can send out its first request, and thus makes it=20
-> more likely that the fault injector has closed the connection before=20
-> the read request is issued rather than after (the message only appears=20
-> when read beats the race), but the NBD code shouldn't be printing the=20
-> error message in the first place, and 083 needs to be tweaked to=20
-> remove the noisy lines added in f140e300 (not just the three lines=20
-> that are reliably different due to this patch, but all other such=20
-> lines due to strategic server drops at other points in the NBD protocol).
->
+>>> I think Igor wants one contiguous region for RAM, where additional
+>>> space can be reserved for hotplugging.  
+>> This is not compliant with 2012 ARM white paper, although I don't really
+>> know if this document truly is a reference (did not get any reply).
+> it's upto QEMU to pick layout, if we have maxmem (upto 256Gb) we could
+> accommodate legacy req and put single device_memory in 1Gb-256Gb GPA gap,
+> if it's more we can move whole device_memory to 2Tb, 8Tb ...
+> that keeps things manageable for us and fits specs (if such exist).
+> WE should make selection of the next RAM base deterministic is possible
+> when layout changes due to maxram size or IOVA, so that we won't need
+> to use compat knobs/checks to keep machine migratable.
+Sorry for the delay. I was out of the office those past weeks.
 
-Ok, agree, I'll do it in reconnect series.
+OK understood. Your preferred approach is to have a contiguous memory
+region (initial + hotplug). So this depends on the FW capability to
+support flexible RAM base. Let's see how this dependency gets resolved.
 
---=20
-Best regards,
-Vladimir
+This series does not bump the non hotpluggable memory region limit,
+which is still limited to 255GB. The only way to add more memory is
+though PCDIMM or NVDIMM (max 2TB atm). To do so you need to add ,maxmem
+and ,slots options which need to be on both source and dest, right, +
+the PCDIMM/NVDIMM device option lines? Also the series checks the
+destination has at least the same IPA range capability as the source,
+which conditions the fact the requested device_memory size can be
+accommodated. At the moment I fail to see what are the other compat
+knobs I must be prepared to handle.
+
+Thanks
+
+Eric
+> 
+> [...]
+> 
