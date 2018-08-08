@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jthumshirn@suse.de>) id 1fnPIt-0003JK-Rj
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:19:13 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jthumshirn@suse.de>) id 1fnPIn-0001hM-HO
+	(envelope-from <jthumshirn@suse.de>) id 1fnPIr-0003J6-LI
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:19:11 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56858 helo=mx1.suse.de)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <jthumshirn@suse.de>) id 1fnPIn-0001hV-I9
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:19:09 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56854 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jthumshirn@suse.de>) id 1fnPIn-0001en-5y
+	(Exim 4.71) (envelope-from <jthumshirn@suse.de>) id 1fnPIn-0001ej-69
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:19:05 -0400
 Received: from relay1.suse.de (unknown [195.135.220.254])
-	by mx1.suse.de (Postfix) with ESMTP id F0B23AE29
+	by mx1.suse.de (Postfix) with ESMTP id DF02FAE15
 	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 14:19:02 +0000 (UTC)
 From: Johannes Thumshirn <jthumshirn@suse.de>
-Date: Wed,  8 Aug 2018 16:17:00 +0200
-Message-Id: <20180808141700.21333-5-jthumshirn@suse.de>
+Date: Wed,  8 Aug 2018 16:16:58 +0200
+Message-Id: <20180808141700.21333-3-jthumshirn@suse.de>
 In-Reply-To: <20180808141700.21333-1-jthumshirn@suse.de>
 References: <20180808141700.21333-1-jthumshirn@suse.de>
-Subject: [Qemu-devel] [PATCH 4/4] wdt_z069: Add support for MEN 16z069
- Watchdog
+Subject: [Qemu-devel] [PATCH 2/4] Add MEN Chameleon Bus via PCI carrier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,149 +29,198 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
 
-Add 16z069 Watchdog over MEN Chameleon BUS emulation.
-
 Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- hw/watchdog/Makefile.objs |   1 +
- hw/watchdog/wdt_z069.c    | 212 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 213 insertions(+)
- create mode 100644 hw/watchdog/wdt_z069.c
+ hw/mcb/Makefile.objs |   1 +
+ hw/mcb/mcb-pci.c     | 305 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 306 insertions(+)
+ create mode 100644 hw/mcb/mcb-pci.c
 
-diff --git a/hw/watchdog/Makefile.objs b/hw/watchdog/Makefile.objs
-index 9589bed63a3d..ada010f1eb69 100644
---- a/hw/watchdog/Makefile.objs
-+++ b/hw/watchdog/Makefile.objs
-@@ -3,3 +3,4 @@ common-obj-$(CONFIG_WDT_IB6300ESB) += wdt_i6300esb.o
- common-obj-$(CONFIG_WDT_IB700) += wdt_ib700.o
- common-obj-$(CONFIG_WDT_DIAG288) += wdt_diag288.o
- common-obj-$(CONFIG_ASPEED_SOC) += wdt_aspeed.o
-+common-obj-$(CONFIG_MCB) += wdt_z069.o
-diff --git a/hw/watchdog/wdt_z069.c b/hw/watchdog/wdt_z069.c
+diff --git a/hw/mcb/Makefile.objs b/hw/mcb/Makefile.objs
+index 32427c987c44..125f4a84700a 100644
+--- a/hw/mcb/Makefile.objs
++++ b/hw/mcb/Makefile.objs
+@@ -1 +1,2 @@
+ common-obj-$(CONFIG_MCB) += mcb.o
++common-obj-$(CONFIG_MCB) += mcb-pci.o
+diff --git a/hw/mcb/mcb-pci.c b/hw/mcb/mcb-pci.c
 new file mode 100644
-index 000000000000..55e7614e83be
+index 000000000000..57651f64f1b0
 --- /dev/null
-+++ b/hw/watchdog/wdt_z069.c
-@@ -0,0 +1,212 @@
++++ b/hw/mcb/mcb-pci.c
+@@ -0,0 +1,305 @@
 +/*
-+ * QEMU MEN 16z069 Watchdog over MCB emulation
++ * QEMU MEN Chameleon Bus emulation
 + *
-+ * Copyright (C) 2018 Johannes Thumshirn <jthumshirn@suse.de>
++ * Copyright (C) 2016 Johannes Thumshirn <jthumshirn@suse.de>
 + *
 + * This code is licensed under the GNU GPL v2 or (at your opinion) any
 + * later version
 + */
++
 +#include "qemu/osdep.h"
-+#include "qemu/timer.h"
-+#include "sysemu/watchdog.h"
++#include "qapi/error.h"
 +#include "hw/mcb/mcb.h"
++#include "hw/pci/pci.h"
 +
-+/* #define Z069_DEBUG 1 */
++/* #define DEBUG_MPCI 1 */
 +
-+#ifdef Z069_DEBUG
-+#define z069_debug(fmt, ...)                                        \
-+    fprintf(stderr, "wdt_z069: %s: "fmt, __func__, ##__VA_ARGS__)
++#ifdef DEBUG_MPCI
++#define DPRINTF(fmt, ...)                                               \
++    do { fprintf(stderr, "mcb-pci: " fmt, ## __VA_ARGS__); } while (0)
 +#else
-+#define z069_debug(fmt, ...)
++#define DPRINTF(fmt, ...) do { } while (0)
 +#endif
 +
-+#define MEN_Z069_WTR 0x10
-+#define MEN_Z069_WTR_WDEN BIT(15)
-+#define MEN_Z069_WTR_WDET_MASK  0x7fff
-+#define MEN_Z069_WVR 0x14
-+
-+#define CLK_500(x) ((x) * 2) /* 500Hz in ms */
++typedef struct {
++    uint8_t revision;
++    char model;
++    uint8_t minor;
++    uint8_t bus_type;
++    uint16_t magic;
++    uint16_t reserved;
++    /* This one has no '\0' at the end!!! */
++    char filename[12];
++} ChameleonFPGAHeader;
++#define CHAMELEON_BUS_TYPE_WISHBONE 0
++#define CHAMELEONV2_MAGIC 0xabce
 +
 +typedef struct {
-+    MCBDevice dev;
-+    QEMUTimer *timer;
++    PCIDevice dev;
++    MCBus bus;
++    MemoryRegion ctbl;
++    uint16_t status;
++    uint8_t int_set;
++    ChameleonFPGAHeader *header;
 +
-+    bool enabled;
-+    unsigned int timeout;
++    uint8_t minor;
++    uint8_t rev;
++    uint8_t model;
++} MPCIState;
 +
-+    MemoryRegion mmio;
++#define TYPE_MCB_PCI "mcb-pci"
 +
-+    /* Registers */
-+    uint16_t wtr;
-+    uint16_t wvr;
-+} MENZ069State;
++#define MPCI(obj)                                       \
++    OBJECT_CHECK(MPCIState, (obj), TYPE_MCB_PCI)
 +
-+static void men_z069_wdt_enable(MENZ069State *s)
++#define CHAMELEON_TABLE_SIZE 0x200
++#define N_MODULES 32
++
++#define PCI_VENDOR_ID_MEN 0x1a88
++#define PCI_DEVICE_ID_MEN_MCBPCI 0x4d45
++
++static uint32_t read_header(MPCIState *s, hwaddr addr)
 +{
-+    z069_debug("next timeout will fire in +%dms\n", s->timeout);
-+    timer_mod(s->timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + s->timeout);
-+}
++    uint32_t ret = 0;
++    ChameleonFPGAHeader *header = s->header;
 +
-+static void men_z069_wdt_disable(MENZ069State *s)
-+{
-+    timer_del(s->timer);
-+}
-+
-+static uint64_t men_z069_wdt_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    MENZ069State *s = opaque;
-+    uint64_t ret;
-+
-+    switch (addr) {
-+    case MEN_Z069_WTR:
-+        ret = s->wtr;
++    switch (addr / 4) {
++    case 0:
++        ret |= header->revision;
++        ret |= header->model << 8;
++        ret |= header->minor << 16;
++        ret |= header->bus_type << 24;
 +        break;
-+    case MEN_Z069_WVR:
-+        ret = s->wvr;
++    case 1:
++        ret |= header->magic;
++        ret |= header->reserved << 16;
 +        break;
-+    default:
-+        ret = 0UL;
++    case 2:
++        memcpy(&ret, header->filename, sizeof(uint32_t));
 +        break;
++    case 3:
++        memcpy(&ret, header->filename + sizeof(uint32_t),
++               sizeof(uint32_t));
++        break;
++    case 4:
++        memcpy(&ret, header->filename + 2 * sizeof(uint32_t),
++               sizeof(uint32_t));
 +    }
 +
-+    z069_debug("returning: 0x%"PRIx64" @ 0x%lx\n", ret, addr);
 +    return ret;
 +}
 +
-+static void men_z069_wdt_write(void *opaque, hwaddr addr, uint64_t v,
-+                               unsigned size)
++static uint32_t read_gdd(MCBDevice *mdev, int reg)
 +{
-+    MENZ069State *s = opaque;
-+    bool old_ena = s->enabled;
-+    uint16_t val = v & 0xffff;
-+    uint16_t tout;
++    ChameleonDeviceDescriptor *gdd;
++    uint32_t ret = 0;
 +
-+    z069_debug("got: 0x%"PRIx64" @ 0x%lx\n", v, addr);
++    gdd = mdev->gdd;
 +
-+    switch (addr) {
-+    case MEN_Z069_WTR:
-+        s->wtr = val;
-+        tout = val & MEN_Z069_WTR_WDET_MASK;
-+        s->timeout = CLK_500(tout);
-+        s->enabled = val & MEN_Z069_WTR_WDEN;
-+        z069_debug("new timeout: %u (0x%x) %u\n", tout, tout, s->timeout);
-+
-+        if (old_ena && !s->enabled) {
-+            men_z069_wdt_disable(s);
-+        } else if (!old_ena && s->enabled) {
-+            men_z069_wdt_enable(s);
-+        }
-+
++    switch (reg) {
++    case 0:
++        ret = gdd->reg1;
 +        break;
-+    case MEN_Z069_WVR:
-+        /* The watchdog trigger value toggles between 0x5555 and 0xaaaa */
-+        if (val == (s->wvr ^ 0xffff)) {
-+            s->wvr = val;
-+            z069_debug("watchdog triggered, next timeout will fire in +%dms\n",
-+                       s->timeout);
-+            timer_mod(s->timer,
-+                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + s->timeout);
-+        }
++    case 1:
++        ret = gdd->reg2;
 +        break;
-+    default:
++    case 2:
++        ret = gdd->offset;
++        break;
++    case 3:
++        ret = gdd->size;
 +        break;
 +    }
++
++    return ret;
++}
++
++static uint64_t mpci_chamtbl_read(void *opaque, hwaddr addr, unsigned size)
++{
++    MPCIState *s = opaque;
++    MCBus *bus = &s->bus;
++    MCBDevice *mdev;
++    uint32_t ret = 0;
++
++    DPRINTF("Read from address 0x%lx size %d\n", addr, size);
++
++    if (addr < sizeof(ChameleonFPGAHeader)) {
++        return le32_to_cpu(read_header(s, addr));
++    } else if (addr >= sizeof(ChameleonFPGAHeader) &&
++               addr < CHAMELEON_TABLE_SIZE) {
++        /* Handle read on chameleon table */
++        BusChild *kid;
++        DeviceState *qdev;
++        int slot;
++        int offset;
++        int i;
++
++        offset = addr - sizeof(ChameleonFPGAHeader);
++        slot = offset / sizeof(ChameleonDeviceDescriptor);
++
++        kid = QTAILQ_FIRST(&BUS(bus)->children);
++        for (i = 0; i < slot; i++) {
++            kid = QTAILQ_NEXT(kid, sibling);
++            if (!kid) { /* Last element */
++                DPRINTF("Last element: 0x%08x\n", ~0U);
++                return ~0U;
++            }
++        }
++        qdev = kid->child;
++        mdev = MCB_DEVICE(qdev);
++        offset -= slot * 16;
++
++        ret = read_gdd(mdev, offset / 4);
++        return le32_to_cpu(ret);
++    }
++
++    return ret;
++}
++
++static void mpci_chamtbl_write(void *opaque, hwaddr addr, uint64_t val,
++                               unsigned size)
++{
++
++    if (addr < CHAMELEON_TABLE_SIZE)
++        DPRINTF("Invalid write to 0x%x: 0x%x\n", (unsigned) addr,
++                (unsigned) val);
++
 +    return;
 +}
 +
-+static const MemoryRegionOps men_z069_io_ops = {
-+    .read = men_z069_wdt_read,
-+    .write = men_z069_wdt_write,
++static const MemoryRegionOps mpci_chamtbl_ops = {
++    .read = mpci_chamtbl_read,
++    .write = mpci_chamtbl_write,
 +    .endianness = DEVICE_LITTLE_ENDIAN,
 +    .valid = {
 +        .min_access_size = 4,
@@ -184,87 +232,127 @@ index 000000000000..55e7614e83be
 +    },
 +};
 +
-+static void men_z069_timer_expired(void *opaque)
++static void mcb_pci_set_irq(void *opaque, int intno, int level)
 +{
-+    MENZ069State *s = opaque;
++    MCBDevice *mdev = opaque;
++    MCBus *bus = MCB_BUS(qdev_get_parent_bus(DEVICE(mdev)));
++    PCIDevice *pcidev = PCI_DEVICE(BUS(bus)->parent);
++    MPCIState *dev = MPCI(pcidev);
 +
-+    watchdog_perform_action();
-+    timer_del(s->timer);
-+}
++    if (level) {
++        pci_set_irq(&dev->dev, !dev->int_set);
++        pci_set_irq(&dev->dev,  dev->int_set);
++    } else {
++        uint16_t level_status = dev->status;
 +
-+static void men_z069_wdt_realize(DeviceState *dev, Error **errp)
-+{
-+    MCBDevice *mdev = MCB_DEVICE(dev);
-+    MENZ069State *s = DO_UPCAST(MENZ069State, dev, mdev);
-+    MCBus *bus = MCB_BUS(qdev_get_parent_bus(DEVICE(dev)));
-+
-+    mdev->gdd = mcb_new_chameleon_descriptor(bus, 69, mdev->rev,
-+                                             mdev->var, 0x18);
-+    if (!mdev->gdd) {
-+        return;
++        if (level_status && !dev->int_set) {
++            pci_irq_assert(&dev->dev);
++            dev->int_set = 1;
++        } else if (!level_status && dev->int_set) {
++            pci_irq_deassert(&dev->dev);
++            dev->int_set = 0;
++        }
 +    }
-+
-+    s->wvr = 0x5555;
-+    s->wtr = 0x7fff;
-+    s->timeout = CLK_500(s->wtr & MEN_Z069_WTR_WDET_MASK);
-+    s->timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
-+                            men_z069_timer_expired, s);
-+
-+    memory_region_init_io(&s->mmio, OBJECT(s),
-+                          &men_z069_io_ops, s, "z069.wdt", 0x16);
-+    memory_region_add_subregion(&bus->mmio_region, mdev->gdd->offset,
-+                                &s->mmio);
 +}
 +
-+static void men_z069_wdt_unrealize(DeviceState *dev, Error **errp)
++static void mcb_pci_write_config(PCIDevice *pci_dev, uint32_t address,
++                                 uint32_t val, int len)
 +{
-+    MCBDevice *mdev = MCB_DEVICE(dev);
-+
-+    g_free(&mdev->gdd);
++    pci_default_write_config(pci_dev, address, val, len);
 +}
 +
-+static const VMStateDescription vmstate_z069_wdt = {
-+    .name = "z069-wdt",
++static void mcb_pci_realize(PCIDevice *pci_dev, Error **errp)
++{
++    MPCIState *s = MPCI(pci_dev);
++    uint8_t *pci_conf = s->dev.config;
++    ChameleonFPGAHeader *header;
++    MCBus *bus = &s->bus;
++
++    header = g_new0(ChameleonFPGAHeader, 1);
++
++    s->header = header;
++
++    header->revision = s->rev;
++    header->model = (char) s->model;
++    header->minor = s->minor;
++    header->bus_type = CHAMELEON_BUS_TYPE_WISHBONE;
++    header->magic = CHAMELEONV2_MAGIC;
++    memcpy(&header->filename, "QEMU MCB PCI", 12);
++
++    pci_dev->config_write = mcb_pci_write_config;
++    pci_set_byte(pci_conf + PCI_INTERRUPT_PIN, 0x01); /* Interrupt pin A */
++    pci_conf[PCI_COMMAND] = PCI_COMMAND_MEMORY;
++
++    mcb_bus_new_inplace(&s->bus, sizeof(s->bus), DEVICE(pci_dev), NULL,
++                        N_MODULES, mcb_pci_set_irq);
++
++    memory_region_init(&bus->mmio_region, OBJECT(s), "mcb-pci.mmio",
++                       2048 * 1024);
++    memory_region_init_io(&s->ctbl, OBJECT(s), &mpci_chamtbl_ops,
++                          s, "mpci_chamtbl_ops", CHAMELEON_TABLE_SIZE);
++    memory_region_add_subregion(&bus->mmio_region, 0, &s->ctbl);
++    pci_register_bar(&s->dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY,
++                     &bus->mmio_region);
++
++}
++
++static void mcb_pci_unrealize(PCIDevice *pci_dev)
++{
++    MPCIState *s = MPCI(pci_dev);
++
++    g_free(s->header);
++    s->header = NULL;
++}
++
++static const VMStateDescription vmstate_mcb_pci = {
++    .name = "mcb-pci",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_MCB_DEVICE(dev, MENZ069State),
-+        VMSTATE_TIMER_PTR(timer, MENZ069State),
++        VMSTATE_PCI_DEVICE(dev, MPCIState),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
-+static Property men_z069_wdt_properties[] = {
-+    DEFINE_PROP_UINT8("rev", MENZ069State, dev.rev, 0),
-+    DEFINE_PROP_UINT8("var", MENZ069State, dev.var, 0),
++static Property mcb_pci_props[] = {
++    DEFINE_PROP_UINT8("revision", MPCIState, rev, 1),
++    DEFINE_PROP_UINT8("minor", MPCIState, minor, 0),
++    DEFINE_PROP_UINT8("model", MPCIState, model, 0x41),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void men_z069_wdt_class_intifn(ObjectClass *klass, void *data)
++static void mcb_pci_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
-+    MCBDeviceClass *mc = MCB_DEVICE_CLASS(klass);
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
 +
-+    mc->realize = men_z069_wdt_realize;
-+    mc->unrealize = men_z069_wdt_unrealize;
++    k->realize = mcb_pci_realize;
++    k->exit = mcb_pci_unrealize;
++    k->vendor_id = PCI_VENDOR_ID_MEN;
++    k->device_id = PCI_DEVICE_ID_MEN_MCBPCI;
++    k->class_id = PCI_CLASS_BRIDGE_OTHER;
 +
-+    dc->desc = "MEN 16z069 Watchdog Timer";
-+    dc->vmsd = &vmstate_z069_wdt;
-+    dc->props = men_z069_wdt_properties;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    dc->desc = "MEN Chameleon Bus over PCI";
++    dc->vmsd = &vmstate_mcb_pci;
++    dc->props = mcb_pci_props;
 +}
 +
-+static const TypeInfo men_z069_wdt_info = {
-+    .name = "z069-wdt",
-+    .parent = TYPE_MCB_DEVICE,
-+    .instance_size = sizeof(MENZ069State),
-+    .class_init = men_z069_wdt_class_intifn,
++static const TypeInfo mcb_pci_info = {
++    .name = TYPE_MCB_PCI,
++    .parent = TYPE_PCI_DEVICE,
++    .instance_size = sizeof(MPCIState),
++    .class_init = mcb_pci_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { INTERFACE_PCIE_DEVICE },
++        { }
++    },
 +};
 +
-+static void men_z069_wdt_register_types(void)
++static void mcb_pci_register_types(void)
 +{
-+    type_register_static(&men_z069_wdt_info);
++    type_register(&mcb_pci_info);
 +}
-+
-+type_init(men_z069_wdt_register_types);
++type_init(mcb_pci_register_types);
 -- 
 2.16.4
