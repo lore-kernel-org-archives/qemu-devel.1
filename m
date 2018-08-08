@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fnTsA-0006ve-7W
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 15:11:54 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fnU0R-0000mN-AW
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 15:20:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fnTs7-0003Ts-2p
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 15:11:54 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:41452
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fnU0O-0001U8-4u
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 15:20:27 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:41483
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1fnTs6-0003Jx-QB
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 15:11:50 -0400
-References: <20180805112850.26063-1-mark.cave-ayland@ilande.co.uk>
-	<20180805112850.26063-3-mark.cave-ayland@ilande.co.uk>
-	<20180806201128.GB12341@localhost.localdomain>
-	<987d9b7e-afdb-e954-4aae-ec192b2b51c9@ilande.co.uk>
-	<20180807194558.GZ23195@localhost.localdomain>
+	id 1fnU0N-0001Sb-Qi
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 15:20:24 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <59409730-10ff-86ff-de36-8926eae91d80@ilande.co.uk>
-Date: Wed, 8 Aug 2018 20:11:33 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180807194558.GZ23195@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] fw_cfg: set the
- get_boot_devices_list() ignore_suffixes parameter from machine property
+Date: Wed,  8 Aug 2018 20:19:51 +0100
+Message-Id: <20180808191951.23193-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH] fw_cfg: add bootdevice-ignore-suffixes property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,30 +23,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: lersek@redhat.com, qemu-devel@nongnu.org
+To: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, lersek@redhat.com, qemu-devel@nongnu.org
 
-On 07/08/18 20:45, Eduardo Habkost wrote:
+For the older machines (such as Mac and SPARC) the DT nodes representing
+bootdevices for disk nodes are irregular for mainly historical reasons.
 
->> Is this sufficient, or are the compat properties supposed to be versioned
->> according to the QEMU machine version?
-> 
-> I never saw compat_properties being used for non-versioned
-> machines, but it should work for this use case as well.
-> 
-> But, I'm not sure this is the best option.  If the machine type
-> is not versioned, you can simply manually set the device property
-> to the desired value when creating the device inside your machine
-> init function.  See how the "data_width" and "dma_enabled"
-> properties are set by existing machines, for an example.
+Since the majority of bootdevice nodes for these machines either do not have a
+separate disk node or require different (custom) names then it is much easier
+to disable all suffixes for a particular machine by setting the ignore_suffixes
+parameter to get_boot_devices_list() to true, and customise the disk nodes as
+required.
 
-After some more digging, I can see that you are right and that we can 
-actually get away with a standard qdev property for the fw_cfg device 
-rather than a machine property after all - it's just that I need to 
-convert both machines away from using the old fw_cfg_init() functions 
-first. I'll send over what I have shortly.
+Here we add a new bootdevice-ignore-suffixes property to the FW_CFG device to
+allow the generation of disk suffixes to be controlled on a per-machine basis.
 
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/nvram/fw_cfg.c         | 9 ++++++++-
+ include/hw/nvram/fw_cfg.h | 1 +
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-ATB,
-
-Mark.
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index b23e7f64a8..52488b999f 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -861,7 +861,8 @@ static void fw_cfg_machine_reset(void *opaque)
+     void *ptr;
+     size_t len;
+     FWCfgState *s = opaque;
+-    char *bootindex = get_boot_devices_list(&len, false);
++    char *bootindex = get_boot_devices_list(&len,
++                                            s->bootdevice_ignore_suffixes);
+ 
+     ptr = fw_cfg_modify_file(s, "bootorder", (uint8_t *)bootindex, len);
+     g_free(ptr);
+@@ -990,12 +991,18 @@ FWCfgState *fw_cfg_find(void)
+     return FW_CFG(object_resolve_path_type("", TYPE_FW_CFG, NULL));
+ }
+ 
++static Property fw_cfg_properties[] = {
++    DEFINE_PROP_BOOL("bootdevice-ignore-suffixes", FWCfgState,
++                     bootdevice_ignore_suffixes, false),
++    DEFINE_PROP_END_OF_LIST(),
++};
+ 
+ static void fw_cfg_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->reset = fw_cfg_reset;
++    dc->props = fw_cfg_properties;
+     dc->vmsd = &vmstate_fw_cfg;
+ }
+ 
+diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+index b2259cc4a3..848c83aef4 100644
+--- a/include/hw/nvram/fw_cfg.h
++++ b/include/hw/nvram/fw_cfg.h
+@@ -58,6 +58,7 @@ struct FWCfgState {
+     uint16_t cur_entry;
+     uint32_t cur_offset;
+     Notifier machine_ready;
++    bool bootdevice_ignore_suffixes;
+ 
+     int fw_cfg_order_override;
+ 
+-- 
+2.11.0
