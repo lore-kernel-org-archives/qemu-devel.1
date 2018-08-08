@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBv-0006p0-Ek
+	(envelope-from <armbru@redhat.com>) id 1fnNBv-0006oz-3x
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:04:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBm-00009U-9V
+	(envelope-from <armbru@redhat.com>) id 1fnNBl-00008e-Tj
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43276 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51758 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBl-00007D-RL
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:42 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBl-000064-A7
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:41 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed,  8 Aug 2018 14:03:33 +0200
-Message-Id: <20180808120334.10970-56-armbru@redhat.com>
+Date: Wed,  8 Aug 2018 14:03:25 +0200
+Message-Id: <20180808120334.10970-48-armbru@redhat.com>
 In-Reply-To: <20180808120334.10970-1-armbru@redhat.com>
 References: <20180808120334.10970-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 55/56] json: Clean up headers
+Subject: [Qemu-devel] [PATCH 47/56] qjson: Have qobject_from_json() &
+ friends reject empty and blank
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,286 +27,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-The JSON parser has three public headers, json-lexer.h, json-parser.h,
-json-streamer.h.  They all contain stuff that is of no interest
-outside qobject/json-*.c.
+The last case where qobject_from_json() & friends return null without
+setting an error is empty or blank input.  Callers:
 
-Collect the public interface in include/qapi/qmp/json-parser.h, and
-everything else in qobject/json-parser-int.h.
+* block.c's parse_json_protocol() reports "Could not parse the JSON
+  options".  It's marked as a work-around, because it also covered
+  actual bugs, but they got fixed in the previous few commits.
+
+* qobject_input_visitor_new_str() reports "JSON parse error".  Also
+  marked as work-around.  The recent fixes have made this unreachable,
+  because it currently gets called only for input starting with '{'.
+
+* check-qjson.c's empty_input() and blank_input() demonstrate the
+  behavior.
+
+* The other callers are not affected since they only pass input with
+  exactly one JSON value or, in the case of negative tests, one error.
+
+Fail with "Expecting a JSON value" instead of returning null, and
+simplify callers.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qapi/qmp/json-parser.h                | 36 ++++++++++++---
- include/qapi/qmp/json-streamer.h              | 46 -------------------
- monitor.c                                     |  2 +-
- qga/main.c                                    |  2 +-
- qobject/json-lexer.c                          |  3 +-
- .../json-lexer.h => qobject/json-parser-int.h | 26 ++++++-----
- qobject/json-parser.c                         |  4 +-
- qobject/json-streamer.c                       |  4 +-
- qobject/qjson.c                               |  2 +-
- tests/libqtest.c                              |  2 +-
- 10 files changed, 51 insertions(+), 76 deletions(-)
- delete mode 100644 include/qapi/qmp/json-streamer.h
- rename include/qapi/qmp/json-lexer.h => qobject/json-parser-int.h (62%)
+ block.c                      |  5 -----
+ qapi/qobject-input-visitor.c |  5 -----
+ qobject/qjson.c              |  4 ++++
+ tests/check-qjson.c          | 12 ++++++++++--
+ 4 files changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/include/qapi/qmp/json-parser.h b/include/qapi/qmp/json-parser.h
-index 55f75954c3..7345a9bd5c 100644
---- a/include/qapi/qmp/json-parser.h
-+++ b/include/qapi/qmp/json-parser.h
-@@ -1,5 +1,5 @@
- /*
-- * JSON Parser 
-+ * JSON Parser
-  *
-  * Copyright IBM, Corp. 2009
-  *
-@@ -11,14 +11,36 @@
-  *
-  */
+diff --git a/block.c b/block.c
+index 39f373e035..b837684e3c 100644
+--- a/block.c
++++ b/block.c
+@@ -1478,11 +1478,6 @@ static QDict *parse_json_filename(const char *filename, Error **errp)
  
--#ifndef QEMU_JSON_PARSER_H
--#define QEMU_JSON_PARSER_H
-+#ifndef QAPI_QMP_JSON_PARSER_H
-+#define QAPI_QMP_JSON_PARSER_H
- 
--#include "qapi/qmp/json-lexer.h"
-+typedef struct JSONLexer {
-+    int start_state, state;
-+    GString *token;
-+    int x, y;
-+} JSONLexer;
- 
--typedef struct JSONToken JSONToken;
-+typedef struct JSONMessageParser {
-+    void (*emit)(void *opaque, QObject *json, Error *err);
-+    void *opaque;
-+    va_list *ap;
-+    JSONLexer lexer;
-+    int brace_count;
-+    int bracket_count;
-+    GQueue tokens;
-+    uint64_t token_size;
-+} JSONMessageParser;
- 
--JSONToken *json_token(JSONTokenType type, int x, int y, GString *tokstr);
--QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp);
-+void json_message_parser_init(JSONMessageParser *parser,
-+                              void (*emit)(void *opaque, QObject *json,
-+                                           Error *err),
-+                              void *opaque, va_list *ap);
-+
-+void json_message_parser_feed(JSONMessageParser *parser,
-+                             const char *buffer, size_t size);
-+
-+void json_message_parser_flush(JSONMessageParser *parser);
-+
-+void json_message_parser_destroy(JSONMessageParser *parser);
- 
- #endif
-diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-streamer.h
-deleted file mode 100644
-index 29950ac37c..0000000000
---- a/include/qapi/qmp/json-streamer.h
-+++ /dev/null
-@@ -1,46 +0,0 @@
--/*
-- * JSON streaming support
-- *
-- * Copyright IBM, Corp. 2009
-- *
-- * Authors:
-- *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
--
--#ifndef QEMU_JSON_STREAMER_H
--#define QEMU_JSON_STREAMER_H
--
--#include "qapi/qmp/json-lexer.h"
--
--typedef struct JSONMessageParser
--{
--    void (*emit)(void *opaque, QObject *json, Error *err);
--    void *opaque;
--    va_list *ap;
--    JSONLexer lexer;
--    int brace_count;
--    int bracket_count;
--    GQueue tokens;
--    uint64_t token_size;
--} JSONMessageParser;
--
--void json_message_process_token(JSONLexer *lexer, GString *input,
--                                JSONTokenType type, int x, int y);
--
--void json_message_parser_init(JSONMessageParser *parser,
--                              void (*emit)(void *opaque, QObject *json,
--                                           Error *err),
--                              void *opaque, va_list *ap);
--
--void json_message_parser_feed(JSONMessageParser *parser,
--                             const char *buffer, size_t size);
--
--void json_message_parser_flush(JSONMessageParser *parser);
--
--void json_message_parser_destroy(JSONMessageParser *parser);
--
--#endif
-diff --git a/monitor.c b/monitor.c
-index dc0ed8df92..ff8960f857 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -58,7 +58,7 @@
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/qmp/qjson.h"
--#include "qapi/qmp/json-streamer.h"
-+#include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/qlist.h"
- #include "qom/object_interfaces.h"
- #include "trace-root.h"
-diff --git a/qga/main.c b/qga/main.c
-index b74e1241ef..6d70242d05 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -18,7 +18,7 @@
- #include <syslog.h>
- #include <sys/wait.h>
- #endif
--#include "qapi/qmp/json-streamer.h"
-+#include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qstring.h"
-diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index dc21eb52cf..4d2b840929 100644
---- a/qobject/json-lexer.c
-+++ b/qobject/json-lexer.c
-@@ -12,8 +12,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "qapi/qmp/json-lexer.h"
--#include "qapi/qmp/json-streamer.h"
-+#include "json-parser-int.h"
- 
- #define MAX_TOKEN_SIZE (64ULL << 20)
- 
-diff --git a/include/qapi/qmp/json-lexer.h b/qobject/json-parser-int.h
-similarity index 62%
-rename from include/qapi/qmp/json-lexer.h
-rename to qobject/json-parser-int.h
-index 1a2dbbb717..442d17996a 100644
---- a/include/qapi/qmp/json-lexer.h
-+++ b/qobject/json-parser-int.h
-@@ -1,5 +1,5 @@
- /*
-- * JSON lexer
-+ * JSON Parser
-  *
-  * Copyright IBM, Corp. 2009
-  *
-@@ -11,8 +11,10 @@
-  *
-  */
- 
--#ifndef QEMU_JSON_LEXER_H
--#define QEMU_JSON_LEXER_H
-+#ifndef JSON_PARSER_INT_H
-+#define JSON_PARSER_INT_H
-+
-+#include "qapi/qmp/json-parser.h"
- 
- typedef enum {
-     JSON_ERROR = 0,             /* must be zero */
-@@ -30,18 +32,20 @@ typedef enum {
-     JSON_END_OF_INPUT           /* must be last */
- } JSONTokenType;
- 
--typedef struct JSONLexer {
--    int start_state, state;
--    GString *token;
--    int x, y;
--} JSONLexer;
-+typedef struct JSONToken JSONToken;
- 
-+/* json-lexer.c */
- void json_lexer_init(JSONLexer *lexer, bool enable_interpolation);
--
- void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size);
--
- void json_lexer_flush(JSONLexer *lexer);
--
- void json_lexer_destroy(JSONLexer *lexer);
- 
-+/* json-streamer.c */
-+void json_message_process_token(JSONLexer *lexer, GString *input,
-+                                JSONTokenType type, int x, int y);
-+
-+/* json-parser.c */
-+JSONToken *json_token(JSONTokenType type, int x, int y, GString *tokstr);
-+QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp);
-+
- #endif
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index d8f9df2fd3..179b8a45d7 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -22,9 +22,7 @@
- #include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
--#include "qapi/qmp/json-parser.h"
--#include "qapi/qmp/json-lexer.h"
--#include "qapi/qmp/json-streamer.h"
-+#include "json-parser-int.h"
- 
- struct JSONToken {
-     JSONTokenType type;
-diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index da53e770e9..47dd7ea576 100644
---- a/qobject/json-streamer.c
-+++ b/qobject/json-streamer.c
-@@ -13,9 +13,7 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "qapi/qmp/json-lexer.h"
--#include "qapi/qmp/json-parser.h"
--#include "qapi/qmp/json-streamer.h"
-+#include "json-parser-int.h"
- 
- #define MAX_TOKEN_SIZE (64ULL << 20)
- #define MAX_TOKEN_COUNT (2ULL << 20)
+     options_obj = qobject_from_json(filename, errp);
+     if (!options_obj) {
+-        /* Work around qobject_from_json() lossage TODO fix that */
+-        if (errp && !*errp) {
+-            error_setg(errp, "Could not parse the JSON options");
+-            return NULL;
+-        }
+         error_prepend(errp, "Could not parse the JSON options: ");
+         return NULL;
+     }
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index da57f4cc24..3e88b27f9e 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -725,11 +725,6 @@ Visitor *qobject_input_visitor_new_str(const char *str,
+     if (is_json) {
+         obj = qobject_from_json(str, errp);
+         if (!obj) {
+-            /* Work around qobject_from_json() lossage TODO fix that */
+-            if (errp && !*errp) {
+-                error_setg(errp, "JSON parse error");
+-                return NULL;
+-            }
+             return NULL;
+         }
+         args = qobject_to(QDict, obj);
 diff --git a/qobject/qjson.c b/qobject/qjson.c
-index b9ccae2c2a..db36101f3b 100644
+index 7f69036487..b9ccae2c2a 100644
 --- a/qobject/qjson.c
 +++ b/qobject/qjson.c
-@@ -13,7 +13,7 @@
+@@ -70,6 +70,10 @@ static QObject *qobject_from_jsonv(const char *string, va_list *ap,
+     json_message_parser_flush(&state.parser);
+     json_message_parser_destroy(&state.parser);
  
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "qapi/qmp/json-streamer.h"
-+#include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 7ef8dd621f..19a39091a1 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -23,7 +23,7 @@
- #include "libqtest.h"
- #include "qemu/cutils.h"
- #include "qapi/error.h"
--#include "qapi/qmp/json-streamer.h"
-+#include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qlist.h"
++    if (!state.result && !state.err) {
++        error_setg(&state.err, "Expecting a JSON value");
++    }
++
+     error_propagate(errp, state.err);
+     return state.result;
+ }
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index 833d220654..49490f678e 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -1240,13 +1240,21 @@ static void simple_interpolation(void)
+ 
+ static void empty_input(void)
+ {
+-    QObject *obj = qobject_from_json("", &error_abort);
++    Error *err = NULL;
++    QObject *obj;
++
++    obj = qobject_from_json("", &err);
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ }
+ 
+ static void blank_input(void)
+ {
+-    QObject *obj = qobject_from_json("\n ", &error_abort);
++    Error *err = NULL;
++    QObject *obj;
++
++    obj = qobject_from_json("\n ", &err);
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ }
+ 
 -- 
 2.17.1
