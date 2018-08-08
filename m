@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fnFSA-0004rc-Ge
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:48:07 -0400
+	(envelope-from <peterx@redhat.com>) id 1fnFVe-0006uY-52
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:51:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fnFS9-0000BF-Ga
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:48:06 -0400
-Date: Tue, 7 Aug 2018 23:47:54 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180808034754.GD755222@localhost.localdomain>
-References: <20180807043349.27196-1-jsnow@redhat.com>
-	<20180807043349.27196-7-jsnow@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1fnFVa-00027b-7C
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:51:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55106 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fnFVa-00027M-1k
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:51:38 -0400
+Date: Wed, 8 Aug 2018 11:51:27 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180808035127.GD24415@xz-mi>
+References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
+	<20180807091209.13531-2-xiaoguangrong@tencent.com>
+	<6fb46b1e-5cae-24ec-acd6-72ba562a5c05@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180807043349.27196-7-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 06/21] block/stream: utilize job_exit shim
+In-Reply-To: <6fb46b1e-5cae-24ec-acd6-72ba562a5c05@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 01/10] migration: do not wait for free
+ thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: guangrong.xiao@gmail.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Tue, Aug 07, 2018 at 12:33:34AM -0400, John Snow wrote:
-> Change the manual deferment to stream_complete into the implicit
-> callback to job_exit.
+On Tue, Aug 07, 2018 at 08:29:54AM -0500, Eric Blake wrote:
+> On 08/07/2018 04:12 AM, guangrong.xiao@gmail.com wrote:
+> > From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > 
+> > Instead of putting the main thread to sleep state to wait for
+> > free compression thread, we can directly post it out as normal
+> > page that reduces the latency and uses CPUs more efficiently
+> > 
+> > A parameter, compress-wait-thread, is introduced, it can be
+> > enabled if the user really wants the old behavior
+> > 
+> > Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > ---
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+> > +++ b/qapi/migration.json
+> > @@ -462,6 +462,11 @@
+> >   # @compress-threads: Set compression thread count to be used in live migration,
+> >   #          the compression thread count is an integer between 1 and 255.
+> >   #
+> > +# @compress-wait-thread: Wait if no thread is free to compress the memory page
+> > +#          if it's enabled, otherwise, the page will be posted out immediately
+> > +#          in the main thread without compression. It's true on default.
+> > +#          (Since: 3.1)
+> 
+> Grammar suggestion:
+> 
+> @compress-wait-thread: Controls behavior when all compression threads are
+> currently busy. If true (default), wait for a free compression thread to
+> become available; otherwise, send the page uncompressed. (Since 3.1)
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+Eric's version seems better.  With that:
 
-> ---
->  block/stream.c | 23 ++++++++---------------
->  1 file changed, 8 insertions(+), 15 deletions(-)
-> 
-> diff --git a/block/stream.c b/block/stream.c
-> index a5d6e0cf8a..163cd6431c 100644
-> --- a/block/stream.c
-> +++ b/block/stream.c
-> @@ -54,20 +54,16 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
->      return blk_co_preadv(blk, offset, qiov.size, &qiov, BDRV_REQ_COPY_ON_READ);
->  }
->  
-> -typedef struct {
-> -    int ret;
-> -} StreamCompleteData;
-> -
-> -static void stream_complete(Job *job, void *opaque)
-> +static void stream_exit(Job *job)
->  {
->      StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
->      BlockJob *bjob = &s->common;
-> -    StreamCompleteData *data = opaque;
->      BlockDriverState *bs = blk_bs(bjob->blk);
->      BlockDriverState *base = s->base;
->      Error *local_err = NULL;
-> +    int ret = job->ret;
->  
-> -    if (!job_is_cancelled(job) && bs->backing && data->ret == 0) {
-> +    if (!job_is_cancelled(job) && bs->backing && ret == 0) {
->          const char *base_id = NULL, *base_fmt = NULL;
->          if (base) {
->              base_id = s->backing_file_str;
-> @@ -75,11 +71,11 @@ static void stream_complete(Job *job, void *opaque)
->                  base_fmt = base->drv->format_name;
->              }
->          }
-> -        data->ret = bdrv_change_backing_file(bs, base_id, base_fmt);
-> +        ret = bdrv_change_backing_file(bs, base_id, base_fmt);
->          bdrv_set_backing_hd(bs, base, &local_err);
->          if (local_err) {
->              error_report_err(local_err);
-> -            data->ret = -EPERM;
-> +            ret = -EPERM;
->              goto out;
->          }
->      }
-> @@ -93,14 +89,12 @@ out:
->      }
->  
->      g_free(s->backing_file_str);
-> -    job_completed(job, data->ret);
-> -    g_free(data);
-> +    job->ret = ret;
->  }
->  
->  static void coroutine_fn stream_run(void *opaque)
->  {
->      StreamBlockJob *s = opaque;
-> -    StreamCompleteData *data;
->      BlockBackend *blk = s->common.blk;
->      BlockDriverState *bs = blk_bs(blk);
->      BlockDriverState *base = s->base;
-> @@ -203,9 +197,7 @@ static void coroutine_fn stream_run(void *opaque)
->  
->  out:
->      /* Modify backing chain and close BDSes in main loop */
-> -    data = g_malloc(sizeof(*data));
-> -    data->ret = ret;
-> -    job_defer_to_main_loop(&s->common.job, stream_complete, data);
-> +    s->common.job.ret = ret;
->  }
->  
->  static const BlockJobDriver stream_job_driver = {
-> @@ -214,6 +206,7 @@ static const BlockJobDriver stream_job_driver = {
->          .job_type      = JOB_TYPE_STREAM,
->          .free          = block_job_free,
->          .start         = stream_run,
-> +        .exit          = stream_exit,
->          .user_resume   = block_job_user_resume,
->          .drain         = block_job_drain,
->      },
-> -- 
-> 2.14.4
-> 
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+Regards,
+
+-- 
+Peter Xu
