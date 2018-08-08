@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fnIsg-0003pA-QH
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:27:43 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fnIzJ-0005gr-2L
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:34:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fnIsb-0003uu-W8
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:27:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33588 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fnIsb-0003uX-Qn
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:27:37 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <CAFEAcA_XJGWPioUDUR0+9v16Xj_osDwk7OYEK3vkqdg_SacMXA@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 7 Aug 2018 16:09:53 +0100")
-References: <20180807130355.29780-1-peter.maydell@linaro.org>
-	<87muty2u57.fsf@trasno.org>
-	<CAFEAcA_m+81aDQR=n=8gXhcifYp0L6n9KZA5COQsRejeqZe2FQ@mail.gmail.com>
-	<87in4m2qni.fsf@trasno.org>
-	<CAFEAcA81Xr6_eUV5247JtZRnN9Ms7fau1iwhHkmW-gnwH9y8JA@mail.gmail.com>
-	<87wot21bbt.fsf@trasno.org>
-	<CAFEAcA_y1qKsC8kSDee+FEpqZstz9UHTeyP6ABuGfXf_aDMRHw@mail.gmail.com>
-	<87o9ee1aka.fsf@trasno.org>
-	<CAFEAcA_XJGWPioUDUR0+9v16Xj_osDwk7OYEK3vkqdg_SacMXA@mail.gmail.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 08 Aug 2018 09:27:31 +0200
-Message-ID: <87k1p11foc.fsf@trasno.org>
+	(envelope-from <cohuck@redhat.com>) id 1fnIzE-0007gF-1l
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:34:33 -0400
+Date: Wed, 8 Aug 2018 09:34:15 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180808093415.0ae050c8.cohuck@redhat.com>
+In-Reply-To: <4305b179-bcaa-9373-5b5c-41cd79122d5c@linux.ibm.com>
+References: <1530312483-23864-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<4305b179-bcaa-9373-5b5c-41cd79122d5c@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] migration: Correctly handle subsections
- with no 'needed' function
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 0/5] s390x: vfio-ap: guest dedicated
+ crypto adapters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +24,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-Peter Maydell <peter.maydell@linaro.org> wrote:
-D> On 7 August 2018 at 16:05, Juan Quintela <quintela@redhat.com> wrote:
->> Peter Maydell <peter.maydell@linaro.org> wrote:
->>> So it's better to use a needed-always subsection, which will give
->>> the desired behaviour:
->>>  * new QEMU -> new QEMU: state is always migrated
->>>  * old QEMU -> new QEMU: migration doesn't fail, and guest
->>>    will work assuming it didn't care about this corner of the
->>>    device's functionality (the device will end up with state
->>>    as it was at reset, or possibly special-cased via
->>>    pre_load/post_load hooks for the "section not present" case)
->>
->> we break by definiton new QEMU -M <old machine type> into old QEMU.
->
-> Is that supposed to work? I always thought that we never
-> supported migration back to an older QEMU version like that.
+On Tue, 7 Aug 2018 18:41:29 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-It is a "best effort" case.  As David told, downstream we try very
-hard.  For upstream we do when I found that, but not anywhere else.
+> Ping
 
-> In any case, for all the devices here the machine types are
-> not versioned.
+Maybe send a new version when the kernel part is sent again? I don't
+think I had any further comments.
 
-This is part of the problem.  For some architectures, we don't even care
-about migraiton.  For others, we care about migration but not
-cross-version.  And yet in others we care very much (downstream
-specially).
-
-And it is not clear what devices support each of them.
-
-Later, Juan.
+> 
+> On 06/29/2018 06:47 PM, Tony Krowiak wrote:
+> > From: Tony Krowiak <akrowiak@linux.ibm.com>
+> >
+> > This patch series is the QEMU counterpart to the KVM/kernel support for
+> > guest dedicated crypto adapters. The KVM/kernel model is built on the
+> > VFIO mediated device framework and provides the infrastructure for
+> > granting exclusive guest access to crypto devices installed on the linux
+> > host. This patch series introduces a new QEMU command line option, QEMU
+> > object model and CPU model features to exploit the KVM/kernel model.
+> >
+> > See the detailed specifications for AP virtualization provided by this
+> > patch set in docs/vfio-ap.txt for a more complete discussion of the
+> > design introduced by this patch series.
+> >
+> > Note: This series implements the minimal viable product (MVP) and does not
+> >        provide support for hot plug/unplug or migration. The goal
+> >        of the MVP model is to solidify a base upon which these additional
+> >        features will be built.
+> >
+> > --
+> > v5 => v6 Change log:
+> > ===================
+> > * Added reset handling fo vfio-ap device
+> > * Added a bridge/bus to AP device object model - thanks to Halil Pasic
+> >
+> > v4 => v5 Change log:
+> > ===================
+> > * Added MAINTAINERS entries for VFIO AP
+> > * Added explanation for why we are only supporting zEC12 and newer CPU
+> >    models.
+> > * Changed CPU model feature qci=on|off to apqci=on|off
+> > * Misc. minor changes
+> >
+> > v3 => v4 Change log:
+> > ===================
+> > * Made vfio-ap device unpluggable for now
+> > * Renamed command line CPU model feature for QCI: qci=on -> apqci=on
+> > * Removed call to KVM_S390_VM_CRYPTO_INTERPRET_AP ioctl - ioctl was
+> >    removed from kernel and AP instruction interpretation is set from the
+> >    VFIO device driver
+> > * Added check to ensure only one vfio-ap device can be configured per
+> >    guest
+> > * Removed AP instruction interception handlers: AP instructions will be
+> >    interpreted by default if AP facilities are installed to handle the case
+> >    where feature ap=on and no vfio-ap device is configured for the guest.
+> >
+> >
+> > Tony Krowiak (5):
+> >    linux-headers: linux header updates for AP support
+> >    s390x/cpumodel: Set up CPU model for AP device support
+> >    s390x/ap: base Adjunct Processor (AP) object model
+> >    s390x/vfio: ap: Introduce VFIO AP device
+> >    s390: doc: detailed specifications for AP virtualization
+> >
+> >   MAINTAINERS                       |   14 +
+> >   default-configs/s390x-softmmu.mak |    1 +
+> >   docs/vfio-ap.txt                  |  649 +++++++++++++++++++++++++++++++++++++
+> >   hw/s390x/Makefile.objs            |    2 +
+> >   hw/s390x/ap-bridge.c              |   76 +++++
+> >   hw/s390x/ap-device.c              |   39 +++
+> >   hw/s390x/s390-virtio-ccw.c        |    4 +
+> >   hw/vfio/Makefile.objs             |    1 +
+> >   hw/vfio/ap.c                      |  183 +++++++++++
+> >   include/hw/s390x/ap-bridge.h      |   37 +++
+> >   include/hw/s390x/ap-device.h      |   38 +++
+> >   include/hw/vfio/vfio-common.h     |    1 +
+> >   linux-headers/asm-s390/kvm.h      |    2 +
+> >   linux-headers/linux/vfio.h        |    2 +
+> >   target/s390x/cpu_features.c       |    3 +
+> >   target/s390x/cpu_features_def.h   |    3 +
+> >   target/s390x/cpu_models.c         |    2 +
+> >   target/s390x/gen-features.c       |    3 +
+> >   target/s390x/kvm.c                |    1 +
+> >   19 files changed, 1061 insertions(+), 0 deletions(-)
+> >   create mode 100644 docs/vfio-ap.txt
+> >   create mode 100644 hw/s390x/ap-bridge.c
+> >   create mode 100644 hw/s390x/ap-device.c
+> >   create mode 100644 hw/vfio/ap.c
+> >   create mode 100644 include/hw/s390x/ap-bridge.h
+> >   create mode 100644 include/hw/s390x/ap-device.h
+> >  
+> 
