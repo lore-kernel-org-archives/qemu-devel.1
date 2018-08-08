@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBu-0006ov-1I
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1fnNBx-0006qq-2c
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBl-00007y-MU
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51752 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fnNBm-00009M-8H
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37328 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBl-00005k-7Z
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:41 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBl-00007T-Qw
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:42 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed,  8 Aug 2018 14:03:27 +0200
-Message-Id: <20180808120334.10970-50-armbru@redhat.com>
+Date: Wed,  8 Aug 2018 14:03:34 +0200
+Message-Id: <20180808120334.10970-57-armbru@redhat.com>
 In-Reply-To: <20180808120334.10970-1-armbru@redhat.com>
 References: <20180808120334.10970-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 49/56] json: Streamline
- json_message_process_token()
+Subject: [Qemu-devel] [PATCH 56/56] docs/interop/qmp-spec: How to force
+ known good parser state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +27,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
+Section "QGA Synchronization" specifies that sending "a raw 0xFF
+sentinel byte" makes the server "reset its state and discard all
+pending data prior to the sentinel."  What actually happens there is a
+lexical error, which will produce one ore more error responses.
+Moreover, it's not specific to QGA.
+
+Create new section "Forcing the JSON parser into known-good state" to
+document the technique properly.  Rewrite section "QGA
+Synchronization" to document just the other direction, i.e. command
+guest-sync-delimited.
+
+Section "Protocol Specification" mentions "synchronization bytes
+(documented below)".  Delete that.
+
+While there, fix it not to claim '"Server" is QEMU itself', but
+'"Server" is either QEMU or the QEMU Guest Agent'.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qobject/json-streamer.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ docs/interop/qmp-spec.txt | 37 ++++++++++++++++++++++++-------------
+ 1 file changed, 24 insertions(+), 13 deletions(-)
 
-diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index 810aae521f..954bf9d468 100644
---- a/qobject/json-streamer.c
-+++ b/qobject/json-streamer.c
-@@ -99,16 +99,13 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
+index 1566b8ae5e..d4a42fe2cc 100644
+--- a/docs/interop/qmp-spec.txt
++++ b/docs/interop/qmp-spec.txt
+@@ -20,9 +20,9 @@ operating system.
+ 2. Protocol Specification
+ =========================
  
-     g_queue_push_tail(parser->tokens, token);
+-This section details the protocol format. For the purpose of this document
+-"Client" is any application which is using QMP to communicate with QEMU and
+-"Server" is QEMU itself.
++This section details the protocol format. For the purpose of this
++document, "Server" is either QEMU or the QEMU Guest Agent, and
++"Client" is any application communicating with it via QMP.
  
--    if (parser->brace_count < 0 ||
--        parser->bracket_count < 0 ||
--        (parser->brace_count == 0 &&
--         parser->bracket_count == 0)) {
--        json = json_parser_parse(parser->tokens, parser->ap, &err);
--        parser->tokens = NULL;
--        goto out_emit;
-+    if ((parser->brace_count > 0 || parser->bracket_count > 0)
-+        && parser->bracket_count >= 0 && parser->bracket_count >= 0) {
-+        return;
-     }
+ JSON data structures, when mentioned in this document, are always in the
+ following format:
+@@ -34,9 +34,8 @@ by the JSON standard:
  
--    return;
-+    json = json_parser_parse(parser->tokens, parser->ap, &err);
-+    parser->tokens = NULL;
+ http://www.ietf.org/rfc/rfc7159.txt
  
- out_emit:
-     parser->brace_count = 0;
+-The protocol is always encoded in UTF-8 except for synchronization
+-bytes (documented below); although thanks to json-string escape
+-sequences, the server will reply using only the strict ASCII subset.
++The sever expects its input to be encoded in UTF-8, and sends its
++output encoded in ASCII.
+ 
+ For convenience, json-object members mentioned in this document will
+ be in a certain order. However, in real protocol usage they can be in
+@@ -215,16 +214,28 @@ Some events are rate-limited to at most one per second.  If additional
+ dropped, and the last one is delayed.  "Similar" normally means same
+ event type.  See qmp-events.txt for details.
+ 
+-2.6 QGA Synchronization
++2.6 Forcing the JSON parser into known-good state
++-------------------------------------------------
++
++Incomplete or invalid input can leave the server's JSON parser in a
++state where it can't parse additional commands.  To get it back into
++known-good state, the client should provoke a lexical error.
++
++The cleanest way to do that is sending an ASCII control character
++other than '\t' (horizontal tab), '\r' (carriage return), and '\n'
++(new line).
++
++Sadly, older versions of QEMU can fail to flag this as an error.  If a
++client needs to deal with them, it should send a 0xFF byte.
++
++2.7 QGA Synchronization
+ -----------------------
+ 
+ When using QGA, an additional synchronization feature is built into
+-the protocol.  If the Client sends a raw 0xFF sentinel byte (not valid
+-JSON), then the Server will reset its state and discard all pending
+-data prior to the sentinel.  Conversely, if the Client makes use of
+-the 'guest-sync-delimited' command, the Server will send a raw 0xFF
+-sentinel byte prior to its response, to aid the Client in discarding
+-any data prior to the sentinel.
++the protocol. If the Client makes use of the 'guest-sync-delimited'
++command, the Server will send a raw 0xFF sentinel byte prior to its
++response, to aid the Client in discarding any data prior to the
++sentinel.
+ 
+ 
+ 3. QMP Examples
 -- 
 2.17.1
