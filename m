@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fnG8U-0000NC-Dd
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 00:31:51 -0400
+	(envelope-from <peterx@redhat.com>) id 1fnGG5-0003LP-Ri
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 00:39:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fnG8T-0004k4-D7
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 00:31:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58500)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fnG8T-0004jo-5x
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 00:31:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fnG8R-0007RK-Ba
-	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 04:31:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 394302E80E2
-	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 04:31:47 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1fnGG1-0002cn-Vk
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 00:39:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33682 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fnGG1-0002b8-Qj
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 00:39:37 -0400
+Date: Wed, 8 Aug 2018 12:39:26 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180808043926.GE24415@xz-mi>
+References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
+	<20180807091209.13531-6-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Aug 2018 04:17:28 -0000
-From: Launchpad Bug Tracker <1463172@bugs.launchpad.net>
-Reply-To: Bug 1463172 <1463172@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150608204231.21794.24190.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153370184832.9868.17038596037418341752.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1463172] Re: destination arm board hangs after
- migration from x86 source
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180807091209.13531-6-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v3 05/10] migration: move handle of zero
+ page to the thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,35 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On Tue, Aug 07, 2018 at 05:12:04PM +0800, guangrong.xiao@gmail.com wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> Detecting zero page is not a light work, moving it to the thread to
+> speed the main thread up, btw, handling ram_release_pages() for the
+> zero page is moved to the thread as well
+> 
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> ---
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+[...]
 
--- =
+> @@ -2239,17 +2290,10 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
+>      }
+>  
+>      /*
+> -     * Make sure the first page is sent out before other pages.
+> -     *
+> -     * we post it as normal page as compression will take much
+> -     * CPU resource.
+> +     * do not use multifd for compression as the first page in the new
+> +     * block should be posted out before sending the compressed page
+>       */
+> -    if (block == rs->last_sent_block && save_page_use_compression(rs)) {
+> -        res = compress_page_with_multi_thread(rs, block, offset);
+> -        if (res > 0) {
+> -            return res;
+> -        }
+> -    } else if (migrate_use_multifd()) {
+> +    if (!save_page_use_compression(rs) && migrate_use_multifd()) {
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1463172
+Not related to this patch: I think we should just disallow user to
+specify both compression and multifd together.  I vaguely remembered
+that I left a comment somewhere in the multifd series but it must have
+fallen throw the cracks...  Anyway it's not related to this patch:
 
-Title:
-  destination arm board hangs after migration from x86 source
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Status in QEMU:
-  Expired
-Status in qemu package in Ubuntu:
-  Expired
+Thanks,
 
-Bug description:
-  The qemu destination on an arm board hangs after migration from a x86
-  source. With qemu emulating Arch, the migration works fine while the
-  vm is still in the boot selection screen, but if the machine is
-  booted, then the destination arm board vm hangs indefinitely after
-  migrating from the x86 source. This bug does not occur the other way
-  around, meaning a booted vm originally run on arm board will continue
-  to work after migrating to a x86 destination.
+>          return ram_save_multifd_page(rs, block, offset);
+>      }
+>  
+> -- 
+> 2.14.4
+> 
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1463172/+subscriptions
+-- 
+Peter Xu
