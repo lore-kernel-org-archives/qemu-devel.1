@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fnPtq-0008H6-L5
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:57:23 -0400
+	(envelope-from <bounces@canonical.com>) id 1fnPyA-0001xZ-BD
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:01:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fnPtp-0007oP-HU
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:57:22 -0400
-Date: Wed, 8 Aug 2018 16:57:07 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180808145707.GB15410@localhost.localdomain>
-References: <20180807043349.27196-1-jsnow@redhat.com>
-	<20180807043349.27196-2-jsnow@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fnPy5-0003gr-HX
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:01:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48786)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fnPy5-0003cM-AO
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:01:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fnPy2-0005HH-DW
+	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 15:01:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AE7EC2E8181
+	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 15:01:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180807043349.27196-2-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/21] jobs: canonize Error object
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 08 Aug 2018 14:54:55 -0000
+From: umarcor <1783362@bugs.launchpad.net>
+Reply-To: Bug 1783362 <1783362@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153244909751.11925.3364609945591086988.malonedeb@gac.canonical.com>
+Message-Id: <153374009669.18002.15272518611430411362.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1783362] Re: qemu-user: mmap should return
+ failure (MAP_FAILED, -1) instead of success (NULL, 0) when len==0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +37,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
 
-Am 07.08.2018 um 06:33 hat John Snow geschrieben:
-> Jobs presently use both an Error object in the case of the create job,
-> and char strings in the case of generic errors elsewhere.
-> 
-> Unify the two paths as just j->err, and remove the extra argument from
-> job_completed.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
-Hm, not sure. Overall, this feels like a step backwards.
+** Changed in: qemu (Ubuntu)
+       Status: Fix Committed =3D> Fix Released
 
-> diff --git a/include/qemu/job.h b/include/qemu/job.h
-> index 18c9223e31..845ad00c03 100644
-> --- a/include/qemu/job.h
-> +++ b/include/qemu/job.h
-> @@ -124,12 +124,12 @@ typedef struct Job {
->      /** Estimated progress_current value at the completion of the job */
->      int64_t progress_total;
->  
-> -    /** Error string for a failed job (NULL if, and only if, job->ret == 0) */
-> -    char *error;
-> -
->      /** ret code passed to job_completed. */
->      int ret;
->  
-> +    /** Error object for a failed job **/
-> +    Error *err;
-> +
->      /** The completion function that will be called when the job completes.  */
->      BlockCompletionFunc *cb;
+-- =
 
-This is the change that I could agree with, though I don't think it
-makes a big difference: Whether you store the string immediately or an
-Error object from which you get the string later, doesn't really make a
-big difference.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1783362
 
-Maybe we find more uses and having an Error object is common practice in
-QEMU, so no objections to this change.
+Title:
+  qemu-user: mmap should return failure (MAP_FAILED, -1) instead of
+  success (NULL, 0) when len=3D=3D0
 
-> @@ -484,15 +484,13 @@ void job_transition_to_ready(Job *job);
->  /**
->   * @job: The job being completed.
->   * @ret: The status code.
-> - * @error: The error message for a failing job (only with @ret < 0). If @ret is
-> - *         negative, but NULL is given for @error, strerror() is used.
->   *
->   * Marks @job as completed. If @ret is non-zero, the job transaction it is part
->   * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
->   * is the last job to complete in its transaction, all jobs in the transaction
->   * move from WAITING to PENDING.
->   */
-> -void job_completed(Job *job, int ret, Error *error);
-> +void job_completed(Job *job, int ret);
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
 
-I don't like this one, though.
+Bug description:
+  As shown in https://github.com/beehive-
+  lab/mambo/issues/19#issuecomment-407420602, with len=3D=3D0 mmap returns
+  success (NULL, 0) instead of failure (MAP_FAILED, -1) in a x86_64 host
+  executing a ELF 64-bit LSB executable, ARM aarch64 binary.
 
-Before this change, job_completed(..., NULL) was a clear sign that the
-error message probably needed an improvement, because an errno string
-doesn't usually describe error situations very well. We may not have a
-much better message in some cases, but in most cases we just don't pass
-one because an error message after job creation is still a quite new
-thing in the QAPI schema.
+  Steps to reproduce the bug:
 
-What we should get rid of in the long term is the int ret, not the Error
-*error. I suspect callers really just distinguish success/error without
-actually looking at the error code.
+  - (cross-)compile the attached source file:
 
-With this change applied, what's your new conversion plan for making
-sure that every failing caller of job_completed() has set job->error
-first?
+  $ aarch64-linux-gnu-gcc -static -std=3Dgnu99 -lpthread test/mmap_qemu.c
+  -o mmap_qemu
 
-> @@ -666,8 +665,8 @@ static void job_update_rc(Job *job)
->          job->ret = -ECANCELED;
->      }
->      if (job->ret) {
-> -        if (!job->error) {
-> -            job->error = g_strdup(strerror(-job->ret));
-> +        if (!job->err) {
-> +            error_setg_errno(&job->err, -job->ret, "job failed");
->          }
->          job_state_transition(job, JOB_STATUS_ABORTING);
->      }
+  - Execute in a x86_64 host with qemu-user and qemu-user-binfmt:
 
-This hunk just makes the error message more verbose with a "job failed"
-prefix that doesn't add information. If it's the error string for a job,
-of course the job failed.
+  $ ./mmap_qemu
+  alloc: 0
+  MAP_FAILED: -1
+  errno: 0
+  mmap_qemu: test/mmap_qemu.c:15: main: Assertion `alloc =3D=3D MAP_FAILED'=
+ failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  Aborted (core dumped)
 
-Kevin
+  - Execute in a ARM host without any additional dependecy:
+
+  $ ./mmap_qemu
+  alloc: -1
+  MAP_FAILED: -1
+  errno: 22
+
+  The bug is present in Fedora:
+
+  $ qemu-aarch64 --version
+  qemu-aarch64 version 2.11.2(qemu-2.11.2-1.fc28)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+  $ uname -r
+  4.17.7-200.fc28.x86_64
+
+  And also in Ubuntu:
+
+  $ qemu-aarch64 --version
+  qemu-aarch64 version 2.12.0 (Debian 1:2.12+dfsg-3ubuntu3)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+  $ uname -r
+  4.15.0-23-generic
+
+  Possibly related to:
+
+  - https://lists.freebsd.org/pipermail/freebsd-hackers/2009-July/029109.ht=
+ml
+  - https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=3D203852
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1783362/+subscriptions
