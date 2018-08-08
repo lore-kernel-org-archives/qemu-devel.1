@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fnFJ6-0000zB-FI
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:38:45 -0400
+	(envelope-from <jcody@redhat.com>) id 1fnFLt-0002RC-Qw
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:41:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fnFJ1-00033I-H1
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:38:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60302 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fnFJ1-000330-A9
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:38:39 -0400
-Date: Wed, 8 Aug 2018 11:38:28 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180808033828.GB24415@xz-mi>
-References: <20180807193125.30378-1-alex.williamson@redhat.com>
-	<20180807193125.30378-4-alex.williamson@redhat.com>
+	(envelope-from <jcody@redhat.com>) id 1fnFLs-0004vc-Rw
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:41:37 -0400
+Date: Tue, 7 Aug 2018 23:41:24 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180808034124.GB755222@localhost.localdomain>
+References: <20180807043349.27196-1-jsnow@redhat.com>
+	<20180807043349.27196-5-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180807193125.30378-4-alex.williamson@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] vfio: Inhibit ballooning based on
- group attachment to a container
+In-Reply-To: <20180807043349.27196-5-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 04/21] block/commit: utilize job_exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +23,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, david@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Tue, Aug 07, 2018 at 01:31:24PM -0600, Alex Williamson wrote:
-> We use a VFIOContainer to associate an AddressSpace to one or more
-> VFIOGroups.  The VFIOContainer represents the DMA context for that
-> AdressSpace for those VFIOGroups and is synchronized to changes in
-> that AddressSpace via a MemoryListener.  For IOMMU backed devices,
-> maintaining the DMA context for a VFIOGroup generally involves
-> pinning a host virtual address in order to create a stable host
-> physical address and then mapping a translation from the associated
-> guest physical address to that host physical address into the IOMMU.
+On Tue, Aug 07, 2018 at 12:33:32AM -0400, John Snow wrote:
+> Change the manual deferment to commit_complete into the implicit
+> callback to job_exit.
 > 
-> While the above maintains the VFIOContainer synchronized to the QEMU
-> memory API of the VM, memory ballooning occurs outside of that API.
-> Inflating the memory balloon (ie. cooperatively capturing pages from
-> the guest for use by the host) simply uses MADV_DONTNEED to "zap"
-> pages from QEMU's host virtual address space.  The page pinning and
-> IOMMU mapping above remains in place, negating the host's ability to
-> reuse the page, but the host virtual to host physical mapping of the
-> page is invalidated outside of QEMU's memory API.
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/commit.c | 19 +++++--------------
+>  1 file changed, 5 insertions(+), 14 deletions(-)
 > 
-> When the balloon is later deflated, attempting to cooperatively
-> return pages to the guest, the page is simply freed by the guest
-> balloon driver, allowing it to be used in the guest and incurring a
-> page fault when that occurs.  The page fault maps a new host physical
-> page backing the existing host virtual address, meanwhile the
-> VFIOContainer still maintains the translation to the original host
-> physical address.  At this point the guest vCPU and any assigned
-> devices will map different host physical addresses to the same guest
-> physical address.  Badness.
-> 
-> The IOMMU typically does not have page level granularity with which
-> it can track this mapping without also incurring inefficiencies in
-> using page size mappings throughout.  MMU notifiers in the host
-> kernel also provide indicators for invalidating the mapping on
-> balloon inflation, not for updating the mapping when the balloon is
-> deflated.  For these reasons we assume a default behavior that the
-> mapping of each VFIOGroup into the VFIOContainer is incompatible
-> with memory ballooning and increment the balloon inhibitor to match
-> the attached VFIOGroups.
-> 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> diff --git a/block/commit.c b/block/commit.c
+> index 620666161b..5bed098d5f 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
+> @@ -68,19 +68,14 @@ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
+>      return 0;
+>  }
+>  
+> -typedef struct {
+> -    int ret;
+> -} CommitCompleteData;
+> -
+> -static void commit_complete(Job *job, void *opaque)
+> +static void commit_exit(Job *job)
+>  {
+>      CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
+>      BlockJob *bjob = &s->common;
+> -    CommitCompleteData *data = opaque;
+>      BlockDriverState *top = blk_bs(s->top);
+>      BlockDriverState *base = blk_bs(s->base);
+>      BlockDriverState *commit_top_bs = s->commit_top_bs;
+> -    int ret = data->ret;
+> +    int ret = job->ret;
+>      bool remove_commit_top_bs = false;
+>  
+>      /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Since 'ret' is only assigned to 'job->ret' outside of this line, we could
+drop the local 'ret' and assign job->ret to the output of
+brdrv_drop_intermediate() in this code below:
 
-Thanks,
+    if (!job_is_cancelled(job) && ret == 0) {
+        /* success */
+        ret = bdrv_drop_intermediate(s->commit_top_bs, base,
+                                     s->backing_file_str);
+    }
 
--- 
-Peter Xu
+> @@ -117,9 +112,6 @@ static void commit_complete(Job *job, void *opaque)
+>       * bdrv_set_backing_hd() to fail. */
+>      block_job_remove_all_bdrv(bjob);
+>  
+> -    job_completed(job, ret);
+> -    g_free(data);
+> -
+>      /* If bdrv_drop_intermediate() didn't already do that, remove the commit
+>       * filter driver from the backing chain. Do this as the final step so that
+>       * the 'consistent read' permission can be granted.  */
+> @@ -132,12 +124,12 @@ static void commit_complete(Job *job, void *opaque)
+>  
+>      bdrv_unref(commit_top_bs);
+>      bdrv_unref(top);
+> +    job->ret = ret;
+
+We could then drop this line as well.
+
+(This may fall under bike shedding, so I don't feel strongly about it):
+
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+
+>  }
+>  
+>  static void coroutine_fn commit_run(void *opaque)
+>  {
+>      CommitBlockJob *s = opaque;
+> -    CommitCompleteData *data;
+>      int64_t offset;
+>      uint64_t delay_ns = 0;
+>      int ret = 0;
+> @@ -210,9 +202,7 @@ static void coroutine_fn commit_run(void *opaque)
+>  out:
+>      qemu_vfree(buf);
+>  
+> -    data = g_malloc(sizeof(*data));
+> -    data->ret = ret;
+> -    job_defer_to_main_loop(&s->common.job, commit_complete, data);
+> +    s->common.job.ret = ret;
+>  }
+>  
+>  static const BlockJobDriver commit_job_driver = {
+> @@ -223,6 +213,7 @@ static const BlockJobDriver commit_job_driver = {
+>          .user_resume   = block_job_user_resume,
+>          .drain         = block_job_drain,
+>          .start         = commit_run,
+> +        .exit          = commit_exit,
+>      },
+>  };
+>  
+> -- 
+> 2.14.4
+> 
