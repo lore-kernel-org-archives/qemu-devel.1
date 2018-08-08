@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fnFVe-0006uY-52
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:51:43 -0400
+	(envelope-from <jcody@redhat.com>) id 1fnFgg-00015l-FX
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 00:03:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fnFVa-00027b-7C
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:51:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55106 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fnFVa-00027M-1k
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:51:38 -0400
-Date: Wed, 8 Aug 2018 11:51:27 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180808035127.GD24415@xz-mi>
-References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
-	<20180807091209.13531-2-xiaoguangrong@tencent.com>
-	<6fb46b1e-5cae-24ec-acd6-72ba562a5c05@redhat.com>
+	(envelope-from <jcody@redhat.com>) id 1fnFgf-0002HZ-F5
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 00:03:06 -0400
+Date: Wed, 8 Aug 2018 00:02:53 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180808040253.GE755222@localhost.localdomain>
+References: <20180807043349.27196-1-jsnow@redhat.com>
+	<20180807043349.27196-3-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6fb46b1e-5cae-24ec-acd6-72ba562a5c05@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 01/10] migration: do not wait for free
- thread
+In-Reply-To: <20180807043349.27196-3-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/21] jobs: add exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +23,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: guangrong.xiao@gmail.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Tue, Aug 07, 2018 at 08:29:54AM -0500, Eric Blake wrote:
-> On 08/07/2018 04:12 AM, guangrong.xiao@gmail.com wrote:
-> > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > 
-> > Instead of putting the main thread to sleep state to wait for
-> > free compression thread, we can directly post it out as normal
-> > page that reduces the latency and uses CPUs more efficiently
-> > 
-> > A parameter, compress-wait-thread, is introduced, it can be
-> > enabled if the user really wants the old behavior
-> > 
-> > Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > ---
+On Tue, Aug 07, 2018 at 12:33:30AM -0400, John Snow wrote:
+> Most jobs do the same thing when they leave their running loop:
+> - Store the return code in a structure
+> - wait to receive this structure in the main thread
+> - signal job completion via job_completed
 > 
-> > +++ b/qapi/migration.json
-> > @@ -462,6 +462,11 @@
-> >   # @compress-threads: Set compression thread count to be used in live migration,
-> >   #          the compression thread count is an integer between 1 and 255.
-> >   #
-> > +# @compress-wait-thread: Wait if no thread is free to compress the memory page
-> > +#          if it's enabled, otherwise, the page will be posted out immediately
-> > +#          in the main thread without compression. It's true on default.
-> > +#          (Since: 3.1)
+> More seriously, when we utilize job_defer_to_main_loop_bh to call
+> a function that calls job_completed, job_finalize_single will run
+> in a context where it has recursively taken the aio_context lock,
+> which can cause hangs if it puts down a reference that causes a flush.
 > 
-> Grammar suggestion:
+> The job infrastructure is perfectly capable of registering job
+> completion itself when we leave the job's entry point. In this
+> context, we can signal job completion from outside of the aio_context,
+> which should allow for job cleanup code to run with only one lock.
 > 
-> @compress-wait-thread: Controls behavior when all compression threads are
-> currently busy. If true (default), wait for a free compression thread to
-> become available; otherwise, send the page uncompressed. (Since 3.1)
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
-Eric's version seems better.  With that:
+I like the simplification, both in SLOC and in exit logic (as seen in
+patches 3-7).
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+> ---
+>  include/qemu/job.h |  7 +++++++
+>  job.c              | 19 +++++++++++++++++++
+>  2 files changed, 26 insertions(+)
+> 
+> diff --git a/include/qemu/job.h b/include/qemu/job.h
+> index 845ad00c03..0c24e8704f 100644
+> --- a/include/qemu/job.h
+> +++ b/include/qemu/job.h
+> @@ -204,6 +204,13 @@ struct JobDriver {
+>       */
+>      void (*drain)(Job *job);
+>  
+> +    /**
+> +     * If the callback is not NULL, exit will be invoked from the main thread
+> +     * when the job's coroutine has finished, but before transactional
+> +     * convergence; before @prepare or @abort.
+> +     */
+> +    void (*exit)(Job *job);
+> +
+>      /**
+>       * If the callback is not NULL, prepare will be invoked when all the jobs
+>       * belonging to the same transaction complete; or upon this job's completion
+> diff --git a/job.c b/job.c
+> index b281f30375..cc5ac9ac30 100644
+> --- a/job.c
+> +++ b/job.c
+> @@ -535,6 +535,19 @@ void job_drain(Job *job)
+>      }
+>  }
+>  
+> +static void job_exit(void *opaque)
+> +{
+> +    Job *job = (Job *)opaque;
+> +    AioContext *aio_context = job->aio_context;
+> +
+> +    if (job->driver->exit) {
+> +        aio_context_acquire(aio_context);
+> +        job->driver->exit(job);
+> +        aio_context_release(aio_context);
+> +    }
+> +    job_completed(job, job->ret);
+> +}
+> +
+>  /**
+>   * All jobs must allow a pause point before entering their job proper. This
+>   * ensures that jobs can be paused prior to being started, then resumed later.
+> @@ -546,6 +559,12 @@ static void coroutine_fn job_co_entry(void *opaque)
+>      assert(job && job->driver && job->driver->start);
+>      job_pause_point(job);
+>      job->driver->start(job);
 
-Regards,
+One nit-picky observation here, that is unrelated to this patch: reading
+through, it may not be so obvious that 'start' is really a 'run' or
+'execute', (linguistically, to me 'start' implies a kick-off rather than
+ongoing execution).
 
--- 
-Peter Xu
+Just some bike-shedding again, though, and not even for this patch.  So
+nothing to do here :)
+
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+
+
+> +    if (!job->deferred_to_main_loop) {
+> +        job->deferred_to_main_loop = true;
+> +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+> +                                job_exit,
+> +                                job);
+> +    }
+>  }
+>  
+>  
+> -- 
+> 2.14.4
+> 
