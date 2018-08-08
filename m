@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fnIoi-0002DX-9s
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:23:37 -0400
+	(envelope-from <quintela@redhat.com>) id 1fnIsg-0003pA-QH
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:27:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fnIod-0001zu-FP
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:23:36 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44294)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fnIod-0001zg-6p
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:23:31 -0400
-Received: by mail-pg1-x544.google.com with SMTP id r1-v6so652199pgp.11
-	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 00:23:31 -0700 (PDT)
-References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
-	<20180807091209.13531-9-xiaoguangrong@tencent.com>
-	<20180808050846.GG24415@xz-mi>
-	<503d7733-e2e7-09c5-75a3-1e250f549065@gmail.com>
-	<20180808065619.GK24415@xz-mi>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <4c3ebdce-8c4e-8cb4-4dfe-384489224343@gmail.com>
-Date: Wed, 8 Aug 2018 15:23:22 +0800
+	(envelope-from <quintela@redhat.com>) id 1fnIsb-0003uu-W8
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:27:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33588 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fnIsb-0003uX-Qn
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:27:37 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <CAFEAcA_XJGWPioUDUR0+9v16Xj_osDwk7OYEK3vkqdg_SacMXA@mail.gmail.com>
+	(Peter Maydell's message of "Tue, 7 Aug 2018 16:09:53 +0100")
+References: <20180807130355.29780-1-peter.maydell@linaro.org>
+	<87muty2u57.fsf@trasno.org>
+	<CAFEAcA_m+81aDQR=n=8gXhcifYp0L6n9KZA5COQsRejeqZe2FQ@mail.gmail.com>
+	<87in4m2qni.fsf@trasno.org>
+	<CAFEAcA81Xr6_eUV5247JtZRnN9Ms7fau1iwhHkmW-gnwH9y8JA@mail.gmail.com>
+	<87wot21bbt.fsf@trasno.org>
+	<CAFEAcA_y1qKsC8kSDee+FEpqZstz9UHTeyP6ABuGfXf_aDMRHw@mail.gmail.com>
+	<87o9ee1aka.fsf@trasno.org>
+	<CAFEAcA_XJGWPioUDUR0+9v16Xj_osDwk7OYEK3vkqdg_SacMXA@mail.gmail.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 08 Aug 2018 09:27:31 +0200
+Message-ID: <87k1p11foc.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <20180808065619.GK24415@xz-mi>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 08/10] migration: handle the error
- condition properly
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] migration: Correctly handle subsections
+ with no 'needed' function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +36,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-
-
-On 08/08/2018 02:56 PM, Peter Xu wrote:
-> On Wed, Aug 08, 2018 at 02:29:52PM +0800, Xiao Guangrong wrote:
+Peter Maydell <peter.maydell@linaro.org> wrote:
+D> On 7 August 2018 at 16:05, Juan Quintela <quintela@redhat.com> wrote:
+>> Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> So it's better to use a needed-always subsection, which will give
+>>> the desired behaviour:
+>>>  * new QEMU -> new QEMU: state is always migrated
+>>>  * old QEMU -> new QEMU: migration doesn't fail, and guest
+>>>    will work assuming it didn't care about this corner of the
+>>>    device's functionality (the device will end up with state
+>>>    as it was at reset, or possibly special-cased via
+>>>    pre_load/post_load hooks for the "section not present" case)
 >>
->>
->> On 08/08/2018 01:08 PM, Peter Xu wrote:
->>> On Tue, Aug 07, 2018 at 05:12:07PM +0800, guangrong.xiao@gmail.com wrote:
->>>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
->>>>
->>>> ram_find_and_save_block() can return negative if any error hanppens,
->>>> however, it is completely ignored in current code
->>>
->>> Could you hint me where we'll return an error?
->>>
->>
->> I think control_save_page() may return a error condition but i am not
->> good at it ... Other places look safe _currently_. These functions were
->> designed to have error returned anyway.
-> 
-> Ah, the RDMA codes...
-> 
-> Then I feel like this patch would be more suitable to be put into some
-> of the RDMA series - at least we'd better be clear about what errors
-> we're going to capture.  For non-RDMA, it seems a bit helpless after
-> all - AFAIU we're depending on the few qemu_file_get_error() calls to
-> detect output errors.
+>> we break by definiton new QEMU -M <old machine type> into old QEMU.
+>
+> Is that supposed to work? I always thought that we never
+> supported migration back to an older QEMU version like that.
 
-So, are you talking about to modify the semantic of these functions,
-ram_save_host_page(), ram_save_target_page(), etc, and make them
-be:
-"Returns the number of pages written where zero means no dirty pages,
-error conditions are indicated in the QEMUFile @rs->file if it
-happened."
+It is a "best effort" case.  As David told, downstream we try very
+hard.  For upstream we do when I found that, but not anywhere else.
 
-If it's what you want, i will update the comments and make the
-implementation more clear to reflect this fact for these
-functions
+> In any case, for all the devices here the machine types are
+> not versioned.
+
+This is part of the problem.  For some architectures, we don't even care
+about migraiton.  For others, we care about migration but not
+cross-version.  And yet in others we care very much (downstream
+specially).
+
+And it is not clear what devices support each of them.
+
+Later, Juan.
