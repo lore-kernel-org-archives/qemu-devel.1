@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fnMxc-0000pg-2d
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 07:49:05 -0400
+	(envelope-from <quintela@redhat.com>) id 1fnMxd-0000r7-Df
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 07:49:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fnMxa-0000Di-O5
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 07:49:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51404 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fnMxc-0000Fy-1J
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 07:49:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47256 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fnMxa-0000Cj-I5
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 07:49:02 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fnMxb-0000Ek-RO
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 07:49:03 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0CAF740241C3
-	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 11:49:02 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5BA087A7E8
+	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 11:49:03 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  8 Aug 2018 13:48:27 +0200
-Message-Id: <20180808114830.7169-20-quintela@redhat.com>
+Date: Wed,  8 Aug 2018 13:48:28 +0200
+Message-Id: <20180808114830.7169-21-quintela@redhat.com>
 In-Reply-To: <20180808114830.7169-1-quintela@redhat.com>
 References: <20180808114830.7169-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 19/22] virtio: split virtio-scsi bits from
+Subject: [Qemu-devel] [PATCH v2 20/22] virtio: split virtio-blk bits rom
  virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,124 +33,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Notice that we can't still run tests with it disabled.  Both cdrom-test and
-drive_del-test use virtio-scsi without checking if it is enabled.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hw/virtio/Makefile.objs     |  1 +
- hw/virtio/virtio-pci.c      | 68 ---------------------------
- hw/virtio/virtio-scsi-pci.c | 93 +++++++++++++++++++++++++++++++++++++
- tests/Makefile.include      |  4 +-
- 4 files changed, 96 insertions(+), 70 deletions(-)
- create mode 100644 hw/virtio/virtio-scsi-pci.c
+ hw/virtio/Makefile.objs    |  1 +
+ hw/virtio/virtio-blk-pci.c | 82 ++++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c     | 58 ---------------------------
+ tests/Makefile.include     |  4 +-
+ 4 files changed, 85 insertions(+), 60 deletions(-)
+ create mode 100644 hw/virtio/virtio-blk-pci.c
 
 diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index 6e6e001449..5d59302f89 100644
+index 5d59302f89..c28b740dca 100644
 --- a/hw/virtio/Makefile.objs
 +++ b/hw/virtio/Makefile.objs
-@@ -19,6 +19,7 @@ obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
- obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
+@@ -20,6 +20,7 @@ obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
  obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
  obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
-+obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
+ obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
++obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
  endif
  
  common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO),$(CONFIG_LINUX))) += vhost-stub.o
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 6dbcf87371..2777e4b764 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1941,73 +1941,6 @@ static const TypeInfo virtio_blk_pci_info = {
-     .class_init    = virtio_blk_pci_class_init,
- };
- 
--/* virtio-scsi-pci */
--
--static Property virtio_scsi_pci_properties[] = {
--    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
--                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
--    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
--                       DEV_NVECTORS_UNSPECIFIED),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void virtio_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
--{
--    VirtIOSCSIPCI *dev = VIRTIO_SCSI_PCI(vpci_dev);
--    DeviceState *vdev = DEVICE(&dev->vdev);
--    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
--    DeviceState *proxy = DEVICE(vpci_dev);
--    char *bus_name;
--
--    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
--        vpci_dev->nvectors = vs->conf.num_queues + 3;
--    }
--
--    /*
--     * For command line compatibility, this sets the virtio-scsi-device bus
--     * name as before.
--     */
--    if (proxy->id) {
--        bus_name = g_strdup_printf("%s.0", proxy->id);
--        virtio_device_set_child_bus_name(VIRTIO_DEVICE(vdev), bus_name);
--        g_free(bus_name);
--    }
--
--    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
--    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
--}
--
--static void virtio_scsi_pci_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
--    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
--
--    k->realize = virtio_scsi_pci_realize;
--    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
--    dc->props = virtio_scsi_pci_properties;
--    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
--    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
--    pcidev_k->revision = 0x00;
--    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
--}
--
--static void virtio_scsi_pci_instance_init(Object *obj)
--{
--    VirtIOSCSIPCI *dev = VIRTIO_SCSI_PCI(obj);
--
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_SCSI);
--}
--
--static const TypeInfo virtio_scsi_pci_info = {
--    .name          = TYPE_VIRTIO_SCSI_PCI,
--    .parent        = TYPE_VIRTIO_PCI,
--    .instance_size = sizeof(VirtIOSCSIPCI),
--    .instance_init = virtio_scsi_pci_instance_init,
--    .class_init    = virtio_scsi_pci_class_init,
--};
--
- /* virtio-serial-pci */
- 
- static void virtio_serial_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-@@ -2186,7 +2119,6 @@ static void virtio_pci_register_types(void)
-     type_register_static(&virtio_pci_bus_info);
-     type_register_static(&virtio_pci_info);
-     type_register_static(&virtio_blk_pci_info);
--    type_register_static(&virtio_scsi_pci_info);
-     type_register_static(&virtio_serial_pci_info);
-     type_register_static(&virtio_net_pci_info);
- }
-diff --git a/hw/virtio/virtio-scsi-pci.c b/hw/virtio/virtio-scsi-pci.c
+diff --git a/hw/virtio/virtio-blk-pci.c b/hw/virtio/virtio-blk-pci.c
 new file mode 100644
-index 0000000000..4acceef1d5
+index 0000000000..d0ded0d1c6
 --- /dev/null
-+++ b/hw/virtio/virtio-scsi-pci.c
-@@ -0,0 +1,93 @@
++++ b/hw/virtio/virtio-blk-pci.c
+@@ -0,0 +1,82 @@
 +/*
-+ * Virtio scsi PCI Bindings
++ * Virtio blk PCI Bindings
 + *
 + * Copyright IBM, Corp. 2007
 + * Copyright (c) 2009 CodeSourcery
@@ -169,8 +80,10 @@ index 0000000000..4acceef1d5
 +#include "qemu/osdep.h"
 +
 +#include "virtio-pci.h"
++#include "qapi/error.h"
 +
-+static Property virtio_scsi_pci_properties[] = {
++static Property virtio_blk_pci_properties[] = {
++    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
 +    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
 +                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
 +    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
@@ -178,84 +91,147 @@ index 0000000000..4acceef1d5
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void virtio_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++static void virtio_blk_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
 +{
-+    VirtIOSCSIPCI *dev = VIRTIO_SCSI_PCI(vpci_dev);
++    VirtIOBlkPCI *dev = VIRTIO_BLK_PCI(vpci_dev);
 +    DeviceState *vdev = DEVICE(&dev->vdev);
-+    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
-+    DeviceState *proxy = DEVICE(vpci_dev);
-+    char *bus_name;
 +
 +    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
-+        vpci_dev->nvectors = vs->conf.num_queues + 3;
-+    }
-+
-+    /*
-+     * For command line compatibility, this sets the virtio-scsi-device bus
-+     * name as before.
-+     */
-+    if (proxy->id) {
-+        bus_name = g_strdup_printf("%s.0", proxy->id);
-+        virtio_device_set_child_bus_name(VIRTIO_DEVICE(vdev), bus_name);
-+        g_free(bus_name);
++        vpci_dev->nvectors = dev->vdev.conf.num_queues + 1;
 +    }
 +
 +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
 +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 +}
 +
-+static void virtio_scsi_pci_class_init(ObjectClass *klass, void *data)
++static void virtio_blk_pci_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
 +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
 +
-+    k->realize = virtio_scsi_pci_realize;
 +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+    dc->props = virtio_scsi_pci_properties;
++    dc->props = virtio_blk_pci_properties;
++    k->realize = virtio_blk_pci_realize;
 +    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-+    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
-+    pcidev_k->revision = 0x00;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BLOCK;
++    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
 +    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
 +}
 +
-+static void virtio_scsi_pci_instance_init(Object *obj)
++static void virtio_blk_pci_instance_init(Object *obj)
 +{
-+    VirtIOSCSIPCI *dev = VIRTIO_SCSI_PCI(obj);
++    VirtIOBlkPCI *dev = VIRTIO_BLK_PCI(obj);
 +
 +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_SCSI);
++                                TYPE_VIRTIO_BLK);
++    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
++                              "bootindex", &error_abort);
 +}
 +
-+static const TypeInfo virtio_scsi_pci_info = {
-+    .name          = TYPE_VIRTIO_SCSI_PCI,
++static const TypeInfo virtio_blk_pci_info = {
++    .name          = TYPE_VIRTIO_BLK_PCI,
 +    .parent        = TYPE_VIRTIO_PCI,
-+    .instance_size = sizeof(VirtIOSCSIPCI),
-+    .instance_init = virtio_scsi_pci_instance_init,
-+    .class_init    = virtio_scsi_pci_class_init,
++    .instance_size = sizeof(VirtIOBlkPCI),
++    .instance_init = virtio_blk_pci_instance_init,
++    .class_init    = virtio_blk_pci_class_init,
 +};
-+
-+
-+static void virtio_scsi_pci_register(void)
++static void virtio_blk_pci_register(void)
 +{
-+    type_register_static(&virtio_scsi_pci_info);
++    type_register_static(&virtio_blk_pci_info);
 +}
 +
-+type_init(virtio_scsi_pci_register)
++type_init(virtio_blk_pci_register)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 2777e4b764..e1c6088019 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1884,63 +1884,6 @@ static const TypeInfo virtio_pci_info = {
+     },
+ };
+ 
+-/* virtio-blk-pci */
+-
+-static Property virtio_blk_pci_properties[] = {
+-    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
+-    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
+-                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
+-    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
+-                       DEV_NVECTORS_UNSPECIFIED),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+-static void virtio_blk_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+-{
+-    VirtIOBlkPCI *dev = VIRTIO_BLK_PCI(vpci_dev);
+-    DeviceState *vdev = DEVICE(&dev->vdev);
+-
+-    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+-        vpci_dev->nvectors = dev->vdev.conf.num_queues + 1;
+-    }
+-
+-    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+-    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+-}
+-
+-static void virtio_blk_pci_class_init(ObjectClass *klass, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(klass);
+-    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+-    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+-
+-    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+-    dc->props = virtio_blk_pci_properties;
+-    k->realize = virtio_blk_pci_realize;
+-    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+-    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BLOCK;
+-    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
+-    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
+-}
+-
+-static void virtio_blk_pci_instance_init(Object *obj)
+-{
+-    VirtIOBlkPCI *dev = VIRTIO_BLK_PCI(obj);
+-
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VIRTIO_BLK);
+-    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
+-                              "bootindex", &error_abort);
+-}
+-
+-static const TypeInfo virtio_blk_pci_info = {
+-    .name          = TYPE_VIRTIO_BLK_PCI,
+-    .parent        = TYPE_VIRTIO_PCI,
+-    .instance_size = sizeof(VirtIOBlkPCI),
+-    .instance_init = virtio_blk_pci_instance_init,
+-    .class_init    = virtio_blk_pci_class_init,
+-};
+-
+ /* virtio-serial-pci */
+ 
+ static void virtio_serial_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+@@ -2118,7 +2061,6 @@ static void virtio_pci_register_types(void)
+ {
+     type_register_static(&virtio_pci_bus_info);
+     type_register_static(&virtio_pci_info);
+-    type_register_static(&virtio_blk_pci_info);
+     type_register_static(&virtio_serial_pci_info);
+     type_register_static(&virtio_net_pci_info);
+ }
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index d0432e4132..32dc111300 100644
+index 32dc111300..296e04f704 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -197,8 +197,8 @@ check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
- gcov-files-virtio-y += i386-softmmu/hw/block/virtio-blk.c
+@@ -193,8 +193,8 @@ check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
+ gcov-files-virtio-y += i386-softmmu/hw/net/virtio-net.c
+ check-qtest-virtio-$(CONFIG_VIRTIO_BALLOON) += tests/virtio-balloon-test$(EXESUF)
+ gcov-files-virtio-$(CONFIG_VIRTIO_BALLOON) += i386-softmmu/hw/virtio/virtio-balloon.c
+-check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
+-gcov-files-virtio-y += i386-softmmu/hw/block/virtio-blk.c
++check-qtest-virtio-$(CONFIG_VIRTIO_BLK) += tests/virtio-blk-test$(EXESUF)
++gcov-files-virtio-$(CONFIG_VIRTIO_BLK) += i386-softmmu/hw/block/virtio-blk.c
  check-qtest-virtio-$(CONFIG_VIRTIO_RNG) += tests/virtio-rng-test$(EXESUF)
  gcov-files-virtio-$(CONFIG_VIRTIO_RNG) += hw/virtio/virtio-rng.c
--check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
--gcov-files-virtio-y += i386-softmmu/hw/scsi/virtio-scsi.c
-+check-qtest-virtio-$(CONFIG_VIRTIO_SCSI) += tests/virtio-scsi-test$(EXESUF)
-+gcov-files-virtio-$(CONFIG_VIRTIO_SCSI) += i386-softmmu/hw/scsi/virtio-scsi.c
- ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
- check-qtest-virtio-y += tests/virtio-9p-test$(EXESUF)
- gcov-files-virtio-y += hw/9pfs/virtio-9p.c
+ check-qtest-virtio-$(CONFIG_VIRTIO_SCSI) += tests/virtio-scsi-test$(EXESUF)
 -- 
 2.17.1
