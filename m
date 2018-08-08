@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBp-0006jd-Sq
+	(envelope-from <armbru@redhat.com>) id 1fnNBu-0006ox-UY
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBj-0008TM-6k
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45378 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fnNBl-00008G-RC
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43246 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBi-0008Rc-SR
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:39 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBl-000062-9y
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:41 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed,  8 Aug 2018 14:02:57 +0200
-Message-Id: <20180808120334.10970-20-armbru@redhat.com>
+Date: Wed,  8 Aug 2018 14:03:14 +0200
+Message-Id: <20180808120334.10970-37-armbru@redhat.com>
 In-Reply-To: <20180808120334.10970-1-armbru@redhat.com>
 References: <20180808120334.10970-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 19/56] json: Tighten and simplify
- qstring_from_escaped_str()'s loop
+Subject: [Qemu-devel] [PATCH 36/56] json: Rename token JSON_ESCAPE & friends
+ to JSON_INTERPOL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,109 +27,170 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Simplify loop control, and assert that the string ends with the
-appropriate quote (the lexer ensures it does).
+The JSON parser optionally supports interpolation.  The code calls it
+"escape".  Awkward, because it uses the same term for escape sequences
+within strings.  The latter usage is consistent with RFC 7159 "The
+JavaScript Object Notation (JSON) Data Interchange Format" and ISO C.
+Call the former "interpolation" instead.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qobject/json-parser.c | 35 +++++++++--------------------------
- 1 file changed, 9 insertions(+), 26 deletions(-)
+ include/qapi/qmp/json-lexer.h |  2 +-
+ qobject/json-lexer.c          | 64 +++++++++++++++++------------------
+ qobject/json-parser.c         |  8 ++---
+ 3 files changed, 37 insertions(+), 37 deletions(-)
 
+diff --git a/include/qapi/qmp/json-lexer.h b/include/qapi/qmp/json-lexer.h
+index 44bcf2ca64..ff3a6f80f0 100644
+--- a/include/qapi/qmp/json-lexer.h
++++ b/include/qapi/qmp/json-lexer.h
+@@ -27,7 +27,7 @@ typedef enum json_token_type {
+     JSON_FLOAT,
+     JSON_KEYWORD,
+     JSON_STRING,
+-    JSON_ESCAPE,
++    JSON_INTERPOL,
+     JSON_SKIP,
+     JSON_ERROR,
+ } JSONTokenType;
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index 0b54b1af56..5b1f720331 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -115,12 +115,12 @@ enum json_lexer_state {
+     IN_NONZERO_NUMBER,
+     IN_NEG_NONZERO_NUMBER,
+     IN_KEYWORD,
+-    IN_ESCAPE,
+-    IN_ESCAPE_L,
+-    IN_ESCAPE_LL,
+-    IN_ESCAPE_I,
+-    IN_ESCAPE_I6,
+-    IN_ESCAPE_I64,
++    IN_INTERPOL,
++    IN_INTERPOL_L,
++    IN_INTERPOL_LL,
++    IN_INTERPOL_I,
++    IN_INTERPOL_I6,
++    IN_INTERPOL_I64,
+     IN_WHITESPACE,
+     IN_START,
+ };
+@@ -221,40 +221,40 @@ static const uint8_t json_lexer[][256] =  {
+         ['\n'] = IN_WHITESPACE,
+     },
+ 
+-    /* escape */
+-    [IN_ESCAPE_LL] = {
+-        ['d'] = JSON_ESCAPE,
+-        ['u'] = JSON_ESCAPE,
++    /* interpolation */
++    [IN_INTERPOL_LL] = {
++        ['d'] = JSON_INTERPOL,
++        ['u'] = JSON_INTERPOL,
+     },
+ 
+-    [IN_ESCAPE_L] = {
+-        ['d'] = JSON_ESCAPE,
+-        ['l'] = IN_ESCAPE_LL,
+-        ['u'] = JSON_ESCAPE,
++    [IN_INTERPOL_L] = {
++        ['d'] = JSON_INTERPOL,
++        ['l'] = IN_INTERPOL_LL,
++        ['u'] = JSON_INTERPOL,
+     },
+ 
+-    [IN_ESCAPE_I64] = {
+-        ['d'] = JSON_ESCAPE,
+-        ['u'] = JSON_ESCAPE,
++    [IN_INTERPOL_I64] = {
++        ['d'] = JSON_INTERPOL,
++        ['u'] = JSON_INTERPOL,
+     },
+ 
+-    [IN_ESCAPE_I6] = {
+-        ['4'] = IN_ESCAPE_I64,
++    [IN_INTERPOL_I6] = {
++        ['4'] = IN_INTERPOL_I64,
+     },
+ 
+-    [IN_ESCAPE_I] = {
+-        ['6'] = IN_ESCAPE_I6,
++    [IN_INTERPOL_I] = {
++        ['6'] = IN_INTERPOL_I6,
+     },
+ 
+-    [IN_ESCAPE] = {
+-        ['d'] = JSON_ESCAPE,
+-        ['i'] = JSON_ESCAPE,
+-        ['p'] = JSON_ESCAPE,
+-        ['s'] = JSON_ESCAPE,
+-        ['u'] = JSON_ESCAPE,
+-        ['f'] = JSON_ESCAPE,
+-        ['l'] = IN_ESCAPE_L,
+-        ['I'] = IN_ESCAPE_I,
++    [IN_INTERPOL] = {
++        ['d'] = JSON_INTERPOL,
++        ['i'] = JSON_INTERPOL,
++        ['p'] = JSON_INTERPOL,
++        ['s'] = JSON_INTERPOL,
++        ['u'] = JSON_INTERPOL,
++        ['f'] = JSON_INTERPOL,
++        ['l'] = IN_INTERPOL_L,
++        ['I'] = IN_INTERPOL_I,
+     },
+ 
+     /* top level rule */
+@@ -271,7 +271,7 @@ static const uint8_t json_lexer[][256] =  {
+         [','] = JSON_COMMA,
+         [':'] = JSON_COLON,
+         ['a' ... 'z'] = IN_KEYWORD,
+-        ['%'] = IN_ESCAPE,
++        ['%'] = IN_INTERPOL,
+         [' '] = IN_WHITESPACE,
+         ['\t'] = IN_WHITESPACE,
+         ['\r'] = IN_WHITESPACE,
+@@ -311,7 +311,7 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+         case JSON_RSQUARE:
+         case JSON_COLON:
+         case JSON_COMMA:
+-        case JSON_ESCAPE:
++        case JSON_INTERPOL:
+         case JSON_INTEGER:
+         case JSON_FLOAT:
+         case JSON_KEYWORD:
 diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index a5aa790d62..e00405745f 100644
+index 0e4ea564ab..f1806ce0dc 100644
 --- a/qobject/json-parser.c
 +++ b/qobject/json-parser.c
-@@ -132,66 +132,50 @@ static QString *qstring_from_escaped_str(JSONParserContext *ctxt,
+@@ -418,7 +418,7 @@ static QObject *parse_keyword(JSONParserContext *ctxt)
+     return NULL;
+ }
+ 
+-static QObject *parse_escape(JSONParserContext *ctxt, va_list *ap)
++static QObject *parse_interpolation(JSONParserContext *ctxt, va_list *ap)
  {
-     const char *ptr = token->str;
-     QString *str;
--    int double_quote = 1;
--
--    if (*ptr == '"') {
--        double_quote = 1;
--    } else {
--        double_quote = 0;
--    }
--    ptr++;
-+    char quote;
+     JSONToken *token;
  
-+    assert(*ptr == '"' || *ptr == '\'');
-+    quote = *ptr;
-     str = qstring_new();
--    while (*ptr && 
--           ((double_quote && *ptr != '"') || (!double_quote && *ptr != '\''))) {
-+
-+    while (*++ptr != quote) {
-+        assert(*ptr);
-         if (*ptr == '\\') {
--            ptr++;
--
--            switch (*ptr) {
-+            switch (*++ptr) {
-             case '"':
-                 qstring_append(str, "\"");
--                ptr++;
-                 break;
-             case '\'':
-                 qstring_append(str, "'");
--                ptr++;
-                 break;
-             case '\\':
-                 qstring_append(str, "\\");
--                ptr++;
-                 break;
-             case '/':
-                 qstring_append(str, "/");
--                ptr++;
-                 break;
-             case 'b':
-                 qstring_append(str, "\b");
--                ptr++;
-                 break;
-             case 'f':
-                 qstring_append(str, "\f");
--                ptr++;
-                 break;
-             case 'n':
-                 qstring_append(str, "\n");
--                ptr++;
-                 break;
-             case 'r':
-                 qstring_append(str, "\r");
--                ptr++;
-                 break;
-             case 't':
-                 qstring_append(str, "\t");
--                ptr++;
-                 break;
-             case 'u': {
-                 uint16_t unicode_char = 0;
-                 char utf8_char[4];
-                 int i = 0;
+@@ -427,7 +427,7 @@ static QObject *parse_escape(JSONParserContext *ctxt, va_list *ap)
+     }
  
--                ptr++;
--
-                 for (i = 0; i < 4; i++) {
-+                    ptr++;
-                     if (qemu_isxdigit(*ptr)) {
-                         unicode_char |= hex2decimal(*ptr) << ((3 - i) * 4);
-                     } else {
-@@ -199,7 +183,6 @@ static QString *qstring_from_escaped_str(JSONParserContext *ctxt,
-                                     "invalid hex escape sequence in string");
-                         goto out;
-                     }
--                    ptr++;
-                 }
+     token = parser_context_pop_token(ctxt);
+-    assert(token && token->type == JSON_ESCAPE);
++    assert(token && token->type == JSON_INTERPOL);
  
-                 wchar_to_utf8(unicode_char, utf8_char, sizeof(utf8_char));
-@@ -212,7 +195,7 @@ static QString *qstring_from_escaped_str(JSONParserContext *ctxt,
-         } else {
-             char dummy[2];
- 
--            dummy[0] = *ptr++;
-+            dummy[0] = *ptr;
-             dummy[1] = 0;
- 
-             qstring_append(str, dummy);
+     if (!strcmp(token->str, "%p")) {
+         return va_arg(*ap, QObject *);
+@@ -522,8 +522,8 @@ static QObject *parse_value(JSONParserContext *ctxt, va_list *ap)
+         return parse_object(ctxt, ap);
+     case JSON_LSQUARE:
+         return parse_array(ctxt, ap);
+-    case JSON_ESCAPE:
+-        return parse_escape(ctxt, ap);
++    case JSON_INTERPOL:
++        return parse_interpolation(ctxt, ap);
+     case JSON_INTEGER:
+     case JSON_FLOAT:
+     case JSON_STRING:
 -- 
 2.17.1
