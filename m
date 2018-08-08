@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fnHpe-00055Y-IW
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 02:20:31 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fnHrZ-0005lX-L0
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 02:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fnHpa-00027H-Fh
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 02:20:30 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35989)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fnHrW-0003Wa-Gc
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 02:22:29 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46422)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fnHpa-00026s-8s
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 02:20:26 -0400
-Received: by mail-pg1-x541.google.com with SMTP id h12-v6so591382pgs.3
-	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 23:20:26 -0700 (PDT)
+	id 1fnHrW-0003W6-99
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 02:22:26 -0400
+Received: by mail-pf1-x442.google.com with SMTP id u24-v6so596675pfn.13
+	for <qemu-devel@nongnu.org>; Tue, 07 Aug 2018 23:22:26 -0700 (PDT)
 References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
-	<20180807091209.13531-2-xiaoguangrong@tencent.com>
-	<6fb46b1e-5cae-24ec-acd6-72ba562a5c05@redhat.com>
-	<20180808035127.GD24415@xz-mi>
+	<20180807091209.13531-8-xiaoguangrong@tencent.com>
+	<20180808045209.GF24415@xz-mi>
 From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <21fc899c-f221-17a5-cd86-7a3810603178@gmail.com>
-Date: Wed, 8 Aug 2018 14:20:17 +0800
+Message-ID: <721a5f04-4591-509b-1765-459450970448@gmail.com>
+Date: Wed, 8 Aug 2018 14:22:18 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180808035127.GD24415@xz-mi>
+In-Reply-To: <20180808045209.GF24415@xz-mi>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 01/10] migration: do not wait for free
- thread
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] migration: do not
+ flush_compressed_data at the end of each iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
 
 
-On 08/08/2018 11:51 AM, Peter Xu wrote:
-> On Tue, Aug 07, 2018 at 08:29:54AM -0500, Eric Blake wrote:
->> On 08/07/2018 04:12 AM, guangrong.xiao@gmail.com wrote:
->>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
->>>
->>> Instead of putting the main thread to sleep state to wait for
->>> free compression thread, we can directly post it out as normal
->>> page that reduces the latency and uses CPUs more efficiently
->>>
->>> A parameter, compress-wait-thread, is introduced, it can be
->>> enabled if the user really wants the old behavior
->>>
->>> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
->>> ---
+On 08/08/2018 12:52 PM, Peter Xu wrote:
+> On Tue, Aug 07, 2018 at 05:12:06PM +0800, guangrong.xiao@gmail.com wrote:
+>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
 >>
->>> +++ b/qapi/migration.json
->>> @@ -462,6 +462,11 @@
->>>    # @compress-threads: Set compression thread count to be used in live migration,
->>>    #          the compression thread count is an integer between 1 and 255.
->>>    #
->>> +# @compress-wait-thread: Wait if no thread is free to compress the memory page
->>> +#          if it's enabled, otherwise, the page will be posted out immediately
->>> +#          in the main thread without compression. It's true on default.
->>> +#          (Since: 3.1)
+>> flush_compressed_data() needs to wait all compression threads to
+>> finish their work, after that all threads are free until the
+>> migration feeds new request to them, reducing its call can improve
+>> the throughput and use CPU resource more effectively
 >>
->> Grammar suggestion:
+>> We do not need to flush all threads at the end of iteration, the
+>> data can be kept locally until the memory block is changed or
+>> memory migration starts over in that case we will meet a dirtied
+>> page which may still exists in compression threads's ring
 >>
->> @compress-wait-thread: Controls behavior when all compression threads are
->> currently busy. If true (default), wait for a free compression thread to
->> become available; otherwise, send the page uncompressed. (Since 3.1)
+>> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+>> ---
+>>   migration/ram.c | 14 +++++++++++++-
+>>   1 file changed, 13 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index 99ecf9b315..55966bc2c1 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -306,6 +306,8 @@ struct RAMState {
+>>       uint64_t iterations;
+>>       /* number of dirty bits in the bitmap */
+>>       uint64_t migration_dirty_pages;
+>> +    /* last dirty_sync_count we have seen */
+>> +    uint64_t dirty_sync_count_prev;
+>>       /* protects modification of the bitmap */
+>>       QemuMutex bitmap_mutex;
+>>       /* The RAMBlock used in the last src_page_requests */
+>> @@ -3173,6 +3175,17 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+>>   
+>>       ram_control_before_iterate(f, RAM_CONTROL_ROUND);
+>>   
+>> +    /*
+>> +     * if memory migration starts over, we will meet a dirtied page which
+>> +     * may still exists in compression threads's ring, so we should flush
+>> +     * the compressed data to make sure the new page is not overwritten by
+>> +     * the old one in the destination.
+>> +     */
+>> +    if (ram_counters.dirty_sync_count != rs->dirty_sync_count_prev) {
+>> +        rs->dirty_sync_count_prev = ram_counters.dirty_sync_count;
+>> +        flush_compressed_data(rs);
 > 
-> Eric's version seems better.  With that:
-
-It's good to me too. Will apply Eric's suggestion in the next version.
-
+> AFAIU this only happens when ram_save_pending() calls
+> migration_bitmap_sync().  Could we just simply flush there?  Then we
+> can avoid that new variable.
 > 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Thank you, Peter and Eric.
+Yup, that's better indeed, will do it.
