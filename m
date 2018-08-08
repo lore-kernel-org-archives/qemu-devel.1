@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fnFLt-0002RC-Qw
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:41:38 -0400
+	(envelope-from <peterx@redhat.com>) id 1fnFQ7-00044F-Cc
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:46:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fnFLs-0004vc-Rw
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:41:37 -0400
-Date: Tue, 7 Aug 2018 23:41:24 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180808034124.GB755222@localhost.localdomain>
-References: <20180807043349.27196-1-jsnow@redhat.com>
-	<20180807043349.27196-5-jsnow@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1fnFQ2-00078F-Hx
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:45:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38230 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fnFQ2-00077w-CF
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:45:54 -0400
+Date: Wed, 8 Aug 2018 11:45:43 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180808034543.GC24415@xz-mi>
+References: <20180807193125.30378-1-alex.williamson@redhat.com>
+	<20180807224033-mutt-send-email-mst@kernel.org>
+	<20180807135303.3938b3a2@t450s.home>
+	<20180808004929-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180807043349.27196-5-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/21] block/commit: utilize job_exit shim
+In-Reply-To: <20180808004929-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Balloon inhibit enhancements,
+ vfio restriction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,105 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org, david@redhat.com
 
-On Tue, Aug 07, 2018 at 12:33:32AM -0400, John Snow wrote:
-> Change the manual deferment to commit_complete into the implicit
-> callback to job_exit.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/commit.c | 19 +++++--------------
->  1 file changed, 5 insertions(+), 14 deletions(-)
-> 
-> diff --git a/block/commit.c b/block/commit.c
-> index 620666161b..5bed098d5f 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -68,19 +68,14 @@ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
->      return 0;
->  }
->  
-> -typedef struct {
-> -    int ret;
-> -} CommitCompleteData;
-> -
-> -static void commit_complete(Job *job, void *opaque)
-> +static void commit_exit(Job *job)
->  {
->      CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
->      BlockJob *bjob = &s->common;
-> -    CommitCompleteData *data = opaque;
->      BlockDriverState *top = blk_bs(s->top);
->      BlockDriverState *base = blk_bs(s->base);
->      BlockDriverState *commit_top_bs = s->commit_top_bs;
-> -    int ret = data->ret;
-> +    int ret = job->ret;
->      bool remove_commit_top_bs = false;
->  
->      /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
+On Wed, Aug 08, 2018 at 12:58:32AM +0300, Michael S. Tsirkin wrote:
+> At least with VTD, it seems entirely possible to change e.g. a PMD
+> atomically to point to a different set of PTEs, then flush.
+> That will allow removing memory at high granularity for
+> an arbitrary device without mdev or PASID dependency.
 
-Since 'ret' is only assigned to 'job->ret' outside of this line, we could
-drop the local 'ret' and assign job->ret to the output of
-brdrv_drop_intermediate() in this code below:
+My understanding is that the guest driver should prohibit this kind of
+operation (say, modifying PMD).  Actually I don't see how it can
+happen in Linux if the kernel drivers always call the IOMMU API since
+there are only map/unmap APIs rather than this atomic-modify API.
 
-    if (!job_is_cancelled(job) && ret == 0) {
-        /* success */
-        ret = bdrv_drop_intermediate(s->commit_top_bs, base,
-                                     s->backing_file_str);
-    }
+The thing is that IMHO it's the guest driver's responsibility to make
+sure the pages will never be used by the device before it removes the
+entry (including modifying the PMD since that actually removes all the
+entries on the old PMD).  If not, I would see it a guest kernel bug
+instead of the bug in the emulation code.
 
-> @@ -117,9 +112,6 @@ static void commit_complete(Job *job, void *opaque)
->       * bdrv_set_backing_hd() to fail. */
->      block_job_remove_all_bdrv(bjob);
->  
-> -    job_completed(job, ret);
-> -    g_free(data);
-> -
->      /* If bdrv_drop_intermediate() didn't already do that, remove the commit
->       * filter driver from the backing chain. Do this as the final step so that
->       * the 'consistent read' permission can be granted.  */
-> @@ -132,12 +124,12 @@ static void commit_complete(Job *job, void *opaque)
->  
->      bdrv_unref(commit_top_bs);
->      bdrv_unref(top);
-> +    job->ret = ret;
+Thanks,
 
-We could then drop this line as well.
-
-(This may fall under bike shedding, so I don't feel strongly about it):
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
->  }
->  
->  static void coroutine_fn commit_run(void *opaque)
->  {
->      CommitBlockJob *s = opaque;
-> -    CommitCompleteData *data;
->      int64_t offset;
->      uint64_t delay_ns = 0;
->      int ret = 0;
-> @@ -210,9 +202,7 @@ static void coroutine_fn commit_run(void *opaque)
->  out:
->      qemu_vfree(buf);
->  
-> -    data = g_malloc(sizeof(*data));
-> -    data->ret = ret;
-> -    job_defer_to_main_loop(&s->common.job, commit_complete, data);
-> +    s->common.job.ret = ret;
->  }
->  
->  static const BlockJobDriver commit_job_driver = {
-> @@ -223,6 +213,7 @@ static const BlockJobDriver commit_job_driver = {
->          .user_resume   = block_job_user_resume,
->          .drain         = block_job_drain,
->          .start         = commit_run,
-> +        .exit          = commit_exit,
->      },
->  };
->  
-> -- 
-> 2.14.4
-> 
+-- 
+Peter Xu
