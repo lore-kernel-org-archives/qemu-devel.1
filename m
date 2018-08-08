@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBt-0006or-Up
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1fnNBl-0006f9-M0
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBl-00008O-Ql
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43254 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBl-00006C-CN
+	(envelope-from <armbru@redhat.com>) id 1fnNBi-0008SY-UL
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51054 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBi-0008RE-L5
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:38 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed,  8 Aug 2018 14:03:29 +0200
-Message-Id: <20180808120334.10970-52-armbru@redhat.com>
+Date: Wed,  8 Aug 2018 14:02:51 +0200
+Message-Id: <20180808120334.10970-14-armbru@redhat.com>
 In-Reply-To: <20180808120334.10970-1-armbru@redhat.com>
 References: <20180808120334.10970-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 51/56] json: Eliminate lexer state IN_ERROR and
- pseudo-token JSON_MIN
+Subject: [Qemu-devel] [PATCH 13/56] check-qjson: Fix utf8_string() to test
+ all invalid sequences
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +27,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
+Some of utf8_string()'s test_cases[] contain multiple invalid
+sequences.  Testing that qobject_from_json() fails only tests we
+reject at least one invalid sequence.  That's incomplete.
+
+Additionally test each non-space sequence in isolation.
+
+This demonstrates that the JSON parser accepts invalid sequences
+starting with \xC2..\xF4.  Add a FIXME comment.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qapi/qmp/json-lexer.h | 10 ++++------
- qobject/json-lexer.c          | 18 ++++++++----------
- 2 files changed, 12 insertions(+), 16 deletions(-)
+ tests/check-qjson.c | 33 ++++++++++++++++++++++++++++-----
+ 1 file changed, 28 insertions(+), 5 deletions(-)
 
-diff --git a/include/qapi/qmp/json-lexer.h b/include/qapi/qmp/json-lexer.h
-index 8058695e40..f3524de07a 100644
---- a/include/qapi/qmp/json-lexer.h
-+++ b/include/qapi/qmp/json-lexer.h
-@@ -14,10 +14,9 @@
- #ifndef QEMU_JSON_LEXER_H
- #define QEMU_JSON_LEXER_H
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index 5ba09e5ab6..5f3334322b 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -20,6 +20,7 @@
+ #include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qstring.h"
++#include "qemu/unicode.h"
+ #include "qemu-common.h"
  
--
--typedef enum json_token_type {
--    JSON_MIN = 100,
--    JSON_LCURLY = JSON_MIN,
-+typedef enum {
-+    JSON_ERROR = 0,             /* must be zero */
-+    JSON_LCURLY,
-     JSON_RCURLY,
-     JSON_LSQUARE,
-     JSON_RSQUARE,
-@@ -29,8 +28,7 @@ typedef enum json_token_type {
-     JSON_STRING,
-     JSON_INTERPOL,
-     JSON_SKIP,
--    JSON_ERROR,
--    JSON_END_OF_INPUT
-+    JSON_END_OF_INPUT           /* must be last */
- } JSONTokenType;
+ static QString *from_json_str(const char *jstr, Error **errp, bool single)
+@@ -379,7 +380,7 @@ static void utf8_string(void)
+             "\xC8 \xC9 \xCA \xCB \xCC \xCD \xCE \xCF "
+             "\xD0 \xD1 \xD2 \xD3 \xD4 \xD5 \xD6 \xD7 "
+             "\xD8 \xD9 \xDA \xDB \xDC \xDD \xDE \xDF ",
+-            NULL,               /* bug: rejected */
++            NULL,               /* bug: rejected (partly, see FIXME below) */
+             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
+             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
+             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
+@@ -398,7 +399,7 @@ static void utf8_string(void)
+         /* 3.2.3  All 8 first bytes of 4-byte sequences, followed by space */
+         {
+             "\xF0 \xF1 \xF2 \xF3 \xF4 \xF5 \xF6 \xF7 ",
+-            NULL,               /* bug: rejected */
++            NULL,               /* bug: rejected (partly, see FIXME below) */
+             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD ",
+         },
+         /* 3.2.4  All 4 first bytes of 5-byte sequences, followed by space */
+@@ -478,7 +479,7 @@ static void utf8_string(void)
+         {
+             "\xC0\xE0\x80\xF0\x80\x80\xF8\x80\x80\x80\xFC\x80\x80\x80\x80"
+             "\xDF\xEF\xBF\xF7\xBF\xBF\xFB\xBF\xBF\xBF\xFD\xBF\xBF\xBF\xBF",
+-            NULL,               /* bug: rejected */
++            NULL,               /* bug: rejected (partly, see FIXME below) */
+             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD"
+             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD",
+         },
+@@ -761,8 +762,8 @@ static void utf8_string(void)
+     };
+     int i, j;
+     QString *str;
+-    const char *json_in, *utf8_out, *utf8_in, *json_out;
+-    char *jstr;
++    const char *json_in, *utf8_out, *utf8_in, *json_out, *tail;
++    char *end, *in, *jstr;
  
- typedef struct JSONLexer {
-diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index 823db3aef8..0332f9dbe1 100644
---- a/qobject/json-lexer.c
-+++ b/qobject/json-lexer.c
-@@ -101,8 +101,9 @@
-  * - Decoding and validating is left to the parser.
-  */
+     for (i = 0; test_cases[i].json_in; i++) {
+         for (j = 0; j < 2; j++) {
+@@ -779,6 +780,28 @@ static void utf8_string(void)
+             } else {
+                 str = from_json_str(json_in, NULL, j);
+                 g_assert(!str);
++                /*
++                 * Failure may be due to any sequence, but *all* sequences
++                 * are expected to fail.  Test each one in isolation.
++                 */
++                for (tail = json_in; *tail; tail = end) {
++                    mod_utf8_codepoint(tail, 6, &end);
++                    if (*end == ' ') {
++                        end++;
++                    }
++                    in = strndup(tail, end - tail);
++                    str = from_json_str(in, NULL, j);
++                    /*
++                     * FIXME JSON parser accepts invalid sequence
++                     * starting with \xC2..\xF4
++                     */
++                    if (*in >= '\xC2' && *in <= '\xF4') {
++                        g_free(str);
++                        str = NULL;
++                    }
++                    g_assert(!str);
++                    g_free(in);
++                }
+             }
  
--enum json_lexer_state {
--    IN_ERROR = 0,               /* must really be 0, see json_lexer[] */
-+enum {
-+    IN_START = JSON_END_OF_INPUT + 1,
-+    IN_START_INTERPOL,
-     IN_DQ_STRING_ESCAPE,
-     IN_DQ_STRING,
-     IN_SQ_STRING_ESCAPE,
-@@ -119,11 +120,9 @@ enum json_lexer_state {
-     IN_KEYWORD,
-     IN_INTERPOL,
-     IN_WHITESPACE,
--    IN_START_INTERPOL,
--    IN_START,
- };
- 
--QEMU_BUILD_BUG_ON((int)JSON_MIN <= (int)IN_START);
-+QEMU_BUILD_BUG_ON(JSON_ERROR != 0); /* json_lexer[] relies on this */
- 
- #define TERMINAL(state) [0 ... 0x7F] = (state)
- 
-@@ -131,10 +130,10 @@ QEMU_BUILD_BUG_ON((int)JSON_MIN <= (int)IN_START);
-    from OLD_STATE required lookahead.  This happens whenever the table
-    below uses the TERMINAL macro.  */
- #define TERMINAL_NEEDED_LOOKAHEAD(old_state, terminal) \
--    (terminal != IN_ERROR && json_lexer[(old_state)][0] == (terminal))
-+    (terminal != JSON_ERROR && json_lexer[(old_state)][0] == (terminal))
- 
- static const uint8_t json_lexer[][256] =  {
--    /* Relies on default initialization to IN_ERROR! */
-+    /* Relies on default initialization to JSON_ERROR */
- 
-     /* double quote string */
-     [IN_DQ_STRING_ESCAPE] = {
-@@ -318,7 +317,7 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
-             g_string_truncate(lexer->token, 0);
-             new_state = lexer->start_state;
-             break;
--        case IN_ERROR:
-+        case JSON_ERROR:
-             /* XXX: To avoid having previous bad input leaving the parser in an
-              * unresponsive state where we consume unpredictable amounts of
-              * subsequent "good" input, percolate this error state up to the
-@@ -335,8 +334,7 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
-             json_message_process_token(lexer, lexer->token, JSON_ERROR,
-                                        lexer->x, lexer->y);
-             g_string_truncate(lexer->token, 0);
--            new_state = lexer->start_state;
--            lexer->state = new_state;
-+            lexer->state = lexer->start_state;
-             return;
-         default:
-             break;
+             /* Unparse @utf8_in, expect @json_out */
 -- 
 2.17.1
