@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fnQvT-0001u9-JI
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 12:03:13 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fnR1y-0006K2-2R
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 12:09:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fnQvN-0004Ub-PP
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 12:03:07 -0400
-Date: Wed, 8 Aug 2018 18:02:52 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180808160240.GE15410@localhost.localdomain>
-References: <20180807043349.27196-1-jsnow@redhat.com>
-	<20180807043349.27196-2-jsnow@redhat.com>
-	<20180808145707.GB15410@localhost.localdomain>
-	<3983d933-42c4-1786-5aec-1de76da3d68a@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fnR1t-0008Rv-2m
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 12:09:50 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:56278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fnR1s-0008RQ-NK
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 12:09:44 -0400
+Received: by mail-wm0-x244.google.com with SMTP id f21-v6so3296952wmc.5
+	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 09:09:44 -0700 (PDT)
+References: <20180808123934.17450-1-alex.bennee@linaro.org>
+	<20180808123934.17450-5-alex.bennee@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180808123934.17450-5-alex.bennee@linaro.org>
+Date: Wed, 08 Aug 2018 17:09:42 +0100
+Message-ID: <87r2j8q1q1.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3983d933-42c4-1786-5aec-1de76da3d68a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/21] jobs: canonize Error object
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 4/4] disas: allow capstone to defer to
+ a fallback function on failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +31,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, richard.henderson@linaro.org, Peter Maydell <peter.maydell@linaro.org>
 
-Am 08.08.2018 um 17:50 hat John Snow geschrieben:
-> 
-> 
-> On 08/08/2018 10:57 AM, Kevin Wolf wrote:
-> > Am 07.08.2018 um 06:33 hat John Snow geschrieben:
-> >> Jobs presently use both an Error object in the case of the create job,
-> >> and char strings in the case of generic errors elsewhere.
-> >>
-> >> Unify the two paths as just j->err, and remove the extra argument from
-> >> job_completed.
-> >>
-> >> Signed-off-by: John Snow <jsnow@redhat.com>
-> > 
-> > Hm, not sure. Overall, this feels like a step backwards.
-> > 
-> >> diff --git a/include/qemu/job.h b/include/qemu/job.h
-> >> index 18c9223e31..845ad00c03 100644
-> >> --- a/include/qemu/job.h
-> >> +++ b/include/qemu/job.h
-> >> @@ -124,12 +124,12 @@ typedef struct Job {
-> >>      /** Estimated progress_current value at the completion of the job */
-> >>      int64_t progress_total;
-> >>  
-> >> -    /** Error string for a failed job (NULL if, and only if, job->ret == 0) */
-> >> -    char *error;
-> >> -
-> >>      /** ret code passed to job_completed. */
-> >>      int ret;
-> >>  
-> >> +    /** Error object for a failed job **/
-> >> +    Error *err;
-> >> +
-> >>      /** The completion function that will be called when the job completes.  */
-> >>      BlockCompletionFunc *cb;
-> > 
-> > This is the change that I could agree with, though I don't think it
-> > makes a big difference: Whether you store the string immediately or an
-> > Error object from which you get the string later, doesn't really make a
-> > big difference.
-> > 
-> > Maybe we find more uses and having an Error object is common practice in
-> > QEMU, so no objections to this change.
-> > 
-> >> @@ -484,15 +484,13 @@ void job_transition_to_ready(Job *job);
-> >>  /**
-> >>   * @job: The job being completed.
-> >>   * @ret: The status code.
-> >> - * @error: The error message for a failing job (only with @ret < 0). If @ret is
-> >> - *         negative, but NULL is given for @error, strerror() is used.
-> >>   *
-> >>   * Marks @job as completed. If @ret is non-zero, the job transaction it is part
-> >>   * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
-> >>   * is the last job to complete in its transaction, all jobs in the transaction
-> >>   * move from WAITING to PENDING.
-> >>   */
-> >> -void job_completed(Job *job, int ret, Error *error);
-> >> +void job_completed(Job *job, int ret);
-> > 
-> > I don't like this one, though.
-> > 
-> > Before this change, job_completed(..., NULL) was a clear sign that the
-> > error message probably needed an improvement, because an errno string
-> > doesn't usually describe error situations very well. We may not have a
-> > much better message in some cases, but in most cases we just don't pass
-> > one because an error message after job creation is still a quite new
-> > thing in the QAPI schema.
-> > 
-> > What we should get rid of in the long term is the int ret, not the Error
-> > *error. I suspect callers really just distinguish success/error without
-> > actually looking at the error code.
-> > 
-> > With this change applied, what's your new conversion plan for making
-> > sure that every failing caller of job_completed() has set job->error
-> > first?
-> > 
-> 
-> Getting rid of job_completed and moving to our fairly ubiquitous "ret &
-> Error *" combo.
 
-Yup, with the context of the discussion for patch 2, if you make .start
-(or .run) take an Error **errp, that sounds like a good plan to me.
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-> >> @@ -666,8 +665,8 @@ static void job_update_rc(Job *job)
-> >>          job->ret = -ECANCELED;
-> >>      }
-> >>      if (job->ret) {
-> >> -        if (!job->error) {
-> >> -            job->error = g_strdup(strerror(-job->ret));
-> >> +        if (!job->err) {
-> >> +            error_setg_errno(&job->err, -job->ret, "job failed");
-> >>          }
-> >>          job_state_transition(job, JOB_STATUS_ABORTING);
-> >>      }
-> > 
-> > This hunk just makes the error message more verbose with a "job failed"
-> > prefix that doesn't add information. If it's the error string for a job,
-> > of course the job failed.
-> > 
-> > Kevin
-> > 
-> 
-> Yeah, it's not a good prefix, but if I wanted to use the error object in
-> a general way across all jobs, I needed _some_ kind of prefix there...
+> We can abuse the CS_OPT_SKIPDATA by providing a call back when
+> capstone can't disassemble something. The passing of the string to the
+> dump function is a little clunky but works.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  disas.c             | 30 +++++++++++++++++++++++++++++-
+>  include/disas/bfd.h | 11 ++++++++++-
+>  target/arm/cpu.c    |  4 ++++
+>  3 files changed, 43 insertions(+), 2 deletions(-)
+>
+> diff --git a/disas.c b/disas.c
+> index 5325b7e6be..dfd2c251c5 100644
+> --- a/disas.c
+> +++ b/disas.c
+> @@ -178,6 +178,20 @@ static int print_insn_od_target(bfd_vma pc, disassem=
+ble_info *info)
+>     to share this across calls and across host vs target disassembly.  */
+>  static __thread cs_insn *cap_insn;
+>
+> +
+> +/* Handle fall-back dissasembly. We don't print here but we do set
+> + * cap_fallback_str for cap_dump_insn to used*/
+> +static size_t cap_disas_fallback(const uint8_t *code, size_t code_size,
+> +                                 size_t offset, void *user_data)
+> +{
+> +    disassemble_info *info =3D (disassemble_info *) user_data;
+> +    info->cap_fallback_str =3D g_malloc0(256);
+> +    size_t skip =3D info->capstone_fallback_func(code + offset,
+> +                                               info->cap_fallback_str, 2=
+56);
+> +    return skip;
+> +}
+> +
+> +
+>  /* Initialize the Capstone library.  */
+>  /* ??? It would be nice to cache this.  We would need one handle for the
+>     host and one for the target.  For most targets we can reset specific
+> @@ -206,6 +220,14 @@ static cs_err cap_disas_start(disassemble_info *info=
+, csh *handle)
+>          cs_option(*handle, CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT);
+>      }
+>
+> +    if (info->capstone_fallback_func) {
+> +        cs_opt_skipdata skipdata =3D {
+> +            .callback =3D cap_disas_fallback,
+> +            .user_data =3D info,
 
-Shouldn't this one work?
+This also needs:
 
-    error_setg(&job->err, strerror(-job->ret));
+            .mnemonic =3D "deadbeef",
 
-Kevin
+just to stop the capstone skip handling crashing. For some reason this
+only showed up when I started doing Aarch64-to-Aarch64 testing.
+
+> +        };
+> +        cs_option(*handle, CS_OPT_SKIPDATA_SETUP, (size_t) &skipdata);
+> +    }
+> +
+>      /* "Disassemble" unknown insns as ".byte W,X,Y,Z".  */
+>      cs_option(*handle, CS_OPT_SKIPDATA, CS_OPT_ON);
+>
+> @@ -281,7 +303,13 @@ static void cap_dump_insn(disassemble_info *info, cs=
+_insn *insn)
+>      }
+>
+>      /* Print the actual instruction.  */
+> -    print(info->stream, "  %-8s %s\n", insn->mnemonic, insn->op_str);
+> +    if (info->cap_fallback_str) {
+> +        print(info->stream, "  %s\n", info->cap_fallback_str);
+> +        g_free(info->cap_fallback_str);
+> +        info->cap_fallback_str =3D NULL;
+> +    } else {
+> +        print(info->stream, "  %-8s %s\n", insn->mnemonic, insn->op_str);
+> +    }
+>
+>      /* Dump any remaining part of the insn on subsequent lines.  */
+>      for (i =3D split; i < n; i +=3D split) {
+> diff --git a/include/disas/bfd.h b/include/disas/bfd.h
+> index 1f69a6e9d3..9d99bfef48 100644
+> --- a/include/disas/bfd.h
+> +++ b/include/disas/bfd.h
+> @@ -377,6 +377,12 @@ typedef struct disassemble_info {
+>    int cap_insn_unit;
+>    int cap_insn_split;
+>
+> +  /* Fallback function to disassemble things capstone can't. */
+> +  size_t (*capstone_fallback_func)
+> +    (const uint8_t *insn, char *ptr, size_t n);
+> +
+> +  char *cap_fallback_str;
+> +
+>  } disassemble_info;
+>
+>  
+
+> @@ -491,7 +497,10 @@ int generic_symbol_at_address(bfd_vma, struct disass=
+emble_info *);
+>    (INFO).bytes_per_chunk =3D 0, \
+>    (INFO).display_endian =3D BFD_ENDIAN_UNKNOWN, \
+>    (INFO).disassembler_options =3D NULL, \
+> -  (INFO).insn_info_valid =3D 0
+> +  (INFO).insn_info_valid =3D 0, \
+> +  (INFO).capstone_fallback_func =3D NULL, \
+> +  (INFO).cap_fallback_str =3D NULL
+> +
+>
+>  #ifndef ATTRIBUTE_UNUSED
+>  #define ATTRIBUTE_UNUSED __attribute__((unused))
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 64a8005a4b..cfefbfb0b9 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -519,6 +519,10 @@ static void arm_disas_set_info(CPUState *cpu, disass=
+emble_info *info)
+>          info->cap_arch =3D CS_ARCH_ARM64;
+>          info->cap_insn_unit =3D 4;
+>          info->cap_insn_split =3D 4;
+> +
+> +#if defined(TARGET_AARCH64)
+> +        info->capstone_fallback_func =3D do_aarch64_fallback_disassembly;
+> +#endif
+>      } else {
+>          int cap_mode;
+>          if (env->thumb) {
+
+
+--
+Alex Benn=C3=A9e
