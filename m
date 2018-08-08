@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fnIzJ-0005gr-2L
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:34:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1fnJKj-0003H4-Kj
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:56:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fnIzE-0007gF-1l
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:34:33 -0400
-Date: Wed, 8 Aug 2018 09:34:15 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180808093415.0ae050c8.cohuck@redhat.com>
-In-Reply-To: <4305b179-bcaa-9373-5b5c-41cd79122d5c@linux.ibm.com>
-References: <1530312483-23864-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<4305b179-bcaa-9373-5b5c-41cd79122d5c@linux.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1fnJKg-00049r-Ia
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:56:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43980 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fnJKg-00049W-C2
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:56:38 -0400
+References: <BN7PR08MB48688EB667F7EDFF86B90D2CC6200@BN7PR08MB4868.namprd08.prod.outlook.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e589005c-cea6-5ad4-983b-9dda0eac003d@redhat.com>
+Date: Wed, 8 Aug 2018 09:56:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 0/5] s390x: vfio-ap: guest dedicated
- crypto adapters
+In-Reply-To: <BN7PR08MB48688EB667F7EDFF86B90D2CC6200@BN7PR08MB4868.namprd08.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Question: How to integrate simple tests for a new
+ platform so that they fit in well within QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Tue, 7 Aug 2018 18:41:29 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On 08/07/2018 02:34 PM, Aleksandar Markovic wrote:
+> Hello, folks.
+>=20
+> We are introducing a new MIPS platform - called nanoMIPS - to the QEMU.
+>=20
+> Besides providing new functionality, we would like to integrate into QE=
+MU some basic testing capabilities for that new platform. Something like =
+this:
+>=20
+>     Enable user to specify cross compiler and, using QEMU Linux user mo=
+de:
+>         a. execute several tests that are just almost minimal tests of =
+emulation of selected instructions.
+>         b. execute several tests that are just almost minimal tests of =
+translation of selected system calls.
+>=20
+> In other words, this would enable a user to run "smoke tests" for nanoM=
+IPS platform, and perhaps to use these tests as a starting point for some=
+ other tests.
+>=20
+> My question is:
+>=20
+> 1. Is this a good idea at all?
 
-> Ping
+Yes, it certainly is!
 
-Maybe send a new version when the kernel part is sent again? I don't
-think I had any further comments.
+> 2. If yes, what would be the best way to integrate these tests into cur=
+rent QEMU test organization?
 
-> 
-> On 06/29/2018 06:47 PM, Tony Krowiak wrote:
-> > From: Tony Krowiak <akrowiak@linux.ibm.com>
-> >
-> > This patch series is the QEMU counterpart to the KVM/kernel support for
-> > guest dedicated crypto adapters. The KVM/kernel model is built on the
-> > VFIO mediated device framework and provides the infrastructure for
-> > granting exclusive guest access to crypto devices installed on the linux
-> > host. This patch series introduces a new QEMU command line option, QEMU
-> > object model and CPU model features to exploit the KVM/kernel model.
-> >
-> > See the detailed specifications for AP virtualization provided by this
-> > patch set in docs/vfio-ap.txt for a more complete discussion of the
-> > design introduced by this patch series.
-> >
-> > Note: This series implements the minimal viable product (MVP) and does not
-> >        provide support for hot plug/unplug or migration. The goal
-> >        of the MVP model is to solidify a base upon which these additional
-> >        features will be built.
-> >
-> > --
-> > v5 => v6 Change log:
-> > ===================
-> > * Added reset handling fo vfio-ap device
-> > * Added a bridge/bus to AP device object model - thanks to Halil Pasic
-> >
-> > v4 => v5 Change log:
-> > ===================
-> > * Added MAINTAINERS entries for VFIO AP
-> > * Added explanation for why we are only supporting zEC12 and newer CPU
-> >    models.
-> > * Changed CPU model feature qci=on|off to apqci=on|off
-> > * Misc. minor changes
-> >
-> > v3 => v4 Change log:
-> > ===================
-> > * Made vfio-ap device unpluggable for now
-> > * Renamed command line CPU model feature for QCI: qci=on -> apqci=on
-> > * Removed call to KVM_S390_VM_CRYPTO_INTERPRET_AP ioctl - ioctl was
-> >    removed from kernel and AP instruction interpretation is set from the
-> >    VFIO device driver
-> > * Added check to ensure only one vfio-ap device can be configured per
-> >    guest
-> > * Removed AP instruction interception handlers: AP instructions will be
-> >    interpreted by default if AP facilities are installed to handle the case
-> >    where feature ap=on and no vfio-ap device is configured for the guest.
-> >
-> >
-> > Tony Krowiak (5):
-> >    linux-headers: linux header updates for AP support
-> >    s390x/cpumodel: Set up CPU model for AP device support
-> >    s390x/ap: base Adjunct Processor (AP) object model
-> >    s390x/vfio: ap: Introduce VFIO AP device
-> >    s390: doc: detailed specifications for AP virtualization
-> >
-> >   MAINTAINERS                       |   14 +
-> >   default-configs/s390x-softmmu.mak |    1 +
-> >   docs/vfio-ap.txt                  |  649 +++++++++++++++++++++++++++++++++++++
-> >   hw/s390x/Makefile.objs            |    2 +
-> >   hw/s390x/ap-bridge.c              |   76 +++++
-> >   hw/s390x/ap-device.c              |   39 +++
-> >   hw/s390x/s390-virtio-ccw.c        |    4 +
-> >   hw/vfio/Makefile.objs             |    1 +
-> >   hw/vfio/ap.c                      |  183 +++++++++++
-> >   include/hw/s390x/ap-bridge.h      |   37 +++
-> >   include/hw/s390x/ap-device.h      |   38 +++
-> >   include/hw/vfio/vfio-common.h     |    1 +
-> >   linux-headers/asm-s390/kvm.h      |    2 +
-> >   linux-headers/linux/vfio.h        |    2 +
-> >   target/s390x/cpu_features.c       |    3 +
-> >   target/s390x/cpu_features_def.h   |    3 +
-> >   target/s390x/cpu_models.c         |    2 +
-> >   target/s390x/gen-features.c       |    3 +
-> >   target/s390x/kvm.c                |    1 +
-> >   19 files changed, 1061 insertions(+), 0 deletions(-)
-> >   create mode 100644 docs/vfio-ap.txt
-> >   create mode 100644 hw/s390x/ap-bridge.c
-> >   create mode 100644 hw/s390x/ap-device.c
-> >   create mode 100644 hw/vfio/ap.c
-> >   create mode 100644 include/hw/s390x/ap-bridge.h
-> >   create mode 100644 include/hw/s390x/ap-device.h
-> >  
-> 
+Best way is to use the test infrastructure in tests/tcg (see mail from
+Richard).
+Another possibility is to add a simple test to tests/boot-serial-test.c
+- but this only works if your machine can output something to the serial
+console with some few lines of assembly code.
+
+ Thomas
