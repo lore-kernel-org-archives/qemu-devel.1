@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBm-0006fp-AI
+	(envelope-from <armbru@redhat.com>) id 1fnNBq-0006js-2l
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBi-0008QV-2N
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51046 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fnNBl-000070-9A
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51102 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBh-0008PQ-TP
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:38 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBk-0008Vo-Ox
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:40 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed,  8 Aug 2018 14:02:42 +0200
-Message-Id: <20180808120334.10970-5-armbru@redhat.com>
+Date: Wed,  8 Aug 2018 14:03:17 +0200
+Message-Id: <20180808120334.10970-40-armbru@redhat.com>
 In-Reply-To: <20180808120334.10970-1-armbru@redhat.com>
 References: <20180808120334.10970-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/56] qmp-cmd-test: Split off qmp-test
+Subject: [Qemu-devel] [PATCH 39/56] json: Leave rejecting invalid
+ interpolation to parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,494 +27,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-qmp-test is for QMP protocol tests.  Commit e4a426e75ef added generic,
-basic tests of query commands to it.  Move them to their own test
-program qmp-cmd-test, to keep qmp-test focused on the protocol.
+Both lexer and parser reject invalid interpolation specifications.
+The parser's check is useless.
+
+The lexer ends the token right after the first bad character.  This
+tends to lead to suboptimal error reporting.  For instance, input
+
+    [ %11d ]
+
+produces the tokens
+
+    JSON_LSQUARE  [
+    JSON_ERROR    %1
+    JSON_INTEGER  1
+    JSON_KEYWORD  d
+    JSON_RSQUARE  ]
+
+The parser then yields an error, an object and two more errors:
+
+    error: Invalid JSON syntax
+    object: 1
+    error: JSON parse error, invalid keyword
+    error: JSON parse error, expecting value
+
+Change the lexer to accept [A-Za-z0-9]*[duipsf].  It now produces
+
+    JSON_LSQUARE  [
+    JSON_INTERPOLATION %11d
+    JSON_RSQUARE  ]
+
+and the parser reports just
+
+    JSON parse error, invalid interpolation '%11d'
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- MAINTAINERS            |   1 +
- tests/Makefile.include |   3 +
- tests/qmp-cmd-test.c   | 213 +++++++++++++++++++++++++++++++++++++++++
- tests/qmp-test.c       | 191 +-----------------------------------
- 4 files changed, 218 insertions(+), 190 deletions(-)
- create mode 100644 tests/qmp-cmd-test.c
+ qobject/json-lexer.c  | 52 +++++++++----------------------------------
+ qobject/json-parser.c |  1 +
+ 2 files changed, 11 insertions(+), 42 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 666e936812..dc129b7034 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1695,6 +1695,7 @@ F: monitor.c
- F: docs/devel/*qmp-*
- F: scripts/qmp/
- F: tests/qmp-test.c
-+F: tests/qmp-cmd-test.c
- T: git git://repo.or.cz/qemu/armbru.git qapi-next
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index 0ea1eae4aa..7a82aab88b 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -93,7 +93,8 @@
+  *   (apostrophe) instead of %x22 (quotation mark), and can't contain
+  *   unescaped apostrophe, but can contain unescaped quotation mark.
+  * - Interpolation:
+- *   interpolation = %((l|ll|I64)[du]|[ipsf])
++ *   The lexer accepts [A-Za-z0-9]*, and leaves rejecting invalid ones
++ *   to the parser.
+  *
+  * Note:
+  * - Input must be encoded in modified UTF-8.
+@@ -116,11 +117,6 @@ enum json_lexer_state {
+     IN_NEG_NONZERO_NUMBER,
+     IN_KEYWORD,
+     IN_INTERPOL,
+-    IN_INTERPOL_L,
+-    IN_INTERPOL_LL,
+-    IN_INTERPOL_I,
+-    IN_INTERPOL_I6,
+-    IN_INTERPOL_I64,
+     IN_WHITESPACE,
+     IN_START_INTERPOL,
+     IN_START,
+@@ -222,42 +218,6 @@ static const uint8_t json_lexer[][256] =  {
+         ['\n'] = IN_WHITESPACE,
+     },
  
- Register API
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index a49282704e..48f18ad581 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -179,6 +179,8 @@ check-block-$(CONFIG_POSIX) += tests/qemu-iotests-quick.sh
+-    /* interpolation */
+-    [IN_INTERPOL_LL] = {
+-        ['d'] = JSON_INTERPOL,
+-        ['u'] = JSON_INTERPOL,
+-    },
+-
+-    [IN_INTERPOL_L] = {
+-        ['d'] = JSON_INTERPOL,
+-        ['l'] = IN_INTERPOL_LL,
+-        ['u'] = JSON_INTERPOL,
+-    },
+-
+-    [IN_INTERPOL_I64] = {
+-        ['d'] = JSON_INTERPOL,
+-        ['u'] = JSON_INTERPOL,
+-    },
+-
+-    [IN_INTERPOL_I6] = {
+-        ['4'] = IN_INTERPOL_I64,
+-    },
+-
+-    [IN_INTERPOL_I] = {
+-        ['6'] = IN_INTERPOL_I6,
+-    },
+-
+-    [IN_INTERPOL] = {
+-        ['d'] = JSON_INTERPOL,
+-        ['i'] = JSON_INTERPOL,
+-        ['p'] = JSON_INTERPOL,
+-        ['s'] = JSON_INTERPOL,
+-        ['u'] = JSON_INTERPOL,
+-        ['f'] = JSON_INTERPOL,
+-        ['l'] = IN_INTERPOL_L,
+-        ['I'] = IN_INTERPOL_I,
+-    },
+-
+     /* top level rule */
+     [IN_START] = {
+         ['"'] = IN_DQ_STRING,
+@@ -278,6 +238,14 @@ static const uint8_t json_lexer[][256] =  {
+         ['\n'] = IN_WHITESPACE,
+     },
  
- check-qtest-generic-y = tests/qmp-test$(EXESUF)
- gcov-files-generic-y = monitor.c qapi/qmp-dispatch.c
-+check-qtest-generic-y += tests/qmp-cmd-test$(EXESUF)
++    /* interpolation */
++    [IN_INTERPOL] = {
++        TERMINAL(JSON_INTERPOL),
++        ['A' ... 'Z'] = IN_INTERPOL,
++        ['a' ... 'z'] = IN_INTERPOL,
++        ['0' ... '9'] = IN_INTERPOL,
++    },
 +
- check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
- gcov-files-generic-y = qdev-monitor.c qmp.c
- check-qtest-generic-y += tests/cdrom-test$(EXESUF)
-@@ -770,6 +772,7 @@ libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
- libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virtio.o tests/libqos/virtio-pci.o tests/libqos/virtio-mmio.o tests/libqos/malloc-generic.o
- 
- tests/qmp-test$(EXESUF): tests/qmp-test.o
-+tests/qmp-cmd-test$(EXESUF): tests/qmp-cmd-test.o
- tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
- tests/rtc-test$(EXESUF): tests/rtc-test.o
- tests/m48t59-test$(EXESUF): tests/m48t59-test.o
-diff --git a/tests/qmp-cmd-test.c b/tests/qmp-cmd-test.c
-new file mode 100644
-index 0000000000..5e4a831adb
---- /dev/null
-+++ b/tests/qmp-cmd-test.c
-@@ -0,0 +1,213 @@
-+/*
-+ * QMP command test cases
-+ *
-+ * Copyright (c) 2017 Red Hat Inc.
-+ *
-+ * Authors:
-+ *  Markus Armbruster <armbru@redhat.com>,
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "qapi/error.h"
-+#include "qapi/qapi-visit-introspect.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/qobject-input-visitor.h"
-+
-+const char common_args[] = "-nodefaults -machine none";
-+
-+/* Query smoke tests */
-+
-+static int query_error_class(const char *cmd)
-+{
-+    static struct {
-+        const char *cmd;
-+        int err_class;
-+    } fails[] = {
-+        /* Success depends on build configuration: */
-+#ifndef CONFIG_SPICE
-+        { "query-spice", ERROR_CLASS_COMMAND_NOT_FOUND },
-+#endif
-+#ifndef CONFIG_VNC
-+        { "query-vnc", ERROR_CLASS_GENERIC_ERROR },
-+        { "query-vnc-servers", ERROR_CLASS_GENERIC_ERROR },
-+#endif
-+#ifndef CONFIG_REPLICATION
-+        { "query-xen-replication-status", ERROR_CLASS_COMMAND_NOT_FOUND },
-+#endif
-+        /* Likewise, and require special QEMU command-line arguments: */
-+        { "query-acpi-ospm-status", ERROR_CLASS_GENERIC_ERROR },
-+        { "query-balloon", ERROR_CLASS_DEVICE_NOT_ACTIVE },
-+        { "query-hotpluggable-cpus", ERROR_CLASS_GENERIC_ERROR },
-+        { "query-vm-generation-id", ERROR_CLASS_GENERIC_ERROR },
-+        { NULL, -1 }
-+    };
-+    int i;
-+
-+    for (i = 0; fails[i].cmd; i++) {
-+        if (!strcmp(cmd, fails[i].cmd)) {
-+            return fails[i].err_class;
-+        }
-+    }
-+    return -1;
-+}
-+
-+static void test_query(const void *data)
-+{
-+    const char *cmd = data;
-+    int expected_error_class = query_error_class(cmd);
-+    QDict *resp, *error;
-+    const char *error_class;
-+
-+    qtest_start(common_args);
-+
-+    resp = qmp("{ 'execute': %s }", cmd);
-+    error = qdict_get_qdict(resp, "error");
-+    error_class = error ? qdict_get_str(error, "class") : NULL;
-+
-+    if (expected_error_class < 0) {
-+        g_assert(qdict_haskey(resp, "return"));
-+    } else {
-+        g_assert(error);
-+        g_assert_cmpint(qapi_enum_parse(&QapiErrorClass_lookup, error_class,
-+                                        -1, &error_abort),
-+                        ==, expected_error_class);
-+    }
-+    qobject_unref(resp);
-+
-+    qtest_end();
-+}
-+
-+static bool query_is_blacklisted(const char *cmd)
-+{
-+    const char *blacklist[] = {
-+        /* Not actually queries: */
-+        "add-fd",
-+        /* Success depends on target arch: */
-+        "query-cpu-definitions",  /* arm, i386, ppc, s390x */
-+        "query-gic-capabilities", /* arm */
-+        /* Success depends on target-specific build configuration: */
-+        "query-pci",              /* CONFIG_PCI */
-+        /* Success depends on launching SEV guest */
-+        "query-sev-launch-measure",
-+        /* Success depends on Host or Hypervisor SEV support */
-+        "query-sev",
-+        "query-sev-capabilities",
-+        NULL
-+    };
-+    int i;
-+
-+    for (i = 0; blacklist[i]; i++) {
-+        if (!strcmp(cmd, blacklist[i])) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+typedef struct {
-+    SchemaInfoList *list;
-+    GHashTable *hash;
-+} QmpSchema;
-+
-+static void qmp_schema_init(QmpSchema *schema)
-+{
-+    QDict *resp;
-+    Visitor *qiv;
-+    SchemaInfoList *tail;
-+
-+    qtest_start(common_args);
-+    resp = qmp("{ 'execute': 'query-qmp-schema' }");
-+
-+    qiv = qobject_input_visitor_new(qdict_get(resp, "return"));
-+    visit_type_SchemaInfoList(qiv, NULL, &schema->list, &error_abort);
-+    visit_free(qiv);
-+
-+    qobject_unref(resp);
-+    qtest_end();
-+
-+    schema->hash = g_hash_table_new(g_str_hash, g_str_equal);
-+
-+    /* Build @schema: hash table mapping entity name to SchemaInfo */
-+    for (tail = schema->list; tail; tail = tail->next) {
-+        g_hash_table_insert(schema->hash, tail->value->name, tail->value);
-+    }
-+}
-+
-+static SchemaInfo *qmp_schema_lookup(QmpSchema *schema, const char *name)
-+{
-+    return g_hash_table_lookup(schema->hash, name);
-+}
-+
-+static void qmp_schema_cleanup(QmpSchema *schema)
-+{
-+    qapi_free_SchemaInfoList(schema->list);
-+    g_hash_table_destroy(schema->hash);
-+}
-+
-+static bool object_type_has_mandatory_members(SchemaInfo *type)
-+{
-+    SchemaInfoObjectMemberList *tail;
-+
-+    g_assert(type->meta_type == SCHEMA_META_TYPE_OBJECT);
-+
-+    for (tail = type->u.object.members; tail; tail = tail->next) {
-+        if (!tail->value->has_q_default) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
-+static void add_query_tests(QmpSchema *schema)
-+{
-+    SchemaInfoList *tail;
-+    SchemaInfo *si, *arg_type, *ret_type;
-+    char *test_name;
-+
-+    /* Test the query-like commands */
-+    for (tail = schema->list; tail; tail = tail->next) {
-+        si = tail->value;
-+        if (si->meta_type != SCHEMA_META_TYPE_COMMAND) {
-+            continue;
-+        }
-+
-+        if (query_is_blacklisted(si->name)) {
-+            continue;
-+        }
-+
-+        arg_type = qmp_schema_lookup(schema, si->u.command.arg_type);
-+        if (object_type_has_mandatory_members(arg_type)) {
-+            continue;
-+        }
-+
-+        ret_type = qmp_schema_lookup(schema, si->u.command.ret_type);
-+        if (ret_type->meta_type == SCHEMA_META_TYPE_OBJECT
-+            && !ret_type->u.object.members) {
-+            continue;
-+        }
-+
-+        test_name = g_strdup_printf("qmp/%s", si->name);
-+        qtest_add_data_func(test_name, si->name, test_query);
-+        g_free(test_name);
-+    }
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+    QmpSchema schema;
-+    int ret;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qmp_schema_init(&schema);
-+    add_query_tests(&schema);
-+    ret = g_test_run();
-+
-+    qmp_schema_cleanup(&schema);
-+    return ret;
-+}
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 487ef946ed..b6eff4fe97 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -13,13 +13,10 @@
- #include "qemu/osdep.h"
- #include "libqtest.h"
- #include "qapi/error.h"
--#include "qapi/qapi-visit-introspect.h"
- #include "qapi/qapi-visit-misc.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qlist.h"
- #include "qapi/qobject-input-visitor.h"
--#include "qapi/util.h"
--#include "qapi/visitor.h"
- #include "qapi/qmp/qstring.h"
- 
- const char common_args[] = "-nodefaults -machine none";
-@@ -253,184 +250,6 @@ static void test_qmp_oob(void)
-     qtest_quit(qts);
+     [IN_START_INTERPOL] = {
+         ['"'] = IN_DQ_STRING,
+         ['\''] = IN_SQ_STRING,
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 848d469b2a..bd137399e5 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -448,6 +448,7 @@ static QObject *parse_interpolation(JSONParserContext *ctxt, va_list *ap)
+     } else if (!strcmp(token->str, "%f")) {
+         return QOBJECT(qnum_from_double(va_arg(*ap, double)));
+     }
++    parse_error(ctxt, token, "invalid interpolation '%s'", token->str);
+     return NULL;
  }
  
--/* Query smoke tests */
--
--static int query_error_class(const char *cmd)
--{
--    static struct {
--        const char *cmd;
--        int err_class;
--    } fails[] = {
--        /* Success depends on build configuration: */
--#ifndef CONFIG_SPICE
--        { "query-spice", ERROR_CLASS_COMMAND_NOT_FOUND },
--#endif
--#ifndef CONFIG_VNC
--        { "query-vnc", ERROR_CLASS_GENERIC_ERROR },
--        { "query-vnc-servers", ERROR_CLASS_GENERIC_ERROR },
--#endif
--#ifndef CONFIG_REPLICATION
--        { "query-xen-replication-status", ERROR_CLASS_COMMAND_NOT_FOUND },
--#endif
--        /* Likewise, and require special QEMU command-line arguments: */
--        { "query-acpi-ospm-status", ERROR_CLASS_GENERIC_ERROR },
--        { "query-balloon", ERROR_CLASS_DEVICE_NOT_ACTIVE },
--        { "query-hotpluggable-cpus", ERROR_CLASS_GENERIC_ERROR },
--        { "query-vm-generation-id", ERROR_CLASS_GENERIC_ERROR },
--        { NULL, -1 }
--    };
--    int i;
--
--    for (i = 0; fails[i].cmd; i++) {
--        if (!strcmp(cmd, fails[i].cmd)) {
--            return fails[i].err_class;
--        }
--    }
--    return -1;
--}
--
--static void test_query(const void *data)
--{
--    const char *cmd = data;
--    int expected_error_class = query_error_class(cmd);
--    QDict *resp, *error;
--    const char *error_class;
--
--    qtest_start(common_args);
--
--    resp = qmp("{ 'execute': %s }", cmd);
--    error = qdict_get_qdict(resp, "error");
--    error_class = error ? qdict_get_str(error, "class") : NULL;
--
--    if (expected_error_class < 0) {
--        g_assert(qdict_haskey(resp, "return"));
--    } else {
--        g_assert(error);
--        g_assert_cmpint(qapi_enum_parse(&QapiErrorClass_lookup, error_class,
--                                        -1, &error_abort),
--                        ==, expected_error_class);
--    }
--    qobject_unref(resp);
--
--    qtest_end();
--}
--
--static bool query_is_blacklisted(const char *cmd)
--{
--    const char *blacklist[] = {
--        /* Not actually queries: */
--        "add-fd",
--        /* Success depends on target arch: */
--        "query-cpu-definitions",  /* arm, i386, ppc, s390x */
--        "query-gic-capabilities", /* arm */
--        /* Success depends on target-specific build configuration: */
--        "query-pci",              /* CONFIG_PCI */
--        /* Success depends on launching SEV guest */
--        "query-sev-launch-measure",
--        /* Success depends on Host or Hypervisor SEV support */
--        "query-sev",
--        "query-sev-capabilities",
--        NULL
--    };
--    int i;
--
--    for (i = 0; blacklist[i]; i++) {
--        if (!strcmp(cmd, blacklist[i])) {
--            return true;
--        }
--    }
--    return false;
--}
--
--typedef struct {
--    SchemaInfoList *list;
--    GHashTable *hash;
--} QmpSchema;
--
--static void qmp_schema_init(QmpSchema *schema)
--{
--    QDict *resp;
--    Visitor *qiv;
--    SchemaInfoList *tail;
--
--    qtest_start(common_args);
--    resp = qmp("{ 'execute': 'query-qmp-schema' }");
--
--    qiv = qobject_input_visitor_new(qdict_get(resp, "return"));
--    visit_type_SchemaInfoList(qiv, NULL, &schema->list, &error_abort);
--    visit_free(qiv);
--
--    qobject_unref(resp);
--    qtest_end();
--
--    schema->hash = g_hash_table_new(g_str_hash, g_str_equal);
--
--    /* Build @schema: hash table mapping entity name to SchemaInfo */
--    for (tail = schema->list; tail; tail = tail->next) {
--        g_hash_table_insert(schema->hash, tail->value->name, tail->value);
--    }
--}
--
--static SchemaInfo *qmp_schema_lookup(QmpSchema *schema, const char *name)
--{
--    return g_hash_table_lookup(schema->hash, name);
--}
--
--static void qmp_schema_cleanup(QmpSchema *schema)
--{
--    qapi_free_SchemaInfoList(schema->list);
--    g_hash_table_destroy(schema->hash);
--}
--
--static bool object_type_has_mandatory_members(SchemaInfo *type)
--{
--    SchemaInfoObjectMemberList *tail;
--
--    g_assert(type->meta_type == SCHEMA_META_TYPE_OBJECT);
--
--    for (tail = type->u.object.members; tail; tail = tail->next) {
--        if (!tail->value->has_q_default) {
--            return true;
--        }
--    }
--
--    return false;
--}
--
--static void add_query_tests(QmpSchema *schema)
--{
--    SchemaInfoList *tail;
--    SchemaInfo *si, *arg_type, *ret_type;
--    char *test_name;
--
--    /* Test the query-like commands */
--    for (tail = schema->list; tail; tail = tail->next) {
--        si = tail->value;
--        if (si->meta_type != SCHEMA_META_TYPE_COMMAND) {
--            continue;
--        }
--
--        if (query_is_blacklisted(si->name)) {
--            continue;
--        }
--
--        arg_type = qmp_schema_lookup(schema, si->u.command.arg_type);
--        if (object_type_has_mandatory_members(arg_type)) {
--            continue;
--        }
--
--        ret_type = qmp_schema_lookup(schema, si->u.command.ret_type);
--        if (ret_type->meta_type == SCHEMA_META_TYPE_OBJECT
--            && !ret_type->u.object.members) {
--            continue;
--        }
--
--        test_name = g_strdup_printf("qmp/%s", si->name);
--        qtest_add_data_func(test_name, si->name, test_query);
--        g_free(test_name);
--    }
--}
--
- /* Preconfig tests */
- 
- static void test_qmp_preconfig(void)
-@@ -474,19 +293,11 @@ static void test_qmp_preconfig(void)
- 
- int main(int argc, char *argv[])
- {
--    QmpSchema schema;
--    int ret;
--
-     g_test_init(&argc, &argv, NULL);
- 
-     qtest_add_func("qmp/protocol", test_qmp_protocol);
-     qtest_add_func("qmp/oob", test_qmp_oob);
--    qmp_schema_init(&schema);
--    add_query_tests(&schema);
-     qtest_add_func("qmp/preconfig", test_qmp_preconfig);
- 
--    ret = g_test_run();
--
--    qmp_schema_cleanup(&schema);
--    return ret;
-+    return g_test_run();
- }
 -- 
 2.17.1
