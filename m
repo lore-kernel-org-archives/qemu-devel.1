@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fnIRV-0008C3-Tb
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 02:59:39 -0400
+	(envelope-from <bounces@canonical.com>) id 1fnIXO-0002CD-0K
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:05:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fnIRS-0004P3-1R
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 02:59:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36402 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fnIRR-0004Op-R1
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 02:59:33 -0400
-Date: Wed, 8 Aug 2018 14:59:26 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180808065926.GL24415@xz-mi>
-References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
-	<20180807091209.13531-10-xiaoguangrong@tencent.com>
-	<20180808060506.GH24415@xz-mi>
-	<2a8e132b-2944-7077-6c76-b6447d1770c5@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1fnIXJ-0007z9-VN
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:05:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33204)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fnIXJ-0007yX-Mw
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 03:05:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fnIXI-0008Qu-CF
+	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 07:05:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 518E62E80C0
+	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 07:05:36 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2a8e132b-2944-7077-6c76-b6447d1770c5@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 09/10] migration: fix calculating
- xbzrle_counters.cache_miss_rate
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 08 Aug 2018 06:56:00 -0000
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Reply-To: Bug 1785972 <1785972@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153371136089.29473.12663307170219083138.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1785972] [NEW] v3.0.0-rc4: VM fails to start
+ after vcpuhotunplug, managedsave sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,135 +36,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: qemu-devel@nongnu.org
 
-On Wed, Aug 08, 2018 at 02:36:51PM +0800, Xiao Guangrong wrote:
-> 
-> 
-> On 08/08/2018 02:05 PM, Peter Xu wrote:
-> > On Tue, Aug 07, 2018 at 05:12:08PM +0800, guangrong.xiao@gmail.com wrote:
-> > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > > 
-> > > As Peter pointed out:
-> > > | - xbzrle_counters.cache_miss is done in save_xbzrle_page(), so it's
-> > > |   per-guest-page granularity
-> > > |
-> > > | - RAMState.iterations is done for each ram_find_and_save_block(), so
-> > > |   it's per-host-page granularity
-> > > |
-> > > | An example is that when we migrate a 2M huge page in the guest, we
-> > > | will only increase the RAMState.iterations by 1 (since
-> > > | ram_find_and_save_block() will be called once), but we might increase
-> > > | xbzrle_counters.cache_miss for 2M/4K=512 times (we'll call
-> > > | save_xbzrle_page() that many times) if all the pages got cache miss.
-> > > | Then IMHO the cache miss rate will be 512/1=51200% (while it should
-> > > | actually be just 100% cache miss).
-> > > 
-> > > And he also suggested as xbzrle_counters.cache_miss_rate is the only
-> > > user of rs->iterations we can adapt it to count guest page numbers
-> > > 
-> > > After that, rename 'iterations' to 'handle_pages' to better reflect
-> > > its meaning
-> > > 
-> > > Suggested-by: Peter Xu <peterx@redhat.com>
-> > > Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > > ---
-> > >   migration/ram.c | 18 +++++++++---------
-> > >   1 file changed, 9 insertions(+), 9 deletions(-)
-> > > 
-> > > diff --git a/migration/ram.c b/migration/ram.c
-> > > index 09be01dca2..bd7c18d1f9 100644
-> > > --- a/migration/ram.c
-> > > +++ b/migration/ram.c
-> > > @@ -300,10 +300,10 @@ struct RAMState {
-> > >       uint64_t num_dirty_pages_period;
-> > >       /* xbzrle misses since the beginning of the period */
-> > >       uint64_t xbzrle_cache_miss_prev;
-> > > -    /* number of iterations at the beginning of period */
-> > > -    uint64_t iterations_prev;
-> > > -    /* Iterations since start */
-> > > -    uint64_t iterations;
-> > > +    /* total handled pages at the beginning of period */
-> > > +    uint64_t handle_pages_prev;
-> > > +    /* total handled pages since start */
-> > > +    uint64_t handle_pages;
-> > 
-> > The name is not that straightforward to me.  I would think about
-> > "[guest|host]_page_count" or something better, or we just keep the old
-> > naming but with a better comment would be fine too.
-> 
-> The filed actually indicates total pages (target pages more precisely)
-> handled during live migration. 'iterations' confuses us completely.
-> 
-> It's target_page_count good to you?
+Public bug reported:
 
-Yes.
+VM fails to start after vcpu hot un-plug, managedsave sequence
 
-> 
-> > 
-> > >       /* number of dirty bits in the bitmap */
-> > >       uint64_t migration_dirty_pages;
-> > >       /* last dirty_sync_count we have seen */
-> > > @@ -1587,19 +1587,19 @@ uint64_t ram_pagesize_summary(void)
-> > >   static void migration_update_rates(RAMState *rs, int64_t end_time)
-> > >   {
-> > > -    uint64_t iter_count = rs->iterations - rs->iterations_prev;
-> > > +    uint64_t page_count = rs->handle_pages - rs->handle_pages_prev;
-> > >       /* calculate period counters */
-> > >       ram_counters.dirty_pages_rate = rs->num_dirty_pages_period * 1000
-> > >                   / (end_time - rs->time_last_bitmap_sync);
-> > > -    if (!iter_count) {
-> > > +    if (!page_count) {
-> > >           return;
-> > >       }
-> > >       if (migrate_use_xbzrle()) {
-> > >           xbzrle_counters.cache_miss_rate = (double)(xbzrle_counters.cache_miss -
-> > > -            rs->xbzrle_cache_miss_prev) / iter_count;
-> > > +            rs->xbzrle_cache_miss_prev) / page_count;
-> > >           rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
-> > >       }
-> > >   }
-> > > @@ -1657,7 +1657,7 @@ static void migration_bitmap_sync(RAMState *rs)
-> > >           migration_update_rates(rs, end_time);
-> > > -        rs->iterations_prev = rs->iterations;
-> > > +        rs->handle_pages_prev = rs->handle_pages;
-> > >           /* reset period counters */
-> > >           rs->time_last_bitmap_sync = end_time;
-> > > @@ -3209,7 +3209,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-> > >               break;
-> > >           }
-> > > -        rs->iterations++;
-> > > +        rs->handle_pages += pages;
-> > 
-> > So it's still counting host pages, is this your intention to only
-> > change the name in the patch?
-> 
-> Hmm... the value returned by ram_find_and_save_block() isn't the total
-> target pages posted out?
+Host info:
+Kernel: 4.18.0-rc8-00002-g1236568ee3cb
 
-Hmm, I overlooked that. Sorry. :)
+qemu: commit 6ad90805383e6d04b3ff49681b8519a48c9f4410 (HEAD -> master, tag:=
+ v3.0.0-rc4)
+QEMU emulator version 2.12.94 (v3.0.0-rc4-dirty)
 
-Then it looks fine to me:
+libvirt: commit 087de2f5a3dffb27d2eeb0c50a86d5d6984e5a5e (HEAD -> master)
+libvirtd (libvirt) 4.6.0
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Guest Kernel: 4.18.0-rc8-00002-g1236568ee3cb
 
-> 
-> /**
->  * ram_find_and_save_block: finds a dirty page and sends it to f
->  *
->  * Called within an RCU critical section.
->  *
->  * Returns the number of pages written where zero means no dirty pages,
->  * or negative on error
-> ...
-> 
->  *
->  * On systems where host-page-size > target-page-size it will send all the
->  * pages in a host page that are dirty.
->  */
 
-Regards,
+Steps to reproduce:
+1. Start a guest(VM) with 2 current , 4 max vcpus
+virsh start vm1
+Domain vm1 started
 
--- 
-Peter Xu
+2. Hotplug 2 vcpus
+virsh setvcpus vm1 4 --live
+
+3. Hot unplug 2 vcpus
+virsh setvcpus vm1 2 --live
+
+4. Managedsave the VM
+virsh managedsave vm1
+
+Domain vm1 state saved by libvirt
+
+5. Start the VM ---Fails to start
+virsh start vm1
+
+error: Failed to start domain avocado-vt-vm1
+error: internal error: qemu unexpectedly closed the monitor: 2018-08-08T06:=
+27:53.853818Z qemu: Unknown savevm section or instance 'spapr_cpu' 2
+2018-08-08T06:27:53.854949Z qemu: load of migration failed: Invalid argument
+
+
+Testcase:
+avocado run libvirt_vcpu_plug_unplug.positive_test.vcpu_set.live.vm_operate=
+.managedsave_with_unplug --vt-type libvirt --vt-extra-params emulator_path=
+=3D/usr/share/avocado-plugins-vt/bin/qemu create_vm_libvirt=3Dyes kill_vm_l=
+ibvirt=3Dyes env_cleanup=3Dyes smp=3D8 backup_image_before_testing=3Dno lib=
+virt_controller=3Dvirtio-scsi scsi_hba=3Dvirtio-scsi-pci drive_format=3Dscs=
+i-hd use_os_variant=3Dno restore_image_after_testing=3Dno vga=3Dnone displa=
+y=3Dnographic kernel=3D/home/kvmci/linux/vmlinux kernel_args=3D'root=3D/dev=
+/sda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init  initcall_=
+debug' take_regular_screendumps=3Dno --vt-guest-os JeOS.27.ppc64le
+JOB ID     : 1f869477ad87e7d7e7e7777f631ae08965f41a74
+JOB LOG    : /root/avocado/job-results/job-2018-08-08T02.42-1f86947/job.log
+ (1/1) type_specific.io-github-autotest-libvirt.libvirt_vcpu_plug_unplug.po=
+sitive_test.vcpu_set.live.vm_operate.managedsave_with_unplug: ERROR (91.58 =
+s)
+RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CA=
+NCEL 0
+JOB TIME   : 95.89 s
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "avocado test log"
+   https://bugs.launchpad.net/bugs/1785972/+attachment/5172872/+files/job.l=
+og
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1785972
+
+Title:
+  v3.0.0-rc4: VM fails to start after vcpuhotunplug, managedsave
+  sequence
+
+Status in QEMU:
+  New
+
+Bug description:
+  VM fails to start after vcpu hot un-plug, managedsave sequence
+
+  Host info:
+  Kernel: 4.18.0-rc8-00002-g1236568ee3cb
+
+  qemu: commit 6ad90805383e6d04b3ff49681b8519a48c9f4410 (HEAD -> master, ta=
+g: v3.0.0-rc4)
+  QEMU emulator version 2.12.94 (v3.0.0-rc4-dirty)
+
+  libvirt: commit 087de2f5a3dffb27d2eeb0c50a86d5d6984e5a5e (HEAD -> master)
+  libvirtd (libvirt) 4.6.0
+
+  Guest Kernel: 4.18.0-rc8-00002-g1236568ee3cb
+
+  =
+
+  Steps to reproduce:
+  1. Start a guest(VM) with 2 current , 4 max vcpus
+  virsh start vm1
+  Domain vm1 started
+
+  2. Hotplug 2 vcpus
+  virsh setvcpus vm1 4 --live
+
+  3. Hot unplug 2 vcpus
+  virsh setvcpus vm1 2 --live
+
+  4. Managedsave the VM
+  virsh managedsave vm1
+
+  Domain vm1 state saved by libvirt
+
+  5. Start the VM ---Fails to start
+  virsh start vm1
+
+  error: Failed to start domain avocado-vt-vm1
+  error: internal error: qemu unexpectedly closed the monitor: 2018-08-08T0=
+6:27:53.853818Z qemu: Unknown savevm section or instance 'spapr_cpu' 2
+  2018-08-08T06:27:53.854949Z qemu: load of migration failed: Invalid argum=
+ent
+
+
+  Testcase:
+  avocado run libvirt_vcpu_plug_unplug.positive_test.vcpu_set.live.vm_opera=
+te.managedsave_with_unplug --vt-type libvirt --vt-extra-params emulator_pat=
+h=3D/usr/share/avocado-plugins-vt/bin/qemu create_vm_libvirt=3Dyes kill_vm_=
+libvirt=3Dyes env_cleanup=3Dyes smp=3D8 backup_image_before_testing=3Dno li=
+bvirt_controller=3Dvirtio-scsi scsi_hba=3Dvirtio-scsi-pci drive_format=3Dsc=
+si-hd use_os_variant=3Dno restore_image_after_testing=3Dno vga=3Dnone displ=
+ay=3Dnographic kernel=3D/home/kvmci/linux/vmlinux kernel_args=3D'root=3D/de=
+v/sda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init  initcall=
+_debug' take_regular_screendumps=3Dno --vt-guest-os JeOS.27.ppc64le
+  JOB ID     : 1f869477ad87e7d7e7e7777f631ae08965f41a74
+  JOB LOG    : /root/avocado/job-results/job-2018-08-08T02.42-1f86947/job.l=
+og
+   (1/1) type_specific.io-github-autotest-libvirt.libvirt_vcpu_plug_unplug.=
+positive_test.vcpu_set.live.vm_operate.managedsave_with_unplug: ERROR (91.5=
+8 s)
+  RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | =
+CANCEL 0
+  JOB TIME   : 95.89 s
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1785972/+subscriptions
