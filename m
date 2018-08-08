@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fnMxG-0000Zb-Ma
+	(envelope-from <quintela@redhat.com>) id 1fnMxH-0000Zs-MA
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 07:48:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fnMxF-00086Y-6S
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 07:48:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45000 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fnMxG-00088E-IP
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 07:48:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45002 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fnMxF-000860-2J
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 07:48:41 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fnMxG-00087l-Cz
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 07:48:42 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 91A5981663CF
-	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 11:48:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E6E2A81663CF
+	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 11:48:41 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  8 Aug 2018 13:48:11 +0200
-Message-Id: <20180808114830.7169-4-quintela@redhat.com>
+Date: Wed,  8 Aug 2018 13:48:12 +0200
+Message-Id: <20180808114830.7169-5-quintela@redhat.com>
 In-Reply-To: <20180808114830.7169-1-quintela@redhat.com>
 References: <20180808114830.7169-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 03/22] check: Use land/lor when possible
+Subject: [Qemu-devel] [PATCH v2 04/22] check: Only test isa-testdev when it
+ is compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +33,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-So everythig is (a bit) more consistent
+Once there, untangle endianness-test and boot-serial-test.
+
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+--
+
+boot-serial-test don't depend on isa-testdev.  Thanks Thomas.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- tests/Makefile.include | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ tests/Makefile.include | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index d6f5cc9ccc..2016c353e3 100644
+index 2016c353e3..4e5f47aac0 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -98,11 +98,9 @@ check-unit-y += tests/test-block-backend$(EXESUF)
- check-unit-y += tests/test-x86-cpuid$(EXESUF)
- # all code tested by test-x86-cpuid is inside topology.h
- gcov-files-test-x86-cpuid-y =
--ifeq ($(CONFIG_SOFTMMU),y)
--check-unit-y += tests/test-xbzrle$(EXESUF)
--gcov-files-test-xbzrle-y = migration/xbzrle.c
--check-unit-$(CONFIG_POSIX) += tests/test-vmstate$(EXESUF)
--endif
-+check-unit-$(CONFIG_SOFTMMU) += tests/test-xbzrle$(EXESUF)
-+gcov-files-test-xbzrle-$(CONFIG_SOFTMMU) = migration/xbzrle.c
-+check-unit-$(call land, $(CONFIG_SOFTMMU), $(CONFIG_POSIX)) += tests/test-vmstate$(EXESUF)
- check-unit-y += tests/test-cutils$(EXESUF)
- gcov-files-test-cutils-y += util/cutils.c
- check-unit-y += tests/test-shift128$(EXESUF)
-@@ -299,9 +297,7 @@ check-qtest-i386-y += tests/q35-test$(EXESUF)
- check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
- gcov-files-i386-y += hw/pci-host/q35.c
- check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
--ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
--check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) += tests/vhost-user-test$(EXESUF)
--endif
-+check-qtest-x86_64-$(call lor, $(CONFIG_VHOST_USER_NET_TEST_i386), $(CONFIG_VHOST_USER_NET_TEST_x86_64)) += tests/vhost-user-test$(EXESUF)
- check-qtest-i386-$(CONFIG_TPM) += tests/tpm-crb-swtpm-test$(EXESUF)
- check-qtest-i386-$(CONFIG_TPM) += tests/tpm-crb-test$(EXESUF)
- check-qtest-i386-$(CONFIG_TPM) += tests/tpm-tis-swtpm-test$(EXESUF)
+@@ -248,7 +248,7 @@ gcov-files-pci-y += hw/misc/ivshmem.c
+ check-qtest-pci-y += tests/megasas-test$(EXESUF)
+ gcov-files-pci-y += hw/scsi/megasas.c
+ 
+-check-qtest-i386-y = tests/endianness-test$(EXESUF)
++check-qtest-i386-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
+ check-qtest-i386-y += tests/fdc-test$(EXESUF)
+ gcov-files-i386-y = hw/block/fdc.c
+ check-qtest-i386-y += tests/ide-test$(EXESUF)
+@@ -321,15 +321,15 @@ check-qtest-m68k-y = tests/boot-serial-test$(EXESUF)
+ 
+ check-qtest-microblaze-y = tests/boot-serial-test$(EXESUF)
+ 
+-check-qtest-mips-y = tests/endianness-test$(EXESUF)
+-
+-check-qtest-mips64-y = tests/endianness-test$(EXESUF)
+-
+-check-qtest-mips64el-y = tests/endianness-test$(EXESUF)
+-
+ check-qtest-moxie-y = tests/boot-serial-test$(EXESUF)
+ 
+-check-qtest-ppc-y = tests/endianness-test$(EXESUF)
++check-qtest-mips-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
++
++check-qtest-mips64-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
++
++check-qtest-mips64el-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
++
++check-qtest-ppc-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
+ check-qtest-ppc-y += tests/boot-order-test$(EXESUF)
+ check-qtest-ppc-y += tests/prom-env-test$(EXESUF)
+ check-qtest-ppc-y += tests/drive_del-test$(EXESUF)
+@@ -360,16 +360,16 @@ check-qtest-ppc64-y += tests/numa-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_IVSHMEM) += tests/ivshmem-test$(EXESUF)
+ check-qtest-ppc64-y += tests/cpu-plug-test$(EXESUF)
+ 
+-check-qtest-sh4-y = tests/endianness-test$(EXESUF)
++check-qtest-sh4-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
+ 
+-check-qtest-sh4eb-y = tests/endianness-test$(EXESUF)
++check-qtest-sh4eb-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
+ 
+ check-qtest-sparc-y = tests/prom-env-test$(EXESUF)
+ check-qtest-sparc-y += tests/m48t59-test$(EXESUF)
+ gcov-files-sparc-y = hw/timer/m48t59.c
+ check-qtest-sparc-y += tests/boot-serial-test$(EXESUF)
+ 
+-check-qtest-sparc64-y = tests/endianness-test$(EXESUF)
++check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
+ check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
+ check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
+ 
 -- 
 2.17.1
