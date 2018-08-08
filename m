@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fnNuI-0004nC-Nc
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:49:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1fnNy3-0008F9-9R
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:53:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fnNuG-0004O0-6T
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:49:42 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed,  8 Aug 2018 15:49:24 +0300
-Message-Id: <20180808124925.21031-7-vsementsov@virtuozzo.com>
-In-Reply-To: <20180808124925.21031-1-vsementsov@virtuozzo.com>
-References: <20180808124925.21031-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 6/7] Revert "test-hbitmap: Add non-advancing
- iter_next tests"
+	(envelope-from <eblake@redhat.com>) id 1fnNy2-0005zP-Ev
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:53:35 -0400
+References: <20180618164504.24488-1-kwolf@redhat.com>
+	<20180618164504.24488-22-kwolf@redhat.com>
+	<fd4b2077-448f-2b62-8880-b2a3dcca586a@redhat.com>
+	<28f44beb-e19b-3e26-254a-4678eacf30c2@redhat.com>
+	<9d74eea6-3101-3325-e561-d55f112fe68c@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <030bc8d6-a085-c376-51d2-6362cc55e5b0@redhat.com>
+Date: Wed, 8 Aug 2018 07:53:26 -0500
+MIME-Version: 1.0
+In-Reply-To: <9d74eea6-3101-3325-e561-d55f112fe68c@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 21/35] block: fix QEMU crash with scsi-hd
+ and drive_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,105 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-This reverts commit 269576848ec3d57d2d958cf5ac69b08c44adf816.
+On 08/08/2018 06:40 AM, Vladimir Sementsov-Ogievskiy wrote:
 
-The functionality is unused. Drop tests.
+>> I don't know how much the proposed NBD reconnect code will change=20
+>> things in 3.1.=C2=A0 Meanwhile, we've missed any chance for 3.0 to fix=
+ test=20
+>> 83.
+>=20
+> hmm, isn't 3.0 release planned on August 14th?
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/test-hbitmap.c | 36 ++++++++++++------------------------
- 1 file changed, 12 insertions(+), 24 deletions(-)
+Yes, but -rc4 has already been cut, and there will not be an -rc5 unless=20
+there is a MAJOR regression identified in qemu proper (a failing iotest=20
+is not major).
 
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index c11d160633..957caa27ae 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -30,18 +30,6 @@ typedef struct TestHBitmapData {
- } TestHBitmapData;
- 
- 
--static int64_t check_hbitmap_iter_next(HBitmapIter *hbi)
--{
--    int next0, next1;
--
--    next0 = hbitmap_iter_next(hbi, false);
--    next1 = hbitmap_iter_next(hbi, true);
--
--    g_assert_cmpint(next0, ==, next1);
--
--    return next0;
--}
--
- /* Check that the HBitmap and the shadow bitmap contain the same data,
-  * ignoring the same "first" bits.
-  */
-@@ -58,7 +46,7 @@ static void hbitmap_test_check(TestHBitmapData *data,
- 
-     i = first;
-     for (;;) {
--        next = check_hbitmap_iter_next(&hbi);
-+        next = hbitmap_iter_next(&hbi, true);
-         if (next < 0) {
-             next = data->size;
-         }
-@@ -447,25 +435,25 @@ static void test_hbitmap_iter_granularity(TestHBitmapData *data,
-     /* Note that hbitmap_test_check has to be invoked manually in this test.  */
-     hbitmap_test_init(data, 131072 << 7, 7);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
- 
-     hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
--    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
- 
-     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
-     g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
- 
-     hbitmap_test_set(data, (131072 << 7) - 8, 8);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
--    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, 131071 << 7);
--    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
- 
-     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
--    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, 131071 << 7);
--    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
- }
- 
- static void hbitmap_test_set_boundary_bits(TestHBitmapData *data, ssize_t diff)
-@@ -905,7 +893,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmapData *data,
-     for (i = 0; i < num_positions; i++) {
-         hbitmap_deserialize_zeroes(data->hb, positions[i], min_l1, true);
-         hbitmap_iter_init(&iter, data->hb, 0);
--        next = check_hbitmap_iter_next(&iter);
-+        next = hbitmap_iter_next(&iter, true);
-         if (i == num_positions - 1) {
-             g_assert_cmpint(next, ==, -1);
-         } else {
-@@ -931,10 +919,10 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
- 
-     hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
- 
--    check_hbitmap_iter_next(&hbi);
-+    hbitmap_iter_next(&hbi, true);
- 
-     hbitmap_reset_all(data->hb);
--    check_hbitmap_iter_next(&hbi);
-+    hbitmap_iter_next(&hbi, true);
- }
- 
- static void test_hbitmap_next_zero_check_range(TestHBitmapData *data,
--- 
-2.11.1
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
