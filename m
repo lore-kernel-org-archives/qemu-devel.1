@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fnK7S-00016N-24
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 04:47:04 -0400
+	(envelope-from <thuth@redhat.com>) id 1fnK8h-0001hB-HX
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 04:48:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fnK7P-0001AO-0f
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 04:47:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46164 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fnK8e-0001ku-Ao
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 04:48:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41332 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fnK7O-00019u-RG
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 04:46:58 -0400
-Date: Wed, 8 Aug 2018 16:46:47 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180808084647.GA5772@xz-mi>
-References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
-	<20180807091209.13531-9-xiaoguangrong@tencent.com>
-	<20180808050846.GG24415@xz-mi>
-	<503d7733-e2e7-09c5-75a3-1e250f549065@gmail.com>
-	<20180808065619.GK24415@xz-mi>
-	<4c3ebdce-8c4e-8cb4-4dfe-384489224343@gmail.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fnK8e-0001kc-3k
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 04:48:16 -0400
+References: <40d9df00-f80d-02a4-58ec-b407e7dd8cdb@redhat.com>
+	<da05f804-31f4-e820-12ed-22a240bf2d07@ilande.co.uk>
+	<CACXAS8CE9OZ+bxOUQCjDVedqGNUXMRvDWfCWmhf4jqeVzLVGZA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0c11695e-88b9-29f0-caf5-d06612ff49bd@redhat.com>
+Date: Wed, 8 Aug 2018 10:48:13 +0200
 MIME-Version: 1.0
+In-Reply-To: <CACXAS8CE9OZ+bxOUQCjDVedqGNUXMRvDWfCWmhf4jqeVzLVGZA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4c3ebdce-8c4e-8cb4-4dfe-384489224343@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 08/10] migration: handle the error
- condition properly
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] valgrind problem in sun4u_load_kernel()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Aug 08, 2018 at 03:23:22PM +0800, Xiao Guangrong wrote:
+On 06/19/2018 10:03 AM, Artyom Tarasenko wrote:
+> On Sun, Jun 17, 2018 at 12:22 PM, Mark Cave-Ayland
+> <mark.cave-ayland@ilande.co.uk> wrote:
+>> On 15/06/18 11:37, Thomas Huth wrote:
+>>
+>>>   Hi Mark, hi Artyom,
+>>>
+>>> while using valgrind to fix some issues with the rom_ptr() function
+>>> today, I noticed that there is one more problem in sun4u_load_kernel():
+>>> The kernel_top variable can be used uninitialized in some cases:
+>>> If load_elf() fails and the kernel is loaded via load_aout() or
+>>> load_image_targphys(), the kernel_top variable is never set to a valid
+>>> value. This could cause some trouble when loading the initrd later. When
+>>> you've got some spare time, could you please have a look?
+>>
+>>
+>> Hmmm that's an interesting one - I'm not immediately aware of any 64-bit
+>> kernels that are a.out rather than ELF, so I wonder if this has been used to
+>> run a.out executables on startup? Any thoughts, Artyom?
 > 
+> I think there are no Linux/SPARC64 kernels in the a.out format.
+> NetBSD should not be a problem either
 > 
-> On 08/08/2018 02:56 PM, Peter Xu wrote:
-> > On Wed, Aug 08, 2018 at 02:29:52PM +0800, Xiao Guangrong wrote:
-> > > 
-> > > 
-> > > On 08/08/2018 01:08 PM, Peter Xu wrote:
-> > > > On Tue, Aug 07, 2018 at 05:12:07PM +0800, guangrong.xiao@gmail.com wrote:
-> > > > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > > > > 
-> > > > > ram_find_and_save_block() can return negative if any error hanppens,
-> > > > > however, it is completely ignored in current code
-> > > > 
-> > > > Could you hint me where we'll return an error?
-> > > > 
-> > > 
-> > > I think control_save_page() may return a error condition but i am not
-> > > good at it ... Other places look safe _currently_. These functions were
-> > > designed to have error returned anyway.
-> > 
-> > Ah, the RDMA codes...
-> > 
-> > Then I feel like this patch would be more suitable to be put into some
-> > of the RDMA series - at least we'd better be clear about what errors
-> > we're going to capture.  For non-RDMA, it seems a bit helpless after
-> > all - AFAIU we're depending on the few qemu_file_get_error() calls to
-> > detect output errors.
-> 
-> So, are you talking about to modify the semantic of these functions,
-> ram_save_host_page(), ram_save_target_page(), etc, and make them
-> be:
-> "Returns the number of pages written where zero means no dirty pages,
-> error conditions are indicated in the QEMUFile @rs->file if it
-> happened."
-> 
-> If it's what you want, i will update the comments and make the
-> implementation more clear to reflect this fact for these
-> functions
+>> If this is the case then we can only have a valid kernel_top with an ELF
+>> kernel then maybe the following is a good enough solution:
+>>
+>>
+>> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+>> index 3975a7b65a..35acf8c96e 100644
+>> --- a/hw/sparc64/sun4u.c
+>> +++ b/hw/sparc64/sun4u.c
+>> @@ -139,7 +139,7 @@ static uint64_t sun4u_load_kernel(const char
+>> *kernel_filename,
+>>      unsigned int i;
+>>      long kernel_size;
+>>      uint8_t *ptr;
+>> -    uint64_t kernel_top;
+>> +    uint64_t kernel_top = 0;
+>>
+>>      linux_boot = (kernel_filename != NULL);
+>>
+>> @@ -172,7 +172,7 @@ static uint64_t sun4u_load_kernel(const char
+>> *kernel_filename,
+>>          }
+>>          /* load initrd above kernel */
+>>          *initrd_size = 0;
+>> -        if (initrd_filename) {
+>> +        if (initrd_filename && kernel_top) {
+>>              *initrd_addr = TARGET_PAGE_ALIGN(kernel_top);
+>>
+>>              *initrd_size = load_image_targphys(initrd_filename,
+>>
+>>
+> Looks good to me.
+> Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
-Not really; I am just unclear about how this patch could help current
-code, however I have no objection on the content.  Let's see whether
-Dave or Juan would like it.
+ Hi Mark,
 
-Thanks,
+that looked also fine to me. Could you post it as a proper patch, please?
 
--- 
-Peter Xu
+ Thanks,
+  Thomas
