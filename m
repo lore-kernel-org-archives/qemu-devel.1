@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fnPyA-0001xZ-BD
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:01:56 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fnQBx-0005pG-TB
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:16:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fnPy5-0003gr-HX
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:01:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48786)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fnPy5-0003cM-AO
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:01:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fnPy2-0005HH-DW
-	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 15:01:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AE7EC2E8181
-	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 15:01:41 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Aug 2018 14:54:55 -0000
-From: umarcor <1783362@bugs.launchpad.net>
-Reply-To: Bug 1783362 <1783362@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153244909751.11925.3364609945591086988.malonedeb@gac.canonical.com>
-Message-Id: <153374009669.18002.15272518611430411362.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1783362] Re: qemu-user: mmap should return
- failure (MAP_FAILED, -1) instead of success (NULL, 0) when len==0
+	(envelope-from <imammedo@redhat.com>) id 1fnQBu-0002gc-4k
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:16:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56706 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fnQBt-0002g6-Vy
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 11:16:02 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E4AA5402315B
+	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 15:16:00 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Wed,  8 Aug 2018 17:15:46 +0200
+Message-Id: <1533741349-199141-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1533741349-199141-1-git-send-email-imammedo@redhat.com>
+References: <1533741349-199141-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH 1/4] acpi: aml: add aml_register()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,80 +30,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+From: "Michael S. Tsirkin" <mst@redhat.com>
 
-** Changed in: qemu (Ubuntu)
-       Status: Fix Committed =3D> Fix Released
+Based on a patch by Igor Mammedov.
 
--- =
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ include/hw/acpi/aml-build.h |  5 +++++
+ hw/acpi/aml-build.c         | 21 +++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1783362
-
-Title:
-  qemu-user: mmap should return failure (MAP_FAILED, -1) instead of
-  success (NULL, 0) when len=3D=3D0
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-
-Bug description:
-  As shown in https://github.com/beehive-
-  lab/mambo/issues/19#issuecomment-407420602, with len=3D=3D0 mmap returns
-  success (NULL, 0) instead of failure (MAP_FAILED, -1) in a x86_64 host
-  executing a ELF 64-bit LSB executable, ARM aarch64 binary.
-
-  Steps to reproduce the bug:
-
-  - (cross-)compile the attached source file:
-
-  $ aarch64-linux-gnu-gcc -static -std=3Dgnu99 -lpthread test/mmap_qemu.c
-  -o mmap_qemu
-
-  - Execute in a x86_64 host with qemu-user and qemu-user-binfmt:
-
-  $ ./mmap_qemu
-  alloc: 0
-  MAP_FAILED: -1
-  errno: 0
-  mmap_qemu: test/mmap_qemu.c:15: main: Assertion `alloc =3D=3D MAP_FAILED'=
- failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  Aborted (core dumped)
-
-  - Execute in a ARM host without any additional dependecy:
-
-  $ ./mmap_qemu
-  alloc: -1
-  MAP_FAILED: -1
-  errno: 22
-
-  The bug is present in Fedora:
-
-  $ qemu-aarch64 --version
-  qemu-aarch64 version 2.11.2(qemu-2.11.2-1.fc28)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  $ uname -r
-  4.17.7-200.fc28.x86_64
-
-  And also in Ubuntu:
-
-  $ qemu-aarch64 --version
-  qemu-aarch64 version 2.12.0 (Debian 1:2.12+dfsg-3ubuntu3)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  $ uname -r
-  4.15.0-23-generic
-
-  Possibly related to:
-
-  - https://lists.freebsd.org/pipermail/freebsd-hackers/2009-July/029109.ht=
-ml
-  - https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=3D203852
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1783362/+subscriptions
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 6c36903..10c7946 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -346,6 +346,11 @@ Aml *aml_qword_memory(AmlDecode dec, AmlMinFixed min_fixed,
+                       uint64_t len);
+ Aml *aml_dma(AmlDmaType typ, AmlDmaBusMaster bm, AmlTransferSize sz,
+              uint8_t channel);
++Aml *aml_register(AmlAddressSpace as,
++                  uint8_t bit_width,
++                  uint8_t bit_offset,
++                  uint64_t address,
++                  uint8_t access_size);
+ Aml *aml_sleep(uint64_t msec);
+ 
+ /* Block AML object primitives */
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 1e43cd7..def62b3 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -874,6 +874,27 @@ Aml *aml_irq_no_flags(uint8_t irq)
+     return var;
+ }
+ 
++/*
++ * ACPI: 2.0: 16.2.4.16 ASL Macro for Generic Register Descriptor
++ *
++ * access_size comes from:
++ *     ACPI 3.0: 17.5.98 Register (Generic Register Resource Descriptor Macro)
++ */
++Aml *aml_register(AmlAddressSpace as,
++                  uint8_t bit_width,
++                  uint8_t bit_offset,
++                  uint64_t address,
++                  uint8_t access_size)
++{
++    Aml *var = aml_alloc();
++
++    build_append_byte(var->buf, 0x82);        /* Generic Register Descriptor */
++    build_append_byte(var->buf, 0x0C);        /* Length, bits[7:0] */
++    build_append_byte(var->buf, 0x0);         /* Length, bits[15:8] */
++    build_append_gas(var->buf, as, bit_width, bit_offset, access_size, address);
++    return var;
++}
++
+ /* ACPI 1.0b: 16.2.5.4 Type 2 Opcodes Encoding: DefLNot */
+ Aml *aml_lnot(Aml *arg)
+ {
+-- 
+2.7.4
