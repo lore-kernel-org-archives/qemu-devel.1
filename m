@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fnNu9-0004dB-MS
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:49:34 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fnNu9-0004dG-Oa
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:49:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fnNu6-0004Dk-K2
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fnNu6-0004Dp-KK
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:49:33 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed,  8 Aug 2018 15:49:21 +0300
-Message-Id: <20180808124925.21031-4-vsementsov@virtuozzo.com>
+Date: Wed,  8 Aug 2018 15:49:23 +0300
+Message-Id: <20180808124925.21031-6-vsementsov@virtuozzo.com>
 In-Reply-To: <20180808124925.21031-1-vsementsov@virtuozzo.com>
 References: <20180808124925.21031-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 3/7] dirty-bitmap: add
- bdrv_dirty_bitmap_next_dirty_area
+Subject: [Qemu-devel] [PATCH v2 5/7] Revert "block/dirty-bitmap: Add
+ bdrv_dirty_iter_next_area"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,123 +23,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-The function alters bdrv_dirty_iter_next_area(), which is wrong and
-less efficient (see next commit for description).
+This reverts commit 72d10a94213a954ad569095cb4491f2ae0853c40.
+
+The function is unused now.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/dirty-bitmap.h |  3 +++
- include/qemu/hbitmap.h       | 15 +++++++++++++++
- block/dirty-bitmap.c         |  7 +++++++
- util/hbitmap.c               | 38 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 63 insertions(+)
+ include/block/dirty-bitmap.h |  2 --
+ block/dirty-bitmap.c         | 55 --------------------------------------------
+ 2 files changed, 57 deletions(-)
 
 diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 5dc146abf3..c02be67564 100644
+index c02be67564..3cab01eb4c 100644
 --- a/include/block/dirty-bitmap.h
 +++ b/include/block/dirty-bitmap.h
-@@ -100,6 +100,9 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
- char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
- int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start,
-                                     uint64_t bytes);
-+bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
-+                                       uint64_t *offset, uint64_t end,
-+                                       uint64_t *length);
- BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
-                                                   BdrvDirtyBitmap *bitmap,
-                                                   Error **errp);
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index cd091f6134..b1e897af28 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -306,6 +306,21 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi);
-  */
- int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count);
- 
-+/* hbitmap_next_dirty_area:
-+ * @hb: The HBitmap to operate on
-+ * @offset: in-out parameter.
-+ *          in: the offset to start from
-+ *          out: (if area found) start of found area
-+ * @end: end of requested region. (*@offset + *@length) will be <= @end
-+ * @length: length of found area
-+ *
-+ * If dirty area found within [@offset, @end), returns true and sets @offset
-+ * and @length appropriately. Otherwise returns true and leaves @offset and
-+ * @length unchanged.
-+ */
-+bool hbitmap_next_dirty_area(const HBitmap *hb, uint64_t *offset,
-+                             uint64_t end, uint64_t *length);
-+
- /* hbitmap_create_meta:
-  * Create a "meta" hbitmap to track dirtiness of the bits in this HBitmap.
-  * The caller owns the created bitmap and must call hbitmap_free_meta(hb) to
+@@ -83,8 +83,6 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
+ void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
+                                     int64_t offset, int64_t bytes);
+ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
+-bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
+-                               uint64_t *offset, int *bytes);
+ void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
+ int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
+ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index a9ee814da7..c24aa0e229 100644
+index c24aa0e229..35987e66a8 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -791,6 +791,13 @@ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset,
-     return hbitmap_next_zero(bitmap->bitmap, offset, bytes);
+@@ -528,61 +528,6 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
+     return hbitmap_iter_next(&iter->hbi, true);
  }
  
-+bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
-+                                       uint64_t *offset, uint64_t end,
-+                                       uint64_t *length)
-+{
-+    return hbitmap_next_dirty_area(bitmap->bitmap, offset, end, length);
-+}
-+
- void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
-                              Error **errp)
- {
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 8dbcd80a3d..9de0d7bf2d 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -244,6 +244,44 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count)
-     return res;
- }
- 
-+bool hbitmap_next_dirty_area(const HBitmap *hb, uint64_t *offset,
-+                             uint64_t end, uint64_t *length)
-+{
-+    HBitmapIter hbi;
-+    int64_t off1, off0;
-+    uint32_t granularity = 1UL << hb->granularity;
-+
-+    if (end == 0) {
-+        end = hb->orig_size;
-+    }
-+
-+    hbitmap_iter_init(&hbi, hb, *offset << hb->granularity);
-+    off1 = hbitmap_iter_next(&hbi, true);
-+
-+    if (off1 < 0 || off1 >= end) {
-+        return false;
-+    }
-+
-+    if (off1 + granularity >= end) {
-+        if (off1 > *offset) {
-+            *offset = off1;
-+        }
-+        *length = end - *offset;
-+        return true;
-+    }
-+
-+    off0 = hbitmap_next_zero(hb, off1 + granularity, end);
-+    if (off0 < 0) {
-+        off0 = end;
-+    }
-+
-+    if (off1 > *offset) {
-+        *offset = off1;
-+    }
-+    *length = off0 - *offset;
-+    return true;
-+}
-+
- bool hbitmap_empty(const HBitmap *hb)
- {
-     return hb->count == 0;
+-/**
+- * Return the next consecutively dirty area in the dirty bitmap
+- * belonging to the given iterator @iter.
+- *
+- * @max_offset: Maximum value that may be returned for
+- *              *offset + *bytes
+- * @offset:     Will contain the start offset of the next dirty area
+- * @bytes:      Will contain the length of the next dirty area
+- *
+- * Returns: True if a dirty area could be found before max_offset
+- *          (which means that *offset and *bytes then contain valid
+- *          values), false otherwise.
+- *
+- * Note that @iter is never advanced if false is returned.  If an area
+- * is found (which means that true is returned), it will be advanced
+- * past that area.
+- */
+-bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
+-                               uint64_t *offset, int *bytes)
+-{
+-    uint32_t granularity = bdrv_dirty_bitmap_granularity(iter->bitmap);
+-    uint64_t gran_max_offset;
+-    int64_t ret;
+-    int size;
+-
+-    if (max_offset == iter->bitmap->size) {
+-        /* If max_offset points to the image end, round it up by the
+-         * bitmap granularity */
+-        gran_max_offset = ROUND_UP(max_offset, granularity);
+-    } else {
+-        gran_max_offset = max_offset;
+-    }
+-
+-    ret = hbitmap_iter_next(&iter->hbi, false);
+-    if (ret < 0 || ret + granularity > gran_max_offset) {
+-        return false;
+-    }
+-
+-    *offset = ret;
+-    size = 0;
+-
+-    assert(granularity <= INT_MAX);
+-
+-    do {
+-        /* Advance iterator */
+-        ret = hbitmap_iter_next(&iter->hbi, true);
+-        size += granularity;
+-    } while (ret + granularity <= gran_max_offset &&
+-             hbitmap_iter_next(&iter->hbi, false) == ret + granularity &&
+-             size <= INT_MAX - granularity);
+-
+-    *bytes = MIN(size, max_offset - *offset);
+-    return true;
+-}
+-
+ /* Called within bdrv_dirty_bitmap_lock..unlock */
+ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
+                                   int64_t offset, int64_t bytes)
 -- 
 2.11.1
