@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fnOOd-0003Uy-4m
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 09:21:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1fnOYJ-0005mZ-V7
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 09:31:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fnOOY-0007BN-5o
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 09:21:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56656)
+	(envelope-from <bounces@canonical.com>) id 1fnOYF-0002pC-P9
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 09:31:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60848)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fnOOX-0007Aa-UE
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 09:20:58 -0400
+	id 1fnOYF-0002oc-Hp
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 09:30:59 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fnOOT-0005MG-Ul
-	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 13:20:54 +0000
+	id 1fnOYC-0007iV-LX
+	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 13:30:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B0DD12E80D5
-	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 13:20:52 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5F2E42E80D1
+	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 13:30:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Aug 2018 13:14:26 -0000
-From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Date: Wed, 08 Aug 2018 13:23:11 -0000
+From: Bharata B Rao <1785972@bugs.launchpad.net>
 Reply-To: Bug 1785972 <1785972@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153371136089.29473.12663307170219083138.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153373406678.29509.3810737145052415777.malone@chaenomeles.canonical.com>
+Message-Id: <153373459147.3443.4550096621765346347.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1785972] Re: v3.0.0-rc4: VM fails to start after
  vcpuhotunplug, managedsave sequence
@@ -39,8 +39,15 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Last good commit I could find, 2309832afdaf8d6451ebc2e81bace8eb8ea41293
-where both vcpu hotplug and managed save sequence worked fine.
+The first commit that causes this issue is:
+
+b94020268e0b6659499e250d25346baaa9888fed (spapr_cpu_core: migrate per-
+CPU data)
+
+Simpler way to reproduce:
+1. Hotplug a CPU
+2. Hot unplug it
+3. Migrate the VM (will fail)
 
 -- =
 
