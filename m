@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fnPBL-0000sv-5J
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:11:24 -0400
+	(envelope-from <berto@igalia.com>) id 1fnPDV-00022t-Jx
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:13:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fnPBH-0006JR-5E
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:11:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47758 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fnPBG-0006IX-Vq
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:11:19 -0400
-Date: Wed, 8 Aug 2018 15:11:13 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180808141112.GK2734@work-vm>
-References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
-	<20180807091209.13531-9-xiaoguangrong@tencent.com>
-	<20180808050846.GG24415@xz-mi>
-	<503d7733-e2e7-09c5-75a3-1e250f549065@gmail.com>
+	(envelope-from <berto@igalia.com>) id 1fnPDR-0007Mq-K2
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:13:37 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180808071051.30628-4-lbloch@janustech.com>
+References: <20180808071051.30628-1-lbloch@janustech.com>
+	<20180808071051.30628-4-lbloch@janustech.com>
+Date: Wed, 08 Aug 2018 16:13:29 +0200
+Message-ID: <w514lg5t08m.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <503d7733-e2e7-09c5-75a3-1e250f549065@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 08/10] migration: handle the error
- condition properly
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] qcow2: Resize the cache upon image
+ resizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: Peter Xu <peterx@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-* Xiao Guangrong (guangrong.xiao@gmail.com) wrote:
-> 
-> 
-> On 08/08/2018 01:08 PM, Peter Xu wrote:
-> > On Tue, Aug 07, 2018 at 05:12:07PM +0800, guangrong.xiao@gmail.com wrote:
-> > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > > 
-> > > ram_find_and_save_block() can return negative if any error hanppens,
-> > > however, it is completely ignored in current code
-> > 
-> > Could you hint me where we'll return an error?
-> > 
-> 
-> I think control_save_page() may return a error condition but i am not
-> good at it ... Other places look safe _currently_. These functions were
-> designed to have error returned anyway.
+On Wed 08 Aug 2018 09:10:49 AM CEST, Leonid Bloch wrote:
+> The caches are now recalculated upon image resizing. This is done
+> because the new default behavior of assigning a sufficient L2 cache to
+> cover the entire image implies that the cache will still be sufficient
+> after an image resizing.
 
-ram_control_save_page's return is checked by control_save_page which
-returns true/false but sets *pages to a return value.
+This is related to what I mentioned in the previous patch. The default
+behavior doesn't make the cache try to cover the entire image (or at
+least it doesn't *extend* the cache, which is what I understand from
+this paragraph). What it does is *reduce* the cache if the smaller
+version is enough for the entire image.
 
-What I'd need to follow closely is the case where ram_control_save_page
-returns RAM_SAVE_CONTROL_DELAYED, in that case control_save_page I think
-returns with *pages=-1 and returns true.
-And I think in that case ram_save_target_page can leak that -1 - hmm.
+> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+> ---
+>  block/qcow2.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 98cb96aaca..f60cb92169 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -3639,6 +3639,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+>          }
+>      }
+>  
+> +    bs->total_sectors = offset / BDRV_SECTOR_SIZE;
+> +
+>      /* write updated header.size */
+>      offset = cpu_to_be64(offset);
+>      ret = bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
+> @@ -3649,6 +3651,12 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+>      }
+>  
+>      s->l1_vm_state_index = new_l1_size;
 
-Now, ram_save_host_page already checks for <0 and will return that,
-but I think that would potentially loop in ram_find_and_save_block; I'm
-not sure we want to change that or not!
+You could add an empty line here for readability.
 
-Dave
+> +    /* Update cache sizes */
+> +    QDict *options = qdict_clone_shallow(bs->options);
 
-> 
-> > (Anyway I agree that the error handling is not that good, mostly
-> >   because the QEMUFile APIs does not provide proper return code, e.g.,
-> >   qemu_put_be64 returns void)
-> > 
-> 
-> Yes, it is, the returned error condition is mixed in file's API and
-> function's return value... :(
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+C99 allows variable declarations in the middle of a block, but we're
+still doing it at the beginning (I don't know if there's a good reason
+for this?).
+
+Otherwise the patch looks good to me. Thanks!
+
+Berto
