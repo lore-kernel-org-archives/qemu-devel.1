@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fnW4m-0007Fi-Dd
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 17:33:05 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fnWgf-0002RA-Fx
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 18:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fnW4l-0006aS-J9
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 17:33:04 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fnWgb-00026L-GO
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 18:12:13 -0400
+From: Leonid Bloch <lbloch@janustech.com>
+Date: Thu,  9 Aug 2018 01:11:33 +0300
+Message-Id: <20180808221138.5770-1-lbloch@janustech.com>
 MIME-Version: 1.0
-In-Reply-To: <20180803144721.17036-4-stefanha@redhat.com>
-References: <20180803144721.17036-1-stefanha@redhat.com>
-	<20180803144721.17036-4-stefanha@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 8 Aug 2018 14:32:31 -0700
-Message-ID: <CAKmqyKOLkNzAQgrr9rRYTCzrDnsjj1uChDaX4-2xnJMrEtEUKw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 3/6] loader: extract rom_free() function
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 0/5] qcow2: Take the image size into account
+ when allocating the L2 cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,74 +20,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, mail@steffen-goertz.de, Su Hang <suhang16@mails.ucas.ac.cn>, Liviu Ionescu <ilg@livius.net>, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, jusual@mail.ru
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>
 
-On Fri, Aug 3, 2018 at 7:47 AM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The next patch will need to free a rom.  There is already code to do
-> this in rom_add_file().
->
-> Note that rom_add_file() uses:
->
->   rom = g_malloc0(sizeof(*rom));
->   ...
->   if (rom->fw_dir) {
->       g_free(rom->fw_dir);
->       g_free(rom->fw_file);
->   }
->
-> The conditional is unnecessary since g_free(NULL) is a no-op.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+This series makes the qcow2 L2 cache assignment aware of the image size,
+with the intention for it to cover the entire image. The importance of
+this change is in noticeable performance improvement, especially with
+heavy random I/O. The memory overhead is not big in most cases, as only
+1 MB of cache for every 8 GB of image size is used. For cases with very
+large images and/or small cluster sizes, or systems with limited RAM
+resources, there is an upper limit on the default L2 cache: 32 MB. To
+modify this limit one can use the already existing 'l2-cache-size' and
+'cache-size' options. Moreover, this fixes the behavior of 'l2-cache-size',
+as it was documented as the *maximum* L2 cache size, but in practice
+behaved as the absolute size.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+To compensate the memory overhead which may be increased following this
+behavior, the default cache-clean-interval is set to 10 minutes by default
+(was disabled by default before).
 
-Alistair
+The L2 cache is also resized accordingly, by default, if the image is
+resized.
 
-> ---
->  hw/core/loader.c | 21 ++++++++++++---------
->  1 file changed, 12 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index bbb6e65bb5..0c72e7c05a 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -847,6 +847,17 @@ struct Rom {
->  static FWCfgState *fw_cfg;
->  static QTAILQ_HEAD(, Rom) roms = QTAILQ_HEAD_INITIALIZER(roms);
->
-> +/* rom->data must be heap-allocated (do not use with rom_add_elf_program()) */
-> +static void rom_free(Rom *rom)
-> +{
-> +    g_free(rom->data);
-> +    g_free(rom->path);
-> +    g_free(rom->name);
-> +    g_free(rom->fw_dir);
-> +    g_free(rom->fw_file);
-> +    g_free(rom);
-> +}
-> +
->  static inline bool rom_order_compare(Rom *rom, Rom *item)
->  {
->      return ((uintptr_t)(void *)rom->as > (uintptr_t)(void *)item->as) ||
-> @@ -995,15 +1006,7 @@ err:
->      if (fd != -1)
->          close(fd);
->
-> -    g_free(rom->data);
-> -    g_free(rom->path);
-> -    g_free(rom->name);
-> -    if (fw_dir) {
-> -        g_free(rom->fw_dir);
-> -        g_free(rom->fw_file);
-> -    }
-> -    g_free(rom);
-> -
-> +    rom_free(rom);
->      return -1;
->  }
->
-> --
-> 2.17.1
->
->
+Additionally, few minor changes are made (refactoring and documentation
+fixes).
+
+Differences from v1:
+* .gitignore modification patch removed (unneeded).
+* The grammar fix in conflicting cache sizing patch removed (merged).
+* The update total_sectors when resizing patch squashed with the
+  resizing patch.
+* L2 cache is now capped at 32 MB.
+* The default cache-clean-interval is set to 30 seconds.
+
+Differences from v2:
+* Made it clear in the documentation that setting cache-clean-interval
+  to 0 disables this feature.
+
+Differences from v3:
+* The default cache-clean-interval is set to 10 minutes instead of 30
+  seconds before.
+* Commit message changes to better explain the patches.
+* Some refactoring.
+
+Leonid Bloch (5):
+  qcow2: Options' documentation fixes
+  qcow2: Assign the L2 cache relatively to image size
+  qcow2: Resize the cache upon image resizing
+  qcow2: Set the default cache-clean-interval to 10 minutes
+  qcow2: Explicit number replaced by a constant
+
+ block/qcow2.c              | 49 ++++++++++++++++++++------------------
+ block/qcow2.h              |  5 ++--
+ docs/qcow2-cache.txt       | 31 ++++++++++++++----------
+ qapi/block-core.json       |  3 ++-
+ qemu-options.hx            | 11 +++++----
+ tests/qemu-iotests/137     |  1 -
+ tests/qemu-iotests/137.out |  1 -
+ 7 files changed, 56 insertions(+), 45 deletions(-)
+
+-- 
+2.17.1
