@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fnKdI-0002ni-EY
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:19:57 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fnKqI-0006zv-S2
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:33:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fnKdE-0002EU-DR
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:19:56 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:34417)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fnKdD-0002Du-Sy
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:19:52 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id l2-v6so75150wme.1
-	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 02:19:51 -0700 (PDT)
-References: <BN7PR08MB48688EB667F7EDFF86B90D2CC6200@BN7PR08MB4868.namprd08.prod.outlook.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <BN7PR08MB48688EB667F7EDFF86B90D2CC6200@BN7PR08MB4868.namprd08.prod.outlook.com>
-Date: Wed, 08 Aug 2018 10:19:48 +0100
-Message-ID: <87zhxxp64r.fsf@linaro.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fnKqF-000100-Lv
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:33:22 -0400
+References: <20180618164504.24488-1-kwolf@redhat.com>
+	<20180618164504.24488-22-kwolf@redhat.com>
+	<fd4b2077-448f-2b62-8880-b2a3dcca586a@redhat.com>
+	<28f44beb-e19b-3e26-254a-4678eacf30c2@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <bfd7fd9e-11ad-3aa3-68b8-b9b46df36f1a@virtuozzo.com>
+Date: Wed, 8 Aug 2018 12:33:10 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <28f44beb-e19b-3e26-254a-4678eacf30c2@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Question: How to integrate simple tests for a new
- platform so that they fit in well within QEMU
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PULL 21/35] block: fix QEMU crash with scsi-hd
+ and drive_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +27,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Petar Jovanovic <pjovanovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-
-Aleksandar Markovic <amarkovic@wavecomp.com> writes:
-
-> Hello, folks.
+07.08.2018 22:57, Eric Blake wrote:
+> On 08/06/2018 05:04 PM, Eric Blake wrote:
+>> On 06/18/2018 11:44 AM, Kevin Wolf wrote:
+>>> From: Greg Kurz <groug@kaod.org>
+>>>
+>>> Removing a drive with drive_del while it is being used to run an I/O
+>>> intensive workload can cause QEMU to crash.
+>>>
+>> ...
 >
-> We are introducing a new MIPS platform - called nanoMIPS - to the QEMU.
+>>
+>> Test 83 sets up a client that intentionally disconnects at critical=20
+>> points in the NBD protocol exchange, to ensure that the server reacts=20
+>> sanely.
 >
-> Besides providing new functionality, we would like to integrate into QEMU=
- some basic testing capabilities for that new platform. Something like this:
+> Rather, nbd-fault-injector.py is a server that disconnects at critical=20
+> points, and the test is of client reaction.
 >
->     Enable user to specify cross compiler and, using QEMU Linux user mode:
->         a. execute several tests that are just almost minimal tests of em=
-ulation of selected instructions.
->         b. execute several tests that are just almost minimal tests of
->     translation of selected system calls.
+>> =C2=A0 I suspect that somewhere in the NBD code, the server detects the=
+=20
+>> disconnect and was somehow calling into blk_remove_bs() (although I=20
+>> could not quickly find the backtrace); and that prior to this patch,=20
+>> the 'Connection closed' message resulted from other NBD coroutines=20
+>> getting a shot at the (now-closed) connection, while after this=20
+>> patch, the additional blk_drain() somehow tweaks things in a way that=20
+>> prevents the other NBD coroutines from printing a message.=C2=A0 If so,=
+=20
+>> then the change in 83 reference output is probably intentional, and=20
+>> we should update it.
 >
-> In other words, this would enable a user to run "smoke tests" for nanoMIP=
-S platform, and perhaps to use these tests as a starting point for some oth=
-er tests.
+> It seems like this condition is racy, and that the race is more likely=20
+> to be lost prior to this patch than after. It's a question of whether=20
+> the client has time to start a request to the server prior to the=20
+> server hanging up, as the message is generated during=20
+> nbd_co_do_receive_one_chunk.=C2=A0 Here's a demonstration of the fact tha=
+t=20
+> things are racy:
 >
-> My question is:
+> $ git revert f45280cbf
+> $ make
+> $ cd tests/qemu-iotests
+> $ cat fault.txt
+> [inject-error "a"]
+> event=3Dneg2
+> when=3Dafter
+> $ python nbd-fault-injector.py localhost:10809 ./fault.txt &
+> Listening on 127.0.0.1:10809
+> $ ../../qemu-io -f raw nbd://localhost:10809 -c 'r 0 512'
+> Closing connection on rule match inject-error "a"
+> Connection closed
+> read failed: Input/output error
+> $ python nbd-fault-injector.py localhost:10809 ./fault.txt &
+> Listening on 127.0.0.1:10809
+> $ ../../qemu-io -f raw nbd://localhost:10809
+> Closing connection on rule match inject-error "a"
+> qemu-io> r 0 512
+> read failed: Input/output error
+> qemu-io> q
 >
-> 1. Is this a good idea at all?
+> So, depending on whether the read command is kicked off quickly (via=20
+> -c) or slowly (via typing into qemu-io) determines whether the message=20
+> appears.
+>
+> What's more, in commit f140e300, we specifically called out in the=20
+> commit message that maybe it was better to trace when we detect=20
+> connection closed rather than log it to stdout, and in all cases in=20
+> that commit, the additional 'Connection closed' messages do not add=20
+> any information to the error message already displayed by the rest of=20
+> the code.
+>
+> I don't know how much the proposed NBD reconnect code will change=20
+> things in 3.1.=C2=A0 Meanwhile, we've missed any chance for 3.0 to fix te=
+st=20
+> 83.
+>
+>>
+>> But I'm having a hard time convincing myself that this is the case,=20
+>> particularly since I'm not even sure how to easily debug the=20
+>> assumptions I made above.
+>>
+>> Since I'm very weak on the whole notion of what blk_drain() vs.=20
+>> blk_remove_bs() is really supposed to be doing, and could easily be=20
+>> persuaded that the change in output is a regression instead of a fix.
+>
+> At this point, I don't think we have a regression, just merely a bad=20
+> iotests reference output. The extra blk_drain() merely adds more time=20
+> before the NBD code can send out its first request, and thus makes it=20
+> more likely that the fault injector has closed the connection before=20
+> the read request is issued rather than after (the message only appears=20
+> when read beats the race), but the NBD code shouldn't be printing the=20
+> error message in the first place, and 083 needs to be tweaked to=20
+> remove the noisy lines added in f140e300 (not just the three lines=20
+> that are reliably different due to this patch, but all other such=20
+> lines due to strategic server drops at other points in the NBD protocol).
+>
 
-Totally. The test/tcg section languished for awhile as most people don't
-have cross compilers set up. Thanks to docker we can now have a fall-back to
-known good cross-compilers while still supporting local setups with
---cross-cc-ARCH and --cross-cc-flags-ARCH.
+Ok, agree, I'll do it in reconnect series.
 
-> 2. If yes, what would be the best way to integrate these tests into
-> current QEMU test organization?
-
-So currently tests/tcg is setup for linux-user testing. It will run
-everything in tests/tcg/multiarch and any additional user-mode tests in
-tests/tcg/ARCH as governed by the Makefile.include.
-
-For the existing MIPS it is basically multiarch however there are
-sub-directories that are system tests that need to be re-integrated. We
-have cross compilers for a bunch of the existing MIPS platforms in the
-form of:
-
-  debian-mips-cross.docker
-  debian-mips64-cross.docker
-  debian-mipsel-cross.docker
-  debian-mipsn32-cross.docker
-  debian-mips64el-cross.docker
-
-If you would like to help resurrect the system emulation testing for the
-existing MIPS tests I would welcome the help. I think all the
-infrastructure for compilers is already there so it should just be a
-case of tweaking the Makefile structure a little.
-
-> I appreciate any opinion of yours.
-
-So the first question that needs to be answered is where can you get
-nanoMIPS compilers?
-
-For some of the more esoteric architectures QEMU supports we ended up
-using Debian's rolling Sid distribution as it still contains cross
-compilers for unofficial architectures that are in ports. If there is
-any push for getting a nanoMIPS Debian release that might be the
-quickest way. Otherwise you would need to write a dockerfile to install
-the toolchain on some reasonable base system - see for example
-debian-tricore-cross.docker which basically builds Bastien's fork of
-binutils.
-
-You don't have to build the toolchain from scratch - however it would
-nice to have a clear idea from of where the source for the toolchain
-comes from. At least with Debian images we know any binary is only an
-apt-get source away from it's code.
-
-If you have any more questions please ask away and also CC me on any
-patches (MAINTAINERS should take care of this).
-
---
-Alex Benn=C3=A9e
+--=20
+Best regards,
+Vladimir
