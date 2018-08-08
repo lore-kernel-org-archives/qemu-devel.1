@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fnPWI-0007n6-AX
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:33:06 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fnPYq-0000zo-4o
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:35:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fnPWC-0002o8-6Q
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:33:02 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20180618164504.24488-1-kwolf@redhat.com>
-	<20180618164504.24488-22-kwolf@redhat.com>
-	<fd4b2077-448f-2b62-8880-b2a3dcca586a@redhat.com>
-	<28f44beb-e19b-3e26-254a-4678eacf30c2@redhat.com>
-	<bfd7fd9e-11ad-3aa3-68b8-b9b46df36f1a@virtuozzo.com>
-Message-ID: <20070601-f5e0-6433-e266-823341d09634@virtuozzo.com>
-Date: Wed, 8 Aug 2018 17:32:23 +0300
+	(envelope-from <lbloch@janustech.com>) id 1fnPYo-0003zc-TZ
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 10:35:40 -0400
+References: <20180808071051.30628-1-lbloch@janustech.com>
+	<20180808071051.30628-3-lbloch@janustech.com>
+	<w51d0utt4kk.fsf@maestria.local.igalia.com>
+	<f1197908-f00f-1c2b-b63c-3339e39488c5@janustech.com>
+	<w517el1t0yd.fsf@maestria.local.igalia.com>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <350a86fa-5341-ddc2-e2c4-f75648830248@janustech.com>
+Date: Wed, 8 Aug 2018 17:35:19 +0300
 MIME-Version: 1.0
-In-Reply-To: <bfd7fd9e-11ad-3aa3-68b8-b9b46df36f1a@virtuozzo.com>
+In-Reply-To: <w517el1t0yd.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PULL 21/35] block: fix QEMU crash with scsi-hd
- and drive_del
+Content-Language: en-GB-large
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] qcow2: Make the default L2 cache
+ sufficient to cover the entire image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,119 +28,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-08.08.2018 12:33, Vladimir Sementsov-Ogievskiy wrote:
-> 07.08.2018 22:57, Eric Blake wrote:
->> On 08/06/2018 05:04 PM, Eric Blake wrote:
->>> On 06/18/2018 11:44 AM, Kevin Wolf wrote:
->>>> From: Greg Kurz <groug@kaod.org>
->>>>
->>>> Removing a drive with drive_del while it is being used to run an I/O
->>>> intensive workload can cause QEMU to crash.
->>>>
->>> ...
->>
+On 08/08/2018 04:58 PM, Alberto Garcia wrote:
+> On Wed 08 Aug 2018 03:07:10 PM CEST, Leonid Bloch wrote:
+>> On 08/08/2018 03:39 PM, Alberto Garcia wrote:
+>>> On Wed 08 Aug 2018 09:10:48 AM CEST, Leonid Bloch wrote:
+>>>> Sufficient L2 cache can noticeably improve the performance when using
+>>>> large images with frequent I/O. The memory overhead is not significant
+>>>> in most cases, as the cache size is only 1 MB for each 8 GB of virtual
+>>>> image size (with the default cluster size of 64 KB). For cases with very
+>>>> large images and/or small cluster sizes, there is an upper limit on the
+>>>> default L2 cache: 32 MB.
 >>>
->>> Test 83 sets up a client that intentionally disconnects at critical=20
->>> points in the NBD protocol exchange, to ensure that the server=20
->>> reacts sanely.
->>
->> Rather, nbd-fault-injector.py is a server that disconnects at=20
->> critical points, and the test is of client reaction.
->>
->>> =C2=A0 I suspect that somewhere in the NBD code, the server detects the=
-=20
->>> disconnect and was somehow calling into blk_remove_bs() (although I=20
->>> could not quickly find the backtrace); and that prior to this patch,=20
->>> the 'Connection closed' message resulted from other NBD coroutines=20
->>> getting a shot at the (now-closed) connection, while after this=20
->>> patch, the additional blk_drain() somehow tweaks things in a way=20
->>> that prevents the other NBD coroutines from printing a message.=C2=A0 I=
-f=20
->>> so, then the change in 83 reference output is probably intentional,=20
->>> and we should update it.
->>
->> It seems like this condition is racy, and that the race is more=20
->> likely to be lost prior to this patch than after. It's a question of=20
->> whether the client has time to start a request to the server prior to=20
->> the server hanging up, as the message is generated during=20
->> nbd_co_do_receive_one_chunk.=C2=A0 Here's a demonstration of the fact th=
-at=20
->> things are racy:
->>
->> $ git revert f45280cbf
->> $ make
->> $ cd tests/qemu-iotests
->> $ cat fault.txt
->> [inject-error "a"]
->> event=3Dneg2
->> when=3Dafter
->> $ python nbd-fault-injector.py localhost:10809 ./fault.txt &
->> Listening on 127.0.0.1:10809
->> $ ../../qemu-io -f raw nbd://localhost:10809 -c 'r 0 512'
->> Closing connection on rule match inject-error "a"
->> Connection closed
->> read failed: Input/output error
->> $ python nbd-fault-injector.py localhost:10809 ./fault.txt &
->> Listening on 127.0.0.1:10809
->> $ ../../qemu-io -f raw nbd://localhost:10809
->> Closing connection on rule match inject-error "a"
->> qemu-io> r 0 512
->> read failed: Input/output error
->> qemu-io> q
->>
->> So, depending on whether the read command is kicked off quickly (via=20
->> -c) or slowly (via typing into qemu-io) determines whether the=20
->> message appears.
->>
->> What's more, in commit f140e300, we specifically called out in the=20
->> commit message that maybe it was better to trace when we detect=20
->> connection closed rather than log it to stdout, and in all cases in=20
->> that commit, the additional 'Connection closed' messages do not add=20
->> any information to the error message already displayed by the rest of=20
->> the code.
->>
->> I don't know how much the proposed NBD reconnect code will change=20
->> things in 3.1.=C2=A0 Meanwhile, we've missed any chance for 3.0 to fix=20
->> test 83.
->>
+>>> I find this description a bit confusing.
 >>>
->>> But I'm having a hard time convincing myself that this is the case,=20
->>> particularly since I'm not even sure how to easily debug the=20
->>> assumptions I made above.
+>>> First of all, because it's not true that the default will cover the
+>>> whole image: we're just increasing it, but any image > 256GB is going to
+>>> need more than 32MB (with 64KB clusters, that is).
+>>
+>> How about the following:
+>>
+>> qcow2: Make the default L2 cache try to cover the entire image
+> 
+> That's what I think it's misleading, the patch only increases the
+> default cache size value. The current 1MB cache also tries to cover the
+> entire image, if the entire image is <= 8GB. But there's no new feature
+> that extends the cache size to cover the entire image. There's no "we
+> used to cover 8GB images by default, but now we cover all images".
+> 
+> In other words, the message that I think the user should get is: set
+> l2-cache-size as high as the maximum amount of memory you're willing to
+> use for the cache, and QEMU will ensure that it will only use as much as
+> it needs and no extra memory will be wasted. If you're working with a
+> 100GB image it doesn't matter if you set l2-cache-size to 32MB or
+> 1GB. It will use the exact same amount of RAM.
+
+Then:
+
+qcow2: Make the L2 cache size relative to the size of the image
+
+[Something like] Now the L2 cache will be only as large as needed to 
+cover the entire image, until a preset maximum (which is 32 MB by default).
+?
+
+> 
+>>> The way I see it: there are two simple changes from the user's point of
+>>> view (they can even be two separate patches).
 >>>
->>> Since I'm very weak on the whole notion of what blk_drain() vs.=20
->>> blk_remove_bs() is really supposed to be doing, and could easily be=20
->>> persuaded that the change in output is a regression instead of a fix.
->>
->> At this point, I don't think we have a regression, just merely a bad=20
->> iotests reference output. The extra blk_drain() merely adds more time=20
->> before the NBD code can send out its first request, and thus makes it=20
->> more likely that the fault injector has closed the connection before=20
->> the read request is issued rather than after (the message only=20
->> appears when read beats the race), but the NBD code shouldn't be=20
->> printing the error message in the first place, and 083 needs to be=20
->> tweaked to remove the noisy lines added in f140e300 (not just the=20
->> three lines that are reliably different due to this patch, but all=20
->> other such lines due to strategic server drops at other points in the=20
->> NBD protocol).
->>
->
-> Ok, agree, I'll do it in reconnect series.
->
+>>> 1) The default l2-cache-size is now 32MB. DEFAULT_L2_CACHE_CLUSTERS is
+>>>      useless now and disappears.
+>> I don't think that it can be a separate patch, because unless the other
+>> logic is changed, the cache will occupy 32 MB *always*, regardless of
+>> the image size, and that's quite a big and unneeded overhead.
+> 
+> Change the order of both patches then :-)
 
+Do you really think it's necessary? The increase of the default max size 
+is directly tied to the functionality change: it will be harmful to 
+increase the maximum before the new functionality is implemented, and 
+there is no need to change the functionality if the default max is not 
+increased.
 
-hmm, do what?
+Leonid.
 
-I was going to change these error messages to be traces, but now I'm not=20
-sure that it's a good idea. We have generic errp returned from the=20
-function, and why to drop it from logs? Fixing iotest is not a good=20
-reason, better is to adjust iotest itself a bit (just commit changed=20
-output) and forget about it. Is iotest racy itself, did you see=20
-different output running 83 iotest, not testing by hand?
-
---=20
-Best regards,
-Vladimir
+> 
+>   1) If l2-cache-size > l2_metadata_size, then make l2-cache-size =
+>      l2_metadata_size. This is already useful on its own, even with the
+>      current default of 1MB.
+> 
+>   2) Increase the default to 32MB. This won't waste additional memory for
+>      small images because of the previous patch, and will cover images up
+>      to 256GB. If you have larger images you would need to increase
+>      l2-cache-size manually if you want to cache all the L2 metadata.
+> 
+> The way I see it is that the important change is (1): it's safe to
+> increase l2-cache-size, it won't waste memory[*]. (2) is nice too
+> because it will cover larger images by default, but if you're running
+> VMs with disk images larger than 256GB (which is not an extreme
+> scenario) you still need to increase the cache.
+> 
+> [*] In practice it's not wasting too much memory even now, because even
+> if you allocate a 32MB cache but only need 1MB, those extra 31MB are
+> going to be uninitialized and unused, and therefore not taking up any
+> physical memory. But you still need to have Qcow2CachedTable structures
+> for those entries, and any loop that needs to walk Qcow2Cache.entries is
+> going to be slower. So it's a good idea not to allocate unneeded memory
+> and to make this an explicit promise to the user.
+> 
+> Berto
+> 
