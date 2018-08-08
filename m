@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fnNJp-0005io-5t
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:12:02 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fnNPp-0002ln-1C
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:18:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fnNJl-000535-Vl
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:12:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48158 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fnNJl-00052b-J2
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:11:57 -0400
-References: <20180808114830.7169-1-quintela@redhat.com>
-	<20180808114830.7169-9-quintela@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b6823c45-d95f-ba5d-2944-c8fabc2772ba@redhat.com>
-Date: Wed, 8 Aug 2018 14:11:53 +0200
+	(envelope-from <lbloch@janustech.com>) id 1fnNPn-0001Ef-SU
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:18:12 -0400
+References: <20180808071051.30628-1-lbloch@janustech.com>
+	<20180808071051.30628-5-lbloch@janustech.com>
+	<w51in4lt6zv.fsf@maestria.local.igalia.com>
+	<28c19ef6-4e22-7509-f4b9-f683385933f7@janustech.com>
+	<w51ftzpt6jd.fsf@maestria.local.igalia.com>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <a742f854-1db4-66f3-fa1c-1780841f2d47@janustech.com>
+Date: Wed, 8 Aug 2018 15:17:47 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180808114830.7169-9-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <w51ftzpt6jd.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB-large
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/22] check: Only test tpm devices when
- they are compiled in
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] qcow2: Set the default
+ cache-clean-interval to 30 seconds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 08/08/2018 01:48 PM, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  tests/Makefile.include | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+On 08/08/2018 02:57 PM, Alberto Garcia wrote:
+> On Wed 08 Aug 2018 01:49:08 PM CEST, Leonid Bloch wrote:
+>> On 08/08/2018 02:47 PM, Alberto Garcia wrote:
+>>> On Wed 08 Aug 2018 09:10:50 AM CEST, Leonid Bloch wrote:
+>>>> The default cache-clean-interval is set to 30 seconds, in order to lower
+>>>> the overhead of the qcow2 caches (before the default was 0, i.e.
+>>>> disabled).
+>>>>
+>>>> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+>>>
+>>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>>>
+>>>> +#define DEFAULT_CACHE_CLEAN_INTERVAL 30  /* seconds */
+>>>
+>>> I wonder if it shouldn't be a bit higher, though. Isn't 30 seconds too
+>>> low for a default?
+>>
+>> I also had this thought. What would you suggest?
 > 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index eae89b0fc0..47a5b66cde 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -299,10 +299,10 @@ check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
->  gcov-files-i386-y += hw/pci-host/q35.c
->  check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
->  check-qtest-x86_64-$(call lor, $(CONFIG_VHOST_USER_NET_TEST_i386), $(CONFIG_VHOST_USER_NET_TEST_x86_64)) += tests/vhost-user-test$(EXESUF)
-> -check-qtest-i386-$(CONFIG_TPM) += tests/tpm-crb-swtpm-test$(EXESUF)
-> -check-qtest-i386-$(CONFIG_TPM) += tests/tpm-crb-test$(EXESUF)
-> -check-qtest-i386-$(CONFIG_TPM) += tests/tpm-tis-swtpm-test$(EXESUF)
-> -check-qtest-i386-$(CONFIG_TPM) += tests/tpm-tis-test$(EXESUF)
-> +check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-swtpm-test$(EXESUF)
-> +check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-test$(EXESUF)
-> +check-qtest-i386-$(CONFIG_TPM_TIS) += tests/tpm-tis-swtpm-test$(EXESUF)
-> +check-qtest-i386-$(CONFIG_TPM_TIS) += tests/tpm-tis-test$(EXESUF)
->  check-qtest-i386-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
->  check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
->  check-qtest-i386-$(CONFIG_RTL8139_PCI) += tests/test-filter-redirector$(EXESUF)
+> I don't know, 5 minutes at least. It should discard cache entries that
+> haven't been used in a while.
+> 
+> It my opinion the default should be for saving memory in VMs that are
+> mostly idle. If the VM is more or less active I wouldn't want to clean
+> cache entries that are used frequently.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+How about 10 minutes?
+
+Leonid.
+
+> 
+> Berto
+> 
