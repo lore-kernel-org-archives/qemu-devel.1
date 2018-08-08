@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fnKT9-0007Ro-RN
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:09:28 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fnKVN-0000VU-9Z
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:11:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fnKT8-0006CY-Qw
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:09:27 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:38776)
+	(envelope-from <stefanha@gmail.com>) id 1fnKVM-0007XO-Bt
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:11:45 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:55611)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fnKT8-0006AH-Ix
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:09:26 -0400
-Received: by mail-wm0-x244.google.com with SMTP id t25-v6so1951672wmi.3
-	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 02:09:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fnKVM-0007WY-5o
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 05:11:44 -0400
+Received: by mail-wm0-x241.google.com with SMTP id f21-v6so1920880wmc.5
+	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 02:11:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180806100114.21410-4-contrib@steffen-goertz.de>
+In-Reply-To: <20180806100114.21410-5-contrib@steffen-goertz.de>
 References: <20180806100114.21410-1-contrib@steffen-goertz.de>
-	<20180806100114.21410-4-contrib@steffen-goertz.de>
+	<20180806100114.21410-5-contrib@steffen-goertz.de>
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 8 Aug 2018 10:09:24 +0100
-Message-ID: <CAJSP0QVrWiKtuRW+-EjFSJxrvWLtXWxsDHuvAuEe6yXOLWb72A@mail.gmail.com>
+Date: Wed, 8 Aug 2018 10:11:42 +0100
+Message-ID: <CAJSP0QUkW2A7pWb6zVAZGQk-y6YGsxwicBW4nuhHWPf8yL2_6Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/7] tests: Add bbc:microbit / nRF51 test
- suite
+Subject: Re: [Qemu-devel] [PATCH 4/7] hw/gpio/nrf51_gpio: Add nRF51 GPIO
+ peripheral
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,25 +35,29 @@ Cc: qemu-devel <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Jim Mussa
 
 On Mon, Aug 6, 2018 at 11:01 AM, Steffen G=C3=B6rtz
 <contrib@steffen-goertz.de> wrote:
-> +#define PAGE_SIZE           1024
-> +#define FLASH_SIZE          (256 * PAGE_SIZE)
-> +#define FLASH_BASE          0x00000000
-> +#define UICR_BASE           0x10001000
-> +#define UICR_SIZE           0x100
-> +#define NVMC_BASE           0x4001E000UL
-> +#define NVMC_READY          0x400
-> +#define NVMC_CONFIG         0x504
-> +#define NVMC_ERASEPAGE      0x508
-> +#define NVMC_ERASEPCR1      0x508
-> +#define NVMC_ERASEALL       0x50C
-> +#define NVMC_ERASEPCR0      0x510
-> +#define NVMC_ERASEUICR      0x514
+> This adds a model of the nRF51 GPIO peripheral.
+>
+> Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
+>
+> The nRF51 series microcontrollers support up to 32 GPIO pins in various c=
+onfigurations.
+> The pins can be used as input pins with pull-ups or pull-down.
+> Furthermore, three different output driver modes per level are
+> available (disconnected, standard, high-current).
+>
+> The GPIO-Peripheral has a mechanism for detecting level changes which is
+> not featured in this model.
+>
+> Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+> ---
+>  Makefile.objs                |   1 +
+>  hw/gpio/Makefile.objs        |   1 +
+>  hw/gpio/nrf51_gpio.c         | 305 +++++++++++++++++++++++++++++++++++
+>  hw/gpio/trace-events         |   7 +
+>  include/hw/gpio/nrf51_gpio.h |  57 +++++++
+>  5 files changed, 371 insertions(+)
+>  create mode 100644 hw/gpio/nrf51_gpio.c
+>  create mode 100644 hw/gpio/trace-events
+>  create mode 100644 include/hw/gpio/nrf51_gpio.h
 
-All these constants could live in include/hw/arm/nrf51.h.  That way
-tests do not need to duplicate them.  As more devices are implemented
-we can expect this list to grow.
-
-> +static void fill_and_erase(hwaddr base, hwaddr size, uint32_t address_re=
-g)
-
-Why hwaddr?  writel() and friends use uint64_t.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
