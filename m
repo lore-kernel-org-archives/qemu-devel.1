@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fnDJ4-0003lN-L8
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 21:30:35 -0400
+	(envelope-from <peterx@redhat.com>) id 1fnF3N-0004uv-V3
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:22:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fnDJ1-0002CJ-Hv
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 21:30:34 -0400
-Received: from mga18.intel.com ([134.134.136.126]:41405)
+	(envelope-from <peterx@redhat.com>) id 1fnF3K-0002ik-Mz
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:22:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58710 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1fnDJ1-0002Bq-6h
-	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 21:30:31 -0400
-Message-ID: <5B6A48AF.7010906@intel.com>
-Date: Wed, 08 Aug 2018 09:34:39 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fnF3K-0002i1-GB
+	for qemu-devel@nongnu.org; Tue, 07 Aug 2018 23:22:26 -0400
+Date: Wed, 8 Aug 2018 11:22:19 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180808032219.GA24415@xz-mi>
+References: <153299204130.14411.11438396195753743913.stgit@gimli.home>
+	<153299246170.14411.6197545037372422542.stgit@gimli.home>
+	<20180807131021.GF7265@xz-mi> <20180807103505.4c182f4d@t450s.home>
 MIME-Version: 1.0
-References: <1533031278-5615-1-git-send-email-wei.w.wang@intel.com>
-	<20180807073905.GA7265@xz-mi> <5B69567B.8050309@intel.com>
-	<20180807095337.GD2556@work-vm>
-In-Reply-To: <20180807095337.GD2556@work-vm>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] bitmap: fix BITMAP_LAST_WORD_MASK
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180807103505.4c182f4d@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] vfio: Inhibit ballooning based on
+ group attachment to a container
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +29,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, mst@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, cohuck@redhat.com, mst@redhat.com, david@redhat.com
 
-On 08/07/2018 05:53 PM, Dr. David Alan Gilbert wrote:
-> * Wei Wang (wei.w.wang@intel.com) wrote:
->> On 08/07/2018 03:39 PM, Peter Xu wrote:
->>> On Tue, Jul 31, 2018 at 06:01:18PM +0800, Wei Wang wrote:
->>>> When "nbits = 0", which means no bits to mask, this macro is expected to
->>>> return 0, instead of 0xffffffff. This patch changes the macro to return
->>>> 0 when there is no bit needs to be masked.
->>>>
->>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->>>> CC: Juan Quintela <quintela@redhat.com>
->>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>> CC: Peter Xu <peterx@redhat.com>
->>> Reviewed-by: Peter Xu <peterx@redhat.com>
->>>
->>> Is there any existing path that can trigger this nbits==0?
->> Not sure about other bitmap APIs which call this macro. But it happens in
->> the patches we are working on, which use bitmap_count_one.
->> It would be good to have the macro itself handle this corner case, so that
->> callers won't need to worry about that.
-> Given that I see you're having a similar discussion on the kernel list
-> we should see how that pans out before making qemu changes.
+On Tue, Aug 07, 2018 at 10:35:05AM -0600, Alex Williamson wrote:
+> On Tue, 7 Aug 2018 21:10:21 +0800
+> Peter Xu <peterx@redhat.com> wrote:
+> 
+> > On Mon, Jul 30, 2018 at 05:14:21PM -0600, Alex Williamson wrote:
+> > > We use a VFIOContainer to associate an AddressSpace to one or more
+> > > VFIOGroups.  The VFIOContainer represents the DMA context for that
+> > > AdressSpace for those VFIOGroups and is synchronized to changes in
+> > > that AddressSpace via a MemoryListener.  For IOMMU backed devices,
+> > > maintaining the DMA context for a VFIOGroup generally involves
+> > > pinning a host virtual address in order to create a stable host
+> > > physical address and then mapping a translation from the associated
+> > > guest physical address to that host physical address into the IOMMU.
+> > > 
+> > > While the above maintains the VFIOContainer synchronized to the QEMU
+> > > memory API of the VM, memory ballooning occurs outside of that API.
+> > > Inflating the memory balloon (ie. cooperatively capturing pages from
+> > > the guest for use by the host) simply uses MADV_DONTNEED to "zap"
+> > > pages from QEMU's host virtual address space.  The page pinning and
+> > > IOMMU mapping above remains in place, negating the host's ability to
+> > > reuse the page, but the host virtual to host physical mapping of the
+> > > page is invalidated outside of QEMU's memory API.
+> > > 
+> > > When the balloon is later deflated, attempting to cooperatively
+> > > return pages to the guest, the page is simply freed by the guest
+> > > balloon driver, allowing it to be used in the guest and incurring a
+> > > page fault when that occurs.  The page fault maps a new host physical
+> > > page backing the existing host virtual address, meanwhile the
+> > > VFIOContainer still maintains the translation to the original host
+> > > physical address.  At this point the guest vCPU and any assigned
+> > > devices will map different host physical addresses to the same guest
+> > > physical address.  Badness.
+> > > 
+> > > The IOMMU typically does not have page level granularity with which
+> > > it can track this mapping without also incurring inefficiencies in
+> > > using page size mappings throughout.  MMU notifiers in the host
+> > > kernel also provide indicators for invalidating the mapping on
+> > > balloon inflation, not for updating the mapping when the balloon is
+> > > deflated.  For these reasons we assume a default behavior that the
+> > > mapping of each VFIOGroup into the VFIOContainer is incompatible
+> > > with memory ballooning and increment the balloon inhibitor to match
+> > > the attached VFIOGroups.
+> > > 
+> > > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > > ---
+> > >  hw/vfio/common.c |    5 +++++
+> > >  1 file changed, 5 insertions(+)
+> > > 
+> > > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > > index fb396cf00ac4..4881b691a659 100644
+> > > --- a/hw/vfio/common.c
+> > > +++ b/hw/vfio/common.c
+> > > @@ -32,6 +32,7 @@
+> > >  #include "hw/hw.h"
+> > >  #include "qemu/error-report.h"
+> > >  #include "qemu/range.h"
+> > > +#include "sysemu/balloon.h"
+> > >  #include "sysemu/kvm.h"
+> > >  #include "trace.h"
+> > >  #include "qapi/error.h"
+> > > @@ -1049,6 +1050,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+> > >              group->container = container;
+> > >              QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+> > >              vfio_kvm_device_add_group(group);
+> > > +            qemu_balloon_inhibit(true);  
+> > 
+> > [1]
+> > 
+> > >              return 0;
+> > >          }
+> > >      }
+> > > @@ -1198,6 +1200,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+> > >      }
+> > >  
+> > >      vfio_kvm_device_add_group(group);
+> > > +    qemu_balloon_inhibit(true);  
+> > 
+> > AFAIU there is a very critical information that this
+> > qemu_balloon_inhibit() call must be before the call to:
+> > 
+> >     memory_listener_register(&container->listener, container->space->as);
+> > 
+> > Since the memory listener registeration is the point when we do the
+> > pinning of the pages.  So to make sure we won't have stale pages we
+> > must call qemu_balloon_inhibit() before memory_listener_register()
+> > (which is what this patch does).  However this is not that obvious,
+> > not sure whether that might worth a comment.
+> > 
+> > Considering this, not sure whether we can just do this per-container
+> > instead of per-group, then we also don't need to bother with extra
+> > group-add paths like [1].
+> > 
+> > No matter what, this patch looks good to me (and it is correct AFAIK),
+> > so I'm leaving r-b and I'll leave Alex to decide:
+> 
+> Thanks Peter.  I agree, I'll add more commentary.  A minor correction,
+> we won't have "stale" pages at the time we pin, the act of pinning will
+> make those valid (same as I discussed in reply to mst why we don't need
+> to worry about pages ballooned before the device is added), but once a
+> page is pinned, we need to make sure it's not madvised dontneed, so we
+> need to be sure there's no possible race there, which effectively means
+> inhibiting before the memory listener can do any pinning.
 
-OK.
-The situation is a little different in Linux, because all the callers 
-there have already taken the responsibilities to avoid the "nbits=0" 
-corner case, that's also the reason that they want to stick with the old 
-way. Here in QEMU, most callers (e.g. bitmap_count_one, bitmap_fill, 
-bitmap_intersects) haven't checked that, so fixing the macro itself 
-might be a better choice here.
+Yes.
 
-Best,
-Wei
+> 
+> The reason I chose to inhibit per group is that it becomes easier to
+> allow endpoint drivers to opt-in.  For instance if we could have ccw
+> and vfio-pci in the same VM, they would by default share a container.
+> If ccw releases the inhibit, we'd need to somehow reinstate it for the
+> vfio-pci device and remember which did what if one is hot unplugged.
+> Doing the inhibit at the group level resolves this, the ccw group adds
+> an inhibit by default, then releases it, the vfio-pci group adds an
+> inhibit and maintains it so long as attached.  I struggled with whether
+> this should actually be a per-device inhibit, but then there's a gap
+> that the container listener is active before the device is retrieved,
+> so again the per-group inhibit was a better fit.  Thanks,
+
+Thanks for explaining.  I didn't look into the ccw patch, but it
+sounds reasonable to me now.
+
+Regards,
+
+-- 
+Peter Xu
