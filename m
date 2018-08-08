@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fnRnv-0007Et-T8
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 12:59:26 -0400
+	(envelope-from <quintela@redhat.com>) id 1fnRr3-0000ll-QQ
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 13:02:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fnRnq-0006Kl-Uh
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 12:59:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34438 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fnRqy-0007vj-RR
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 13:02:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58772 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fnRnq-0006Ir-NJ
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 12:59:18 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fnRqy-0007vX-LE
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 13:02:32 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4739940241C6
-	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 16:59:17 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2CF827A7E8
+	for <qemu-devel@nongnu.org>; Wed,  8 Aug 2018 17:02:32 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <96e995b7-9dec-05af-5835-ab200bb1a743@redhat.com> (Thomas Huth's
-	message of "Wed, 8 Aug 2018 14:10:34 +0200")
+In-Reply-To: <81c76597-7dd3-59f0-8b04-4972e489bbc8@redhat.com> (Thomas Huth's
+	message of "Wed, 8 Aug 2018 14:06:37 +0200")
 References: <20180808114830.7169-1-quintela@redhat.com>
-	<20180808114830.7169-7-quintela@redhat.com>
-	<96e995b7-9dec-05af-5835-ab200bb1a743@redhat.com>
+	<20180808114830.7169-6-quintela@redhat.com>
+	<81c76597-7dd3-59f0-8b04-4972e489bbc8@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Wed, 08 Aug 2018 18:59:10 +0200
-Message-ID: <87pnysx09t.fsf@trasno.org>
+Date: Wed, 08 Aug 2018 19:02:24 +0200
+Message-ID: <87lg9gx04f.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 06/22] i386-softmmu: Configuration is
- identical to x86_64-softmmu
+Subject: Re: [Qemu-devel] [PATCH v2 05/22] check: Only test usb-xhci-nec
+ when it is compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,107 +37,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
 Thomas Huth <thuth@redhat.com> wrote:
 > On 08/08/2018 01:48 PM, Juan Quintela wrote:
->> If we ever changed that, just make the things that are different
->> explicit.
->> 
 >> Signed-off-by: Juan Quintela <quintela@redhat.com>
 >> ---
->>  default-configs/i386-softmmu.mak | 65 +-------------------------------
->>  1 file changed, 1 insertion(+), 64 deletions(-)
+>>  tests/Makefile.include | 9 +++++----
+>>  1 file changed, 5 insertions(+), 4 deletions(-)
 >> 
->> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
->> index 8827166ba1..6ec7a3b0ae 100644
->> --- a/default-configs/i386-softmmu.mak
->> +++ b/default-configs/i386-softmmu.mak
->> @@ -1,66 +1,3 @@
->>  # Default configuration for i386-softmmu
->>  
->> -include pci.mak
->> -include sound.mak
->> -include usb.mak
->> -CONFIG_QXL=$(CONFIG_SPICE)
->> -CONFIG_VGA_ISA=y
->> -CONFIG_VGA_CIRRUS=y
->> -CONFIG_VMWARE_VGA=y
->> -CONFIG_VMXNET3_PCI=y
->> -CONFIG_VIRTIO_VGA=y
->> -CONFIG_VMMOUSE=y
->> -CONFIG_IPMI=y
->> -CONFIG_IPMI_LOCAL=y
->> -CONFIG_IPMI_EXTERN=y
->> -CONFIG_ISA_IPMI_KCS=y
->> -CONFIG_ISA_IPMI_BT=y
->> -CONFIG_PARALLEL=y
->> -CONFIG_I8254=y
->> -CONFIG_PCSPK=y
->> -CONFIG_PCKBD=y
->> -CONFIG_FDC=y
->> -CONFIG_ACPI=y
->> -CONFIG_ACPI_X86=y
->> -CONFIG_ACPI_X86_ICH=y
->> -CONFIG_ACPI_MEMORY_HOTPLUG=y
->> -CONFIG_ACPI_CPU_HOTPLUG=y
->> -CONFIG_APM=y
->> -CONFIG_I8257=y
->> -CONFIG_IDE_ISA=y
->> -CONFIG_IDE_PIIX=y
->> -CONFIG_NE2000_ISA=y
->> -CONFIG_HPET=y
->> -CONFIG_APPLESMC=y
->> -CONFIG_I8259=y
->> -CONFIG_PFLASH_CFI01=y
->> -CONFIG_TPM_TIS=$(CONFIG_TPM)
->> -CONFIG_TPM_CRB=$(CONFIG_TPM)
->> -CONFIG_MC146818RTC=y
->> -CONFIG_PCI_PIIX=y
->> -CONFIG_WDT_IB700=y
->> -CONFIG_ISA_DEBUG=y
->> -CONFIG_ISA_TESTDEV=y
->> -CONFIG_VMPORT=y
->> -CONFIG_SGA=y
->> -CONFIG_LPC_ICH9=y
->> -CONFIG_PCI_Q35=y
->> -CONFIG_APIC=y
->> -CONFIG_IOAPIC=y
->> -CONFIG_PVPANIC=y
->> -CONFIG_MEM_HOTPLUG=y
->> -CONFIG_NVDIMM=y
->> -CONFIG_ACPI_NVDIMM=y
->> -CONFIG_PCIE_PORT=y
->> -CONFIG_XIO3130=y
->> -CONFIG_IOH3420=y
->> -CONFIG_I82801B11=y
->> -CONFIG_SMBIOS=y
->> -CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
->> -CONFIG_PXB=y
->> -CONFIG_ACPI_VMGENID=y
->> -CONFIG_FW_CFG_DMA=y
->> -CONFIG_I2C=y
->> -CONFIG_SEV=$(CONFIG_KVM)
->> -CONFIG_VTD=y
->> -CONFIG_AMD_IOMMU=y
->> +include x86_64-softmmu.mak
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 4e5f47aac0..1105469daa 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -290,8 +290,9 @@ endif
+>>  gcov-files-i386-$(CONFIG_USB_EHCI) += hw/usb/hcd-ehci.c
+>>  gcov-files-i386-y += hw/usb/dev-hid.c
+>>  gcov-files-i386-y += hw/usb/dev-storage.c
+>> -check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
+>> -gcov-files-i386-y += hw/usb/hcd-xhci.c
+>> +check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
+>> +gcov-files-i386-$(CONFIG_USB_XHCI) += hw/usb/hcd-xhci.c
+>> +gcov-files-i386-$(CONFIG_USB_XHCI) += hw/usb/hcd-xhci-nec.c
 >
-> That's theoretically a good idea, but I think I'd rather do it the other
-> way round: include i386-softmmu.mak in the x86_64 config file.
-> Rationale: x86_64 is supposed to be a superset of i386, not the other
-> way round, so when we will ever get a CONFIG_SWITCH_FOR_X86_64_ONLY,
-> it's easier to handle if the includes are done the other way round.
+> Maybe use CONFIG_USB_XHCI_NEC for the hcd-xhci-nec.c entry instead?
 
-[1]
+Not sure, this split looks artifitial. My read of this:
 
-> And that's also how we do it in aarch64-softmmu.mak an ppc64-softmmu.mak.
 
-This is a good point.
+commit 0bbb2f3df1ffd9ccf7135a69a450c6929bc0b915
+Author: Gerd Hoffmann <kraxel@redhat.com>
+Date:   Wed May 17 12:33:12 2017 +0200
 
-But for (1), I really think that we should make i386 only for old stuff,
-and remove things like ISA devices from x86_64 (ok, I know that there is
-some ISA on all chipsets, but ne2000-isa is not one of them).
+    xhci: split into multiple files
+    
 
-Anyways, I don't really care enough, so I will change that.
+Is that it got split so we could add more controllers that never
+happened.  I am not sure what we need to do.
 
-Later, Juan.
+>>  check-qtest-i386-y += tests/cpu-plug-test$(EXESUF)
+>>  check-qtest-i386-y += tests/q35-test$(EXESUF)
+>>  check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+>> @@ -349,8 +350,8 @@ check-qtest-ppc64-$(CONFIG_USB_OHCI) +=
+>> tests/usb-hcd-ohci-test$(EXESUF)
+>>  gcov-files-ppc64-$(CONFIG_USB_OHCI) += hw/usb/hcd-ohci.c
+>>  check-qtest-ppc64-$(CONFIG_USB_UHCI) += tests/usb-hcd-uhci-test$(EXESUF)
+>>  gcov-files-ppc64-$(CONFIG_USB_UHCI) += hw/usb/hcd-uhci.c
+>> -check-qtest-ppc64-y += tests/usb-hcd-xhci-test$(EXESUF)
+>> -gcov-files-ppc64-y += hw/usb/hcd-xhci.c
+>> +check-qtest-ppc64-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
+>> +gcov-files-ppc64-$(CONFIG_USB_XHCI) += hw/usb/hcd-xhci.c
+>
+> Also add hcd-xhci-nec.c gcov entry here?
+
+I didn't want to go "further", but I think that we should have here is
+something like:
+
+
+check-qtest-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
+gcov-files-$(CONFIG_USB_XHCI) += hw/usb/hcd-xhci.c
+
+and remove the arch specific bits.  If one arch don't support it, we
+know have CONFIG_USB_XHCI bits to not _enable_ it there.
+
+What do you think?
+
+Thanks, Juan.
