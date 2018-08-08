@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBq-0006ld-Lp
+	(envelope-from <armbru@redhat.com>) id 1fnNBq-0006lc-Lk
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fnNBj-0008UL-I5
+	(envelope-from <armbru@redhat.com>) id 1fnNBk-0008VT-4p
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51076 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45394 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBj-0008SP-8e
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fnNBj-0008UI-Qv
 	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 08:03:39 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed,  8 Aug 2018 14:03:04 +0200
-Message-Id: <20180808120334.10970-27-armbru@redhat.com>
+Date: Wed,  8 Aug 2018 14:03:09 +0200
+Message-Id: <20180808120334.10970-32-armbru@redhat.com>
 In-Reply-To: <20180808120334.10970-1-armbru@redhat.com>
 References: <20180808120334.10970-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 26/56] json: Simplify parse_string()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 31/56] json-parser: simplify and avoid
+ JSONParserContext allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,102 +30,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+parser_context_new/free() are only used from json_parser_parse(). We
+can fold the code there and avoid an allocation altogether.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20180719184111.5129-9-marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- qobject/json-parser.c | 42 +++++++++++++++++++-----------------------
- 1 file changed, 19 insertions(+), 23 deletions(-)
+ qobject/json-parser.c | 41 +++++++++--------------------------------
+ 1 file changed, 9 insertions(+), 32 deletions(-)
 
 diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index d469004616..f26e5b7511 100644
+index 703065fa2b..b14336e653 100644
 --- a/qobject/json-parser.c
 +++ b/qobject/json-parser.c
-@@ -101,8 +101,7 @@ static int hex2decimal(char ch)
-     } else if (ch >= 'A' && ch <= 'F') {
-         return 10 + (ch - 'A');
-     }
--
--    return -1;
-+    abort();
+@@ -232,33 +232,6 @@ static JSONToken *parser_context_peek_token(JSONPars=
+erContext *ctxt)
+     return g_queue_peek_head(ctxt->buf);
  }
- 
- /**
-@@ -144,7 +143,7 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
-     const char *ptr = token->str;
-     QString *str;
-     char quote;
--    int cp;
-+    int cp, i;
-     char *end;
-     ssize_t len;
-     char utf8_buf[5];
-@@ -158,51 +157,48 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
-         if (*ptr == '\\') {
-             switch (*++ptr) {
-             case '"':
--                qstring_append(str, "\"");
-+                qstring_append_chr(str, '"');
-                 break;
-             case '\'':
--                qstring_append(str, "'");
-+                qstring_append_chr(str, '\'');
-                 break;
-             case '\\':
--                qstring_append(str, "\\");
-+                qstring_append_chr(str, '\\');
-                 break;
-             case '/':
--                qstring_append(str, "/");
-+                qstring_append_chr(str, '/');
-                 break;
-             case 'b':
--                qstring_append(str, "\b");
-+                qstring_append_chr(str, '\b');
-                 break;
-             case 'f':
--                qstring_append(str, "\f");
-+                qstring_append_chr(str, '\f');
-                 break;
-             case 'n':
--                qstring_append(str, "\n");
-+                qstring_append_chr(str, '\n');
-                 break;
-             case 'r':
--                qstring_append(str, "\r");
-+                qstring_append_chr(str, '\r');
-                 break;
-             case 't':
--                qstring_append(str, "\t");
-+                qstring_append_chr(str, '\t');
-                 break;
--            case 'u': {
--                uint16_t unicode_char = 0;
--                char utf8_char[4];
--                int i = 0;
+=20
+-static JSONParserContext *parser_context_new(GQueue *tokens)
+-{
+-    JSONParserContext *ctxt;
 -
-+            case 'u':
-+                cp = 0;
-                 for (i = 0; i < 4; i++) {
-                     ptr++;
--                    if (qemu_isxdigit(*ptr)) {
--                        unicode_char |= hex2decimal(*ptr) << ((3 - i) * 4);
--                    } else {
-+                    if (!qemu_isxdigit(*ptr)) {
-                         parse_error(ctxt, token,
-                                     "invalid hex escape sequence in string");
-                         goto out;
-                     }
-+                    cp <<= 4;
-+                    cp |= hex2decimal(*ptr);
-                 }
- 
--                wchar_to_utf8(unicode_char, utf8_char, sizeof(utf8_char));
--                qstring_append(str, utf8_char);
--            }   break;
-+                wchar_to_utf8(cp, utf8_buf, sizeof(utf8_buf));
-+                qstring_append(str, utf8_buf);
-+                break;
-             default:
-                 parse_error(ctxt, token, "invalid escape sequence in string");
-                 goto out;
--- 
+-    if (!tokens) {
+-        return NULL;
+-    }
+-
+-    ctxt =3D g_malloc0(sizeof(JSONParserContext));
+-    ctxt->buf =3D tokens;
+-
+-    return ctxt;
+-}
+-
+-/* to support error propagation, ctxt->err must be freed separately */
+-static void parser_context_free(JSONParserContext *ctxt)
+-{
+-    if (ctxt) {
+-        while (!g_queue_is_empty(ctxt->buf)) {
+-            parser_context_pop_token(ctxt);
+-        }
+-        g_free(ctxt->current);
+-        g_queue_free(ctxt->buf);
+-        g_free(ctxt);
+-    }
+-}
+-
+ /**
+  * Parsing rules
+  */
+@@ -570,18 +543,22 @@ QObject *json_parser_parse(GQueue *tokens, va_list =
+*ap)
+=20
+ QObject *json_parser_parse_err(GQueue *tokens, va_list *ap, Error **errp=
+)
+ {
+-    JSONParserContext *ctxt =3D parser_context_new(tokens);
++    JSONParserContext ctxt =3D { .buf =3D tokens };
+     QObject *result;
+=20
+-    if (!ctxt) {
++    if (!tokens) {
+         return NULL;
+     }
+=20
+-    result =3D parse_value(ctxt, ap);
++    result =3D parse_value(&ctxt, ap);
+=20
+-    error_propagate(errp, ctxt->err);
++    error_propagate(errp, ctxt.err);
+=20
+-    parser_context_free(ctxt);
++    while (!g_queue_is_empty(ctxt.buf)) {
++        parser_context_pop_token(&ctxt);
++    }
++    g_free(ctxt.current);
++    g_queue_free(ctxt.buf);
+=20
+     return result;
+ }
+--=20
 2.17.1
