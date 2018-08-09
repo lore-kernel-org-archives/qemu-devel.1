@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnlUB-0002aE-AQ
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:00:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1fnlXT-0004GB-HL
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:03:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnlU7-0002W8-4t
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:00:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37672 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fnlXP-0003zp-GA
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:03:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38008 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fnlU6-0002Vn-VT
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:00:15 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fnlXP-0003zc-B6
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:03:39 -0400
 References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-8-armbru@redhat.com>
+	<20180808120334.10970-10-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <4f9088ac-b871-f2de-0a7f-223a873d15d8@redhat.com>
-Date: Thu, 9 Aug 2018 09:00:12 -0500
+Message-ID: <536be1d2-05ed-44f8-405c-5a821bee6d82@redhat.com>
+Date: Thu, 9 Aug 2018 09:03:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180808120334.10970-8-armbru@redhat.com>
+In-Reply-To: <20180808120334.10970-10-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 07/56] check-qjson: Cover escaped
- characters more thoroughly, part 1
+Subject: Re: [Qemu-devel] [PATCH 09/56] check-qjson: Cover escaped
+ characters more thoroughly, part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +33,25 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
 On 08/08/2018 07:02 AM, Markus Armbruster wrote:
-> escaped_string() first tests double quoted strings, then repeats a few
-> tests with single quotes.  Repeat all of them: store the strings to
-> test without quotes, and wrap them in either kind of quote for
-> testing.
+> Cover surrogates, invalid escapes, and noncharacters.  This
+> demonstrates that valid surrogate pairs are misinterpreted, and
+> invalid surrogates and noncharacters aren't rejected.
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   tests/check-qjson.c | 94 ++++++++++++++++++++++++++-------------------
->   1 file changed, 55 insertions(+), 39 deletions(-)
+>   tests/check-qjson.c | 53 ++++++++++++++++++++++++++++++++++++++-------
+>   1 file changed, 45 insertions(+), 8 deletions(-)
 > 
 
->       struct {
-> -        const char *encoded;
-> -        const char *decoded;
-> +        /* Content of JSON string to parse with qobject_from_json() */
-> +        const char *json_in;
-> +        /* Expected parse output; to unparse with qobject_to_json() */
-> +        const char *utf8_out;
->           int skip;
+> +        { "\\u12x", NULL },
+> +        { "\\u123x", NULL },
+> +        { "\\u12345", "\341\210\2645" },
+> +        { "\\u12345", "\341\210\2645" },
 
-Instead of int skip (and why is that not a bool?), would it be better to 
-have an optional const char *json_out?
+Why is this one duplicated?
 
-> +    for (i = 0; test_cases[i].json_in; i++) {
-> +        for (j = 0; j < 2; j++) {
-> +            cstr = from_json_str(test_cases[i].json_in, &error_abort, j);
-> +            g_assert_cmpstr(qstring_get_try_str(cstr),
-> +                            ==, test_cases[i].utf8_out);
-> +            if (test_cases[i].skip == 0) {
-> +                jstr = to_json_str(cstr);
-> +                g_assert_cmpstr(jstr, ==, test_cases[i].json_in);
-> +                g_free(jstr);
-
-and here, write g_assert_cmpstr(jstr, ==, test_cases[i].json_out ?: 
-test_cases[i].json_in)?  After all, the reason we're skipping is because 
-there are some cases of multiple inputs that get canonicalized to 
-constant output, such as " " vs. "\u0020", or "\\'" vs. "'".
+Otherwise,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
