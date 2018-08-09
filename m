@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fnkZP-0005wL-ML
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:41 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fnkZS-0005yx-1D
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fnkZO-0003Na-LH
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:39 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fnkZR-0003PE-2u
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:42 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  9 Aug 2018 14:01:09 +0100
-Message-Id: <20180809130115.28951-11-peter.maydell@linaro.org>
+Date: Thu,  9 Aug 2018 14:01:14 +0100
+Message-Id: <20180809130115.28951-16-peter.maydell@linaro.org>
 In-Reply-To: <20180809130115.28951-1-peter.maydell@linaro.org>
 References: <20180809130115.28951-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 10/16] hw/dma/pl080: Allow use as
- embedded-struct device
+Subject: [Qemu-devel] [PATCH 15/16] hw/dma/pl080: Remove hw_error() if DMA
+ is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,157 +23,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Create a new include file for the pl081's device struct,
-type macros, etc, so that it can be instantiated using
-the "embedded struct" coding style.
+The PL08x model currently will unconditionally call hw_error()
+if the DMA engine is enabled by the guest. This has been
+present since the PL080 model was edded in 2006, and is
+presumably either unintentional debug code left enabled,
+or a guard against untested DMA engine code being used.
+
+Remove the hw_error(), since we now have a guest which
+will actually try to use the DMA engine (the self-test
+binary for the AN505 MPS2 FPGA image).
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/dma/pl080.h | 62 ++++++++++++++++++++++++++++++++++++++++++
- hw/dma/pl080.c         | 34 ++---------------------
- MAINTAINERS            |  1 +
- 3 files changed, 65 insertions(+), 32 deletions(-)
- create mode 100644 include/hw/dma/pl080.h
+ hw/dma/pl080.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/include/hw/dma/pl080.h b/include/hw/dma/pl080.h
-new file mode 100644
-index 00000000000..7deb46c8578
---- /dev/null
-+++ b/include/hw/dma/pl080.h
-@@ -0,0 +1,62 @@
-+/*
-+ * ARM PrimeCell PL080/PL081 DMA controller
-+ *
-+ * Copyright (c) 2006 CodeSourcery.
-+ * Copyright (c) 2018 Linaro Limited
-+ * Written by Paul Brook, Peter Maydell
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or
-+ * (at your option) any later version.
-+ */
-+
-+/* This is a model of the Arm PrimeCell PL080/PL081 DMA controller:
-+ * The PL080 TRM is:
-+ * http://infocenter.arm.com/help/topic/com.arm.doc.ddi0196g/DDI0196.pdf
-+ * and the PL081 TRM is:
-+ * http://infocenter.arm.com/help/topic/com.arm.doc.ddi0218e/DDI0218.pdf
-+ *
-+ * QEMU interface:
-+ * + sysbus IRQ: DMACINTR combined interrupt line
-+ * + sysbus MMIO region 0: MemoryRegion for the device's registers
-+ */
-+
-+#ifndef HW_DMA_PL080_H
-+#define HW_DMA_PL080_H
-+
-+#include "hw/sysbus.h"
-+
-+#define PL080_MAX_CHANNELS 8
-+
-+typedef struct {
-+    uint32_t src;
-+    uint32_t dest;
-+    uint32_t lli;
-+    uint32_t ctrl;
-+    uint32_t conf;
-+} pl080_channel;
-+
-+#define TYPE_PL080 "pl080"
-+#define TYPE_PL081 "pl081"
-+#define PL080(obj) OBJECT_CHECK(PL080State, (obj), TYPE_PL080)
-+
-+typedef struct PL080State {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+    uint8_t tc_int;
-+    uint8_t tc_mask;
-+    uint8_t err_int;
-+    uint8_t err_mask;
-+    uint32_t conf;
-+    uint32_t sync;
-+    uint32_t req_single;
-+    uint32_t req_burst;
-+    pl080_channel chan[PL080_MAX_CHANNELS];
-+    int nchannels;
-+    /* Flag to avoid recursive DMA invocations.  */
-+    int running;
-+    qemu_irq irq;
-+} PL080State;
-+
-+#endif
 diff --git a/hw/dma/pl080.c b/hw/dma/pl080.c
-index 7724c93b8f2..0f79c2d8a6c 100644
+index 8f92550392b..ef15d3e628d 100644
 --- a/hw/dma/pl080.c
 +++ b/hw/dma/pl080.c
-@@ -11,8 +11,8 @@
- #include "hw/sysbus.h"
- #include "exec/address-spaces.h"
- #include "qemu/log.h"
-+#include "hw/dma/pl080.h"
+@@ -110,7 +110,6 @@ static void pl080_run(PL080State *s)
+     if ((s->conf & PL080_CONF_E) == 0)
+         return;
  
--#define PL080_MAX_CHANNELS 8
- #define PL080_CONF_E    0x1
- #define PL080_CONF_M1   0x2
- #define PL080_CONF_M2   0x4
-@@ -30,36 +30,6 @@
- #define PL080_CCTRL_D   0x02000000
- #define PL080_CCTRL_S   0x01000000
- 
--typedef struct {
--    uint32_t src;
--    uint32_t dest;
--    uint32_t lli;
--    uint32_t ctrl;
--    uint32_t conf;
--} pl080_channel;
--
--#define TYPE_PL080 "pl080"
--#define PL080(obj) OBJECT_CHECK(PL080State, (obj), TYPE_PL080)
--
--typedef struct PL080State {
--    SysBusDevice parent_obj;
--
--    MemoryRegion iomem;
--    uint8_t tc_int;
--    uint8_t tc_mask;
--    uint8_t err_int;
--    uint8_t err_mask;
--    uint32_t conf;
--    uint32_t sync;
--    uint32_t req_single;
--    uint32_t req_burst;
--    pl080_channel chan[PL080_MAX_CHANNELS];
--    int nchannels;
--    /* Flag to avoid recursive DMA invocations.  */
--    int running;
--    qemu_irq irq;
--} PL080State;
--
- static const VMStateDescription vmstate_pl080_channel = {
-     .name = "pl080_channel",
-     .version_id = 1,
-@@ -408,7 +378,7 @@ static const TypeInfo pl080_info = {
- };
- 
- static const TypeInfo pl081_info = {
--    .name          = "pl081",
-+    .name          = TYPE_PL081,
-     .parent        = TYPE_PL080,
-     .instance_init = pl081_init,
- };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5d1a3645dd4..92ccca716c6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -444,6 +444,7 @@ F: hw/char/pl011.c
- F: include/hw/char/pl011.h
- F: hw/display/pl110*
- F: hw/dma/pl080.c
-+F: include/hw/dma/pl080.h
- F: hw/dma/pl330.c
- F: hw/gpio/pl061.c
- F: hw/input/pl050.c
+-hw_error("DMA active\n");
+     /* If we are already in the middle of a DMA operation then indicate that
+        there may be new DMA requests and return immediately.  */
+     if (s->running) {
 -- 
 2.17.1
