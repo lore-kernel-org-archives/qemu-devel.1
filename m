@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fnm5S-0008JR-QZ
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:38:51 -0400
+	(envelope-from <simon@ruderich.org>) id 1fnmAG-0002dA-ES
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:43:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fnm5R-0000wm-V3
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:38:50 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180809114417.28718-4-marcandre.lureau@redhat.com>
-References: <20180809114417.28718-1-marcandre.lureau@redhat.com>
-	<20180809114417.28718-4-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 9 Aug 2018 16:38:47 +0200
-Message-ID: <CAJ+F1C+dpfLNb4C-5LxEPbRBR7C0HVSce7by4ckppyNiFZcsRQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/4] monitor: fix oob command leak
+	(envelope-from <simon@ruderich.org>) id 1fnmAC-0004iu-6h
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:43:48 -0400
+Received: from zucker2.schokokeks.org ([178.63.68.90]:33833)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1fnmAB-0004fD-Ts
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:43:44 -0400
+Date: Thu, 9 Aug 2018 16:43:40 +0200
+From: Simon Ruderich <simon@ruderich.org>
+Message-ID: <20180809144340.GA29237@ruderich.org>
+References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
+	<cover.1526916378.git.simon@ruderich.org>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="=_zucker.schokokeks.org-4798-1533825821-0001-2"
+Content-Disposition: inline
+In-Reply-To: <cover.1526916378.git.simon@ruderich.org>
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU <qemu-devel@nongnu.org>
-Cc: Hannes Reinecke <hare@suse.com>, Fam Zheng <famz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi
+This is a MIME-formatted message.  If you see this text it means that your
+E-mail software does not support MIME-formatted messages.
 
-On Thu, Aug 9, 2018 at 1:44 PM, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
-> Spotted by ASAN, during make check...
+--=_zucker.schokokeks.org-4798-1533825821-0001-2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, May 21, 2018 at 05:36:39PM +0200, Simon Ruderich wrote:
+> Hello,
 >
-> Direct leak of 40 byte(s) in 1 object(s) allocated from:
->     #0 0x7f8e27262c48 in malloc (/lib64/libasan.so.5+0xeec48)
->     #1 0x7f8e26a5f3c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
->     #2 0x555ab67078a8 in qstring_from_str /home/elmarco/src/qq/qobject/qs=
-tring.c:67
->     #3 0x555ab67071e4 in qstring_new /home/elmarco/src/qq/qobject/qstring=
-.c:24
->     #4 0x555ab6713fbf in qstring_from_escaped_str /home/elmarco/src/qq/qo=
-bject/json-parser.c:144
->     #5 0x555ab671738c in parse_literal /home/elmarco/src/qq/qobject/json-=
-parser.c:506
->     #6 0x555ab67179c3 in parse_value /home/elmarco/src/qq/qobject/json-pa=
-rser.c:569
->     #7 0x555ab6715123 in parse_pair /home/elmarco/src/qq/qobject/json-par=
-ser.c:306
->     #8 0x555ab6715483 in parse_object /home/elmarco/src/qq/qobject/json-p=
-arser.c:357
->     #9 0x555ab671798b in parse_value /home/elmarco/src/qq/qobject/json-pa=
-rser.c:561
->     #10 0x555ab6717a6b in json_parser_parse_err /home/elmarco/src/qq/qobj=
-ect/json-parser.c:592
->     #11 0x555ab4fd4dcf in handle_qmp_command /home/elmarco/src/qq/monitor=
-.c:4257
->     #12 0x555ab6712c4d in json_message_process_token /home/elmarco/src/qq=
-/qobject/json-streamer.c:105
->     #13 0x555ab67e01e2 in json_lexer_feed_char /home/elmarco/src/qq/qobje=
-ct/json-lexer.c:323
->     #14 0x555ab67e0af6 in json_lexer_feed /home/elmarco/src/qq/qobject/js=
-on-lexer.c:373
->     #15 0x555ab6713010 in json_message_parser_feed /home/elmarco/src/qq/q=
-object/json-streamer.c:124
->     #16 0x555ab4fd58ec in monitor_qmp_read /home/elmarco/src/qq/monitor.c=
-:4337
->     #17 0x555ab6559df2 in qemu_chr_be_write_impl /home/elmarco/src/qq/cha=
-rdev/char.c:175
->     #18 0x555ab6559e95 in qemu_chr_be_write /home/elmarco/src/qq/chardev/=
-char.c:187
->     #19 0x555ab6560127 in fd_chr_read /home/elmarco/src/qq/chardev/char-f=
-d.c:66
->     #20 0x555ab65d9c73 in qio_channel_fd_source_dispatch /home/elmarco/sr=
-c/qq/io/channel-watch.c:84
->     #21 0x7f8e26a598ac in g_main_context_dispatch (/lib64/libglib-2.0.so.=
-0+0x4c8ac)
+> This is third version of this patch set, rebased on current
+> master.
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> As I've received no answers to [1] (and I'd prefer to keep the
+> patch as is for now if possible) this doesn't include any changes
+> to address the comments to [2].
 
-It looks like it was introduced with commit
-b27314567d4cd8e204a18feba60d3341fb2d1aed "qmp: Simplify code around
-monitor_qmp_dispatch_one()"
+Hello again,
 
-> ---
->  monitor.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/monitor.c b/monitor.c
-> index 77861e96af..a1999e396c 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4277,6 +4277,8 @@ static void handle_qmp_command(JSONMessageParser *p=
-arser, GQueue *tokens)
->          trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(id)
->                                            ?: "");
->          monitor_qmp_dispatch(mon, req, id);
-> +        qobject_unref(req);
-> +        qobject_unref(id);
->          return;
->      }
->
-> --
-> 2.18.0.547.g1d89318c48
->
->
+I haven't received any answers in quite some time. Is there
+anything I can do to get these patches merged? Are there any
+issues left to resolve?
 
-
-
+Regards
+Simon
 --=20
-Marc-Andr=C3=A9 Lureau
++ privacy is necessary
++ using gnupg http://gnupg.org
++ public key id: 0x92FEFDB7E44C32F9
+
+--=_zucker.schokokeks.org-4798-1533825821-0001-2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEO7rfWMMObpFkF3n0kv79t+RMMvkFAltsUxEACgkQkv79t+RM
+MvkaPA//UHbQNzZLsUfeJQ107RDHGnbQ/KaMHDcEq672/u20CjH70BdJycQ1LGDG
+bkzs0CKQBFBS6pVJfSGl1Qk0hse5QJm4utdJvYqE26cZUSKTracUqAEayrOVScSK
+cBQNpelWxOA1G2lWPz4ULexFkFFw9IZ9NBBLhQ8kMBdgHrXfEQEArpgQPVcRhSWM
++3nsjPl7vUAQXPjN07ELoil8j1WvJ2N4sBSNmSwVaHXDdzHhFVohxR57lAmcjCRc
+FMhK44aAhfslH1svNdTvROH56FpB+3LFx6G/2nrYa8eAq5rBasonaP/qHi71NMuP
+Hu3bON3DovAM3ElyLToT1m3Fkqo0C34ysa8n10qV/SMLSLTwNVDXqlrsV5Cbmx06
+Ts4bcwotE/5JIR6ysOdwF8W24bSX86PfINnD5sUM17EzSxPaasd/ObeDacbeDE+v
+KvHxL33VCZjCD4hyBFEP490MaXkHipgfig0Isjutf4862taxhrKNsLrhGR+7bap2
+m+GMi9ymSS8/28tdsD0U+mjqGlNCPxmu/I/TqD2PgHp9VTfE3YK4PkPvXaZgxUMi
+jUkosf8dxAN165BGdR4wkB8BGURvg7A8dib0XQmWF9rTWqVVDyO7A1PxYRlSBmCz
+YBHHK6ryBArM5xuuRUBzkvPY61dNng6uwoEjaflmjoM3Dd9svrw=
+=uAn5
+-----END PGP SIGNATURE-----
+
+--=_zucker.schokokeks.org-4798-1533825821-0001-2--
