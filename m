@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnl8l-00039S-RO
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:38:12 -0400
+	(envelope-from <lvivier@redhat.com>) id 1fnlAY-00041W-3g
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:40:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnl8i-0004GJ-IC
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:38:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37238 helo=mx1.redhat.com)
+	(envelope-from <lvivier@redhat.com>) id 1fnlAS-0005nr-Vm
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:40:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37288 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fnl8i-0004Ft-Bt
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:38:08 -0400
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-5-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8db80373-f9fb-ca83-5c56-4439b807e78e@redhat.com>
-Date: Thu, 9 Aug 2018 08:38:06 -0500
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1fnlAS-0005mz-Pf
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:39:56 -0400
+References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
+	<20180806143412.27722-14-e.emanuelegiuseppe@gmail.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <d0252c8c-801e-5e20-67ef-a36e9819cd59@redhat.com>
+Date: Thu, 9 Aug 2018 15:39:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180808120334.10970-5-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180806143412.27722-14-e.emanuelegiuseppe@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/56] qmp-cmd-test: Split off qmp-test
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 13/34] test/qgraph: virtio_start_device
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
 
-On 08/08/2018 07:02 AM, Markus Armbruster wrote:
-> qmp-test is for QMP protocol tests.  Commit e4a426e75ef added generic,
-> basic tests of query commands to it.  Move them to their own test
-> program qmp-cmd-test, to keep qmp-test focused on the protocol.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On 06/08/2018 16:33, Emanuele Giuseppe Esposito wrote:
+> This function is intended to group all the qvirtio_* functions that
+> start the qvirtio devices.
+> Applied in all tests using this combination of functions.
+>=20
+> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com=
+>
 > ---
->   MAINTAINERS            |   1 +
->   tests/Makefile.include |   3 +
->   tests/qmp-cmd-test.c   | 213 +++++++++++++++++++++++++++++++++++++++++
->   tests/qmp-test.c       | 191 +-----------------------------------
->   4 files changed, 218 insertions(+), 190 deletions(-)
->   create mode 100644 tests/qmp-cmd-test.c
-> 
+>  tests/libqos/virtio.c    |  8 ++++++++
+>  tests/libqos/virtio.h    |  1 +
+>  tests/vhost-user-test.c  |  5 +----
+>  tests/virtio-9p-test.c   |  6 +-----
+>  tests/virtio-blk-test.c  | 18 ++----------------
+>  tests/virtio-net-test.c  |  6 +-----
+>  tests/virtio-scsi-test.c |  4 +---
+>  7 files changed, 15 insertions(+), 33 deletions(-)
+>=20
+> diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
+> index 0dad5c19ac..56007ef11b 100644
+> --- a/tests/libqos/virtio.c
+> +++ b/tests/libqos/virtio.c
+> @@ -365,3 +365,11 @@ const char *qvirtio_get_dev_type(void)
+>          return "pci";
+>      }
+>  }
+> +
+> +void qvirtio_start_device(QVirtioDevice *vdev)
+> +{
+> +    qvirtio_reset(vdev);
+> +    qvirtio_set_acknowledge(vdev);
+> +    qvirtio_set_driver(vdev);
+> +    qvirtio_set_driver_ok(vdev);
 
-> +++ b/tests/qmp-cmd-test.c
-> @@ -0,0 +1,213 @@
-> +/*
-> + * QMP command test cases
-> + *
-> + * Copyright (c) 2017 Red Hat Inc.
+I'm not sure you can put qvirtio_set_driver_ok() here.
 
-Worth adding 2018?
+qvirtio_set_driver_ok() must be called when the driver is OK, it means
+that the virtio device must be fully initialized before (features,
+virtqueue, MSI, ...).
 
-> + *
-> + * Authors:
-> + *  Markus Armbruster <armbru@redhat.com>,
-> + *
+http://docs.oasis-open.org/virtio/virtio/v1.0/virtio-v1.0.pdf
 
-Trailing comma is odd. And these days, I'm inclined to omit Author lines 
-(git history is more reliable, anyways)
+3.1.1 Driver Requirements: Device Initialization
 
-Those are minor issues, where it is up to you if/how to clean them, so
+The driver MUST follow this sequence to initialize a device:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+1. Reset the device.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2. Set the ACKNOWLEDGE status bit: the guest OS has notice the device.
+
+3. Set the DRIVER status bit: the guest OS knows how to drive the device.
+
+4. Read device feature bits, and write the subset of feature bits
+understood by the OS and driver to the
+device. During this step the driver MAY read (but MUST NOT write) the
+device-specific configuration
+fields to check that it can support the device before accepting it.
+
+5. Set the FEATURES_OK status bit. The driver MUST NOT accept new
+feature bits after this step.
+
+6. Re-read device status to ensure the FEATURES_OK bit is still set:
+otherwise, the device does not
+support our subset of features and the device is unusable.
+
+7. Perform device-specific setup, including discovery of virtqueues for
+the device, optional per-bus setup,
+reading and possibly writing the device=E2=80=99s virtio configuration sp=
+ace,
+and population of virtqueues.
+
+8. Set the DRIVER_OK status bit. At this point the device is =E2=80=9Cliv=
+e=E2=80=9D.
+
+Thanks,
+Laurent
