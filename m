@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fnsta-00052h-Il
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:55:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1fnt2G-00051y-QK
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fnstW-0006p9-So
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:55:02 -0400
-From: Leonid Bloch <lbloch@janustech.com>
-Date: Fri, 10 Aug 2018 00:53:07 +0300
-Message-Id: <20180809215307.18241-9-lbloch@janustech.com>
-In-Reply-To: <20180809215307.18241-1-lbloch@janustech.com>
+	(envelope-from <eblake@redhat.com>) id 1fnt2F-0004jw-Vs
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:04:00 -0400
 References: <20180809215307.18241-1-lbloch@janustech.com>
+	<20180809215307.18241-6-lbloch@janustech.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e47135a1-2827-d969-1c33-da00846c9e61@redhat.com>
+Date: Thu, 9 Aug 2018 17:03:53 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 8/8] qcow2: Explicit number replaced by a
- constant
+In-Reply-To: <20180809215307.18241-6-lbloch@janustech.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 5/8] qcow2: Increase the default upper
+ limit on the L2 cache size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,36 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>
+To: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Signed-off-by: Leonid Bloch <lbloch@janustech.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On 08/09/2018 04:53 PM, Leonid Bloch wrote:
+> The upper limit on the L2 cache size is increased from 1 MB to 32 MB.
+> This is done in order to allow default full coverage of an image with
+> the L2 cache for images of up to 256 GB in size (was 8 GB). Note, that
+> only the needed amount to cover the full image is allocated. The value
+> which is changed here is just the upper limit on the L2 cache size,
+> beyond which it will not grow, even if the size of the image requires
+> it to.
+> 
+> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+> ---
+>   block/qcow2.h        | 2 +-
+>   docs/qcow2-cache.txt | 6 +++---
+>   qemu-options.hx      | 2 +-
+>   3 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index 0bab3d8b94..d77a31d932 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -73,7 +73,7 @@
+>   /* Must be at least 4 to cover all cases of refcount table growth */
+>   #define MIN_REFCOUNT_CACHE_SIZE 4 /* clusters */
+>   
+> -#define DEFAULT_L2_CACHE_MAX_SIZE 1048576  /* bytes */
+> +#define DEFAULT_L2_CACHE_MAX_SIZE 0x2000000U /* bytes */
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index b4f291765b..b0e20aeffc 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1324,7 +1324,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-     /* 2^(s->refcount_order - 3) is the refcount width in bytes */
-     s->refcount_block_bits = s->cluster_bits - (s->refcount_order - 3);
-     s->refcount_block_size = 1 << s->refcount_block_bits;
--    bs->total_sectors = header.size / 512;
-+    bs->total_sectors = header.size / BDRV_SECTOR_SIZE;
-     s->csize_shift = (62 - (s->cluster_bits - 8));
-     s->csize_mask = (1 << (s->cluster_bits - 8)) - 1;
-     s->cluster_offset_mask = (1LL << s->csize_shift) - 1;
-@@ -3450,7 +3450,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-         goto fail;
-     }
- 
--    old_length = bs->total_sectors * 512;
-+    old_length = bs->total_sectors * BDRV_SECTOR_SIZE;
-     new_l1_size = size_to_l1(s, offset);
- 
-     if (offset < old_length) {
+I'd spell this as '(64 * MiB)' with the help of "qemu/units.h".
+
 -- 
-2.17.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
