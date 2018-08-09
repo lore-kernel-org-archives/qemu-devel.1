@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fnlk8-0000rQ-Ce
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:16:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1fnlka-00019s-PJ
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:17:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fnlk5-0001w3-28
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:16:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60724 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fnlkX-0002L7-Ea
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:17:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51280 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1fnlk4-0001vV-RM
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:16:44 -0400
-References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
-	<20180806143412.27722-30-e.emanuelegiuseppe@gmail.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <f1bdb55c-9787-f9cb-6da8-c74d192d3c3e@redhat.com>
-Date: Thu, 9 Aug 2018 16:16:42 +0200
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fnlkX-0002Kg-A3
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:17:13 -0400
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-12-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <26ff5c67-abfa-bc5d-7c26-3f08ffbdc57b@redhat.com>
+Date: Thu, 9 Aug 2018 09:17:11 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180806143412.27722-30-e.emanuelegiuseppe@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180808120334.10970-12-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 29/34] test/qgraph: virtio-blk test node
+Subject: Re: [Qemu-devel] [PATCH 11/56] check-qjson: Cover UTF-8 in single
+ quoted strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 06/08/2018 16:34, Emanuele Giuseppe Esposito wrote:
-> -static void mmio_basic(void)
-> +static void basic_resize(void *obj, void *data, QGuestAllocator *t_alloc)
->  {
-> -    QVirtioMMIODevice *dev;
-> -    QVirtQueue *vq;
-> -    QGuestAllocator *alloc;
-> +    QVirtioBlk *blk_if = obj;
-> +    QVirtioDevice *dev = blk_if->vdev;
->      int n_size = TEST_IMAGE_SIZE / 2;
->      uint64_t capacity;
-> +    QVirtQueue *vq;
->  
-> -    arm_test_start();
-> -
-> -    dev = qvirtio_mmio_device_new(MMIO_DEV_BASE_ADDR, MMIO_PAGE_SIZE);
+On 08/08/2018 07:02 AM, Markus Armbruster wrote:
+> utf8_string() tests only double quoted strings.  Cover single quoted
+> strings, too: store the strings to test without quotes, then wrap them
+> in either kind of quote.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   tests/check-qjson.c | 427 ++++++++++++++++++++++----------------------
+>   1 file changed, 214 insertions(+), 213 deletions(-)
+> 
 
-This is the only user of qvirtio_mmio_device_new(), so if you remove the
-call here, you could also remove the function definition.
+Pre-existing, but:
 
-Thanks,
-Laurent
+>           /* 2.2.4  4 bytes U+1FFFFF */
+
+Technically, Unicode ends at U+10FFFF (21 bits). Anything beyond that is 
+not valid Unicode, even if it IS a valid interpretation of UTF-8 encoding.
+
+>           {
+> -            "\"\xF7\xBF\xBF\xBF\"",
+> +            "\xF7\xBF\xBF\xBF",
+>               NULL,               /* bug: rejected */
+> -            "\"\\uFFFD\"",
+> +            "\\uFFFD",
+>               "\xF7\xBF\xBF\xBF",
+>           },
+>           /* 2.2.5  5 bytes U+3FFFFFF */
+
+Which makes this one also questionable,
+
+>           {
+> -            "\"\xFB\xBF\xBF\xBF\xBF\"",
+> +            "\xFB\xBF\xBF\xBF\xBF",
+>               NULL,               /* bug: rejected */
+> -            "\"\\uFFFD\"",
+> +            "\\uFFFD",
+>               "\xFB\xBF\xBF\xBF\xBF",
+>           },
+>           /* 2.2.6  6 bytes U+7FFFFFFF */
+
+and this one.
+
+>           {
+>               /* last one in last plane: U+10FFFD */
+> -            "\"\xF4\x8F\xBF\xBD\"",
+>               "\xF4\x8F\xBF\xBD",
+> -            "\"\\uDBFF\\uDFFD\""
+> +            "\xF4\x8F\xBF\xBD",
+> +            "\\uDBFF\\uDFFD"
+>           },
+>           {
+>               /* first one beyond Unicode range: U+110000 */
+
+while these are reasonable.
+
+The conversion of the initializer looks sane (well, mechanical).  Ergo:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
