@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fniAS-0005EP-Va
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:27:45 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fniYs-0003F2-NO
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:53:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fniAP-0000YT-1O
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:27:44 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:35202)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
-	id 1fniAO-0000YL-PY
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:27:40 -0400
-Received: by mail-ed1-x543.google.com with SMTP id e6-v6so2636676edr.2
-	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 03:27:40 -0700 (PDT)
-References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
-	<e165d2c3-814d-e8b5-3691-af0225ee981d@redhat.com>
-	<581443fd-c054-06ad-94d6-7285b2713cd6@gmail.com>
-	<af774599-c03a-c839-5190-1e1809d1216b@redhat.com>
-From: Emanuele <e.emanuelegiuseppe@gmail.com>
-Message-ID: <7f377177-f813-e9b9-5299-aa7031a10f96@gmail.com>
-Date: Thu, 9 Aug 2018 12:27:37 +0200
+	(envelope-from <lbloch@janustech.com>) id 1fniYr-0004MI-Nv
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:52:58 -0400
+References: <20180808221138.5770-1-lbloch@janustech.com>
+	<20180808221138.5770-5-lbloch@janustech.com>
+	<w51woszc2b1.fsf@maestria.local.igalia.com>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <be69de56-51b2-de63-a4ae-c5345a8dcce4@janustech.com>
+Date: Thu, 9 Aug 2018 13:52:34 +0300
 MIME-Version: 1.0
-In-Reply-To: <af774599-c03a-c839-5190-1e1809d1216b@redhat.com>
+In-Reply-To: <w51woszc2b1.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 00/34] Qtest driver framework
+Content-Language: en-GB-large
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 4/5] qcow2: Set the default
+ cache-clean-interval to 10 minutes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 08/09/2018 11:44 AM, Paolo Bonzini wrote:
-> On 09/08/2018 11:20, Emanuele wrote:
->> Why this? Shouldn't it be:
+On 8/9/18 12:33 PM, Alberto Garcia wrote:
+> On Thu 09 Aug 2018 12:11:37 AM CEST, Leonid Bloch wrote:
+>> The default cache-clean-interval is set to 10 minutes, in order to lower
+>> the overhead of the qcow2 caches (before the default was 0, i.e.
+>> disabled).
 >>
->> if (g_strcmp0(old_path, path)) {
->>          qtest_end(); /* handles global_qtest = NULL */
->>          g_free(old_path); /* handles NULL */
->>          old_path = path;
->>          global_qtest = qtest_start(path);
->> } else ....
-> Yes, of course.  Though I'd have thought that my version has "just" a
-> memory leak.  Even better, this could call qos_invalidate_command_line.
->
-> Can you post the fixes to a separate commit on github?
-https://github.com/esposem/qemu/commit/4389e83522c06ce7001382284153d59105692061
+>> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+> 
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -2830,7 +2830,8 @@
+>>   #
+>>   # @cache-clean-interval:  clean unused entries in the L2 and refcount
+>>   #                         caches. The interval is in seconds. The default value
+>> -#                         is 0 and it disables this feature (since 2.5)
+>> +#                         is 600. Setting 0 disables this feature. (since 2.5)
+>> +#
+> 
+> It should be "Setting it to 0 ...".
 
-I also added g_free(old_path); in qos-test main function, since last 
-old_path is not free'd.
-This commit is part of qgraph-v3, where I am also applying Laurent's 
-suggestions.
+How about:
 
-Emanuele
+"... is 600 (0 disables this feature). (since 2.5)"?
+
+... To avoid the extra line. That's why I skipped the "it to" as well. 
+Alternatively, maybe we can skip the defaults altogether in this file, 
+just as with all the other qcow2 options there?
+
+Leonid.
+
+> 
+> With that corrected,
+> 
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> 
+> Berto
+> 
