@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1fnjPn-00056o-Al
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:47:40 -0400
+	(envelope-from <liran.alon@oracle.com>) id 1fnjPp-00059K-R1
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:47:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1fnjPk-0007I7-MJ
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:47:39 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:34254)
+	(envelope-from <liran.alon@oracle.com>) id 1fnjPn-0007LB-7n
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:47:41 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:37012)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
-	id 1fnjPk-0007Hg-CA
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:47:36 -0400
+	id 1fnjPm-0007J4-Sb
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:47:39 -0400
 From: Liran Alon <liran.alon@oracle.com>
-Date: Thu,  9 Aug 2018 14:46:26 +0300
-Message-Id: <1533815202-11967-14-git-send-email-liran.alon@oracle.com>
+Date: Thu,  9 Aug 2018 14:46:27 +0300
+Message-Id: <1533815202-11967-15-git-send-email-liran.alon@oracle.com>
 In-Reply-To: <1533815202-11967-1-git-send-email-liran.alon@oracle.com>
 References: <1533815202-11967-1-git-send-email-liran.alon@oracle.com>
-Subject: [Qemu-devel] [PATCH 13/29] vmsvga: Add support for extended FIFO
- registers
+Subject: [Qemu-devel] [PATCH 14/29] vmsvga: Setup interrupt pin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +25,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, habkost@redhat.com, kraxel@redhat.com, Liran Alon <liran.alon@oracle.com>
+Cc: pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, habkost@redhat.com, kraxel@redhat.com, Leonid Shatz <leonid.shatz@oracle.com>, Liran Alon <liran.alon@oracle.com>
 
-Supporting extended FIFO registers is required to support
-SVGA_FIFO_FENCE which allows guest to receive interrupt when FIFO is
-processed up to a specified fence.
+From: Leonid Shatz <leonid.shatz@oracle.com>
 
-Thus, as a preperation for supporting SVGA_FIFO_FENCE, add extened
-FIFO registers support. Note that exposing SVGA_CAP_EXTENDED_FIFO
-requires to support the following registers: SVGA_FIFO_CAPABILITIES,
-SVGA_FIFO_FLAGS and SVGA_FIFO_3D_HWVERSION.
+This is necessary in order for device to raise interrupts.
+Future patches will add functionality to device which will
+need this ability.
 
-For more information on how SVGA_FIFO_3D_HWVERSION is negoitated, see
-SVGA3D_Init() in VMware SVGA development kit.
-
+Signed-off-by: Leonid Shatz <leonid.shatz@oracle.com>
 Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 Signed-off-by: Liran Alon <liran.alon@oracle.com>
 ---
- hw/display/vmware_vga.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/display/vmware_vga.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/hw/display/vmware_vga.c b/hw/display/vmware_vga.c
-index 8eeb0efc9cab..91f990544e14 100644
+index 91f990544e14..eae3f1455445 100644
 --- a/hw/display/vmware_vga.c
 +++ b/hw/display/vmware_vga.c
-@@ -1033,6 +1033,7 @@ static uint32_t vmsvga_value_read(void *opaque, uint32_t address)
-                     SVGA_CAP_CURSOR_BYPASS;
-         }
- #endif
-+        caps |= SVGA_CAP_EXTENDED_FIFO;
-         ret = caps;
-         break;
+@@ -1447,6 +1447,7 @@ static void pci_vmsvga_realize(PCIDevice *dev, Error **errp)
+     dev->config[PCI_CACHE_LINE_SIZE] = 0x08;
+     dev->config[PCI_LATENCY_TIMER] = 0x40;
+     dev->config[PCI_INTERRUPT_LINE] = 0xff;          /* End */
++    dev->config[PCI_INTERRUPT_PIN] = 1;  /* interrupt pin A */
  
-@@ -1138,6 +1139,8 @@ static void vmsvga_value_write(void *opaque, uint32_t address, uint32_t value)
-         } else {
-             vga_dirty_log_start(&s->vga);
-         }
-+        if (s->enable)
-+            s->fifo[SVGA_FIFO_3D_HWVERSION] = 0;    /* 3D disabled */
-         break;
- 
-     case SVGA_REG_WIDTH:
-@@ -1384,6 +1387,8 @@ static void vmsvga_init(DeviceState *dev, struct vmsvga_state_s *s,
-                            &error_fatal);
-     s->fifo = (uint32_t *)memory_region_get_ram_ptr(&s->fifo_ram);
-     s->num_fifo_regs = SVGA_FIFO_NUM_REGS;
-+    s->fifo[SVGA_FIFO_CAPABILITIES] = 0;
-+    s->fifo[SVGA_FIFO_FLAGS] = 0;
- 
-     vga_common_init(&s->vga, OBJECT(dev));
-     vga_init(&s->vga, OBJECT(dev), address_space, io, true);
+     memory_region_init_io(&s->io_bar, NULL, &vmsvga_io_ops, &s->chip,
+                           "vmsvga-io", 0x10);
 -- 
 1.9.1
