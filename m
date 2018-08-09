@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fnsda-0004lZ-Ti
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:38:32 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fnsdc-0004nm-OD
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:38:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fnsdW-0004WU-4J
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:38:30 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fnsdb-0004cc-N0
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:38:32 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu,  9 Aug 2018 23:37:59 +0200
-Message-Id: <20180809213801.15098-10-mreitz@redhat.com>
+Date: Thu,  9 Aug 2018 23:38:00 +0200
+Message-Id: <20180809213801.15098-11-mreitz@redhat.com>
 In-Reply-To: <20180809213801.15098-1-mreitz@redhat.com>
 References: <20180809213801.15098-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/11] iotests: Add filter mirror test cases
+Subject: [Qemu-devel] [PATCH 10/11] iotests: Add test for commit in sub
+ directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,192 +23,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This patch adds some test cases how mirroring relates to filters.  One
-of them tests what happens when you mirror off a filtered COW node, two
-others use the mirror filter node as basically our only example of an
-implicitly created filter node so far (besides the commit filter).
+Add a test for committing an overlay in a sub directory to one of the
+images in its backing chain, using both relative and absolute filenames.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/041     | 146 ++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/041.out |   4 +-
- 2 files changed, 147 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/020     | 36 ++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/020.out | 10 ++++++++++
+ 2 files changed, 46 insertions(+)
 
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index 186bd0f031..c21c8b36d5 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -20,8 +20,9 @@
+diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
+index eac5080f83..d0ac33922d 100755
+--- a/tests/qemu-iotests/020
++++ b/tests/qemu-iotests/020
+@@ -32,6 +32,11 @@ _cleanup()
+ 	_cleanup_test_img
+     rm -f "$TEST_IMG.base"
+     rm -f "$TEST_IMG.orig"
++
++    rm -f "$TEST_DIR/subdir/t.$IMGFMT.base"
++    rm -f "$TEST_DIR/subdir/t.$IMGFMT.mid"
++    rm -f "$TEST_DIR/subdir/t.$IMGFMT"
++    rmdir "$TEST_DIR/subdir" &> /dev/null
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
- import time
- import os
-+import json
- import iotests
--from iotests import qemu_img, qemu_io
-+from iotests import qemu_img, qemu_img_pipe, qemu_io
+@@ -135,6 +140,37 @@ $QEMU_IO -c 'writev 0 64k' "$TEST_IMG" | _filter_qemu_io
+ $QEMU_IMG commit "$TEST_IMG"
+ _cleanup
  
- backing_img = os.path.join(iotests.test_dir, 'backing.img')
- target_backing_img = os.path.join(iotests.test_dir, 'target-backing.img')
-@@ -1185,5 +1186,148 @@ class TestReplaces(iotests.QMPTestCase):
-         os.remove(test_img)
-         os.remove(target_img)
- 
-+# Tests for mirror with filters (and how the mirror filter behaves, as
-+# an example for an implicit filter)
-+class TestFilters(iotests.QMPTestCase):
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, backing_img, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, '-b', backing_img, test_img)
-+        qemu_img('create', '-f', iotests.imgfmt, '-b', backing_img, target_img)
 +
-+        qemu_io('-c', 'write -P 1 0 512k', backing_img)
-+        qemu_io('-c', 'write -P 2 512k 512k', test_img)
++echo
++echo 'Testing commit in sub-directory with relative filenames'
++echo
 +
-+        self.vm = iotests.VM()
-+        self.vm.launch()
++pushd "$TEST_DIR" > /dev/null
 +
-+        result = self.vm.qmp('blockdev-add', **{
-+                                'node-name': 'target',
-+                                'driver': iotests.imgfmt,
-+                                'file': {
-+                                    'driver': 'file',
-+                                    'filename': target_img
-+                                },
-+                                'backing': None
-+                            })
-+        self.assert_qmp(result, 'return', {})
++mkdir subdir
 +
-+        self.filterless_chain = {
-+                'node-name': 'source',
-+                'driver': iotests.imgfmt,
-+                'file': {
-+                    'driver': 'file',
-+                    'filename': test_img
-+                },
-+                'backing': {
-+                    'node-name': 'backing',
-+                    'driver': iotests.imgfmt,
-+                    'file': {
-+                        'driver': 'file',
-+                        'filename': backing_img
-+                    }
-+                }
-+            }
++TEST_IMG="subdir/t.$IMGFMT.base" _make_test_img 1M
++TEST_IMG="subdir/t.$IMGFMT.mid" _make_test_img -b "t.$IMGFMT.base"
++TEST_IMG="subdir/t.$IMGFMT" _make_test_img -b "t.$IMGFMT.mid"
 +
-+    def tearDown(self):
-+        self.vm.shutdown()
++# Should work
++$QEMU_IMG commit -b "t.$IMGFMT.mid" "subdir/t.$IMGFMT"
 +
-+        os.remove(test_img)
-+        os.remove(target_img)
-+        os.remove(backing_img)
++# Might theoretically work, but does not in practice (we have to
++# decide between this and the above; and since we always represent
++# backing file names as relative to the overlay, we go for the above)
++$QEMU_IMG commit -b "subdir/t.$IMGFMT.mid" "subdir/t.$IMGFMT" 2>&1 | \
++    _filter_imgfmt
 +
-+    def test_cor(self):
-+        result = self.vm.qmp('blockdev-add', **{
-+                                'node-name': 'filter',
-+                                'driver': 'copy-on-read',
-+                                'file': self.filterless_chain
-+                            })
-+        self.assert_qmp(result, 'return', {})
++# This should work as well
++$QEMU_IMG commit -b "$TEST_DIR/subdir/t.$IMGFMT.mid" "subdir/t.$IMGFMT"
 +
-+        result = self.vm.qmp('blockdev-mirror',
-+                             job_id='mirror',
-+                             device='filter',
-+                             target='target',
-+                             sync='top')
-+        self.assert_qmp(result, 'return', {})
++popd > /dev/null
 +
-+        self.complete_and_wait('mirror')
++# Now let's try with just absolute filenames
++$QEMU_IMG commit -b "$TEST_DIR/subdir/t.$IMGFMT.mid" \
++    "$TEST_DIR/subdir/t.$IMGFMT"
 +
-+        self.vm.qmp('blockdev-del', node_name='target')
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/020.out b/tests/qemu-iotests/020.out
+index 4b722b2dd0..228c37dded 100644
+--- a/tests/qemu-iotests/020.out
++++ b/tests/qemu-iotests/020.out
+@@ -1094,4 +1094,14 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=json:{'driv
+ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qemu-img: Block job failed: No space left on device
 +
-+        target_map = qemu_img_pipe('map', '--output=json', target_img)
-+        target_map = json.loads(target_map)
++Testing commit in sub-directory with relative filenames
 +
-+        assert target_map[0]['start'] == 0
-+        assert target_map[0]['length'] == 512 * 1024
-+        assert target_map[0]['depth'] == 1
-+
-+        assert target_map[1]['start'] == 512 * 1024
-+        assert target_map[1]['length'] == 512 * 1024
-+        assert target_map[1]['depth'] == 0
-+
-+    def test_implicit_mirror_filter(self):
-+        result = self.vm.qmp('blockdev-add', **self.filterless_chain)
-+        self.assert_qmp(result, 'return', {})
-+
-+        # We need this so we can query from above the mirror node
-+        result = self.vm.qmp('device_add',
-+                             driver='virtio-blk',
-+                             id='virtio',
-+                             bus='pci.0',
-+                             drive='source')
-+        self.assert_qmp(result, 'return', {})
-+
-+        result = self.vm.qmp('blockdev-mirror',
-+                             job_id='mirror',
-+                             device='source',
-+                             target='target',
-+                             sync='top')
-+        self.assert_qmp(result, 'return', {})
-+
-+        # The mirror filter is now an implicit node, so it should be
-+        # invisible when querying the backing chain
-+        device_info = self.vm.qmp('query-block')['return'][0]
-+        assert device_info['qdev'] == '/machine/peripheral/virtio/virtio-backend'
-+
-+        assert device_info['inserted']['node-name'] == 'source'
-+
-+        image_info = device_info['inserted']['image']
-+        assert image_info['filename'] == test_img
-+        assert image_info['backing-image']['filename'] == backing_img
-+
-+        self.complete_and_wait('mirror')
-+
-+    def test_explicit_mirror_filter(self):
-+        # Same test as above, but this time we give the mirror filter
-+        # a node-name so it will not be invisible
-+        result = self.vm.qmp('blockdev-add', **self.filterless_chain)
-+        self.assert_qmp(result, 'return', {})
-+
-+        # We need this so we can query from above the mirror node
-+        result = self.vm.qmp('device_add',
-+                             driver='virtio-blk',
-+                             id='virtio',
-+                             bus='pci.0',
-+                             drive='source')
-+        self.assert_qmp(result, 'return', {})
-+
-+        result = self.vm.qmp('blockdev-mirror',
-+                             job_id='mirror',
-+                             device='source',
-+                             target='target',
-+                             sync='top',
-+                             filter_node_name='mirror-filter')
-+        self.assert_qmp(result, 'return', {})
-+
-+        # With a node-name given to it, the mirror filter should now
-+        # be visible
-+        device_info = self.vm.qmp('query-block')['return'][0]
-+        assert device_info['qdev'] == '/machine/peripheral/virtio/virtio-backend'
-+
-+        assert device_info['inserted']['node-name'] == 'mirror-filter'
-+
-+        self.complete_and_wait('mirror')
-+
-+
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2', 'qed'])
-diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
-index d71481b010..2c448b4239 100644
---- a/tests/qemu-iotests/041.out
-+++ b/tests/qemu-iotests/041.out
-@@ -1,5 +1,5 @@
--.......................................................................................
-+..........................................................................................
- ----------------------------------------------------------------------
--Ran 87 tests
-+Ran 90 tests
- 
- OK
++Formatting 'subdir/t.IMGFMT.base', fmt=IMGFMT size=1048576
++Formatting 'subdir/t.IMGFMT.mid', fmt=IMGFMT size=1048576 backing_file=t.IMGFMT.base
++Formatting 'subdir/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=t.IMGFMT.mid
++Image committed.
++qemu-img: Did not find 'subdir/t.IMGFMT.mid' in the backing chain of 'subdir/t.IMGFMT'
++Image committed.
++Image committed.
+ *** done
 -- 
 2.17.1
