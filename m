@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnlnu-0003sn-Lx
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:20:43 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fnloV-0004Kf-Et
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:21:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnlnr-0004Bc-5E
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:20:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51424 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fnlnq-0004BN-PG
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:20:38 -0400
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-13-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a6dc734e-12cb-bc3d-64fa-76c4e569b438@redhat.com>
-Date: Thu, 9 Aug 2018 09:20:34 -0500
+	(envelope-from <lbloch@janustech.com>) id 1fnloS-0004a8-D2
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:21:19 -0400
+From: Leonid Bloch <lbloch@janustech.com>
+Date: Thu,  9 Aug 2018 17:20:42 +0300
+Message-Id: <20180809142046.12311-2-lbloch@janustech.com>
+In-Reply-To: <20180809142046.12311-1-lbloch@janustech.com>
+References: <20180809142046.12311-1-lbloch@janustech.com>
 MIME-Version: 1.0
-In-Reply-To: <20180808120334.10970-13-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/56] check-qjson: Simplify utf8_string()
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v5 1/5] qcow2: Options' documentation fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +21,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>
 
-On 08/08/2018 07:02 AM, Markus Armbruster wrote:
-> The previous commit made utf8_string()'s test_cases[].utf8_in
-> superfluous: we can use .json_in instead.  Except for the case testing
-> U+0000.  \x00 doesn't work in C strings, so it tests \\u0000 instead.
-> But testing \\uXXXX is escaped_string()'s job.  It's covered there.
-> Test U+0001 here, and drop .utf8_in.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   tests/check-qjson.c | 53 ++++++++-------------------------------------
->   1 file changed, 9 insertions(+), 44 deletions(-)
-> 
+Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+---
+ docs/qcow2-cache.txt | 3 +++
+ qemu-options.hx      | 9 ++++++---
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
+index 8a09a5cc5f..5bf2a8ad29 100644
+--- a/docs/qcow2-cache.txt
++++ b/docs/qcow2-cache.txt
+@@ -130,6 +130,9 @@ There are a few things that need to be taken into account:
+    memory as possible to the L2 cache before increasing the refcount
+    cache size.
+ 
++ - At most two of "l2-cache-size", "refcount-cache-size", and "cache-size"
++   can be set simultaneously.
++
+ Unlike L2 tables, refcount blocks are not used during normal I/O but
+ only during allocations and internal snapshots. In most cases they are
+ accessed sequentially (even during random guest I/O) so increasing the
+diff --git a/qemu-options.hx b/qemu-options.hx
+index b1bf0f485f..f6804758d3 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -752,15 +752,18 @@ image file)
+ 
+ @item cache-size
+ The maximum total size of the L2 table and refcount block caches in bytes
+-(default: 1048576 bytes or 8 clusters, whichever is larger)
++(default: the sum of l2-cache-size and refcount-cache-size)
+ 
+ @item l2-cache-size
+ The maximum size of the L2 table cache in bytes
+-(default: 4/5 of the total cache size)
++(default: if cache-size is not defined - 1048576 bytes or 8 clusters, whichever
++is larger; otherwise, as large as possible or needed within the cache-size,
++while permitting the requested or the minimal refcount cache size)
+ 
+ @item refcount-cache-size
+ The maximum size of the refcount block cache in bytes
+-(default: 1/5 of the total cache size)
++(default: 4 times the cluster size; or if cache-size is specified, the part of
++it which is not used for the L2 cache)
+ 
+ @item cache-clean-interval
+ Clean unused entries in the L2 and refcount caches. The interval is in seconds.
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.1
