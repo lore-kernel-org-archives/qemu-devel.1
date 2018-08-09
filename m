@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnl07-0004OM-VQ
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:29:16 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fnl1b-0006dO-CF
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:30:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnl04-0005zN-LN
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:29:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fnl04-0005yr-EK
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:29:12 -0400
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-3-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8d30dec0-ddbb-60cc-208a-a02177c140b3@redhat.com>
-Date: Thu, 9 Aug 2018 08:29:03 -0500
+	(envelope-from <kwolf@redhat.com>) id 1fnl1a-0006lN-Ey
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:30:47 -0400
+Date: Thu, 9 Aug 2018 15:30:38 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180809133038.GC4320@localhost.localdomain>
+References: <20180806141322.14427-1-berto@igalia.com>
+	<20180806150541.GE4631@localhost.localdomain>
+	<w51mutzo730.fsf@maestria.local.igalia.com>
+	<20180806155840.GF4631@localhost.localdomain>
+	<w51mutvbsak.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20180808120334.10970-3-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/56] check-qjson: Cover blank and
- lexically erroneous input
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w51mutvbsak.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Release dirty entries with
+ cache-clean-interval
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 08/08/2018 07:02 AM, Markus Armbruster wrote:
-> qobject_from_json() can return null without setting an error on
-> lexical errors.  I call that a bug.  Add test coverage to demonstrate
-> it.
+Am 09.08.2018 um 15:09 hat Alberto Garcia geschrieben:
+> On Mon 06 Aug 2018 05:58:41 PM CEST, Kevin Wolf wrote:
+> > Am 06.08.2018 um 17:20 hat Alberto Garcia geschrieben:
+> >> On Mon 06 Aug 2018 05:05:41 PM CEST, Kevin Wolf wrote:
+> >> > Am 06.08.2018 um 16:13 hat Alberto Garcia geschrieben:
+> >> >> -static inline bool can_clean_entry(Qcow2Cache *c, int i)
+> >> >> +static inline bool can_clean_entry(BlockDriverState *bs, Qcow2Cache *c, int i)
+> >> >>  {
+> >> >>      Qcow2CachedTable *t = &c->entries[i];
+> >> >> -    return t->ref == 0 && !t->dirty && t->offset != 0 &&
+> >> >> -        t->lru_counter <= c->cache_clean_lru_counter;
+> >> >> +    if (t->ref || !t->offset || t->lru_counter > c->cache_clean_lru_counter) {
+> >> >> +        return false;
+> >> >> +    }
+> >> >> +
+> >> >> +    if (qcow2_cache_entry_flush(bs, c, i) < 0) {
+> >> >> +        return false;
+> >> >> +    }
+> >> >
+> >> > We're not in coroutine context here, so qcow2_cache_entry_flush() will
+> >> > be blocking. I don't think that's acceptable in a timer callback.
+> >> >
+> >> > On the other hand, if we made it non-blocking by moving it into a
+> >> > coroutine that could yield, we would have to consider races with other
+> >> > parts of the code and at least take s->lock and implement
+> >> > .bdrv_co_drain_begin/end callbacks.
+> >> 
+> >> Oh, I see... it's probably not worth complicating the code for this then.
+> >
+> > On second thoughts, I actually think we can do without the drain
+> > callbacks if we just add a bdrv_inc/dec_in_flight() pair around
+> > qcow2_cache_clean_unused().
+> >
+> > We'd still have to create a coroutine in cache_clean_timer_cb() and take
+> > the lock, but that sounds more managable.
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   tests/check-qjson.c | 36 +++++++++++++++++++++++++++++++++---
->   1 file changed, 33 insertions(+), 3 deletions(-)
-> 
+> When we're waiting for a cache entry to flush and the coroutine yields,
+> can the previous (already checked) cache entries become dirty?
 
-> +static void junk_input(void)
-> +{
-> +    /* Note: junk within strings is covered elsewhere */
-> +    Error *err = NULL;
-> +    QObject *obj;
-> +
-> +    obj = qobject_from_json("@", &err);
+qcow2_cache_entry_mark_dirty() should only ever be called under s->lock,
+so as long as you take the lock, I don't think so.
 
-Invalid token
-
-> +    g_assert(!err);             /* BUG */
-> +    g_assert(obj == NULL);
-> +
-> +    obj = qobject_from_json("[0\xFF]", &err);
-
-\xff stream reset, followed by unbalanced ]
-
-> +    error_free_or_abort(&err);
-> +    g_assert(obj == NULL);
-> +
-> +    obj = qobject_from_json("00", &err);
-
-Invalid as a JSON number
-
-> +    g_assert(!err);             /* BUG */
-> +    g_assert(obj == NULL);
-> +
-> +    obj = qobject_from_json("[1e", &err);
-
-Incomplete as a JSON number
-
-> +    g_assert(!err);             /* BUG */
->       g_assert(obj == NULL);
->   }
-
-Is it also worth testing:
-
-"t" (incomplete as a JSON literal)
-"a" (not a valid JSON literal, but alphabetic and thus different from 
-the "@" test above)
-
-At any rate, with or without further tests this is good improved 
-coverage dealt with in the rest of the series.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Kevin
