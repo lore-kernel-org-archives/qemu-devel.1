@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fnhOZ-0003SN-VK
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:38:16 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fnhV0-0005yh-SB
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:44:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fnhOU-0001Iu-TK
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:38:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57180 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fnhUw-0004k8-SV
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:44:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59240 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fnhOU-0001GN-Nq
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:38:10 -0400
-Date: Thu, 9 Aug 2018 17:37:58 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180809093758.GB2539@xz-mi>
-References: <20180807193125.30378-1-alex.williamson@redhat.com>
-	<20180807224033-mutt-send-email-mst@kernel.org>
-	<20180807135303.3938b3a2@t450s.home>
-	<20180808004929-mutt-send-email-mst@kernel.org>
-	<20180808034543.GC24415@xz-mi>
-	<20180809122030-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fnhUw-0004k2-MK
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:44:50 -0400
+References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
+	<e165d2c3-814d-e8b5-3691-af0225ee981d@redhat.com>
+	<581443fd-c054-06ad-94d6-7285b2713cd6@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <af774599-c03a-c839-5190-1e1809d1216b@redhat.com>
+Date: Thu, 9 Aug 2018 11:44:47 +0200
 MIME-Version: 1.0
+In-Reply-To: <581443fd-c054-06ad-94d6-7285b2713cd6@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180809122030-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Balloon inhibit enhancements,
- vfio restriction
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 00/34] Qtest driver framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org, david@redhat.com
+To: Emanuele <e.emanuelegiuseppe@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
 
-On Thu, Aug 09, 2018 at 12:23:43PM +0300, Michael S. Tsirkin wrote:
-> On Wed, Aug 08, 2018 at 11:45:43AM +0800, Peter Xu wrote:
-> > On Wed, Aug 08, 2018 at 12:58:32AM +0300, Michael S. Tsirkin wrote:
-> > > At least with VTD, it seems entirely possible to change e.g. a PMD
-> > > atomically to point to a different set of PTEs, then flush.
-> > > That will allow removing memory at high granularity for
-> > > an arbitrary device without mdev or PASID dependency.
-> > 
-> > My understanding is that the guest driver should prohibit this kind of
-> > operation (say, modifying PMD).
-> 
-> Interesting.  Which part of the VTD spec prohibits this?
-> 
-> > Actually I don't see how it can
-> > happen in Linux if the kernel drivers always call the IOMMU API since
-> > there are only map/unmap APIs rather than this atomic-modify API.
-> 
-> It could happen with a non-Linux guest which might have a different API.
-> 
-> > The thing is that IMHO it's the guest driver's responsibility to make
-> > sure the pages will never be used by the device before it removes the
-> > entry (including modifying the PMD since that actually removes all the
-> > entries on the old PMD).
-> 
-> If you switch PMDs atomically from one set of valid PTEs to another,
-> then flush, then as far as I could see it just works in the hardware
-> VTD, but not in the emulated VTD. So that's a difference in
-> behaviour. Maybe we are lucky and no one does that.
+On 09/08/2018 11:20, Emanuele wrote:
+>>
+> Why this? Shouldn't it be:
+>=20
+> if (g_strcmp0(old_path, path)) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qtest_end(); /* handles glob=
+al_qtest =3D NULL */
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_free(old_path); /* handles=
+ NULL */
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 old_path =3D path;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 global_qtest =3D qtest_start=
+(path);
+> } else ....
 
-Yes, but AFAICT that's also the best we can have now since the
-userspace QEMU (or say, the VT-d emulation code) cannot really modify
-a real PMD that the hardware uses - it can only call the VFIO APIs,
-and finally it boils down again to the host kernel IOMMU APIs to do
-map or unmap only.  So it's a impossible task until we provide such an
-interface through the whole IOMMU/VFIO/... stack just like what you
-have discussed in the other thread.
+Yes, of course.  Though I'd have thought that my version has "just" a
+memory leak.  Even better, this could call qos_invalidate_command_line.
 
-Thanks,
+Can you post the fixes to a separate commit on github?
 
--- 
-Peter Xu
+Paolo
