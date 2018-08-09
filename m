@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fnkZS-0005yx-1D
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:44 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fnkZV-000615-Kk
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fnkZR-0003PE-2u
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:42 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fnkZU-0003SK-Ng
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:45 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  9 Aug 2018 14:01:14 +0100
-Message-Id: <20180809130115.28951-16-peter.maydell@linaro.org>
+Date: Thu,  9 Aug 2018 14:01:12 +0100
+Message-Id: <20180809130115.28951-14-peter.maydell@linaro.org>
 In-Reply-To: <20180809130115.28951-1-peter.maydell@linaro.org>
 References: <20180809130115.28951-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 15/16] hw/dma/pl080: Remove hw_error() if DMA
- is enabled
+Subject: [Qemu-devel] [PATCH 13/16] hw/dma/pl080: Provide device reset
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,32 +23,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-The PL08x model currently will unconditionally call hw_error()
-if the DMA engine is enabled by the guest. This has been
-present since the PL080 model was edded in 2006, and is
-presumably either unintentional debug code left enabled,
-or a guard against untested DMA engine code being used.
-
-Remove the hw_error(), since we now have a guest which
-will actually try to use the DMA engine (the self-test
-binary for the AN505 MPS2 FPGA image).
+The PL080/PL081 model is missing a reset function; implement it.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/dma/pl080.c | 1 -
- 1 file changed, 1 deletion(-)
+ hw/dma/pl080.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/hw/dma/pl080.c b/hw/dma/pl080.c
-index 8f92550392b..ef15d3e628d 100644
+index 8f9f3e08d9a..a7aacad74f0 100644
 --- a/hw/dma/pl080.c
 +++ b/hw/dma/pl080.c
-@@ -110,7 +110,6 @@ static void pl080_run(PL080State *s)
-     if ((s->conf & PL080_CONF_E) == 0)
-         return;
+@@ -348,6 +348,30 @@ static const MemoryRegionOps pl080_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
  
--hw_error("DMA active\n");
-     /* If we are already in the middle of a DMA operation then indicate that
-        there may be new DMA requests and return immediately.  */
-     if (s->running) {
++static void pl080_reset(DeviceState *dev)
++{
++    PL080State *s = PL080(dev);
++    int i;
++
++    s->tc_int = 0;
++    s->tc_mask = 0;
++    s->err_int = 0;
++    s->err_mask = 0;
++    s->conf = 0;
++    s->sync = 0;
++    s->req_single = 0;
++    s->req_burst = 0;
++    s->running = 0;
++
++    for (i = 0; i < s->nchannels; i++) {
++        s->chan[i].src = 0;
++        s->chan[i].dest = 0;
++        s->chan[i].lli = 0;
++        s->chan[i].ctrl = 0;
++        s->chan[i].conf = 0;
++    }
++}
++
+ static void pl080_init(Object *obj)
+ {
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+@@ -393,6 +417,7 @@ static void pl080_class_init(ObjectClass *oc, void *data)
+     dc->vmsd = &vmstate_pl080;
+     dc->realize = pl080_realize;
+     dc->props = pl080_properties;
++    dc->reset = pl080_reset;
+ }
+ 
+ static const TypeInfo pl080_info = {
 -- 
 2.17.1
