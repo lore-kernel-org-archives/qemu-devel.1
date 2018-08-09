@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fnkZV-000615-Kk
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:46 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fnkZU-00060K-VE
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fnkZU-0003SK-Ng
+	(envelope-from <pm215@archaic.org.uk>) id 1fnkZR-0003P7-0e
 	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:45 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  9 Aug 2018 14:01:12 +0100
-Message-Id: <20180809130115.28951-14-peter.maydell@linaro.org>
+Date: Thu,  9 Aug 2018 14:01:03 +0100
+Message-Id: <20180809130115.28951-5-peter.maydell@linaro.org>
 In-Reply-To: <20180809130115.28951-1-peter.maydell@linaro.org>
 References: <20180809130115.28951-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 13/16] hw/dma/pl080: Provide device reset
- function
+Subject: [Qemu-devel] [PATCH 04/16] hw/arm/iotkit: Wire up the S32KTIMER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +22,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-The PL080/PL081 model is missing a reset function; implement it.
+The IoTKit has a CMSDK timer device that runs on the S32KCLK.
+Create this and wire it up.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/dma/pl080.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ include/hw/arm/iotkit.h | 2 +-
+ hw/arm/iotkit.c         | 9 +++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/hw/dma/pl080.c b/hw/dma/pl080.c
-index 8f9f3e08d9a..a7aacad74f0 100644
---- a/hw/dma/pl080.c
-+++ b/hw/dma/pl080.c
-@@ -348,6 +348,30 @@ static const MemoryRegionOps pl080_ops = {
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
+diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
+index 776d0497087..0f5c5101708 100644
+--- a/include/hw/arm/iotkit.h
++++ b/include/hw/arm/iotkit.h
+@@ -83,6 +83,7 @@ typedef struct IoTKit {
+     TZMPC mpc;
+     CMSDKAPBTIMER timer0;
+     CMSDKAPBTIMER timer1;
++    CMSDKAPBTIMER s32ktimer;
+     qemu_or_irq ppc_irq_orgate;
+     SplitIRQ sec_resp_splitter;
+     SplitIRQ ppc_irq_splitter[NUM_PPCS];
+@@ -91,7 +92,6 @@ typedef struct IoTKit {
+     qemu_or_irq nmi_orgate;
  
-+static void pl080_reset(DeviceState *dev)
-+{
-+    PL080State *s = PL080(dev);
-+    int i;
-+
-+    s->tc_int = 0;
-+    s->tc_mask = 0;
-+    s->err_int = 0;
-+    s->err_mask = 0;
-+    s->conf = 0;
-+    s->sync = 0;
-+    s->req_single = 0;
-+    s->req_burst = 0;
-+    s->running = 0;
-+
-+    for (i = 0; i < s->nchannels; i++) {
-+        s->chan[i].src = 0;
-+        s->chan[i].dest = 0;
-+        s->chan[i].lli = 0;
-+        s->chan[i].ctrl = 0;
-+        s->chan[i].conf = 0;
-+    }
-+}
-+
- static void pl080_init(Object *obj)
- {
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-@@ -393,6 +417,7 @@ static void pl080_class_init(ObjectClass *oc, void *data)
-     dc->vmsd = &vmstate_pl080;
-     dc->realize = pl080_realize;
-     dc->props = pl080_properties;
-+    dc->reset = pl080_reset;
+     CMSDKAPBDualTimer dualtimer;
+-    UnimplementedDeviceState s32ktimer;
+ 
+     CMSDKAPBWatchdog s32kwatchdog;
+     CMSDKAPBWatchdog nswatchdog;
+diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+index 5cedfa03570..cb0ec456f39 100644
+--- a/hw/arm/iotkit.c
++++ b/hw/arm/iotkit.c
+@@ -141,6 +141,8 @@ static void iotkit_init(Object *obj)
+                           TYPE_CMSDK_APB_TIMER);
+     sysbus_init_child_obj(obj, "timer1", &s->timer1, sizeof(s->timer1),
+                           TYPE_CMSDK_APB_TIMER);
++    sysbus_init_child_obj(obj, "s32ktimer", &s->s32ktimer, sizeof(s->s32ktimer),
++                          TYPE_CMSDK_APB_TIMER);
+     sysbus_init_child_obj(obj, "dualtimer", &s->dualtimer, sizeof(s->dualtimer),
+                           TYPE_CMSDK_APB_DUALTIMER);
+     sysbus_init_child_obj(obj, "s32kwatchdog", &s->s32kwatchdog,
+@@ -166,8 +168,6 @@ static void iotkit_init(Object *obj)
+                                 TYPE_SPLIT_IRQ, &error_abort, NULL);
+         g_free(name);
+     }
+-    sysbus_init_child_obj(obj, "s32ktimer", &s->s32ktimer, sizeof(s->s32ktimer),
+-                          TYPE_UNIMPLEMENTED_DEVICE);
  }
  
- static const TypeInfo pl080_info = {
+ static void iotkit_exp_irq(void *opaque, int n, int level)
+@@ -476,13 +476,14 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+     /* Devices behind APB PPC1:
+      *   0x4002f000: S32K timer
+      */
+-    qdev_prop_set_string(DEVICE(&s->s32ktimer), "name", "S32KTIMER");
+-    qdev_prop_set_uint64(DEVICE(&s->s32ktimer), "size", 0x1000);
++    qdev_prop_set_uint32(DEVICE(&s->s32ktimer), "pclk-frq", S32KCLK);
+     object_property_set_bool(OBJECT(&s->s32ktimer), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+     }
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->s32ktimer), 0,
++                       qdev_get_gpio_in(DEVICE(&s->armv7m), 2));
+     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->s32ktimer), 0);
+     object_property_set_link(OBJECT(&s->apb_ppc1), OBJECT(mr), "port[0]", &err);
+     if (err) {
 -- 
 2.17.1
