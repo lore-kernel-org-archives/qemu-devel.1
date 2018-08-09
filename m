@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fnhV0-0005yh-SB
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:44:55 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fnhYS-0006rn-4y
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:48:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fnhUw-0004k8-SV
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:44:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59240 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fnhUw-0004k2-MK
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:44:50 -0400
-References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
-	<e165d2c3-814d-e8b5-3691-af0225ee981d@redhat.com>
-	<581443fd-c054-06ad-94d6-7285b2713cd6@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <af774599-c03a-c839-5190-1e1809d1216b@redhat.com>
-Date: Thu, 9 Aug 2018 11:44:47 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1fnhYO-00086O-5b
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:48:28 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35276)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fnhYN-000842-Po
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:48:24 -0400
+Received: by mail-wr1-x441.google.com with SMTP id g1-v6so4601684wru.2
+	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 02:48:23 -0700 (PDT)
+References: <20180809034033.10579-1-richard.henderson@linaro.org>
+	<20180809034033.10579-4-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180809034033.10579-4-richard.henderson@linaro.org>
+Date: Thu, 09 Aug 2018 10:48:20 +0100
+Message-ID: <87mutvq3a3.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <581443fd-c054-06ad-94d6-7285b2713cd6@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/34] Qtest driver framework
+Subject: Re: [Qemu-devel] [PATCH 03/11] target/arm: Reorganize SVE WHILE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +30,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Emanuele <e.emanuelegiuseppe@gmail.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-stable@nongnu.org
 
-On 09/08/2018 11:20, Emanuele wrote:
->>
-> Why this? Shouldn't it be:
->=20
-> if (g_strcmp0(old_path, path)) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qtest_end(); /* handles glob=
-al_qtest =3D NULL */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_free(old_path); /* handles=
- NULL */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 old_path =3D path;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 global_qtest =3D qtest_start=
-(path);
-> } else ....
 
-Yes, of course.  Though I'd have thought that my version has "just" a
-memory leak.  Even better, this could call qos_invalidate_command_line.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Can you post the fixes to a separate commit on github?
+> The pseudocode for this operation is an increment + compare loop,
+> so comparing <=3D the maximum integer produces an all-true predicate.
+>
+> Rather than bound in both the inline code and the helper, pass the
+> helper the number of predicate bits to set instead of the number
+> of predicate elements to set.
+>
+> Cc: qemu-stable@nongnu.org (3.0.1)
+> Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Paolo
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  target/arm/sve_helper.c    |  5 ----
+>  target/arm/translate-sve.c | 49 +++++++++++++++++++++++++-------------
+>  2 files changed, 32 insertions(+), 22 deletions(-)
+>
+> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+> index 9bd0694d55..87594a8adb 100644
+> --- a/target/arm/sve_helper.c
+> +++ b/target/arm/sve_helper.c
+> @@ -2846,11 +2846,6 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t coun=
+t, uint32_t pred_desc)
+>          return flags;
+>      }
+>
+> -    /* Scale from predicate element count to bits.  */
+> -    count <<=3D esz;
+> -    /* Bound to the bits in the predicate.  */
+> -    count =3D MIN(count, oprsz * 8);
+> -
+>      /* Set all of the requested bits.  */
+>      for (i =3D 0; i < count / 64; ++i) {
+>          d->p[i] =3D esz_mask;
+> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+> index 9dd4c38bab..89efc80ee7 100644
+> --- a/target/arm/translate-sve.c
+> +++ b/target/arm/translate-sve.c
+> @@ -3173,19 +3173,19 @@ static bool trans_CTERM(DisasContext *s, arg_CTER=
+M *a, uint32_t insn)
+>
+>  static bool trans_WHILE(DisasContext *s, arg_WHILE *a, uint32_t insn)
+>  {
+> -    if (!sve_access_check(s)) {
+> -        return true;
+> -    }
+> -
+> -    TCGv_i64 op0 =3D read_cpu_reg(s, a->rn, 1);
+> -    TCGv_i64 op1 =3D read_cpu_reg(s, a->rm, 1);
+> -    TCGv_i64 t0 =3D tcg_temp_new_i64();
+> -    TCGv_i64 t1 =3D tcg_temp_new_i64();
+> +    TCGv_i64 op0, op1, t0, t1, tmax;
+>      TCGv_i32 t2, t3;
+>      TCGv_ptr ptr;
+>      unsigned desc, vsz =3D vec_full_reg_size(s);
+>      TCGCond cond;
+>
+> +    if (!sve_access_check(s)) {
+> +        return true;
+> +    }
+> +
+> +    op0 =3D read_cpu_reg(s, a->rn, 1);
+> +    op1 =3D read_cpu_reg(s, a->rm, 1);
+> +
+>      if (!a->sf) {
+>          if (a->u) {
+>              tcg_gen_ext32u_i64(op0, op0);
+> @@ -3198,32 +3198,47 @@ static bool trans_WHILE(DisasContext *s, arg_WHIL=
+E *a, uint32_t insn)
+>
+>      /* For the helper, compress the different conditions into a computat=
+ion
+>       * of how many iterations for which the condition is true.
+> -     *
+> -     * This is slightly complicated by 0 <=3D UINT64_MAX, which is nomin=
+ally
+> -     * 2**64 iterations, overflowing to 0.  Of course, predicate registe=
+rs
+> -     * aren't that large, so any value >=3D predicate size is sufficient.
+>       */
+> +    t0 =3D tcg_temp_new_i64();
+> +    t1 =3D tcg_temp_new_i64();
+>      tcg_gen_sub_i64(t0, op1, op0);
+>
+> -    /* t0 =3D MIN(op1 - op0, vsz).  */
+> -    tcg_gen_movi_i64(t1, vsz);
+> -    tcg_gen_umin_i64(t0, t0, t1);
+> +    tmax =3D tcg_const_i64(vsz >> a->esz);
+>      if (a->eq) {
+>          /* Equality means one more iteration.  */
+>          tcg_gen_addi_i64(t0, t0, 1);
+> +
+> +        /* If op1 is max (un)signed integer (and the only time the addit=
+ion
+> +         * above could overflow), then we produce an all-true predicate =
+by
+> +         * setting the count to the vector length.  This is because the
+> +         * pseudocode is described as an increment + compare loop, and t=
+he
+> +         * max integer would always compare true.
+> +         */
+> +        tcg_gen_movi_i64(t1, (a->sf
+> +                              ? (a->u ? UINT64_MAX : INT64_MAX)
+> +                              : (a->u ? UINT32_MAX : INT32_MAX)));
+> +        tcg_gen_movcond_i64(TCG_COND_EQ, t0, op1, t1, tmax, t0);
+>      }
+>
+> -    /* t0 =3D (condition true ? t0 : 0).  */
+> +    /* Bound to the maximum.  */
+> +    tcg_gen_umin_i64(t0, t0, tmax);
+> +    tcg_temp_free_i64(tmax);
+> +
+> +    /* Set the count to zero if the condition is false.  */
+>      cond =3D (a->u
+>              ? (a->eq ? TCG_COND_LEU : TCG_COND_LTU)
+>              : (a->eq ? TCG_COND_LE : TCG_COND_LT));
+>      tcg_gen_movi_i64(t1, 0);
+>      tcg_gen_movcond_i64(cond, t0, op0, op1, t0, t1);
+> +    tcg_temp_free_i64(t1);
+>
+> +    /* Since we're bounded, pass as a 32-bit type.  */
+>      t2 =3D tcg_temp_new_i32();
+>      tcg_gen_extrl_i64_i32(t2, t0);
+>      tcg_temp_free_i64(t0);
+> -    tcg_temp_free_i64(t1);
+> +
+> +    /* Scale elements to bits.  */
+> +    tcg_gen_shli_i32(t2, t2, a->esz);
+>
+>      desc =3D (vsz / 8) - 2;
+>      desc =3D deposit32(desc, SIMD_DATA_SHIFT, 2, a->esz);
+
+
+--
+Alex Benn=C3=A9e
