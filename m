@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fnstC-0004RI-IX
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:54:39 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fnstD-0004RJ-1M
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:54:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fnstB-0006fY-CZ
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:54:38 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fnst9-0006eC-0E
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:54:39 -0400
 From: Leonid Bloch <lbloch@janustech.com>
-Date: Fri, 10 Aug 2018 00:53:05 +0300
-Message-Id: <20180809215307.18241-7-lbloch@janustech.com>
+Date: Fri, 10 Aug 2018 00:53:04 +0300
+Message-Id: <20180809215307.18241-6-lbloch@janustech.com>
 In-Reply-To: <20180809215307.18241-1-lbloch@janustech.com>
 References: <20180809215307.18241-1-lbloch@janustech.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 6/8] qcow2: Resize the cache upon image
- resizing
+Subject: [Qemu-devel] [PATCH v6 5/8] qcow2: Increase the default upper limit
+ on the L2 cache size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +25,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>
 
-The caches are now recalculated upon image resizing. This is done
-because the new default behavior of assigning L2 cache relatively to
-the image size, implies that the cache will be adapted accordingly
-after an image resize.
+The upper limit on the L2 cache size is increased from 1 MB to 32 MB.
+This is done in order to allow default full coverage of an image with
+the L2 cache for images of up to 256 GB in size (was 8 GB). Note, that
+only the needed amount to cover the full image is allocated. The value
+which is changed here is just the upper limit on the L2 cache size,
+beyond which it will not grow, even if the size of the image requires
+it to.
 
 Signed-off-by: Leonid Bloch <lbloch@janustech.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/qcow2.h        | 2 +-
+ docs/qcow2-cache.txt | 6 +++---
+ qemu-options.hx      | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 434fb89076..ba4dfae735 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3418,6 +3418,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-     uint64_t old_length;
-     int64_t new_l1_size;
-     int ret;
-+    QDict *options;
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 0bab3d8b94..d77a31d932 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -73,7 +73,7 @@
+ /* Must be at least 4 to cover all cases of refcount table growth */
+ #define MIN_REFCOUNT_CACHE_SIZE 4 /* clusters */
  
-     if (prealloc != PREALLOC_MODE_OFF && prealloc != PREALLOC_MODE_METADATA &&
-         prealloc != PREALLOC_MODE_FALLOC && prealloc != PREALLOC_MODE_FULL)
-@@ -3642,6 +3643,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-         }
-     }
+-#define DEFAULT_L2_CACHE_MAX_SIZE 1048576  /* bytes */
++#define DEFAULT_L2_CACHE_MAX_SIZE 0x2000000U /* bytes */
  
-+    bs->total_sectors = offset / BDRV_SECTOR_SIZE;
-+
-     /* write updated header.size */
-     offset = cpu_to_be64(offset);
-     ret = bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
-@@ -3652,6 +3655,13 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-     }
+ #define DEFAULT_CLUSTER_SIZE 65536
  
-     s->l1_vm_state_index = new_l1_size;
-+
-+    /* Update cache sizes */
-+    options = qdict_clone_shallow(bs->options);
-+    ret = qcow2_update_options(bs, options, s->flags, errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-     ret = 0;
- fail:
-     qemu_co_mutex_unlock(&s->lock);
+diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
+index 69af306267..6ad1081d1a 100644
+--- a/docs/qcow2-cache.txt
++++ b/docs/qcow2-cache.txt
+@@ -125,8 +125,8 @@ There are a few things that need to be taken into account:
+    (or the cache entry size: see "Using smaller cache sizes" below).
+ 
+  - The default L2 cache size will cover the entire virtual size of an
+-   image, up to a certain maximum. This maximum is 1 MB by default
+-   (enough for image sizes of up to 8 GB with the default cluster size)
++   image, up to a certain maximum. This maximum is 32 MB by default
++   (enough for image sizes of up to 256 GB with the default cluster size)
+    and it can be reduced or enlarged using the "l2-cache-size" option.
+    The minimum is 2 clusters (or 2 cache entries, see below).
+ 
+@@ -186,7 +186,7 @@ Some things to take into account:
+    always uses the cluster size as the entry size.
+ 
+  - If the L2 cache is big enough to hold all of the image's L2 tables
+-   (the default behavior for images of up to 8 GB in size) then none
++   (the default behavior for images of up to 256 GB in size) then none
+    of this is necessary and you can omit the "l2-cache-entry-size"
+    parameter altogether.
+ 
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 22e8e2d113..4c44cdbc23 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -756,7 +756,7 @@ The maximum total size of the L2 table and refcount block caches in bytes
+ 
+ @item l2-cache-size
+ The maximum size of the L2 table cache in bytes
+-(default: if cache-size is not specified - 1M; otherwise, as large as possible
++(default: if cache-size is not specified - 32M; otherwise, as large as possible
+ within the cache-size, while permitting the requested or the minimal refcount
+ cache size)
+ 
 -- 
 2.17.1
