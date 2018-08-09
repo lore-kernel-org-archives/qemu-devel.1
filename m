@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fnsdc-0004nm-OD
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:38:33 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fnsdd-0004oT-Ak
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:38:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fnsdb-0004cc-N0
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:38:32 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fnsdc-0004dN-DC
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:38:33 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu,  9 Aug 2018 23:38:00 +0200
-Message-Id: <20180809213801.15098-11-mreitz@redhat.com>
+Date: Thu,  9 Aug 2018 23:38:01 +0200
+Message-Id: <20180809213801.15098-12-mreitz@redhat.com>
 In-Reply-To: <20180809213801.15098-1-mreitz@redhat.com>
 References: <20180809213801.15098-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/11] iotests: Add test for commit in sub
- directory
+Subject: [Qemu-devel] [PATCH 11/11] iotests: Test committing to overridden
+ backing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +23,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Add a test for committing an overlay in a sub directory to one of the
-images in its backing chain, using both relative and absolute filenames.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/020     | 36 ++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/020.out | 10 ++++++++++
- 2 files changed, 46 insertions(+)
+ tests/qemu-iotests/040     | 61 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/040.out |  4 +--
+ 2 files changed, 63 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
-index eac5080f83..d0ac33922d 100755
---- a/tests/qemu-iotests/020
-+++ b/tests/qemu-iotests/020
-@@ -32,6 +32,11 @@ _cleanup()
- 	_cleanup_test_img
-     rm -f "$TEST_IMG.base"
-     rm -f "$TEST_IMG.orig"
-+
-+    rm -f "$TEST_DIR/subdir/t.$IMGFMT.base"
-+    rm -f "$TEST_DIR/subdir/t.$IMGFMT.mid"
-+    rm -f "$TEST_DIR/subdir/t.$IMGFMT"
-+    rmdir "$TEST_DIR/subdir" &> /dev/null
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
+diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+index f0544d6107..90c03e745b 100755
+--- a/tests/qemu-iotests/040
++++ b/tests/qemu-iotests/040
+@@ -476,5 +476,66 @@ class TestCommitWithFilters(iotests.QMPTestCase):
+         self.assert_qmp(result, 'error/desc',
+                         'Top image file %s not found' % cow3_name)
  
-@@ -135,6 +140,37 @@ $QEMU_IO -c 'writev 0 64k' "$TEST_IMG" | _filter_qemu_io
- $QEMU_IMG commit "$TEST_IMG"
- _cleanup
++class TestCommitWithOverriddenBacking(iotests.QMPTestCase):
++    img_base_a = os.path.join(iotests.test_dir, 'base_a.img')
++    img_base_b = os.path.join(iotests.test_dir, 'base_b.img')
++    img_top = os.path.join(iotests.test_dir, 'top.img')
++
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, self.img_base_a, '1M')
++        qemu_img('create', '-f', iotests.imgfmt, self.img_base_b, '1M')
++        qemu_img('create', '-f', iotests.imgfmt, '-b', self.img_base_a, \
++                 self.img_top)
++
++        self.vm = iotests.VM()
++        self.vm.launch()
++
++        # Use base_b instead of base_a as the backing of top
++        result = self.vm.qmp('blockdev-add', **{
++                                'node-name': 'top',
++                                'driver': iotests.imgfmt,
++                                'file': {
++                                    'driver': 'file',
++                                    'filename': self.img_top
++                                },
++                                'backing': {
++                                    'node-name': 'base',
++                                    'driver': iotests.imgfmt,
++                                    'file': {
++                                        'driver': 'file',
++                                        'filename': self.img_base_b
++                                    }
++                                }
++                            })
++        self.assert_qmp(result, 'return', {})
++
++    def tearDown(self):
++        self.vm.shutdown()
++        os.remove(self.img_top)
++        os.remove(self.img_base_a)
++        os.remove(self.img_base_b)
++
++    def test_commit_to_a(self):
++        # Try committing to base_a (which should fail, as top's
++        # backing image is base_b instead)
++        result = self.vm.qmp('block-commit',
++                             job_id='commit',
++                             device='top',
++                             base=self.img_base_a)
++        self.assert_qmp(result, 'error/class', 'GenericError')
++
++    def test_commit_to_b(self):
++        # Try committing to base_b (which should work, since that is
++        # actually top's backing image)
++        result = self.vm.qmp('block-commit',
++                             job_id='commit',
++                             device='top',
++                             base=self.img_base_b)
++        self.assert_qmp(result, 'return', {})
++
++        self.vm.event_wait('BLOCK_JOB_READY')
++        self.vm.qmp('block-job-complete', device='commit')
++        self.vm.event_wait('BLOCK_JOB_COMPLETED')
++
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2', 'qed'])
+diff --git a/tests/qemu-iotests/040.out b/tests/qemu-iotests/040.out
+index 49f84261d0..cfa5c0d0e6 100644
+--- a/tests/qemu-iotests/040.out
++++ b/tests/qemu-iotests/040.out
+@@ -1,5 +1,5 @@
+-.................................
++...................................
+ ----------------------------------------------------------------------
+-Ran 33 tests
++Ran 35 tests
  
-+
-+echo
-+echo 'Testing commit in sub-directory with relative filenames'
-+echo
-+
-+pushd "$TEST_DIR" > /dev/null
-+
-+mkdir subdir
-+
-+TEST_IMG="subdir/t.$IMGFMT.base" _make_test_img 1M
-+TEST_IMG="subdir/t.$IMGFMT.mid" _make_test_img -b "t.$IMGFMT.base"
-+TEST_IMG="subdir/t.$IMGFMT" _make_test_img -b "t.$IMGFMT.mid"
-+
-+# Should work
-+$QEMU_IMG commit -b "t.$IMGFMT.mid" "subdir/t.$IMGFMT"
-+
-+# Might theoretically work, but does not in practice (we have to
-+# decide between this and the above; and since we always represent
-+# backing file names as relative to the overlay, we go for the above)
-+$QEMU_IMG commit -b "subdir/t.$IMGFMT.mid" "subdir/t.$IMGFMT" 2>&1 | \
-+    _filter_imgfmt
-+
-+# This should work as well
-+$QEMU_IMG commit -b "$TEST_DIR/subdir/t.$IMGFMT.mid" "subdir/t.$IMGFMT"
-+
-+popd > /dev/null
-+
-+# Now let's try with just absolute filenames
-+$QEMU_IMG commit -b "$TEST_DIR/subdir/t.$IMGFMT.mid" \
-+    "$TEST_DIR/subdir/t.$IMGFMT"
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/020.out b/tests/qemu-iotests/020.out
-index 4b722b2dd0..228c37dded 100644
---- a/tests/qemu-iotests/020.out
-+++ b/tests/qemu-iotests/020.out
-@@ -1094,4 +1094,14 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=json:{'driv
- wrote 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- qemu-img: Block job failed: No space left on device
-+
-+Testing commit in sub-directory with relative filenames
-+
-+Formatting 'subdir/t.IMGFMT.base', fmt=IMGFMT size=1048576
-+Formatting 'subdir/t.IMGFMT.mid', fmt=IMGFMT size=1048576 backing_file=t.IMGFMT.base
-+Formatting 'subdir/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=t.IMGFMT.mid
-+Image committed.
-+qemu-img: Did not find 'subdir/t.IMGFMT.mid' in the backing chain of 'subdir/t.IMGFMT'
-+Image committed.
-+Image committed.
- *** done
+ OK
 -- 
 2.17.1
