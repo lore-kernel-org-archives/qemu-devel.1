@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fneXl-0002tI-Te
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 02:35:51 -0400
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fneY2-00037S-Sc
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 02:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fneXK-0000Dd-AE
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 02:35:33 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41235)
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fneXf-0000Yd-HH
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 02:35:50 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36897)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
-	id 1fneXK-0000D9-21
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 02:35:06 -0400
-Received: by mail-pf1-x442.google.com with SMTP id y10-v6so2347762pfn.8
-	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 23:35:05 -0700 (PDT)
+	id 1fneXf-0000Xh-At
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 02:35:27 -0400
+Received: by mail-qt0-x243.google.com with SMTP id n6-v6so5396792qtl.4
+	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 23:35:27 -0700 (PDT)
 From: Zihan Yang <whois.zihan.yang@gmail.com>
-Date: Thu,  9 Aug 2018 14:34:48 +0800
-Message-Id: <1533796488-22926-1-git-send-email-whois.zihan.yang@gmail.com>
-Subject: [Qemu-devel] [RFC v4 4/6] pci_expander_bridge: Add config_read
- callback
+Date: Thu,  9 Aug 2018 14:35:12 +0800
+Message-Id: <1533796513-23419-1-git-send-email-whois.zihan.yang@gmail.com>
+Subject: [Qemu-devel] [RFC v4 5/6] pci_expander_bridge: Add ioport for pxb
+ host bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,137 +28,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Zihan Yang <whois.zihan.yang@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-This allows SeaBIOS to retrieve MCFG base and size when it initializes
-pxb host bridges.
-
-A backlink to PXBPCIEHost is added in PXBDev to achieve above goal
+This enables seabios to read config file in pxb host bus other than sysbus
 
 Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
 ---
- hw/pci-bridge/pci_expander_bridge.c         | 55 +++++++++++++++++++++++++++++
- include/hw/pci-bridge/pci_expander_bridge.h |  1 +
- 2 files changed, 56 insertions(+)
+ hw/pci-bridge/pci_expander_bridge.c         | 15 +++++++++++++++
+ include/hw/pci-bridge/pci_expander_bridge.h |  3 +++
+ 2 files changed, 18 insertions(+)
 
 diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
-index d28a64c..c685c75 100644
+index c685c75..686b026 100644
 --- a/hw/pci-bridge/pci_expander_bridge.c
 +++ b/hw/pci-bridge/pci_expander_bridge.c
-@@ -49,11 +49,18 @@ typedef struct PXBBus {
- #define PROP_PXB_PCIE_MAX_BUS "max_bus"
- #define PROP_PXB_NUMA_NODE "numa_node"
- 
-+typedef struct PXBPCIEHost PXBPCIEHost;
-+typedef struct PXBDev PXBDev;
-+
- typedef struct PXBDev {
-     /*< private >*/
-     PCIDevice parent_obj;
-     /*< public >*/
- 
-+    /* backlink to PXBPCIEHost, this makes it easier to get
-+     * mcfg properties in pxb-pcie-host bridge */
-+    PXBPCIEHost *pxbhost;
-+
-     uint32_t domain_nr; /* PCI domain number, non-zero means separate domain */
-     uint8_t max_bus;    /* max bus number to use(including this one) */
-     uint8_t bus_nr;
-@@ -350,9 +357,15 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
-     if (pcie) {
-         g_assert (pxb->max_bus >= pxb->bus_nr);
-         ds = qdev_create(NULL, TYPE_PXB_PCIE_HOST);
-+        /* attach it under /machine, so that we can resolve a valid path in
-+         * object_property_set_link below */
-+        object_property_add_child(qdev_get_machine(), "pxb-pcie-host[*]", OBJECT(ds), NULL);
- 
-+        /* set link and backlink between PXBPCIEHost and PXBDev */
-         object_property_set_link(OBJECT(ds), OBJECT(pxb),
-                                  PROP_PXB_PCIE_DEV, errp);
-+        object_property_set_link(OBJECT(pxb), OBJECT(ds),
-+                                 PROP_PXB_PCIE_HOST, errp);
- 
-         /* will be overwritten by firmware, but kept for readability */
-         qdev_prop_set_uint64(ds, PCIE_HOST_MCFG_BASE,
-@@ -421,6 +434,36 @@ static void pxb_dev_exitfn(PCIDevice *pci_dev)
-     pxb_dev_list = g_list_remove(pxb_dev_list, pxb);
+@@ -234,6 +234,20 @@ static void pxb_pcie_host_initfn(Object *obj)
+                          qdev_prop_allow_set_link_before_realize, 0, NULL);
  }
  
-+static uint32_t pxb_pcie_config_read(PCIDevice *d, uint32_t address, int len)
++static void pxb_pcie_host_realize(DeviceState *dev, Error **errp)
 +{
-+    PXBDev *pxb = convert_to_pxb(d);
-+    uint32_t val;
-+    Object *host;
++    PCIHostState *pci = PCI_HOST_BRIDGE(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
 +
-+   switch (address) {
-+    case MCH_HOST_BRIDGE_PCIEXBAR:
-+        host = object_property_get_link(OBJECT(pxb), PROP_PXB_PCIE_HOST, NULL);
-+        assert(host);
-+        val = object_property_get_uint(host, PCIE_HOST_MCFG_BASE, NULL) & 0xFFFFFFFF;
-+        break;
-+    case MCH_HOST_BRIDGE_PCIEXBAR + 4:
-+        host = object_property_get_link(OBJECT(pxb), PROP_PXB_PCIE_HOST, NULL);
-+        assert(host);
-+        val = (object_property_get_uint(host, PCIE_HOST_MCFG_BASE, NULL) >> 32) & 0xFFFFFFFF;
-+        break;
-+    case MCH_HOST_BRIDGE_PCIEXBAR + 8:  // Fix me!
-+        host = object_property_get_link(OBJECT(pxb), PROP_PXB_PCIE_HOST, NULL);
-+        assert(host);
-+        val = object_property_get_uint(host, PCIE_HOST_MCFG_SIZE, NULL) & 0xFFFFFFFF;
-+        break;
-+    default:
-+        val = pci_default_read_config(d, address, len);
-+        break;
-+    }
++    // FIX ME! Use specific port number for pxb-pcie host bridge, not scalable!
++    /* port layout is | pxb1_cmd | pxb1_data | pxb2_cmd | pxb2_data | ... | */
++    sysbus_add_io(sbd, PXB_PCIE_HOST_BRIDGE_CONFIG_ADDR_BASE, &pci->conf_mem);
++    sysbus_init_ioports(sbd, PXB_PCIE_HOST_BRIDGE_CONFIG_ADDR_BASE + g_list_length(pxb_dev_list) * 8, 4);
 +
-+    return val;
++    sysbus_add_io(sbd, PXB_PCIE_HOST_BRIDGE_CONFIG_DATA_BASE, &pci->data_mem);
++    sysbus_init_ioports(sbd, PXB_PCIE_HOST_BRIDGE_CONFIG_DATA_BASE + g_list_length(pxb_dev_list) * 8, 4);
 +}
 +
- static Property pxb_dev_properties[] = {
-     /* Note: 0 is not a legal PXB bus number. */
-     DEFINE_PROP_UINT8(PROP_PXB_BUS_NR, PXBDev, bus_nr, 0),
-@@ -455,6 +498,16 @@ static void pxb_dev_class_init(ObjectClass *klass, void *data)
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
- }
+ static Property pxb_pcie_host_props[] = {
+     DEFINE_PROP_UINT64(PCIE_HOST_MCFG_BASE, PXBPCIEHost, parent_obj.base_addr,
+                         PCIE_BASE_ADDR_UNMAPPED),
+@@ -262,6 +276,7 @@ static void pxb_pcie_host_class_init(ObjectClass *class, void *data)
  
-+static void pxb_pcie_dev_initfn(Object *obj)
-+{
-+    PXBDev *pxb = PXB_PCIE_DEV(obj);
-+
-+    /* Add backlink to pxb-pcie-host */
-+    object_property_add_link(obj, PROP_PXB_PCIE_HOST, TYPE_PXB_PCIE_HOST,
-+                         (Object **)&pxb->pxbhost,
-+                         qdev_prop_allow_set_link_before_realize, 0, NULL);
-+}
-+
- static const TypeInfo pxb_dev_info = {
-     .name          = TYPE_PXB_DEVICE,
-     .parent        = TYPE_PCI_DEVICE,
-@@ -486,6 +539,7 @@ static void pxb_pcie_dev_class_init(ObjectClass *klass, void *data)
- 
-     k->realize = pxb_pcie_dev_realize;
-     k->exit = pxb_dev_exitfn;
-+    k->config_read = pxb_pcie_config_read;
-     k->vendor_id = PCI_VENDOR_ID_REDHAT;
-     k->device_id = PCI_DEVICE_ID_REDHAT_PXB_PCIE;
-     k->class_id = PCI_CLASS_BRIDGE_HOST;
-@@ -500,6 +554,7 @@ static const TypeInfo pxb_pcie_dev_info = {
-     .name          = TYPE_PXB_PCIE_DEVICE,
-     .parent        = TYPE_PCI_DEVICE,
-     .instance_size = sizeof(PXBDev),
-+    .instance_init = pxb_pcie_dev_initfn,
-     .class_init    = pxb_pcie_dev_class_init,
-     .interfaces = (InterfaceInfo[]) {
-         { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+     dc->fw_name = "pcie";
+     dc->props = pxb_pcie_host_props;
++    dc->realize = pxb_pcie_host_realize;
+     /* Reason: Internal part of the pxb/pxb-pcie device, not usable by itself */
+     dc->user_creatable = false;
+     sbc->explicit_ofw_unit_address = pxb_host_ofw_unit_address;
 diff --git a/include/hw/pci-bridge/pci_expander_bridge.h b/include/hw/pci-bridge/pci_expander_bridge.h
-index 870c4cd..1119210 100644
+index 1119210..e6d3b67 100644
 --- a/include/hw/pci-bridge/pci_expander_bridge.h
 +++ b/include/hw/pci-bridge/pci_expander_bridge.h
-@@ -2,6 +2,7 @@
- #define HW_PCI_EXPANDER_H
- 
- #define PROP_PXB_PCIE_DEV "pxbdev"
-+#define PROP_PXB_PCIE_HOST "x-pxb-host"
- 
+@@ -7,6 +7,9 @@
  #define PROP_PXB_PCIE_DOMAIN_NR "domain_nr"
  #define PROP_PXB_BUS_NR "bus_nr"
+ 
++#define PXB_PCIE_HOST_BRIDGE_CONFIG_ADDR_BASE 0x1000
++#define PXB_PCIE_HOST_BRIDGE_CONFIG_DATA_BASE 0x1004
++
+ uint64_t pxb_pcie_mcfg_hole(void);
+ 
+ #endif
 -- 
 2.7.4
