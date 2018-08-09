@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fntSp-0007tJ-8Y
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:31:28 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fntT2-00083t-Ia
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:31:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fntSo-0002XQ-DE
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:31:27 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fntT1-0002hf-9o
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:31:40 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 10 Aug 2018 00:31:08 +0200
-Message-Id: <20180809223117.7846-3-mreitz@redhat.com>
+Date: Fri, 10 Aug 2018 00:31:12 +0200
+Message-Id: <20180809223117.7846-7-mreitz@redhat.com>
 In-Reply-To: <20180809223117.7846-1-mreitz@redhat.com>
 References: <20180809223117.7846-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 02/11] blockdev: Check @replaces in
- blockdev_mirror_common
+Subject: [Qemu-devel] [PATCH v2 06/11] iotests: Add tests for mirror
+ @replaces loops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +23,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-There is no reason why the constraints we put on @replaces should be
-limited to drive-mirror.  Therefore, move the sanity checks from
-qmp_drive_mirror() to blockdev_mirror_common() so they apply to
-blockdev-mirror as well.
+This adds two tests for cases where our old check_to_replace_node()
+function failed to detect that executing this job with these parameters
+would result in a cyclic graph.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- blockdev.c | 55 ++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 33 insertions(+), 22 deletions(-)
+ tests/qemu-iotests/041     | 124 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/041.out |   4 +-
+ 2 files changed, 126 insertions(+), 2 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 9b143d9e72..2d61588a9a 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3644,6 +3644,39 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-         sync = MIRROR_SYNC_MODE_FULL;
-     }
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index c20ac7da87..186bd0f031 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -1061,5 +1061,129 @@ class TestOrphanedSource(iotests.QMPTestCase):
+                              target='dest-ro')
+         self.assert_qmp(result, 'error/class', 'GenericError')
  
-+    if (has_replaces) {
-+        BlockDriverState *to_replace_bs;
-+        AioContext *replace_aio_context;
-+        int64_t bs_size, replace_size;
++# Various tests for the @replaces option (independent of quorum)
++class TestReplaces(iotests.QMPTestCase):
++    def setUp(self):
++        self.vm = iotests.VM()
++        self.vm.launch()
 +
-+        bs_size = bdrv_getlength(bs);
-+        if (bs_size < 0) {
-+            error_setg_errno(errp, -bs_size, "Failed to query device's size");
-+            return;
-+        }
++    def tearDown(self):
++        self.vm.shutdown()
 +
-+        to_replace_bs = check_to_replace_node(bs, replaces, errp);
-+        if (!to_replace_bs) {
-+            return;
-+        }
++    def test_drive_mirror_loop(self):
++        qemu_img('create', '-f', iotests.imgfmt, test_img, '1M')
 +
-+        replace_aio_context = bdrv_get_aio_context(to_replace_bs);
-+        aio_context_acquire(replace_aio_context);
-+        replace_size = bdrv_getlength(to_replace_bs);
-+        aio_context_release(replace_aio_context);
++        result = self.vm.qmp('object-add', qom_type='throttle-group', id='tg')
++        self.assert_qmp(result, 'return', {})
 +
-+        if (replace_size < 0) {
-+            error_setg_errno(errp, -replace_size,
-+                             "Failed to query the replacement node's size");
-+            return;
-+        }
-+        if (bs_size != replace_size) {
-+            error_setg(errp, "cannot replace image with a mirror image of "
-+                             "different size");
-+            return;
-+        }
-+    }
++        result = self.vm.qmp('blockdev-add', **{
++                    'node-name': 'source',
++                    'driver': 'throttle',
++                    'throttle-group': 'tg',
++                    'file': {
++                        'node-name': 'filtered',
++                        'driver': 'qcow2',
++                        'file': {
++                            'driver': 'file',
++                            'filename': test_img
++                        }
++                    }
++                })
++        self.assert_qmp(result, 'return', {})
 +
-     /* pass the node name to replace to mirror start since it's loose coupling
-      * and will allow to check whether the node still exist at mirror completion
-      */
-@@ -3704,33 +3737,11 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-     }
++        # Mirror from @source to @target in sync=none, so that @source
++        # will be @target's backing file; but replace @filtered.
++        # Then, @target's backing file will be @source, whose backing
++        # file is now @target instead of @filtered.  That is a loop.
++        # (But apart from the loop, replacing @filtered instead of
++        # @source is fine, because both are just filtered versions of
++        # each other.)
++        result = self.vm.qmp('drive-mirror',
++                             job_id='mirror',
++                             device='source',
++                             target=target_img,
++                             format=iotests.imgfmt,
++                             node_name='target',
++                             sync='none',
++                             replaces='filtered')
++        if 'error' in result:
++            # This is the correct result
++            self.assert_qmp(result, 'error/class', 'GenericError')
++        else:
++            # This is wrong, but let's run it to the bitter conclusion
++            self.complete_and_wait(drive='mirror')
++            # Fail for good measure, although qemu should have crashed
++            # anyway
++            self.fail('Loop creation was successful')
++
++        os.remove(test_img)
++        try:
++            os.remove(target_img)
++        except OSError:
++            pass
++
++    def test_blockdev_mirror_loop(self):
++        qemu_img('create', '-f', iotests.imgfmt, test_img, '1M')
++        qemu_img('create', '-f', iotests.imgfmt, target_img, '1M')
++
++        result = self.vm.qmp('object-add', qom_type='throttle-group', id='tg')
++        self.assert_qmp(result, 'return', {})
++
++        result = self.vm.qmp('blockdev-add', **{
++                    'node-name': 'source',
++                    'driver': 'throttle',
++                    'throttle-group': 'tg',
++                    'file': {
++                        'node-name': 'middle',
++                        'driver': 'throttle',
++                        'throttle-group': 'tg',
++                        'file': {
++                            'node-name': 'bottom',
++                            'driver': 'qcow2',
++                            'file': {
++                                'driver': 'file',
++                                'filename': test_img
++                            }
++                        }
++                    }
++                })
++        self.assert_qmp(result, 'return', {})
++
++        result = self.vm.qmp('blockdev-add', **{
++                    'node-name': 'target',
++                    'driver': 'qcow2',
++                    'file': {
++                        'driver': 'file',
++                        'filename': target_img
++                    },
++                    'backing': 'middle'
++                })
++
++        # Mirror from @source to @target.  With blockdev-mirror, the
++        # current (old) backing file is retained (which is @middle).
++        # By replacing @bottom, @middle's file will be @target, whose
++        # backing file is @middle again.  That is a loop.
++        # (But apart from the loop, replacing @bottom instead of
++        # @source is fine, because both are just filtered versions of
++        # each other.)
++        result = self.vm.qmp('blockdev-mirror',
++                             job_id='mirror',
++                             device='source',
++                             target='target',
++                             sync='full',
++                             replaces='bottom')
++        if 'error' in result:
++            # This is the correct result
++            self.assert_qmp(result, 'error/class', 'GenericError')
++        else:
++            # This is wrong, but let's run it to the bitter conclusion
++            self.complete_and_wait(drive='mirror')
++            # Fail for good measure, although qemu should have crashed
++            # anyway
++            self.fail('Loop creation was successful')
++
++        os.remove(test_img)
++        os.remove(target_img)
++
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2', 'qed'])
+diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
+index c28b392b87..d71481b010 100644
+--- a/tests/qemu-iotests/041.out
++++ b/tests/qemu-iotests/041.out
+@@ -1,5 +1,5 @@
+-.....................................................................................
++.......................................................................................
+ ----------------------------------------------------------------------
+-Ran 85 tests
++Ran 87 tests
  
-     if (arg->has_replaces) {
--        BlockDriverState *to_replace_bs;
--        AioContext *replace_aio_context;
--        int64_t replace_size;
--
-         if (!arg->has_node_name) {
-             error_setg(errp, "a node-name must be provided when replacing a"
-                              " named node of the graph");
-             goto out;
-         }
--
--        to_replace_bs = check_to_replace_node(bs, arg->replaces, &local_err);
--
--        if (!to_replace_bs) {
--            error_propagate(errp, local_err);
--            goto out;
--        }
--
--        replace_aio_context = bdrv_get_aio_context(to_replace_bs);
--        aio_context_acquire(replace_aio_context);
--        replace_size = bdrv_getlength(to_replace_bs);
--        aio_context_release(replace_aio_context);
--
--        if (size != replace_size) {
--            error_setg(errp, "cannot replace image with a mirror image of "
--                             "different size");
--            goto out;
--        }
-     }
- 
-     if (arg->mode == NEW_IMAGE_MODE_ABSOLUTE_PATHS) {
+ OK
 -- 
 2.17.1
