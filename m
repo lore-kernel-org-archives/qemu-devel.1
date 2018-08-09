@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fnkqf-0005jT-Op
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:19:30 -0400
+	(envelope-from <famz@redhat.com>) id 1fnkuP-0007iw-NU
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:23:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fnkqb-0000Lv-MA
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:19:29 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:41185)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
-	id 1fnkqb-0000LS-DR
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:19:25 -0400
-Received: by mail-ed1-x541.google.com with SMTP id s24-v6so2852444edr.8
-	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 06:19:25 -0700 (PDT)
-References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
-	<20180806143412.27722-10-e.emanuelegiuseppe@gmail.com>
-	<cb63d852-df80-a894-9290-9147a55554ab@redhat.com>
-From: Emanuele <e.emanuelegiuseppe@gmail.com>
-Message-ID: <cf50d581-dea3-ebc6-8bf6-f3f4cfb1aa21@gmail.com>
-Date: Thu, 9 Aug 2018 15:19:17 +0200
-MIME-Version: 1.0
-In-Reply-To: <cb63d852-df80-a894-9290-9147a55554ab@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 09/34] tests/qgraph: pci-spapr driver
- and interface nodes
+	(envelope-from <famz@redhat.com>) id 1fnkuO-0002U8-OT
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:23:21 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Thu,  9 Aug 2018 21:22:58 +0800
+Message-Id: <20180809132259.18402-2-famz@redhat.com>
+In-Reply-To: <20180809132259.18402-1-famz@redhat.com>
+References: <20180809132259.18402-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] aio-posix: Don't count ctx->notifier as
+ progress when polling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,23 +20,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>, Fam Zheng <famz@redhat.com>, qemu-stable@nongnu.org, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, lersek@redhat.com
 
+The same logic exists in fd polling. This change is especially important
+to avoid busy loop once we limit aio_notify_accept() to blocking
+aio_poll().
 
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ util/aio-posix.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On 08/09/2018 03:02 PM, Laurent Vivier wrote:
-> On 06/08/2018 16:33, Emanuele Giuseppe Esposito wrote:
->> +void qpci_init_spapr(QPCIBusSPAPR *ret, QTestState *qts, QGuestAllocator *alloc)
->> +{
->>       assert(qts);
->>   
->> +    /* tests cannot use spapr, needs to be fixed first */
->> +    ret->bus.has_buggy_msi = TRUE;
->> +
-> Perhaps you can revert the logic and call that "msi_is_available"?
-> It's more generic than "buggy". It says if we can or not use MSI.
-This name was suggested by Paolo, I honestly don't know which is better, 
-maybe it's better to ask him for this.
-> Thanks,
-> Laurent
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 118bf5784b..b5c7f463aa 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -494,7 +494,8 @@ static bool run_poll_handlers_once(AioContext *ctx)
+     QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
+         if (!node->deleted && node->io_poll &&
+             aio_node_check(ctx, node->is_external) &&
+-            node->io_poll(node->opaque)) {
++            node->io_poll(node->opaque) &&
++            node->opaque != &ctx->notifier) {
+             progress = true;
+         }
+ 
+-- 
+2.17.1
