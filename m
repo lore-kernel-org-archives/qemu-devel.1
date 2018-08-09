@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fnbJl-0005Np-MV
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 23:08:54 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fnbOD-0007bp-KS
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 23:13:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fnbJg-0006QW-Rp
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 23:08:53 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38847)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fnbOA-0002OU-GI
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 23:13:29 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:37672)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fnbJg-0006Pv-KV
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 23:08:48 -0400
-Received: by mail-pg1-x544.google.com with SMTP id k3-v6so2034277pgq.5
-	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 20:08:48 -0700 (PDT)
+	id 1fnbOA-0002Ny-9u
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 23:13:26 -0400
+Received: by mail-pl0-x242.google.com with SMTP id d5-v6so1919173pll.4
+	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 20:13:26 -0700 (PDT)
 References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
-	<20180807091209.13531-9-xiaoguangrong@tencent.com>
-	<20180808050846.GG24415@xz-mi>
-	<503d7733-e2e7-09c5-75a3-1e250f549065@gmail.com>
-	<20180808141112.GK2734@work-vm>
+	<20180807091209.13531-11-xiaoguangrong@tencent.com>
+	<20180808061230.GI24415@xz-mi>
 From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <76174d1d-fcd7-b58a-8950-5f6c6795f49f@gmail.com>
-Date: Thu, 9 Aug 2018 11:08:39 +0800
+Message-ID: <40696b07-5663-5c6d-28a6-7d354f0e45cb@gmail.com>
+Date: Thu, 9 Aug 2018 11:13:17 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180808141112.GK2734@work-vm>
+In-Reply-To: <20180808061230.GI24415@xz-mi>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 08/10] migration: handle the error
- condition properly
+Subject: Re: [Qemu-devel] [PATCH v3 10/10] migration: show the statistics of
+ compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +33,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
 
 
-On 08/08/2018 10:11 PM, Dr. David Alan Gilbert wrote:
-> * Xiao Guangrong (guangrong.xiao@gmail.com) wrote:
->>
->>
->> On 08/08/2018 01:08 PM, Peter Xu wrote:
->>> On Tue, Aug 07, 2018 at 05:12:07PM +0800, guangrong.xiao@gmail.com wrote:
->>>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
->>>>
->>>> ram_find_and_save_block() can return negative if any error hanppens,
->>>> however, it is completely ignored in current code
->>>
->>> Could you hint me where we'll return an error?
->>>
->>
->> I think control_save_page() may return a error condition but i am not
->> good at it ... Other places look safe _currently_. These functions were
->> designed to have error returned anyway.
+On 08/08/2018 02:12 PM, Peter Xu wrote:
+> On Tue, Aug 07, 2018 at 05:12:09PM +0800, guangrong.xiao@gmail.com wrote:
 > 
-> ram_control_save_page's return is checked by control_save_page which
-> returns true/false but sets *pages to a return value.
+> [...]
 > 
-> What I'd need to follow closely is the case where ram_control_save_page
-> returns RAM_SAVE_CONTROL_DELAYED, in that case control_save_page I think
-> returns with *pages=-1 and returns true.
-> And I think in that case ram_save_target_page can leak that -1 - hmm.
+>> @@ -1602,6 +1614,26 @@ static void migration_update_rates(RAMState *rs, int64_t end_time)
+>>               rs->xbzrle_cache_miss_prev) / page_count;
+>>           rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
+>>       }
+>> +
+>> +    if (migrate_use_compression()) {
+>> +        compression_counters.busy_rate = (double)(compression_counters.busy -
+>> +            rs->compress_thread_busy_prev) / page_count;
 > 
-> Now, ram_save_host_page already checks for <0 and will return that,
-> but I think that would potentially loop in ram_find_and_save_block; I'm
-> not sure we want to change that or not!
+> So this is related to the previous patch - I still doubt its
+> correctness if page_count is the host pages count rather than the
+> guest pages'.  Other than that the patch looks good to me.
 
-ram_find_and_save_block() will continue the look only if ram_save_host_page
-returns zero:
-
-......
-         if (found) {
-             pages = ram_save_host_page(rs, &pss, last_stage);
-         }
-     } while (!pages && again);
-
-IMHO, how to change the code really depends on the semantic of these functions,
-based on the comments of them, returning error conditions is the current
-semantic.
-
-Another choice would be the one squashes error conditions to QEMUFile and
-adapt comments and code of these functions to reflect the new semantic
-clearly.
-
-Which one do you guys prefer to? :)
+I think i can treat it as your Reviewed-by boldly. :)
