@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fnhyY-0001ud-Qo
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:15:27 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fniAS-0005EP-Va
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:27:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fnhyT-0000sz-SU
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:15:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58162 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fnhyT-0000sP-Jc
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:15:21 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fniAP-0000YT-1O
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:27:44 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:35202)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
+	id 1fniAO-0000YL-PY
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:27:40 -0400
+Received: by mail-ed1-x543.google.com with SMTP id e6-v6so2636676edr.2
+	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 03:27:40 -0700 (PDT)
 References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
-	<20180806143412.27722-6-e.emanuelegiuseppe@gmail.com>
-	<f5a3c33f-f459-806c-1465-3b5415a5ccc1@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <141175f7-a38a-5236-cd63-70353870913a@redhat.com>
-Date: Thu, 9 Aug 2018 12:15:18 +0200
+	<e165d2c3-814d-e8b5-3691-af0225ee981d@redhat.com>
+	<581443fd-c054-06ad-94d6-7285b2713cd6@gmail.com>
+	<af774599-c03a-c839-5190-1e1809d1216b@redhat.com>
+From: Emanuele <e.emanuelegiuseppe@gmail.com>
+Message-ID: <7f377177-f813-e9b9-5299-aa7031a10f96@gmail.com>
+Date: Thu, 9 Aug 2018 12:27:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <f5a3c33f-f459-806c-1465-3b5415a5ccc1@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <af774599-c03a-c839-5190-1e1809d1216b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/34] tests/qgraph: sdhci driver and
- interface nodes
+Subject: Re: [Qemu-devel] [PATCH v2 00/34] Qtest driver framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
 
-On 09/08/2018 12:10, Laurent Vivier wrote:
->>  libqgraph-pci-obj-y = $(libqos-pc-obj-y)
->>  libqgraph-pci-obj-y += $(libqgraph-machines-obj-y)
->> +libqgraph-pci-obj-y += tests/libqos/sdhci.o
-> The file also implements memory mapped SDHCI, should we split the file
-> in two files, one added to libqgraph-pci-obj-y and the other to
-> check-qtest-arm-y and check-qtest-aarch64-y?
-> 
+On 08/09/2018 11:44 AM, Paolo Bonzini wrote:
+> On 09/08/2018 11:20, Emanuele wrote:
+>> Why this? Shouldn't it be:
+>>
+>> if (g_strcmp0(old_path, path)) {
+>>          qtest_end(); /* handles global_qtest = NULL */
+>>          g_free(old_path); /* handles NULL */
+>>          old_path = path;
+>>          global_qtest = qtest_start(path);
+>> } else ....
+> Yes, of course.  Though I'd have thought that my version has "just" a
+> memory leak.  Even better, this could call qos_invalidate_command_line.
+>
+> Can you post the fixes to a separate commit on github?
+https://github.com/esposem/qemu/commit/4389e83522c06ce7001382284153d59105692061
 
-No, there is only one libqgraph.  The same test (qos-test) can run for
-both PCI and non-PCI machines, and will cull the unnecessary part of the
-graph automatically simply because there is no path from a machine to a
-PCI device.
+I also added g_free(old_path); in qos-test main function, since last 
+old_path is not free'd.
+This commit is part of qgraph-v3, where I am also applying Laurent's 
+suggestions.
 
-Paolo
+Emanuele
