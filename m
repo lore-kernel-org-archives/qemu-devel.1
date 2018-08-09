@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnofh-0002bR-4S
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 13:24:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1fnohu-0004Oe-CZ
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 13:26:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnofd-0000ar-6w
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 13:24:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47990 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fnohr-0002NP-7a
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 13:26:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40078 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fnofd-0000Zy-2L
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 13:24:21 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fnohr-0002NF-1x
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 13:26:39 -0400
 References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-15-armbru@redhat.com>
+	<20180808120334.10970-16-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <65e0558e-f798-201b-9c71-48f51a35a128@redhat.com>
-Date: Thu, 9 Aug 2018 12:24:17 -0500
+Message-ID: <78ff3fd5-2fb8-8396-fc21-b51cca71e6ce@redhat.com>
+Date: Thu, 9 Aug 2018 12:26:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180808120334.10970-15-armbru@redhat.com>
+In-Reply-To: <20180808120334.10970-16-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 14/56] check-qjson qmp-test: Cover control
- characters more thoroughly
+Subject: Re: [Qemu-devel] [PATCH 15/56] check-qjson: Cover interpolation
+ more thoroughly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,19 +33,13 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
 On 08/08/2018 07:02 AM, Markus Armbruster wrote:
-> RFC 7159 requires control characters in strings to be escaped.
-> Demonstrate the JSON parser accepts U+0001 .. U+001F unescaped.
-> 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   tests/check-qjson.c | 36 ++++++++++++++++++++++++++++++------
->   tests/qmp-test.c    | 14 ++++++++++++++
->   2 files changed, 44 insertions(+), 6 deletions(-)
+>   tests/check-qjson.c | 141 ++++++++++++++++++++++++--------------------
+>   1 file changed, 77 insertions(+), 64 deletions(-)
 > 
-Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Accepting it on input (as an extension to the RFC, similar to our \' 
-extension) sounds reasonable, but producing it on output is wrong.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
