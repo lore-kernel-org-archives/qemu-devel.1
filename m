@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fnsdd-0004oT-Ak
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:38:34 -0400
+	(envelope-from <cota@braap.org>) id 1fnsjB-00030W-Nf
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:44:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fnsdc-0004dN-DC
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:38:33 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Thu,  9 Aug 2018 23:38:01 +0200
-Message-Id: <20180809213801.15098-12-mreitz@redhat.com>
-In-Reply-To: <20180809213801.15098-1-mreitz@redhat.com>
-References: <20180809213801.15098-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 11/11] iotests: Test committing to overridden
- backing
+	(envelope-from <cota@braap.org>) id 1fnsj8-0000xB-4H
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:44:17 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:43251)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fnsj7-0000uC-Vh
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:44:14 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Thu,  9 Aug 2018 17:43:54 -0400
+Message-Id: <20180809214356.27690-2-cota@braap.org>
+In-Reply-To: <20180809214356.27690-1-cota@braap.org>
+References: <20180809214356.27690-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 1/3] target/riscv: optimize cross-page direct
+ jumps in softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,97 +24,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- tests/qemu-iotests/040     | 61 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/040.out |  4 +--
- 2 files changed, 63 insertions(+), 2 deletions(-)
+ target/riscv/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index f0544d6107..90c03e745b 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -476,5 +476,66 @@ class TestCommitWithFilters(iotests.QMPTestCase):
-         self.assert_qmp(result, 'error/desc',
-                         'Top image file %s not found' % cow3_name)
- 
-+class TestCommitWithOverriddenBacking(iotests.QMPTestCase):
-+    img_base_a = os.path.join(iotests.test_dir, 'base_a.img')
-+    img_base_b = os.path.join(iotests.test_dir, 'base_b.img')
-+    img_top = os.path.join(iotests.test_dir, 'top.img')
-+
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, self.img_base_a, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, self.img_base_b, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, '-b', self.img_base_a, \
-+                 self.img_top)
-+
-+        self.vm = iotests.VM()
-+        self.vm.launch()
-+
-+        # Use base_b instead of base_a as the backing of top
-+        result = self.vm.qmp('blockdev-add', **{
-+                                'node-name': 'top',
-+                                'driver': iotests.imgfmt,
-+                                'file': {
-+                                    'driver': 'file',
-+                                    'filename': self.img_top
-+                                },
-+                                'backing': {
-+                                    'node-name': 'base',
-+                                    'driver': iotests.imgfmt,
-+                                    'file': {
-+                                        'driver': 'file',
-+                                        'filename': self.img_base_b
-+                                    }
-+                                }
-+                            })
-+        self.assert_qmp(result, 'return', {})
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        os.remove(self.img_top)
-+        os.remove(self.img_base_a)
-+        os.remove(self.img_base_b)
-+
-+    def test_commit_to_a(self):
-+        # Try committing to base_a (which should fail, as top's
-+        # backing image is base_b instead)
-+        result = self.vm.qmp('block-commit',
-+                             job_id='commit',
-+                             device='top',
-+                             base=self.img_base_a)
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+
-+    def test_commit_to_b(self):
-+        # Try committing to base_b (which should work, since that is
-+        # actually top's backing image)
-+        result = self.vm.qmp('block-commit',
-+                             job_id='commit',
-+                             device='top',
-+                             base=self.img_base_b)
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.vm.event_wait('BLOCK_JOB_READY')
-+        self.vm.qmp('block-job-complete', device='commit')
-+        self.vm.event_wait('BLOCK_JOB_COMPLETED')
-+
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2', 'qed'])
-diff --git a/tests/qemu-iotests/040.out b/tests/qemu-iotests/040.out
-index 49f84261d0..cfa5c0d0e6 100644
---- a/tests/qemu-iotests/040.out
-+++ b/tests/qemu-iotests/040.out
-@@ -1,5 +1,5 @@
--.................................
-+...................................
- ----------------------------------------------------------------------
--Ran 33 tests
-+Ran 35 tests
- 
- OK
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 0b6be74f2d..ec2988b4f6 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -135,7 +135,7 @@ static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+         if (ctx->base.singlestep_enabled) {
+             gen_exception_debug();
+         } else {
+-            tcg_gen_exit_tb(NULL, 0);
++            tcg_gen_lookup_and_goto_ptr();
+         }
+     }
+ }
 -- 
 2.17.1
