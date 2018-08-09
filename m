@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fngze-0001wU-Dy
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:12:31 -0400
+	(envelope-from <mst@redhat.com>) id 1fnh7P-0004fq-Hb
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:20:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fngzb-0004Mz-7A
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:12:30 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33227)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fngza-0004M7-VJ
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:12:27 -0400
-Received: by mail-wm0-x242.google.com with SMTP id r24-v6so1776670wmh.0
-	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 02:12:26 -0700 (PDT)
-References: <20180809034033.10579-1-richard.henderson@linaro.org>
-	<20180809034033.10579-3-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180809034033.10579-3-richard.henderson@linaro.org>
-Date: Thu, 09 Aug 2018 10:12:24 +0100
-Message-ID: <87o9ebq4xz.fsf@linaro.org>
+	(envelope-from <mst@redhat.com>) id 1fnh7M-0000Za-10
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:20:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58358 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fnh7L-0000Wu-IB
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 05:20:27 -0400
+Date: Thu, 9 Aug 2018 12:20:23 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180809121649-mutt-send-email-mst@kernel.org>
+References: <20180807193125.30378-1-alex.williamson@redhat.com>
+	<20180807224033-mutt-send-email-mst@kernel.org>
+	<20180807135303.3938b3a2@t450s.home>
+	<20180808004929-mutt-send-email-mst@kernel.org>
+	<20180808034543.GC24415@xz-mi> <20180808162304.42d3fecc@t450s.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/11] target/arm: Fix typo in
- do_sat_addsub_64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180808162304.42d3fecc@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Balloon inhibit enhancements,
+ vfio restriction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +31,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-stable@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org, david@redhat.com
 
+On Wed, Aug 08, 2018 at 04:23:04PM -0600, Alex Williamson wrote:
+> So again, I think this comes down to new iommu driver support and new
+> iommu apis and new vfio apis to enable some sort of atomic update
+> interface,
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Oh absolutely. My point is some guest OS can start using atomic updates
+at any time since it's something IOMMU hardware supports.  Adherence to
+a hardware spec would be preferable to adherence to an internal Linux
+API.  I appreciate it's not an easy task involving host Linux and QEMU
+changes.
 
-> Used the wrong temporary in the computation of subtractive overflow.
->
-> Cc: qemu-stable@nongnu.org (3.0.1)
-> Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/translate-sve.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-> index 374051cd20..9dd4c38bab 100644
-> --- a/target/arm/translate-sve.c
-> +++ b/target/arm/translate-sve.c
-> @@ -1625,7 +1625,7 @@ static void do_sat_addsub_64(TCGv_i64 reg, TCGv_i64=
- val, bool u, bool d)
->              /* Detect signed overflow for subtraction.  */
->              tcg_gen_xor_i64(t0, reg, val);
->              tcg_gen_sub_i64(t1, reg, val);
-> -            tcg_gen_xor_i64(reg, reg, t0);
-> +            tcg_gen_xor_i64(reg, reg, t1);
->              tcg_gen_and_i64(t0, t0, reg);
->
->              /* Bound the result.  */
-
-
---
-Alex Benn=C3=A9e
+-- 
+MST
