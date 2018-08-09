@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jthumshirn@suse.de>) id 1fnjLq-00013d-Ps
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:43:36 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fnjMi-0001iL-Bj
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:44:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jthumshirn@suse.de>) id 1fnjLo-0005T9-8l
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:43:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42784 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jthumshirn@suse.de>) id 1fnjLn-0005RT-TP
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:43:32 -0400
-Received: from relay2.suse.de (unknown [195.135.220.254])
-	by mx1.suse.de (Postfix) with ESMTP id A51E5ADF2
-	for <qemu-devel@nongnu.org>; Thu,  9 Aug 2018 11:43:30 +0000 (UTC)
-From: Johannes Thumshirn <jthumshirn@suse.de>
-Date: Thu,  9 Aug 2018 13:40:15 +0200
-Message-Id: <20180809114017.16643-3-jthumshirn@suse.de>
-In-Reply-To: <20180809114017.16643-1-jthumshirn@suse.de>
-References: <20180809114017.16643-1-jthumshirn@suse.de>
-Subject: [Qemu-devel] [PATCH v2 2/4] Add MEN Chameleon Bus via PCI carrier
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fnjMh-00066d-MV
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:44:28 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu,  9 Aug 2018 13:44:13 +0200
+Message-Id: <20180809114417.28718-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/4] Memory leak fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,332 +21,23 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Hannes Reinecke <hare@suse.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- hw/mcb/Makefile.objs |   1 +
- hw/mcb/mcb-pci.c     | 305 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 306 insertions(+)
- create mode 100644 hw/mcb/mcb-pci.c
+Hi,
 
-diff --git a/hw/mcb/Makefile.objs b/hw/mcb/Makefile.objs
-index 32427c987c44..125f4a84700a 100644
---- a/hw/mcb/Makefile.objs
-+++ b/hw/mcb/Makefile.objs
-@@ -1 +1,2 @@
- common-obj-$(CONFIG_MCB) += mcb.o
-+common-obj-$(CONFIG_MCB) += mcb-pci.o
-diff --git a/hw/mcb/mcb-pci.c b/hw/mcb/mcb-pci.c
-new file mode 100644
-index 000000000000..a1a47980766f
---- /dev/null
-+++ b/hw/mcb/mcb-pci.c
-@@ -0,0 +1,305 @@
-+/*
-+ * QEMU MEN Chameleon Bus emulation
-+ *
-+ * Copyright (C) 2016 - 2018 Johannes Thumshirn <jth@kernel.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/mcb/mcb.h"
-+#include "hw/pci/pci.h"
-+
-+/* #define DEBUG_MPCI 1 */
-+
-+#ifdef DEBUG_MPCI
-+#define DPRINTF(fmt, ...)                                               \
-+    do { fprintf(stderr, "mcb-pci: " fmt, ## __VA_ARGS__); } while (0)
-+#else
-+#define DPRINTF(fmt, ...) do { } while (0)
-+#endif
-+
-+typedef struct {
-+    uint8_t revision;
-+    char model;
-+    uint8_t minor;
-+    uint8_t bus_type;
-+    uint16_t magic;
-+    uint16_t reserved;
-+    /* This one has no '\0' at the end!!! */
-+    char filename[12];
-+} ChameleonFPGAHeader;
-+#define CHAMELEON_BUS_TYPE_WISHBONE 0
-+#define CHAMELEONV2_MAGIC 0xabce
-+
-+typedef struct {
-+    PCIDevice dev;
-+    MCBus bus;
-+    MemoryRegion ctbl;
-+    uint16_t status;
-+    uint8_t int_set;
-+    ChameleonFPGAHeader *header;
-+
-+    uint8_t minor;
-+    uint8_t rev;
-+    uint8_t model;
-+} MPCIState;
-+
-+#define TYPE_MCB_PCI "mcb-pci"
-+
-+#define MPCI(obj)                                       \
-+    OBJECT_CHECK(MPCIState, (obj), TYPE_MCB_PCI)
-+
-+#define CHAMELEON_TABLE_SIZE 0x200
-+#define N_MODULES 32
-+
-+#define PCI_VENDOR_ID_MEN 0x1a88
-+#define PCI_DEVICE_ID_MEN_MCBPCI 0x4d45
-+
-+static uint32_t read_header(MPCIState *s, hwaddr addr)
-+{
-+    uint32_t ret = 0;
-+    ChameleonFPGAHeader *header = s->header;
-+
-+    switch (addr / 4) {
-+    case 0:
-+        ret |= header->revision;
-+        ret |= header->model << 8;
-+        ret |= header->minor << 16;
-+        ret |= header->bus_type << 24;
-+        break;
-+    case 1:
-+        ret |= header->magic;
-+        ret |= header->reserved << 16;
-+        break;
-+    case 2:
-+        memcpy(&ret, header->filename, sizeof(uint32_t));
-+        break;
-+    case 3:
-+        memcpy(&ret, header->filename + sizeof(uint32_t),
-+               sizeof(uint32_t));
-+        break;
-+    case 4:
-+        memcpy(&ret, header->filename + 2 * sizeof(uint32_t),
-+               sizeof(uint32_t));
-+    }
-+
-+    return ret;
-+}
-+
-+static uint32_t read_gdd(MCBDevice *mdev, int reg)
-+{
-+    ChameleonDeviceDescriptor *gdd;
-+    uint32_t ret = 0;
-+
-+    gdd = mdev->gdd;
-+
-+    switch (reg) {
-+    case 0:
-+        ret = gdd->reg1;
-+        break;
-+    case 1:
-+        ret = gdd->reg2;
-+        break;
-+    case 2:
-+        ret = gdd->offset;
-+        break;
-+    case 3:
-+        ret = gdd->size;
-+        break;
-+    }
-+
-+    return ret;
-+}
-+
-+static uint64_t mpci_chamtbl_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    MPCIState *s = opaque;
-+    MCBus *bus = &s->bus;
-+    MCBDevice *mdev;
-+    uint32_t ret = 0;
-+
-+    DPRINTF("Read from address 0x%lx size %d\n", addr, size);
-+
-+    if (addr < sizeof(ChameleonFPGAHeader)) {
-+        return le32_to_cpu(read_header(s, addr));
-+    } else if (addr >= sizeof(ChameleonFPGAHeader) &&
-+               addr < CHAMELEON_TABLE_SIZE) {
-+        /* Handle read on chameleon table */
-+        BusChild *kid;
-+        DeviceState *qdev;
-+        int slot;
-+        int offset;
-+        int i;
-+
-+        offset = addr - sizeof(ChameleonFPGAHeader);
-+        slot = offset / sizeof(ChameleonDeviceDescriptor);
-+
-+        kid = QTAILQ_FIRST(&BUS(bus)->children);
-+        for (i = 0; i < slot; i++) {
-+            kid = QTAILQ_NEXT(kid, sibling);
-+            if (!kid) { /* Last element */
-+                DPRINTF("Last element: 0x%08x\n", ~0U);
-+                return ~0U;
-+            }
-+        }
-+        qdev = kid->child;
-+        mdev = MCB_DEVICE(qdev);
-+        offset -= slot * 16;
-+
-+        ret = read_gdd(mdev, offset / 4);
-+        return le32_to_cpu(ret);
-+    }
-+
-+    return ret;
-+}
-+
-+static void mpci_chamtbl_write(void *opaque, hwaddr addr, uint64_t val,
-+                               unsigned size)
-+{
-+
-+    if (addr < CHAMELEON_TABLE_SIZE)
-+        DPRINTF("Invalid write to 0x%x: 0x%x\n", (unsigned) addr,
-+                (unsigned) val);
-+
-+    return;
-+}
-+
-+static const MemoryRegionOps mpci_chamtbl_ops = {
-+    .read = mpci_chamtbl_read,
-+    .write = mpci_chamtbl_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4
-+    },
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4
-+    },
-+};
-+
-+static void mcb_pci_set_irq(void *opaque, int intno, int level)
-+{
-+    MCBDevice *mdev = opaque;
-+    MCBus *bus = MCB_BUS(qdev_get_parent_bus(DEVICE(mdev)));
-+    PCIDevice *pcidev = PCI_DEVICE(BUS(bus)->parent);
-+    MPCIState *dev = MPCI(pcidev);
-+
-+    if (level) {
-+        pci_set_irq(&dev->dev, !dev->int_set);
-+        pci_set_irq(&dev->dev,  dev->int_set);
-+    } else {
-+        uint16_t level_status = dev->status;
-+
-+        if (level_status && !dev->int_set) {
-+            pci_irq_assert(&dev->dev);
-+            dev->int_set = 1;
-+        } else if (!level_status && dev->int_set) {
-+            pci_irq_deassert(&dev->dev);
-+            dev->int_set = 0;
-+        }
-+    }
-+}
-+
-+static void mcb_pci_write_config(PCIDevice *pci_dev, uint32_t address,
-+                                 uint32_t val, int len)
-+{
-+    pci_default_write_config(pci_dev, address, val, len);
-+}
-+
-+static void mcb_pci_realize(PCIDevice *pci_dev, Error **errp)
-+{
-+    MPCIState *s = MPCI(pci_dev);
-+    uint8_t *pci_conf = s->dev.config;
-+    ChameleonFPGAHeader *header;
-+    MCBus *bus = &s->bus;
-+
-+    header = g_new0(ChameleonFPGAHeader, 1);
-+
-+    s->header = header;
-+
-+    header->revision = s->rev;
-+    header->model = (char) s->model;
-+    header->minor = s->minor;
-+    header->bus_type = CHAMELEON_BUS_TYPE_WISHBONE;
-+    header->magic = CHAMELEONV2_MAGIC;
-+    memcpy(&header->filename, "QEMU MCB PCI", 12);
-+
-+    pci_dev->config_write = mcb_pci_write_config;
-+    pci_set_byte(pci_conf + PCI_INTERRUPT_PIN, 0x01); /* Interrupt pin A */
-+    pci_conf[PCI_COMMAND] = PCI_COMMAND_MEMORY;
-+
-+    mcb_bus_new_inplace(&s->bus, sizeof(s->bus), DEVICE(pci_dev), NULL,
-+                        N_MODULES, mcb_pci_set_irq);
-+
-+    memory_region_init(&bus->mmio_region, OBJECT(s), "mcb-pci.mmio",
-+                       2048 * 1024);
-+    memory_region_init_io(&s->ctbl, OBJECT(s), &mpci_chamtbl_ops,
-+                          s, "mpci_chamtbl_ops", CHAMELEON_TABLE_SIZE);
-+    memory_region_add_subregion(&bus->mmio_region, 0, &s->ctbl);
-+    pci_register_bar(&s->dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY,
-+                     &bus->mmio_region);
-+
-+}
-+
-+static void mcb_pci_unrealize(PCIDevice *pci_dev)
-+{
-+    MPCIState *s = MPCI(pci_dev);
-+
-+    g_free(s->header);
-+    s->header = NULL;
-+}
-+
-+static const VMStateDescription vmstate_mcb_pci = {
-+    .name = "mcb-pci",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCI_DEVICE(dev, MPCIState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property mcb_pci_props[] = {
-+    DEFINE_PROP_UINT8("revision", MPCIState, rev, 1),
-+    DEFINE_PROP_UINT8("minor", MPCIState, minor, 0),
-+    DEFINE_PROP_UINT8("model", MPCIState, model, 0x41),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void mcb_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+
-+    k->realize = mcb_pci_realize;
-+    k->exit = mcb_pci_unrealize;
-+    k->vendor_id = PCI_VENDOR_ID_MEN;
-+    k->device_id = PCI_DEVICE_ID_MEN_MCBPCI;
-+    k->class_id = PCI_CLASS_BRIDGE_OTHER;
-+
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->desc = "MEN Chameleon Bus over PCI";
-+    dc->vmsd = &vmstate_mcb_pci;
-+    dc->props = mcb_pci_props;
-+}
-+
-+static const TypeInfo mcb_pci_info = {
-+    .name = TYPE_MCB_PCI,
-+    .parent = TYPE_PCI_DEVICE,
-+    .instance_size = sizeof(MPCIState),
-+    .class_init = mcb_pci_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { INTERFACE_PCIE_DEVICE },
-+        { }
-+    },
-+};
-+
-+static void mcb_pci_register_types(void)
-+{
-+    type_register(&mcb_pci_info);
-+}
-+type_init(mcb_pci_register_types);
--- 
-2.16.4
+A series of leaks spotted by ASAN. Some of them might be worth for 3.0...
+
+Marc-Andr=C3=A9 Lureau (4):
+  tests: fix crumple/recursive leak
+  tests: fix bdrv-drain leak
+  monitor: fix oob command leak
+  RFC: fix megasas leak
+
+ hw/scsi/megasas.c         | 1 +
+ monitor.c                 | 2 ++
+ tests/check-block-qdict.c | 1 +
+ tests/test-bdrv-drain.c   | 1 +
+ 4 files changed, 5 insertions(+)
+
+--=20
+2.18.0.547.g1d89318c48
