@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fnst2-0004GL-5Y
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fnst2-0004H1-Vr
 	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:54:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fnssy-0006Vo-HT
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:54:28 -0400
-From: Leonid Bloch <lbloch@janustech.com>
-Date: Fri, 10 Aug 2018 00:53:00 +0300
-Message-Id: <20180809215307.18241-2-lbloch@janustech.com>
-In-Reply-To: <20180809215307.18241-1-lbloch@janustech.com>
-References: <20180809215307.18241-1-lbloch@janustech.com>
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fnssz-0006W9-0p
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:54:29 -0400
+Received: from hera.aquilenet.fr ([185.233.100.1]:47834)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1fnssy-0006V9-PR
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:54:24 -0400
+Date: Thu, 9 Aug 2018 23:54:21 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20180809215421.hexdewc3igklwvob@var.youpi.perso.aquilenet.fr>
+References: <20180807114501.12370-1-peter.maydell@linaro.org>
+	<20180809111233.GA2619@work-vm>
+	<CAFEAcA-+5xFDMuvK2W8v=Ufs2E1K4y9onZY_4x6RMYbHLFpkxA@mail.gmail.com>
+	<20180809113204.GB2618@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 1/8] qcow2: Options' documentation fixes
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180809113204.GB2618@work-vm>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.0] slirp: Correct size check in
+ m_inc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,75 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, Prasad J Pandit <pjp@fedoraproject.org>, liqsub1 <liqsub1@163.com>
 
-Signed-off-by: Leonid Bloch <lbloch@janustech.com>
----
- docs/qcow2-cache.txt | 16 +++++++++++-----
- qemu-options.hx      |  9 ++++++---
- 2 files changed, 17 insertions(+), 8 deletions(-)
+Dr. David Alan Gilbert, le jeu. 09 ao=C3=BBt 2018 12:32:05 +0100, a ecrit=
+:
+> >    |--datasize---->|---m_len------->
+> >    |----------m_size------------------------------>
+> >                    |----M_ROOM-------------------->
+> >                                     |-M_FREEROOM-->
+> >=20
+> >    ^               ^                               ^
+> >    m_dat           m_data                          end of buffer
+> >=20
+> > ("datasize" is a bit misnamed, as it's "size of the leading
+> > gap between the start of the buffer and the data"; "gapsize"
+> > would be more helpful.)
+> >=20
+> > Anyway, we allocate size + datasize, and
+> > m_size =3D=3D datasize + M_ROOM. We know that size >=3D M_ROOM,
+> > so the allocated buffer must be at least m_size big.
+>=20
+> Ah OK, thanks.
+> (That ascii art could do with being in a comment somewhere!)
 
-diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
-index 8a09a5cc5f..0f157d859a 100644
---- a/docs/qcow2-cache.txt
-+++ b/docs/qcow2-cache.txt
-@@ -97,12 +97,15 @@ need:
-    l2_cache_size = disk_size_GB * 131072
-    refcount_cache_size = disk_size_GB * 32768
- 
--QEMU has a default L2 cache of 1MB (1048576 bytes) and a refcount
--cache of 256KB (262144 bytes), so using the formulas we've just seen
--we have
-+With the default cluster size, to cover each 8 GB of the virtual image
-+size, 1MB of L2 cache is needed:
- 
--   1048576 / 131072 = 8 GB of virtual disk covered by that cache
--    262144 /  32768 = 8 GB
-+   65536 / 8 = 8192 = 8 GB / 1 MB
+Indeed. Peter, maybe your Signed-off-by on this? :)
+
+Samuel
+
+commit 4be85a1eeb6b19e91491e689d4d0d054030cbb49
+Author: Peter Maydell <peter.maydell@linaro.org>
+Date:   Thu Aug 9 23:52:59 2018 +0200
+
+    slirp: document mbuf pointers and sizes
+   =20
+    Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+
+diff --git a/slirp/mbuf.h b/slirp/mbuf.h
+index 33b84485d6..a5bb3f9e66 100644
+--- a/slirp/mbuf.h
++++ b/slirp/mbuf.h
+@@ -47,6 +47,16 @@
+  * free the m_ext.  This is inefficient memory-wise, but who cares.
+  */
+=20
++/*
++ *  |--gapsize----->|---m_len------->
++ *  |----------m_size------------------------------>
++ *                  |----M_ROOM-------------------->
++ *                                   |-M_FREEROOM-->
++ *
++ *  ^               ^                               ^
++ *  m_dat/m_ext     m_data                          end of buffer
++ */
 +
-+A default refcount cache is 4 times the cluster size, which defaults to
-+256 KB (262144 bytes). This is sufficient for 8 GB of image size:
-+
-+   262144 / 32768 = 8 GB
- 
- 
- How to configure the cache sizes
-@@ -130,6 +133,9 @@ There are a few things that need to be taken into account:
-    memory as possible to the L2 cache before increasing the refcount
-    cache size.
- 
-+ - At most two of "l2-cache-size", "refcount-cache-size", and "cache-size"
-+   can be set simultaneously.
-+
- Unlike L2 tables, refcount blocks are not used during normal I/O but
- only during allocations and internal snapshots. In most cases they are
- accessed sequentially (even during random guest I/O) so increasing the
-diff --git a/qemu-options.hx b/qemu-options.hx
-index b1bf0f485f..f6804758d3 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -752,15 +752,18 @@ image file)
- 
- @item cache-size
- The maximum total size of the L2 table and refcount block caches in bytes
--(default: 1048576 bytes or 8 clusters, whichever is larger)
-+(default: the sum of l2-cache-size and refcount-cache-size)
- 
- @item l2-cache-size
- The maximum size of the L2 table cache in bytes
--(default: 4/5 of the total cache size)
-+(default: if cache-size is not defined - 1048576 bytes or 8 clusters, whichever
-+is larger; otherwise, as large as possible or needed within the cache-size,
-+while permitting the requested or the minimal refcount cache size)
- 
- @item refcount-cache-size
- The maximum size of the refcount block cache in bytes
--(default: 1/5 of the total cache size)
-+(default: 4 times the cluster size; or if cache-size is specified, the part of
-+it which is not used for the L2 cache)
- 
- @item cache-clean-interval
- Clean unused entries in the L2 and refcount caches. The interval is in seconds.
--- 
-2.17.1
+ /*
+  * How much room is in the mbuf, from m_data to the end of the mbuf
+  */
