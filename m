@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1fnlhb-0007VB-G3
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:14:12 -0400
+	(envelope-from <lvivier@redhat.com>) id 1fnlk8-0000rQ-Ce
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:16:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1fnlha-0000V8-KL
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:14:11 -0400
-Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::6]:16269)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1fnlha-0000Tu-4X
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:14:10 -0400
-From: Olaf Hering <olaf@aepfle.de>
-Date: Thu,  9 Aug 2018 16:14:03 +0200
-Message-Id: <20180809141403.11296-1-olaf@aepfle.de>
+	(envelope-from <lvivier@redhat.com>) id 1fnlk5-0001w3-28
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:16:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60724 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1fnlk4-0001vV-RM
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 10:16:44 -0400
+References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
+	<20180806143412.27722-30-e.emanuelegiuseppe@gmail.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <f1bdb55c-9787-f9cb-6da8-c74d192d3c3e@redhat.com>
+Date: Thu, 9 Aug 2018 16:16:42 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1] exec: handle NULL pointer in
- flatview_read_continue
+In-Reply-To: <20180806143412.27722-30-e.emanuelegiuseppe@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 29/34] test/qgraph: virtio-blk test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>
-Cc: Olaf Hering <olaf@aepfle.de>
+To: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
 
-The codepaths behind qemu_ram_ptr_length can return NULL.
-Avoid crashing the device-model in such case, just move on.
+On 06/08/2018 16:34, Emanuele Giuseppe Esposito wrote:
+> -static void mmio_basic(void)
+> +static void basic_resize(void *obj, void *data, QGuestAllocator *t_alloc)
+>  {
+> -    QVirtioMMIODevice *dev;
+> -    QVirtQueue *vq;
+> -    QGuestAllocator *alloc;
+> +    QVirtioBlk *blk_if = obj;
+> +    QVirtioDevice *dev = blk_if->vdev;
+>      int n_size = TEST_IMAGE_SIZE / 2;
+>      uint64_t capacity;
+> +    QVirtQueue *vq;
+>  
+> -    arm_test_start();
+> -
+> -    dev = qvirtio_mmio_device_new(MMIO_DEV_BASE_ADDR, MMIO_PAGE_SIZE);
 
-Signed-off-by: Olaf Hering <olaf@aepfle.de>
----
-This happens if calling xendevicemodel_create_ioreq_server() is disabled,
-and eventually if that function returns an error.
----
- exec.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This is the only user of qvirtio_mmio_device_new(), so if you remove the
+call here, you could also remove the function definition.
 
-diff --git a/exec.c b/exec.c
-index 4f5df07b6a..0d30e48571 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3318,7 +3318,8 @@ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
-         } else {
-             /* RAM case */
-             ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
--            memcpy(buf, ptr, l);
-+	    if (ptr)
-+                memcpy(buf, ptr, l);
-         }
- 
-         if (release_lock) {
+Thanks,
+Laurent
