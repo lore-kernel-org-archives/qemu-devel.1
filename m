@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1fnjSF-00075T-Ri
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:50:12 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1fnjVZ-0001b9-Ed
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:53:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1fnjSD-0008Da-5i
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:50:11 -0400
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:36345)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1fnjSC-0008DF-Tr
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:50:09 -0400
-Received: by mail-wm0-f66.google.com with SMTP id w24-v6so6107452wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 04:50:08 -0700 (PDT)
-Date: Thu, 9 Aug 2018 13:50:03 +0200
-From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Message-ID: <20180809135003.75fe8fa3@fiorina>
-In-Reply-To: <e91a6eb7-d5b2-93e6-05bf-65270ccb8736@redhat.com>
-References: <cover.1533639095.git.tgolembi@redhat.com>
-	<23ca1636f8e238b2ffaded962519d2be1e3b5d3a.1533639095.git.tgolembi@redhat.com>
-	<e91a6eb7-d5b2-93e6-05bf-65270ccb8736@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] qga: report serial ID and device
- node
+	(envelope-from <robert.hu@linux.intel.com>) id 1fnjVW-0001y6-R3
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:53:37 -0400
+Received: from mga02.intel.com ([134.134.136.20]:34246)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1fnjVW-0001xT-I8
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:53:34 -0400
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Thu,  9 Aug 2018 19:53:26 +0800
+Message-Id: <1533815609-37245-1-git-send-email-robert.hu@linux.intel.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] x86: QEMU side support on MSR based
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +23,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com
+Cc: robert.hu@intel.com, jingqi.liu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
 
-On Tue, 7 Aug 2018 08:52:37 -0500
-Eric Blake <eblake@redhat.com> wrote:
+KVM side has added the framework (kvm.git:d1d93fa90) to support MSR based features.
+Here is the QEMU part, including data structure changes/expanding, referring
+functions changes, and the implementations on 
+KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS system ioctl.
 
-> On 08/07/2018 05:51 AM, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD wrote:
-> > On Linux the functionality depends on libudev.
-> >=20
-> > Example from Linux:
-> >=20
-> >      {
-> >        "name": "dm-2",
-> >        "mountpoint": "/",
-> >        ...
-> >        "disk": [
-> >          {
-> >            "serial": "SAMSUNG_MZ7LN512HCHP-000L1_S1ZKNXAG822493",
-> >            "dev": "/dev/sda2",
-> >            ...
-> >          }
-> >        ],
-> >      }
-> >=20
-> > Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
-> > --- =20
->=20
-> > +++ b/qga/commands-posix.c
-> > @@ -47,6 +47,7 @@ extern char **environ;
-> >   #include <sys/socket.h>
-> >   #include <net/if.h>
-> >   #include <sys/statvfs.h>
-> > +#include <libudev.h> =20
->=20
-> Is libudev universally available on BSD systems and always preinstalled=20
-> on Linux systems, or does this need a configure probe?
+Changelog:
+v2: coding style changes to pass ./scripts/checkpatch.pl.
+----------------
+Robert Hoo (3):
+  x86: Data structure changes to support MSR based features
+  kvm: Add support to KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS
+    system ioctl
+  Change other funcitons referring to feature_word_info[]
 
-The code is specific to Linux. I couldn't find portable way of querying
-the serial number.
+ include/sysemu/kvm.h |   2 +
+ target/i386/cpu.c    | 209 +++++++++++++++++++++++++++++++++++++--------------
+ target/i386/cpu.h    |   5 ++
+ target/i386/kvm.c    |  78 +++++++++++++++++++
+ 4 files changed, 236 insertions(+), 58 deletions(-)
 
-libudev is part of systemd, so it should generally be there. But I
-suppose we should not break on systems that don't use it. I'll add
-configure check for it.
-
-    Tomas
-
---=20
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+-- 
+1.8.3.1
