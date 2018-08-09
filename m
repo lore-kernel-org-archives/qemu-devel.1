@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fnsbM-0002hZ-69
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:36:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fnsbP-0002nM-Cw
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:36:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fnsbL-0008Hh-9B
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:36:12 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fnsbO-0008Km-CQ
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 17:36:15 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu,  9 Aug 2018 23:35:14 +0200
-Message-Id: <20180809213528.14738-18-mreitz@redhat.com>
+Date: Thu,  9 Aug 2018 23:35:17 +0200
+Message-Id: <20180809213528.14738-21-mreitz@redhat.com>
 In-Reply-To: <20180809213528.14738-1-mreitz@redhat.com>
 References: <20180809213528.14738-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-3.1 v10 17/31] block/nbd: Make
- bdrv_dirname() return NULL
+Subject: [Qemu-devel] [PATCH for-3.1 v10 20/31] iotests: Add quorum case to
+ test 110
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +23,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-The generic bdrv_dirname() implementation would be able to generate some
-form of directory name for many NBD nodes, but it would be always wrong.
-Therefore, we have to explicitly make it an error (until NBD has some
-form of specification for export paths, if it ever will).
+Test 110 tests relative backing filenames for complex BDS trees.  Now
+that the originally supposedly failing test passes, let us add a new
+failing test: Quorum can never work automatically (without detecting
+whether all child nodes have the same base directory, but that would be
+rather inconsistent behavior).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/nbd.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ tests/qemu-iotests/110     | 26 ++++++++++++++++++++++++++
+ tests/qemu-iotests/110.out |  7 +++++++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index e87699fb73..bca127c8f5 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -564,6 +564,16 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
-     bs->full_open_options = opts;
+diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
+index ba1b3c6c7d..08976c8a61 100755
+--- a/tests/qemu-iotests/110
++++ b/tests/qemu-iotests/110
+@@ -30,6 +30,7 @@ status=1	# failure is the default!
+ _cleanup()
+ {
+ 	_cleanup_test_img
++        rm -f "$TEST_IMG.copy"
  }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
-+static char *nbd_dirname(BlockDriverState *bs, Error **errp)
-+{
-+    /* The generic bdrv_dirname() implementation is able to work out some
-+     * directory name for NBD nodes, but that would be wrong. So far there is no
-+     * specification for how "export paths" would work, so NBD does not have
-+     * directory names. */
-+    error_setg(errp, "Cannot generate a base directory for NBD nodes");
-+    return NULL;
-+}
+@@ -87,6 +88,31 @@ echo
+ # omit the image size; it should work anyway
+ _make_test_img -b "$TEST_IMG_REL.base"
+ 
++echo
++echo '=== Nodes without a common directory ==='
++echo
 +
- static BlockDriver bdrv_nbd = {
-     .format_name                = "nbd",
-     .protocol_name              = "nbd",
-@@ -582,6 +592,7 @@ static BlockDriver bdrv_nbd = {
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_co_block_status       = nbd_client_co_block_status,
-+    .bdrv_dirname               = nbd_dirname,
- };
++cp "$TEST_IMG" "$TEST_IMG.copy"
++
++# Should inform us that the actual path of the backing file cannot be determined
++TEST_IMG="json:{
++    'driver': '$IMGFMT',
++    'file': {
++        'driver': 'quorum',
++        'vote-threshold': 1,
++        'children': [
++            {
++                'driver': 'file',
++                'filename': '$TEST_IMG'
++            },
++            {
++                'driver': 'file',
++                'filename': '$TEST_IMG.copy'
++            }
++        ]
++    }
++}" _img_info | _filter_img_info
++
  
- static BlockDriver bdrv_nbd_tcp = {
-@@ -602,6 +613,7 @@ static BlockDriver bdrv_nbd_tcp = {
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_co_block_status       = nbd_client_co_block_status,
-+    .bdrv_dirname               = nbd_dirname,
- };
+ # success, all done
+ echo '*** done'
+diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
+index 5370bc1d26..1d0b2475cc 100644
+--- a/tests/qemu-iotests/110.out
++++ b/tests/qemu-iotests/110.out
+@@ -19,4 +19,11 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
+ === Backing name is always relative to the backed image ===
  
- static BlockDriver bdrv_nbd_unix = {
-@@ -622,6 +634,7 @@ static BlockDriver bdrv_nbd_unix = {
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_co_block_status       = nbd_client_co_block_status,
-+    .bdrv_dirname               = nbd_dirname,
- };
- 
- static void bdrv_nbd_init(void)
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=t.IMGFMT.base
++
++=== Nodes without a common directory ===
++
++image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-corrupted": false, "vote-threshold": 1}}
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++backing file: t.IMGFMT.base (cannot determine actual path)
+ *** done
 -- 
 2.17.1
