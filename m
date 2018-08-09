@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fnk8M-0008IP-5I
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 08:33:43 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fnk9m-0000nc-L3
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 08:35:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fnk8I-0000cO-7a
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 08:33:42 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:37729)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
-	id 1fnk8H-0000aY-V9
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 08:33:38 -0400
-Received: by mail-ed1-x541.google.com with SMTP id b10-v6so2802680eds.4
-	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 05:33:37 -0700 (PDT)
-References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
-	<20180806143412.27722-4-e.emanuelegiuseppe@gmail.com>
-	<938f8b05-a687-8595-5452-8ec5abf7414c@redhat.com>
-	<1c703cc4-644b-1ba8-4ec2-8b58ada7028a@gmail.com>
-	<050466ae-69e8-20cd-7484-7da7160deaa9@redhat.com>
-From: Emanuele <e.emanuelegiuseppe@gmail.com>
-Message-ID: <7a4ad181-f811-7feb-6178-b7d854e102b3@gmail.com>
-Date: Thu, 9 Aug 2018 14:33:29 +0200
+	(envelope-from <flukshun@gmail.com>) id 1fnk9i-0002mk-MR
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 08:35:10 -0400
+Sender: fluxion <flukshun@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <050466ae-69e8-20cd-7484-7da7160deaa9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 03/34] tests/qgraph: pci-pc driver and
- interface nodes
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20180809002335.GK7429@umbus.fritz.box>
+References: <20180808155919.12972-1-bharata@linux.ibm.com>
+	<20180809002335.GK7429@umbus.fritz.box>
+Message-ID: <153381809870.13636.6434595806199633248@sif>
+Date: Thu, 09 Aug 2018 07:34:58 -0500
+Subject: Re: [Qemu-devel] [PATCH] spapr_cpu_core: vmstate_[un]register
+ per-CPU data from (un)realizefn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,79 +25,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
+To: Bharata B Rao <bharata@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, sathnaga@linux.vnet.ibm.com, qemu-stable@nongnu.org
 
+Quoting David Gibson (2018-08-08 19:23:35)
+> On Wed, Aug 08, 2018 at 09:29:19PM +0530, Bharata B Rao wrote:
+> > VMStateDescription vmstate_spapr_cpu_state was added by commit
+> > b94020268e0b6 (spapr_cpu_core: migrate per-CPU data) to migrate per-CPU
+> > data with the required vmstate registration and unregistration calls.
+> > However the unregistration is being done only from vcpu creation error =
+path
+> > and not from CPU delete path.
+> > =
 
+> > This causes migration to fail with the following error if migration is
+> > attempted after a CPU unplug like this:
+> > Unknown savevm section or instance 'spapr_cpu' 16
+> > Additionally this leaves the source VM unresponsive after migration fai=
+lure.
+> > =
 
-On 08/09/2018 02:29 PM, Laurent Vivier wrote:
-> On 09/08/2018 14:17, Emanuele wrote:
->>>> +    return TRUE;
->>>> +}
->>>> +
->>>> +QPCIDevice *qpci_device_find(QPCIBus *bus, int devfn)
->>>> +{
->>>> +    QPCIDevice *dev;
->>>> +
->>>> +    dev = g_malloc0(sizeof(*dev));
->>>> +
->>>> +    if (!qpci_device_set(dev, bus, devfn)) {
->>>>            g_free(dev);
->>>>            return NULL;
->>>>        }
->>>> @@ -66,6 +83,21 @@ QPCIDevice *qpci_device_find(QPCIBus *bus, int devfn)
->>>>        return dev;
->>>>    }
->>>>    +void qpci_device_init(QPCIDevice *dev, QPCIBus *bus, QPCIAddress
->>>> *addr)
->>>> +{
->>>> +    uint16_t vendor_id, device_id;
->>>> +
->>>> +    if (!qpci_device_set(dev, bus, addr->devfn)) {
->>>> +        printf("PCI Device not found\n");
->>>> +        abort();
->>>> +    }
->>> so, here, you should use qpci_device_set() and qpci_device_available()...
->> I changed qpci_device_set to just set the fields, while
->> qpci_device_available simply is doing
->> {
->>      return qpci_config_readw(...) != 0xFFFF
->> }
->> Now both qpci_device_init and qpci_device_find call qpci_device_set, and
->> check that  qpci_device_available is not false, otherwise it will
->> trigger g_assert_not_reached().
->>>> +
->>>> +    vendor_id = qpci_config_readw(dev, PCI_VENDOR_ID);
->>> or you can only check vendor_id to see it is 0xffff or not...
->>>
->>>> +    device_id = qpci_config_readw(dev, PCI_DEVICE_ID);
->>>> +    g_assert(vendor_id == addr->vendor_id);
->>> that should be in fact detected by this g_assert().
->> since this case is covered by qpci_device_available, I don't think
->> there's the need to insert the assertion.
-> What I mean is you don't need the qpci_device_available().
->
-> The 0xffff case is detected by "g_assert(vendor_id == addr->vendor_id)".
->
-> The functions could be:
->
-> static void qpci_device_set(QPCIDevice *dev, QPCIBus *bus, int devfn)
-> {
->       dev->bus = bus;
->       dev->devfn = devfn;
-> }
->
-> void qpci_device_init(QPCIDevice *dev, QPCIBus *bus, QPCIAddress *addr)
-> {
->      uint16_t vendor_id, device_id;
->
->      qpci_device_set(dev, bus, addr->devfn);
->
->      vendor_id = qpci_config_readw(dev, PCI_VENDOR_ID);
->      device_id = qpci_config_readw(dev, PCI_DEVICE_ID);
->      g_assert(vendor_id == addr->vendor_id);
->      g_assert(device_id == addr->device_id);
-> }
-Ok, makes sense for qpci_device_init, but I still need to perform that 
-check for qpci_device_find.
-Emanuele
+> > Fix this by ensuring the vmstate_unregister happens during CPU removal.
+> > Fixing this becomes easier when vmstate (un)registration calls are move=
+d to
+> > vcpu (un)realize functions which is what this patch does.
+> > =
+
+> > Fixes: https://bugs.launchpad.net/qemu/+bug/1785972
+> > Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+> > Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+> =
+
+> Applied to ppc-for-3.1.
+> =
+
+> Unfortunately, despite being a clear regression, I think it's too late
+> for 3.0 :(.
+> =
+
+> Mike, can you queue this for 3.0.1 as too, thanks?
+
+Sure, will do.
+
+> =
+
+> > ---
+> >  hw/ppc/spapr_cpu_core.c | 62 +++++++++++++++++++++++++----------------=
+--------
+> >  1 file changed, 32 insertions(+), 30 deletions(-)
+> > =
+
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index 993759db47..bb88a3ce4e 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -113,26 +113,6 @@ const char *spapr_get_cpu_core_type(const char *cp=
+u_type)
+> >      return object_class_get_name(oc);
+> >  }
+> >  =
+
+> > -static void spapr_unrealize_vcpu(PowerPCCPU *cpu)
+> > -{
+> > -    qemu_unregister_reset(spapr_cpu_reset, cpu);
+> > -    object_unparent(cpu->intc);
+> > -    cpu_remove_sync(CPU(cpu));
+> > -    object_unparent(OBJECT(cpu));
+> > -}
+> > -
+> > -static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
+> > -{
+> > -    sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+> > -    CPUCore *cc =3D CPU_CORE(dev);
+> > -    int i;
+> > -
+> > -    for (i =3D 0; i < cc->nr_threads; i++) {
+> > -        spapr_unrealize_vcpu(sc->threads[i]);
+> > -    }
+> > -    g_free(sc->threads);
+> > -}
+> > -
+> >  static bool slb_shadow_needed(void *opaque)
+> >  {
+> >      sPAPRCPUState *spapr_cpu =3D opaque;
+> > @@ -207,10 +187,34 @@ static const VMStateDescription vmstate_spapr_cpu=
+_state =3D {
+> >      }
+> >  };
+> >  =
+
+> > +static void spapr_unrealize_vcpu(PowerPCCPU *cpu, sPAPRCPUCore *sc)
+> > +{
+> > +    if (!sc->pre_3_0_migration) {
+> > +        vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machin=
+e_data);
+> > +    }
+> > +    qemu_unregister_reset(spapr_cpu_reset, cpu);
+> > +    object_unparent(cpu->intc);
+> > +    cpu_remove_sync(CPU(cpu));
+> > +    object_unparent(OBJECT(cpu));
+> > +}
+> > +
+> > +static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
+> > +{
+> > +    sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+> > +    CPUCore *cc =3D CPU_CORE(dev);
+> > +    int i;
+> > +
+> > +    for (i =3D 0; i < cc->nr_threads; i++) {
+> > +        spapr_unrealize_vcpu(sc->threads[i], sc);
+> > +    }
+> > +    g_free(sc->threads);
+> > +}
+> > +
+> >  static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spa=
+pr,
+> > -                               Error **errp)
+> > +                               sPAPRCPUCore *sc, Error **errp)
+> >  {
+> >      CPUPPCState *env =3D &cpu->env;
+> > +    CPUState *cs =3D CPU(cpu);
+> >      Error *local_err =3D NULL;
+> >  =
+
+> >      object_property_set_bool(OBJECT(cpu), true, "realized", &local_err=
+);
+> > @@ -233,6 +237,11 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sP=
+APRMachineState *spapr,
+> >          goto error_unregister;
+> >      }
+> >  =
+
+> > +    if (!sc->pre_3_0_migration) {
+> > +        vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
+> > +                         cpu->machine_data);
+> > +    }
+> > +
+> >      return;
+> >  =
+
+> >  error_unregister:
+> > @@ -272,10 +281,6 @@ static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore =
+*sc, int i, Error **errp)
+> >      }
+> >  =
+
+> >      cpu->machine_data =3D g_new0(sPAPRCPUState, 1);
+> > -    if (!sc->pre_3_0_migration) {
+> > -        vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
+> > -                         cpu->machine_data);
+> > -    }
+> >  =
+
+> >      object_unref(obj);
+> >      return cpu;
+> > @@ -290,9 +295,6 @@ static void spapr_delete_vcpu(PowerPCCPU *cpu, sPAP=
+RCPUCore *sc)
+> >  {
+> >      sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
+> >  =
+
+> > -    if (!sc->pre_3_0_migration) {
+> > -        vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machin=
+e_data);
+> > -    }
+> >      cpu->machine_data =3D NULL;
+> >      g_free(spapr_cpu);
+> >      object_unparent(OBJECT(cpu));
+> > @@ -325,7 +327,7 @@ static void spapr_cpu_core_realize(DeviceState *dev=
+, Error **errp)
+> >      }
+> >  =
+
+> >      for (j =3D 0; j < cc->nr_threads; j++) {
+> > -        spapr_realize_vcpu(sc->threads[j], spapr, &local_err);
+> > +        spapr_realize_vcpu(sc->threads[j], spapr, sc, &local_err);
+> >          if (local_err) {
+> >              goto err_unrealize;
+> >          }
+> > @@ -334,7 +336,7 @@ static void spapr_cpu_core_realize(DeviceState *dev=
+, Error **errp)
+> >  =
+
+> >  err_unrealize:
+> >      while (--j >=3D 0) {
+> > -        spapr_unrealize_vcpu(sc->threads[j]);
+> > +        spapr_unrealize_vcpu(sc->threads[j], sc);
+> >      }
+> >  err:
+> >      while (--i >=3D 0) {
+> =
+
+> -- =
+
+> David Gibson                    | I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au  | minimalist, thank you.  NOT _the_ _othe=
+r_
+>                                 | _way_ _around_!
+> http://www.ozlabs.org/~dgibson
