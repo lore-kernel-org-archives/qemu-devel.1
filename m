@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fntml-0000ks-Vr
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:52:04 -0400
+	(envelope-from <mst@redhat.com>) id 1fntqy-0004JC-Ih
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:56:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fntmi-00080M-MD
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:52:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56596 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fntqv-0003DT-HX
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:56:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40088 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fntmi-0007zX-FQ
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:52:00 -0400
-Date: Fri, 10 Aug 2018 01:51:57 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fntqv-0003D8-CU
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 18:56:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 86B3940216F3
+	for <qemu-devel@nongnu.org>; Thu,  9 Aug 2018 22:56:20 +0000 (UTC)
+Date: Fri, 10 Aug 2018 01:56:16 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180810015124-mutt-send-email-mst@kernel.org>
-References: <CGME20180809165352eucas1p2359a46f1beb147fdcbd035c28bbd48d9@eucas1p2.samsung.com>
-	<1533833677-27512-1-git-send-email-i.maximets@samsung.com>
+Message-ID: <20180810015411-mutt-send-email-mst@kernel.org>
+References: <20180808114830.7169-1-quintela@redhat.com>
+	<20180808114830.7169-10-quintela@redhat.com>
+	<20180809190303.GF2618@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1533833677-27512-1-git-send-email-i.maximets@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: add support for in-order feature
+In-Reply-To: <20180809190303.GF2618@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v2 09/22] virtio: Remove unneeded includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +34,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ilya Maximets <i.maximets@samsung.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On Thu, Aug 09, 2018 at 07:54:37PM +0300, Ilya Maximets wrote:
-> New feature bit for in-order feature of the upcoming
-> virtio 1.1. It's already supported by DPDK vhost-user
-> and virtio implementations. These changes required to
-> allow feature negotiation.
-> 
-> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
-> ---
-> 
-> I just wanted to test this new feature in DPDK but failed
-> to found required patch for QEMU side. So, I implemented it.
-> At least it will be helpful for someone like me, who wants
-> to evaluate VIRTIO_F_IN_ORDER with DPDK.
-> 
->  hw/net/vhost_net.c                             |  1 +
->  include/hw/virtio/virtio.h                     | 12 +++++++-----
->  include/standard-headers/linux/virtio_config.h |  7 +++++++
->  3 files changed, 15 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> index e037db6..86879c5 100644
-> --- a/hw/net/vhost_net.c
-> +++ b/hw/net/vhost_net.c
-> @@ -78,6 +78,7 @@ static const int user_feature_bits[] = {
->      VIRTIO_NET_F_MRG_RXBUF,
->      VIRTIO_NET_F_MTU,
->      VIRTIO_F_IOMMU_PLATFORM,
-> +    VIRTIO_F_IN_ORDER,
->  
->      /* This bit implies RARP isn't sent by QEMU out of band */
->      VIRTIO_NET_F_GUEST_ANNOUNCE,
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index 9c1fa07..a422025 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -254,16 +254,18 @@ typedef struct virtio_input_conf virtio_input_conf;
->  typedef struct VirtIOSCSIConf VirtIOSCSIConf;
->  typedef struct VirtIORNGConf VirtIORNGConf;
->  
-> -#define DEFINE_VIRTIO_COMMON_FEATURES(_state, _field) \
-> +#define DEFINE_VIRTIO_COMMON_FEATURES(_state, _field)     \
->      DEFINE_PROP_BIT64("indirect_desc", _state, _field,    \
->                        VIRTIO_RING_F_INDIRECT_DESC, true), \
->      DEFINE_PROP_BIT64("event_idx", _state, _field,        \
->                        VIRTIO_RING_F_EVENT_IDX, true),     \
->      DEFINE_PROP_BIT64("notify_on_empty", _state, _field,  \
-> -                      VIRTIO_F_NOTIFY_ON_EMPTY, true), \
-> -    DEFINE_PROP_BIT64("any_layout", _state, _field, \
-> -                      VIRTIO_F_ANY_LAYOUT, true), \
-> -    DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
-> +                      VIRTIO_F_NOTIFY_ON_EMPTY, true),    \
-> +    DEFINE_PROP_BIT64("any_layout", _state, _field,       \
-> +                      VIRTIO_F_ANY_LAYOUT, true),         \
-> +    DEFINE_PROP_BIT64("in_order", _state, _field,         \
-> +                      VIRTIO_F_IN_ORDER, true),           \
-> +    DEFINE_PROP_BIT64("iommu_platform", _state, _field,   \
->                        VIRTIO_F_IOMMU_PLATFORM, false)
+On Thu, Aug 09, 2018 at 08:03:03PM +0100, Dr. David Alan Gilbert wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+> > They are all already included in virtio_pci.h.
 
-Is in_order really right for all virtio devices?
+All I see in virtio_pci.h is:
 
->  hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
-> diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
-> index b777069..d20398c 100644
-> --- a/include/standard-headers/linux/virtio_config.h
-> +++ b/include/standard-headers/linux/virtio_config.h
-> @@ -71,4 +71,11 @@
->   * this is for compatibility with legacy systems.
->   */
->  #define VIRTIO_F_IOMMU_PLATFORM		33
-> +
-> +/*
-> + * Inorder feature indicates that all buffers are used by the device
-> + * in the same order in which they have been made available.
-> + */
-> +#define VIRTIO_F_IN_ORDER 35
-> +
->  #endif /* _LINUX_VIRTIO_CONFIG_H */
-> -- 
-> 2.7.4
+#include "standard-headers/linux/types.h"
+
+Weird.
+
+BTW what's the point of this patch?  Generally it's best not to depend
+on headers including each other, it makes refactoring harder.
+
+
+> > 
+> > Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> 
+> cc'ing in mst for virtio goodness.
+> 
+> 
+> > ---
+> >  hw/virtio/virtio-pci.c | 15 +--------------
+> >  1 file changed, 1 insertion(+), 14 deletions(-)
+> > 
+> > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> > index 3a01fe90f0..cb2ddd3f41 100644
+> > --- a/hw/virtio/virtio-pci.c
+> > +++ b/hw/virtio/virtio-pci.c
+> > @@ -18,24 +18,11 @@
+> >  #include "qemu/osdep.h"
+> >  
+> >  #include "standard-headers/linux/virtio_pci.h"
+> > -#include "hw/virtio/virtio.h"
+> > -#include "hw/virtio/virtio-blk.h"
+> > -#include "hw/virtio/virtio-net.h"
+> > -#include "hw/virtio/virtio-serial.h"
+> > -#include "hw/virtio/virtio-scsi.h"
+> > -#include "hw/virtio/virtio-balloon.h"
+> > -#include "hw/virtio/virtio-input.h"
+> > -#include "hw/pci/pci.h"
+> > +#include "virtio-pci.h"
+> >  #include "qapi/error.h"
+> > -#include "qemu/error-report.h"
+> > -#include "hw/pci/msi.h"
+> >  #include "hw/pci/msix.h"
+> > -#include "hw/loader.h"
+> >  #include "sysemu/kvm.h"
+> > -#include "virtio-pci.h"
+> >  #include "qemu/range.h"
+> > -#include "hw/virtio/virtio-bus.h"
+> > -#include "qapi/visitor.h"
+> >  
+> >  #define VIRTIO_PCI_REGION_SIZE(dev)     VIRTIO_PCI_CONFIG_OFF(msix_present(dev))
+> >  
+> > -- 
+> > 2.17.1
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
