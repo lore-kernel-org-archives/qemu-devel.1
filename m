@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnq5m-0007SR-I2
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 14:55:27 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fnqDK-0001ak-Lh
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 15:03:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnq5i-0002fI-L8
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 14:55:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33802 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fnqDH-0006Ce-Gm
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 15:03:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49848 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fnq5i-0002f7-Fs
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 14:55:22 -0400
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-21-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <450781e6-728b-59c4-b393-a0c2fa56a04a@redhat.com>
-Date: Thu, 9 Aug 2018 13:55:19 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fnqDH-0006CA-Ax
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 15:03:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4AEA4F2B48
+	for <qemu-devel@nongnu.org>; Thu,  9 Aug 2018 19:03:10 +0000 (UTC)
+Date: Thu, 9 Aug 2018 20:03:03 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180809190303.GF2618@work-vm>
+References: <20180808114830.7169-1-quintela@redhat.com>
+	<20180808114830.7169-10-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180808120334.10970-21-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 20/56] check-qjson: Document we expect
- invalid UTF-8 to be rejected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180808114830.7169-10-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 09/22] virtio: Remove unneeded includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Juan Quintela <quintela@redhat.com>, mst@redhat.com
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 08/08/2018 07:02 AM, Markus Armbruster wrote:
-> The JSON parser rejects some invalid sequences, but accepts others
-> without correcting the problem.
+* Juan Quintela (quintela@redhat.com) wrote:
+> They are all already included in virtio_pci.h.
 > 
-> We should either reject all invalid sequences, or minimize overlong
-> sequences and replace all other invalid sequences by a suitable
-> replacement character.  A common choice for replacement is U+FFFD.
-> 
-> I'm going to implement the former.  Update the comments in
-> utf8_string() to expect this.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+
+cc'ing in mst for virtio goodness.
+
+
 > ---
->   tests/check-qjson.c | 151 +++++++++++++++++++++-----------------------
->   1 file changed, 71 insertions(+), 80 deletions(-)
+>  hw/virtio/virtio-pci.c | 15 +--------------
+>  1 file changed, 1 insertion(+), 14 deletions(-)
 > 
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index 3a01fe90f0..cb2ddd3f41 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -18,24 +18,11 @@
+>  #include "qemu/osdep.h"
+>  
+>  #include "standard-headers/linux/virtio_pci.h"
+> -#include "hw/virtio/virtio.h"
+> -#include "hw/virtio/virtio-blk.h"
+> -#include "hw/virtio/virtio-net.h"
+> -#include "hw/virtio/virtio-serial.h"
+> -#include "hw/virtio/virtio-scsi.h"
+> -#include "hw/virtio/virtio-balloon.h"
+> -#include "hw/virtio/virtio-input.h"
+> -#include "hw/pci/pci.h"
+> +#include "virtio-pci.h"
+>  #include "qapi/error.h"
+> -#include "qemu/error-report.h"
+> -#include "hw/pci/msi.h"
+>  #include "hw/pci/msix.h"
+> -#include "hw/loader.h"
+>  #include "sysemu/kvm.h"
+> -#include "virtio-pci.h"
+>  #include "qemu/range.h"
+> -#include "hw/virtio/virtio-bus.h"
+> -#include "qapi/visitor.h"
+>  
+>  #define VIRTIO_PCI_REGION_SIZE(dev)     VIRTIO_PCI_CONFIG_OFF(msix_present(dev))
+>  
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
