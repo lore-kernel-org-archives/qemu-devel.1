@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fnjAs-0003Ar-Cr
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:32:15 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1fnjBI-0003Mh-DE
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:32:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fnjAo-0000my-Ce
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:32:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33974 helo=mx1.redhat.com)
+	(envelope-from <robert.hu@linux.intel.com>) id 1fnjBF-0000wD-5z
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:32:40 -0400
+Received: from mga03.intel.com ([134.134.136.65]:42133)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fnjAo-0000mX-8S
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:32:10 -0400
-Date: Thu, 9 Aug 2018 12:32:05 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180809113204.GB2618@work-vm>
-References: <20180807114501.12370-1-peter.maydell@linaro.org>
-	<20180809111233.GA2619@work-vm>
-	<CAFEAcA-+5xFDMuvK2W8v=Ufs2E1K4y9onZY_4x6RMYbHLFpkxA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-+5xFDMuvK2W8v=Ufs2E1K4y9onZY_4x6RMYbHLFpkxA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.0] slirp: Correct size check in
- m_inc()
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1fnjBE-0000vb-TP
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 07:32:37 -0400
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Thu,  9 Aug 2018 19:32:26 +0800
+Message-Id: <1533814349-34727-1-git-send-email-robert.hu@linux.intel.com>
+Subject: [Qemu-devel] [PATCH v1 0/3] x86: QEMU side support on MSR based
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +23,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, Prasad J Pandit <pjp@fedoraproject.org>, liqsub1 <liqsub1@163.com>
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com
+Cc: robert.hu@intel.com, jingqi.liu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 9 August 2018 at 12:12, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> > * Peter Maydell (peter.maydell@linaro.org) wrote:
-> >> diff --git a/slirp/mbuf.c b/slirp/mbuf.c
-> >> index 0c189e1a7bf..1b7868355a3 100644
-> >> --- a/slirp/mbuf.c
-> >> +++ b/slirp/mbuf.c
-> >> @@ -154,7 +154,7 @@ m_inc(struct mbuf *m, int size)
-> >>      int datasize;
-> >>
-> >>      /* some compilers throw up on gotos.  This one we can fake. */
-> >> -    if (m->m_size > size) {
-> >> +    if (M_ROOM(m) > size) {
-> >>          return;
-> >>      }
-> >
-> > I'm worried about a side effect of this change.
-> > A few lines below we have:
-> >
-> >         datasize = m->m_data - m->m_dat;
-> >         m->m_ext = g_malloc(size + datasize);
-> >         memcpy(m->m_ext, m->m_dat, m->m_size);
-> >         m->m_flags |= M_EXT;
-> >
-> > Question: What guarantees there's m_size room for that
-> > memcpy in the new m_ext?
-> 
-> It did take me a while to convince myself that that was true
-> when I was writing the patch... Here's the ASCII art:
-> 
-> 
->    |--datasize---->|---m_len------->
->    |----------m_size------------------------------>
->                    |----M_ROOM-------------------->
->                                     |-M_FREEROOM-->
-> 
->    ^               ^                               ^
->    m_dat           m_data                          end of buffer
-> 
-> ("datasize" is a bit misnamed, as it's "size of the leading
-> gap between the start of the buffer and the data"; "gapsize"
-> would be more helpful.)
-> 
-> Anyway, we allocate size + datasize, and
-> m_size == datasize + M_ROOM. We know that size >= M_ROOM,
-> so the allocated buffer must be at least m_size big.
+KVM side has added the framework (kvm.git:d1d93fa90) to support MSR based features.
+Here is the QEMU part, including data structure changes/expanding, referring
+functions changes, and the implementations on 
+KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS system ioctl.
 
-Ah OK, thanks.
-(That ascii art could do with being in a comment somewhere!)
+Robert Hoo (3):
+  x86: Data structure changes to support MSR based features
+  kvm: Add support to KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS
+    system ioctl
+  Change other funcitons referring to feature_word_info[]
 
-Dave
+ include/sysemu/kvm.h |   2 +
+ target/i386/cpu.c    | 209 +++++++++++++++++++++++++++++++++++++--------------
+ target/i386/cpu.h    |   5 ++
+ target/i386/kvm.c    |  78 +++++++++++++++++++
+ 4 files changed, 236 insertions(+), 58 deletions(-)
 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+1.8.3.1
