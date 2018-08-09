@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fnhju-0003Ft-Qw
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:00:23 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fnhtM-0005U7-8h
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:10:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fnhjr-0005s5-Oe
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:00:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42954 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fnhjr-0005qk-J1
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:00:15 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A604C40216E8
-	for <qemu-devel@nongnu.org>; Thu,  9 Aug 2018 10:00:14 +0000 (UTC)
-Date: Thu, 9 Aug 2018 12:00:11 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180809120011.51023bf2@redhat.com>
-In-Reply-To: <20180808231636-mutt-send-email-mst@kernel.org>
-References: <1533741349-199141-1-git-send-email-imammedo@redhat.com>
-	<1533741349-199141-4-git-send-email-imammedo@redhat.com>
-	<20180808231636-mutt-send-email-mst@kernel.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1fnhtH-0004JQ-GH
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:10:04 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37565)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fnhtH-0004Hz-8U
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 06:09:59 -0400
+Received: by mail-wr1-x444.google.com with SMTP id u12-v6so4641894wrr.4
+	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 03:09:59 -0700 (PDT)
+References: <20180809034033.10579-1-richard.henderson@linaro.org>
+	<20180809034033.10579-6-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180809034033.10579-6-richard.henderson@linaro.org>
+Date: Thu, 09 Aug 2018 11:09:57 +0100
+Message-ID: <87lg9fq2a2.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 3/4] pc: acpi: add _CST support
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 05/11] target/arm: Fix typo in
+ helper_sve_ld1hss_r
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-stable@nongnu.org
 
-On Wed, 8 Aug 2018 23:17:48 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> On Wed, Aug 08, 2018 at 05:15:48PM +0200, Igor Mammedov wrote:
-> > Reuse CPU hotplug IO registers for passing a CST entry
-> > containing package for shalowest C1 using mwait and
-> > read it out in guest with new CCST AML method.  
-> 
-> I don't see how 1 entry is enough. We need to describe full _CST package so
-> that guest can do reasonable power management on the CPU.
-I was assuming that CST are to be used for mwait/monitor idle combo
-to help reduce latencies/vmexits on cpus wakeup from idle state, hence 1 entry.
-It's trivial to add as much as needed entries though.
-If you are fine with approach I can respin patch with arbitrary
-number of CStates.
- 
-> > The CState support is optional and could be turned on
-> > with '-global PIIX4_PM.cstate=on' CLI option.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-[...]
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> Cc: qemu-stable@nongnu.org (3.0.1)
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  target/arm/sve_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+> index c3cbec9cf5..e03f954a26 100644
+> --- a/target/arm/sve_helper.c
+> +++ b/target/arm/sve_helper.c
+> @@ -4045,7 +4045,7 @@ DO_LD1(sve_ld1bdu_r, cpu_ldub_data_ra, uint64_t, ui=
+nt8_t, )
+>  DO_LD1(sve_ld1bds_r, cpu_ldsb_data_ra, uint64_t, int8_t, )
+>
+>  DO_LD1(sve_ld1hsu_r, cpu_lduw_data_ra, uint32_t, uint16_t, H1_4)
+> -DO_LD1(sve_ld1hss_r, cpu_ldsw_data_ra, uint32_t, int8_t, H1_4)
+> +DO_LD1(sve_ld1hss_r, cpu_ldsw_data_ra, uint32_t, int16_t, H1_4)
+>  DO_LD1(sve_ld1hdu_r, cpu_lduw_data_ra, uint64_t, uint16_t, )
+>  DO_LD1(sve_ld1hds_r, cpu_ldsw_data_ra, uint64_t, int16_t, )
+
+
+--
+Alex Benn=C3=A9e
