@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fnZE4-0005pz-0U
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 20:54:53 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fnbJl-0005Np-MV
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 23:08:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fnZE2-0000vL-MP
-	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 20:54:52 -0400
-Date: Thu, 9 Aug 2018 10:23:35 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180809002335.GK7429@umbus.fritz.box>
-References: <20180808155919.12972-1-bharata@linux.ibm.com>
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fnbJg-0006QW-Rp
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 23:08:53 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38847)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1fnbJg-0006Pv-KV
+	for qemu-devel@nongnu.org; Wed, 08 Aug 2018 23:08:48 -0400
+Received: by mail-pg1-x544.google.com with SMTP id k3-v6so2034277pgq.5
+	for <qemu-devel@nongnu.org>; Wed, 08 Aug 2018 20:08:48 -0700 (PDT)
+References: <20180807091209.13531-1-xiaoguangrong@tencent.com>
+	<20180807091209.13531-9-xiaoguangrong@tencent.com>
+	<20180808050846.GG24415@xz-mi>
+	<503d7733-e2e7-09c5-75a3-1e250f549065@gmail.com>
+	<20180808141112.GK2734@work-vm>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <76174d1d-fcd7-b58a-8950-5f6c6795f49f@gmail.com>
+Date: Thu, 9 Aug 2018 11:08:39 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="u3bvv0EcKsvvYeex"
-Content-Disposition: inline
-In-Reply-To: <20180808155919.12972-1-bharata@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] spapr_cpu_core: vmstate_[un]register
- per-CPU data from (un)realizefn
+In-Reply-To: <20180808141112.GK2734@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 08/10] migration: handle the error
+ condition properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,202 +35,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, sathnaga@linux.vnet.ibm.com, mdroth@linux.vnet.ibm.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
 
---u3bvv0EcKsvvYeex
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 08, 2018 at 09:29:19PM +0530, Bharata B Rao wrote:
-> VMStateDescription vmstate_spapr_cpu_state was added by commit
-> b94020268e0b6 (spapr_cpu_core: migrate per-CPU data) to migrate per-CPU
-> data with the required vmstate registration and unregistration calls.
-> However the unregistration is being done only from vcpu creation error pa=
-th
-> and not from CPU delete path.
->=20
-> This causes migration to fail with the following error if migration is
-> attempted after a CPU unplug like this:
-> Unknown savevm section or instance 'spapr_cpu' 16
-> Additionally this leaves the source VM unresponsive after migration failu=
-re.
->=20
-> Fix this by ensuring the vmstate_unregister happens during CPU removal.
-> Fixing this becomes easier when vmstate (un)registration calls are moved =
-to
-> vcpu (un)realize functions which is what this patch does.
->=20
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1785972
-> Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+On 08/08/2018 10:11 PM, Dr. David Alan Gilbert wrote:
+> * Xiao Guangrong (guangrong.xiao@gmail.com) wrote:
+>>
+>>
+>> On 08/08/2018 01:08 PM, Peter Xu wrote:
+>>> On Tue, Aug 07, 2018 at 05:12:07PM +0800, guangrong.xiao@gmail.com wrote:
+>>>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+>>>>
+>>>> ram_find_and_save_block() can return negative if any error hanppens,
+>>>> however, it is completely ignored in current code
+>>>
+>>> Could you hint me where we'll return an error?
+>>>
+>>
+>> I think control_save_page() may return a error condition but i am not
+>> good at it ... Other places look safe _currently_. These functions were
+>> designed to have error returned anyway.
+> 
+> ram_control_save_page's return is checked by control_save_page which
+> returns true/false but sets *pages to a return value.
+> 
+> What I'd need to follow closely is the case where ram_control_save_page
+> returns RAM_SAVE_CONTROL_DELAYED, in that case control_save_page I think
+> returns with *pages=-1 and returns true.
+> And I think in that case ram_save_target_page can leak that -1 - hmm.
+> 
+> Now, ram_save_host_page already checks for <0 and will return that,
+> but I think that would potentially loop in ram_find_and_save_block; I'm
+> not sure we want to change that or not!
 
-Applied to ppc-for-3.1.
+ram_find_and_save_block() will continue the look only if ram_save_host_page
+returns zero:
 
-Unfortunately, despite being a clear regression, I think it's too late
-for 3.0 :(.
+......
+         if (found) {
+             pages = ram_save_host_page(rs, &pss, last_stage);
+         }
+     } while (!pages && again);
 
-Mike, can you queue this for 3.0.1 as too, thanks?
+IMHO, how to change the code really depends on the semantic of these functions,
+based on the comments of them, returning error conditions is the current
+semantic.
 
-> ---
->  hw/ppc/spapr_cpu_core.c | 62 +++++++++++++++++++++++++------------------=
-------
->  1 file changed, 32 insertions(+), 30 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 993759db47..bb88a3ce4e 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -113,26 +113,6 @@ const char *spapr_get_cpu_core_type(const char *cpu_=
-type)
->      return object_class_get_name(oc);
->  }
-> =20
-> -static void spapr_unrealize_vcpu(PowerPCCPU *cpu)
-> -{
-> -    qemu_unregister_reset(spapr_cpu_reset, cpu);
-> -    object_unparent(cpu->intc);
-> -    cpu_remove_sync(CPU(cpu));
-> -    object_unparent(OBJECT(cpu));
-> -}
-> -
-> -static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
-> -{
-> -    sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
-> -    CPUCore *cc =3D CPU_CORE(dev);
-> -    int i;
-> -
-> -    for (i =3D 0; i < cc->nr_threads; i++) {
-> -        spapr_unrealize_vcpu(sc->threads[i]);
-> -    }
-> -    g_free(sc->threads);
-> -}
-> -
->  static bool slb_shadow_needed(void *opaque)
->  {
->      sPAPRCPUState *spapr_cpu =3D opaque;
-> @@ -207,10 +187,34 @@ static const VMStateDescription vmstate_spapr_cpu_s=
-tate =3D {
->      }
->  };
-> =20
-> +static void spapr_unrealize_vcpu(PowerPCCPU *cpu, sPAPRCPUCore *sc)
-> +{
-> +    if (!sc->pre_3_0_migration) {
-> +        vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_=
-data);
-> +    }
-> +    qemu_unregister_reset(spapr_cpu_reset, cpu);
-> +    object_unparent(cpu->intc);
-> +    cpu_remove_sync(CPU(cpu));
-> +    object_unparent(OBJECT(cpu));
-> +}
-> +
-> +static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
-> +{
-> +    sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
-> +    CPUCore *cc =3D CPU_CORE(dev);
-> +    int i;
-> +
-> +    for (i =3D 0; i < cc->nr_threads; i++) {
-> +        spapr_unrealize_vcpu(sc->threads[i], sc);
-> +    }
-> +    g_free(sc->threads);
-> +}
-> +
->  static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-> -                               Error **errp)
-> +                               sPAPRCPUCore *sc, Error **errp)
->  {
->      CPUPPCState *env =3D &cpu->env;
-> +    CPUState *cs =3D CPU(cpu);
->      Error *local_err =3D NULL;
-> =20
->      object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
-> @@ -233,6 +237,11 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
->          goto error_unregister;
->      }
-> =20
-> +    if (!sc->pre_3_0_migration) {
-> +        vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
-> +                         cpu->machine_data);
-> +    }
-> +
->      return;
-> =20
->  error_unregister:
-> @@ -272,10 +281,6 @@ static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *s=
-c, int i, Error **errp)
->      }
-> =20
->      cpu->machine_data =3D g_new0(sPAPRCPUState, 1);
-> -    if (!sc->pre_3_0_migration) {
-> -        vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
-> -                         cpu->machine_data);
-> -    }
-> =20
->      object_unref(obj);
->      return cpu;
-> @@ -290,9 +295,6 @@ static void spapr_delete_vcpu(PowerPCCPU *cpu, sPAPRC=
-PUCore *sc)
->  {
->      sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> =20
-> -    if (!sc->pre_3_0_migration) {
-> -        vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_=
-data);
-> -    }
->      cpu->machine_data =3D NULL;
->      g_free(spapr_cpu);
->      object_unparent(OBJECT(cpu));
-> @@ -325,7 +327,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
-Error **errp)
->      }
-> =20
->      for (j =3D 0; j < cc->nr_threads; j++) {
-> -        spapr_realize_vcpu(sc->threads[j], spapr, &local_err);
-> +        spapr_realize_vcpu(sc->threads[j], spapr, sc, &local_err);
->          if (local_err) {
->              goto err_unrealize;
->          }
-> @@ -334,7 +336,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
-Error **errp)
-> =20
->  err_unrealize:
->      while (--j >=3D 0) {
-> -        spapr_unrealize_vcpu(sc->threads[j]);
-> +        spapr_unrealize_vcpu(sc->threads[j], sc);
->      }
->  err:
->      while (--i >=3D 0) {
+Another choice would be the one squashes error conditions to QEMUFile and
+adapt comments and code of these functions to reflect the new semantic
+clearly.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---u3bvv0EcKsvvYeex
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltriYQACgkQbDjKyiDZ
-s5L6sg/+MA5XFfUH96EUd3eVZxJgZfrRrKnO5pXGSZ1uDoJhI53MmUv6bqFKGmgD
-EQItbpQw2zJYJL25O7aJVCMQeXAx4yVbaBYCTpvR/o5yA1yEWNtLowIBHh8AOOEm
-P6AiZg+tSCGSUdvxjxyIjf5ed4MRrdALzLscsRa+B4E65rnF1VyPXzrf1GFwgJqI
-uZivHvKgUTVildhqYBu1efqZlA0iNx8pgf3d1v7uwL4+tvlHfrIDB0Gvdv/TY13f
-9knSApnYYjhBg3DW3Xnv/D4rnR3vR5epR1AMDm7hbu14ZeLUVJPHdtfhILgANPWY
-xdN3aOdb9jZmRgR/L2RcNz8YVQrwBObBYd//Fi8xcLJ/qNC+isEZV8haaIRqRI73
-RrOsoLs0X3hRHL3MkzpDKSZI25RsUSn3lJno+s0hCgw1iBwSbdf4vUA1x/I1JZbP
-80qQjOTXWipt+4GVd6XvODyspZAqtJSUhvPVnzBavXZh7u4C+oxX4NY/FCUvwnge
-oMx5ctyacv9ek0BKBduNFmYvIqfkvyO/v5Jx/p6Iywk2wVhYl/heNTb5gR+zthSN
-EgV4a+q04CGN3cKF2FRwXnUXLUNtqXZ8Xy6Kbelxo1oT6WI2ZqPJOFRmh+0e3jfh
-Lrf4Y95aQxq43zmF1773/dbwipwDV58YsAnB9Cxhj8oqX1L6CjM=
-=LgLa
------END PGP SIGNATURE-----
-
---u3bvv0EcKsvvYeex--
+Which one do you guys prefer to? :)
