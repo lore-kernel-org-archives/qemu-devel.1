@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnlD8-0004zS-9k
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:42:43 -0400
+	(envelope-from <berto@igalia.com>) id 1fnlF2-0005qD-OR
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:44:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fnlD5-0007rd-Lr
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:42:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37176 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fnlD5-0007rG-Ev
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:42:39 -0400
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-6-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <36518ac8-f022-c54d-2e57-6a709b3678ce@redhat.com>
-Date: Thu, 9 Aug 2018 08:42:36 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180808120334.10970-6-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/56] qmp-test: Cover syntax and lexical
- errors
+	(envelope-from <berto@igalia.com>) id 1fnlF0-0001JE-3P
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:44:40 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Thu,  9 Aug 2018 16:44:13 +0300
+Message-Id: <20180809134413.30823-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2] qcow2: Release dirty entries with
+ cache-clean-interval
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +18,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 08/08/2018 07:02 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   tests/libqtest.c | 17 +++++++++++++++++
->   tests/libqtest.h | 11 +++++++++++
->   tests/qmp-test.c | 39 +++++++++++++++++++++++++++++++++++++++
->   3 files changed, 67 insertions(+)
-> 
+The cache-clean-interval option is used to periodically release unused
+entries from the L2 and refcount caches. Dirty cache entries are left
+untouched, even if they are otherwise valid candidates for removal.
 
-> +    /* lexical error: impossible byte outside string */
-> +    qtest_qmp_send_raw(qts, "{\xFF");
+This patch allows releasing those entries by flushing them to disk
+first. This is a blocking operation, so we need to do it in coroutine
+context.
 
-\xff is an impossible byte inside a string as well; plus it has special 
-meaning to at least QMP for commanding a parser reset. Is a better byte 
-more appropriate (maybe \x7f), either in replacement to \xff or as an 
-additional test?
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-cache.c | 26 ++++++++++++++++++++------
+ block/qcow2.c       | 15 ++++++++++++---
+ block/qcow2.h       |  2 +-
+ 3 files changed, 33 insertions(+), 10 deletions(-)
 
-> +    resp = qtest_qmp_receive(qts);
-> +    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-> +    qobject_unref(resp);
-> +    g_assert(recovered(qts));
-> +
-> +    /* lexical error: impossible byte in string */
-> +    qtest_qmp_send_raw(qts, "{'bad \xFF");
-
-Same question about \xff being special as the parser reset command, so 
-should we test a different byte instead/as well?
-
-> +    resp = qtest_qmp_receive(qts);
-> +    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-> +    qobject_unref(resp);
-> +    g_assert(recovered(qts));
-> +
-> +    /* lexical error: interpolation */
-> +    qtest_qmp_send_raw(qts, "%%p\n");
-> +    resp = qtest_qmp_receive(qts);
-> +    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-> +    qobject_unref(resp);
-> +    g_assert(recovered(qts));
-> +
->       /* Not even a dictionary */
->       resp = qtest_qmp(qts, "null");
->       g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-> 
-
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index d9dafa31e5..33207eca9b 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -46,6 +46,8 @@ struct Qcow2Cache {
+     uint64_t                cache_clean_lru_counter;
+ };
+ 
++static int qcow2_cache_entry_flush(BlockDriverState *bs, Qcow2Cache *c, int i);
++
+ static inline void *qcow2_cache_get_table_addr(Qcow2Cache *c, int table)
+ {
+     return (uint8_t *) c->table_array + (size_t) table * c->table_size;
+@@ -86,26 +88,36 @@ static void qcow2_cache_table_release(Qcow2Cache *c, int i, int num_tables)
+ #endif
+ }
+ 
+-static inline bool can_clean_entry(Qcow2Cache *c, int i)
++static inline bool can_clean_entry(BlockDriverState *bs, Qcow2Cache *c, int i)
+ {
+     Qcow2CachedTable *t = &c->entries[i];
+-    return t->ref == 0 && !t->dirty && t->offset != 0 &&
+-        t->lru_counter <= c->cache_clean_lru_counter;
++    if (t->ref || !t->offset || t->lru_counter > c->cache_clean_lru_counter) {
++        return false;
++    }
++
++    if (qcow2_cache_entry_flush(bs, c, i) < 0) {
++        return false;
++    }
++
++    return true;
+ }
+ 
+-void qcow2_cache_clean_unused(Qcow2Cache *c)
++void qcow2_cache_clean_unused(BlockDriverState *bs, Qcow2Cache *c)
+ {
+     int i = 0;
++
++    bdrv_inc_in_flight(bs);
++
+     while (i < c->size) {
+         int to_clean = 0;
+ 
+         /* Skip the entries that we don't need to clean */
+-        while (i < c->size && !can_clean_entry(c, i)) {
++        while (i < c->size && !can_clean_entry(bs, c, i)) {
+             i++;
+         }
+ 
+         /* And count how many we can clean in a row */
+-        while (i < c->size && can_clean_entry(c, i)) {
++        while (i < c->size && can_clean_entry(bs, c, i)) {
+             c->entries[i].offset = 0;
+             c->entries[i].lru_counter = 0;
+             i++;
+@@ -118,6 +130,8 @@ void qcow2_cache_clean_unused(Qcow2Cache *c)
+     }
+ 
+     c->cache_clean_lru_counter = c->lru_counter;
++
++    bdrv_dec_in_flight(bs);
+ }
+ 
+ Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables,
+diff --git a/block/qcow2.c b/block/qcow2.c
+index ec9e6238a0..2fcb41b12f 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -728,16 +728,25 @@ static const char *overlap_bool_option_names[QCOW2_OL_MAX_BITNR] = {
+     [QCOW2_OL_BITMAP_DIRECTORY_BITNR] = QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
+ };
+ 
+-static void cache_clean_timer_cb(void *opaque)
++static void coroutine_fn cache_co_clean_unused(void *opaque)
+ {
+     BlockDriverState *bs = opaque;
+     BDRVQcow2State *s = bs->opaque;
+-    qcow2_cache_clean_unused(s->l2_table_cache);
+-    qcow2_cache_clean_unused(s->refcount_block_cache);
++
++    qemu_co_mutex_lock(&s->lock);
++    qcow2_cache_clean_unused(bs, s->l2_table_cache);
++    qcow2_cache_clean_unused(bs, s->refcount_block_cache);
++    qemu_co_mutex_unlock(&s->lock);
++
+     timer_mod(s->cache_clean_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+               (int64_t) s->cache_clean_interval * 1000);
+ }
+ 
++static void cache_clean_timer_cb(void *opaque)
++{
++    qemu_coroutine_enter(qemu_coroutine_create(cache_co_clean_unused, opaque));
++}
++
+ static void cache_clean_timer_init(BlockDriverState *bs, AioContext *context)
+ {
+     BDRVQcow2State *s = bs->opaque;
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 81b844e936..e8b390ba4b 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -659,7 +659,7 @@ int qcow2_cache_set_dependency(BlockDriverState *bs, Qcow2Cache *c,
+     Qcow2Cache *dependency);
+ void qcow2_cache_depends_on_flush(Qcow2Cache *c);
+ 
+-void qcow2_cache_clean_unused(Qcow2Cache *c);
++void qcow2_cache_clean_unused(BlockDriverState *bs, Qcow2Cache *c);
+ int qcow2_cache_empty(BlockDriverState *bs, Qcow2Cache *c);
+ 
+ int qcow2_cache_get(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.11.0
