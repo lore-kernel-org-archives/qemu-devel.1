@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fno5P-0002sc-La
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 12:46:57 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fno5f-00032I-0f
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 12:47:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fno5M-00014v-GZ
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 12:46:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45372 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fno5M-00014Q-A7
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 12:46:52 -0400
-References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
-	<cover.1526916378.git.simon@ruderich.org>
-	<851d095cd457109e4a22a2e5ecd36ccbdacbf48b.1526916378.git.simon@ruderich.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <42329ae3-cac6-8519-c8d8-0cfc4489d3c5@redhat.com>
-Date: Thu, 9 Aug 2018 11:46:50 -0500
+	(envelope-from <lbloch@janustech.com>) id 1fno5d-0001IS-Gx
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 12:47:11 -0400
+References: <20180808221138.5770-1-lbloch@janustech.com>
+	<20180808221138.5770-3-lbloch@janustech.com>
+	<w51r2j7butk.fsf@maestria.local.igalia.com>
+	<4e5aaa3e-0ad5-74b1-2569-7d3cbec279eb@janustech.com>
+	<w51k1ozblpd.fsf@maestria.local.igalia.com>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <93a5da55-b5d8-05fc-6643-98e71c423237@janustech.com>
+Date: Thu, 9 Aug 2018 19:46:48 +0300
 MIME-Version: 1.0
-In-Reply-To: <851d095cd457109e4a22a2e5ecd36ccbdacbf48b.1526916378.git.simon@ruderich.org>
+In-Reply-To: <w51k1ozblpd.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Language: en-GB-large
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] qmp: add pmemload command
+Subject: Re: [Qemu-devel] [PATCH v4 2/5] qcow2: Assign the L2 cache
+ relatively to image size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +28,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Simon Ruderich <simon@ruderich.org>, qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 05/21/2018 10:36 AM, Simon Ruderich wrote:
-> Adapted patch from Baojun Wang [1] with the following commit message:
+On 8/9/18 6:31 PM, Alberto Garcia wrote:
+> On Thu 09 Aug 2018 04:04:23 PM CEST, Leonid Bloch wrote:
+>>>> -    int min_refcount_cache = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
+>>>> +    uint64_t min_refcount_cache = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
+>>>
+>>> Why do you need to change this data type here? min_refcount_cache is
+>>> guaranteed to fit in an int.
+>>
+>> No necessity here, just it participates in arithmetics with other
+>> uint64_t's afterwards, so it might as well be uint64_t from the
+>> get-go.
 > 
->      I found this could be useful to have qemu-softmmu as a cross
->      debugger (launch with -s -S command line option), then if we can
->      have a command to load guest physical memory, we can use cross gdb
->      to do some target debug which gdb cannot do directly.
+> The compiler already does that when needed, so it's not so important
+> (and it adds noise to the patch).
+
+I didn't say it's important or increases the performance in any way. It 
+just looks nicer, more logical, and too small of a change to require a 
+separate patch, even a trivial one. Since it's just next to the lines 
+I'm modifying anyway, I made this change because it looks nicer and more 
+consistent.
+
 > 
-> pmemload is necessary to directly write physical memory which is not
-> possible with gdb alone as it uses only logical addresses.
+>>>> -                *refcount_cache_size =
+>>>> -                    MIN(combined_cache_size, min_refcount_cache);
+>>>> +                *refcount_cache_size = MIN(combined_cache_size,
+>>>> +                                           min_refcount_cache);
+>>>
+>>> There are no functional changes, why do you need to change the
+>>> indentation here?
+>>
+>> It's in the "immediate area (few lines) of the lines [I'm] changing".
 > 
-> The QAPI for pmemload uses "val" as parameter name for the physical
-> address. This name is not very descriptive but is consistent with the
-> existing pmemsave. Changing the parameter name of pmemsave is not
-> possible without breaking the existing API.
+> But there's no need to change those lines unless there's an obvious
+> mistake. In this case it's just a matter of style so they just add noise
+> to the patch.
+
+Again, it just looks nicer, more readable, compliant to the generally 
+accepted style, and right next to the functional changes. It's a style 
+improvement which is in the immediate vicinity of the functional 
+improvements. I made another one, you must have seen it already, in v5.
+
+Look, it just looks better. It's possible to make another patch for 
+these cosmetic changes, but is it worth it when they are right next to 
+the functional changes? It's a bit of noise in the patch, versus noise 
+in the Git history.
+
 > 
-> [1]: https://lists.gnu.org/archive/html/qemu-trivial/2014-04/msg00074.html
+>>>> +QEMU will use a default L2 cache sufficient to cover the entire virtual
+>>>> +size of an image, which with the default cluster size will result in 1 MB
+>>>> +of cache for every 8 GB of virtual image size:
+>>>
+>>> This is not true. QEMU will use a default size of 32MB, which may or
+>>> may not cover the entire image.
+>>
+>> But no, QEMU will not use a default size of 32MB. It will use a
+>> default size which is just enough to cover the image, unless the
+>> needed size is larger than 32 MB.
 > 
-> Based-on-patch-by: Baojun Wang <wangbj@gmail.com>
-> Signed-off-by: Simon Ruderich <simon@ruderich.org>
-> ---
->   cpus.c          | 41 +++++++++++++++++++++++++++++++++++++++++
->   hmp-commands.hx | 14 ++++++++++++++
->   hmp.c           | 12 ++++++++++++
->   hmp.h           |  1 +
->   qapi/misc.json  | 20 ++++++++++++++++++++
->   5 files changed, 88 insertions(+)
-
-I haven't closely reviewed this, but a quick note:
-
-
-> +++ b/qapi/misc.json
-> @@ -1219,6 +1219,26 @@
->   { 'command': 'pmemsave',
->     'data': {'val': 'int', 'size': 'int', 'filename': 'str'} }
->   
-> +##
-> +# @pmemload:
-> +#
-> +# Load a portion of guest physical memory from a file.
-> +#
-> +# @val: the physical address of the guest to start from
-> +#
-> +# @size: the size of memory region to load
-> +#
-> +# @offset: the offset in the file to start from
-> +#
-> +# @filename: the file to load the memory from as binary data
-> +#
-> +# Returns: Nothing on success
-> +#
-> +# Since: 2.13
-
-There was no 2.13 release, and this feature has missed the 3.0 
-deadlines, so it would need to say 'Since: 3.1'
-
-> +##
-> +{ 'command': 'pmemload',
-> +  'data': {'val': 'int', 'size': 'int', 'offset': 'int', 'filename': 'str'} }
-> +
->   ##
->   # @cont:
->   #
+> Now: QEMU will use a default L2 cache of up to 32MB, which may or may
+> not be enough to cover the entire image.
 > 
+> Previously: QEMU will use a default L2 cache of 1MB, which may or may
+> not be enough to cover the entire image.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Now: QEMU will use just enough to fit the image, unless it's more than 
+32 MB.
+
+Then: QEMU will use MAX(1 MB, 8 * cluster_size).
+
+Anyway, this place should not mention the default cache sizes, and I 
+have reworded it in v5 (maybe let's fix this in patch 1/5?). This 
+section is all about explaining the numbers needed for the cache. The 
+defaults are mentioned below.
+
+> 
+>>> I would prefer if you would say "we increased the default cache size
+>>> so now we cover larger images" instead of "the default cache size
+>>> will now cover the entire image", because the latter is not true.
+>>
+>> But it's not correct: we did not increase the default size, we made
+>> the default size fit the image size, and set a maximum. It's not the
+>> same, do you agree?
+> 
+> I don't think we made the default size fit the image size, because if
+> you override the default size QEMU will still adjust it if it's too
+> large.
+
+Now there is no such thing as the default size, there is the "default 
+maximum size". It fits the image by default now, unless it needs to be 
+larger than the max.
+
+> What we did is guarantee that QEMU will use *up to* l2-cache-size
+> bytes, regardless of whether l2-cache-size is set by the user or is the
+> default value. Plus, we increased that default value to 32MB.
+
+Yes! :)
+But the meaning of "default" now and before is different. Before it was 
+the "default size", and now - "default maximum size".
+
+> 
+>  From the end user's point of view, who had a VM with images of 8GB,
+> 200GB and 2TB, the most visible result is that the L2 cache is now
+> larger, enough for the first two images but still not enough for the
+> third. That's the big change, both in terms of performance and memory
+> usage, and it's easy to measure.
+> 
+> The other change (the cache size fits the image size) is not immediately
+> visible, and certainly not with a 32MB cache.
+
+Isn't it the same change? :)
+
+> 
+> Let's make an experiment:
+> 
+>     - Take QEMU stable or master (without these patches)
+>     - Create a 16GB qcow2 image and fill it completely with data
+>     - Run QEMU and attach that image with l2-cache-size=2M (2 MB L2 cache)
+>     - Read the complete image to make sure that all L2 tables are cached
+>     - Measure the amount of memory that QEMU is using, e.g. with smem
+>       (you can do that before and after caching the L2 tables)
+> 
+> Repeat the same experiment with l2-cache-size=2G (2 GB L2 cache). Do you
+> see any difference?
+
+Actually, I did this experiment before, after Kevin's suggestions. I 
+know what you want to say: it's not actually used, but allocated in the 
+virtual memory. But still, with this patch it will be just enough 
+allocation.
+
+Look, we agree on the functional changes, right? It's just the cosmetic 
+changes and the documentation that remain unsettled. :)
+
+Leonid.
+
+> 
+> Berto
+> 
