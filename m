@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fnkZY-00063i-1n
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:52 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fnkZO-0003NS-L3
+	(envelope-from <pm215@archaic.org.uk>) id 1fnkZU-0005zF-A1
 	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:48 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pm215@archaic.org.uk>) id 1fnkZO-0003NN-Kd
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 09:01:44 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  9 Aug 2018 14:01:05 +0100
-Message-Id: <20180809130115.28951-7-peter.maydell@linaro.org>
+Date: Thu,  9 Aug 2018 14:01:08 +0100
+Message-Id: <20180809130115.28951-10-peter.maydell@linaro.org>
 In-Reply-To: <20180809130115.28951-1-peter.maydell@linaro.org>
 References: <20180809130115.28951-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 06/16] hw/misc/iotkit: Wire up the system
- control element
+Subject: [Qemu-devel] [PATCH 09/16] hw/arm/iotkit: Wire up the lines for MSCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +22,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Wire up the system control element's register banks.
+The IoTKit doesn't have any MSCs itself but it does need
+some wiring to connect the external signals from MSCs
+in the outer board model up to the registers and the
+NVIC IRQ line.
 
-This is the last of the previously completely unimplemented
-components in the IoTKit.
+We also need to expose a MemoryRegion corresponding to
+the AHB bus, so that MSCs in the outer board model can
+use that as their downstream port. (In the FPGA this is
+the "AHB Slave Expansion" ports shown in the block
+diagram in the AN505 documentation.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/iotkit.h |  4 +++-
- hw/arm/iotkit.c         | 19 +++++++++++--------
- 2 files changed, 14 insertions(+), 9 deletions(-)
+ include/hw/arm/iotkit.h |  8 ++++++++
+ hw/arm/iotkit.c         | 15 +++++++++++++++
+ 2 files changed, 23 insertions(+)
 
 diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
-index 0f5c5101708..1ffa31d521b 100644
+index 1ffa31d521b..5bb66b10468 100644
 --- a/include/hw/arm/iotkit.h
 +++ b/include/hw/arm/iotkit.h
-@@ -58,7 +58,7 @@
- #include "hw/timer/cmsdk-apb-timer.h"
- #include "hw/timer/cmsdk-apb-dualtimer.h"
- #include "hw/watchdog/cmsdk-apb-watchdog.h"
--#include "hw/misc/unimp.h"
-+#include "hw/misc/iotkit-sysctl.h"
- #include "hw/or-irq.h"
- #include "hw/core/split-irq.h"
+@@ -28,6 +28,9 @@
+  *  + QOM property "EXP_NUMIRQ" sets the number of expansion interrupts
+  *  + Named GPIO inputs "EXP_IRQ" 0..n are the expansion interrupts, which
+  *    are wired to the NVIC lines 32 .. n+32
++ *  + sysbus MMIO region 0 is the "AHB Slave Expansion" which allows
++ *    bus master devices in the board model to make transactions into
++ *    all the devices and memory areas in the IoTKit
+  * Controlling up to 4 AHB expansion PPBs which a system using the IoTKit
+  * might provide:
+  *  + named GPIO outputs apb_ppcexp{0,1,2,3}_nonsec[0..15]
+@@ -45,6 +48,11 @@
+  * Controlling each of the 16 expansion MPCs which a system using the IoTKit
+  * might provide:
+  *  + named GPIO inputs mpcexp_status[0..15]
++ * Controlling each of the 16 expansion MSCs which a system using the IoTKit
++ * might provide:
++ *  + named GPIO inputs mscexp_status[0..15]
++ *  + named GPIO outputs mscexp_clear[0..15]
++ *  + named GPIO outputs mscexp_ns[0..15]
+  */
  
-@@ -97,6 +97,8 @@ typedef struct IoTKit {
-     CMSDKAPBWatchdog nswatchdog;
-     CMSDKAPBWatchdog swatchdog;
- 
-+    IoTKitSysCtl sysctl;
-+
-     MemoryRegion container;
-     MemoryRegion alias1;
-     MemoryRegion alias2;
+ #ifndef IOTKIT_H
 diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
-index cb0ec456f39..5d59ed5489f 100644
+index 5d59ed5489f..8ae2a052517 100644
 --- a/hw/arm/iotkit.c
 +++ b/hw/arm/iotkit.c
-@@ -16,7 +16,6 @@
- #include "hw/sysbus.h"
- #include "hw/registerfields.h"
- #include "hw/arm/iotkit.h"
--#include "hw/misc/unimp.h"
- #include "hw/arm/arm.h"
+@@ -660,6 +660,21 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
  
- /* Clock frequency in HZ of the 32KHz "slow clock" */
-@@ -151,6 +150,8 @@ static void iotkit_init(Object *obj)
-                           sizeof(s->nswatchdog), TYPE_CMSDK_APB_WATCHDOG);
-     sysbus_init_child_obj(obj, "swatchdog", &s->swatchdog,
-                           sizeof(s->swatchdog), TYPE_CMSDK_APB_WATCHDOG);
-+    sysbus_init_child_obj(obj, "iotkit-sysctl", &s->sysctl, sizeof(s->sysctl),
-+                          TYPE_IOTKIT_SYSCTL);
-     object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
-                             sizeof(s->nmi_orgate), TYPE_OR_IRQ,
-                             &error_abort, NULL);
-@@ -516,13 +517,15 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
-                           qdev_get_gpio_in_named(dev_apb_ppc1,
-                                                  "cfg_sec_resp", 0));
+     iotkit_forward_sec_resp_cfg(s);
  
--    /* Using create_unimplemented_device() maps the stub into the
--     * system address space rather than into our container, but the
--     * overall effect to the guest is the same.
--     */
--    create_unimplemented_device("SYSINFO", 0x40020000, 0x1000);
--
--    create_unimplemented_device("SYSCONTROL", 0x50021000, 0x1000);
-+    object_property_set_bool(OBJECT(&s->sysctl), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    /* System information registers */
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctl), 0, 0x40020000);
-+    /* System control registers */
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctl), 1, 0x50021000);
++    /* Forward the MSC related signals */
++    qdev_pass_gpios(dev_secctl, dev, "mscexp_status");
++    qdev_pass_gpios(dev_secctl, dev, "mscexp_clear");
++    qdev_pass_gpios(dev_secctl, dev, "mscexp_ns");
++    qdev_connect_gpio_out_named(dev_secctl, "msc_irq", 0,
++                                qdev_get_gpio_in(DEVICE(&s->armv7m), 11));
++
++    /*
++     * Expose our container region to the board model; this corresponds
++     * to the AHB Slave Expansion ports which allow bus master devices
++     * (eg DMA controllers) in the board model to make transactions into
++     * devices in the IoTKit.
++     */
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->container);
++
+     system_clock_scale = NANOSECONDS_PER_SECOND / s->mainclk_frq;
+ }
  
-     /* This OR gate wires together outputs from the secure watchdogs to NMI */
-     object_property_set_int(OBJECT(&s->nmi_orgate), 2, "num-lines", &err);
 -- 
 2.17.1
