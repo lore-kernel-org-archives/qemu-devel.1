@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fnmuj-0005Au-02
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 11:31:50 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fnnMH-0002b0-5o
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 12:00:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fnmuf-00019e-T8
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 11:31:48 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <4e5aaa3e-0ad5-74b1-2569-7d3cbec279eb@janustech.com>
-References: <20180808221138.5770-1-lbloch@janustech.com>
-	<20180808221138.5770-3-lbloch@janustech.com>
-	<w51r2j7butk.fsf@maestria.local.igalia.com>
-	<4e5aaa3e-0ad5-74b1-2569-7d3cbec279eb@janustech.com>
-Date: Thu, 09 Aug 2018 17:31:42 +0200
-Message-ID: <w51k1ozblpd.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] qcow2: Assign the L2 cache
- relatively to image size
+	(envelope-from <pm215@archaic.org.uk>) id 1fnnMG-0002hf-3W
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 12:00:17 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fnnMF-0002hJ-Ry
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 12:00:16 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu,  9 Aug 2018 17:00:11 +0100
+Message-Id: <20180809160011.17225-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] scripts/checkpatch.pl: Enforce multiline
+ comment syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,87 +23,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On Thu 09 Aug 2018 04:04:23 PM CEST, Leonid Bloch wrote:
->>> -    int min_refcount_cache = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
->>> +    uint64_t min_refcount_cache = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
->> 
->> Why do you need to change this data type here? min_refcount_cache is
->> guaranteed to fit in an int.
->
-> No necessity here, just it participates in arithmetics with other
-> uint64_t's afterwards, so it might as well be uint64_t from the
-> get-go.
+We now require Linux-kernel-style multiline comments:
+    /*
+     * line one
+     * line two
+     */
 
-The compiler already does that when needed, so it's not so important
-(and it adds noise to the patch).
+Enforce this in checkpatch.pl, by backporting the relevant
+parts of the Linux kernel's checkpatch.pl. (The only changes
+needed are that Linux's checkpatch.pl WARN() function takes
+an extra argument that ours does not.)
 
->>> -                *refcount_cache_size =
->>> -                    MIN(combined_cache_size, min_refcount_cache);
->>> +                *refcount_cache_size = MIN(combined_cache_size,
->>> +                                           min_refcount_cache);
->> 
->> There are no functional changes, why do you need to change the
->> indentation here?
->
-> It's in the "immediate area (few lines) of the lines [I'm] changing".
+The kernel's checkpatch does not enforce "leading /* on
+a line of its own, so that part is unique to QEMU's checkpatch.
 
-But there's no need to change those lines unless there's an obvious
-mistake. In this case it's just a matter of style so they just add noise
-to the patch.
+Sample warning output:
 
->>> +QEMU will use a default L2 cache sufficient to cover the entire virtual
->>> +size of an image, which with the default cluster size will result in 1 MB
->>> +of cache for every 8 GB of virtual image size:
->> 
->> This is not true. QEMU will use a default size of 32MB, which may or
->> may not cover the entire image.
->
-> But no, QEMU will not use a default size of 32MB. It will use a
-> default size which is just enough to cover the image, unless the
-> needed size is larger than 32 MB.
+WARNING: Block comments use a leading /* on a separate line
+#34: FILE: hw/intc/arm_gicv3_common.c:39:
++    /* Older versions of QEMU had a bug in the handling of state save/restore
 
-Now: QEMU will use a default L2 cache of up to 32MB, which may or may
-not be enough to cover the entire image.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I'm still not used to the leeading-/*-on-it's-own style,
+so having checkpatch catch my lapses is handy...
 
-Previously: QEMU will use a default L2 cache of 1MB, which may or may
-not be enough to cover the entire image.
+I used WARN level severity mostly because Linux does.
+---
+ scripts/checkpatch.pl | 48 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
->> I would prefer if you would say "we increased the default cache size
->> so now we cover larger images" instead of "the default cache size
->> will now cover the entire image", because the latter is not true.
->
-> But it's not correct: we did not increase the default size, we made
-> the default size fit the image size, and set a maximum. It's not the
-> same, do you agree?
-
-I don't think we made the default size fit the image size, because if
-you override the default size QEMU will still adjust it if it's too
-large. What we did is guarantee that QEMU will use *up to* l2-cache-size
-bytes, regardless of whether l2-cache-size is set by the user or is the
-default value. Plus, we increased that default value to 32MB.
-
->From the end user's point of view, who had a VM with images of 8GB,
-200GB and 2TB, the most visible result is that the L2 cache is now
-larger, enough for the first two images but still not enough for the
-third. That's the big change, both in terms of performance and memory
-usage, and it's easy to measure.
-
-The other change (the cache size fits the image size) is not immediately
-visible, and certainly not with a 32MB cache.
-
-Let's make an experiment:
-
-   - Take QEMU stable or master (without these patches)
-   - Create a 16GB qcow2 image and fill it completely with data
-   - Run QEMU and attach that image with l2-cache-size=2M (2 MB L2 cache)
-   - Read the complete image to make sure that all L2 tables are cached
-   - Measure the amount of memory that QEMU is using, e.g. with smem
-     (you can do that before and after caching the L2 tables)
-
-Repeat the same experiment with l2-cache-size=2G (2 GB L2 cache). Do you
-see any difference?
-
-Berto
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 42e1c50dd80..18bc3c59c85 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -1566,6 +1566,54 @@ sub process {
+ # check we are in a valid C source file if not then ignore this hunk
+ 		next if ($realfile !~ /\.(h|c|cpp)$/);
+ 
++# Block comment styles
++
++		# Block comments use /* on a line of its own
++		if ($rawline !~ m@^\+.*/\*.*\*/[ \t]*$@ &&	#inline /*...*/
++		    $rawline =~ m@^\+.*/\*\*?[ \t]*.+[ \t]*$@) { # /* or /** non-blank
++			WARN("Block comments use a leading /* on a separate line\n" . $herecurr);
++		}
++
++# Block comments use * on subsequent lines
++		if ($prevline =~ /$;[ \t]*$/ &&			#ends in comment
++		    $prevrawline =~ /^\+.*?\/\*/ &&		#starting /*
++		    $prevrawline !~ /\*\/[ \t]*$/ &&		#no trailing */
++		    $rawline =~ /^\+/ &&			#line is new
++		    $rawline !~ /^\+[ \t]*\*/) {		#no leading *
++			WARN("Block comments use * on subsequent lines\n" . $hereprev);
++		}
++
++# Block comments use */ on trailing lines
++		if ($rawline !~ m@^\+[ \t]*\*/[ \t]*$@ &&	#trailing */
++		    $rawline !~ m@^\+.*/\*.*\*/[ \t]*$@ &&	#inline /*...*/
++		    $rawline !~ m@^\+.*\*{2,}/[ \t]*$@ &&	#trailing **/
++		    $rawline =~ m@^\+[ \t]*.+\*\/[ \t]*$@) {	#non blank */
++			WARN("Block comments use a trailing */ on a separate line\n" . $herecurr);
++		}
++
++# Block comment * alignment
++		if ($prevline =~ /$;[ \t]*$/ &&			#ends in comment
++		    $line =~ /^\+[ \t]*$;/ &&			#leading comment
++		    $rawline =~ /^\+[ \t]*\*/ &&		#leading *
++		    (($prevrawline =~ /^\+.*?\/\*/ &&		#leading /*
++		      $prevrawline !~ /\*\/[ \t]*$/) ||		#no trailing */
++		     $prevrawline =~ /^\+[ \t]*\*/)) {		#leading *
++			my $oldindent;
++			$prevrawline =~ m@^\+([ \t]*/?)\*@;
++			if (defined($1)) {
++				$oldindent = expand_tabs($1);
++			} else {
++				$prevrawline =~ m@^\+(.*/?)\*@;
++				$oldindent = expand_tabs($1);
++			}
++			$rawline =~ m@^\+([ \t]*)\*@;
++			my $newindent = $1;
++			$newindent = expand_tabs($newindent);
++			if (length($oldindent) ne length($newindent)) {
++				WARN("Block comments should align the * on each line\n" . $hereprev);
++			}
++		}
++
+ # Check for potential 'bare' types
+ 		my ($stat, $cond, $line_nr_next, $remain_next, $off_next,
+ 		    $realline_next);
+-- 
+2.17.1
