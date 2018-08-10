@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fo6Js-0002xf-Im
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:15:05 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fo6QH-0005R5-QI
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:21:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fo6Jr-0003ZS-IC
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:15:04 -0400
-Date: Fri, 10 Aug 2018 14:14:55 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180810121455.GF4367@localhost.localdomain>
-References: <20180718084318.7540-1-famz@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1fo6QG-0002Yz-TJ
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:21:41 -0400
+Date: Fri, 10 Aug 2018 09:21:32 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180810122132.GN15372@localhost.localdomain>
+References: <20180808123934.17450-1-alex.bennee@linaro.org>
+	<20180808123934.17450-2-alex.bennee@linaro.org>
+	<20180810033200.GA8773@localhost.localdomain>
+	<878t5eppm1.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180718084318.7540-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] file-posix: Skip effectiveless OFD lock
- operations
+In-Reply-To: <878t5eppm1.fsf@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 1/4] scripts/decodetree.py: add a
+ disassembly generator (HACK!)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +27,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, richard.henderson@linaro.org, Cleber Rosa <crosa@redhat.com>
 
-Am 18.07.2018 um 10:43 hat Fam Zheng geschrieben:
-> If we know we've already locked the bytes, don't do it again; similarly
-> don't unlock a byte if we haven't locked it. This doesn't change the
-> behavior, but fixes a corner case explained below.
-> 
-> Libvirt had an error handling bug that an image can get its (ownership,
-> file mode, SELinux) permissions changed (RHBZ 1584982) by mistake behind
-> QEMU. Specifically, an image in use by Libvirt VM has:
-> 
->     $ ls -lhZ b.img
->     -rw-r--r--. qemu qemu system_u:object_r:svirt_image_t:s0:c600,c690 b.img
-> 
-> Trying to attach it a second time won't work because of image locking.
-> And after the error, it becomes:
-> 
->     $ ls -lhZ b.img
->     -rw-r--r--. root root system_u:object_r:virt_image_t:s0 b.img
-> 
-> Then, we won't be able to do OFD lock operations with the existing fd.
-> In other words, the code such as in blk_detach_dev:
-> 
->     blk_set_perm(blk, 0, BLK_PERM_ALL, &error_abort);
-> 
-> can abort() QEMU, out of environmental changes.
-> 
-> This patch is an easy fix to this and the change is regardlessly
-> reasonable, so do it.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/file-posix.c | 27 +++++++++++++++++----------
->  1 file changed, 17 insertions(+), 10 deletions(-)
-> 
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 60af4b3d51..45d44c9947 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -680,23 +680,28 @@ typedef enum {
->   * file; if @unlock == true, also unlock the unneeded bytes.
->   * @shared_perm_lock_bits is the mask of all permissions that are NOT shared.
->   */
-> -static int raw_apply_lock_bytes(int fd,
-> +static int raw_apply_lock_bytes(BDRVRawState *s, int fd,
->                                  uint64_t perm_lock_bits,
->                                  uint64_t shared_perm_lock_bits,
->                                  bool unlock, Error **errp)
->  {
->      int ret;
->      int i;
-> +    uint64_t locked_perm, locked_shared_perm;
-> +
-> +    locked_perm = s ? s->perm : 0;
-> +    locked_shared_perm = s ? ~s->shared_perm & BLK_PERM_ALL : 0;
+On Fri, Aug 10, 2018 at 09:55:50AM +0100, Alex Benn=E9e wrote:
+>=20
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+>=20
+> > On Wed, Aug 08, 2018 at 01:39:31PM +0100, Alex Benn=E9e wrote:
+> >> Given our issues with failing disassembly we could try and re-use th=
+e
+> >> decode tree data to output what instruction is being decoded. This
+> >> will be used if registered as a fall-back for when the "proper"
+> >> disassembler fails to decode an instruction.
+> >>
+> >> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> >
+> > I don't have an opinion on the approach you are taking, but the
+> > Python code you are adding is consistent with the existing style
+> > of the script.
+> >
+> > That said, I find the existing code full of output() calls very
+> > hard to read.  If anybody wants to volunteer to improve the
+> > readability of the output generation, it would be welcome.
+>=20
+> If we expect to have the script output a number of different forms I
+> guess re-factoring it with some sort of template based approach would b=
+e
+> worthwhile. I wonder if there are other examples in the code base? We
+> wouldn't want to have multiple template types.
 
-For the s == NULL case, using 0 is okay for locking because we will
-always consider the bit as previously unlocked, so we will lock it.
+QAPI scripts also generates C code, and I find them more
+readable[1].
 
-For unlocking, however, we'll also see it as previously unlocked, so we
-will never actually unlock anything any more.
+I think a true template language would be even better than QAPI's
+approach, but I don't see an obvious candidate that would be
+worth adding another build dependency to QEMU.
 
-Am I missing something?
 
-Kevin
+[1] Compare:
+
+def output_decl(self):
+    global translate_scope
+    global translate_prefix
+    output('typedef ', self.base.base.struct_name(),
+           ' arg_', self.name, ';\n')
+    output(translate_scope, 'bool ', translate_prefix, '_', self.name,
+           '(DisasContext *ctx, arg_', self.name,
+           ' *a, ', insntype, ' insn);\n')
+
+And:
+
+def gen_visit_members_decl(name):
+    return mcgen('''
+
+void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **e=
+rrp);
+''',
+                 c_name=3Dc_name(name))
+
+--=20
+Eduardo
