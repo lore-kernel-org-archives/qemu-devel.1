@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51541)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fnyG0-0006kA-2D
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 23:38:33 -0400
+	id 1fnyH1-0007X3-R6
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 23:39:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fnyFz-00047h-57
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 23:38:32 -0400
+	id 1fnyH1-00054i-3g
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 23:39:35 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180803144721.17036-1-stefanha@redhat.com>
-	<20180803144721.17036-3-stefanha@redhat.com>
+	<20180803144721.17036-4-stefanha@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e00e2807-e0ef-0c76-a09b-aec66177f9eb@amsat.org>
-Date: Fri, 10 Aug 2018 00:38:16 -0300
+Message-ID: <d62dda7f-0427-3d01-85f7-eaf6aaa25005@amsat.org>
+Date: Fri, 10 Aug 2018 00:39:25 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180803144721.17036-3-stefanha@redhat.com>
+In-Reply-To: <20180803144721.17036-4-stefanha@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 2/6] target/arm: add
- "cortex-m0" CPU model
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 3/6] loader: extract
+ rom_free() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +33,65 @@ To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, mail@steffen-goertz.de, Su Hang <suhang16@mails.ucas.ac.cn>, ilg@livius.net, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>, jusual@mail.ru
 
 On 08/03/2018 11:47 AM, Stefan Hajnoczi wrote:
-> Define a "cortex-m0" ARMv6-M CPU model.
+> The next patch will need to free a rom.  There is already code to do
+> this in rom_add_file().
 > 
-> Most of the register reset values set by other CPU models are not
-> relevant for the cut-down ARMv6-M architecture.
+> Note that rom_add_file() uses:
+> 
+>   rom = g_malloc0(sizeof(*rom));
+>   ...
+>   if (rom->fw_dir) {
+>       g_free(rom->fw_dir);
+>       g_free(rom->fw_file);
+>   }
+> 
+> The conditional is unnecessary since g_free(NULL) is a no-op.
 > 
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  target/arm/cpu.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  hw/core/loader.c | 21 ++++++++++++---------
+>  1 file changed, 12 insertions(+), 9 deletions(-)
 > 
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 3848ef46aa..7e477c0d23 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1255,6 +1255,15 @@ static void arm11mpcore_initfn(Object *obj)
->      cpu->reset_auxcr = 1;
->  }
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index bbb6e65bb5..0c72e7c05a 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -847,6 +847,17 @@ struct Rom {
+>  static FWCfgState *fw_cfg;
+>  static QTAILQ_HEAD(, Rom) roms = QTAILQ_HEAD_INITIALIZER(roms);
 >  
-> +static void cortex_m0_initfn(Object *obj)
+> +/* rom->data must be heap-allocated (do not use with rom_add_elf_program()) */
+> +static void rom_free(Rom *rom)
 > +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +    set_feature(&cpu->env, ARM_FEATURE_V6);
-> +    set_feature(&cpu->env, ARM_FEATURE_M);
-> +
-> +    cpu->midr = 0x410cc200;
+> +    g_free(rom->data);
+> +    g_free(rom->path);
+> +    g_free(rom->name);
+> +    g_free(rom->fw_dir);
+> +    g_free(rom->fw_file);
+> +    g_free(rom);
 > +}
 > +
->  static void cortex_m3_initfn(Object *obj)
+>  static inline bool rom_order_compare(Rom *rom, Rom *item)
 >  {
->      ARMCPU *cpu = ARM_CPU(obj);
-> @@ -1845,6 +1854,8 @@ static const ARMCPUInfo arm_cpus[] = {
->      { .name = "arm1136",     .initfn = arm1136_initfn },
->      { .name = "arm1176",     .initfn = arm1176_initfn },
->      { .name = "arm11mpcore", .initfn = arm11mpcore_initfn },
-> +    { .name = "cortex-m0",   .initfn = cortex_m0_initfn,
-> +                             .class_init = arm_v7m_class_init },
->      { .name = "cortex-m3",   .initfn = cortex_m3_initfn,
->                               .class_init = arm_v7m_class_init },
->      { .name = "cortex-m4",   .initfn = cortex_m4_initfn,
+>      return ((uintptr_t)(void *)rom->as > (uintptr_t)(void *)item->as) ||
+> @@ -995,15 +1006,7 @@ err:
+>      if (fd != -1)
+>          close(fd);
+>  
+> -    g_free(rom->data);
+> -    g_free(rom->path);
+> -    g_free(rom->name);
+> -    if (fw_dir) {
+> -        g_free(rom->fw_dir);
+> -        g_free(rom->fw_file);
+> -    }
+> -    g_free(rom);
+> -
+> +    rom_free(rom);
+>      return -1;
+>  }
+>  
 > 
