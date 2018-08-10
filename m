@@ -1,31 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fo4Tg-000772-9V
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:17:05 -0400
+	(envelope-from <mst@redhat.com>) id 1fo4Ub-0007UY-Ql
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fo4Td-0000SU-3G
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:17:04 -0400
-Received: from mail-wr1-f50.google.com ([209.85.221.50]:35905)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fo4Tc-0000Rx-RK
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:17:01 -0400
-Received: by mail-wr1-f50.google.com with SMTP id h9-v6so7830740wro.3
-	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 03:17:00 -0700 (PDT)
-References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
-	<20180806143412.27722-6-e.emanuelegiuseppe@gmail.com>
-	<f5a3c33f-f459-806c-1465-3b5415a5ccc1@redhat.com>
-	<141175f7-a38a-5236-cd63-70353870913a@redhat.com>
-	<b17c18e1-e283-b65b-8f26-efae69be8119@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b825d311-8513-8925-8761-47a34c07cdd2@redhat.com>
-Date: Fri, 10 Aug 2018 12:16:56 +0200
+	(envelope-from <mst@redhat.com>) id 1fo4UY-0001DD-JV
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:18:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46918 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fo4UY-0001CI-E4
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:17:58 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1490E857AB
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 10:17:58 +0000 (UTC)
+Date: Fri, 10 Aug 2018 13:17:54 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180810131717-mutt-send-email-mst@kernel.org>
+References: <20180808114830.7169-1-quintela@redhat.com>
+	<20180808114830.7169-10-quintela@redhat.com>
+	<20180809190303.GF2618@work-vm>
+	<20180810015411-mutt-send-email-mst@kernel.org>
+	<87d0uqwu7r.fsf@trasno.org>
+	<20180810122918-mutt-send-email-mst@kernel.org>
+	<878t5ewnef.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <b17c18e1-e283-b65b-8f26-efae69be8119@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/34] tests/qgraph: sdhci driver and
- interface nodes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878t5ewnef.fsf@trasno.org>
+Subject: Re: [Qemu-devel] [PATCH v2 09/22] virtio: Remove unneeded includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,16 +38,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 09/08/2018 13:01, Laurent Vivier wrote:
->> No, there is only one libqgraph.  The same test (qos-test) can run for
->> both PCI and non-PCI machines, and will cull the unnecessary part of the
->> graph automatically simply because there is no path from a machine to a
->> PCI device.
-> So, all libqgraph files should be added to check-qtest-generic-y?
+On Fri, Aug 10, 2018 at 12:01:44PM +0200, Juan Quintela wrote:
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Fri, Aug 10, 2018 at 09:34:32AM +0200, Juan Quintela wrote:
+> >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >> > On Thu, Aug 09, 2018 at 08:03:03PM +0100, Dr. David Alan Gilbert wrote:
+> >> >> * Juan Quintela (quintela@redhat.com) wrote:
+> >> >> > They are all already included in virtio_pci.h.
+> >> >
+> >> > All I see in virtio_pci.h is:
+> >> >
+> >> > #include "standard-headers/linux/types.h"
+> >> >
+> >> > Weird.
+> >> >
+> >> > BTW what's the point of this patch?  Generally it's best not to depend
+> >> > on headers including each other, it makes refactoring harder.
+> >> 
+> >> If you see the following patches, we remove blk, net, serial, scsi,
+> >> balloon and input bits from that file, so I was removing includes patch
+> >> by patch.
+> >> 
+> >> And at the end, I found that we only need that ones.
+> >> 
+> >> "virtio-pci.h" does too many things here, I could have split it also,
+> >> because the mayority of the bits are only used now inside their own
+> >> virtio-foo-pci.c.  But then, there are things that share bits,
+> >> virtio-bus-pci is used for lots of stuff, virtio-input-pci bits are used
+> >> in virtio-input-host-pci.c, etc,   So I decided to only do the direct
+> >> split.
+> >> 
+> >> And about including directly all the files that you use, and including
+> >> only the files that are extrictly needed, the normal argument is that
+> >> the less includes, the faster compiler times.
+> >> 
+> >> Later, Juan.
+> >
+> > That's reverse of the direction we have been going.
+> > Pls move includes when you split up the files.
+> 
+> Hi
+> 
+> You want this bit of virtio-pci.h into vhost-vsock-pci.h?
 
-Yes.
+In fact can we move it into c file?
 
-Paolo
+> #ifdef CONFIG_VHOST_VSOCK
+> /*
+>  * vhost-vsock-pci: This extends VirtioPCIProxy.
+>  */
+> #define TYPE_VHOST_VSOCK_PCI "vhost-vsock-pci"
+> #define VHOST_VSOCK_PCI(obj) \
+>         OBJECT_CHECK(VHostVSockPCI, (obj), TYPE_VHOST_VSOCK_PCI)
+> 
+> struct VHostVSockPCI {
+>     VirtIOPCIProxy parent_obj;
+>     VHostVSock vdev;
+> };
+> #endif
+> 
+> Except for shared things (input, bus, ...) the rest are only used on
+> the file that uses them.
+> 
+> Later, Juan.
+> 
