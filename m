@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fo5vm-0000wN-4a
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 07:50:11 -0400
+	(envelope-from <armbru@redhat.com>) id 1fo61R-0002dC-4N
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 07:56:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fo5vj-0005aI-36
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 07:50:10 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180810062647.23211-2-lbloch@janustech.com>
-References: <20180810062647.23211-1-lbloch@janustech.com>
-	<20180810062647.23211-2-lbloch@janustech.com>
-Date: Fri, 10 Aug 2018 13:50:03 +0200
-Message-ID: <w51600i8mqc.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 1/9] qcow2: Options' documentation fixes
+	(envelope-from <armbru@redhat.com>) id 1fo61O-0003YZ-37
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 07:56:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45002 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fo61N-0003XP-U5
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 07:55:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EEB6C402243B
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 11:55:54 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-62.ams2.redhat.com
+	[10.36.117.62])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C5AAB2026D65
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 11:55:54 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri, 10 Aug 2018 13:55:53 +0200
+Message-Id: <20180810115553.32604-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: Fix F: patterns that don't match
+ anything
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,42 +32,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri 10 Aug 2018 08:26:39 AM CEST, Leonid Bloch wrote:
-> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
-> ---
->  docs/qcow2-cache.txt | 16 +++++++++++-----
->  qemu-options.hx      |  9 ++++++---
->  2 files changed, 17 insertions(+), 8 deletions(-)
->
-> diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
-> index 8a09a5cc5f..0f157d859a 100644
-> --- a/docs/qcow2-cache.txt
-> +++ b/docs/qcow2-cache.txt
-> @@ -97,12 +97,15 @@ need:
->     l2_cache_size = disk_size_GB * 131072
->     refcount_cache_size = disk_size_GB * 32768
->  
-> -QEMU has a default L2 cache of 1MB (1048576 bytes) and a refcount
-> -cache of 256KB (262144 bytes), so using the formulas we've just seen
-> -we have
-> +With the default cluster size, to cover each 8 GB of the virtual image
-> +size, 1MB of L2 cache is needed:
->  
-> -   1048576 / 131072 = 8 GB of virtual disk covered by that cache
-> -    262144 /  32768 = 8 GB
-> +   65536 / 8 = 8192 = 8 GB / 1 MB
+Commit ba51ef25571 moved hw/dma/sun4m_iommu.c to
+hw/sparc/sun4m_iommu.c without updating MAINTAINERS.
 
-Where does this 65536 / 8 come from? The line that you changed follows
-directly from the formula immediately before that paragraph:
+Commit f5980f757c0 deleted include/hw/sparc/sun4m.h without updating
+MAINTAINERS.
 
-     l2_cache_size = disk_size_GB * 131072
+Commit 0bcc8e5bd8d fat-fingered tests/check-block-qdict.c.
 
-that is
+Commit 33e9e9bd62d fat-fingered include/qemu/job.h.
 
-     l2_cache_size / 131072 = disk_size_GB
-           1048576 / 131072 = 8 GB
+Commit eb815e248f5 moved qapi-schema.json to qapi/ without updating
+MAINTAINERS.
 
-Berto
+Commit 2e3c8f8dbdd converted docs/devel/migration.txt to
+docs/devel/migration.rst without updating MAINTAINERS.
+
+Offenders tracked down with the following shell loop:
+
+    shopt -s nullglob
+    for i in `sed -n 's/^F: //p' <MAINTAINERS `
+    do
+        glob="`echo $i`"
+	if [ "$glob" = "$i" ]
+	then [ ! -e $i ]
+	else [ -z "$glob" ]
+	fi && echo "$i"
+    done
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ MAINTAINERS | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 666e936812..01a2f20718 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -873,12 +873,11 @@ Sun4m
+ M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+ S: Maintained
+ F: hw/sparc/sun4m.c
++F: hw/sparc/sun4m_iommu.c
+ F: hw/dma/sparc32_dma.c
+-F: hw/dma/sun4m_iommu.c
+ F: hw/misc/eccmemctl.c
+ F: hw/misc/slavio_misc.c
+ F: include/hw/sparc/sparc32_dma.h
+-F: include/hw/sparc/sun4m.h
+ F: pc-bios/openbios-sparc32
+ 
+ Sun4u
+@@ -1399,7 +1398,7 @@ F: qemu-io*
+ F: tests/qemu-iotests/
+ F: util/qemu-progress.c
+ F: qobject/block-qdict.c
+-F: test/check-block-qdict.c
++F: tests/check-block-qdict.c
+ T: git git://repo.or.cz/qemu/kevin.git block
+ 
+ Block I/O path
+@@ -1432,7 +1431,7 @@ F: blockjob.c
+ F: include/block/blockjob.h
+ F: job.c
+ F: job-qmp.c
+-F: include/block/job.h
++F: include/qemu/job.h
+ F: block/backup.c
+ F: block/commit.c
+ F: block/stream.c
+@@ -1647,7 +1646,6 @@ QAPI Schema
+ M: Eric Blake <eblake@redhat.com>
+ M: Markus Armbruster <armbru@redhat.com>
+ S: Supported
+-F: qapi-schema.json
+ F: qapi/*.json
+ T: git git://repo.or.cz/qemu/armbru.git qapi-next
+ 
+@@ -1756,7 +1754,7 @@ F: migration/
+ F: scripts/vmstate-static-checker.py
+ F: tests/vmstate-static-checker-data/
+ F: tests/migration-test.c
+-F: docs/devel/migration.txt
++F: docs/devel/migration.rst
+ F: qapi/migration.json
+ 
+ Seccomp
+-- 
+2.17.1
