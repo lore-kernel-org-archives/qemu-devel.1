@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fo6Gy-0002Fd-Aq
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:12:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fo6Js-0002xf-Im
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:15:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fo6Gt-0001Ih-BU
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:12:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50390 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fo6Gt-0001IP-5g
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:11:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D09C0857AB
-	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 12:11:58 +0000 (UTC)
-References: <20180808114830.7169-1-quintela@redhat.com>
-	<20180808114830.7169-5-quintela@redhat.com>
-	<b30ab0a9-8250-b0da-7c2c-c455db0dddcd@redhat.com>
-	<87r2j6v5q7.fsf@trasno.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <51fa5967-1e9e-3f43-b79b-4a45930562c6@redhat.com>
-Date: Fri, 10 Aug 2018 14:11:56 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fo6Jr-0003ZS-IC
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:15:04 -0400
+Date: Fri, 10 Aug 2018 14:14:55 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180810121455.GF4367@localhost.localdomain>
+References: <20180718084318.7540-1-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87r2j6v5q7.fsf@trasno.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 04/22] check: Only test isa-testdev when
- it is compiled in
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180718084318.7540-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] file-posix: Skip effectiveless OFD lock
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,23 +23,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On 10/08/2018 13:08, Juan Quintela wrote:
->> Emanuele's qos-test would do this automatically.  It would be nicer to
->> convert the whole ISA subsystem to use libqos and qos-test...
-> Can we get this in until we get some volunteer for that other work?
-> /me full of things on his plate at the moment.
+Am 18.07.2018 um 10:43 hat Fam Zheng geschrieben:
+> If we know we've already locked the bytes, don't do it again; similarly
+> don't unlock a byte if we haven't locked it. This doesn't change the
+> behavior, but fixes a corner case explained below.
+> 
+> Libvirt had an error handling bug that an image can get its (ownership,
+> file mode, SELinux) permissions changed (RHBZ 1584982) by mistake behind
+> QEMU. Specifically, an image in use by Libvirt VM has:
+> 
+>     $ ls -lhZ b.img
+>     -rw-r--r--. qemu qemu system_u:object_r:svirt_image_t:s0:c600,c690 b.img
+> 
+> Trying to attach it a second time won't work because of image locking.
+> And after the error, it becomes:
+> 
+>     $ ls -lhZ b.img
+>     -rw-r--r--. root root system_u:object_r:virt_image_t:s0 b.img
+> 
+> Then, we won't be able to do OFD lock operations with the existing fd.
+> In other words, the code such as in blk_detach_dev:
+> 
+>     blk_set_perm(blk, 0, BLK_PERM_ALL, &error_abort);
+> 
+> can abort() QEMU, out of environmental changes.
+> 
+> This patch is an easy fix to this and the change is regardlessly
+> reasonable, so do it.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/file-posix.c | 27 +++++++++++++++++----------
+>  1 file changed, 17 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 60af4b3d51..45d44c9947 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -680,23 +680,28 @@ typedef enum {
+>   * file; if @unlock == true, also unlock the unneeded bytes.
+>   * @shared_perm_lock_bits is the mask of all permissions that are NOT shared.
+>   */
+> -static int raw_apply_lock_bytes(int fd,
+> +static int raw_apply_lock_bytes(BDRVRawState *s, int fd,
+>                                  uint64_t perm_lock_bits,
+>                                  uint64_t shared_perm_lock_bits,
+>                                  bool unlock, Error **errp)
+>  {
+>      int ret;
+>      int i;
+> +    uint64_t locked_perm, locked_shared_perm;
+> +
+> +    locked_perm = s ? s->perm : 0;
+> +    locked_shared_perm = s ? ~s->shared_perm & BLK_PERM_ALL : 0;
 
-Sure, but since this is RFC, I commented. :)  With qos-test, all tests
-end up in a single binary that is generic for all QEMU targets, and
-there's no need to synchronize the configuration with the testing.
+For the s == NULL case, using 0 is okay for locking because we will
+always consider the bit as previously unlocked, so we will lock it.
 
-The disadvantage of doing it at the Makefile level is that it relies on
-the devices being either in all targets or none.  For example
-CONFIG_ISA_TESTDEV cannot be removed from just
-default-configs/ppc-softmmu.mak if you are building both a PPC and an
-x86 target.
+For unlocking, however, we'll also see it as previously unlocked, so we
+will never actually unlock anything any more.
 
-Paolo
+Am I missing something?
+
+Kevin
