@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fo3K0-0000RX-1t
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:03:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fo3LD-0000vH-Nd
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:04:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fo3Jz-0007ZQ-4j
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:03:00 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:42434)
+	(envelope-from <peter.maydell@linaro.org>) id 1fo3LC-0008KN-85
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:04:15 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:45626)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fo3Jy-0007YR-UV
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:02:59 -0400
-Received: by mail-oi0-x244.google.com with SMTP id b16-v6so14580979oic.9
-	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 02:02:58 -0700 (PDT)
+	id 1fo3LC-0008Jq-2I
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:04:14 -0400
+Received: by mail-oi0-x242.google.com with SMTP id q11-v6so14583920oic.12
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 02:04:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180809215421.hexdewc3igklwvob@var.youpi.perso.aquilenet.fr>
-References: <20180807114501.12370-1-peter.maydell@linaro.org>
-	<20180809111233.GA2619@work-vm>
-	<CAFEAcA-+5xFDMuvK2W8v=Ufs2E1K4y9onZY_4x6RMYbHLFpkxA@mail.gmail.com>
-	<20180809113204.GB2618@work-vm>
-	<20180809215421.hexdewc3igklwvob@var.youpi.perso.aquilenet.fr>
+In-Reply-To: <fd82c9db-1ecd-a833-8eab-0060647c2220@amsat.org>
+References: <20180809130115.28951-1-peter.maydell@linaro.org>
+	<20180809130115.28951-11-peter.maydell@linaro.org>
+	<b16ded66-e814-43f4-389f-65e697660740@amsat.org>
+	<fd82c9db-1ecd-a833-8eab-0060647c2220@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Aug 2018 10:02:37 +0100
-Message-ID: <CAFEAcA9hquE5jck7=-c6Xd36uDfm7Z_Kw39P1vCkZRqE1M4EDQ@mail.gmail.com>
+Date: Fri, 10 Aug 2018 10:03:52 +0100
+Message-ID: <CAFEAcA_tVngNnDEgbeg4wobzJLsHHMKyv8=yDRb_TQSBUOg9_A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.0] slirp: Correct size check in
- m_inc()
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 10/16] hw/dma/pl080: Allow use
+ as embedded-struct device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,69 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, Prasad J Pandit <pjp@fedoraproject.org>, liqsub1 <liqsub1@163.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 9 August 2018 at 22:54, Samuel Thibault <samuel.thibault@gnu.org> wrote:
-> Dr. David Alan Gilbert, le jeu. 09 ao=C3=BBt 2018 12:32:05 +0100, a ecrit=
-:
->> >    |--datasize---->|---m_len------->
->> >    |----------m_size------------------------------>
->> >                    |----M_ROOM-------------------->
->> >                                     |-M_FREEROOM-->
->> >
->> >    ^               ^                               ^
->> >    m_dat           m_data                          end of buffer
->> >
->> > ("datasize" is a bit misnamed, as it's "size of the leading
->> > gap between the start of the buffer and the data"; "gapsize"
->> > would be more helpful.)
->> >
->> > Anyway, we allocate size + datasize, and
->> > m_size =3D=3D datasize + M_ROOM. We know that size >=3D M_ROOM,
->> > so the allocated buffer must be at least m_size big.
+On 10 August 2018 at 06:27, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
+rote:
+> On 08/10/2018 02:18 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 08/09/2018 10:01 AM, Peter Maydell wrote:
+>>> Create a new include file for the pl081's device struct,
+>>> type macros, etc, so that it can be instantiated using
+>>> the "embedded struct" coding style.
+> [...]
+>>> +#ifndef HW_DMA_PL080_H
+>>> +#define HW_DMA_PL080_H
+>>> +
+>>> +#include "hw/sysbus.h"
+>>> +
+>>> +#define PL080_MAX_CHANNELS 8
+>>> +
+>>> +typedef struct {
+>>> +    uint32_t src;
+>>> +    uint32_t dest;
+>>> +    uint32_t lli;
+>>> +    uint32_t ctrl;
+>>> +    uint32_t conf;
+>>> +} pl080_channel;
+>>> +
+>>> +#define TYPE_PL080 "pl080"
+>>> +#define TYPE_PL081 "pl081"
+>>> +#define PL080(obj) OBJECT_CHECK(PL080State, (obj), TYPE_PL080)
 >>
->> Ah OK, thanks.
->> (That ascii art could do with being in a comment somewhere!)
+>> The PL080() macro can stay in the source.
 >
-> Indeed. Peter, maybe your Signed-off-by on this? :)
+> Oh this respect the "coding style" indeed.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Yes.
 
-> Samuel
->
-> commit 4be85a1eeb6b19e91491e689d4d0d054030cbb49
-> Author: Peter Maydell <peter.maydell@linaro.org>
-> Date:   Thu Aug 9 23:52:59 2018 +0200
->
->     slirp: document mbuf pointers and sizes
->
->     Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
->
-> diff --git a/slirp/mbuf.h b/slirp/mbuf.h
-> index 33b84485d6..a5bb3f9e66 100644
-> --- a/slirp/mbuf.h
-> +++ b/slirp/mbuf.h
-> @@ -47,6 +47,16 @@
->   * free the m_ext.  This is inefficient memory-wise, but who cares.
->   */
->
-> +/*
-> + *  |--gapsize----->|---m_len------->
-> + *  |----------m_size------------------------------>
-> + *                  |----M_ROOM-------------------->
-> + *                                   |-M_FREEROOM-->
-> + *
-> + *  ^               ^                               ^
-> + *  m_dat/m_ext     m_data                          end of buffer
-> + */
-> +
+> Can you add the PL081() companion? Thanks.
 
-...but
-(a) you should add a comment describing what 'gapsize'
-is, ie that there may be a gap between the in-use data and the
-start of the allocated buffer, and
-(b) m_inc() should change its variable name to match.
+No, because the PL081 has no separate data structure
+and there is no PL081State* for a PL081() macro to
+be casting to.
 
 thanks
 -- PMM
