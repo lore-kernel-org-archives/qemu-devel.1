@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fo6yn-00017L-JT
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:57:22 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fo76K-0003tW-Az
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:05:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fo6yj-0002cV-CC
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:57:21 -0400
-Date: Fri, 10 Aug 2018 09:57:13 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180810125713.GS15372@localhost.localdomain>
-References: <20180810124027.10698-1-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <cohuck@redhat.com>) id 1fo76G-0007Yo-8t
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:05:08 -0400
+Date: Fri, 10 Aug 2018 15:04:59 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180810150459.79c6b4e0.cohuck@redhat.com>
+In-Reply-To: <20180810030139.25916-1-pavel.zbitskiy@gmail.com>
+References: <20180810030139.25916-1-pavel.zbitskiy@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180810124027.10698-1-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg: ignore suffixes in the bootdevice
- list dependent on machine class
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/7] Some improvements in z/Arch
+ instructions support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,26 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lersek@redhat.com, marcel.apfelbaum@gmail.com, arei.gonglei@huawei.com, david@gibson.dropbear.id.au
+To: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, david@redhat.com, richard.henderson@linaro.org
 
-On Fri, Aug 10, 2018 at 01:40:27PM +0100, Mark Cave-Ayland wrote:
-> For the older machines (such as Mac and SPARC) the DT nodes representing
-> bootdevices for disk nodes are irregular for mainly historical reasons.
-> 
-> Since the majority of bootdevice nodes for these machines either do not have a
-> separate disk node or require different (custom) names then it is much easier
-> for processing to just disable all suffixes for a particular machine.
-> 
-> Introduce a new ignore_boot_device_suffixes MachineClass property to control
-> bootdevice suffix generation, defaulting to false in order to preserve
-> compatibility.
-> 
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+On Thu,  9 Aug 2018 23:01:32 -0400
+Pavel Zbitskiy <pavel.zbitskiy@gmail.com> wrote:
 
-Thanks, I'm queueing this for 3.1:
-  https://github.com/ehabkost/qemu.git machine-for-3.1
+> Found while attempting to run an old tool in qemu.
+> 
+> * BAL and BALR:    Added.
+> * CSST:            Qemu crashed after an accidental jump to garbage.
+> * IPM:             A tool produced an incorrect output.
+> * EX TRT/TRTR:     A tool ran quite slow.
+> * PACK:            A tool produced an incorrect output.
+> * CVB, CVBY, CVBG: Added.
+> 
+> Changes since v1:
+> * Tests.
 
--- 
-Eduardo
+Nice, thanks for adding these.
+
+> * Call pc_to_link_info() instead of op_bas().
+> * Clarified CSST commit message.
+> * Rewrote IPM using extract/deposit.
+> * Clarified PACK commit message.
+> * Do not use LowCore for CONFIG_USER_ONLY.
+> * Reduce duplication in CVB code.
+> 
+> Pavel Zbitskiy (7):
+>   tests/tcg: add a simple s390x test
+>   target/s390x: add BAL and BALR instructions
+>   target/s390x: fix CSST decoding and runtime alignment check
+>   target/s390x: fix IPM polluting irrelevant bits
+>   target/s390x: add EX support for TRT and TRTR
+>   target/s390x: fix PACK reading 1 byte less and writing 1 byte more
+>   target/s390x: implement CVB, CVBY and CVBG
+
+I'll wait for some acks/reviews before applying these.
