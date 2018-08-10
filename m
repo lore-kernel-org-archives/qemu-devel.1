@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1foEjL-0000FQ-Vo
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 17:13:56 -0400
+	(envelope-from <laurent@vivier.eu>) id 1foFqn-00041e-EP
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 18:25:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1foEjK-0004wf-Tm
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 17:13:55 -0400
-References: <20180810120418.6695-1-mark.cave-ayland@ilande.co.uk>
-	<a9a1a60a-a521-7150-a2df-8813046a1b65@reactos.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <8c6b0b0b-c189-3f6f-08f3-bbe79ef3474e@ilande.co.uk>
-Date: Fri, 10 Aug 2018 22:13:35 +0100
-MIME-Version: 1.0
-In-Reply-To: <a9a1a60a-a521-7150-a2df-8813046a1b65@reactos.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] 40p: don't use legacy fw_cfg_init_mem()
- function
+	(envelope-from <laurent@vivier.eu>) id 1foFqi-0007Bo-LA
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 18:25:41 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:36937)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1foFqi-0007B2-BD
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 18:25:36 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Sat, 11 Aug 2018 00:25:02 +0200
+Message-Id: <20180810222502.19663-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH] sh4: fix use_icount with linux-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +21,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>
 
-On 10/08/18 21:18, Hervé Poussineau wrote:
+This patch revert changes from 4834871bc9 that are
+not only state renaming.
 
-> Le 10/08/2018 à 14:04, Mark Cave-Ayland a écrit :
->> Instead initialise the device via qdev to allow us to set device
->> properties
->> directly as required.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> ---
->>   hw/ppc/prep.c | 13 +++++++++++--
->>   1 file changed, 11 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
->> index 3401570d98..9cf4a2adc3 100644
->> --- a/hw/ppc/prep.c
->> +++ b/hw/ppc/prep.c
->> @@ -706,7 +706,7 @@ static void ibm_40p_init(MachineState *machine)
->>       uint16_t cmos_checksum;
->>       PowerPCCPU *cpu;
->>       DeviceState *dev;
->> -    SysBusDevice *pcihost;
->> +    SysBusDevice *pcihost, *s;
->>       Nvram *m48t59 = NULL;
->>       PCIBus *pci_bus;
->>       ISABus *isa_bus;
->> @@ -799,7 +799,16 @@ static void ibm_40p_init(MachineState *machine)
->>       }
->>         /* Prepare firmware configuration for OpenBIOS */
->> -    fw_cfg = fw_cfg_init_mem(CFG_ADDR, CFG_ADDR + 2);
->> +    dev = qdev_create(NULL, TYPE_FW_CFG_MEM);
->> +    fw_cfg = FW_CFG(dev);
->> +    qdev_prop_set_uint32(dev, "data_width", 1);
->> +    qdev_prop_set_bit(dev, "dma_enabled", false);
->> +    object_property_add_child(OBJECT(qdev_get_machine()), TYPE_FW_CFG,
->> +                              OBJECT(fw_cfg), NULL);
->> +    qdev_init_nofail(dev);
->> +    s = SYS_BUS_DEVICE(dev);
->> +    sysbus_mmio_map(s, 0, CFG_ADDR);
->> +    sysbus_mmio_map(s, 1, CFG_ADDR + 2);
->>         if (machine->kernel_filename) {
->>           /* load kernel */
->>
-> 
-> So, you're inlining fw_cfg_init_mem() and resolving parameters and
-> conditions.
-> Any reason to do this, as this function is also used in other places?
+This fixes java in a linux-user chroot:
+  $ java --version
+  qemu-sh4: .../accel/tcg/cpu-exec.c:634: cpu_loop_exec_tb: Assertion `use_icount' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  Aborted (core dumped)
 
-Well, not any more as I've sent patches to remove just about all of the
-others.
+The problem seems to be in gen_conditional_jump() in the
+GUSA_EXCLUSIVE part: it should reset base.is_jmp to DISAS_NEXT after the
+gen_goto_tb() as it is done in gen_delayed_conditional_jump() after the
+gen_jump().
 
-The problem with using *_init() functions is that you end up needing one
-for every combination of parameters that you need, or having to map
-function parameters to qdev parameters. And if you're doing that, you
-might as well use the qdev parameters directly.
+Bug: https://bugs.launchpad.net/qemu/+bug/1768246
+Fixes: 4834871bc95b67343248100e2a75ae0d287bc08b
+       ("target/sh4: Convert to DisasJumpType")
+Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/sh4/translate.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> However,
-> Acked-by: Hervé Poussineau <hpoussin@reactos.org>
-
-
-ATB,
-
-Mark.
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 1b9a201d6d..5010b0d349 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -253,7 +253,6 @@ static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+             tcg_gen_lookup_and_goto_ptr();
+         }
+     }
+-    ctx->base.is_jmp = DISAS_NORETURN;
+ }
+ 
+ static void gen_jump(DisasContext * ctx)
+@@ -324,7 +323,6 @@ static void gen_delayed_conditional_jump(DisasContext * ctx)
+         gen_jump(ctx);
+ 
+         gen_set_label(l1);
+-        ctx->base.is_jmp = DISAS_NEXT;
+         return;
+     }
+ 
+@@ -1877,6 +1875,7 @@ static void decode_opc(DisasContext * ctx)
+         ctx->envflags &= ~GUSA_MASK;
+ 
+         tcg_gen_movi_i32(cpu_flags, ctx->envflags);
++        ctx->base.is_jmp = DISAS_NORETURN;
+         if (old_flags & DELAY_SLOT_CONDITIONAL) {
+ 	    gen_delayed_conditional_jump(ctx);
+         } else {
+-- 
+2.17.1
