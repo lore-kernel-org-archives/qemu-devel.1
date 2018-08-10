@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fo6Xx-0000SI-2K
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:29:38 -0400
+	(envelope-from <bounces@canonical.com>) id 1fo6ZM-0001yO-G7
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:31:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fo6Xt-0001Dp-Sf
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:29:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47374 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fo6Xt-0001Cv-Ir
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:29:33 -0400
-References: <20180809141403.11296-1-olaf@aepfle.de>
-	<20180809162403.32c53c50.olaf@aepfle.de>
-	<30203041-c944-1a12-d983-9735756dc334@redhat.com>
-	<20180809163816.092a7c8c.olaf@aepfle.de>
-	<a75c67d5-816d-a603-b7bb-12a28f034fb1@redhat.com>
-	<20180809165549.5c92d5f4.olaf@aepfle.de>
-	<dba2887e-a59c-d05e-1642-b22623199cc5@redhat.com>
-	<840c9f90-3299-e2e5-63b6-5d368d15da5c@redhat.com>
-	<20180810123221.785ae741.olaf@aepfle.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a08c692b-5e62-9469-db63-b4b439e9afc3@redhat.com>
-Date: Fri, 10 Aug 2018 14:29:28 +0200
+	(envelope-from <bounces@canonical.com>) id 1fo6ZJ-0002PS-HC
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:31:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fo6ZJ-0002Nl-9t
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:31:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fo6ZG-0002YL-2h
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 12:30:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 64DCF2E8529
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 12:30:57 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180810123221.785ae741.olaf@aepfle.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="VfSYDt897f0VrjITHGXSpYueXNe3AS1Dh"
-Subject: Re: [Qemu-devel] [PATCH v1] exec: handle NULL pointer in
- flatview_read_continue
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 10 Aug 2018 12:16:48 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1777672 <1777672@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152942324302.25954.17370619302309595715.malonedeb@soybean.canonical.com>
+Message-Id: <153390340817.23918.10289522648391671954.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1777672] Re: QEMU aarch64 virtual/physical frame
+ buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,62 +37,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olaf Hering <olaf@aepfle.de>
-Cc: Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VfSYDt897f0VrjITHGXSpYueXNe3AS1Dh
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Olaf Hering <olaf@aepfle.de>
-Cc: Richard Henderson <rth@twiddle.net>,
- "open list:Overall" <qemu-devel@nongnu.org>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Message-ID: <a08c692b-5e62-9469-db63-b4b439e9afc3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1] exec: handle NULL pointer in
- flatview_read_continue
-References: <20180809141403.11296-1-olaf@aepfle.de>
- <20180809162403.32c53c50.olaf@aepfle.de>
- <30203041-c944-1a12-d983-9735756dc334@redhat.com>
- <20180809163816.092a7c8c.olaf@aepfle.de>
- <a75c67d5-816d-a603-b7bb-12a28f034fb1@redhat.com>
- <20180809165549.5c92d5f4.olaf@aepfle.de>
- <dba2887e-a59c-d05e-1642-b22623199cc5@redhat.com>
- <840c9f90-3299-e2e5-63b6-5d368d15da5c@redhat.com>
- <20180810123221.785ae741.olaf@aepfle.de>
-In-Reply-To: <20180810123221.785ae741.olaf@aepfle.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+Thanks for the test case. I'm having difficulty matching up your guest
+code with the documentation of the fb mbox tags in
+https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
+...
 
-On 10/08/2018 12:32, Olaf Hering wrote:
-> Am Fri, 10 Aug 2018 12:25:09 +0200
-> schrieb Paolo Bonzini <pbonzini@redhat.com>:
->=20
->> There are many more callers of qemu_ram_ptr_length, and none of them c=
-heck the result.
->=20
-> So you mean that function must not return NULL?
-> Or should the caller check for the result?
+Your code sets the physical height to FBHEIGHT via tag 0x48003, and the
+virtual height to FBHEIGHT * 2 via tag 0x48004. The documentation in the
+wiki link agrees that 48003 is phys w/h and 48004 is virt w/h, but it
+says that the physical size is the size of the buffer in memory, and the
+virtual size is the size of the viewport sent to the display device, ie
+the virtual size should be smaller than the physical, not vice-versa.
+Which is correct ?
 
-Either, but the former would of course be much simpler if possible.
+-- =
 
-Paolo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1777672
 
+Title:
+  QEMU aarch64 virtual/physical frame buffer
 
---VfSYDt897f0VrjITHGXSpYueXNe3AS1Dh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Status in QEMU:
+  New
 
------BEGIN PGP SIGNATURE-----
+Bug description:
+  I fully recognize that the error here could be mine, but the code is
+  pretty simple and straightforward; When emulating a Raspberry PI 3
+  using aarch64 and allocating a virtual framebuffer larger than the
+  physical frambuffer (for double-buffering purposes), the QEMU window
+  shows the full size of the *virtual* framebuffer rather than the size
+  of the *physical* framebuffer.
 
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAltthSkACgkQv/vSX3jH
-roNc8gf+P1xXiTb5/OuYtoP1L8FdrNE5bWjIYvDC9uyyjAC+x0W1v71bzs1pkR5r
-Fd92gG01IS11YztVxc0XkyABaF9/vIDKII+cHGT0Kv1jiBm2kl2De6pggeozdB7l
-GIBM7AbzlzboYyOsCR1YLBt1CikF/GMCoPHFkmgFZ7M4ain4wK4sez5anLVlq8DA
-6TWzNmG/t33K7SnvhLSVKxgMmbFluJ0Ugo23Vl0CPm4nzPowxrXWldfMoXUGRap7
-JHxy38YnxgeWLRKl7I8a/qrb12ptOkN/PXhoc4fkrQmqc5qvKpRlGH/oHwzfciG0
-hjSXpB5u0dqxqDP7F9KsYfRn+JQ1+g==
-=Bq9H
------END PGP SIGNATURE-----
+  You can replicate this with code such as:
 
---VfSYDt897f0VrjITHGXSpYueXNe3AS1Dh--
+  =
+
+  #define FBWIDTH 1024
+  #define FBHEIGHT 768
+
+  void lfb_init()
+  {
+      uart_puts("Initializing Framebuffer\n");
+      mbox[0] =3D 35*4;
+      mbox[1] =3D MBOX_REQUEST;
+
+      mbox[2] =3D 0x48003;  //set phy wh
+      mbox[3] =3D 8;
+      mbox[4] =3D 8;
+      mbox[5] =3D FBWIDTH;         //FrameBufferInfo.width
+      mbox[6] =3D FBHEIGHT;          //FrameBufferInfo.height
+
+      mbox[7] =3D 0x48004;  //set virt wh
+      mbox[8] =3D 8;
+      mbox[9] =3D 8;
+      mbox[10] =3D FBWIDTH;        //FrameBufferInfo.virtual_width
+      mbox[11] =3D FBHEIGHT * 2;         //FrameBufferInfo.virtual_height
+      =
+
+      mbox[12] =3D 0x48009; //set virt offset
+      mbox[13] =3D 8;
+      mbox[14] =3D 8;
+      mbox[15] =3D 0;           //FrameBufferInfo.x_offset
+      mbox[16] =3D 0;           //FrameBufferInfo.y.offset
+      =
+
+      mbox[17] =3D 0x48005; //set depth
+      mbox[18] =3D 4;
+      mbox[19] =3D 4;
+      mbox[20] =3D 32;          //FrameBufferInfo.depth
+
+      mbox[21] =3D 0x48006; //set pixel order
+      mbox[22] =3D 4;
+      mbox[23] =3D 4;
+      mbox[24] =3D 1;           //RGB, not BGR preferably
+
+      mbox[25] =3D 0x40001; //get framebuffer, gets alignment on request
+      mbox[26] =3D 8;
+      mbox[27] =3D 8;
+      mbox[28] =3D 4096;        //FrameBufferInfo.pointer
+      mbox[29] =3D 0;           //FrameBufferInfo.size
+
+      mbox[30] =3D 0x40008; //get pitch
+      mbox[31] =3D 4;
+      mbox[32] =3D 4;
+      mbox[33] =3D 0;           //FrameBufferInfo.pitch
+
+      mbox[34] =3D MBOX_TAG_LAST;
+
+      if(mbox_call(MBOX_CH_PROP) && mbox[20]=3D=3D32 && mbox[28]!=3D0) {
+          mbox[28]&=3D0x3FFFFFFF;
+          fbwidth=3Dmbox[5];
+          fbheight=3Dmbox[6];
+          pitch=3Dmbox[33];
+          lfb=3D(void*)((unsigned long)mbox[28]);
+      }
+  }
+
+  I will assume, for the sake of this posting, that the reader
+  understands the mailbox architecture and the appropriate address
+  definitions for them.  The key point is that allocating a virtual
+  buffer twice the height of the physical buffer results in QEMU
+  improperly displaying a double-height window.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1777672/+subscriptions
