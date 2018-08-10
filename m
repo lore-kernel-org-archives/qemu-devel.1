@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fo3k5-0003HP-IZ
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:30:00 -0400
+	(envelope-from <mst@redhat.com>) id 1fo3os-0005Fw-3F
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fo3k2-0004VK-E3
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:29:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36554 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fo3oo-0007gF-Us
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:34:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41202 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fo3k2-0004UZ-8t
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:29:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9AD0D8197038
-	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 09:29:52 +0000 (UTC)
-Date: Fri, 10 Aug 2018 12:29:50 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fo3oo-0007fZ-LE
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:34:50 -0400
+Date: Fri, 10 Aug 2018 12:34:44 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180810122918-mutt-send-email-mst@kernel.org>
-References: <20180808114830.7169-1-quintela@redhat.com>
-	<20180808114830.7169-10-quintela@redhat.com>
-	<20180809190303.GF2618@work-vm>
-	<20180810015411-mutt-send-email-mst@kernel.org>
-	<87d0uqwu7r.fsf@trasno.org>
+Message-ID: <20180810123104-mutt-send-email-mst@kernel.org>
+References: <CGME20180809165352eucas1p2359a46f1beb147fdcbd035c28bbd48d9@eucas1p2.samsung.com>
+	<1533833677-27512-1-git-send-email-i.maximets@samsung.com>
+	<20180810015124-mutt-send-email-mst@kernel.org>
+	<20180810082754eucas1p2c5833c9292851a7009d348b00bbe811e~JeIgqEodG2498924989eucas1p2Z@eucas1p2.samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87d0uqwu7r.fsf@trasno.org>
-Subject: Re: [Qemu-devel] [PATCH v2 09/22] virtio: Remove unneeded includes
+In-Reply-To: <20180810082754eucas1p2c5833c9292851a7009d348b00bbe811e~JeIgqEodG2498924989eucas1p2Z@eucas1p2.samsung.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio: add support for in-order feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +29,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Ilya Maximets <i.maximets@samsung.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-On Fri, Aug 10, 2018 at 09:34:32AM +0200, Juan Quintela wrote:
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > On Thu, Aug 09, 2018 at 08:03:03PM +0100, Dr. David Alan Gilbert wrote:
-> >> * Juan Quintela (quintela@redhat.com) wrote:
-> >> > They are all already included in virtio_pci.h.
-> >
-> > All I see in virtio_pci.h is:
-> >
-> > #include "standard-headers/linux/types.h"
-> >
-> > Weird.
-> >
-> > BTW what's the point of this patch?  Generally it's best not to depend
-> > on headers including each other, it makes refactoring harder.
+On Fri, Aug 10, 2018 at 11:28:47AM +0300, Ilya Maximets wrote:
+> On 10.08.2018 01:51, Michael S. Tsirkin wrote:
+> > On Thu, Aug 09, 2018 at 07:54:37PM +0300, Ilya Maximets wrote:
+> >> New feature bit for in-order feature of the upcoming
+> >> virtio 1.1. It's already supported by DPDK vhost-user
+> >> and virtio implementations. These changes required to
+> >> allow feature negotiation.
+> >>
+> >> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+> >> ---
+> >>
+> >> I just wanted to test this new feature in DPDK but failed
+> >> to found required patch for QEMU side. So, I implemented it.
+> >> At least it will be helpful for someone like me, who wants
+> >> to evaluate VIRTIO_F_IN_ORDER with DPDK.
+> >>
+> >>  hw/net/vhost_net.c                             |  1 +
+> >>  include/hw/virtio/virtio.h                     | 12 +++++++-----
+> >>  include/standard-headers/linux/virtio_config.h |  7 +++++++
+> >>  3 files changed, 15 insertions(+), 5 deletions(-)
+> >>
+> >> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+> >> index e037db6..86879c5 100644
+> >> --- a/hw/net/vhost_net.c
+> >> +++ b/hw/net/vhost_net.c
+> >> @@ -78,6 +78,7 @@ static const int user_feature_bits[] = {
+> >>      VIRTIO_NET_F_MRG_RXBUF,
+> >>      VIRTIO_NET_F_MTU,
+> >>      VIRTIO_F_IOMMU_PLATFORM,
+> >> +    VIRTIO_F_IN_ORDER,
+> >>  
+> >>      /* This bit implies RARP isn't sent by QEMU out of band */
+> >>      VIRTIO_NET_F_GUEST_ANNOUNCE,
+> >> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> >> index 9c1fa07..a422025 100644
+> >> --- a/include/hw/virtio/virtio.h
+> >> +++ b/include/hw/virtio/virtio.h
+> >> @@ -254,16 +254,18 @@ typedef struct virtio_input_conf virtio_input_conf;
+> >>  typedef struct VirtIOSCSIConf VirtIOSCSIConf;
+> >>  typedef struct VirtIORNGConf VirtIORNGConf;
+> >>  
+> >> -#define DEFINE_VIRTIO_COMMON_FEATURES(_state, _field) \
+> >> +#define DEFINE_VIRTIO_COMMON_FEATURES(_state, _field)     \
+> >>      DEFINE_PROP_BIT64("indirect_desc", _state, _field,    \
+> >>                        VIRTIO_RING_F_INDIRECT_DESC, true), \
+> >>      DEFINE_PROP_BIT64("event_idx", _state, _field,        \
+> >>                        VIRTIO_RING_F_EVENT_IDX, true),     \
+> >>      DEFINE_PROP_BIT64("notify_on_empty", _state, _field,  \
+> >> -                      VIRTIO_F_NOTIFY_ON_EMPTY, true), \
+> >> -    DEFINE_PROP_BIT64("any_layout", _state, _field, \
+> >> -                      VIRTIO_F_ANY_LAYOUT, true), \
+> >> -    DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
+> >> +                      VIRTIO_F_NOTIFY_ON_EMPTY, true),    \
+> >> +    DEFINE_PROP_BIT64("any_layout", _state, _field,       \
+> >> +                      VIRTIO_F_ANY_LAYOUT, true),         \
+> >> +    DEFINE_PROP_BIT64("in_order", _state, _field,         \
+> >> +                      VIRTIO_F_IN_ORDER, true),           \
+> >> +    DEFINE_PROP_BIT64("iommu_platform", _state, _field,   \
+> >>                        VIRTIO_F_IOMMU_PLATFORM, false)
+> > 
+> > Is in_order really right for all virtio devices?
 > 
-> If you see the following patches, we remove blk, net, serial, scsi,
-> balloon and input bits from that file, so I was removing includes patch
-> by patch.
+> I see nothing device specific in this feature. It just specifies
+> some restrictions on the descriptors handling. All virtio devices
+> could use it to have performance benefits. Also, upcoming packed
+> rings should give a good performance boost in case of enabled
+> in-order feature. And packed rings RFC [1] implements
+> VIRTIO_F_RING_PACKED for all virtio devices. So, I see no issues
+> in enabling in-order negotiation for all of them.
 > 
-> And at the end, I found that we only need that ones.
+> What do you think?
 > 
-> "virtio-pci.h" does too many things here, I could have split it also,
-> because the mayority of the bits are only used now inside their own
-> virtio-foo-pci.c.  But then, there are things that share bits,
-> virtio-bus-pci is used for lots of stuff, virtio-input-pci bits are used
-> in virtio-input-host-pci.c, etc,   So I decided to only do the direct
-> split.
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg01028.html
 > 
-> And about including directly all the files that you use, and including
-> only the files that are extrictly needed, the normal argument is that
-> the less includes, the faster compiler times.
-> 
-> Later, Juan.
+> Best regards, Ilya Maximets.
 
-That's reverse of the direction we have been going.
-Pls move includes when you split up the files.
+If guest assumes in-order use of buffers but device uses them out of
+order then guest will crash. So there's a missing piece where
+you actually make devices use buffers in order when the flag is set.
 
--- 
-MST
+> > 
+> >>  hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
+> >> diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
+> >> index b777069..d20398c 100644
+> >> --- a/include/standard-headers/linux/virtio_config.h
+> >> +++ b/include/standard-headers/linux/virtio_config.h
+> >> @@ -71,4 +71,11 @@
+> >>   * this is for compatibility with legacy systems.
+> >>   */
+> >>  #define VIRTIO_F_IOMMU_PLATFORM		33
+> >> +
+> >> +/*
+> >> + * Inorder feature indicates that all buffers are used by the device
+> >> + * in the same order in which they have been made available.
+> >> + */
+> >> +#define VIRTIO_F_IN_ORDER 35
+> >> +
+> >>  #endif /* _LINUX_VIRTIO_CONFIG_H */
+> >> -- 
+> >> 2.7.4
+> > 
+> > 
