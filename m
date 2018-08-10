@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1foD8M-0002RG-8u
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:31:39 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1foD8P-0002SZ-1q
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1foD8L-0005bx-AS
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:31:38 -0400
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:35608)
+	(envelope-from <richard.henderson@linaro.org>) id 1foD8O-0005eh-9D
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:31:41 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:38760)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1foD8L-0005bK-4b
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:31:37 -0400
-Received: by mail-pg1-x52d.google.com with SMTP id w10-v6so4850986pgv.2
-	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 12:31:37 -0700 (PDT)
+	id 1foD8O-0005dy-2U
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:31:40 -0400
+Received: by mail-pf1-x441.google.com with SMTP id x17-v6so4974310pfh.5
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 12:31:39 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 10 Aug 2018 12:31:26 -0700
-Message-Id: <20180810193129.1556-4-richard.henderson@linaro.org>
+Date: Fri, 10 Aug 2018 12:31:28 -0700
+Message-Id: <20180810193129.1556-6-richard.henderson@linaro.org>
 In-Reply-To: <20180810193129.1556-1-richard.henderson@linaro.org>
 References: <20180810193129.1556-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 3/6] target/arm: Use fp_status_fp16 for
- do_fmpa_zpzzz_h
+Subject: [Qemu-devel] [PATCH 5/6] target/arm: Fix aa64 FCADD and FCMLA decode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +27,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org, alex.bennee@linaro.org, qemu-stable@nongnu.org
+Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org, alex.bennee@linaro.org
 
-This makes float16_muladd correctly use FZ16 not FZ.
+These insns require u=1; failed to include that in the switch
+cases.  This probably happened during one of the rebases just
+before final commit.
 
-Fixes: 6ceabaad110
-Cc: qemu-stable@nongnu.org (3.0.1)
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Fixes: d17b7cdcf4e
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/sve_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/arm/translate-a64.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 5bae600d17..f8434e68f2 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -3398,7 +3398,7 @@ static void do_fmla_zpzzz_h(CPUARMState *env, void *vg, uint32_t desc,
-                 e1 = *(uint16_t *)(vn + H1_2(i)) ^ neg1;
-                 e2 = *(uint16_t *)(vm + H1_2(i));
-                 e3 = *(uint16_t *)(va + H1_2(i)) ^ neg3;
--                r = float16_muladd(e1, e2, e3, 0, &env->vfp.fp_status);
-+                r = float16_muladd(e1, e2, e3, 0, &env->vfp.fp_status_f16);
-                 *(uint16_t *)(vd + H1_2(i)) = r;
-             }
-         } while (i & 63);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 4a0ca8c906..8a24278d79 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11427,12 +11427,12 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
+         }
+         feature = ARM_FEATURE_V8_DOTPROD;
+         break;
+-    case 0x8: /* FCMLA, #0 */
+-    case 0x9: /* FCMLA, #90 */
+-    case 0xa: /* FCMLA, #180 */
+-    case 0xb: /* FCMLA, #270 */
+-    case 0xc: /* FCADD, #90 */
+-    case 0xe: /* FCADD, #270 */
++    case 0x18: /* FCMLA, #0 */
++    case 0x19: /* FCMLA, #90 */
++    case 0x1a: /* FCMLA, #180 */
++    case 0x1b: /* FCMLA, #270 */
++    case 0x1c: /* FCADD, #90 */
++    case 0x1e: /* FCADD, #270 */
+         if (size == 0
+             || (size == 1 && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))
+             || (size == 3 && !is_q)) {
 -- 
 2.17.1
