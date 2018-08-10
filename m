@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fo4eb-0004LA-F4
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:28:22 -0400
+	(envelope-from <olaf@aepfle.de>) id 1fo4ic-0007Qw-Ii
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:32:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fo4ea-0002Pz-AU
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:28:21 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 10 Aug 2018 11:27:57 +0100
-Message-Id: <20180810102757.21010-3-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180810102757.21010-1-mark.cave-ayland@ilande.co.uk>
-References: <20180810102757.21010-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 2/2] mac_newworld: don't use legacy
- fw_cfg_init_mem() function
+	(envelope-from <olaf@aepfle.de>) id 1fo4ib-0004zE-Pd
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:32:30 -0400
+Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::3]:25312)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1fo4ib-0004xb-8E
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:32:29 -0400
+Date: Fri, 10 Aug 2018 12:32:21 +0200
+From: Olaf Hering <olaf@aepfle.de>
+Message-ID: <20180810123221.785ae741.olaf@aepfle.de>
+In-Reply-To: <840c9f90-3299-e2e5-63b6-5d368d15da5c@redhat.com>
+References: <20180809141403.11296-1-olaf@aepfle.de>
+	<20180809162403.32c53c50.olaf@aepfle.de>
+	<30203041-c944-1a12-d983-9735756dc334@redhat.com>
+	<20180809163816.092a7c8c.olaf@aepfle.de>
+	<a75c67d5-816d-a603-b7bb-12a28f034fb1@redhat.com>
+	<20180809165549.5c92d5f4.olaf@aepfle.de>
+	<dba2887e-a59c-d05e-1642-b22623199cc5@redhat.com>
+	<840c9f90-3299-e2e5-63b6-5d368d15da5c@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/apsAM8LnJ/2DCrRmJ9qezef";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v1] exec: handle NULL pointer in
+ flatview_read_continue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,38 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Instead initialise the device via qdev to allow us to set device properties
-directly as required.
+--Sig_/apsAM8LnJ/2DCrRmJ9qezef
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/ppc/mac_newworld.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+Am Fri, 10 Aug 2018 12:25:09 +0200
+schrieb Paolo Bonzini <pbonzini@redhat.com>:
 
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 2ca294664b..a6b95f024c 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -454,7 +454,17 @@ static void ppc_core99_init(MachineState *machine)
-     pmac_format_nvram_partition(nvr, 0x2000);
-     /* No PCI init: the BIOS will do it */
- 
--    fw_cfg = fw_cfg_init_mem(CFG_ADDR, CFG_ADDR + 2);
-+    dev = qdev_create(NULL, TYPE_FW_CFG_MEM);
-+    fw_cfg = FW_CFG(dev);
-+    qdev_prop_set_uint32(dev, "data_width", 1);
-+    qdev_prop_set_bit(dev, "dma_enabled", false);
-+    object_property_add_child(OBJECT(qdev_get_machine()), TYPE_FW_CFG,
-+                              OBJECT(fw_cfg), NULL);
-+    qdev_init_nofail(dev);
-+    s = SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(s, 0, CFG_ADDR);
-+    sysbus_mmio_map(s, 1, CFG_ADDR + 2);
-+
-     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
-     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
--- 
-2.11.0
+> There are many more callers of qemu_ram_ptr_length, and none of them chec=
+k the result.
+
+So you mean that function must not return NULL?
+Or should the caller check for the result?
+
+Olaf
+
+--Sig_/apsAM8LnJ/2DCrRmJ9qezef
+Content-Type: application/pgp-signature
+Content-Description: Digitale Signatur von OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCW21ptQAKCRBdQqD6ppg2
+fnfdAKDHuCHqGn+Y4J22VAb3YUQUWa/TuACg5104fTHv8f9ok8+u20D18qxlgFg=
+=yDHu
+-----END PGP SIGNATURE-----
+
+--Sig_/apsAM8LnJ/2DCrRmJ9qezef--
