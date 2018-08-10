@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fo8ae-00067V-MI
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:40:35 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fo8jp-0002GH-L2
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:50:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fo8aa-0007UY-Dk
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:40:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59288 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fo8aa-0007Tx-6q
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:40:28 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-22-armbru@redhat.com>
-	<1f889c18-c795-85e3-3ed1-001247403a1d@redhat.com>
-Date: Fri, 10 Aug 2018 16:40:25 +0200
-In-Reply-To: <1f889c18-c795-85e3-3ed1-001247403a1d@redhat.com> (Eric Blake's
-	message of "Thu, 9 Aug 2018 17:16:48 -0500")
-Message-ID: <87y3dejndy.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fo8jm-0007xu-Ho
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:50:01 -0400
+Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:39425)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fo8jm-0007xU-BY
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:49:58 -0400
+Received: by mail-ua1-x943.google.com with SMTP id g18-v6so2115084uam.6
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 07:49:58 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1533574847-19294-11-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c9ac1c0d-e003-fdf2-c45c-b09177cf033f@amsat.org>
+Date: Fri, 10 Aug 2018 11:49:50 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 21/56] json: Reject invalid UTF-8 sequences
+In-Reply-To: <1533574847-19294-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 10/80] elf: Remove duplicate
+ preprocessor constant definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,134 +36,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
+On 08/06/2018 01:59 PM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> Remove duplicate preprocessor constant definition for EF_MIPS_ARCH.
+> 
+> The duplicate was introduced in commit 45506bdd. It placed the
+> constant EF_MIPS_ARCH in a better place, however it did not remove
+> the original. This patch removes the original occurence.
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-> On 08/08/2018 07:02 AM, Markus Armbruster wrote:
->> We reject bytes that can't occur in valid UTF-8 (\xC0..\xC1,
->> \xF5..\xFF in the lexer.  That's insufficient; there's plenty of
->> invalid UTF-8 not containing these bytes, as demonstrated by
->> check-qjson:
->>
->> * Malformed sequences
->>
->>    - Unexpected continuation bytes
->>
->>    - Missing continuation bytes after start bytes other than
->>      \xC0..\xC1, \xF5..\xFD.
->>
->> * Overlong sequences with start bytes other than \xC0..\xC1,
->>    \xF5..\xFD.
->>
->> * Invalid code points
->>
->> Fixing this in the lexer would be bothersome.  Fixing it in the parser
->> is straightforward, so do that.
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->
->> @@ -193,12 +198,15 @@ static QString *qstring_from_escaped_str(JSONParserContext *ctxt,
->>                   goto out;
->>               }
->>           } else {
->> -            char dummy[2];
->> -
->> -            dummy[0] = *ptr;
->> -            dummy[1] = 0;
->> -
->> -            qstring_append(str, dummy);
->> +            cp = mod_utf8_codepoint(ptr, 6, &end);
->
-> Why are you hard-coding 6 here, rather than computing min(6,
-> strchr(ptr,0)-ptr)?  If the user passes an invalid sequence at the end
-> of the string, can we end up making mod_utf8_codepoint() read beyond
-> the end of our string?  Would it be better to just always pass the
-> remaining string length (mod_utf8_codepoint() only cares about
-> stopping short of 6 bytes, but never reads beyond there even if you
-> pass a larger number)?
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-mod_utf8_codepoint() never reads beyond '\0'.  The second parameter
-exists only so you can further limit reads.  I like to provide that
-capability, because it sometimes saves a silly substring copy.
-
-
->> +            if (cp <= 0) {
->> +                parse_error(ctxt, token, "invalid UTF-8 sequence in string");
->> +                goto out;
->> +            }
->> +            ptr = end - 1;
->> +            len = mod_utf8_encode(utf8_buf, sizeof(utf8_buf), cp);
->> +            assert(len >= 0);
->> +            qstring_append(str, utf8_buf);
->>           }
->>       }
->>   
->
->> +++ b/util/unicode.c
->> @@ -13,6 +13,21 @@
->>   #include "qemu/osdep.h"
->>   #include "qemu/unicode.h"
->>   
->
->> +ssize_t mod_utf8_encode(char buf[], size_t bufsz, int codepoint)
->> +{
->> +    assert(bufsz >= 5);
->> +
->> +    if (!is_valid_codepoint(codepoint)) {
->> +        return -1;
->> +    }
->> +
->> +    if (codepoint > 0 && codepoint <= 0x7F) {
->> +        buf[0] = codepoint & 0x7F;
->
-> Dead use of binary &. But acceptable for symmetry with the other code
-> branches.
-
-Exactly as dead as ...
-
->> +        buf[1] = 0;
->> +        return 1;
->> +    }
->> +    if (codepoint <= 0x7FF) {
->> +        buf[0] = 0xC0 | ((codepoint >> 6) & 0x1F);
-
-... this one, and ...
-
->> +        buf[1] = 0x80 | (codepoint & 0x3F);
->> +        buf[2] = 0;
->> +        return 2;
->> +    }
->> +    if (codepoint <= 0xFFFF) {
->> +        buf[0] = 0xE0 | ((codepoint >> 12) & 0x0F);
-
-... this one, and ...
-
->> +        buf[1] = 0x80 | ((codepoint >> 6) & 0x3F);
->> +        buf[2] = 0x80 | (codepoint & 0x3F);
->> +        buf[3] = 0;
->> +        return 3;
->> +    }
->> +    buf[0] = 0xF0 | ((codepoint >> 18) & 0x07);
-
-... even this one.
-
-The last one only because is_valid_codepoint() rejects codepoints >
-0x10FFFFu, which is admittedly a non-local argument.
-
-I'm debating whether to keep or drop the redundant masking.  Got a
-preference?
-
->> +    buf[1] = 0x80 | ((codepoint >> 12) & 0x3F);
->> +    buf[2] = 0x80 | ((codepoint >> 6) & 0x3F);
->> +    buf[3] = 0x80 | (codepoint & 0x3F);
->> +    buf[4] = 0;
->> +    return 4;
->> +}
->>
->
-> Overall, looks nice.
-
-Thanks!
+> ---
+>  include/elf.h | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/include/elf.h b/include/elf.h
+> index 934dbbd..60f6cbe 100644
+> --- a/include/elf.h
+> +++ b/include/elf.h
+> @@ -61,7 +61,6 @@ typedef int64_t  Elf64_Sxword;
+>  #define EF_MIPS_ABI		0x0000f000
+>  #define EF_MIPS_FP64      0x00000200
+>  #define EF_MIPS_NAN2008   0x00000400
+> -#define EF_MIPS_ARCH      0xf0000000
+>  
+>  /* These constants define the different elf file types */
+>  #define ET_NONE   0
+> 
