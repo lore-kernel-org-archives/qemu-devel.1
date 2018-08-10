@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38378)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fnzxJ-0005Tu-I2
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:27:22 -0400
+	id 1fnzzF-0006DJ-Se
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fnzxG-0005Rq-BN
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:27:21 -0400
+	id 1fnzzC-0007Wm-M7
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:29:21 -0400
+Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:45642)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fnzzC-0007VV-Hp
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:29:18 -0400
+Received: by mail-ua1-x943.google.com with SMTP id k8-v6so685908uaq.12
+	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 22:29:18 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
+References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1533574847-19294-4-git-send-email-aleksandar.markovic@rt-rk.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20180809130115.28951-1-peter.maydell@linaro.org>
-	<20180809130115.28951-11-peter.maydell@linaro.org>
-	<b16ded66-e814-43f4-389f-65e697660740@amsat.org>
-Message-ID: <fd82c9db-1ecd-a833-8eab-0060647c2220@amsat.org>
-Date: Fri, 10 Aug 2018 02:27:13 -0300
+Message-ID: <88756318-d4bc-026d-025c-710c42711397@amsat.org>
+Date: Fri, 10 Aug 2018 02:29:11 -0300
 MIME-Version: 1.0
-In-Reply-To: <b16ded66-e814-43f4-389f-65e697660740@amsat.org>
+In-Reply-To: <1533574847-19294-4-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 10/16] hw/dma/pl080: Allow use
- as embedded-struct device
+Subject: Re: [Qemu-devel] [PATCH v7 03/80] target/mips: Mark switch
+ fallthroughs with interpretable comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,134 +36,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
 
-On 08/10/2018 02:18 AM, Philippe Mathieu-Daudé wrote:
-> On 08/09/2018 10:01 AM, Peter Maydell wrote:
->> Create a new include file for the pl081's device struct,
->> type macros, etc, so that it can be instantiated using
->> the "embedded struct" coding style.
-[...]
->> +#ifndef HW_DMA_PL080_H
->> +#define HW_DMA_PL080_H
->> +
->> +#include "hw/sysbus.h"
->> +
->> +#define PL080_MAX_CHANNELS 8
->> +
->> +typedef struct {
->> +    uint32_t src;
->> +    uint32_t dest;
->> +    uint32_t lli;
->> +    uint32_t ctrl;
->> +    uint32_t conf;
->> +} pl080_channel;
->> +
->> +#define TYPE_PL080 "pl080"
->> +#define TYPE_PL081 "pl081"
->> +#define PL080(obj) OBJECT_CHECK(PL080State, (obj), TYPE_PL080)
+On 08/06/2018 01:59 PM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> The PL080() macro can stay in the source.
+> Mark switch fallthroughs with comments, in cases fallthroughs
+> are intentional.
+> 
+> The comments "/* fall through */" are interpreted by compilers and
+> other tools, and they will not issue warnings in such cases. For gcc,
+> the warning is turnend on by -Wimplicit-fallthrough. With this patch,
+> there will be no such warnings in target/mips directory. If such
+> warning appears in future, it should be checked if it is intentional,
+> and, if yes, marked with a comment similar to those from this patch.
+> 
+> The comment must be just before next "case", otherwise gcc won't
+> understand it.
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 
-Oh this respect the "coding style" indeed.
-Can you add the PL081() companion? Thanks.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+> ---
+>  target/mips/translate.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> Regardless:
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 051dda5..e32fd5f 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -14255,8 +14255,8 @@ static void decode_micromips32_opc(CPUMIPSState *env, DisasContext *ctx)
+>          case SDP:
+>              check_insn(ctx, ISA_MIPS3);
+>              check_mips_64(ctx);
+> -            /* Fallthrough */
+>  #endif
+> +            /* fall through */
+>          case LWP:
+>          case SWP:
+>              gen_ldst_pair(ctx, minor, rt, rs, SIMM(ctx->opcode, 0, 12));
+> @@ -14266,8 +14266,8 @@ static void decode_micromips32_opc(CPUMIPSState *env, DisasContext *ctx)
+>          case SDM:
+>              check_insn(ctx, ISA_MIPS3);
+>              check_mips_64(ctx);
+> -            /* Fallthrough */
+>  #endif
+> +            /* fall through */
+>          case LWM32:
+>          case SWM32:
+>              gen_ldst_multiple(ctx, minor, rt, rs, SIMM(ctx->opcode, 0, 12));
+> @@ -20023,6 +20023,7 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+>          case OPC_MTHC1:
+>              check_cp1_enabled(ctx);
+>              check_insn(ctx, ISA_MIPS32R2);
+> +            /* fall through */
+>          case OPC_MFC1:
+>          case OPC_CFC1:
+>          case OPC_MTC1:
 > 
->> +
->> +typedef struct PL080State {
->> +    SysBusDevice parent_obj;
->> +
->> +    MemoryRegion iomem;
->> +    uint8_t tc_int;
->> +    uint8_t tc_mask;
->> +    uint8_t err_int;
->> +    uint8_t err_mask;
->> +    uint32_t conf;
->> +    uint32_t sync;
->> +    uint32_t req_single;
->> +    uint32_t req_burst;
->> +    pl080_channel chan[PL080_MAX_CHANNELS];
->> +    int nchannels;
->> +    /* Flag to avoid recursive DMA invocations.  */
->> +    int running;
->> +    qemu_irq irq;
->> +} PL080State;
->> +
->> +#endif
->> diff --git a/hw/dma/pl080.c b/hw/dma/pl080.c
->> index 7724c93b8f2..0f79c2d8a6c 100644
->> --- a/hw/dma/pl080.c
->> +++ b/hw/dma/pl080.c
->> @@ -11,8 +11,8 @@
->>  #include "hw/sysbus.h"
->>  #include "exec/address-spaces.h"
->>  #include "qemu/log.h"
->> +#include "hw/dma/pl080.h"
->>  
->> -#define PL080_MAX_CHANNELS 8
->>  #define PL080_CONF_E    0x1
->>  #define PL080_CONF_M1   0x2
->>  #define PL080_CONF_M2   0x4
->> @@ -30,36 +30,6 @@
->>  #define PL080_CCTRL_D   0x02000000
->>  #define PL080_CCTRL_S   0x01000000
->>  
->> -typedef struct {
->> -    uint32_t src;
->> -    uint32_t dest;
->> -    uint32_t lli;
->> -    uint32_t ctrl;
->> -    uint32_t conf;
->> -} pl080_channel;
->> -
->> -#define TYPE_PL080 "pl080"
->> -#define PL080(obj) OBJECT_CHECK(PL080State, (obj), TYPE_PL080)
->> -
->> -typedef struct PL080State {
->> -    SysBusDevice parent_obj;
->> -
->> -    MemoryRegion iomem;
->> -    uint8_t tc_int;
->> -    uint8_t tc_mask;
->> -    uint8_t err_int;
->> -    uint8_t err_mask;
->> -    uint32_t conf;
->> -    uint32_t sync;
->> -    uint32_t req_single;
->> -    uint32_t req_burst;
->> -    pl080_channel chan[PL080_MAX_CHANNELS];
->> -    int nchannels;
->> -    /* Flag to avoid recursive DMA invocations.  */
->> -    int running;
->> -    qemu_irq irq;
->> -} PL080State;
->> -
->>  static const VMStateDescription vmstate_pl080_channel = {
->>      .name = "pl080_channel",
->>      .version_id = 1,
->> @@ -408,7 +378,7 @@ static const TypeInfo pl080_info = {
->>  };
->>  
->>  static const TypeInfo pl081_info = {
->> -    .name          = "pl081",
->> +    .name          = TYPE_PL081,
->>      .parent        = TYPE_PL080,
->>      .instance_init = pl081_init,
->>  };
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 5d1a3645dd4..92ccca716c6 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -444,6 +444,7 @@ F: hw/char/pl011.c
->>  F: include/hw/char/pl011.h
->>  F: hw/display/pl110*
->>  F: hw/dma/pl080.c
->> +F: include/hw/dma/pl080.h
->>  F: hw/dma/pl330.c
->>  F: hw/gpio/pl061.c
->>  F: hw/input/pl050.c
->>
