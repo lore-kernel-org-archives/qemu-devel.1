@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1fo084-0002YL-1o
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:38:28 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1fo08F-0002hO-NT
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:38:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1fo080-0000io-U6
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:38:28 -0400
-From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Fri, 10 Aug 2018 07:37:12 +0200
-Message-Id: <20180810053712.6587-1-hpoussin@reactos.org>
+	(envelope-from <hpoussin@reactos.org>) id 1fo08E-0000qO-Ql
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:38:39 -0400
+References: <20180809204010.3579-1-hpoussin@reactos.org>
+	<20180809204010.3579-2-hpoussin@reactos.org>
+	<20180810010439.GC4079@umbus>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <2cb987ea-9d45-ced2-83d5-eadc7821d41b@reactos.org>
+Date: Fri, 10 Aug 2018 07:38:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180810010439.GC4079@umbus>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] hw/ppc: on 40p machine,
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/ppc: on 40p machine,
  change default firmware to OpenBIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,29 +26,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
-Use it, instead of relying on an unmaintained and very limited firmware.
+Le 10/08/2018 à 03:04, David Gibson a écrit :
+> On Thu, Aug 09, 2018 at 10:40:09PM +0200, Hervé Poussineau wrote:
+>> OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
+>> Use it, instead of relying on the presence of a proprietary
+>> firmware.
+> 
+> Uh..  openhackware might be, well, a hack, but I don't think it's
+> propietary.  Replacing it with openbios might well be a good idea, but
+> we want an accurrate reason for doing so.
 
-Signed-off-by: HervÃ© Poussineau <hpoussin@reactos.org>
----
- hw/ppc/prep.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Oops, you're right. That's what happens when you try to change/expand
+your commit messages just before sending the patch. I will resend.
 
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index 3401570d98..1558855247 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -736,7 +736,7 @@ static void ibm_40p_init(MachineState *machine)
-     /* PCI host */
-     dev = qdev_create(NULL, "raven-pcihost");
-     if (!bios_name) {
--        bios_name = BIOS_FILENAME;
-+        bios_name = "openbios-ppc";
-     }
-     qdev_prop_set_string(dev, "bios-name", bios_name);
-     qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
--- 
-2.11.0
+> 
+>> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+>> ---
+>>   hw/ppc/prep.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+>> index 3401570d98..1558855247 100644
+>> --- a/hw/ppc/prep.c
+>> +++ b/hw/ppc/prep.c
+>> @@ -736,7 +736,7 @@ static void ibm_40p_init(MachineState *machine)
+>>       /* PCI host */
+>>       dev = qdev_create(NULL, "raven-pcihost");
+>>       if (!bios_name) {
+>> -        bios_name = BIOS_FILENAME;
+>> +        bios_name = "openbios-ppc";
+>>       }
+>>       qdev_prop_set_string(dev, "bios-name", bios_name);
+>>       qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
+> 
