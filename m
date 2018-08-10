@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fo3Ou-0002bx-L3
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:08:05 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fo3PJ-0002nr-0c
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:08:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fo3Ot-0002kG-4M
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:08:04 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:41723)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fo3Os-0002jp-UI
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:08:03 -0400
-Received: by mail-oi0-x243.google.com with SMTP id k12-v6so14638918oiw.8
-	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 02:08:02 -0700 (PDT)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fo3PF-0003Hq-RZ
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:08:28 -0400
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:43466)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1fo3PF-0003D4-DF
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:08:25 -0400
+Date: Fri, 10 Aug 2018 11:08:21 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20180810090821.l6r4vlisx7htbvv3@var.youpi.perso.aquilenet.fr>
+References: <20180807114501.12370-1-peter.maydell@linaro.org>
+	<20180809111233.GA2619@work-vm>
+	<CAFEAcA-+5xFDMuvK2W8v=Ufs2E1K4y9onZY_4x6RMYbHLFpkxA@mail.gmail.com>
+	<20180809113204.GB2618@work-vm>
+	<20180809215421.hexdewc3igklwvob@var.youpi.perso.aquilenet.fr>
+	<CAFEAcA9hquE5jck7=-c6Xd36uDfm7Z_Kw39P1vCkZRqE1M4EDQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87zhxuu4ev.fsf@dusky.pond.sub.org>
-References: <20180809160011.17225-1-peter.maydell@linaro.org>
-	<87zhxuu4ev.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Aug 2018 10:07:41 +0100
-Message-ID: <CAFEAcA_N_Btro-jaJXAiWhS9gD1hRkY=y5n0Q+J_k0=sh7TmJA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] scripts/checkpatch.pl: Enforce multiline
- comment syntax
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEAcA9hquE5jck7=-c6Xd36uDfm7Z_Kw39P1vCkZRqE1M4EDQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0] slirp: Correct size check in
+ m_inc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +34,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, Prasad J Pandit <pjp@fedoraproject.org>, liqsub1 <liqsub1@163.com>
 
-On 10 August 2018 at 07:22, Markus Armbruster <armbru@redhat.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
->> We now require Linux-kernel-style multiline comments:
->>     /*
->>      * line one
->>      * line two
->>      */
->>
->> Enforce this in checkpatch.pl, by backporting the relevant
->> parts of the Linux kernel's checkpatch.pl. (The only changes
->> needed are that Linux's checkpatch.pl WARN() function takes
->> an extra argument that ours does not.)
->
-> Really?  [*]
+Peter Maydell, le ven. 10 août 2018 10:02:37 +0100, a ecrit:
+> (a) you should add a comment describing what 'gapsize'
+> is, ie that there may be a gap between the in-use data and the
+> start of the allocated buffer, and
+> (b) m_inc() should change its variable name to match.
 
-Yes; the parts that I have taken from checkpatch.pl
-are only modified by adjusting the WARN() function calls.
+Right, I have done so in my tree.  Do you prefer to have it pushed for
+qemu 3.0?
 
->> The kernel's checkpatch does not enforce "leading /* on
->> a line of its own, so that part is unique to QEMU's checkpatch.
->>
->> Sample warning output:
->>
->> WARNING: Block comments use a leading /* on a separate line
->> #34: FILE: hw/intc/arm_gicv3_common.c:39:
->> +    /* Older versions of QEMU had a bug in the handling of state save/restore
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> I'm still not used to the leeading-/*-on-it's-own style,
->> so having checkpatch catch my lapses is handy...
->
-> Yes, please!
->
->> I used WARN level severity mostly because Linux does.
->> ---
->>  scripts/checkpatch.pl | 48 +++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 48 insertions(+)
->>
->> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
->> index 42e1c50dd80..18bc3c59c85 100755
->> --- a/scripts/checkpatch.pl
->> +++ b/scripts/checkpatch.pl
->> @@ -1566,6 +1566,54 @@ sub process {
->>  # check we are in a valid C source file if not then ignore this hunk
->>               next if ($realfile !~ /\.(h|c|cpp)$/);
->>
->> +# Block comment styles
->> +
->> +             # Block comments use /* on a line of its own
->> +             if ($rawline !~ m@^\+.*/\*.*\*/[ \t]*$@ &&      #inline /*...*/
->> +                 $rawline =~ m@^\+.*/\*\*?[ \t]*.+[ \t]*$@) { # /* or /** non-blank
->> +                     WARN("Block comments use a leading /* on a separate line\n" . $herecurr);
->> +             }
->> +
-
-This is the bit that is "unique to QEMU's checkpatch",
-per the commit message.
-
-
-> [*] The kernel's has
->
->    # Networking with an initial /*
->                    if ($realfile =~ m@^(drivers/net/|net/)@ &&
->                        $prevrawline =~ /^\+[ \t]*\/\*[ \t]*$/ &&
->                        $rawline =~ /^\+[ \t]*\*/ &&
->                        $realline > 2) {
->                            WARN("NETWORKING_BLOCK_COMMENT_STYLE",
->                                 "networking block comments don't use an empty /* line, use /* Comment...\n" . $hereprev);
->                    }
->
-> which makes no sense for us.
-
-This is a part which I did not take from kernel checkpatch;
-it is not a "relevant part", per the commit message.
-
-> With a corrected commit message:
-
-The commit message still makes sense to me.
-
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-thanks
--- PMM
+Samuel
