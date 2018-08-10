@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fo0tR-0006jh-Rd
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 02:27:26 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fo0tV-0006mX-0f
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 02:27:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fo0tP-0001bM-8S
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 02:27:25 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fo0tS-0001db-Cp
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 02:27:29 -0400
 From: Leonid Bloch <lbloch@janustech.com>
-Date: Fri, 10 Aug 2018 09:26:40 +0300
-Message-Id: <20180810062647.23211-3-lbloch@janustech.com>
+Date: Fri, 10 Aug 2018 09:26:41 +0300
+Message-Id: <20180810062647.23211-4-lbloch@janustech.com>
 In-Reply-To: <20180810062647.23211-1-lbloch@janustech.com>
 References: <20180810062647.23211-1-lbloch@janustech.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v7 2/9] qcow2: Cosmetic changes
+Subject: [Qemu-devel] [PATCH v7 3/9] qcow2: Make sizes more humanly readable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +24,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>
 
-Some refactoring for better readability is done here.
-
 Signed-off-by: Leonid Bloch <lbloch@janustech.com>
 ---
- block/qcow2.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ block/qcow2.c | 2 +-
+ block/qcow2.h | 9 +++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/block/qcow2.c b/block/qcow2.c
-index ec9e6238a0..3f4abc394e 100644
+index 3f4abc394e..7a2d7a1d48 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -790,8 +790,9 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-     *refcount_cache_size = qemu_opt_get_size(opts,
-                                              QCOW2_OPT_REFCOUNT_CACHE_SIZE, 0);
- 
--    *l2_cache_entry_size = qemu_opt_get_size(
--        opts, QCOW2_OPT_L2_CACHE_ENTRY_SIZE, s->cluster_size);
-+    *l2_cache_entry_size = qemu_opt_get_size(opts,
-+                                             QCOW2_OPT_L2_CACHE_ENTRY_SIZE,
-+                                             s->cluster_size);
- 
-     if (combined_cache_size_set) {
-         if (l2_cache_size_set && refcount_cache_size_set) {
-@@ -823,8 +824,8 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-                 *l2_cache_size = max_l2_cache;
-                 *refcount_cache_size = combined_cache_size - *l2_cache_size;
-             } else {
--                *refcount_cache_size =
--                    MIN(combined_cache_size, min_refcount_cache);
-+                *refcount_cache_size = MIN(combined_cache_size,
-+                                           min_refcount_cache);
-                 *l2_cache_size = combined_cache_size - *refcount_cache_size;
-             }
+@@ -831,7 +831,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
          }
+     } else {
+         if (!l2_cache_size_set) {
+-            *l2_cache_size = MAX(DEFAULT_L2_CACHE_BYTE_SIZE,
++            *l2_cache_size = MAX(DEFAULT_L2_CACHE_SIZE,
+                                  (uint64_t)DEFAULT_L2_CACHE_CLUSTERS
+                                  * s->cluster_size);
+         }
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 81b844e936..39e1b279f8 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -27,6 +27,7 @@
+ 
+ #include "crypto/block.h"
+ #include "qemu/coroutine.h"
++#include "qemu/units.h"
+ 
+ //#define DEBUG_ALLOC
+ //#define DEBUG_ALLOC2
+@@ -43,11 +44,11 @@
+ 
+ /* 8 MB refcount table is enough for 2 PB images at 64k cluster size
+  * (128 GB for 512 byte clusters, 2 EB for 2 MB clusters) */
+-#define QCOW_MAX_REFTABLE_SIZE 0x800000
++#define QCOW_MAX_REFTABLE_SIZE (8 * MiB)
+ 
+ /* 32 MB L1 table is enough for 2 PB images at 64k cluster size
+  * (128 GB for 512 byte clusters, 2 EB for 2 MB clusters) */
+-#define QCOW_MAX_L1_SIZE 0x2000000
++#define QCOW_MAX_L1_SIZE (32 * MiB)
+ 
+ /* Allow for an average of 1k per snapshot table entry, should be plenty of
+  * space for snapshot names and IDs */
+@@ -75,9 +76,9 @@
+ 
+ /* Whichever is more */
+ #define DEFAULT_L2_CACHE_CLUSTERS 8 /* clusters */
+-#define DEFAULT_L2_CACHE_BYTE_SIZE 1048576 /* bytes */
++#define DEFAULT_L2_CACHE_SIZE (1 * MiB)
+ 
+-#define DEFAULT_CLUSTER_SIZE 65536
++#define DEFAULT_CLUSTER_SIZE (64 * KiB)
+ 
+ 
+ #define QCOW2_OPT_LAZY_REFCOUNTS "lazy-refcounts"
 -- 
 2.17.1
