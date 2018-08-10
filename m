@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1foDHr-00025M-Fa
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:41:29 -0400
+	(envelope-from <laurent@vivier.eu>) id 1foDJr-0003Tk-LU
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:43:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1foDHo-0004ar-Df
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:41:27 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:46680)
+	(envelope-from <laurent@vivier.eu>) id 1foDJo-0006LS-IJ
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:43:31 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:36998)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1foDHo-0004Zn-3Q
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:41:24 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1foDJo-0006Kf-7V
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 15:43:28 -0400
 References: <20180810185321.20017-1-laurent@vivier.eu>
-	<20180810185321.20017-2-laurent@vivier.eu>
-	<c000bae3-1986-1062-0dbc-a8d2feb0820e@linaro.org>
+	<91c3c3ac-83f1-18e3-2fc2-c25d329c5414@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <8e73a927-9e25-a1c8-1d7b-233a8bff26f0@vivier.eu>
-Date: Fri, 10 Aug 2018 21:40:32 +0200
+Message-ID: <347efd7c-80e8-daec-e2ca-c304182ed13a@vivier.eu>
+Date: Fri, 10 Aug 2018 21:43:09 +0200
 MIME-Version: 1.0
-In-Reply-To: <c000bae3-1986-1062-0dbc-a8d2feb0820e@linaro.org>
+In-Reply-To: <91c3c3ac-83f1-18e3-2fc2-c25d329c5414@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] linux-user: fix 32bit g2h()/h2g()
+Subject: Re: [Qemu-devel] [PATCH 1/2] linux-user: cleanup msync output in
+ strace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +32,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>
 
-Le 10/08/2018 à 21:30, Richard Henderson a écrit :
+Le 10/08/2018 à 21:28, Richard Henderson a écrit :
 > On 08/10/2018 11:53 AM, Laurent Vivier wrote:
->> sparc32plus has 64bit long type but only 32bit virtual address space.
->>
->> For instance, "apt-get upgrade" failed because of a mmap()/msync()
->> sequence.
->>
->> mmap() returned 0xff252000 but msync() used g2h(0xffffffffff252000)
->> to find the host address. The "(target_ulong)" in g2h() doesn't fix the
->> address because it is 64bit long.
->>
->> This patch introduces a "target_ptr" that is set to uint32_t
->> if the virtual address space is addressed using 32bit in the linux-user
->> case. It stays set to target_ulong with softmmu case.
+>> -{ TARGET_NR_msync, "msync" , NULL, NULL, NULL },
+>> +{ TARGET_NR_msync, "msync" , "%s(%#x,%d,%x)", NULL, NULL },
 > 
-> I would prefer the name "abi_ptr", since the full 64-bits of target_ulong are
-> still used for any actual dereferences.
+> Would you mind having a look at my linux-user reorg proposal?
+> It would make this change redundant.
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg02935.html
+> 
 
-I can, I have no preference for that.
-
-The abi_XXX types have an alignment attribute, while the target_XXX
-don't. Do you think I should add it to the abi_ptr type?
+Yes, I know your series. I posted this patch because it helped me to
+debug the patch 2/2. I can remove it for this series if you prefer.
 
 Thanks,
 Laurent
