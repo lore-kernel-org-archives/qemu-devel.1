@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fo9AO-0008Kr-NL
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 11:17:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1fo9EI-00032z-Ao
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 11:21:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fo9AN-00076m-JP
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 11:17:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50902 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fo9EF-0004JZ-5I
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 11:21:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56782 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fo9AN-00075u-DV
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 11:17:27 -0400
-References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
-	<1533909989-56115-4-git-send-email-robert.hu@linux.intel.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fo9EE-0004I2-Ua
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 11:21:27 -0400
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-22-armbru@redhat.com>
+	<1f889c18-c795-85e3-3ed1-001247403a1d@redhat.com>
+	<87y3dejndy.fsf@dusky.pond.sub.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <893de8e8-da77-f6d5-5c0c-534e9999b7f0@redhat.com>
-Date: Fri, 10 Aug 2018 10:17:24 -0500
+Message-ID: <226f2f8f-7c7b-c433-9dd7-6d90b5585920@redhat.com>
+Date: Fri, 10 Aug 2018 10:21:23 -0500
 MIME-Version: 1.0
-In-Reply-To: <1533909989-56115-4-git-send-email-robert.hu@linux.intel.com>
+In-Reply-To: <87y3dejndy.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] Change other funcitons referring to
- feature_word_info[]
+Subject: Re: [Qemu-devel] [PATCH 21/56] json: Reject invalid UTF-8 sequences
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com
-Cc: robert.hu@intel.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 08/10/2018 09:06 AM, Robert Hoo wrote:
+On 08/10/2018 09:40 AM, Markus Armbruster wrote:
 
-In the subject: s/funcitons/functions/
-
-Also, it may be worth using a topic prefix (most of our commit messages 
-resemble:
-
-topic: Description of patch
-
-to make it easier to spot patches by topic).
-
-> Add an util function feature_word_description(), which help construct the string
-
-s/an util/a util/
-s/help/helps/
-
-> describing the feature word (both CPUID and MSR types).
+>>> +            cp = mod_utf8_codepoint(ptr, 6, &end);
+>>
+>> Why are you hard-coding 6 here, rather than computing min(6,
+>> strchr(ptr,0)-ptr)?  If the user passes an invalid sequence at the end
+>> of the string, can we end up making mod_utf8_codepoint() read beyond
+>> the end of our string?  Would it be better to just always pass the
+>> remaining string length (mod_utf8_codepoint() only cares about
+>> stopping short of 6 bytes, but never reads beyond there even if you
+>> pass a larger number)?
 > 
-> report_unavailable_features(): add MSR_FEATURE_WORD type support.
-> x86_cpu_get_feature_words(): limit to CPUID_FEATURE_WORD only.
-> x86_cpu_get_supported_feature_word(): add MSR_FEATURE_WORD type support.
-> x86_cpu_adjust_feat_level(): assert the requested feature must be
-> CPUID_FEATURE_WORD type.
+> mod_utf8_codepoint() never reads beyond '\0'.  The second parameter
+> exists only so you can further limit reads.  I like to provide that
+> capability, because it sometimes saves a silly substring copy.
+
+Okay. Perhaps the comments on mod_utf8_codepoint() could make that more 
+clear that the contract is not violated (I didn't spot it without a 
+close re-read of the code, prompted by your reply).  But that's possibly 
+a separate patch.
+
+
+>>> +    if (codepoint > 0 && codepoint <= 0x7F) {
+>>> +        buf[0] = codepoint & 0x7F;
+>>
+>> Dead use of binary &. But acceptable for symmetry with the other code
+>> branches.
 > 
-> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> ---
->   target/i386/cpu.c | 77 +++++++++++++++++++++++++++++++++++++++++--------------
->   1 file changed, 58 insertions(+), 19 deletions(-)
+> Exactly as dead as ...
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index f7c70d9..21ed599 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -3024,21 +3024,51 @@ static const TypeInfo host_x86_cpu_type_info = {
->   
->   #endif
->   
-> +/*
-> +*caller should have input str no less than 64 byte length.
-> +*/
-> +#define FEATURE_WORD_DESCPTION_LEN 64
 
-s/DESCPTION/DESCRIPTION/
+>>> +    buf[0] = 0xF0 | ((codepoint >> 18) & 0x07);
+> 
+> ... even this one.
+> 
+> The last one only because is_valid_codepoint() rejects codepoints >
+> 0x10FFFFu, which is admittedly a non-local argument.
+> 
+> I'm debating whether to keep or drop the redundant masking.  Got a
+> preference?
 
-> +static int feature_word_description(char str[], FeatureWordInfo *f,
-> +                                            uint32_t bit)
-> +{
-
-Prone to buffer overflow if the caller doesn't pass in the length. 
-Would it be better to just g_strdup_printf() into a malloc'd result 
-instead of trying to snprintf()'ing into a buffer that you hope the 
-caller sized large enough?
-
-> +    int ret;
-> +
-> +    assert(f->type == CPUID_FEATURE_WORD ||
-> +        f->type == MSR_FEATURE_WORD);
-> +    switch (f->type) {
-> +    case CPUID_FEATURE_WORD:
-> +        {
-> +            const char *reg = get_register_name_32(f->cpuid.reg);
-> +            assert(reg);
-> +            ret = snprintf(str, FEATURE_WORD_DESCPTION_LEN,
-> +                "CPUID.%02XH:%s%s%s [bit %d]",
-> +                f->cpuid.eax, reg,
-> +                f->feat_names[bit] ? "." : "",
-> +                f->feat_names[bit] ? f->feat_names[bit] : "", bit);
-> +            break;
-> +        }
-> +    case MSR_FEATURE_WORD:
-> +        ret = snprintf(str, FEATURE_WORD_DESCPTION_LEN,
-> +            "MSR(%xH).%s [bit %d]",
-> +            f->msr.index,
-> +            f->feat_names[bit] ? f->feat_names[bit] : "", bit);
-> +        break;
-> +    }
+No strong preference. A compiler with good range propagation during 
+optimization should be able to eliminate the dead mask from the emitted 
+assembly.
 
 -- 
 Eric Blake, Principal Software Engineer
