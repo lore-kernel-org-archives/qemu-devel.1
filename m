@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fo2Lx-0004hN-CT
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 04:00:58 -0400
+	(envelope-from <i.maximets@samsung.com>) id 1fo2mC-0004uY-1O
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 04:28:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fo2Lt-0007at-G9
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 04:00:57 -0400
-Received: from 11.mo7.mail-out.ovh.net ([87.98.173.157]:57481)
+	(envelope-from <i.maximets@samsung.com>) id 1fo2m7-0001TC-1F
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 04:28:04 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:36271)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fo2Lt-0007Zl-84
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 04:00:53 -0400
-Received: from player728.ha.ovh.net (unknown [10.109.159.222])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id F1C7BC3ED2
-	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 10:00:50 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 10 Aug 2018 10:00:26 +0200
-Message-Id: <20180810080026.19398-1-clg@kaod.org>
+	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
+	id 1fo2m6-0001RP-FG
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 04:27:58 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
+	20180810082755euoutp0279f81a928e1bb1bb6f9100d6761ee742~JeIh4wr_91616516165euoutp02i
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 08:27:55 +0000 (GMT)
+From: Ilya Maximets <i.maximets@samsung.com>
+Date: Fri, 10 Aug 2018 11:28:47 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] spapr_pci: factorize the use of
- SPAPR_MACHINE_GET_CLASS()
+In-Reply-To: <20180810015124-mutt-send-email-mst@kernel.org>
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Message-Id: <20180810082754eucas1p2c5833c9292851a7009d348b00bbe811e~JeIgqEodG2498924989eucas1p2Z@eucas1p2.samsung.com>
+Content-Type: text/plain; charset="utf-8"
+References: <CGME20180809165352eucas1p2359a46f1beb147fdcbd035c28bbd48d9@eucas1p2.samsung.com>
+	<1533833677-27512-1-git-send-email-i.maximets@samsung.com>
+	<20180810015124-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH] virtio: add support for in-order feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +34,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-It should save us some CPU cycles as these routines perform a lot of
-checks.
+On 10.08.2018 01:51, Michael S. Tsirkin wrote:
+> On Thu, Aug 09, 2018 at 07:54:37PM +0300, Ilya Maximets wrote:
+>> New feature bit for in-order feature of the upcoming
+>> virtio 1.1. It's already supported by DPDK vhost-user
+>> and virtio implementations. These changes required to
+>> allow feature negotiation.
+>>
+>> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+>> ---
+>>
+>> I just wanted to test this new feature in DPDK but failed
+>> to found required patch for QEMU side. So, I implemented it.
+>> At least it will be helpful for someone like me, who wants
+>> to evaluate VIRTIO_F_IN_ORDER with DPDK.
+>>
+>>  hw/net/vhost_net.c                             |  1 +
+>>  include/hw/virtio/virtio.h                     | 12 +++++++-----
+>>  include/standard-headers/linux/virtio_config.h |  7 +++++++
+>>  3 files changed, 15 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+>> index e037db6..86879c5 100644
+>> --- a/hw/net/vhost_net.c
+>> +++ b/hw/net/vhost_net.c
+>> @@ -78,6 +78,7 @@ static const int user_feature_bits[] = {
+>>      VIRTIO_NET_F_MRG_RXBUF,
+>>      VIRTIO_NET_F_MTU,
+>>      VIRTIO_F_IOMMU_PLATFORM,
+>> +    VIRTIO_F_IN_ORDER,
+>>  
+>>      /* This bit implies RARP isn't sent by QEMU out of band */
+>>      VIRTIO_NET_F_GUEST_ANNOUNCE,
+>> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+>> index 9c1fa07..a422025 100644
+>> --- a/include/hw/virtio/virtio.h
+>> +++ b/include/hw/virtio/virtio.h
+>> @@ -254,16 +254,18 @@ typedef struct virtio_input_conf virtio_input_conf;
+>>  typedef struct VirtIOSCSIConf VirtIOSCSIConf;
+>>  typedef struct VirtIORNGConf VirtIORNGConf;
+>>  
+>> -#define DEFINE_VIRTIO_COMMON_FEATURES(_state, _field) \
+>> +#define DEFINE_VIRTIO_COMMON_FEATURES(_state, _field)     \
+>>      DEFINE_PROP_BIT64("indirect_desc", _state, _field,    \
+>>                        VIRTIO_RING_F_INDIRECT_DESC, true), \
+>>      DEFINE_PROP_BIT64("event_idx", _state, _field,        \
+>>                        VIRTIO_RING_F_EVENT_IDX, true),     \
+>>      DEFINE_PROP_BIT64("notify_on_empty", _state, _field,  \
+>> -                      VIRTIO_F_NOTIFY_ON_EMPTY, true), \
+>> -    DEFINE_PROP_BIT64("any_layout", _state, _field, \
+>> -                      VIRTIO_F_ANY_LAYOUT, true), \
+>> -    DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
+>> +                      VIRTIO_F_NOTIFY_ON_EMPTY, true),    \
+>> +    DEFINE_PROP_BIT64("any_layout", _state, _field,       \
+>> +                      VIRTIO_F_ANY_LAYOUT, true),         \
+>> +    DEFINE_PROP_BIT64("in_order", _state, _field,         \
+>> +                      VIRTIO_F_IN_ORDER, true),           \
+>> +    DEFINE_PROP_BIT64("iommu_platform", _state, _field,   \
+>>                        VIRTIO_F_IOMMU_PLATFORM, false)
+> 
+> Is in_order really right for all virtio devices?
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/ppc/spapr_pci.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+I see nothing device specific in this feature. It just specifies
+some restrictions on the descriptors handling. All virtio devices
+could use it to have performance benefits. Also, upcoming packed
+rings should give a good performance boost in case of enabled
+in-order feature. And packed rings RFC [1] implements
+VIRTIO_F_RING_PACKED for all virtio devices. So, I see no issues
+in enabling in-order negotiation for all of them.
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 3791ced6c536..5cd676e4430d 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -267,6 +267,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-                                 target_ulong args, uint32_t nret,
-                                 target_ulong rets)
- {
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-     uint32_t config_addr =3D rtas_ld(args, 0);
-     uint64_t buid =3D rtas_ldq(args, 1);
-     unsigned int func =3D rtas_ld(args, 3);
-@@ -334,7 +335,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-             return;
-         }
-=20
--        if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+        if (!smc->legacy_irq_allocation) {
-             spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
-         }
-         spapr_irq_free(spapr, msi->first_irq, msi->num);
-@@ -375,7 +376,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-     }
-=20
-     /* Allocate MSIs */
--    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+    if (smc->legacy_irq_allocation) {
-         irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS=
-_TYPE_MSI,
-                              &err);
-     } else {
-@@ -401,7 +402,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-=20
-     /* Release previous MSIs */
-     if (msi) {
--        if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+        if (!smc->legacy_irq_allocation) {
-             spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
-         }
-         spapr_irq_free(spapr, msi->first_irq, msi->num);
-@@ -1558,6 +1559,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
-or **errp)
-     sPAPRMachineState *spapr =3D
-         (sPAPRMachineState *) object_dynamic_cast(qdev_get_machine(),
-                                                   TYPE_SPAPR_MACHINE);
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-     SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
-     sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(s);
-     PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
-@@ -1575,7 +1577,6 @@ static void spapr_phb_realize(DeviceState *dev, Err=
-or **errp)
-     }
-=20
-     if (sphb->index !=3D (uint32_t)-1) {
--        sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-         Error *local_err =3D NULL;
-=20
-         smc->phb_placement(spapr, sphb->index,
-@@ -1720,7 +1721,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
-or **errp)
-         uint32_t irq =3D SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS =
-+ i;
-         Error *local_err =3D NULL;
-=20
--        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+        if (smc->legacy_irq_allocation) {
-             irq =3D spapr_irq_findone(spapr, &local_err);
-             if (local_err) {
-                 error_propagate(errp, local_err);
---=20
-2.17.1
+What do you think?
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg01028.html
+
+Best regards, Ilya Maximets.
+
+> 
+>>  hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
+>> diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
+>> index b777069..d20398c 100644
+>> --- a/include/standard-headers/linux/virtio_config.h
+>> +++ b/include/standard-headers/linux/virtio_config.h
+>> @@ -71,4 +71,11 @@
+>>   * this is for compatibility with legacy systems.
+>>   */
+>>  #define VIRTIO_F_IOMMU_PLATFORM		33
+>> +
+>> +/*
+>> + * Inorder feature indicates that all buffers are used by the device
+>> + * in the same order in which they have been made available.
+>> + */
+>> +#define VIRTIO_F_IN_ORDER 35
+>> +
+>>  #endif /* _LINUX_VIRTIO_CONFIG_H */
+>> -- 
+>> 2.7.4
+> 
+> 
