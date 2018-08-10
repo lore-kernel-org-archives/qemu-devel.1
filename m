@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fo841-0003Bg-0P
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:06:51 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1fo84G-0003L3-8R
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fo83x-0002WR-RP
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:06:49 -0400
-Received: from mga12.intel.com ([192.55.52.136]:34472)
+	(envelope-from <robert.hu@linux.intel.com>) id 1fo84D-0002i2-3C
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:07:04 -0400
+Received: from mga12.intel.com ([192.55.52.136]:34474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1fo83x-0002PU-DG
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:06:45 -0400
+	id 1fo84C-0002Qr-PB
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:07:01 -0400
 From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Fri, 10 Aug 2018 22:06:27 +0800
-Message-Id: <1533909989-56115-2-git-send-email-robert.hu@linux.intel.com>
+Date: Fri, 10 Aug 2018 22:06:28 +0800
+Message-Id: <1533909989-56115-3-git-send-email-robert.hu@linux.intel.com>
 In-Reply-To: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
 References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v3 1/3] x86: Data structure changes to support
- MSR based features
+Subject: [Qemu-devel] [PATCH v3 2/3] kvm: Add support to
+ KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS system ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,389 +28,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com
 Cc: qemu-devel@nongnu.org, robert.hu@intel.com, jingqi.liu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
 
-Define FeatureWordType.
-Expand FeatureWordInfo to support both CPUID type feature word as well as
-MSR type's.
-Change feature_word_info[] accordingly.
+Add kvm_get_supported_feature_msrs() to get supported MSR feature index list.
+Add kvm_arch_get_supported_msr_feature() to get each MSR features value.
+
+kvm_get_supported_feature_msrs() is called in kvm_arch_init().
+kvm_arch_get_supported_msr_feature() is called by
+x86_cpu_get_supported_feature_word().
 
 Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
 ---
- target/i386/cpu.c | 133 ++++++++++++++++++++++++++++++++++++++----------------
- target/i386/cpu.h |   5 ++
- 2 files changed, 99 insertions(+), 39 deletions(-)
+ include/sysemu/kvm.h |  2 ++
+ target/i386/kvm.c    | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 81 insertions(+)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ba7abe5..f7c70d9 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -770,17 +770,36 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
-           /* missing:
-           CPUID_XSAVE_XSAVEC, CPUID_XSAVE_XSAVES */
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 0b64b8e..97d8d9d 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -463,6 +463,8 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension);
  
-+typedef enum FeatureWordType {
-+   CPUID_FEATURE_WORD,
-+   MSR_FEATURE_WORD,
-+} FeatureWordType;
+ uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
+                                       uint32_t index, int reg);
++uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
 +
- typedef struct FeatureWordInfo {
--    /* feature flags names are taken from "Intel Processor Identification and
-+    FeatureWordType type;
-+   /* feature flags names are taken from "Intel Processor Identification and
-      * the CPUID Instruction" and AMD's "CPUID Specification".
-      * In cases of disagreement between feature naming conventions,
-      * aliases may be added.
-      */
-     const char *feat_names[32];
--    uint32_t cpuid_eax;   /* Input EAX for CPUID */
--    bool cpuid_needs_ecx; /* CPUID instruction uses ECX as input */
--    uint32_t cpuid_ecx;   /* Input ECX value for CPUID */
--    int cpuid_reg;        /* output register (R_* constant) */
-+    union {
-+        /* If type==CPUID_FEATURE_WORD */
-+        struct {
-+            uint32_t eax;   /* Input EAX for CPUID */
-+            bool needs_ecx; /* CPUID instruction uses ECX as input */
-+            uint32_t ecx;   /* Input ECX value for CPUID */
-+            int reg;        /* output register (R_* constant) */
-+        } cpuid;
-+        /* If type==MSR_FEATURE_WORD */
-+        struct {
-+            uint32_t index;
-+            struct {   /*CPUID that enumerate this MSR*/
-+                FeatureWord cpuid_class;
-+                uint32_t    cpuid_flag;
-+            } cpuid_dep;
-+        } msr;
-+    };
-     uint32_t tcg_features; /* Feature flags supported by TCG */
-     uint32_t unmigratable_flags; /* Feature flags known to be unmigratable */
-     uint32_t migratable_flags; /* Feature flags known to be migratable */
-@@ -790,6 +809,7 @@ typedef struct FeatureWordInfo {
  
- static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-     [FEAT_1_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "fpu", "vme", "de", "pse",
-             "tsc", "msr", "pae", "mce",
-@@ -800,10 +820,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "fxsr", "sse", "sse2", "ss",
-             "ht" /* Intel htt */, "tm", "ia64", "pbe",
-         },
--        .cpuid_eax = 1, .cpuid_reg = R_EDX,
-+        .cpuid = {.eax = 1, .reg = R_EDX, },
-         .tcg_features = TCG_FEATURES,
-     },
-     [FEAT_1_ECX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "pni" /* Intel,AMD sse3 */, "pclmulqdq", "dtes64", "monitor",
-             "ds-cpl", "vmx", "smx", "est",
-@@ -814,7 +835,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "tsc-deadline", "aes", "xsave", NULL /* osxsave */,
-             "avx", "f16c", "rdrand", "hypervisor",
-         },
--        .cpuid_eax = 1, .cpuid_reg = R_ECX,
-+        .cpuid = { .eax = 1, .reg = R_ECX, },
-         .tcg_features = TCG_EXT_FEATURES,
-     },
-     /* Feature names that are already defined on feature_name[] but
-@@ -823,6 +844,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-      * to features[FEAT_8000_0001_EDX] if and only if CPU vendor is AMD.
-      */
-     [FEAT_8000_0001_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL /* fpu */, NULL /* vme */, NULL /* de */, NULL /* pse */,
-             NULL /* tsc */, NULL /* msr */, NULL /* pae */, NULL /* mce */,
-@@ -833,10 +855,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL /* fxsr */, "fxsr-opt", "pdpe1gb", "rdtscp",
-             NULL, "lm", "3dnowext", "3dnow",
-         },
--        .cpuid_eax = 0x80000001, .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 0x80000001, .reg = R_EDX, },
-         .tcg_features = TCG_EXT2_FEATURES,
-     },
-     [FEAT_8000_0001_ECX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "lahf-lm", "cmp-legacy", "svm", "extapic",
-             "cr8legacy", "abm", "sse4a", "misalignsse",
-@@ -847,10 +870,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "perfctr-nb", NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x80000001, .cpuid_reg = R_ECX,
-+        .cpuid = { .eax = 0x80000001, .reg = R_ECX, },
-         .tcg_features = TCG_EXT3_FEATURES,
-     },
-     [FEAT_C000_0001_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, NULL, "xstore", "xstore-en",
-             NULL, NULL, "xcrypt", "xcrypt-en",
-@@ -861,10 +885,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0xC0000001, .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 0xC0000001, .reg = R_EDX, },
-         .tcg_features = TCG_EXT4_FEATURES,
-     },
-     [FEAT_KVM] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
-             "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
-@@ -875,10 +900,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "kvmclock-stable-bit", NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EAX,
-+        .cpuid = { .eax = KVM_CPUID_FEATURES, .reg = R_EAX, },
-         .tcg_features = TCG_KVM_FEATURES,
-     },
-     [FEAT_KVM_HINTS] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "kvm-hint-dedicated", NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-@@ -889,7 +915,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = KVM_CPUID_FEATURES, .reg = R_EDX, },
-         .tcg_features = TCG_KVM_FEATURES,
-         /*
-          * KVM hints aren't auto-enabled by -cpu host, they need to be
-@@ -898,6 +924,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         .no_autoenable_flags = ~0U,
-     },
-     [FEAT_HYPERV_EAX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL /* hv_msr_vp_runtime_access */, NULL /* hv_msr_time_refcount_access */,
-             NULL /* hv_msr_synic_access */, NULL /* hv_msr_stimer_access */,
-@@ -912,9 +939,10 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x40000003, .cpuid_reg = R_EAX,
-+        .cpuid = { .eax = 0x40000003, .reg = R_EAX, },
-     },
-     [FEAT_HYPERV_EBX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL /* hv_create_partitions */, NULL /* hv_access_partition_id */,
-             NULL /* hv_access_memory_pool */, NULL /* hv_adjust_message_buffers */,
-@@ -928,9 +956,10 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x40000003, .cpuid_reg = R_EBX,
-+        .cpuid = { .eax = 0x40000003, .reg = R_EBX, },
-     },
-     [FEAT_HYPERV_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL /* hv_mwait */, NULL /* hv_guest_debugging */,
-             NULL /* hv_perf_monitor */, NULL /* hv_cpu_dynamic_part */,
-@@ -943,9 +972,10 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x40000003, .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 0x40000003, .reg = R_EDX, },
-     },
-     [FEAT_SVM] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "npt", "lbrv", "svm-lock", "nrip-save",
-             "tsc-scale", "vmcb-clean",  "flushbyasid", "decodeassists",
-@@ -956,10 +986,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x8000000A, .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 0x8000000A, .reg = R_EDX, },
-         .tcg_features = TCG_SVM_FEATURES,
-     },
-     [FEAT_7_0_EBX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "fsgsbase", "tsc-adjust", NULL, "bmi1",
-             "hle", "avx2", NULL, "smep",
-@@ -970,12 +1001,13 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "clwb", "intel-pt", "avx512pf", "avx512er",
-             "avx512cd", "sha-ni", "avx512bw", "avx512vl",
-         },
--        .cpuid_eax = 7,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
--        .cpuid_reg = R_EBX,
-+        .cpuid = { .eax = 7,
-+            .needs_ecx = true, .ecx = 0,
-+            .reg = R_EBX, },
-         .tcg_features = TCG_7_0_EBX_FEATURES,
-     },
-     [FEAT_7_0_ECX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, "avx512vbmi", "umip", "pku",
-             NULL /* ospke */, NULL, "avx512vbmi2", NULL,
-@@ -986,12 +1018,13 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, "cldemote", NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 7,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
--        .cpuid_reg = R_ECX,
-+        .cpuid = { .eax = 7,
-+            .needs_ecx = true, .ecx = 0,
-+            .reg = R_ECX, },
-         .tcg_features = TCG_7_0_ECX_FEATURES,
-     },
-     [FEAT_7_0_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, NULL, "avx512-4vnniw", "avx512-4fmaps",
-             NULL, NULL, NULL, NULL,
-@@ -1002,13 +1035,14 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, "spec-ctrl", NULL,
-             NULL, "arch-capabilities", NULL, "ssbd",
-         },
--        .cpuid_eax = 7,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
--        .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 7,
-+            .needs_ecx = true, .ecx = 0,
-+            .reg = R_EDX, },
-         .tcg_features = TCG_7_0_EDX_FEATURES,
-         .unmigratable_flags = CPUID_7_0_EDX_ARCH_CAPABILITIES,
-     },
-     [FEAT_8000_0007_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-@@ -1019,12 +1053,12 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x80000007,
--        .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 0x80000007, .reg = R_EDX, },
-         .tcg_features = TCG_APM_FEATURES,
-         .unmigratable_flags = CPUID_APM_INVTSC,
-     },
-     [FEAT_8000_0008_EBX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-@@ -1035,12 +1069,12 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "amd-ssbd", "virt-ssbd", "amd-no-ssb", NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x80000008,
--        .cpuid_reg = R_EBX,
-+        .cpuid = { .eax = 0x80000008, .reg = R_EBX, },
-         .tcg_features = 0,
-         .unmigratable_flags = 0,
-     },
-     [FEAT_XSAVE] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "xsaveopt", "xsavec", "xgetbv1", "xsaves",
-             NULL, NULL, NULL, NULL,
-@@ -1051,12 +1085,13 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0xd,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 1,
--        .cpuid_reg = R_EAX,
-+        .cpuid = { .eax = 0xd,
-+            .needs_ecx = true, .ecx = 1,
-+            .reg = R_EAX, },
-         .tcg_features = TCG_XSAVE_FEATURES,
-     },
-     [FEAT_6_EAX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, NULL, "arat", NULL,
-             NULL, NULL, NULL, NULL,
-@@ -1067,13 +1102,14 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 6, .cpuid_reg = R_EAX,
-+        .cpuid = { .eax = 6, .reg = R_EAX, },
-         .tcg_features = TCG_6_EAX_FEATURES,
-     },
-     [FEAT_XSAVE_COMP_LO] = {
--        .cpuid_eax = 0xD,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
--        .cpuid_reg = R_EAX,
-+        .type = CPUID_FEATURE_WORD,
-+        .cpuid = { .eax = 0xD,
-+            .needs_ecx = true, .ecx = 0,
-+            .reg = R_EAX, },
-         .tcg_features = ~0U,
-         .migratable_flags = XSTATE_FP_MASK | XSTATE_SSE_MASK |
-             XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK | XSTATE_BNDCSR_MASK |
-@@ -1081,11 +1117,30 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             XSTATE_PKRU_MASK,
-     },
-     [FEAT_XSAVE_COMP_HI] = {
--        .cpuid_eax = 0xD,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
--        .cpuid_reg = R_EDX,
-+        .type = CPUID_FEATURE_WORD,
-+        .cpuid = { .eax = 0xD,
-+            .needs_ecx = true, .ecx = 0,
-+            .reg = R_EDX, },
-         .tcg_features = ~0U,
-     },
-+    /*Below are MSR exposed features*/
-+    [FEATURE_WORDS_ARCH_CAPABILITIES] = {
-+        .type = MSR_FEATURE_WORD,
-+        .feat_names = {
-+            "rdctl-no", "ibrs-all", "rsba", NULL,
-+            "ssb-no", NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+        },
-+        .msr = { .index = MSR_IA32_ARCH_CAPABILITIES,
-+                .cpuid_dep = { FEAT_7_0_EDX,
-+                    CPUID_7_0_EDX_ARCH_CAPABILITIES }
-+                },
-+    },
- };
+ void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
  
- typedef struct X86RegisterInfo32 {
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index cddf9d9..9e8879e 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -502,9 +502,14 @@ typedef enum FeatureWord {
-     FEAT_6_EAX,         /* CPUID[6].EAX */
-     FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
-     FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
-+    FEATURE_WORDS_NUM_CPUID,
-+    FEATURE_WORDS_FIRST_MSR = FEATURE_WORDS_NUM_CPUID,
-+    FEATURE_WORDS_ARCH_CAPABILITIES = FEATURE_WORDS_FIRST_MSR,
-     FEATURE_WORDS,
- } FeatureWord;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 9313602..70d8606 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -107,6 +107,7 @@ static int has_pit_state2;
+ static bool has_msr_mcg_ext_ctl;
  
-+#define FEATURE_WORDS_NUM_MSRS (FEATURE_WORDS - FEATURE_WORDS_FIRST_MSR)
+ static struct kvm_cpuid2 *cpuid_cache;
++static struct kvm_msr_list *kvm_feature_msrs;
+ 
+ int kvm_has_pit_state2(void)
+ {
+@@ -420,6 +421,41 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+     return ret;
+ }
+ 
++uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
++{
++    struct {
++        struct kvm_msrs info;
++        struct kvm_msr_entry entries[1];
++    } msr_data;
++    uint32_t ret;
 +
- typedef uint32_t FeatureWordArray[FEATURE_WORDS];
++    /*Check if the requested feature MSR is supported*/
++    int i;
++    for (i = 0; i < kvm_feature_msrs->nmsrs; i++) {
++        if (index == kvm_feature_msrs->indices[i]) {
++            break;
++        }
++    }
++    if (i >= kvm_feature_msrs->nmsrs) {
++        fprintf(stderr, "Requested MSR (index= %d) is not supported.\n", index);
++        return 0;
++    }
++
++    msr_data.info.nmsrs = 1;
++    msr_data.entries[0].index = index;
++
++    ret = kvm_ioctl(s, KVM_GET_MSRS, &msr_data);
++
++    if (ret != 1) {
++        fprintf(stderr, "KVM get MSR (index=0x%x) feature failed, %s\n",
++            index, strerror(-ret));
++        exit(1);
++    }
++
++    return msr_data.entries[0].data;
++}
++
++
+ typedef struct HWPoisonPage {
+     ram_addr_t ram_addr;
+     QLIST_ENTRY(HWPoisonPage) list;
+@@ -1238,7 +1274,45 @@ void kvm_arch_do_init_vcpu(X86CPU *cpu)
+         env->mp_state = KVM_MP_STATE_INIT_RECEIVED;
+     }
+ }
++static int kvm_get_supported_feature_msrs(KVMState *s)
++{
++    static int kvm_supported_feature_msrs;
++    int ret = 0;
++
++    if (kvm_supported_feature_msrs == 0) {
++        struct kvm_msr_list msr_list;
++
++        kvm_supported_feature_msrs++;
++
++        msr_list.nmsrs = 0;
++        ret = kvm_ioctl(s, KVM_GET_MSR_FEATURE_INDEX_LIST, &msr_list);
++        if (ret < 0 && ret != -E2BIG) {
++            return ret;
++        }
++
++        assert(msr_list.nmsrs > 0);
++        kvm_feature_msrs = (struct kvm_msr_list *) \
++            g_malloc0(sizeof(msr_list) +
++                     msr_list.nmsrs * sizeof(msr_list.indices[0]));
++        if (kvm_feature_msrs == NULL) {
++            fprintf(stderr, "Failed to allocate space for KVM Feature MSRs"
++                "which has %d MSRs\n", msr_list.nmsrs);
++            return -1;
++        }
++
++        kvm_feature_msrs->nmsrs = msr_list.nmsrs;
++        ret = kvm_ioctl(s, KVM_GET_MSR_FEATURE_INDEX_LIST, kvm_feature_msrs);
  
- /* cpuid_features bits */
++        if (ret < 0) {  /*ioctl failure*/
++            fprintf(stderr, "Fetch KVM feature MSRs failed: %s\n",
++                strerror(-ret));
++            g_free(kvm_feature_msrs);
++            return ret;
++        }
++    }
++
++    return 0;
++}
+ static int kvm_get_supported_msrs(KVMState *s)
+ {
+     static int kvm_supported_msrs;
+@@ -1400,6 +1474,11 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         return ret;
+     }
+ 
++    ret = kvm_get_supported_feature_msrs(s);
++    if (ret < 0) {
++        return ret;
++    }
++
+     uname(&utsname);
+     lm_capable_kernel = strcmp(utsname.machine, "x86_64") == 0;
+ 
 -- 
 1.8.3.1
