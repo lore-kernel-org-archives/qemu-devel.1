@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fo1BS-0001H5-WF
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 02:46:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1fo1KX-00051o-Ad
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 02:55:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fo1BP-0002Y9-Lt
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 02:46:03 -0400
-Date: Fri, 10 Aug 2018 16:41:54 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180810064154.GE4079@umbus>
-References: <20180810053712.6587-1-hpoussin@reactos.org>
+	(envelope-from <armbru@redhat.com>) id 1fo1KV-0001JM-SB
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 02:55:25 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180809114417.28718-1-marcandre.lureau@redhat.com>
+	<20180809114417.28718-4-marcandre.lureau@redhat.com>
+	<CAJ+F1C+dpfLNb4C-5LxEPbRBR7C0HVSce7by4ckppyNiFZcsRQ@mail.gmail.com>
+Date: Fri, 10 Aug 2018 08:55:13 +0200
+In-Reply-To: <CAJ+F1C+dpfLNb4C-5LxEPbRBR7C0HVSce7by4ckppyNiFZcsRQ@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 9 Aug 2018
+	16:38:47 +0200")
+Message-ID: <87in4iu2we.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="zaRBsRFn0XYhEU69"
-Content-Disposition: inline
-In-Reply-To: <20180810053712.6587-1-hpoussin@reactos.org>
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc: on 40p machine,
- change default firmware to OpenBIOS
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/4] monitor: fix oob command leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +26,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
-Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Hannes Reinecke <hare@suse.com>, Fam Zheng <famz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
---zaRBsRFn0XYhEU69
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Hi
+>
+> On Thu, Aug 9, 2018 at 1:44 PM, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+>> Spotted by ASAN, during make check...
+>>
+>> Direct leak of 40 byte(s) in 1 object(s) allocated from:
+>>     #0 0x7f8e27262c48 in malloc (/lib64/libasan.so.5+0xeec48)
+>>     #1 0x7f8e26a5f3c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
+>>     #2 0x555ab67078a8 in qstring_from_str /home/elmarco/src/qq/qobject/q=
+string.c:67
+>>     #3 0x555ab67071e4 in qstring_new /home/elmarco/src/qq/qobject/qstrin=
+g.c:24
+>>     #4 0x555ab6713fbf in qstring_from_escaped_str /home/elmarco/src/qq/q=
+object/json-parser.c:144
+>>     #5 0x555ab671738c in parse_literal /home/elmarco/src/qq/qobject/json=
+-parser.c:506
+>>     #6 0x555ab67179c3 in parse_value /home/elmarco/src/qq/qobject/json-p=
+arser.c:569
+>>     #7 0x555ab6715123 in parse_pair /home/elmarco/src/qq/qobject/json-pa=
+rser.c:306
+>>     #8 0x555ab6715483 in parse_object /home/elmarco/src/qq/qobject/json-=
+parser.c:357
+>>     #9 0x555ab671798b in parse_value /home/elmarco/src/qq/qobject/json-p=
+arser.c:561
+>>     #10 0x555ab6717a6b in json_parser_parse_err /home/elmarco/src/qq/qob=
+ject/json-parser.c:592
+>>     #11 0x555ab4fd4dcf in handle_qmp_command /home/elmarco/src/qq/monito=
+r.c:4257
+>>     #12 0x555ab6712c4d in json_message_process_token /home/elmarco/src/q=
+q/qobject/json-streamer.c:105
+>>     #13 0x555ab67e01e2 in json_lexer_feed_char /home/elmarco/src/qq/qobj=
+ect/json-lexer.c:323
+>>     #14 0x555ab67e0af6 in json_lexer_feed /home/elmarco/src/qq/qobject/j=
+son-lexer.c:373
+>>     #15 0x555ab6713010 in json_message_parser_feed /home/elmarco/src/qq/=
+qobject/json-streamer.c:124
+>>     #16 0x555ab4fd58ec in monitor_qmp_read /home/elmarco/src/qq/monitor.=
+c:4337
+>>     #17 0x555ab6559df2 in qemu_chr_be_write_impl /home/elmarco/src/qq/ch=
+ardev/char.c:175
+>>     #18 0x555ab6559e95 in qemu_chr_be_write /home/elmarco/src/qq/chardev=
+/char.c:187
+>>     #19 0x555ab6560127 in fd_chr_read /home/elmarco/src/qq/chardev/char-=
+fd.c:66
+>>     #20 0x555ab65d9c73 in qio_channel_fd_source_dispatch /home/elmarco/s=
+rc/qq/io/channel-watch.c:84
+>>     #21 0x7f8e26a598ac in g_main_context_dispatch (/lib64/libglib-2.0.so=
+.0+0x4c8ac)
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> It looks like it was introduced with commit
+> b27314567d4cd8e204a18feba60d3341fb2d1aed "qmp: Simplify code around
+> monitor_qmp_dispatch_one()"
 
-On Fri, Aug 10, 2018 at 07:37:12AM +0200, Herv=E9 Poussineau wrote:
-> OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
-> Use it, instead of relying on an unmaintained and very limited firmware.
->=20
-> Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
+Yes.
 
-Applied to ppc-for-3.1, thanks.
+Before that commit, handle_qmp_command() freed @req and @id as follows.
 
-> ---
->  hw/ppc/prep.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 3401570d98..1558855247 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -736,7 +736,7 @@ static void ibm_40p_init(MachineState *machine)
->      /* PCI host */
->      dev =3D qdev_create(NULL, "raven-pcihost");
->      if (!bios_name) {
-> -        bios_name =3D BIOS_FILENAME;
-> +        bios_name =3D "openbios-ppc";
->      }
->      qdev_prop_set_string(dev, "bios-name", bios_name);
->      qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
+* Early errors: goto err, where we free req, and leak @id (I think).
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+* Out of band: store @req and @id in @req_obj, free it in
+  monitor_qmp_dispatch_one().
 
---zaRBsRFn0XYhEU69
-Content-Type: application/pgp-signature; name="signature.asc"
+* In band: store @req and @id in @req_obj
 
------BEGIN PGP SIGNATURE-----
+  - queue full: free by calling qmp_request_free()
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlttM7AACgkQbDjKyiDZ
-s5IbjRAAh9/nEKTzE7BtIL3AwE/5CJXQem6KTYTZ+dGMbDB5WjNjxukgWIqgEpBS
-HAddkzJX9mWcaViAd37Nd/e+yP4c3XgiWg6Tmrevmyx3S7xjzuiOmbVjWx4mUEfT
-NQzbPxz260BVuQqrFX8SusO8WQh3gggVfEhltWPLdQXGHewb8XAXFrSBDa8Q+geb
-bUjHVdR1dhV0I9TZd8jovAKIAXAaoWwbE+TcEKbATV3cWR6pXMT7WQGCdsPrgz8V
-F2ffpzMMfGLVkaEl7S6x5W2cTFTBuVWZPEX2BAGejA+SAwovunAkek6y0u6BPOKj
-EWCQSgXq/dj2nA0NcGd3jm6UGa15lXT9wzfBy4tcSCIqpboS4kjTWD9xs6jxHAML
-i9pMdkE2mEakIQxuS/+BVW34RuDZWa9x4IjQ7wJerFkZ4HocqySdnjnqAM3GEOlx
-C4tmjV1AHcjSjZzFVRwBmF7NNIvIlMjs1Aao4uetz9rfNMxL2jpjbmUuZUfoPq0j
-WGiEm+JW8ZnLCtvLJ+IC9+fZUTJbQK56QXFOgTr7G0xgsrUZ4M8KJ/DXAU9Uei+R
-WooaRwSd7mMqxncmDPSYiU2uM0FUx6OU1ggaDOoxd79YBbKFoH/YeAKH/LEqC2UN
-UNep/SpQPr9Z5KM6TUv2R9BmqC9I/Gk73a6cr8jIwSek0vjV1pc=
-=tH/m
------END PGP SIGNATURE-----
+  - else: enqueue, monitor_qmp_bh_dispatcher() will deqeueue and pass to
+    monitor_qmp_dispatch_one(), which frees.
 
---zaRBsRFn0XYhEU69--
+Current head always stores @req and @id in @req_obj.  It frees as
+follows.
+
+* Out of band: it doesn't, since monitor_qmp_dispatch(), renamed from
+  monitor_qmp_dispatch_one(), doesn't free anymore.  This patch fixes
+  it.
+
+* In band:
+
+  - queue full: free by calling qmp_request_free().
+
+  - else: enqueue, monitor_qmp_bh_dispatcher() will deqeueue and pass to
+    monitor_qmp_dispatch(), then free with qmp_request_free().
+
+Looks like the commit replaced one leak by another one.
+
+>
+>> ---
+>>  monitor.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/monitor.c b/monitor.c
+>> index 77861e96af..a1999e396c 100644
+>> --- a/monitor.c
+>> +++ b/monitor.c
+>> @@ -4277,6 +4277,8 @@ static void handle_qmp_command(JSONMessageParser *=
+parser, GQueue *tokens)
+>>          trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(id)
+>>                                            ?: "");
+>>          monitor_qmp_dispatch(mon, req, id);
+>> +        qobject_unref(req);
+>> +        qobject_unref(id);
+>>          return;
+>>      }
+>>
+>> --
+>> 2.18.0.547.g1d89318c48
+>>
+>>
+
+I'm not going to argue for inclusion in 3.0, because OOB is experimental
+and off by default due to its remaining flaws.
+
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
