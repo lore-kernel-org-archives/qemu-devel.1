@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fo0De-0005kh-8x
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:44:15 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fo0VY-0003el-Dg
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 02:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fo0DZ-0005fp-9K
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:44:14 -0400
-Received: from mail-ua1-x944.google.com ([2607:f8b0:4864:20::944]:38277)
+	(envelope-from <stefanha@gmail.com>) id 1fo0VX-00071B-EW
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 02:02:44 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46529)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fo0DZ-0005fW-31
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:44:09 -0400
-Received: by mail-ua1-x944.google.com with SMTP id o11-v6so715060uak.5
-	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 22:44:08 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5b12b2c3-8476-2862-d686-d406b65fc6cc@amsat.org>
-Date: Fri, 10 Aug 2018 02:44:02 -0300
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fo0VX-00070c-7i
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 02:02:43 -0400
+Received: by mail-wr1-x443.google.com with SMTP id h14-v6so7165938wrw.13
+	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 23:02:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 00/80] Add nanoMIPS support to QEMU
+In-Reply-To: <20180808210750.3915-2-jusual@mail.ru>
+References: <20180808210750.3915-1-jusual@mail.ru>
+	<20180808210750.3915-2-jusual@mail.ru>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 10 Aug 2018 07:02:41 +0100
+Message-ID: <CAJSP0QUZERaC=YVe_eWJjtVdMt24Ngi7H5yU6a9anf59n+Zwfw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] hw/char: Implement nRF51 SoC UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,25 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
+To: Julia Suvorova <jusual@mail.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
 
-Hi Aleksandar,
+On Wed, Aug 8, 2018 at 10:07 PM, Julia Suvorova <jusual@mail.ru> wrote:
+> +static uint64_t uart_read(void *opaque, hwaddr addr, unsigned int size)
+> +{
+> +    NRF51UARTState *s = NRF51_UART(opaque);
+> +    uint64_t r;
+> +
+> +    if (!s->enabled) {
+> +        return 0;
+> +    }
+> +
+> +    switch (addr) {
+> +    case A_UART_RXD:
+> +        r = s->rx_fifo[s->rx_fifo_pos];
+> +        if (s->rx_started && s->rx_fifo_len) {
+> +            qemu_chr_fe_accept_input(&s->chr);
 
-On 08/06/2018 01:59 PM, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
-[snip]
-> This series of patches implements recently announced nanoMIPS on QEMU.
-> nanoMIPS is a variable length ISA containing 16, 32 and 48-bit wide
-> instructions. It is designed to be portable at assembly level with
-> other MIPS and microMIPS code, but contains a number of changes that
-> enhance code density and efficiency. The largest portion of patches
-> is nanoMIPS decoding engine.
-[snip]
+Should this be called after popping a byte from the rx fifo?  That way
+.can_receive() will return true again.
 
-I think you can stage 1-12 for the next MIPS pull request on 3.1 cycle
-opens. Then respins of this series will be a bit shorter ;)
+> +static void nrf51_uart_realize(DeviceState *dev, Error **errp)
+> +{
+> +    NRF51UARTState *s = NRF51_UART(dev);
+> +
+> +    qemu_chr_fe_set_handlers(&s->chr, uart_can_receive, uart_receive,
+> +                             uart_event, NULL, s, NULL, true);
+> +}
 
-Regards,
-
-Phil.
+unrealize() should set the handlers to NULL.  That way the device can
+be removed without leaving callbacks registered.
