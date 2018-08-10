@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fo76K-0003tW-Az
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:05:11 -0400
+	(envelope-from <david@redhat.com>) id 1fo78Z-00052F-U4
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:07:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fo76G-0007Yo-8t
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:05:08 -0400
-Date: Fri, 10 Aug 2018 15:04:59 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180810150459.79c6b4e0.cohuck@redhat.com>
-In-Reply-To: <20180810030139.25916-1-pavel.zbitskiy@gmail.com>
+	(envelope-from <david@redhat.com>) id 1fo78V-0000yD-Rw
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:07:27 -0400
 References: <20180810030139.25916-1-pavel.zbitskiy@gmail.com>
+	<20180810030139.25916-4-pavel.zbitskiy@gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <0bc9ea43-6bdb-49de-ce8d-d3a455356a07@redhat.com>
+Date: Fri, 10 Aug 2018 15:07:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180810030139.25916-4-pavel.zbitskiy@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/7] Some improvements in z/Arch
- instructions support
+Subject: Re: [Qemu-devel] [PATCH 3/7] target/s390x: fix CSST decoding and
+ runtime alignment check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, david@redhat.com, richard.henderson@linaro.org
+To: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, richard.henderson@linaro.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-On Thu,  9 Aug 2018 23:01:32 -0400
-Pavel Zbitskiy <pavel.zbitskiy@gmail.com> wrote:
-
-> Found while attempting to run an old tool in qemu.
+On 10.08.2018 05:01, Pavel Zbitskiy wrote:
+> CSST is defined as:
 > 
-> * BAL and BALR:    Added.
-> * CSST:            Qemu crashed after an accidental jump to garbage.
-> * IPM:             A tool produced an incorrect output.
-> * EX TRT/TRTR:     A tool ran quite slow.
-> * PACK:            A tool produced an incorrect output.
-> * CVB, CVBY, CVBG: Added.
+>     C(0xc802, CSST,    SSF,   CASS, la1, a2, 0, 0, csst, 0)
 > 
-> Changes since v1:
-> * Tests.
-
-Nice, thanks for adding these.
-
-> * Call pc_to_link_info() instead of op_bas().
-> * Clarified CSST commit message.
-> * Rewrote IPM using extract/deposit.
-> * Clarified PACK commit message.
-> * Do not use LowCore for CONFIG_USER_ONLY.
-> * Reduce duplication in CVB code.
+> It means that the first parameter is handled by in1_la1().
+> in1_la1() fills addr1 field, and not in1.
 > 
-> Pavel Zbitskiy (7):
->   tests/tcg: add a simple s390x test
->   target/s390x: add BAL and BALR instructions
->   target/s390x: fix CSST decoding and runtime alignment check
->   target/s390x: fix IPM polluting irrelevant bits
->   target/s390x: add EX support for TRT and TRTR
->   target/s390x: fix PACK reading 1 byte less and writing 1 byte more
->   target/s390x: implement CVB, CVBY and CVBG
+> Furthermore, when extract32() is used for the alignment check, the
+> third parameter should specify the number of trailing bits that must
+> be 0. For FC these numbers are:
+> 
+>     FC=0 (word, 4 bytes):        2
+>     FC=1 (double word, 8 bytes): 3
+>     FC=2 (quad word, 16 bytes):  4
+> 
+> For SC these numbers correspond to the size:
+> 
+>     SC=0: 0
+>     SC=1: 1
+>     SC=2: 2
+>     SC=3: 3
+>     SC=4: 4
+> 
+> Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
 
-I'll wait for some acks/reviews before applying these.
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
