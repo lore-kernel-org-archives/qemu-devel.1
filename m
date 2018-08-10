@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fo4eZ-0004Jz-Fn
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:28:20 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fo4eb-0004LA-F4
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fo4eY-0002Nx-ML
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:28:19 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fo4ea-0002Pz-AU
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:28:21 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 10 Aug 2018 11:27:56 +0100
-Message-Id: <20180810102757.21010-2-mark.cave-ayland@ilande.co.uk>
+Date: Fri, 10 Aug 2018 11:27:57 +0100
+Message-Id: <20180810102757.21010-3-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180810102757.21010-1-mark.cave-ayland@ilande.co.uk>
 References: <20180810102757.21010-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 1/2] mac_oldworld: don't use legacy
+Subject: [Qemu-devel] [PATCH 2/2] mac_newworld: don't use legacy
  fw_cfg_init_mem() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,15 +27,15 @@ directly as required.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/ppc/mac_oldworld.c | 12 +++++++++++-
+ hw/ppc/mac_newworld.c | 12 +++++++++++-
  1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 064d7eb30a..80b5525775 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -309,7 +309,17 @@ static void ppc_heathrow_init(MachineState *machine)
- 
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 2ca294664b..a6b95f024c 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -454,7 +454,17 @@ static void ppc_core99_init(MachineState *machine)
+     pmac_format_nvram_partition(nvr, 0x2000);
      /* No PCI init: the BIOS will do it */
  
 -    fw_cfg = fw_cfg_init_mem(CFG_ADDR, CFG_ADDR + 2);
