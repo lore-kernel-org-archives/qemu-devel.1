@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fo3os-0005Fw-3F
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:34:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1fo3vk-00088n-Dx
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:42:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fo3oo-0007gF-Us
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:34:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41202 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fo3vh-0005vw-Ap
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:42:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49414 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fo3oo-0007fZ-LE
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:34:50 -0400
-Date: Fri, 10 Aug 2018 12:34:44 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180810123104-mutt-send-email-mst@kernel.org>
-References: <CGME20180809165352eucas1p2359a46f1beb147fdcbd035c28bbd48d9@eucas1p2.samsung.com>
-	<1533833677-27512-1-git-send-email-i.maximets@samsung.com>
-	<20180810015124-mutt-send-email-mst@kernel.org>
-	<20180810082754eucas1p2c5833c9292851a7009d348b00bbe811e~JeIgqEodG2498924989eucas1p2Z@eucas1p2.samsung.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fo3vh-0005uS-4l
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 05:41:57 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180809160011.17225-1-peter.maydell@linaro.org>
+	<19a9c0c6-03eb-d368-d8c8-fb62102556a4@redhat.com>
+	<CAFEAcA_rRW7qbtiM4c-sBVmQhFMSuKnVqU6+oXsdXPwJ3GKv6A@mail.gmail.com>
+	<9da04e7f-bd0c-9d50-fb7c-026b5aaa674c@redhat.com>
+Date: Fri, 10 Aug 2018 11:41:54 +0200
+In-Reply-To: <9da04e7f-bd0c-9d50-fb7c-026b5aaa674c@redhat.com> (Paolo
+	Bonzini's message of "Fri, 10 Aug 2018 10:34:14 +0200")
+Message-ID: <87ftzmr21p.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180810082754eucas1p2c5833c9292851a7009d348b00bbe811e~JeIgqEodG2498924989eucas1p2Z@eucas1p2.samsung.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: add support for in-order feature
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] scripts/checkpatch.pl: Enforce multiline
+ comment syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ilya Maximets <i.maximets@samsung.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On Fri, Aug 10, 2018 at 11:28:47AM +0300, Ilya Maximets wrote:
-> On 10.08.2018 01:51, Michael S. Tsirkin wrote:
-> > On Thu, Aug 09, 2018 at 07:54:37PM +0300, Ilya Maximets wrote:
-> >> New feature bit for in-order feature of the upcoming
-> >> virtio 1.1. It's already supported by DPDK vhost-user
-> >> and virtio implementations. These changes required to
-> >> allow feature negotiation.
-> >>
-> >> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
-> >> ---
-> >>
-> >> I just wanted to test this new feature in DPDK but failed
-> >> to found required patch for QEMU side. So, I implemented it.
-> >> At least it will be helpful for someone like me, who wants
-> >> to evaluate VIRTIO_F_IN_ORDER with DPDK.
-> >>
-> >>  hw/net/vhost_net.c                             |  1 +
-> >>  include/hw/virtio/virtio.h                     | 12 +++++++-----
-> >>  include/standard-headers/linux/virtio_config.h |  7 +++++++
-> >>  3 files changed, 15 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> >> index e037db6..86879c5 100644
-> >> --- a/hw/net/vhost_net.c
-> >> +++ b/hw/net/vhost_net.c
-> >> @@ -78,6 +78,7 @@ static const int user_feature_bits[] = {
-> >>      VIRTIO_NET_F_MRG_RXBUF,
-> >>      VIRTIO_NET_F_MTU,
-> >>      VIRTIO_F_IOMMU_PLATFORM,
-> >> +    VIRTIO_F_IN_ORDER,
-> >>  
-> >>      /* This bit implies RARP isn't sent by QEMU out of band */
-> >>      VIRTIO_NET_F_GUEST_ANNOUNCE,
-> >> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> >> index 9c1fa07..a422025 100644
-> >> --- a/include/hw/virtio/virtio.h
-> >> +++ b/include/hw/virtio/virtio.h
-> >> @@ -254,16 +254,18 @@ typedef struct virtio_input_conf virtio_input_conf;
-> >>  typedef struct VirtIOSCSIConf VirtIOSCSIConf;
-> >>  typedef struct VirtIORNGConf VirtIORNGConf;
-> >>  
-> >> -#define DEFINE_VIRTIO_COMMON_FEATURES(_state, _field) \
-> >> +#define DEFINE_VIRTIO_COMMON_FEATURES(_state, _field)     \
-> >>      DEFINE_PROP_BIT64("indirect_desc", _state, _field,    \
-> >>                        VIRTIO_RING_F_INDIRECT_DESC, true), \
-> >>      DEFINE_PROP_BIT64("event_idx", _state, _field,        \
-> >>                        VIRTIO_RING_F_EVENT_IDX, true),     \
-> >>      DEFINE_PROP_BIT64("notify_on_empty", _state, _field,  \
-> >> -                      VIRTIO_F_NOTIFY_ON_EMPTY, true), \
-> >> -    DEFINE_PROP_BIT64("any_layout", _state, _field, \
-> >> -                      VIRTIO_F_ANY_LAYOUT, true), \
-> >> -    DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
-> >> +                      VIRTIO_F_NOTIFY_ON_EMPTY, true),    \
-> >> +    DEFINE_PROP_BIT64("any_layout", _state, _field,       \
-> >> +                      VIRTIO_F_ANY_LAYOUT, true),         \
-> >> +    DEFINE_PROP_BIT64("in_order", _state, _field,         \
-> >> +                      VIRTIO_F_IN_ORDER, true),           \
-> >> +    DEFINE_PROP_BIT64("iommu_platform", _state, _field,   \
-> >>                        VIRTIO_F_IOMMU_PLATFORM, false)
-> > 
-> > Is in_order really right for all virtio devices?
-> 
-> I see nothing device specific in this feature. It just specifies
-> some restrictions on the descriptors handling. All virtio devices
-> could use it to have performance benefits. Also, upcoming packed
-> rings should give a good performance boost in case of enabled
-> in-order feature. And packed rings RFC [1] implements
-> VIRTIO_F_RING_PACKED for all virtio devices. So, I see no issues
-> in enabling in-order negotiation for all of them.
-> 
-> What do you think?
-> 
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg01028.html
-> 
-> Best regards, Ilya Maximets.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-If guest assumes in-order use of buffers but device uses them out of
-order then guest will crash. So there's a missing piece where
-you actually make devices use buffers in order when the flag is set.
+> On 09/08/2018 19:03, Peter Maydell wrote:
+>> On 9 August 2018 at 17:43, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>> I'm still not used to the leeading-/*-on-it's-own style,
+>>>> so having checkpatch catch my lapses is handy...
+>>>
+>>> ... if it's not what we are using, why enforce it?
+>> 
+>> See the enormous long threads on the recent changes to CODING_STYLE:
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg00696.html
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg02717.html
+>> 
+>> Basically, I wanted to rule out things like
+>> 
+>>   /* this
+>>      weirdness */
+>> 
+>> and lots of other people wanted (a) to not have
+>> 
+>>   /* this thing
+>>    * which I think is fine
+>>    */
+>> 
+>> and (b) to consistently define only one format as OK.
+>> 
+>> So I accepted having my personal preferred format not being
+>> permitted in order to get consensus on getting rid of the
+>> formats I think are really ugly :-)
+>
+> This is one of the cases where we are decently consistent:
+>
+> Lone "/*" or "/**": 9986 cases
+> 	of which in the first column: 7617
+> 	of which the first line in the file (license headers): 2834
+> 	regex: ^[ \t]*/\*\*?[ \t]*$
+>
+> "/*" with the first line of the comment: 11246
+> 	of which in the first column: 4985
+> 	of which the first line in the file: 97
+> 	regex: ^[ \t]*/\*\*?+(?:(?!\*/).)+?$
+>
+> License headers almost always have the "lone /*" format.  Apart from
+> license headers, 63% of the comments have the now-deprecated format.
+>
+> Inside functions, 73% of the comments have the now-deprecated format.
+> Outside functions it's 50-50.  That's because there are 2024 doc
+> comments, which in turn are 50% of the comments that are 1) outside the
+> functions 2) using a lone "/*".
+>
+> So my proposal, which is actually consistent with what QEMU is doing, is
+> the following:
+>
+> 1) the first line of a file should always be "/*", otherwise warn
+>
+> 2) a comment that starts with "/**" should have it on a lone line
+>
+> 3) every other multiline comment should start with
+> "/*<whitespace><something>"
 
-> > 
-> >>  hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
-> >> diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
-> >> index b777069..d20398c 100644
-> >> --- a/include/standard-headers/linux/virtio_config.h
-> >> +++ b/include/standard-headers/linux/virtio_config.h
-> >> @@ -71,4 +71,11 @@
-> >>   * this is for compatibility with legacy systems.
-> >>   */
-> >>  #define VIRTIO_F_IOMMU_PLATFORM		33
-> >> +
-> >> +/*
-> >> + * Inorder feature indicates that all buffers are used by the device
-> >> + * in the same order in which they have been made available.
-> >> + */
-> >> +#define VIRTIO_F_IN_ORDER 35
-> >> +
-> >>  #endif /* _LINUX_VIRTIO_CONFIG_H */
-> >> -- 
-> >> 2.7.4
-> > 
-> > 
+(3) is not consistent with what QEMU is doing in this case, since
+according to your data there is no consistency in what QEMU is doing.
+
+Moreover, requiring winged comment start in some, but not all places is
+more complicated than simply requiring it everywhere.
+
+The "enourmous long threads" quoted by Peter resulted in strong
+agreement we don't want
+
+   /* this
+      weirdness */
+
+and rough consensus to go with
+
+   /*
+    * Wing your multiline comment
+    * at both ends, please.
+    */
+
+going forward.
+
+If there's actually no consensus on this, then the issue devolves to
+subsystem maintainers.
+
+For what it's worth, I've been demanding "wing your multi-line comments
+at both ends", and intend to continue doing so, unless we adopt a
+different project-wide multi-line comment style, enforced by checkpatch.
+
+[...]
