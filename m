@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1foAFu-0007eH-TL
+	(envelope-from <kwolf@redhat.com>) id 1foAFv-0007eh-6I
 	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 12:27:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1foAFt-0004wi-Sr
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 12:27:14 -0400
+	(envelope-from <kwolf@redhat.com>) id 1foAFu-0004wv-0t
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 12:27:15 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 10 Aug 2018 18:26:57 +0200
-Message-Id: <20180810162658.6562-2-kwolf@redhat.com>
+Date: Fri, 10 Aug 2018 18:26:58 +0200
+Message-Id: <20180810162658.6562-3-kwolf@redhat.com>
 In-Reply-To: <20180810162658.6562-1-kwolf@redhat.com>
 References: <20180810162658.6562-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] commit: Add top-node/base-node options
+Subject: [Qemu-devel] [PATCH 2/2] qemu-iotests: Test commit with
+ top-node/base-node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,121 +23,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-The block-commit QMP command required specifying the top and base nodes
-of the commit jobs using the file name of that node. While this works
-in simple cases (local files with absolute paths), the file names
-generated for more complicated setups can be hard to predict.
-
-This adds two new options top-node and base-node to the command, which
-allow specifying node names instead. They are mutually exclusive with
-the old options.
+This adds some tests for block-commit with the new options top-node and
+base-node (taking node names) instead of top and base (taking file
+names).
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json | 24 ++++++++++++++++++------
- blockdev.c           | 32 ++++++++++++++++++++++++++++++--
- 2 files changed, 48 insertions(+), 8 deletions(-)
+ tests/qemu-iotests/040     | 52 ++++++++++++++++++++++++++++++++++++++++++++--
+ tests/qemu-iotests/040.out |  4 ++--
+ 2 files changed, 52 insertions(+), 4 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 5b9084a394..91dd075c84 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1455,12 +1455,23 @@
- #
- # @device:  the device name or node-name of a root node
- #
--# @base:   The file name of the backing image to write data into.
--#                    If not specified, this is the deepest backing image.
-+# @base-node: The node name of the backing image to write data into.
-+#             If not specified, this is the deepest backing image.
-+#             (since: 2.10)
- #
--# @top:    The file name of the backing image within the image chain,
--#                    which contains the topmost data to be committed down. If
--#                    not specified, this is the active layer.
-+# @base: Same as @base-node, except that it is a file name rather than a node
-+#        name. This must be the exact filename string that was used to open the
-+#        node; other strings, even if addressing the same file, are not
-+#        accepted (deprecated, use @base-node instead)
-+#
-+# @top-node: The node name of the backing image within the image chain
-+#            which contains the topmost data to be committed down. If
-+#            not specified, this is the active layer. (since: 2.10)
-+#
-+# @top: Same as @top-node, except that it is a file name rather than a node
-+#       name. This must be the exact filename string that was used to open the
-+#       node; other strings, even if addressing the same file, are not
-+#       accepted (deprecated, use @base-node instead)
- #
- # @backing-file:  The backing file string to write into the overlay
- #                           image of 'top'.  If 'top' is the active layer,
-@@ -1516,7 +1527,8 @@
- #
- ##
- { 'command': 'block-commit',
--  'data': { '*job-id': 'str', 'device': 'str', '*base': 'str', '*top': 'str',
-+  'data': { '*job-id': 'str', 'device': 'str', '*base-node': 'str',
-+            '*base': 'str', '*top-node': 'str', '*top': 'str',
-             '*backing-file': 'str', '*speed': 'int',
-             '*filter-node-name': 'str' } }
+diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+index 1beb5e6dab..1cb1ceeb33 100755
+--- a/tests/qemu-iotests/040
++++ b/tests/qemu-iotests/040
+@@ -57,9 +57,12 @@ class ImageCommitTestCase(iotests.QMPTestCase):
+         self.assert_no_active_block_jobs()
+         self.vm.shutdown()
  
-diff --git a/blockdev.c b/blockdev.c
-index dcf8c8d2ab..064c8fb3f5 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3308,7 +3308,9 @@ out:
- }
+-    def run_commit_test(self, top, base, need_ready=False):
++    def run_commit_test(self, top, base, need_ready=False, node_names=False):
+         self.assert_no_active_block_jobs()
+-        result = self.vm.qmp('block-commit', device='drive0', top=top, base=base)
++        if node_names:
++            result = self.vm.qmp('block-commit', device='drive0', top_node=top, base_node=base)
++        else:
++            result = self.vm.qmp('block-commit', device='drive0', top=top, base=base)
+         self.assert_qmp(result, 'return', {})
+         self.wait_for_complete(need_ready)
  
- void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-+                      bool has_base_node, const char *base_node,
-                       bool has_base, const char *base,
-+                      bool has_top_node, const char *top_node,
-                       bool has_top, const char *top,
-                       bool has_backing_file, const char *backing_file,
-                       bool has_speed, int64_t speed,
-@@ -3360,7 +3362,20 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-     /* default top_bs is the active layer */
-     top_bs = bs;
+@@ -101,6 +104,11 @@ class TestSingleDrive(ImageCommitTestCase):
+         self.assertEqual(-1, qemu_io('-f', 'raw', '-c', 'read -P 0xab 0 524288', backing_img).find("verification failed"))
+         self.assertEqual(-1, qemu_io('-f', 'raw', '-c', 'read -P 0xef 524288 524288', backing_img).find("verification failed"))
  
--    if (has_top && top) {
-+    if (has_top_node && has_top) {
-+        error_setg(errp, "'top-node' and 'top' are mutually exclusive");
-+        goto out;
-+    } else if (has_top_node) {
-+        top_bs = bdrv_lookup_bs(NULL, top_node, errp);
-+        if (top_bs == NULL) {
-+            goto out;
-+        }
-+        if (!bdrv_chain_contains(bs, top_bs)) {
-+            error_setg(errp, "'%s' is not in this backing file chain",
-+                       top_node);
-+            goto out;
-+        }
-+    } else if (has_top && top) {
-         if (strcmp(bs->filename, top) != 0) {
-             top_bs = bdrv_find_backing_image(bs, top);
-         }
-@@ -3373,7 +3388,20 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
++    def test_commit_node(self):
++        self.run_commit_test("mid", "base", node_names=True)
++        self.assertEqual(-1, qemu_io('-f', 'raw', '-c', 'read -P 0xab 0 524288', backing_img).find("verification failed"))
++        self.assertEqual(-1, qemu_io('-f', 'raw', '-c', 'read -P 0xef 524288 524288', backing_img).find("verification failed"))
++
+     def test_device_not_found(self):
+         result = self.vm.qmp('block-commit', device='nonexistent', top='%s' % mid_img)
+         self.assert_qmp(result, 'error/class', 'DeviceNotFound')
+@@ -123,6 +131,30 @@ class TestSingleDrive(ImageCommitTestCase):
+         self.assert_qmp(result, 'error/class', 'GenericError')
+         self.assert_qmp(result, 'error/desc', 'Base \'badfile\' not found')
  
-     assert(bdrv_get_aio_context(top_bs) == aio_context);
++    def test_top_node_invalid(self):
++        self.assert_no_active_block_jobs()
++        result = self.vm.qmp('block-commit', device='drive0', top_node='badfile', base_node='base')
++        self.assert_qmp(result, 'error/class', 'GenericError')
++        self.assert_qmp(result, 'error/desc', "Cannot find device= nor node_name=badfile")
++
++    def test_base_node_invalid(self):
++        self.assert_no_active_block_jobs()
++        result = self.vm.qmp('block-commit', device='drive0', top_node='mid', base_node='badfile')
++        self.assert_qmp(result, 'error/class', 'GenericError')
++        self.assert_qmp(result, 'error/desc', "Cannot find device= nor node_name=badfile")
++
++    def test_top_path_and_node(self):
++        self.assert_no_active_block_jobs()
++        result = self.vm.qmp('block-commit', device='drive0', top_node='mid', base_node='base', top='%s' % mid_img)
++        self.assert_qmp(result, 'error/class', 'GenericError')
++        self.assert_qmp(result, 'error/desc', "'top-node' and 'top' are mutually exclusive")
++
++    def test_base_path_and_node(self):
++        self.assert_no_active_block_jobs()
++        result = self.vm.qmp('block-commit', device='drive0', top_node='mid', base_node='base', base='%s' % backing_img)
++        self.assert_qmp(result, 'error/class', 'GenericError')
++        self.assert_qmp(result, 'error/desc', "'base-node' and 'base' are mutually exclusive")
++
+     def test_top_is_active(self):
+         self.run_commit_test(test_img, backing_img, need_ready=True)
+         self.assertEqual(-1, qemu_io('-f', 'raw', '-c', 'read -P 0xab 0 524288', backing_img).find("verification failed"))
+@@ -139,6 +171,22 @@ class TestSingleDrive(ImageCommitTestCase):
+         self.assert_qmp(result, 'error/class', 'GenericError')
+         self.assert_qmp(result, 'error/desc', 'Base \'%s\' not found' % mid_img)
  
--    if (has_base && base) {
-+    if (has_base_node && has_base) {
-+        error_setg(errp, "'base-node' and 'base' are mutually exclusive");
-+        goto out;
-+    } else if (has_base_node) {
-+        base_bs = bdrv_lookup_bs(NULL, base_node, errp);
-+        if (base_bs == NULL) {
-+            goto out;
-+        }
-+        if (!bdrv_chain_contains(top_bs, base_bs)) {
-+            error_setg(errp, "'%s' is not in this backing file chain",
-+                       base_node);
-+            goto out;
-+        }
-+    } else if (has_base && base) {
-         base_bs = bdrv_find_backing_image(top_bs, base);
-     } else {
-         base_bs = bdrv_find_base(top_bs);
++    def test_top_and_base_node_reversed(self):
++        self.assert_no_active_block_jobs()
++        result = self.vm.qmp('block-commit', device='drive0', top_node='base', base_node='top')
++        self.assert_qmp(result, 'error/class', 'GenericError')
++        self.assert_qmp(result, 'error/desc', "'top' is not in this backing file chain")
++
++    def test_top_node_in_wrong_chain(self):
++        self.assert_no_active_block_jobs()
++
++        result = self.vm.qmp('blockdev-add', driver='null-co', node_name='null')
++        self.assert_qmp(result, 'return', {})
++
++        result = self.vm.qmp('block-commit', device='drive0', top_node='null', base_node='base')
++        self.assert_qmp(result, 'error/class', 'GenericError')
++        self.assert_qmp(result, 'error/desc', "'null' is not in this backing file chain")
++
+     # When the job is running on a BB that is automatically deleted on hot
+     # unplug, the job is cancelled when the device disappears
+     def test_hot_unplug(self):
+diff --git a/tests/qemu-iotests/040.out b/tests/qemu-iotests/040.out
+index e20a75ce4f..802ffaa0c0 100644
+--- a/tests/qemu-iotests/040.out
++++ b/tests/qemu-iotests/040.out
+@@ -1,5 +1,5 @@
+-.............................
++...........................................
+ ----------------------------------------------------------------------
+-Ran 29 tests
++Ran 43 tests
+ 
+ OK
 -- 
 2.13.6
