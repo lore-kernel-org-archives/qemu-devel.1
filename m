@@ -1,19 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fnw1G-0002yd-KF
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 21:15:12 -0400
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1fnxhg-0005hm-Bv
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 23:03:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fnw1D-0004ds-BK
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 21:15:10 -0400
-Received: from m15-112.126.com ([220.181.15.112]:54365)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fnw1C-0004bK-KA
-	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 21:15:07 -0400
-From: Chen Hanxiao <chen_han_xiao@126.com>
-Date: Fri, 10 Aug 2018 09:13:48 +0800
-Message-Id: <20180810011348.8952-1-chen_han_xiao@126.com>
-Subject: [Qemu-devel] [resend][PATCH] qga-win: add support for
- qmp_guest_fsfreeze_freeze_list
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1fnxhf-0001up-H9
+	for qemu-devel@nongnu.org; Thu, 09 Aug 2018 23:03:04 -0400
+From: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
+Date: Thu,  9 Aug 2018 23:01:32 -0400
+Message-Id: <20180810030139.25916-1-pavel.zbitskiy@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/7] Some improvements in z/Arch instructions
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,282 +19,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, Chen Hanxiao <chen_han_xiao@126.com>
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com, richard.henderson@linaro.org, Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
 
-From: Chen Hanxiao <chenhanxiao@gmail.com>
+Found while attempting to run an old tool in qemu.
 
-This patch add support for freeze specified fs.
+* BAL and BALR:    Added.
+* CSST:            Qemu crashed after an accidental jump to garbage.
+* IPM:             A tool produced an incorrect output.
+* EX TRT/TRTR:     A tool ran quite slow.
+* PACK:            A tool produced an incorrect output.
+* CVB, CVBY, CVBG: Added.
 
-The valid mountpoints list member are [1]:
+Changes since v1:
+* Tests.
+* Call pc_to_link_info() instead of op_bas().
+* Clarified CSST commit message.
+* Rewrote IPM using extract/deposit.
+* Clarified PACK commit message.
+* Do not use LowCore for CONFIG_USER_ONLY.
+* Reduce duplication in CVB code.
 
-  The path of a mounted folder, for example, Y:\MountX\
-  A drive letter, for example, D:\
-  A volume GUID path of the form \\?\Volume{GUID}\,
-      where GUID identifies the volume
-  A UNC path that specifies a remote file share,
-      for example, \\Clusterx\Share1\
+Pavel Zbitskiy (7):
+  tests/tcg: add a simple s390x test
+  target/s390x: add BAL and BALR instructions
+  target/s390x: fix CSST decoding and runtime alignment check
+  target/s390x: fix IPM polluting irrelevant bits
+  target/s390x: add EX support for TRT and TRTR
+  target/s390x: fix PACK reading 1 byte less and writing 1 byte more
+  target/s390x: implement CVB, CVBY and CVBG
 
-[1] https://docs.microsoft.com/en-us/windows/desktop/api/vsbackup/nf-vsbackup-ivssbackupcomponents-addtosnapshotset
+ target/s390x/helper.h           |  1 +
+ target/s390x/insn-data.def      |  7 ++++
+ target/s390x/int_helper.c       | 50 ++++++++++++++++++++++++++
+ target/s390x/mem_helper.c       | 24 ++++++++++---
+ target/s390x/translate.c        | 64 ++++++++++++++++++++++++++-------
+ tests/tcg/s390x/Makefile.target |  9 +++++
+ tests/tcg/s390x/csst.c          | 43 ++++++++++++++++++++++
+ tests/tcg/s390x/cvb.c           | 18 ++++++++++
+ tests/tcg/s390x/exrl-trt.c      | 48 +++++++++++++++++++++++++
+ tests/tcg/s390x/exrl-trtr.c     | 48 +++++++++++++++++++++++++
+ tests/tcg/s390x/hello-s390x.c   |  7 ++++
+ tests/tcg/s390x/ipm.c           | 22 ++++++++++++
+ tests/tcg/s390x/pack.c          | 21 +++++++++++
+ 13 files changed, 346 insertions(+), 16 deletions(-)
+ create mode 100644 tests/tcg/s390x/Makefile.target
+ create mode 100644 tests/tcg/s390x/csst.c
+ create mode 100644 tests/tcg/s390x/cvb.c
+ create mode 100644 tests/tcg/s390x/exrl-trt.c
+ create mode 100644 tests/tcg/s390x/exrl-trtr.c
+ create mode 100644 tests/tcg/s390x/hello-s390x.c
+ create mode 100644 tests/tcg/s390x/ipm.c
+ create mode 100644 tests/tcg/s390x/pack.c
 
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
----
- qga/commands-win32.c        | 21 ++++++--------
- qga/main.c                  |  2 +-
- qga/vss-win32.c             |  5 ++--
- qga/vss-win32.h             |  3 +-
- qga/vss-win32/requester.cpp | 56 +++++++++++++++++++++++++++++++------
- qga/vss-win32/requester.h   | 13 +++++++--
- 6 files changed, 72 insertions(+), 28 deletions(-)
-
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 98d9735389..1d627f73c1 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -776,6 +776,13 @@ GuestFsfreezeStatus qmp_guest_fsfreeze_status(Error **errp)
-  * The frozen state is limited for up to 10 seconds by VSS.
-  */
- int64_t qmp_guest_fsfreeze_freeze(Error **errp)
-+{
-+    return qmp_guest_fsfreeze_freeze_list(false, NULL, errp);
-+}
-+
-+int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
-+                                       strList *mountpoints,
-+                                       Error **errp)
- {
-     int i;
-     Error *local_err = NULL;
-@@ -790,7 +797,7 @@ int64_t qmp_guest_fsfreeze_freeze(Error **errp)
-     /* cannot risk guest agent blocking itself on a write in this state */
-     ga_set_frozen(ga_state);
- 
--    qga_vss_fsfreeze(&i, true, &local_err);
-+    qga_vss_fsfreeze(&i, true, mountpoints, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto error;
-@@ -808,15 +815,6 @@ error:
-     return 0;
- }
- 
--int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
--                                       strList *mountpoints,
--                                       Error **errp)
--{
--    error_setg(errp, QERR_UNSUPPORTED);
--
--    return 0;
--}
--
- /*
-  * Thaw local file systems using Volume Shadow-copy Service.
-  */
-@@ -829,7 +827,7 @@ int64_t qmp_guest_fsfreeze_thaw(Error **errp)
-         return 0;
-     }
- 
--    qga_vss_fsfreeze(&i, false, errp);
-+    qga_vss_fsfreeze(&i, false, NULL, errp);
- 
-     ga_unset_frozen(ga_state);
-     return i;
-@@ -1646,7 +1644,6 @@ GList *ga_command_blacklist_init(GList *blacklist)
-         "guest-set-vcpus",
-         "guest-get-memory-blocks", "guest-set-memory-blocks",
-         "guest-get-memory-block-size",
--        "guest-fsfreeze-freeze-list",
-         NULL};
-     char **p = (char **)list_unsupported;
- 
-diff --git a/qga/main.c b/qga/main.c
-index 87372d40ef..098c783f1f 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -152,7 +152,7 @@ static void quit_handler(int sig)
-             WaitForSingleObject(hEventTimeout, 0);
-             CloseHandle(hEventTimeout);
-         }
--        qga_vss_fsfreeze(&i, false, &err);
-+        qga_vss_fsfreeze(&i, false, NULL, &err);
-         if (err) {
-             g_debug("Error unfreezing filesystems prior to exiting: %s",
-                 error_get_pretty(err));
-diff --git a/qga/vss-win32.c b/qga/vss-win32.c
-index a541f3ae01..f444a25a70 100644
---- a/qga/vss-win32.c
-+++ b/qga/vss-win32.c
-@@ -147,7 +147,8 @@ void ga_uninstall_vss_provider(void)
- }
- 
- /* Call VSS requester and freeze/thaw filesystems and applications */
--void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
-+void qga_vss_fsfreeze(int *nr_volume, bool freeze,
-+                      strList *mountpoints, Error **errp)
- {
-     const char *func_name = freeze ? "requester_freeze" : "requester_thaw";
-     QGAVSSRequesterFunc func;
-@@ -164,5 +165,5 @@ void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
-         return;
-     }
- 
--    func(nr_volume, &errset);
-+    func(nr_volume, mountpoints, &errset);
- }
-diff --git a/qga/vss-win32.h b/qga/vss-win32.h
-index 4f8e39aa5c..ce2abe5a72 100644
---- a/qga/vss-win32.h
-+++ b/qga/vss-win32.h
-@@ -22,6 +22,7 @@ bool vss_initialized(void);
- int ga_install_vss_provider(void);
- void ga_uninstall_vss_provider(void);
- 
--void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp);
-+void qga_vss_fsfreeze(int *nr_volume, bool freeze,
-+                      strList *mountpints, Error **errp);
- 
- #endif
-diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
-index 3d9c9716c0..0bd170eddc 100644
---- a/qga/vss-win32/requester.cpp
-+++ b/qga/vss-win32/requester.cpp
-@@ -234,7 +234,7 @@ out:
-     }
- }
- 
--void requester_freeze(int *num_vols, ErrorSet *errset)
-+void requester_freeze(int *num_vols, void *mountpoints, ErrorSet *errset)
- {
-     COMPointer<IVssAsync> pAsync;
-     HANDLE volume;
-@@ -245,7 +245,9 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
-     SECURITY_ATTRIBUTES sa;
-     WCHAR short_volume_name[64], *display_name = short_volume_name;
-     DWORD wait_status;
-+    PWCHAR WStr = NULL;
-     int num_fixed_drives = 0, i;
-+    int num_mount_points = 0;
- 
-     if (vss_ctx.pVssbc) { /* already frozen */
-         *num_vols = 0;
-@@ -337,12 +339,42 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
-         goto out;
-     }
- 
--    volume = FindFirstVolumeW(short_volume_name, sizeof(short_volume_name));
--    if (volume == INVALID_HANDLE_VALUE) {
--        err_set(errset, hr, "failed to find first volume");
-+    if (mountpoints) {
-+        for (volList *list = (volList *)mountpoints; list; list = list->next) {
-+            size_t len = strlen(list->value) + 1;
-+            size_t converted = 0;
-+            VSS_ID pid;
-+
-+            WStr = new wchar_t[len];
-+            mbstowcs_s(&converted, WStr, len, list->value, _TRUNCATE);
-+
-+            hr = vss_ctx.pVssbc->AddToSnapshotSet(WStr,
-+                                                  g_gProviderId, &pid);
-+            if (FAILED(hr)) {
-+                err_set(errset, hr, "failed to add %S to snapshot set", WStr);
-+                goto out;
-+            }
-+            num_mount_points++;
-+
-+            delete WStr;
-+        }
-+    }
-+
-+    if (mountpoints && num_mount_points == 0) {
-+        /* If there is no valid mount points, just exit. */
-         goto out;
-     }
--    for (;;) {
-+
-+
-+    if (!mountpoints) {
-+        volume = FindFirstVolumeW(short_volume_name, sizeof(short_volume_name));
-+        if (volume == INVALID_HANDLE_VALUE) {
-+            err_set(errset, hr, "failed to find first volume");
-+            goto out;
-+        }
-+    }
-+
-+    while (!mountpoints) {
-         if (GetDriveTypeW(short_volume_name) == DRIVE_FIXED) {
-             VSS_ID pid;
-             hr = vss_ctx.pVssbc->AddToSnapshotSet(short_volume_name,
-@@ -355,7 +387,7 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
-                     display_name = volume_path_name;
-                 }
-                 err_set(errset, hr, "failed to add %S to snapshot set",
--                                 display_name);
-+                        display_name);
-                 FindVolumeClose(volume);
-                 goto out;
-             }
-@@ -368,7 +400,7 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
-         }
-     }
- 
--    if (num_fixed_drives == 0) {
-+    if (!mountpoints && num_fixed_drives == 0) {
-         goto out; /* If there is no fixed drive, just exit. */
-     }
- 
-@@ -435,13 +467,19 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
-         goto out;
-     }
- 
--    *num_vols = vss_ctx.cFrozenVols = num_fixed_drives;
-+    if (mountpoints) {
-+        *num_vols = vss_ctx.cFrozenVols = num_mount_points;
-+    } else {
-+        *num_vols = vss_ctx.cFrozenVols = num_fixed_drives;
-+    }
-+
-     return;
- 
- out:
-     if (vss_ctx.pVssbc) {
-         vss_ctx.pVssbc->AbortBackup();
-     }
-+    delete WStr;
- 
- out1:
-     requester_cleanup();
-@@ -449,7 +487,7 @@ out1:
- }
- 
- 
--void requester_thaw(int *num_vols, ErrorSet *errset)
-+void requester_thaw(int *num_vols, void *mountpints, ErrorSet *errset)
- {
-     COMPointer<IVssAsync> pAsync;
- 
-diff --git a/qga/vss-win32/requester.h b/qga/vss-win32/requester.h
-index 2a39d734a2..5a8e8faf0c 100644
---- a/qga/vss-win32/requester.h
-+++ b/qga/vss-win32/requester.h
-@@ -34,9 +34,16 @@ typedef struct ErrorSet {
- STDAPI requester_init(void);
- STDAPI requester_deinit(void);
- 
--typedef void (*QGAVSSRequesterFunc)(int *, ErrorSet *);
--void requester_freeze(int *num_vols, ErrorSet *errset);
--void requester_thaw(int *num_vols, ErrorSet *errset);
-+typedef struct volList volList;
-+
-+struct volList {
-+    volList *next;
-+    char *value;
-+};
-+
-+typedef void (*QGAVSSRequesterFunc)(int *, void *, ErrorSet *);
-+void requester_freeze(int *num_vols, void *volList, ErrorSet *errset);
-+void requester_thaw(int *num_vols, void *volList, ErrorSet *errset);
- 
- #ifdef __cplusplus
- }
 -- 
-2.17.1
+2.18.0
