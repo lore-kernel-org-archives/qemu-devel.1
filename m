@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1foBKc-0002io-3Z
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 13:36:11 -0400
+	(envelope-from <cota@braap.org>) id 1foBOA-0004Ks-KD
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 13:39:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1foBKb-00076Y-9x
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 13:36:10 -0400
-References: <20180810162658.6562-1-kwolf@redhat.com>
-	<20180810162658.6562-3-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e695078a-90e5-2d96-924d-b85cd8fba29e@redhat.com>
-Date: Fri, 10 Aug 2018 12:36:02 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180810162658.6562-3-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-iotests: Test commit with
- top-node/base-node
+	(envelope-from <cota@braap.org>) id 1foBO6-0001Qk-Mz
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 13:39:50 -0400
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:38797)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1foBO6-0001PX-2R
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 13:39:46 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Fri, 10 Aug 2018 13:39:38 -0400
+Message-Id: <20180810173941.5301-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v2 0/3] target/riscv: use
+ tcg_lookup_and_goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +22,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On 08/10/2018 11:26 AM, Kevin Wolf wrote:
-> This adds some tests for block-commit with the new options top-node and
-> base-node (taking node names) instead of top and base (taking file
-> names).
+Changes wrt v1: changed patch 3 as suggested by Richard. Also
+added his R-b's.
 
-May need a rewrite if you like my idea of "by-node":true.
+You can fetch this series from:
+  https://github.com/cota/qemu/tree/riscv-lookup_ptr-v2
 
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   tests/qemu-iotests/040     | 52 ++++++++++++++++++++++++++++++++++++++++++++--
->   tests/qemu-iotests/040.out |  4 ++--
->   2 files changed, 52 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-> index 1beb5e6dab..1cb1ceeb33 100755
-> --- a/tests/qemu-iotests/040
-> +++ b/tests/qemu-iotests/040
-> @@ -57,9 +57,12 @@ class ImageCommitTestCase(iotests.QMPTestCase):
->           self.assert_no_active_block_jobs()
->           self.vm.shutdown()
->   
-> -    def run_commit_test(self, top, base, need_ready=False):
-> +    def run_commit_test(self, top, base, need_ready=False, node_names=False):
+Thanks,
 
-Especially since you've already picked that style of signature here :)
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+		Emilio
