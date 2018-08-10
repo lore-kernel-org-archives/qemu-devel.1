@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fo7ng-0001bF-Bc
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:49:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1fo7qX-0003RA-4Y
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:52:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fo7nc-0000HZ-9g
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:49:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57528 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fo7qT-0002Ja-2T
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:52:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57648 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fo7nc-0000HF-4c
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:49:52 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fo7qS-0002JD-T0
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 09:52:48 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-5-armbru@redhat.com>
-	<8db80373-f9fb-ca83-5c56-4439b807e78e@redhat.com>
-Date: Fri, 10 Aug 2018 15:49:47 +0200
-In-Reply-To: <8db80373-f9fb-ca83-5c56-4439b807e78e@redhat.com> (Eric Blake's
-	message of "Thu, 9 Aug 2018 08:38:06 -0500")
-Message-ID: <87in4imiv8.fsf@dusky.pond.sub.org>
+	<20180808120334.10970-6-armbru@redhat.com>
+	<36518ac8-f022-c54d-2e57-6a709b3678ce@redhat.com>
+Date: Fri, 10 Aug 2018 15:52:46 +0200
+In-Reply-To: <36518ac8-f022-c54d-2e57-6a709b3678ce@redhat.com> (Eric Blake's
+	message of "Thu, 9 Aug 2018 08:42:36 -0500")
+Message-ID: <87d0uqmiq9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 04/56] qmp-cmd-test: Split off qmp-test
+Subject: Re: [Qemu-devel] [PATCH 05/56] qmp-test: Cover syntax and lexical
+ errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +30,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
 Eric Blake <eblake@redhat.com> writes:
 
 > On 08/08/2018 07:02 AM, Markus Armbruster wrote:
->> qmp-test is for QMP protocol tests.  Commit e4a426e75ef added generic,
->> basic tests of query commands to it.  Move them to their own test
->> program qmp-cmd-test, to keep qmp-test focused on the protocol.
->>
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
->>   MAINTAINERS            |   1 +
->>   tests/Makefile.include |   3 +
->>   tests/qmp-cmd-test.c   | 213 +++++++++++++++++++++++++++++++++++++++++
->>   tests/qmp-test.c       | 191 +-----------------------------------
->>   4 files changed, 218 insertions(+), 190 deletions(-)
->>   create mode 100644 tests/qmp-cmd-test.c
+>>   tests/libqtest.c | 17 +++++++++++++++++
+>>   tests/libqtest.h | 11 +++++++++++
+>>   tests/qmp-test.c | 39 +++++++++++++++++++++++++++++++++++++++
+>>   3 files changed, 67 insertions(+)
 >>
 >
->> +++ b/tests/qmp-cmd-test.c
->> @@ -0,0 +1,213 @@
->> +/*
->> + * QMP command test cases
->> + *
->> + * Copyright (c) 2017 Red Hat Inc.
+>> +    /* lexical error: impossible byte outside string */
+>> +    qtest_qmp_send_raw(qts, "{\xFF");
 >
-> Worth adding 2018?
+> \xff is an impossible byte inside a string as well; plus it has
+> special meaning to at least QMP for commanding a parser reset. Is a
+> better byte more appropriate (maybe \x7f), either in replacement to
+> \xff or as an additional test?
 
-I'll do that in one of the patches that adds something new.
+\xFF is documented to have special meaning for QGA, but as far as the
+code's concerned, it's a lexical error like any other.  I'm fixing the
+documentation in PATCH 56.  Want me to move that patch to the front of
+the series?
 
->> + *
->> + * Authors:
->> + *  Markus Armbruster <armbru@redhat.com>,
->> + *
+>> +    resp = qtest_qmp_receive(qts);
+>> +    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+>> +    qobject_unref(resp);
+>> +    g_assert(recovered(qts));
+>> +
+>> +    /* lexical error: impossible byte in string */
+>> +    qtest_qmp_send_raw(qts, "{'bad \xFF");
 >
-> Trailing comma is odd. And these days, I'm inclined to omit Author
-> lines (git history is more reliable, anyways)
-
-Comma inherited from qmp-test.c.  I'm fixing both.
-
-> Those are minor issues, where it is up to you if/how to clean them, so
+> Same question about \xff being special as the parser reset command, so
+> should we test a different byte instead/as well?
 >
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+>> +    resp = qtest_qmp_receive(qts);
+>> +    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+>> +    qobject_unref(resp);
+>> +    g_assert(recovered(qts));
+>> +
+>> +    /* lexical error: interpolation */
+>> +    qtest_qmp_send_raw(qts, "%%p\n");
+>> +    resp = qtest_qmp_receive(qts);
+>> +    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+>> +    qobject_unref(resp);
+>> +    g_assert(recovered(qts));
+>> +
+>>       /* Not even a dictionary */
+>>       resp = qtest_qmp(qts, "null");
+>>       g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+>>
