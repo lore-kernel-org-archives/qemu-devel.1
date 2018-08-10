@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39282)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fnzzm-0006gX-SI
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:29:55 -0400
+	id 1fo01k-0007lM-DZ
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:31:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fnzzj-00087h-PV
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:29:54 -0400
-Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:43142)
+	id 1fo01h-0003CS-4h
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:31:56 -0400
+Received: from mail-ua1-x929.google.com ([2607:f8b0:4864:20::929]:41770)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fnzzj-000879-LU
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:29:51 -0400
-Received: by mail-ua1-x943.google.com with SMTP id f4-v6so688983uao.10
-	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 22:29:51 -0700 (PDT)
+	id 1fo01g-0003AW-Ty
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 01:31:53 -0400
+Received: by mail-ua1-x929.google.com with SMTP id h1-v6so693260uao.8
+	for <qemu-devel@nongnu.org>; Thu, 09 Aug 2018 22:31:52 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1533574847-19294-5-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1533574847-19294-10-git-send-email-aleksandar.markovic@rt-rk.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <84bab0fd-3624-1613-4e73-5e3a9c06a589@amsat.org>
-Date: Fri, 10 Aug 2018 02:29:43 -0300
+Message-ID: <a9a97704-c24d-0e79-ff13-2f71bee34c80@amsat.org>
+Date: Fri, 10 Aug 2018 02:31:45 -0300
 MIME-Version: 1.0
-In-Reply-To: <1533574847-19294-5-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1533574847-19294-10-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 04/80] target/mips: Fix two instances of
- shadow variables
+Subject: Re: [Qemu-devel] [PATCH v7 09/80] target/mips: Check ELPA flag only
+ in some cases of MFHC0 and MTHC0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,41 +40,71 @@ To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
 
 On 08/06/2018 01:59 PM, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> From: Yongbok Kim <yongbok.kim@mips.com>
 > 
-> Fix two instances of shadow variables. This cleans up entire file
-> translate.c from shadow variables.
+> MFHC0 and MTHC0 used to handle EntryLo0 and EntryLo1 registers only,
+> and placing ELPA flag checks before switch statement were technically
+> correct. However, after adding handling more registers, these checks
+> should be moved to act only in cases of handling EntryLo0 and
+> EntryLo1.
 > 
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  target/mips/translate.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  target/mips/translate.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
 > diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index e32fd5f..d6eccc9 100644
+> index 841c0c8..bc1f21f 100644
 > --- a/target/mips/translate.c
 > +++ b/target/mips/translate.c
-> @@ -13247,7 +13247,7 @@ static void gen_pool16c_r6_insn(DisasContext *ctx)
->              gen_arith_imm(ctx, OPC_ADDIU, 29, 29, imm << 2);
->          } else {
->              /* JRC16 */
-> -            int rs = extract32(ctx->opcode, 5, 5);
-> +            rs = extract32(ctx->opcode, 5, 5);
->              gen_compute_branch(ctx, OPC_JR, 2, rs, 0, 0, 0);
->          }
->          break;
-> @@ -15249,7 +15249,7 @@ static void decode_micromips32_opc(CPUMIPSState *env, DisasContext *ctx)
->          } else {
->              /* ADDIUPC */
->              int reg = mmreg(ZIMM(ctx->opcode, 23, 3));
-> -            int offset = SIMM(ctx->opcode, 0, 23) << 2;
-> +            offset = SIMM(ctx->opcode, 0, 23) << 2;
+> @@ -4896,12 +4896,11 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>  {
+>      const char *rn = "invalid";
 >  
->              gen_addiupc(ctx, reg, offset, 0, 0);
->          }
+> -    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+> -
+>      switch (reg) {
+>      case 2:
+>          switch (sel) {
+>          case 0:
+> +            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+>              gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0));
+>              rn = "EntryLo0";
+>              break;
+> @@ -4912,6 +4911,7 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>      case 3:
+>          switch (sel) {
+>          case 0:
+> +            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+>              gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1));
+>              rn = "EntryLo1";
+>              break;
+> @@ -4964,12 +4964,11 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>      const char *rn = "invalid";
+>      uint64_t mask = ctx->PAMask >> 36;
+>  
+> -    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+> -
+>      switch (reg) {
+>      case 2:
+>          switch (sel) {
+>          case 0:
+> +            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+>              tcg_gen_andi_tl(arg, arg, mask);
+>              gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0));
+>              rn = "EntryLo0";
+> @@ -4981,6 +4980,7 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>      case 3:
+>          switch (sel) {
+>          case 0:
+> +            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+>              tcg_gen_andi_tl(arg, arg, mask);
+>              gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1));
+>              rn = "EntryLo1";
 > 
