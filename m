@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fo4RP-0005op-T0
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:14:44 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fo4Tg-000772-9V
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:17:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fo4RM-0007RG-MC
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:14:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56088 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fo4RM-0007R5-Gy
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:14:40 -0400
-Date: Fri, 10 Aug 2018 12:14:38 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180810101438.5yfxte2yojhaivtj@sirius.home.kraxel.org>
-References: <1533815202-11967-1-git-send-email-liran.alon@oracle.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fo4Td-0000SU-3G
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:17:04 -0400
+Received: from mail-wr1-f50.google.com ([209.85.221.50]:35905)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fo4Tc-0000Rx-RK
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 06:17:01 -0400
+Received: by mail-wr1-f50.google.com with SMTP id h9-v6so7830740wro.3
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 03:17:00 -0700 (PDT)
+References: <20180806143412.27722-1-e.emanuelegiuseppe@gmail.com>
+	<20180806143412.27722-6-e.emanuelegiuseppe@gmail.com>
+	<f5a3c33f-f459-806c-1465-3b5415a5ccc1@redhat.com>
+	<141175f7-a38a-5236-cd63-70353870913a@redhat.com>
+	<b17c18e1-e283-b65b-8f26-efae69be8119@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b825d311-8513-8925-8761-47a34c07cdd2@redhat.com>
+Date: Fri, 10 Aug 2018 12:16:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1533815202-11967-1-git-send-email-liran.alon@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH 00/29]: vmsvga: Various fixes and
- enhancements
+In-Reply-To: <b17c18e1-e283-b65b-8f26-efae69be8119@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 05/34] tests/qgraph: sdhci driver and
+ interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,24 +34,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liran Alon <liran.alon@oracle.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, habkost@redhat.com
+To: Laurent Vivier <lvivier@redhat.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On Thu, Aug 09, 2018 at 02:46:13PM +0300, Liran Alon wrote:
-> Hi,
-> 
-> This patch series aim to fix many issues in vmware-svga emulation
-> which have prevented it from being fully functional in a wide-variety
-> of guests.
+On 09/08/2018 13:01, Laurent Vivier wrote:
+>> No, there is only one libqgraph.  The same test (qos-test) can run for
+>> both PCI and non-PCI machines, and will cull the unnecessary part of the
+>> graph automatically simply because there is no path from a machine to a
+>> PCI device.
+> So, all libqgraph files should be added to check-qtest-generic-y?
 
-Nice job in modernizing the vmware svga emulation.
+Yes.
 
-What guests this was tested with?  I've tried Fedora 28.  The vmware kms
-driver loads fine, fbcon runs fine.  Nice.
-
-But gdm doesn't start, neither with X11 nor with wayland.  Which is a
-regression, because the xorg vmware driver manages to handle the current
-qemu emulation just fine so gnome @ X11 works.
-
-cheers,
-  Gerd
+Paolo
