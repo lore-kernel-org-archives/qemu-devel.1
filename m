@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fo8jp-0002GH-L2
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:50:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1fo8sx-0006Cw-NY
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:59:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fo8jm-0007xu-Ho
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:50:01 -0400
-Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:39425)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fo8jm-0007xU-BY
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:49:58 -0400
-Received: by mail-ua1-x943.google.com with SMTP id g18-v6so2115084uam.6
-	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 07:49:58 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1533574847-19294-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1533574847-19294-11-git-send-email-aleksandar.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c9ac1c0d-e003-fdf2-c45c-b09177cf033f@amsat.org>
-Date: Fri, 10 Aug 2018 11:49:50 -0300
+	(envelope-from <eblake@redhat.com>) id 1fo8st-0000WR-4a
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:59:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46012 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fo8ss-0000VV-VT
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 10:59:23 -0400
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-12-armbru@redhat.com>
+	<26ff5c67-abfa-bc5d-7c26-3f08ffbdc57b@redhat.com>
+	<87k1oyl2y4.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <faf9bd30-5d2a-a68f-e6b4-c9dc8c369466@redhat.com>
+Date: Fri, 10 Aug 2018 09:59:20 -0500
 MIME-Version: 1.0
-In-Reply-To: <1533574847-19294-11-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <87k1oyl2y4.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 10/80] elf: Remove duplicate
- preprocessor constant definition
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 11/56] check-qjson: Cover UTF-8 in single
+ quoted strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, arikalo@wavecomp.com, thuth@redhat.com, armbru@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 08/06/2018 01:59 PM, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 08/10/2018 09:18 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
 > 
-> Remove duplicate preprocessor constant definition for EF_MIPS_ARCH.
+>> On 08/08/2018 07:02 AM, Markus Armbruster wrote:
+>>> utf8_string() tests only double quoted strings.  Cover single quoted
+>>> strings, too: store the strings to test without quotes, then wrap them
+>>> in either kind of quote.
+>>>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>>    tests/check-qjson.c | 427 ++++++++++++++++++++++----------------------
+>>>    1 file changed, 214 insertions(+), 213 deletions(-)
+>>>
+>>
+>> Pre-existing, but:
+>>
+>>>            /* 2.2.4  4 bytes U+1FFFFF */
+>>
+>> Technically, Unicode ends at U+10FFFF (21 bits). Anything beyond that
+>> is not valid Unicode, even if it IS a valid interpretation of UTF-8
+>> encoding.
 > 
-> The duplicate was introduced in commit 45506bdd. It placed the
-> constant EF_MIPS_ARCH in a better place, however it did not remove
-> the original. This patch removes the original occurence.
+> Correct.  Testing how we handle such sequences makes sense all the same.
 > 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+>>>            {
+>>> -            "\"\xF7\xBF\xBF\xBF\"",
+>>> +            "\xF7\xBF\xBF\xBF",
+>>>                NULL,               /* bug: rejected */
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+So, maybe all the more we need to do is remove the comment (as we WANT 
+to reject these)?
 
-> ---
->  include/elf.h | 1 -
->  1 file changed, 1 deletion(-)
+>>
+>> The conversion of the initializer looks sane (well, mechanical).  Ergo:
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
 > 
-> diff --git a/include/elf.h b/include/elf.h
-> index 934dbbd..60f6cbe 100644
-> --- a/include/elf.h
-> +++ b/include/elf.h
-> @@ -61,7 +61,6 @@ typedef int64_t  Elf64_Sxword;
->  #define EF_MIPS_ABI		0x0000f000
->  #define EF_MIPS_FP64      0x00000200
->  #define EF_MIPS_NAN2008   0x00000400
-> -#define EF_MIPS_ARCH      0xf0000000
->  
->  /* These constants define the different elf file types */
->  #define ET_NONE   0
-> 
+> Thanks!
+
+Of course, playing games with the pre-existing comments on out-of-range 
+behavior is probably better for a separate patch, and you do have some 
+churn on these tests in later patches. I'll leave it up to you what to 
+do (or leave put).
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
