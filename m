@@ -1,15 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fo6ij-0007E4-GC
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:40:46 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fo6mx-0000nx-H6
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:45:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fo6ig-00039y-B6
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:40:45 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 10 Aug 2018 13:40:27 +0100
-Message-Id: <20180810124027.10698-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH] fw_cfg: ignore suffixes in the bootdevice list
- dependent on machine class
+	(envelope-from <pbonzini@redhat.com>) id 1fo6ms-0006fR-Gw
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:45:07 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43361)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fo6ms-0006eH-9n
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 08:45:02 -0400
+Received: by mail-wr1-f67.google.com with SMTP id b15-v6so8165290wrv.10
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 05:45:02 -0700 (PDT)
+References: <20180809160011.17225-1-peter.maydell@linaro.org>
+	<19a9c0c6-03eb-d368-d8c8-fb62102556a4@redhat.com>
+	<CAFEAcA_rRW7qbtiM4c-sBVmQhFMSuKnVqU6+oXsdXPwJ3GKv6A@mail.gmail.com>
+	<9da04e7f-bd0c-9d50-fb7c-026b5aaa674c@redhat.com>
+	<87ftzmr21p.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <190f6353-c2ab-aa77-825b-fbaed0b821ab@redhat.com>
+Date: Fri, 10 Aug 2018 14:44:59 +0200
+MIME-Version: 1.0
+In-Reply-To: <87ftzmr21p.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] scripts/checkpatch.pl: Enforce multiline
+ comment syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,114 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, ehabkost@redhat.com, lersek@redhat.com, marcel.apfelbaum@gmail.com, arei.gonglei@huawei.com, david@gibson.dropbear.id.au
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-For the older machines (such as Mac and SPARC) the DT nodes representing
-bootdevices for disk nodes are irregular for mainly historical reasons.
+On 10/08/2018 11:41, Markus Armbruster wrote:
+>> Lone "/*" or "/**": 9986 cases
+>> 	of which in the first column: 7617
+>> 	of which the first line in the file (license headers): 2834
+>> 	regex: ^[ \t]*/\*\*?[ \t]*$
+>>
+>> "/*" with the first line of the comment: 11246
+>> 	of which in the first column: 4985
+>> 	of which the first line in the file: 97
+>> 	regex: ^[ \t]*/\*\*?+(?:(?!\*/).)+?$
+>>
+>> License headers almost always have the "lone /*" format.  Apart from
+>> license headers, 63% of the comments have the now-deprecated format.
+>>
+>> Inside functions, 73% of the comments have the now-deprecated format.
+>> Outside functions it's 50-50.  That's because there are 2024 doc
+>> comments, which in turn are 50% of the comments that are 1) outside the
+>> functions 2) using a lone "/*".
+>>
+>> So my proposal, which is actually consistent with what QEMU is doing, is
+>> the following:
+>>
+>> 1) the first line of a file should always be "/*", otherwise warn
+>>
+>> 2) a comment that starts with "/**" should have it on a lone line
+>>
+>> 3) every other multiline comment should start with
+>> "/*<whitespace><something>"
+> (3) is not consistent with what QEMU is doing in this case, since
+> according to your data there is no consistency in what QEMU is doing.
 
-Since the majority of bootdevice nodes for these machines either do not have a
-separate disk node or require different (custom) names then it is much easier
-for processing to just disable all suffixes for a particular machine.
+65-35, and 75-25 inside functions (comments outside should be doc
+comments so that's again a different story) is pretty consistent
+actually.  So no patch would be better in your opinion?
 
-Introduce a new ignore_boot_device_suffixes MachineClass property to control
-bootdevice suffix generation, defaulting to false in order to preserve
-compatibility.
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- bootdevice.c            | 5 ++++-
- hw/nvram/fw_cfg.c       | 2 +-
- hw/ppc/spapr.c          | 3 ++-
- include/hw/boards.h     | 1 +
- include/sysemu/sysemu.h | 2 +-
- 5 files changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/bootdevice.c b/bootdevice.c
-index 1141009114..1d225202f9 100644
---- a/bootdevice.c
-+++ b/bootdevice.c
-@@ -29,6 +29,7 @@
- #include "qemu/error-report.h"
- #include "sysemu/reset.h"
- #include "hw/qdev-core.h"
-+#include "hw/boards.h"
- 
- typedef struct FWBootEntry FWBootEntry;
- 
-@@ -208,11 +209,13 @@ DeviceState *get_boot_device(uint32_t position)
-  * memory pointed by "size" is assigned total length of the array in bytes
-  *
-  */
--char *get_boot_devices_list(size_t *size, bool ignore_suffixes)
-+char *get_boot_devices_list(size_t *size)
- {
-     FWBootEntry *i;
-     size_t total = 0;
-     char *list = NULL;
-+    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
-+    bool ignore_suffixes = mc->ignore_boot_device_suffixes;
- 
-     QTAILQ_FOREACH(i, &fw_boot_order, link) {
-         char *devpath = NULL,  *suffix = NULL;
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index b23e7f64a8..d79a568f54 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -861,7 +861,7 @@ static void fw_cfg_machine_reset(void *opaque)
-     void *ptr;
-     size_t len;
-     FWCfgState *s = opaque;
--    char *bootindex = get_boot_devices_list(&len, false);
-+    char *bootindex = get_boot_devices_list(&len);
- 
-     ptr = fw_cfg_modify_file(s, "bootorder", (uint8_t *)bootindex, len);
-     g_free(ptr);
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 421b2dd09b..e5d825374e 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1160,7 +1160,7 @@ static void spapr_dt_chosen(sPAPRMachineState *spapr, void *fdt)
-     const char *boot_device = machine->boot_order;
-     char *stdout_path = spapr_vio_stdout_path(spapr->vio_bus);
-     size_t cb = 0;
--    char *bootlist = get_boot_devices_list(&cb, true);
-+    char *bootlist = get_boot_devices_list(&cb);
- 
-     _FDT(chosen = fdt_add_subnode(fdt, 0, "chosen"));
- 
-@@ -3949,6 +3949,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     InterruptStatsProviderClass *ispc = INTERRUPT_STATS_PROVIDER_CLASS(oc);
- 
-     mc->desc = "pSeries Logical Partition (PAPR compliant)";
-+    mc->ignore_boot_device_suffixes = true;
- 
-     /*
-      * We set up the default / latest behaviour here.  The class_init
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index d139a431a6..f82f28468b 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -206,6 +206,7 @@ struct MachineClass {
-     bool auto_enable_numa_with_memhp;
-     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size);
-+    bool ignore_boot_device_suffixes;
- 
-     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-                                            DeviceState *dev);
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 76ef6196a7..8d6095d98b 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -182,7 +182,7 @@ void hmp_info_usb(Monitor *mon, const QDict *qdict);
- 
- void add_boot_device_path(int32_t bootindex, DeviceState *dev,
-                           const char *suffix);
--char *get_boot_devices_list(size_t *size, bool ignore_suffixes);
-+char *get_boot_devices_list(size_t *size);
- 
- DeviceState *get_boot_device(uint32_t position);
- void check_boot_index(int32_t bootindex, Error **errp);
--- 
-2.11.0
+Paolo
