@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1foAwO-00074l-QA
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 13:11:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1foB3M-0002HL-HI
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 13:18:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1foAwM-0007if-IZ
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 13:11:08 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38829)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1foAwM-0007he-Ag
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 13:11:06 -0400
-Received: by mail-wr1-x444.google.com with SMTP id v14-v6so8907442wro.5
-	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 10:11:06 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 10 Aug 2018 18:10:59 +0100
-Message-Id: <20180810171102.16451-2-alex.bennee@linaro.org>
-In-Reply-To: <20180810171102.16451-1-alex.bennee@linaro.org>
-References: <20180810171102.16451-1-alex.bennee@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1foB3H-0005Ln-R8
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 13:18:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54068 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1foB3H-0005Kp-Lw
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 13:18:15 -0400
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-29-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <67210961-8fc0-f3ac-be32-cf2f4903eed9@redhat.com>
+Date: Fri, 10 Aug 2018 12:18:10 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 1/3] HACKING: mention the C GNU extensions
- we use
+In-Reply-To: <20180808120334.10970-29-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 28/56] json: Fix \uXXXX for surrogate pairs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-QEMU is not a pure C99 code-base as anyone attempting to build with
--std=c99 will find out.
+On 08/08/2018 07:03 AM, Markus Armbruster wrote:
+> The JSON parser treats each half of a surrogate pair as unpaired
+> surrogate.  Fix it to recognize surrogate pairs.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   qobject/json-parser.c | 16 +++++++++++++++-
+>   tests/check-qjson.c   |  3 +--
+>   2 files changed, 16 insertions(+), 3 deletions(-)
+> 
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- HACKING | 5 +++++
- 1 file changed, 5 insertions(+)
+> @@ -168,6 +170,18 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
+>                       cp |= hex2decimal(*ptr);
+>                   }
+>   
+> +                if (cp >= 0xD800 && cp <= 0xDBFF && !leading_surrogate
+> +                    && ptr[1] == '\\' && ptr[2] == 'u') {
+> +                    ptr += 2;
+> +                    leading_surrogate = cp;
+> +                    goto hex;
+> +                }
+> +                if (cp >= 0xDC00 && cp <= 0xDFFF && leading_surrogate) {
+> +                    cp &= 0x3FF;
+> +                    cp |= (leading_surrogate & 0x3FF) << 10;
+> +                    cp += 0x010000;
+> +                }
+> +
+>                   if (mod_utf8_encode(utf8_buf, sizeof(utf8_buf), cp) < 0) {
+>                       parse_error(ctxt, token,
+>                                   "\\u%.4s is not a valid Unicode character",
 
-diff --git a/HACKING b/HACKING
-index 0fc3e0fc04..e042dd1f4f 100644
---- a/HACKING
-+++ b/HACKING
-@@ -189,6 +189,11 @@ In addition, QEMU assumes that the compiler does not use the latitude
- given in C99 and C11 to treat aspects of signed '<<' as undefined, as
- documented in the GNU Compiler Collection manual starting at version 4.0.
- 
-+Finally QEMU also uses some GNU extensions to the C language including
-+making extensive use of the typeof keyword for type inference. While
-+typeof() is a GCC extension it is fairly widely understood by other
-+compilers.
-+
- 7. Error handling and reporting
- 
- 7.1 Reporting errors to the human user
+Consider "\\udbff\\udfff" - a valid surrogate pair (in terms of being in 
+range), but which decodes to u+10ffff.  Since is_valid_codepoint() (part 
+of mod_utf8_encode()) rejects it due to (codepoint & 0xfffe) == 0xfffe, 
+it means we end up printing this error message, but only using the 
+second half of the surrogate pair.  Is that okay?
+
+Otherwise,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.17.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
