@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1fnyj0-00012i-FR
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 00:08:31 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fnz0I-0001M7-Fl
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 00:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1fnyiw-0002nj-Es
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 00:08:30 -0400
-From: Julio Faracco <jcfaracco@gmail.com>
-Date: Fri, 10 Aug 2018 01:07:43 -0300
-Message-Id: <20180810040743.25424-5-jcfaracco@gmail.com>
-In-Reply-To: <20180810040743.25424-1-jcfaracco@gmail.com>
-References: <20180810040743.25424-1-jcfaracco@gmail.com>
-Subject: [Qemu-devel] [PATCH 4/4] dmg: exchanging hardcoded dmg UDIF block
- types to enum.
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fnz0G-0002sT-W7
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 00:26:22 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180803144721.17036-1-stefanha@redhat.com>
+	<20180803144721.17036-7-stefanha@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <25a63ca5-20ad-f8d9-0117-b46c31c0c6c5@amsat.org>
+Date: Fri, 10 Aug 2018 01:26:08 -0300
+MIME-Version: 1.0
+In-Reply-To: <20180803144721.17036-7-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 6/6] Add QTest testcase for
+ the Intel Hexadecimal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,126 +29,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+To: Su Hang <suhang16@mails.ucas.ac.cn>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, mail@steffen-goertz.de, ilg@livius.net, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>, jusual@mail.ru
 
-This change is better to understand what kind of block type is being
-handled by the code. Using a syntax similar to the DMG documentation is
-easier than tracking all hex values assigned to a block type.
+Hi Su,
 
-Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
----
- block/dmg.c | 43 ++++++++++++++++++++++++++++---------------
- 1 file changed, 28 insertions(+), 15 deletions(-)
+On 08/03/2018 11:47 AM, Stefan Hajnoczi wrote:
+> From: Su Hang <suhang16@mails.ucas.ac.cn>
+> 
+> 'test.hex' file is a bare metal ARM software stored in Hexadecimal
+> Object Format. When it's loaded by QEMU, it will print "Hello world!\n"
+> on console.
 
-diff --git a/block/dmg.c b/block/dmg.c
-index 390ab67e53..ae379adb20 100644
---- a/block/dmg.c
-+++ b/block/dmg.c
-@@ -44,6 +44,19 @@ enum {
-     DMG_SECTORCOUNTS_MAX = DMG_LENGTHS_MAX / 512,
- };
- 
-+enum {
-+    /* DMG Block Type */
-+    UDZE=0, /* Zeroes */
-+    UDRW,   /* RAW type */
-+    UDIG,   /* Ignore */
-+    UDCO=0x80000004,
-+    UDZO,
-+    UDBZ,
-+    ULFO,
-+    UDCM=0x7ffffffe, /* Comments */
-+    UDLE             /* Last Entry */
-+};
-+
- static int dmg_probe(const uint8_t *buf, int buf_size, const char *filename)
- {
-     int len;
-@@ -108,16 +121,16 @@ static void update_max_chunk_size(BDRVDMGState *s, uint32_t chunk,
-     uint32_t uncompressed_sectors = 0;
- 
-     switch (s->types[chunk]) {
--    case 0x80000005: /* zlib compressed */
--    case 0x80000006: /* bzip2 compressed */
--    case 0x80000007: /* lzfse compressed */
-+    case UDCO: /* zlib compressed */
-+    case UDBZ: /* bzip2 compressed */
-+    case ULFO: /* lzfse compressed */
-         compressed_size = s->lengths[chunk];
-         uncompressed_sectors = s->sectorcounts[chunk];
-         break;
--    case 1: /* copy */
-+    case UDRW: /* copy */
-         uncompressed_sectors = DIV_ROUND_UP(s->lengths[chunk], 512);
-         break;
--    case 2: /* zero */
-+    case UDIG: /* zero */
-         /* as the all-zeroes block may be large, it is treated specially: the
-          * sector is not copied from a large buffer, a simple memset is used
-          * instead. Therefore uncompressed_sectors does not need to be set. */
-@@ -186,13 +199,13 @@ typedef struct DmgHeaderState {
- static bool dmg_is_known_block_type(uint32_t entry_type)
- {
-     switch (entry_type) {
--    case 0x00000001:    /* uncompressed */
--    case 0x00000002:    /* zeroes */
--    case 0x80000005:    /* zlib */
-+    case UDRW:    /* uncompressed */
-+    case UDIG:    /* zeroes */
-+    case UDCO:    /* zlib */
-         return true;
--    case 0x80000006:    /* bzip2 */
-+    case UDBZ:    /* bzip2 */
-         return !!dmg_uncompress_bz2;
--    case 0x80000007:    /* lzfse */
-+    case ULFO:    /* lzfse */
- 	return !!dmg_uncompress_lzfse;
-     default:
-         return false;
-@@ -592,7 +605,7 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
- 
-         s->current_chunk = s->n_chunks;
-         switch (s->types[chunk]) { /* block entry type */
--        case 0x80000005: { /* zlib compressed */
-+        case UDZO: { /* zlib compressed */
-             /* we need to buffer, because only the chunk as whole can be
-              * inflated. */
-             ret = bdrv_pread(bs->file, s->offsets[chunk],
-@@ -615,7 +628,7 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
-                 return -1;
-             }
-             break; }
--        case 0x80000006: /* bzip2 compressed */
-+        case UDBZ: /* bzip2 compressed */
-             if (!dmg_uncompress_bz2) {
-                 break;
-             }
-@@ -636,7 +649,7 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
-                 return ret;
-             }
-             break;
--	case 0x80000007:
-+	case ULFO:
- 	    if (!dmg_uncompress_lzfse) {
-                 break;
-             }
-@@ -657,14 +670,14 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
-                 return ret;
-             }
-             break;
--        case 1: /* copy */
-+        case UDRW: /* copy */
-             ret = bdrv_pread(bs->file, s->offsets[chunk],
-                              s->uncompressed_chunk, s->lengths[chunk]);
-             if (ret != s->lengths[chunk]) {
-                 return -1;
-             }
-             break;
--        case 2: /* zero */
-+        case UDIG: /* zero */
-             /* see dmg_read, it is treated specially. No buffer needs to be
-              * pre-filled, the zeroes can be set directly. */
-             break;
--- 
-2.17.1
+... on the console of the Emcraft SmartFusion2 machine.
+
+> 
+> `pre_store` array in 'hexloader-test.c' file, stores the binary format
+> of 'test.hex' file, which is used to verify correctness.
+> 
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Suggested-by: Steffen Gortz <qemu.ml@steffen-goertz.de>
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  MAINTAINERS                          |  6 +++
+>  configure                            |  4 ++
+>  tests/Makefile.include               |  2 +
+>  tests/hexloader-test.c               | 60 ++++++++++++++++++++++++++++
+>  tests/hex-loader-check-data/test.hex | 12 ++++++
+>  5 files changed, 84 insertions(+)
+>  create mode 100644 tests/hexloader-test.c
+>  create mode 100644 tests/hex-loader-check-data/test.hex
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 666e936812..c48d9271cf 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1323,6 +1323,12 @@ F: hw/core/generic-loader.c
+>  F: include/hw/core/generic-loader.h
+>  F: docs/generic-loader.txt
+>  
+> +Intel Hexadecimal Object File Loader
+> +M: Su Hang <suhang16@mails.ucas.ac.cn>
+> +S: Maintained
+> +F: tests/hexloader-test.c
+> +F: tests/hex-loader-check-data/test.hex
+> +
+>  CHRP NVRAM
+>  M: Thomas Huth <thuth@redhat.com>
+>  S: Maintained
+> diff --git a/configure b/configure
+> index 2a7796ea80..db97930314 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7382,6 +7382,10 @@ for test_file in $(find $source_path/tests/acpi-test-data -type f)
+>  do
+>      FILES="$FILES tests/acpi-test-data$(echo $test_file | sed -e 's/.*acpi-test-data//')"
+>  done
+> +for test_file in $(find $source_path/tests/hex-loader-check-data -type f)
+> +do
+> +    FILES="$FILES tests/hex-loader-check-data$(echo $test_file | sed -e 's/.*hex-loader-check-data//')"
+> +done
+>  mkdir -p $DIRS
+>  for f in $FILES ; do
+>      if [ -e "$source_path/$f" ] && [ "$pwd_is_source_path" != "y" ]; then
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index a49282704e..760a0f18b6 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -386,6 +386,7 @@ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
+>  gcov-files-arm-y += hw/timer/arm_mptimer.c
+>  check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
+>  check-qtest-arm-y += tests/sdhci-test$(EXESUF)
+> +check-qtest-arm-y += tests/hexloader-test$(EXESUF)
+>  
+>  check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+>  check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
+> @@ -773,6 +774,7 @@ tests/qmp-test$(EXESUF): tests/qmp-test.o
+>  tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
+>  tests/rtc-test$(EXESUF): tests/rtc-test.o
+>  tests/m48t59-test$(EXESUF): tests/m48t59-test.o
+> +tests/hexloader-test$(EXESUF): tests/hexloader-test.o
+>  tests/endianness-test$(EXESUF): tests/endianness-test.o
+>  tests/spapr-phb-test$(EXESUF): tests/spapr-phb-test.o $(libqos-obj-y)
+>  tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
+> diff --git a/tests/hexloader-test.c b/tests/hexloader-test.c
+> new file mode 100644
+> index 0000000000..8818bd45f8
+> --- /dev/null
+> +++ b/tests/hexloader-test.c
+> @@ -0,0 +1,60 @@
+> +/*
+> + * QTest testcase for the Intel Hexadecimal Object File Loader
+> + *
+> + * Authors:
+> + *  Su Hang <suhang16@mails.ucas.ac.cn> 2018
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "libqtest.h"
+> +
+> +#define BIN_SIZE 146
+
+This size is not needed, just use sizeof().
+
+> +
+> +static unsigned char pre_store[BIN_SIZE] = {
+
+I'd call this blob 'emcraft_sf2_uart_hello'.
+
+It can also be const:
+
+static const unsigned char emcraft_sf2_uart_hello[] = {
+    ...
+
+Can you add a comment providing the .S asm source and how to
+build/generate this blob? (I think this is required to respect the GPLv2
+license in your header).
+
+> +  0x04, 0xd0, 0x9f, 0xe5,   0x16, 0x00, 0x00, 0xeb,   0xfe, 0xff, 0xff, 0xea,
+> +  0x98, 0x10, 0x01, 0x00,   0x04, 0xb0, 0x2d, 0xe5,   0x00, 0xb0, 0x8d, 0xe2,
+> +  0x0c, 0xd0, 0x4d, 0xe2,   0x08, 0x00, 0x0b, 0xe5,   0x06, 0x00, 0x00, 0xea,
+> +  0x08, 0x30, 0x1b, 0xe5,   0x00, 0x20, 0xd3, 0xe5,   0x2c, 0x30, 0x9f, 0xe5,
+> +  0x00, 0x20, 0x83, 0xe5,   0x08, 0x30, 0x1b, 0xe5,   0x01, 0x30, 0x83, 0xe2,
+> +  0x08, 0x30, 0x0b, 0xe5,   0x08, 0x30, 0x1b, 0xe5,   0x00, 0x30, 0xd3, 0xe5,
+> +  0x00, 0x00, 0x53, 0xe3,   0xf4, 0xff, 0xff, 0x1a,   0x00, 0x00, 0xa0, 0xe1,
+> +  0x00, 0xd0, 0x8b, 0xe2,   0x04, 0xb0, 0x9d, 0xe4,   0x1e, 0xff, 0x2f, 0xe1,
+> +  0x00, 0x10, 0x1f, 0x10,   0x00, 0x48, 0x2d, 0xe9,   0x04, 0xb0, 0x8d, 0xe2,
+> +  0x08, 0x00, 0x9f, 0xe5,   0xe6, 0xff, 0xff, 0xeb,   0x00, 0x00, 0xa0, 0xe1,
+> +  0x00, 0x88, 0xbd, 0xe8,   0x84, 0x00, 0x01, 0x00,   0x00, 0x10, 0x1f, 0x10,
+> +  'H',  'e',  'l',  'l',    'o',  ' ',  'w',  'o',    'r',  'l',  'd',  '!',
+> +  '\n', '\0'
+> +};
+> +
+> +/* success if no crash or abort */
+> +static void hex_loader_test(void)
+> +{
+> +    unsigned int i;
+> +    unsigned char memory_content[BIN_SIZE];
+
+Not needed.
+
+> +    const unsigned int base_addr = 0x00010000;
+> +
+> +    QTestState *s = qtest_startf(
+> +        "-M emcraft-sf2 -nographic -device loader,file=tests/hex-loader-check-data/test.hex");
+> +
+> +    for (i = 0; i < BIN_SIZE; ++i) {
+> +        memory_content[i] = qtest_readb(s, base_addr + i);
+> +        g_assert_cmpuint(memory_content[i], ==, pre_store[i]);
+> +    }
+
+Simply:
+
+    for (i = 0; i < ARRAY_SIZE(emcraft_sf2_uart_hello); ++i) {
+        g_assert_cmphex(qtest_readb(s, base_addr + i),
+                        ==, emcraft_sf2_uart_hello[i]);
+    }
+
+> +    qtest_quit(s);
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +    int ret;
+> +
+> +    g_test_init(&argc, &argv, NULL);
+> +
+> +    qtest_add_func("/tmp/hex_loader", hex_loader_test);
+
+       qtest_add_func("/loader/hex/emcraft-sf2/uart_hello", ...
+
+> +    ret = g_test_run();
+> +
+> +    return ret;
+> +}
+> diff --git a/tests/hex-loader-check-data/test.hex b/tests/hex-loader-check-data/test.hex
+> new file mode 100644
+> index 0000000000..7e99b452f5
+> --- /dev/null
+> +++ b/tests/hex-loader-check-data/test.hex
+> @@ -0,0 +1,12 @@
+> +:020000040001F9
+> +:1000000004D09FE5160000EBFEFFFFEA9810010008
+> +:1000100004B02DE500B08DE20CD04DE208000BE5F8
+> +:10002000060000EA08301BE50020D3E52C309FE5F0
+> +:10003000002083E508301BE5013083E208300BE542
+> +:1000400008301BE50030D3E5000053E3F4FFFF1A4E
+> +:100050000000A0E100D08BE204B09DE41EFF2FE180
+> +:1000600000101F1000482DE904B08DE208009FE544
+> +:10007000E6FFFFEB0000A0E10088BDE8840001007E
+> +:1000800000101F1048656C6C6F20776F726C6421D4
+> +:020090000A0064
+> +:00000001FF
+> 
+
+With comment addressed:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+Regards,
+
+Phil.
