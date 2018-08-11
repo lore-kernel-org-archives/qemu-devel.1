@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1foZwJ-0007c9-Q2
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:52:45 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1foaz4-0003X6-Pv
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 16:59:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1foZwI-0003eJ-1H
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:52:43 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:39431)
+	(envelope-from <zhangckid@gmail.com>) id 1foaz1-0000m7-Ny
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 16:59:38 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43141)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1foZwH-0003dV-M2
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:52:41 -0400
-Received: by mail-wr1-x436.google.com with SMTP id h10-v6so10982081wre.6
-	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 12:52:41 -0700 (PDT)
-MIME-Version: 1.0
-References: <20180722193350.6028-1-zhangckid@gmail.com>
-	<20180722193350.6028-9-zhangckid@gmail.com>
-	<20180727185131.GD2498@work-vm>
-	<CAK3tnv+N94Fuev05WF3A4bBOuZ8-RfPrWWG2eGsFcEtjh0=mTA@mail.gmail.com>
-	<20180807184447.GS2556@work-vm>
-In-Reply-To: <20180807184447.GS2556@work-vm>
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1foaz1-0000ko-ES
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 16:59:35 -0400
+Received: by mail-pg1-x542.google.com with SMTP id a14-v6so5848567pgv.10
+	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 13:59:35 -0700 (PDT)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Sun, 12 Aug 2018 03:52:26 +0800
-Message-ID: <CAK3tnvK_GKX2FEcFPf_b1CKZYJz-7ywLF_1b+6vcdi0FZu5dZQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V10 08/20] ram/COLO: Record the dirty pages
- that SVM received
+Date: Sun, 12 Aug 2018 04:59:04 +0800
+Message-Id: <20180811205924.4113-1-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH V11 00/20] COLO: integrate colo frame with
+ block replication and COLO proxy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,155 +24,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, jasowang@redhat.com, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On Wed, Aug 8, 2018 at 2:44 AM Dr. David Alan Gilbert <dgilbert@redhat.com>
-wrote:
+Hi~ All~
 
-> * Zhang Chen (zhangckid@gmail.com) wrote:
-> > On Sat, Jul 28, 2018 at 2:51 AM, Dr. David Alan Gilbert <
-> dgilbert@redhat.com
-> > > wrote:
-> >
-> > > * Zhang Chen (zhangckid@gmail.com) wrote:
-> > > > We record the address of the dirty pages that received,
-> > > > it will help flushing pages that cached into SVM.
-> > > >
-> > > > Here, it is a trick, we record dirty pages by re-using migration
-> > > > dirty bitmap. In the later patch, we will start the dirty log
-> > > > for SVM, just like migration, in this way, we can record both
-> > > > the dirty pages caused by PVM and SVM, we only flush those dirty
-> > > > pages from RAM cache while do checkpoint.
-> > > >
-> > > > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > ---
-> > > >  migration/ram.c | 33 +++++++++++++++++++++++++++++++++
-> > > >  1 file changed, 33 insertions(+)
-> > > >
-> > > > diff --git a/migration/ram.c b/migration/ram.c
-> > > > index 33ebd09d70..d1060f1337 100644
-> > > > --- a/migration/ram.c
-> > > > +++ b/migration/ram.c
-> > > > @@ -3325,6 +3325,15 @@ static inline void
-> *colo_cache_from_block_offset(RAMBlock
-> > > *block,
-> > > >                       __func__, block->idstr);
-> > > >          return NULL;
-> > > >      }
-> > > > +
-> > > > +    /*
-> > > > +    * During colo checkpoint, we need bitmap of these migrated
-> pages.
-> > > > +    * It help us to decide which pages in ram cache should be
-> flushed
-> > > > +    * into VM's RAM later.
-> > > > +    */
-> > > > +    if (!test_and_set_bit(offset >> TARGET_PAGE_BITS, block->bmap))
-> {
-> > > > +        ram_state->migration_dirty_pages++;
-> > > > +    }
-> > > >      return block->colo_cache + offset;
-> > > >  }
-> > > >
-> > > > @@ -3555,6 +3564,24 @@ int colo_init_ram_cache(void)
-> > > >          memcpy(block->colo_cache, block->host, block->used_length);
-> > > >      }
-> > > >      rcu_read_unlock();
-> > > > +    /*
-> > > > +    * Record the dirty pages that sent by PVM, we use this dirty
-> bitmap
-> > > together
-> > > > +    * with to decide which page in cache should be flushed into
-> SVM's
-> > > RAM. Here
-> > > > +    * we use the same name 'ram_bitmap' as for migration.
-> > > > +    */
-> > > > +    if (ram_bytes_total()) {
-> > > > +        RAMBlock *block;
-> > > > +
-> > > > +        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> > >
-> > > I think those need updating to check for 'qemu_ram_is_migratable' - it
-> > > might be worth moving RAMBLOCK_FOREACH_MIGRATABLE.
-> > >
-> >
-> >
-> > OK, I will change to the " RAMBLOCK_FOREACH_MIGRATABLE " in next version.
-> >
-> >
-> > >
-> > > > +            unsigned long pages = block->max_length >>
-> TARGET_PAGE_BITS;
-> > > > +
-> > > > +            block->bmap = bitmap_new(pages);
-> > > > +            bitmap_set(block->bmap, 0, pages);
-> > >
-> > > Would it make sense to use the 'receivedmap' that was recently added
-> > > for other uses rather than needing your own?
-> > >
-> >
-> > Maybe we can do this job as optimization in the future, currently we want
-> > to make this series merged into upstream first.
->
-> Sure; I think it's getting there; I don't see anything too bad in the
-> migration bits as is;  hopefully Jason can check the networking set
-> again and Markus/Eric check the QMP side of things.
->
+COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
+filter-redirector,filter-rewriter) have been exist in qemu
+for long time, it's time to integrate these three parts to make COLO really works.
 
-Hi Dave,
+In this series, we have some optimizations for COLO frame, including separating the
+process of saving ram and device state, using an COLO_EXIT event to notify users that
+VM exits COLO, for these parts, most of them have been reviewed long time ago in old version,
+but since this series have just rebased on upstream which had merged a new series of migration,
+parts of pathes in this series deserve review again.
 
-Yes, I will update new version for this series.
+We use notifier/callback method for COLO compare to notify COLO frame about
+net packets inconsistent event, and add a handle_event method for NetFilterClass to
+help COLO frame to notify filters and colo-compare about checkpoint/failover event,
+it is flexible.
 
-Thank you for your help with the COLO project.
-Zhang Chen
+For the neweset version, please refer to:
+https://github.com/zhangckid/qemu/tree/qemu-colo-18aug12
+
+Please review, thanks.
+
+V11:
+ - Rebased on upstream.
+ - Used "RAMBLOCK_FOREACH_MIGRATABLE()" to replace "QLIST_FOREACH_RCU()" in patch 08/20.
+ - Fixed COLO related qapi command's since version in patch 10/20.
+
+V10:
+ - Rebased on upstream.
+ - Removed the "active" in COLOState.
+ - Fixed some comments.
+
+V9:
+ - Rebased on upstream codes.
+ - Addressed Jason's comments add TCP state machine track in
+   filter-rewriter.
+ - Fix some bug in colo-compare.
+ - Fix typo.
+ - Add filter-rewriter failover handle.
+ - Add net client type check in colo-compare.
+ - Add COLO state diagram.
+ - Addressed Markus and Daive's comments.
 
 
->
-> Dave
->
-> > Thanks
-> > Zhang Chen
-> >
-> >
-> > >
-> > > Dave
-> > >
-> > > > +         }
-> > > > +    }
-> > > > +    ram_state = g_new0(RAMState, 1);
-> > > > +    ram_state->migration_dirty_pages = 0;
-> > > > +
-> > > >      return 0;
-> > > >
-> > > >  out_locked:
-> > > > @@ -3574,6 +3601,10 @@ void colo_release_ram_cache(void)
-> > > >  {
-> > > >      RAMBlock *block;
-> > > >
-> > > > +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> > > > +        g_free(block->bmap);
-> > > > +        block->bmap = NULL;
-> > > > +    }
-> > > >      rcu_read_lock();
-> > > >      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> > > >          if (block->colo_cache) {
-> > > > @@ -3582,6 +3613,8 @@ void colo_release_ram_cache(void)
-> > > >          }
-> > > >      }
-> > > >      rcu_read_unlock();
-> > > > +    g_free(ram_state);
-> > > > +    ram_state = NULL;
-> > > >  }
-> > > >
-> > > >  /**
-> > > > --
-> > > > 2.17.1
-> > > >
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > >
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
+V8:
+ - Rebased on upstream codes.
+ - Addressed Markus's comments in patch 10/17.
+ - Addressed Markus's comments in patch 11/17.
+ - Removed some comments in patch 4/17.
+ - Moved the "migration_bitmap_clear_dirty()" to suitable position in
+   patch 9/17.
+ - Rewrote the patch 07/17 to address Davie's comments.
+ - Moved the "qemu_savevm_live_state" out of the
+   qemu_mutex_lock_iothread.
+ - Fixed the bug that in some status COLO vm crash with segmentation fault.
+
+V7:
+ - Addressed Markus's comments in 11/17.
+ - Rebased on upstream.
+
+V6:
+ - Addressed Eric Blake's comments, use the enum to feedback in patch 11/17.
+ - Fixed QAPI command separator problem in patch 11/17.
+
+
+
+Zhang Chen (16):
+  filter-rewriter: Add TCP state machine and fix memory leak in
+    connection_track_table
+  colo-compare: implement the process of checkpoint
+  colo-compare: use notifier to notify packets comparing result
+  COLO: integrate colo compare with colo frame
+  COLO: Add block replication into colo process
+  COLO: Remove colo_state migration struct
+  COLO: Load dirty pages into SVM's RAM cache firstly
+  ram/COLO: Record the dirty pages that SVM received
+  COLO: Flush memory data from ram cache
+  qapi/migration.json: Rename COLO unknown mode to none mode.
+  qapi: Add new command to query colo status
+  savevm: split the process of different stages for loadvm/savevm
+  net/net.c: Add net client type check function for COLO
+  filter: Add handle_event method for NetFilterClass
+  filter-rewriter: handle checkpoint and failover event
+  docs: Add COLO status diagram to COLO-FT.txt
+
+zhanghailiang (4):
+  qmp event: Add COLO_EXIT event to notify users while exited COLO
+  COLO: flush host dirty ram from cache
+  COLO: notify net filters about checkpoint/failover event
+  COLO: quick failover process by kick COLO thread
+
+ docs/COLO-FT.txt          |  34 ++++++
+ include/exec/ram_addr.h   |   1 +
+ include/migration/colo.h  |  11 +-
+ include/net/filter.h      |   5 +
+ include/net/net.h         |   1 +
+ migration/Makefile.objs   |   2 +-
+ migration/colo-comm.c     |  76 --------------
+ migration/colo-failover.c |   2 +-
+ migration/colo.c          | 212 ++++++++++++++++++++++++++++++++++++--
+ migration/migration.c     |  44 +++++++-
+ migration/ram.c           | 166 ++++++++++++++++++++++++++++-
+ migration/ram.h           |   4 +
+ migration/savevm.c        |  53 ++++++++--
+ migration/savevm.h        |   5 +
+ migration/trace-events    |   3 +
+ net/colo-compare.c        | 120 +++++++++++++++++++--
+ net/colo-compare.h        |  24 +++++
+ net/colo.c                |  10 +-
+ net/colo.h                |  11 +-
+ net/filter-rewriter.c     | 162 +++++++++++++++++++++++++++--
+ net/filter.c              |  17 +++
+ net/net.c                 |  42 ++++++++
+ qapi/migration.json       |  80 +++++++++++++-
+ vl.c                      |   2 -
+ 24 files changed, 948 insertions(+), 139 deletions(-)
+ delete mode 100644 migration/colo-comm.c
+ create mode 100644 net/colo-compare.h
+
+-- 
+2.17.GIT
