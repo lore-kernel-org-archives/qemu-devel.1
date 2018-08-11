@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1foVjL-00009s-NL
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 11:23:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1foVnF-0002S0-1q
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 11:27:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1foVjI-0007Jy-Hc
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 11:23:03 -0400
-Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:39847)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
-	id 1foVjI-0007Ho-9A
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 11:23:00 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1foVnB-0001qy-U3
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 11:27:05 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44319)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1foVnB-0001nT-Ks
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 11:27:01 -0400
+Received: by mail-pg1-x543.google.com with SMTP id r1-v6so5668000pgp.11
+	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 08:27:01 -0700 (PDT)
 References: <20180811082328.11268-1-laurent@vivier.eu>
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Message-ID: <d4baf81e-a4db-ca58-cf79-64f9995b37ed@physik.fu-berlin.de>
-Date: Sat, 11 Aug 2018 17:22:52 +0200
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7195617a-1f47-00e1-638f-50d20c21ba9e@linaro.org>
+Date: Sat, 11 Aug 2018 08:26:57 -0700
 MIME-Version: 1.0
 In-Reply-To: <20180811082328.11268-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
@@ -29,9 +31,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-On 08/11/2018 10:23 AM, Laurent Vivier wrote:
+On 08/11/2018 01:23 AM, Laurent Vivier wrote:
 > This fixes java in a linux-user chroot:
 >   $ java --version
 >   qemu-sh4: .../accel/tcg/cpu-exec.c:634: cpu_loop_exec_tb: Assertion `use_icount' failed.
@@ -47,21 +49,14 @@ On 08/11/2018 10:23 AM, Laurent Vivier wrote:
 >        ("target/sh4: Convert to DisasJumpType")
 > Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 > Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+> 
+> Notes:
+>     v2:
+>       don't revert the part of the original patch,
+>       but fixes the state problem in gen_conditional_jump()
 
-Thanks, testing this revision now as well.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Both patches finally allow me to use much newer QEMU versions for SH4,
-before that I was stuck to versions from before the regression was
-introduced.
 
-So far, the overall improvement is quite spectacular and even the
-Haskell compiler GHC now works much more reliable on qemu-sh4 than
-it did in the past.
-
-Adrian
-
--- 
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer - glaubitz@debian.org
-`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+r~
