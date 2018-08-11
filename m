@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1foaz9-0003kA-2V
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 16:59:44 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1foazG-0004Dk-9Q
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 16:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1foaz7-0000vP-Ij
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 16:59:43 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:35069)
+	(envelope-from <zhangckid@gmail.com>) id 1foazD-00012g-6x
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 16:59:50 -0400
+Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:41484)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1foaz7-0000uq-AL
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 16:59:41 -0400
-Received: by mail-pf1-x441.google.com with SMTP id p12-v6so6016283pfh.2
-	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 13:59:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1foazC-00011S-UQ
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 16:59:47 -0400
+Received: by mail-pf1-x430.google.com with SMTP id y10-v6so6000323pfn.8
+	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 13:59:46 -0700 (PDT)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Sun, 12 Aug 2018 04:59:05 +0800
-Message-Id: <20180811205924.4113-2-zhangckid@gmail.com>
+Date: Sun, 12 Aug 2018 04:59:06 +0800
+Message-Id: <20180811205924.4113-3-zhangckid@gmail.com>
 In-Reply-To: <20180811205924.4113-1-zhangckid@gmail.com>
 References: <20180811205924.4113-1-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V11 01/20] filter-rewriter: Add TCP state
- machine and fix memory leak in connection_track_table
+Subject: [Qemu-devel] [PATCH V11 02/20] colo-compare: implement the process
+ of checkpoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,250 +29,224 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <chen.zhang@intel.com>
 
-We add almost full TCP state machine in filter-rewriter, except
-TCPS_LISTEN and some simplify in VM active close FIN states.
-
-After a net connection is closed, we didn't clear its releated resources
-in connection_track_table, which will lead to memory leak.
-
-Let't track the state of net connection, if it is closed, its related
-resources will be cleared up.
+While do checkpoint, we need to flush all the unhandled packets,
+By using the filter notifier mechanism, we can easily to notify
+every compare object to do this process, which runs inside
+of compare threads as a coroutine.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 ---
- net/colo.c            |   2 +-
- net/colo.h            |   9 ++--
- net/filter-rewriter.c | 105 ++++++++++++++++++++++++++++++++++++++----
- 3 files changed, 100 insertions(+), 16 deletions(-)
+ include/migration/colo.h |  6 ++++
+ net/colo-compare.c       | 78 ++++++++++++++++++++++++++++++++++++++++
+ net/colo-compare.h       | 22 ++++++++++++
+ 3 files changed, 106 insertions(+)
+ create mode 100644 net/colo-compare.h
 
-diff --git a/net/colo.c b/net/colo.c
-index 6dda4ed66e..97c8fc928f 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -137,7 +137,7 @@ Connection *connection_new(ConnectionKey *key)
-     conn->ip_proto = key->ip_proto;
-     conn->processing = false;
-     conn->offset = 0;
--    conn->syn_flag = 0;
-+    conn->tcp_state = TCPS_CLOSED;
-     conn->pack = 0;
-     conn->sack = 0;
-     g_queue_init(&conn->primary_list);
-diff --git a/net/colo.h b/net/colo.h
-index da6c36dcf7..0277e0e9ba 100644
---- a/net/colo.h
-+++ b/net/colo.h
-@@ -18,6 +18,7 @@
- #include "slirp/slirp.h"
- #include "qemu/jhash.h"
- #include "qemu/timer.h"
-+#include "slirp/tcp.h"
+diff --git a/include/migration/colo.h b/include/migration/colo.h
+index 2fe48ad353..fefb2fcf4c 100644
+--- a/include/migration/colo.h
++++ b/include/migration/colo.h
+@@ -16,6 +16,12 @@
+ #include "qemu-common.h"
+ #include "qapi/qapi-types-migration.h"
  
- #define HASHTABLE_MAX_SIZE 16384
- 
-@@ -81,11 +82,9 @@ typedef struct Connection {
-     uint32_t sack;
-     /* offset = secondary_seq - primary_seq */
-     tcp_seq  offset;
--    /*
--     * we use this flag update offset func
--     * run once in independent tcp connection
--     */
--    int syn_flag;
++enum colo_event {
++    COLO_EVENT_NONE,
++    COLO_EVENT_CHECKPOINT,
++    COLO_EVENT_FAILOVER,
++};
 +
-+    int tcp_state; /* TCP FSM state */
-+    tcp_seq fin_ack_seq; /* the seq of 'fin=1,ack=1' */
- } Connection;
+ void colo_info_init(void);
  
- uint32_t connection_key_hash(const void *opaque);
-diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-index f584e4eba4..f18a71bf2e 100644
---- a/net/filter-rewriter.c
-+++ b/net/filter-rewriter.c
-@@ -59,9 +59,9 @@ static int is_tcp_packet(Packet *pkt)
+ void migrate_start_colo_process(MigrationState *s);
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index dd745a491b..80e6532e8b 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -27,11 +27,16 @@
+ #include "qemu/sockets.h"
+ #include "colo.h"
+ #include "sysemu/iothread.h"
++#include "net/colo-compare.h"
++#include "migration/colo.h"
+ 
+ #define TYPE_COLO_COMPARE "colo-compare"
+ #define COLO_COMPARE(obj) \
+     OBJECT_CHECK(CompareState, (obj), TYPE_COLO_COMPARE)
+ 
++static QTAILQ_HEAD(, CompareState) net_compares =
++       QTAILQ_HEAD_INITIALIZER(net_compares);
++
+ #define COMPARE_READ_LEN_MAX NET_BUFSIZE
+ #define MAX_QUEUE_SIZE 1024
+ 
+@@ -41,6 +46,10 @@
+ /* TODO: Should be configurable */
+ #define REGULAR_PACKET_CHECK_MS 3000
+ 
++static QemuMutex event_mtx;
++static QemuCond event_complete_cond;
++static int event_unhandled_count;
++
+ /*
+  *  + CompareState ++
+  *  |               |
+@@ -87,6 +96,11 @@ typedef struct CompareState {
+     IOThread *iothread;
+     GMainContext *worker_context;
+     QEMUTimer *packet_check_timer;
++
++    QEMUBH *event_bh;
++    enum colo_event event;
++
++    QTAILQ_ENTRY(CompareState) next;
+ } CompareState;
+ 
+ typedef struct CompareClass {
+@@ -736,6 +750,25 @@ static void check_old_packet_regular(void *opaque)
+                 REGULAR_PACKET_CHECK_MS);
  }
  
- /* handle tcp packet from primary guest */
--static int handle_primary_tcp_pkt(NetFilterState *nf,
-+static int handle_primary_tcp_pkt(RewriterState *rf,
-                                   Connection *conn,
--                                  Packet *pkt)
-+                                  Packet *pkt, ConnectionKey *key)
++/* Public API, Used for COLO frame to notify compare event */
++void colo_notify_compares_event(void *opaque, int event, Error **errp)
++{
++    CompareState *s;
++
++    qemu_mutex_lock(&event_mtx);
++    QTAILQ_FOREACH(s, &net_compares, next) {
++        s->event = event;
++        qemu_bh_schedule(s->event_bh);
++        event_unhandled_count++;
++    }
++    /* Wait all compare threads to finish handling this event */
++    while (event_unhandled_count > 0) {
++        qemu_cond_wait(&event_complete_cond, &event_mtx);
++    }
++
++    qemu_mutex_unlock(&event_mtx);
++}
++
+ static void colo_compare_timer_init(CompareState *s)
  {
-     struct tcphdr *tcp_pkt;
- 
-@@ -74,23 +74,28 @@ static int handle_primary_tcp_pkt(NetFilterState *nf,
-         trace_colo_filter_rewriter_conn_offset(conn->offset);
+     AioContext *ctx = iothread_get_aio_context(s->iothread);
+@@ -756,6 +789,30 @@ static void colo_compare_timer_del(CompareState *s)
      }
+  }
  
-+    if (((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == (TH_ACK | TH_SYN)) &&
-+        conn->tcp_state == TCPS_SYN_SENT) {
-+        conn->tcp_state = TCPS_ESTABLISHED;
++static void colo_flush_packets(void *opaque, void *user_data);
++
++static void colo_compare_handle_event(void *opaque)
++{
++    CompareState *s = opaque;
++
++    switch (s->event) {
++    case COLO_EVENT_CHECKPOINT:
++        g_queue_foreach(&s->conn_list, colo_flush_packets, s);
++        break;
++    case COLO_EVENT_FAILOVER:
++        break;
++    default:
++        break;
 +    }
 +
-     if (((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == TH_SYN)) {
-         /*
-          * we use this flag update offset func
-          * run once in independent tcp connection
-          */
--        conn->syn_flag = 1;
-+        conn->tcp_state = TCPS_SYN_RECEIVED;
-     }
- 
-     if (((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == TH_ACK)) {
--        if (conn->syn_flag) {
-+        if (conn->tcp_state == TCPS_SYN_RECEIVED) {
-             /*
-              * offset = secondary_seq - primary seq
-              * ack packet sent by guest from primary node,
-              * so we use th_ack - 1 get primary_seq
-              */
-             conn->offset -= (ntohl(tcp_pkt->th_ack) - 1);
--            conn->syn_flag = 0;
-+            conn->tcp_state = TCPS_ESTABLISHED;
-         }
-         if (conn->offset) {
-             /* handle packets to the secondary from the primary */
-@@ -99,15 +104,63 @@ static int handle_primary_tcp_pkt(NetFilterState *nf,
-             net_checksum_calculate((uint8_t *)pkt->data + pkt->vnet_hdr_len,
-                                    pkt->size - pkt->vnet_hdr_len);
-         }
-+        /*
-+         * Case 1:
-+         * Step 3:
-+         * The *server* side of this connect is VM, *client* tries to close
-+         * the connection.
-+         *
-+         * We got 'ack=1' packets from client side, it acks 'fin=1, ack=1'
-+         * packet from server side. From this point, we can ensure that there
-+         * will be no packets in the connection, except that, some errors
-+         * happen between the path of 'filter object' and vNIC, if this rare
-+         * case really happen, we can still create a new connection,
-+         * So it is safe to remove the connection from connection_track_table.
-+         *
-+         */
-+        if ((conn->tcp_state == TCPS_LAST_ACK) &&
-+            (ntohl(tcp_pkt->th_ack) == (conn->fin_ack_seq + 1))) {
-+            conn->tcp_state = TCPS_CLOSED;
-+            g_hash_table_remove(rf->connection_track_table, key);
-+        }
-+    }
++    assert(event_unhandled_count > 0);
 +
-+    if ((tcp_pkt->th_flags & TH_FIN) == TH_FIN) {
-+        /*
-+         * Case 1:
-+         * Step 1:
-+         * The *server* side of this connect is VM, *client* tries to close
-+         * the connection. We will into CLOSE_WAIT status.
-+         */
-+        if (conn->tcp_state == TCPS_ESTABLISHED) {
-+            conn->tcp_state = TCPS_CLOSE_WAIT;
-+        }
++    qemu_mutex_lock(&event_mtx);
++    event_unhandled_count--;
++    qemu_cond_broadcast(&event_complete_cond);
++    qemu_mutex_unlock(&event_mtx);
++}
 +
-+        /*
-+         * Case 2:
-+         * Step 2:
-+         * The *server* side of this connect is VM, *server* tries to close
-+         * the connection. We will into CLOSE_WAIT status.
-+         * We simplify the TCPS_FIN_WAIT_2, TCPS_TIME_WAIT and CLOSING status.
-+         */
-+        if (conn->tcp_state == TCPS_FIN_WAIT_1) {
-+            conn->tcp_state = TCPS_TIME_WAIT;
-+            /*
-+             * For simplify implementation, we needn't wait 2MSL time
-+             * in filter rewriter.
-+             */
-+            conn->tcp_state = TCPS_CLOSED;
-+            g_hash_table_remove(rf->connection_track_table, key);
-+        }
-     }
- 
-     return 0;
- }
- 
- /* handle tcp packet from secondary guest */
--static int handle_secondary_tcp_pkt(NetFilterState *nf,
-+static int handle_secondary_tcp_pkt(RewriterState *rf,
-                                     Connection *conn,
--                                    Packet *pkt)
-+                                    Packet *pkt, ConnectionKey *key)
+ static void colo_compare_iothread(CompareState *s)
  {
-     struct tcphdr *tcp_pkt;
+     object_ref(OBJECT(s->iothread));
+@@ -769,6 +826,7 @@ static void colo_compare_iothread(CompareState *s)
+                              s, s->worker_context, true);
  
-@@ -121,7 +174,8 @@ static int handle_secondary_tcp_pkt(NetFilterState *nf,
-         trace_colo_filter_rewriter_conn_offset(conn->offset);
-     }
- 
--    if (((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == (TH_ACK | TH_SYN))) {
-+    if (conn->tcp_state == TCPS_SYN_RECEIVED &&
-+        ((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == (TH_ACK | TH_SYN))) {
-         /*
-          * save offset = secondary_seq and then
-          * in handle_primary_tcp_pkt make offset
-@@ -130,6 +184,12 @@ static int handle_secondary_tcp_pkt(NetFilterState *nf,
-         conn->offset = ntohl(tcp_pkt->th_seq);
-     }
- 
-+    /* VM active connect */
-+    if (conn->tcp_state == TCPS_CLOSED &&
-+        ((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == TH_SYN)) {
-+        conn->tcp_state = TCPS_SYN_SENT;
-+    }
-+
-     if ((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == TH_ACK) {
-         /* Only need to adjust seq while offset is Non-zero */
-         if (conn->offset) {
-@@ -140,6 +200,31 @@ static int handle_secondary_tcp_pkt(NetFilterState *nf,
-                                    pkt->size - pkt->vnet_hdr_len);
-         }
-     }
-+    /*
-+     * Case 1:
-+     * Step 2:
-+     * The *server* side of this connect is VM, *client* tries to close
-+     * the connection. In this step we will into LAST_ACK status.
-+     *
-+     * We got 'fin=1, ack=1' packet from server side, we need to
-+     * record the seq of 'fin=1, ack=1' packet.
-+     */
-+    if (conn->tcp_state == TCPS_CLOSE_WAIT &&
-+        (tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == (TH_ACK | TH_FIN)) {
-+        conn->fin_ack_seq = ntohl(tcp_pkt->th_seq);
-+        conn->tcp_state = TCPS_LAST_ACK;
-+    }
-+
-+    /*
-+     * Case 2:
-+     * Step 1:
-+     * The *server* side of this connect is VM, *server* tries to close
-+     * the connection.
-+     */
-+    if (conn->tcp_state == TCPS_ESTABLISHED &&
-+        (tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == TH_FIN) {
-+        conn->tcp_state = TCPS_FIN_WAIT_1;
-+    }
- 
-     return 0;
+     colo_compare_timer_init(s);
++    s->event_bh = qemu_bh_new(colo_compare_handle_event, s);
  }
-@@ -190,7 +275,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
  
-         if (sender == nf->netdev) {
-             /* NET_FILTER_DIRECTION_TX */
--            if (!handle_primary_tcp_pkt(nf, conn, pkt)) {
-+            if (!handle_primary_tcp_pkt(s, conn, pkt, &key)) {
-                 qemu_net_queue_send(s->incoming_queue, sender, 0,
-                 (const uint8_t *)pkt->data, pkt->size, NULL);
-                 packet_destroy(pkt, NULL);
-@@ -203,7 +288,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
-             }
-         } else {
-             /* NET_FILTER_DIRECTION_RX */
--            if (!handle_secondary_tcp_pkt(nf, conn, pkt)) {
-+            if (!handle_secondary_tcp_pkt(s, conn, pkt, &key)) {
-                 qemu_net_queue_send(s->incoming_queue, sender, 0,
-                 (const uint8_t *)pkt->data, pkt->size, NULL);
-                 packet_destroy(pkt, NULL);
+ static char *compare_get_pri_indev(Object *obj, Error **errp)
+@@ -926,8 +984,13 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+     net_socket_rs_init(&s->pri_rs, compare_pri_rs_finalize, s->vnet_hdr);
+     net_socket_rs_init(&s->sec_rs, compare_sec_rs_finalize, s->vnet_hdr);
+ 
++    QTAILQ_INSERT_TAIL(&net_compares, s, next);
++
+     g_queue_init(&s->conn_list);
+ 
++    qemu_mutex_init(&event_mtx);
++    qemu_cond_init(&event_complete_cond);
++
+     s->connection_track_table = g_hash_table_new_full(connection_key_hash,
+                                                       connection_key_equal,
+                                                       g_free,
+@@ -990,6 +1053,7 @@ static void colo_compare_init(Object *obj)
+ static void colo_compare_finalize(Object *obj)
+ {
+     CompareState *s = COLO_COMPARE(obj);
++    CompareState *tmp = NULL;
+ 
+     qemu_chr_fe_deinit(&s->chr_pri_in, false);
+     qemu_chr_fe_deinit(&s->chr_sec_in, false);
+@@ -997,6 +1061,16 @@ static void colo_compare_finalize(Object *obj)
+     if (s->iothread) {
+         colo_compare_timer_del(s);
+     }
++
++    qemu_bh_delete(s->event_bh);
++
++    QTAILQ_FOREACH(tmp, &net_compares, next) {
++        if (tmp == s) {
++            QTAILQ_REMOVE(&net_compares, s, next);
++            break;
++        }
++    }
++
+     /* Release all unhandled packets after compare thead exited */
+     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+ 
+@@ -1009,6 +1083,10 @@ static void colo_compare_finalize(Object *obj)
+     if (s->iothread) {
+         object_unref(OBJECT(s->iothread));
+     }
++
++    qemu_mutex_destroy(&event_mtx);
++    qemu_cond_destroy(&event_complete_cond);
++
+     g_free(s->pri_indev);
+     g_free(s->sec_indev);
+     g_free(s->outdev);
+diff --git a/net/colo-compare.h b/net/colo-compare.h
+new file mode 100644
+index 0000000000..1b1ce76aea
+--- /dev/null
++++ b/net/colo-compare.h
+@@ -0,0 +1,22 @@
++/*
++ * COarse-grain LOck-stepping Virtual Machines for Non-stop Service (COLO)
++ * (a.k.a. Fault Tolerance or Continuous Replication)
++ *
++ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
++ * Copyright (c) 2017 FUJITSU LIMITED
++ * Copyright (c) 2017 Intel Corporation
++ *
++ * Authors:
++ *    zhanghailiang <zhang.zhanghailiang@huawei.com>
++ *    Zhang Chen <zhangckid@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_COLO_COMPARE_H
++#define QEMU_COLO_COMPARE_H
++
++void colo_notify_compares_event(void *opaque, int event, Error **errp);
++
++#endif /* QEMU_COLO_COMPARE_H */
 -- 
 2.17.GIT
