@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tom.leiming@gmail.com>) id 1foSvW-00050d-Rt
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 08:23:28 -0400
+	(envelope-from <mreitz@redhat.com>) id 1foUUX-0000Fi-4T
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 10:03:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tom.leiming@gmail.com>) id 1foSvV-0007nK-In
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 08:23:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1foUUW-0001oQ-Ah
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 10:03:41 -0400
+References: <20180809114417.28718-1-marcandre.lureau@redhat.com>
+	<20180809114417.28718-3-marcandre.lureau@redhat.com>
+	<87r2j6u44f.fsf@dusky.pond.sub.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <165ace92-3b41-3d56-19f4-d2aa6edf8d8e@redhat.com>
+Date: Sat, 11 Aug 2018 16:03:24 +0200
 MIME-Version: 1.0
-In-Reply-To: <f40092b20856d07bd7f870abf5ea939e@natalenko.name>
-References: <f40092b20856d07bd7f870abf5ea939e@natalenko.name>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Sat, 11 Aug 2018 20:23:20 +0800
-Message-ID: <CACVXFVO1pN=CZvNY8Q4wBrAoA=3w8Ew38aGqpOSHJ1uYAM-sxw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Slow boot in QEMU with virtio-scsi disks
+In-Reply-To: <87r2j6u44f.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SMyoUIgLnSwiSNxXfSl9xLZqbXC0prx79"
+Subject: Re: [Qemu-devel] [PATCH 2/4] tests: fix bdrv-drain leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,93 +25,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc: Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, Christoph Hellwig <hch@lst.de>, Paolo Bonzini <pbonzini@redhat.com>, Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>, Linux SCSI List <linux-scsi@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Greg Kurz <groug@kaod.org>, qemu-discuss@nongnu.org, qemu-devel <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Hannes Reinecke <hare@suse.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Sat, Aug 11, 2018 at 5:47 PM, Oleksandr Natalenko
-<oleksandr@natalenko.name> wrote:
-> Hi.
->
-> I'd like to resurrect previous discussion [1] regarding slow kernel boot
-> inside QEMU with virtio-scsi disks attached and blk_mq enabled.
->
-> Symptom:
->
-> [    2.830857] ata1: SATA max UDMA/133 abar m4096@0x98002000 port 0x98002100
-> irq 36
-> [    2.834559] ata2: SATA max UDMA/133 abar m4096@0x98002000 port 0x98002180
-> irq 36
-> [    2.837746] ata3: SATA max UDMA/133 abar m4096@0x98002000 port 0x98002200
-> irq 36
-> [    2.841861] ata4: SATA max UDMA/133 abar m4096@0x98002000 port 0x98002280
-> irq 36
-> [    2.847899] ata5: SATA max UDMA/133 abar m4096@0x98002000 port 0x98002300
-> irq 36
-> [    2.853229] ata6: SATA max UDMA/133 abar m4096@0x98002000 port 0x98002380
-> irq 36
-> [    3.172159] ata1: SATA link down (SStatus 0 SControl 300)
-> [    3.183552] ata5: SATA link down (SStatus 0 SControl 300)
-> [    3.189925] ata3: SATA link down (SStatus 0 SControl 300)
-> [    3.196156] ata6: SATA link down (SStatus 0 SControl 300)
-> [    3.201136] ata2: SATA link down (SStatus 0 SControl 300)
-> [    3.208559] ata4: SATA link down (SStatus 0 SControl 300)
-> [   16.480972] sd 0:0:1:0: Power-on or device reset occurred
-> [   16.481591] sd 0:0:0:0: [sda] 16777216 512-byte logical blocks: (8.59
-> GB/8.00 GiB)
-> [   16.481671] sd 0:0:0:0: [sda] Write Protect is off
-> [   16.481815] sd 0:0:0:0: [sda] Write cache: disabled, read cache: enabled,
-> doesn't support DPO or FUA
-> [   16.491325]  sda: sda1 sda2
-> [   16.517532] sd 0:0:1:0: [sdb] 16777216 512-byte logical blocks: (8.59
-> GB/8.00 GiB)
-> [   16.525131] sr 0:0:2:0: Power-on or device reset occurred
-> [   16.525974] sd 0:0:1:0: [sdb] Write Protect is off
-> [   16.530946] sr 0:0:2:0: [sr0] scsi3-mmc drive: 16x/50x cd/rw xa/form2
-> cdda tray
-> [   16.543592] cdrom: Uniform CD-ROM driver Revision: 3.20
-> [   16.549815] sd 0:0:1:0: [sdb] Write cache: disabled, read cache: enabled,
-> doesn't support DPO or FUA
-> [   16.549833] sd 0:0:0:0: [sda] Attached SCSI disk
-> [   16.572055]  sdb: sdb1 sdb2
-> [   16.580463] sd 0:0:1:0: [sdb] Attached SCSI disk
->
-> (note the hang that lasts for 13 seconds)
->
-> The disks are attached to the VM in the following manner:
->
-> -device virtio-scsi,id=scsi -device scsi-hd,drive=hd1 -drive
-> if=none,media=disk,id=hd1,file=sda.img,format=raw
->
-> What I've tested so far:
->
-> * 4.14.62  + virtio-scsi +    blk_mq == slow boot
-> * 4.14.62  + virtio-scsi + no blk_mq == fast boot
-> * 4.17.13  + virtio-scsi +    blk_mq == slow boot
-> * 4.18-rc8 + virtio-scsi +    blk_mq == slow boot
->
-> QEMU is of v2.12.1, runs with "-machine q35,accel=kvm -cpu host". Also, if
-> virtio-scsi disks are replaced with SATA disks, the hang does not occur
-> (although, QEMU has other issues with SATA, but that's another story [3]).
->
-> Apparently, the commit that was mentioned in [2],
-> b5b6e8c8d3b4cbeb447a0f10c7d5de3caa573299, forces blk_mq for virtio_scsi, so
-> it cannot be disabled for new kernels.
->
-> Any hint on how to avoid this hang while still having virtio-scsi disks and
-> blk_mq enabled please?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SMyoUIgLnSwiSNxXfSl9xLZqbXC0prx79
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Hannes Reinecke <hare@suse.com>,
+ Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <165ace92-3b41-3d56-19f4-d2aa6edf8d8e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] tests: fix bdrv-drain leak
+References: <20180809114417.28718-1-marcandre.lureau@redhat.com>
+ <20180809114417.28718-3-marcandre.lureau@redhat.com>
+ <87r2j6u44f.fsf@dusky.pond.sub.org>
+In-Reply-To: <87r2j6u44f.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Please test for-4.19/block:
+On 2018-08-10 08:28, Markus Armbruster wrote:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>=20
+>> Spotted by ASAN:
+>>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> =3D=3D5378=3D=3DERROR: LeakSanitizer: detected memory leaks
+>>
+>> Direct leak of 65536 byte(s) in 1 object(s) allocated from:
+>>     #0 0x7f788f83bc48 in malloc (/lib64/libasan.so.5+0xeec48)
+>>     #1 0x7f788c9923c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
+>>     #2 0x5622a1fe37bc in coroutine_trampoline /home/elmarco/src/qq/uti=
+l/coroutine-ucontext.c:116
+>>     #3 0x7f788a15d75f in __correctly_grouped_prefixwc (/lib64/libc.so.=
+6+0x4c75f)
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  tests/test-bdrv-drain.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+>> index 17bb8508ae..abc8bbe6f0 100644
+>> --- a/tests/test-bdrv-drain.c
+>> +++ b/tests/test-bdrv-drain.c
+>> @@ -948,6 +948,7 @@ static void coroutine_fn test_co_delete_by_drain(v=
+oid *opaque)
+>>      }
+>> =20
+>>      dbdd->done =3D true;
+>> +    g_free(buffer);
+>>  }
+>> =20
+>>  /**
+>=20
+> Screwed up in commit 4c8158e359d.
+>=20
+> Max, could the coroutine's stack accomodate the buffer?
 
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=for-4.19/block
+I don't know.  How big is a coroutine's stack?  The buffer size
+apparently is 64k.  (Which is my opinion is generally too much to put on
+any stack.)
 
-This slow boot issue should have been fixed by the following commits:
+But why would you want to put it on the stack anyway?  It's not like it
+would make the patch any simpler.
 
-1311326cf475 blk-mq: avoid to synchronize rcu inside blk_cleanup_queue()
-97889f9ac24f blk-mq: remove synchronize_rcu() from blk_mq_del_queue_tag_set()
-5815839b3ca1 blk-mq: introduce new lock for protecting hctx->dispatch_wait
-2278d69f030f blk-mq: don't pass **hctx to blk_mq_mark_tag_wait()
-8ab6bb9ee8d0 blk-mq: cleanup blk_mq_get_driver_tag()
+Max
 
 
-Thanks,
-Ming Lei
+--SMyoUIgLnSwiSNxXfSl9xLZqbXC0prx79
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltu7KwACgkQ9AfbAGHV
+z0Ay2AgAsubLJ0aMCT0mJ3xynh03XXu25eNar37bWthcX+EzYphCsy/N6l9C41tH
+6JhFfuHck7tWcQtsZ3zqJ+IRJP26K2uLs/DaWLyAqwGUO97TS2D7CIOdFCXiFmza
+keSAlzvaqittBbcTZriAZFq5wml2Mv4lpTTIge/ge6J8mbyV3pAiIQMk0ufjXDHf
+hedXepvCeXamaJXs9U0UvE602FT0EB2tBKC8LwX9wOmzY6AU945wkEs+w3262zb8
+R560vRj28DVO0FouHbXJjBDbjT5dT+GaWFYRjRATorPZowsKYHkiwN3IZ+9JHJCl
+HF0i7IGt/Tj2jYkcDAaHWEcyEMOOuQ==
+=XRVI
+-----END PGP SIGNATURE-----
+
+--SMyoUIgLnSwiSNxXfSl9xLZqbXC0prx79--
