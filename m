@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fob0O-0005Ov-AK
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 17:01:04 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fob0V-0005Rw-NW
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 17:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fob0N-0001Z2-Ih
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 17:01:00 -0400
-Received: from mail-pg1-x536.google.com ([2607:f8b0:4864:20::536]:46832)
+	(envelope-from <zhangckid@gmail.com>) id 1fob0S-0001ap-Ma
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 17:01:07 -0400
+Received: from mail-pl0-x234.google.com ([2607:f8b0:400e:c01::234]:40187)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fob0N-0001Ym-CV
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 17:00:59 -0400
-Received: by mail-pg1-x536.google.com with SMTP id f14-v6so5850797pgv.13
-	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 14:00:59 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fob0S-0001aY-GL
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 17:01:04 -0400
+Received: by mail-pl0-x234.google.com with SMTP id s17-v6so5377864plp.7
+	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 14:01:04 -0700 (PDT)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Sun, 12 Aug 2018 04:59:19 +0800
-Message-Id: <20180811205924.4113-16-zhangckid@gmail.com>
+Date: Sun, 12 Aug 2018 04:59:20 +0800
+Message-Id: <20180811205924.4113-17-zhangckid@gmail.com>
 In-Reply-To: <20180811205924.4113-1-zhangckid@gmail.com>
 References: <20180811205924.4113-1-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V11 15/20] net/net.c: Add net client type check
- function for COLO
+Subject: [Qemu-devel] [PATCH V11 16/20] filter: Add handle_event method for
+ NetFilterClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +27,124 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <chen.zhang@intel.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-From: Zhang Chen <chen.zhang@intel.com>
+Filter needs to process the event of checkpoint/failover or
+other event passed by COLO frame.
 
-We add is_colo_support_client_type() to check the net client type for
-COLO-compare. Currently we just support TAP.
-Suggested by Jason.
-
-Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 ---
- include/net/net.h  |  1 +
- net/colo-compare.c |  5 +++++
- net/net.c          | 14 ++++++++++++++
- 3 files changed, 20 insertions(+)
+ include/net/filter.h |  5 +++++
+ net/filter.c         | 17 +++++++++++++++++
+ net/net.c            | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 50 insertions(+)
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 1425960f76..dcbc7ba9c0 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -212,6 +212,7 @@ void hmp_host_net_add(Monitor *mon, const QDict *qdict);
- void hmp_host_net_remove(Monitor *mon, const QDict *qdict);
- void netdev_add(QemuOpts *opts, Error **errp);
- void qmp_netdev_add(QDict *qdict, QObject **ret, Error **errp);
-+bool is_colo_support_client_type(void);
+diff --git a/include/net/filter.h b/include/net/filter.h
+index 435acd6f82..49da666ac0 100644
+--- a/include/net/filter.h
++++ b/include/net/filter.h
+@@ -38,6 +38,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *nc,
  
- int net_hub_id_for_client(NetClientState *nc, int *id);
- NetClientState *net_hub_port_find(int hub_id);
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 426eab5973..b8c0240725 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -996,6 +996,11 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
-         return;
-     }
+ typedef void (FilterStatusChanged) (NetFilterState *nf, Error **errp);
  
-+    if (!is_colo_support_client_type()) {
-+        error_setg(errp, "COLO-compare: Net client type is not supported");
-+        return;
-+    }
++typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Error **errp);
 +
-     net_socket_rs_init(&s->pri_rs, compare_pri_rs_finalize, s->vnet_hdr);
-     net_socket_rs_init(&s->sec_rs, compare_sec_rs_finalize, s->vnet_hdr);
+ typedef struct NetFilterClass {
+     ObjectClass parent_class;
  
+@@ -45,6 +47,7 @@ typedef struct NetFilterClass {
+     FilterSetup *setup;
+     FilterCleanup *cleanup;
+     FilterStatusChanged *status_changed;
++    FilterHandleEvent *handle_event;
+     /* mandatory */
+     FilterReceiveIOV *receive_iov;
+ } NetFilterClass;
+@@ -77,4 +80,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState *sender,
+                                     int iovcnt,
+                                     void *opaque);
+ 
++void colo_notify_filters_event(int event, Error **errp);
++
+ #endif /* QEMU_NET_FILTER_H */
+diff --git a/net/filter.c b/net/filter.c
+index 2fd7d7d663..0f17eba143 100644
+--- a/net/filter.c
++++ b/net/filter.c
+@@ -17,6 +17,8 @@
+ #include "net/vhost_net.h"
+ #include "qom/object_interfaces.h"
+ #include "qemu/iov.h"
++#include "net/colo.h"
++#include "migration/colo.h"
+ 
+ static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
+ {
+@@ -245,11 +247,26 @@ static void netfilter_finalize(Object *obj)
+     g_free(nf->netdev_id);
+ }
+ 
++static void dummy_handle_event(NetFilterState *nf, int event, Error **errp)
++{
++    switch (event) {
++    case COLO_EVENT_CHECKPOINT:
++        break;
++    case COLO_EVENT_FAILOVER:
++        object_property_set_str(OBJECT(nf), "off", "status", errp);
++        break;
++    default:
++        break;
++    }
++}
++
+ static void netfilter_class_init(ObjectClass *oc, void *data)
+ {
+     UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++    NetFilterClass *nfc = NETFILTER_CLASS(oc);
+ 
+     ucc->complete = netfilter_complete;
++    nfc->handle_event = dummy_handle_event;
+ }
+ 
+ static const TypeInfo netfilter_info = {
 diff --git a/net/net.c b/net/net.c
-index 2a3133990c..a77ea88fff 100644
+index a77ea88fff..b4f6a2efb2 100644
 --- a/net/net.c
 +++ b/net/net.c
-@@ -1733,3 +1733,17 @@ int net_fill_rstate(SocketReadState *rs, const uint8_t *buf, int size)
-     assert(size == 0);
-     return 0;
+@@ -1331,6 +1331,34 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
+     }
  }
-+
-+/* Currently, COLO just support TAP */
-+bool is_colo_support_client_type(void)
+ 
++void colo_notify_filters_event(int event, Error **errp)
 +{
-+    NetClientState *nc;
++    NetClientState *nc, *peer;
++    NetClientDriver type;
++    NetFilterState *nf;
++    NetFilterClass *nfc = NULL;
++    Error *local_err = NULL;
 +
 +    QTAILQ_FOREACH(nc, &net_clients, next) {
-+        if (nc->info->type != NET_CLIENT_DRIVER_TAP) {
-+            return false;
++        peer = nc->peer;
++        type = nc->info->type;
++        if (!peer || type != NET_CLIENT_DRIVER_TAP) {
++            continue;
++        }
++        QTAILQ_FOREACH(nf, &nc->filters, next) {
++            nfc =  NETFILTER_GET_CLASS(OBJECT(nf));
++            if (!nfc->handle_event) {
++                continue;
++            }
++            nfc->handle_event(nf, event, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                return;
++            }
 +        }
 +    }
-+
-+    return true;
 +}
++
+ void qmp_set_link(const char *name, bool up, Error **errp)
+ {
+     NetClientState *ncs[MAX_QUEUE_NUM];
 -- 
 2.17.GIT
