@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <remy.noel@blade-group.com>) id 1foZEi-0006rJ-Dx
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:07:41 -0400
+	(envelope-from <lbloch@janustech.com>) id 1foZQZ-0004W3-7W
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:19:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <remy.noel@blade-group.com>) id 1foZEe-0003DM-Tw
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:07:40 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45911)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <remy.noel@blade-group.com>)
-	id 1foZEe-0003Cs-K3
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:07:36 -0400
-Received: by mail-wr1-x443.google.com with SMTP id f12-v6so10905653wrv.12
-	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 12:07:36 -0700 (PDT)
-References: <20180720081948.23644-1-remy.noel@blade-group.com>
-	<20180807131918.22bgcmfv2wu4bjda@sirius.home.kraxel.org>
-	<20180807145701.GK2556@work-vm>
-	<CAFEAcA9mgyCzR7-ANw0YvKdzz-0H50vETrr_sw5bH5D_2PUeNg@mail.gmail.com>
-	<20180807150935.GL2556@work-vm>
-From: Remy NOEL <remy.noel@blade-group.com>
-Message-ID: <3d89d87f-857d-ebb1-1fe7-710a52ea381d@blade-group.com>
-Date: Sat, 11 Aug 2018 21:07:38 +0200
+	(envelope-from <lbloch@janustech.com>) id 1foZQX-0001hh-Si
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:19:55 -0400
+References: <20180810062647.23211-1-lbloch@janustech.com>
+	<20180810062647.23211-6-lbloch@janustech.com>
+	<w51sh3m70ca.fsf@maestria.local.igalia.com>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <1475efc2-86af-48d1-5887-bb8a1a3997a7@janustech.com>
+Date: Sat, 11 Aug 2018 22:19:31 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180807150935.GL2556@work-vm>
+In-Reply-To: <w51sh3m70ca.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB-large
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US-large
-Subject: Re: [Qemu-devel] [PATCH] secondary-vga: unregister vram on unplug.
+Subject: Re: [Qemu-devel] [PATCH v7 5/9] qcow2: Assign the L2 cache
+ relatively to the image size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,67 +26,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 08/07/2018 05:09 PM, Dr. David Alan Gilbert wrote:
+On 8/10/18 5:39 PM, Alberto Garcia wrote:
+> On Fri 10 Aug 2018 08:26:43 AM CEST, Leonid Bloch wrote:
+>> Previously, the L2 cache was allocated without considering the image
+>> size, and an option existed to manually determine its size.
+> 
+> This is not quite correct: the L2 cache was set to the maximum needed
+> for the image when "cache-size" was large enough:
+> 
+>          if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
+>                  *l2_cache_size = max_l2_cache;
+>          } ...
+> 
+> See below for an example.
 
-> * Peter Maydell (peter.maydell@linaro.org) wrote:
->> On 7 August 2018 at 15:57, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
->>> * Gerd Hoffmann (kraxel@redhat.com) wrote:
->>>> On Fri, Jul 20, 2018 at 10:19:48AM +0200, remy.noel@blade-group.com wrote:
->>>>> From: "Remy Noel" <remy.noel@blade-group.com>
->>>>>
->>>>> When removing a secondary-vga device and then adding it back (or adding
->>>>> an other one), qemu aborts with:
->>>>>      "RAMBlock "0000:00:02.0/vga.vram" already registered, abort!".
->>>>>
->>>>> It is caused by the vram staying registered, preventing vga replugging.
->>>> David?  Does that look ok?
->>>>
->>>> This balances the
->>>>
->>>>       vmstate_register_ram(&s->vram, s->global_vmstate ?  NULL : DEVICE(obj));
->>>>
->>>> call in vga_common_init().  I'm wondering whenever the manual cleanup is
->>>> actually needed in case owner is not NULL?
->>> I can't see anyone who is calling unregister_ram or the functions it
->>> calls as part of generic device cleanup, so I think it IS needed
->>> to manually do it.
->>>
->>> Which is a bit worrying since we have vastly more register's than
->>> unregister's.
->> Paolo suggested in an email last month that vmstate_unregister_ram()
->> should simply not exist, because it doesn't actually do anything useful:
->> https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg01125.html
->>
->> (ie it was added in the first place because we'd ended up with
->> two identically named ramblocks, but that only happened because
->> a reference-counting bug meant we hadn't deleted the first one
->> properly before creating the second.)
->>
->> So I think that the bug reported in this thread is similar:
->> the problem is not that we're not calling vmstate_unregister_ram(),
->> but that when the first instance of secondary-vga is removed
->> it is not correctly destroying the ramblock.
-> Ah yes that makes more sense; I remember there was another similar bug
-> where a device screwed up and didn't delete it's RAM causing similar
-> problems.
->
-> Dave
-Thanks for the feedback, after closer inspection, the secondary-vga 
-refcount does, indeed, never reach 0.
+You're right. I'll fix that.
 
-I noticed the bug was not present in v2.12.0 and had been visible since 
-93abfc88bd649de1933588bfc7175605331b3ea9 
-(https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg07547.html).
+> 
+>>           } else {
+>> -            uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
+>> -            uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
+>> -
+>>               /* Assign as much memory as possible to the L2 cache, and
+>>                * use the remainder for the refcount cache */
+>> -            if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
+>> -                *l2_cache_size = max_l2_cache;
+>> +            if (combined_cache_size >= *l2_cache_size + min_refcount_cache) {
+> 
+> This has an (unintended?) side effect:
+> 
+> If you have a 1TB qcow2 image and open it with e.g. cache-size=200M,
+> with the previous code you would get a 128MB L2 cache (max_l2_cache).
+> With the new code you only get 32MB.
 
-This patch causes the secondary-vga object to be referenced by its 
-subregions (mrs) which are themselves referenced by its mmio region 
-which is referenced by the device causing a reference loop.
-We should probably break this loop upon exit, however, i am not sure 
-whether we should deletes the subregions or delete the mmio properly.
+Good catch!! Thanks!
 
-Thanks
+> 
+> The rest of the function looks good to me now. We're getting close :)
+> 
+>> - - The default L2 cache size is 8 clusters or 1MB (whichever is more),
+>> -   and the minimum is 2 clusters (or 2 cache entries, see below).
+>> + - The default L2 cache size will cover the entire virtual size of an
+>> +   image, up to a certain maximum. This maximum is 1 MB by default
+>> +   (enough for image sizes of up to 8 GB with the default cluster size)
+>> +   and it can be reduced or enlarged using the "l2-cache-size" option.
+>> +   The minimum is 2 clusters (or 2 cache entries, see below).
+> 
+> It's not clear with this wording if this "certain maximum" refers to the
+> cache size or the image size.
 
-Remy
+"This maximum is 1 MB by default (enough for image sizes of up to 8 GB 
+..." - to me it's quite clear that it speaks of the image size. But I 
+guess I can change the wording.
+
+> 
+> I'm thinking that perhaps it's clearer if you leave that item unchanged
+> and add a new one below, something like:
+
+I can't leave it unchanged for two reasons: (1) "8 clusters or 1MB 
+(whichever is more)" (2) "default" - now it is not default, but maximal.
+OK, I'll change it to be more clear, incorporating your suggestion from 
+below.
+
+> 
+> - The L2 cache size setting (regardless of whether it takes the default
+>    value or it's set by the user) refers to the maximum size of the L2
+>    cache. If QEMU needs less memory to hold all of the image's L2 tables,
+>    then that's the actual size of the cache that will be allocated. >
+>>    - If the L2 cache is big enough to hold all of the image's L2 tables
+>> -   (as explained in the "Choosing the right cache sizes" section
+>> -   earlier in this document) then none of this is necessary and you
+>> -   can omit the "l2-cache-entry-size" parameter altogether.
+>> +   (the default behavior for images of up to 8 GB in size) then none
+>> +   of this is necessary and you can omit the "l2-cache-entry-size"
+>> +   parameter altogether.
+> 
+> I think this change is unnecessary :-?
+
+Maybe I'll just mention the default here? Or refer to the section which 
+speaks of the defaults ('as explained in the "Choosing the right cache 
+sizes" and "How to configure the cache sizes" sections ...")?
+
+> 
+>>   @item refcount-cache-size
+>>   The maximum size of the refcount block cache in bytes
+>> diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
+>> index 87965625d8..e3fb078588 100755
+>> --- a/tests/qemu-iotests/137
+>> +++ b/tests/qemu-iotests/137
+>> @@ -109,7 +109,6 @@ $QEMU_IO \
+>>       -c "reopen -o cache-size=1M,l2-cache-size=64k,refcount-cache-size=64k" \
+>>       -c "reopen -o cache-size=1M,l2-cache-size=2M" \
+>>       -c "reopen -o cache-size=1M,refcount-cache-size=2M" \
+>> -    -c "reopen -o l2-cache-size=256T" \
+> 
+> The "L2 cache size too big" error can still be tested, but you will need
+> to create an image large enough to allow such a big cache.
+> 
+> $ qemu-img create -f qcow2 -o cluster_size=256k hd.qcow2 32P
+> $ $QEMU -drive file=hd.qcow2,l2-cache-entry-size=512,l2-cache-size=1T
+
+* 32P qcow2 will take 33M - is it OK to create it just for a test?
+* Is it worth to create a special test scenario, with a separate image 
+creation, just for that case?
+
+Leonid.
+
+> 
+> Berto
+> 
