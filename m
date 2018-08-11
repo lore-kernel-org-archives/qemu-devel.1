@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1foWgh-0007w5-UB
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 12:24:24 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1foX3X-0008E3-IX
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 12:48:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1foWgg-0000uX-U9
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 12:24:23 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:37668)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1foX3T-0002IA-LR
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 12:47:59 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:39447)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
-	id 1foWgg-0000uD-P4
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 12:24:22 -0400
-Received: by mail-qk0-x243.google.com with SMTP id t79-v6so8430860qke.4
-	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 09:24:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1foX3T-0002HZ-Dl
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 12:47:55 -0400
+Received: by mail-ed1-x542.google.com with SMTP id h4-v6so6245537edi.6
+	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 09:47:55 -0700 (PDT)
+References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
+	<d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
+	<8bf07395-4872-ce74-c201-9fca232edd01@gmail.com>
+	<80532e46-ffbf-9c87-5296-741bbb6f83ac@redhat.com>
+	<d5ad3096-86b1-29e4-47bd-1ca71b8e7879@bluestop.org>
+	<1feb3cc1-86ee-f708-6dc7-b9e20a7588ac@redhat.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <5434c03d-7d03-8255-ea0f-d85ec96ac844@gmail.com>
+Date: Sat, 11 Aug 2018 19:47:49 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180810193129.1556-7-richard.henderson@linaro.org>
-References: <20180810193129.1556-1-richard.henderson@linaro.org>
-	<20180810193129.1556-7-richard.henderson@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Sat, 11 Aug 2018 18:24:21 +0200
-Message-ID: <CABoDooN+mCfWKGL6QG-ofJaCJHfCuNPgaTTX5W8ppwevgRF03w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 6/6] softfloat: Fix missing inexact for
- floating-point add
+In-Reply-To: <1feb3cc1-86ee-f708-6dc7-b9e20a7588ac@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +35,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>, Rebecca Cran <rebecca@bluestop.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yuval Shaia <yuval.shaia@oracle.com>, Kamil Rytarowski <kamil@netbsd.org>, Brad Smith <brad@comstyle.com>
 
-On Fri, Aug 10, 2018 at 9:31 PM, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> For 0x1.0000000000003p+0 + 0x1.ffffffep+14 = 0x1.0001fffp+15
-> we dropped the sticky bit and so failed to raise inexact.
+Hi,
+
+On 08/06/2018 11:51 AM, Thomas Huth wrote:
+> On 07/28/2018 05:50 AM, Rebecca Cran wrote:
+>> On 7/25/18 5:14 AM, Thomas Huth wrote:
+>>
+>>> Note that the error has been reported to happen on FreeBSD - so I doubt
+>>> that this <linux/types.h> header should be here.
+>>>
+>>> Anyway, our include/standard-headers/linux/types.h is also empty ... so
+>>> could you try whether it compiles if you simply remove this #include
+>>> line, Rebecca?
+>>
+>> Sorry for the delay, I'm just getting back to this. Removing the include
+>> causes it to fail later on, with:
+>>
+>> /home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning:
+>> implicit declaration of function 'mremap' is invalid in C99
+>> [-Wimplicit-function-declaration]
+>>      host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
+> OK, thanks for checking. According to
 >
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-
-Laurent
-
-> ---
->  fpu/softfloat.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   https://www.freebsd.org/cgi/man.cgi?query=mremap&manpath=NetBSD+5.0
 >
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index 8cd2400081..7d63cffdeb 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -701,7 +701,7 @@ static FloatParts addsub_floats(FloatParts a, FloatParts b, bool subtract,
->              }
->              a.frac += b.frac;
->              if (a.frac & DECOMPOSED_OVERFLOW_BIT) {
-> -                a.frac >>= 1;
-> +                shift64RightJamming(a.frac, 1, &a.frac);
->                  a.exp += 1;
->              }
->              return a;
-> --
-> 2.17.1
+> that syscall should also be available on FreeBSD. So could you please do
+> one more test and see whether it works when you add the following line
+> somewhere at the beginning of the file:
 >
+>    #include <sys/mman.h>
+
+It took some time, but I finally have a FreeBSD VM with RDMA enabled.
+
+My findings:
+- The RDMA libraries are there, so the flag  "RDMA"=yes is set correctly.
+- include of <linux/types.h> is not needed, I will remove it.
+- In FreeBSD mremap is not implemented in all configurations, it depends
+   on some SANITIZER_LINUX flag (Linux emulation?), I think;
+   so pvrdma cannot be compiled.  I think we should have a different 
+QEMU configuration
+   flag --enable-pvrdma that will specifically check it is not a "bsd" 
+platform.
+   I'll send a patch for that too.
+
+Thanks,
+Marcel
+
+
+>
+>   Thanks,
+>    Thomas
