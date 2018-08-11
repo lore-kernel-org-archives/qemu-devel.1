@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1foHOx-0006LX-0O
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 20:05:03 -0400
+	(envelope-from <rth7680@gmail.com>) id 1foJqP-00046S-OM
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 22:41:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1foHOt-0004zj-1D
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 20:05:02 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:49598)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
-	id 1foHOs-0004yu-Mc
-	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 20:04:58 -0400
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-From: Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20180810100005.3ttvqgaz7sc3iajj@sirius.home.kraxel.org>
-Date: Sat, 11 Aug 2018 03:04:53 +0300
+	(envelope-from <rth7680@gmail.com>) id 1foJqL-0002v1-RH
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 22:41:33 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:38988)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1foJqL-0002u5-KF
+	for qemu-devel@nongnu.org; Fri, 10 Aug 2018 22:41:29 -0400
+Received: by mail-pg1-x543.google.com with SMTP id a11-v6so5173657pgw.6
+	for <qemu-devel@nongnu.org>; Fri, 10 Aug 2018 19:41:29 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180810222502.19663-1-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <0c363042-274c-a713-3c3b-69cb4906dec2@twiddle.net>
+Date: Fri, 10 Aug 2018 19:41:26 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180810222502.19663-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <6E4D921B-7291-4967-90C3-FA3B8BC75C20@oracle.com>
-References: <1533815202-11967-1-git-send-email-liran.alon@oracle.com>
-	<1533815202-11967-7-git-send-email-liran.alon@oracle.com>
-	<20180810100005.3ttvqgaz7sc3iajj@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH 06/29] vmsvga: Fix parse of
- SVGA_CMD_UPDATE_VERBOSE to consider additional opaque cookie
+Subject: Re: [Qemu-devel] [PATCH] sh4: fix use_icount with linux-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net, habkost@redhat.com, Leonid Shatz <leonid.shatz@oracle.com>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Aurelien Jarno <aurelien@aurel32.net>
+
+On 08/10/2018 03:25 PM, Laurent Vivier wrote:
+> +++ b/target/sh4/translate.c
+> @@ -253,7 +253,6 @@ static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+>              tcg_gen_lookup_and_goto_ptr();
+>          }
+>      }
+> -    ctx->base.is_jmp = DISAS_NORETURN;
+>  }
+>  
+
+Looking at the other places gen_goto_tb is used,
+this doesn't look right.
+
+Based on the description, I expected a modification in
+gen_conditional_jump, much like the one you remove here:
+
+> @@ -324,7 +323,6 @@ static void gen_delayed_conditional_jump(DisasContext * ctx)
+>          gen_jump(ctx);
+>  
+>          gen_set_label(l1);
+> -        ctx->base.is_jmp = DISAS_NEXT;
+>          return;
+>      }
+>  
 
 
-
-> On 10 Aug 2018, at 13:00, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> 
->  Hi,
-> 
->> +            if (cmd == SVGA_CMD_UPDATE_VERBOSE)
->> +                vmsvga_fifo_read(s);
-> 
-> Code style.  qemu wants braces unconditionally.  There might be more of
-> this in following patches.  You can use scripts/checkpatch.pl to check.
-> 
-> cheers,
->  Gerd
-> 
-
-Oops. Will fix for v2 of patch series.
-
-Thanks,
--Liran
+r~
