@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1foZrT-0005Xd-8M
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:47:45 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1foZwJ-0007c9-Q2
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:52:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1foZrR-0000tW-8z
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:47:43 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39564)
+	(envelope-from <zhangckid@gmail.com>) id 1foZwI-0003eJ-1H
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:52:43 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:39431)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1foZrQ-0000sT-T6
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:47:41 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h10-v6so10976398wre.6
-	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 12:47:40 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1foZwH-0003dV-M2
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:52:41 -0400
+Received: by mail-wr1-x436.google.com with SMTP id h10-v6so10982081wre.6
+	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 12:52:41 -0700 (PDT)
 MIME-Version: 1.0
 References: <20180722193350.6028-1-zhangckid@gmail.com>
-	<20180722193350.6028-6-zhangckid@gmail.com>
-	<20180807143036.GJ2556@work-vm>
-In-Reply-To: <20180807143036.GJ2556@work-vm>
+	<20180722193350.6028-9-zhangckid@gmail.com>
+	<20180727185131.GD2498@work-vm>
+	<CAK3tnv+N94Fuev05WF3A4bBOuZ8-RfPrWWG2eGsFcEtjh0=mTA@mail.gmail.com>
+	<20180807184447.GS2556@work-vm>
+In-Reply-To: <20180807184447.GS2556@work-vm>
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Sun, 12 Aug 2018 03:47:26 +0800
-Message-ID: <CAK3tnvK=yQz8=mE8_7OMHiiNwPiRY8dG-7yek_iv_yXHgQYqKg@mail.gmail.com>
+Date: Sun, 12 Aug 2018 03:52:26 +0800
+Message-ID: <CAK3tnvK_GKX2FEcFPf_b1CKZYJz-7ywLF_1b+6vcdi0FZu5dZQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V10 05/20] COLO: Add block replication into
- colo process
+Subject: Re: [Qemu-devel] [PATCH V10 08/20] ram/COLO: Record the dirty pages
+ that SVM received
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,200 +35,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, jasowang@redhat.com, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com
 
-On Tue, Aug 7, 2018 at 10:30 PM Dr. David Alan Gilbert <dgilbert@redhat.com>
+On Wed, Aug 8, 2018 at 2:44 AM Dr. David Alan Gilbert <dgilbert@redhat.com>
 wrote:
 
 > * Zhang Chen (zhangckid@gmail.com) wrote:
-> > Make sure master start block replication after slave's block
-> > replication started.
+> > On Sat, Jul 28, 2018 at 2:51 AM, Dr. David Alan Gilbert <
+> dgilbert@redhat.com
+> > > wrote:
 > >
-> > Besides, we need to activate VM's blocks before goes into
-> > COLO state.
+> > > * Zhang Chen (zhangckid@gmail.com) wrote:
+> > > > We record the address of the dirty pages that received,
+> > > > it will help flushing pages that cached into SVM.
+> > > >
+> > > > Here, it is a trick, we record dirty pages by re-using migration
+> > > > dirty bitmap. In the later patch, we will start the dirty log
+> > > > for SVM, just like migration, in this way, we can record both
+> > > > the dirty pages caused by PVM and SVM, we only flush those dirty
+> > > > pages from RAM cache while do checkpoint.
+> > > >
+> > > > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> > > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > ---
+> > > >  migration/ram.c | 33 +++++++++++++++++++++++++++++++++
+> > > >  1 file changed, 33 insertions(+)
+> > > >
+> > > > diff --git a/migration/ram.c b/migration/ram.c
+> > > > index 33ebd09d70..d1060f1337 100644
+> > > > --- a/migration/ram.c
+> > > > +++ b/migration/ram.c
+> > > > @@ -3325,6 +3325,15 @@ static inline void
+> *colo_cache_from_block_offset(RAMBlock
+> > > *block,
+> > > >                       __func__, block->idstr);
+> > > >          return NULL;
+> > > >      }
+> > > > +
+> > > > +    /*
+> > > > +    * During colo checkpoint, we need bitmap of these migrated
+> pages.
+> > > > +    * It help us to decide which pages in ram cache should be
+> flushed
+> > > > +    * into VM's RAM later.
+> > > > +    */
+> > > > +    if (!test_and_set_bit(offset >> TARGET_PAGE_BITS, block->bmap))
+> {
+> > > > +        ram_state->migration_dirty_pages++;
+> > > > +    }
+> > > >      return block->colo_cache + offset;
+> > > >  }
+> > > >
+> > > > @@ -3555,6 +3564,24 @@ int colo_init_ram_cache(void)
+> > > >          memcpy(block->colo_cache, block->host, block->used_length);
+> > > >      }
+> > > >      rcu_read_unlock();
+> > > > +    /*
+> > > > +    * Record the dirty pages that sent by PVM, we use this dirty
+> bitmap
+> > > together
+> > > > +    * with to decide which page in cache should be flushed into
+> SVM's
+> > > RAM. Here
+> > > > +    * we use the same name 'ram_bitmap' as for migration.
+> > > > +    */
+> > > > +    if (ram_bytes_total()) {
+> > > > +        RAMBlock *block;
+> > > > +
+> > > > +        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> > >
+> > > I think those need updating to check for 'qemu_ram_is_migratable' - it
+> > > might be worth moving RAMBLOCK_FOREACH_MIGRATABLE.
+> > >
 > >
-> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > ---
-> >  migration/colo.c      | 43 +++++++++++++++++++++++++++++++++++++++++++
-> >  migration/migration.c |  9 +++++++++
-> >  2 files changed, 52 insertions(+)
 > >
-> > diff --git a/migration/colo.c b/migration/colo.c
-> > index 081df1835f..e06640c3d6 100644
-> > --- a/migration/colo.c
-> > +++ b/migration/colo.c
-> > @@ -27,6 +27,7 @@
-> >  #include "replication.h"
-> >  #include "net/colo-compare.h"
-> >  #include "net/colo.h"
-> > +#include "block/block.h"
+> > OK, I will change to the " RAMBLOCK_FOREACH_MIGRATABLE " in next version.
 > >
-> >  static bool vmstate_loading;
-> >  static Notifier packets_compare_notifier;
-> > @@ -56,6 +57,7 @@ static void secondary_vm_do_failover(void)
-> >  {
-> >      int old_state;
-> >      MigrationIncomingState *mis = migration_incoming_get_current();
-> > +    Error *local_err = NULL;
 > >
-> >      /* Can not do failover during the process of VM's loading VMstate,
-> Or
-> >       * it will break the secondary VM.
-> > @@ -73,6 +75,11 @@ static void secondary_vm_do_failover(void)
-> >      migrate_set_state(&mis->state, MIGRATION_STATUS_COLO,
-> >                        MIGRATION_STATUS_COMPLETED);
+> > >
+> > > > +            unsigned long pages = block->max_length >>
+> TARGET_PAGE_BITS;
+> > > > +
+> > > > +            block->bmap = bitmap_new(pages);
+> > > > +            bitmap_set(block->bmap, 0, pages);
+> > >
+> > > Would it make sense to use the 'receivedmap' that was recently added
+> > > for other uses rather than needing your own?
+> > >
 > >
-> > +    replication_stop_all(true, &local_err);
-> > +    if (local_err) {
-> > +        error_report_err(local_err);
-> > +    }
-> > +
-> >      if (!autostart) {
-> >          error_report("\"-S\" qemu option will be ignored in secondary
-> side");
-> >          /* recover runstate to normal migration finish state */
-> > @@ -110,6 +117,7 @@ static void primary_vm_do_failover(void)
-> >  {
-> >      MigrationState *s = migrate_get_current();
-> >      int old_state;
-> > +    Error *local_err = NULL;
-> >
-> >      migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
-> >                        MIGRATION_STATUS_COMPLETED);
-> > @@ -133,6 +141,13 @@ static void primary_vm_do_failover(void)
-> >                       FailoverStatus_str(old_state));
-> >          return;
-> >      }
-> > +
-> > +    replication_stop_all(true, &local_err);
-> > +    if (local_err) {
-> > +        error_report_err(local_err);
-> > +        local_err = NULL;
-> > +    }
-> > +
-> >      /* Notify COLO thread that failover work is finished */
-> >      qemu_sem_post(&s->colo_exit_sem);
-> >  }
-> > @@ -356,6 +371,11 @@ static int
-> colo_do_checkpoint_transaction(MigrationState *s,
-> >      qemu_savevm_state_header(fb);
-> >      qemu_savevm_state_setup(fb);
-> >      qemu_mutex_lock_iothread();
-> > +    replication_do_checkpoint_all(&local_err);
-> > +    if (local_err) {
-> > +        qemu_mutex_unlock_iothread();
-> > +        goto out;
-> > +    }
+> > Maybe we can do this job as optimization in the future, currently we want
+> > to make this series merged into upstream first.
 >
-> In docs/block-replication.txt it says:
->   b. replication_do_checkpoint_all()
->    This interface is called after all VM state is transferred to
->    Secondary QEMU. The Disk buffer will be dropped in this interface.
->    The caller must hold the I/O mutex lock if it is in migration/checkpoint
->    thread.
->
-> but we're making this call before the call below that actually transfers
-> all the state.  Which is right?
+> Sure; I think it's getting there; I don't see anything too bad in the
+> migration bits as is;  hopefully Jason can check the networking set
+> again and Markus/Eric check the QMP side of things.
 >
 
 Hi Dave,
 
-The "docs/block-replication.txt" means we should call the
-replication_do_checkpoint_all() after VM state is transferred in secondary
-node,
-and in primary node this function no need to call before transfers all the
-state.
+Yes, I will update new version for this series.
 
-Thanks
+Thank you for your help with the COLO project.
 Zhang Chen
 
 
-
->
-> Other than that I think it's OK.
 >
 > Dave
 >
-> >      qemu_savevm_state_complete_precopy(fb, false, false);
-> >      qemu_mutex_unlock_iothread();
+> > Thanks
+> > Zhang Chen
 > >
-> > @@ -446,6 +466,12 @@ static void colo_process_checkpoint(MigrationState
-> *s)
-> >      object_unref(OBJECT(bioc));
 > >
-> >      qemu_mutex_lock_iothread();
-> > +    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
-> > +    if (local_err) {
-> > +        qemu_mutex_unlock_iothread();
-> > +        goto out;
-> > +    }
-> > +
-> >      vm_start();
-> >      qemu_mutex_unlock_iothread();
-> >      trace_colo_vm_state_change("stop", "run");
-> > @@ -585,6 +611,11 @@ void *colo_process_incoming_thread(void *opaque)
-> >      object_unref(OBJECT(bioc));
-> >
-> >      qemu_mutex_lock_iothread();
-> > +    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
-> > +    if (local_err) {
-> > +        qemu_mutex_unlock_iothread();
-> > +        goto out;
-> > +    }
-> >      vm_start();
-> >      trace_colo_vm_state_change("stop", "run");
-> >      qemu_mutex_unlock_iothread();
-> > @@ -665,6 +696,18 @@ void *colo_process_incoming_thread(void *opaque)
-> >              goto out;
-> >          }
-> >
-> > +        replication_get_error_all(&local_err);
-> > +        if (local_err) {
-> > +            qemu_mutex_unlock_iothread();
-> > +            goto out;
-> > +        }
-> > +        /* discard colo disk buffer */
-> > +        replication_do_checkpoint_all(&local_err);
-> > +        if (local_err) {
-> > +            qemu_mutex_unlock_iothread();
-> > +            goto out;
-> > +        }
-> > +
-> >          vmstate_loading = false;
-> >          vm_start();
-> >          trace_colo_vm_state_change("stop", "run");
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index ce06941706..c97b7660af 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -385,6 +385,7 @@ static void process_incoming_migration_co(void
-> *opaque)
-> >      MigrationIncomingState *mis = migration_incoming_get_current();
-> >      PostcopyState ps;
-> >      int ret;
-> > +    Error *local_err = NULL;
-> >
-> >      assert(mis->from_src_file);
-> >      mis->largest_page_size = qemu_ram_pagesize_largest();
-> > @@ -416,6 +417,14 @@ static void process_incoming_migration_co(void
-> *opaque)
-> >
-> >      /* we get COLO info, and know if we are in COLO mode */
-> >      if (!ret && migration_incoming_enable_colo()) {
-> > +        /* Make sure all file formats flush their mutable metadata */
-> > +        bdrv_invalidate_cache_all(&local_err);
-> > +        if (local_err) {
-> > +            migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-> > +                    MIGRATION_STATUS_FAILED);
-> > +            error_report_err(local_err);
-> > +            exit(EXIT_FAILURE);
-> > +        }
-> >          mis->migration_incoming_co = qemu_coroutine_self();
-> >          qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
-> >               colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
-> > --
-> > 2.17.1
-> >
+> > >
+> > > Dave
+> > >
+> > > > +         }
+> > > > +    }
+> > > > +    ram_state = g_new0(RAMState, 1);
+> > > > +    ram_state->migration_dirty_pages = 0;
+> > > > +
+> > > >      return 0;
+> > > >
+> > > >  out_locked:
+> > > > @@ -3574,6 +3601,10 @@ void colo_release_ram_cache(void)
+> > > >  {
+> > > >      RAMBlock *block;
+> > > >
+> > > > +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> > > > +        g_free(block->bmap);
+> > > > +        block->bmap = NULL;
+> > > > +    }
+> > > >      rcu_read_lock();
+> > > >      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> > > >          if (block->colo_cache) {
+> > > > @@ -3582,6 +3613,8 @@ void colo_release_ram_cache(void)
+> > > >          }
+> > > >      }
+> > > >      rcu_read_unlock();
+> > > > +    g_free(ram_state);
+> > > > +    ram_state = NULL;
+> > > >  }
+> > > >
+> > > >  /**
+> > > > --
+> > > > 2.17.1
+> > > >
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > >
 > --
 > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 >
