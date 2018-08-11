@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1foXUO-0002C1-Bw
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 13:15:45 -0400
+	(envelope-from <laurent.desnogues@gmail.com>) id 1foXVu-0002sr-9j
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 13:17:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1foXUJ-0004Zg-Db
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 13:15:44 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42102)
+	(envelope-from <laurent.desnogues@gmail.com>) id 1foXVt-0005OB-4A
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 13:17:18 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:44354)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1foXUJ-0004ZA-6m
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 13:15:39 -0400
-Received: by mail-wr1-x442.google.com with SMTP id e7-v6so10793198wrs.9
-	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 10:15:39 -0700 (PDT)
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sat, 11 Aug 2018 20:15:34 +0300
-Message-Id: <20180811171534.11917-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel]  [PATCH] hw/pvrdma: remove not needed include
+	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
+	id 1foXVs-0005N8-Vf
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 13:17:17 -0400
+Received: by mail-qt0-x242.google.com with SMTP id b15-v6so13474155qtp.11
+	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 10:17:16 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180810193129.1556-6-richard.henderson@linaro.org>
+References: <20180810193129.1556-1-richard.henderson@linaro.org>
+	<20180810193129.1556-6-richard.henderson@linaro.org>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Sat, 11 Aug 2018 19:17:15 +0200
+Message-ID: <CABoDooO-kKP2ee6==0XOJMkPrrOQ7ufcz86XJGqAH=e6Jd9wTw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 5/6] target/arm: Fix aa64 FCADD and FCMLA
+ decode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,28 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: yuval.shaia@oracle.com, thuth@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-No need to include linux/types.h, is empty anyway.
+On Fri, Aug 10, 2018 at 9:31 PM, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> These insns require u=1; failed to include that in the switch
+> cases.  This probably happened during one of the rebases just
+> before final commit.
+>
+> Fixes: d17b7cdcf4e
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
----
- hw/rdma/vmw/pvrdma_cmd.c | 1 -
- 1 file changed, 1 deletion(-)
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 
-diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-index 14255d609f..3f697c8db7 100644
---- a/hw/rdma/vmw/pvrdma_cmd.c
-+++ b/hw/rdma/vmw/pvrdma_cmd.c
-@@ -16,7 +16,6 @@
- #include "qemu/osdep.h"
- #include "qemu/error-report.h"
- #include "cpu.h"
--#include <linux/types.h>
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_ids.h"
--- 
-2.17.1
+Laurent
+
+> ---
+>  target/arm/translate-a64.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 4a0ca8c906..8a24278d79 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -11427,12 +11427,12 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
+>          }
+>          feature = ARM_FEATURE_V8_DOTPROD;
+>          break;
+> -    case 0x8: /* FCMLA, #0 */
+> -    case 0x9: /* FCMLA, #90 */
+> -    case 0xa: /* FCMLA, #180 */
+> -    case 0xb: /* FCMLA, #270 */
+> -    case 0xc: /* FCADD, #90 */
+> -    case 0xe: /* FCADD, #270 */
+> +    case 0x18: /* FCMLA, #0 */
+> +    case 0x19: /* FCMLA, #90 */
+> +    case 0x1a: /* FCMLA, #180 */
+> +    case 0x1b: /* FCMLA, #270 */
+> +    case 0x1c: /* FCADD, #90 */
+> +    case 0x1e: /* FCADD, #270 */
+>          if (size == 0
+>              || (size == 1 && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))
+>              || (size == 3 && !is_q)) {
+> --
+> 2.17.1
+>
