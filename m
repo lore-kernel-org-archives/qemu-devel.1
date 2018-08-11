@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1foNEI-0002A5-5n
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 02:18:27 -0400
+	(envelope-from <laurent@vivier.eu>) id 1foPBo-0001nI-8m
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 04:24:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1foNEH-0005sT-98
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 02:18:26 -0400
-References: <20180810224645.10659-1-hpoussin@reactos.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <ff0d75af-553f-3e08-92e2-f434025204ea@ilande.co.uk>
-Date: Sat, 11 Aug 2018 07:17:57 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180810224645.10659-1-hpoussin@reactos.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-doc: mark ppc/prep machine as
- deprecated
+	(envelope-from <laurent@vivier.eu>) id 1foPBl-0004SB-2q
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 04:24:00 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:37337)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1foPBk-0004Rd-Oo
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 04:23:56 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Sat, 11 Aug 2018 10:23:28 +0200
+Message-Id: <20180811082328.11268-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v2] sh4: fix use_icount with linux-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +21,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org
-Cc: "reviewer:Incompatible changes" <libvir-list@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Laurent Vivier <laurent@vivier.eu>
 
-On 10/08/18 23:46, Hervé Poussineau wrote:
+This fixes java in a linux-user chroot:
+  $ java --version
+  qemu-sh4: .../accel/tcg/cpu-exec.c:634: cpu_loop_exec_tb: Assertion `use_icount' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  Aborted (core dumped)
 
-> 40p machine type should be used instead.
-> 
-> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
-> ---
->  qemu-deprecated.texi | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 9920a85adc..9c7ff3fe2d 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -218,6 +218,12 @@ support page sizes < 4096 any longer.
->  These machine types are very old and likely can not be used for live migration
->  from old QEMU versions anymore. A newer machine type should be used instead.
->  
-> +@subsection prep (PowerPC) (since 3.1)
-> +
-> +This machine type uses an unmaintained firmware, broken in lots of ways,
-> +and unable to start post-2004 operating systems. 40p machine type should be
-> +used instead.
-> +
->  @section Device options
->  
->  @subsection Block device options
+In gen_conditional_jump() in the GUSA_EXCLUSIVE part, we must reset
+base.is_jmp to DISAS_NEXT after the gen_goto_tb() as it is done in
+gen_delayed_conditional_jump() after the gen_jump().
 
-Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Bug: https://bugs.launchpad.net/qemu/+bug/1768246
+Fixes: 4834871bc95b67343248100e2a75ae0d287bc08b
+       ("target/sh4: Convert to DisasJumpType")
+Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
 
+Notes:
+    v2:
+      don't revert the part of the original patch,
+      but fixes the state problem in gen_conditional_jump()
 
-ATB,
+ target/sh4/translate.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Mark.
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 1b9a201d6d..ab254b0e8d 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -293,6 +293,7 @@ static void gen_conditional_jump(DisasContext *ctx, target_ulong dest,
+            disallow it in use_goto_tb, but it handles exit + singlestep.  */
+         gen_goto_tb(ctx, 0, dest);
+         gen_set_label(l1);
++        ctx->base.is_jmp = DISAS_NEXT;
+         return;
+     }
+ 
+-- 
+2.17.1
