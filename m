@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1foXVu-0002sr-9j
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 13:17:19 -0400
+	(envelope-from <oleksandr@natalenko.name>) id 1foXrr-0003WF-Q0
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 13:40:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1foXVt-0005OB-4A
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 13:17:18 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:44354)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
-	id 1foXVs-0005N8-Vf
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 13:17:17 -0400
-Received: by mail-qt0-x242.google.com with SMTP id b15-v6so13474155qtp.11
-	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 10:17:16 -0700 (PDT)
+	(envelope-from <oleksandr@natalenko.name>) id 1foXrq-0005x6-Qf
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 13:39:59 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180810193129.1556-6-richard.henderson@linaro.org>
-References: <20180810193129.1556-1-richard.henderson@linaro.org>
-	<20180810193129.1556-6-richard.henderson@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Sat, 11 Aug 2018 19:17:15 +0200
-Message-ID: <CABoDooO-kKP2ee6==0XOJMkPrrOQ7ufcz86XJGqAH=e6Jd9wTw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 5/6] target/arm: Fix aa64 FCADD and FCMLA
- decode
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Sat, 11 Aug 2018 19:39:56 +0200
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+In-Reply-To: <CACVXFVO1pN=CZvNY8Q4wBrAoA=3w8Ew38aGqpOSHJ1uYAM-sxw@mail.gmail.com>
+References: <f40092b20856d07bd7f870abf5ea939e@natalenko.name>
+	<CACVXFVO1pN=CZvNY8Q4wBrAoA=3w8Ew38aGqpOSHJ1uYAM-sxw@mail.gmail.com>
+Message-ID: <98344e68266e447826f133ad14d0c83d@natalenko.name>
+Subject: Re: [Qemu-devel] Slow boot in QEMU with virtio-scsi disks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>, "Martin
+	K. Petersen" <martin.petersen@oracle.com>, Christoph Hellwig <hch@lst.de>, Paolo Bonzini <pbonzini@redhat.com>, Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>, Linux SCSI List <linux-scsi@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Greg Kurz <groug@kaod.org>, qemu-discuss@nongnu.org, qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, Aug 10, 2018 at 9:31 PM, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> These insns require u=1; failed to include that in the switch
-> cases.  This probably happened during one of the rebases just
-> before final commit.
->
-> Fixes: d17b7cdcf4e
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Hi.
 
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+On 11.08.2018 14:23, Ming Lei wrote:
+> Please test for-4.19/block:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=for-4.19/block
+> 
+> This slow boot issue should have been fixed by the following commits:
+> 
+> 1311326cf475 blk-mq: avoid to synchronize rcu inside 
+> blk_cleanup_queue()
+> 97889f9ac24f blk-mq: remove synchronize_rcu() from 
+> blk_mq_del_queue_tag_set()
+> 5815839b3ca1 blk-mq: introduce new lock for protecting 
+> hctx->dispatch_wait
+> 2278d69f030f blk-mq: don't pass **hctx to blk_mq_mark_tag_wait()
+> 8ab6bb9ee8d0 blk-mq: cleanup blk_mq_get_driver_tag()
 
-Laurent
+Indeed, I can confirm that these commits fix the issue.
 
-> ---
->  target/arm/translate-a64.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 4a0ca8c906..8a24278d79 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -11427,12 +11427,12 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
->          }
->          feature = ARM_FEATURE_V8_DOTPROD;
->          break;
-> -    case 0x8: /* FCMLA, #0 */
-> -    case 0x9: /* FCMLA, #90 */
-> -    case 0xa: /* FCMLA, #180 */
-> -    case 0xb: /* FCMLA, #270 */
-> -    case 0xc: /* FCADD, #90 */
-> -    case 0xe: /* FCADD, #270 */
-> +    case 0x18: /* FCMLA, #0 */
-> +    case 0x19: /* FCMLA, #90 */
-> +    case 0x1a: /* FCMLA, #180 */
-> +    case 0x1b: /* FCMLA, #270 */
-> +    case 0x1c: /* FCADD, #90 */
-> +    case 0x1e: /* FCADD, #270 */
->          if (size == 0
->              || (size == 1 && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))
->              || (size == 3 && !is_q)) {
-> --
-> 2.17.1
->
+Thanks a lot.
+
+-- 
+   Oleksandr Natalenko (post-factum)
