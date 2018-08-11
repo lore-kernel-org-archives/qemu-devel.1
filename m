@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1foZQZ-0004W3-7W
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:19:56 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1foZrT-0005Xd-8M
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:47:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1foZQX-0001hh-Si
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:19:55 -0400
-References: <20180810062647.23211-1-lbloch@janustech.com>
-	<20180810062647.23211-6-lbloch@janustech.com>
-	<w51sh3m70ca.fsf@maestria.local.igalia.com>
-From: Leonid Bloch <lbloch@janustech.com>
-Message-ID: <1475efc2-86af-48d1-5887-bb8a1a3997a7@janustech.com>
-Date: Sat, 11 Aug 2018 22:19:31 +0300
+	(envelope-from <zhangckid@gmail.com>) id 1foZrR-0000tW-8z
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:47:43 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39564)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1foZrQ-0000sT-T6
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 15:47:41 -0400
+Received: by mail-wr1-x443.google.com with SMTP id h10-v6so10976398wre.6
+	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 12:47:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <w51sh3m70ca.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB-large
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 5/9] qcow2: Assign the L2 cache
- relatively to the image size
+References: <20180722193350.6028-1-zhangckid@gmail.com>
+	<20180722193350.6028-6-zhangckid@gmail.com>
+	<20180807143036.GJ2556@work-vm>
+In-Reply-To: <20180807143036.GJ2556@work-vm>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Sun, 12 Aug 2018 03:47:26 +0800
+Message-ID: <CAK3tnvK=yQz8=mE8_7OMHiiNwPiRY8dG-7yek_iv_yXHgQYqKg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V10 05/20] COLO: Add block replication into
+ colo process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,115 +30,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, jasowang@redhat.com, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com
 
-On 8/10/18 5:39 PM, Alberto Garcia wrote:
-> On Fri 10 Aug 2018 08:26:43 AM CEST, Leonid Bloch wrote:
->> Previously, the L2 cache was allocated without considering the image
->> size, and an option existed to manually determine its size.
-> 
-> This is not quite correct: the L2 cache was set to the maximum needed
-> for the image when "cache-size" was large enough:
-> 
->          if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
->                  *l2_cache_size = max_l2_cache;
->          } ...
-> 
-> See below for an example.
+On Tue, Aug 7, 2018 at 10:30 PM Dr. David Alan Gilbert <dgilbert@redhat.com>
+wrote:
 
-You're right. I'll fix that.
+> * Zhang Chen (zhangckid@gmail.com) wrote:
+> > Make sure master start block replication after slave's block
+> > replication started.
+> >
+> > Besides, we need to activate VM's blocks before goes into
+> > COLO state.
+> >
+> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> > ---
+> >  migration/colo.c      | 43 +++++++++++++++++++++++++++++++++++++++++++
+> >  migration/migration.c |  9 +++++++++
+> >  2 files changed, 52 insertions(+)
+> >
+> > diff --git a/migration/colo.c b/migration/colo.c
+> > index 081df1835f..e06640c3d6 100644
+> > --- a/migration/colo.c
+> > +++ b/migration/colo.c
+> > @@ -27,6 +27,7 @@
+> >  #include "replication.h"
+> >  #include "net/colo-compare.h"
+> >  #include "net/colo.h"
+> > +#include "block/block.h"
+> >
+> >  static bool vmstate_loading;
+> >  static Notifier packets_compare_notifier;
+> > @@ -56,6 +57,7 @@ static void secondary_vm_do_failover(void)
+> >  {
+> >      int old_state;
+> >      MigrationIncomingState *mis = migration_incoming_get_current();
+> > +    Error *local_err = NULL;
+> >
+> >      /* Can not do failover during the process of VM's loading VMstate,
+> Or
+> >       * it will break the secondary VM.
+> > @@ -73,6 +75,11 @@ static void secondary_vm_do_failover(void)
+> >      migrate_set_state(&mis->state, MIGRATION_STATUS_COLO,
+> >                        MIGRATION_STATUS_COMPLETED);
+> >
+> > +    replication_stop_all(true, &local_err);
+> > +    if (local_err) {
+> > +        error_report_err(local_err);
+> > +    }
+> > +
+> >      if (!autostart) {
+> >          error_report("\"-S\" qemu option will be ignored in secondary
+> side");
+> >          /* recover runstate to normal migration finish state */
+> > @@ -110,6 +117,7 @@ static void primary_vm_do_failover(void)
+> >  {
+> >      MigrationState *s = migrate_get_current();
+> >      int old_state;
+> > +    Error *local_err = NULL;
+> >
+> >      migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
+> >                        MIGRATION_STATUS_COMPLETED);
+> > @@ -133,6 +141,13 @@ static void primary_vm_do_failover(void)
+> >                       FailoverStatus_str(old_state));
+> >          return;
+> >      }
+> > +
+> > +    replication_stop_all(true, &local_err);
+> > +    if (local_err) {
+> > +        error_report_err(local_err);
+> > +        local_err = NULL;
+> > +    }
+> > +
+> >      /* Notify COLO thread that failover work is finished */
+> >      qemu_sem_post(&s->colo_exit_sem);
+> >  }
+> > @@ -356,6 +371,11 @@ static int
+> colo_do_checkpoint_transaction(MigrationState *s,
+> >      qemu_savevm_state_header(fb);
+> >      qemu_savevm_state_setup(fb);
+> >      qemu_mutex_lock_iothread();
+> > +    replication_do_checkpoint_all(&local_err);
+> > +    if (local_err) {
+> > +        qemu_mutex_unlock_iothread();
+> > +        goto out;
+> > +    }
+>
+> In docs/block-replication.txt it says:
+>   b. replication_do_checkpoint_all()
+>    This interface is called after all VM state is transferred to
+>    Secondary QEMU. The Disk buffer will be dropped in this interface.
+>    The caller must hold the I/O mutex lock if it is in migration/checkpoint
+>    thread.
+>
+> but we're making this call before the call below that actually transfers
+> all the state.  Which is right?
+>
 
-> 
->>           } else {
->> -            uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
->> -            uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
->> -
->>               /* Assign as much memory as possible to the L2 cache, and
->>                * use the remainder for the refcount cache */
->> -            if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
->> -                *l2_cache_size = max_l2_cache;
->> +            if (combined_cache_size >= *l2_cache_size + min_refcount_cache) {
-> 
-> This has an (unintended?) side effect:
-> 
-> If you have a 1TB qcow2 image and open it with e.g. cache-size=200M,
-> with the previous code you would get a 128MB L2 cache (max_l2_cache).
-> With the new code you only get 32MB.
+Hi Dave,
 
-Good catch!! Thanks!
+The "docs/block-replication.txt" means we should call the
+replication_do_checkpoint_all() after VM state is transferred in secondary
+node,
+and in primary node this function no need to call before transfers all the
+state.
 
-> 
-> The rest of the function looks good to me now. We're getting close :)
-> 
->> - - The default L2 cache size is 8 clusters or 1MB (whichever is more),
->> -   and the minimum is 2 clusters (or 2 cache entries, see below).
->> + - The default L2 cache size will cover the entire virtual size of an
->> +   image, up to a certain maximum. This maximum is 1 MB by default
->> +   (enough for image sizes of up to 8 GB with the default cluster size)
->> +   and it can be reduced or enlarged using the "l2-cache-size" option.
->> +   The minimum is 2 clusters (or 2 cache entries, see below).
-> 
-> It's not clear with this wording if this "certain maximum" refers to the
-> cache size or the image size.
+Thanks
+Zhang Chen
 
-"This maximum is 1 MB by default (enough for image sizes of up to 8 GB 
-..." - to me it's quite clear that it speaks of the image size. But I 
-guess I can change the wording.
 
-> 
-> I'm thinking that perhaps it's clearer if you leave that item unchanged
-> and add a new one below, something like:
 
-I can't leave it unchanged for two reasons: (1) "8 clusters or 1MB 
-(whichever is more)" (2) "default" - now it is not default, but maximal.
-OK, I'll change it to be more clear, incorporating your suggestion from 
-below.
-
-> 
-> - The L2 cache size setting (regardless of whether it takes the default
->    value or it's set by the user) refers to the maximum size of the L2
->    cache. If QEMU needs less memory to hold all of the image's L2 tables,
->    then that's the actual size of the cache that will be allocated. >
->>    - If the L2 cache is big enough to hold all of the image's L2 tables
->> -   (as explained in the "Choosing the right cache sizes" section
->> -   earlier in this document) then none of this is necessary and you
->> -   can omit the "l2-cache-entry-size" parameter altogether.
->> +   (the default behavior for images of up to 8 GB in size) then none
->> +   of this is necessary and you can omit the "l2-cache-entry-size"
->> +   parameter altogether.
-> 
-> I think this change is unnecessary :-?
-
-Maybe I'll just mention the default here? Or refer to the section which 
-speaks of the defaults ('as explained in the "Choosing the right cache 
-sizes" and "How to configure the cache sizes" sections ...")?
-
-> 
->>   @item refcount-cache-size
->>   The maximum size of the refcount block cache in bytes
->> diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
->> index 87965625d8..e3fb078588 100755
->> --- a/tests/qemu-iotests/137
->> +++ b/tests/qemu-iotests/137
->> @@ -109,7 +109,6 @@ $QEMU_IO \
->>       -c "reopen -o cache-size=1M,l2-cache-size=64k,refcount-cache-size=64k" \
->>       -c "reopen -o cache-size=1M,l2-cache-size=2M" \
->>       -c "reopen -o cache-size=1M,refcount-cache-size=2M" \
->> -    -c "reopen -o l2-cache-size=256T" \
-> 
-> The "L2 cache size too big" error can still be tested, but you will need
-> to create an image large enough to allow such a big cache.
-> 
-> $ qemu-img create -f qcow2 -o cluster_size=256k hd.qcow2 32P
-> $ $QEMU -drive file=hd.qcow2,l2-cache-entry-size=512,l2-cache-size=1T
-
-* 32P qcow2 will take 33M - is it OK to create it just for a test?
-* Is it worth to create a special test scenario, with a separate image 
-creation, just for that case?
-
-Leonid.
-
-> 
-> Berto
-> 
+>
+> Other than that I think it's OK.
+>
+> Dave
+>
+> >      qemu_savevm_state_complete_precopy(fb, false, false);
+> >      qemu_mutex_unlock_iothread();
+> >
+> > @@ -446,6 +466,12 @@ static void colo_process_checkpoint(MigrationState
+> *s)
+> >      object_unref(OBJECT(bioc));
+> >
+> >      qemu_mutex_lock_iothread();
+> > +    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
+> > +    if (local_err) {
+> > +        qemu_mutex_unlock_iothread();
+> > +        goto out;
+> > +    }
+> > +
+> >      vm_start();
+> >      qemu_mutex_unlock_iothread();
+> >      trace_colo_vm_state_change("stop", "run");
+> > @@ -585,6 +611,11 @@ void *colo_process_incoming_thread(void *opaque)
+> >      object_unref(OBJECT(bioc));
+> >
+> >      qemu_mutex_lock_iothread();
+> > +    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
+> > +    if (local_err) {
+> > +        qemu_mutex_unlock_iothread();
+> > +        goto out;
+> > +    }
+> >      vm_start();
+> >      trace_colo_vm_state_change("stop", "run");
+> >      qemu_mutex_unlock_iothread();
+> > @@ -665,6 +696,18 @@ void *colo_process_incoming_thread(void *opaque)
+> >              goto out;
+> >          }
+> >
+> > +        replication_get_error_all(&local_err);
+> > +        if (local_err) {
+> > +            qemu_mutex_unlock_iothread();
+> > +            goto out;
+> > +        }
+> > +        /* discard colo disk buffer */
+> > +        replication_do_checkpoint_all(&local_err);
+> > +        if (local_err) {
+> > +            qemu_mutex_unlock_iothread();
+> > +            goto out;
+> > +        }
+> > +
+> >          vmstate_loading = false;
+> >          vm_start();
+> >          trace_colo_vm_state_change("stop", "run");
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index ce06941706..c97b7660af 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -385,6 +385,7 @@ static void process_incoming_migration_co(void
+> *opaque)
+> >      MigrationIncomingState *mis = migration_incoming_get_current();
+> >      PostcopyState ps;
+> >      int ret;
+> > +    Error *local_err = NULL;
+> >
+> >      assert(mis->from_src_file);
+> >      mis->largest_page_size = qemu_ram_pagesize_largest();
+> > @@ -416,6 +417,14 @@ static void process_incoming_migration_co(void
+> *opaque)
+> >
+> >      /* we get COLO info, and know if we are in COLO mode */
+> >      if (!ret && migration_incoming_enable_colo()) {
+> > +        /* Make sure all file formats flush their mutable metadata */
+> > +        bdrv_invalidate_cache_all(&local_err);
+> > +        if (local_err) {
+> > +            migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> > +                    MIGRATION_STATUS_FAILED);
+> > +            error_report_err(local_err);
+> > +            exit(EXIT_FAILURE);
+> > +        }
+> >          mis->migration_incoming_co = qemu_coroutine_self();
+> >          qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+> >               colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
+> > --
+> > 2.17.1
+> >
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
