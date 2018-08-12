@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fouis-0004fo-0Q
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:04:54 -0400
+	(envelope-from <lersek@redhat.com>) id 1fovQx-0001dk-VF
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:49:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fouiK-000323-Sd
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:04:13 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38546)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fouiI-0002uI-VW
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:03:40 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id v14-v6so12369260wro.5
-	for <qemu-devel@nongnu.org>; Sun, 12 Aug 2018 11:03:38 -0700 (PDT)
-References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
-	<d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
-	<8bf07395-4872-ce74-c201-9fca232edd01@gmail.com>
-	<80532e46-ffbf-9c87-5296-741bbb6f83ac@redhat.com>
-	<d5ad3096-86b1-29e4-47bd-1ca71b8e7879@bluestop.org>
-	<1feb3cc1-86ee-f708-6dc7-b9e20a7588ac@redhat.com>
-	<5434c03d-7d03-8255-ea0f-d85ec96ac844@gmail.com>
-	<20180812083918.GA3004@lap1>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <b8de7f26-a870-9f1c-122b-0eaf6a730f34@gmail.com>
-Date: Sun, 12 Aug 2018 15:10:12 +0300
+	(envelope-from <lersek@redhat.com>) id 1fovQt-0000T7-1y
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:49:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35902 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fovQs-0000Sj-SG
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:49:42 -0400
+References: <1533625449-14989-1-git-send-email-jing2.liu@linux.intel.com>
+	<893d9264-7908-4e2c-ae1d-7e46eed6e6a0@redhat.com>
+	<e06b10e0-d0b6-d190-6673-f97199bebb72@redhat.com>
+	<efc99631-454d-4377-8551-0594fc763c94@gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <7d37b9ad-9a69-99fd-1940-b0e5fe87efe5@redhat.com>
+Date: Sun, 12 Aug 2018 16:34:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180812083918.GA3004@lap1>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <efc99631-454d-4377-8551-0594fc763c94@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/pci: add pci capability to pci-pci
+ bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: Thomas Huth <thuth@redhat.com>, Rebecca Cran <rebecca@bluestop.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Kamil Rytarowski <kamil@netbsd.org>, Brad Smith <brad@comstyle.com>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Jing Liu <jing2.liu@linux.intel.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, anthony.xu@intel.com, mst@redhat.com
 
+On 08/12/18 09:11, Marcel Apfelbaum wrote:
+> On 08/07/2018 06:59 PM, Laszlo Ersek wrote:
 
+>> First, under the label "shpc_error", we call pci_bridge_exitfn(), which
+>> seems to clean up everything (checking individually for each thing to
+>> clean up). Given this, I wonder why we introduced the "slotid_error" and
+>> "msi_error" labels at all. Cascading teardown on the error path, and
+>> invkoing a function that checks everything individually and then tears
+>> it all down, are usually mutually exclusive.
+> 
+> I think is possible you miss-interpreted pci_bridge_dev_exitfn
+> with pci_bridge_exitfn. The first one is the "catch all", the second
+> one that is used in the error path is for the bridge specific cleanup.
 
-On 08/12/2018 11:39 AM, Yuval Shaia wrote:
-> On Sat, Aug 11, 2018 at 07:47:49PM +0300, Marcel Apfelbaum wrote:
->> Hi,
->>
->> On 08/06/2018 11:51 AM, Thomas Huth wrote:
->>> On 07/28/2018 05:50 AM, Rebecca Cran wrote:
->>>> On 7/25/18 5:14 AM, Thomas Huth wrote:
->>>>
->>>>> Note that the error has been reported to happen on FreeBSD - so I doubt
->>>>> that this <linux/types.h> header should be here.
->>>>>
->>>>> Anyway, our include/standard-headers/linux/types.h is also empty ... so
->>>>> could you try whether it compiles if you simply remove this #include
->>>>> line, Rebecca?
->>>> Sorry for the delay, I'm just getting back to this. Removing the include
->>>> causes it to fail later on, with:
->>>>
->>>> /home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning:
->>>> implicit declaration of function 'mremap' is invalid in C99
->>>> [-Wimplicit-function-declaration]
->>>>       host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
->>> OK, thanks for checking. According to
->>>
->>>    https://www.freebsd.org/cgi/man.cgi?query=mremap&manpath=NetBSD+5.0
->>>
->>> that syscall should also be available on FreeBSD. So could you please do
->>> one more test and see whether it works when you add the following line
->>> somewhere at the beginning of the file:
->>>
->>>     #include <sys/mman.h>
->> It took some time, but I finally have a FreeBSD VM with RDMA enabled.
->>
->> My findings:
->> - The RDMA libraries are there, so the flag  "RDMA"=yes is set correctly.
->> - include of <linux/types.h> is not needed, I will remove it.
->> - In FreeBSD mremap is not implemented in all configurations, it depends
->>    on some SANITIZER_LINUX flag (Linux emulation?), I think;
->>    so pvrdma cannot be compiled.  I think we should have a different QEMU
->> configuration
->>    flag --enable-pvrdma that will specifically check it is not a "bsd"
->> platform.
-> A good idea.
->
-> So, do i get it right that you will "revert back" the things we did
-> to--enable-rdma and do all our stuff in new --enable-pvrdma section?
+Ah, you are correct, I totally mistook the call to pci_bridge_exitfn()
+for pci_bridge_dev_exitfn(). I do see the difference now, so it's clear
+that the error path in pci_bridge_dev_realize() is of the "cascading"
+kind, and not of the "call a catch-all function" kind.
 
-Yes, but I plan to do it as a patch "on top" rather than reverting the 
-actual commit.
+That gives this patch a clear pattern to follow.
 
-Thanks,
-Marcel
-
->>    I'll send a patch for that too.
->>
->> Thanks,
->> Marcel
->>
->>
->>>    Thanks,
->>>     Thomas
+Thank you!
+Laszlo
