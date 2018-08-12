@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fovQx-0001dk-VF
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:49:48 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fovZk-00067v-R6
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fovQt-0000T7-1y
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:49:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35902 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fovQs-0000Sj-SG
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:49:42 -0400
-References: <1533625449-14989-1-git-send-email-jing2.liu@linux.intel.com>
-	<893d9264-7908-4e2c-ae1d-7e46eed6e6a0@redhat.com>
-	<e06b10e0-d0b6-d190-6673-f97199bebb72@redhat.com>
-	<efc99631-454d-4377-8551-0594fc763c94@gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <7d37b9ad-9a69-99fd-1940-b0e5fe87efe5@redhat.com>
-Date: Sun, 12 Aug 2018 16:34:11 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1fovZg-0007Qb-SG
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:58:52 -0400
+Received: from mail-wm0-f47.google.com ([74.125.82.47]:40220)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fovZg-0007Pk-Iv
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:58:48 -0400
+Received: by mail-wm0-f47.google.com with SMTP id y9-v6so6712967wma.5
+	for <qemu-devel@nongnu.org>; Sun, 12 Aug 2018 11:58:48 -0700 (PDT)
+References: <20180806065344.7103-1-armbru@redhat.com>
+	<20180806065344.7103-24-armbru@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f39973cf-3088-6c39-f13b-34af159120f7@redhat.com>
+Date: Sun, 12 Aug 2018 12:02:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <efc99631-454d-4377-8551-0594fc763c94@gmail.com>
+In-Reply-To: <20180806065344.7103-24-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/pci: add pci capability to pci-pci
- bridge
+Subject: Re: [Qemu-devel] [PATCH v3 23/23] libqtest: Rename qtest_FOOv() to
+ qtest_vFOO() for consistency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +31,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Jing Liu <jing2.liu@linux.intel.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, anthony.xu@intel.com, mst@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, f4bug@amsat.org
 
-On 08/12/18 09:11, Marcel Apfelbaum wrote:
-> On 08/07/2018 06:59 PM, Laszlo Ersek wrote:
+On 06/08/2018 08:53, Markus Armbruster wrote:
+> 13 of 13 C99 library function pairs taking ... or a va_list parameter
+> are called FOO() and vFOO().  In QEMU, we sometimes call the one
+> taking a va_list FOOv() instead.  Bad taste.  libqtest.h uses both
+> spellings.  Normalize it to the standard spelling.
 
->> First, under the label "shpc_error", we call pci_bridge_exitfn(), which
->> seems to clean up everything (checking individually for each thing to
->> clean up). Given this, I wonder why we introduced the "slotid_error" and
->> "msi_error" labels at all. Cascading teardown on the error path, and
->> invkoing a function that checks everything individually and then tears
->> it all down, are usually mutually exclusive.
-> 
-> I think is possible you miss-interpreted pci_bridge_dev_exitfn
-> with pci_bridge_exitfn. The first one is the "catch all", the second
-> one that is used in the error path is for the bridge specific cleanup.
+Probably the bad example here was g_strdupv and g_strjoinv.  Those
+however are taking a NULL-terminated char** [1] so the example was
+copied incorrectly.
 
-Ah, you are correct, I totally mistook the call to pci_bridge_exitfn()
-for pci_bridge_dev_exitfn(). I do see the difference now, so it's clear
-that the error path in pci_bridge_dev_realize() is of the "cascading"
-kind, and not of the "call a catch-all function" kind.
+Paolo
 
-That gives this patch a clear pattern to follow.
-
-Thank you!
-Laszlo
+[1] In this case, it's NULL not NUL. :)
