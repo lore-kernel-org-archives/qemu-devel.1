@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdenber@gmx.com>) id 1fov1g-0008KB-Dc
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:23:41 -0400
+	(envelope-from <aoates@google.com>) id 1fowym-0008L7-07
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 16:28:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdenber@gmx.com>) id 1fov1c-00084R-G7
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:23:40 -0400
-Received: from mout.gmx.net ([212.227.15.19]:55587)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mdenber@gmx.com>) id 1fov1c-00083e-5F
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:23:36 -0400
-Received: from [192.168.0.20] ([24.149.35.70]) by mail.gmx.com (mrgmx001
-	[212.227.17.184]) with ESMTPSA (Nemesis) id 0MarNa-1fZyDS2iuQ-00KPZt
-	for <qemu-devel@nongnu.org>; Sun, 12 Aug 2018 17:39:44 +0200
-Message-ID: <5B7054D9.9000209@gmx.com>
-Date: Sun, 12 Aug 2018 11:40:09 -0400
-From: Michele Denber <mdenber@gmx.com>
+	(envelope-from <aoates@google.com>) id 1fowyk-00022j-Kx
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 16:28:47 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:42354)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aoates@google.com>) id 1fowyk-00022Z-BE
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 16:28:46 -0400
+Received: by mail-io0-x241.google.com with SMTP id n18-v6so12517093ioa.9
+	for <qemu-devel@nongnu.org>; Sun, 12 Aug 2018 13:28:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] QEMU  on Solaris
+References: <20180812030740.99170-1-aoates@google.com>
+	<485414e6-9f8d-aa29-f36b-b02e76613752@redhat.com>
+In-Reply-To: <485414e6-9f8d-aa29-f36b-b02e76613752@redhat.com>
+From: Andrew Oates <aoates@google.com>
+Date: Sun, 12 Aug 2018 16:28:32 -0400
+Message-ID: <CAJ1tprDf8ZNJN+g+hfUs1AgK1Diyd3UBNemSPcjcaN79ch1ywg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target-i386: Fix lcall to call gate in
+ IA-32e mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,22 +29,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: pbonzini@redhat.com
+Cc: rth@twiddle.net, ehabkost@redhat.com, qemu-devel@nongnu.org
 
-After configuring QEMU on my Sun I got this message:
+On Sun, Aug 12, 2018 at 6:17 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-"Host OS SunOS support is not currently maintained.
-The QEMU project intends to remove support for this host OS in
-a future release if nobody volunteers to maintain it and to
-provide a build host for our continuous integration setup.
-configure has succeeded and you can continue to build, but
-if you care about QEMU on this platform you should contact
-us upstream at qemu-devel@nongnu.org."
+> On 12/08/2018 05:07, Andrew Oates via Qemu-devel wrote:
+> > Currently call gates are always treated as 32-bit gates.  In IA-32e mode
+> > (either compatibility or 64-bit submode), system segment descriptors are
+> > always 64-bit.  Treating them as 32-bit has the expected unfortunate
+> > effect: only the lower 32 bits of the offset are loaded, the stack
+> > pointer is truncated, a bad new stack pointer is loaded from the TSS (if
+> > switching privilege levels), etc.
+> >
+> > This change adds support for 64-bit call gate to the lcall instruction.
+> > Additionally, there should be a check for non-canonical stack pointers,
+> > but I've omitted that since there doesn't seem to be checks for
+> > non-canonical addresses in this code elsewhere.
+>
+> Thanks.  It's also missing a check for task gates in 64-bit mode and,
+> since we are at it, we should also implement ljmp to call gates.
+> Something like this (untested):
+>
 
-Well I do care about QEMU on my platform so I'd like to volunteer to 
-provide a host for support.  I can provide you with a free account on my 
-Sun Oracle Enterprise M3000 quad-core 2.75 GHz. SPARC64 VII running 
-Solaris 10 Update 11.  I've got plenty of spare CPU cycles and lots of 
-free disk.  Please let me know.
+Yeah, I was going to do ljmp in a followup.  I'll go ahead and add it to
+this patch.
 
-             - Michele
+
+>
+> diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
+> index d3b31f3c1b..0b2efe2cae 100644
+> --- a/target/i386/seg_helper.c
+> +++ b/target/i386/seg_helper.c
+> @@ -1645,6 +1645,13 @@ void helper_ljmp_protected(CPUX86State *env, int
+> new_cs, target_ulong new_eip,
+>          rpl = new_cs & 3;
+>          cpl = env->hflags & HF_CPL_MASK;
+>          type = (e2 >> DESC_TYPE_SHIFT) & 0xf;
+> +#ifdef TARGET_X86_64
+> +        if (env->efer & MSR_EFER_LMA) {
+> +            if (type != 12) {
+> +                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc,
+> GETPC());
+> +            }
+> +        }
+> +#endif
+>          switch (type) {
+>          case 1: /* 286 TSS */
+>          case 9: /* 386 TSS */
+> @@ -1666,6 +1673,21 @@ void helper_ljmp_protected(CPUX86State *env, int
+> new_cs, target_ulong new_eip,
+>              new_eip = (e1 & 0xffff);
+>              if (type == 12) {
+>                  new_eip |= (e2 & 0xffff0000);
+> +#ifdef TARGET_X86_64
+> +                if (env->efer & MSR_EFER_LMA) {
+> +                    /* load the upper 8 bytes of the 64-bit call gate */
+> +                    if (load_segment_ra(env, &e1, &e2, new_cs + 8,
+> GETPC())) {
+> +                        raise_exception_err_ra(env, EXCP0D_GPF, new_cs &
+> 0xfffc,
+> +                                               GETPC());
+> +                    }
+> +                    type = (e2 >> DESC_TYPE_SHIFT) & 0x1f;
+> +                    if (type != 0) {
+> +                        raise_exception_err_ra(env, EXCP0D_GPF, gate_cs &
+> 0xfffc,
+> +                                               GETPC());
+> +                    }
+> +                    new_eip |= ((target_ulong)e1) << 32;
+> +                }
+> +#endif
+>              }
+>              if (load_segment_ra(env, &e1, &e2, gate_cs, GETPC()) != 0) {
+>                  raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc,
+> GETPC());
+> @@ -1812,6 +1834,13 @@ void helper_lcall_protected(CPUX86State *env, int
+> new_cs, target_ulong new_eip,
+>          type = (e2 >> DESC_TYPE_SHIFT) & 0x1f;
+>          dpl = (e2 >> DESC_DPL_SHIFT) & 3;
+>          rpl = new_cs & 3;
+> +#ifdef TARGET_X86_64
+> +        if (env->efer & MSR_EFER_LMA) {
+> +            if (type != 12) {
+> +                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc,
+> GETPC());
+> +            }
+> +        }
+> +#endif
+>          switch (type) {
+>          case 1: /* available 286 TSS */
+>          case 9: /* available 386 TSS */
+>
+>
+> Out of curiosity, what OS is using 64-bit call gates? :)
+>
+
+As far as I know, no important ones :)  Just something I've been hacking
+around with in my spare time.  The rational thing to do would have been to
+just stop using 64-bit call gates, but I figured it would be more fun to
+fix it for everyone.
+
+
+>
+> Paolo
+>
+> > I've left the raise_exception_err_ra lines unwapped at 80 columns to
+> > match the style in the rest of the file.
+> >
+> > Signed-off-by: Andrew Oates <aoates@google.com>
+> > ---
+> >  target/i386/seg_helper.c | 145 ++++++++++++++++++++++++++++-----------
+> >  1 file changed, 106 insertions(+), 39 deletions(-)
+>
+>
