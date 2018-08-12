@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fp1pj-0003h3-TD
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 21:39:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fp1sU-0005An-Ny
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 21:42:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fp1pi-0004Bg-KK
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 21:39:47 -0400
-References: <20180810062647.23211-1-lbloch@janustech.com>
-	<20180810062647.23211-7-lbloch@janustech.com>
-	<w5136vm8m8u.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ca79bbff-163b-f50e-e17b-54d6597e6bfe@redhat.com>
-Date: Mon, 13 Aug 2018 03:39:35 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1fp1sS-0004wo-99
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 21:42:38 -0400
+Date: Sun, 12 Aug 2018 12:58:03 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180812025803.GF4079@umbus>
+References: <20180730141134.31153-1-clg@kaod.org>
+	<20180730141134.31153-4-clg@kaod.org> <20180810004646.GA4079@umbus>
+	<8c3ea427-a373-36e9-dfb3-179584a9b060@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <w5136vm8m8u.fsf@maestria.local.igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="7sUzTq00pd3AHYR8qJHSNw7sTvxR7nGAB"
-Subject: Re: [Qemu-devel] [PATCH v7 6/9] qcow2: Increase the default upper
- limit on the L2 cache size
+	protocol="application/pgp-signature"; boundary="XStn23h1fwudRqtG"
+Content-Disposition: inline
+In-Reply-To: <8c3ea427-a373-36e9-dfb3-179584a9b060@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v6 3/4] spapr: introduce a IRQ controller
+ backend to the machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,158 +26,681 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7sUzTq00pd3AHYR8qJHSNw7sTvxR7nGAB
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>,
- qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>
-Message-ID: <ca79bbff-163b-f50e-e17b-54d6597e6bfe@redhat.com>
-Subject: Re: [PATCH v7 6/9] qcow2: Increase the default upper limit on the L2
- cache size
-References: <20180810062647.23211-1-lbloch@janustech.com>
- <20180810062647.23211-7-lbloch@janustech.com>
- <w5136vm8m8u.fsf@maestria.local.igalia.com>
-In-Reply-To: <w5136vm8m8u.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
+
+--XStn23h1fwudRqtG
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-08-10 14:00, Alberto Garcia wrote:
-> On Fri 10 Aug 2018 08:26:44 AM CEST, Leonid Bloch wrote:
->> The upper limit on the L2 cache size is increased from 1 MB to 32 MB.
->> This is done in order to allow default full coverage with the L2 cache=
 
->> for images of up to 256 GB in size (was 8 GB). Note, that only the
->> needed amount to cover the full image is allocated. The value which is=
-
->> changed here is just the upper limit on the L2 cache size, beyond whic=
-h
->> it will not grow, even if the size of the image will require it to.
->>
->> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+On Fri, Aug 10, 2018 at 09:47:49AM +0200, C=E9dric Le Goater wrote:
+> On 08/10/2018 02:46 AM, David Gibson wrote:
+> > On Mon, Jul 30, 2018 at 04:11:33PM +0200, C=E9dric Le Goater wrote:
+> >> This proposal moves all the related IRQ routines of the sPAPR machine
+> >> behind a sPAPR IRQ backend interface 'spapr_irq' to prepare for future
+> >> changes. First of which will be to increase the size of the IRQ number
+> >> space, then, will follow a new backend for the POWER9 XIVE IRQ control=
+ler.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >=20
+> > Applied to ppc-for-3.1.
 >=20
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> I see that you have applied patch 2/4 and not 3/4. I suppose you=20
+> are still reviewing 3/4.
+
+Actually, I just forgot to push my tree out.  3/4 should be in there
+now.
 >=20
->> -#define DEFAULT_L2_CACHE_MAX_SIZE (1 * MiB)
->> +#define DEFAULT_L2_CACHE_MAX_SIZE (32 * MiB)
 >=20
-> The patch looks perfect to me now and I'm fine with this change, but
-> this is quite an increase from the previous default value. If anyone
-> thinks that this is too aggressive (or too little :)) I'm all ears.
+> Btw, it would be good if we could change the way the interrupt=20
+> device objects (ICSState and soon sPAPRXive) are allocated and=20
+> use object_initialize() instead of object_new(). That can come=20
+> later for XICS but for XIVE, it would be better to get the initial=20
+> patch right. This means that the holding C struct is common to=20
+> the QEMU and KVM devices. =20
+>=20
+> Thanks,
+>=20
+> C.=20
+> =20
+> >> ---
+> >>  include/hw/ppc/spapr.h     |  11 +-
+> >>  include/hw/ppc/spapr_irq.h |  22 ++++
+> >>  hw/ppc/spapr.c             | 180 +----------------------------
+> >>  hw/ppc/spapr_cpu_core.c    |   1 +
+> >>  hw/ppc/spapr_irq.c         | 230 +++++++++++++++++++++++++++++++++++++
+> >>  5 files changed, 259 insertions(+), 185 deletions(-)
+> >>
+> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> >> index 73067f5ee8aa..ad4d7cfd97b0 100644
+> >> --- a/include/hw/ppc/spapr.h
+> >> +++ b/include/hw/ppc/spapr.h
+> >> @@ -4,7 +4,6 @@
+> >>  #include "qemu/units.h"
+> >>  #include "sysemu/dma.h"
+> >>  #include "hw/boards.h"
+> >> -#include "hw/ppc/xics.h"
+> >>  #include "hw/ppc/spapr_drc.h"
+> >>  #include "hw/mem/pc-dimm.h"
+> >>  #include "hw/ppc/spapr_ovec.h"
+> >> @@ -16,6 +15,7 @@ struct sPAPRNVRAM;
+> >>  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
+> >>  typedef struct sPAPREventSource sPAPREventSource;
+> >>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+> >> +typedef struct ICSState ICSState;
+> >> =20
+> >>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+> >>  #define SPAPR_ENTRY_POINT       0x100
+> >> @@ -110,6 +110,7 @@ struct sPAPRMachineClass {
+> >>                            unsigned n_dma, uint32_t *liobns, Error **e=
+rrp);
+> >>      sPAPRResizeHPT resize_hpt_default;
+> >>      sPAPRCapabilities default_caps;
+> >> +    sPAPRIrq *irq;
+> >>  };
+> >> =20
+> >>  /**
+> >> @@ -780,14 +781,6 @@ int spapr_get_vcpu_id(PowerPCCPU *cpu);
+> >>  void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp);
+> >>  PowerPCCPU *spapr_find_cpu(int vcpu_id);
+> >> =20
+> >> -int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align,
+> >> -                   Error **errp);
+> >> -#define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false=
+, errp)
+> >> -int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Erro=
+r **errp);
+> >> -void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+> >> -qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+> >> -
+> >> -
+> >>  int spapr_caps_pre_load(void *opaque);
+> >>  int spapr_caps_pre_save(void *opaque);
+> >> =20
+> >> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> >> index 6f7f50548809..0e98c4474bb2 100644
+> >> --- a/include/hw/ppc/spapr_irq.h
+> >> +++ b/include/hw/ppc/spapr_irq.h
+> >> @@ -29,4 +29,26 @@ int spapr_irq_msi_alloc(sPAPRMachineState *spapr, u=
+int32_t num, bool align,
+> >>  void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t n=
+um);
+> >>  void spapr_irq_msi_reset(sPAPRMachineState *spapr);
+> >> =20
+> >> +typedef struct sPAPRIrq {
+> >> +    uint32_t    nr_irqs;
+> >> +
+> >> +    void (*init)(sPAPRMachineState *spapr, Error **errp);
+> >> +    int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp);
+> >> +    void (*free)(sPAPRMachineState *spapr, int irq, int num);
+> >> +    qemu_irq (*qirq)(sPAPRMachineState *spapr, int irq);
+> >> +    void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
+> >> +} sPAPRIrq;
+> >> +
+> >> +extern sPAPRIrq spapr_irq_xics;
+> >> +
+> >> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Erro=
+r **errp);
+> >> +void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+> >> +qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+> >> +
+> >> +/*
+> >> + * XICS legacy routines
+> >> + */
+> >> +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Err=
+or **errp);
+> >> +#define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false=
+, errp)
+> >> +
+> >>  #endif
+> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >> index 792e24453d8b..d9f8cca49208 100644
+> >> --- a/hw/ppc/spapr.c
+> >> +++ b/hw/ppc/spapr.c
+> >> @@ -54,7 +54,6 @@
+> >>  #include "hw/ppc/spapr.h"
+> >>  #include "hw/ppc/spapr_vio.h"
+> >>  #include "hw/pci-host/spapr.h"
+> >> -#include "hw/ppc/xics.h"
+> >>  #include "hw/pci/msi.h"
+> >> =20
+> >>  #include "hw/pci/pci.h"
+> >> @@ -117,33 +116,6 @@ static bool spapr_is_thread0_in_vcore(sPAPRMachin=
+eState *spapr,
+> >>      return spapr_get_vcpu_id(cpu) % spapr->vsmt =3D=3D 0;
+> >>  }
+> >> =20
+> >> -static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
+> >> -                                  const char *type_ics,
+> >> -                                  int nr_irqs, Error **errp)
+> >> -{
+> >> -    Error *local_err =3D NULL;
+> >> -    Object *obj;
+> >> -
+> >> -    obj =3D object_new(type_ics);
+> >> -    object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort=
+);
+> >> -    object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+> >> -                                   &error_abort);
+> >> -    object_property_set_int(obj, nr_irqs, "nr-irqs", &local_err);
+> >> -    if (local_err) {
+> >> -        goto error;
+> >> -    }
+> >> -    object_property_set_bool(obj, true, "realized", &local_err);
+> >> -    if (local_err) {
+> >> -        goto error;
+> >> -    }
+> >> -
+> >> -    return ICS_BASE(obj);
+> >> -
+> >> -error:
+> >> -    error_propagate(errp, local_err);
+> >> -    return NULL;
+> >> -}
+> >> -
+> >>  static bool pre_2_10_vmstate_dummy_icp_needed(void *opaque)
+> >>  {
+> >>      /* Dummy entries correspond to unused ICPState objects in older Q=
+EMUs,
+> >> @@ -184,43 +156,6 @@ static int xics_max_server_number(sPAPRMachineSta=
+te *spapr)
+> >>      return DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads);
+> >>  }
+> >> =20
+> >> -static void xics_system_init(MachineState *machine, int nr_irqs, Erro=
+r **errp)
+> >> -{
+> >> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
+> >> -    Error *local_err =3D NULL;
+> >> -
+> >> -    /* Initialize the MSI IRQ allocator. */
+> >> -    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> >> -        spapr_irq_msi_init(spapr, XICS_IRQ_BASE + nr_irqs - SPAPR_IRQ=
+_MSI);
+> >> -    }
+> >> -
+> >> -    if (kvm_enabled()) {
+> >> -        if (machine_kernel_irqchip_allowed(machine) &&
+> >> -            !xics_kvm_init(spapr, &local_err)) {
+> >> -            spapr->icp_type =3D TYPE_KVM_ICP;
+> >> -            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_i=
+rqs,
+> >> -                                          &local_err);
+> >> -        }
+> >> -        if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
+> >> -            error_prepend(&local_err,
+> >> -                          "kernel_irqchip requested but unavailable: =
+");
+> >> -            goto error;
+> >> -        }
+> >> -        error_free(local_err);
+> >> -        local_err =3D NULL;
+> >> -    }
+> >> -
+> >> -    if (!spapr->ics) {
+> >> -        xics_spapr_init(spapr);
+> >> -        spapr->icp_type =3D TYPE_ICP;
+> >> -        spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_ir=
+qs,
+> >> -                                      &local_err);
+> >> -    }
+> >> -
+> >> -error:
+> >> -    error_propagate(errp, local_err);
+> >> -}
+> >> -
+> >>  static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *=
+cpu,
+> >>                                    int smt_threads)
+> >>  {
+> >> @@ -2618,7 +2553,7 @@ static void spapr_machine_init(MachineState *mac=
+hine)
+> >>      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
+> >> =20
+> >>      /* Set up Interrupt Controller before we create the VCPUs */
+> >> -    xics_system_init(machine, XICS_IRQS_SPAPR, &error_fatal);
+> >> +    smc->irq->init(spapr, &error_fatal);
+> >> =20
+> >>      /* Set up containers for ibm,client-architecture-support negotiat=
+ed options
+> >>       */
+> >> @@ -3810,121 +3745,13 @@ static ICPState *spapr_icp_get(XICSFabric *xi=
+, int vcpu_id)
+> >>      return cpu ? ICP(cpu->intc) : NULL;
+> >>  }
+> >> =20
+> >> -#define ICS_IRQ_FREE(ics, srcno)   \
+> >> -    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
+> >> -
+> >> -static int ics_find_free_block(ICSState *ics, int num, int alignnum)
+> >> -{
+> >> -    int first, i;
+> >> -
+> >> -    for (first =3D 0; first < ics->nr_irqs; first +=3D alignnum) {
+> >> -        if (num > (ics->nr_irqs - first)) {
+> >> -            return -1;
+> >> -        }
+> >> -        for (i =3D first; i < first + num; ++i) {
+> >> -            if (!ICS_IRQ_FREE(ics, i)) {
+> >> -                break;
+> >> -            }
+> >> -        }
+> >> -        if (i =3D=3D (first + num)) {
+> >> -            return first;
+> >> -        }
+> >> -    }
+> >> -
+> >> -    return -1;
+> >> -}
+> >> -
+> >> -int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Err=
+or **errp)
+> >> -{
+> >> -    ICSState *ics =3D spapr->ics;
+> >> -    int first =3D -1;
+> >> -
+> >> -    assert(ics);
+> >> -
+> >> -    /*
+> >> -     * MSIMesage::data is used for storing VIRQ so
+> >> -     * it has to be aligned to num to support multiple
+> >> -     * MSI vectors. MSI-X is not affected by this.
+> >> -     * The hint is used for the first IRQ, the rest should
+> >> -     * be allocated continuously.
+> >> -     */
+> >> -    if (align) {
+> >> -        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+> >> -               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+> >> -        first =3D ics_find_free_block(ics, num, num);
+> >> -    } else {
+> >> -        first =3D ics_find_free_block(ics, num, 1);
+> >> -    }
+> >> -
+> >> -    if (first < 0) {
+> >> -        error_setg(errp, "can't find a free %d-IRQ block", num);
+> >> -        return -1;
+> >> -    }
+> >> -
+> >> -    return first + ics->offset;
+> >> -}
+> >> -
+> >> -int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Erro=
+r **errp)
+> >> -{
+> >> -    ICSState *ics =3D spapr->ics;
+> >> -
+> >> -    assert(ics);
+> >> -
+> >> -    if (!ics_valid_irq(ics, irq)) {
+> >> -        error_setg(errp, "IRQ %d is invalid", irq);
+> >> -        return -1;
+> >> -    }
+> >> -
+> >> -    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
+> >> -        error_setg(errp, "IRQ %d is not free", irq);
+> >> -        return -1;
+> >> -    }
+> >> -
+> >> -    ics_set_irq_type(ics, irq - ics->offset, lsi);
+> >> -    return 0;
+> >> -}
+> >> -
+> >> -void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+> >> -{
+> >> -    ICSState *ics =3D spapr->ics;
+> >> -    int srcno =3D irq - ics->offset;
+> >> -    int i;
+> >> -
+> >> -    if (ics_valid_irq(ics, irq)) {
+> >> -        trace_spapr_irq_free(0, irq, num);
+> >> -        for (i =3D srcno; i < srcno + num; ++i) {
+> >> -            if (ICS_IRQ_FREE(ics, i)) {
+> >> -                trace_spapr_irq_free_warn(0, i + ics->offset);
+> >> -            }
+> >> -            memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+> >> -        }
+> >> -    }
+> >> -}
+> >> -
+> >> -qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq)
+> >> -{
+> >> -    ICSState *ics =3D spapr->ics;
+> >> -
+> >> -    if (ics_valid_irq(ics, irq)) {
+> >> -        return ics->qirqs[irq - ics->offset];
+> >> -    }
+> >> -
+> >> -    return NULL;
+> >> -}
+> >> -
+> >>  static void spapr_pic_print_info(InterruptStatsProvider *obj,
+> >>                                   Monitor *mon)
+> >>  {
+> >>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> >> -    CPUState *cs;
+> >> -
+> >> -    CPU_FOREACH(cs) {
+> >> -        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> >> -
+> >> -        icp_pic_print_info(ICP(cpu->intc), mon);
+> >> -    }
+> >> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> >> =20
+> >> -    ics_pic_print_info(spapr->ics, mon);
+> >> +    smc->irq->print_info(spapr, mon);
+> >>  }
+> >> =20
+> >>  int spapr_get_vcpu_id(PowerPCCPU *cpu)
+> >> @@ -4036,6 +3863,7 @@ static void spapr_machine_class_init(ObjectClass=
+ *oc, void *data)
+> >>      smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
+> >>      smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64ki=
+B */
+> >>      spapr_caps_add_properties(smc, &error_abort);
+> >> +    smc->irq =3D &spapr_irq_xics;
+> >>  }
+> >> =20
+> >>  static const TypeInfo spapr_machine_info =3D {
+> >> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> >> index 993759db47fa..fb091995a11f 100644
+> >> --- a/hw/ppc/spapr_cpu_core.c
+> >> +++ b/hw/ppc/spapr_cpu_core.c
+> >> @@ -11,6 +11,7 @@
+> >>  #include "hw/ppc/spapr_cpu_core.h"
+> >>  #include "target/ppc/cpu.h"
+> >>  #include "hw/ppc/spapr.h"
+> >> +#include "hw/ppc/xics.h" /* for icp_create() - to be removed */
+> >>  #include "hw/boards.h"
+> >>  #include "qapi/error.h"
+> >>  #include "sysemu/cpus.h"
+> >> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> >> index 24e9c1d4433c..0cbb5dd39368 100644
+> >> --- a/hw/ppc/spapr_irq.c
+> >> +++ b/hw/ppc/spapr_irq.c
+> >> @@ -13,6 +13,9 @@
+> >>  #include "qapi/error.h"
+> >>  #include "hw/ppc/spapr.h"
+> >>  #include "hw/ppc/xics.h"
+> >> +#include "sysemu/kvm.h"
+> >> +
+> >> +#include "trace.h"
+> >> =20
+> >>  void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_msis)
+> >>  {
+> >> @@ -54,3 +57,230 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr)
+> >>  {
+> >>      bitmap_clear(spapr->irq_map, 0, spapr->irq_map_nr);
+> >>  }
+> >> +
+> >> +
+> >> +/*
+> >> + * XICS IRQ backend.
+> >> + */
+> >> +
+> >> +static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
+> >> +                                  const char *type_ics,
+> >> +                                  int nr_irqs, Error **errp)
+> >> +{
+> >> +    Error *local_err =3D NULL;
+> >> +    Object *obj;
+> >> +
+> >> +    obj =3D object_new(type_ics);
+> >> +    object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort=
+);
+> >> +    object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+> >> +                                   &error_abort);
+> >> +    object_property_set_int(obj, nr_irqs, "nr-irqs", &local_err);
+> >> +    if (local_err) {
+> >> +        goto error;
+> >> +    }
+> >> +    object_property_set_bool(obj, true, "realized", &local_err);
+> >> +    if (local_err) {
+> >> +        goto error;
+> >> +    }
+> >> +
+> >> +    return ICS_BASE(obj);
+> >> +
+> >> +error:
+> >> +    error_propagate(errp, local_err);
+> >> +    return NULL;
+> >> +}
+> >> +
+> >> +static void spapr_irq_init_xics(sPAPRMachineState *spapr, Error **err=
+p)
+> >> +{
+> >> +    MachineState *machine =3D MACHINE(spapr);
+> >> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> >> +    int nr_irqs =3D smc->irq->nr_irqs;
+> >> +    Error *local_err =3D NULL;
+> >> +
+> >> +    /* Initialize the MSI IRQ allocator. */
+> >> +    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> >> +        spapr_irq_msi_init(spapr, XICS_IRQ_BASE + nr_irqs - SPAPR_IRQ=
+_MSI);
+> >> +    }
+> >> +
+> >> +    if (kvm_enabled()) {
+> >> +        if (machine_kernel_irqchip_allowed(machine) &&
+> >> +            !xics_kvm_init(spapr, &local_err)) {
+> >> +            spapr->icp_type =3D TYPE_KVM_ICP;
+> >> +            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_i=
+rqs,
+> >> +                                          &local_err);
+> >> +        }
+> >> +        if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
+> >> +            error_prepend(&local_err,
+> >> +                          "kernel_irqchip requested but unavailable: =
+");
+> >> +            goto error;
+> >> +        }
+> >> +        error_free(local_err);
+> >> +        local_err =3D NULL;
+> >> +    }
+> >> +
+> >> +    if (!spapr->ics) {
+> >> +        xics_spapr_init(spapr);
+> >> +        spapr->icp_type =3D TYPE_ICP;
+> >> +        spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_ir=
+qs,
+> >> +                                      &local_err);
+> >> +    }
+> >> +
+> >> +error:
+> >> +    error_propagate(errp, local_err);
+> >> +}
+> >> +
+> >> +#define ICS_IRQ_FREE(ics, srcno)   \
+> >> +    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
+> >> +
+> >> +static int spapr_irq_claim_xics(sPAPRMachineState *spapr, int irq, bo=
+ol lsi,
+> >> +                                Error **errp)
+> >> +{
+> >> +    ICSState *ics =3D spapr->ics;
+> >> +
+> >> +    assert(ics);
+> >> +
+> >> +    if (!ics_valid_irq(ics, irq)) {
+> >> +        error_setg(errp, "IRQ %d is invalid", irq);
+> >> +        return -1;
+> >> +    }
+> >> +
+> >> +    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
+> >> +        error_setg(errp, "IRQ %d is not free", irq);
+> >> +        return -1;
+> >> +    }
+> >> +
+> >> +    ics_set_irq_type(ics, irq - ics->offset, lsi);
+> >> +    return 0;
+> >> +}
+> >> +
+> >> +static void spapr_irq_free_xics(sPAPRMachineState *spapr, int irq, in=
+t num)
+> >> +{
+> >> +    ICSState *ics =3D spapr->ics;
+> >> +    uint32_t srcno =3D irq - ics->offset;
+> >> +    int i;
+> >> +
+> >> +    if (ics_valid_irq(ics, irq)) {
+> >> +        trace_spapr_irq_free(0, irq, num);
+> >> +        for (i =3D srcno; i < srcno + num; ++i) {
+> >> +            if (ICS_IRQ_FREE(ics, i)) {
+> >> +                trace_spapr_irq_free_warn(0, i);
+> >> +            }
+> >> +            memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+> >> +        }
+> >> +    }
+> >> +}
+> >> +
+> >> +static qemu_irq spapr_qirq_xics(sPAPRMachineState *spapr, int irq)
+> >> +{
+> >> +    ICSState *ics =3D spapr->ics;
+> >> +    uint32_t srcno =3D irq - ics->offset;
+> >> +
+> >> +    if (ics_valid_irq(ics, irq)) {
+> >> +        return ics->qirqs[srcno];
+> >> +    }
+> >> +
+> >> +    return NULL;
+> >> +}
+> >> +
+> >> +static void spapr_irq_print_info_xics(sPAPRMachineState *spapr, Monit=
+or *mon)
+> >> +{
+> >> +    CPUState *cs;
+> >> +
+> >> +    CPU_FOREACH(cs) {
+> >> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> >> +
+> >> +        icp_pic_print_info(ICP(cpu->intc), mon);
+> >> +    }
+> >> +
+> >> +    ics_pic_print_info(spapr->ics, mon);
+> >> +}
+> >> +
+> >> +sPAPRIrq spapr_irq_xics =3D {
+> >> +    .nr_irqs     =3D XICS_IRQS_SPAPR,
+> >> +
+> >> +    .init        =3D spapr_irq_init_xics,
+> >> +    .claim       =3D spapr_irq_claim_xics,
+> >> +    .free        =3D spapr_irq_free_xics,
+> >> +    .qirq        =3D spapr_qirq_xics,
+> >> +    .print_info  =3D spapr_irq_print_info_xics,
+> >> +};
+> >> +
+> >> +/*
+> >> + * sPAPR IRQ frontend routines for devices
+> >> + */
+> >> +
+> >> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Erro=
+r **errp)
+> >> +{
+> >> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> >> +
+> >> +    return smc->irq->claim(spapr, irq, lsi, errp);
+> >> +}
+> >> +
+> >> +void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+> >> +{
+> >> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> >> +
+> >> +    smc->irq->free(spapr, irq, num);
+> >> +}
+> >> +
+> >> +qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq)
+> >> +{
+> >> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> >> +
+> >> +    return smc->irq->qirq(spapr, irq);
+> >> +}
+> >> +
+> >> +/*
+> >> + * XICS legacy routines - to deprecate one day
+> >> + */
+> >> +
+> >> +static int ics_find_free_block(ICSState *ics, int num, int alignnum)
+> >> +{
+> >> +    int first, i;
+> >> +
+> >> +    for (first =3D 0; first < ics->nr_irqs; first +=3D alignnum) {
+> >> +        if (num > (ics->nr_irqs - first)) {
+> >> +            return -1;
+> >> +        }
+> >> +        for (i =3D first; i < first + num; ++i) {
+> >> +            if (!ICS_IRQ_FREE(ics, i)) {
+> >> +                break;
+> >> +            }
+> >> +        }
+> >> +        if (i =3D=3D (first + num)) {
+> >> +            return first;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    return -1;
+> >> +}
+> >> +
+> >> +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Err=
+or **errp)
+> >> +{
+> >> +    ICSState *ics =3D spapr->ics;
+> >> +    int first =3D -1;
+> >> +
+> >> +    assert(ics);
+> >> +
+> >> +    /*
+> >> +     * MSIMesage::data is used for storing VIRQ so
+> >> +     * it has to be aligned to num to support multiple
+> >> +     * MSI vectors. MSI-X is not affected by this.
+> >> +     * The hint is used for the first IRQ, the rest should
+> >> +     * be allocated continuously.
+> >> +     */
+> >> +    if (align) {
+> >> +        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+> >> +               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+> >> +        first =3D ics_find_free_block(ics, num, num);
+> >> +    } else {
+> >> +        first =3D ics_find_free_block(ics, num, 1);
+> >> +    }
+> >> +
+> >> +    if (first < 0) {
+> >> +        error_setg(errp, "can't find a free %d-IRQ block", num);
+> >> +        return -1;
+> >> +    }
+> >> +
+> >> +    return first + ics->offset;
+> >> +}
+> >=20
+>=20
 
-This is just noise from the sidelines (so nothing too serious), but
-anyway, I don't like it very much.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-My first point is that the old limit doesn't mean you can only use 8 GB
-qcow2 images.  You can use more, you just can't access more than 8 GB
-randomly.  I know I'm naive, but I think that the number of use cases
-where you need random IOPS spread out over more than 8 GB of an image
-are limited.
-
-My second point is that qemu still allocated 128 MB of RAM by default.
-Using 1/4th of that for every qcow2 image you attach to the VM seems a
-bit much.
-
-Now it gets a bit complicated.  This series makes cache-clean-interval
-default to 10 minutes, so it shouldn't be an issue in practice.  But one
-thing to note is that this is a Linux-specific feature, so on every
-other system, this really means 32 MB per image.  (Also, 10 minutes
-means that whenever I boot up my VM with a couple of disks with random
-accesses all over the images during boot, I might end up using 32 MB per
-image again (for 10 min), even though I don't really need that performanc=
-e.)
-
-Now if we really rely on that cache-clean-interval, why not make it
-always cover the whole image by default?  I don't really see why we
-should now say "256 GB seems reasonable, and 32 MB doesn't sound like
-too much, let's go there".  (Well, OK, I do see how you end up using 32
-MB as basically a safety margin, where you'd say that anything above it
-is just unreasonable.)
-
-Do we update the limit in a couple of years again because people have
-more RAM and larger disks then?  (Maybe we do?)
-
-My personal opinion is this: Most users should be fine with 8 GB of
-randomly accessible image space (this may be wrong).  Whenever a user
-does have an application that uses more than 8 GB, they are probably in
-an area where they want to do some performance tuning anyway.  Requiring
-them to set l2-cache-full in that case seems reasonable to me.  Pushing
-the default to 256 GB to me looks a bit like just letting them run into
-the problem later.  It doesn't solve the issue that you need to do some
-performance tuning if you have a bit of a special use case (but maybe
-I'm wrong and accessing more than 8 GB randomly is what everybody does
-with their VMs).
-
-(Maybe it's even a good thing to limit it to a smaller number so users
-run into the issue sooner than later...)
-
-OTOH, this change means that everyone on a non-Linux system will have to
-use 32 MB of their RAM per qcow2 image, and everyone on a Linux system
-will potentially use it e.g. during boot when you do access a lot
-randomly (even though the performance usually is not of utmost
-importance then (important, but not extremely so)).  But then again,
-this will probably only affect a single disk (the one with the OS on
-it), so it won't be too bad.
-
-So my stance is:
-
-(1) Is it really worth pushing the default to 256 GB if you probably
-have to do a bit of performance tuning anyway when you get past 8 GB
-random IOPS?  I think it's reasonable to ask users to use l2-cache-full
-or adjust the cache to their needs.
-
-(2) For non-Linux systems, this seems to really mean 32 MB of RAM per
-qcow2 image.  That's 1/4th of default VM RAM.  Is that worth it?
-
-(3) For Linux, I don't like it much either, but that's because I'm
-stupid.  The fact that if you don't need this much random I/O only your
-boot disk may cause a RAM usage spike, and even then it's going to go
-down after 10 minutes, is probably enough to justify this change.
-
-
-I suppose my moaning would subside if we only increased the default on
-systems that actually support cache-clean-interval...?
-
-Max
-
-
-PS: I also don't quite like how you got to the default of 10 minutes of
-the cache-clean-interval.  You can't justify using 32 MB as the default
-cache size by virtue of "We have a cache-clean-interval now", and then
-justify a CCI of 10 min by "It's just for VMs which sit idle".
-
-No.  If you rely on CCI to be there to make the cache size reasonable by
-default for whatever the user is doing with their images, you have to
-consider that fact when choosing a CCI.
-
-Ideally we'd probably want a soft and a hard cache limit, but I don't
-know...
-
-(Like, a soft cache limit of 1 MB with a CCI of 10 min, and a hard cache
-limit of 32 MB with a CCI of 1 min by default.  So whenever your cache
-uses more than 1 MB of RAM, your CCI is 1 min, and whenever it's below,
-your CCI is 10 min.)
-
-
---7sUzTq00pd3AHYR8qJHSNw7sTvxR7nGAB
+--XStn23h1fwudRqtG
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltw4VcACgkQ9AfbAGHV
-z0AKhwgAnZ3LEG22BpY2jB8oBx3JZPerVh+ZZnOw3GRXw7Rpcb7CHGzfUzEHFSJh
-iCDP5KImWfp3gwcHsLlHMVHaLjTplRNObKLpiiGtdx6a8lfJbUwvuHAfiPZuKrw1
-xjcI1EX0cGxH2ODf+i0ifateVdig98EvSR3JT0niynL9gg55FgkMdKPyyYd1xojT
-x6ssLy/jPuVLaqPwxbW3eJ6/OQKCIGxGuAvzRv+WI0M43AOmzesSN4is1s6fs8z5
-7bx2qibkYWxD7J8tfS00taP9mKDKxit4RQEUh7WP3OwLNRbGCUumLxpB5U5v5E1S
-9Spob2ai3H4lQhPLOyTstBVP9LWMrg==
-=V2AT
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltvojgACgkQbDjKyiDZ
+s5JFYw/+OJnvfZ/jBmu0y1i/9o7Cea87j+i8nnoVg60bY/aPDIa8+BrJsBN65GN7
+yeyHAay/E0pQDnCfrnEyk+t7FtvizYZua4xuv4WWQt4iWUr2UN1WSn0FJ5FMKo8i
+xuPaj/q5s/y8CiUgzJCqWVc5MOF6KT+dwfVQwFfeMRzDUlcPN9QvzHa7NnWaDBq3
+GpyaTKoE/7TXlXZemI2vmnj1JRUwAA69KkzIvCgM7GBbW6FsGQOweNRLEYDFyrUJ
+En3OeucjMWMx95pCe77W6kpDm0+Kj0O7jIOkLIH+C0dtoA0993tBdjwlUuz3kyUH
+l574Oltnb3iUsJIYdzG3yOhgiSoYUuOpLuByJm4KGlHS6SAgFTIPTSuawgFRWxXs
+utBVFsS1NwQdjD2zj3Bpaeayn47EyxGNMustUE/rA5ARY1NWvgONm+TFiGLE++IK
+885dz6auedGoitQYRO9m6WgNd/7lvz++RbHRJGB9LPmch6951h3UTSPZcAmBa2iI
+c5c0kLjrjpSnWHGqB1E6j0h8qUWgYCbxIUWXCT7VBg/vxs0uKlrZ2eAK63J6xboT
+UtJiH2xlRGRcZMjl8i64bpZsF/wgP1dC25yP1XNLlG7tnfcWPX2+ydg1BeL5lE45
+SJP8GJTSvo/GMWi6bdgJ0w17zv1Pitr3jF+zDVQgqmDwHEe9apc=
+=ObR4
 -----END PGP SIGNATURE-----
 
---7sUzTq00pd3AHYR8qJHSNw7sTvxR7nGAB--
+--XStn23h1fwudRqtG--
