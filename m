@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fov8j-0003gk-Jv
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:30:58 -0400
+	(envelope-from <mdenber@gmx.com>) id 1fov1g-0008KB-Dc
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:23:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fov8g-0004EF-Aa
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:30:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fov8g-0004Cy-3o
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:30:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fov8d-0005jM-Uc
-	for <qemu-devel@nongnu.org>; Sun, 12 Aug 2018 18:30:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 275DF2E8532
-	for <qemu-devel@nongnu.org>; Sun, 12 Aug 2018 18:30:51 +0000 (UTC)
+	(envelope-from <mdenber@gmx.com>) id 1fov1c-00084R-G7
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:23:40 -0400
+Received: from mout.gmx.net ([212.227.15.19]:55587)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mdenber@gmx.com>) id 1fov1c-00083e-5F
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:23:36 -0400
+Received: from [192.168.0.20] ([24.149.35.70]) by mail.gmx.com (mrgmx001
+	[212.227.17.184]) with ESMTPSA (Nemesis) id 0MarNa-1fZyDS2iuQ-00KPZt
+	for <qemu-devel@nongnu.org>; Sun, 12 Aug 2018 17:39:44 +0200
+Message-ID: <5B7054D9.9000209@gmx.com>
+Date: Sun, 12 Aug 2018 11:40:09 -0400
+From: Michele Denber <mdenber@gmx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 12 Aug 2018 18:21:42 -0000
-From: Lorenz Brun <lorenz@dolansoft.org>
-Reply-To: Bug 1777235 <1777235@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152914985958.7724.174010690226549747.malonedeb@wampee.canonical.com>
-Message-Id: <153409810340.8206.14614488777671929977.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1777235] Re: NVME is missing support for Get Log
- Page command
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] QEMU  on Solaris
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,29 +29,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I have a patch for that, it was designed to run NVMe for MacOS guests
-and implements at least the bare minimum of the spec. I'll try to polish
-it up and upstream it as soon as I have time.
+After configuring QEMU on my Sun I got this message:
 
-** Patch added: "0001-Enough-GetLogCmd-for-macOS.patch"
-   https://bugs.launchpad.net/qemu/+bug/1777235/+attachment/5174516/+files/=
-0001-Enough-GetLogCmd-for-macOS.patch
+"Host OS SunOS support is not currently maintained.
+The QEMU project intends to remove support for this host OS in
+a future release if nobody volunteers to maintain it and to
+provide a build host for our continuous integration setup.
+configure has succeeded and you can continue to build, but
+if you care about QEMU on this platform you should contact
+us upstream at qemu-devel@nongnu.org."
 
--- =
+Well I do care about QEMU on my platform so I'd like to volunteer to 
+provide a host for support.  I can provide you with a free account on my 
+Sun Oracle Enterprise M3000 quad-core 2.75 GHz. SPARC64 VII running 
+Solaris 10 Update 11.  I've got plenty of spare CPU cycles and lots of 
+free disk.  Please let me know.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1777235
-
-Title:
-  NVME is missing support for Get Log Page command
-
-Status in QEMU:
-  New
-
-Bug description:
-  "Get Log Page" is a mandatory admin command by the specification (NVMe
-  1.2, Section 5, Figure 40) currently not implemented by device.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1777235/+subscriptions
+             - Michele
