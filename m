@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32805)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
-	<3jaRvWwYKCnYUiUnYmaiiafY.WigkYgo-XYpYfhihaho.ila@flex--aoates.bounces.google.com>)
-	id 1fogjZ-0004iB-DM
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 23:08:02 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33220)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <aoates@google.com>) id 1fognH-0006ZU-5g
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 23:11:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from
-	<3jaRvWwYKCnYUiUnYmaiiafY.WigkYgo-XYpYfhihaho.ila@flex--aoates.bounces.google.com>)
-	id 1fogjX-0002hr-TL
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 23:08:01 -0400
-Received: from mail-ua1-x94a.google.com ([2607:f8b0:4864:20::94a]:56020)
+	(envelope-from <aoates@google.com>) id 1fognF-0004LD-PM
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 23:11:51 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:55684)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from
-	<3jaRvWwYKCnYUiUnYmaiiafY.WigkYgo-XYpYfhihaho.ila@flex--aoates.bounces.google.com>)
-	id 1fogjX-0002h5-Mr
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 23:07:59 -0400
-Received: by mail-ua1-x94a.google.com with SMTP id h11-v6so4601099uao.22
-	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 20:07:58 -0700 (PDT)
-Date: Sat, 11 Aug 2018 23:07:40 -0400
-Message-Id: <20180812030740.99170-1-aoates@google.com>
-Mime-Version: 1.0
+	(Exim 4.71) (envelope-from <aoates@google.com>) id 1fognF-0004IK-HU
+	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 23:11:49 -0400
+Received: by mail-it0-x243.google.com with SMTP id d10-v6so8023565itj.5
+	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 20:11:47 -0700 (PDT)
+MIME-Version: 1.0
+References: <20180729143545.6978-1-samuel.thibault@ens-lyon.org>
+	<20180729143545.6978-2-samuel.thibault@ens-lyon.org>
+	<CAFEAcA8tX0_MNg99oorgOWarJa8Oy+gFFwoRys-fU7ZX3_Ufng@mail.gmail.com>
+	<CAJ1tprAuf1mWtpw+4M3QFZyrDz22TMcnGS9xkhQn6Q9UQTrwiw@mail.gmail.com>
+	<CAFEAcA_pj4tFE2tyrbRtvJnPoeRekDXtVJCzgSeFiiK=sxg4Aw@mail.gmail.com>
+	<CAJ1tprAyHqgH1mHkeLu6qU1Fr8O-B5ebJ3Cfw8e_nHMYSYXfmQ@mail.gmail.com>
+	<CAFEAcA8DdkVB6LG=wq10wJDBjZgScdC_6tavtMzEi-UgGXjEKw@mail.gmail.com>
+	<CAJ1tprA11Q+kjkdmmpmJRiLbDveWR6qzKY3hz_FbRXAUPpXy6A@mail.gmail.com>
+In-Reply-To: <CAJ1tprA11Q+kjkdmmpmJRiLbDveWR6qzKY3hz_FbRXAUPpXy6A@mail.gmail.com>
 From: Andrew Oates <aoates@google.com>
+Date: Sat, 11 Aug 2018 23:11:35 -0400
+Message-ID: <CAJ1tprBXs6PWP=SsjtPOPNxPJfvWsWFoHCAhovJEGn4=mf8_tw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] [PATCH] target-i386: Fix lcall to call gate in IA-32e
- mode
+Subject: Re: [Qemu-devel] [PULL 1/1] slirp: fix ICMP handling on macOS hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,234 +34,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, qemu-devel@nongnu.org
-Cc: Andrew Oates <aoates@google.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, stefanha@redhat.com, "J. Kiszka" <jan.kiszka@siemens.com>
 
-Currently call gates are always treated as 32-bit gates.  In IA-32e mode
-(either compatibility or 64-bit submode), system segment descriptors are
-always 64-bit.  Treating them as 32-bit has the expected unfortunate
-effect: only the lower 32 bits of the offset are loaded, the stack
-pointer is truncated, a bad new stack pointer is loaded from the TSS (if
-switching privilege levels), etc.
+Ping --- would you like me to resubmit the patch using CONFIG_BSD?
 
-This change adds support for 64-bit call gate to the lcall instruction.
-Additionally, there should be a check for non-canonical stack pointers,
-but I've omitted that since there doesn't seem to be checks for
-non-canonical addresses in this code elsewhere.
+Cheers,
+~Andrew
 
-I've left the raise_exception_err_ra lines unwapped at 80 columns to
-match the style in the rest of the file.
 
-Signed-off-by: Andrew Oates <aoates@google.com>
----
- target/i386/seg_helper.c | 145 ++++++++++++++++++++++++++++-----------
- 1 file changed, 106 insertions(+), 39 deletions(-)
+On Wed, Aug 1, 2018 at 10:39 AM Andrew Oates <aoates@google.com> wrote:
 
-diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
-index 00301a0c04..d3b31f3c1b 100644
---- a/target/i386/seg_helper.c
-+++ b/target/i386/seg_helper.c
-@@ -518,6 +518,11 @@ static void switch_tss(CPUX86State *env, int tss_selector,
- 
- static inline unsigned int get_sp_mask(unsigned int e2)
- {
-+#ifdef TARGET_X86_64
-+    if (e2 & DESC_L_MASK) {
-+        return 0;
-+    } else
-+#endif
-     if (e2 & DESC_B_MASK) {
-         return 0xffffffff;
-     } else {
-@@ -1724,12 +1729,12 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
-                             int shift, target_ulong next_eip)
- {
-     int new_stack, i;
--    uint32_t e1, e2, cpl, dpl, rpl, selector, offset, param_count;
--    uint32_t ss = 0, ss_e1 = 0, ss_e2 = 0, sp, type, ss_dpl, sp_mask;
-+    uint32_t e1, e2, cpl, dpl, rpl, selector, param_count;
-+    uint32_t ss = 0, ss_e1 = 0, ss_e2 = 0, type, ss_dpl, sp_mask;
-     uint32_t val, limit, old_sp_mask;
--    target_ulong ssp, old_ssp;
-+    target_ulong ssp, old_ssp, offset, sp;
- 
--    LOG_PCALL("lcall %04x:%08x s=%d\n", new_cs, (uint32_t)new_eip, shift);
-+    LOG_PCALL("lcall %04x:" TARGET_FMT_lx " s=%d\n", new_cs, new_eip, shift);
-     LOG_PCALL_STATE(CPU(x86_env_get_cpu(env)));
-     if ((new_cs & 0xfffc) == 0) {
-         raise_exception_err_ra(env, EXCP0D_GPF, 0, GETPC());
-@@ -1833,8 +1838,23 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
-             raise_exception_err_ra(env, EXCP0B_NOSEG,  new_cs & 0xfffc, GETPC());
-         }
-         selector = e1 >> 16;
--        offset = (e2 & 0xffff0000) | (e1 & 0x0000ffff);
-         param_count = e2 & 0x1f;
-+        offset = (e2 & 0xffff0000) | (e1 & 0x0000ffff);
-+#ifdef TARGET_X86_64
-+        if (env->efer & MSR_EFER_LMA) {
-+            /* load the upper 8 bytes of the 64-bit call gate */
-+            if (load_segment_ra(env, &e1, &e2, new_cs + 8, GETPC())) {
-+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
-+                                       GETPC());
-+            }
-+            type = (e2 >> DESC_TYPE_SHIFT) & 0x1f;
-+            if (type != 0) {
-+                raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
-+                                       GETPC());
-+            }
-+            offset |= ((target_ulong)e1) << 32;
-+        }
-+#endif
-         if ((selector & 0xfffc) == 0) {
-             raise_exception_err_ra(env, EXCP0D_GPF, 0, GETPC());
-         }
-@@ -1849,46 +1869,80 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
-         if (dpl > cpl) {
-             raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
-         }
-+#ifdef TARGET_X86_64
-+        if (env->efer & MSR_EFER_LMA) {
-+            if (!(e2 & DESC_L_MASK)) {
-+                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
-+            }
-+            if (e2 & DESC_B_MASK) {
-+                raise_exception_err_ra(env, EXCP0D_GPF, selector & 0xfffc, GETPC());
-+            }
-+            shift++;
-+        }
-+#endif
-         if (!(e2 & DESC_P_MASK)) {
-             raise_exception_err_ra(env, EXCP0B_NOSEG, selector & 0xfffc, GETPC());
-         }
- 
-         if (!(e2 & DESC_C_MASK) && dpl < cpl) {
-             /* to inner privilege */
--            get_ss_esp_from_tss(env, &ss, &sp, dpl, GETPC());
--            LOG_PCALL("new ss:esp=%04x:%08x param_count=%d env->regs[R_ESP]="
--                      TARGET_FMT_lx "\n", ss, sp, param_count,
--                      env->regs[R_ESP]);
--            if ((ss & 0xfffc) == 0) {
--                raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
--            }
--            if ((ss & 3) != dpl) {
--                raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
--            }
--            if (load_segment_ra(env, &ss_e1, &ss_e2, ss, GETPC()) != 0) {
--                raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
--            }
--            ss_dpl = (ss_e2 >> DESC_DPL_SHIFT) & 3;
--            if (ss_dpl != dpl) {
--                raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
--            }
--            if (!(ss_e2 & DESC_S_MASK) ||
--                (ss_e2 & DESC_CS_MASK) ||
--                !(ss_e2 & DESC_W_MASK)) {
--                raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
--            }
--            if (!(ss_e2 & DESC_P_MASK)) {
--                raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
-+#ifdef TARGET_X86_64
-+            if (shift == 2) {
-+                sp = get_rsp_from_tss(env, dpl);
-+                ss = dpl;  /* SS = NULL selector with RPL = new CPL */
-+                new_stack = 1;
-+                sp_mask = 0;
-+                ssp = 0;  /* SS base is always zero in IA-32e mode */
-+                LOG_PCALL("new ss:rsp=%04x:%016llx env->regs[R_ESP]="
-+                          TARGET_FMT_lx "\n", ss, sp, env->regs[R_ESP]);
-+            } else
-+#endif
-+            {
-+                uint32_t sp32;
-+                get_ss_esp_from_tss(env, &ss, &sp32, dpl, GETPC());
-+                LOG_PCALL("new ss:esp=%04x:%08x param_count=%d env->regs[R_ESP]="
-+                          TARGET_FMT_lx "\n", ss, sp32, param_count,
-+                          env->regs[R_ESP]);
-+                sp = sp32;
-+                if ((ss & 0xfffc) == 0) {
-+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
-+                }
-+                if ((ss & 3) != dpl) {
-+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
-+                }
-+                if (load_segment_ra(env, &ss_e1, &ss_e2, ss, GETPC()) != 0) {
-+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
-+                }
-+                ss_dpl = (ss_e2 >> DESC_DPL_SHIFT) & 3;
-+                if (ss_dpl != dpl) {
-+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
-+                }
-+                if (!(ss_e2 & DESC_S_MASK) ||
-+                    (ss_e2 & DESC_CS_MASK) ||
-+                    !(ss_e2 & DESC_W_MASK)) {
-+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
-+                }
-+                if (!(ss_e2 & DESC_P_MASK)) {
-+                    raise_exception_err_ra(env, EXCP0A_TSS, ss & 0xfffc, GETPC());
-+                }
-+
-+                sp_mask = get_sp_mask(ss_e2);
-+                ssp = get_seg_base(ss_e1, ss_e2);
-             }
- 
-             /* push_size = ((param_count * 2) + 8) << shift; */
- 
-             old_sp_mask = get_sp_mask(env->segs[R_SS].flags);
-             old_ssp = env->segs[R_SS].base;
--
--            sp_mask = get_sp_mask(ss_e2);
--            ssp = get_seg_base(ss_e1, ss_e2);
--            if (shift) {
-+#ifdef TARGET_X86_64
-+            if (shift == 2) {
-+                /* XXX: verify if new stack address is canonical */
-+                PUSHQ_RA(sp, env->segs[R_SS].selector, GETPC());
-+                PUSHQ_RA(sp, env->regs[R_ESP], GETPC());
-+                /* parameters aren't supported for 64-bit call gates */
-+            } else
-+#endif
-+            if (shift == 1) {
-                 PUSHL_RA(ssp, sp, sp_mask, env->segs[R_SS].selector, GETPC());
-                 PUSHL_RA(ssp, sp, sp_mask, env->regs[R_ESP], GETPC());
-                 for (i = param_count - 1; i >= 0; i--) {
-@@ -1917,7 +1971,13 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
-             new_stack = 0;
-         }
- 
--        if (shift) {
-+#ifdef TARGET_X86_64
-+        if (shift == 2) {
-+            PUSHQ_RA(sp, env->segs[R_CS].selector, GETPC());
-+            PUSHQ_RA(sp, next_eip, GETPC());
-+        } else
-+#endif
-+        if (shift == 1) {
-             PUSHL_RA(ssp, sp, sp_mask, env->segs[R_CS].selector, GETPC());
-             PUSHL_RA(ssp, sp, sp_mask, next_eip, GETPC());
-         } else {
-@@ -1928,11 +1988,18 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
-         /* from this point, not restartable */
- 
-         if (new_stack) {
--            ss = (ss & ~3) | dpl;
--            cpu_x86_load_seg_cache(env, R_SS, ss,
--                                   ssp,
--                                   get_seg_limit(ss_e1, ss_e2),
--                                   ss_e2);
-+#ifdef TARGET_X86_64
-+            if (shift == 2) {
-+                cpu_x86_load_seg_cache(env, R_SS, ss, 0, 0, 0);
-+            } else
-+#endif
-+            {
-+                ss = (ss & ~3) | dpl;
-+                cpu_x86_load_seg_cache(env, R_SS, ss,
-+                                       ssp,
-+                                       get_seg_limit(ss_e1, ss_e2),
-+                                       ss_e2);
-+            }
-         }
- 
-         selector = (selector & ~3) | dpl;
--- 
-2.17.0
+>
+>
+>
+> On Wed, Aug 1, 2018 at 6:10 AM Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+>
+>> On 1 August 2018 at 00:25, Andrew Oates <aoates@google.com> wrote:
+>> > Both CONFIG_BSD and not-CONFIG_LINUX work on macOS.  I unfortunately
+>> don't
+>> > have access to any other BSDs to test them, though.
+>>
+>> Is there an easy way to test it? The QEMU makefiles have some
+>> runes for setting up a BSD VM...
+>>
+>
+> Ok, it turns out that SOCK_DGRAM+IPPROTO_ICMP isn't actually supported on
+> FreeBSD---tested in qemu (thanks for the tip!).
+>
+> I didn't actually boot up NetBSD or OpenBSD, but poking around the kernel
+> source I found for them it appears they have the same restriction:
+> https://github.com/freebsd/freebsd/blob/master/sys/netinet/in_proto.c
+> https://github.com/openbsd/src/blob/master/sys/netinet/in_proto.c
+>
+> http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/netinet/in_proto.c?rev=1.128&content-type=text/x-cvsweb-markup
+>
+> (search for SOCK_DGRAM and IPPROTO_ICMP in the above).
+>
+> So I don't think ICMP via SLIRP would work at all in the other BSDs,
+> meaning this patch is a no-op for them either way.  If we _were_ to make
+> SLIRP+ICMP work in *BSD, we'd presumably want to do it with a
+> SOCK_RAW+IPPROTO_ICMP socket (which would require special permissions to
+> create), which would mean an included IP header---so I think that #ifdef
+> CONFIG_BSD here is defensible.
+>
+> I did some poking for Solaris and Haiku and didn't find much, though it
+> looks like the version of ping included w/ Haiku uses SOCK_RAW rather than
+> SOCK_DGRAM, so it may be in the same boat as non-OSX-BSDs (
+> https://github.com/haiku/haiku/blob/master/src/bin/network/ping/ping.c#L205
+> ).
+>
+> ~Andrew
+>
+>
+>>
+>> thanks
+>> -- PMM
+>>
+>
