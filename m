@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fouan-0002sr-Az
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 13:56:44 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fouis-0004fo-0Q
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:04:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1foua1-0006dC-6j
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 13:55:44 -0400
-Received: from mail-wr1-f42.google.com ([209.85.221.42]:39077)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fouiK-000323-Sd
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:04:13 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38546)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fouZw-0006Vo-3y
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 13:55:02 -0400
-Received: by mail-wr1-f42.google.com with SMTP id h10-v6so12348911wre.6
-	for <qemu-devel@nongnu.org>; Sun, 12 Aug 2018 10:54:57 -0700 (PDT)
-References: <20180812030740.99170-1-aoates@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <485414e6-9f8d-aa29-f36b-b02e76613752@redhat.com>
-Date: Sun, 12 Aug 2018 12:17:35 +0200
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fouiI-0002uI-VW
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 14:03:40 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id v14-v6so12369260wro.5
+	for <qemu-devel@nongnu.org>; Sun, 12 Aug 2018 11:03:38 -0700 (PDT)
+References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
+	<d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
+	<8bf07395-4872-ce74-c201-9fca232edd01@gmail.com>
+	<80532e46-ffbf-9c87-5296-741bbb6f83ac@redhat.com>
+	<d5ad3096-86b1-29e4-47bd-1ca71b8e7879@bluestop.org>
+	<1feb3cc1-86ee-f708-6dc7-b9e20a7588ac@redhat.com>
+	<5434c03d-7d03-8255-ea0f-d85ec96ac844@gmail.com>
+	<20180812083918.GA3004@lap1>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <b8de7f26-a870-9f1c-122b-0eaf6a730f34@gmail.com>
+Date: Sun, 12 Aug 2018 15:10:12 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180812030740.99170-1-aoates@google.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180812083918.GA3004@lap1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-i386: Fix lcall to call gate in
- IA-32e mode
+Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +37,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Oates <aoates@google.com>, rth@twiddle.net, ehabkost@redhat.com, qemu-devel@nongnu.org
-
-On 12/08/2018 05:07, Andrew Oates via Qemu-devel wrote:
-> Currently call gates are always treated as 32-bit gates.  In IA-32e mode
-> (either compatibility or 64-bit submode), system segment descriptors are
-> always 64-bit.  Treating them as 32-bit has the expected unfortunate
-> effect: only the lower 32 bits of the offset are loaded, the stack
-> pointer is truncated, a bad new stack pointer is loaded from the TSS (if
-> switching privilege levels), etc.
-> 
-> This change adds support for 64-bit call gate to the lcall instruction.
-> Additionally, there should be a check for non-canonical stack pointers,
-> but I've omitted that since there doesn't seem to be checks for
-> non-canonical addresses in this code elsewhere.
-
-Thanks.  It's also missing a check for task gates in 64-bit mode and,
-since we are at it, we should also implement ljmp to call gates.
-Something like this (untested):
-
-diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
-index d3b31f3c1b..0b2efe2cae 100644
---- a/target/i386/seg_helper.c
-+++ b/target/i386/seg_helper.c
-@@ -1645,6 +1645,13 @@ void helper_ljmp_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
-         rpl = new_cs & 3;
-         cpl = env->hflags & HF_CPL_MASK;
-         type = (e2 >> DESC_TYPE_SHIFT) & 0xf;
-+#ifdef TARGET_X86_64
-+        if (env->efer & MSR_EFER_LMA) {
-+            if (type != 12) {
-+                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc, GETPC());
-+            }
-+        }
-+#endif
-         switch (type) {
-         case 1: /* 286 TSS */
-         case 9: /* 386 TSS */
-@@ -1666,6 +1673,21 @@ void helper_ljmp_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
-             new_eip = (e1 & 0xffff);
-             if (type == 12) {
-                 new_eip |= (e2 & 0xffff0000);
-+#ifdef TARGET_X86_64
-+                if (env->efer & MSR_EFER_LMA) {
-+                    /* load the upper 8 bytes of the 64-bit call gate */
-+                    if (load_segment_ra(env, &e1, &e2, new_cs + 8, GETPC())) {
-+                        raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc,
-+                                               GETPC());
-+                    }
-+                    type = (e2 >> DESC_TYPE_SHIFT) & 0x1f;
-+                    if (type != 0) {
-+                        raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc,
-+                                               GETPC());
-+                    }
-+                    new_eip |= ((target_ulong)e1) << 32;
-+                }
-+#endif
-             }
-             if (load_segment_ra(env, &e1, &e2, gate_cs, GETPC()) != 0) {
-                 raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc, GETPC());
-@@ -1812,6 +1834,13 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
-         type = (e2 >> DESC_TYPE_SHIFT) & 0x1f;
-         dpl = (e2 >> DESC_DPL_SHIFT) & 3;
-         rpl = new_cs & 3;
-+#ifdef TARGET_X86_64
-+        if (env->efer & MSR_EFER_LMA) {
-+            if (type != 12) {
-+                raise_exception_err_ra(env, EXCP0D_GPF, gate_cs & 0xfffc, GETPC());
-+            }
-+        }
-+#endif
-         switch (type) {
-         case 1: /* available 286 TSS */
-         case 9: /* available 386 TSS */
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: Thomas Huth <thuth@redhat.com>, Rebecca Cran <rebecca@bluestop.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Kamil Rytarowski <kamil@netbsd.org>, Brad Smith <brad@comstyle.com>
 
 
-Out of curiosity, what OS is using 64-bit call gates? :)
 
-Paolo
+On 08/12/2018 11:39 AM, Yuval Shaia wrote:
+> On Sat, Aug 11, 2018 at 07:47:49PM +0300, Marcel Apfelbaum wrote:
+>> Hi,
+>>
+>> On 08/06/2018 11:51 AM, Thomas Huth wrote:
+>>> On 07/28/2018 05:50 AM, Rebecca Cran wrote:
+>>>> On 7/25/18 5:14 AM, Thomas Huth wrote:
+>>>>
+>>>>> Note that the error has been reported to happen on FreeBSD - so I doubt
+>>>>> that this <linux/types.h> header should be here.
+>>>>>
+>>>>> Anyway, our include/standard-headers/linux/types.h is also empty ... so
+>>>>> could you try whether it compiles if you simply remove this #include
+>>>>> line, Rebecca?
+>>>> Sorry for the delay, I'm just getting back to this. Removing the include
+>>>> causes it to fail later on, with:
+>>>>
+>>>> /home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning:
+>>>> implicit declaration of function 'mremap' is invalid in C99
+>>>> [-Wimplicit-function-declaration]
+>>>>       host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
+>>> OK, thanks for checking. According to
+>>>
+>>>    https://www.freebsd.org/cgi/man.cgi?query=mremap&manpath=NetBSD+5.0
+>>>
+>>> that syscall should also be available on FreeBSD. So could you please do
+>>> one more test and see whether it works when you add the following line
+>>> somewhere at the beginning of the file:
+>>>
+>>>     #include <sys/mman.h>
+>> It took some time, but I finally have a FreeBSD VM with RDMA enabled.
+>>
+>> My findings:
+>> - The RDMA libraries are there, so the flag  "RDMA"=yes is set correctly.
+>> - include of <linux/types.h> is not needed, I will remove it.
+>> - In FreeBSD mremap is not implemented in all configurations, it depends
+>>    on some SANITIZER_LINUX flag (Linux emulation?), I think;
+>>    so pvrdma cannot be compiled.  I think we should have a different QEMU
+>> configuration
+>>    flag --enable-pvrdma that will specifically check it is not a "bsd"
+>> platform.
+> A good idea.
+>
+> So, do i get it right that you will "revert back" the things we did
+> to--enable-rdma and do all our stuff in new --enable-pvrdma section?
 
-> I've left the raise_exception_err_ra lines unwapped at 80 columns to
-> match the style in the rest of the file.
-> 
-> Signed-off-by: Andrew Oates <aoates@google.com>
-> ---
->  target/i386/seg_helper.c | 145 ++++++++++++++++++++++++++++-----------
->  1 file changed, 106 insertions(+), 39 deletions(-)
+Yes, but I plan to do it as a patch "on top" rather than reverting the 
+actual commit.
+
+Thanks,
+Marcel
+
+>>    I'll send a patch for that too.
+>>
+>> Thanks,
+>> Marcel
+>>
+>>
+>>>    Thanks,
+>>>     Thomas
