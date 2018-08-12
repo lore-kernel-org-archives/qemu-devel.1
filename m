@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aoates@google.com>) id 1fognH-0006ZU-5g
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 23:11:52 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fokWx-0005oY-Cb
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 03:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aoates@google.com>) id 1fognF-0004LD-PM
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 23:11:51 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:55684)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fokWu-0001Ta-6s
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 03:11:15 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42135)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aoates@google.com>) id 1fognF-0004IK-HU
-	for qemu-devel@nongnu.org; Sat, 11 Aug 2018 23:11:49 -0400
-Received: by mail-it0-x243.google.com with SMTP id d10-v6so8023565itj.5
-	for <qemu-devel@nongnu.org>; Sat, 11 Aug 2018 20:11:47 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fokWt-0001TJ-Vg
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 03:11:12 -0400
+Received: by mail-wr1-x444.google.com with SMTP id e7-v6so11558847wrs.9
+	for <qemu-devel@nongnu.org>; Sun, 12 Aug 2018 00:11:11 -0700 (PDT)
+References: <1533625449-14989-1-git-send-email-jing2.liu@linux.intel.com>
+	<893d9264-7908-4e2c-ae1d-7e46eed6e6a0@redhat.com>
+	<e06b10e0-d0b6-d190-6673-f97199bebb72@redhat.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <efc99631-454d-4377-8551-0594fc763c94@gmail.com>
+Date: Sun, 12 Aug 2018 10:11:07 +0300
 MIME-Version: 1.0
-References: <20180729143545.6978-1-samuel.thibault@ens-lyon.org>
-	<20180729143545.6978-2-samuel.thibault@ens-lyon.org>
-	<CAFEAcA8tX0_MNg99oorgOWarJa8Oy+gFFwoRys-fU7ZX3_Ufng@mail.gmail.com>
-	<CAJ1tprAuf1mWtpw+4M3QFZyrDz22TMcnGS9xkhQn6Q9UQTrwiw@mail.gmail.com>
-	<CAFEAcA_pj4tFE2tyrbRtvJnPoeRekDXtVJCzgSeFiiK=sxg4Aw@mail.gmail.com>
-	<CAJ1tprAyHqgH1mHkeLu6qU1Fr8O-B5ebJ3Cfw8e_nHMYSYXfmQ@mail.gmail.com>
-	<CAFEAcA8DdkVB6LG=wq10wJDBjZgScdC_6tavtMzEi-UgGXjEKw@mail.gmail.com>
-	<CAJ1tprA11Q+kjkdmmpmJRiLbDveWR6qzKY3hz_FbRXAUPpXy6A@mail.gmail.com>
-In-Reply-To: <CAJ1tprA11Q+kjkdmmpmJRiLbDveWR6qzKY3hz_FbRXAUPpXy6A@mail.gmail.com>
-From: Andrew Oates <aoates@google.com>
-Date: Sat, 11 Aug 2018 23:11:35 -0400
-Message-ID: <CAJ1tprBXs6PWP=SsjtPOPNxPJfvWsWFoHCAhovJEGn4=mf8_tw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 1/1] slirp: fix ICMP handling on macOS hosts
+In-Reply-To: <e06b10e0-d0b6-d190-6673-f97199bebb72@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] hw/pci: add pci capability to pci-pci
+ bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,62 +33,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, stefanha@redhat.com, "J. Kiszka" <jan.kiszka@siemens.com>
+To: Laszlo Ersek <lersek@redhat.com>, Jing Liu <jing2.liu@linux.intel.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, anthony.xu@intel.com, mst@redhat.com
 
-Ping --- would you like me to resubmit the patch using CONFIG_BSD?
+Hi Laszlo,
 
-Cheers,
-~Andrew
+On 08/07/2018 06:59 PM, Laszlo Ersek wrote:
+> On 08/07/18 14:19, Laszlo Ersek wrote:
+>> On 08/07/18 09:04, Jing Liu wrote:
+>>> Add hint to firmware (e.g. SeaBIOS) to reserve addtional
+>>> IO/MEM/PREF spaces for legacy pci-pci bridge, to enable
+>>> some pci devices hotplugging whose IO/MEM/PREF spaces
+>>> requests are larger than the ones in pci-pci bridge set
+>>> by firmware.
+>>>
+>>> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+>>> ---
+>>>   hw/pci-bridge/pci_bridge_dev.c | 20 ++++++++++++++++++++
+>>>   1 file changed, 20 insertions(+)
+>>> +cap_error:
+>>> +    msi_uninit(dev);
+>> (4) This error handler doesn't look entirely correct; we can reach it
+>> without having initialized MSI. (MSI setup is conditional; and even if
+>> we attempt it, it is permitted to fail with "msi=auto".) Therefore,
+>> msi_uninit() should be wrapped into "if (msi_present())", same as you
+>> see in pci_bridge_dev_exitfn().
 
+You are right.  msi_present should be checked.
 
-On Wed, Aug 1, 2018 at 10:39 AM Andrew Oates <aoates@google.com> wrote:
-
->
->
->
-> On Wed, Aug 1, 2018 at 6:10 AM Peter Maydell <peter.maydell@linaro.org>
-> wrote:
->
->> On 1 August 2018 at 00:25, Andrew Oates <aoates@google.com> wrote:
->> > Both CONFIG_BSD and not-CONFIG_LINUX work on macOS.  I unfortunately
->> don't
->> > have access to any other BSDs to test them, though.
 >>
->> Is there an easy way to test it? The QEMU makefiles have some
->> runes for setting up a BSD VM...
->>
+>>>   msi_error:
+>>>       slotid_cap_cleanup(dev);
+>>>   slotid_error:
+> I tried to understand the error handling a bit better. I'm confused.
 >
-> Ok, it turns out that SOCK_DGRAM+IPPROTO_ICMP isn't actually supported on
-> FreeBSD---tested in qemu (thanks for the tip!).
+> First, under the label "shpc_error", we call pci_bridge_exitfn(), which
+> seems to clean up everything (checking individually for each thing to
+> clean up). Given this, I wonder why we introduced the "slotid_error" and
+> "msi_error" labels at all. Cascading teardown on the error path, and
+> invkoing a function that checks everything individually and then tears
+> it all down, are usually mutually exclusive.
+
+I think is possible you miss-interpreted pci_bridge_dev_exitfn
+with pci_bridge_exitfn. The first one is the "catch all", the second
+one that is used in the error path is for the bridge specific cleanup.
+
+> Second, msi_uninit() and shpc_cleanup() are internally inconsistent
+> between each other. The former removes the respective capability from
+> config space -- with pci_del_capability() --,
+
+Right
+
+>   but the latter only has a
+> comment, "/* TODO: cleanup config space changes? */".
+
+But also disables the QEMU_PCI_CAP_SLOTID (but no code checks it anyway)
+I agree it should call pci_del_capability to delete the SHPC capability,
+maybe is some "debt" from early development stages.
+
+>   The same comment
+> is present in the slotid_cap_cleanup() function. Given this
+> inconsistency,
+
+Here we also miss a call to pci_del_capability.
+
+> I don't know what to suggest for the new capability's
+> teardown, in pci_bridge_dev_exitfn()  -- should we just ignore it (as
+> suggested by this patch)?
+
+No, we should remove it properly.
+
+I think it is not considered a "big" issue since adding/removing PCI 
+capabilities
+is not an operation that deals with resources, we only edit an array  
+(the config space)
+that will not be used anyway if the device init sequence failed.
+
+That does not mean the code should not be clean.
+
+Thanks,
+Marcel
+
 >
-> I didn't actually boot up NetBSD or OpenBSD, but poking around the kernel
-> source I found for them it appears they have the same restriction:
-> https://github.com/freebsd/freebsd/blob/master/sys/netinet/in_proto.c
-> https://github.com/openbsd/src/blob/master/sys/netinet/in_proto.c
->
-> http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/netinet/in_proto.c?rev=1.128&content-type=text/x-cvsweb-markup
->
-> (search for SOCK_DGRAM and IPPROTO_ICMP in the above).
->
-> So I don't think ICMP via SLIRP would work at all in the other BSDs,
-> meaning this patch is a no-op for them either way.  If we _were_ to make
-> SLIRP+ICMP work in *BSD, we'd presumably want to do it with a
-> SOCK_RAW+IPPROTO_ICMP socket (which would require special permissions to
-> create), which would mean an included IP header---so I think that #ifdef
-> CONFIG_BSD here is defensible.
->
-> I did some poking for Solaris and Haiku and didn't find much, though it
-> looks like the version of ping included w/ Haiku uses SOCK_RAW rather than
-> SOCK_DGRAM, so it may be in the same boat as non-OSX-BSDs (
-> https://github.com/haiku/haiku/blob/master/src/bin/network/ping/ping.c#L205
-> ).
->
-> ~Andrew
->
->
->>
->> thanks
->> -- PMM
->>
+> Thanks
+> Laszlo
 >
