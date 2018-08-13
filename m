@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fp2mm-0002oL-Ki
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:40:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fp4Bl-0002BI-FJ
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 00:10:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fp2mh-0000zP-On
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:40:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52754)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fp2mh-0000ye-HQ
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:40:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fp2mg-0000S7-Eq
-	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 02:40:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6C3792E8060
-	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 02:40:42 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1fp4Bj-0004y9-N4
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 00:10:41 -0400
+Date: Mon, 13 Aug 2018 14:02:59 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180813040259.GL4079@umbus>
+References: <20180807092948.28134-1-rka@sysgo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Aug 2018 02:33:37 -0000
-From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Reply-To: Bug 1785972 <1785972@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153371136089.29473.12663307170219083138.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153412761805.26437.14940155219101835306.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1785972] Re: v3.0.0-rc4: VM fails to start after
- vcpuhotunplug, managedsave sequence
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ai3I8gwHc37+ASRI"
+Content-Disposition: inline
+In-Reply-To: <20180807092948.28134-1-rka@sysgo.com>
+Subject: Re: [Qemu-devel] [PATCH] ppc: add DBCR based debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,90 +23,347 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Applied to ppc-for-3.1.
-
-https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg01317.html
-
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Committed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1785972
-
-Title:
-  v3.0.0-rc4: VM fails to start after vcpuhotunplug, managedsave
-  sequence
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  VM fails to start after vcpu hot un-plug, managedsave sequence
-
-  Host info:
-  Kernel: 4.18.0-rc8-00002-g1236568ee3cb
-
-  qemu: commit 6ad90805383e6d04b3ff49681b8519a48c9f4410 (HEAD -> master, ta=
-g: v3.0.0-rc4)
-  QEMU emulator version 2.12.94 (v3.0.0-rc4-dirty)
-
-  libvirt: commit 087de2f5a3dffb27d2eeb0c50a86d5d6984e5a5e (HEAD -> master)
-  libvirtd (libvirt) 4.6.0
-
-  Guest Kernel: 4.18.0-rc8-00002-g1236568ee3cb
-
-  =
-
-  Steps to reproduce:
-  1. Start a guest(VM) with 2 current , 4 max vcpus
-  virsh start vm1
-  Domain vm1 started
-
-  2. Hotplug 2 vcpus
-  virsh setvcpus vm1 4 --live
-
-  3. Hot unplug 2 vcpus
-  virsh setvcpus vm1 2 --live
-
-  4. Managedsave the VM
-  virsh managedsave vm1
-
-  Domain vm1 state saved by libvirt
-
-  5. Start the VM ---Fails to start
-  virsh start vm1
-
-  error: Failed to start domain avocado-vt-vm1
-  error: internal error: qemu unexpectedly closed the monitor: 2018-08-08T0=
-6:27:53.853818Z qemu: Unknown savevm section or instance 'spapr_cpu' 2
-  2018-08-08T06:27:53.854949Z qemu: load of migration failed: Invalid argum=
-ent
+To: Roman Kapl <rka@sysgo.com>
+Cc: Alexander Graf <agraf@suse.de>, "open list:PowerPC" <qemu-ppc@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
 
-  Testcase:
-  avocado run libvirt_vcpu_plug_unplug.positive_test.vcpu_set.live.vm_opera=
-te.managedsave_with_unplug --vt-type libvirt --vt-extra-params emulator_pat=
-h=3D/usr/share/avocado-plugins-vt/bin/qemu create_vm_libvirt=3Dyes kill_vm_=
-libvirt=3Dyes env_cleanup=3Dyes smp=3D8 backup_image_before_testing=3Dno li=
-bvirt_controller=3Dvirtio-scsi scsi_hba=3Dvirtio-scsi-pci drive_format=3Dsc=
-si-hd use_os_variant=3Dno restore_image_after_testing=3Dno vga=3Dnone displ=
-ay=3Dnographic kernel=3D/home/kvmci/linux/vmlinux kernel_args=3D'root=3D/de=
-v/sda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init  initcall=
-_debug' take_regular_screendumps=3Dno --vt-guest-os JeOS.27.ppc64le
-  JOB ID     : 1f869477ad87e7d7e7e7777f631ae08965f41a74
-  JOB LOG    : /root/avocado/job-results/job-2018-08-08T02.42-1f86947/job.l=
-og
-   (1/1) type_specific.io-github-autotest-libvirt.libvirt_vcpu_plug_unplug.=
-positive_test.vcpu_set.live.vm_operate.managedsave_with_unplug: ERROR (91.5=
-8 s)
-  RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | =
-CANCEL 0
-  JOB TIME   : 95.89 s
+--ai3I8gwHc37+ASRI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1785972/+subscriptions
+On Tue, Aug 07, 2018 at 11:29:48AM +0200, Roman Kapl wrote:
+> Add support for DBCR (debug control register) based debugging as used on
+> BookE ppc. So far supports only branch and single-step events, but these =
+are
+> the important ones. GDB in Linux guest can now do single-stepping.
+>=20
+> Signed-off-by: Roman Kapl <rka@sysgo.com>
+> ---
+>  target/ppc/cpu.h                |   5 ++
+>  target/ppc/excp_helper.c        |   3 +-
+>  target/ppc/translate.c          | 107 ++++++++++++++++++++++++++++++----=
+------
+>  target/ppc/translate_init.inc.c |  17 +++++++
+>  4 files changed, 104 insertions(+), 28 deletions(-)
+>=20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 4edcf62cf7..ec149349e2 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -481,6 +481,11 @@ struct ppc_slb_t {
+>  #define msr_ts   ((env->msr >> MSR_TS1)  & 3)
+>  #define msr_tm   ((env->msr >> MSR_TM)   & 1)
+> =20
+> +#define DBCR0_ICMP (1 << 27)
+> +#define DBCR0_BRT (1 << 26)
+> +#define DBSR_ICMP (1 << 27)
+> +#define DBSR_BRT (1 << 26)
+> +
+>  /* Hypervisor bit is more specific */
+>  #if defined(TARGET_PPC64)
+>  #define MSR_HVB (1ULL << MSR_SHV)
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index d6e97a90e0..3463efaf4e 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -359,8 +359,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
+excp_model, int excp)
+>          default:
+>              break;
+>          }
+> -        /* XXX: TODO */
+> -        cpu_abort(cs, "Debug exception is not implemented yet !\n");
+> +        /* DBSR already modified by caller */
+
+Ths is unconditionally enabling the exception for every platform,
+which doesn't seem right.  I think it would be better to add the
+specific exception models which use the DBCR to the switch statement
+above this.
+
+>          break;
+>      case POWERPC_EXCP_SPEU:      /* SPE/embedded floating-point unavaila=
+ble  */
+>          env->spr[SPR_BOOKE_ESR] =3D ESR_SPV;
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 9eaa10b421..69cd45dd81 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -211,6 +211,7 @@ struct DisasContext {
+>      bool gtse;
+>      ppc_spr_t *spr_cb; /* Needed to check rights for mfspr/mtspr */
+>      int singlestep_enabled;
+> +    uint32_t flags;
+>      uint64_t insns_flags;
+>      uint64_t insns_flags2;
+>  };
+> @@ -251,6 +252,17 @@ struct opc_handler_t {
+>  #endif
+>  };
+> =20
+> +/* SPR load/store helpers */
+> +static inline void gen_load_spr(TCGv t, int reg)
+> +{
+> +    tcg_gen_ld_tl(t, cpu_env, offsetof(CPUPPCState, spr[reg]));
+> +}
+> +
+> +static inline void gen_store_spr(int reg, TCGv t)
+> +{
+> +    tcg_gen_st_tl(t, cpu_env, offsetof(CPUPPCState, spr[reg]));
+> +}
+> +
+>  static inline void gen_set_access_type(DisasContext *ctx, int access_typ=
+e)
+>  {
+>      if (ctx->need_access_type && ctx->access_type !=3D access_type) {
+> @@ -313,6 +325,38 @@ static void gen_exception_nip(DisasContext *ctx, uin=
+t32_t excp,
+>      ctx->exception =3D (excp);
+>  }
+> =20
+> +/* Translates the EXCP_TRACE/BRANCH to an appropriate exception depending
+> + * on processor version (BookE vs regular)
+
+It's not obvious what "regular" means in this context.
+
+> + */
+> +static uint32_t gen_prep_dbgex(DisasContext *ctx, uint32_t excp)
+> +{
+> +    if ((ctx->singlestep_enabled & CPU_SINGLE_STEP)
+> +        && (excp =3D=3D POWERPC_EXCP_BRANCH)) {
+> +        /* Trace excpt. has priority */
+> +        excp =3D POWERPC_EXCP_TRACE;
+> +    }
+> +    if (ctx->flags & POWERPC_FLAG_DE) {
+> +        target_ulong dbsr =3D 0;
+> +        switch (excp) {
+> +        case POWERPC_EXCP_TRACE:
+> +            dbsr =3D DBCR0_ICMP;
+> +            break;
+> +        case POWERPC_EXCP_BRANCH:
+> +            dbsr =3D DBCR0_BRT;
+> +            break;
+> +        }
+> +        TCGv t0 =3D tcg_temp_new();
+> +        gen_load_spr(t0, SPR_BOOKE_DBSR);
+> +        tcg_gen_ori_tl(t0, t0, dbsr);
+> +        gen_store_spr(SPR_BOOKE_DBSR, t0);
+> +        tcg_temp_free(t0);
+> +        return POWERPC_EXCP_DEBUG;
+> +    } else {
+> +        return excp;
+> +    }
+> +    return POWERPC_EXCP_NONE;
+> +}
+> +
+>  static void gen_debug_exception(DisasContext *ctx)
+>  {
+>      TCGv_i32 t0;
+> @@ -575,17 +619,6 @@ typedef struct opcode_t {
+>  }
+>  #endif
+> =20
+> -/* SPR load/store helpers */
+> -static inline void gen_load_spr(TCGv t, int reg)
+> -{
+> -    tcg_gen_ld_tl(t, cpu_env, offsetof(CPUPPCState, spr[reg]));
+> -}
+> -
+> -static inline void gen_store_spr(int reg, TCGv t)
+> -{
+> -    tcg_gen_st_tl(t, cpu_env, offsetof(CPUPPCState, spr[reg]));
+> -}
+> -
+
+You move these around, but the new code doesn't seem to use them, so
+I'm not sure why.
+
+>  /* Invalid instruction */
+>  static void gen_invalid(DisasContext *ctx)
+>  {
+> @@ -3602,6 +3635,24 @@ static inline bool use_goto_tb(DisasContext *ctx, =
+target_ulong dest)
+>  #endif
+>  }
+> =20
+> +static void gen_lookup_and_goto_ptr(DisasContext *ctx)
+> +{
+> +    int sse =3D ctx->singlestep_enabled;
+> +    if (unlikely(sse)) {
+> +        if (sse & GDBSTUB_SINGLE_STEP) {
+> +            gen_debug_exception(ctx);
+> +        } else if (sse & (CPU_SINGLE_STEP | CPU_BRANCH_STEP)) {
+> +            uint32_t excp =3D gen_prep_dbgex(ctx, POWERPC_EXCP_BRANCH);
+> +            if (excp !=3D POWERPC_EXCP_NONE) {
+> +                gen_exception(ctx, excp);
+> +            }
+> +        }
+> +        tcg_gen_exit_tb(NULL, 0);
+> +    } else {
+> +        tcg_gen_lookup_and_goto_ptr();
+> +    }
+> +}
+> +
+>  /***                                Branch                              =
+   ***/
+>  static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+>  {
+> @@ -3614,18 +3665,7 @@ static void gen_goto_tb(DisasContext *ctx, int n, =
+target_ulong dest)
+>          tcg_gen_exit_tb(ctx->base.tb, n);
+>      } else {
+>          tcg_gen_movi_tl(cpu_nip, dest & ~3);
+> -        if (unlikely(ctx->singlestep_enabled)) {
+> -            if ((ctx->singlestep_enabled &
+> -                (CPU_BRANCH_STEP | CPU_SINGLE_STEP)) &&
+> -                (ctx->exception =3D=3D POWERPC_EXCP_BRANCH ||
+> -                 ctx->exception =3D=3D POWERPC_EXCP_TRACE)) {
+> -                gen_exception_nip(ctx, POWERPC_EXCP_TRACE, dest);
+> -            }
+> -            if (ctx->singlestep_enabled & GDBSTUB_SINGLE_STEP) {
+> -                gen_debug_exception(ctx);
+> -            }
+> -        }
+> -        tcg_gen_lookup_and_goto_ptr();
+> +        gen_lookup_and_goto_ptr(ctx);
+>      }
+>  }
+> =20
+> @@ -3668,8 +3708,8 @@ static void gen_bcond(DisasContext *ctx, int type)
+>      uint32_t bo =3D BO(ctx->opcode);
+>      TCGLabel *l1;
+>      TCGv target;
+> -
+>      ctx->exception =3D POWERPC_EXCP_BRANCH;
+> +
+>      if (type =3D=3D BCOND_LR || type =3D=3D BCOND_CTR || type =3D=3D BCO=
+ND_TAR) {
+>          target =3D tcg_temp_local_new();
+>          if (type =3D=3D BCOND_CTR)
+> @@ -3733,10 +3773,11 @@ static void gen_bcond(DisasContext *ctx, int type)
+>          } else {
+>              tcg_gen_andi_tl(cpu_nip, target, ~3);
+>          }
+> -        tcg_gen_lookup_and_goto_ptr();
+> +        gen_lookup_and_goto_ptr(ctx);
+>          tcg_temp_free(target);
+>      }
+>      if ((bo & 0x14) !=3D 0x14) {
+> +        /* fallthrough case */
+>          gen_set_label(l1);
+>          gen_goto_tb(ctx, 1, ctx->base.pc_next);
+>      }
+> @@ -7419,6 +7460,7 @@ static void ppc_tr_init_disas_context(DisasContextB=
+ase *dcbase, CPUState *cs)
+>      ctx->need_access_type =3D !(env->mmu_model & POWERPC_MMU_64B);
+>      ctx->le_mode =3D !!(env->hflags & (1 << MSR_LE));
+>      ctx->default_tcg_memop_mask =3D ctx->le_mode ? MO_LE : MO_BE;
+> +    ctx->flags =3D env->flags;
+>  #if defined(TARGET_PPC64)
+>      ctx->sf_mode =3D msr_is_64bit(env, env->msr);
+>      ctx->has_cfar =3D !!(env->flags & POWERPC_FLAG_CFAR);
+> @@ -7455,6 +7497,17 @@ static void ppc_tr_init_disas_context(DisasContext=
+Base *dcbase, CPUState *cs)
+>          ctx->singlestep_enabled =3D 0;
+>      if ((env->flags & POWERPC_FLAG_BE) && msr_be)
+>          ctx->singlestep_enabled |=3D CPU_BRANCH_STEP;
+> +    if ((env->flags & POWERPC_FLAG_DE) && msr_de) {
+> +        ctx->singlestep_enabled =3D 0;
+> +        target_ulong dbcr0 =3D env->spr[SPR_BOOKE_DBCR0];
+> +        if (dbcr0 & DBCR0_ICMP) {
+> +            ctx->singlestep_enabled |=3D CPU_SINGLE_STEP;
+> +        }
+> +        if (dbcr0 & DBCR0_BRT) {
+> +            ctx->singlestep_enabled |=3D CPU_BRANCH_STEP;
+> +        }
+> +
+> +    }
+>      if (unlikely(ctx->base.singlestep_enabled)) {
+>          ctx->singlestep_enabled |=3D GDBSTUB_SINGLE_STEP;
+>      }
+> @@ -7565,7 +7618,9 @@ static void ppc_tr_translate_insn(DisasContextBase =
+*dcbase, CPUState *cs)
+>                   ctx->exception !=3D POWERPC_SYSCALL &&
+>                   ctx->exception !=3D POWERPC_EXCP_TRAP &&
+>                   ctx->exception !=3D POWERPC_EXCP_BRANCH)) {
+> -        gen_exception_nip(ctx, POWERPC_EXCP_TRACE, ctx->base.pc_next);
+> +        uint32_t excp =3D gen_prep_dbgex(ctx, POWERPC_EXCP_TRACE);
+> +        if (excp !=3D POWERPC_EXCP_NONE)
+> +            gen_exception_nip(ctx, excp, ctx->base.pc_next);
+>      }
+> =20
+>      if (tcg_check_temp_count()) {
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 7813b1b004..f1be7b7953 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -498,6 +498,7 @@ static void spr_write_40x_pit(DisasContext *ctx, int =
+sprn, int gprn)
+> =20
+>  static void spr_write_40x_dbcr0(DisasContext *ctx, int sprn, int gprn)
+>  {
+> +    gen_store_spr(sprn, cpu_gpr[gprn]);
+>      gen_helper_store_40x_dbcr0(cpu_env, cpu_gpr[gprn]);
+>      /* We must stop translation as we may have rebooted */
+>      gen_stop_exception(ctx);
+> @@ -1769,6 +1770,14 @@ static void gen_spr_BookE(CPUPPCState *env, uint64=
+_t ivor_mask)
+>                   SPR_NOACCESS, SPR_NOACCESS,
+>                   &spr_read_generic, &spr_write_generic,
+>                   0x00000000);
+> +    spr_register(env, SPR_BOOKE_DSRR0, "DSRR0",
+> +                 SPR_NOACCESS, SPR_NOACCESS,
+> +                 &spr_read_generic, &spr_write_generic,
+> +                 0x00000000);
+> +    spr_register(env, SPR_BOOKE_DSRR1, "DSRR1",
+> +                 SPR_NOACCESS, SPR_NOACCESS,
+> +                 &spr_read_generic, &spr_write_generic,
+> +                 0x00000000);
+>      /* XXX : not implemented */
+>      spr_register(env, SPR_BOOKE_DBSR, "DBSR",
+>                   SPR_NOACCESS, SPR_NOACCESS,
+> @@ -1841,6 +1850,14 @@ static void gen_spr_BookE(CPUPPCState *env, uint64=
+_t ivor_mask)
+>                   SPR_NOACCESS, SPR_NOACCESS,
+>                   &spr_read_generic, &spr_write_generic,
+>                   0x00000000);
+> +    spr_register(env, SPR_BOOKE_SPRG8, "SPRG8",
+> +                 SPR_NOACCESS, SPR_NOACCESS,
+> +                 &spr_read_generic, &spr_write_generic,
+> +                 0x00000000);
+> +    spr_register(env, SPR_BOOKE_SPRG9, "SPRG9",
+> +                 SPR_NOACCESS, SPR_NOACCESS,
+> +                 &spr_read_generic, &spr_write_generic,
+> +                 0x00000000);
+>  }
+> =20
+>  static inline uint32_t gen_tlbncfg(uint32_t assoc, uint32_t minsize,
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ai3I8gwHc37+ASRI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltxAvEACgkQbDjKyiDZ
+s5JFNRAAj0b8mDBx7TLuxDScvs83cfv4Qs+KerNyFITVmjgK/c/2t4PNofKTfBM0
+qFHplNzRCCKbtCeEtD2M7H22v1Li+rnoF2gZeyVyAme8b8t0E3oHgUrQ0w036zg8
+ICBS4kpWlWi5LXKvzAs/cM+XdMhyfEBAVUH0rbZDm3RIhBv4KKUR2O9NW5/4UWPT
+4mOC/fG92UcTe+AjhbMxlpoe+UNfqaPMMY3TrWT5SvytlPTCoUoVMzC/ioTeWDu2
+rFuhFJPy3trZYfqezggTSLP8sneyDIZ1EJzejBbg1ieU+Ugov5ec5z3gn5ffkig7
+tvj32L17LIn6O0F1y2gDW/Sbl2fgHlR+2kXZcw5LB71BnR9OC1DhqyBqj92wIVr5
+e+Tqh9mCX69kB8QJ8UmWbP/2H3xufJRneU2uuk9hAZ7yaZl76AIE/AvccQHo0hIQ
+gI80EsCmxpGesSkd0MJuAigOu0e+V/FrkpfaJAn65b8BaFsQjk5EMt7u7AIM1nsd
+WRja6tvTdaNZP2ed7ZAJ+hag9RBSwNg/GmyBhRGKP/JknHG0wSJFwjmoQ8dyQ4v4
+Tp11clHfNLF2Zm5QNeA88Y/DO7NMXlAG0sn7sC03ZZJowR1SKRcwCNGVfRVRcSyp
+GMoFeMMEAkrdlEaTJptK9ih4DxFzeOoEMOcrmGn1m0J9yc61hLw=
+=EIhy
+-----END PGP SIGNATURE-----
+
+--ai3I8gwHc37+ASRI--
