@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fpB4O-0004IO-SR
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 07:31:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fpB6S-0005Jg-KA
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 07:33:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fpB4J-0004cB-Vi
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 07:31:32 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:54542)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fpB4J-0004by-NB
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 07:31:27 -0400
-Received: by mail-wm0-x244.google.com with SMTP id c14-v6so8491011wmb.4
-	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 04:31:27 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20180808114830.7169-1-quintela@redhat.com>
-	<20180808114830.7169-5-quintela@redhat.com>
-	<b30ab0a9-8250-b0da-7c2c-c455db0dddcd@redhat.com>
-	<87r2j6v5q7.fsf@trasno.org>
-	<51fa5967-1e9e-3f43-b79b-4a45930562c6@redhat.com>
-	<87a7puuu89.fsf@trasno.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c4d5eb16-10ee-2339-3e5f-aa90c4bbd9ec@redhat.com>
-Date: Mon, 13 Aug 2018 13:31:24 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fpB6R-0005Zb-RS
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 07:33:40 -0400
+Date: Mon, 13 Aug 2018 13:33:31 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180813113331.GE4323@localhost.localdomain>
+References: <20180810062647.23211-1-lbloch@janustech.com>
+	<20180810062647.23211-6-lbloch@janustech.com>
+	<w51sh3m70ca.fsf@maestria.local.igalia.com>
+	<1475efc2-86af-48d1-5887-bb8a1a3997a7@janustech.com>
 MIME-Version: 1.0
-In-Reply-To: <87a7puuu89.fsf@trasno.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 04/22] check: Only test isa-testdev when
- it is compiled in
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1475efc2-86af-48d1-5887-bb8a1a3997a7@janustech.com>
+Subject: Re: [Qemu-devel] [PATCH v7 5/9] qcow2: Assign the L2 cache
+ relatively to the image size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,33 +26,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com
+To: Leonid Bloch <lbloch@janustech.com>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 10/08/2018 17:17, Juan Quintela wrote:
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 10/08/2018 13:08, Juan Quintela wrote:
->>>> Emanuele's qos-test would do this automatically.  It would be nicer to
->>>> convert the whole ISA subsystem to use libqos and qos-test...
->>> Can we get this in until we get some volunteer for that other work?
->>> /me full of things on his plate at the moment.
->>
->> Sure, but since this is RFC, I commented. :)
+Am 11.08.2018 um 21:19 hat Leonid Bloch geschrieben:
+> > >   @item refcount-cache-size
+> > >   The maximum size of the refcount block cache in bytes
+> > > diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
+> > > index 87965625d8..e3fb078588 100755
+> > > --- a/tests/qemu-iotests/137
+> > > +++ b/tests/qemu-iotests/137
+> > > @@ -109,7 +109,6 @@ $QEMU_IO \
+> > >       -c "reopen -o cache-size=1M,l2-cache-size=64k,refcount-cache-size=64k" \
+> > >       -c "reopen -o cache-size=1M,l2-cache-size=2M" \
+> > >       -c "reopen -o cache-size=1M,refcount-cache-size=2M" \
+> > > -    -c "reopen -o l2-cache-size=256T" \
+> > 
+> > The "L2 cache size too big" error can still be tested, but you will need
+> > to create an image large enough to allow such a big cache.
+> > 
+> > $ qemu-img create -f qcow2 -o cluster_size=256k hd.qcow2 32P
+> > $ $QEMU -drive file=hd.qcow2,l2-cache-entry-size=512,l2-cache-size=1T
 > 
-> I didn't expect less of you O:-)
-> 
->> With qos-test, all tests
->> end up in a single binary that is generic for all QEMU targets, and
->> there's no need to synchronize the configuration with the testing.
->>
->> The disadvantage of doing it at the Makefile level is that it relies on
->> the devices being either in all targets or none.  For example
->> CONFIG_ISA_TESTDEV cannot be removed from just
->> default-configs/ppc-softmmu.mak if you are building both a PPC and an
->> x86 target.
+> * 32P qcow2 will take 33M - is it OK to create it just for a test?
+> * Is it worth to create a special test scenario, with a separate image
+> creation, just for that case?
 
-Anyway, I'm not opposed to merging this part, it's just that they may be
-unnecessary in the future.  The virtio split is more interesting to me,
-and I am very happy that you are doing it!
+We're creating larger images than that during tests, so I think this is
+fine. You don't have to create a new separate test file or anything,
+just increase the size of the used test image from 64M to 32P or
+whatever is necessary.
 
-Paolo
+Kevin
