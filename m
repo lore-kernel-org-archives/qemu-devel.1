@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH37-0005Os-9D
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH37-0005P3-Rd
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH32-00072a-UQ
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH34-00074q-En
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:37 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55741 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:55757 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpH32-00071N-JH
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:32 -0400
+	id 1fpH33-00072t-WC
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:34 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 13 Aug 2018 19:52:32 +0200
-Message-Id: <1534182832-554-8-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 13 Aug 2018 19:52:49 +0200
+Message-Id: <1534182832-554-25-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 07/87] target/mips: Add CP0 BadInstrX
- register
+Subject: [Qemu-devel] [PATCH v8 24/87] target/mips: Add nanoMIPS decoding
+ and extraction utilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,114 +28,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add CP0 BadInstrX register. This register will be used in nanoMIPS.
+Add some basic utility functions and macros for nanoMIPS decoding
+engine.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  1 +
- target/mips/machine.c   |  5 +++--
- target/mips/translate.c | 22 +++++++++++++++++++++-
- 3 files changed, 25 insertions(+), 3 deletions(-)
+ target/mips/translate.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 77c638c..009202c 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -323,6 +323,7 @@ struct CPUMIPSState {
-     target_ulong CP0_BadVAddr;
-     uint32_t CP0_BadInstr;
-     uint32_t CP0_BadInstrP;
-+    uint32_t CP0_BadInstrX;
-     int32_t CP0_Count;
-     target_ulong CP0_EntryHi;
- #define CP0EnHi_EHINV 10
-diff --git a/target/mips/machine.c b/target/mips/machine.c
-index 20100d5..5ba78ac 100644
---- a/target/mips/machine.c
-+++ b/target/mips/machine.c
-@@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb =3D {
-=20
- const VMStateDescription vmstate_mips_cpu =3D {
-     .name =3D "cpu",
--    .version_id =3D 10,
--    .minimum_version_id =3D 10,
-+    .version_id =3D 11,
-+    .minimum_version_id =3D 11,
-     .post_load =3D cpu_post_load,
-     .fields =3D (VMStateField[]) {
-         /* Active TC */
-@@ -266,6 +266,7 @@ const VMStateDescription vmstate_mips_cpu =3D {
-         VMSTATE_UINTTL(env.CP0_BadVAddr, MIPSCPU),
-         VMSTATE_UINT32(env.CP0_BadInstr, MIPSCPU),
-         VMSTATE_UINT32(env.CP0_BadInstrP, MIPSCPU),
-+        VMSTATE_UINT32(env.CP0_BadInstrX, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Count, MIPSCPU),
-         VMSTATE_UINTTL(env.CP0_EntryHi, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Compare, MIPSCPU),
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 2b70d1b..ae3aaab 100644
+index 0475e1d..0467339 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -5328,7 +5328,13 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, =
-int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
-             rn =3D "BadInstrP";
-             break;
--        default:
-+        case 3:
-+            CP0_CHECK(ctx->bi);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
-+            tcg_gen_andi_tl(arg, arg, ~0xffff);
-+            rn =3D "BadInstrX";
-+            break;
-+       default:
-             goto cp0_unimplemented;
-         }
-         break;
-@@ -6019,6 +6025,10 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, =
-int reg, int sel)
-             /* ignored */
-             rn =3D "BadInstrP";
-             break;
-+        case 3:
-+            /* ignored */
-+            rn =3D "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -6724,6 +6734,12 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg,=
- int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
-             rn =3D "BadInstrP";
-             break;
-+        case 3:
-+            CP0_CHECK(ctx->bi);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
-+            tcg_gen_andi_tl(arg, arg, ~0xffff);
-+            rn =3D "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -7398,6 +7414,10 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg,=
- int reg, int sel)
-             /* ignored */
-             rn =3D "BadInstrP";
-             break;
-+        case 3:
-+            /* ignored */
-+            rn =3D "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
---=20
+@@ -16646,6 +16646,51 @@ enum {
+  *
+  */
+ 
++/* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr3'). */
++static inline int decode_gpr_gpr3(int r)
++{
++    static const int map[] = { 16, 17, 18, 19,  4,  5,  6,  7 };
++
++    return map[r & 0x7];
++}
++
++/* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr3.src.store'). */
++static inline int decode_gpr_gpr3_src_store(int r)
++{
++    static const int map[] = {  0, 17, 18, 19,  4,  5,  6,  7 };
++
++    return map[r & 0x7];
++}
++
++/* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr4'). */
++static inline int decode_gpr_gpr4(int r)
++{
++    static const int map[] = {  8,  9, 10, 11,  4,  5,  6,  7,
++                               16, 17, 18, 19, 20, 21, 22, 23 };
++
++    return map[r & 0xf];
++}
++
++/* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr4.zero'). */
++static inline int decode_gpr_gpr4_zero(int r)
++{
++    static const int map[] = {  8,  9, 10,  0,  4,  5,  6,  7,
++                               16, 17, 18, 19, 20, 21, 22, 23 };
++
++    return map[r & 0xf];
++}
++
++
++/* extraction utilities */
++
++#define NANOMIPS_EXTRACT_RD(op) ((op >> 7) & 0x7)
++#define NANOMIPS_EXTRACT_RS(op) ((op >> 4) & 0x7)
++#define NANOMIPS_EXTRACT_RS2(op) uMIPS_RS(op)
++#define NANOMIPS_EXTRACT_RS1(op) ((op >> 1) & 0x7)
++#define NANOMIPS_EXTRACT_RD5(op) ((op >> 5) & 0x1f)
++#define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
++
++
+ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+ {
+     return 2;
+-- 
 2.7.4
