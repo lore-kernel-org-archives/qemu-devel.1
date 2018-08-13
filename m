@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9sg-0007D1-FO
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:24 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9si-0007FV-1w
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9se-00022r-Ih
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:22 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9sg-00024l-Ch
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:23 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 13 Aug 2018 12:14:28 +0200
-Message-Id: <20180813101453.10200-9-e.emanuelegiuseppe@gmail.com>
+Date: Mon, 13 Aug 2018 12:14:29 +0200
+Message-Id: <20180813101453.10200-10-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
 References: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 08/33] tests/qgraph: pci-spapr driver and
- interface nodes
+Subject: [Qemu-devel] [PATCH 09/33] tests/qgraph: ppc64/pseries machine node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,228 +22,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, John Snow <jsnow@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add pci-bus-spapr node, that produces pci-bus. Move QPCIBusSPAPR struct
-declaration in its header (since it will be needed by other drivers)
-and introduce a setter method for drivers that do not need to allocate
-but have to initialize QPCIBusSPAPR.
+Add pseries  machine for the ppc64 QEMU binary. This machine contains a
+spapr-pci-host-bridge driver, that contains itself a pci-bus-spapr
+that produces the pci-bus interface.
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
- tests/Makefile.include   |   2 +-
- tests/libqos/pci-spapr.c | 116 +++++++++++++++++++++------------------
- tests/libqos/pci-spapr.h |  24 ++++++++
- 3 files changed, 88 insertions(+), 54 deletions(-)
+ tests/Makefile.include               |   1 +
+ tests/libqos/ppc64_pseries-machine.c | 111 +++++++++++++++++++++++++++
+ 2 files changed, 112 insertions(+)
+ create mode 100644 tests/libqos/ppc64_pseries-machine.c
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 67dbec0d35..5713be3ec4 100644
+index 5713be3ec4..7c712406e1 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -771,7 +771,7 @@ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virt
+@@ -770,6 +770,7 @@ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virt
+ 
  libqgraph-machines-obj-y = tests/libqos/x86_64_pc-machine.o
  libqgraph-machines-obj-y += tests/libqos/raspi2-machine.o
++libqgraph-machines-obj-y += tests/libqos/ppc64_pseries-machine.o
  
--libqgraph-pci-obj-y = $(libqos-pc-obj-y)
-+libqgraph-pci-obj-y = $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+ libqgraph-pci-obj-y = $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
  libqgraph-pci-obj-y += $(libqgraph-machines-obj-y)
- libqgraph-pci-obj-y += tests/libqos/sdhci.o
- 
-diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
-index f306cb746d..24f2c2c60d 100644
---- a/tests/libqos/pci-spapr.c
-+++ b/tests/libqos/pci-spapr.c
-@@ -9,33 +9,13 @@
- #include "libqtest.h"
- #include "libqos/pci-spapr.h"
- #include "libqos/rtas.h"
+diff --git a/tests/libqos/ppc64_pseries-machine.c b/tests/libqos/ppc64_pseries-machine.c
+new file mode 100644
+index 0000000000..c860e9bc5b
+--- /dev/null
++++ b/tests/libqos/ppc64_pseries-machine.c
+@@ -0,0 +1,111 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++ #include "qemu/osdep.h"
++#include "libqtest.h"
 +#include "libqos/qgraph.h"
- 
- #include "hw/pci/pci_regs.h"
- 
- #include "qemu-common.h"
- #include "qemu/host-utils.h"
- 
--
--/* From include/hw/pci-host/spapr.h */
--
--typedef struct QPCIWindow {
--    uint64_t pci_base;    /* window address in PCI space */
--    uint64_t size;        /* window size */
--} QPCIWindow;
--
--typedef struct QPCIBusSPAPR {
--    QPCIBus bus;
--    QGuestAllocator *alloc;
--
--    uint64_t buid;
--
--    uint64_t pio_cpu_base;
--    QPCIWindow pio;
--
--    uint64_t mmio32_cpu_base;
--    QPCIWindow mmio32;
--} QPCIBusSPAPR;
--
- /*
-  * PCI devices are always little-endian
-  * SPAPR by default is big-endian
-@@ -160,60 +140,90 @@ static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
- #define SPAPR_PCI_MMIO32_WIN_SIZE    0x80000000 /* 2 GiB */
- #define SPAPR_PCI_IO_WIN_SIZE        0x10000
- 
--QPCIBus *qpci_new_spapr(QTestState *qts, QGuestAllocator *alloc)
-+static void *qpci_spapr_get_driver(void *obj, const char *interface)
- {
--    QPCIBusSPAPR *ret = g_new0(QPCIBusSPAPR, 1);
-+    QPCIBusSPAPR *qpci = obj;
-+    if (!g_strcmp0(interface, "pci-bus")) {
-+        return &qpci->bus;
++#include "pci-spapr.h"
++#include "libqos/malloc-spapr.h"
++
++typedef struct QSPAPR_pci_host QSPAPR_pci_host;
++typedef struct Qppc64_pseriesMachine Qppc64_pseriesMachine;
++
++struct QSPAPR_pci_host {
++    QOSGraphObject obj;
++    QPCIBusSPAPR pci;
++};
++
++struct Qppc64_pseriesMachine {
++    QOSGraphObject obj;
++    QGuestAllocator *alloc;
++    QSPAPR_pci_host bridge;
++};
++
++/* QSPAPR_pci_host */
++
++static QOSGraphObject *QSPAPR_host_get_device(void *obj, const char *device)
++{
++    QSPAPR_pci_host *host = obj;
++    if (!g_strcmp0(device, "pci-bus-spapr")) {
++        return &host->pci.obj;
 +    }
-+    fprintf(stderr, "%s not present in pci-bus-spapr", interface);
++    fprintf(stderr, "%s not present in QSPAPR_pci_host\n", device);
 +    g_assert_not_reached();
 +}
- 
-+void qpci_init_spapr(QPCIBusSPAPR *qpci, QTestState *qts,
-+                     QGuestAllocator *alloc)
++
++static void qos_create_QSPAPR_host(QSPAPR_pci_host *host,
++                                   QGuestAllocator *alloc)
 +{
-     assert(qts);
- 
--    ret->alloc = alloc;
-+    qpci->alloc = alloc;
- 
--    ret->bus.pio_readb = qpci_spapr_pio_readb;
--    ret->bus.pio_readw = qpci_spapr_pio_readw;
--    ret->bus.pio_readl = qpci_spapr_pio_readl;
--    ret->bus.pio_readq = qpci_spapr_pio_readq;
-+    qpci->bus.pio_readb = qpci_spapr_pio_readb;
-+    qpci->bus.pio_readw = qpci_spapr_pio_readw;
-+    qpci->bus.pio_readl = qpci_spapr_pio_readl;
-+    qpci->bus.pio_readq = qpci_spapr_pio_readq;
- 
--    ret->bus.pio_writeb = qpci_spapr_pio_writeb;
--    ret->bus.pio_writew = qpci_spapr_pio_writew;
--    ret->bus.pio_writel = qpci_spapr_pio_writel;
--    ret->bus.pio_writeq = qpci_spapr_pio_writeq;
-+    qpci->bus.pio_writeb = qpci_spapr_pio_writeb;
-+    qpci->bus.pio_writew = qpci_spapr_pio_writew;
-+    qpci->bus.pio_writel = qpci_spapr_pio_writel;
-+    qpci->bus.pio_writeq = qpci_spapr_pio_writeq;
- 
--    ret->bus.memread = qpci_spapr_memread;
--    ret->bus.memwrite = qpci_spapr_memwrite;
-+    qpci->bus.memread = qpci_spapr_memread;
-+    qpci->bus.memwrite = qpci_spapr_memwrite;
- 
--    ret->bus.config_readb = qpci_spapr_config_readb;
--    ret->bus.config_readw = qpci_spapr_config_readw;
--    ret->bus.config_readl = qpci_spapr_config_readl;
-+    qpci->bus.config_readb = qpci_spapr_config_readb;
-+    qpci->bus.config_readw = qpci_spapr_config_readw;
-+    qpci->bus.config_readl = qpci_spapr_config_readl;
- 
--    ret->bus.config_writeb = qpci_spapr_config_writeb;
--    ret->bus.config_writew = qpci_spapr_config_writew;
--    ret->bus.config_writel = qpci_spapr_config_writel;
-+    qpci->bus.config_writeb = qpci_spapr_config_writeb;
-+    qpci->bus.config_writew = qpci_spapr_config_writew;
-+    qpci->bus.config_writel = qpci_spapr_config_writel;
- 
-     /* FIXME: We assume the default location of the PHB for now.
-      * Ideally we'd parse the device tree deposited in the guest to
-      * get the window locations */
--    ret->buid = 0x800000020000000ULL;
-+    qpci->buid = 0x800000020000000ULL;
- 
--    ret->pio_cpu_base = SPAPR_PCI_BASE;
--    ret->pio.pci_base = 0;
--    ret->pio.size = SPAPR_PCI_IO_WIN_SIZE;
-+    qpci->pio_cpu_base = SPAPR_PCI_BASE;
-+    qpci->pio.pci_base = 0;
-+    qpci->pio.size = SPAPR_PCI_IO_WIN_SIZE;
- 
-     /* 32-bit portion of the MMIO window is at PCI address 2..4 GiB */
--    ret->mmio32_cpu_base = SPAPR_PCI_BASE;
--    ret->mmio32.pci_base = SPAPR_PCI_MMIO32_WIN_SIZE;
--    ret->mmio32.size = SPAPR_PCI_MMIO32_WIN_SIZE;
-+    qpci->mmio32_cpu_base = SPAPR_PCI_BASE;
-+    qpci->mmio32.pci_base = SPAPR_PCI_MMIO32_WIN_SIZE;
-+    qpci->mmio32.size = SPAPR_PCI_MMIO32_WIN_SIZE;
- 
--    ret->bus.qts = qts;
--    ret->bus.pio_alloc_ptr = 0xc000;
--    ret->bus.mmio_alloc_ptr = ret->mmio32.pci_base;
--    ret->bus.mmio_limit = ret->mmio32.pci_base + ret->mmio32.size;
-+    qpci->bus.qts = qts;
-+    qpci->bus.pio_alloc_ptr = 0xc000;
-+    qpci->bus.mmio_alloc_ptr = qpci->mmio32.pci_base;
-+    qpci->bus.mmio_limit = qpci->mmio32.pci_base + qpci->mmio32.size;
- 
--    return &ret->bus;
-+    qpci->obj.get_driver = qpci_spapr_get_driver;
++    host->obj.get_device = QSPAPR_host_get_device;
++    qpci_init_spapr(&host->pci, global_qtest, alloc);
 +}
 +
-+QPCIBus *qpci_new_spapr(QTestState *qts, QGuestAllocator *alloc)
++/* ppc64/pseries machine */
++
++static void spapr_destructor(QOSGraphObject *obj)
 +{
-+    QPCIBusSPAPR *qpci = g_new0(QPCIBusSPAPR, 1);
-+    qpci_init_spapr(qpci, qts, alloc);
++    Qppc64_pseriesMachine *machine = (Qppc64_pseriesMachine *) obj;
++    spapr_alloc_uninit(machine->alloc);
++    g_free(obj);
++}
 +
-+    return &qpci->bus;
- }
- 
- void qpci_free_spapr(QPCIBus *bus)
- {
--    QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
-+    QPCIBusSPAPR *s;
-+
-+    if (!bus) {
-+        return;
++static void *spapr_get_driver(void *object, const char *interface)
++{
++    Qppc64_pseriesMachine *machine = object;
++    if (!g_strcmp0(interface, "memory")) {
++        return machine->alloc;
 +    }
-+    s = container_of(bus, QPCIBusSPAPR, bus);
- 
-     g_free(s);
- }
 +
-+static void qpci_spapr_register_nodes(void)
-+{
-+    qos_node_create_driver("pci-bus-spapr", NULL);
-+    qos_node_produces("pci-bus-spapr", "pci-bus");
++    fprintf(stderr, "%s not present in ppc64/pseries\n", interface);
++    g_assert_not_reached();
 +}
 +
-+libqos_init(qpci_spapr_register_nodes);
-diff --git a/tests/libqos/pci-spapr.h b/tests/libqos/pci-spapr.h
-index 177e8c002c..d9e25631c6 100644
---- a/tests/libqos/pci-spapr.h
-+++ b/tests/libqos/pci-spapr.h
-@@ -10,7 +10,31 @@
- 
- #include "libqos/malloc.h"
- #include "libqos/pci.h"
-+#include "libqos/qgraph.h"
- 
-+/* From include/hw/pci-host/spapr.h */
++static QOSGraphObject *spapr_get_device(void *obj, const char *device)
++{
++    Qppc64_pseriesMachine *machine = obj;
++    if (!g_strcmp0(device, "spapr-pci-host-bridge")) {
++        return &machine->bridge.obj;
++    }
 +
-+typedef struct QPCIWindow {
-+    uint64_t pci_base;    /* window address in PCI space */
-+    uint64_t size;        /* window size */
-+} QPCIWindow;
++    fprintf(stderr, "%s not present in ppc64/pseries\n", device);
++    g_assert_not_reached();
++}
 +
-+typedef struct QPCIBusSPAPR {
-+    QOSGraphObject obj;
-+    QPCIBus bus;
-+    QGuestAllocator *alloc;
++static void *qos_create_machine_spapr(void)
++{
++    Qppc64_pseriesMachine *machine = g_new0(Qppc64_pseriesMachine, 1);
++    machine->obj.get_device = spapr_get_device;
++    machine->obj.get_driver = spapr_get_driver;
++    machine->obj.destructor = spapr_destructor;
++    machine->alloc =  spapr_alloc_init_flags(global_qtest,
++                                             ALLOC_NO_FLAGS);
++    qos_create_QSPAPR_host(&machine->bridge, machine->alloc);
 +
-+    uint64_t buid;
++    return &machine->obj;
++}
 +
-+    uint64_t pio_cpu_base;
-+    QPCIWindow pio;
++static void spapr_machine_register_nodes(void)
++{
++    qos_node_create_machine("ppc64/pseries", qos_create_machine_spapr);
++    qos_node_create_driver("spapr-pci-host-bridge", NULL);
++    qos_node_contains("ppc64/pseries", "spapr-pci-host-bridge", NULL);
++    qos_node_contains("spapr-pci-host-bridge", "pci-bus-spapr", NULL);
++}
 +
-+    uint64_t mmio32_cpu_base;
-+    QPCIWindow mmio32;
-+} QPCIBusSPAPR;
++libqos_init(spapr_machine_register_nodes);
 +
-+void qpci_init_spapr(QPCIBusSPAPR *ret, QTestState *qts,
-+                     QGuestAllocator *alloc);
- QPCIBus *qpci_new_spapr(QTestState *qts, QGuestAllocator *alloc);
- void     qpci_free_spapr(QPCIBus *bus);
- 
 -- 
 2.17.1
