@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tO-0007n4-SA
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:09 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tN-0007lH-5f
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tM-0002oV-Nx
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:06 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tK-0002nE-GX
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:05 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 13 Aug 2018 12:14:42 +0200
-Message-Id: <20180813101453.10200-23-e.emanuelegiuseppe@gmail.com>
+Date: Mon, 13 Aug 2018 12:14:41 +0200
+Message-Id: <20180813101453.10200-22-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
 References: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 22/33] tests/qgraph: virtio-9p test node
+Subject: [Qemu-devel] [PATCH 21/33] tests/qgraph: virtio-9p driver and
+ interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,490 +25,249 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8
 
 Add qgraph nodes for virtio-9p-pci and virtio-9p-device.
 Both nodes produce virtio-9p, but virtio-9p-pci receives
-a pci-bus and uses virtio-pci QOSGraphObject and functions,
+a pci-bus and overrides virtio-pci QOSGraphObject and its functions,
 while virtio-9p-device receives a virtio and implements
 its own functions
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
- tests/Makefile.include |   3 +-
- tests/virtio-9p-test.c | 219 +++++++++++++++--------------------------
- 2 files changed, 82 insertions(+), 140 deletions(-)
+ tests/Makefile.include   |   1 +
+ tests/libqos/virtio-9p.c | 165 +++++++++++++++++++++++++++++++++++++++
+ tests/libqos/virtio-9p.h |  42 ++++++++++
+ 3 files changed, 208 insertions(+)
+ create mode 100644 tests/libqos/virtio-9p.c
+ create mode 100644 tests/libqos/virtio-9p.h
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 48d3aab447..495ff5ca9b 100644
+index eafceefc12..48d3aab447 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -201,7 +201,6 @@ gcov-files-virtio-y += hw/virtio/virtio-rng.c
- check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
- gcov-files-virtio-y += i386-softmmu/hw/scsi/virtio-scsi.c
- ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
--check-qtest-virtio-y += tests/virtio-9p-test$(EXESUF)
- gcov-files-virtio-y += hw/9pfs/virtio-9p.c
- gcov-files-virtio-y += i386-softmmu/hw/9pfs/virtio-9p-device.c
- endif
-@@ -783,6 +782,7 @@ libqgraph-tests-obj-y += tests/sdhci-test.o
- libqgraph-tests-obj-y += tests/e1000e-test.o
- libqgraph-tests-obj-y += tests/virtio-serial-test.o
- libqgraph-tests-obj-y += tests/virtio-console-test.o
-+libqgraph-tests-obj-y += tests/virtio-9p-test.o
+@@ -770,6 +770,7 @@ libqgraph-machines-obj-y += tests/libqos/ppc64_pseries-machine.o
+ libqgraph-machines-obj-y += tests/libqos/virt-machine.o
  
- check-unit-y += tests/test-qgraph$(EXESUF)
- tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
-@@ -831,7 +831,6 @@ tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
- tests/virtio-net-test$(EXESUF): tests/virtio-net-test.o $(libqos-pc-obj-y) $(libqos-virtio-obj-y)
- tests/virtio-rng-test$(EXESUF): tests/virtio-rng-test.o $(libqos-pc-obj-y)
- tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
--tests/virtio-9p-test$(EXESUF): tests/virtio-9p-test.o $(libqos-virtio-obj-y)
- tests/tpci200-test$(EXESUF): tests/tpci200-test.o
- tests/display-vga-test$(EXESUF): tests/display-vga-test.o
- tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index d275c74106..7a80c1d785 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -9,99 +9,36 @@
+ libqgraph-virtio-obj-y = tests/libqos/virtio-serial.o
++libqgraph-virtio-obj-y += tests/libqos/virtio-9p.o
  
- #include "qemu/osdep.h"
- #include "libqtest.h"
--#include "qemu-common.h"
--#include "libqos/libqos-pc.h"
--#include "libqos/libqos-spapr.h"
--#include "libqos/virtio.h"
--#include "libqos/virtio-pci.h"
--#include "standard-headers/linux/virtio_ids.h"
--#include "standard-headers/linux/virtio_pci.h"
- #include "hw/9pfs/9p.h"
- #include "hw/9pfs/9p-synth.h"
+ libqgraph-pci-obj-y = $(libqos-virtio-obj-y)
+ libqgraph-pci-obj-y += $(libqgraph-machines-obj-y)
+diff --git a/tests/libqos/virtio-9p.c b/tests/libqos/virtio-9p.c
+new file mode 100644
+index 0000000000..df60db8f39
+--- /dev/null
++++ b/tests/libqos/virtio-9p.c
+@@ -0,0 +1,165 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "standard-headers/linux/virtio_ids.h"
 +#include "libqos/virtio-9p.h"
 +#include "libqos/qgraph.h"
- 
- #define QVIRTIO_9P_TIMEOUT_US (10 * 1000 * 1000)
-+static QGuestAllocator *alloc;
- 
--static const char mount_tag[] = "qtest";
--
--typedef struct {
--    QVirtioDevice *dev;
--    QOSState *qs;
--    QVirtQueue *vq;
--} QVirtIO9P;
--
--static QVirtIO9P *qvirtio_9p_start(const char *driver)
--{
--    const char *arch = qtest_get_arch();
--    const char *cmd = "-fsdev synth,id=fsdev0 "
--                      "-device %s,fsdev=fsdev0,mount_tag=%s";
--    QVirtIO9P *v9p = g_new0(QVirtIO9P, 1);
--
--    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        v9p->qs = qtest_pc_boot(cmd, driver, mount_tag);
--    } else if (strcmp(arch, "ppc64") == 0) {
--        v9p->qs = qtest_spapr_boot(cmd, driver, mount_tag);
--    } else {
--        g_printerr("virtio-9p tests are only available on x86 or ppc64\n");
--        exit(EXIT_FAILURE);
--    }
--    global_qtest = v9p->qs->qts;
--
--    return v9p;
--}
--
--static void qvirtio_9p_stop(QVirtIO9P *v9p)
--{
--    qtest_shutdown(v9p->qs);
--    g_free(v9p);
--}
--
--static QVirtIO9P *qvirtio_9p_pci_start(void)
--{
--    QVirtIO9P *v9p = qvirtio_9p_start("virtio-9p-pci");
--    QVirtioPCIDevice *dev = qvirtio_pci_device_find(v9p->qs->pcibus,
--                                                    VIRTIO_ID_9P);
--    g_assert_nonnull(dev);
--    g_assert_cmphex(dev->vdev.device_type, ==, VIRTIO_ID_9P);
--    v9p->dev = (QVirtioDevice *) dev;
--
--    qvirtio_pci_device_enable(dev);
--    qvirtio_start_device(v9p->dev);
--
--    v9p->vq = qvirtqueue_setup(v9p->dev, v9p->qs->alloc, 0);
--
--    qvirtio_set_driver_ok(v9p->dev);
--
--    return v9p;
--}
--
--static void qvirtio_9p_pci_stop(QVirtIO9P *v9p)
-+static void pci_config(void *obj, void *data, QGuestAllocator *t_alloc)
- {
--    qvirtqueue_cleanup(v9p->dev->bus, v9p->vq, v9p->qs->alloc);
--    qvirtio_pci_device_disable(container_of(v9p->dev, QVirtioPCIDevice, vdev));
--    qvirtio_pci_device_free((QVirtioPCIDevice *)v9p->dev);
--    qvirtio_9p_stop(v9p);
--}
--
--static void pci_config(QVirtIO9P *v9p)
--{
--    size_t tag_len = qvirtio_config_readw(v9p->dev, 0);
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-+    size_t tag_len = qvirtio_config_readw(v9p->vdev, 0);
-     char *tag;
-     int i;
- 
--    g_assert_cmpint(tag_len, ==, strlen(mount_tag));
-+    g_assert_cmpint(tag_len, ==, strlen(MOUNT_TAG));
- 
-     tag = g_malloc(tag_len);
-     for (i = 0; i < tag_len; i++) {
--        tag[i] = qvirtio_config_readb(v9p->dev, i + 2);
-+        tag[i] = qvirtio_config_readb(v9p->vdev, i + 2);
-     }
--    g_assert_cmpmem(tag, tag_len, mount_tag, tag_len);
-+    g_assert_cmpmem(tag, tag_len, MOUNT_TAG, tag_len);
-     g_free(tag);
- }
- 
- #define P9_MAX_SIZE 4096 /* Max size of a T-message or R-message */
- 
- typedef struct {
--    QVirtIO9P *v9p;
-+    QVirtio9P *v9p;
-     uint16_t tag;
-     uint64_t t_msg;
-     uint32_t t_size;
-@@ -204,7 +141,7 @@ static void v9fs_string_read(P9Req *req, uint16_t *len, char **string)
-     uint16_t tag;
- } QEMU_PACKED P9Hdr;
- 
--static P9Req *v9fs_req_init(QVirtIO9P *v9p, uint32_t size, uint8_t id,
-+static P9Req *v9fs_req_init(QVirtio9P *v9p, uint32_t size, uint8_t id,
-                             uint16_t tag)
- {
-     P9Req *req = g_new0(P9Req, 1);
-@@ -222,7 +159,7 @@ static P9Req *v9fs_req_init(QVirtIO9P *v9p, uint32_t size, uint8_t id,
- 
-     req->v9p = v9p;
-     req->t_size = total_size;
--    req->t_msg = guest_alloc(v9p->qs->alloc, req->t_size);
-+    req->t_msg = guest_alloc(alloc, req->t_size);
-     v9fs_memwrite(req, &hdr, 7);
-     req->tag = tag;
-     return req;
-@@ -230,13 +167,13 @@ static P9Req *v9fs_req_init(QVirtIO9P *v9p, uint32_t size, uint8_t id,
- 
- static void v9fs_req_send(P9Req *req)
- {
--    QVirtIO9P *v9p = req->v9p;
-+    QVirtio9P *v9p = req->v9p;
- 
--    req->r_msg = guest_alloc(v9p->qs->alloc, P9_MAX_SIZE);
-+    req->r_msg = guest_alloc(alloc, P9_MAX_SIZE);
-     req->free_head = qvirtqueue_add(v9p->vq, req->t_msg, req->t_size, false,
-                                     true);
-     qvirtqueue_add(v9p->vq, req->r_msg, P9_MAX_SIZE, true, false);
--    qvirtqueue_kick(v9p->dev, v9p->vq, req->free_head);
-+    qvirtqueue_kick(v9p->vdev, v9p->vq, req->free_head);
-     req->t_off = 0;
- }
- 
-@@ -255,9 +192,9 @@ static const char *rmessage_name(uint8_t id)
- 
- static void v9fs_req_wait_for_reply(P9Req *req, uint32_t *len)
- {
--    QVirtIO9P *v9p = req->v9p;
-+    QVirtio9P *v9p = req->v9p;
- 
--    qvirtio_wait_used_elem(v9p->dev, v9p->vq, req->free_head, len,
-+    qvirtio_wait_used_elem(v9p->vdev, v9p->vq, req->free_head, len,
-                            QVIRTIO_9P_TIMEOUT_US);
- }
- 
-@@ -288,10 +225,8 @@ static void v9fs_req_recv(P9Req *req, uint8_t id)
- 
- static void v9fs_req_free(P9Req *req)
- {
--    QVirtIO9P *v9p = req->v9p;
--
--    guest_free(v9p->qs->alloc, req->t_msg);
--    guest_free(v9p->qs->alloc, req->r_msg);
-+    guest_free(alloc, req->t_msg);
-+    guest_free(alloc, req->r_msg);
-     g_free(req);
- }
- 
-@@ -304,7 +239,7 @@ static void v9fs_rlerror(P9Req *req, uint32_t *err)
- }
- 
- /* size[4] Tversion tag[2] msize[4] version[s] */
--static P9Req *v9fs_tversion(QVirtIO9P *v9p, uint32_t msize, const char *version,
-+static P9Req *v9fs_tversion(QVirtio9P *v9p, uint32_t msize, const char *version,
-                             uint16_t tag)
- {
-     P9Req *req;
-@@ -339,7 +274,7 @@ static void v9fs_rversion(P9Req *req, uint16_t *len, char **version)
- }
- 
- /* size[4] Tattach tag[2] fid[4] afid[4] uname[s] aname[s] n_uname[4] */
--static P9Req *v9fs_tattach(QVirtIO9P *v9p, uint32_t fid, uint32_t n_uname,
-+static P9Req *v9fs_tattach(QVirtio9P *v9p, uint32_t fid, uint32_t n_uname,
-                            uint16_t tag)
- {
-     const char *uname = ""; /* ignored by QEMU */
-@@ -368,7 +303,7 @@ static void v9fs_rattach(P9Req *req, v9fs_qid *qid)
- }
- 
- /* size[4] Twalk tag[2] fid[4] newfid[4] nwname[2] nwname*(wname[s]) */
--static P9Req *v9fs_twalk(QVirtIO9P *v9p, uint32_t fid, uint32_t newfid,
-+static P9Req *v9fs_twalk(QVirtio9P *v9p, uint32_t fid, uint32_t newfid,
-                          uint16_t nwname, char *const wnames[], uint16_t tag)
- {
-     P9Req *req;
-@@ -410,7 +345,7 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid, v9fs_qid **wqid)
- }
- 
- /* size[4] Tlopen tag[2] fid[4] flags[4] */
--static P9Req *v9fs_tlopen(QVirtIO9P *v9p, uint32_t fid, uint32_t flags,
-+static P9Req *v9fs_tlopen(QVirtio9P *v9p, uint32_t fid, uint32_t flags,
-                           uint16_t tag)
- {
-     P9Req *req;
-@@ -438,7 +373,7 @@ static void v9fs_rlopen(P9Req *req, v9fs_qid *qid, uint32_t *iounit)
- }
- 
- /* size[4] Twrite tag[2] fid[4] offset[8] count[4] data[count] */
--static P9Req *v9fs_twrite(QVirtIO9P *v9p, uint32_t fid, uint64_t offset,
-+static P9Req *v9fs_twrite(QVirtio9P *v9p, uint32_t fid, uint64_t offset,
-                           uint32_t count, const void *data, uint16_t tag)
- {
-     P9Req *req;
-@@ -466,7 +401,7 @@ static void v9fs_rwrite(P9Req *req, uint32_t *count)
- }
- 
- /* size[4] Tflush tag[2] oldtag[2] */
--static P9Req *v9fs_tflush(QVirtIO9P *v9p, uint16_t oldtag, uint16_t tag)
-+static P9Req *v9fs_tflush(QVirtio9P *v9p, uint16_t oldtag, uint16_t tag)
- {
-     P9Req *req;
- 
-@@ -483,8 +418,10 @@ static void v9fs_rflush(P9Req *req)
-     v9fs_req_free(req);
- }
- 
--static void fs_version(QVirtIO9P *v9p)
-+static void fs_version(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-     const char *version = "9P2000.L";
-     uint16_t server_len;
-     char *server_version;
-@@ -499,18 +436,22 @@ static void fs_version(QVirtIO9P *v9p)
-     g_free(server_version);
- }
- 
--static void fs_attach(QVirtIO9P *v9p)
-+static void fs_attach(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-     P9Req *req;
- 
--    fs_version(v9p);
-+    fs_version(v9p, NULL, t_alloc);
-     req = v9fs_tattach(v9p, 0, getuid(), 0);
-     v9fs_req_wait_for_reply(req, NULL);
-     v9fs_rattach(req, NULL);
- }
- 
--static void fs_walk(QVirtIO9P *v9p)
-+static void fs_walk(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-     char *wnames[P9_MAXWELEM];
-     uint16_t nwqid;
-     v9fs_qid *wqid;
-@@ -521,7 +462,7 @@ static void fs_walk(QVirtIO9P *v9p)
-         wnames[i] = g_strdup_printf(QTEST_V9FS_SYNTH_WALK_FILE, i);
-     }
- 
--    fs_attach(v9p);
-+    fs_attach(v9p, NULL, t_alloc);
-     req = v9fs_twalk(v9p, 0, 1, P9_MAXWELEM, wnames, 0);
-     v9fs_req_wait_for_reply(req, NULL);
-     v9fs_rwalk(req, &nwqid, &wqid);
-@@ -535,13 +476,15 @@ static void fs_walk(QVirtIO9P *v9p)
-     g_free(wqid);
- }
- 
--static void fs_walk_no_slash(QVirtIO9P *v9p)
-+static void fs_walk_no_slash(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-     char *const wnames[] = { g_strdup(" /") };
-     P9Req *req;
-     uint32_t err;
- 
--    fs_attach(v9p);
-+    fs_attach(v9p, NULL, t_alloc);
-     req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-     v9fs_req_wait_for_reply(req, NULL);
-     v9fs_rlerror(req, &err);
-@@ -551,13 +494,15 @@ static void fs_walk_no_slash(QVirtIO9P *v9p)
-     g_free(wnames[0]);
- }
- 
--static void fs_walk_dotdot(QVirtIO9P *v9p)
-+static void fs_walk_dotdot(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-     char *const wnames[] = { g_strdup("..") };
-     v9fs_qid root_qid, *wqid;
-     P9Req *req;
- 
--    fs_version(v9p);
-+    fs_version(v9p, NULL, t_alloc);
-     req = v9fs_tattach(v9p, 0, getuid(), 0);
-     v9fs_req_wait_for_reply(req, NULL);
-     v9fs_rattach(req, &root_qid);
-@@ -572,12 +517,14 @@ static void fs_walk_dotdot(QVirtIO9P *v9p)
-     g_free(wnames[0]);
- }
- 
--static void fs_lopen(QVirtIO9P *v9p)
-+static void fs_lopen(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-     char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_LOPEN_FILE) };
-     P9Req *req;
- 
--    fs_attach(v9p);
-+    fs_attach(v9p, NULL, t_alloc);
-     req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-     v9fs_req_wait_for_reply(req, NULL);
-     v9fs_rwalk(req, NULL, NULL);
-@@ -589,15 +536,17 @@ static void fs_lopen(QVirtIO9P *v9p)
-     g_free(wnames[0]);
- }
- 
--static void fs_write(QVirtIO9P *v9p)
-+static void fs_write(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-     static const uint32_t write_count = P9_MAX_SIZE / 2;
-     char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_WRITE_FILE) };
-     char *buf = g_malloc0(write_count);
-     uint32_t count;
-     P9Req *req;
- 
--    fs_attach(v9p);
-+    fs_attach(v9p, NULL, t_alloc);
-     req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-     v9fs_req_wait_for_reply(req, NULL);
-     v9fs_rwalk(req, NULL, NULL);
-@@ -615,14 +564,16 @@ static void fs_write(QVirtIO9P *v9p)
-     g_free(wnames[0]);
- }
- 
--static void fs_flush_success(QVirtIO9P *v9p)
-+static void fs_flush_success(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-     char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_FLUSH_FILE) };
-     P9Req *req, *flush_req;
-     uint32_t reply_len;
-     uint8_t should_block;
- 
--    fs_attach(v9p);
-+    fs_attach(v9p, NULL, t_alloc);
-     req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-     v9fs_req_wait_for_reply(req, NULL);
-     v9fs_rwalk(req, NULL, NULL);
-@@ -650,14 +601,16 @@ static void fs_flush_success(QVirtIO9P *v9p)
-     g_free(wnames[0]);
- }
- 
--static void fs_flush_ignored(QVirtIO9P *v9p)
-+static void fs_flush_ignored(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-     char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_FLUSH_FILE) };
-     P9Req *req, *flush_req;
-     uint32_t count;
-     uint8_t should_block;
- 
--    fs_attach(v9p);
-+    fs_attach(v9p, NULL, t_alloc);
-     req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-     v9fs_req_wait_for_reply(req, NULL);
-     v9fs_rwalk(req, NULL, NULL);
-@@ -685,39 +638,29 @@ static void fs_flush_ignored(QVirtIO9P *v9p)
-     g_free(wnames[0]);
- }
- 
--typedef void (*v9fs_test_fn)(QVirtIO9P *v9p);
--
--static void v9fs_run_pci_test(gconstpointer data)
-+static void virtio_nop(void *obj, void *data, QGuestAllocator *t_alloc)
- {
--    v9fs_test_fn fn = data;
--    QVirtIO9P *v9p = qvirtio_9p_pci_start();
--
--    if (fn) {
--        fn(v9p);
--    }
--    qvirtio_9p_pci_stop(v9p);
-+    /* no operation */
- }
- 
--static void v9fs_qtest_pci_add(const char *path, v9fs_test_fn fn)
--{
--    qtest_add_data_func(path, fn, v9fs_run_pci_test);
--}
- 
--int main(int argc, char **argv)
-+static void register_virtio_9p_test(void)
- {
--    g_test_init(&argc, &argv, NULL);
--    v9fs_qtest_pci_add("/virtio/9p/pci/nop", NULL);
--    v9fs_qtest_pci_add("/virtio/9p/pci/config", pci_config);
--    v9fs_qtest_pci_add("/virtio/9p/pci/fs/version/basic", fs_version);
--    v9fs_qtest_pci_add("/virtio/9p/pci/fs/attach/basic", fs_attach);
--    v9fs_qtest_pci_add("/virtio/9p/pci/fs/walk/basic", fs_walk);
--    v9fs_qtest_pci_add("/virtio/9p/pci/fs/walk/no_slash", fs_walk_no_slash);
--    v9fs_qtest_pci_add("/virtio/9p/pci/fs/walk/dotdot_from_root",
--                       fs_walk_dotdot);
--    v9fs_qtest_pci_add("/virtio/9p/pci/fs/lopen/basic", fs_lopen);
--    v9fs_qtest_pci_add("/virtio/9p/pci/fs/write/basic", fs_write);
--    v9fs_qtest_pci_add("/virtio/9p/pci/fs/flush/success", fs_flush_success);
--    v9fs_qtest_pci_add("/virtio/9p/pci/fs/flush/ignored", fs_flush_ignored);
--
--    return g_test_run();
-+    qos_add_test("virtio-9p-nop", "virtio-9p", virtio_nop, NULL);
-+    qos_add_test("virtio-9p-config", "virtio-9p", pci_config, NULL);
-+    qos_add_test("virtio-9p-fs/version/basic", "virtio-9p", fs_version, NULL);
-+    qos_add_test("virtio-9p-fs/attach/basic", "virtio-9p", fs_attach, NULL);
-+    qos_add_test("virtio-9p-fs/walk/basic", "virtio-9p", fs_walk, NULL);
-+    qos_add_test("virtio-9p-fs/walk/no_slash", "virtio-9p", fs_walk_no_slash,
-+                 NULL);
-+    qos_add_test("virtio-9p-fs/walk/dotdot_from_root", "virtio-9p",
-+                 fs_walk_dotdot, NULL);
-+    qos_add_test("virtio-9p-fs/lopen/basic", "virtio-9p", fs_lopen, NULL);
-+    qos_add_test("virtio-9p-fs/write/basic", "virtio-9p", fs_write, NULL);
-+    qos_add_test("virtio-9p-fs/flush/success", "virtio-9p", fs_flush_success,
-+                 NULL);
-+    qos_add_test("virtio-9p-fs/flush/ignored", "virtio-9p", fs_flush_ignored,
-+                 NULL);
- }
 +
-+libqos_init(register_virtio_9p_test);
++static QGuestAllocator *alloc;
++
++static void virtio_9p_cleanup(QVirtio9P *interface)
++{
++    qvirtqueue_cleanup(interface->vdev->bus, interface->vq, alloc);
++}
++
++static void virtio_9p_setup(QVirtio9P *interface)
++{
++    interface->vq = qvirtqueue_setup(interface->vdev, alloc, 0);
++    qvirtio_set_driver_ok(interface->vdev);
++}
++
++/* virtio-9p-device */
++static void virtio_9p_device_destructor(QOSGraphObject *obj)
++{
++    QVirtio9PDevice *v_9p = (QVirtio9PDevice *) obj;
++    QVirtio9P *interface = &v_9p->v9p;
++    virtio_9p_cleanup(interface);
++
++    g_free(v_9p);
++}
++
++static void virtio_9p_device_start_hw(QOSGraphObject *obj)
++{
++    QVirtio9PDevice *v_9p = (QVirtio9PDevice *) obj;
++    QVirtio9P *interface = &v_9p->v9p;
++
++    virtio_9p_setup(interface);
++}
++
++static void *virtio_9p_device_get_driver(void *object, const char *interface)
++{
++    QVirtio9PDevice *v_9p = object;
++    if (!g_strcmp0(interface, "virtio-9p")) {
++        return &v_9p->v9p;
++    }
++
++    fprintf(stderr, "%s not present in virtio-9p-device\n", interface);
++    g_assert_not_reached();
++}
++
++static void *virtio_9p_device_create(void *virtio_dev,
++                                     QGuestAllocator *t_alloc,
++                                     void *addr)
++{
++    QVirtio9PDevice *virtio_device = g_new0(QVirtio9PDevice, 1);
++    QVirtio9P *interface = &virtio_device->v9p;
++
++    interface->vdev = virtio_dev;
++    alloc = t_alloc;
++
++    virtio_device->obj.destructor = virtio_9p_device_destructor;
++    virtio_device->obj.get_driver = virtio_9p_device_get_driver;
++    virtio_device->obj.start_hw = virtio_9p_device_start_hw;
++
++    return &virtio_device->obj;
++}
++
++/* virtio-9p-pci */
++static void virtio_9p_pci_destructor(QOSGraphObject *obj)
++{
++    QVirtio9PPCI *v9_pci = (QVirtio9PPCI *) obj;
++    QVirtio9P *interface = &v9_pci->v9p;
++    QOSGraphObject *pci_vobj =  &v9_pci->pci_vdev.obj;
++
++    virtio_9p_cleanup(interface);
++    qvirtio_pci_destructor(pci_vobj);
++    g_free(v9_pci);
++}
++
++static void virtio_9p_pci_start_hw(QOSGraphObject *obj)
++{
++    QVirtio9PPCI *v9_pci = (QVirtio9PPCI *) obj;
++    QVirtio9P *interface = &v9_pci->v9p;
++    QOSGraphObject *pci_vobj =  &v9_pci->pci_vdev.obj;
++
++    qvirtio_pci_start_hw(pci_vobj);
++    virtio_9p_setup(interface);
++}
++
++static void *virtio_9p_pci_get_driver(void *object, const char *interface)
++{
++    QVirtio9PPCI *v9p = object;
++    if (!g_strcmp0(interface, "virtio-9p")) {
++        return &v9p->v9p;
++    }
++
++    fprintf(stderr, "%s not present in virtio-9p-pci\n", interface);
++    g_assert_not_reached();
++}
++
++static void *virtio_9p_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
++                                  void *addr)
++{
++    QVirtio9PPCI *v9_pci = g_new0(QVirtio9PPCI, 1);
++    QVirtio9P *interface = &v9_pci->v9p;
++    QOSGraphObject *obj = &v9_pci->pci_vdev.obj;
++
++    virtio_pci_init(&v9_pci->pci_vdev, pci_bus, addr);
++    interface->vdev = &v9_pci->pci_vdev.vdev;
++    alloc = t_alloc;
++
++    g_assert_cmphex(interface->vdev->device_type, ==, VIRTIO_ID_9P);
++
++    obj->destructor = virtio_9p_pci_destructor;
++    obj->start_hw = virtio_9p_pci_start_hw;
++    obj->get_driver = virtio_9p_pci_get_driver;
++
++    return obj;
++}
++
++static void virtio_9p_register_nodes(void)
++{
++    const char *str_simple = "fsdev=fsdev0,mount_tag=" MOUNT_TAG;
++    const char *str_addr = "fsdev=fsdev0,addr=04.0,mount_tag=" MOUNT_TAG;
++
++    QPCIAddress addr = {
++        .devfn = QPCI_DEVFN(4, 0),
++    };
++
++    QOSGraphEdgeOptions opts = {
++        .before_cmd_line = "-fsdev synth,id=fsdev0",
++    };
++
++    /* virtio-9p-device */
++    opts.extra_device_opts = str_simple,
++    qos_node_create_driver("virtio-9p-device", virtio_9p_device_create);
++    qos_node_consumes("virtio-9p-device", "virtio", &opts);
++    qos_node_produces("virtio-9p-device", "virtio-9p");
++
++    /* virtio-9p-pci */
++    opts.extra_device_opts = str_addr;
++    add_qpci_address(&opts, &addr);
++    qos_node_create_driver("virtio-9p-pci", virtio_9p_pci_create);
++    qos_node_consumes("virtio-9p-pci", "pci-bus", &opts);
++    qos_node_produces("virtio-9p-pci", "virtio-9p");
++
++}
++
++libqos_init(virtio_9p_register_nodes);
+diff --git a/tests/libqos/virtio-9p.h b/tests/libqos/virtio-9p.h
+new file mode 100644
+index 0000000000..dba22772b5
+--- /dev/null
++++ b/tests/libqos/virtio-9p.h
+@@ -0,0 +1,42 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "libqos/qgraph.h"
++#include "libqos/virtio.h"
++#include "libqos/virtio-pci.h"
++
++typedef struct QVirtio9P QVirtio9P;
++typedef struct QVirtio9PPCI QVirtio9PPCI;
++typedef struct QVirtio9PDevice QVirtio9PDevice;
++
++#define MOUNT_TAG "qtest"
++
++struct QVirtio9P {
++    QVirtioDevice *vdev;
++    QVirtQueue *vq;
++};
++
++struct QVirtio9PPCI {
++    QVirtioPCIDevice pci_vdev;
++    QVirtio9P v9p;
++};
++
++struct QVirtio9PDevice {
++    QOSGraphObject obj;
++    QVirtio9P v9p;
++};
 -- 
 2.17.1
