@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fpEeC-0002hL-BW
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:20:45 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fpEf9-0003E3-KV
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:21:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fpEeB-0000xA-F7
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:20:44 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fpEf8-0001J2-Uh
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:21:43 -0400
 References: <20180813022006.7216-1-mreitz@redhat.com>
-	<20180813022006.7216-3-mreitz@redhat.com>
-	<20180813125457.GA11625@kermit-br-ibm-com>
+	<20180813022006.7216-10-mreitz@redhat.com>
+	<400a8b57-a930-2eee-a4a0-bf5a0733db1a@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <fd3efd1e-520b-50ff-b1c5-ffcc08094f3a@redhat.com>
-Date: Mon, 13 Aug 2018 17:20:33 +0200
+Message-ID: <813769bd-7249-d831-b8c5-0050f9546cf4@redhat.com>
+Date: Mon, 13 Aug 2018 17:21:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180813125457.GA11625@kermit-br-ibm-com>
+In-Reply-To: <400a8b57-a930-2eee-a4a0-bf5a0733db1a@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="GBGVnQCMJ5bQMmqu2vaC22cTYC6LhmC00"
-Subject: Re: [Qemu-devel] [PATCH 02/17] mirror: Make
- wait_for_any_operation() coroutine_fn
+	boundary="1Tka9iUVxPNpbsVaG25yW3ZT4W6C8uijj"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 09/17] mirror: Lock AioContext
+ in mirror_co_perform()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GBGVnQCMJ5bQMmqu2vaC22cTYC6LhmC00
+--1Tka9iUVxPNpbsVaG25yW3ZT4W6C8uijj
 From: Max Reitz <mreitz@redhat.com>
-To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>,
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>,
  qemu-devel@nongnu.org
-Message-ID: <fd3efd1e-520b-50ff-b1c5-ffcc08094f3a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 02/17] mirror: Make wait_for_any_operation()
- coroutine_fn
+Message-ID: <813769bd-7249-d831-b8c5-0050f9546cf4@redhat.com>
+Subject: Re: [Qemu-block] [PATCH 09/17] mirror: Lock AioContext in
+ mirror_co_perform()
 References: <20180813022006.7216-1-mreitz@redhat.com>
- <20180813022006.7216-3-mreitz@redhat.com>
- <20180813125457.GA11625@kermit-br-ibm-com>
-In-Reply-To: <20180813125457.GA11625@kermit-br-ibm-com>
+ <20180813022006.7216-10-mreitz@redhat.com>
+ <400a8b57-a930-2eee-a4a0-bf5a0733db1a@redhat.com>
+In-Reply-To: <400a8b57-a930-2eee-a4a0-bf5a0733db1a@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-08-13 14:54, Murilo Opsfelder Araujo wrote:
-> Hi, Max.
-
-Hi, Murilo!
-
-> On Mon, Aug 13, 2018 at 04:19:51AM +0200, Max Reitz wrote:
->> mirror_wait_for_any_operation() calls qemu_co_queue_wait(), which is a=
-
->> coroutine_fn (technically it is a macro which resolves to a
->> coroutine_fn).  Therefore, this function needs to be a coroutine_fn as=
-
->> well.
->>
->> This patch makes it and all of its callers coroutine_fns.
->>
+On 2018-08-13 16:43, Paolo Bonzini wrote:
+> On 13/08/2018 04:19, Max Reitz wrote:
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/mirror.c | 30 ++++++++++++++++--------------
->>  1 file changed, 16 insertions(+), 14 deletions(-)
->>
->> diff --git a/block/mirror.c b/block/mirror.c
->> index 85f5742eae..c28b6159d5 100644
->> --- a/block/mirror.c
->> +++ b/block/mirror.c
-
-[...]
-
->> @@ -1098,11 +1100,11 @@ static void mirror_complete(Job *job, Error **=
-errp)
->>      job_enter(job);
->>  }
->>
->> -static void mirror_pause(Job *job)
->> +static void coroutine_fn mirror_pause(Job *job)
 >=20
-> Other functions in this patch were renamed to mirror_co_*.  I'm not sur=
-e if
-> mirror_pause() should follow that, i.e. be renamed to mirror_co_pause()=
-=2E
+> Locking AioContext should not be needed anywhere here.  mirror_run is
+> called via aio_co_enter or aio_co_wake, so the lock is actually already=
 
-Hm.  I don't know why I didn't do that.  Makes sense, why not.
+> taken every time you call aio_context_acquire.
+>=20
+> It was needed only because AIO callbacks do *not* take the lock, but
+> it's not needed anymore since the conversion to coroutines.
 
-(Well, JobDriver.pause() is not called .co_pause(), but then again,
-JobDriver.start is set to mirror_run(), so it's not like our function
-names match so far...)
+Uh, nice.  Thanks for letting me know! :-)
+
+I'll drop the locks in v2.
 
 Max
 
 
---GBGVnQCMJ5bQMmqu2vaC22cTYC6LhmC00
+--1Tka9iUVxPNpbsVaG25yW3ZT4W6C8uijj
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltxocEACgkQ9AfbAGHV
-z0D99wf/a4vX2Dg1vg4YXl8NgPxnw0+A4oE/ulQl4bHXs8iIgbxluFRlt8Rv5sgm
-reoQc9fy9WPNRwtDwIP8K3TZkxRt69lHqa1bKoowqczYQc3ou03G0O10F5vmOooW
-/6wJZEpSveKOcFPivajYNfw/lB4zXGkB1CMVduDXosZVMa0ojOi1DPI0O52kHWaL
-Et9j3TOPGc+sTC5MDF+VuNArnZVDI8+hBNf9WrzO19Q+2emwZRO9JynYejjtSO0d
-qYfod8GQpJPpKQfceRiixPdQscWG+BUM28bIQpZVezboLpnWJfatYBJsrChoN0Fa
-geucZgtvG+TaittQc0Mxk9dLdYtccg==
-=2l13
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltxof8ACgkQ9AfbAGHV
+z0B1vAf8CxG8FhnBj5jfSyFD36c2BPP5wxnNjEyLnLbHeATkfbwxvTTQkDKhIWKN
+eym1KzADEOmqdhxMPrA2K6bo1faXrfvMpQSj+vf0DzGsTxG6mVxOc0gNGzN+Dgwi
+iMrk7/xYFFaWerUsKIAzWGxyDaOu6+ZAlylqKIGlgBQ4YVhnBdtAd7xtqgpzpl3S
+tcfz/kObt1+tXp36qG+9L0/NWvGM1enk7r6jELSORF22iK7CV6U6AZjQjVqgP7BX
+W+Sg1BGvMkOXGu11wenvJFaG6HtCNSwICmdR82q8s6NjKqaQPEv9KXrftj4+JjkN
+cwNEUOLFZoTGmR+elhRAqbm6C+nfRg==
+=XH2v
 -----END PGP SIGNATURE-----
 
---GBGVnQCMJ5bQMmqu2vaC22cTYC6LhmC00--
+--1Tka9iUVxPNpbsVaG25yW3ZT4W6C8uijj--
