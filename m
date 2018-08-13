@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fp2mm-0002oM-LI
+	(envelope-from <bounces@canonical.com>) id 1fp2mm-0002oL-Ki
 	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:40:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fp2mh-0000zA-NK
+	(envelope-from <bounces@canonical.com>) id 1fp2mh-0000zP-On
 	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:40:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52736)
+Received: from indium.canonical.com ([91.189.90.7]:52754)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fp2mh-0000yI-7I
+	id 1fp2mh-0000ye-HQ
 	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:40:43 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fp2mf-0000S9-Ic
-	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 02:40:41 +0000
+	id 1fp2mg-0000S7-Eq
+	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 02:40:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8A1982E8060
-	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 02:40:41 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 6C3792E8060
+	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 02:40:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Aug 2018 02:31:39 -0000
+Date: Mon, 13 Aug 2018 02:33:37 -0000
 From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 Reply-To: Bug 1785972 <1785972@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153371136089.29473.12663307170219083138.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153412749934.8641.3519343112785319203.malone@wampee.canonical.com>
+Message-Id: <153412761805.26437.14940155219101835306.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1785972] Re: v3.0.0-rc4: VM fails to start after
  vcpuhotunplug, managedsave sequence
@@ -39,11 +39,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This commit https://lists.gnu.org/archive/html/qemu-
-devel/2018-08/msg01281.html from ~bharata-rao, fixes the issue.
+Applied to ppc-for-3.1.
+
+https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg01317.html
 
 ** Changed in: qemu
-       Status: New =3D> Confirmed
+       Status: Confirmed =3D> Fix Committed
 
 -- =
 
