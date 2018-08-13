@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH34-0005Oc-7i
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH34-0005Of-8d
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH32-00072Q-Tr
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH31-00071S-O8
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:34 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55740 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:55275 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpH32-00071M-IQ
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:32 -0400
+	id 1fpH31-0006xD-Gm
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:31 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 13 Aug 2018 19:52:33 +0200
-Message-Id: <1534182832-554-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 13 Aug 2018 19:52:26 +0200
+Message-Id: <1534182832-554-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v8 08/87] target/mips: Add support for
- availability control via bit XNP
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v8 01/87] MAINTAINERS: Update target/mips
+ maintainer's email addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +31,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add a field in hflags for XNP bit, and a function check_xnp().
+Update email addresses of Aleksandar Markovic and Paul Burton in the
+MAINTAINERS file. Also, add corresponding items in the .mailmap file.
 
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  3 ++-
- target/mips/internal.h  |  5 ++++-
- target/mips/translate.c | 12 ++++++++++++
- 3 files changed, 18 insertions(+), 2 deletions(-)
+ .mailmap    | 7 +++++--
+ MAINTAINERS | 9 +++++----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 009202c..02ea91e 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -554,7 +554,7 @@ struct CPUMIPSState {
- #define EXCP_INST_NOTAVAIL 0x2 /* No valid instruction word for BadInstr */
-     uint32_t hflags;    /* CPU State */
-     /* TMASK defines different execution modes */
--#define MIPS_HFLAG_TMASK  0x1F5807FF
-+#define MIPS_HFLAG_TMASK  0x3F5807FF
- #define MIPS_HFLAG_MODE   0x00007 /* execution modes                    */
-     /* The KSU flags must be the lowest bits in hflags. The flag order
-        must be the same as defined for CP0 Status. This allows to use
-@@ -605,6 +605,7 @@ struct CPUMIPSState {
- #define MIPS_HFLAG_ELPA  0x4000000
- #define MIPS_HFLAG_ITC_CACHE  0x8000000 /* CACHE instr. operates on ITC tag */
- #define MIPS_HFLAG_ERL   0x10000000 /* error level flag */
-+#define MIPS_HFLAG_XNP   0x20000000
-     target_ulong btarget;        /* Jump / branch target               */
-     target_ulong bcond;          /* Branch condition (if needed)       */
- 
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index e41051f..97485da 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -308,7 +308,7 @@ static inline void compute_hflags(CPUMIPSState *env)
-                      MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
-                      MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
-                      MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA | MIPS_HFLAG_FRE |
--                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
-+                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL | MIPS_HFLAG_XNP);
-     if (env->CP0_Status & (1 << CP0St_ERL)) {
-         env->hflags |= MIPS_HFLAG_ERL;
-     }
-@@ -402,6 +402,9 @@ static inline void compute_hflags(CPUMIPSState *env)
-             env->hflags |= MIPS_HFLAG_ELPA;
-         }
-     }
-+    if (env->CP0_Config5 & (1 << CP0C5_XNP)) {
-+        env->hflags |= MIPS_HFLAG_XNP;
-+    }
- }
- 
- void cpu_mips_tlb_flush(CPUMIPSState *env);
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index ae3aaab..35342e2 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -1902,6 +1902,18 @@ static inline void check_mvh(DisasContext *ctx)
- }
- #endif
- 
-+/*
-+ * This code generates a "reserved instruction" exception if the
-+ * Config5 XNP bit is set.
-+ */
-+static inline void check_xnp(DisasContext *ctx)
-+{
-+    if (unlikely(ctx->hflags & MIPS_HFLAG_XNP)) {
-+        generate_exception_end(ctx, EXCP_RI);
-+    }
-+}
+diff --git a/.mailmap b/.mailmap
+index 778a4d4..2c2b9b1 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -12,8 +12,11 @@ Fabrice Bellard <fabrice@bellard.org> bellard <bellard=
+@c046a42c-6fe2-441c-8c8c-7
+ James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+ Jocelyn Mayer <l_indien@magic.fr> j_mayer <j_mayer@c046a42c-6fe2-441c-8c=
+8c-71466251a162>
+ Paul Brook <paul@codesourcery.com> pbrook <pbrook@c046a42c-6fe2-441c-8c8=
+c-71466251a162>
+-Paul Burton <paul.burton@mips.com> <paul.burton@imgtec.com>
+-Paul Burton <paul.burton@mips.com> <paul@archlinuxmips.org>
++Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@mips.c=
+om>
++Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@imgtec=
+.com>
++Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
++Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
++Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
+ Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-714662=
+51a162>
+ malc <av1474@comtv.ru> malc <malc@c046a42c-6fe2-441c-8c8c-71466251a162>
+=20
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 666e936..7130807 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -187,7 +187,7 @@ F: disas/microblaze.c
+=20
+ MIPS
+ M: Aurelien Jarno <aurelien@aurel32.net>
+-M: Aleksandar Markovic <aleksandar.markovic@mips.com>
++M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ S: Maintained
+ F: target/mips/
+ F: hw/mips/
+@@ -718,7 +718,7 @@ S: Maintained
+ F: hw/mips/mips_malta.c
+=20
+ Mipssim
+-M: Aleksandar Markovic <aleksandar.markovic@mips.com>
++M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ S: Odd Fixes
+ F: hw/mips/mips_mipssim.c
+ F: hw/net/mipsnet.c
+@@ -729,14 +729,15 @@ S: Maintained
+ F: hw/mips/mips_r4k.c
+=20
+ Fulong 2E
+-M: Aleksandar Markovic <aleksandar.markovic@mips.com>
++M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ S: Odd Fixes
+ F: hw/mips/mips_fulong2e.c
+ F: hw/isa/vt82c686.c
 +
-+
- /* Define small wrappers for gen_load_fpr* so that we have a uniform
-    calling interface for 32 and 64-bit FPRs.  No sense in changing
-    all callers for gen_load_fpr32 when we need the CTX parameter for
--- 
+ F: include/hw/isa/vt82c686.h
+=20
+ Boston
+-M: Paul Burton <paul.burton@mips.com>
++M: Paul Burton <pburton@wavecomp.com>
+ S: Maintained
+ F: hw/core/loader-fit.c
+ F: hw/mips/boston.c
+--=20
 2.7.4
