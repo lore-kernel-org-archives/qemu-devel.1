@@ -1,18 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fpDx5-00035B-Ca
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:36:12 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fpE48-0005ya-Nl
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:43:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fpDx2-0005Ka-9d
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:36:11 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <cover.1530270904.git.berto@igalia.com>
-References: <cover.1530270904.git.berto@igalia.com>
-Date: Mon, 13 Aug 2018 16:36:04 +0200
-Message-ID: <w51mutq72qz.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/5] Some bs->options fixes
+	(envelope-from <pbonzini@redhat.com>) id 1fpE47-0007md-Vp
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:43:28 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 13 Aug 2018 16:43:20 +0200
+Message-Id: <20180813144320.12382-2-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] nvme: simplify plug/unplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,50 +18,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: famz@redhat.com, qemu-block@nongnu.org
 
-ping
+bdrv_io_plug/bdrv_io_unplug take care of keeping a nesting count,
+so change s->plugged to just a bool.
 
-On Fri 29 Jun 2018 01:36:58 PM CEST, Alberto Garcia wrote:
-> Hi everyone,
->
-> this is part of the blockdev-reopen work that I'm doing, but since
-> I'll be away during most of July I thought that I could send already a
-> couple of patches that I think are ready and don't need anything else
-> from the rest of the series.
->
-> There's two main fixes here:
->
->   1) bs->options are not kept up to date after an image is reopened
->      and no longer reflect its state.
->
->   2) bs->options and bs->explicit_options also contain the options of
->      a BDS's children, so there's data that is duplicated and will be
->      inconsistent as soon as you change the children's options
->      directly.
->
-> The fix for (2) involves removing all children options from both
-> QDicts. In the cases of node name references ("backing": "node-name")
-> those remain in the QDict (they're technically parent options). I
-> think we don't really need them and it should be possible to get rid
-> of them, but it's a little more complicated (we need them during
-> bdrv_reopen() to ensure that the user didn't try to change any of
-> them).
->
-> Regards,
->
-> Berto
->
-> Alberto Garcia (5):
->   qdict: Make qdict_extract_subqdict() accept dst = NULL
->   block: Remove children options from bs->{options,explicit_options}
->   block: Simplify bdrv_reopen_abort()
->   block: Update bs->options if bdrv_reopen() succeeds
->   block: Simplify append_open_options()
->
->  block.c               | 42 +++++++++++++++++++++++++++++++-----------
->  qobject/block-qdict.c | 11 ++++++++---
->  2 files changed, 39 insertions(+), 14 deletions(-)
->
-> -- 
-> 2.11.0
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block/nvme.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/block/nvme.c b/block/nvme.c
+index df2e16fabe..973db3decd 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -104,7 +104,7 @@ typedef struct {
+     uint64_t nsze; /* Namespace size reported by identify command */
+     int nsid;      /* The namespace id to read/write data. */
+     uint64_t max_transfer;
+-    int plugged;
++    bool plugged;
+ 
+     CoMutex dma_map_lock;
+     CoQueue dma_flush_queue;
+@@ -1110,7 +1110,8 @@ static void nvme_attach_aio_context(BlockDriverState *bs,
+ static void nvme_aio_plug(BlockDriverState *bs)
+ {
+     BDRVNVMeState *s = bs->opaque;
+-    s->plugged++;
++    assert(!s->plugged);
++    s->plugged = true;
+ }
+ 
+ static void nvme_aio_unplug(BlockDriverState *bs)
+@@ -1118,14 +1119,13 @@ static void nvme_aio_unplug(BlockDriverState *bs)
+     int i;
+     BDRVNVMeState *s = bs->opaque;
+     assert(s->plugged);
+-    if (!--s->plugged) {
+-        for (i = 1; i < s->nr_queues; i++) {
+-            NVMeQueuePair *q = s->queues[i];
+-            qemu_mutex_lock(&q->lock);
+-            nvme_kick(s, q);
+-            nvme_process_completion(s, q);
+-            qemu_mutex_unlock(&q->lock);
+-        }
++    s->plugged = false;
++    for (i = 1; i < s->nr_queues; i++) {
++        NVMeQueuePair *q = s->queues[i];
++        qemu_mutex_lock(&q->lock);
++        nvme_kick(s, q);
++        nvme_process_completion(s, q);
++        qemu_mutex_unlock(&q->lock);
+     }
+ }
+ 
+-- 
+2.17.1
