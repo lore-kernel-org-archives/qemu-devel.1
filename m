@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpGmP-0007Hp-LN
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:37:22 -0400
+	(envelope-from <nongiach@gmail.com>) id 1fpEjC-0004sj-EM
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:25:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpGmK-0001CL-Px
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:37:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44914 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpGmK-0001CE-Kh
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:37:16 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 13 Aug 2018 19:37:10 +0200
-Message-Id: <1534181830-6055-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests/device-introspection: Check that the
- qom-tree and qtree do not change
+	(envelope-from <nongiach@gmail.com>) id 1fpEjB-0003tP-7B
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:25:54 -0400
+Received: from mail-yw1-xc2a.google.com ([2607:f8b0:4864:20::c2a]:35584)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nongiach@gmail.com>) id 1fpEjB-0003sF-1H
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:25:53 -0400
+Received: by mail-yw1-xc2a.google.com with SMTP id s68-v6so13829072ywg.2
+	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 08:25:52 -0700 (PDT)
+MIME-Version: 1.0
+From: nongiach nongiach <nongiach@gmail.com>
+Date: Mon, 13 Aug 2018 17:25:51 +0200
+Message-ID: <CABVn_oq5ij9mY7_BJe3UQfXMbNLDd_GA_L1+DSnN7TRMA2VQyA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [qemu-web PATCH] arm_now
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,60 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org, cdt-dev@eclipse.org
 
-Introspection should not change the qom-tree / qtree, so we should check
-this in the device-introspect-test, too. This patch helped to find lots
-of instrospection bugs during the QEMU v3.0 soft/hard-freeze period in the
-last two months.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/device-introspect-test.c | 23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
+ _posts/2018-08-13-arm-now.md | 46 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+ create mode 100644 _posts/2018-08-13-arm-now.md
 
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-index 0b4f221..5b7ec05 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -103,7 +103,14 @@ static QList *device_type_list(bool abstract)
- static void test_one_device(const char *type)
- {
-     QDict *resp;
--    char *help, *qom_tree;
-+    char *help;
-+    char *qom_tree_start, *qom_tree_end;
-+    char *qtree_start, *qtree_end;
+diff --git a/_posts/2018-08-13-arm-now.md b/_posts/2018-08-13-arm-now.md
+new file mode 100644
+index 0000000..f3ea3df
+--- /dev/null
++++ b/_posts/2018-08-13-arm-now.md
+@@ -0,0 +1,46 @@
++---
++layout: post
++title:  "arm_now: qemu out of the box for everyone"
++date:   2018-08-13 17:05:00:00 +0000
++last_modified_at: 2018-08-13 17:05:00:00 +0000
++author: @chaignc
++categories: [Wrapper, ARM, MIPS, POWERPC, x86]
++---
 +
-+    g_debug("Testing device '%s'", type);
++[`arm_now`](https://github.com/nongiach/arm_now) is a qemu powered tool
+that allows instant setup of
++virtual machines on arm cpu, mips, powerpc, nios2, x86 and more,
++for reverse, exploit, fuzzing and programming purpose.
 +
-+    qom_tree_start = hmp("info qom-tree");
-+    qtree_start = hmp("info qtree");
- 
-     resp = qmp("{'execute': 'device-list-properties',"
-                " 'arguments': {'typename': %s}}",
-@@ -115,10 +122,18 @@ static void test_one_device(const char *type)
- 
-     /*
-      * Some devices leave dangling pointers in QOM behind.
--     * "info qom-tree" has a good chance at crashing then
-+     * "info qom-tree" or "info qtree" have a good chance at crashing then.
-+     * Also make sure that the tree did not change.
-      */
--    qom_tree = hmp("info qom-tree");
--    g_free(qom_tree);
-+    qom_tree_end = hmp("info qom-tree");
-+    g_assert_cmpstr(qom_tree_start, ==, qom_tree_end);
-+    g_free(qom_tree_start);
-+    g_free(qom_tree_end);
++# Install
 +
-+    qtree_end = hmp("info qtree");
-+    g_assert_cmpstr(qtree_start, ==, qtree_end);
-+    g_free(qtree_start);
-+    g_free(qtree_end);
- }
- 
- static void test_device_intro_list(void)
++    # pip3 install https://github.com/nongiach/arm_now/archive/master.zip
+--upgrade
++
++# Start an ARM Virtual Machine
++
++    $ arm_now start armv5-eabi
++    Welcome to arm_now
++    buildroot login: root
++    # uname -m
++    armv7l
++
++# Debug the ls binary on mips
++
++    $ arm_now start mips32el
++    Welcome to arm_now
++    buildroot login: root
++    # gdb /bin/ls
++    (gdb) start
++    Temporary breakpoint 1, 0x00405434 in main ()
++    (gdb) x/i $pc
++    => 0x405434 <main+12>: li a0,-1
++
++# Why use arm_now?
++
++arm_now is just a qemu wrapper, if you have 2 minutes then you can already
+start a VM using arm_now (Downloading time included).
++It's configured out of the box with a package manager, a nat network
+interface and current directory syncing is one option away.
++No chroot, and no root right required to run.
++
++# Links
++
++https://github.com/nongiach/arm_now/wiki
++https://github.com/nongiach/arm_now
 -- 
-1.8.3.1
+2.18.0
