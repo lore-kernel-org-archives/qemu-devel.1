@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH3B-0005TZ-AL
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH3B-0005TI-3M
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH35-00077T-Er
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH34-00076L-S2
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:41 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55778 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:55767 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpH34-000749-TM
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:35 -0400
+	id 1fpH34-00073Y-DL
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:34 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 13 Aug 2018 19:53:02 +0200
-Message-Id: <1534182832-554-38-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 13 Aug 2018 19:52:54 +0200
+Message-Id: <1534182832-554-30-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v8 37/87] target/mips: Add emulation of misc
- nanoMIPS instructions (pool32axf)
+Subject: [Qemu-devel] [PATCH v8 29/87] target/mips: Add emulation of
+ nanoMIPS 16-bit load and store instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,122 +30,138 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add emulation of misc nanoMIPS instructions situated in pool32axf.
+Add emulation of LWXS16, LB16, SB16, LBU16, LH16, SH16, LHU16, LW16, LWSP16,
+LW4X4, SW4X4, LWGP16, SWSP16, SW16, and SWGP16 instructions.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 89 insertions(+)
+ target/mips/translate.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 7133538..63928eb 100644
+index c7fdc73..240e3fb 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16943,6 +16943,87 @@ static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
-     }
- }
+@@ -16697,6 +16697,7 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+     int rt = decode_gpr_gpr3(NANOMIPS_EXTRACT_RD(ctx->opcode));
+     int rs = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS(ctx->opcode));
+     int rd = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS1(ctx->opcode));
++    int offset;
+     int imm;
  
-+static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
-+{
-+    int rt = extract32(ctx->opcode, 21, 5);
-+    int rs = extract32(ctx->opcode, 16, 5);
-+
-+    switch (extract32(ctx->opcode, 6, 3)) {
-+    case NM_POOL32AXF_4:
-+    case NM_POOL32AXF_5:
-+        switch (extract32(ctx->opcode, 9, 7)) {
-+#ifndef CONFIG_USER_ONLY
-+        case NM_TLBP:
-+            gen_cp0(env, ctx, OPC_TLBP, 0, 0);
+     /* make sure instructions are on a halfword boundary */
+@@ -16764,6 +16765,13 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case NM_P16C:
++        switch (ctx->opcode & 1) {
++        case NM_POOL16C_0:
 +            break;
-+        case NM_TLBR:
-+            gen_cp0(env, ctx, OPC_TLBR, 0, 0);
++        case NM_LWXS16:
++            gen_ldxs(ctx, rt, rs, rd);
 +            break;
-+        case NM_TLBWI:
-+            gen_cp0(env, ctx, OPC_TLBWI, 0, 0);
++        }
+         break;
+     case NM_P16_A1:
+         switch (extract32(ctx->opcode, 6, 1)) {
+@@ -16835,24 +16843,95 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+     case NM_ANDI16:
+         break;
+     case NM_P16_LB:
++        offset = extract32(ctx->opcode, 0, 2);
++        switch (extract32(ctx->opcode, 2, 2)) {
++        case NM_LB16:
++            gen_ld(ctx, OPC_LB, rt, rs, offset);
 +            break;
-+        case NM_TLBWR:
-+            gen_cp0(env, ctx, OPC_TLBWR, 0, 0);
++        case NM_SB16:
++            rt = decode_gpr_gpr3_src_store(
++                     NANOMIPS_EXTRACT_RD(ctx->opcode));
++            gen_st(ctx, OPC_SB, rt, rs, offset);
 +            break;
-+        case NM_TLBINV:
-+            gen_cp0(env, ctx, OPC_TLBINV, 0, 0);
++        case NM_LBU16:
++            gen_ld(ctx, OPC_LBU, rt, rs, offset);
 +            break;
-+        case NM_TLBINVF:
-+            gen_cp0(env, ctx, OPC_TLBINVF, 0, 0);
-+            break;
-+        case NM_DI:
-+            check_cp0_enabled(ctx);
-+            {
-+                TCGv t0 = tcg_temp_new();
-+
-+                save_cpu_state(ctx, 1);
-+                gen_helper_di(t0, cpu_env);
-+                gen_store_gpr(t0, rt);
-+            /* Stop translation as we may have switched the execution mode */
-+                ctx->base.is_jmp = DISAS_STOP;
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case NM_EI:
-+            check_cp0_enabled(ctx);
-+            {
-+                TCGv t0 = tcg_temp_new();
-+
-+                save_cpu_state(ctx, 1);
-+                gen_helper_ei(t0, cpu_env);
-+                gen_store_gpr(t0, rt);
-+            /* Stop translation as we may have switched the execution mode */
-+                ctx->base.is_jmp = DISAS_STOP;
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case NM_RDPGPR:
-+            gen_load_srsgpr(rs, rt);
-+            break;
-+        case NM_WRPGPR:
-+            gen_store_srsgpr(rs, rt);
-+            break;
-+        case NM_WAIT:
-+            gen_cp0(env, ctx, OPC_WAIT, 0, 0);
-+            break;
-+        case NM_DERET:
-+            gen_cp0(env, ctx, OPC_DERET, 0, 0);
-+            break;
-+        case NM_ERETX:
-+            gen_cp0(env, ctx, OPC_ERET, 0, 0);
-+            break;
-+#endif
 +        default:
 +            generate_exception_end(ctx, EXCP_RI);
 +            break;
 +        }
-+        break;
-+    default:
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    }
-+}
-+
- static void gen_pool32f_nanomips_insn(DisasContext *ctx)
- {
-     int rt, rs, rd;
-@@ -17312,6 +17393,14 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-             gen_pool32a0_nanomips_insn(ctx);
-             break;
-         case NM_POOL32A7:
-+            switch (extract32(ctx->opcode, 3, 3)) {
-+            case NM_POOL32AXF:
-+                gen_pool32axf_nanomips_insn(env, ctx);
-+                break;
-+            default:
-+                generate_exception_end(ctx, EXCP_RI);
-+                break;
-+            }
-             break;
-         default:
-             generate_exception_end(ctx, EXCP_RI);
+         break;
+     case NM_P16_LH:
++        offset = extract32(ctx->opcode, 1, 2) << 1;
++        switch ((extract32(ctx->opcode, 3, 1) << 1) | (ctx->opcode & 1)) {
++        case NM_LH16:
++            gen_ld(ctx, OPC_LH, rt, rs, offset);
++            break;
++        case NM_SH16:
++            rt = decode_gpr_gpr3_src_store(
++                     NANOMIPS_EXTRACT_RD(ctx->opcode));
++            gen_st(ctx, OPC_SH, rt, rs, offset);
++            break;
++        case NM_LHU16:
++            gen_ld(ctx, OPC_LHU, rt, rs, offset);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
+         break;
+     case NM_LW16:
++        offset = extract32(ctx->opcode, 0, 4) << 2;
++        gen_ld(ctx, OPC_LW, rt, rs, offset);
+         break;
+     case NM_LWSP16:
++        rt = NANOMIPS_EXTRACT_RD5(ctx->opcode);
++        offset = extract32(ctx->opcode, 0, 5) << 2;
++        gen_ld(ctx, OPC_LW, rt, 29, offset);
+         break;
+     case NM_LW4X4:
++        rt = (extract32(ctx->opcode, 9, 1) << 3) |
++             extract32(ctx->opcode, 5, 3);
++        rs = (extract32(ctx->opcode, 4, 1) << 3) |
++             extract32(ctx->opcode, 0, 3);
++        offset = (extract32(ctx->opcode, 3, 1) << 3) |
++                 (extract32(ctx->opcode, 8, 1) << 2);
++        rt = decode_gpr_gpr4(rt);
++        rs = decode_gpr_gpr4(rs);
++        gen_ld(ctx, OPC_LW, rt, rs, offset);
+         break;
+     case NM_SW4X4:
++        rt = (extract32(ctx->opcode, 9, 1) << 3) |
++             extract32(ctx->opcode, 5, 3);
++        rs = (extract32(ctx->opcode, 4, 1) << 3) |
++             extract32(ctx->opcode, 0, 3);
++        offset = (extract32(ctx->opcode, 3, 1) << 3) |
++                 (extract32(ctx->opcode, 8, 1) << 2);
++        rt = decode_gpr_gpr4_zero(rt);
++        rs = decode_gpr_gpr4(rs);
++        gen_st(ctx, OPC_SW, rt, rs, offset);
+         break;
+     case NM_LWGP16:
++        offset = extract32(ctx->opcode, 0, 7) << 2;
++        gen_ld(ctx, OPC_LW, rt, 28, offset);
+         break;
+     case NM_SWSP16:
++        rt = NANOMIPS_EXTRACT_RD5(ctx->opcode);
++        offset = extract32(ctx->opcode, 0, 5) << 2;
++        gen_st(ctx, OPC_SW, rt, 29, offset);
+         break;
+     case NM_SW16:
++        rt = decode_gpr_gpr3_src_store(
++                 NANOMIPS_EXTRACT_RD(ctx->opcode));
++        rs = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS(ctx->opcode));
++        offset = extract32(ctx->opcode, 0, 4) << 2;
++        gen_st(ctx, OPC_SW, rt, rs, offset);
+         break;
+     case NM_SWGP16:
++        rt = decode_gpr_gpr3_src_store(
++                 NANOMIPS_EXTRACT_RD(ctx->opcode));
++        offset = extract32(ctx->opcode, 0, 7) << 2;
++        gen_st(ctx, OPC_SW, rt, 28, offset);
+         break;
+     case NM_BC16:
+         gen_compute_branch(ctx, OPC_BEQ, 2, 0, 0,
 -- 
 2.7.4
