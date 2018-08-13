@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH3J-0005u0-7b
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:57 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH3B-0005UW-QE
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH38-0007D1-GK
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:49 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55830 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH35-00076g-3p
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:41 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:55770 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpH37-00079Z-Hc
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:38 -0400
+	id 1fpH34-00073n-Hq
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:34 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 13 Aug 2018 19:53:32 +0200
-Message-Id: <1534182832-554-68-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 13 Aug 2018 19:52:57 +0200
+Message-Id: <1534182832-554-33-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v8 67/87] linux-user: Add syscall numbers for
- nanoMIPS
+Subject: [Qemu-devel] [PATCH v8 32/87] target/mips: Add emulation of some
+ common nanoMIPS 32-bit instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,300 +28,306 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add syscall numbers for nanoMIPS. nanoMIPS redefines its ABI
-compared to preceding MIPS architectures, and its set of
-supported system calls is significantly different.
+Add emulation of SIGRIE, SYSCALL, BREAK, SDBBP, ADDIU, ADDIUPC,
+ADDIUGP.W, LWGP, SWGP, ORI, XORI, ANDI, and other instructions.
 
-Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/nanomips/syscall_nr.h | 275 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 275 insertions(+)
- create mode 100644 linux-user/nanomips/syscall_nr.h
+ target/mips/translate.c | 270 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 269 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/nanomips/syscall_nr.h b/linux-user/nanomips/syscall_nr.h
-new file mode 100644
-index 0000000..b826e5c
---- /dev/null
-+++ b/linux-user/nanomips/syscall_nr.h
-@@ -0,0 +1,275 @@
-+/*
-+ * Linux mipsp32 style syscalls.
-+ */
-+#define TARGET_NR_io_setup                   0
-+#define TARGET_NR_io_destroy                 1
-+#define TARGET_NR_io_submit                  2
-+#define TARGET_NR_io_cancel                  3
-+#define TARGET_NR_io_getevents               4
-+#define TARGET_NR_setxattr                   5
-+#define TARGET_NR_lsetxattr                  6
-+#define TARGET_NR_fsetxattr                  7
-+#define TARGET_NR_getxattr                   8
-+#define TARGET_NR_lgetxattr                  9
-+#define TARGET_NR_fgetxattr                  10
-+#define TARGET_NR_listxattr                  11
-+#define TARGET_NR_llistxattr                 12
-+#define TARGET_NR_flistxattr                 13
-+#define TARGET_NR_removexattr                14
-+#define TARGET_NR_lremovexattr               15
-+#define TARGET_NR_fremovexattr               16
-+#define TARGET_NR_getcwd                     17
-+#define TARGET_NR_lookup_dcookie             18
-+#define TARGET_NR_eventfd2                   19
-+#define TARGET_NR_epoll_create1              20
-+#define TARGET_NR_epoll_ctl                  21
-+#define TARGET_NR_epoll_pwait                22
-+#define TARGET_NR_dup                        23
-+#define TARGET_NR_dup3                       24
-+#define TARGET_NR_fcntl64                    25
-+#define TARGET_NR_inotify_init1              26
-+#define TARGET_NR_inotify_add_watch          27
-+#define TARGET_NR_inotify_rm_watch           28
-+#define TARGET_NR_ioctl                      29
-+#define TARGET_NR_ioprio_set                 30
-+#define TARGET_NR_ioprio_get                 31
-+#define TARGET_NR_flock                      32
-+#define TARGET_NR_mknodat                    33
-+#define TARGET_NR_mkdirat                    34
-+#define TARGET_NR_unlinkat                   35
-+#define TARGET_NR_symlinkat                  36
-+#define TARGET_NR_linkat                     37
-+#define TARGET_NR_umount2                    39
-+#define TARGET_NR_mount                      40
-+#define TARGET_NR_pivot_root                 41
-+#define TARGET_NR_nfsservctl                 42
-+#define TARGET_NR_statfs64                   43
-+#define TARGET_NR_fstatfs64                  44
-+#define TARGET_NR_truncate64                 45
-+#define TARGET_NR_ftruncate64                46
-+#define TARGET_NR_fallocate                  47
-+#define TARGET_NR_faccessat                  48
-+#define TARGET_NR_chdir                      49
-+#define TARGET_NR_fchdir                     50
-+#define TARGET_NR_chroot                     51
-+#define TARGET_NR_fchmod                     52
-+#define TARGET_NR_fchmodat                   53
-+#define TARGET_NR_fchownat                   54
-+#define TARGET_NR_fchown                     55
-+#define TARGET_NR_openat                     56
-+#define TARGET_NR_close                      57
-+#define TARGET_NR_vhangup                    58
-+#define TARGET_NR_pipe2                      59
-+#define TARGET_NR_quotactl                   60
-+#define TARGET_NR_getdents64                 61
-+#define TARGET_NR__llseek                    62
-+#define TARGET_NR_read                       63
-+#define TARGET_NR_write                      64
-+#define TARGET_NR_readv                      65
-+#define TARGET_NR_writev                     66
-+#define TARGET_NR_pread64                    67
-+#define TARGET_NR_pwrite64                   68
-+#define TARGET_NR_preadv                     69
-+#define TARGET_NR_pwritev                    70
-+#define TARGET_NR_sendfile64                 71
-+#define TARGET_NR_pselect6                   72
-+#define TARGET_NR_ppoll                      73
-+#define TARGET_NR_signalfd4                  74
-+#define TARGET_NR_vmsplice                   75
-+#define TARGET_NR_splice                     76
-+#define TARGET_NR_tee                        77
-+#define TARGET_NR_readlinkat                 78
-+#define TARGET_NR_sync                       81
-+#define TARGET_NR_fsync                      82
-+#define TARGET_NR_fdatasync                  83
-+#define TARGET_NR_sync_file_range2           84
-+#define TARGET_NR_timerfd_create             85
-+#define TARGET_NR_timerfd_settime            86
-+#define TARGET_NR_timerfd_gettime            87
-+#define TARGET_NR_utimensat                  88
-+#define TARGET_NR_acct                       89
-+#define TARGET_NR_capget                     90
-+#define TARGET_NR_capset                     91
-+#define TARGET_NR_personality                92
-+#define TARGET_NR_exit                       93
-+#define TARGET_NR_exit_group                 94
-+#define TARGET_NR_waitid                     95
-+#define TARGET_NR_set_tid_address            96
-+#define TARGET_NR_unshare                    97
-+#define TARGET_NR_futex                      98
-+#define TARGET_NR_set_robust_list            99
-+#define TARGET_NR_get_robust_list            100
-+#define TARGET_NR_nanosleep                  101
-+#define TARGET_NR_getitimer                  102
-+#define TARGET_NR_setitimer                  103
-+#define TARGET_NR_kexec_load                 104
-+#define TARGET_NR_init_module                105
-+#define TARGET_NR_delete_module              106
-+#define TARGET_NR_timer_create               107
-+#define TARGET_NR_timer_gettime              108
-+#define TARGET_NR_timer_getoverrun           109
-+#define TARGET_NR_timer_settime              110
-+#define TARGET_NR_timer_delete               111
-+#define TARGET_NR_clock_settime              112
-+#define TARGET_NR_clock_gettime              113
-+#define TARGET_NR_clock_getres               114
-+#define TARGET_NR_clock_nanosleep            115
-+#define TARGET_NR_syslog                     116
-+#define TARGET_NR_ptrace                     117
-+#define TARGET_NR_sched_setparam             118
-+#define TARGET_NR_sched_setscheduler         119
-+#define TARGET_NR_sched_getscheduler         120
-+#define TARGET_NR_sched_getparam             121
-+#define TARGET_NR_sched_setaffinity          122
-+#define TARGET_NR_sched_getaffinity          123
-+#define TARGET_NR_sched_yield                124
-+#define TARGET_NR_sched_get_priority_max     125
-+#define TARGET_NR_sched_get_priority_min     126
-+#define TARGET_NR_sched_rr_get_interval      127
-+#define TARGET_NR_restart_syscall            128
-+#define TARGET_NR_kill                       129
-+#define TARGET_NR_tkill                      130
-+#define TARGET_NR_tgkill                     131
-+#define TARGET_NR_sigaltstack                132
-+#define TARGET_NR_rt_sigsuspend              133
-+#define TARGET_NR_rt_sigaction               134
-+#define TARGET_NR_rt_sigprocmask             135
-+#define TARGET_NR_rt_sigpending              136
-+#define TARGET_NR_rt_sigtimedwait            137
-+#define TARGET_NR_rt_sigqueueinfo            138
-+#define TARGET_NR_rt_sigreturn               139
-+#define TARGET_NR_setpriority                140
-+#define TARGET_NR_getpriority                141
-+#define TARGET_NR_reboot                     142
-+#define TARGET_NR_setregid                   143
-+#define TARGET_NR_setgid                     144
-+#define TARGET_NR_setreuid                   145
-+#define TARGET_NR_setuid                     146
-+#define TARGET_NR_setresuid                  147
-+#define TARGET_NR_getresuid                  148
-+#define TARGET_NR_setresgid                  149
-+#define TARGET_NR_getresgid                  150
-+#define TARGET_NR_setfsuid                   151
-+#define TARGET_NR_setfsgid                   152
-+#define TARGET_NR_times                      153
-+#define TARGET_NR_setpgid                    154
-+#define TARGET_NR_getpgid                    155
-+#define TARGET_NR_getsid                     156
-+#define TARGET_NR_setsid                     157
-+#define TARGET_NR_getgroups                  158
-+#define TARGET_NR_setgroups                  159
-+#define TARGET_NR_uname                      160
-+#define TARGET_NR_sethostname                161
-+#define TARGET_NR_setdomainname              162
-+#define TARGET_NR_getrusage                  165
-+#define TARGET_NR_umask                      166
-+#define TARGET_NR_prctl                      167
-+#define TARGET_NR_getcpu                     168
-+#define TARGET_NR_gettimeofday               169
-+#define TARGET_NR_settimeofday               170
-+#define TARGET_NR_adjtimex                   171
-+#define TARGET_NR_getpid                     172
-+#define TARGET_NR_getppid                    173
-+#define TARGET_NR_getuid                     174
-+#define TARGET_NR_geteuid                    175
-+#define TARGET_NR_getgid                     176
-+#define TARGET_NR_getegid                    177
-+#define TARGET_NR_gettid                     178
-+#define TARGET_NR_sysinfo                    179
-+#define TARGET_NR_mq_open                    180
-+#define TARGET_NR_mq_unlink                  181
-+#define TARGET_NR_mq_timedsend               182
-+#define TARGET_NR_mq_timedreceive            183
-+#define TARGET_NR_mq_notify                  184
-+#define TARGET_NR_mq_getsetattr              185
-+#define TARGET_NR_msgget                     186
-+#define TARGET_NR_msgctl                     187
-+#define TARGET_NR_msgrcv                     188
-+#define TARGET_NR_msgsnd                     189
-+#define TARGET_NR_semget                     190
-+#define TARGET_NR_semctl                     191
-+#define TARGET_NR_semtimedop                 192
-+#define TARGET_NR_semop                      193
-+#define TARGET_NR_shmget                     194
-+#define TARGET_NR_shmctl                     195
-+#define TARGET_NR_shmat                      196
-+#define TARGET_NR_shmdt                      197
-+#define TARGET_NR_socket                     198
-+#define TARGET_NR_socketpair                 199
-+#define TARGET_NR_bind                       200
-+#define TARGET_NR_listen                     201
-+#define TARGET_NR_accept                     202
-+#define TARGET_NR_connect                    203
-+#define TARGET_NR_getsockname                204
-+#define TARGET_NR_getpeername                205
-+#define TARGET_NR_sendto                     206
-+#define TARGET_NR_recvfrom                   207
-+#define TARGET_NR_setsockopt                 208
-+#define TARGET_NR_getsockopt                 209
-+#define TARGET_NR_shutdown                   210
-+#define TARGET_NR_sendmsg                    211
-+#define TARGET_NR_recvmsg                    212
-+#define TARGET_NR_readahead                  213
-+#define TARGET_NR_brk                        214
-+#define TARGET_NR_munmap                     215
-+#define TARGET_NR_mremap                     216
-+#define TARGET_NR_add_key                    217
-+#define TARGET_NR_request_key                218
-+#define TARGET_NR_keyctl                     219
-+#define TARGET_NR_clone                      220
-+#define TARGET_NR_execve                     221
-+#define TARGET_NR_mmap2                      222
-+#define TARGET_NR_fadvise64_64               223
-+#define TARGET_NR_swapon                     224
-+#define TARGET_NR_swapoff                    225
-+#define TARGET_NR_mprotect                   226
-+#define TARGET_NR_msync                      227
-+#define TARGET_NR_mlock                      228
-+#define TARGET_NR_munlock                    229
-+#define TARGET_NR_mlockall                   230
-+#define TARGET_NR_munlockall                 231
-+#define TARGET_NR_mincore                    232
-+#define TARGET_NR_madvise                    233
-+#define TARGET_NR_remap_file_pages           234
-+#define TARGET_NR_mbind                      235
-+#define TARGET_NR_get_mempolicy              236
-+#define TARGET_NR_set_mempolicy              237
-+#define TARGET_NR_migrate_pages              238
-+#define TARGET_NR_move_pages                 239
-+#define TARGET_NR_rt_tgsigqueueinfo          240
-+#define TARGET_NR_perf_event_open            241
-+#define TARGET_NR_accept4                    242
-+#define TARGET_NR_recvmmsg                   243
-+#define TARGET_NR_set_thread_area            244
-+#define TARGET_NR_wait4                      260
-+#define TARGET_NR_prlimit64                  261
-+#define TARGET_NR_fanotify_init              262
-+#define TARGET_NR_fanotify_mark              263
-+#define TARGET_NR_name_to_handle_at          264
-+#define TARGET_NR_open_by_handle_at          265
-+#define TARGET_NR_clock_adjtime              266
-+#define TARGET_NR_syncfs                     267
-+#define TARGET_NR_setns                      268
-+#define TARGET_NR_sendmmsg                   269
-+#define TARGET_NR_process_vm_readv           270
-+#define TARGET_NR_process_vm_writev          271
-+#define TARGET_NR_kcmp                       272
-+#define TARGET_NR_finit_module               273
-+#define TARGET_NR_sched_setattr              274
-+#define TARGET_NR_sched_getattr              275
-+#define TARGET_NR_renameat2                  276
-+#define TARGET_NR_seccomp                    277
-+#define TARGET_NR_getrandom                  278
-+#define TARGET_NR_memfd_create               279
-+#define TARGET_NR_bpf                        280
-+#define TARGET_NR_execveat                   281
-+#define TARGET_NR_userfaultfd                282
-+#define TARGET_NR_membarrier                 283
-+#define TARGET_NR_mlock2                     284
-+#define TARGET_NR_copy_file_range            285
-+#define TARGET_NR_preadv2                    286
-+#define TARGET_NR_pwritev2                   287
-+#define TARGET_NR_pkey_mprotect              288
-+#define TARGET_NR_pkey_alloc                 289
-+#define TARGET_NR_pkey_free                  290
-+#define TARGET_NR_statx                      291
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 868535c..6cd8cec 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -16768,6 +16768,274 @@ static void gen_pool16c_nanomips_insn(DisasContext *ctx)
+     }
+ }
+ 
++static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
++{
++    uint16_t insn;
++    uint32_t op;
++    int rt, rs;
++    int offset;
++    int imm;
++
++    insn = cpu_lduw_code(env, ctx->base.pc_next + 2);
++    ctx->opcode = (ctx->opcode << 16) | insn;
++
++    rt = extract32(ctx->opcode, 21, 5);
++    rs = extract32(ctx->opcode, 16, 5);
++
++    op = extract32(ctx->opcode, 26, 6);
++    switch (op) {
++    case NM_P_ADDIU:
++        if (rt == 0) {
++            /* P.RI */
++            switch (extract32(ctx->opcode, 19, 2)) {
++            case NM_SIGRIE:
++            default:
++                generate_exception_end(ctx, EXCP_RI);
++                break;
++            case NM_P_SYSCALL:
++                if ((extract32(ctx->opcode, 18, 1)) == NM_SYSCALL) {
++                    generate_exception_end(ctx, EXCP_SYSCALL);
++                } else {
++                    generate_exception_end(ctx, EXCP_RI);
++                }
++                break;
++            case NM_BREAK:
++                generate_exception_end(ctx, EXCP_BREAK);
++                break;
++            case NM_SDBBP:
++                if (is_uhi(extract32(ctx->opcode, 0, 19))) {
++                    gen_helper_do_semihosting(cpu_env);
++                } else {
++                    if (ctx->hflags & MIPS_HFLAG_SBRI) {
++                        generate_exception_end(ctx, EXCP_RI);
++                    } else {
++                        generate_exception_end(ctx, EXCP_DBp);
++                    }
++                }
++                break;
++            }
++        } else {
++            imm = extract32(ctx->opcode, 0, 16);
++            if (rs != 0) {
++                tcg_gen_addi_tl(cpu_gpr[rt], cpu_gpr[rs], imm);
++                tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
++            } else {
++                tcg_gen_movi_tl(cpu_gpr[rt], imm);
++            }
++        }
++        break;
++    case NM_ADDIUPC:
++        if (rt != 0) {
++            offset = sextract32(ctx->opcode, 0, 1) << 21 |
++                     extract32(ctx->opcode, 1, 20) << 1;
++            target_long addr = addr_add(ctx, ctx->base.pc_next + 4, offset);
++            tcg_gen_movi_tl(cpu_gpr[rt], addr);
++        }
++        break;
++    case NM_POOL32A:
++        break;
++    case NM_P_GP_W:
++        switch (ctx->opcode & 0x03) {
++        case NM_ADDIUGP_W:
++            if (rt != 0) {
++                offset = extract32(ctx->opcode, 0, 21);
++                gen_op_addr_addi(ctx, cpu_gpr[rt], cpu_gpr[28], offset);
++            }
++            break;
++        case NM_LWGP:
++            gen_ld(ctx, OPC_LW, rt, 28, extract32(ctx->opcode, 2, 19) << 2);
++            break;
++        case NM_SWGP:
++            gen_st(ctx, OPC_SW, rt, 28, extract32(ctx->opcode, 2, 19) << 2);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++        break;
++    case NM_P48I:
++        return 6;
++    case NM_P_U12:
++        switch (extract32(ctx->opcode, 12, 4)) {
++        case NM_ORI:
++            gen_logic_imm(ctx, OPC_ORI, rt, rs, extract32(ctx->opcode, 0, 12));
++            break;
++        case NM_XORI:
++            gen_logic_imm(ctx, OPC_XORI, rt, rs, extract32(ctx->opcode, 0, 12));
++            break;
++        case NM_ANDI:
++            gen_logic_imm(ctx, OPC_ANDI, rt, rs, extract32(ctx->opcode, 0, 12));
++            break;
++        case NM_P_SR:
++            switch (extract32(ctx->opcode, 20, 1)) {
++            case NM_PP_SR:
++                switch (ctx->opcode & 3) {
++                case NM_SAVE:
++                    gen_save(ctx, rt, extract32(ctx->opcode, 16, 4),
++                             extract32(ctx->opcode, 2, 1),
++                             extract32(ctx->opcode, 3, 9) << 3);
++                    break;
++                case NM_RESTORE:
++                case NM_RESTORE_JRC:
++                    gen_restore(ctx, rt, extract32(ctx->opcode, 16, 4),
++                                extract32(ctx->opcode, 2, 1),
++                                extract32(ctx->opcode, 3, 9) << 3);
++                    if ((ctx->opcode & 3) == NM_RESTORE_JRC) {
++                        gen_compute_branch(ctx, OPC_JR, 2, 31, 0, 0, 0);
++                    }
++                    break;
++                default:
++                    generate_exception_end(ctx, EXCP_RI);
++                    break;
++                }
++                break;
++            case NM_P_SR_F:
++                generate_exception_end(ctx, EXCP_RI);
++                break;
++            }
++            break;
++        case NM_SLTI:
++            gen_slt_imm(ctx, OPC_SLTI, rt, rs, extract32(ctx->opcode, 0, 12));
++            break;
++        case NM_SLTIU:
++            gen_slt_imm(ctx, OPC_SLTIU, rt, rs, extract32(ctx->opcode, 0, 12));
++            break;
++        case NM_SEQI:
++            {
++                TCGv t0 = tcg_temp_new();
++
++                imm = extract32(ctx->opcode, 0, 12);
++                gen_load_gpr(t0, rs);
++                tcg_gen_setcondi_tl(TCG_COND_EQ, t0, t0, imm);
++                gen_store_gpr(t0, rt);
++
++                tcg_temp_free(t0);
++            }
++            break;
++        case NM_ADDIUNEG:
++            imm = (int16_t) extract32(ctx->opcode, 0, 12);
++            gen_arith_imm(ctx, OPC_ADDIU, rt, rs, -imm);
++            break;
++        case NM_P_SHIFT:
++            {
++                int shift = extract32(ctx->opcode, 0, 5);
++                switch (extract32(ctx->opcode, 5, 4)) {
++                case NM_P_SLL:
++                    if (rt == 0 && shift == 0) {
++                        /* NOP */
++                    } else if (rt == 0 && shift == 3) {
++                        /* EHB treat as NOP */
++                    } else if (rt == 0 && shift == 5) {
++                        /* PAUSE */
++                        if (ctx->hflags & MIPS_HFLAG_BMASK) {
++                            generate_exception_end(ctx, EXCP_RI);
++                        }
++                    } else if (rt == 0 && shift == 6) {
++                        /* SYNC */
++                        gen_sync(extract32(ctx->opcode, 16, 5));
++                    } else {
++                        /* SLL */
++                        gen_shift_imm(ctx, OPC_SLL, rt, rs,
++                                      extract32(ctx->opcode, 0, 5));
++                    }
++                    break;
++                case NM_SRL:
++                    gen_shift_imm(ctx, OPC_SRL, rt, rs,
++                                  extract32(ctx->opcode, 0, 5));
++                    break;
++                case NM_SRA:
++                    gen_shift_imm(ctx, OPC_SRA, rt, rs,
++                                  extract32(ctx->opcode, 0, 5));
++                    break;
++                case NM_ROTR:
++                    gen_shift_imm(ctx, OPC_ROTR, rt, rs,
++                                  extract32(ctx->opcode, 0, 5));
++                    break;
++                }
++            }
++            break;
++        case NM_P_ROTX:
++            break;
++        case NM_P_INS:
++            switch (((ctx->opcode >> 10) & 2) |
++                    (extract32(ctx->opcode, 5, 1))) {
++            case NM_INS:
++                gen_bitops(ctx, OPC_INS, rt, rs, extract32(ctx->opcode, 0, 5),
++                           extract32(ctx->opcode, 6, 5));
++                break;
++            default:
++                generate_exception_end(ctx, EXCP_RI);
++                break;
++            }
++            break;
++        case NM_P_EXT:
++            switch (((ctx->opcode >> 10) & 2) |
++                    (extract32(ctx->opcode, 5, 1))) {
++            case NM_EXT:
++                gen_bitops(ctx, OPC_EXT, rt, rs, extract32(ctx->opcode, 0, 5),
++                           extract32(ctx->opcode, 6, 5));
++                break;
++            default:
++                generate_exception_end(ctx, EXCP_RI);
++                break;
++            }
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++        break;
++    case NM_POOL32F:
++        break;
++    case NM_POOL32S:
++        break;
++    case NM_P_LUI:
++        switch (extract32(ctx->opcode, 1, 1)) {
++        case NM_LUI:
++            if (rt != 0) {
++                tcg_gen_movi_tl(cpu_gpr[rt],
++                                sextract32(ctx->opcode, 0, 1) << 31 |
++                                extract32(ctx->opcode, 2, 10) << 21 |
++                                extract32(ctx->opcode, 12, 9) << 12);
++            }
++            break;
++        case NM_ALUIPC:
++            if (rt != 0) {
++                offset = sextract32(ctx->opcode, 0, 1) << 31 |
++                         extract32(ctx->opcode, 2, 10) << 21 |
++                         extract32(ctx->opcode, 12, 9) << 12;
++                target_long addr;
++                addr = ~0xFFF & addr_add(ctx, ctx->base.pc_next + 4, offset);
++                tcg_gen_movi_tl(cpu_gpr[rt], addr);
++            }
++            break;
++        }
++        break;
++    case NM_P_GP_BH:
++        break;
++    case NM_P_LS_U12:
++        break;
++    case NM_P_LS_S9:
++        break;
++    case NM_MOVE_BALC:
++        break;
++    case NM_P_BAL:
++        break;
++    case NM_P_J:
++        break;
++    case NM_P_BR1:
++        break;
++    case NM_P_BR2:
++        break;
++    case NM_P_BRI:
++        break;
++    default:
++        generate_exception_end(ctx, EXCP_RI);
++        break;
++    }
++    return 4;
++}
++
+ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+ {
+     uint32_t op;
+@@ -17085,7 +17353,7 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+     case NM_MOVEPREV:
+         break;
+     default:
+-        break;
++        return decode_nanomips_32_48_opc(env, ctx);
+     }
+ 
+     return 2;
 -- 
 2.7.4
