@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fpEaT-0008Dc-Dp
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:16:54 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fpEeC-0002hL-BW
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fpEaS-00081s-E4
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:16:53 -0400
-References: <20180810062647.23211-1-lbloch@janustech.com>
-	<20180810062647.23211-7-lbloch@janustech.com>
-	<w5136vm8m8u.fsf@maestria.local.igalia.com>
-	<ca79bbff-163b-f50e-e17b-54d6597e6bfe@redhat.com>
-	<BDD8E417-5EE2-4B3A-BF19-C37A7BBD0330@janustech.com>
+	(envelope-from <mreitz@redhat.com>) id 1fpEeB-0000xA-F7
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:20:44 -0400
+References: <20180813022006.7216-1-mreitz@redhat.com>
+	<20180813022006.7216-3-mreitz@redhat.com>
+	<20180813125457.GA11625@kermit-br-ibm-com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <572652c3-bb11-4158-c3ec-8dc786fd2ae8@redhat.com>
-Date: Mon, 13 Aug 2018 17:16:43 +0200
+Message-ID: <fd3efd1e-520b-50ff-b1c5-ffcc08094f3a@redhat.com>
+Date: Mon, 13 Aug 2018 17:20:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <BDD8E417-5EE2-4B3A-BF19-C37A7BBD0330@janustech.com>
+In-Reply-To: <20180813125457.GA11625@kermit-br-ibm-com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Ks6GIjHhDg9lkUq0x5bnMoifpJfWsXscZ"
-Subject: Re: [Qemu-devel] [PATCH v7 6/9] qcow2: Increase the default upper
- limit on the L2 cache size
+	boundary="GBGVnQCMJ5bQMmqu2vaC22cTYC6LhmC00"
+Subject: Re: [Qemu-devel] [PATCH 02/17] mirror: Make
+ wait_for_any_operation() coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +26,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ks6GIjHhDg9lkUq0x5bnMoifpJfWsXscZ
+--GBGVnQCMJ5bQMmqu2vaC22cTYC6LhmC00
 From: Max Reitz <mreitz@redhat.com>
-To: Leonid Bloch <lbloch@janustech.com>, Alberto Garcia <berto@igalia.com>,
- qemu-devel@nongnu.org
+To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>
-Message-ID: <572652c3-bb11-4158-c3ec-8dc786fd2ae8@redhat.com>
-Subject: Re: [PATCH v7 6/9] qcow2: Increase the default upper limit on the L2
- cache size
-References: <20180810062647.23211-1-lbloch@janustech.com>
- <20180810062647.23211-7-lbloch@janustech.com>
- <w5136vm8m8u.fsf@maestria.local.igalia.com>
- <ca79bbff-163b-f50e-e17b-54d6597e6bfe@redhat.com>
- <BDD8E417-5EE2-4B3A-BF19-C37A7BBD0330@janustech.com>
-In-Reply-To: <BDD8E417-5EE2-4B3A-BF19-C37A7BBD0330@janustech.com>
+ Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <fd3efd1e-520b-50ff-b1c5-ffcc08094f3a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/17] mirror: Make wait_for_any_operation()
+ coroutine_fn
+References: <20180813022006.7216-1-mreitz@redhat.com>
+ <20180813022006.7216-3-mreitz@redhat.com>
+ <20180813125457.GA11625@kermit-br-ibm-com>
+In-Reply-To: <20180813125457.GA11625@kermit-br-ibm-com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-08-13 08:09, Leonid Bloch wrote:
-> On August 13, 2018 4:39:35 AM EEST, Max Reitz <mreitz@redhat.com> wrote=
-:
+On 2018-08-13 14:54, Murilo Opsfelder Araujo wrote:
+> Hi, Max.
+
+Hi, Murilo!
+
+> On Mon, Aug 13, 2018 at 04:19:51AM +0200, Max Reitz wrote:
+>> mirror_wait_for_any_operation() calls qemu_co_queue_wait(), which is a=
+
+>> coroutine_fn (technically it is a macro which resolves to a
+>> coroutine_fn).  Therefore, this function needs to be a coroutine_fn as=
+
+>> well.
+>>
+>> This patch makes it and all of its callers coroutine_fns.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  block/mirror.c | 30 ++++++++++++++++--------------
+>>  1 file changed, 16 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/block/mirror.c b/block/mirror.c
+>> index 85f5742eae..c28b6159d5 100644
+>> --- a/block/mirror.c
+>> +++ b/block/mirror.c
 
 [...]
 
->> Ideally we'd probably want a soft and a hard cache limit, but I don't
->> know...
+>> @@ -1098,11 +1100,11 @@ static void mirror_complete(Job *job, Error **=
+errp)
+>>      job_enter(job);
+>>  }
 >>
->> (Like, a soft cache limit of 1 MB with a CCI of 10 min, and a hard
->> cache
->> limit of 32 MB with a CCI of 1 min by default.  So whenever your cache=
-
->> uses more than 1 MB of RAM, your CCI is 1 min, and whenever it's below=
-,
->> your CCI is 10 min.)
+>> -static void mirror_pause(Job *job)
+>> +static void coroutine_fn mirror_pause(Job *job)
 >=20
-> Max, thanks for your insight. Indeed some good points.
-> Considering this, I'm thinking to set the limit to 16 MB, and the CCI t=
-o 5 min. What do you think?
+> Other functions in this patch were renamed to mirror_co_*.  I'm not sur=
+e if
+> mirror_pause() should follow that, i.e. be renamed to mirror_co_pause()=
+=2E
 
-I think it's good for a preliminary solution, and then later increase
-the limit with the soft and hard limits.
+Hm.  I don't know why I didn't do that.  Makes sense, why not.
 
-OTOH, if we implement the soft/hard limits, it doesn't really matter
-what default you choose now...
-
-> Modern Windows installations should gain performance from being able to=
- random I/O to >8 GB chunks, and data processing tasks where each data se=
-t is 8+ GB for sure do (did benchmarks). And the maximum is only ever use=
-d if (a) the image is large enough and (b) it is indeed used.
-> While taking 256 GB images as the "limit" can be considered an overshoo=
-t, 128 GB is quite reasonable, I think.
->=20
-> Your idea with "soft" and "hard" limits is great! I'm tempted to implem=
-ent this. Say 4 MB with 10 min., and 16 MB with 5 min?
-
-32 MB and 2 or 3 min? :-)
-
-If you do that, I'm fine with a plain default of 32 MB for now.
+(Well, JobDriver.pause() is not called .co_pause(), but then again,
+JobDriver.start is set to mirror_run(), so it's not like our function
+names match so far...)
 
 Max
 
 
---Ks6GIjHhDg9lkUq0x5bnMoifpJfWsXscZ
+--GBGVnQCMJ5bQMmqu2vaC22cTYC6LhmC00
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltxoNsACgkQ9AfbAGHV
-z0C4Hwf+OLfePsUQ6A5jZ1iQMmN4UpWf5+29z9b0sty4IjRS9bqQYEWDTEpOKXvu
-sACk98SgjWZAITJQkaIusNqGTqTxAhfZwMOghUOJ5UaFoGna+A1pL2All1ztZ9cV
-KKtdFtluiAGRfneu00R2/FYp8C6D8tcVQTRlm8gKZbmlLRoHezzWj5rKYCSRHpKl
-N5EKt8jIYGyKDZQ/iydLbleJePadkE5td3l0tSIkx3yCpPENRI1BDZWtDRdMDpO5
-lgpuNa1dWifYnjveZtDhnTTyetXt7LABCWJ0BPxwGUm3sycng2tHpbpjPx4jrlvo
-gssWfffd8jWSKtZSSFHvLn6FEYYU2w==
-=HW0a
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltxocEACgkQ9AfbAGHV
+z0D99wf/a4vX2Dg1vg4YXl8NgPxnw0+A4oE/ulQl4bHXs8iIgbxluFRlt8Rv5sgm
+reoQc9fy9WPNRwtDwIP8K3TZkxRt69lHqa1bKoowqczYQc3ou03G0O10F5vmOooW
+/6wJZEpSveKOcFPivajYNfw/lB4zXGkB1CMVduDXosZVMa0ojOi1DPI0O52kHWaL
+Et9j3TOPGc+sTC5MDF+VuNArnZVDI8+hBNf9WrzO19Q+2emwZRO9JynYejjtSO0d
+qYfod8GQpJPpKQfceRiixPdQscWG+BUM28bIQpZVezboLpnWJfatYBJsrChoN0Fa
+geucZgtvG+TaittQc0Mxk9dLdYtccg==
+=2l13
 -----END PGP SIGNATURE-----
 
---Ks6GIjHhDg9lkUq0x5bnMoifpJfWsXscZ--
+--GBGVnQCMJ5bQMmqu2vaC22cTYC6LhmC00--
