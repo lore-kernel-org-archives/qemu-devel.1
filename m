@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9t6-0007aN-Na
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:50 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tE-0007f9-5F
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9t5-0002fU-Iv
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:48 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tA-0002id-Uz
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:56 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 13 Aug 2018 12:14:36 +0200
-Message-Id: <20180813101453.10200-17-e.emanuelegiuseppe@gmail.com>
+Date: Mon, 13 Aug 2018 12:14:37 +0200
+Message-Id: <20180813101453.10200-18-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
 References: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 16/33] tests/qgraph: arm/virt machine node
+Subject: [Qemu-devel] [PATCH 17/33] tests: virtio: separate ccw tests from
+ libqos
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,125 +21,179 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, John Snow <jsnow@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, John Snow <jsnow@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>
 
-Add arm/virt machine to the graph. This machine contains virtio-mmio, so
-its constructor must take care of setting it properly when called.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Because qtest does not support s390 channel I/O, s390 only performs smoke tests on
+those few devices that do not have any functional tests.  Therefore, every time we
+add functional tests for a virtio device, the choice is between removing
+those tests from the s390 suite (so that s390 actually _loses_ coverage)
+or sprinkling the test with architecture checks.
+
+This patch simply creates a ccw-specific test that only performs smoke tests on
+all virtio-ccw devices.  If channel I/O support is ever added to qtest and libqos,
+then this file can go away.  In the meanwhile, it simplifies maintenance and
+makes sure that all virtio devices are tested.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/Makefile.include      |  1 +
- tests/libqos/virt-machine.c | 90 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 91 insertions(+)
- create mode 100644 tests/libqos/virt-machine.c
+ tests/Makefile.include  |   5 +-
+ tests/virtio-ccw-test.c | 121 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 123 insertions(+), 3 deletions(-)
+ create mode 100644 tests/virtio-ccw-test.c
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 5220136473..20cb983ed0 100644
+index 20cb983ed0..0e0bebf783 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -770,6 +770,7 @@ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virt
- libqgraph-machines-obj-y = tests/libqos/x86_64_pc-machine.o
- libqgraph-machines-obj-y += tests/libqos/raspi2-machine.o
- libqgraph-machines-obj-y += tests/libqos/ppc64_pseries-machine.o
-+libqgraph-machines-obj-y += tests/libqos/virt-machine.o
+@@ -397,9 +397,7 @@ check-qtest-s390x-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
+ check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
+ check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
+ check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
+-check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
+-check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
+-check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
++check-qtest-s390x-y += tests/virtio-ccw-test$(EXESUF)
+ check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
  
- libqgraph-pci-obj-y = $(libqos-virtio-obj-y)
- libqgraph-pci-obj-y += $(libqgraph-machines-obj-y)
-diff --git a/tests/libqos/virt-machine.c b/tests/libqos/virt-machine.c
+ check-qtest-generic-y += tests/machine-none-test$(EXESUF)
+@@ -824,6 +822,7 @@ tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
+ tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
+ tests/virtio-balloon-test$(EXESUF): tests/virtio-balloon-test.o $(libqos-virtio-obj-y)
+ tests/virtio-blk-test$(EXESUF): tests/virtio-blk-test.o $(libqos-virtio-obj-y)
++tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
+ tests/virtio-net-test$(EXESUF): tests/virtio-net-test.o $(libqos-pc-obj-y) $(libqos-virtio-obj-y)
+ tests/virtio-rng-test$(EXESUF): tests/virtio-rng-test.o $(libqos-pc-obj-y)
+ tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
+diff --git a/tests/virtio-ccw-test.c b/tests/virtio-ccw-test.c
 new file mode 100644
-index 0000000000..c8910a58f4
+index 0000000000..88602f3235
 --- /dev/null
-+++ b/tests/libqos/virt-machine.c
-@@ -0,0 +1,90 @@
++++ b/tests/virtio-ccw-test.c
+@@ -0,0 +1,121 @@
 +/*
-+ * libqos driver framework
++ * QTest testcase for VirtIO CCW
 + *
-+ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ * Copyright (c) 2014 SUSE LINUX Products GmbH
++ * Copyright (c) 2018 Red Hat, Inc.
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License version 2 as published by the Free Software Foundation.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++/* Until we have a full libqos implementation of virtio-ccw (which requires
++ * also to add support for I/O channels to qtest), we can only do simple
++ * tests that initialize the devices.
 + */
 +
 +#include "qemu/osdep.h"
 +#include "libqtest.h"
-+#include "libqos/malloc.h"
-+#include "libqos/qgraph.h"
-+#include "libqos/virtio-mmio.h"
-+#include "libqos/malloc-generic.h"
++#include "libqos/virtio.h"
 +
-+#define ARM_PAGE_SIZE               4096
-+#define VIRTIO_MMIO_BASE_ADDR       0x0A003E00
-+#define ARM_VIRT_RAM_ADDR           0x40000000
-+#define ARM_VIRT_RAM_SIZE           0x20000000
-+#define VIRTIO_MMIO_SIZE            0x00000200
-+
-+typedef struct QVirtioMachine QVirtioMachine;
-+
-+struct QVirtioMachine {
-+    QOSGraphObject obj;
-+    QGuestAllocator *alloc;
-+    QVirtioMMIODevice virtio_mmio;
-+};
-+
-+static void virtio_destructor(QOSGraphObject *obj)
++static void virtio_balloon_nop(void)
 +{
-+    QVirtioMachine *machine = (QVirtioMachine *) obj;
-+    generic_alloc_uninit(machine->alloc);
-+    g_free(obj);
++    global_qtest = qtest_startf("-device virtio-balloon-ccw");
++    qtest_end();
 +}
 +
-+static void *virtio_get_driver(void *object, const char *interface)
++static void virtconsole_nop(void)
 +{
-+    QVirtioMachine *machine = object;
-+    if (!g_strcmp0(interface, "memory")) {
-+        return machine->alloc;
-+    }
-+
-+    fprintf(stderr, "%s not present in arm/virtio\n", interface);
-+    g_assert_not_reached();
++    global_qtest = qtest_startf("-device virtio-serial-ccw,id=vser0 "
++                                "-device virtconsole,bus=vser0.0");
++    qtest_end();
 +}
 +
-+static QOSGraphObject *virtio_get_device(void *obj, const char *device)
++static void virtserialport_nop(void)
 +{
-+    QVirtioMachine *machine = obj;
-+    if (!g_strcmp0(device, "virtio-mmio")) {
-+        return &machine->virtio_mmio.obj;
-+    }
-+
-+    fprintf(stderr, "%s not present in arm/virtio\n", device);
-+    g_assert_not_reached();
++    global_qtest = qtest_startf("-device virtio-serial-ccw,id=vser0 "
++                                "-device virtserialport,bus=vser0.0");
++    qtest_end();
 +}
 +
-+static void *qos_create_machine_arm_virt(void)
++static void virtio_serial_nop(void)
 +{
-+    QVirtioMachine *machine = g_new0(QVirtioMachine, 1);
-+
-+    machine->alloc = generic_alloc_init(ARM_VIRT_RAM_ADDR, ARM_VIRT_RAM_SIZE,
-+                                        ARM_PAGE_SIZE);
-+    qvirtio_mmio_init_device(&machine->virtio_mmio, VIRTIO_MMIO_BASE_ADDR,
-+                             VIRTIO_MMIO_SIZE);
-+
-+    machine->obj.get_device = virtio_get_device;
-+    machine->obj.get_driver = virtio_get_driver;
-+    machine->obj.destructor = virtio_destructor;
-+    return machine;
++    global_qtest = qtest_startf("-device virtio-serial-ccw");
++    qtest_end();
 +}
 +
-+static void virtio_mmio_register_nodes(void)
++static void virtio_serial_hotplug(void)
 +{
-+    qos_node_create_machine("arm/virt", qos_create_machine_arm_virt);
-+    qos_node_contains("arm/virt", "virtio-mmio", NULL);
++    global_qtest = qtest_startf("-device virtio-serial-ccw");
++    qtest_qmp_device_add("virtserialport", "hp-port", NULL);
++    qtest_qmp_device_del("hp-port");
++    qtest_end();
 +}
 +
-+libqos_init(virtio_mmio_register_nodes);
++static void virtio_blk_nop(void)
++{
++    global_qtest = qtest_startf("-drive if=none,id=drv0,"
++                                "file=null-co://,format=raw "
++                                "-device virtio-blk-ccw,drive=drv0");
++    qtest_end();
++}
++
++static void virtio_net_nop(void)
++{
++    global_qtest = qtest_startf("-device virtio-net-ccw");
++    qtest_end();
++}
++
++static void virtio_9p_nop(void)
++{
++    global_qtest = qtest_startf("-fsdev synth,id=fsdev0 "
++                                "-device virtio-9p-ccw,fsdev=fsdev0,mount_tag=qtest");
++    qtest_end();
++}
++
++static void virtio_rng_nop(void)
++{
++    global_qtest = qtest_startf("-device virtio-rng-ccw");
++    qtest_end();
++}
++
++static void virtio_scsi_nop(void)
++{
++    global_qtest = qtest_startf("-device virtio-scsi-ccw");
++    qtest_end();
++}
++
++static void virtio_scsi_hotplug(void)
++{
++    global_qtest = qtest_startf("-drive if=none,id=drv0,"
++                                "file=null-co://,format=raw "
++                                "-drive if=none,id=drv1,"
++                                "file=null-co://,format=raw "
++                                "-device virtio-scsi-ccw "
++                                "-device scsi-hd,drive=drv0");
++    qtest_qmp_device_add("scsi-hd", "scsihd", "'drive': 'drv1'");
++    qtest_qmp_device_del("scsihd");
++
++    qtest_end();
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++
++    g_test_init(&argc, &argv, NULL);
++    qtest_add_func("/virtio/balloon/nop", virtio_balloon_nop);
++    qtest_add_func("/virtio/console/nop", virtconsole_nop);
++    qtest_add_func("/virtio/serialport/nop", virtserialport_nop);
++    qtest_add_func("/virtio/serial/nop", virtio_serial_nop);
++    qtest_add_func("/virtio/serial/hotplug", virtio_serial_hotplug);
++    qtest_add_func("/virtio/block/nop", virtio_blk_nop);
++    qtest_add_func("/virtio/net/nop", virtio_net_nop);
++    qtest_add_func("/virtio/9p/nop", virtio_9p_nop);
++    qtest_add_func("/virtio/rng/nop", virtio_rng_nop);
++    qtest_add_func("/virtio/scsi/nop", virtio_scsi_nop);
++    qtest_add_func("/virtio/scsi/hotplug", virtio_scsi_hotplug);
++
++    ret = g_test_run();
++
++    return ret;
++}
 -- 
 2.17.1
