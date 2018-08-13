@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fp2TC-0003XV-6q
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:20:35 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fp2TF-0003aU-Tn
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:20:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fp2TB-0008CP-8v
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:20:34 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fp2TE-0008Do-U3
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:20:37 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 13 Aug 2018 04:19:57 +0200
-Message-Id: <20180813022006.7216-9-mreitz@redhat.com>
+Date: Mon, 13 Aug 2018 04:19:58 +0200
+Message-Id: <20180813022006.7216-10-mreitz@redhat.com>
 In-Reply-To: <20180813022006.7216-1-mreitz@redhat.com>
 References: <20180813022006.7216-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 08/17] mirror: Make mirror_co_discard() nicer
+Subject: [Qemu-devel] [PATCH 09/17] mirror: Lock AioContext in
+ mirror_co_perform()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +25,71 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redh
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/mirror.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ block/mirror.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/block/mirror.c b/block/mirror.c
-index df8e0242dc..85b08086cc 100644
+index 85b08086cc..6330269156 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -374,16 +374,13 @@ static int coroutine_fn mirror_co_zero(MirrorBlockJob *s,
-                                 s->unmap ? BDRV_REQ_MAY_UNMAP : 0);
- }
- 
--static void coroutine_fn mirror_co_discard(void *opaque)
-+static int coroutine_fn mirror_co_discard(MirrorBlockJob *s,
-+                                          int64_t offset, int64_t bytes)
+@@ -196,7 +196,6 @@ static void coroutine_fn mirror_write_complete(MirrorOp *op, int ret)
  {
--    MirrorOp *op = opaque;
--    int ret;
--
--    op->s->in_flight++;
--    op->s->bytes_in_flight += op->bytes;
-+    s->in_flight++;
-+    s->bytes_in_flight += bytes;
+     MirrorBlockJob *s = op->s;
  
--    ret = blk_co_pdiscard(op->s->target, op->offset, op->bytes);
--    mirror_write_complete(op, ret);
-+    return blk_co_pdiscard(s->target, offset, bytes);
+-    aio_context_acquire(blk_get_aio_context(s->common.blk));
+     if (ret < 0) {
+         BlockErrorAction action;
+ 
+@@ -207,14 +206,12 @@ static void coroutine_fn mirror_write_complete(MirrorOp *op, int ret)
+         }
+     }
+     mirror_iteration_done(op, ret);
+-    aio_context_release(blk_get_aio_context(s->common.blk));
  }
  
- static void coroutine_fn mirror_co_perform(void *opaque)
-@@ -400,8 +397,8 @@ static void coroutine_fn mirror_co_perform(void *opaque)
+ static void coroutine_fn mirror_read_complete(MirrorOp *op, int ret)
+ {
+     MirrorBlockJob *s = op->s;
+ 
+-    aio_context_acquire(blk_get_aio_context(s->common.blk));
+     if (ret < 0) {
+         BlockErrorAction action;
+ 
+@@ -230,7 +227,6 @@ static void coroutine_fn mirror_read_complete(MirrorOp *op, int ret)
+                              op->qiov.size, &op->qiov, 0);
+         mirror_write_complete(op, ret);
+     }
+-    aio_context_release(blk_get_aio_context(s->common.blk));
+ }
+ 
+ /* Clip bytes relative to offset to not exceed end-of-file */
+@@ -387,12 +383,16 @@ static void coroutine_fn mirror_co_perform(void *opaque)
+ {
+     MirrorOp *op = opaque;
+     MirrorBlockJob *s = op->s;
++    AioContext *aio_context;
+     int ret;
+ 
++    aio_context = blk_get_aio_context(s->common.blk);
++    aio_context_acquire(aio_context);
++
+     switch (op->mirror_method) {
+     case MIRROR_METHOD_COPY:
+         mirror_co_read(opaque);
+-        return;
++        goto done;
+     case MIRROR_METHOD_ZERO:
          ret = mirror_co_zero(s, op->offset, op->bytes);
          break;
-     case MIRROR_METHOD_DISCARD:
--        mirror_co_discard(opaque);
--        return;
-+        ret = mirror_co_discard(s, op->offset, op->bytes);
-+        break;
-     default:
-         abort();
+@@ -404,6 +404,9 @@ static void coroutine_fn mirror_co_perform(void *opaque)
      }
+ 
+     mirror_write_complete(op, ret);
++
++done:
++    aio_context_release(aio_context);
+ }
+ 
+ /* If mirror_method == MIRROR_METHOD_COPY, *offset and *bytes will be
 -- 
 2.17.1
