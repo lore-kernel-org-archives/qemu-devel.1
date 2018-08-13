@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fpFyR-00032W-2M
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:45:43 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fpG99-0007ce-L0
+	for Qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:56:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fpFyM-0003VJ-1l
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:45:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37752 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fpFyL-0003Uq-TJ
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:45:37 -0400
-Date: Mon, 13 Aug 2018 17:45:34 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180813164533.GF2488@work-vm>
-References: <CAEkmjvUix62F8EK9pHboRZOcpycCgMapiqVNM976UVkv-B6u5g@mail.gmail.com>
-	<8487b7ec-271c-4ba1-b1f8-539635943603@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fpG95-0007JW-Lx
+	for Qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:56:47 -0400
+References: <20180730212249.16418-1-programmingkidx@gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5679ec6f-e2d7-e139-1b56-304540c89977@redhat.com>
+Date: Mon, 13 Aug 2018 18:56:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8487b7ec-271c-4ba1-b1f8-539635943603@redhat.com>
-Subject: Re: [Qemu-devel] RAMBlocks and memory_region_init_ram_nomigrate
+In-Reply-To: <20180730212249.16418-1-programmingkidx@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="m4PpEUvcynqhwTXeieQoCIB3SmppbYjoU"
+Subject: Re: [Qemu-devel] [PATCH] qemu-img.c: increase spacing between
+ commands in documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,27 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Frank Yang <lfy@google.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
+To: John Arbuckle <programmingkidx@gmail.com>, eblake@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, Qemu-devel@nongnu.org
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 13/08/2018 18:16, Frank Yang wrote:
-> > Hi Paolo,
-> > 
-> > I see that migration/ram.c saves RAMBlocks associated with memory
-> > regions initialized with nomigrate. Is this intended?
-> 
-> Probably the name and size of the RAMBlocks must match but the contents
-> need not (but honestly I haven't looked at the code to find the answer).
->  CCing the qemu mailing list (always a good idea) and a couple people
-> that might know.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--m4PpEUvcynqhwTXeieQoCIB3SmppbYjoU
+From: Max Reitz <mreitz@redhat.com>
+To: John Arbuckle <programmingkidx@gmail.com>, eblake@redhat.com,
+ kwolf@redhat.com, qemu-block@nongnu.org, Qemu-devel@nongnu.org
+Message-ID: <5679ec6f-e2d7-e139-1b56-304540c89977@redhat.com>
+Subject: Re: [PATCH] qemu-img.c: increase spacing between commands in
+ documentation
+References: <20180730212249.16418-1-programmingkidx@gmail.com>
+In-Reply-To: <20180730212249.16418-1-programmingkidx@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-All the migration code should now be using RAMBLOCK_FOREACH_MIGRATABLE and
-qemu_ram_is_migratable whenever it's iterating the ramblock list,
-so that *shouldn't* happen these days.
-Of course we could have messed it up somewhere; what are you seeing?
+On 2018-07-30 23:22, John Arbuckle wrote:
+> When the user uses the --help option in qemu-img, the output for the co=
+mmands is very hard to read due to being so close to each other. With thi=
+s patch the help for the commands is double spaced making things easier t=
+o read.
+>=20
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> ---
+>  qemu-img.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 9b7506b8ae..6a7e63435e 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -120,7 +120,7 @@ static void QEMU_NORETURN help(void)
+>             "\n"
+>             "Command syntax:\n"
+>  #define DEF(option, callback, arg_string)        \
+> -           "  " arg_string "\n"
+> +           "  " arg_string "\n\n"
+>  #include "qemu-img-cmds.h"
+>  #undef DEF
+>             "\n"
 
-Dave
-> Paolo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Ah, hm, so much for that.  Hm...  I don't quite know what to think of
+this.  It does indeed improve legibility.  But the question is whether
+--help should be as condensed as possible, and if the user finds it hard
+to read, whether they should not just open the man page...
+
+Then again, our --help text already has 102 lines.
+
+Let me just think about it for a bit longer. :-)
+(And see whether others have opinions.)
+
+Max
+
+
+--m4PpEUvcynqhwTXeieQoCIB3SmppbYjoU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltxuEgACgkQ9AfbAGHV
+z0CZQQf8C2POgk+9cnHuJIe/clGb2tNTyvkzFNqbYR0EkQ2yVQj18Ld2cJD8eQDE
+DsqMgAdt4U3/MCRdEH9tkklaC6xeHaFAu4/4wRFl5E4IdNmA5nSvCfT2ff+3OwyH
+K5fMGio/OliddOkU0YmUacZCmB7MucPUW6iF2j5bqVKfreohe+c+WIM7I5624w5V
+id9Y2GrWviKHAwD7AQjaA8Dd9SUZXeGwu+J9YZjCxBREIuAE4EBKWsF8m9kUtlkn
+eYpe069KNWRgFKsU4hfY8jE6m50VLNWRTlxlTRCVyzr1yofO1vHRQ6hOWGwTTJ0p
+VxkQYhCy+r5yhWb1zGb42SptjBDPsw==
+=OPYL
+-----END PGP SIGNATURE-----
+
+--m4PpEUvcynqhwTXeieQoCIB3SmppbYjoU--
