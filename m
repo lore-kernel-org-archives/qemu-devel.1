@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fp9cg-0006O1-7Q
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 05:58:51 -0400
+	(envelope-from <peter.tribble@gmail.com>) id 1fp9lk-0003WB-8k
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:08:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fp9cf-0002Pf-IX
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 05:58:50 -0400
+	(envelope-from <peter.tribble@gmail.com>) id 1fp9li-00078v-Sg
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:08:12 -0400
+Received: from mail-ua1-x92f.google.com ([2607:f8b0:4864:20::92f]:45260)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.tribble@gmail.com>)
+	id 1fp9li-00078d-Lc
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:08:10 -0400
+Received: by mail-ua1-x92f.google.com with SMTP id k8-v6so8516713uaq.12
+	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 03:08:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20180803144721.17036-1-stefanha@redhat.com>
-	<20180803144721.17036-5-stefanha@redhat.com>
-	<CAKmqyKOthBCQrWc_v9zhdYoBATHYfjyjkUQqx1W5mktm2b+6hw@mail.gmail.com>
-In-Reply-To: <CAKmqyKOthBCQrWc_v9zhdYoBATHYfjyjkUQqx1W5mktm2b+6hw@mail.gmail.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Mon, 13 Aug 2018 10:58:36 +0100
-Message-ID: <CAJSP0QU2UhO+X-XX0Rj_Cj9=NmBp4aaBNRb4GExxDq546AabXw@mail.gmail.com>
+In-Reply-To: <20180813083408.GG22904@redhat.com>
+References: <5B7054D9.9000209@gmx.com> <20180813083408.GG22904@redhat.com>
+From: Peter Tribble <peter.tribble@gmail.com>
+Date: Mon, 13 Aug 2018 11:08:09 +0100
+Message-ID: <CAEgYsbEQpnVn-hWgQxBmCfiTnU7eOdA+sdscpAHo=+KH17bnuA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 4/6] loader: add rom transaction API
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] QEMU on Solaris
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, Liviu Ionescu <ilg@livius.net>, Alistair Francis <alistair@alistair23.me>, qemu-devel <qemu-devel@nongnu.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <qemu.ml@steffen-goertz.de>, =?UTF-8?B?6IuP6Iiq?= <suhang16@mails.ucas.ac.cn>, Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>, Julia Suvorova <jusual@mail.ru>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Michele Denber <mdenber@gmx.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Aug 8, 2018 at 10:32 PM Alistair Francis <alistair23@gmail.com> wrote:
-> On Fri, Aug 3, 2018 at 7:47 AM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > @@ -1168,6 +1172,34 @@ void rom_reset_order_override(void)
-> >      fw_cfg_reset_order_override(fw_cfg);
-> >  }
+On Mon, Aug 13, 2018 at 9:34 AM, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
+om>
+wrote:
+
+> On Sun, Aug 12, 2018 at 11:40:09AM -0400, Michele Denber wrote:
+> > After configuring QEMU on my Sun I got this message:
 > >
-> > +void rom_transaction_begin(void)
-> > +{
-> > +    Rom *rom;
-> > +
-> > +    /* Ignore ROMs added without the transaction API */
-> > +    QTAILQ_FOREACH(rom, &roms, next) {
-> > +        rom->committed = true;
+> > "Host OS SunOS support is not currently maintained.
+> > The QEMU project intends to remove support for this host OS in
+> > a future release if nobody volunteers to maintain it and to
+> > provide a build host for our continuous integration setup.
+> > configure has succeeded and you can continue to build, but
+> > if you care about QEMU on this platform you should contact
+> > us upstream at qemu-devel@nongnu.org."
+> >
+> > Well I do care about QEMU on my platform so I'd like to volunteer to
+> provide
+> > a host for support.  I can provide you with a free account on my Sun
+> Oracle
+> > Enterprise M3000 quad-core 2.75 GHz. SPARC64 VII running Solaris 10
+> Update
+> > 11.  I've got plenty of spare CPU cycles and lots of free disk.  Please
+> let
+> > me know.
 >
-> My only thought is that maybe this should produce a warning or error
-> if a ROM isn't committed.
+> Copying Peter, as he would need access to a Solaris host to do GIT
+> pre-merge
+> build testing.
+>
+> Then there's the question of what ordinary developers would use for their
+> own
+> testing if they needed to work on some portability issue. We've got suppo=
+rt
+> in tree for running builds against VM images for the various *BSDs, and
+> have
+> mingw cross build toolchain for Windows. Is it possible to provide
+> free-to-use
+> VM disk images for Solaris build testing, or are software licensing
+> requirements
+> going to get in the way of developers using them ?
+>
+> There is OpenIndiana that forked off OpenSolaris, but I'm unclear how far
+> OpenIndiana and commercial Solaris have diverged since then ?
+>
 
-Not all loaders use the transaction API.  Therefore it is likely that
-some pre-existing ROMs will have ->committed = false.
+>From the point of view of software such as qemu, divergences should be
+slight
+(there are going to be changes around packaging, shipped compilers, but
+that's
+true for different Linux distros in the same family). If it builds and
+works on
+Solaris, it'll build and work on one of the illumos distributions, and vice
+versa.
+(Although I note that's Solaris 10 mentioned above, which is now EOL, and
+may be a little more problematic due to its age.)
 
-For example, imagine a firmware ROM is loaded by the machine type and
-then -kernel is used to load a file.  The -kernel loader shouldn't
-worry about the firmware ROM, which was added without the transaction
-API.
+You can certainly run illumos (such as OpenIndiana or Tribblix) in a VM
+easily,
+and freely. I can help with that.
 
-If we want to be strict I'd have to audit all ROM API users and wrap
-them in add rom_transaction_begin/end() even if they cannot fail.
-This is why I decided to simply ignore pre-existing ROMs.
+That's for x86, of course. Building on a SPARC platform is a different
+matter
+entirely. (Although that's one of the reasons some of us are interested in
+qemu
+in the first place.)
 
-Stefan
+Thanks,
+
+--=20
+-Peter Tribble
+http://www.petertribble.co.uk/ - http://ptribble.blogspot.com/
