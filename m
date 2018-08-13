@@ -1,31 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fpCNN-0002ZR-BP
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:55:14 -0400
+	(envelope-from <muriloo@linux.ibm.com>) id 1fpCNP-0002iy-Qv
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:55:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fpCNK-0004R3-4h
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:55:13 -0400
-Received: from mail-eopbgr70104.outbound.protection.outlook.com
-	([40.107.7.104]:10784
-	helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+	(envelope-from <muriloo@linux.ibm.com>) id 1fpCNM-0004So-Kp
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:55:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36098)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1fpCNJ-0004NH-5n
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:55:10 -0400
-References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
-	<20180629115359.GH2568@work-vm> <20180725101836.GI2479@xz-mi>
-	<20180725191736.GE2365@work-vm> <20180725200456.GM18452@redhat.com>
-	<e1c85e53-1b94-b1df-b7ee-6d93bb43caf6@redhat.com>
-	<20180726092307.GL2479@xz-mi>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <d1370a77-3d67-9c83-8214-3cba291744a1@virtuozzo.com>
-Date: Mon, 13 Aug 2018 15:55:02 +0300
+	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
+	id 1fpCNM-0004Rz-B7
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:55:12 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w7DCmlnT103255
+	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 08:55:11 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ku8nsmhky-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 08:55:10 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
+	Mon, 13 Aug 2018 06:55:09 -0600
+Date: Mon, 13 Aug 2018 09:54:57 -0300
+From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+References: <20180813022006.7216-1-mreitz@redhat.com>
+	<20180813022006.7216-3-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180726092307.GL2479@xz-mi>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180813022006.7216-3-mreitz@redhat.com>
+Message-Id: <20180813125457.GA11625@kermit-br-ibm-com>
+Subject: Re: [Qemu-devel] [PATCH 02/17] mirror: Make
+ wait_for_any_operation() coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,81 +42,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Andrea Arcangeli <aarcange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
+Hi, Max.
 
+On Mon, Aug 13, 2018 at 04:19:51AM +0200, Max Reitz wrote:
+> mirror_wait_for_any_operation() calls qemu_co_queue_wait(), which is a
+> coroutine_fn (technically it is a macro which resolves to a
+> coroutine_fn).  Therefore, this function needs to be a coroutine_fn as
+> well.
+>
+> This patch makes it and all of its callers coroutine_fns.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/mirror.c | 30 ++++++++++++++++--------------
+>  1 file changed, 16 insertions(+), 14 deletions(-)
+>
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 85f5742eae..c28b6159d5 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -279,7 +279,8 @@ static int mirror_cow_align(MirrorBlockJob *s, int64_t *offset,
+>      return ret;
+>  }
+>
+> -static inline void mirror_wait_for_any_operation(MirrorBlockJob *s, bool active)
+> +static inline void coroutine_fn
+> +    mirror_co_wait_for_any_operation(MirrorBlockJob *s, bool active)
+>  {
+>      MirrorOp *op;
+>
+> @@ -297,10 +298,11 @@ static inline void mirror_wait_for_any_operation(MirrorBlockJob *s, bool active)
+>      abort();
+>  }
+>
+> -static inline void mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s)
+> +static inline void coroutine_fn
+> +    mirror_co_wait_for_free_in_flight_slot(MirrorBlockJob *s)
+>  {
+>      /* Only non-active operations use up in-flight slots */
+> -    mirror_wait_for_any_operation(s, false);
+> +    mirror_co_wait_for_any_operation(s, false);
+>  }
+>
+>  /* Perform a mirror copy operation.
+> @@ -343,7 +345,7 @@ static void coroutine_fn mirror_co_read(void *opaque)
+>
+>      while (s->buf_free_count < nb_chunks) {
+>          trace_mirror_yield_in_flight(s, op->offset, s->in_flight);
+> -        mirror_wait_for_free_in_flight_slot(s);
+> +        mirror_co_wait_for_free_in_flight_slot(s);
+>      }
+>
+>      /* Now make a QEMUIOVector taking enough granularity-sized chunks
+> @@ -549,7 +551,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+>
+>          while (s->in_flight >= MAX_IN_FLIGHT) {
+>              trace_mirror_yield_in_flight(s, offset, s->in_flight);
+> -            mirror_wait_for_free_in_flight_slot(s);
+> +            mirror_co_wait_for_free_in_flight_slot(s);
+>          }
+>
+>          if (s->ret < 0) {
+> @@ -600,10 +602,10 @@ static void mirror_free_init(MirrorBlockJob *s)
+>   * mirror_resume() because mirror_run() will begin iterating again
+>   * when the job is resumed.
+>   */
+> -static void mirror_wait_for_all_io(MirrorBlockJob *s)
+> +static void coroutine_fn mirror_co_wait_for_all_io(MirrorBlockJob *s)
+>  {
+>      while (s->in_flight > 0) {
+> -        mirror_wait_for_free_in_flight_slot(s);
+> +        mirror_co_wait_for_free_in_flight_slot(s);
+>      }
+>  }
+>
+> @@ -762,7 +764,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+>              if (s->in_flight >= MAX_IN_FLIGHT) {
+>                  trace_mirror_yield(s, UINT64_MAX, s->buf_free_count,
+>                                     s->in_flight);
+> -                mirror_wait_for_free_in_flight_slot(s);
+> +                mirror_co_wait_for_free_in_flight_slot(s);
+>                  continue;
+>              }
+>
+> @@ -770,7 +772,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+>              offset += bytes;
+>          }
+>
+> -        mirror_wait_for_all_io(s);
+> +        mirror_co_wait_for_all_io(s);
+>          s->initial_zeroing_ongoing = false;
+>      }
+>
+> @@ -916,7 +918,7 @@ static void coroutine_fn mirror_run(void *opaque)
+>          /* Do not start passive operations while there are active
+>           * writes in progress */
+>          while (s->in_active_write_counter) {
+> -            mirror_wait_for_any_operation(s, true);
+> +            mirror_co_wait_for_any_operation(s, true);
+>          }
+>
+>          if (s->ret < 0) {
+> @@ -942,7 +944,7 @@ static void coroutine_fn mirror_run(void *opaque)
+>              if (s->in_flight >= MAX_IN_FLIGHT || s->buf_free_count == 0 ||
+>                  (cnt == 0 && s->in_flight > 0)) {
+>                  trace_mirror_yield(s, cnt, s->buf_free_count, s->in_flight);
+> -                mirror_wait_for_free_in_flight_slot(s);
+> +                mirror_co_wait_for_free_in_flight_slot(s);
+>                  continue;
+>              } else if (cnt != 0) {
+>                  delay_ns = mirror_iteration(s);
+> @@ -1028,7 +1030,7 @@ immediate_exit:
+>          assert(ret < 0 || ((s->common.job.force_cancel || !s->synced) &&
+>                 job_is_cancelled(&s->common.job)));
+>          assert(need_drain);
+> -        mirror_wait_for_all_io(s);
+> +        mirror_co_wait_for_all_io(s);
+>      }
+>
+>      assert(s->in_flight == 0);
+> @@ -1098,11 +1100,11 @@ static void mirror_complete(Job *job, Error **errp)
+>      job_enter(job);
+>  }
+>
+> -static void mirror_pause(Job *job)
+> +static void coroutine_fn mirror_pause(Job *job)
 
-On 26.07.2018 12:23, Peter Xu wrote:
-> On Thu, Jul 26, 2018 at 10:51:33AM +0200, Paolo Bonzini wrote:
->> On 25/07/2018 22:04, Andrea Arcangeli wrote:
->>>
->>> It may look like the uffd-wp model is wish-feature similar to an
->>> optimization, but without the uffd-wp model when the WP fault is
->>> triggered by kernel code, the sigsegv model falls apart and requires
->>> all kind of ad-hoc changes just for this single feature. Plus uffd-wp
->>> has other benefits: it makes it all reliable in terms of not
->>> increasing the number of vmas in use during the snapshot. Finally it
->>> makes it faster too with no mmap_sem for reading and no sigsegv
->>> signals.
->>>
->>> The non cooperative features got merged first because there was much
->>> activity on the kernel side on that front, but this is just an ideal
->>> time to nail down the remaining issues in uffd-wp I think. That I
->>> believe is time better spent than trying to emulate it with sigsegv
->>> and changing all drivers to send new events down to qemu specific to
->>> the sigsegv handling. We considered this before doing uffd for
->>> postcopy too but overall it's unreliable and more work (no single
->>> change was then needed to KVM code with uffd to handle postcopy and
->>> here it should be the same).
->>
->> I totally agree.  The hard part in userfaultfd was the changes to the
->> kernel get_user_pages API, but the payback was huge because _all_ kernel
->> uses (KVM, vhost-net, syscalls, etc.) just work with userfaultfd.  Going
->> back to mprotect would be a huge mistake.
-> 
-> Thanks for explaining the bits.  I'd say I wasn't aware of the
-> difference before I started the investigation (and only until now I
-> noticed that major difference between mprotect and userfaultfd).  I'm
-> really glad that it's much clear (at least for me) on which way we
-> should choose.
-> 
-> Now I'm thinking whether we can move the userfault write protect work
-> forward.  The latest discussion I saw so far is in 2016, when someone
-> from Huawei tried to use the write protect feature for that old
-> version of live snapshot but reported issue:
-> 
->    https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01127.html
-> 
-> Is that the latest status for userfaultfd wr-protect?
-> 
-> If so, I'm thinking whether I can try to re-verify the work (I tried
-> his QEMU repository but I failed to compile somehow, so I plan to
-> write some even simpler code to try) to see whether I can get the same
-> KVM error he encountered.
-> 
-> Thoughts?
+Other functions in this patch were renamed to mirror_co_*.  I'm not sure if
+mirror_pause() should follow that, i.e. be renamed to mirror_co_pause().
 
-Just to sum up all being said before.
+>  {
+>      MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
+>
+> -    mirror_wait_for_all_io(s);
+> +    mirror_co_wait_for_all_io(s);
+>  }
+>
+>  static bool mirror_drained_poll(BlockJob *job)
+> --
+> 2.17.1
+>
+>
 
-Using mprotect is a bad idea because VM's memory can be accessed from 
-the number of places (KVM, vhost, ...) which need their own special care
-of tracking memory accesses and notifying QEMU which makes the mprotect 
-using unacceptable.
-
-Protected memory accesses tracking can be done via userfaultfd's WP mode 
-which isn't available right now.
-
-So, the reasonable conclusion is to wait until the WP mode is available 
-and build the background snapshot on top of userfaultfd-wp.
-But, works on adding the WP-mode is pending for a quite a long time 
-already.
-
-Is there any way to estimate when it could be available?
-> 
-> Regards,
-> 
-
--- 
-Best,
-Denis
+--
+Murilo
