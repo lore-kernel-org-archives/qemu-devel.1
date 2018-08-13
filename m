@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.tribble@gmail.com>) id 1fp9lk-0003WB-8k
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:08:13 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fp9qA-0005LO-ME
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:12:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.tribble@gmail.com>) id 1fp9li-00078v-Sg
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:08:12 -0400
-Received: from mail-ua1-x92f.google.com ([2607:f8b0:4864:20::92f]:45260)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.tribble@gmail.com>)
-	id 1fp9li-00078d-Lc
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:08:10 -0400
-Received: by mail-ua1-x92f.google.com with SMTP id k8-v6so8516713uaq.12
-	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 03:08:10 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1fp9q5-0000xE-NJ
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:12:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48252 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fp9q5-0000wx-HG
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:12:41 -0400
+References: <20180813093402.10852-1-jusual@mail.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e9bc37b7-f91d-a50d-bddf-8b3d0fbd3412@redhat.com>
+Date: Mon, 13 Aug 2018 12:12:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180813083408.GG22904@redhat.com>
-References: <5B7054D9.9000209@gmx.com> <20180813083408.GG22904@redhat.com>
-From: Peter Tribble <peter.tribble@gmail.com>
-Date: Mon, 13 Aug 2018 11:08:09 +0100
-Message-ID: <CAEgYsbEQpnVn-hWgQxBmCfiTnU7eOdA+sdscpAHo=+KH17bnuA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] QEMU on Solaris
+In-Reply-To: <20180813093402.10852-1-jusual@mail.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] chardev/char-fe: Fix typos
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +27,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Michele Denber <mdenber@gmx.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Julia Suvorova <jusual@mail.ru>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com
 
-On Mon, Aug 13, 2018 at 9:34 AM, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om>
-wrote:
+On 13/08/2018 11:34, Julia Suvorova wrote:
+> Fixup some typos in the comments.
+> 
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> ---
+>  include/chardev/char-fe.h | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
+> index 71cd069478..c67271f1ba 100644
+> --- a/include/chardev/char-fe.h
+> +++ b/include/chardev/char-fe.h
+> @@ -113,7 +113,7 @@ void qemu_chr_fe_accept_input(CharBackend *be);
+>  /**
+>   * @qemu_chr_fe_disconnect:
+>   *
+> - * Close a fd accpeted by character backend.
+> + * Close a fd accepted by character backend.
+>   * Without associated Chardev, do nothing.
+>   */
+>  void qemu_chr_fe_disconnect(CharBackend *be);
+> @@ -122,7 +122,7 @@ void qemu_chr_fe_disconnect(CharBackend *be);
+>   * @qemu_chr_fe_wait_connected:
+>   *
+>   * Wait for characted backend to be connected, return < 0 on error or
+> - * if no assicated Chardev.
+> + * if no associated Chardev.
+>   */
+>  int qemu_chr_fe_wait_connected(CharBackend *be, Error **errp);
+>  
+> @@ -186,7 +186,7 @@ guint qemu_chr_fe_add_watch(CharBackend *be, GIOCondition cond,
+>   * @buf the data
+>   * @len the number of bytes to send
+>   *
+> - * Returns: the number of bytes consumed (0 if no assicated Chardev)
+> + * Returns: the number of bytes consumed (0 if no associated Chardev)
+>   */
+>  int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len);
+>  
+> @@ -201,7 +201,7 @@ int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len);
+>   * @buf the data
+>   * @len the number of bytes to send
+>   *
+> - * Returns: the number of bytes consumed (0 if no assicated Chardev)
+> + * Returns: the number of bytes consumed (0 if no associated Chardev)
+>   */
+>  int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len);
+>  
+> @@ -213,7 +213,7 @@ int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len);
+>   * @buf the data buffer
+>   * @len the number of bytes to read
+>   *
+> - * Returns: the number of bytes read (0 if no assicated Chardev)
+> + * Returns: the number of bytes read (0 if no associated Chardev)
+>   */
+>  int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len);
+>  
+> 
 
-> On Sun, Aug 12, 2018 at 11:40:09AM -0400, Michele Denber wrote:
-> > After configuring QEMU on my Sun I got this message:
-> >
-> > "Host OS SunOS support is not currently maintained.
-> > The QEMU project intends to remove support for this host OS in
-> > a future release if nobody volunteers to maintain it and to
-> > provide a build host for our continuous integration setup.
-> > configure has succeeded and you can continue to build, but
-> > if you care about QEMU on this platform you should contact
-> > us upstream at qemu-devel@nongnu.org."
-> >
-> > Well I do care about QEMU on my platform so I'd like to volunteer to
-> provide
-> > a host for support.  I can provide you with a free account on my Sun
-> Oracle
-> > Enterprise M3000 quad-core 2.75 GHz. SPARC64 VII running Solaris 10
-> Update
-> > 11.  I've got plenty of spare CPU cycles and lots of free disk.  Please
-> let
-> > me know.
->
-> Copying Peter, as he would need access to a Solaris host to do GIT
-> pre-merge
-> build testing.
->
-> Then there's the question of what ordinary developers would use for their
-> own
-> testing if they needed to work on some portability issue. We've got suppo=
-rt
-> in tree for running builds against VM images for the various *BSDs, and
-> have
-> mingw cross build toolchain for Windows. Is it possible to provide
-> free-to-use
-> VM disk images for Solaris build testing, or are software licensing
-> requirements
-> going to get in the way of developers using them ?
->
-> There is OpenIndiana that forked off OpenSolaris, but I'm unclear how far
-> OpenIndiana and commercial Solaris have diverged since then ?
->
+Queued, thanks.
 
->From the point of view of software such as qemu, divergences should be
-slight
-(there are going to be changes around packaging, shipped compilers, but
-that's
-true for different Linux distros in the same family). If it builds and
-works on
-Solaris, it'll build and work on one of the illumos distributions, and vice
-versa.
-(Although I note that's Solaris 10 mentioned above, which is now EOL, and
-may be a little more problematic due to its age.)
-
-You can certainly run illumos (such as OpenIndiana or Tribblix) in a VM
-easily,
-and freely. I can help with that.
-
-That's for x86, of course. Building on a SPARC platform is a different
-matter
-entirely. (Although that's one of the reasons some of us are interested in
-qemu
-in the first place.)
-
-Thanks,
-
---=20
--Peter Tribble
-http://www.petertribble.co.uk/ - http://ptribble.blogspot.com/
+Paolo
