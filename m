@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH3G-0005kN-4V
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:54 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH3H-0005rl-MP
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH38-0007Ce-9N
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:46 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55834 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH39-0007E3-88
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:47 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:55853 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpH37-00079l-Iu
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:38 -0400
+	id 1fpH38-0007Bb-T3
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:39 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 13 Aug 2018 19:53:36 +0200
-Message-Id: <1534182832-554-72-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 13 Aug 2018 19:53:45 +0200
+Message-Id: <1534182832-554-81-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v8 71/87] linux-user: Add target_fcntl.h header
- for nanoMIPS
+Subject: [Qemu-devel] [PATCH v8 80/87] linux-user: Amend support for
+ sigaction() syscall for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +30,29 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Add fcntl-related constants and structures for nanoMIPS.
+Amend sigaction syscall support for nanoMIPS. This must be done
+since nanoMIPS' signal handling is different than MIPS' signal
+handling.
 
 Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/nanomips/target_fcntl.h | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
- create mode 100644 linux-user/nanomips/target_fcntl.h
+ linux-user/syscall.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/linux-user/nanomips/target_fcntl.h b/linux-user/nanomips/target_fcntl.h
-new file mode 100644
-index 0000000..4203825
---- /dev/null
-+++ b/linux-user/nanomips/target_fcntl.h
-@@ -0,0 +1,38 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef NANOMIPS_TARGET_FCNTL_H
-+#define NANOMIPS_TARGET_FCNTL_H
-+
-+#define TARGET_O_APPEND         0x000400
-+#define TARGET_O_DSYNC          0x001000
-+#define TARGET_O_NONBLOCK       0x000800
-+#define TARGET_O_CREAT          0x000040
-+#define TARGET_O_TRUNC          0x000200
-+#define TARGET_O_EXCL           0x000080
-+#define TARGET_O_NOCTTY         0x000100
-+#define TARGET_FASYNC           0x002000
-+#define TARGET_O_LARGEFILE      0x008000
-+#define TARGET___O_SYNC         0x101000
-+#define TARGET_O_DIRECT         0x004000
-+#define TARGET_O_CLOEXEC        0x080000
-+
-+#define TARGET_F_GETLK         5
-+#define TARGET_F_SETLK         6
-+#define TARGET_F_SETLKW        7
-+#define TARGET_F_SETOWN        8       /*  for sockets. */
-+#define TARGET_F_GETOWN        9       /*  for sockets. */
-+
-+#define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
-+#define TARGET_ARCH_FLOCK64_PAD
-+
-+#define TARGET_F_GETLK64       12      /*  using 'struct flock64' */
-+#define TARGET_F_SETLK64       13
-+#define TARGET_F_SETLKW64      14
-+
-+#include "../generic/fcntl.h"
-+#endif
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 3d57966..bced9b8 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8825,7 +8825,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+                 old_act->sa_flags = oact.sa_flags;
+                 unlock_user_struct(old_act, arg3, 1);
+             }
+-#elif defined(TARGET_MIPS)
++#elif defined(TARGET_MIPS) && !defined(TARGET_NANOMIPS)
+ 	    struct target_sigaction act, oact, *pact, *old_act;
+ 
+ 	    if (arg2) {
 -- 
 2.7.4
