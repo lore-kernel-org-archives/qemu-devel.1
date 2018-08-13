@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fpFYV-0001zK-3e
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:18:55 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fpFdv-0003DY-27
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:24:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fpFYR-00086S-S4
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:18:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60954 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fpFYR-00086A-Ls
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:18:51 -0400
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-41-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <87a5ca96-5f44-5e18-a8a0-91c76f66f054@redhat.com>
-Date: Mon, 13 Aug 2018 11:18:48 -0500
+	(envelope-from <kwolf@redhat.com>) id 1fpFdu-0003dP-15
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:24:31 -0400
+Date: Mon, 13 Aug 2018 18:24:21 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180813162421.GN4323@localhost.localdomain>
+References: <20180810062647.23211-1-lbloch@janustech.com>
+	<20180810062647.23211-7-lbloch@janustech.com>
+	<w5136vm8m8u.fsf@maestria.local.igalia.com>
+	<ca79bbff-163b-f50e-e17b-54d6597e6bfe@redhat.com>
+	<20180813112333.GD4323@localhost.localdomain>
+	<e9a77f1e-6b9e-3fea-69c9-c18638961a2e@redhat.com>
+	<20180813155856.GL4323@localhost.localdomain>
+	<5436d747-9cf3-50a0-6fab-537fb8cc8bae@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180808120334.10970-41-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 40/56] json: Replace %I64d, %I64u by %PRId64,
- %PRIu64
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Q0rSlbzrZN6k9QnT"
+Content-Disposition: inline
+In-Reply-To: <5436d747-9cf3-50a0-6fab-537fb8cc8bae@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 6/9] qcow2: Increase the default upper
+ limit on the L2 cache size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
 
-On 08/08/2018 07:03 AM, Markus Armbruster wrote:
-> Support for %I64d got addded in commit 2c0d4b36e7f "json: fix PRId64
 
-s/addded/added/
+--Q0rSlbzrZN6k9QnT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> on Win32".  We had to hard-code I64d because we used the lexer's
-> finite state machine to check interpolations.  No more, so clean this
-> up.
-> 
-> Additional conversion specifications would be easy enough to implement
-> when needed.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   qobject/json-parser.c | 10 ++++++----
->   tests/check-qjson.c   | 10 ++++++++++
->   2 files changed, 16 insertions(+), 4 deletions(-)
-> 
+Am 13.08.2018 um 18:08 hat Max Reitz geschrieben:
+> >>> default should reflect that, especially considering that we only use
+> >>> the memory on demand. If your image is only 32 GB, you'll never use m=
+ore
+> >>> than 4 MB of cache.
+> >>
+> >> Well, OK, yes.  This is an especially important point when it really is
+> >> about hosts that have limited memory.  In those cases, users probably
+> >> won't run huge images anyway.
+> >>
+> >>>                     And if your image is huge, but only access part of
+> >>> it, we also won't use the full 32 MB.
+> >>
+> >> On Linux. O:-)
+> >=20
+> > No, on any system where qemu_try_blockalign() results in a COW zero
+> > page.
+>=20
+> OK, yes, but why would you only ever access part of it?  Then you might
+> just as well have created a smaller disk from the beginning.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I always create my qcow2 images larger than I actually need them. It
+costs basically nothing and avoids the need to resize my partitions
+inside the guest later.
 
->          return QOBJECT(qnum_from_int(va_arg(*ap, long)));
-> -    } else if (!strcmp(token->str, "%lld") ||
-> -               !strcmp(token->str, "%I64d")) {
-> +    } else if (!strcmp(token->str, "%lld")) {
->          return QOBJECT(qnum_from_int(va_arg(*ap, long long)));
-> +    } else if (!strcmp(token->str, "%" PRId64)) {
-> +        return QOBJECT(qnum_from_int(va_arg(*ap, int64_t)));
+And anyway, a disk with 100% usage is not the common case, but the point
+where the user will either delete stuff or resize the image. For
+long-running VMs, deleting stuff doesn't get rid of the large cache on
+non-Linux, but I think we agree that long-running guests aren't what we
+expect on those hosts?
 
-I had a double-take to make sure this still works on mingw. The trick 
-used to be that the lexer had to parse the union of all forms understood 
-by any libc (making Linux understand %I64d even though only mingw would 
-generate it) then the parser had to accept all forms allowed through by 
-the lexer.  Now the lexer accepts all forms with no effort (because it 
-is no longer validates), and the parser is made stricter (%I64d no 
-longer works on Linux, where we have two redundant 'if' clauses; but 
-mingw has two distinct 'if' clauses and works as desired).
+> > The Linux-only addition is returning memory even after an access.
+> >=20
+> >> So it's good that you have calmed my nerves about how this might be
+> >> problematic on Linux systems (it isn't in practice, although I disagree
+> >> that people will find qcow2 to be the fault when their memory runs out=
+),
+> >> but you haven't said anything about non-Linux systems.  I understand
+> >> that you don't care, but as I said here, this was my only substantial
+> >> concern anyway.
+> >=20
+> > I don't actually think it's so bad to keep the cache permanently
+> > allocated, but I wouldn't object to a lower default for non-Linux hosts
+> > either. 1 MB may still be a little too low, 4 MB (covers up to 32 GB)
+> > might be more adequate. My typical desktop VMs are larger than 8 GB, but
+> > smaller than 32 GB.
+>=20
+> Will your typical desktop VMs gain anything from the cache covering
+> more than 8 GB?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Good point. Probably not.
+
+> Anyway, I certainly won't complain about 4 MB.
+>=20
+> (My point here is that on non-Linux systems, qemu probably does not have
+> users who have use cases where they need to access 256 GB of disk
+> simultaneously.  Probably not even more than 8 GB.  If you want to
+> increase the cache size there to 4 MB, fine, I think that won't hurt.
+> But 32 MB might hurt, and I don't think on non-Linux systems there are
+> users who would benefit from it -- specifically because your "typical
+> desktop VM" wouldn't benefit from it.)
+
+Maybe 1 MB is fine for them, after all.
+
+Kevin
+
+--Q0rSlbzrZN6k9QnT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJbcbC1AAoJEH8JsnLIjy/W7L8P/3NBawJR9Xb9XWehFVxl0zSc
+KSd+uKT07l30YTcdhwiT3Qqx1oh/9HB+kKM8Nt6m4xpoluGjXJOkpjS6iHoaP2tf
+3FELkP22K7MxXdKjwsgl7rAqBDYKhCNhV9xrKMi3BCY+zwbOhB+S+79vKodglAhP
+aNfB0OA892+YODyNGkM+KHAZr6r0Xc287zKogh2RswneYu7nVwm8kT2ofapYhW8V
+MHxEju/X0rwYL2w3YJ79REI5HmL6eONusNqbJwJ1p6yq7IEdhSpUU9D7kPaLQEqM
+q2WelYVn2uI1KVwdy/XKhrY8UFCuSU2famw4TOpB6rRnqodF9opIa/au/HhREMqc
+gzkNSkdalr+BdEngXyK/5tqTDa18uHya/zFaNt/O7C5x6PE7rkFaUJW++NOGJx3g
+npTVCP9ayit7mqfFiq9gOIvZ1Z3o6/4U/x32FO+gD8paWixQA6pHTcu8g07kTmo2
+ZQu70x6VTR/LTYexn2yYjh8muKYOxSBdUoNNR99dkWYmZ0sne4D/QAJxZ4nzh6wc
+8B+axJiz/iwwsstdfWomXJ2WuMj2Kg6l3/7oorc+NkW3zaE49OrAUFmYiGX5X6tV
+Tq/hBXHsXDk24B4tGCxe0VXWV4KSovS5RhEmbc/JRGRElNytGx1ald9/KtCMzxD7
+WZI7KCwBnPlf66YtMmRu
+=3yGJ
+-----END PGP SIGNATURE-----
+
+--Q0rSlbzrZN6k9QnT--
