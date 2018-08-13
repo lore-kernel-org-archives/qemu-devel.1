@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fpBZ7-0000bv-7q
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:03:26 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fpBc3-00026l-9M
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:06:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fpBZ5-0002tN-N7
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:03:17 -0400
-Date: Mon, 13 Aug 2018 15:02:51 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180813145125-mutt-send-email-mst@kernel.org>
-References: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
+	(envelope-from <ehabkost@redhat.com>) id 1fpBc0-0005JZ-2O
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:06:19 -0400
+Date: Mon, 13 Aug 2018 09:06:09 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180813120609.GR15372@localhost.localdomain>
+References: <1533910017-55158-1-git-send-email-imammedo@redhat.com>
+	<20180810180106.26e1f642@redhat.com>
+	<20180810182835.GZ15372@localhost.localdomain>
+	<20180813090713.76d7f710@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 00/33] Qtest driver framework
+In-Reply-To: <20180813090713.76d7f710@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] acpi: SRAT: do not create reserved gap
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,194 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, John Snow <jsnow@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, lersek@redhat.com, mst@redhat.com
 
-On Mon, Aug 13, 2018 at 12:14:20PM +0200, Emanuele Giuseppe Esposito wrote:
-> Qgraph API for the qtest driver framework
+On Mon, Aug 13, 2018 at 09:07:13AM +0200, Igor Mammedov wrote:
+> On Fri, 10 Aug 2018 15:28:35 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> This series of patches introduce a different qtest driver
-> organization, viewing machines, drivers and tests as node in a
-> graph, each having one or multiple edges relations.
-> 
-> The idea is to have a framework where each test asks for a specific
-> driver, and the framework takes care of allocating the proper devices
-> required and passing the correct command line arguments to QEMU.
-> 
-> A node can be of four types:
-> - MACHINE:   for example "arm/raspi2"
-> - DRIVER:    for example "generic-sdhci"
-> - INTERFACE: for example "sdhci" (interface for all "-sdhci" drivers)
-> - TEST:      for example "sdhci-test", consumes an interface and tests
->              the functions provided
-> 
-> An edge relation between two nodes (drivers or machines) X and Y can be:
-> - X CONSUMES Y: Y can be plugged into X
-> - X PRODUCES Y: X provides the interface Y
-> - X CONTAINS Y: Y is part of X component
-> 
-> Basic framework steps are the following:
-> - All nodes and edges are created in their respective machine/driver/test files
-> - The framework starts QEMU and asks for a list of available devices
->   and machines
-> - The framework walks the graph starting from the available machines and
->   performs a Depth First Search for tests
-> - Once a test is found, the path is walked again and all drivers are
->   allocated accordingly and the final interface is passed to the test
-> - The test is executed
-> - Unused objects are cleaned and the path discovery is continued
-> 
-> Depending on the QEMU binary used, only some drivers/machines will be available
-> and only test that are reached by them will be executed.
-> 
-> This work is being done as Google Summer of Code 2018 project for QEMU,
-> my mentors are Paolo Bonzini and Laurent Vivier.
-> Additional infos on the project can be found at:
-> https://wiki.qemu.org/Features/qtest_driver_framework
+> > On Fri, Aug 10, 2018 at 06:01:06PM +0200, Igor Mammedov wrote:
+> > > On Fri, 10 Aug 2018 16:06:57 +0200
+> > > Igor Mammedov <imammedo@redhat.com> wrote:
+> > >   
+> > > > Commit 848a1cc1e8b04 while introducing SRAT entries for DIMM and NVDIMM
+> > > > also introduced fake entries for gaps between memory devices, assuming
+> > > > that we need all possible range covered with SRAT entries.
+> > > > And it did it wrong since gap would overlap with preceeding entry.
+> > > > Reproduced with following CLI:
+> > > > 
+> > > >  -m 1G,slots=4,maxmem=8 \
+> > > >  -object memory-backend-ram,size=1G,id=m0 \
+> > > >  -device pc-dimm,memdev=m0,addr=0x101000000 \
+> > > >  -object memory-backend-ram,size=1G,id=m1 \
+> > > >  -device pc-dimm,memdev=m1
+> > > > 
+> > > > However recent development (10efd7e108) showed that gap entries might
+> > > > be not need. And indeed testing with WS2008DC-WS2016DC guests range
+> > > > shows that memory hotplug works just fine without gap entries.
+> > > > 
+> > > > So rather than fixing gap entry borders, just drop them altogether
+> > > > and simplify code around it.
+> > > > 
+> > > > Spotted-by: Laszlo Ersek <lersek@redhat.com>
+> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > ---
+> > > > There is no need to update reference blobs since gaps beween dimms
+> > > > aren't generated by any exsting test case.
+> > > > 
+> > > > Considering issue is not visible by default lets just merge it into 3.1
+> > > > and stable 3.0.1  
+> > > Pls ignore it for now I'll need to do more extensive testing with old kernels,
+> > > we might need these holes for old kernels or even new ones.
+> > > /me goes to read kernel code
+> > > 
+> > > /per spec possible to hotplug range could be in SRAT,
+> > >  even though I don't like it bu we might end up with static
+> > >  partitioning of hotplug area between nodes like on bare metal
+> > >  to avoid chasing after unknown requirements from windows /  
+> > 
+> > Does that mean we might want to pair DIMM slots with NUMA nodes
+> > in advance?  Do you have a suggestion on how the command-line
+> > would look like, in this case?
+> > 
+> > Maybe "-numa mem-slot,slot=X,node=Y"?
+> it's either, to make it per slot (it implies fixed maximum size per slot)
+> or a bit more flexible maxmem per node, might be something like:
+>   -numa memory,node=X,maxmem=Y
 
-Seems pretty clean to me. Except that patch 33
-needs to be fixed and fix squashed:
+That could work, but maybe it's too much flexibility?  It would
+be tricky to define what is supposed happen when a slot cross
+multiple NUMA nodes.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-
-> v3:
-> - Minor fixes regarding memory leaks and naming
-> 
-> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-> 
-> Emanuele Giuseppe Esposito (32):
->   tests: qgraph API for the qtest driver framework
->   tests/qgraph: rename qpci_init_pc and qpci_init_spapr functions
->   tests/qgraph: pci-pc driver and interface nodes
->   tests/qgraph: x86_64/pc machine node
->   tests/qgraph: sdhci driver and interface nodes
->   tests/qgraph: sdhci test node
->   tests/qgraph: arm/raspi2 machine node
->   tests/qgraph: pci-spapr driver and interface nodes
->   tests/qgraph: ppc64/pseries machine node
->   tests/qgraph: has_buggy_msi flag
->   tests/qgraph: e1000e driver and interface nodes
->   tests/qgraph: e1000e-test node
->   tests/qgraph: virtio_start_device function
->   tests/qgraph: virtio-pci driver and interface nodes
->   tests/qgraph: virtio-mmio driver and interface nodes
->   tests/qgraph: arm/virt machine node
->   tests/qgraph: virtio-serial driver and interface nodes
->   tests/qgraph: virtio-console test node
->   tests/qgraph: virtio-serial test node
->   tests/qgraph: virtio-9p driver and interface nodes
->   tests/qgraph: virtio-9p test node
->   tests/qgraph: virtio-balloon driver and interface nodes
->   tests/qgraph: virtio-balloon test node
->   tests/qgraph: virtio-rng driver and interface nodes
->   tests/qgraph: virtio-rng test node
->   tests/qgraph: virtio-blk driver and interface nodes
->   tests/qgraph: virtio-blk test node
->   tests/qgraph: virtio-net driver and interface nodes
->   tests/qgraph: virtio-net test node
->   tests/qgraph: virtio-scsi driver and interface nodes
->   tests/qgraph: virtio-scsi test node
->   tests/qgraph: temporarly commented vhost-user-test
-> 
-> Paolo Bonzini (1):
->   tests: virtio: separate ccw tests from libqos
-> 
->  configure                            |   2 +-
->  include/qemu/module.h                |   2 +
->  tests/Makefile.include               |  79 +--
->  tests/e1000e-test.c                  | 354 +++----------
->  tests/i440fx-test.c                  |   2 +-
->  tests/ide-test.c                     |   2 +-
->  tests/libqos/ahci.c                  |   2 +-
->  tests/libqos/e1000e.c                | 262 ++++++++++
->  tests/libqos/e1000e.h                |  53 ++
->  tests/libqos/libqos-pc.c             |   2 +-
->  tests/libqos/libqos-spapr.c          |   2 +-
->  tests/libqos/libqos.c                |   2 +-
->  tests/libqos/libqos.h                |   2 +-
->  tests/libqos/pci-pc.c                |  86 ++--
->  tests/libqos/pci-pc.h                |  22 +-
->  tests/libqos/pci-spapr.c             | 119 +++--
->  tests/libqos/pci-spapr.h             |  26 +-
->  tests/libqos/pci.c                   |  37 +-
->  tests/libqos/pci.h                   |  15 +
->  tests/libqos/ppc64_pseries-machine.c | 111 +++++
->  tests/libqos/qgraph.c                | 721 +++++++++++++++++++++++++++
->  tests/libqos/qgraph.h                | 515 +++++++++++++++++++
->  tests/libqos/qgraph_extra.h          | 263 ++++++++++
->  tests/libqos/raspi2-machine.c        |  82 +++
->  tests/libqos/sdhci.c                 | 163 ++++++
->  tests/libqos/sdhci.h                 |  69 +++
->  tests/libqos/virt-machine.c          |  90 ++++
->  tests/libqos/virtio-9p.c             | 165 ++++++
->  tests/libqos/virtio-9p.h             |  42 ++
->  tests/libqos/virtio-balloon.c        | 111 +++++
->  tests/libqos/virtio-balloon.h        |  39 ++
->  tests/libqos/virtio-blk.c            | 126 +++++
->  tests/libqos/virtio-blk.h            |  40 ++
->  tests/libqos/virtio-mmio.c           |  66 ++-
->  tests/libqos/virtio-mmio.h           |   5 +-
->  tests/libqos/virtio-net.c            | 179 +++++++
->  tests/libqos/virtio-net.h            |  41 ++
->  tests/libqos/virtio-pci.c            |  80 ++-
->  tests/libqos/virtio-pci.h            |  12 +
->  tests/libqos/virtio-rng.c            | 108 ++++
->  tests/libqos/virtio-rng.h            |  39 ++
->  tests/libqos/virtio-scsi.c           | 117 +++++
->  tests/libqos/virtio-scsi.h           |  39 ++
->  tests/libqos/virtio-serial.c         | 109 ++++
->  tests/libqos/virtio-serial.h         |  39 ++
->  tests/libqos/virtio.c                |   8 +
->  tests/libqos/virtio.h                |   1 +
->  tests/libqos/x86_64_pc-machine.c     | 110 ++++
->  tests/libqtest.h                     |   3 +
->  tests/q35-test.c                     |   4 +-
->  tests/qos-test.c                     | 481 ++++++++++++++++++
->  tests/rtl8139-test.c                 |   2 +-
->  tests/sdhci-test.c                   | 222 +++------
->  tests/tco-test.c                     |   2 +-
->  tests/test-qgraph.c                  | 446 +++++++++++++++++
->  tests/usb-hcd-ehci-test.c            |   2 +-
->  tests/vhost-user-test.c              |   6 +-
->  tests/virtio-9p-test.c               | 221 +++-----
->  tests/virtio-balloon-test.c          |  22 +-
->  tests/virtio-blk-test.c              | 473 +++++++-----------
->  tests/virtio-ccw-test.c              | 121 +++++
->  tests/virtio-console-test.c          |  30 +-
->  tests/virtio-net-test.c              | 163 ++----
->  tests/virtio-rng-test.c              |  25 +-
->  tests/virtio-scsi-test.c             | 155 +++---
->  tests/virtio-serial-test.c           |  27 +-
->  66 files changed, 5674 insertions(+), 1292 deletions(-)
->  create mode 100644 tests/libqos/e1000e.c
->  create mode 100644 tests/libqos/e1000e.h
->  create mode 100644 tests/libqos/ppc64_pseries-machine.c
->  create mode 100644 tests/libqos/qgraph.c
->  create mode 100644 tests/libqos/qgraph.h
->  create mode 100644 tests/libqos/qgraph_extra.h
->  create mode 100644 tests/libqos/raspi2-machine.c
->  create mode 100644 tests/libqos/sdhci.c
->  create mode 100644 tests/libqos/sdhci.h
->  create mode 100644 tests/libqos/virt-machine.c
->  create mode 100644 tests/libqos/virtio-9p.c
->  create mode 100644 tests/libqos/virtio-9p.h
->  create mode 100644 tests/libqos/virtio-balloon.c
->  create mode 100644 tests/libqos/virtio-balloon.h
->  create mode 100644 tests/libqos/virtio-blk.c
->  create mode 100644 tests/libqos/virtio-blk.h
->  create mode 100644 tests/libqos/virtio-net.c
->  create mode 100644 tests/libqos/virtio-net.h
->  create mode 100644 tests/libqos/virtio-rng.c
->  create mode 100644 tests/libqos/virtio-rng.h
->  create mode 100644 tests/libqos/virtio-scsi.c
->  create mode 100644 tests/libqos/virtio-scsi.h
->  create mode 100644 tests/libqos/virtio-serial.c
->  create mode 100644 tests/libqos/virtio-serial.h
->  create mode 100644 tests/libqos/x86_64_pc-machine.c
->  create mode 100644 tests/qos-test.c
->  create mode 100644 tests/test-qgraph.c
->  create mode 100644 tests/virtio-ccw-test.c
-> 
-> -- 
-> 2.17.1
+-- 
+Eduardo
