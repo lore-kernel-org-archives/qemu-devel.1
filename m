@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fp6BH-0004CV-V1
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 02:18:20 -0400
+	(envelope-from <thuth@redhat.com>) id 1fp6JF-0007An-IB
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 02:26:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fp6BE-00081u-QK
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 02:18:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44478 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fp6JC-0001gj-7X
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 02:26:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45944 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fp6BE-00081j-JZ
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 02:18:16 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fp6JC-0001gX-19
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 02:26:30 -0400
 References: <20180809160011.17225-1-peter.maydell@linaro.org>
-	<19a9c0c6-03eb-d368-d8c8-fb62102556a4@redhat.com>
-	<CAFEAcA_rRW7qbtiM4c-sBVmQhFMSuKnVqU6+oXsdXPwJ3GKv6A@mail.gmail.com>
-	<9da04e7f-bd0c-9d50-fb7c-026b5aaa674c@redhat.com>
-	<CAFEAcA_4M195VD57LyNVyWTLos140v2e7ymvuiY+rtJ4ZTCXwg@mail.gmail.com>
-	<14a92c80-4aec-bd60-68fd-d6a68c8a63b6@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4a1a3e8d-8ab7-7a10-cb53-8383495f1cd2@redhat.com>
-Date: Mon, 13 Aug 2018 08:18:13 +0200
+Message-ID: <e760a064-47b4-5e11-425f-8bad9ba3efbb@redhat.com>
+Date: Mon, 13 Aug 2018 08:26:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <14a92c80-4aec-bd60-68fd-d6a68c8a63b6@redhat.com>
+In-Reply-To: <20180809160011.17225-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -33,57 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, patches@linaro.org
 
-On 08/10/2018 02:45 PM, Paolo Bonzini wrote:
-> On 10/08/2018 11:10, Peter Maydell wrote:
->>> So my proposal, which is actually consistent with what QEMU is doing, is
->>> the following:
->>>
->>> 1) the first line of a file should always be "/*", otherwise warn
->>>
->>> 2) a comment that starts with "/**" should have it on a lone line
->>>
->>> 3) every other multiline comment should start with
->>> "/*<whitespace><something>"
->> Personally I would prefer your suggestion, but as I say, there
->> was no consensus in the thread for it, and there was consensus
->> for "use the kernel's style here". I don't think we gain much
->> from reopening the debate at this point.
+On 08/09/2018 06:00 PM, Peter Maydell wrote:
+> We now require Linux-kernel-style multiline comments:
+>     /*
+>      * line one
+>      * line two
+>      */
 > 
-> What we lose is that 3000 more new warnings appear.  So if we make an
-> exception and convert all of the comments, I'm okay.
+> Enforce this in checkpatch.pl, by backporting the relevant
+> parts of the Linux kernel's checkpatch.pl. (The only changes
+> needed are that Linux's checkpatch.pl WARN() function takes
+> an extra argument that ours does not.)
+> 
+> The kernel's checkpatch does not enforce "leading /* on
+> a line of its own, so that part is unique to QEMU's checkpatch.
+> 
+> Sample warning output:
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #34: FILE: hw/intc/arm_gicv3_common.c:39:
+> +    /* Older versions of QEMU had a bug in the handling of state save/restore
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I'm still not used to the leeading-/*-on-it's-own style,
+> so having checkpatch catch my lapses is handy...
+> 
+> I used WARN level severity mostly because Linux does.
+> ---
+>  scripts/checkpatch.pl | 48 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 48 insertions(+)
 
-Why do you want to enforce to convert all of them in one go? For example
-we still have also some TABs in some source files, and nobody cares
-about converting them all in one go. If we enforce the comments in new
-code, that should IMHO be good enough. Or make it a BiteSizeTask for the
-next GSoC maybe.
-
-> But otherwise, at least Eric, you, me (only now I admit), Thomas
-> expressed a preference for the other style;
-
-No, wait, you've got that wrong. I said that I don't like the asymetric
-style that you're now trying to propagate again, but I'm fine with either
-
- /* dense comments
-  * on multiple lines */
-
-or
-
- /*
-  * no dense comments
-  * on multiple lines
-  */
-
-> on the other side it's
-> Markus, Stefan, Conny and Alex, some of whom were okay with applying
-> maintainer discretion; John and rth wanted a third one but disagreed on
-> their second choice.  I appreciate your writing the patch, but I'm not
-> sure that's consensus...
-
-Count me in for the consensus on this other side, I really don't want
-the asymetric style.
-
- Thomas
+Acked-by: Thomas Huth <thuth@redhat.com>
