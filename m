@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Julian_Brown@mentor.com>) id 1fp1H2-0005yq-Qn
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 21:03:57 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fp1Lj-0007fR-1U
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 21:08:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Julian_Brown@mentor.com>) id 1fp1Gy-0008So-Rj
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 21:03:56 -0400
-Received: from relay1.mentorg.com ([192.94.38.131]:48122)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Julian_Brown@mentor.com>)
-	id 1fp1Gy-0008SZ-Kb
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 21:03:52 -0400
-Date: Mon, 13 Aug 2018 02:03:40 +0100
-From: Julian Brown <julian@codesourcery.com>
-Message-ID: <20180813020340.77c80175@squid.athome>
-In-Reply-To: <93a94aa5-2143-8079-3e0c-02364d0fab22@codesourcery.com>
-References: <cover.1526671191.git.julian@codesourcery.com>
-	<845fc301f4a7725c239708c58876e3ae4d858fd9.1526671191.git.julian@codesourcery.com>
-	<805fc7b5-03f0-56d4-abfd-ed010d4fa769@denx.de>
-	<20180518211928.488214aa@octopus>
-	<08f92788-6380-35fe-e237-aa80f075519e@codesourcery.com>
-	<93a94aa5-2143-8079-3e0c-02364d0fab22@codesourcery.com>
+	(envelope-from <lbloch@janustech.com>) id 1fp1Le-0001iB-Vy
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 21:08:46 -0400
+From: Leonid Bloch <lbloch@janustech.com>
+Date: Mon, 13 Aug 2018 04:07:21 +0300
+Message-Id: <20180813010729.4844-1-lbloch@janustech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] Add Nios II semihosting support.
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v8 0/8] Take the image size into account when
+ allocating the L2 cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +20,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sandra Loosemore <sandra@codesourcery.com>
-Cc: Marek Vasut <marex@denx.de>, qemu-devel@nongnu.org, Chris Wulff <crwulff@gmail.com>, Andrew Jenner <Andrew_Jenner@mentor.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>
 
-On Thu, 2 Aug 2018 15:56:47 -0600
-Sandra Loosemore <sandra@codesourcery.com> wrote:
+This series makes the qcow2 L2 cache assignment aware of the image size,
+with the intention for it to cover the entire image. The importance of
+this change is in noticeable performance improvement, especially with
+heavy random I/O. The memory overhead is not big in most cases, as only
+1 MB of cache for every 8 GB of image size is used. For cases with very
+large images and/or small cluster sizes, or systems with limited RAM
+resources, there is an upper limit on the default L2 cache: 32 MB. To
+modify this limit one can use the already existing 'l2-cache-size' and
+'cache-size' options. Moreover, this fixes the behavior of 'l2-cache-size',
+as it was documented as the *maximum* L2 cache size, but in practice
+behaved as the absolute size.
 
-> On 05/18/2018 03:35 PM, Sandra Loosemore wrote:
-> > On 05/18/2018 02:19 PM, Julian Brown wrote: =20
-> >> On Fri, 18 May 2018 21:52:04 +0200
-> >> Marek Vasut <marex@denx.de> wrote:
-> >> =20
-> >>> On 05/18/2018 09:23 PM, Julian Brown wrote: =20
-> >>>> This patch (by Sandra Loosemore, mildly rebased) adds support for
-> >>>> semihosting for Nios II bare-metal emulation.
-> >>>>
-> >>>> Signed-off-by: Julian Brown <julian@codesourcery.com>
-> >>>> Signed-off-by: Sandra Loosemore <sandra@codesourcery.com> =20
-> >>>
-> >>> Is there some documentation for this stuff ? It looks
-> >>> interesting, but how can I try it here ? =20
-> >>
-> >> There's no documentation AFAIK apart from that the entry points are
-> >> the same as m68k, semihosting is invoked with "break 1", and r4/r5
-> >> are used for passing arguments. I'm not actually sure how you can
-> >> try this stuff without our startup code or other infrastructure
-> >> (that I'm pretty sure we can't divulge). Sandra, any ideas? =20
-> >=20
-> > I don't see any reason why we couldn't contribute libgloss support,=20
-> > except that I don't have time to write such a BSP right now.=C2=A0 :-(
-> > I recently did this for C-SKY, though, and the semihosting parts
-> > were just a straightforward copy from the m68k port. =20
->=20
-> I've posted a patch with libgloss semihosting support for nios2 here:
->=20
-> https://sourceware.org/ml/newlib/2018/msg00610.html
->=20
-> I hope this is enough to unblock consideration of the corresponding
-> QEMU patch set now.  Here's a link to the original patch posting:
->=20
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg04571.html
+To compensate the memory overhead which may be increased following this
+behavior, the default cache-clean-interval is set to 10 minutes by default
+(was disabled by default before).
 
-For completeness I've re-tested with a rebased QEMU and posted
-again (with a couple of checkpatch.pl nits fixed, but otherwise
-identical):
+The L2 cache is also resized accordingly, by default, if the image is
+resized.
 
-http://lists.nongnu.org/archive/html/qemu-devel/2018-08/msg01987.html
+Additionally, few minor changes are made (refactoring and documentation
+fixes).
 
-Thank you,
+Differences from v1:
+* .gitignore modification patch removed (unneeded).
+* The grammar fix in conflicting cache sizing patch removed (merged).
+* The update total_sectors when resizing patch squashed with the
+  resizing patch.
+* L2 cache is now capped at 32 MB.
+* The default cache-clean-interval is set to 30 seconds.
 
-Julian
+Differences from v2:
+* Made it clear in the documentation that setting cache-clean-interval
+  to 0 disables this feature.
+
+Differences from v3:
+* The default cache-clean-interval is set to 10 minutes instead of 30
+  seconds before.
+* Commit message changes to better explain the patches.
+* Some refactoring.
+
+Differences from v4:
+* Refactoring.
+* Documentation and commit message fixes.
+
+Differences from v5:
+* A patch with cosmetic changes is split from the main patch
+* A patch for avoiding duplication in refcount cache size assignment is
+  split from the main patch.
+* In the main patch the cap on the L2 cache size is set to only 1 MB (in
+  order to be close to the previous behavior) and a separate patch sets
+  it to 32 MB.
+* Changes in the documentation fixes patch [1/8].
+
+Differences from v6:
+* A patch is added to make the defined sizes more humanly readable.
+
+Differences from v7:
+* Documentation and commit message changes.
+* Fix: when cache-size is specified and is large enough, with the L2 and
+  refcount caches not set, the L2 cache will be as large as needed to
+  cover the entire image, and not as the default max. size. (Return to
+  the previous behavior in this part, which was correct).
+* Cosmetic changes patch not used.
+
+
+Leonid Bloch (8):
+  qcow2: Options' documentation fixes
+  qcow2: Make sizes more humanly readable
+  qcow2: Avoid duplication in setting the refcount cache size
+  qcow2: Assign the L2 cache relatively to the image size
+  qcow2: Increase the default upper limit on the L2 cache size
+  qcow2: Resize the cache upon image resizing
+  qcow2: Set the default cache-clean-interval to 10 minutes
+  qcow2: Explicit number replaced by a constant
+
+ block/qcow2.c              | 42 ++++++++++++++++++++++----------------
+ block/qcow2.h              | 12 +++++------
+ docs/qcow2-cache.txt       | 39 ++++++++++++++++++++++-------------
+ qapi/block-core.json       |  3 ++-
+ qemu-options.hx            | 11 ++++++----
+ tests/qemu-iotests/137     |  1 -
+ tests/qemu-iotests/137.out |  1 -
+ 7 files changed, 64 insertions(+), 45 deletions(-)
+
+-- 
+2.17.1
