@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fp2Su-0003GH-5B
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:20:19 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fp2T0-0003Mp-N4
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fp2St-0007b9-4G
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:20:16 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fp2Sx-0007jf-Gt
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:20:22 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 13 Aug 2018 04:19:49 +0200
-Message-Id: <20180813022006.7216-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 00/17] mirror: Mainly coroutine refinements
+Date: Mon, 13 Aug 2018 04:19:51 +0200
+Message-Id: <20180813022006.7216-3-mreitz@redhat.com>
+In-Reply-To: <20180813022006.7216-1-mreitz@redhat.com>
+References: <20180813022006.7216-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/17] mirror: Make wait_for_any_operation()
+ coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,99 +23,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>
 
-This series is based on v2 of my "block: Deal with filters" series:
+mirror_wait_for_any_operation() calls qemu_co_queue_wait(), which is a
+coroutine_fn (technically it is a macro which resolves to a
+coroutine_fn).  Therefore, this function needs to be a coroutine_fn as
+well.
 
-Based-on: <20180809223117.7846-1-mreitz@redhat.com>
+This patch makes it and all of its callers coroutine_fns.
 
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/mirror.c | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
 
-The bulk of this series (14 of the patches here, in fact) makes more of
-the coroutined mirror I started with my active mirror series.  For this,
-mirror_perform() is translated into a coroutine version that actually
-looks like coroutines are a nice thing to have (a single AioContext
-lock, a common clean-up path, and a mirror_co_copy() that does both read
-and write in a single function (like it is supposed to)).
-
-Another thing I have wanted to implement is a read-write-blocking mode.
-write-blocking (active mirror) copies data to the target whenever you
-write data to the mirror node -- so once the mirror bitmap is clean, it
-will stay clean, and completing the job is guaranteed to be basically
-instantenous.  read-write-blocking would also copy data whenever you
-read from the mirror node, because we have already read the data right
-now, so we might as well copy it to the target now.
-
-Instead of implementing it actually as a new copy-mode (which is how I
-used to do, but I decided that was boring), I opted for implementing an
-interesting .bdrv_co_block_status() function that allows using COR for
-the purpose: You simply put a COR node on top of your write-blocking
-mirror node, and then all the data read will be copied to the target
-through COR (as long as it is not already cleanly mirrored).
-
-The benefit I see with this approach is that is just looks nice.  Why
-implement an actual new copy-mode when we can just an existing block
-layer function for the purpose?
-
-The drawbacks I see are these:
-(1) mirror in write-blocking mode has to interpret
-    BDRV_REQ_WRITE_UNCHANGED in a special manner, or this doesn't really
-    work.  With patch 16 of this series, such requests are not written
-    to the source, but only to the target.  You might find that weird.
-
-(2) We currently don't have a good way of inserting a COR node at
-    runtime...
-
-(3) You may break your data if you do funny stuff.  Now this is of
-    course the interesting point.
-    Mirror works (by design) even when you attach a parent to the source
-    directly, i.e., not going through the mirror node.  That is because
-    mirror uses the source's dirty bitmap functionality and does not
-    build its own.  But if you do this with COR/write-blocking, then the
-    COR driver may issue a request while some other parent is issuing
-    another request immediately to the source, which may cause source
-    and target to go out of sync.
-    But...  Technically this is already an issue with write-blocking
-    alone.  We reset the bitmap only in do_sync_target_write(), after we
-    have already written to the source.  So if another of source's
-    parents writes to source between our write and the bitmap reset, we
-    lose that information.
-    So I suppose when using write-blocking, the mirror driver may not
-    share the WRITE permission?
-
-(4) The same issue exists with COR itself, actually...  It can only
-    share the WRITE permission because COR requests are serializing, but
-    that only works on a single layer.  With a filter between COR and
-    the allocating node, you get the same issue of someone being able to
-    slip in a request between the COR read and the COR allocation.
-    Maybe we actually want COR not to share WRITE either?
-
-So in my opinion the main drawback is that this design reveals current
-weaknesses and bugs of the block layer.
-
-
-Max Reitz (17):
-  iotests: Try reading while mirroring in 156
-  mirror: Make wait_for_any_operation() coroutine_fn
-  mirror: Pull *_align_for_copy() from *_co_read()
-  mirror: Remove bytes_handled, part 1
-  mirror: Remove bytes_handled, part 2
-  mirror: Create mirror_co_perform()
-  mirror: Make mirror_co_zero() nicer
-  mirror: Make mirror_co_discard() nicer
-  mirror: Lock AioContext in mirror_co_perform()
-  mirror: Create mirror_co_alloc_qiov()
-  mirror: Inline mirror_write_complete(), part 1
-  mirror: Put QIOV locally into mirror_co_read
-  mirror: Linearize mirror_co_read()
-  mirror: Inline mirror_iteration_done()
-  mirror: Release AioCtx before queue_restart_all()
-  mirror: Support COR with write-blocking
-  iotests: Add test for active mirror with COR
-
- block/mirror.c             | 483 ++++++++++++++++++++-----------------
- tests/qemu-iotests/151     |  56 +++++
- tests/qemu-iotests/151.out |   4 +-
- tests/qemu-iotests/156     |   7 +
- tests/qemu-iotests/156.out |   3 +
- 5 files changed, 334 insertions(+), 219 deletions(-)
-
+diff --git a/block/mirror.c b/block/mirror.c
+index 85f5742eae..c28b6159d5 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -279,7 +279,8 @@ static int mirror_cow_align(MirrorBlockJob *s, int64_t *offset,
+     return ret;
+ }
+ 
+-static inline void mirror_wait_for_any_operation(MirrorBlockJob *s, bool active)
++static inline void coroutine_fn
++    mirror_co_wait_for_any_operation(MirrorBlockJob *s, bool active)
+ {
+     MirrorOp *op;
+ 
+@@ -297,10 +298,11 @@ static inline void mirror_wait_for_any_operation(MirrorBlockJob *s, bool active)
+     abort();
+ }
+ 
+-static inline void mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s)
++static inline void coroutine_fn
++    mirror_co_wait_for_free_in_flight_slot(MirrorBlockJob *s)
+ {
+     /* Only non-active operations use up in-flight slots */
+-    mirror_wait_for_any_operation(s, false);
++    mirror_co_wait_for_any_operation(s, false);
+ }
+ 
+ /* Perform a mirror copy operation.
+@@ -343,7 +345,7 @@ static void coroutine_fn mirror_co_read(void *opaque)
+ 
+     while (s->buf_free_count < nb_chunks) {
+         trace_mirror_yield_in_flight(s, op->offset, s->in_flight);
+-        mirror_wait_for_free_in_flight_slot(s);
++        mirror_co_wait_for_free_in_flight_slot(s);
+     }
+ 
+     /* Now make a QEMUIOVector taking enough granularity-sized chunks
+@@ -549,7 +551,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+ 
+         while (s->in_flight >= MAX_IN_FLIGHT) {
+             trace_mirror_yield_in_flight(s, offset, s->in_flight);
+-            mirror_wait_for_free_in_flight_slot(s);
++            mirror_co_wait_for_free_in_flight_slot(s);
+         }
+ 
+         if (s->ret < 0) {
+@@ -600,10 +602,10 @@ static void mirror_free_init(MirrorBlockJob *s)
+  * mirror_resume() because mirror_run() will begin iterating again
+  * when the job is resumed.
+  */
+-static void mirror_wait_for_all_io(MirrorBlockJob *s)
++static void coroutine_fn mirror_co_wait_for_all_io(MirrorBlockJob *s)
+ {
+     while (s->in_flight > 0) {
+-        mirror_wait_for_free_in_flight_slot(s);
++        mirror_co_wait_for_free_in_flight_slot(s);
+     }
+ }
+ 
+@@ -762,7 +764,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+             if (s->in_flight >= MAX_IN_FLIGHT) {
+                 trace_mirror_yield(s, UINT64_MAX, s->buf_free_count,
+                                    s->in_flight);
+-                mirror_wait_for_free_in_flight_slot(s);
++                mirror_co_wait_for_free_in_flight_slot(s);
+                 continue;
+             }
+ 
+@@ -770,7 +772,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+             offset += bytes;
+         }
+ 
+-        mirror_wait_for_all_io(s);
++        mirror_co_wait_for_all_io(s);
+         s->initial_zeroing_ongoing = false;
+     }
+ 
+@@ -916,7 +918,7 @@ static void coroutine_fn mirror_run(void *opaque)
+         /* Do not start passive operations while there are active
+          * writes in progress */
+         while (s->in_active_write_counter) {
+-            mirror_wait_for_any_operation(s, true);
++            mirror_co_wait_for_any_operation(s, true);
+         }
+ 
+         if (s->ret < 0) {
+@@ -942,7 +944,7 @@ static void coroutine_fn mirror_run(void *opaque)
+             if (s->in_flight >= MAX_IN_FLIGHT || s->buf_free_count == 0 ||
+                 (cnt == 0 && s->in_flight > 0)) {
+                 trace_mirror_yield(s, cnt, s->buf_free_count, s->in_flight);
+-                mirror_wait_for_free_in_flight_slot(s);
++                mirror_co_wait_for_free_in_flight_slot(s);
+                 continue;
+             } else if (cnt != 0) {
+                 delay_ns = mirror_iteration(s);
+@@ -1028,7 +1030,7 @@ immediate_exit:
+         assert(ret < 0 || ((s->common.job.force_cancel || !s->synced) &&
+                job_is_cancelled(&s->common.job)));
+         assert(need_drain);
+-        mirror_wait_for_all_io(s);
++        mirror_co_wait_for_all_io(s);
+     }
+ 
+     assert(s->in_flight == 0);
+@@ -1098,11 +1100,11 @@ static void mirror_complete(Job *job, Error **errp)
+     job_enter(job);
+ }
+ 
+-static void mirror_pause(Job *job)
++static void coroutine_fn mirror_pause(Job *job)
+ {
+     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
+ 
+-    mirror_wait_for_all_io(s);
++    mirror_co_wait_for_all_io(s);
+ }
+ 
+ static bool mirror_drained_poll(BlockJob *job)
 -- 
 2.17.1
