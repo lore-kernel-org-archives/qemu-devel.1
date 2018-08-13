@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpDW6-0007Od-W1
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:08:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fpDYD-00008T-1z
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:10:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpDW5-0008Ne-Ue
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:08:18 -0400
-Date: Mon, 13 Aug 2018 16:08:07 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fpDYB-0001MF-Sf
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:10:29 -0400
+Date: Mon, 13 Aug 2018 16:10:18 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180813140807.GG4323@localhost.localdomain>
+Message-ID: <20180813141018.GH4323@localhost.localdomain>
 References: <20180810040743.25424-1-jcfaracco@gmail.com>
-	<20180810040743.25424-2-jcfaracco@gmail.com>
+	<20180810040743.25424-3-jcfaracco@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180810040743.25424-2-jcfaracco@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] block: adding lzfse decompressing
- support as a module.
+In-Reply-To: <20180810040743.25424-3-jcfaracco@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] configure: adding support to lzfse
+ library.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +28,116 @@ To: Julio Faracco <jcfaracco@gmail.com>
 Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
 Am 10.08.2018 um 06:07 hat Julio Faracco geschrieben:
-> QEMU dmg support includes zlib and bzip2, but it does not contains lzfse
-> support. This commit adds the source file to extend compression support
-> for new DMGs.
+> This commit includes the support to lzfse opensource library. With this
+> library dmg block driver can decompress images with this type of
+> compression inside.
 > 
 > Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
 > ---
->  block/dmg-lzfse.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 54 insertions(+)
->  create mode 100644 block/dmg-lzfse.c
+>  block/Makefile.objs |  2 ++
+>  configure           | 32 ++++++++++++++++++++++++++++++++
+>  2 files changed, 34 insertions(+)
 > 
-> diff --git a/block/dmg-lzfse.c b/block/dmg-lzfse.c
-> new file mode 100644
-> index 0000000000..d09b544a0a
-> --- /dev/null
-> +++ b/block/dmg-lzfse.c
-> @@ -0,0 +1,54 @@
-> +/*
-> + * DMG lzfse uncompression
-> + *
-> + * Copyright (c) 2018 Julio Cesar Faracco
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "dmg.h"
+> diff --git a/block/Makefile.objs b/block/Makefile.objs
+> index c8337bf186..f4ddbb9c7b 100644
+> --- a/block/Makefile.objs
+> +++ b/block/Makefile.objs
+> @@ -47,6 +47,8 @@ ssh.o-cflags       := $(LIBSSH2_CFLAGS)
+>  ssh.o-libs         := $(LIBSSH2_LIBS)
+>  block-obj-$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
+>  dmg-bz2.o-libs     := $(BZIP2_LIBS)
+> +block-obj-$(if $(CONFIG_LZFSE),m,n) += dmg-lzfse.o
+> +dmg-lzfse.o-libs   := $(LZFSE_LIBS)
+>  qcow.o-libs        := -lz
+>  linux-aio.o-libs   := -laio
+>  parallels.o-cflags := $(LIBXML2_CFLAGS)
+> diff --git a/configure b/configure
+> index 2a7796ea80..b12a16f2bf 100755
+> --- a/configure
+> +++ b/configure
+> @@ -432,6 +432,7 @@ capstone=""
+>  lzo=""
+>  snappy=""
+>  bzip2=""
+> +lzfse=""
+>  guest_agent=""
+>  guest_agent_with_vss="no"
+>  guest_agent_ntddscsi="no"
+> @@ -1300,6 +1301,10 @@ for opt do
+>    ;;
+>    --enable-bzip2) bzip2="yes"
+>    ;;
+> +  --enable-lzfse) lzfse="yes"
+> +  ;;
+> +  --disable-lzfse) lzfse="no"
+> +  ;;
+>    --enable-guest-agent) guest_agent="yes"
+>    ;;
+>    --disable-guest-agent) guest_agent="no"
+> @@ -1689,6 +1694,8 @@ disabled with --disable-FEATURE, default is enabled if available:
+>    snappy          support of snappy compression library
+>    bzip2           support of bzip2 compression library
+>                    (for reading bzip2-compressed dmg images)
+> +  lzfse           support of lzfse compression library
+> +                  (for reading lzfse-compressed dmg images)
+>    seccomp         seccomp support
+>    coroutine-pool  coroutine freelist (better performance)
+>    glusterfs       GlusterFS backend
+> @@ -2213,6 +2220,25 @@ EOF
+>      fi
+>  fi
+>  
+> +##########################################
+> +# lzfse check
+> +
+> +if test "$lzfse" != "no" ; then
+> +    cat > $TMPC << EOF
 > +#include <lzfse.h>
-> +
-> +static int dmg_uncompress_lzfse_do(char *next_in, unsigned int avail_in,
-> +                                   char *next_out, unsigned int avail_out)
-> +{
-> +    void *aux;
-> +    size_t aux_allocated;
-> +    size_t out_size;
-> +
-> +    aux_allocated = lzfse_decode_scratch_size();
-> +    aux = g_malloc(aux_allocated);
-> +
-> +    if (aux_allocated != 0 && aux == 0) {
-> +        return -1;
-> +    }
-> +
-> +    out_size = lzfse_decode_buffer((uint8_t *) next_out, avail_out,
-> +                                   (uint8_t *) next_in, avail_in, aux);
-> +
-> +    return out_size;
-> +}
+> +int main(void) { lzfse_decode_scratch_size(); return 0; }
+> +EOF
+> +    if compile_prog "" "-llzfse" ; then
+> +        libs_softmmu="$libs_softmmu -llzfse"
 
-aux is leaked in this function.
+Are you sure about libs_softmmu? I think this is only for QEMU proper,
+but not for tools like qemu-img or qemu-io, so if this were relevant,
+we'd be missing lzfse support in some tools.
 
-Also, I don't think we actually need it. lzfse_decode_buffer() is
-documented to just do the necessary allocation internally if NULL is
-passed. Unless we do something more sophisticated, doing the memory
-allocation ourselves is unnecessary complexity.
+> +        lzfse="yes"
+> +    else
+> +        if test "$lzfse" = "yes"; then
+> +            feature_not_found "lzfse" "Install lzfse devel"
+> +        fi
+> +        lzfse="no"
+> +    fi
+> +fi
+> +
+>  ##########################################
+>  # libseccomp check
+>  
+> @@ -6001,6 +6027,7 @@ echo "Live block migration $live_block_migration"
+>  echo "lzo support       $lzo"
+>  echo "snappy support    $snappy"
+>  echo "bzip2 support     $bzip2"
+> +echo "lzfse support     $lzfse"
+>  echo "NUMA host support $numa"
+>  echo "libxml2           $libxml2"
+>  echo "tcmalloc support  $tcmalloc"
+> @@ -6525,6 +6552,11 @@ if test "$bzip2" = "yes" ; then
+>    echo "BZIP2_LIBS=-lbz2" >> $config_host_mak
+>  fi
+>  
+> +if test "$lzfse" = "yes" ; then
+> +  echo "CONFIG_LZFSE=y" >> $config_host_mak
+> +  echo "LZFSE_LIBS=-llzfse" >> $config_host_mak
+
+But since we have LZFSE_LIBS here and this is referenced in
+block/Makefile.objs, I suspect that the libs_softmmu addition is
+actually redundant and could just go away above.
+
+> +fi
+> +
+>  if test "$libiscsi" = "yes" ; then
+>    echo "CONFIG_LIBISCSI=m" >> $config_host_mak
+>    echo "LIBISCSI_CFLAGS=$libiscsi_cflags" >> $config_host_mak
 
 Kevin
