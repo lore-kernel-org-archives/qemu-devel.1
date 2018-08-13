@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fpC0o-0004GC-Tx
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:31:55 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fpCNN-0002ZR-BP
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:55:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fpC0k-0005GK-TA
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:31:54 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1534161104-8253-1-git-send-email-thuth@redhat.com>
-Date: Mon, 13 Aug 2018 14:31:48 +0200
-In-Reply-To: <1534161104-8253-1-git-send-email-thuth@redhat.com> (Thomas
-	Huth's message of "Mon, 13 Aug 2018 13:51:44 +0200")
-Message-ID: <87y3da5txn.fsf@dusky.pond.sub.org>
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fpCNK-0004R3-4h
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:55:13 -0400
+Received: from mail-eopbgr70104.outbound.protection.outlook.com
+	([40.107.7.104]:10784
+	helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+	id 1fpCNJ-0004NH-5n
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:55:10 -0400
+References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+	<20180629115359.GH2568@work-vm> <20180725101836.GI2479@xz-mi>
+	<20180725191736.GE2365@work-vm> <20180725200456.GM18452@redhat.com>
+	<e1c85e53-1b94-b1df-b7ee-6d93bb43caf6@redhat.com>
+	<20180726092307.GL2479@xz-mi>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <d1370a77-3d67-9c83-8214-3cba291744a1@virtuozzo.com>
+Date: Mon, 13 Aug 2018 15:55:02 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qemu-options: Fix bad "macaddr" property
- in the documentation
+In-Reply-To: <20180726092307.GL2479@xz-mi>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +34,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Harald Hoyer <harald@redhat.com>
+To: Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
 
-Thomas Huth <thuth@redhat.com> writes:
 
-> When using the "-device" option, the property is called "mac".
-> "macaddr" is only used for the legacy "-net nic" option.
 
-Indeed:
+On 26.07.2018 12:23, Peter Xu wrote:
+> On Thu, Jul 26, 2018 at 10:51:33AM +0200, Paolo Bonzini wrote:
+>> On 25/07/2018 22:04, Andrea Arcangeli wrote:
+>>>
+>>> It may look like the uffd-wp model is wish-feature similar to an
+>>> optimization, but without the uffd-wp model when the WP fault is
+>>> triggered by kernel code, the sigsegv model falls apart and requires
+>>> all kind of ad-hoc changes just for this single feature. Plus uffd-wp
+>>> has other benefits: it makes it all reliable in terms of not
+>>> increasing the number of vmas in use during the snapshot. Finally it
+>>> makes it faster too with no mmap_sem for reading and no sigsegv
+>>> signals.
+>>>
+>>> The non cooperative features got merged first because there was much
+>>> activity on the kernel side on that front, but this is just an ideal
+>>> time to nail down the remaining issues in uffd-wp I think. That I
+>>> believe is time better spent than trying to emulate it with sigsegv
+>>> and changing all drivers to send new events down to qemu specific to
+>>> the sigsegv handling. We considered this before doing uffd for
+>>> postcopy too but overall it's unreliable and more work (no single
+>>> change was then needed to KVM code with uffd to handle postcopy and
+>>> here it should be the same).
+>>
+>> I totally agree.  The hard part in userfaultfd was the changes to the
+>> kernel get_user_pages API, but the payback was huge because _all_ kernel
+>> uses (KVM, vhost-net, syscalls, etc.) just work with userfaultfd.  Going
+>> back to mprotect would be a huge mistake.
+> 
+> Thanks for explaining the bits.  I'd say I wasn't aware of the
+> difference before I started the investigation (and only until now I
+> noticed that major difference between mprotect and userfaultfd).  I'm
+> really glad that it's much clear (at least for me) on which way we
+> should choose.
+> 
+> Now I'm thinking whether we can move the userfault write protect work
+> forward.  The latest discussion I saw so far is in 2016, when someone
+> from Huawei tried to use the write protect feature for that old
+> version of live snapshot but reported issue:
+> 
+>    https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01127.html
+> 
+> Is that the latest status for userfaultfd wr-protect?
+> 
+> If so, I'm thinking whether I can try to re-verify the work (I tried
+> his QEMU repository but I failed to compile somehow, so I plan to
+> write some even simpler code to try) to see whether I can get the same
+> KVM error he encountered.
+> 
+> Thoughts?
 
-    #define DEFINE_NIC_PROPERTIES(_state, _conf)                            \
---->    DEFINE_PROP_MACADDR("mac",   _state, _conf.macaddr),                \
-        DEFINE_PROP_NETDEV("netdev", _state, _conf.peers)
+Just to sum up all being said before.
 
-> Reported-by: Harald Hoyer <harald@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  qemu-options.hx | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index b1bf0f4..3495531 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -2345,7 +2345,7 @@ qemu-system-i386 linux.img \
->                   -netdev socket,id=n2,mcast=230.0.0.1:1234
->  # launch yet another QEMU instance on same "bus"
->  qemu-system-i386 linux.img \
-> -                 -device e1000,netdev=n3,macaddr=52:54:00:12:34:58 \
-> +                 -device e1000,netdev=n3,mac=52:54:00:12:34:58 \
->                   -netdev socket,id=n3,mcast=230.0.0.1:1234
->  @end example
+Using mprotect is a bad idea because VM's memory can be accessed from 
+the number of places (KVM, vhost, ...) which need their own special care
+of tracking memory accesses and notifying QEMU which makes the mprotect 
+using unacceptable.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Protected memory accesses tracking can be done via userfaultfd's WP mode 
+which isn't available right now.
+
+So, the reasonable conclusion is to wait until the WP mode is available 
+and build the background snapshot on top of userfaultfd-wp.
+But, works on adding the WP-mode is pending for a quite a long time 
+already.
+
+Is there any way to estimate when it could be available?
+> 
+> Regards,
+> 
+
+-- 
+Best,
+Denis
