@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fpFpM-0003UX-33
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:36:20 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fpFph-0003cv-3B
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:36:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fpFpH-0000NG-Eu
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:36:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37256 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fpFpH-0000N7-68
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:36:15 -0400
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-43-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e56b43c7-cd9c-d0bb-62ff-265858405ca9@redhat.com>
-Date: Mon, 13 Aug 2018 11:36:13 -0500
+	(envelope-from <mreitz@redhat.com>) id 1fpFpg-0000Vy-7c
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:36:41 -0400
+References: <20180803005015.5116-1-programmingkidx@gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c9658407-b1f5-de88-44d4-1b977812de77@redhat.com>
+Date: Mon, 13 Aug 2018 18:36:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180808120334.10970-43-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 42/56] json: Improve names of lexer states
- related to numbers
+In-Reply-To: <20180803005015.5116-1-programmingkidx@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SUNe8qXqDIebUIEEnN5121q0UQspJyD2S"
+Subject: Re: [Qemu-devel] [PATCH] qemu-img.c: Add examples section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +23,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: John Arbuckle <programmingkidx@gmail.com>, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On 08/08/2018 07:03 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SUNe8qXqDIebUIEEnN5121q0UQspJyD2S
+From: Max Reitz <mreitz@redhat.com>
+To: John Arbuckle <programmingkidx@gmail.com>, kwolf@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Message-ID: <c9658407-b1f5-de88-44d4-1b977812de77@redhat.com>
+Subject: Re: [PATCH] qemu-img.c: Add examples section
+References: <20180803005015.5116-1-programmingkidx@gmail.com>
+In-Reply-To: <20180803005015.5116-1-programmingkidx@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-08-03 02:50, John Arbuckle wrote:
+> Add an examples section to the help output.
+>=20
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
 > ---
->   qobject/json-lexer.c | 38 +++++++++++++++++++-------------------
->   1 file changed, 19 insertions(+), 19 deletions(-)
+>  qemu-img.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>=20
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 1acddf693c..f77c82695d 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -199,6 +199,17 @@ static void QEMU_NORETURN help(void)
+> =20
+>      printf("%s\nSupported formats:", help_msg);
+>      bdrv_iterate_format(format_print, NULL);
+> +
+> +    printf("\n\nExamples:\n\n"
+> +           "Create: qemu-img create -f qcow2 image.qcow2 10G\n\n"
+> +           "Info: qemu-img info image.qcow2\n\n"
+> +           "Resize: qemu-img resize image.qcow2 20G\n\n"
+> +           "Convert: qemu-img convert -f raw -O qcow2 image.img image.=
+qcow2\n\n"
+> +           "Check: qemu-img check image.qcow2\n\n"
+> +           "Map: qemu-img map -f qcow2 --output=3Dhuman image.qcow2\n\=
+n"
+> +           "Rebase: qemu-img rebase -b new_backing_file.qcow2 image.qc=
+ow2"
+> +           );
+> +
 
-> @@ -228,8 +228,8 @@ static const uint8_t json_lexer[][256] =  {
->           ['"'] = IN_DQ_STRING,
->           ['\''] = IN_SQ_STRING,
->           ['0'] = IN_ZERO,
-> -        ['1' ... '9'] = IN_NONZERO_NUMBER,
-> -        ['-'] = IN_NEG_NONZERO_NUMBER,
-> +        ['1' ... '9'] = IN_DIGITS,
-> +        ['-'] = IN_SIGN,
->           ['{'] = JSON_LCURLY,
->           ['}'] = JSON_RCURLY,
->           ['['] = JSON_LSQUARE,
-> @@ -255,8 +255,8 @@ static const uint8_t json_lexer[][256] =  {
->           ['"'] = IN_DQ_STRING,
->           ['\''] = IN_SQ_STRING,
->           ['0'] = IN_ZERO,
-> -        ['1' ... '9'] = IN_NONZERO_NUMBER,
-> -        ['-'] = IN_NEG_NONZERO_NUMBER,
-> +        ['1' ... '9'] = IN_DIGITS,
-> +        ['-'] = IN_SIGN,
+The examples look good!
 
-If you take my advice in the earlier patch about not repeating this list 
-for IN_INTERPOL_START, you'll have an easy-to-resolve conflict here.
+I have to agree with Fam, though, that since all the rest of the help
+text is rather dense, this should be condensed as well.  I would vote
+for replacing all \n\n" by \n" and indenting the example lines by two
+spaces.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+(I personally am a fan of not-so-dense info, but then again, this is a
+--help text, so there is a point in making it dense.)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Also, I think it would be better to order the examples alphabetically.
+
+Max
+
+>      printf("\n\n" QEMU_HELP_BOTTOM "\n");
+>      exit(EXIT_SUCCESS);
+>  }
+>=20
+
+
+
+--SUNe8qXqDIebUIEEnN5121q0UQspJyD2S
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltxs4sACgkQ9AfbAGHV
+z0A4FAf/QhV9mZpIfA8yk+gOmhs6wyRucO/TtSZkfVHHlN+ZiuhkJ3hbj0sqjV8U
+oTLABJ5glmN+sWNN0qZdfuhirzb3Ui2Y+04wv+//PSbP7f4AMYctWyCUJRATTi1S
+uVhD0HRfSmdUc3okRBS1o632ap8Sg+4aSv68YC4AE+YUMJGOlPPF7A5ouFFwmzRb
+4Mp+EYURGZYpzdQ5cU0WP+puOYILqhph9t23HtHylTNFA5vdjEP5cDdyGxv/uOpJ
+5rEj2MOLXeeOk/90A3ag00VdmhVg6ca7HBafCygO6D7LWwsGOKTdkxlPeGTfOtOo
+O1CRkWqGGBoTA3O0nXJngvGk1JpE0w==
+=WipB
+-----END PGP SIGNATURE-----
+
+--SUNe8qXqDIebUIEEnN5121q0UQspJyD2S--
