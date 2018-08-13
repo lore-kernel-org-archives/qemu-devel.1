@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpBYM-0000Mq-4C
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:02:31 -0400
+	(envelope-from <mst@redhat.com>) id 1fpBZ7-0000bv-7q
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:03:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpBYI-0002eI-Ut
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:02:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55054 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fpBYI-0002eD-OW
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:02:26 -0400
-References: <20180813102037.12097-1-jusual@mail.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9aee6f27-6a6d-2703-f49d-78c6bd3f7bc3@redhat.com>
-Date: Mon, 13 Aug 2018 14:02:06 +0200
+	(envelope-from <mst@redhat.com>) id 1fpBZ5-0002tN-N7
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 08:03:17 -0400
+Date: Mon, 13 Aug 2018 15:02:51 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180813145125-mutt-send-email-mst@kernel.org>
+References: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180813102037.12097-1-jusual@mail.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] chardev: Add websocket support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 00/33] Qtest driver framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,143 +22,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, marcandre.lureau@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
+To: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, John Snow <jsnow@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>
 
-Thanks Julia, just a few cleanups to simplify the prototypes of some
-functions.
+On Mon, Aug 13, 2018 at 12:14:20PM +0200, Emanuele Giuseppe Esposito wrote:
+> Qgraph API for the qtest driver framework
+> 
+> This series of patches introduce a different qtest driver
+> organization, viewing machines, drivers and tests as node in a
+> graph, each having one or multiple edges relations.
+> 
+> The idea is to have a framework where each test asks for a specific
+> driver, and the framework takes care of allocating the proper devices
+> required and passing the correct command line arguments to QEMU.
+> 
+> A node can be of four types:
+> - MACHINE:   for example "arm/raspi2"
+> - DRIVER:    for example "generic-sdhci"
+> - INTERFACE: for example "sdhci" (interface for all "-sdhci" drivers)
+> - TEST:      for example "sdhci-test", consumes an interface and tests
+>              the functions provided
+> 
+> An edge relation between two nodes (drivers or machines) X and Y can be:
+> - X CONSUMES Y: Y can be plugged into X
+> - X PRODUCES Y: X provides the interface Y
+> - X CONTAINS Y: Y is part of X component
+> 
+> Basic framework steps are the following:
+> - All nodes and edges are created in their respective machine/driver/test files
+> - The framework starts QEMU and asks for a list of available devices
+>   and machines
+> - The framework walks the graph starting from the available machines and
+>   performs a Depth First Search for tests
+> - Once a test is found, the path is walked again and all drivers are
+>   allocated accordingly and the final interface is passed to the test
+> - The test is executed
+> - Unused objects are cleaned and the path discovery is continued
+> 
+> Depending on the QEMU binary used, only some drivers/machines will be available
+> and only test that are reached by them will be executed.
+> 
+> This work is being done as Google Summer of Code 2018 project for QEMU,
+> my mentors are Paolo Bonzini and Laurent Vivier.
+> Additional infos on the project can be found at:
+> https://wiki.qemu.org/Features/qtest_driver_framework
 
-On 13/08/2018 12:20, Julia Suvorova wrote:
-> New option "websock" added to allow using websocket protocol for
-> chardev socket backend.
-> Example:
->     -chardev socket,websock,id=3D...
->=20
-> Signed-off-by: Julia Suvorova <jusual@mail.ru>
-> ---
->  chardev/char-socket.c | 75 ++++++++++++++++++++++++++++++++++++-------
->  chardev/char.c        |  3 ++
->  qapi/char.json        |  3 ++
->  3 files changed, 70 insertions(+), 11 deletions(-)
->=20
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index efbad6ee7c..4464446511 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -26,6 +26,7 @@
->  #include "chardev/char.h"
->  #include "io/channel-socket.h"
->  #include "io/channel-tls.h"
-> +#include "io/channel-websock.h"
->  #include "io/net-listener.h"
->  #include "qemu/error-report.h"
->  #include "qemu/option.h"
-> @@ -69,6 +70,8 @@ typedef struct {
->      GSource *telnet_source;
->      TCPChardevTelnetInit *telnet_init;
-> =20
-> +    bool is_websock;
-> +
->      GSource *reconnect_timer;
->      int64_t reconnect_time;
->      bool connect_err_reported;
-> @@ -386,12 +389,14 @@ static void tcp_chr_free_connection(Chardev *chr)
->  }
-> =20
->  static char *SocketAddress_to_str(const char *prefix, SocketAddress *a=
-ddr,
-> -                                  bool is_listen, bool is_telnet)
-> +                                  bool is_listen, bool is_telnet,
-> +                                  bool is_websock)
+Seems pretty clean to me. Except that patch 33
+needs to be fixed and fix squashed:
 
-The only caller passes the four arguments as "s->addr, s->is_listen,
-s->is_telner, s->is_websock".  Can you change the arguments to
-"SocketChardev *s, const char *prefix" and rename to
-qemu_chr_socket_address?  Or even remove "const char *prefix" and rename
-to "qemu_chr_compute_disconnected_filename", as you prefer.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
->  {
->      switch (addr->type) {
->      case SOCKET_ADDRESS_TYPE_INET:
->          return g_strdup_printf("%s%s:%s:%s%s", prefix,
-> -                               is_telnet ? "telnet" : "tcp",
-> +                               is_telnet ? "telnet"
-> +                                         : (is_websock ? "websock" : "=
-tcp"),
->                                 addr->u.inet.host,
->                                 addr->u.inet.port,
->                                 is_listen ? ",server" : "");
-> @@ -420,7 +425,8 @@ static void update_disconnected_filename(SocketChar=
-dev *s)
-> =20
->      g_free(chr->filename);
->      chr->filename =3D SocketAddress_to_str("disconnected:", s->addr,
-> -                                         s->is_listen, s->is_telnet);
-> +                                         s->is_listen, s->is_telnet,
-> +                                         s->is_websock);
->  }
-> =20
->  /* NB may be called even if tcp_chr_connect has not been
-> @@ -508,7 +514,7 @@ static int tcp_chr_sync_read(Chardev *chr, const ui=
-nt8_t *buf, int len)
-> =20
->  static char *sockaddr_to_str(struct sockaddr_storage *ss, socklen_t ss=
-_len,
->                               struct sockaddr_storage *ps, socklen_t ps=
-_len,
-> -                             bool is_listen, bool is_telnet)
-> +                             bool is_listen, bool is_telnet, bool is_w=
-ebsock)
 
-Likewise here, the function only needs a single argument SocketChardev
-*s and can be renamed to qemu_chr_compute_filename (since the result is
-assigned to chr->filename).
-
->  {
->      char shost[NI_MAXHOST], sserv[NI_MAXSERV];
->      char phost[NI_MAXHOST], pserv[NI_MAXSERV];
-> @@ -531,7 +537,8 @@ static char *sockaddr_to_str(struct sockaddr_storag=
-e *ss, socklen_t ss_len,
->          getnameinfo((struct sockaddr *) ps, ps_len, phost, sizeof(phos=
-t),
->                      pserv, sizeof(pserv), NI_NUMERICHOST | NI_NUMERICS=
-ERV);
->          return g_strdup_printf("%s:%s%s%s:%s%s <-> %s%s%s:%s",
-> -                               is_telnet ? "telnet" : "tcp",
-> +                               is_telnet ? "telnet"
-> +                                         : (is_websock ? "websock" : "=
-tcp"),
-
-... and finally add a new function
-qemu_chr_socket_protocol(SocketChardev *s) that returns one of "telnet",
-"websock" or "tcp".
-
-> diff --git a/qapi/char.json b/qapi/char.json
-> index b7b2a05766..135ccddaf7 100644
-> --- a/qapi/char.json
-> +++ b/qapi/char.json
-> @@ -251,6 +251,8 @@
->  #          sockets (default: false)
->  # @tn3270: enable tn3270 protocol on server
->  #          sockets (default: false) (Since: 2.10)
-> +# @websock: enable websocket protocol on server
-> +#           sockets (default: false)
-
-"(Since: 3.1)".
-
-Thanks,
-
-Paolo
-
->  # @reconnect: For a client socket, if a socket is disconnected,
->  #          then attempt a reconnect after the given number of seconds.
->  #          Setting this to zero disables this function. (default: 0)
-> @@ -265,6 +267,7 @@
->                                       '*nodelay'   : 'bool',
->                                       '*telnet'    : 'bool',
->                                       '*tn3270'    : 'bool',
-> +                                     '*websock'   : 'bool',
->                                       '*reconnect' : 'int' },
->    'base': 'ChardevCommon' }
-> =20
->=20
+> v3:
+> - Minor fixes regarding memory leaks and naming
+> 
+> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> 
+> Emanuele Giuseppe Esposito (32):
+>   tests: qgraph API for the qtest driver framework
+>   tests/qgraph: rename qpci_init_pc and qpci_init_spapr functions
+>   tests/qgraph: pci-pc driver and interface nodes
+>   tests/qgraph: x86_64/pc machine node
+>   tests/qgraph: sdhci driver and interface nodes
+>   tests/qgraph: sdhci test node
+>   tests/qgraph: arm/raspi2 machine node
+>   tests/qgraph: pci-spapr driver and interface nodes
+>   tests/qgraph: ppc64/pseries machine node
+>   tests/qgraph: has_buggy_msi flag
+>   tests/qgraph: e1000e driver and interface nodes
+>   tests/qgraph: e1000e-test node
+>   tests/qgraph: virtio_start_device function
+>   tests/qgraph: virtio-pci driver and interface nodes
+>   tests/qgraph: virtio-mmio driver and interface nodes
+>   tests/qgraph: arm/virt machine node
+>   tests/qgraph: virtio-serial driver and interface nodes
+>   tests/qgraph: virtio-console test node
+>   tests/qgraph: virtio-serial test node
+>   tests/qgraph: virtio-9p driver and interface nodes
+>   tests/qgraph: virtio-9p test node
+>   tests/qgraph: virtio-balloon driver and interface nodes
+>   tests/qgraph: virtio-balloon test node
+>   tests/qgraph: virtio-rng driver and interface nodes
+>   tests/qgraph: virtio-rng test node
+>   tests/qgraph: virtio-blk driver and interface nodes
+>   tests/qgraph: virtio-blk test node
+>   tests/qgraph: virtio-net driver and interface nodes
+>   tests/qgraph: virtio-net test node
+>   tests/qgraph: virtio-scsi driver and interface nodes
+>   tests/qgraph: virtio-scsi test node
+>   tests/qgraph: temporarly commented vhost-user-test
+> 
+> Paolo Bonzini (1):
+>   tests: virtio: separate ccw tests from libqos
+> 
+>  configure                            |   2 +-
+>  include/qemu/module.h                |   2 +
+>  tests/Makefile.include               |  79 +--
+>  tests/e1000e-test.c                  | 354 +++----------
+>  tests/i440fx-test.c                  |   2 +-
+>  tests/ide-test.c                     |   2 +-
+>  tests/libqos/ahci.c                  |   2 +-
+>  tests/libqos/e1000e.c                | 262 ++++++++++
+>  tests/libqos/e1000e.h                |  53 ++
+>  tests/libqos/libqos-pc.c             |   2 +-
+>  tests/libqos/libqos-spapr.c          |   2 +-
+>  tests/libqos/libqos.c                |   2 +-
+>  tests/libqos/libqos.h                |   2 +-
+>  tests/libqos/pci-pc.c                |  86 ++--
+>  tests/libqos/pci-pc.h                |  22 +-
+>  tests/libqos/pci-spapr.c             | 119 +++--
+>  tests/libqos/pci-spapr.h             |  26 +-
+>  tests/libqos/pci.c                   |  37 +-
+>  tests/libqos/pci.h                   |  15 +
+>  tests/libqos/ppc64_pseries-machine.c | 111 +++++
+>  tests/libqos/qgraph.c                | 721 +++++++++++++++++++++++++++
+>  tests/libqos/qgraph.h                | 515 +++++++++++++++++++
+>  tests/libqos/qgraph_extra.h          | 263 ++++++++++
+>  tests/libqos/raspi2-machine.c        |  82 +++
+>  tests/libqos/sdhci.c                 | 163 ++++++
+>  tests/libqos/sdhci.h                 |  69 +++
+>  tests/libqos/virt-machine.c          |  90 ++++
+>  tests/libqos/virtio-9p.c             | 165 ++++++
+>  tests/libqos/virtio-9p.h             |  42 ++
+>  tests/libqos/virtio-balloon.c        | 111 +++++
+>  tests/libqos/virtio-balloon.h        |  39 ++
+>  tests/libqos/virtio-blk.c            | 126 +++++
+>  tests/libqos/virtio-blk.h            |  40 ++
+>  tests/libqos/virtio-mmio.c           |  66 ++-
+>  tests/libqos/virtio-mmio.h           |   5 +-
+>  tests/libqos/virtio-net.c            | 179 +++++++
+>  tests/libqos/virtio-net.h            |  41 ++
+>  tests/libqos/virtio-pci.c            |  80 ++-
+>  tests/libqos/virtio-pci.h            |  12 +
+>  tests/libqos/virtio-rng.c            | 108 ++++
+>  tests/libqos/virtio-rng.h            |  39 ++
+>  tests/libqos/virtio-scsi.c           | 117 +++++
+>  tests/libqos/virtio-scsi.h           |  39 ++
+>  tests/libqos/virtio-serial.c         | 109 ++++
+>  tests/libqos/virtio-serial.h         |  39 ++
+>  tests/libqos/virtio.c                |   8 +
+>  tests/libqos/virtio.h                |   1 +
+>  tests/libqos/x86_64_pc-machine.c     | 110 ++++
+>  tests/libqtest.h                     |   3 +
+>  tests/q35-test.c                     |   4 +-
+>  tests/qos-test.c                     | 481 ++++++++++++++++++
+>  tests/rtl8139-test.c                 |   2 +-
+>  tests/sdhci-test.c                   | 222 +++------
+>  tests/tco-test.c                     |   2 +-
+>  tests/test-qgraph.c                  | 446 +++++++++++++++++
+>  tests/usb-hcd-ehci-test.c            |   2 +-
+>  tests/vhost-user-test.c              |   6 +-
+>  tests/virtio-9p-test.c               | 221 +++-----
+>  tests/virtio-balloon-test.c          |  22 +-
+>  tests/virtio-blk-test.c              | 473 +++++++-----------
+>  tests/virtio-ccw-test.c              | 121 +++++
+>  tests/virtio-console-test.c          |  30 +-
+>  tests/virtio-net-test.c              | 163 ++----
+>  tests/virtio-rng-test.c              |  25 +-
+>  tests/virtio-scsi-test.c             | 155 +++---
+>  tests/virtio-serial-test.c           |  27 +-
+>  66 files changed, 5674 insertions(+), 1292 deletions(-)
+>  create mode 100644 tests/libqos/e1000e.c
+>  create mode 100644 tests/libqos/e1000e.h
+>  create mode 100644 tests/libqos/ppc64_pseries-machine.c
+>  create mode 100644 tests/libqos/qgraph.c
+>  create mode 100644 tests/libqos/qgraph.h
+>  create mode 100644 tests/libqos/qgraph_extra.h
+>  create mode 100644 tests/libqos/raspi2-machine.c
+>  create mode 100644 tests/libqos/sdhci.c
+>  create mode 100644 tests/libqos/sdhci.h
+>  create mode 100644 tests/libqos/virt-machine.c
+>  create mode 100644 tests/libqos/virtio-9p.c
+>  create mode 100644 tests/libqos/virtio-9p.h
+>  create mode 100644 tests/libqos/virtio-balloon.c
+>  create mode 100644 tests/libqos/virtio-balloon.h
+>  create mode 100644 tests/libqos/virtio-blk.c
+>  create mode 100644 tests/libqos/virtio-blk.h
+>  create mode 100644 tests/libqos/virtio-net.c
+>  create mode 100644 tests/libqos/virtio-net.h
+>  create mode 100644 tests/libqos/virtio-rng.c
+>  create mode 100644 tests/libqos/virtio-rng.h
+>  create mode 100644 tests/libqos/virtio-scsi.c
+>  create mode 100644 tests/libqos/virtio-scsi.h
+>  create mode 100644 tests/libqos/virtio-serial.c
+>  create mode 100644 tests/libqos/virtio-serial.h
+>  create mode 100644 tests/libqos/x86_64_pc-machine.c
+>  create mode 100644 tests/qos-test.c
+>  create mode 100644 tests/test-qgraph.c
+>  create mode 100644 tests/virtio-ccw-test.c
+> 
+> -- 
+> 2.17.1
