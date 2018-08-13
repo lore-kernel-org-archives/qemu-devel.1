@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fpFOk-0005hf-Dv
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:08:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1fpFS8-0007l0-DO
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:12:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fpFOj-0001Qq-7r
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:08:50 -0400
-References: <20180810062647.23211-1-lbloch@janustech.com>
-	<20180810062647.23211-7-lbloch@janustech.com>
-	<w5136vm8m8u.fsf@maestria.local.igalia.com>
-	<ca79bbff-163b-f50e-e17b-54d6597e6bfe@redhat.com>
-	<20180813112333.GD4323@localhost.localdomain>
-	<e9a77f1e-6b9e-3fea-69c9-c18638961a2e@redhat.com>
-	<20180813155856.GL4323@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <5436d747-9cf3-50a0-6fab-537fb8cc8bae@redhat.com>
-Date: Mon, 13 Aug 2018 18:08:39 +0200
+	(envelope-from <eblake@redhat.com>) id 1fpFS4-0002qy-DI
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:12:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34418 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fpFS4-0002qn-6c
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:12:16 -0400
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-40-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5f5cbcf3-bb28-0cef-8951-794d4b2607fd@redhat.com>
+Date: Mon, 13 Aug 2018 11:12:13 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180813155856.GL4323@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5cdwn2ctv9SZNTNgQfMuDHNJCXodf9SKM"
-Subject: Re: [Qemu-devel] [PATCH v7 6/9] qcow2: Increase the default upper
- limit on the L2 cache size
+In-Reply-To: <20180808120334.10970-40-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 39/56] json: Leave rejecting invalid
+ interpolation to parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,157 +29,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5cdwn2ctv9SZNTNgQfMuDHNJCXodf9SKM
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
-Message-ID: <5436d747-9cf3-50a0-6fab-537fb8cc8bae@redhat.com>
-Subject: Re: [PATCH v7 6/9] qcow2: Increase the default upper limit on the L2
- cache size
-References: <20180810062647.23211-1-lbloch@janustech.com>
- <20180810062647.23211-7-lbloch@janustech.com>
- <w5136vm8m8u.fsf@maestria.local.igalia.com>
- <ca79bbff-163b-f50e-e17b-54d6597e6bfe@redhat.com>
- <20180813112333.GD4323@localhost.localdomain>
- <e9a77f1e-6b9e-3fea-69c9-c18638961a2e@redhat.com>
- <20180813155856.GL4323@localhost.localdomain>
-In-Reply-To: <20180813155856.GL4323@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On 08/08/2018 07:03 AM, Markus Armbruster wrote:
+> Both lexer and parser reject invalid interpolation specifications.
+> The parser's check is useless.
+> 
+> The lexer ends the token right after the first bad character.  This
+> tends to lead to suboptimal error reporting.  For instance, input
+> 
+>      [ %11d ]
 
-On 2018-08-13 17:58, Kevin Wolf wrote:
-> Am 13.08.2018 um 17:11 hat Max Reitz geschrieben:
->>>> My personal opinion is this: Most users should be fine with 8 GB of
->>>> randomly accessible image space (this may be wrong).  Whenever a use=
-r
->>>> does have an application that uses more than 8 GB, they are probably=
- in
->>>> an area where they want to do some performance tuning anyway.  Requi=
-ring
->>>> them to set l2-cache-full in that case seems reasonable to me.
->>>
->>> In principle, I'd agree. I'd even say that management tools should
->>> always explicitly set those options instead of relying on our default=
-s.
->>> But management tools have been ignoring these options for a long time=
+With no context of other characters on this line, it took me a while to 
+notice that this was '1' (one) not 'l' (ell), even though my current 
+font renders the two quite distinctly. (And now you know why base32 
+avoids 0/1 in its alphabet, to minimize confusion with O/l - see RFC 
+4648).  A better example might be %22d.
 
->>> and keep doing so.
->>>
->>> And honestly, if you can't spend a few megabytes for the caches, it's=
+> 
+> produces the tokens
+> 
+>      JSON_LSQUARE  [
+>      JSON_ERROR    %1
+>      JSON_INTEGER  1
 
->>> just as reasonable that you should set l2-cache to a lower value. You=
-'ll
->>> need some more tweaking anyway to reduce the memory footprint.
->>
->> It isn't, because as I explained above, it is more reasonable to expec=
-t
->> people to find out about disk options because their disk performance i=
-s
->> abysmal than because their RAM is exhausted.
->>
->> I would like to say "but it is nearly as reasonable", but I really don=
-'t
->> think so.
->=20
-> Maybe in a perfect world, finding the option when their disk performanc=
-e
-> is abysmal is what users would do. In this world, they either just use
-> raw and scream for backing files and dirty bitmaps and whatnot for raw,=
+And that's in spite of the context you have here, which makes it obvious 
+that the parser saw an integer.
 
-> or they just directly go to some other hypervisor.
->=20
-> Realistically, the cache options don't exist. They are hard to discover=
+>      JSON_KEYWORD  d
+>      JSON_RSQUARE  ]
+> 
+> The parser then yields an error, an object and two more errors:
+> 
+>      error: Invalid JSON syntax
+>      object: 1
+>      error: JSON parse error, invalid keyword
+>      error: JSON parse error, expecting value
+> 
+> Change the lexer to accept [A-Za-z0-9]*[duipsf].  It now produces
 
-> in the QEMU command line and management tools don't support them.
->=20
-> Conclusion: We're doomed to find a one-size-fits-all default that works=
+That regex doesn't match the code.
 
-> well in all common use cases, including benchmarks. We can try and make=
+> 
+>      JSON_LSQUARE  [
+>      JSON_INTERPOLATION %11d
+>      JSON_RSQUARE  ]
+> 
+> and the parser reports just
+> 
+>      JSON parse error, invalid interpolation '%11d'
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   qobject/json-lexer.c  | 52 +++++++++----------------------------------
+>   qobject/json-parser.c |  1 +
+>   2 files changed, 11 insertions(+), 42 deletions(-)
+> 
+> diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+> index 0ea1eae4aa..7a82aab88b 100644
+> --- a/qobject/json-lexer.c
+> +++ b/qobject/json-lexer.c
+> @@ -93,7 +93,8 @@
+>    *   (apostrophe) instead of %x22 (quotation mark), and can't contain
+>    *   unescaped apostrophe, but can contain unescaped quotation mark.
+>    * - Interpolation:
+> - *   interpolation = %((l|ll|I64)[du]|[ipsf])
+> + *   The lexer accepts [A-Za-z0-9]*, and leaves rejecting invalid ones
+> + *   to the parser.
 
-> it adapt to the situation, but we can't reasonably expect users to
-> manually override it.
+This comment is more apropos.  But is it worth spelling "The lexer 
+accepts %[A-Za-z0-9]*", and/or documenting that recognizing 
+interpolation during lexing is now optional (thanks to the previous patch)?
 
-OK, saying both is unreasonable is something I can get behind.
+> @@ -278,6 +238,14 @@ static const uint8_t json_lexer[][256] =  {
+>           ['\n'] = IN_WHITESPACE,
+>       },
+>   
+> +    /* interpolation */
+> +    [IN_INTERPOL] = {
+> +        TERMINAL(JSON_INTERPOL),
+> +        ['A' ... 'Z'] = IN_INTERPOL,
+> +        ['a' ... 'z'] = IN_INTERPOL,
+> +        ['0' ... '9'] = IN_INTERPOL,
+> +    },
+> +
 
->>>                                                         Our choice of=
- a
->>> default should reflect that, especially considering that we only use
->>> the memory on demand. If your image is only 32 GB, you'll never use m=
-ore
->>> than 4 MB of cache.
->>
->> Well, OK, yes.  This is an especially important point when it really i=
-s
->> about hosts that have limited memory.  In those cases, users probably
->> won't run huge images anyway.
->>
->>>                     And if your image is huge, but only access part o=
-f
->>> it, we also won't use the full 32 MB.
->>
->> On Linux. O:-)
->=20
-> No, on any system where qemu_try_blockalign() results in a COW zero
-> page.
+Note that we still treat code like "'foo': %#x" as an invalid 
+interpolation request (it would be a valid printf format), while at the 
+same time passing "%1" on to the parser (which is not a valid printf 
+format, so -Wformat would have flagged it).  In fact, "%d1" which is 
+valid for printf as "%d" followed by a literal "1" gets thrown to the 
+parser as one chunk - but it is not valid in JSON to have %d adjacent to 
+another integer any more than it is to reject "%d1" as an unknown 
+sequence.  I don't think that catering to the remaining printf 
+metacharacters (' ', '#', '\'', '-', '*', '+') nor demanding that things 
+end on a letter is worth the effort, since it just makes the lexer more 
+complicated when your goal was to do as little as possible to get things 
+thrown over to the parser.
 
-OK, yes, but why would you only ever access part of it?  Then you might
-just as well have created a smaller disk from the beginning.
+So even though your lexing is now somewhat different from printf, I 
+don't see that as a serious drawback (the uses we care about are still 
+-Wformat clean, and the uses we don't like are properly handled in the 
+parser).
 
-> The Linux-only addition is returning memory even after an access.
->=20
->> So it's good that you have calmed my nerves about how this might be
->> problematic on Linux systems (it isn't in practice, although I disagre=
-e
->> that people will find qcow2 to be the fault when their memory runs out=
-),
->> but you haven't said anything about non-Linux systems.  I understand
->> that you don't care, but as I said here, this was my only substantial
->> concern anyway.
->=20
-> I don't actually think it's so bad to keep the cache permanently
-> allocated, but I wouldn't object to a lower default for non-Linux hosts=
+Perhaps you want to enhance the testsuite (earlier in the series) to 
+cover "%22d", "%d1", "%1" as various unaccepted interpolation requests 
+(if you didn't already).
 
-> either. 1 MB may still be a little too low, 4 MB (covers up to 32 GB)
-> might be more adequate. My typical desktop VMs are larger than 8 GB, bu=
-t
-> smaller than 32 GB.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Will your typical desktop VMs gain anything from the cache covering more
-than 8 GB?
-
-Anyway, I certainly won't complain about 4 MB.
-
-(My point here is that on non-Linux systems, qemu probably does not have
-users who have use cases where they need to access 256 GB of disk
-simultaneously.  Probably not even more than 8 GB.  If you want to
-increase the cache size there to 4 MB, fine, I think that won't hurt.
-But 32 MB might hurt, and I don't think on non-Linux systems there are
-users who would benefit from it -- specifically because your "typical
-desktop VM" wouldn't benefit from it.)
-
-Max
-
-
---5cdwn2ctv9SZNTNgQfMuDHNJCXodf9SKM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltxrQcACgkQ9AfbAGHV
-z0DcyAf/b6WD9fTIiCSVIjLc3DxRYLt6G0zS8RPR4ZjWOI9VvdGGeVvWH8vzwj/y
-h/RPBYkSLp4Jzo3E3A17GnFDLAwmCfEUhC7+PKeGnvGF23ksRZHOM3uWY/BT45u0
-YCmjpdNwT6I3gI4Q2BWlpUAf5G228Ea+r52m7jXz+FecCkp6IRPP767NTWBFNAcX
-w2yWR2pYhli2a7+vPI/SjK74Mghmjt+8T0cYIDNGkHp9aAMu9AOoFIUY2EtZ6Qtk
-ES55gJs7zGn5sa4HZvxRb+tpX0dozdG25pcu7+RX51wbSaS5l95sDHbB3VVXQasU
-t3H84NmM3rs73cjnVDjOY1w+46IR4A==
-=5KBi
------END PGP SIGNATURE-----
-
---5cdwn2ctv9SZNTNgQfMuDHNJCXodf9SKM--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
