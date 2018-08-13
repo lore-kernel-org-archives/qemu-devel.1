@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH37-0005P3-Rd
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:46 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH37-0005Oz-Mm
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH34-00074q-En
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH34-00074R-AQ
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:37 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55757 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:55754 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpH33-00072t-WC
+	id 1fpH33-00072p-V9
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:34 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 13 Aug 2018 19:52:49 +0200
-Message-Id: <1534182832-554-25-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 13 Aug 2018 19:52:44 +0200
+Message-Id: <1534182832-554-20-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v8 24/87] target/mips: Add nanoMIPS decoding
- and extraction utilities
+Subject: [Qemu-devel] [PATCH v8 19/87] qemu-doc: Amend MIPS-related items
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +29,38 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add some basic utility functions and macros for nanoMIPS decoding
-engine.
+Amend MIPS-related items in qemu-doc.texi
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ qemu-doc.texi | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 0475e1d..0467339 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -16646,6 +16646,51 @@ enum {
-  *
-  */
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index abfd2db..8ea6bfa 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2693,8 +2693,17 @@ The binary format is detected automatically.
+ @command{qemu-microblaze} TODO.
  
-+/* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr3'). */
-+static inline int decode_gpr_gpr3(int r)
-+{
-+    static const int map[] = { 16, 17, 18, 19,  4,  5,  6,  7 };
+ @cindex user mode (MIPS)
+-@command{qemu-mips} TODO.
+-@command{qemu-mipsel} TODO.
++@command{qemu-mips} executes 32-bit big endian MIPS binaries (MIPS O32 ABI).
 +
-+    return map[r & 0x7];
-+}
++@command{qemu-mipsel} executes 32-bit little endian MIPS binaries (MIPS O32 ABI).
 +
-+/* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr3.src.store'). */
-+static inline int decode_gpr_gpr3_src_store(int r)
-+{
-+    static const int map[] = {  0, 17, 18, 19,  4,  5,  6,  7 };
++@command{qemu-mips64} executes 64-bit big endian MIPS binaries (MIPS O64 ABI).
 +
-+    return map[r & 0x7];
-+}
++@command{qemu-mips64el} executes 64-bit little endian MIPS binaries (MIPS O64 ABI).
 +
-+/* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr4'). */
-+static inline int decode_gpr_gpr4(int r)
-+{
-+    static const int map[] = {  8,  9, 10, 11,  4,  5,  6,  7,
-+                               16, 17, 18, 19, 20, 21, 22, 23 };
++@command{qemu-mipsn32} executes 32-bit big endian MIPS binaries (MIPS N32 ABI).
 +
-+    return map[r & 0xf];
-+}
-+
-+/* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr4.zero'). */
-+static inline int decode_gpr_gpr4_zero(int r)
-+{
-+    static const int map[] = {  8,  9, 10,  0,  4,  5,  6,  7,
-+                               16, 17, 18, 19, 20, 21, 22, 23 };
-+
-+    return map[r & 0xf];
-+}
-+
-+
-+/* extraction utilities */
-+
-+#define NANOMIPS_EXTRACT_RD(op) ((op >> 7) & 0x7)
-+#define NANOMIPS_EXTRACT_RS(op) ((op >> 4) & 0x7)
-+#define NANOMIPS_EXTRACT_RS2(op) uMIPS_RS(op)
-+#define NANOMIPS_EXTRACT_RS1(op) ((op >> 1) & 0x7)
-+#define NANOMIPS_EXTRACT_RD5(op) ((op >> 5) & 0x1f)
-+#define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
-+
-+
- static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
- {
-     return 2;
++@command{qemu-mipsn32el} executes 32-bit little endian MIPS binaries (MIPS N32 ABI).
+ 
+ @cindex user mode (NiosII)
+ @command{qemu-nios2} TODO.
 -- 
 2.7.4
