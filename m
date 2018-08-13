@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9sr-0007PB-8b
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:34 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9sw-0007UX-NA
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9sq-0002Is-4b
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:33 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9sv-0002Q0-3a
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:38 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 13 Aug 2018 12:14:33 +0200
-Message-Id: <20180813101453.10200-14-e.emanuelegiuseppe@gmail.com>
+Date: Mon, 13 Aug 2018 12:14:34 +0200
+Message-Id: <20180813101453.10200-15-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
 References: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 13/33] tests/qgraph: virtio_start_device
- function
+Subject: [Qemu-devel] [PATCH 14/33] tests/qgraph: virtio-pci driver and
+ interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,141 +23,271 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, John Snow <jsnow@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-This function is intended to group all the qvirtio_* functions that
-start the qvirtio devices.
-Applied in all tests using this combination of functions.
+Add QOSGraphObject to QVirtioPCIDevice structure, with a basic
+constructor. virtio-pci is not present in qgraph, since it
+will be used as starting point by its subclasses (virtio-*-pci)
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
- tests/libqos/virtio.c    |  7 +++++++
- tests/libqos/virtio.h    |  1 +
- tests/vhost-user-test.c  |  4 +---
- tests/virtio-9p-test.c   |  4 +---
- tests/virtio-blk-test.c  | 10 +++-------
- tests/virtio-net-test.c  |  4 +---
- tests/virtio-scsi-test.c |  4 +---
- 7 files changed, 15 insertions(+), 19 deletions(-)
+ tests/Makefile.include    |  2 +-
+ tests/libqos/virtio-pci.c | 80 +++++++++++++++++++++++++++++++--------
+ tests/libqos/virtio-pci.h | 12 ++++++
+ 3 files changed, 77 insertions(+), 17 deletions(-)
 
-diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
-index 0dad5c19ac..c1ff0206d5 100644
---- a/tests/libqos/virtio.c
-+++ b/tests/libqos/virtio.c
-@@ -365,3 +365,10 @@ const char *qvirtio_get_dev_type(void)
-         return "pci";
-     }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index e18796d8d8..5220136473 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -771,7 +771,7 @@ libqgraph-machines-obj-y = tests/libqos/x86_64_pc-machine.o
+ libqgraph-machines-obj-y += tests/libqos/raspi2-machine.o
+ libqgraph-machines-obj-y += tests/libqos/ppc64_pseries-machine.o
+ 
+-libqgraph-pci-obj-y = $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
++libqgraph-pci-obj-y = $(libqos-virtio-obj-y)
+ libqgraph-pci-obj-y += $(libqgraph-machines-obj-y)
+ libqgraph-pci-obj-y += tests/libqos/sdhci.o
+ libqgraph-pci-obj-y += tests/libqos/e1000e.o
+diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
+index 550dede0a2..86860c47c8 100644
+--- a/tests/libqos/virtio-pci.c
++++ b/tests/libqos/virtio-pci.c
+@@ -15,12 +15,26 @@
+ #include "libqos/pci-pc.h"
+ #include "libqos/malloc.h"
+ #include "libqos/malloc-pc.h"
++#include "libqos/qgraph.h"
+ #include "standard-headers/linux/virtio_ring.h"
+ #include "standard-headers/linux/virtio_pci.h"
+ 
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_regs.h"
+ 
++/* virtio-pci is a superclass of all virtio-xxx-pci devices;
++ * the relation between virtio-pci and virtio-xxx-pci is implicit,
++ * and therefore virtio-pci does not produce virtio and is not
++ * reached by any edge, not even as a "contains" edge.
++ * In facts, every device is a QVirtioPCIDevice with
++ * additional fields, since every one has its own
++ * number of queues and various attributes.
++ * Virtio-pci provides default functions to start the
++ * hw and destroy the object, and nodes that want to
++ * override them should always remember to call the
++ * original qvirtio_pci_destructor and qvirtio_pci_start_hw.
++ */
++
+ typedef struct QVirtioPCIForeachData {
+     void (*func)(QVirtioDevice *d, void *data);
+     uint16_t device_type;
+@@ -32,7 +46,6 @@ typedef struct QVirtioPCIForeachData {
+ void qvirtio_pci_device_free(QVirtioPCIDevice *dev)
+ {
+     g_free(dev->pdev);
+-    g_free(dev);
+ }
+ 
+ static QVirtioPCIDevice *qpcidevice_to_qvirtiodevice(QPCIDevice *pdev)
+@@ -76,7 +89,7 @@ static void qvirtio_pci_assign_device(QVirtioDevice *d, void *data)
+ 
+ static uint8_t qvirtio_pci_config_readb(QVirtioDevice *d, uint64_t off)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     return qpci_io_readb(dev->pdev, dev->bar, CONFIG_BASE(dev) + off);
+ }
+ 
+@@ -90,7 +103,7 @@ static uint8_t qvirtio_pci_config_readb(QVirtioDevice *d, uint64_t off)
+ 
+ static uint16_t qvirtio_pci_config_readw(QVirtioDevice *d, uint64_t off)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     uint16_t value;
+ 
+     value = qpci_io_readw(dev->pdev, dev->bar, CONFIG_BASE(dev) + off);
+@@ -102,7 +115,7 @@ static uint16_t qvirtio_pci_config_readw(QVirtioDevice *d, uint64_t off)
+ 
+ static uint32_t qvirtio_pci_config_readl(QVirtioDevice *d, uint64_t off)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     uint32_t value;
+ 
+     value = qpci_io_readl(dev->pdev, dev->bar, CONFIG_BASE(dev) + off);
+@@ -114,7 +127,7 @@ static uint32_t qvirtio_pci_config_readl(QVirtioDevice *d, uint64_t off)
+ 
+ static uint64_t qvirtio_pci_config_readq(QVirtioDevice *d, uint64_t off)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     uint64_t val;
+ 
+     val = qpci_io_readq(dev->pdev, dev->bar, CONFIG_BASE(dev) + off);
+@@ -127,37 +140,37 @@ static uint64_t qvirtio_pci_config_readq(QVirtioDevice *d, uint64_t off)
+ 
+ static uint32_t qvirtio_pci_get_features(QVirtioDevice *d)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     return qpci_io_readl(dev->pdev, dev->bar, VIRTIO_PCI_HOST_FEATURES);
+ }
+ 
+ static void qvirtio_pci_set_features(QVirtioDevice *d, uint32_t features)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     qpci_io_writel(dev->pdev, dev->bar, VIRTIO_PCI_GUEST_FEATURES, features);
+ }
+ 
+ static uint32_t qvirtio_pci_get_guest_features(QVirtioDevice *d)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     return qpci_io_readl(dev->pdev, dev->bar, VIRTIO_PCI_GUEST_FEATURES);
+ }
+ 
+ static uint8_t qvirtio_pci_get_status(QVirtioDevice *d)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     return qpci_io_readb(dev->pdev, dev->bar, VIRTIO_PCI_STATUS);
+ }
+ 
+ static void qvirtio_pci_set_status(QVirtioDevice *d, uint8_t status)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     qpci_io_writeb(dev->pdev, dev->bar, VIRTIO_PCI_STATUS, status);
+ }
+ 
+ static bool qvirtio_pci_get_queue_isr_status(QVirtioDevice *d, QVirtQueue *vq)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     QVirtQueuePCI *vqpci = (QVirtQueuePCI *)vq;
+     uint32_t data;
+ 
+@@ -182,7 +195,7 @@ static bool qvirtio_pci_get_queue_isr_status(QVirtioDevice *d, QVirtQueue *vq)
+ 
+ static bool qvirtio_pci_get_config_isr_status(QVirtioDevice *d)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     uint32_t data;
+ 
+     if (dev->pdev->msix_enabled) {
+@@ -206,19 +219,19 @@ static bool qvirtio_pci_get_config_isr_status(QVirtioDevice *d)
+ 
+ static void qvirtio_pci_queue_select(QVirtioDevice *d, uint16_t index)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     qpci_io_writeb(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_SEL, index);
+ }
+ 
+ static uint16_t qvirtio_pci_get_queue_size(QVirtioDevice *d)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     return qpci_io_readw(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_NUM);
+ }
+ 
+ static void qvirtio_pci_set_queue_address(QVirtioDevice *d, uint32_t pfn)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     qpci_io_writel(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_PFN, pfn);
+ }
+ 
+@@ -270,7 +283,7 @@ static void qvirtio_pci_virtqueue_cleanup(QVirtQueue *vq,
+ 
+ static void qvirtio_pci_virtqueue_kick(QVirtioDevice *d, QVirtQueue *vq)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     qpci_io_writew(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_NOTIFY, vq->index);
+ }
+ 
+@@ -294,6 +307,7 @@ const QVirtioBus qvirtio_pci = {
+     .virtqueue_kick = qvirtio_pci_virtqueue_kick,
+ };
+ 
++/* TODO: delete this once qgraph is completed */
+ static void qvirtio_pci_foreach(QPCIBus *bus, uint16_t device_type,
+                 bool has_slot, int slot,
+                 void (*func)(QVirtioDevice *d, void *data), void *data)
+@@ -416,3 +430,37 @@ void qvirtio_pci_set_msix_configuration_vector(QVirtioPCIDevice *d,
+     vector = qpci_io_readw(d->pdev, d->bar, VIRTIO_MSI_CONFIG_VECTOR);
+     g_assert_cmphex(vector, !=, VIRTIO_MSI_NO_VECTOR);
  }
 +
-+void qvirtio_start_device(QVirtioDevice *vdev)
++void qvirtio_pci_destructor(QOSGraphObject *obj)
 +{
-+    qvirtio_reset(vdev);
-+    qvirtio_set_acknowledge(vdev);
-+    qvirtio_set_driver(vdev);
++    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)obj;
++    qvirtio_pci_device_disable(dev);
++    qvirtio_pci_device_free(dev);
 +}
-diff --git a/tests/libqos/virtio.h b/tests/libqos/virtio.h
-index 69b5b13840..2c68668de0 100644
---- a/tests/libqos/virtio.h
-+++ b/tests/libqos/virtio.h
-@@ -146,5 +146,6 @@ bool qvirtqueue_get_buf(QVirtQueue *vq, uint32_t *desc_idx, uint32_t *len);
- void qvirtqueue_set_used_event(QVirtQueue *vq, uint16_t idx);
- 
- const char *qvirtio_get_dev_type(void);
-+void qvirtio_start_device(QVirtioDevice *vdev);
- 
- #endif
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index a976808eba..d43d09a013 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -198,9 +198,7 @@ static void init_virtio_dev(TestServer *s, uint32_t features_mask)
-     g_assert_nonnull(s->dev);
- 
-     qvirtio_pci_device_enable(s->dev);
--    qvirtio_reset(&s->dev->vdev);
--    qvirtio_set_acknowledge(&s->dev->vdev);
--    qvirtio_set_driver(&s->dev->vdev);
-+    qvirtio_start_device(&s->dev->vdev);
- 
-     s->alloc = pc_alloc_init(global_qtest);
- 
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index a2b31085f6..d275c74106 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -65,9 +65,7 @@ static QVirtIO9P *qvirtio_9p_pci_start(void)
-     v9p->dev = (QVirtioDevice *) dev;
- 
-     qvirtio_pci_device_enable(dev);
--    qvirtio_reset(v9p->dev);
--    qvirtio_set_acknowledge(v9p->dev);
--    qvirtio_set_driver(v9p->dev);
-+    qvirtio_start_device(v9p->dev);
- 
-     v9p->vq = qvirtqueue_setup(v9p->dev, v9p->qs->alloc, 0);
- 
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 9be9ffb378..66797d0348 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -112,10 +112,7 @@ static QVirtioPCIDevice *virtio_blk_pci_init(QPCIBus *bus, int slot)
-     g_assert_cmphex(dev->pdev->devfn, ==, ((slot << 3) | PCI_FN));
- 
-     qvirtio_pci_device_enable(dev);
--    qvirtio_reset(&dev->vdev);
--    qvirtio_set_acknowledge(&dev->vdev);
--    qvirtio_set_driver(&dev->vdev);
--
-+    qvirtio_start_device(&dev->vdev);
-     return dev;
- }
- 
-@@ -329,6 +326,7 @@ static void pci_indirect(void)
-     qvirtio_set_features(&dev->vdev, features);
- 
-     vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
 +
-     qvirtio_set_driver_ok(&dev->vdev);
- 
-     /* Write request */
-@@ -715,9 +713,7 @@ static void mmio_basic(void)
-     g_assert(dev != NULL);
-     g_assert_cmphex(dev->vdev.device_type, ==, VIRTIO_ID_BLOCK);
- 
--    qvirtio_reset(&dev->vdev);
--    qvirtio_set_acknowledge(&dev->vdev);
--    qvirtio_set_driver(&dev->vdev);
++void qvirtio_pci_start_hw(QOSGraphObject *obj)
++{
++    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)obj;
++    qvirtio_pci_device_enable(dev);
 +    qvirtio_start_device(&dev->vdev);
++}
++
++void virtio_pci_init(QVirtioPCIDevice *dev, QPCIBus *bus, QPCIAddress * addr)
++{
++    QPCIDevice *pci_dev;
++    QVirtioPCIDevice *tmp;
++
++    pci_dev = qpci_device_find(bus, addr->devfn);
++    g_assert_nonnull(pci_dev);
++    tmp = qpcidevice_to_qvirtiodevice(pci_dev);
++    memcpy(dev, tmp, sizeof(QVirtioPCIDevice));
++    dev->pdev = pci_dev;
++    dev->vdev.bus = &qvirtio_pci;
++
++    /* each virtio-xxx-pci device should override at least this function */
++    dev->obj.get_driver = NULL;
++    dev->obj.start_hw = qvirtio_pci_start_hw;
++    dev->obj.destructor = qvirtio_pci_destructor;
++
++    g_free(tmp);
++}
+diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
+index 6ef19094cb..8b619c5133 100644
+--- a/tests/libqos/virtio-pci.h
++++ b/tests/libqos/virtio-pci.h
+@@ -12,8 +12,10 @@
  
-     alloc = generic_alloc_init(MMIO_RAM_ADDR, MMIO_RAM_SIZE, MMIO_PAGE_SIZE);
-     vq = qvirtqueue_setup(&dev->vdev, alloc, 0);
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index b285a262e9..72728acf66 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -45,9 +45,7 @@ static QVirtioPCIDevice *virtio_net_pci_init(QPCIBus *bus, int slot)
-     g_assert_cmphex(dev->vdev.device_type, ==, VIRTIO_ID_NET);
+ #include "libqos/virtio.h"
+ #include "libqos/pci.h"
++#include "libqos/qgraph.h"
  
-     qvirtio_pci_device_enable(dev);
--    qvirtio_reset(&dev->vdev);
--    qvirtio_set_acknowledge(&dev->vdev);
--    qvirtio_set_driver(&dev->vdev);
-+    qvirtio_start_device(&dev->vdev);
+ typedef struct QVirtioPCIDevice {
++    QOSGraphObject obj;
+     QVirtioDevice vdev;
+     QPCIDevice *pdev;
+     QPCIBar bar;
+@@ -31,10 +33,20 @@ typedef struct QVirtQueuePCI {
  
-     return dev;
- }
-diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-index 037872bb98..1581b6926c 100644
---- a/tests/virtio-scsi-test.c
-+++ b/tests/virtio-scsi-test.c
-@@ -159,9 +159,7 @@ static QVirtIOSCSI *qvirtio_scsi_pci_init(int slot)
-     g_assert_cmphex(vs->dev->device_type, ==, VIRTIO_ID_SCSI);
+ extern const QVirtioBus qvirtio_pci;
  
-     qvirtio_pci_device_enable(dev);
--    qvirtio_reset(vs->dev);
--    qvirtio_set_acknowledge(vs->dev);
--    qvirtio_set_driver(vs->dev);
-+    qvirtio_start_device(vs->dev);
++void virtio_pci_init(QVirtioPCIDevice *dev, QPCIBus *bus, QPCIAddress * addr);
+ QVirtioPCIDevice *qvirtio_pci_device_find(QPCIBus *bus, uint16_t device_type);
+ QVirtioPCIDevice *qvirtio_pci_device_find_slot(QPCIBus *bus,
+                                                uint16_t device_type, int slot);
+ void qvirtio_pci_device_free(QVirtioPCIDevice *dev);
++/* virtio-pci object functions available for subclasses that
++ * override the original start_hw and destroy
++ * function. All virtio-xxx-pci subclass that override must
++ * take care of calling these two functions in the respective
++ * places
++ */
++void qvirtio_pci_destructor(QOSGraphObject *obj);
++void qvirtio_pci_start_hw(QOSGraphObject *obj);
++
  
-     vs->num_queues = qvirtio_config_readl(vs->dev, 0);
- 
+ void qvirtio_pci_device_enable(QVirtioPCIDevice *d);
+ void qvirtio_pci_device_disable(QVirtioPCIDevice *d);
 -- 
 2.17.1
