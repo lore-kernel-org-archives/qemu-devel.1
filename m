@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9t2-0007Ww-Bj
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:47 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9t6-0007aN-Na
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9t0-0002c0-RL
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:44 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9t5-0002fU-Iv
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:48 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 13 Aug 2018 12:14:35 +0200
-Message-Id: <20180813101453.10200-16-e.emanuelegiuseppe@gmail.com>
+Date: Mon, 13 Aug 2018 12:14:36 +0200
+Message-Id: <20180813101453.10200-17-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
 References: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 15/33] tests/qgraph: virtio-mmio driver and
- interface nodes
+Subject: [Qemu-devel] [PATCH 16/33] tests/qgraph: arm/virt machine node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,248 +22,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, John Snow <jsnow@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add virtio-mmio node in qgraph framework.
-virtio-mmio produces virtio, the interface consumed by all virtio-*-device
-nodes.
-
-Being a memory-mapped device, it doesn't have to provide a constructor
-to qgraph, since it's always "contained" inside some other nodes.
-
-Also rename qvirtio_mmio_init_device in qvirtio_mmio_device_new, since the function
-actually allocates a new QVirtioMMIODevice and initialize it.
+Add arm/virt machine to the graph. This machine contains virtio-mmio, so
+its constructor must take care of setting it properly when called.
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
- tests/libqos/virtio-mmio.c | 66 ++++++++++++++++++++++++++------------
- tests/libqos/virtio-mmio.h |  5 ++-
- tests/virtio-blk-test.c    |  3 +-
- 3 files changed, 51 insertions(+), 23 deletions(-)
+ tests/Makefile.include      |  1 +
+ tests/libqos/virt-machine.c | 90 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 91 insertions(+)
+ create mode 100644 tests/libqos/virt-machine.c
 
-diff --git a/tests/libqos/virtio-mmio.c b/tests/libqos/virtio-mmio.c
-index 7aa8383338..61ed0e549b 100644
---- a/tests/libqos/virtio-mmio.c
-+++ b/tests/libqos/virtio-mmio.c
-@@ -13,42 +13,43 @@
- #include "libqos/virtio-mmio.h"
- #include "libqos/malloc.h"
- #include "libqos/malloc-generic.h"
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 5220136473..20cb983ed0 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -770,6 +770,7 @@ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virt
+ libqgraph-machines-obj-y = tests/libqos/x86_64_pc-machine.o
+ libqgraph-machines-obj-y += tests/libqos/raspi2-machine.o
+ libqgraph-machines-obj-y += tests/libqos/ppc64_pseries-machine.o
++libqgraph-machines-obj-y += tests/libqos/virt-machine.o
+ 
+ libqgraph-pci-obj-y = $(libqos-virtio-obj-y)
+ libqgraph-pci-obj-y += $(libqgraph-machines-obj-y)
+diff --git a/tests/libqos/virt-machine.c b/tests/libqos/virt-machine.c
+new file mode 100644
+index 0000000000..c8910a58f4
+--- /dev/null
++++ b/tests/libqos/virt-machine.c
+@@ -0,0 +1,90 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "libqos/malloc.h"
 +#include "libqos/qgraph.h"
- #include "standard-headers/linux/virtio_ring.h"
- 
- static uint8_t qvirtio_mmio_config_readb(QVirtioDevice *d, uint64_t off)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     return readb(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
- }
- 
- static uint16_t qvirtio_mmio_config_readw(QVirtioDevice *d, uint64_t off)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     return readw(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
- }
- 
- static uint32_t qvirtio_mmio_config_readl(QVirtioDevice *d, uint64_t off)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     return readl(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
- }
- 
- static uint64_t qvirtio_mmio_config_readq(QVirtioDevice *d, uint64_t off)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     return readq(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
- }
- 
- static uint32_t qvirtio_mmio_get_features(QVirtioDevice *d)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     writel(dev->addr + QVIRTIO_MMIO_HOST_FEATURES_SEL, 0);
-     return readl(dev->addr + QVIRTIO_MMIO_HOST_FEATURES);
- }
- 
- static void qvirtio_mmio_set_features(QVirtioDevice *d, uint32_t features)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     dev->features = features;
-     writel(dev->addr + QVIRTIO_MMIO_GUEST_FEATURES_SEL, 0);
-     writel(dev->addr + QVIRTIO_MMIO_GUEST_FEATURES, features);
-@@ -56,25 +57,25 @@ static void qvirtio_mmio_set_features(QVirtioDevice *d, uint32_t features)
- 
- static uint32_t qvirtio_mmio_get_guest_features(QVirtioDevice *d)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     return dev->features;
- }
- 
- static uint8_t qvirtio_mmio_get_status(QVirtioDevice *d)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     return (uint8_t)readl(dev->addr + QVIRTIO_MMIO_DEVICE_STATUS);
- }
- 
- static void qvirtio_mmio_set_status(QVirtioDevice *d, uint8_t status)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     writel(dev->addr + QVIRTIO_MMIO_DEVICE_STATUS, (uint32_t)status);
- }
- 
- static bool qvirtio_mmio_get_queue_isr_status(QVirtioDevice *d, QVirtQueue *vq)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     uint32_t isr;
- 
-     isr = readl(dev->addr + QVIRTIO_MMIO_INTERRUPT_STATUS) & 1;
-@@ -88,7 +89,7 @@ static bool qvirtio_mmio_get_queue_isr_status(QVirtioDevice *d, QVirtQueue *vq)
- 
- static bool qvirtio_mmio_get_config_isr_status(QVirtioDevice *d)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     uint32_t isr;
- 
-     isr = readl(dev->addr + QVIRTIO_MMIO_INTERRUPT_STATUS) & 2;
-@@ -102,7 +103,7 @@ static bool qvirtio_mmio_get_config_isr_status(QVirtioDevice *d)
- 
- static void qvirtio_mmio_queue_select(QVirtioDevice *d, uint16_t index)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     writel(dev->addr + QVIRTIO_MMIO_QUEUE_SEL, (uint32_t)index);
- 
-     g_assert_cmphex(readl(dev->addr + QVIRTIO_MMIO_QUEUE_PFN), ==, 0);
-@@ -110,20 +111,20 @@ static void qvirtio_mmio_queue_select(QVirtioDevice *d, uint16_t index)
- 
- static uint16_t qvirtio_mmio_get_queue_size(QVirtioDevice *d)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     return (uint16_t)readl(dev->addr + QVIRTIO_MMIO_QUEUE_NUM_MAX);
- }
- 
- static void qvirtio_mmio_set_queue_address(QVirtioDevice *d, uint32_t pfn)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     writel(dev->addr + QVIRTIO_MMIO_QUEUE_PFN, pfn);
- }
- 
- static QVirtQueue *qvirtio_mmio_virtqueue_setup(QVirtioDevice *d,
-                                         QGuestAllocator *alloc, uint16_t index)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     QVirtQueue *vq;
-     uint64_t addr;
- 
-@@ -163,7 +164,7 @@ static void qvirtio_mmio_virtqueue_cleanup(QVirtQueue *vq,
- 
- static void qvirtio_mmio_virtqueue_kick(QVirtioDevice *d, QVirtQueue *vq)
- {
--    QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-+    QVirtioMMIODevice *dev = container_of(d, QVirtioMMIODevice, vdev);
-     writel(dev->addr + QVIRTIO_MMIO_QUEUE_NOTIFY, vq->index);
- }
- 
-@@ -187,12 +188,26 @@ const QVirtioBus qvirtio_mmio = {
-     .virtqueue_kick = qvirtio_mmio_virtqueue_kick,
- };
- 
--QVirtioMMIODevice *qvirtio_mmio_init_device(uint64_t addr, uint32_t page_size)
-+static void *qvirtio_mmio_get_driver(void *obj, const char *interface)
- {
--    QVirtioMMIODevice *dev;
--    uint32_t magic;
--    dev = g_malloc0(sizeof(*dev));
-+    QVirtioMMIODevice *virtio_mmio = obj;
-+    if (!g_strcmp0(interface, "virtio")) {
-+        return &virtio_mmio->vdev;
++#include "libqos/virtio-mmio.h"
++#include "libqos/malloc-generic.h"
++
++#define ARM_PAGE_SIZE               4096
++#define VIRTIO_MMIO_BASE_ADDR       0x0A003E00
++#define ARM_VIRT_RAM_ADDR           0x40000000
++#define ARM_VIRT_RAM_SIZE           0x20000000
++#define VIRTIO_MMIO_SIZE            0x00000200
++
++typedef struct QVirtioMachine QVirtioMachine;
++
++struct QVirtioMachine {
++    QOSGraphObject obj;
++    QGuestAllocator *alloc;
++    QVirtioMMIODevice virtio_mmio;
++};
++
++static void virtio_destructor(QOSGraphObject *obj)
++{
++    QVirtioMachine *machine = (QVirtioMachine *) obj;
++    generic_alloc_uninit(machine->alloc);
++    g_free(obj);
++}
++
++static void *virtio_get_driver(void *object, const char *interface)
++{
++    QVirtioMachine *machine = object;
++    if (!g_strcmp0(interface, "memory")) {
++        return machine->alloc;
 +    }
-+    fprintf(stderr, "%s not present in virtio-mmio\n", interface);
++
++    fprintf(stderr, "%s not present in arm/virtio\n", interface);
 +    g_assert_not_reached();
 +}
 +
-+static void qvirtio_mmio_start_hw(QOSGraphObject *obj)
++static QOSGraphObject *virtio_get_device(void *obj, const char *device)
 +{
-+    QVirtioMMIODevice *dev = (QVirtioMMIODevice *) obj;
-+    qvirtio_start_device(&dev->vdev);
++    QVirtioMachine *machine = obj;
++    if (!g_strcmp0(device, "virtio-mmio")) {
++        return &machine->virtio_mmio.obj;
++    }
++
++    fprintf(stderr, "%s not present in arm/virtio\n", device);
++    g_assert_not_reached();
 +}
- 
-+void qvirtio_mmio_init_device(QVirtioMMIODevice *dev, uint64_t addr,
-+                             uint32_t page_size)
++
++static void *qos_create_machine_arm_virt(void)
 +{
-+    uint32_t magic;
-     magic = readl(addr + QVIRTIO_MMIO_MAGIC_VALUE);
-     g_assert(magic == ('v' | 'i' << 8 | 'r' << 16 | 't' << 24));
- 
-@@ -203,5 +218,14 @@ QVirtioMMIODevice *qvirtio_mmio_init_device(uint64_t addr, uint32_t page_size)
- 
-     writel(addr + QVIRTIO_MMIO_GUEST_PAGE_SIZE, page_size);
- 
--    return dev;
-+    dev->obj.get_driver = qvirtio_mmio_get_driver;
-+    dev->obj.start_hw = qvirtio_mmio_start_hw;
++    QVirtioMachine *machine = g_new0(QVirtioMachine, 1);
++
++    machine->alloc = generic_alloc_init(ARM_VIRT_RAM_ADDR, ARM_VIRT_RAM_SIZE,
++                                        ARM_PAGE_SIZE);
++    qvirtio_mmio_init_device(&machine->virtio_mmio, VIRTIO_MMIO_BASE_ADDR,
++                             VIRTIO_MMIO_SIZE);
++
++    machine->obj.get_device = virtio_get_device;
++    machine->obj.get_driver = virtio_get_driver;
++    machine->obj.destructor = virtio_destructor;
++    return machine;
 +}
 +
 +static void virtio_mmio_register_nodes(void)
 +{
-+    qos_node_create_driver("virtio-mmio", NULL);
-+    qos_node_produces("virtio-mmio", "virtio");
- }
++    qos_node_create_machine("arm/virt", qos_create_machine_arm_virt);
++    qos_node_contains("arm/virt", "virtio-mmio", NULL);
++}
 +
 +libqos_init(virtio_mmio_register_nodes);
-diff --git a/tests/libqos/virtio-mmio.h b/tests/libqos/virtio-mmio.h
-index e3e52b9ce1..aadc60d6ed 100644
---- a/tests/libqos/virtio-mmio.h
-+++ b/tests/libqos/virtio-mmio.h
-@@ -11,6 +11,7 @@
- #define LIBQOS_VIRTIO_MMIO_H
- 
- #include "libqos/virtio.h"
-+#include "libqos/qgraph.h"
- 
- #define QVIRTIO_MMIO_MAGIC_VALUE        0x000
- #define QVIRTIO_MMIO_VERSION            0x004
-@@ -33,6 +34,7 @@
- #define QVIRTIO_MMIO_DEVICE_SPECIFIC    0x100
- 
- typedef struct QVirtioMMIODevice {
-+    QOSGraphObject obj;
-     QVirtioDevice vdev;
-     uint64_t addr;
-     uint32_t page_size;
-@@ -41,6 +43,7 @@ typedef struct QVirtioMMIODevice {
- 
- extern const QVirtioBus qvirtio_mmio;
- 
--QVirtioMMIODevice *qvirtio_mmio_init_device(uint64_t addr, uint32_t page_size);
-+void qvirtio_mmio_init_device(QVirtioMMIODevice *dev, uint64_t addr,
-+                             uint32_t page_size);
- 
- #endif
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 66797d0348..e60b33c38a 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -709,7 +709,8 @@ static void mmio_basic(void)
- 
-     arm_test_start();
- 
--    dev = qvirtio_mmio_init_device(MMIO_DEV_BASE_ADDR, MMIO_PAGE_SIZE);
-+    dev = g_malloc0(sizeof(QVirtioMMIODevice));
-+    qvirtio_mmio_init_device(dev, MMIO_DEV_BASE_ADDR, MMIO_PAGE_SIZE);
-     g_assert(dev != NULL);
-     g_assert_cmphex(dev->vdev.device_type, ==, VIRTIO_ID_BLOCK);
- 
 -- 
 2.17.1
