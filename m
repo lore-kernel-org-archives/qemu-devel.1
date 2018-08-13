@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fpBFl-0007uq-FQ
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 07:43:18 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fpBLY-0002eg-Mi
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 07:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fpBFg-0002AQ-Mb
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 07:43:17 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <cover.1533219143.git.berto@igalia.com>
-References: <cover.1533219143.git.berto@igalia.com>
-Date: Mon, 13 Aug 2018 13:42:33 +0200
-Message-ID: <w51va8e7as6.fsf@maestria.local.igalia.com>
+	(envelope-from <lbloch@janustech.com>) id 1fpBLX-0004eh-R1
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 07:49:16 -0400
+References: <20180810062647.23211-1-lbloch@janustech.com>
+	<20180810062647.23211-6-lbloch@janustech.com>
+	<w51sh3m70ca.fsf@maestria.local.igalia.com>
+	<1475efc2-86af-48d1-5887-bb8a1a3997a7@janustech.com>
+	<20180813113331.GE4323@localhost.localdomain>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <fe213e7a-48a9-2d70-758c-9ed352294d97@janustech.com>
+Date: Mon, 13 Aug 2018 14:48:55 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/4] throttle: Race condition fixes and
- test cases
+In-Reply-To: <20180813113331.GE4323@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB-large
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 5/9] qcow2: Assign the L2 cache
+ relatively to the image size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,68 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-ping
+On 8/13/18 2:33 PM, Kevin Wolf wrote:
+> Am 11.08.2018 um 21:19 hat Leonid Bloch geschrieben:
+>>>>    @item refcount-cache-size
+>>>>    The maximum size of the refcount block cache in bytes
+>>>> diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
+>>>> index 87965625d8..e3fb078588 100755
+>>>> --- a/tests/qemu-iotests/137
+>>>> +++ b/tests/qemu-iotests/137
+>>>> @@ -109,7 +109,6 @@ $QEMU_IO \
+>>>>        -c "reopen -o cache-size=1M,l2-cache-size=64k,refcount-cache-size=64k" \
+>>>>        -c "reopen -o cache-size=1M,l2-cache-size=2M" \
+>>>>        -c "reopen -o cache-size=1M,refcount-cache-size=2M" \
+>>>> -    -c "reopen -o l2-cache-size=256T" \
+>>>
+>>> The "L2 cache size too big" error can still be tested, but you will need
+>>> to create an image large enough to allow such a big cache.
+>>>
+>>> $ qemu-img create -f qcow2 -o cluster_size=256k hd.qcow2 32P
+>>> $ $QEMU -drive file=hd.qcow2,l2-cache-entry-size=512,l2-cache-size=1T
+>>
+>> * 32P qcow2 will take 33M - is it OK to create it just for a test?
+>> * Is it worth to create a special test scenario, with a separate image
+>> creation, just for that case?
+> 
+> We're creating larger images than that during tests, so I think this is
+> fine. You don't have to create a new separate test file or anything,
+> just increase the size of the used test image from 64M to 32P or
+> whatever is necessary.
 
-On Thu 02 Aug 2018 04:50:22 PM CEST, Alberto Garcia wrote:
-> Hi all,
->
-> here are the patches that I promised yesterday.
->
-> I was originally thinking to propose this for the v3.0 release, but
-> after debugging and fixing the problem I think that it's not
-> essential (details below).
->
-> The important patch is the second one. The first and the third are
-> just test cases and the last is an alternative solution for the bug
-> that Stefan fixed in 6fccbb475bc6effc313ee9481726a1748b6dae57.
->
-> There are details in the patches themselves, but here's an explanation
-> of the problem: consider a scenario with two drives A and B that are
-> part of the same throttle group. Both of them have throttled requests
-> and they're waiting for a timer that is set on drive A.
->
->     (timer here) -->  [A]  ---  req1, req2
->                       [B]  ---  req3
->
-> If we drain drive [A] (e.g. by disabling its I/O limits) then its
-> queue is restarted. req1 is processed immediately, and before
-> finishing it calls schedule_next_request(). This follows the
-> round-robin algorithm, selects req3 and puts a timer in [B].
->
-> But we're still not done with draining [A], and now we have a
-> BDRV_POLL_WHILE() loop at the end of bdrv_do_drained_begin() waiting
-> for req2 to finish. That won't happen until the timer in [B] fires and
-> req3 is done. If there are more drives in the group and more requests
-> in the queue this can take a while. That's why disabling a drive's I/O
-> limits can be noticeably slow: we disabled the I/O limits but they're
-> still being enforced in practice.
->
-> The QEMU I/O tests run in qtest mode (with QEMU_CLOCK_VIRTUAL). The
-> clock must be advanced manually, which means that the scenario that I
-> just described hangs QEMU because BDRV_POLL_WHILE() loops forever (you
-> can reproduce this with patch 3). In a real world scenario this only
-> results in the aforementioned slowdown (probably negligible in
-> practice), which is not a critical thing, and that's why I think it's
-> safe to keep the current code for QEMU 3.
->
-> I think that's all. Questions and commend are welcome.
->
-> Berto
->
-> Alberto Garcia (4):
->   qemu-iotests: Test removing a throttle group member with a pending
->     timer
->   throttle-groups: Skip the round-robin if a member is being drained
->   qemu-iotests: Update 093 to improve the draining test
->   throttle-groups: Don't allow timers without throttled requests
->
->  block/throttle-groups.c    | 41 +++++++++++++++++++++++++---------
->  tests/qemu-iotests/093     | 55 ++++++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/093.out |  4 ++--
->  3 files changed, 88 insertions(+), 12 deletions(-)
->
-> -- 
-> 2.11.0
+OK, sure, will do in v9.
+
+Leonid.
+
+> 
+> Kevin
+> 
