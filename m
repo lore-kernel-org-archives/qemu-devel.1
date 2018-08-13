@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fpFtM-0006qY-Ol
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:40:29 -0400
+	(envelope-from <lbloch@janustech.com>) id 1fpFvb-0000A0-LB
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:42:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fpFtL-0001QP-Ue
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:40:28 -0400
-References: <20180810162658.6562-1-kwolf@redhat.com>
-	<20180810162658.6562-2-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <715752ed-6a7b-a370-ef62-d030ec89e236@redhat.com>
-Date: Mon, 13 Aug 2018 18:40:17 +0200
+	(envelope-from <lbloch@janustech.com>) id 1fpFva-00024V-SE
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:42:47 -0400
+References: <20180810062647.23211-1-lbloch@janustech.com>
+	<20180810062647.23211-7-lbloch@janustech.com>
+	<w5136vm8m8u.fsf@maestria.local.igalia.com>
+	<ca79bbff-163b-f50e-e17b-54d6597e6bfe@redhat.com>
+	<20180813112333.GD4323@localhost.localdomain>
+	<e9a77f1e-6b9e-3fea-69c9-c18638961a2e@redhat.com>
+	<20180813155856.GL4323@localhost.localdomain>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <435d9dd8-f994-f011-f62e-4568dea8fd21@janustech.com>
+Date: Mon, 13 Aug 2018 19:42:23 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180810162658.6562-2-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="QBSjAVo2lFWpiAbkimq0YQWBauszvHKSF"
-Subject: Re: [Qemu-devel] [PATCH 1/2] commit: Add top-node/base-node options
+In-Reply-To: <20180813155856.GL4323@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-GB-large
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 6/9] qcow2: Increase the default upper
+ limit on the L2 cache size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QBSjAVo2lFWpiAbkimq0YQWBauszvHKSF
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
-Message-ID: <715752ed-6a7b-a370-ef62-d030ec89e236@redhat.com>
-Subject: Re: [PATCH 1/2] commit: Add top-node/base-node options
-References: <20180810162658.6562-1-kwolf@redhat.com>
- <20180810162658.6562-2-kwolf@redhat.com>
-In-Reply-To: <20180810162658.6562-2-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+> I don't actually think it's so bad to keep the cache permanently
+> allocated, but I wouldn't object to a lower default for non-Linux hosts
+> either. 1 MB may still be a little too low, 4 MB (covers up to 32 GB)
+> might be more adequate. My typical desktop VMs are larger than 8 GB, but
+> smaller than 32 GB.
+> 
+> Kevin
+> 
 
-On 2018-08-10 18:26, Kevin Wolf wrote:
-> The block-commit QMP command required specifying the top and base nodes=
+And for a Windows VM just the OS installation takes above 40 GB. While 
+we probably are not running Windows VMs for our own needs, it is very 
+common that a customer of, for example, some cloud service uses QEMU 
+(unknowingly) for a full-blown Windows. So 100 GB+ images which are 
+quite heavily used is not a rare scenario. 256 GB - yeah, that would be 
+on the higher end.
 
-> of the commit jobs using the file name of that node. While this works
-> in simple cases (local files with absolute paths), the file names
-> generated for more complicated setups can be hard to predict.
->=20
-> This adds two new options top-node and base-node to the command, which
-> allow specifying node names instead. They are mutually exclusive with
-> the old options.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  qapi/block-core.json | 24 ++++++++++++++++++------
->  blockdev.c           | 32 ++++++++++++++++++++++++++++++--
->  2 files changed, 48 insertions(+), 8 deletions(-)
+So 16 MB would indeed be a reasonable default for the *max.* L2 cache 
+now, although below that would be too little, I think. 32 MB - if we 
+want some future-proofing.
 
-Looks good to me, but you made me a bit cautious with your talk of how
-many pitfalls you've encountered on your way to do this change...
-
-Max
-
-
---QBSjAVo2lFWpiAbkimq0YQWBauszvHKSF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltxtHEACgkQ9AfbAGHV
-z0AloAf/Q7vKY62bc7gsaYjC3QXskjTbKXWPqDio0wef21T74kY6OX7SFFowkdSD
-wVejOnQ/jspquxRR8f2zVKBYmxI/9RHhORvsP3xHo8j6zWH36mZq9y3SwPhevhcU
-IDrkPt+RBFh4cDbsLedX9t1W+6TxwqA2zv4pHgOIVMJmR0Rts9LAVpd/yvxu+lp3
-tXZagqz7oGfkux4pTTlbFWXECfkIbzju/x4TnFt+2umVxMmF3qS0BMmVwDn3ZCB8
-D8lZ0WA3mdC9JSzmz8jUnZbRoy/4vNwjjezRfjO9dWYWpxXGWZaUw1T8ycVc0H1C
-dyirPBmFz3+AU8rMU3fnAVAyx4x6HQ==
-=H303
------END PGP SIGNATURE-----
-
---QBSjAVo2lFWpiAbkimq0YQWBauszvHKSF--
+Leonid.
