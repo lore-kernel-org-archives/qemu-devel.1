@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fp1Lj-0007fQ-1c
+	(envelope-from <lbloch@janustech.com>) id 1fp1Lj-0007fU-2j
 	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 21:08:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fp1Lf-0001ip-Ug
+	(envelope-from <lbloch@janustech.com>) id 1fp1Lf-0001iN-FF
 	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 21:08:46 -0400
 From: Leonid Bloch <lbloch@janustech.com>
-Date: Mon, 13 Aug 2018 04:07:24 +0300
-Message-Id: <20180813010729.4844-4-lbloch@janustech.com>
+Date: Mon, 13 Aug 2018 04:07:23 +0300
+Message-Id: <20180813010729.4844-3-lbloch@janustech.com>
 In-Reply-To: <20180813010729.4844-1-lbloch@janustech.com>
 References: <20180813010729.4844-1-lbloch@janustech.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 3/8] qcow2: Avoid duplication in setting the
- refcount cache size
+Subject: [Qemu-devel] [PATCH v8 2/8] qcow2: Make sizes more humanly readable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +24,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Leonid Bloch <lbloch@janustech.com>
 
-The refcount cache size does not need to be set to its minimum value in
-read_cache_sizes(), as it is set to at least its minimum value in
-qcow2_update_options_prepare().
-
 Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ block/qcow2.c | 2 +-
+ block/qcow2.h | 9 +++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 67cc82f0b9..7949d15fc6 100644
+index ec9e6238a0..67cc82f0b9 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -834,10 +834,9 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+@@ -830,7 +830,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+         }
+     } else {
+         if (!l2_cache_size_set) {
+-            *l2_cache_size = MAX(DEFAULT_L2_CACHE_BYTE_SIZE,
++            *l2_cache_size = MAX(DEFAULT_L2_CACHE_SIZE,
                                   (uint64_t)DEFAULT_L2_CACHE_CLUSTERS
                                   * s->cluster_size);
          }
--        if (!refcount_cache_size_set) {
--            *refcount_cache_size = min_refcount_cache;
--        }
-     }
-+    /* l2_cache_size and refcount_cache_size are ensured to have at least
-+     * their minimum values in qcow2_update_options_prepare() */
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 81b844e936..39e1b279f8 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -27,6 +27,7 @@
  
-     if (*l2_cache_entry_size < (1 << MIN_CLUSTER_BITS) ||
-         *l2_cache_entry_size > s->cluster_size ||
+ #include "crypto/block.h"
+ #include "qemu/coroutine.h"
++#include "qemu/units.h"
+ 
+ //#define DEBUG_ALLOC
+ //#define DEBUG_ALLOC2
+@@ -43,11 +44,11 @@
+ 
+ /* 8 MB refcount table is enough for 2 PB images at 64k cluster size
+  * (128 GB for 512 byte clusters, 2 EB for 2 MB clusters) */
+-#define QCOW_MAX_REFTABLE_SIZE 0x800000
++#define QCOW_MAX_REFTABLE_SIZE (8 * MiB)
+ 
+ /* 32 MB L1 table is enough for 2 PB images at 64k cluster size
+  * (128 GB for 512 byte clusters, 2 EB for 2 MB clusters) */
+-#define QCOW_MAX_L1_SIZE 0x2000000
++#define QCOW_MAX_L1_SIZE (32 * MiB)
+ 
+ /* Allow for an average of 1k per snapshot table entry, should be plenty of
+  * space for snapshot names and IDs */
+@@ -75,9 +76,9 @@
+ 
+ /* Whichever is more */
+ #define DEFAULT_L2_CACHE_CLUSTERS 8 /* clusters */
+-#define DEFAULT_L2_CACHE_BYTE_SIZE 1048576 /* bytes */
++#define DEFAULT_L2_CACHE_SIZE (1 * MiB)
+ 
+-#define DEFAULT_CLUSTER_SIZE 65536
++#define DEFAULT_CLUSTER_SIZE (64 * KiB)
+ 
+ 
+ #define QCOW2_OPT_LAZY_REFCOUNTS "lazy-refcounts"
 -- 
 2.17.1
