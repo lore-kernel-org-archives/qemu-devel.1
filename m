@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fpFs7-0004kN-Us
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:39:12 -0400
+	(envelope-from <cota@braap.org>) id 1fpFs7-0004kQ-Vf
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:39:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fpFs2-00011T-U6
+	(envelope-from <cota@braap.org>) id 1fpFs2-00011f-W6
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 12:39:11 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon, 13 Aug 2018 12:38:58 -0400
-Message-Id: <20180813163859.17964-3-cota@braap.org>
+Date: Mon, 13 Aug 2018 12:38:59 -0400
+Message-Id: <20180813163859.17964-4-cota@braap.org>
 In-Reply-To: <20180813163859.17964-1-cota@braap.org>
 References: <20180813163859.17964-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 2/3] spapr: do not use CPU_FOREACH_REVERSE
+Subject: [Qemu-devel] [PATCH 3/3] qom: implement CPU list with an RCU QLIST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,53 +22,167 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org
 
-This paves the way for implementing the CPU list with an RCU QLIST,
-which cannot be traversed in reverse order.
+Iterating over the list without using atomics is undefined behaviour,
+since the list can be modified concurrently by other threads (e.g.
+every time a new thread is created in user-mode).
 
-Note that this is the only caller of CPU_FOREACH_REVERSE.
+Fix it by implementing the CPU list as an RCU QLIST. This requires
+a little bit of extra work to insert CPUs at the tail of
+the list and to iterate over the list in reverse order (see previous patch).
+
+One might be tempted to just insert new CPUs at the head of the list.
+However, I think this might lead to hard-to-debug issues, since it is
+possible that callers are assuming that CPUs are inserted at the tail
+(just like spapr code did in the previous patch). So instead of auditing
+all callers, this patch simply keeps the old behaviour.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- hw/ppc/spapr.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ cpus-common.c        | 19 +++++++++++++++----
+ cpus.c               |  2 +-
+ exec.c               |  2 +-
+ include/qom/cpu.h    | 15 +++++++--------
+ linux-user/main.c    |  2 +-
+ linux-user/syscall.c |  2 +-
+ 6 files changed, 26 insertions(+), 16 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 421b2dd09b..2ef5be2790 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -622,9 +622,12 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+diff --git a/cpus-common.c b/cpus-common.c
+index 6eaedae60b..d8e8db48dd 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -77,6 +77,8 @@ static void finish_safe_work(CPUState *cpu)
  
- static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
+ void cpu_list_add(CPUState *cpu)
  {
-+    CPUState **rev;
-     CPUState *cs;
-+    int n_cpus;
-     int cpus_offset;
-     char *nodename;
-+    int i;
- 
-     cpus_offset = fdt_add_subnode(fdt, 0, "cpus");
-     _FDT(cpus_offset);
-@@ -635,8 +638,19 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
-      * We walk the CPUs in reverse order to ensure that CPU DT nodes
-      * created by fdt_add_subnode() end up in the right order in FDT
-      * for the guest kernel the enumerate the CPUs correctly.
-+     *
-+     * The CPU list cannot be traversed in reverse order, so we need
-+     * to do extra work.
-      */
--    CPU_FOREACH_REVERSE(cs) {
-+    n_cpus = 0;
-+    rev = NULL;
-+    CPU_FOREACH(cs) {
-+        rev = g_renew(CPUState *, rev, n_cpus + 1);
-+        rev[n_cpus++] = cs;
-+    }
++    CPUState *cs, *cs_next;
 +
-+    for (i = n_cpus - 1; i >= 0; i--) {
-+        CPUState *cs = rev[i];
-         PowerPCCPU *cpu = POWERPC_CPU(cs);
-         int index = spapr_get_vcpu_id(cpu);
-         DeviceClass *dc = DEVICE_GET_CLASS(cs);
+     qemu_mutex_lock(&qemu_cpu_list_lock);
+     if (cpu->cpu_index == UNASSIGNED_CPU_INDEX) {
+         cpu->cpu_index = cpu_get_free_index();
+@@ -84,7 +86,18 @@ void cpu_list_add(CPUState *cpu)
+     } else {
+         assert(!cpu_index_auto_assigned);
+     }
+-    QTAILQ_INSERT_TAIL(&cpus, cpu, node);
++    /* poor man's tail insert */
++    CPU_FOREACH_SAFE(cs, cs_next) {
++        if (cs_next == NULL) {
++            break;
++        }
++    }
++    if (cs == NULL) {
++        QLIST_INSERT_HEAD_RCU(&cpus, cpu, node);
++    } else {
++        g_assert(cs_next == NULL);
++        QLIST_INSERT_AFTER_RCU(cs, cpu, node);
++    }
+     cpu->in_cpu_list = true;
+     qemu_mutex_unlock(&qemu_cpu_list_lock);
+ 
+@@ -100,9 +113,7 @@ void cpu_list_remove(CPUState *cpu)
+         return;
+     }
+ 
+-    assert(!(cpu_index_auto_assigned && cpu != QTAILQ_LAST(&cpus, CPUTailQ)));
+-
+-    QTAILQ_REMOVE(&cpus, cpu, node);
++    QLIST_REMOVE_RCU(cpu, node);
+     cpu->cpu_index = UNASSIGNED_CPU_INDEX;
+     qemu_mutex_unlock(&qemu_cpu_list_lock);
+ }
+diff --git a/cpus.c b/cpus.c
+index b5844b7103..82e298d825 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1491,7 +1491,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+             atomic_mb_set(&cpu->exit_request, 0);
+         }
+ 
+-        qemu_tcg_rr_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
++        qemu_tcg_rr_wait_io_event(cpu ? cpu : QLIST_FIRST_RCU(&cpus));
+         deal_with_unplugged_cpus();
+     }
+ 
+diff --git a/exec.c b/exec.c
+index 4f5df07b6a..cab0da6919 100644
+--- a/exec.c
++++ b/exec.c
+@@ -114,7 +114,7 @@ int target_page_bits;
+ bool target_page_bits_decided;
+ #endif
+ 
+-struct CPUTailQ cpus = QTAILQ_HEAD_INITIALIZER(cpus);
++struct CPUTailQ cpus = QLIST_HEAD_INITIALIZER(cpus);
+ /* current CPU in the current thread. It is only valid inside
+    cpu_exec() */
+ __thread CPUState *current_cpu;
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index aa555e27a7..407c57254d 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -26,6 +26,7 @@
+ #include "exec/memattrs.h"
+ #include "qapi/qapi-types-run-state.h"
+ #include "qemu/bitmap.h"
++#include "qemu/rcu_queue.h"
+ #include "qemu/queue.h"
+ #include "qemu/thread.h"
+ 
+@@ -371,7 +372,7 @@ struct CPUState {
+     struct GDBRegisterState *gdb_regs;
+     int gdb_num_regs;
+     int gdb_num_g_regs;
+-    QTAILQ_ENTRY(CPUState) node;
++    QLIST_ENTRY(CPUState) node;
+ 
+     /* ice debug support */
+     QTAILQ_HEAD(breakpoints_head, CPUBreakpoint) breakpoints;
+@@ -436,15 +437,13 @@ struct CPUState {
+     GArray *iommu_notifiers;
+ };
+ 
+-QTAILQ_HEAD(CPUTailQ, CPUState);
++QLIST_HEAD(CPUTailQ, CPUState);
+ extern struct CPUTailQ cpus;
+-#define CPU_NEXT(cpu) QTAILQ_NEXT(cpu, node)
+-#define CPU_FOREACH(cpu) QTAILQ_FOREACH(cpu, &cpus, node)
++#define CPU_NEXT(cpu) QLIST_NEXT_RCU(cpu, node)
++#define CPU_FOREACH(cpu) QLIST_FOREACH_RCU(cpu, &cpus, node)
+ #define CPU_FOREACH_SAFE(cpu, next_cpu) \
+-    QTAILQ_FOREACH_SAFE(cpu, &cpus, node, next_cpu)
+-#define CPU_FOREACH_REVERSE(cpu) \
+-    QTAILQ_FOREACH_REVERSE(cpu, &cpus, CPUTailQ, node)
+-#define first_cpu QTAILQ_FIRST(&cpus)
++    QLIST_FOREACH_SAFE_RCU(cpu, &cpus, node, next_cpu)
++#define first_cpu QLIST_FIRST_RCU(&cpus)
+ 
+ extern __thread CPUState *current_cpu;
+ 
+diff --git a/linux-user/main.c b/linux-user/main.c
+index ea00dd9057..99afb14ae5 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -126,7 +126,7 @@ void fork_end(int child)
+            Discard information about the parent threads.  */
+         CPU_FOREACH_SAFE(cpu, next_cpu) {
+             if (cpu != thread_cpu) {
+-                QTAILQ_REMOVE(&cpus, cpu, node);
++                QLIST_REMOVE_RCU(cpu, node);
+             }
+         }
+         qemu_init_cpu_list();
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index dfc851cc35..41b592dee3 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8040,7 +8040,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             TaskState *ts;
+ 
+             /* Remove the CPU from the list.  */
+-            QTAILQ_REMOVE(&cpus, cpu, node);
++            QLIST_REMOVE_RCU(cpu, node);
+ 
+             cpu_list_unlock();
+ 
 -- 
 2.17.1
