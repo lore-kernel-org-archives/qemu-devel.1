@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fp8HF-0004Py-HK
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 04:32:38 -0400
+	(envelope-from <berrange@redhat.com>) id 1fp8Ir-0005FB-VB
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 04:34:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fp8HE-0003Aq-Np
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 04:32:37 -0400
-References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
-	<4eca96cf-5520-fb82-2e23-afff3ba35077@virtuozzo.com>
-	<c6f924f2-b70d-a460-f96c-7d40b9d06e22@redhat.com>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <7da20590-58d7-4ef0-92b9-fcb955f28c9b@virtuozzo.com>
-Date: Mon, 13 Aug 2018 11:32:22 +0300
+	(envelope-from <berrange@redhat.com>) id 1fp8Io-0003wh-4U
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 04:34:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47734 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fp8In-0003wA-U3
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 04:34:14 -0400
+Date: Mon, 13 Aug 2018 09:34:08 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180813083408.GG22904@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <5B7054D9.9000209@gmx.com>
 MIME-Version: 1.0
-In-Reply-To: <c6f924f2-b70d-a460-f96c-7d40b9d06e22@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block]  [PATCH v0 0/2] Postponed actions
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5B7054D9.9000209@gmx.com>
+Subject: Re: [Qemu-devel] QEMU  on Solaris
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, qemu-stable@nongnu.org
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Michele Denber <mdenber@gmx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Ping ping!
+On Sun, Aug 12, 2018 at 11:40:09AM -0400, Michele Denber wrote:
+> After configuring QEMU on my Sun I got this message:
+> 
+> "Host OS SunOS support is not currently maintained.
+> The QEMU project intends to remove support for this host OS in
+> a future release if nobody volunteers to maintain it and to
+> provide a build host for our continuous integration setup.
+> configure has succeeded and you can continue to build, but
+> if you care about QEMU on this platform you should contact
+> us upstream at qemu-devel@nongnu.org."
+> 
+> Well I do care about QEMU on my platform so I'd like to volunteer to provide
+> a host for support.  I can provide you with a free account on my Sun Oracle
+> Enterprise M3000 quad-core 2.75 GHz. SPARC64 VII running Solaris 10 Update
+> 11.  I've got plenty of spare CPU cycles and lots of free disk.  Please let
+> me know.
 
-On 16.07.2018 21:59, John Snow wrote:
->=20
->=20
-> On 07/16/2018 11:01 AM, Denis Plotnikov wrote:
->> Ping!
->>
->=20
-> I never saw a reply to Stefan's question on July 2nd, did you reply
-> off-list?
->=20
-> --js
-Yes, I did. I talked to Stefan why the patch set appeared.
->=20
->> On 29.06.2018 15:40, Denis Plotnikov wrote:
->>> There are cases when a request to a block driver state shouldn't have
->>> appeared producing dangerous race conditions.
->>> This misbehaviour is usually happens with storage devices emulated
->>> without eventfd for guest to host notifications like IDE.
->>>
->>> The issue arises when the context is in the "drained" section
->>> and doesn't expect the request to come, but request comes from the
->>> device not using iothread and which context is processed by the main
->>> loop.
->>>
->>> The main loop apart of the iothread event loop isn't blocked by the
->>> "drained" section.
->>> The request coming and processing while in "drained" section can spoil
->>> the
->>> block driver state consistency.
->>>
->>> This behavior can be observed in the following KVM-based case:
->>>
->>> 1. Setup a VM with an IDE disk.
->>> 2. Inside a VM start a disk writing load for the IDE device
->>>  =C2=A0=C2=A0 e.g: dd if=3D<file> of=3D<file> bs=3DX count=3DY oflag=3D=
-direct
->>> 3. On the host create a mirroring block job for the IDE device
->>>  =C2=A0=C2=A0 e.g: drive_mirror <your_IDE> <your_path>
->>> 4. On the host finish the block job
->>>  =C2=A0=C2=A0 e.g: block_job_complete <your_IDE>
->>>  =C2=A0 Having done the 4th action, you could get an assert:
->>> assert(QLIST_EMPTY(&bs->tracked_requests)) from mirror_run.
->>> On my setup, the assert is 1/3 reproducible.
->>>
->>> The patch series introduces the mechanism to postpone the requests
->>> until the BDS leaves "drained" section for the devices not using
->>> iothreads.
->>> Also, it modifies the asynchronous block backend infrastructure to use
->>> that mechanism to release the assert bug for IDE devices.
->>>
->>> Denis Plotnikov (2):
->>>  =C2=A0=C2=A0 async: add infrastructure for postponed actions
->>>  =C2=A0=C2=A0 block: postpone the coroutine executing if the BDS's is d=
-rained
->>>
->>>  =C2=A0 block/block-backend.c | 58 ++++++++++++++++++++++++++++++------=
----
->>>  =C2=A0 include/block/aio.h=C2=A0=C2=A0 | 63 ++++++++++++++++++++++++++=
-+++++++++++++++++
->>>  =C2=A0 util/async.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 | 33 +++++++++++++++++++++++
->>>  =C2=A0 3 files changed, 142 insertions(+), 12 deletions(-)
->>>
->>
+Copying Peter, as he would need access to a Solaris host to do GIT pre-merge
+build testing.
 
---=20
-Best,
-Denis
+Then there's the question of what ordinary developers would use for their own
+testing if they needed to work on some portability issue. We've got support
+in tree for running builds against VM images for the various *BSDs, and have
+mingw cross build toolchain for Windows. Is it possible to provide free-to-use
+VM disk images for Solaris build testing, or are software licensing requirements
+going to get in the way of developers using them ?
+
+There is OpenIndiana that forked off OpenSolaris, but I'm unclear how far
+OpenIndiana and commercial Solaris have diverged since then ?
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
