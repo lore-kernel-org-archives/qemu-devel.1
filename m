@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpDeQ-0003Jk-NA
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:17:01 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fpDgh-0004Xm-Ux
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:19:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpDeK-0004rt-Le
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:16:54 -0400
-Date: Mon, 13 Aug 2018 16:16:41 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fpDgb-00063d-R6
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:19:15 -0400
+Date: Mon, 13 Aug 2018 16:18:58 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180813141641.GI4323@localhost.localdomain>
+Message-ID: <20180813141858.GJ4323@localhost.localdomain>
 References: <20180810040743.25424-1-jcfaracco@gmail.com>
-	<20180810040743.25424-4-jcfaracco@gmail.com>
+	<20180810040743.25424-5-jcfaracco@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180810040743.25424-4-jcfaracco@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] dmg: including dmg-lzfse module inside
- dmg block driver.
+In-Reply-To: <20180810040743.25424-5-jcfaracco@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] dmg: exchanging hardcoded dmg UDIF
+ block types to enum.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +28,89 @@ To: Julio Faracco <jcfaracco@gmail.com>
 Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
 Am 10.08.2018 um 06:07 hat Julio Faracco geschrieben:
-> This commit includes the support to new module dmg-lzfse into dmg block
-> driver. It includes the support for block type ULFO (0x80000007).
+> This change is better to understand what kind of block type is being
+> handled by the code. Using a syntax similar to the DMG documentation is
+> easier than tracking all hex values assigned to a block type.
 > 
 > Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
 > ---
->  block/dmg.c | 28 ++++++++++++++++++++++++++++
->  block/dmg.h |  3 +++
->  2 files changed, 31 insertions(+)
+>  block/dmg.c | 43 ++++++++++++++++++++++++++++---------------
+>  1 file changed, 28 insertions(+), 15 deletions(-)
 > 
 > diff --git a/block/dmg.c b/block/dmg.c
-> index c9b3c519c4..390ab67e53 100644
+> index 390ab67e53..ae379adb20 100644
 > --- a/block/dmg.c
 > +++ b/block/dmg.c
-> @@ -33,6 +33,9 @@
->  int (*dmg_uncompress_bz2)(char *next_in, unsigned int avail_in,
->                            char *next_out, unsigned int avail_out);
+> @@ -44,6 +44,19 @@ enum {
+>      DMG_SECTORCOUNTS_MAX = DMG_LENGTHS_MAX / 512,
+>  };
 >  
-> +int (*dmg_uncompress_lzfse)(char *next_in, unsigned int avail_in,
-> +                            char *next_out, unsigned int avail_out);
+> +enum {
+> +    /* DMG Block Type */
+> +    UDZE=0, /* Zeroes */
+> +    UDRW,   /* RAW type */
+> +    UDIG,   /* Ignore */
+> +    UDCO=0x80000004,
+
+Note that 0x80000004 didn't exist in the code previously, so UDCO
+shouldn't occur anywhere else in this patch.
+
+> +    UDZO,
+> +    UDBZ,
+> +    ULFO,
+> +    UDCM=0x7ffffffe, /* Comments */
+> +    UDLE             /* Last Entry */
+> +};
 > +
->  enum {
->      /* Limit chunk sizes to prevent unreasonable amounts of memory being used
->       * or truncating when converting to 32-bit types
-> @@ -107,6 +110,7 @@ static void update_max_chunk_size(BDRVDMGState *s, uint32_t chunk,
+>  static int dmg_probe(const uint8_t *buf, int buf_size, const char *filename)
+>  {
+>      int len;
+> @@ -108,16 +121,16 @@ static void update_max_chunk_size(BDRVDMGState *s, uint32_t chunk,
+>      uint32_t uncompressed_sectors = 0;
+>  
 >      switch (s->types[chunk]) {
->      case 0x80000005: /* zlib compressed */
->      case 0x80000006: /* bzip2 compressed */
-> +    case 0x80000007: /* lzfse compressed */
+> -    case 0x80000005: /* zlib compressed */
+> -    case 0x80000006: /* bzip2 compressed */
+> -    case 0x80000007: /* lzfse compressed */
+> +    case UDCO: /* zlib compressed */
+
+Oops, should this be UDZO?
+
+> +    case UDBZ: /* bzip2 compressed */
+> +    case ULFO: /* lzfse compressed */
 >          compressed_size = s->lengths[chunk];
 >          uncompressed_sectors = s->sectorcounts[chunk];
 >          break;
-> @@ -188,6 +192,8 @@ static bool dmg_is_known_block_type(uint32_t entry_type)
+> -    case 1: /* copy */
+> +    case UDRW: /* copy */
+>          uncompressed_sectors = DIV_ROUND_UP(s->lengths[chunk], 512);
+>          break;
+> -    case 2: /* zero */
+> +    case UDIG: /* zero */
+>          /* as the all-zeroes block may be large, it is treated specially: the
+>           * sector is not copied from a large buffer, a simple memset is used
+>           * instead. Therefore uncompressed_sectors does not need to be set. */
+> @@ -186,13 +199,13 @@ typedef struct DmgHeaderState {
+>  static bool dmg_is_known_block_type(uint32_t entry_type)
+>  {
+>      switch (entry_type) {
+> -    case 0x00000001:    /* uncompressed */
+> -    case 0x00000002:    /* zeroes */
+> -    case 0x80000005:    /* zlib */
+> +    case UDRW:    /* uncompressed */
+> +    case UDIG:    /* zeroes */
+> +    case UDCO:    /* zlib */
+
+And this one, too?
+
 >          return true;
->      case 0x80000006:    /* bzip2 */
+> -    case 0x80000006:    /* bzip2 */
+> +    case UDBZ:    /* bzip2 */
 >          return !!dmg_uncompress_bz2;
-> +    case 0x80000007:    /* lzfse */
-> +	return !!dmg_uncompress_lzfse;
-
-Indentation is off. I think you got a tab instead of spaces here.
-
+> -    case 0x80000007:    /* lzfse */
+> +    case ULFO:    /* lzfse */
+>  	return !!dmg_uncompress_lzfse;
 >      default:
 >          return false;
->      }
-> @@ -431,6 +437,7 @@ static int dmg_open(BlockDriverState *bs, QDict *options, int flags,
->      }
->  
->      block_module_load_one("dmg-bz2");
-> +    block_module_load_one("dmg-lzfse");
->  
->      s->n_chunks = 0;
->      s->offsets = s->lengths = s->sectors = s->sectorcounts = NULL;
-> @@ -629,6 +636,27 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
->                  return ret;
->              }
->              break;
-> +	case 0x80000007:
-> +	    if (!dmg_uncompress_lzfse) {
-
-More tab damage in these two lines.
-
-> +                break;
-> +            }
-> +            /* we need to buffer, because only the chunk as whole can be
-> +             * inflated. */
-> +            ret = bdrv_pread(bs->file, s->offsets[chunk],
-> +                             s->compressed_chunk, s->lengths[chunk]);
-> +            if (ret != s->lengths[chunk]) {
-> +                return -1;
-> +            }
-> +
-> +            ret = dmg_uncompress_lzfse((char *)s->compressed_chunk,
-> +                                       (unsigned int) s->lengths[chunk],
-> +                                       (char *)s->uncompressed_chunk,
-> +                                       (unsigned int)
-> +                                           (512 * s->sectorcounts[chunk]));
-> +            if (ret < 0) {
-
-lzfse_decode_buffer() returns 0 in error cases, and possibly a short
-number of bytes. Should the condition compare ret with the expected full
-byte count?
-
-> +                return ret;
-> +            }
-> +            break;
->          case 1: /* copy */
->              ret = bdrv_pread(bs->file, s->offsets[chunk],
->                               s->uncompressed_chunk, s->lengths[chunk]);
 
 Kevin
