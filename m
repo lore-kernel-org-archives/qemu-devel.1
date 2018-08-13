@@ -1,15 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fp2mF-0002WX-S0
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:40:17 -0400
+	(envelope-from <bounces@canonical.com>) id 1fp2mm-0002oM-LI
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:40:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fp2mE-0000Zk-KX
-	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:40:15 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Mon, 13 Aug 2018 10:39:58 +0800
-Message-Id: <20180813023958.5352-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] file-posix: Skip effectiveless OFD lock
- operations
+	(envelope-from <bounces@canonical.com>) id 1fp2mh-0000zA-NK
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:40:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52736)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fp2mh-0000yI-7I
+	for qemu-devel@nongnu.org; Sun, 12 Aug 2018 22:40:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fp2mf-0000S9-Ic
+	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 02:40:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8A1982E8060
+	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 02:40:41 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 13 Aug 2018 02:31:39 -0000
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Reply-To: Bug 1785972 <1785972@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153371136089.29473.12663307170219083138.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153412749934.8641.3519343112785319203.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1785972] Re: v3.0.0-rc4: VM fails to start after
+ vcpuhotunplug, managedsave sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,156 +38,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-If we know we've already locked the bytes, don't do it again; similarly
-don't unlock a byte if we haven't locked it. This doesn't change the
-behavior, but fixes a corner case explained below.
+This commit https://lists.gnu.org/archive/html/qemu-
+devel/2018-08/msg01281.html from ~bharata-rao, fixes the issue.
 
-Libvirt had an error handling bug that an image can get its (ownership,
-file mode, SELinux) permissions changed (RHBZ 1584982) by mistake behind
-QEMU. Specifically, an image in use by Libvirt VM has:
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
-    $ ls -lhZ b.img
-    -rw-r--r--. qemu qemu system_u:object_r:svirt_image_t:s0:c600,c690 b.img
+-- =
 
-Trying to attach it a second time won't work because of image locking.
-And after the error, it becomes:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1785972
 
-    $ ls -lhZ b.img
-    -rw-r--r--. root root system_u:object_r:virt_image_t:s0 b.img
+Title:
+  v3.0.0-rc4: VM fails to start after vcpuhotunplug, managedsave
+  sequence
 
-Then, we won't be able to do OFD lock operations with the existing fd.
-In other words, the code such as in blk_detach_dev:
+Status in QEMU:
+  Fix Committed
 
-    blk_set_perm(blk, 0, BLK_PERM_ALL, &error_abort);
+Bug description:
+  VM fails to start after vcpu hot un-plug, managedsave sequence
 
-can abort() QEMU, out of environmental changes.
+  Host info:
+  Kernel: 4.18.0-rc8-00002-g1236568ee3cb
 
-This patch is an easy fix to this and the change is regardlessly
-reasonable, so do it.
+  qemu: commit 6ad90805383e6d04b3ff49681b8519a48c9f4410 (HEAD -> master, ta=
+g: v3.0.0-rc4)
+  QEMU emulator version 2.12.94 (v3.0.0-rc4-dirty)
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+  libvirt: commit 087de2f5a3dffb27d2eeb0c50a86d5d6984e5a5e (HEAD -> master)
+  libvirtd (libvirt) 4.6.0
 
----
+  Guest Kernel: 4.18.0-rc8-00002-g1236568ee3cb
 
-v2: For s == NULL, unlock all bits. [Kevin]
----
- block/file-posix.c | 41 +++++++++++++++++++++++++++++++----------
- 1 file changed, 31 insertions(+), 10 deletions(-)
+  =
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index fe83cbf0eb..73ae00c8c5 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -680,23 +680,42 @@ typedef enum {
-  * file; if @unlock == true, also unlock the unneeded bytes.
-  * @shared_perm_lock_bits is the mask of all permissions that are NOT shared.
-  */
--static int raw_apply_lock_bytes(int fd,
-+static int raw_apply_lock_bytes(BDRVRawState *s, int fd,
-                                 uint64_t perm_lock_bits,
-                                 uint64_t shared_perm_lock_bits,
-                                 bool unlock, Error **errp)
- {
-     int ret;
-     int i;
-+    uint64_t locked_perm, locked_shared_perm;
-+
-+    if (s) {
-+        locked_perm = s->perm;
-+        locked_shared_perm = ~s->shared_perm & BLK_PERM_ALL;
-+    } else {
-+        /*
-+         * We don't have the previous bits, just lock/unlock for each of the
-+         * requested bits.
-+         */
-+        if (unlock) {
-+            locked_perm = BLK_PERM_ALL;
-+            locked_shared_perm = BLK_PERM_ALL;
-+        } else {
-+            locked_perm = 0;
-+            locked_shared_perm = 0;
-+        }
-+    }
- 
-     PERM_FOREACH(i) {
-         int off = RAW_LOCK_PERM_BASE + i;
--        if (perm_lock_bits & (1ULL << i)) {
-+        uint64_t bit = (1ULL << i);
-+        if ((perm_lock_bits & bit) && !(locked_perm & bit)) {
-             ret = qemu_lock_fd(fd, off, 1, false);
-             if (ret) {
-                 error_setg(errp, "Failed to lock byte %d", off);
-                 return ret;
-             }
--        } else if (unlock) {
-+        } else if (unlock && (locked_perm & bit) && !(perm_lock_bits & bit)) {
-             ret = qemu_unlock_fd(fd, off, 1);
-             if (ret) {
-                 error_setg(errp, "Failed to unlock byte %d", off);
-@@ -706,13 +725,15 @@ static int raw_apply_lock_bytes(int fd,
-     }
-     PERM_FOREACH(i) {
-         int off = RAW_LOCK_SHARED_BASE + i;
--        if (shared_perm_lock_bits & (1ULL << i)) {
-+        uint64_t bit = (1ULL << i);
-+        if ((shared_perm_lock_bits & bit) && !(locked_shared_perm & bit)) {
-             ret = qemu_lock_fd(fd, off, 1, false);
-             if (ret) {
-                 error_setg(errp, "Failed to lock byte %d", off);
-                 return ret;
-             }
--        } else if (unlock) {
-+        } else if (unlock && (locked_shared_perm & bit) &&
-+                   !(shared_perm_lock_bits & bit)) {
-             ret = qemu_unlock_fd(fd, off, 1);
-             if (ret) {
-                 error_setg(errp, "Failed to unlock byte %d", off);
-@@ -788,7 +809,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
- 
-     switch (op) {
-     case RAW_PL_PREPARE:
--        ret = raw_apply_lock_bytes(s->lock_fd, s->perm | new_perm,
-+        ret = raw_apply_lock_bytes(s, s->lock_fd, s->perm | new_perm,
-                                    ~s->shared_perm | ~new_shared,
-                                    false, errp);
-         if (!ret) {
-@@ -800,7 +821,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-         op = RAW_PL_ABORT;
-         /* fall through to unlock bytes. */
-     case RAW_PL_ABORT:
--        raw_apply_lock_bytes(s->lock_fd, s->perm, ~s->shared_perm,
-+        raw_apply_lock_bytes(s, s->lock_fd, s->perm, ~s->shared_perm,
-                              true, &local_err);
-         if (local_err) {
-             /* Theoretically the above call only unlocks bytes and it cannot
-@@ -810,7 +831,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-         }
-         break;
-     case RAW_PL_COMMIT:
--        raw_apply_lock_bytes(s->lock_fd, new_perm, ~new_shared,
-+        raw_apply_lock_bytes(s, s->lock_fd, new_perm, ~new_shared,
-                              true, &local_err);
-         if (local_err) {
-             /* Theoretically the above call only unlocks bytes and it cannot
-@@ -2209,7 +2230,7 @@ raw_co_create(BlockdevCreateOptions *options, Error **errp)
-     shared = BLK_PERM_ALL & ~BLK_PERM_RESIZE;
- 
-     /* Step one: Take locks */
--    result = raw_apply_lock_bytes(fd, perm, ~shared, false, errp);
-+    result = raw_apply_lock_bytes(NULL, fd, perm, ~shared, false, errp);
-     if (result < 0) {
-         goto out_close;
-     }
-@@ -2250,7 +2271,7 @@ raw_co_create(BlockdevCreateOptions *options, Error **errp)
-     }
- 
- out_unlock:
--    raw_apply_lock_bytes(fd, 0, 0, true, &local_err);
-+    raw_apply_lock_bytes(NULL, fd, 0, 0, true, &local_err);
-     if (local_err) {
-         /* The above call should not fail, and if it does, that does
-          * not mean the whole creation operation has failed.  So
--- 
-2.17.1
+  Steps to reproduce:
+  1. Start a guest(VM) with 2 current , 4 max vcpus
+  virsh start vm1
+  Domain vm1 started
+
+  2. Hotplug 2 vcpus
+  virsh setvcpus vm1 4 --live
+
+  3. Hot unplug 2 vcpus
+  virsh setvcpus vm1 2 --live
+
+  4. Managedsave the VM
+  virsh managedsave vm1
+
+  Domain vm1 state saved by libvirt
+
+  5. Start the VM ---Fails to start
+  virsh start vm1
+
+  error: Failed to start domain avocado-vt-vm1
+  error: internal error: qemu unexpectedly closed the monitor: 2018-08-08T0=
+6:27:53.853818Z qemu: Unknown savevm section or instance 'spapr_cpu' 2
+  2018-08-08T06:27:53.854949Z qemu: load of migration failed: Invalid argum=
+ent
+
+
+  Testcase:
+  avocado run libvirt_vcpu_plug_unplug.positive_test.vcpu_set.live.vm_opera=
+te.managedsave_with_unplug --vt-type libvirt --vt-extra-params emulator_pat=
+h=3D/usr/share/avocado-plugins-vt/bin/qemu create_vm_libvirt=3Dyes kill_vm_=
+libvirt=3Dyes env_cleanup=3Dyes smp=3D8 backup_image_before_testing=3Dno li=
+bvirt_controller=3Dvirtio-scsi scsi_hba=3Dvirtio-scsi-pci drive_format=3Dsc=
+si-hd use_os_variant=3Dno restore_image_after_testing=3Dno vga=3Dnone displ=
+ay=3Dnographic kernel=3D/home/kvmci/linux/vmlinux kernel_args=3D'root=3D/de=
+v/sda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init  initcall=
+_debug' take_regular_screendumps=3Dno --vt-guest-os JeOS.27.ppc64le
+  JOB ID     : 1f869477ad87e7d7e7e7777f631ae08965f41a74
+  JOB LOG    : /root/avocado/job-results/job-2018-08-08T02.42-1f86947/job.l=
+og
+   (1/1) type_specific.io-github-autotest-libvirt.libvirt_vcpu_plug_unplug.=
+positive_test.vcpu_set.live.vm_operate.managedsave_with_unplug: ERROR (91.5=
+8 s)
+  RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | =
+CANCEL 0
+  JOB TIME   : 95.89 s
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1785972/+subscriptions
