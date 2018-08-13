@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9sU-0006zT-8R
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:11 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9sV-00070s-3v
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9sO-0001jq-Ig
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:10 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9sT-0001n7-Er
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:15:11 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 13 Aug 2018 12:14:20 +0200
-Message-Id: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 00/33] Qtest driver framework
+Date: Mon, 13 Aug 2018 12:14:22 +0200
+Message-Id: <20180813101453.10200-3-e.emanuelegiuseppe@gmail.com>
+In-Reply-To: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
+References: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
+Subject: [Qemu-devel] [PATCH 02/33] tests/qgraph: rename qpci_init_pc and
+ qpci_init_spapr functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,184 +23,281 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, John Snow <jsnow@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Qgraph API for the qtest driver framework
-
-This series of patches introduce a different qtest driver
-organization, viewing machines, drivers and tests as node in a
-graph, each having one or multiple edges relations.
-
-The idea is to have a framework where each test asks for a specific
-driver, and the framework takes care of allocating the proper devices
-required and passing the correct command line arguments to QEMU.
-
-A node can be of four types:
-- MACHINE:   for example "arm/raspi2"
-- DRIVER:    for example "generic-sdhci"
-- INTERFACE: for example "sdhci" (interface for all "-sdhci" drivers)
-- TEST:      for example "sdhci-test", consumes an interface and tests
-             the functions provided
-
-An edge relation between two nodes (drivers or machines) X and Y can be:
-- X CONSUMES Y: Y can be plugged into X
-- X PRODUCES Y: X provides the interface Y
-- X CONTAINS Y: Y is part of X component
-
-Basic framework steps are the following:
-- All nodes and edges are created in their respective machine/driver/test files
-- The framework starts QEMU and asks for a list of available devices
-  and machines
-- The framework walks the graph starting from the available machines and
-  performs a Depth First Search for tests
-- Once a test is found, the path is walked again and all drivers are
-  allocated accordingly and the final interface is passed to the test
-- The test is executed
-- Unused objects are cleaned and the path discovery is continued
-
-Depending on the QEMU binary used, only some drivers/machines will be available
-and only test that are reached by them will be executed.
-
-This work is being done as Google Summer of Code 2018 project for QEMU,
-my mentors are Paolo Bonzini and Laurent Vivier.
-Additional infos on the project can be found at:
-https://wiki.qemu.org/Features/qtest_driver_framework
-
-v3:
-- Minor fixes regarding memory leaks and naming
+Rename qpci_init_pc in qpci_pc_new and qpci_init_spapr in qpci_spapr_new,
+since theese function actually allocate a new pci struct and initialize it.
+Changed QOSOps field name from qpci_init to qpci_new.
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+---
+ tests/e1000e-test.c         | 2 +-
+ tests/i440fx-test.c         | 2 +-
+ tests/ide-test.c            | 2 +-
+ tests/libqos/ahci.c         | 2 +-
+ tests/libqos/libqos-pc.c    | 2 +-
+ tests/libqos/libqos-spapr.c | 2 +-
+ tests/libqos/libqos.c       | 2 +-
+ tests/libqos/libqos.h       | 2 +-
+ tests/libqos/pci-pc.c       | 2 +-
+ tests/libqos/pci-pc.h       | 9 ++++++++-
+ tests/libqos/pci-spapr.c    | 2 +-
+ tests/libqos/pci-spapr.h    | 2 +-
+ tests/q35-test.c            | 4 ++--
+ tests/rtl8139-test.c        | 2 +-
+ tests/sdhci-test.c          | 2 +-
+ tests/tco-test.c            | 2 +-
+ tests/usb-hcd-ehci-test.c   | 2 +-
+ tests/vhost-user-test.c     | 2 +-
+ 18 files changed, 26 insertions(+), 19 deletions(-)
 
-Emanuele Giuseppe Esposito (32):
-  tests: qgraph API for the qtest driver framework
-  tests/qgraph: rename qpci_init_pc and qpci_init_spapr functions
-  tests/qgraph: pci-pc driver and interface nodes
-  tests/qgraph: x86_64/pc machine node
-  tests/qgraph: sdhci driver and interface nodes
-  tests/qgraph: sdhci test node
-  tests/qgraph: arm/raspi2 machine node
-  tests/qgraph: pci-spapr driver and interface nodes
-  tests/qgraph: ppc64/pseries machine node
-  tests/qgraph: has_buggy_msi flag
-  tests/qgraph: e1000e driver and interface nodes
-  tests/qgraph: e1000e-test node
-  tests/qgraph: virtio_start_device function
-  tests/qgraph: virtio-pci driver and interface nodes
-  tests/qgraph: virtio-mmio driver and interface nodes
-  tests/qgraph: arm/virt machine node
-  tests/qgraph: virtio-serial driver and interface nodes
-  tests/qgraph: virtio-console test node
-  tests/qgraph: virtio-serial test node
-  tests/qgraph: virtio-9p driver and interface nodes
-  tests/qgraph: virtio-9p test node
-  tests/qgraph: virtio-balloon driver and interface nodes
-  tests/qgraph: virtio-balloon test node
-  tests/qgraph: virtio-rng driver and interface nodes
-  tests/qgraph: virtio-rng test node
-  tests/qgraph: virtio-blk driver and interface nodes
-  tests/qgraph: virtio-blk test node
-  tests/qgraph: virtio-net driver and interface nodes
-  tests/qgraph: virtio-net test node
-  tests/qgraph: virtio-scsi driver and interface nodes
-  tests/qgraph: virtio-scsi test node
-  tests/qgraph: temporarly commented vhost-user-test
-
-Paolo Bonzini (1):
-  tests: virtio: separate ccw tests from libqos
-
- configure                            |   2 +-
- include/qemu/module.h                |   2 +
- tests/Makefile.include               |  79 +--
- tests/e1000e-test.c                  | 354 +++----------
- tests/i440fx-test.c                  |   2 +-
- tests/ide-test.c                     |   2 +-
- tests/libqos/ahci.c                  |   2 +-
- tests/libqos/e1000e.c                | 262 ++++++++++
- tests/libqos/e1000e.h                |  53 ++
- tests/libqos/libqos-pc.c             |   2 +-
- tests/libqos/libqos-spapr.c          |   2 +-
- tests/libqos/libqos.c                |   2 +-
- tests/libqos/libqos.h                |   2 +-
- tests/libqos/pci-pc.c                |  86 ++--
- tests/libqos/pci-pc.h                |  22 +-
- tests/libqos/pci-spapr.c             | 119 +++--
- tests/libqos/pci-spapr.h             |  26 +-
- tests/libqos/pci.c                   |  37 +-
- tests/libqos/pci.h                   |  15 +
- tests/libqos/ppc64_pseries-machine.c | 111 +++++
- tests/libqos/qgraph.c                | 721 +++++++++++++++++++++++++++
- tests/libqos/qgraph.h                | 515 +++++++++++++++++++
- tests/libqos/qgraph_extra.h          | 263 ++++++++++
- tests/libqos/raspi2-machine.c        |  82 +++
- tests/libqos/sdhci.c                 | 163 ++++++
- tests/libqos/sdhci.h                 |  69 +++
- tests/libqos/virt-machine.c          |  90 ++++
- tests/libqos/virtio-9p.c             | 165 ++++++
- tests/libqos/virtio-9p.h             |  42 ++
- tests/libqos/virtio-balloon.c        | 111 +++++
- tests/libqos/virtio-balloon.h        |  39 ++
- tests/libqos/virtio-blk.c            | 126 +++++
- tests/libqos/virtio-blk.h            |  40 ++
- tests/libqos/virtio-mmio.c           |  66 ++-
- tests/libqos/virtio-mmio.h           |   5 +-
- tests/libqos/virtio-net.c            | 179 +++++++
- tests/libqos/virtio-net.h            |  41 ++
- tests/libqos/virtio-pci.c            |  80 ++-
- tests/libqos/virtio-pci.h            |  12 +
- tests/libqos/virtio-rng.c            | 108 ++++
- tests/libqos/virtio-rng.h            |  39 ++
- tests/libqos/virtio-scsi.c           | 117 +++++
- tests/libqos/virtio-scsi.h           |  39 ++
- tests/libqos/virtio-serial.c         | 109 ++++
- tests/libqos/virtio-serial.h         |  39 ++
- tests/libqos/virtio.c                |   8 +
- tests/libqos/virtio.h                |   1 +
- tests/libqos/x86_64_pc-machine.c     | 110 ++++
- tests/libqtest.h                     |   3 +
- tests/q35-test.c                     |   4 +-
- tests/qos-test.c                     | 481 ++++++++++++++++++
- tests/rtl8139-test.c                 |   2 +-
- tests/sdhci-test.c                   | 222 +++------
- tests/tco-test.c                     |   2 +-
- tests/test-qgraph.c                  | 446 +++++++++++++++++
- tests/usb-hcd-ehci-test.c            |   2 +-
- tests/vhost-user-test.c              |   6 +-
- tests/virtio-9p-test.c               | 221 +++-----
- tests/virtio-balloon-test.c          |  22 +-
- tests/virtio-blk-test.c              | 473 +++++++-----------
- tests/virtio-ccw-test.c              | 121 +++++
- tests/virtio-console-test.c          |  30 +-
- tests/virtio-net-test.c              | 163 ++----
- tests/virtio-rng-test.c              |  25 +-
- tests/virtio-scsi-test.c             | 155 +++---
- tests/virtio-serial-test.c           |  27 +-
- 66 files changed, 5674 insertions(+), 1292 deletions(-)
- create mode 100644 tests/libqos/e1000e.c
- create mode 100644 tests/libqos/e1000e.h
- create mode 100644 tests/libqos/ppc64_pseries-machine.c
- create mode 100644 tests/libqos/qgraph.c
- create mode 100644 tests/libqos/qgraph.h
- create mode 100644 tests/libqos/qgraph_extra.h
- create mode 100644 tests/libqos/raspi2-machine.c
- create mode 100644 tests/libqos/sdhci.c
- create mode 100644 tests/libqos/sdhci.h
- create mode 100644 tests/libqos/virt-machine.c
- create mode 100644 tests/libqos/virtio-9p.c
- create mode 100644 tests/libqos/virtio-9p.h
- create mode 100644 tests/libqos/virtio-balloon.c
- create mode 100644 tests/libqos/virtio-balloon.h
- create mode 100644 tests/libqos/virtio-blk.c
- create mode 100644 tests/libqos/virtio-blk.h
- create mode 100644 tests/libqos/virtio-net.c
- create mode 100644 tests/libqos/virtio-net.h
- create mode 100644 tests/libqos/virtio-rng.c
- create mode 100644 tests/libqos/virtio-rng.h
- create mode 100644 tests/libqos/virtio-scsi.c
- create mode 100644 tests/libqos/virtio-scsi.h
- create mode 100644 tests/libqos/virtio-serial.c
- create mode 100644 tests/libqos/virtio-serial.h
- create mode 100644 tests/libqos/x86_64_pc-machine.c
- create mode 100644 tests/qos-test.c
- create mode 100644 tests/test-qgraph.c
- create mode 100644 tests/virtio-ccw-test.c
-
+diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
+index 32aa738b72..574801fd38 100644
+--- a/tests/e1000e-test.c
++++ b/tests/e1000e-test.c
+@@ -395,7 +395,7 @@ static void data_test_init(e1000e_device *d)
+     test_alloc = pc_alloc_init(global_qtest);
+     g_assert_nonnull(test_alloc);
+ 
+-    test_bus = qpci_init_pc(global_qtest, test_alloc);
++    test_bus = qpci_new_pc(global_qtest, test_alloc);
+     g_assert_nonnull(test_bus);
+ 
+     e1000e_device_init(test_bus, d);
+diff --git a/tests/i440fx-test.c b/tests/i440fx-test.c
+index 4390e5591e..69205b58a8 100644
+--- a/tests/i440fx-test.c
++++ b/tests/i440fx-test.c
+@@ -38,7 +38,7 @@ static QPCIBus *test_start_get_bus(const TestData *s)
+     cmdline = g_strdup_printf("-smp %d", s->num_cpus);
+     qtest_start(cmdline);
+     g_free(cmdline);
+-    return qpci_init_pc(global_qtest, NULL);
++    return qpci_new_pc(global_qtest, NULL);
+ }
+ 
+ static void test_i440fx_defaults(gconstpointer opaque)
+diff --git a/tests/ide-test.c b/tests/ide-test.c
+index 2384c2c3e2..ab1fac6074 100644
+--- a/tests/ide-test.c
++++ b/tests/ide-test.c
+@@ -150,7 +150,7 @@ static QPCIDevice *get_pci_device(QPCIBar *bmdma_bar, QPCIBar *ide_bar)
+     uint16_t vendor_id, device_id;
+ 
+     if (!pcibus) {
+-        pcibus = qpci_init_pc(global_qtest, NULL);
++        pcibus = qpci_new_pc(global_qtest, NULL);
+     }
+ 
+     /* Find PCI device and verify it's the right one */
+diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
+index 42d3f76933..36814b4a38 100644
+--- a/tests/libqos/ahci.c
++++ b/tests/libqos/ahci.c
+@@ -130,7 +130,7 @@ QPCIDevice *get_ahci_device(QTestState *qts, uint32_t *fingerprint)
+     uint32_t ahci_fingerprint;
+     QPCIBus *pcibus;
+ 
+-    pcibus = qpci_init_pc(qts, NULL);
++    pcibus = qpci_new_pc(qts, NULL);
+ 
+     /* Find the AHCI PCI device and verify it's the right one. */
+     ahci = qpci_device_find(pcibus, QPCI_DEVFN(0x1F, 0x02));
+diff --git a/tests/libqos/libqos-pc.c b/tests/libqos/libqos-pc.c
+index a9c1aceaa7..293f9b6fe6 100644
+--- a/tests/libqos/libqos-pc.c
++++ b/tests/libqos/libqos-pc.c
+@@ -6,7 +6,7 @@
+ static QOSOps qos_ops = {
+     .init_allocator = pc_alloc_init_flags,
+     .uninit_allocator = pc_alloc_uninit,
+-    .qpci_init = qpci_init_pc,
++    .qpci_new = qpci_new_pc,
+     .qpci_free = qpci_free_pc,
+     .shutdown = qtest_pc_shutdown,
+ };
+diff --git a/tests/libqos/libqos-spapr.c b/tests/libqos/libqos-spapr.c
+index a37791e5d0..64addfe577 100644
+--- a/tests/libqos/libqos-spapr.c
++++ b/tests/libqos/libqos-spapr.c
+@@ -6,7 +6,7 @@
+ static QOSOps qos_ops = {
+     .init_allocator = spapr_alloc_init_flags,
+     .uninit_allocator = spapr_alloc_uninit,
+-    .qpci_init = qpci_init_spapr,
++    .qpci_new = qpci_new_spapr,
+     .qpci_free = qpci_free_spapr,
+     .shutdown = qtest_spapr_shutdown,
+ };
+diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
+index 013ca68581..48b9682d81 100644
+--- a/tests/libqos/libqos.c
++++ b/tests/libqos/libqos.c
+@@ -25,7 +25,7 @@ QOSState *qtest_vboot(QOSOps *ops, const char *cmdline_fmt, va_list ap)
+     qs->ops = ops;
+     if (ops) {
+         qs->alloc = ops->init_allocator(qs->qts, ALLOC_NO_FLAGS);
+-        qs->pcibus = ops->qpci_init(qs->qts, qs->alloc);
++        qs->pcibus = ops->qpci_new(qs->qts, qs->alloc);
+     }
+ 
+     g_free(cmdline);
+diff --git a/tests/libqos/libqos.h b/tests/libqos/libqos.h
+index 07d4b93d1d..1af6035db4 100644
+--- a/tests/libqos/libqos.h
++++ b/tests/libqos/libqos.h
+@@ -10,7 +10,7 @@ typedef struct QOSState QOSState;
+ typedef struct QOSOps {
+     QGuestAllocator *(*init_allocator)(QTestState *qts, QAllocOpts);
+     void (*uninit_allocator)(QGuestAllocator *);
+-    QPCIBus *(*qpci_init)(QTestState *qts, QGuestAllocator *alloc);
++    QPCIBus *(*qpci_new)(QTestState *qts, QGuestAllocator *alloc);
+     void (*qpci_free)(QPCIBus *bus);
+     void (*shutdown)(QOSState *);
+ } QOSOps;
+diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+index a7803308b7..644f45d8b0 100644
+--- a/tests/libqos/pci-pc.c
++++ b/tests/libqos/pci-pc.c
+@@ -115,7 +115,7 @@ static void qpci_pc_config_writel(QPCIBus *bus, int devfn, uint8_t offset, uint3
+     outl(0xcfc, value);
+ }
+ 
+-QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
++QPCIBus *qpci_new_pc(QTestState *qts, QGuestAllocator *alloc)
+ {
+     QPCIBusPC *ret = g_new0(QPCIBusPC, 1);
+ 
+diff --git a/tests/libqos/pci-pc.h b/tests/libqos/pci-pc.h
+index 491eeac756..84cc300735 100644
+--- a/tests/libqos/pci-pc.h
++++ b/tests/libqos/pci-pc.h
+@@ -16,7 +16,14 @@
+ #include "libqos/pci.h"
+ #include "libqos/malloc.h"
+ 
+-QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc);
++/* qpci_new_pc():
++* this function creates a new QPCIBusPC object,
++ * and properly initialize its fields.
++ *
++ * returns the QPCIBus *bus field of a newly
++ * allocated QPCIBusPC.
++ */
++QPCIBus *qpci_new_pc(QTestState *qts, QGuestAllocator *alloc);
+ void     qpci_free_pc(QPCIBus *bus);
+ 
+ #endif
+diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
+index c0f7e6db9b..f306cb746d 100644
+--- a/tests/libqos/pci-spapr.c
++++ b/tests/libqos/pci-spapr.c
+@@ -160,7 +160,7 @@ static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
+ #define SPAPR_PCI_MMIO32_WIN_SIZE    0x80000000 /* 2 GiB */
+ #define SPAPR_PCI_IO_WIN_SIZE        0x10000
+ 
+-QPCIBus *qpci_init_spapr(QTestState *qts, QGuestAllocator *alloc)
++QPCIBus *qpci_new_spapr(QTestState *qts, QGuestAllocator *alloc)
+ {
+     QPCIBusSPAPR *ret = g_new0(QPCIBusSPAPR, 1);
+ 
+diff --git a/tests/libqos/pci-spapr.h b/tests/libqos/pci-spapr.h
+index 387686dfc8..177e8c002c 100644
+--- a/tests/libqos/pci-spapr.h
++++ b/tests/libqos/pci-spapr.h
+@@ -11,7 +11,7 @@
+ #include "libqos/malloc.h"
+ #include "libqos/pci.h"
+ 
+-QPCIBus *qpci_init_spapr(QTestState *qts, QGuestAllocator *alloc);
++QPCIBus *qpci_new_spapr(QTestState *qts, QGuestAllocator *alloc);
+ void     qpci_free_spapr(QPCIBus *bus);
+ 
+ #endif
+diff --git a/tests/q35-test.c b/tests/q35-test.c
+index 7ea7acc9d8..34b34bc2b9 100644
+--- a/tests/q35-test.c
++++ b/tests/q35-test.c
+@@ -87,7 +87,7 @@ static void test_smram_lock(void)
+ 
+     qtest_start("-M q35");
+ 
+-    pcibus = qpci_init_pc(global_qtest, NULL);
++    pcibus = qpci_new_pc(global_qtest, NULL);
+     g_assert(pcibus != NULL);
+ 
+     pcidev = qpci_device_find(pcibus, 0);
+@@ -146,7 +146,7 @@ static void test_tseg_size(const void *data)
+     g_free(cmdline);
+ 
+     /* locate the DRAM controller */
+-    pcibus = qpci_init_pc(global_qtest, NULL);
++    pcibus = qpci_new_pc(global_qtest, NULL);
+     g_assert(pcibus != NULL);
+     pcidev = qpci_device_find(pcibus, 0);
+     g_assert(pcidev != NULL);
+diff --git a/tests/rtl8139-test.c b/tests/rtl8139-test.c
+index 68bfc42178..a85c91f197 100644
+--- a/tests/rtl8139-test.c
++++ b/tests/rtl8139-test.c
+@@ -35,7 +35,7 @@ static QPCIDevice *get_device(void)
+ {
+     QPCIDevice *dev;
+ 
+-    pcibus = qpci_init_pc(global_qtest, NULL);
++    pcibus = qpci_new_pc(global_qtest, NULL);
+     qpci_device_foreach(pcibus, 0x10ec, 0x8139, save_fn, &dev);
+     g_assert(dev != NULL);
+ 
+diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
+index 1d825eb010..be3bad6ceb 100644
+--- a/tests/sdhci-test.c
++++ b/tests/sdhci-test.c
+@@ -187,7 +187,7 @@ static QSDHCI *machine_start(const struct sdhci_t *test)
+         global_qtest = qtest_startf("-machine %s -device sdhci-pci",
+                                     test->machine);
+ 
+-        s->pci.bus = qpci_init_pc(global_qtest, NULL);
++        s->pci.bus = qpci_new_pc(global_qtest, NULL);
+ 
+         /* Find PCI device and verify it's the right one */
+         s->pci.dev = qpci_device_find(s->pci.bus, QPCI_DEVFN(4, 0));
+diff --git a/tests/tco-test.c b/tests/tco-test.c
+index 9945fb8469..538ebec036 100644
+--- a/tests/tco-test.c
++++ b/tests/tco-test.c
+@@ -64,7 +64,7 @@ static void test_init(TestData *d)
+     global_qtest = qs;
+     qtest_irq_intercept_in(qs, "ioapic");
+ 
+-    d->bus = qpci_init_pc(qs, NULL);
++    d->bus = qpci_new_pc(qs, NULL);
+     d->dev = qpci_device_find(d->bus, QPCI_DEVFN(0x1f, 0x00));
+     g_assert(d->dev != NULL);
+ 
+diff --git a/tests/usb-hcd-ehci-test.c b/tests/usb-hcd-ehci-test.c
+index 55d4743a2a..98b3038b2c 100644
+--- a/tests/usb-hcd-ehci-test.c
++++ b/tests/usb-hcd-ehci-test.c
+@@ -52,7 +52,7 @@ static void ehci_port_test(struct qhc *hc, int port, uint32_t expect)
+ 
+ static void test_init(void)
+ {
+-    pcibus = qpci_init_pc(global_qtest, NULL);
++    pcibus = qpci_new_pc(global_qtest, NULL);
+     g_assert(pcibus != NULL);
+ 
+     qusb_pci_init_one(pcibus, &uhci1, QPCI_DEVFN(0x1d, 0), 4);
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index fecc832d99..a976808eba 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -191,7 +191,7 @@ static void init_virtio_dev(TestServer *s, uint32_t features_mask)
+     uint32_t features;
+     int i;
+ 
+-    s->bus = qpci_init_pc(global_qtest, NULL);
++    s->bus = qpci_new_pc(global_qtest, NULL);
+     g_assert_nonnull(s->bus);
+ 
+     s->dev = qvirtio_pci_device_find(s->bus, VIRTIO_ID_NET);
 -- 
 2.17.1
