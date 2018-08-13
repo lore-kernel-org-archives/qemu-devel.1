@@ -1,29 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fpHVe-0002FI-Db
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 14:24:07 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fpHso-0001uI-7j
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 14:48:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fpHVb-0002w1-8G
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 14:24:06 -0400
-Received: from mail-bn3nam01on0091.outbound.protection.outlook.com
-	([104.47.33.91]:38932
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fpHVb-0002vu-2a
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 14:24:03 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 13 Aug 2018 18:23:59 +0000
-Message-ID: <BN7PR08MB486872E154C5754392031FD4C6390@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1534182832-554-11-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1534182832-554-11-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <stefanha@redhat.com>) id 1fpHsn-0003zV-8F
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 14:48:02 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 13 Aug 2018 19:46:18 +0100
+Message-Id: <20180813184624.12071-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v8 10/87] target/mips: Fix MT ASE
- instructions' availability control
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 0/6] arm: add Cortex M0 CPU model and hex
+ file loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,98 +21,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: qemu-devel@nongnu.org
+Cc: ilg@livius.net, jusual@mail.ru, joel@jms.id.au, Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, mail@steffen-goertz.de, qemu-arm@nongnu.org, Alistair Francis <alistair@alistair23.me>, Su Hang <suhang16@mails.ucas.ac.cn>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Steffen Gortz <qemu.ml@steffen-goertz.de>, Stefan Hajnoczi <stefanha@redhat.com>
 
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Sent: Monday, August 13, 2018 7:52 PM
-> To: qemu-devel@nongnu.org
->
-> Subject: [PATCH v8 10/87] target/mips: Fix MT ASE instructions' availabil=
-ity control
->=20
-> From: Aleksandar Rikalo <arikalo@wavecomp.com>
->=20
-> Use bits from configuration registers for availability control
-> of MT ASE instructions, rather than only ISA_MT bit in insn_flags.
->=20
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-> ---
->  target/mips/translate.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
->=20
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index b73f434..af9714b 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -8393,7 +8393,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContex=
-t *ctx, uint32_t opc, int rt,
->          opn =3D "mthc0";
->          break;
->      case OPC_MFTR:
-> -        check_insn(ctx, ASE_MT);
-> +        check_cp0_enabled(ctx);
->          if (rd =3D=3D 0) {
->              /* Treat as NOP. */
->              return;
-> @@ -8403,7 +8403,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContex=
-t *ctx, uint32_t opc, int rt,
->          opn =3D "mftr";
->          break;
->      case OPC_MTTR:
-> -        check_insn(ctx, ASE_MT);
-> +        check_cp0_enabled(ctx);
->          gen_mttr(env, ctx, rd, rt, (ctx->opcode >> 5) & 1,
->                   ctx->opcode & 0x7, (ctx->opcode >> 4) & 1);
->          opn =3D "mttr";
-> @@ -18619,7 +18619,7 @@ static void decode_opc_special3(CPUMIPSState *env=
-, DisasContext *ctx)
->          gen_rdhwr(ctx, rt, rd, extract32(ctx->opcode, 6, 3));
->          break;
->      case OPC_FORK:
-> -        check_insn(ctx, ASE_MT);
-> +        check_mt(ctx);
->          {
->              TCGv t0 =3D tcg_temp_new();
->              TCGv t1 =3D tcg_temp_new();
-> @@ -18632,7 +18632,7 @@ static void decode_opc_special3(CPUMIPSState *env=
-, DisasContext *ctx)
->          }
->          break;
->      case OPC_YIELD:
-> -        check_insn(ctx, ASE_MT);
-> +        check_mt(ctx);
->          {
->              TCGv t0 =3D tcg_temp_new();
->=20
-> @@ -19929,22 +19929,22 @@ static void decode_opc(CPUMIPSState *env, Disas=
-Context *ctx)
->                  op2 =3D MASK_MFMC0(ctx->opcode);
->                  switch (op2) {
->                  case OPC_DMT:
-> -                    check_insn(ctx, ASE_MT);
-> +                    check_cp0_mt(ctx);
->                      gen_helper_dmt(t0);
->                      gen_store_gpr(t0, rt);
->                      break;
->                  case OPC_EMT:
-> -                    check_insn(ctx, ASE_MT);
-> +                    check_cp0_mt(ctx);
->                      gen_helper_emt(t0);
->                      gen_store_gpr(t0, rt);
->                      break;
->                  case OPC_DVPE:
-> -                    check_insn(ctx, ASE_MT);
-> +                    check_cp0_mt(ctx);
->                      gen_helper_dvpe(t0, cpu_env);
->                      gen_store_gpr(t0, rt);
->                      break;
->                  case OPC_EVPE:
-> -                    check_insn(ctx, ASE_MT);
-> +                    check_cp0_mt(ctx);
->                      gen_helper_evpe(t0, cpu_env);
->                      gen_store_gpr(t0, rt);
->                      break;
+v5:
+ * Implemented Phil's hex loader suggestions
+ * Replaced Su Hang's test hex file with a simple memory test pattern,
+   eliminating the need to distribute source [Phil]
+v4:
+ * Drop ARMv7MState to ARMMProfileState rename because it causes a lot of=
+ code
+   churn and is incomplete.  Other parts of QEMU (like NVIC emulation) st=
+ill
+   refer to "v7m" although they apply to other architecture versions too.
+   [Peter]
+ * Use the generic loader device (-device loader,file=3Dprogram.hex,cpu-n=
+um=3D1)
+   instead of -kernel.  -kernel is a legacy command-line option that is k=
+ept as
+   a convenience, but it's not as flexible or predictable as the generic =
+loader
+   device.  New image formats should be added to the generic loader devic=
+e.
+   [Peter]
+ * Use hex/ASCII literals instead of decimal literals in hexloader-test.c=
+.
+   This makes the test case slightly easier to understand. [Philippe]
+v3:
+ * Rename ARMv7MState to ARMMProfileState so a single class can cater for
+   ARMv6-M, ARMv7-M, and ARMv8-M [Peter]
+ * Make bitbanding optional via a qdev property [Peter]
+ * Add hex file loader patches to reduce dependencies in upcoming patch s=
+eries
+ * Implement rollback if hex file loader fails partway through [Peter]
+ * Update hex file loader test case to use an ARMv7-M board since hex fil=
+e
+   loading is only done for ARM M Profile boards
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+This series contains the prerequistes for the "microbit" machine type tha=
+t Joel
+Stanley has written.  I have combined the Cortex M0 CPU model and hex loa=
+der
+work into one series to reduce the dependencies in upcoming patch series =
+from
+Joel, Julia, and Steffen.
+
+This patch series:
+ * Makes bitbanding optional on ARMv7MState.
+ * Adds a "cortex-m0" cpu type which can be used with ARMMProfileState.  =
+This
+   works thanks to Julia's Cortex M0 emulation patches, which are now all
+   merged.
+ * Adds Su Hang's Intel HEX file format loader so that micro:bit and othe=
+r
+   microcontroller firmware images can be run using -kernel.  The micro:b=
+it
+   development tools typically only emit .hex files and not ELFs.
+
+Stefan Hajnoczi (4):
+  hw/arm: make bitbanded IO optional on ARMv7-M
+  target/arm: add "cortex-m0" CPU model
+  loader: extract rom_free() function
+  loader: add rom transaction API
+
+Su Hang (2):
+  loader: Implement .hex file loader
+  Add QTest testcase for the Intel Hexadecimal
+
+ MAINTAINERS                          |   6 +
+ configure                            |   4 +
+ tests/Makefile.include               |   2 +
+ include/hw/arm/armv7m.h              |   2 +
+ include/hw/loader.h                  |  31 +++
+ hw/arm/armv7m.c                      |  37 ++--
+ hw/arm/mps2.c                        |   1 +
+ hw/arm/msf2-soc.c                    |   1 +
+ hw/arm/stellaris.c                   |   1 +
+ hw/arm/stm32f205_soc.c               |   1 +
+ hw/core/generic-loader.c             |   4 +
+ hw/core/loader.c                     | 302 ++++++++++++++++++++++++++-
+ target/arm/cpu.c                     |  11 +
+ tests/hexloader-test.c               |  41 ++++
+ tests/hex-loader-check-data/test.hex |  18 ++
+ 15 files changed, 436 insertions(+), 26 deletions(-)
+ create mode 100644 tests/hexloader-test.c
+ create mode 100644 tests/hex-loader-check-data/test.hex
+
+--=20
+2.17.1
