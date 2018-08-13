@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH3E-0005ZQ-2I
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH3E-0005ZN-1w
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH36-00077r-1b
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpH36-000794-HW
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55781 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:55804 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpH35-000754-Bh
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:35 -0400
+	id 1fpH36-00076q-1h
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 13:54:36 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 13 Aug 2018 19:53:04 +0200
-Message-Id: <1534182832-554-40-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 13 Aug 2018 19:53:17 +0200
+Message-Id: <1534182832-554-53-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v8 39/87] target/mips: Implement emulation of
- nanoMIPS ROTX instruction
+Subject: [Qemu-devel] [PATCH v8 52/87] target/mips: Add handling of branch
+ delay slots for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,164 +30,54 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Matthew Fortune <matthew.fortune@mips.com>
 
-Added a helper for ROTX based on the pseudocode from the
-architecture spec. This instraction was not present in previous
-MIPS instruction sets.
+ISA mode bit (LSB of address) is no longer required but is also
+masked to allow for tools transition. The flag has_isa_mode has the
+key role in the implementation.
 
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/mips/helper.h    |  2 ++
- target/mips/op_helper.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++
- target/mips/translate.c | 15 ++++++++
- 3 files changed, 111 insertions(+)
+ target/mips/translate.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 5f49234..b2a780a 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -40,6 +40,8 @@ DEF_HELPER_FLAGS_1(bitswap, TCG_CALL_NO_RWG_SE, tl, tl)
- DEF_HELPER_FLAGS_1(dbitswap, TCG_CALL_NO_RWG_SE, tl, tl)
- #endif
- 
-+DEF_HELPER_FLAGS_4(rotx, TCG_CALL_NO_RWG_SE, tl, tl, i32, i32, i32)
-+
- #ifndef CONFIG_USER_ONLY
- /* CP0 helpers */
- DEF_HELPER_1(mfc0_mvpcontrol, tl, env)
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 0b2663b..b3eef9f 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -249,6 +249,100 @@ target_ulong helper_bitswap(target_ulong rt)
-     return (int32_t)bitswap(rt);
- }
- 
-+target_ulong helper_rotx(target_ulong rs, uint32_t shift, uint32_t shiftx,
-+                        uint32_t stripe)
-+{
-+    int i;
-+    uint64_t tmp0 = ((uint64_t)rs) << 32 | ((uint64_t)rs & 0xffffffff);
-+    uint64_t tmp1 = tmp0;
-+    for (i = 0; i <= 46; i++) {
-+        int s;
-+        if (i & 0x8) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+
-+        if (stripe != 0 && !(i & 0x4)) {
-+            s = ~s;
-+        }
-+        if (s & 0x10) {
-+            if (tmp0 & (1LL << (i + 16))) {
-+                tmp1 |= 1LL << i;
-+            } else {
-+                tmp1 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp2 = tmp1;
-+    for (i = 0; i <= 38; i++) {
-+        int s;
-+        if (i & 0x4) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+
-+        if (s & 0x8) {
-+            if (tmp1 & (1LL << (i + 8))) {
-+                tmp2 |= 1LL << i;
-+            } else {
-+                tmp2 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp3 = tmp2;
-+    for (i = 0; i <= 34; i++) {
-+        int s;
-+        if (i & 0x2) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+        if (s & 0x4) {
-+            if (tmp2 & (1LL << (i + 4))) {
-+                tmp3 |= 1LL << i;
-+            } else {
-+                tmp3 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp4 = tmp3;
-+    for (i = 0; i <= 32; i++) {
-+        int s;
-+        if (i & 0x1) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+        if (s & 0x2) {
-+            if (tmp3 & (1LL << (i + 2))) {
-+                tmp4 |= 1LL << i;
-+            } else {
-+                tmp4 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp5 = tmp4;
-+    for (i = 0; i <= 31; i++) {
-+        int s;
-+        s = shift;
-+        if (s & 0x1) {
-+            if (tmp4 & (1LL << (i + 1))) {
-+                tmp5 |= 1LL << i;
-+            } else {
-+                tmp5 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    return (int64_t)(int32_t)(uint32_t)tmp5;
-+}
-+
- #ifndef CONFIG_USER_ONLY
- 
- static inline hwaddr do_translate_address(CPUMIPSState *env,
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index a97a989..02c9813 100644
+index 3282fca..e4427e4 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -17722,6 +17722,21 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-             }
-             break;
-         case NM_P_ROTX:
-+            if (rt != 0) {
-+                TCGv t0 = tcg_temp_new();
-+                TCGv_i32 shift = tcg_const_i32(extract32(ctx->opcode, 0, 5));
-+                TCGv_i32 shiftx = tcg_const_i32(extract32(ctx->opcode, 7, 4)
-+                                                << 1);
-+                TCGv_i32 stripe = tcg_const_i32(extract32(ctx->opcode, 6, 1));
-+
-+                gen_load_gpr(t0, rs);
-+                gen_helper_rotx(cpu_gpr[rt], t0, shift, shiftx, stripe);
-+                tcg_temp_free(t0);
-+
-+                tcg_temp_free_i32(shift);
-+                tcg_temp_free_i32(shiftx);
-+                tcg_temp_free_i32(stripe);
-+            }
-             break;
-         case NM_P_INS:
-             switch (((ctx->opcode >> 10) & 2) |
+@@ -1471,6 +1471,7 @@ typedef struct DisasContext {
+     bool mrp;
+     bool nan2008;
+     bool abs2008;
++    bool has_isa_mode;
+ } DisasContext;
+ 
+ #define DISAS_STOP       DISAS_TARGET_0
+@@ -4674,7 +4675,7 @@ static void gen_compute_branch (DisasContext *ctx, uint32_t opc,
+ 
+     if (blink > 0) {
+         int post_delay = insn_bytes + delayslot_size;
+-        int lowbit = !!(ctx->hflags & MIPS_HFLAG_M16);
++        int lowbit = ctx->has_isa_mode && !!(ctx->hflags & MIPS_HFLAG_M16);
+ 
+         tcg_gen_movi_tl(cpu_gpr[blink],
+                         ctx->base.pc_next + post_delay + lowbit);
+@@ -11171,7 +11172,7 @@ static void gen_compute_compact_branch(DisasContext *ctx, uint32_t opc,
+     int bcond_compute = 0;
+     TCGv t0 = tcg_temp_new();
+     TCGv t1 = tcg_temp_new();
+-    int m16_lowbit = (ctx->hflags & MIPS_HFLAG_M16) != 0;
++    int m16_lowbit = ctx->has_isa_mode && ((ctx->hflags & MIPS_HFLAG_M16) != 0);
+ 
+     if (ctx->hflags & MIPS_HFLAG_BMASK) {
+ #ifdef MIPS_DEBUG_DISAS
+@@ -24970,6 +24971,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->mrp = (env->CP0_Config5 >> CP0C5_MRP) & 1;
+     ctx->nan2008 = (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
+     ctx->abs2008 = (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
++    ctx->has_isa_mode = ((env->CP0_Config3 >> CP0C3_MMAR) & 0x7) < 3;
+     restore_cpu_state(env, ctx);
+ #ifdef CONFIG_USER_ONLY
+         ctx->mem_idx = MIPS_HFLAG_UM;
 -- 
 2.7.4
