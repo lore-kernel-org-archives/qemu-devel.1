@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fpJ1l-0007T2-Vl
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 16:01:22 -0400
+	(envelope-from <olaf@aepfle.de>) id 1fpJ9e-0000Ic-Qi
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 16:09:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fpJ1i-0007Cr-Ul
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 16:01:22 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:36021)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fpJ1i-0007CX-OA
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 16:01:18 -0400
-Date: Mon, 13 Aug 2018 16:01:16 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180813200116.GA18755@flamenco>
-References: <1528768140-17894-1-git-send-email-cota@braap.org>
+	(envelope-from <olaf@aepfle.de>) id 1fpJ9d-0002nu-SH
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 16:09:30 -0400
+Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::4]:13987)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1fpJ9d-0002n8-AP
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 16:09:29 -0400
+Date: Mon, 13 Aug 2018 22:07:13 +0200
+From: Olaf Hering <olaf@aepfle.de>
+Message-ID: <20180813215054.7aaf368b.olaf@aepfle.de>
+In-Reply-To: <a08c692b-5e62-9469-db63-b4b439e9afc3@redhat.com>
+References: <20180809141403.11296-1-olaf@aepfle.de>
+	<20180809162403.32c53c50.olaf@aepfle.de>
+	<30203041-c944-1a12-d983-9735756dc334@redhat.com>
+	<20180809163816.092a7c8c.olaf@aepfle.de>
+	<a75c67d5-816d-a603-b7bb-12a28f034fb1@redhat.com>
+	<20180809165549.5c92d5f4.olaf@aepfle.de>
+	<dba2887e-a59c-d05e-1642-b22623199cc5@redhat.com>
+	<840c9f90-3299-e2e5-63b6-5d368d15da5c@redhat.com>
+	<20180810123221.785ae741.olaf@aepfle.de>
+	<a08c692b-5e62-9469-db63-b4b439e9afc3@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1528768140-17894-1-git-send-email-cota@braap.org>
-Subject: Re: [Qemu-devel] [PATCH v4 00/14] fp-test + hardfloat
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/X=3HCSFX0U=hZ4wzjxX4XyK";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v1] exec: handle NULL pointer in
+ flatview_read_continue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,22 +37,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Mon, Jun 11, 2018 at 21:48:46 -0400, Emilio G. Cota wrote:
-> Sending this respin (little more than a rebase) in case there's
-> reviewer bandwidth available until the soft-freeze in 3 weeks.
+--Sig_/X=3HCSFX0U=hZ4wzjxX4XyK
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-*ping*
+Am Fri, 10 Aug 2018 14:29:28 +0200
+schrieb Paolo Bonzini <pbonzini@redhat.com>:
 
-Would be great to get this in for 3.1.
+> On 10/08/2018 12:32, Olaf Hering wrote:
+> > Am Fri, 10 Aug 2018 12:25:09 +0200
+> > schrieb Paolo Bonzini <pbonzini@redhat.com>:
+> > So you mean that function must not return NULL?
+> > Or should the caller check for the result? =20
+> Either, but the former would of course be much simpler if possible.
 
-BTW I have a paper under submission that covers this work among
-other improvements to QEMU. Reading this paper might ease a
-subsequent review of this patch series; ask me privately if
-you want to get a copy.
+Since other callers already deal with NULL, that one has to cope as well.
+And since unavailable memory can not be zero, the memset 0xff is most likel=
+y correct as well.
 
-Thanks,
+So, for me the patch is good as it is. The write part will get a separate c=
+hange in a few days.
 
-		Emilio
+
+Olaf
+
+--Sig_/X=3HCSFX0U=hZ4wzjxX4XyK
+Content-Type: application/pgp-signature
+Content-Description: Digitale Signatur von OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCW3Hk8QAKCRBdQqD6ppg2
+fphEAKD42E0PeYxE0DTt8Zq/p6+TEtogRACgrv6TNomtDPjm1220I/ppPICiytQ=
+=CR/z
+-----END PGP SIGNATURE-----
+
+--Sig_/X=3HCSFX0U=hZ4wzjxX4XyK--
