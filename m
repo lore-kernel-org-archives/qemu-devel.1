@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpDYD-00008T-1z
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:10:30 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fpDeQ-0003Jk-NA
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:17:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpDYB-0001MF-Sf
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:10:29 -0400
-Date: Mon, 13 Aug 2018 16:10:18 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fpDeK-0004rt-Le
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:16:54 -0400
+Date: Mon, 13 Aug 2018 16:16:41 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180813141018.GH4323@localhost.localdomain>
+Message-ID: <20180813141641.GI4323@localhost.localdomain>
 References: <20180810040743.25424-1-jcfaracco@gmail.com>
-	<20180810040743.25424-3-jcfaracco@gmail.com>
+	<20180810040743.25424-4-jcfaracco@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180810040743.25424-3-jcfaracco@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 2/4] configure: adding support to lzfse
- library.
+In-Reply-To: <20180810040743.25424-4-jcfaracco@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] dmg: including dmg-lzfse module inside
+ dmg block driver.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +28,92 @@ To: Julio Faracco <jcfaracco@gmail.com>
 Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
 Am 10.08.2018 um 06:07 hat Julio Faracco geschrieben:
-> This commit includes the support to lzfse opensource library. With this
-> library dmg block driver can decompress images with this type of
-> compression inside.
+> This commit includes the support to new module dmg-lzfse into dmg block
+> driver. It includes the support for block type ULFO (0x80000007).
 > 
 > Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
 > ---
->  block/Makefile.objs |  2 ++
->  configure           | 32 ++++++++++++++++++++++++++++++++
->  2 files changed, 34 insertions(+)
+>  block/dmg.c | 28 ++++++++++++++++++++++++++++
+>  block/dmg.h |  3 +++
+>  2 files changed, 31 insertions(+)
 > 
-> diff --git a/block/Makefile.objs b/block/Makefile.objs
-> index c8337bf186..f4ddbb9c7b 100644
-> --- a/block/Makefile.objs
-> +++ b/block/Makefile.objs
-> @@ -47,6 +47,8 @@ ssh.o-cflags       := $(LIBSSH2_CFLAGS)
->  ssh.o-libs         := $(LIBSSH2_LIBS)
->  block-obj-$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
->  dmg-bz2.o-libs     := $(BZIP2_LIBS)
-> +block-obj-$(if $(CONFIG_LZFSE),m,n) += dmg-lzfse.o
-> +dmg-lzfse.o-libs   := $(LZFSE_LIBS)
->  qcow.o-libs        := -lz
->  linux-aio.o-libs   := -laio
->  parallels.o-cflags := $(LIBXML2_CFLAGS)
-> diff --git a/configure b/configure
-> index 2a7796ea80..b12a16f2bf 100755
-> --- a/configure
-> +++ b/configure
-> @@ -432,6 +432,7 @@ capstone=""
->  lzo=""
->  snappy=""
->  bzip2=""
-> +lzfse=""
->  guest_agent=""
->  guest_agent_with_vss="no"
->  guest_agent_ntddscsi="no"
-> @@ -1300,6 +1301,10 @@ for opt do
->    ;;
->    --enable-bzip2) bzip2="yes"
->    ;;
-> +  --enable-lzfse) lzfse="yes"
-> +  ;;
-> +  --disable-lzfse) lzfse="no"
-> +  ;;
->    --enable-guest-agent) guest_agent="yes"
->    ;;
->    --disable-guest-agent) guest_agent="no"
-> @@ -1689,6 +1694,8 @@ disabled with --disable-FEATURE, default is enabled if available:
->    snappy          support of snappy compression library
->    bzip2           support of bzip2 compression library
->                    (for reading bzip2-compressed dmg images)
-> +  lzfse           support of lzfse compression library
-> +                  (for reading lzfse-compressed dmg images)
->    seccomp         seccomp support
->    coroutine-pool  coroutine freelist (better performance)
->    glusterfs       GlusterFS backend
-> @@ -2213,6 +2220,25 @@ EOF
->      fi
->  fi
+> diff --git a/block/dmg.c b/block/dmg.c
+> index c9b3c519c4..390ab67e53 100644
+> --- a/block/dmg.c
+> +++ b/block/dmg.c
+> @@ -33,6 +33,9 @@
+>  int (*dmg_uncompress_bz2)(char *next_in, unsigned int avail_in,
+>                            char *next_out, unsigned int avail_out);
 >  
-> +##########################################
-> +# lzfse check
+> +int (*dmg_uncompress_lzfse)(char *next_in, unsigned int avail_in,
+> +                            char *next_out, unsigned int avail_out);
 > +
-> +if test "$lzfse" != "no" ; then
-> +    cat > $TMPC << EOF
-> +#include <lzfse.h>
-> +int main(void) { lzfse_decode_scratch_size(); return 0; }
-> +EOF
-> +    if compile_prog "" "-llzfse" ; then
-> +        libs_softmmu="$libs_softmmu -llzfse"
+>  enum {
+>      /* Limit chunk sizes to prevent unreasonable amounts of memory being used
+>       * or truncating when converting to 32-bit types
+> @@ -107,6 +110,7 @@ static void update_max_chunk_size(BDRVDMGState *s, uint32_t chunk,
+>      switch (s->types[chunk]) {
+>      case 0x80000005: /* zlib compressed */
+>      case 0x80000006: /* bzip2 compressed */
+> +    case 0x80000007: /* lzfse compressed */
+>          compressed_size = s->lengths[chunk];
+>          uncompressed_sectors = s->sectorcounts[chunk];
+>          break;
+> @@ -188,6 +192,8 @@ static bool dmg_is_known_block_type(uint32_t entry_type)
+>          return true;
+>      case 0x80000006:    /* bzip2 */
+>          return !!dmg_uncompress_bz2;
+> +    case 0x80000007:    /* lzfse */
+> +	return !!dmg_uncompress_lzfse;
 
-Are you sure about libs_softmmu? I think this is only for QEMU proper,
-but not for tools like qemu-img or qemu-io, so if this were relevant,
-we'd be missing lzfse support in some tools.
+Indentation is off. I think you got a tab instead of spaces here.
 
-> +        lzfse="yes"
-> +    else
-> +        if test "$lzfse" = "yes"; then
-> +            feature_not_found "lzfse" "Install lzfse devel"
-> +        fi
-> +        lzfse="no"
-> +    fi
-> +fi
-> +
->  ##########################################
->  # libseccomp check
+>      default:
+>          return false;
+>      }
+> @@ -431,6 +437,7 @@ static int dmg_open(BlockDriverState *bs, QDict *options, int flags,
+>      }
 >  
-> @@ -6001,6 +6027,7 @@ echo "Live block migration $live_block_migration"
->  echo "lzo support       $lzo"
->  echo "snappy support    $snappy"
->  echo "bzip2 support     $bzip2"
-> +echo "lzfse support     $lzfse"
->  echo "NUMA host support $numa"
->  echo "libxml2           $libxml2"
->  echo "tcmalloc support  $tcmalloc"
-> @@ -6525,6 +6552,11 @@ if test "$bzip2" = "yes" ; then
->    echo "BZIP2_LIBS=-lbz2" >> $config_host_mak
->  fi
+>      block_module_load_one("dmg-bz2");
+> +    block_module_load_one("dmg-lzfse");
 >  
-> +if test "$lzfse" = "yes" ; then
-> +  echo "CONFIG_LZFSE=y" >> $config_host_mak
-> +  echo "LZFSE_LIBS=-llzfse" >> $config_host_mak
+>      s->n_chunks = 0;
+>      s->offsets = s->lengths = s->sectors = s->sectorcounts = NULL;
+> @@ -629,6 +636,27 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
+>                  return ret;
+>              }
+>              break;
+> +	case 0x80000007:
+> +	    if (!dmg_uncompress_lzfse) {
 
-But since we have LZFSE_LIBS here and this is referenced in
-block/Makefile.objs, I suspect that the libs_softmmu addition is
-actually redundant and could just go away above.
+More tab damage in these two lines.
 
-> +fi
+> +                break;
+> +            }
+> +            /* we need to buffer, because only the chunk as whole can be
+> +             * inflated. */
+> +            ret = bdrv_pread(bs->file, s->offsets[chunk],
+> +                             s->compressed_chunk, s->lengths[chunk]);
+> +            if (ret != s->lengths[chunk]) {
+> +                return -1;
+> +            }
 > +
->  if test "$libiscsi" = "yes" ; then
->    echo "CONFIG_LIBISCSI=m" >> $config_host_mak
->    echo "LIBISCSI_CFLAGS=$libiscsi_cflags" >> $config_host_mak
+> +            ret = dmg_uncompress_lzfse((char *)s->compressed_chunk,
+> +                                       (unsigned int) s->lengths[chunk],
+> +                                       (char *)s->uncompressed_chunk,
+> +                                       (unsigned int)
+> +                                           (512 * s->sectorcounts[chunk]));
+> +            if (ret < 0) {
+
+lzfse_decode_buffer() returns 0 in error cases, and possibly a short
+number of bytes. Should the condition compare ret with the expected full
+byte count?
+
+> +                return ret;
+> +            }
+> +            break;
+>          case 1: /* copy */
+>              ret = bdrv_pread(bs->file, s->offsets[chunk],
+>                               s->uncompressed_chunk, s->lengths[chunk]);
 
 Kevin
