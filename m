@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fp6vF-00022W-1U
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 03:05:50 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fp6wg-0002jA-0Y
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 03:07:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fp6vA-00061f-3D
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 03:05:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36688 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fp6v9-00061Z-Tl
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 03:05:44 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-26-armbru@redhat.com>
-	<d20bd7f2-8398-2eec-8b24-5386115c77ba@redhat.com>
-Date: Mon, 13 Aug 2018 09:05:38 +0200
-In-Reply-To: <d20bd7f2-8398-2eec-8b24-5386115c77ba@redhat.com> (Eric Blake's
-	message of "Fri, 10 Aug 2018 10:56:45 -0500")
-Message-ID: <87k1oubvb1.fsf@dusky.pond.sub.org>
+	(envelope-from <imammedo@redhat.com>) id 1fp6wf-0006dB-3e
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 03:07:17 -0400
+Date: Mon, 13 Aug 2018 09:07:13 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180813090713.76d7f710@redhat.com>
+In-Reply-To: <20180810182835.GZ15372@localhost.localdomain>
+References: <1533910017-55158-1-git-send-email-imammedo@redhat.com>
+	<20180810180106.26e1f642@redhat.com>
+	<20180810182835.GZ15372@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 25/56] json: Leave rejecting invalid escape
- sequences to parser
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] acpi: SRAT: do not create reserved gap
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,111 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, lersek@redhat.com, mst@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
+On Fri, 10 Aug 2018 15:28:35 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> On 08/08/2018 07:03 AM, Markus Armbruster wrote:
->> Both lexer and parser reject invalid escape sequences in strings.  The
->> parser's check is useless.
->>
->
->>
->> Drop the lexer's escape sequence checking, and make it accept the same
->> characters after '\' it accepts elsewhere in strings.  It now produces
->>
->>      JSON_LCURLY   {
->>      JSON_STRING   "abc\@ijk"
->>      JSON_COLON    :
->>      JSON_INTEGER  1
->>      JSON_RCURLY
->>
->> and the parser reports just
->>
->>      JSON parse error, invalid escape sequence in string
->>
->> While there, fix parse_string()'s inaccurate function comment.
->
-> Worthwhile improvement.
->
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   qobject/json-lexer.c  | 72 +++----------------------------------------
->>   qobject/json-parser.c | 56 +++++++++++++++++++--------------
->>   2 files changed, 37 insertions(+), 91 deletions(-)
->
-> and shorter!
->
->>       [IN_DQ_STRING_ESCAPE] = {
->> -        ['b'] = IN_DQ_STRING,
->> -        ['f'] =  IN_DQ_STRING,
->> -        ['n'] =  IN_DQ_STRING,
->> -        ['r'] =  IN_DQ_STRING,
->> -        ['t'] =  IN_DQ_STRING,
->> -        ['/'] = IN_DQ_STRING,
->> -        ['\\'] = IN_DQ_STRING,
->> -        ['\''] = IN_DQ_STRING,
->> -        ['\"'] = IN_DQ_STRING,
->> -        ['u'] = IN_DQ_UCODE0,
->> +        [0x20 ... 0xFD] = IN_DQ_STRING,
->
-> Among other things, this means the parser now has to flag "\u" as an
-> incomplete escape - but your added testsuite coverage earlier in the
-> series ensures that we do.
-
-Yes.
-
->> +++ b/qobject/json-parser.c
->> @@ -106,30 +106,40 @@ static int hex2decimal(char ch)
->>   }
->>     /**
->> - * parse_string(): Parse a json string and return a QObject
->> + * parse_string(): Parse a JSON string
->>    *
->> - *  string
->
->> + * From RFC 7159 "The JavaScript Object Notation (JSON) Data
->> + * Interchange Format":
->> + *
->> + *    char = unescaped /
->> + *        escape (
->> + *            %x22 /          ; "    quotation mark  U+0022
->> + *            %x5C /          ; \    reverse solidus U+005C
->> + *            %x2F /          ; /    solidus         U+002F
->> + *            %x62 /          ; b    backspace       U+0008
->> + *            %x66 /          ; f    form feed       U+000C
->> + *            %x6E /          ; n    line feed       U+000A
->> + *            %x72 /          ; r    carriage return U+000D
->> + *            %x74 /          ; t    tab             U+0009
->> + *            %x75 4HEXDIG )  ; uXXXX                U+XXXX
->> + *    escape = %x5C              ; \
->> + *    quotation-mark = %x22      ; "
->> + *    unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
->> + *
->> + * Extensions over RFC 7159:
->> + * - Extra escape sequence in strings:
->> + *   0x27 (apostrophe) is recognized after escape, too
->> + * - Single-quoted strings:
->> + *   Like double-quoted strings, except they're delimited by %x27
->> + *   (apostrophe) instead of %x22 (quotation mark), and can't contain
->> + *   unescaped apostrophe, but can contain unescaped quotation mark.
->> + *
->> + * Note:
->> + * - Encoding is modified UTF-8.
->
-> That is an extension over RFC 7159. But I'm okay with leaving it in
-> the Notes section.
->
->> + * - Invalid Unicode characters are rejected.
->> + * - Control characters are rejected by the lexer.
->
-> Worth being explicit that this is 00-1f, fe, and ff?
-
-\xFE and \xFF are invalid, not control.
-
-What about:
-
- * - Invalid Unicode characters are rejected.
- * - Control characters \x00..\x1F are rejected by the lexer.
+> On Fri, Aug 10, 2018 at 06:01:06PM +0200, Igor Mammedov wrote:
+> > On Fri, 10 Aug 2018 16:06:57 +0200
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> >   
+> > > Commit 848a1cc1e8b04 while introducing SRAT entries for DIMM and NVDIMM
+> > > also introduced fake entries for gaps between memory devices, assuming
+> > > that we need all possible range covered with SRAT entries.
+> > > And it did it wrong since gap would overlap with preceeding entry.
+> > > Reproduced with following CLI:
+> > > 
+> > >  -m 1G,slots=4,maxmem=8 \
+> > >  -object memory-backend-ram,size=1G,id=m0 \
+> > >  -device pc-dimm,memdev=m0,addr=0x101000000 \
+> > >  -object memory-backend-ram,size=1G,id=m1 \
+> > >  -device pc-dimm,memdev=m1
+> > > 
+> > > However recent development (10efd7e108) showed that gap entries might
+> > > be not need. And indeed testing with WS2008DC-WS2016DC guests range
+> > > shows that memory hotplug works just fine without gap entries.
+> > > 
+> > > So rather than fixing gap entry borders, just drop them altogether
+> > > and simplify code around it.
+> > > 
+> > > Spotted-by: Laszlo Ersek <lersek@redhat.com>
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > > There is no need to update reference blobs since gaps beween dimms
+> > > aren't generated by any exsting test case.
+> > > 
+> > > Considering issue is not visible by default lets just merge it into 3.1
+> > > and stable 3.0.1  
+> > Pls ignore it for now I'll need to do more extensive testing with old kernels,
+> > we might need these holes for old kernels or even new ones.
+> > /me goes to read kernel code
+> > 
+> > /per spec possible to hotplug range could be in SRAT,
+> >  even though I don't like it bu we might end up with static
+> >  partitioning of hotplug area between nodes like on bare metal
+> >  to avoid chasing after unknown requirements from windows /  
+> 
+> Does that mean we might want to pair DIMM slots with NUMA nodes
+> in advance?  Do you have a suggestion on how the command-line
+> would look like, in this case?
+> 
+> Maybe "-numa mem-slot,slot=X,node=Y"?
+it's either, to make it per slot (it implies fixed maximum size per slot)
+or a bit more flexible maxmem per node, might be something like:
+  -numa memory,node=X,maxmem=Y
