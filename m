@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpE4D-00060w-T9
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:43:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1fpEDU-0003JA-Af
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:53:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpE4A-0007nu-QQ
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:43:33 -0400
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:51739)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fpE4A-0007na-K4
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:43:30 -0400
-Received: by mail-wm0-f65.google.com with SMTP id y2-v6so9145932wma.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 07:43:30 -0700 (PDT)
-References: <20180813022006.7216-1-mreitz@redhat.com>
-	<20180813022006.7216-10-mreitz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <400a8b57-a930-2eee-a4a0-bf5a0733db1a@redhat.com>
-Date: Mon, 13 Aug 2018 16:43:26 +0200
+	(envelope-from <eblake@redhat.com>) id 1fpEDP-0003i6-IF
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:53:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38642 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fpEDP-0003hs-C2
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 10:53:03 -0400
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-12-armbru@redhat.com>
+	<26ff5c67-abfa-bc5d-7c26-3f08ffbdc57b@redhat.com>
+	<87k1oyl2y4.fsf@dusky.pond.sub.org>
+	<faf9bd30-5d2a-a68f-e6b4-c9dc8c369466@redhat.com>
+	<87ftzidcef.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e3606e6f-6880-0647-f6f0-284142e06ab8@redhat.com>
+Date: Mon, 13 Aug 2018 09:53:00 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180813022006.7216-10-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <87ftzidcef.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 09/17] mirror: Lock AioContext
- in mirror_co_perform()
+Subject: Re: [Qemu-devel] [PATCH 11/56] check-qjson: Cover UTF-8 in single
+ quoted strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-On 13/08/2018 04:19, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 08/13/2018 01:11 AM, Markus Armbruster wrote:
 
-Locking AioContext should not be needed anywhere here.  mirror_run is
-called via aio_co_enter or aio_co_wake, so the lock is actually already
-taken every time you call aio_context_acquire.
-
-It was needed only because AIO callbacks do *not* take the lock, but
-it's not needed anymore since the conversion to coroutines.
-
-Paolo
-
->  block/mirror.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
+>>>> Technically, Unicode ends at U+10FFFF (21 bits). Anything beyond that
+>>>> is not valid Unicode, even if it IS a valid interpretation of UTF-8
+>>>> encoding.
+>>>
+>>> Correct.  Testing how we handle such sequences makes sense all the same.
+>>>
+>>>>>             {
+>>>>> -            "\"\xF7\xBF\xBF\xBF\"",
+>>>>> +            "\xF7\xBF\xBF\xBF",
+>>>>>                 NULL,               /* bug: rejected */
+>>
+>> So, maybe all the more we need to do is remove the comment (as we WANT
+>> to reject these)?
 > 
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 85b08086cc..6330269156 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -196,7 +196,6 @@ static void coroutine_fn mirror_write_complete(MirrorOp *op, int ret)
->  {
->      MirrorBlockJob *s = op->s;
->  
-> -    aio_context_acquire(blk_get_aio_context(s->common.blk));
->      if (ret < 0) {
->          BlockErrorAction action;
->  
-> @@ -207,14 +206,12 @@ static void coroutine_fn mirror_write_complete(MirrorOp *op, int ret)
->          }
->      }
->      mirror_iteration_done(op, ret);
-> -    aio_context_release(blk_get_aio_context(s->common.blk));
->  }
->  
->  static void coroutine_fn mirror_read_complete(MirrorOp *op, int ret)
->  {
->      MirrorBlockJob *s = op->s;
->  
-> -    aio_context_acquire(blk_get_aio_context(s->common.blk));
->      if (ret < 0) {
->          BlockErrorAction action;
->  
-> @@ -230,7 +227,6 @@ static void coroutine_fn mirror_read_complete(MirrorOp *op, int ret)
->                               op->qiov.size, &op->qiov, 0);
->          mirror_write_complete(op, ret);
->      }
-> -    aio_context_release(blk_get_aio_context(s->common.blk));
->  }
->  
->  /* Clip bytes relative to offset to not exceed end-of-file */
-> @@ -387,12 +383,16 @@ static void coroutine_fn mirror_co_perform(void *opaque)
->  {
->      MirrorOp *op = opaque;
->      MirrorBlockJob *s = op->s;
-> +    AioContext *aio_context;
->      int ret;
->  
-> +    aio_context = blk_get_aio_context(s->common.blk);
-> +    aio_context_acquire(aio_context);
-> +
->      switch (op->mirror_method) {
->      case MIRROR_METHOD_COPY:
->          mirror_co_read(opaque);
-> -        return;
-> +        goto done;
->      case MIRROR_METHOD_ZERO:
->          ret = mirror_co_zero(s, op->offset, op->bytes);
->          break;
-> @@ -404,6 +404,9 @@ static void coroutine_fn mirror_co_perform(void *opaque)
->      }
->  
->      mirror_write_complete(op, ret);
-> +
-> +done:
-> +    aio_context_release(aio_context);
->  }
->  
->  /* If mirror_method == MIRROR_METHOD_COPY, *offset and *bytes will be
+> Is PATCH 20 doing what you suggest?
+
+Yes, I think you get there in the end, it was more a question of churn 
+in the meantime.
+
 > 
+>>>>
+>>>> The conversion of the initializer looks sane (well, mechanical).  Ergo:
+>>>>
+>>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>>
+>>> Thanks!
+>>
+>> Of course, playing games with the pre-existing comments on
+>> out-of-range behavior is probably better for a separate patch, and you
+>> do have some churn on these tests in later patches. I'll leave it up
+>> to you what to do (or leave put).
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
