@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tb-0007vS-IM
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:22 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tf-0007ys-FR
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tY-0002zf-C5
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:19 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9td-00038U-Db
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:23 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 13 Aug 2018 12:14:48 +0200
-Message-Id: <20180813101453.10200-29-e.emanuelegiuseppe@gmail.com>
+Date: Mon, 13 Aug 2018 12:14:51 +0200
+Message-Id: <20180813101453.10200-32-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
 References: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 28/33] tests/qgraph: virtio-blk test node
+Subject: [Qemu-devel] [PATCH 31/33] tests/qgraph: virtio-scsi driver and
+ interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,822 +23,200 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, John Snow <jsnow@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Convert tests/virtio-blk-test in qgraph test node,
-virtio-blk-test. This test consumes a virtio-blk interface
-and checks that its function return the expected values.
-
-Some functions are implemented only for virtio-blk-pci, so they
-don't consume virtio-blk, but virtio-blk-pci
-
-Note that this test does not allocate any virtio-blk structure,
-it's all done by the qtest walking graph mechanism
+Add qgraph nodes for virtio-scsi-pci and virtio-scsi-device.
+Both nodes produce virtio-scsi, but virtio-scsi-pci receives
+a pci-bus and uses virtio-pci QOSGraphObject and its functions,
+while virtio-scsi-device receives a virtio and implements
+its own functions
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
- tests/Makefile.include  |   4 +-
- tests/virtio-blk-test.c | 468 ++++++++++++++++------------------------
- 2 files changed, 190 insertions(+), 282 deletions(-)
+ tests/Makefile.include     |   1 +
+ tests/libqos/virtio-scsi.c | 117 +++++++++++++++++++++++++++++++++++++
+ tests/libqos/virtio-scsi.h |  39 +++++++++++++
+ 3 files changed, 157 insertions(+)
+ create mode 100644 tests/libqos/virtio-scsi.c
+ create mode 100644 tests/libqos/virtio-scsi.h
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 340c2462d2..814cef85c7 100644
+index 7a2b67c1ec..a839763505 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -193,7 +193,6 @@ gcov-files-virtio-y += i386-softmmu/hw/virtio/virtio.c
- check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
- gcov-files-virtio-y += i386-softmmu/hw/net/virtio-net.c
- gcov-files-virtio-y += i386-softmmu/hw/virtio/virtio-balloon.c
--check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
- gcov-files-virtio-y += i386-softmmu/hw/block/virtio-blk.c
- gcov-files-virtio-y += hw/virtio/virtio-rng.c
- check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
-@@ -373,7 +372,6 @@ check-qtest-arm-y += tests/pca9552-test$(EXESUF)
- check-qtest-arm-y += tests/ds1338-test$(EXESUF)
- check-qtest-arm-y += tests/m25p80-test$(EXESUF)
- gcov-files-arm-y += hw/misc/tmp105.c
--check-qtest-arm-y += tests/virtio-blk-test$(EXESUF)
- gcov-files-arm-y += arm-softmmu/hw/block/virtio-blk.c
- check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
- gcov-files-arm-y += hw/timer/arm_mptimer.c
-@@ -785,6 +783,7 @@ libqgraph-tests-obj-y += tests/virtio-console-test.o
- libqgraph-tests-obj-y += tests/virtio-9p-test.o
- libqgraph-tests-obj-y += tests/virtio-balloon-test.o
- libqgraph-tests-obj-y += tests/virtio-rng-test.o
-+libqgraph-tests-obj-y += tests/virtio-blk-test.o
+@@ -768,6 +768,7 @@ libqgraph-virtio-obj-y += tests/libqos/virtio-balloon.o
+ libqgraph-virtio-obj-y += tests/libqos/virtio-rng.o
+ libqgraph-virtio-obj-y += tests/libqos/virtio-blk.o
+ libqgraph-virtio-obj-y += tests/libqos/virtio-net.o
++libqgraph-virtio-obj-y += tests/libqos/virtio-scsi.o
  
- check-unit-y += tests/test-qgraph$(EXESUF)
- tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
-@@ -827,7 +826,6 @@ tests/vmxnet3-test$(EXESUF): tests/vmxnet3-test.o
- tests/ne2000-test$(EXESUF): tests/ne2000-test.o
- tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
- tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
--tests/virtio-blk-test$(EXESUF): tests/virtio-blk-test.o $(libqos-virtio-obj-y)
- tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
- tests/virtio-net-test$(EXESUF): tests/virtio-net-test.o $(libqos-pc-obj-y) $(libqos-virtio-obj-y)
- tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index e60b33c38a..930e0b9e67 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -10,29 +10,17 @@
- 
- #include "qemu/osdep.h"
- #include "libqtest.h"
--#include "libqos/libqos-pc.h"
--#include "libqos/libqos-spapr.h"
--#include "libqos/virtio.h"
--#include "libqos/virtio-pci.h"
--#include "libqos/virtio-mmio.h"
--#include "libqos/malloc-generic.h"
--#include "qemu/bswap.h"
--#include "standard-headers/linux/virtio_ids.h"
--#include "standard-headers/linux/virtio_config.h"
--#include "standard-headers/linux/virtio_ring.h"
-+ #include "qemu/bswap.h"
- #include "standard-headers/linux/virtio_blk.h"
- #include "standard-headers/linux/virtio_pci.h"
+ libqgraph-pci-obj-y = $(libqos-virtio-obj-y)
+ libqgraph-pci-obj-y += $(libqgraph-machines-obj-y)
+diff --git a/tests/libqos/virtio-scsi.c b/tests/libqos/virtio-scsi.c
+new file mode 100644
+index 0000000000..8f13c0bfaf
+--- /dev/null
++++ b/tests/libqos/virtio-scsi.c
+@@ -0,0 +1,117 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "standard-headers/linux/virtio_ids.h"
 +#include "libqos/qgraph.h"
-+#include "libqos/virtio-blk.h"
- 
- #define TEST_IMAGE_SIZE         (64 * 1024 * 1024)
- #define QVIRTIO_BLK_TIMEOUT_US  (30 * 1000 * 1000)
- #define PCI_SLOT_HP             0x06
--#define PCI_SLOT                0x04
--#define PCI_FN                  0x00
- 
--#define MMIO_PAGE_SIZE          4096
--#define MMIO_DEV_BASE_ADDR      0x0A003E00
--#define MMIO_RAM_ADDR           0x40000000
--#define MMIO_RAM_SIZE           0x20000000
-+static char *tmp_path;
- 
- typedef struct QVirtioBlkReq {
-     uint32_t type;
-@@ -45,75 +33,16 @@ typedef struct QVirtioBlkReq {
- static char *drive_create(void)
- {
-     int fd, ret;
--    char *tmp_path = g_strdup("/tmp/qtest.XXXXXX");
-+    char *t_path = g_strdup("/tmp/qtest.XXXXXX");
- 
-     /* Create a temporary raw image */
--    fd = mkstemp(tmp_path);
-+    fd = mkstemp(t_path);
-     g_assert_cmpint(fd, >=, 0);
-     ret = ftruncate(fd, TEST_IMAGE_SIZE);
-     g_assert_cmpint(ret, ==, 0);
-     close(fd);
- 
--    return tmp_path;
--}
--
--static QOSState *pci_test_start(void)
--{
--    QOSState *qs;
--    const char *arch = qtest_get_arch();
--    char *tmp_path;
--    const char *cmd = "-drive if=none,id=drive0,file=%s,format=raw "
--                      "-drive if=none,id=drive1,file=null-co://,format=raw "
--                      "-device virtio-blk-pci,id=drv0,drive=drive0,"
--                      "addr=%x.%x";
--
--    tmp_path = drive_create();
--
--    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        qs = qtest_pc_boot(cmd, tmp_path, PCI_SLOT, PCI_FN);
--    } else if (strcmp(arch, "ppc64") == 0) {
--        qs = qtest_spapr_boot(cmd, tmp_path, PCI_SLOT, PCI_FN);
--    } else {
--        g_printerr("virtio-blk tests are only available on x86 or ppc64\n");
--        exit(EXIT_FAILURE);
--    }
--    global_qtest = qs->qts;
--    unlink(tmp_path);
--    g_free(tmp_path);
--    return qs;
--}
--
--static void arm_test_start(void)
--{
--    char *tmp_path;
--
--    tmp_path = drive_create();
--
--    global_qtest = qtest_startf("-machine virt "
--                                "-drive if=none,id=drive0,file=%s,format=raw "
--                                "-device virtio-blk-device,drive=drive0",
--                                tmp_path);
--    unlink(tmp_path);
--    g_free(tmp_path);
--}
--
--static void test_end(void)
--{
--    qtest_end();
--}
--
--static QVirtioPCIDevice *virtio_blk_pci_init(QPCIBus *bus, int slot)
--{
--    QVirtioPCIDevice *dev;
--
--    dev = qvirtio_pci_device_find_slot(bus, VIRTIO_ID_BLOCK, slot);
--    g_assert(dev != NULL);
--    g_assert_cmphex(dev->vdev.device_type, ==, VIRTIO_ID_BLOCK);
--    g_assert_cmphex(dev->pdev->devfn, ==, ((slot << 3) | PCI_FN));
--
--    qvirtio_pci_device_enable(dev);
--    qvirtio_start_device(&dev->vdev);
--    return dev;
-+    return t_path;
- }
- 
- static inline void virtio_blk_fix_request(QVirtioDevice *d, QVirtioBlkReq *req)
-@@ -277,31 +206,21 @@ static void test_basic(QVirtioDevice *dev, QGuestAllocator *alloc,
-     }
- }
- 
--static void pci_basic(void)
-+static void basic(void *obj, void *data, QGuestAllocator *t_alloc)
- {
--    QVirtioPCIDevice *dev;
--    QOSState *qs;
--    QVirtQueuePCI *vqpci;
--
--    qs = pci_test_start();
--    dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT);
--
--    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
--
--    test_basic(&dev->vdev, qs->alloc, &vqpci->vq);
-+    QVirtioBlk *blk_if = obj;
-+    QVirtQueue *vq;
-+    vq = qvirtqueue_setup(blk_if->vdev, t_alloc, 0);
-+    test_basic(blk_if->vdev, t_alloc, vq);
-+    qvirtqueue_cleanup(blk_if->vdev->bus, vq, t_alloc);
- 
--    /* End test */
--    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
--    qvirtio_pci_device_disable(dev);
--    qvirtio_pci_device_free(dev);
--    qtest_shutdown(qs);
- }
- 
--static void pci_indirect(void)
-+static void indirect(void *obj, void *u_data, QGuestAllocator *t_alloc)
- {
--    QVirtioPCIDevice *dev;
--    QVirtQueuePCI *vqpci;
--    QOSState *qs;
-+    QVirtQueue *vq;
-+    QVirtioBlk *blk_if = obj;
-+    QVirtioDevice *dev = blk_if->vdev;
-     QVirtioBlkReq req;
-     QVRingIndirectDesc *indirect;
-     uint64_t req_addr;
-@@ -311,23 +230,19 @@ static void pci_indirect(void)
-     uint8_t status;
-     char *data;
- 
--    qs = pci_test_start();
--
--    dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT);
--
--    capacity = qvirtio_config_readq(&dev->vdev, 0);
-+    capacity = qvirtio_config_readq(dev, 0);
-     g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
- 
--    features = qvirtio_get_features(&dev->vdev);
-+    features = qvirtio_get_features(dev);
-     g_assert_cmphex(features & (1u << VIRTIO_RING_F_INDIRECT_DESC), !=, 0);
-     features = features & ~(QVIRTIO_F_BAD_FEATURE |
-                             (1u << VIRTIO_RING_F_EVENT_IDX) |
-                             (1u << VIRTIO_BLK_F_SCSI));
--    qvirtio_set_features(&dev->vdev, features);
-+    qvirtio_set_features(dev, features);
- 
--    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
-+    vq = qvirtqueue_setup(dev, t_alloc, 0);
- 
--    qvirtio_set_driver_ok(&dev->vdev);
-+    qvirtio_set_driver_ok(dev);
- 
-     /* Write request */
-     req.type = VIRTIO_BLK_T_OUT;
-@@ -336,23 +251,23 @@ static void pci_indirect(void)
-     req.data = g_malloc0(512);
-     strcpy(req.data, "TEST");
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
- 
-     g_free(req.data);
- 
--    indirect = qvring_indirect_desc_setup(&dev->vdev, qs->alloc, 2);
-+    indirect = qvring_indirect_desc_setup(dev, t_alloc, 2);
-     qvring_indirect_desc_add(indirect, req_addr, 528, false);
-     qvring_indirect_desc_add(indirect, req_addr + 528, 1, true);
--    free_head = qvirtqueue_add_indirect(&vqpci->vq, indirect);
--    qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
-+    free_head = qvirtqueue_add_indirect(vq, indirect);
-+    qvirtqueue_kick(dev, vq, free_head);
- 
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head, NULL,
-+    qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
-     status = readb(req_addr + 528);
-     g_assert_cmpint(status, ==, 0);
- 
-     g_free(indirect);
--    guest_free(qs->alloc, req_addr);
-+    guest_free(t_alloc, req_addr);
- 
-     /* Read request */
-     req.type = VIRTIO_BLK_T_IN;
-@@ -361,17 +276,17 @@ static void pci_indirect(void)
-     req.data = g_malloc0(512);
-     strcpy(req.data, "TEST");
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
- 
-     g_free(req.data);
- 
--    indirect = qvring_indirect_desc_setup(&dev->vdev, qs->alloc, 2);
-+    indirect = qvring_indirect_desc_setup(dev, t_alloc, 2);
-     qvring_indirect_desc_add(indirect, req_addr, 16, false);
-     qvring_indirect_desc_add(indirect, req_addr + 16, 513, true);
--    free_head = qvirtqueue_add_indirect(&vqpci->vq, indirect);
--    qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
-+    free_head = qvirtqueue_add_indirect(vq, indirect);
-+    qvirtqueue_kick(dev, vq, free_head);
- 
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head, NULL,
-+    qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
-     status = readb(req_addr + 528);
-     g_assert_cmpint(status, ==, 0);
-@@ -382,50 +297,37 @@ static void pci_indirect(void)
-     g_free(data);
- 
-     g_free(indirect);
--    guest_free(qs->alloc, req_addr);
--
--    /* End test */
--    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
--    qvirtio_pci_device_disable(dev);
--    qvirtio_pci_device_free(dev);
--    qtest_shutdown(qs);
-+    guest_free(t_alloc, req_addr);
-+    qvirtqueue_cleanup(dev->bus, vq, t_alloc);
- }
- 
--static void pci_config(void)
-+static void config(void *obj, void *data, QGuestAllocator *t_alloc)
- {
--    QVirtioPCIDevice *dev;
--    QOSState *qs;
-+    QVirtioBlk *blk_if = obj;
-+    QVirtioDevice *dev = blk_if->vdev;
-     int n_size = TEST_IMAGE_SIZE / 2;
-     uint64_t capacity;
- 
--    qs = pci_test_start();
--
--    dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT);
--
--    capacity = qvirtio_config_readq(&dev->vdev, 0);
-+    capacity = qvirtio_config_readq(dev, 0);
-     g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
- 
--    qvirtio_set_driver_ok(&dev->vdev);
-+    qvirtio_set_driver_ok(dev);
- 
-     qmp_discard_response("{ 'execute': 'block_resize', "
-                          " 'arguments': { 'device': 'drive0', "
-                          " 'size': %d } }", n_size);
--    qvirtio_wait_config_isr(&dev->vdev, QVIRTIO_BLK_TIMEOUT_US);
-+    qvirtio_wait_config_isr(dev, QVIRTIO_BLK_TIMEOUT_US);
- 
--    capacity = qvirtio_config_readq(&dev->vdev, 0);
-+    capacity = qvirtio_config_readq(dev, 0);
-     g_assert_cmpint(capacity, ==, n_size / 512);
--
--    qvirtio_pci_device_disable(dev);
--    qvirtio_pci_device_free(dev);
--
--    qtest_shutdown(qs);
- }
- 
--static void pci_msix(void)
-+static void msix(void *obj, void *u_data, QGuestAllocator *t_alloc)
- {
--    QVirtioPCIDevice *dev;
--    QOSState *qs;
--    QVirtQueuePCI *vqpci;
-+    QVirtQueue *vq;
-+    QVirtioBlkPCI *blk = obj;
-+    QVirtioPCIDevice *pdev = &blk->pci_vdev;
-+    QVirtioDevice *dev = &pdev->vdev;
-     QVirtioBlkReq req;
-     int n_size = TEST_IMAGE_SIZE / 2;
-     uint64_t req_addr;
-@@ -434,36 +336,39 @@ static void pci_msix(void)
-     uint32_t free_head;
-     uint8_t status;
-     char *data;
-+    QOSGraphObject *blk_object = obj;
-+    QPCIDevice *pci_dev = blk_object->get_driver(blk_object, "pci-device");
- 
--    qs = pci_test_start();
--
--    dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT);
--    qpci_msix_enable(dev->pdev);
-+    /* FIXME: add spapr support */
-+    if (qpci_has_buggy_msi(pci_dev)) {
-+        return;
-+    }
- 
--    qvirtio_pci_set_msix_configuration_vector(dev, qs->alloc, 0);
-+    qpci_msix_enable(pdev->pdev);
-+    qvirtio_pci_set_msix_configuration_vector(pdev, t_alloc, 0);
- 
--    capacity = qvirtio_config_readq(&dev->vdev, 0);
-+    capacity = qvirtio_config_readq(dev, 0);
-     g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
- 
--    features = qvirtio_get_features(&dev->vdev);
-+    features = qvirtio_get_features(dev);
-     features = features & ~(QVIRTIO_F_BAD_FEATURE |
-                             (1u << VIRTIO_RING_F_INDIRECT_DESC) |
-                             (1u << VIRTIO_RING_F_EVENT_IDX) |
-                             (1u << VIRTIO_BLK_F_SCSI));
--    qvirtio_set_features(&dev->vdev, features);
-+    qvirtio_set_features(dev, features);
- 
--    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
--    qvirtqueue_pci_msix_setup(dev, vqpci, qs->alloc, 1);
-+    vq = qvirtqueue_setup(dev, t_alloc, 0);
-+    qvirtqueue_pci_msix_setup(pdev, (QVirtQueuePCI *)vq, t_alloc, 1);
- 
--    qvirtio_set_driver_ok(&dev->vdev);
-+    qvirtio_set_driver_ok(dev);
- 
-     qmp_discard_response("{ 'execute': 'block_resize', "
-                          " 'arguments': { 'device': 'drive0', "
-                          " 'size': %d } }", n_size);
- 
--    qvirtio_wait_config_isr(&dev->vdev, QVIRTIO_BLK_TIMEOUT_US);
-+    qvirtio_wait_config_isr(dev, QVIRTIO_BLK_TIMEOUT_US);
- 
--    capacity = qvirtio_config_readq(&dev->vdev, 0);
-+    capacity = qvirtio_config_readq(dev, 0);
-     g_assert_cmpint(capacity, ==, n_size / 512);
- 
-     /* Write request */
-@@ -473,22 +378,22 @@ static void pci_msix(void)
-     req.data = g_malloc0(512);
-     strcpy(req.data, "TEST");
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
- 
-     g_free(req.data);
- 
--    free_head = qvirtqueue_add(&vqpci->vq, req_addr, 16, false, true);
--    qvirtqueue_add(&vqpci->vq, req_addr + 16, 512, false, true);
--    qvirtqueue_add(&vqpci->vq, req_addr + 528, 1, true, false);
--    qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
-+    free_head = qvirtqueue_add(vq, req_addr, 16, false, true);
-+    qvirtqueue_add(vq, req_addr + 16, 512, false, true);
-+    qvirtqueue_add(vq, req_addr + 528, 1, true, false);
-+    qvirtqueue_kick(dev, vq, free_head);
- 
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head, NULL,
-+    qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
- 
-     status = readb(req_addr + 528);
-     g_assert_cmpint(status, ==, 0);
- 
--    guest_free(qs->alloc, req_addr);
-+    guest_free(t_alloc, req_addr);
- 
-     /* Read request */
-     req.type = VIRTIO_BLK_T_IN;
-@@ -496,18 +401,18 @@ static void pci_msix(void)
-     req.sector = 0;
-     req.data = g_malloc0(512);
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
- 
-     g_free(req.data);
- 
--    free_head = qvirtqueue_add(&vqpci->vq, req_addr, 16, false, true);
--    qvirtqueue_add(&vqpci->vq, req_addr + 16, 512, true, true);
--    qvirtqueue_add(&vqpci->vq, req_addr + 528, 1, true, false);
-+    free_head = qvirtqueue_add(vq, req_addr, 16, false, true);
-+    qvirtqueue_add(vq, req_addr + 16, 512, true, true);
-+    qvirtqueue_add(vq, req_addr + 528, 1, true, false);
- 
--    qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
-+    qvirtqueue_kick(dev, vq, free_head);
- 
- 
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head, NULL,
-+    qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
- 
-     status = readb(req_addr + 528);
-@@ -518,21 +423,19 @@ static void pci_msix(void)
-     g_assert_cmpstr(data, ==, "TEST");
-     g_free(data);
- 
--    guest_free(qs->alloc, req_addr);
-+    guest_free(t_alloc, req_addr);
- 
-     /* End test */
--    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
--    qpci_msix_disable(dev->pdev);
--    qvirtio_pci_device_disable(dev);
--    qvirtio_pci_device_free(dev);
--    qtest_shutdown(qs);
-+    qpci_msix_disable(pdev->pdev);
-+    qvirtqueue_cleanup(dev->bus, vq, t_alloc);
- }
- 
--static void pci_idx(void)
-+static void idx(void *obj, void *u_data, QGuestAllocator *t_alloc)
- {
--    QVirtioPCIDevice *dev;
--    QOSState *qs;
--    QVirtQueuePCI *vqpci;
-+    QVirtQueue *vq;
-+    QVirtioBlkPCI *blk = obj;
-+    QVirtioPCIDevice *pdev = &blk->pci_vdev;
-+    QVirtioDevice *dev = &pdev->vdev;
-     QVirtioBlkReq req;
-     uint64_t req_addr;
-     uint64_t capacity;
-@@ -542,28 +445,31 @@ static void pci_idx(void)
-     uint32_t desc_idx;
-     uint8_t status;
-     char *data;
-+    QOSGraphObject *blk_object = obj;
-+    QPCIDevice *pci_dev = blk_object->get_driver(blk_object, "pci-device");
- 
--    qs = pci_test_start();
--
--    dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT);
--    qpci_msix_enable(dev->pdev);
-+    /* FIXME: add spapr support */
-+    if (qpci_has_buggy_msi(pci_dev)) {
-+        return;
-+    }
- 
--    qvirtio_pci_set_msix_configuration_vector(dev, qs->alloc, 0);
-+    qpci_msix_enable(pdev->pdev);
-+    qvirtio_pci_set_msix_configuration_vector(pdev, t_alloc, 0);
- 
--    capacity = qvirtio_config_readq(&dev->vdev, 0);
-+    capacity = qvirtio_config_readq(dev, 0);
-     g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
- 
--    features = qvirtio_get_features(&dev->vdev);
-+    features = qvirtio_get_features(dev);
-     features = features & ~(QVIRTIO_F_BAD_FEATURE |
-                             (1u << VIRTIO_RING_F_INDIRECT_DESC) |
-                             (1u << VIRTIO_F_NOTIFY_ON_EMPTY) |
-                             (1u << VIRTIO_BLK_F_SCSI));
--    qvirtio_set_features(&dev->vdev, features);
-+    qvirtio_set_features(dev, features);
- 
--    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
--    qvirtqueue_pci_msix_setup(dev, vqpci, qs->alloc, 1);
-+    vq = qvirtqueue_setup(dev, t_alloc, 0);
-+    qvirtqueue_pci_msix_setup(pdev, (QVirtQueuePCI *)vq, t_alloc, 1);
- 
--    qvirtio_set_driver_ok(&dev->vdev);
-+    qvirtio_set_driver_ok(dev);
- 
-     /* Write request */
-     req.type = VIRTIO_BLK_T_OUT;
-@@ -572,16 +478,16 @@ static void pci_idx(void)
-     req.data = g_malloc0(512);
-     strcpy(req.data, "TEST");
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
- 
-     g_free(req.data);
- 
--    free_head = qvirtqueue_add(&vqpci->vq, req_addr, 16, false, true);
--    qvirtqueue_add(&vqpci->vq, req_addr + 16, 512, false, true);
--    qvirtqueue_add(&vqpci->vq, req_addr + 528, 1, true, false);
--    qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
-+    free_head = qvirtqueue_add(vq, req_addr, 16, false, true);
-+    qvirtqueue_add(vq, req_addr + 16, 512, false, true);
-+    qvirtqueue_add(vq, req_addr + 528, 1, true, false);
-+    qvirtqueue_kick(dev, vq, free_head);
- 
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head, NULL,
-+    qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
- 
-     /* Write request */
-@@ -591,25 +497,25 @@ static void pci_idx(void)
-     req.data = g_malloc0(512);
-     strcpy(req.data, "TEST");
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
- 
-     g_free(req.data);
- 
-     /* Notify after processing the third request */
--    qvirtqueue_set_used_event(&vqpci->vq, 2);
--    free_head = qvirtqueue_add(&vqpci->vq, req_addr, 16, false, true);
--    qvirtqueue_add(&vqpci->vq, req_addr + 16, 512, false, true);
--    qvirtqueue_add(&vqpci->vq, req_addr + 528, 1, true, false);
--    qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
-+    qvirtqueue_set_used_event(vq, 2);
-+    free_head = qvirtqueue_add(vq, req_addr, 16, false, true);
-+    qvirtqueue_add(vq, req_addr + 16, 512, false, true);
-+    qvirtqueue_add(vq, req_addr + 528, 1, true, false);
-+    qvirtqueue_kick(dev, vq, free_head);
-     write_head = free_head;
- 
-     /* No notification expected */
--    status = qvirtio_wait_status_byte_no_isr(&dev->vdev,
--                                             &vqpci->vq, req_addr + 528,
-+    status = qvirtio_wait_status_byte_no_isr(dev,
-+                                             vq, req_addr + 528,
-                                              QVIRTIO_BLK_TIMEOUT_US);
-     g_assert_cmpint(status, ==, 0);
- 
--    guest_free(qs->alloc, req_addr);
-+    guest_free(t_alloc, req_addr);
- 
-     /* Read request */
-     req.type = VIRTIO_BLK_T_IN;
-@@ -617,20 +523,20 @@ static void pci_idx(void)
-     req.sector = 1;
-     req.data = g_malloc0(512);
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
- 
-     g_free(req.data);
- 
--    free_head = qvirtqueue_add(&vqpci->vq, req_addr, 16, false, true);
--    qvirtqueue_add(&vqpci->vq, req_addr + 16, 512, true, true);
--    qvirtqueue_add(&vqpci->vq, req_addr + 528, 1, true, false);
-+    free_head = qvirtqueue_add(vq, req_addr, 16, false, true);
-+    qvirtqueue_add(vq, req_addr + 16, 512, true, true);
-+    qvirtqueue_add(vq, req_addr + 528, 1, true, false);
- 
--    qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
-+    qvirtqueue_kick(dev, vq, free_head);
- 
-     /* We get just one notification for both requests */
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, write_head, NULL,
-+    qvirtio_wait_used_elem(dev, vq, write_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
--    g_assert(qvirtqueue_get_buf(&vqpci->vq, &desc_idx, NULL));
-+    g_assert(qvirtqueue_get_buf(vq, &desc_idx, NULL));
-     g_assert_cmpint(desc_idx, ==, free_head);
- 
-     status = readb(req_addr + 528);
-@@ -641,122 +547,126 @@ static void pci_idx(void)
-     g_assert_cmpstr(data, ==, "TEST");
-     g_free(data);
- 
--    guest_free(qs->alloc, req_addr);
-+    guest_free(t_alloc, req_addr);
- 
-     /* End test */
--    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
--    qpci_msix_disable(dev->pdev);
--    qvirtio_pci_device_disable(dev);
--    qvirtio_pci_device_free(dev);
--    qtest_shutdown(qs);
-+    qpci_msix_disable(pdev->pdev);
++#include "libqos/virtio-scsi.h"
 +
-+    qvirtqueue_cleanup(dev->bus, vq, t_alloc);
- }
- 
--static void pci_hotplug(void)
-+static void pci_hotplug(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-+    QVirtioBlkPCI *blk = obj;
-+    QVirtioPCIDevice *pdev = &blk->pci_vdev;
-     QVirtioPCIDevice *dev;
--    QOSState *qs;
--    const char *arch = qtest_get_arch();
--
--    qs = pci_test_start();
- 
-     /* plug secondary disk */
-     qpci_plug_device_test("virtio-blk-pci", "drv1", PCI_SLOT_HP,
-                           "'drive': 'drive1'");
- 
--    dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT_HP);
-+    dev = qvirtio_pci_device_find_slot(pdev->pdev->bus, VIRTIO_ID_BLOCK,
-+                                    PCI_SLOT_HP);
-     g_assert(dev);
-     qvirtio_pci_device_disable(dev);
-     qvirtio_pci_device_free(dev);
- 
-     /* unplug secondary disk */
--    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        qpci_unplug_acpi_device_test("drv1", PCI_SLOT_HP);
--    }
--    qtest_shutdown(qs);
-+    qpci_unplug_acpi_device_test("drv1", PCI_SLOT_HP);
- }
- 
- /*
-  * Check that setting the vring addr on a non-existent virtqueue does
-  * not crash.
-  */
--static void test_nonexistent_virtqueue(void)
-+static void test_nonexistent_virtqueue(void *obj, void *data,
-+                                       QGuestAllocator *t_alloc)
- {
-+    QVirtioBlkPCI *blk = obj;
-+    QVirtioPCIDevice *pdev = &blk->pci_vdev;
-     QPCIBar bar0;
--    QOSState *qs;
-     QPCIDevice *dev;
- 
--    qs = pci_test_start();
--    dev = qpci_device_find(qs->pcibus, QPCI_DEVFN(4, 0));
-+    dev = qpci_device_find(pdev->pdev->bus, QPCI_DEVFN(4, 0));
-     g_assert(dev != NULL);
--
-     qpci_device_enable(dev);
++/* virtio-scsi-device */
++static void qvirtio_scsi_device_destructor(QOSGraphObject *obj)
++{
++    QVirtioSCSIDevice *v_scsi = (QVirtioSCSIDevice *) obj;
 +
-     bar0 = qpci_iomap(dev, 0, NULL);
- 
-     qpci_io_writeb(dev, bar0, VIRTIO_PCI_QUEUE_SEL, 2);
-     qpci_io_writel(dev, bar0, VIRTIO_PCI_QUEUE_PFN, 1);
- 
-+
-     g_free(dev);
--    qtest_shutdown(qs);
- }
- 
--static void mmio_basic(void)
-+static void basic_resize(void *obj, void *data, QGuestAllocator *t_alloc)
- {
--    QVirtioMMIODevice *dev;
--    QVirtQueue *vq;
--    QGuestAllocator *alloc;
-+    QVirtioBlk *blk_if = obj;
-+    QVirtioDevice *dev = blk_if->vdev;
-     int n_size = TEST_IMAGE_SIZE / 2;
-     uint64_t capacity;
-+    QVirtQueue *vq;
- 
--    arm_test_start();
--
--    dev = g_malloc0(sizeof(QVirtioMMIODevice));
--    qvirtio_mmio_init_device(dev, MMIO_DEV_BASE_ADDR, MMIO_PAGE_SIZE);
--    g_assert(dev != NULL);
--    g_assert_cmphex(dev->vdev.device_type, ==, VIRTIO_ID_BLOCK);
--
--    qvirtio_start_device(&dev->vdev);
--
--    alloc = generic_alloc_init(MMIO_RAM_ADDR, MMIO_RAM_SIZE, MMIO_PAGE_SIZE);
--    vq = qvirtqueue_setup(&dev->vdev, alloc, 0);
-+    vq = qvirtqueue_setup(dev, t_alloc, 0);
- 
--    test_basic(&dev->vdev, alloc, vq);
-+    test_basic(dev, t_alloc, vq);
- 
-     qmp_discard_response("{ 'execute': 'block_resize', "
-                          " 'arguments': { 'device': 'drive0', "
-                          " 'size': %d } }", n_size);
- 
--    qvirtio_wait_queue_isr(&dev->vdev, vq, QVIRTIO_BLK_TIMEOUT_US);
-+    qvirtio_wait_queue_isr(dev, vq, QVIRTIO_BLK_TIMEOUT_US);
- 
--    capacity = qvirtio_config_readq(&dev->vdev, 0);
-+    capacity = qvirtio_config_readq(dev, 0);
-     g_assert_cmpint(capacity, ==, n_size / 512);
- 
--    /* End test */
--    qvirtqueue_cleanup(dev->vdev.bus, vq, alloc);
--    g_free(dev);
--    generic_alloc_uninit(alloc);
--    test_end();
-+    qvirtqueue_cleanup(dev->bus, vq, t_alloc);
-+
- }
- 
--int main(int argc, char **argv)
-+static void virtio_blk_test_setup(char **cmd_line)
- {
--    const char *arch = qtest_get_arch();
--
--    g_test_init(&argc, &argv, NULL);
--
--    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0 ||
--        strcmp(arch, "ppc64") == 0) {
--        qtest_add_func("/virtio/blk/pci/basic", pci_basic);
--        qtest_add_func("/virtio/blk/pci/indirect", pci_indirect);
--        qtest_add_func("/virtio/blk/pci/config", pci_config);
--        qtest_add_func("/virtio/blk/pci/nxvirtq", test_nonexistent_virtqueue);
--        if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--            qtest_add_func("/virtio/blk/pci/msix", pci_msix);
--            qtest_add_func("/virtio/blk/pci/idx", pci_idx);
--        }
--        qtest_add_func("/virtio/blk/pci/hotplug", pci_hotplug);
--    } else if (strcmp(arch, "arm") == 0) {
--        qtest_add_func("/virtio/blk/mmio/basic", mmio_basic);
--    }
-+    char *new_cmdline;
-+
-+    tmp_path = drive_create();
-+
-+    new_cmdline =
-+        g_strdup_printf("%s "
-+                        "-drive if=none,id=drive0,file=%s,format=raw "
-+                        "-drive if=none,id=drive1,file=null-co://,format=raw ",
-+                        *cmd_line, tmp_path);
-+
-+    g_assert_nonnull(new_cmdline);
-+
-+    g_free(*cmd_line);
-+    *cmd_line = new_cmdline;
++    g_free(v_scsi);
 +}
 +
-+static void virtio_blk_test_cleanup(void)
++static void *qvirtio_scsi_device_get_driver(void *object,
++                                               const char *interface)
 +{
-+    unlink(tmp_path);
-+    g_free(tmp_path);
++    QVirtioSCSIDevice *v_scsi = object;
++    if (!g_strcmp0(interface, "virtio-scsi")) {
++        return &v_scsi->scsi;
++    }
++
++    fprintf(stderr, "%s not present in virtio-scsi-device\n", interface);
++    g_assert_not_reached();
 +}
- 
--    return g_test_run();
-+static void register_virtio_blk_test(void)
++
++static void *virtio_scsi_device_create(void *virtio_dev,
++                                          QGuestAllocator *t_alloc,
++                                          void *addr)
 +{
-+    QOSGraphTestOptions opts = {
-+        .before = virtio_blk_test_setup,
-+        .after = virtio_blk_test_cleanup,
++    QVirtioSCSIDevice *virtio_bdevice = g_new0(QVirtioSCSIDevice, 1);
++    QVirtioSCSI *interface = &virtio_bdevice->scsi;
++
++    interface->vdev = virtio_dev;
++
++    virtio_bdevice->obj.destructor = qvirtio_scsi_device_destructor;
++    virtio_bdevice->obj.get_driver = qvirtio_scsi_device_get_driver;
++
++    return &virtio_bdevice->obj;
++}
++
++/* virtio-scsi-pci */
++static void *qvirtio_scsi_pci_get_driver(void *object,
++                                            const char *interface)
++{
++    QVirtioSCSIPCI *v_scsi = object;
++    if (!g_strcmp0(interface, "virtio-scsi")) {
++        return &v_scsi->scsi;
++    }
++
++    fprintf(stderr, "%s not present in virtio-scsi-pci\n", interface);
++    g_assert_not_reached();
++}
++
++static void *virtio_scsi_pci_create(void *pci_bus,
++                                    QGuestAllocator *t_alloc,
++                                    void *addr)
++{
++    QVirtioSCSIPCI *virtio_spci = g_new0(QVirtioSCSIPCI, 1);
++    QVirtioSCSI *interface = &virtio_spci->scsi;
++    QOSGraphObject *obj = &virtio_spci->pci_vdev.obj;
++
++    virtio_pci_init(&virtio_spci->pci_vdev, pci_bus, addr);
++    interface->vdev = &virtio_spci->pci_vdev.vdev;
++
++    g_assert_cmphex(interface->vdev->device_type, ==, VIRTIO_ID_SCSI);
++
++    obj->get_driver = qvirtio_scsi_pci_get_driver;
++
++    return obj;
++}
++
++static void virtio_scsi_register_nodes(void)
++{
++    QPCIAddress addr = {
++        .devfn = QPCI_DEVFN(4, 0),
 +    };
 +
-+    qos_add_test("blk-indirect", "virtio-blk", indirect, &opts);
-+    qos_add_test("blk-config", "virtio-blk", config, &opts);
-+    qos_add_test("blk-basic", "virtio-blk", basic, &opts);
-+    qos_add_test("blk-basic-resize", "virtio-blk", basic_resize, &opts);
++    QOSGraphEdgeOptions opts = {
++        .before_cmd_line = "-drive id=drv0,if=none,file=null-co://,format=raw",
++        .after_cmd_line = "-device scsi-hd,bus=vs0.0,drive=drv0",
++    };
 +
-+    /* tests just for virtio-blk-pci */
-+    qos_add_test("blk-msix", "virtio-blk-pci", msix, &opts);
-+    qos_add_test("blk-idx", "virtio-blk-pci", idx, &opts);
-+    qos_add_test("blk-nxvirtq", "virtio-blk-pci",
-+                      test_nonexistent_virtqueue, &opts);
-+    qos_add_test("blk-hotplug", "virtio-blk-pci", pci_hotplug, &opts);
- }
++    /* virtio-scsi-device */
++    opts.extra_device_opts = "id=vs0";
++    qos_node_create_driver("virtio-scsi-device",
++                            virtio_scsi_device_create);
++    qos_node_consumes("virtio-scsi-device", "virtio", &opts);
++    qos_node_produces("virtio-scsi-device", "virtio-scsi");
 +
-+libqos_init(register_virtio_blk_test);
++    /* virtio-scsi-pci */
++    opts.extra_device_opts = "id=vs0,addr=04.0";
++    add_qpci_address(&opts, &addr);
++    qos_node_create_driver("virtio-scsi-pci", virtio_scsi_pci_create);
++    qos_node_consumes("virtio-scsi-pci", "pci-bus", &opts);
++    qos_node_produces("virtio-scsi-pci", "virtio-scsi");
++}
++
++libqos_init(virtio_scsi_register_nodes);
+diff --git a/tests/libqos/virtio-scsi.h b/tests/libqos/virtio-scsi.h
+new file mode 100644
+index 0000000000..17a47beddc
+--- /dev/null
++++ b/tests/libqos/virtio-scsi.h
+@@ -0,0 +1,39 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "libqos/qgraph.h"
++#include "libqos/virtio.h"
++#include "libqos/virtio-pci.h"
++
++typedef struct QVirtioSCSI QVirtioSCSI;
++typedef struct QVirtioSCSIPCI QVirtioSCSIPCI;
++typedef struct QVirtioSCSIDevice QVirtioSCSIDevice;
++
++struct QVirtioSCSI {
++    QVirtioDevice *vdev;
++};
++
++struct QVirtioSCSIPCI {
++    QVirtioPCIDevice pci_vdev;
++    QVirtioSCSI scsi;
++};
++
++struct QVirtioSCSIDevice {
++    QOSGraphObject obj;
++    QVirtioSCSI scsi;
++};
 -- 
 2.17.1
