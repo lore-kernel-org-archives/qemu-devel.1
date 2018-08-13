@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fpEtx-0002xC-CR
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:37:02 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fpEuS-0003IM-73
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fpEtw-0000ZL-Iz
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:37:01 -0400
-References: <20180809114417.28718-1-marcandre.lureau@redhat.com>
-	<20180809114417.28718-3-marcandre.lureau@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a7f2ed18-2e31-00a3-e68f-7b21c18361ee@redhat.com>
-Date: Mon, 13 Aug 2018 17:36:54 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fpEuR-0000lX-Cn
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 11:37:32 -0400
+Date: Mon, 13 Aug 2018 17:37:22 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180813153722.GK4323@localhost.localdomain>
+References: <cover.1533219143.git.berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20180809114417.28718-3-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ZcBMgiUV0vl4Zvyc36Jy0fc9Z41AyI67I"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/4] tests: fix bdrv-drain leak
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1533219143.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 0/4] throttle: Race condition fixes and
+ test cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Hannes Reinecke <hare@suse.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZcBMgiUV0vl4Zvyc36Jy0fc9Z41AyI67I
-From: Max Reitz <mreitz@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Hannes Reinecke <hare@suse.com>, Fam Zheng <famz@redhat.com>,
- qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a7f2ed18-2e31-00a3-e68f-7b21c18361ee@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 2/4] tests: fix bdrv-drain leak
-References: <20180809114417.28718-1-marcandre.lureau@redhat.com>
- <20180809114417.28718-3-marcandre.lureau@redhat.com>
-In-Reply-To: <20180809114417.28718-3-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Am 02.08.2018 um 16:50 hat Alberto Garcia geschrieben:
+> Hi all,
+> 
+> here are the patches that I promised yesterday.
+> 
+> I was originally thinking to propose this for the v3.0 release, but
+> after debugging and fixing the problem I think that it's not
+> essential (details below).
+> 
+> The important patch is the second one. The first and the third are
+> just test cases and the last is an alternative solution for the bug
+> that Stefan fixed in 6fccbb475bc6effc313ee9481726a1748b6dae57.
+> 
+> There are details in the patches themselves, but here's an explanation
+> of the problem: consider a scenario with two drives A and B that are
+> part of the same throttle group. Both of them have throttled requests
+> and they're waiting for a timer that is set on drive A.
+> 
+>     (timer here) -->  [A]  ---  req1, req2
+>                       [B]  ---  req3
+> 
+> If we drain drive [A] (e.g. by disabling its I/O limits) then its
+> queue is restarted. req1 is processed immediately, and before
+> finishing it calls schedule_next_request(). This follows the
+> round-robin algorithm, selects req3 and puts a timer in [B].
+> 
+> But we're still not done with draining [A], and now we have a
+> BDRV_POLL_WHILE() loop at the end of bdrv_do_drained_begin() waiting
+> for req2 to finish. That won't happen until the timer in [B] fires and
+> req3 is done. If there are more drives in the group and more requests
+> in the queue this can take a while. That's why disabling a drive's I/O
+> limits can be noticeably slow: we disabled the I/O limits but they're
+> still being enforced in practice.
+> 
+> The QEMU I/O tests run in qtest mode (with QEMU_CLOCK_VIRTUAL). The
+> clock must be advanced manually, which means that the scenario that I
+> just described hangs QEMU because BDRV_POLL_WHILE() loops forever (you
+> can reproduce this with patch 3). In a real world scenario this only
+> results in the aforementioned slowdown (probably negligible in
+> practice), which is not a critical thing, and that's why I think it's
+> safe to keep the current code for QEMU 3.
+> 
+> I think that's all. Questions and commend are welcome.
 
-On 2018-08-09 13:44, Marc-Andr=C3=A9 Lureau wrote:
-> Spotted by ASAN:
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> =3D=3D5378=3D=3DERROR: LeakSanitizer: detected memory leaks
->=20
-> Direct leak of 65536 byte(s) in 1 object(s) allocated from:
->     #0 0x7f788f83bc48 in malloc (/lib64/libasan.so.5+0xeec48)
->     #1 0x7f788c9923c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
->     #2 0x5622a1fe37bc in coroutine_trampoline /home/elmarco/src/qq/util=
-/coroutine-ucontext.c:116
->     #3 0x7f788a15d75f in __correctly_grouped_prefixwc (/lib64/libc.so.6=
-+0x4c75f)
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/test-bdrv-drain.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-> index 17bb8508ae..abc8bbe6f0 100644
-> --- a/tests/test-bdrv-drain.c
-> +++ b/tests/test-bdrv-drain.c
-> @@ -948,6 +948,7 @@ static void coroutine_fn test_co_delete_by_drain(vo=
-id *opaque)
->      }
-> =20
->      dbdd->done =3D true;
-> +    g_free(buffer);
->  }
-> =20
->  /**
->=20
+Thanks, applied to the block branch.
 
-Thanks, added a note of the commit that broke it to the commit message
-and applied to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-Max
-
-
---ZcBMgiUV0vl4Zvyc36Jy0fc9Z41AyI67I
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltxpZYACgkQ9AfbAGHV
-z0A6bwf/eowY3vYDCKgxKnuB9SKe78eeHYGZ/OZxML5hhZicg5dqVqg/gnWyQJ/Z
-NBdVQ5SgAvUEoY6VFDhCSc1HqoLxJQprBkCiOqNPkGybRgtCgfMlBK1lBrftup/r
-5pNWYdkWu/gwd0sWDyS0LqE8x9Y2dHCjLuw0wcEPji9zMqmPBfL0S9eRbP0+NDyk
-LhPwcluyu18kIG/z8UBepqDZO23c4zUH2ixtfHcy0NiW7KzhFrcjpRlimpBVTs8r
-Sk+wPKyTpIJ5B4s73dzlDRnViITs/QyBgpThxp051kIN8I25mJj6xTBhPFI21RU7
-dZO+YrusBx/zQXcbTuaNqMPbFaSaBQ==
-=sXCE
------END PGP SIGNATURE-----
-
---ZcBMgiUV0vl4Zvyc36Jy0fc9Z41AyI67I--
+Kevin
