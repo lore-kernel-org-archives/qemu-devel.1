@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tX-0007sr-8U
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:18 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tb-0007vR-Hd
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tV-0002v0-I4
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:15 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fp9tZ-00032M-Q2
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 06:16:19 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 13 Aug 2018 12:14:47 +0200
-Message-Id: <20180813101453.10200-28-e.emanuelegiuseppe@gmail.com>
+Date: Mon, 13 Aug 2018 12:14:49 +0200
+Message-Id: <20180813101453.10200-30-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
 References: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 27/33] tests/qgraph: virtio-blk driver and
+Subject: [Qemu-devel] [PATCH 29/33] tests/qgraph: virtio-net driver and
  interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,39 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, John Snow <jsnow@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add qgraph nodes for virtio-blk-pci and virtio-blk-device.
-Both nodes produce virtio-blk, but virtio-blk-pci receives
-a pci-bus and uses virtio-pci QOSGraphObject and functions,
-while virtio-blk-device receives a virtio and implements
+Add qgraph nodes for virtio-net-pci and virtio-net-device.
+Both nodes produce virtio-net, but virtio-net-pci receives
+a pci-bus and overrides virtio-pci QOSGraphObject and its functions,
+while virtio-net-device receives a virtio and implements
 its own functions
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
  tests/Makefile.include    |   1 +
- tests/libqos/virtio-blk.c | 126 ++++++++++++++++++++++++++++++++++++++
- tests/libqos/virtio-blk.h |  40 ++++++++++++
- 3 files changed, 167 insertions(+)
- create mode 100644 tests/libqos/virtio-blk.c
- create mode 100644 tests/libqos/virtio-blk.h
+ tests/libqos/virtio-net.c | 179 ++++++++++++++++++++++++++++++++++++++
+ tests/libqos/virtio-net.h |  41 +++++++++
+ 3 files changed, 221 insertions(+)
+ create mode 100644 tests/libqos/virtio-net.c
+ create mode 100644 tests/libqos/virtio-net.h
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index cc1e1396f1..340c2462d2 100644
+index 814cef85c7..c105c0902c 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -769,6 +769,7 @@ libqgraph-virtio-obj-y = tests/libqos/virtio-serial.o
- libqgraph-virtio-obj-y += tests/libqos/virtio-9p.o
+@@ -768,6 +768,7 @@ libqgraph-virtio-obj-y += tests/libqos/virtio-9p.o
  libqgraph-virtio-obj-y += tests/libqos/virtio-balloon.o
  libqgraph-virtio-obj-y += tests/libqos/virtio-rng.o
-+libqgraph-virtio-obj-y += tests/libqos/virtio-blk.o
+ libqgraph-virtio-obj-y += tests/libqos/virtio-blk.o
++libqgraph-virtio-obj-y += tests/libqos/virtio-net.o
  
  libqgraph-pci-obj-y = $(libqos-virtio-obj-y)
  libqgraph-pci-obj-y += $(libqgraph-machines-obj-y)
-diff --git a/tests/libqos/virtio-blk.c b/tests/libqos/virtio-blk.c
+diff --git a/tests/libqos/virtio-net.c b/tests/libqos/virtio-net.c
 new file mode 100644
-index 0000000000..a9dcee376c
+index 0000000000..332d121486
 --- /dev/null
-+++ b/tests/libqos/virtio-blk.c
-@@ -0,0 +1,126 @@
++++ b/tests/libqos/virtio-net.c
+@@ -0,0 +1,179 @@
 +/*
 + * libqos driver framework
 + *
@@ -76,118 +76,171 @@ index 0000000000..a9dcee376c
 +
 +#include "qemu/osdep.h"
 +#include "libqtest.h"
-+#include "standard-headers/linux/virtio_blk.h"
 +#include "libqos/qgraph.h"
-+#include "libqos/virtio-blk.h"
++#include "libqos/virtio-net.h"
++#include "hw/virtio/virtio-net.h"
 +
-+#define PCI_SLOT                0x04
-+#define PCI_FN                  0x00
 +
-+/* virtio-blk-device */
-+static void qvirtio_blk_device_destructor(QOSGraphObject *obj)
++static QGuestAllocator *alloc;
++
++static void driver_init(QVirtioDevice *dev)
 +{
-+    QVirtioBlkDevice *v_blk = (QVirtioBlkDevice *) obj;
-+    g_free(v_blk);
++    uint32_t features;
++
++    features = qvirtio_get_features(dev);
++    features = features & ~(QVIRTIO_F_BAD_FEATURE |
++                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
++                            (1u << VIRTIO_RING_F_EVENT_IDX));
++    qvirtio_set_features(dev, features);
++
++    qvirtio_set_driver_ok(dev);
 +}
 +
-+static void *qvirtio_blk_device_get_driver(void *object,
-+                                           const char *interface)
++static void virtio_net_cleanup(QVirtioNet *interface)
 +{
-+    QVirtioBlkDevice *v_blk = object;
-+    if (!g_strcmp0(interface, "virtio-blk")) {
-+        return &v_blk->blk;
++    qvirtqueue_cleanup(interface->vdev->bus, interface->rx, alloc);
++    qvirtqueue_cleanup(interface->vdev->bus, interface->tx, alloc);
++}
++
++static void virtio_net_setup(QVirtioNet *interface)
++{
++    interface->rx = qvirtqueue_setup(interface->vdev, alloc, 0);
++    interface->tx = qvirtqueue_setup(interface->vdev, alloc, 1);
++    driver_init(interface->vdev);
++}
++
++/* virtio-net-device */
++static void qvirtio_net_device_destructor(QOSGraphObject *obj)
++{
++    QVirtioNetDevice *v_net = (QVirtioNetDevice *) obj;
++    virtio_net_cleanup(&v_net->net);
++    g_free(v_net);
++}
++
++static void qvirtio_net_device_start_hw(QOSGraphObject *obj)
++{
++    QVirtioNetDevice *v_net = (QVirtioNetDevice *) obj;
++    QVirtioNet *interface = &v_net->net;
++
++    virtio_net_setup(interface);
++}
++
++static void *qvirtio_net_device_get_driver(void *object,
++                                               const char *interface)
++{
++    QVirtioNetDevice *v_net = object;
++    if (!g_strcmp0(interface, "virtio-net")) {
++        return &v_net->net;
 +    }
 +
-+    fprintf(stderr, "%s not present in virtio-blk-device\n", interface);
++    fprintf(stderr, "%s not present in virtio-net-device\n", interface);
 +    g_assert_not_reached();
 +}
 +
-+static void *virtio_blk_device_create(void *virtio_dev,
-+                                      QGuestAllocator *t_alloc,
-+                                      void *addr)
++static void *virtio_net_device_create(void *virtio_dev,
++                                          QGuestAllocator *t_alloc,
++                                          void *addr)
 +{
-+    QVirtioBlkDevice *virtio_blk = g_new0(QVirtioBlkDevice, 1);
-+    QVirtioBlk *interface = &virtio_blk->blk;
++    QVirtioNetDevice *virtio_ndevice = g_new0(QVirtioNetDevice, 1);
++    QVirtioNet *interface = &virtio_ndevice->net;
 +
 +    interface->vdev = virtio_dev;
++    alloc = t_alloc;
 +
-+    virtio_blk->obj.destructor = qvirtio_blk_device_destructor;
-+    virtio_blk->obj.get_driver = qvirtio_blk_device_get_driver;
++    virtio_ndevice->obj.destructor = qvirtio_net_device_destructor;
++    virtio_ndevice->obj.get_driver = qvirtio_net_device_get_driver;
++    virtio_ndevice->obj.start_hw = qvirtio_net_device_start_hw;
 +
-+    return &virtio_blk->obj;
++    return &virtio_ndevice->obj;
 +}
 +
-+/* virtio-blk-pci */
-+static void *qvirtio_blk_pci_get_driver(void *object, const char *interface)
++/* virtio-net-pci */
++static void qvirtio_net_pci_destructor(QOSGraphObject *obj)
 +{
-+    QVirtioBlkPCI *v_blk = object;
-+    if (!g_strcmp0(interface, "virtio-blk")) {
-+        return &v_blk->blk;
++    QVirtioNetPCI *v_net = (QVirtioNetPCI *) obj;
++    QVirtioNet *interface = &v_net->net;
++    QOSGraphObject *pci_vobj =  &v_net->pci_vdev.obj;
++
++    virtio_net_cleanup(interface);
++    qvirtio_pci_destructor(pci_vobj);
++    g_free(v_net);
++}
++
++static void qvirtio_net_pci_start_hw(QOSGraphObject *obj)
++{
++    QVirtioNetPCI *v_net = (QVirtioNetPCI *) obj;
++    QVirtioNet *interface = &v_net->net;
++    QOSGraphObject *pci_vobj =  &v_net->pci_vdev.obj;
++
++    qvirtio_pci_start_hw(pci_vobj);
++    virtio_net_setup(interface);
++    driver_init(interface->vdev);
++}
++
++static void *qvirtio_net_pci_get_driver(void *object,
++                                            const char *interface)
++{
++    QVirtioNetPCI *v_net = object;
++    if (!g_strcmp0(interface, "virtio-net")) {
++        return &v_net->net;
 +    }
 +
-+    /* implicit contains */
-+    if (!g_strcmp0(interface, "pci-device")) {
-+        return v_blk->pci_vdev.pdev;
-+    }
-+
-+    fprintf(stderr, "%s not present in virtio-blk-pci\n", interface);
++    fprintf(stderr, "%s not present in virtio-net-pci\n", interface);
 +    g_assert_not_reached();
 +}
 +
-+static void *virtio_blk_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
-+                                      void *addr)
++static void *virtio_net_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
++                                  void *addr)
 +{
-+    QVirtioBlkPCI *virtio_blk = g_new0(QVirtioBlkPCI, 1);
-+    QVirtioBlk *interface = &virtio_blk->blk;
-+    QOSGraphObject *obj = &virtio_blk->pci_vdev.obj;
++    QVirtioNetPCI *virtio_bpci = g_new0(QVirtioNetPCI, 1);
++    QVirtioNet *interface = &virtio_bpci->net;
++    QOSGraphObject *obj = &virtio_bpci->pci_vdev.obj;
 +
-+    virtio_pci_init(&virtio_blk->pci_vdev, pci_bus, addr);
-+    interface->vdev = &virtio_blk->pci_vdev.vdev;
++    virtio_pci_init(&virtio_bpci->pci_vdev, pci_bus, addr);
++    interface->vdev = &virtio_bpci->pci_vdev.vdev;
++    alloc = t_alloc;
 +
-+    g_assert_cmphex(interface->vdev->device_type, ==, VIRTIO_ID_BLOCK);
++    g_assert_cmphex(interface->vdev->device_type, ==, VIRTIO_ID_NET);
 +
-+    obj->get_driver = qvirtio_blk_pci_get_driver;
++    obj->destructor = qvirtio_net_pci_destructor;
++    obj->start_hw = qvirtio_net_pci_start_hw;
++    obj->get_driver = qvirtio_net_pci_get_driver;
 +
 +    return obj;
 +}
 +
-+static void virtio_blk_register_nodes(void)
++static void virtio_net_register_nodes(void)
 +{
-+    /* FIXME: every test using these two nodes needs to setup a
-+     * -drive,id=drive0 otherwise QEMU is not going to start */
-+
-+    char *arg = g_strdup_printf("id=drv0,drive=drive0,addr=%x.%x",
-+                                PCI_SLOT, PCI_FN);
-+
++    /* FIXME: every test using these nodes needs to setup a
++     * -netdev socket,id=hs0 otherwise QEMU is not going to start */
 +    QPCIAddress addr = {
-+        .devfn = QPCI_DEVFN(PCI_SLOT, PCI_FN),
++        .devfn = QPCI_DEVFN(4, 0),
 +    };
 +
 +    QOSGraphEdgeOptions opts = { };
 +
-+    /* virtio-blk-device */
-+    opts.extra_device_opts = "drive=drive0";
-+    qos_node_create_driver("virtio-blk-device", virtio_blk_device_create);
-+    qos_node_consumes("virtio-blk-device", "virtio", &opts);
-+    qos_node_produces("virtio-blk-device", "virtio-blk");
++    /* virtio-net-device */
++    opts.extra_device_opts = "netdev=hs0";
++    qos_node_create_driver("virtio-net-device",
++                            virtio_net_device_create);
++    qos_node_consumes("virtio-net-device", "virtio", &opts);
++    qos_node_produces("virtio-net-device", "virtio-net");
 +
-+    /* virtio-blk-pci */
-+    opts.extra_device_opts = arg;
++    /* virtio-net-pci */
++    opts.extra_device_opts = "netdev=hs0,addr=04.0";
 +    add_qpci_address(&opts, &addr);
-+    qos_node_create_driver("virtio-blk-pci", virtio_blk_pci_create);
-+    qos_node_consumes("virtio-blk-pci", "pci-bus", &opts);
-+    qos_node_produces("virtio-blk-pci", "virtio-blk");
-+
-+    g_free(arg);
++    qos_node_create_driver("virtio-net-pci", virtio_net_pci_create);
++    qos_node_consumes("virtio-net-pci", "pci-bus", &opts);
++    qos_node_produces("virtio-net-pci", "virtio-net");
 +}
 +
-+libqos_init(virtio_blk_register_nodes);
-diff --git a/tests/libqos/virtio-blk.h b/tests/libqos/virtio-blk.h
++libqos_init(virtio_net_register_nodes);
+diff --git a/tests/libqos/virtio-net.h b/tests/libqos/virtio-net.h
 new file mode 100644
-index 0000000000..dc258496ba
+index 0000000000..e6905cd82e
 --- /dev/null
-+++ b/tests/libqos/virtio-blk.h
-@@ -0,0 +1,40 @@
++++ b/tests/libqos/virtio-net.h
+@@ -0,0 +1,41 @@
 +/*
 + * libqos driver framework
 + *
@@ -210,23 +263,24 @@ index 0000000000..dc258496ba
 +#include "libqos/virtio.h"
 +#include "libqos/virtio-pci.h"
 +
-+typedef struct QVirtioBlk QVirtioBlk;
-+typedef struct QVirtioBlkPCI QVirtioBlkPCI;
-+typedef struct QVirtioBlkDevice QVirtioBlkDevice;
++typedef struct QVirtioNet QVirtioNet;
++typedef struct QVirtioNetPCI QVirtioNetPCI;
++typedef struct QVirtioNetDevice QVirtioNetDevice;
 +
-+/* virtqueue is created in each test */
-+struct QVirtioBlk {
++struct QVirtioNet {
 +    QVirtioDevice *vdev;
++    QVirtQueue *rx;
++    QVirtQueue *tx;
 +};
 +
-+struct QVirtioBlkPCI {
++struct QVirtioNetPCI {
 +    QVirtioPCIDevice pci_vdev;
-+    QVirtioBlk blk;
++    QVirtioNet net;
 +};
 +
-+struct QVirtioBlkDevice {
++struct QVirtioNetDevice {
 +    QOSGraphObject obj;
-+    QVirtioBlk blk;
++    QVirtioNet net;
 +};
 -- 
 2.17.1
