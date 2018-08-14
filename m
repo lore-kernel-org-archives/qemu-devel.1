@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fpdBS-0003c8-5l
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:32:57 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fpdCf-0004fu-NB
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:34:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fpdBD-0002oY-1p
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:32:42 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:53747)
+	(envelope-from <laurent@vivier.eu>) id 1fpdCH-00036D-FB
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:33:57 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:43001)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fpdBC-0002oK-P4
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:32:26 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fpdCH-00035c-4a
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:33:33 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 14 Aug 2018 18:19:03 +0200
-Message-Id: <20180814161904.12216-3-laurent@vivier.eu>
+Date: Tue, 14 Aug 2018 18:19:04 +0200
+Message-Id: <20180814161904.12216-4-laurent@vivier.eu>
 In-Reply-To: <20180814161904.12216-1-laurent@vivier.eu>
 References: <20180814161904.12216-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 2/3] linux-user: update netlink route types
+Subject: [Qemu-devel] [PATCH 3/3] linux-user: add QEMU_IFLA_INFO_KIND nested
+ type for tun
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +27,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Add RTA_PREF and RTA_CACHEINFO.
-
-Fix following errors when we start gedit:
-
-  Unknown host RTA type: 12
-  Unknown host RTA type: 20
-
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/syscall.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ linux-user/syscall.c | 48 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 399da09f38..fe12ac4849 100644
+index fe12ac4849..210c236af9 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -2659,12 +2659,17 @@ static abi_long host_to_target_data_addr_rtattr(struct rtattr *rtattr)
- static abi_long host_to_target_data_route_rtattr(struct rtattr *rtattr)
- {
-     uint32_t *u32;
-+    struct rta_cacheinfo *ci;
+@@ -501,6 +501,20 @@ enum {
+     QEMU___IFLA_BRPORT_MAX
+ };
+ 
++enum {
++    QEMU_IFLA_TUN_UNSPEC,
++    QEMU_IFLA_TUN_OWNER,
++    QEMU_IFLA_TUN_GROUP,
++    QEMU_IFLA_TUN_TYPE,
++    QEMU_IFLA_TUN_PI,
++    QEMU_IFLA_TUN_VNET_HDR,
++    QEMU_IFLA_TUN_PERSIST,
++    QEMU_IFLA_TUN_MULTI_QUEUE,
++    QEMU_IFLA_TUN_NUM_QUEUES,
++    QEMU_IFLA_TUN_NUM_DISABLED_QUEUES,
++    QEMU___IFLA_TUN_MAX,
++};
 +
-     switch (rtattr->rta_type) {
-     /* binary: depends on family type */
-     case RTA_GATEWAY:
-     case RTA_DST:
-     case RTA_PREFSRC:
-         break;
-+    /* u8 */
-+    case RTA_PREF:
+ enum {
+     QEMU_IFLA_INFO_UNSPEC,
+     QEMU_IFLA_INFO_KIND,
+@@ -2315,6 +2329,34 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
+     return 0;
+ }
+ 
++static abi_long host_to_target_data_tun_nlattr(struct nlattr *nlattr,
++                                                  void *context)
++{
++    uint32_t *u32;
++
++    switch (nlattr->nla_type) {
++    /* uint8_t */
++    case QEMU_IFLA_TUN_TYPE:
++    case QEMU_IFLA_TUN_PI:
++    case QEMU_IFLA_TUN_VNET_HDR:
++    case QEMU_IFLA_TUN_PERSIST:
++    case QEMU_IFLA_TUN_MULTI_QUEUE:
 +        break;
-     /* u32 */
-     case RTA_PRIORITY:
-     case RTA_TABLE:
-@@ -2672,6 +2677,20 @@ static abi_long host_to_target_data_route_rtattr(struct rtattr *rtattr)
-         u32 = RTA_DATA(rtattr);
-         *u32 = tswap32(*u32);
-         break;
-+    /* struct rta_cacheinfo */
-+    case RTA_CACHEINFO:
-+        ci = RTA_DATA(rtattr);
-+        ci->rta_clntref = tswap32(ci->rta_clntref);
-+        ci->rta_lastuse = tswap32(ci->rta_lastuse);
-+        ci->rta_expires = tswap32(ci->rta_expires);
-+        ci->rta_error = tswap32(ci->rta_error);
-+        ci->rta_used = tswap32(ci->rta_used);
-+#if defined(RTNETLINK_HAVE_PEERINFO)
-+        ci->rta_id = tswap32(ci->rta_id);
-+        ci->rta_ts = tswap32(ci->rta_ts);
-+        ci->rta_tsage = tswap32(ci->rta_tsage);
-+#endif
++    /* uint32_t */
++    case QEMU_IFLA_TUN_NUM_QUEUES:
++    case QEMU_IFLA_TUN_NUM_DISABLED_QUEUES:
++    case QEMU_IFLA_TUN_OWNER:
++    case QEMU_IFLA_TUN_GROUP:
++        u32 = NLA_DATA(nlattr);
++        *u32 = tswap32(*u32);
 +        break;
-     default:
-         gemu_log("Unknown host RTA type: %d\n", rtattr->rta_type);
-         break;
++    default:
++        gemu_log("Unknown QEMU_IFLA_TUN type %d\n", nlattr->nla_type);
++        break;
++    }
++    return 0;
++}
++
+ struct linkinfo_context {
+     int len;
+     char *name;
+@@ -2349,6 +2391,12 @@ static abi_long host_to_target_data_linkinfo_nlattr(struct nlattr *nlattr,
+                                                   nlattr->nla_len,
+                                                   NULL,
+                                              host_to_target_data_bridge_nlattr);
++        } else if (strncmp(li_context->name, "tun",
++                    li_context->len) == 0) {
++            return host_to_target_for_each_nlattr(NLA_DATA(nlattr),
++                                                  nlattr->nla_len,
++                                                  NULL,
++                                                host_to_target_data_tun_nlattr);
+         } else {
+             gemu_log("Unknown QEMU_IFLA_INFO_KIND %s\n", li_context->name);
+         }
 -- 
 2.17.1
