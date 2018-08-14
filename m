@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fpVQD-00064b-N3
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 05:15:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fpVSg-0006zx-Oe
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 05:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fpVQA-0005BE-Hr
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 05:15:25 -0400
-Received: from mga12.intel.com ([192.55.52.136]:19751)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
-	id 1fpVQA-0005Ah-8F
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 05:15:22 -0400
-References: <1533625449-14989-1-git-send-email-jing2.liu@linux.intel.com>
-	<893d9264-7908-4e2c-ae1d-7e46eed6e6a0@redhat.com>
-	<e06b10e0-d0b6-d190-6673-f97199bebb72@redhat.com>
-	<efc99631-454d-4377-8551-0594fc763c94@gmail.com>
-From: "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <4e3d237c-8fb0-47aa-22e0-da25ba071c23@linux.intel.com>
-Date: Tue, 14 Aug 2018 17:15:16 +0800
+	(envelope-from <kwolf@redhat.com>) id 1fpVSf-0005vY-U2
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 05:17:58 -0400
+Date: Tue, 14 Aug 2018 11:17:50 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180814091750.GF5025@dhcp-200-186.str.redhat.com>
+References: <cover.1530270904.git.berto@igalia.com>
+	<0ac388e86dec1afbff4b5e4e6ade1f1fb7b2d7ff.1530270904.git.berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <efc99631-454d-4377-8551-0594fc763c94@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/pci: add pci capability to pci-pci
- bridge
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0ac388e86dec1afbff4b5e4e6ade1f1fb7b2d7ff.1530270904.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] block: Simplify append_open_options()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, anthony.xu@intel.com, mst@redhat.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Hi Marcel,
+Am 29.06.2018 um 13:37 hat Alberto Garcia geschrieben:
+> This function returns a BDS's driver-specific options, excluding also
+> those from its children. Since we have just removed all children
+> options from bs->options there's no need to do this last step.
+> 
+> We allow references to children, though ("backing": "node0"), so those
+> we still have to remove.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-On 8/12/2018 3:11 PM, Marcel Apfelbaum wrote:
-> Hi Laszlo,
-> 
-[...]
->>>>   hw/pci-bridge/pci_bridge_dev.c | 20 ++++++++++++++++++++
->>>>   1 file changed, 20 insertions(+)
->>>> +cap_error:
->>>> +    msi_uninit(dev);
->>> (4) This error handler doesn't look entirely correct; we can reach it
->>> without having initialized MSI. (MSI setup is conditional; and even if
->>> we attempt it, it is permitted to fail with "msi=auto".) Therefore,
->>> msi_uninit() should be wrapped into "if (msi_present())", same as you
->>> see in pci_bridge_dev_exitfn().
-> 
-> You are right.  msi_present should be checked.
+Hmm, yes, but if I compare this with the example you gave in an earlier
+patch:
 
-I looked at the codes calling this function. It need be added to be strong.
-But could I ask why we need check twice? msi_unint() help check again.
-> 
->>>
->>>>   msi_error:
->>>>       slotid_cap_cleanup(dev);
->>>>   slotid_error:
->> I tried to understand the error handling a bit better. I'm confused.
->>
-[...]
->> Second, msi_uninit() and shpc_cleanup() are internally inconsistent
->> between each other. The former removes the respective capability from
->> config space -- with pci_del_capability() --,
-> 
-> Right
-> 
->>   but the latter only has a
->> comment, "/* TODO: cleanup config space changes? */".
-> 
-> But also disables the QEMU_PCI_CAP_SLOTID (but no code checks it anyway)
-> I agree it should call pci_del_capability to delete the SHPC capability,
-> maybe is some "debt" from early development stages.
-> 
->>   The same comment
->> is present in the slotid_cap_cleanup() function. Given this
->> inconsistency,
-> 
-> Here we also miss a call to pci_del_capability.
-> 
->> I don't know what to suggest for the new capability's
->> teardown, in pci_bridge_dev_exitfn()  
-Aha, yes, the teardown needs to be added here.
-Will add that in next version.
+      $ qemu-img create -f qcow2 hd0.qcow2 10M
+      $ qemu-img create -f qcow2 -b hd0.qcow2 hd1.qcow2
+      $ qemu-img create -f qcow2 -b hd1.qcow2 hd2.qcow2
 
--- should we just ignore it (as
->> suggested by this patch)?
-> 
-> No, we should remove it properly.
-> 
-> I think it is not considered a "big" issue since adding/removing PCI 
-> capabilities
-> is not an operation that deals with resources, we only edit an array 
-> (the config space)
-> that will not be used anyway if the device init sequence failed.
-> 
-> That does not mean the code should not be clean.
-Do we need set up another serial patches (separated from this
-one) to add pci_del_capability() for slotid_cap_cleanup() and 
-shpc_cleanup()?
+      $ $QEMU -drive file=hd2.qcow2,node-name=hd2,backing.node-name=hd1
 
-Thanks,
-Jing
+    This opens a chain of images hd0 <- hd1 <- hd2. Now let's remove hd1
+    using block_stream:
 
-[...]
+      (qemu) block_stream hd2 0 hd0.qcow2
+
+    After this hd2 contains backing.node-name=hd1, which is no longer
+    correct because hd1 doesn't exist anymore.
+
+Doesn't backing=hd1 actually result in the same kind of inconsistency?
+That is, bs->option will still have backing=hd1, but in reality we
+reference hd0 now?
+
+Should we get rid of child references in bs->(explicit_)options as well?
+
+Kevin
