@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fpTiU-0001tN-Cv
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:26:11 -0400
+	(envelope-from <berrange@redhat.com>) id 1fpTkH-0002w8-AH
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:28:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fpTiT-0006RQ-HU
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:26:10 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 14 Aug 2018 15:25:51 +0800
-Message-Id: <20180814072551.15465-1-famz@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1fpTkG-0007uW-CI
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:28:01 -0400
+Date: Tue, 14 Aug 2018 08:27:49 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180814072749.GB5057@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180814072551.15465-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180814072551.15465-1-famz@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] luks: Allow share-rw=on
+Subject: Re: [Qemu-devel] [PATCH] luks: Allow share-rw=on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,36 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Format drivers such as qcow2 don't allow sharing the same image between
-two QEMU instances in order to prevent image corruptions, because of
-metadata cache. LUKS driver don't modify metadata except for when
-creating image, so it is safe to relax the permission. This makes
-share-rw=3Don property work on virtual devices.
+On Tue, Aug 14, 2018 at 03:25:51PM +0800, Fam Zheng wrote:
+> Format drivers such as qcow2 don't allow sharing the same image between
+> two QEMU instances in order to prevent image corruptions, because of
+> metadata cache. LUKS driver don't modify metadata except for when
+> creating image, so it is safe to relax the permission. This makes
+> share-rw=3Don property work on virtual devices.
+>=20
+> Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/crypto.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/crypto.c b/block/crypto.c
+> index 146d81c90a..33ee01bebd 100644
+> --- a/block/crypto.c
+> +++ b/block/crypto.c
+> @@ -627,7 +627,9 @@ BlockDriver bdrv_crypto_luks =3D {
+>      .bdrv_probe         =3D block_crypto_probe_luks,
+>      .bdrv_open          =3D block_crypto_open_luks,
+>      .bdrv_close         =3D block_crypto_close,
+> -    .bdrv_child_perm    =3D bdrv_format_default_perms,
+> +    /* This driver doesn't modify LUKS metadata except when creating i=
+mage.
+> +     * Allow share-rw=3Don as a special case. */
+> +    .bdrv_child_perm    =3D bdrv_filter_default_perms,
+>      .bdrv_co_create     =3D block_crypto_co_create_luks,
+>      .bdrv_co_create_opts =3D block_crypto_co_create_opts_luks,
+>      .bdrv_co_truncate   =3D block_crypto_co_truncate,
 
-Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/crypto.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-diff --git a/block/crypto.c b/block/crypto.c
-index 146d81c90a..33ee01bebd 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -627,7 +627,9 @@ BlockDriver bdrv_crypto_luks =3D {
-     .bdrv_probe         =3D block_crypto_probe_luks,
-     .bdrv_open          =3D block_crypto_open_luks,
-     .bdrv_close         =3D block_crypto_close,
--    .bdrv_child_perm    =3D bdrv_format_default_perms,
-+    /* This driver doesn't modify LUKS metadata except when creating ima=
-ge.
-+     * Allow share-rw=3Don as a special case. */
-+    .bdrv_child_perm    =3D bdrv_filter_default_perms,
-     .bdrv_co_create     =3D block_crypto_co_create_luks,
-     .bdrv_co_create_opts =3D block_crypto_co_create_opts_luks,
-     .bdrv_co_truncate   =3D block_crypto_co_truncate,
+
+Regards,
+Daniel
 --=20
-2.17.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
