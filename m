@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fpdN1-0004bp-JX
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:44:55 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fpdN3-0004f8-VA
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:44:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fpdMm-00082i-Ck
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:44:39 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fpdMo-0008Fd-QM
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:44:42 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 14 Aug 2018 20:01:26 +0300
-Message-Id: <20180814170126.56461-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [RFC v2] new, node-graph-based fleecing and backup
+Date: Tue, 14 Aug 2018 19:53:48 +0300
+Message-Id: <20180814165349.56344-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [RFC] new, node-graph-based fleecing and backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,13 +18,10 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
-
-[v2 is just a resend. I forget to add Den an me to cc, and I don't see the
-letter in my thunderbird at all. strange. sorry for that]
 
 Hi all!
 
