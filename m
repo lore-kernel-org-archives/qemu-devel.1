@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fpdoK-0007Qv-0G
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:13:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fpdoo-0007p0-KO
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fpdo4-00013n-Jp
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:12:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34650 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1fpdo4-000126-Bp
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:12:36 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B12284059FE1
-	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 15:45:29 +0000 (UTC)
-References: <20180814154139.28604-1-pbonzini@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <76374ea5-0b9c-4c8f-7b2e-5944e3dd8422@redhat.com>
-Date: Tue, 14 Aug 2018 17:45:27 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fpdoZ-00028t-EG
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:13:22 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34382)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fpdoY-00026o-VZ
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:13:07 -0400
+Received: by mail-oi0-x243.google.com with SMTP id 13-v6so35369632ois.1
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 11:13:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180814154139.28604-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: add maintainers for qtest
+In-Reply-To: <20180814165419.9116-1-rka@sysgo.com>
+References: <20180814165419.9116-1-rka@sysgo.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Aug 2018 19:12:45 +0100
+Message-ID: <CAFEAcA8RQ2X83AQOcvg3acJhJ6ioJ7KtJ=V2iFiUmQh4bF_fmA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/arm: crash on conditional instr in
+ it block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,49 +29,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com
+To: Roman Kapl <rka@sysgo.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 14/08/2018 17:41, Paolo Bonzini wrote:
-> Thomas has been doing a lot of work on qom-test and device-introspection-test,
-> and Laurent has ported libqos to sPAPR and co-mentored Emanuele on the
-> upcoming qtest device framework.  They deserve recognition. :)
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 14 August 2018 at 17:54, Roman Kapl <rka@sysgo.com> wrote:
+> If an instruction is conditional (like CBZ) and it is executed conditionally
+> (using the ITx instruction), a jump to undefined label is generated.
+>
+> Fix the 'skip on condtion' code to create a new label only if it does not
+> already exist. Previously multiple labels were created, but only the last one of
+> them was set.
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Hi; thanks for the bug report and the patch.
 
-> ---
->  MAINTAINERS | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 666e936812..657595e6be 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1685,7 +1685,6 @@ F: qom/
->  X: qom/cpu.c
->  F: tests/check-qom-interface.c
->  F: tests/check-qom-proplist.c
-> -F: tests/qom-test.c
->  
->  QMP
->  M: Markus Armbruster <armbru@redhat.com>
-> @@ -1697,6 +1696,16 @@ F: scripts/qmp/
->  F: tests/qmp-test.c
->  T: git git://repo.or.cz/qemu/armbru.git qapi-next
->  
-> +qtest
-> +M: Paolo Bonzini <pbonzini@redhat.com>
-> +M: Thomas Huth <thuth@redhat.com>
-> +M: Laurent Vivier <lvivier@redhat.com>
-> +S: Maintained
-> +F: qtest.c
-> +F: tests/libqtest.*
-> +F: tests/libqos/
-> +F: tests/*-test.c
+This case (CBZ inside an IT block) is architecturally UNPREDICTABLE,
+but we certainly shouldn't crash QEMU.
+
+For ARMv7 we have very wide latitude in what we can do; for ARMv8
+the "CONSTRAINED UNPREDICTABLE" part of the Arm ARM limits us a
+bit (see section K1.1.7). We can do one of:
+ * generate an UNDEFINED exception
+ * execute the instruction as if the condition code check had passed
+ * execute the instruction as if the condition check failed (ie NOP)
+(and we're allowed to behave differently from execution to execution
+so "honour the condition code check" is ok too I think).
+
+If we don't UNDEF then we have to be a little careful about the
+IT state, but I think we're OK there.
+
+So we could if we like choose to just UNDEF in these cases,
+something like:
+   if (dc->condexec_mask && thumb_insn_unpredictable_in_it(dc, insn) {
+       gen_exception_insn(...)
+   }
+where we currently check for "always unconditional even in
+an IT block" insns.
+
+But I guess that just bringing conditional branches into line
+with what we already do for other insns in this category is
+a reasonable approach. I have a comment below but otherwise
+the patch looks good.
+
+>  target/arm/translate.c | 32 ++++++++++++++++++--------------
+>  1 file changed, 18 insertions(+), 14 deletions(-)
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index f845da7c63..f7c03a36e6 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -8480,6 +8480,16 @@ static void gen_srs(DisasContext *s,
+>      s->base.is_jmp = DISAS_UPDATE;
+>  }
+>
+> +/* Skip this instruction if the condition is true */
+> +static void arm_conditional_skip(DisasContext *s, uint32_t cond)
+> +{
+> +    if (!s->condjmp) {
+> +        s->condlabel = gen_new_label();
+> +        s->condjmp = 1;
+> +    }
+> +    arm_gen_test_cc(cond, s->condlabel);
+> +}
+
+This is a nice piece of refactoring. I think it would make
+more sense to have it do "skip if condition is false", though:
+currently every callsite has to xor the condition with 1.
+
+(You could call it arm_skip_insn_unless(), maybe.)
+
 > +
->  Register API
->  M: Alistair Francis <alistair@alistair23.me>
->  S: Maintained
-> 
+>  static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>  {
+>      unsigned int cond, val, op1, i, shift, rm, rs, rn, rd, sh;
+> @@ -8709,9 +8719,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>      if (cond != 0xe) {
+>          /* if not always execute, we generate a conditional jump to
+>             next instruction */
+> -        s->condlabel = gen_new_label();
+> -        arm_gen_test_cc(cond ^ 1, s->condlabel);
+> -        s->condjmp = 1;
+> +        arm_conditional_skip(s, cond ^ 1);
+>      }
+>      if ((insn & 0x0f900000) == 0x03000000) {
+>          if ((insn & (1 << 21)) == 0) {
+> @@ -11205,9 +11213,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+>                  /* Conditional branch.  */
+>                  op = (insn >> 22) & 0xf;
+>                  /* Generate a conditional jump to next instruction.  */
+> -                s->condlabel = gen_new_label();
+> -                arm_gen_test_cc(op ^ 1, s->condlabel);
+> -                s->condjmp = 1;
+> +                arm_conditional_skip(s, op ^ 1);
+>
+>                  /* offset[11:1] = insn[10:0] */
+>                  offset = (insn & 0x7ff) << 1;
+> @@ -12131,8 +12137,10 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+>          case 1: case 3: case 9: case 11: /* czb */
+>              rm = insn & 7;
+>              tmp = load_reg(s, rm);
+> -            s->condlabel = gen_new_label();
+> -            s->condjmp = 1;
+> +            if (!s->condjmp) {
+> +                s->condlabel = gen_new_label();
+> +                s->condjmp = 1;
+> +            }
+>              if (insn & (1 << 11))
+>                  tcg_gen_brcondi_i32(TCG_COND_EQ, tmp, 0, s->condlabel);
+>              else
+> @@ -12295,9 +12303,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+>              break;
+>          }
+>          /* generate a conditional jump to next instruction */
+> -        s->condlabel = gen_new_label();
+> -        arm_gen_test_cc(cond ^ 1, s->condlabel);
+> -        s->condjmp = 1;
+> +        arm_conditional_skip(s, cond ^ 1);
+>
+>          /* jump to the offset */
+>          val = (uint32_t)s->pc + 2;
+> @@ -12676,9 +12682,7 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+>          uint32_t cond = dc->condexec_cond;
+>
+>          if (cond != 0x0e) {     /* Skip conditional when condition is AL. */
+> -            dc->condlabel = gen_new_label();
+> -            arm_gen_test_cc(cond ^ 1, dc->condlabel);
+> -            dc->condjmp = 1;
+> +            arm_conditional_skip(dc, cond ^ 1);
+>          }
+>      }
+>
+> --
+
+thanks
+-- PMM
