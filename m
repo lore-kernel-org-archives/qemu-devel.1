@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fpdCf-0004fu-NB
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:34:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fpdGS-00081S-50
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:38:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fpdCH-00036D-FB
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:33:57 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:43001)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fpdCH-00035c-4a
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:33:33 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 14 Aug 2018 18:19:04 +0200
-Message-Id: <20180814161904.12216-4-laurent@vivier.eu>
-In-Reply-To: <20180814161904.12216-1-laurent@vivier.eu>
-References: <20180814161904.12216-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 3/3] linux-user: add QEMU_IFLA_INFO_KIND nested
- type for tun
+	(envelope-from <pbonzini@redhat.com>) id 1fpdGC-0004ef-V1
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:37:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48538 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fpdGC-0004dh-OI
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:37:36 -0400
+References: <20180808210750.3915-1-jusual@mail.ru>
+	<20180808210750.3915-2-jusual@mail.ru>
+	<CAJSP0QUZERaC=YVe_eWJjtVdMt24Ngi7H5yU6a9anf59n+Zwfw@mail.gmail.com>
+	<5a087618-751c-c562-6d41-630a9ced03f4@mail.ru>
+	<CAJSP0QWxBtpeTt=4wBjemdTjQy_12DS+1PHZUvP2S48LcxWv7g@mail.gmail.com>
+	<CAFEAcA8wJtLxZcyCSjcN6uxBAHz7LywVEGgFs-5=NjGb7pTTDQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b8139632-bc0b-3a37-26ed-74c812912aac@redhat.com>
+Date: Tue, 14 Aug 2018 19:37:30 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8wJtLxZcyCSjcN6uxBAHz7LywVEGgFs-5=NjGb7pTTDQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] hw/char: Implement nRF51 SoC UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Julia Suvorova <jusual@mail.ru>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/syscall.c | 48 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+On 14/08/2018 12:02, Peter Maydell wrote:
+> On 13 August 2018 at 10:47, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> It's an assumption that on-board devices cannot be hot unplugged and
+>> that the machine type stays alive until QEMU terminates.
+>>
+>> Making this assumption saves 1 call to qemu_chr_fe_set_handlers().
+>> The cost is that we cannot safely stop the system-on-chip because its
+>> devices don't clean up properly.
+>>
+>> Since cleanup is so trivial here I think it's worthwhile.
+> I would be more in favour of adding an unrealize function to
+> random always-present-never-unpluggable devices if we had
+> better documentation of exactly what the QOM lifecycle is
+> and what needs to be done in init/realize/unrealize/etc.
+> As it is, I don't know myself and therefore can't review
+> whether devices with unrealize methods get it right. And
+> obviously the code is completely untestable because it can
+> never run...
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index fe12ac4849..210c236af9 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -501,6 +501,20 @@ enum {
-     QEMU___IFLA_BRPORT_MAX
- };
- 
-+enum {
-+    QEMU_IFLA_TUN_UNSPEC,
-+    QEMU_IFLA_TUN_OWNER,
-+    QEMU_IFLA_TUN_GROUP,
-+    QEMU_IFLA_TUN_TYPE,
-+    QEMU_IFLA_TUN_PI,
-+    QEMU_IFLA_TUN_VNET_HDR,
-+    QEMU_IFLA_TUN_PERSIST,
-+    QEMU_IFLA_TUN_MULTI_QUEUE,
-+    QEMU_IFLA_TUN_NUM_QUEUES,
-+    QEMU_IFLA_TUN_NUM_DISABLED_QUEUES,
-+    QEMU___IFLA_TUN_MAX,
-+};
-+
- enum {
-     QEMU_IFLA_INFO_UNSPEC,
-     QEMU_IFLA_INFO_KIND,
-@@ -2315,6 +2329,34 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
-     return 0;
- }
- 
-+static abi_long host_to_target_data_tun_nlattr(struct nlattr *nlattr,
-+                                                  void *context)
-+{
-+    uint32_t *u32;
-+
-+    switch (nlattr->nla_type) {
-+    /* uint8_t */
-+    case QEMU_IFLA_TUN_TYPE:
-+    case QEMU_IFLA_TUN_PI:
-+    case QEMU_IFLA_TUN_VNET_HDR:
-+    case QEMU_IFLA_TUN_PERSIST:
-+    case QEMU_IFLA_TUN_MULTI_QUEUE:
-+        break;
-+    /* uint32_t */
-+    case QEMU_IFLA_TUN_NUM_QUEUES:
-+    case QEMU_IFLA_TUN_NUM_DISABLED_QUEUES:
-+    case QEMU_IFLA_TUN_OWNER:
-+    case QEMU_IFLA_TUN_GROUP:
-+        u32 = NLA_DATA(nlattr);
-+        *u32 = tswap32(*u32);
-+        break;
-+    default:
-+        gemu_log("Unknown QEMU_IFLA_TUN type %d\n", nlattr->nla_type);
-+        break;
-+    }
-+    return 0;
-+}
-+
- struct linkinfo_context {
-     int len;
-     char *name;
-@@ -2349,6 +2391,12 @@ static abi_long host_to_target_data_linkinfo_nlattr(struct nlattr *nlattr,
-                                                   nlattr->nla_len,
-                                                   NULL,
-                                              host_to_target_data_bridge_nlattr);
-+        } else if (strncmp(li_context->name, "tun",
-+                    li_context->len) == 0) {
-+            return host_to_target_for_each_nlattr(NLA_DATA(nlattr),
-+                                                  nlattr->nla_len,
-+                                                  NULL,
-+                                                host_to_target_data_tun_nlattr);
-         } else {
-             gemu_log("Unknown QEMU_IFLA_INFO_KIND %s\n", li_context->name);
-         }
--- 
-2.17.1
+I agree.  Don't bother with unrealize unless the device hot-unpluggable.
+ What matters is that init/finalize are done right but that is tested by
+device-introspection-test.
+
+Paolo
