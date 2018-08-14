@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpQyu-0006FM-3t
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 00:30:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1fpR45-0000PQ-65
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 00:36:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpQyr-0006IV-Fu
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 00:30:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fpQyr-0006Gr-94
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 00:30:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fpQyq-0007mL-5j
-	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 04:30:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1DABF2E8526
-	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 04:30:52 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1fpR44-0000A6-A1
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 00:36:17 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180809114417.28718-1-marcandre.lureau@redhat.com>
+	<20180809114417.28718-3-marcandre.lureau@redhat.com>
+	<87r2j6u44f.fsf@dusky.pond.sub.org>
+	<165ace92-3b41-3d56-19f4-d2aa6edf8d8e@redhat.com>
+	<877ekudc72.fsf@dusky.pond.sub.org>
+	<61a476a1-f4ab-bf87-9d71-5783dd109afe@redhat.com>
+Date: Tue, 14 Aug 2018 06:36:07 +0200
+In-Reply-To: <61a476a1-f4ab-bf87-9d71-5783dd109afe@redhat.com> (Max Reitz's
+	message of "Mon, 13 Aug 2018 17:35:58 +0200")
+Message-ID: <87r2j14lag.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Aug 2018 04:17:28 -0000
-From: Launchpad Bug Tracker <1463143@bugs.launchpad.net>
-Reply-To: Bug 1463143 <1463143@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150608191356.22500.7085.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153422024890.598.16060854820786401224.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1463143] Re: Kernel Panic on Guest VM
+Subject: Re: [Qemu-devel] [PATCH 2/4] tests: fix bdrv-drain leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,93 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Hannes Reinecke <hare@suse.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Max Reitz <mreitz@redhat.com> writes:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+> On 2018-08-13 08:15, Markus Armbruster wrote:
+>> Max Reitz <mreitz@redhat.com> writes:
+>>=20
+>>> On 2018-08-10 08:28, Markus Armbruster wrote:
+>>>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>>>
+>>>>> Spotted by ASAN:
+>>>>>
+>>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>>> =3D=3D5378=3D=3DERROR: LeakSanitizer: detected memory leaks
+>>>>>
+>>>>> Direct leak of 65536 byte(s) in 1 object(s) allocated from:
+>>>>>     #0 0x7f788f83bc48 in malloc (/lib64/libasan.so.5+0xeec48)
+>>>>>     #1 0x7f788c9923c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
+>>>>>     #2 0x5622a1fe37bc in coroutine_trampoline /home/elmarco/src/qq/ut=
+il/coroutine-ucontext.c:116
+>>>>>     #3 0x7f788a15d75f in __correctly_grouped_prefixwc (/lib64/libc.so=
+.6+0x4c75f)
+>>>>>
+>>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>>> ---
+>>>>>  tests/test-bdrv-drain.c | 1 +
+>>>>>  1 file changed, 1 insertion(+)
+>>>>>
+>>>>> diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+>>>>> index 17bb8508ae..abc8bbe6f0 100644
+>>>>> --- a/tests/test-bdrv-drain.c
+>>>>> +++ b/tests/test-bdrv-drain.c
+>>>>> @@ -948,6 +948,7 @@ static void coroutine_fn test_co_delete_by_drain(=
+void *opaque)
+>>>>>      }
+>>>>>=20=20
+>>>>>      dbdd->done =3D true;
+>>>>> +    g_free(buffer);
+>>>>>  }
+>>>>>=20=20
+>>>>>  /**
+>>>>
+>>>> Screwed up in commit 4c8158e359d.
+>>>>
+>>>> Max, could the coroutine's stack accomodate the buffer?
+>>>
+>>> I don't know.  How big is a coroutine's stack?  The buffer size
+>>> apparently is 64k.  (Which is my opinion is generally too much to put on
+>>> any stack.)
+>>=20
+>> Even in tests?
+>
+> You have a point, but why do things differently in tests for no reason?
+>
+> (So I don't leak memory, yeah, sure, but why not write the test in Rust
+> then from the start? O:-P)
 
--- =
+Only 230 days to April 1st, better hurry.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1463143
+>>> But why would you want to put it on the stack anyway?  It's not like it
+>>> would make the patch any simpler.
+>>=20
+>> If you like the patch as is, go merge it as is :)
+>
+> W-well, I wasn't CC-d!
 
-Title:
-  Kernel Panic on Guest VM
+I fixed that :)
 
-Status in QEMU:
-  Expired
+> I take this as a request to take this one patch from the series and
+> merge it into my tree, so I will do that. O:-)
 
-Bug description:
-  Hi,
-
-  I've recently attempted to move a stack to qemu vm's that I have run
-  successfully on both hard metal and ec2.
-
-  I'm not sure where to even begin debugging, could someone please point
-  me in the right direction?
-
-
-  =
-
-    [781785.483343] RIP: 0010:[<ffffffff81511830>]  [<ffffffff81511830>] at=
-a_sff_hsm_move+0x1b0/0x780
-  [781785.483345] RSP: 0000:ffff88007fd03dd0  EFLAGS: 00010097
-  [781785.483346] RAX: 0000000000000000 RBX: ffff8800374d0000 RCX: 00000000=
-00000050
-  [781785.483347] RDX: 0000000000000006 RSI: ffff8800374d0158 RDI: ffff8800=
-374d0000
-  [781785.483348] RBP: ffff88007fd03e20 R08: 0000000000000086 R09: ffff8800=
-7cc00000
-  [781785.483349] R10: 0000000000000011 R11: 000000000000000b R12: ffff8800=
-374d0158
-  [781785.483350] R13: 0000000000000000 R14: ffff8800374d0158 R15: ffff8800=
-374d0208
-  [781785.483356] FS:  00007f3882e75700(0000) GS:ffff88007fd00000(0000) knl=
-GS:0000000000000000
-  [781785.483357] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  [781785.483358] CR2: 00007f37df39a000 CR3: 000000000b7a5000 CR4: 00000000=
-000006e0
-  [781785.483369] Stack:
-  [781785.483373]  ffff8800373cb000 ffff88007fd03e60 ffffffff8108d7d2 ffff8=
-8007fd03e28
-  [781785.483375]  ffff8800374d2140 ffff8800374d0000 ffff8800374d0158 00000=
-00000000000
-  [781785.483378]  0000000000000050 0000000000000000 ffff88007fd03e50 fffff=
-fff81511e96
-  [781785.483378] Call Trace:
-  [781785.483382]  <IRQ> =
-
-  [781785.483396]  [<ffffffff8108d7d2>] ? run_posix_cpu_timers+0x42/0x5c0
-  [781785.483400]  [<ffffffff81511e96>] __ata_sff_port_intr+0x96/0x120
-  [781785.483403]  [<ffffffff815121ed>] ata_bmdma_port_intr+0x2d/0x120
-  [781785.483405]  [<ffffffff81512ba3>] ata_bmdma_interrupt+0x183/0x1e0
-  [781785.483414]  [<ffffffff810bf8be>] handle_irq_event_percpu+0x3e/0x1d0
-  [781785.483433]  [<ffffffff810bfa8d>] handle_irq_event+0x3d/0x60
-  [781785.483437]  [<ffffffff810c2517>] handle_edge_irq+0x77/0x130
-  [781785.483455]  [<ffffffff81015cde>] handle_irq+0x1e/0x30
-  [781785.483472]  [<ffffffff817312cd>] do_IRQ+0x4d/0xc0
-  [781785.483476]  [<ffffffff81726a6d>] common_interrupt+0x6d/0x6d
-  [781785.483478]  <EOI> =
-
-  [781785.483480]  [<ffffffff8172efad>] ? system_call_fastpath+0x1a/0x1f
-  [781785.483498] Code: f9 ff ff 41 0f b6 46 28 3c 06 0f 84 0b 03 00 00 3c =
-07 0f 84 e3 02 00 00 3c 05 0f 84 c3 02 00 00 0f 0b 66 0f 1f 84 00 00 00 00 =
-00 <0f> 0b 66 0f 1f 44 00 00 f6 c1 08 0f 84 19 05 00 00 f6 c1 21 0f =
-
-  [781785.483501] RIP  [<ffffffff81511830>] ata_sff_hsm_move+0x1b0/0x780
-  [781785.483501]  RSP <ffff88007fd03dd0>
-  [781785.484009] ---[ end trace 1b6ef3497a5641b3 ]---
-  [781785.484009] Kernel panic - not syncing: Fatal exception in interrupt
-  [781785.484009] Shutting down cpus with NMI
-
-  =
-
-  Thanks for any pointers.
-
-  Ryan
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1463143/+subscriptions
+Thanks!
