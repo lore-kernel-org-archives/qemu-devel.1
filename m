@@ -1,24 +1,25 @@
-Received: from [2001:4830:134:3::10] (port=58694 helo=eggs.gnu.org)
+Received: from [2001:4830:134:3::10] (port=59729 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpcyU-0002s3-CI
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:19:23 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fpczf-00050v-V8
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:20:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpcyJ-0001bK-DJ
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:19:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49978 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fpczW-0002Bw-Vs
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:20:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35824 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpcyJ-0001bB-6u
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:19:07 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fpczW-0002Be-OW
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:20:22 -0400
 References: <1534258018-22859-1-git-send-email-thuth@redhat.com>
 	<1534258018-22859-6-git-send-email-thuth@redhat.com>
 	<1d700466-d271-f1b6-d7e4-ea82608d984f@redhat.com>
 	<33446506-a101-69c3-9d31-c1b8ef8d8b32@redhat.com>
 	<e5535b93-990d-94c9-562f-8be49be4c2a3@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f0d25fe6-f526-abf0-6f8a-98cc66592112@redhat.com>
-Date: Tue, 14 Aug 2018 18:01:20 +0200
+	<f0d25fe6-f526-abf0-6f8a-98cc66592112@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4955cb45-df23-608b-3444-c11409894bff@redhat.com>
+Date: Tue, 14 Aug 2018 18:03:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <e5535b93-990d-94c9-562f-8be49be4c2a3@redhat.com>
+In-Reply-To: <f0d25fe6-f526-abf0-6f8a-98cc66592112@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -32,47 +33,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 08/14/2018 05:57 PM, Paolo Bonzini wrote:
-> On 14/08/2018 17:43, Thomas Huth wrote:
->> On 08/14/2018 05:33 PM, Paolo Bonzini wrote:
->>> On 14/08/2018 16:46, Thomas Huth wrote:
->>>> When running qtests with -nodefaults, we are not interested in
->>>> these 'XYZ has no peer' messages.
+On 14/08/2018 18:01, Thomas Huth wrote:
+> On 08/14/2018 05:57 PM, Paolo Bonzini wrote:
+>> On 14/08/2018 17:43, Thomas Huth wrote:
+>>> On 08/14/2018 05:33 PM, Paolo Bonzini wrote:
+>>>> On 14/08/2018 16:46, Thomas Huth wrote:
+>>>>> When running qtests with -nodefaults, we are not interested in
+>>>>> these 'XYZ has no peer' messages.
+>>>>>
+>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>>> ---
+>>>>>  vl.c | 3 +--
+>>>>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>>>>
+>>>>> diff --git a/vl.c b/vl.c
+>>>>> index 16b913f..7055df3 100644
+>>>>> --- a/vl.c
+>>>>> +++ b/vl.c
+>>>>> @@ -4559,11 +4559,10 @@ int main(int argc, char **argv, char **envp)
+>>>>>       * (2) CONFIG_SLIRP not set, in which case the implicit "-net nic"
+>>>>>       * sets up a nic that isn't connected to anything.
+>>>>>       */
+>>>>> -    if (!default_net) {
+>>>>> +    if (!default_net && (!qtest_enabled() || has_defaults)) {
+>>>>>          net_check_clients();
+>>>>>      }
+>>>>>  
 >>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>>  vl.c | 3 +--
->>>>  1 file changed, 1 insertion(+), 2 deletions(-)
->>>>
->>>> diff --git a/vl.c b/vl.c
->>>> index 16b913f..7055df3 100644
->>>> --- a/vl.c
->>>> +++ b/vl.c
->>>> @@ -4559,11 +4559,10 @@ int main(int argc, char **argv, char **envp)
->>>>       * (2) CONFIG_SLIRP not set, in which case the implicit "-net nic"
->>>>       * sets up a nic that isn't connected to anything.
->>>>       */
->>>> -    if (!default_net) {
->>>> +    if (!default_net && (!qtest_enabled() || has_defaults)) {
->>>>          net_check_clients();
->>>>      }
->>>>  
+>>>> Why does it have no peer?  Not a nack, just curiosity.
 >>>
->>> Why does it have no peer?  Not a nack, just curiosity.
+>>> The machines which emulate an embedded system often always create a NIC
+>>> (since it is hard-wired on the board, not optional). But since there is
+>>> no back-end on the host side with "-nodefaults", the net_check_clients()
+>>> function complains in this case.
 >>
->> The machines which emulate an embedded system often always create a NIC
->> (since it is hard-wired on the board, not optional). But since there is
->> no back-end on the host side with "-nodefaults", the net_check_clients()
->> function complains in this case.
+>> Ok, the has_defaults test then makes sense.  Is the qtest_enabled() part
+>> still needed, or is the message unnecessary even in normal operation?
 > 
-> Ok, the has_defaults test then makes sense.  Is the qtest_enabled() part
-> still needed, or is the message unnecessary even in normal operation?
+> I think it is still needed, since you could also screw up your command
+> line parameters after specifying -nodefaults (e.g. "-nodefaults -net
+> nic" without giving an additional "-net user" or something similar).
 
-I think it is still needed, since you could also screw up your command
-line parameters after specifying -nodefaults (e.g. "-nodefaults -net
-nic" without giving an additional "-net user" or something similar).
+True.  Though it cannot happen with -nic, so another possibility is to
+give it only if -net was used?
 
- Thomas
+Paolo
+
+Paolo
