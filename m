@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fpOHm-0006H6-QW
+	(envelope-from <cota@braap.org>) id 1fpOHm-0006H5-Q1
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 21:38:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fpOHj-0002Gf-Og
+	(envelope-from <cota@braap.org>) id 1fpOHj-0002GH-Jf
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 21:38:14 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:45481)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:52151)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fpOHj-0002G6-KW
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fpOHj-0002Fx-Da
 	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 21:38:11 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon, 13 Aug 2018 21:38:01 -0400
-Message-Id: <20180814013801.26036-5-cota@braap.org>
+Date: Mon, 13 Aug 2018 21:37:59 -0400
+Message-Id: <20180814013801.26036-3-cota@braap.org>
 In-Reply-To: <20180814013801.26036-1-cota@braap.org>
 References: <20180814013801.26036-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 4/4] configure: enable mttcg for x86_64
+Subject: [Qemu-devel] [PATCH 2/4] cpus: assert that the BQL is held in
+ cpu_get_ticks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +29,21 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gm
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- configure | 1 +
- 1 file changed, 1 insertion(+)
+ cpus.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/configure b/configure
-index 2a7796ea80..db216bafb1 100755
---- a/configure
-+++ b/configure
-@@ -6935,6 +6935,7 @@ case "$target_name" in
-     TARGET_BASE_ARCH=i386
-     gdb_xml_files="i386-64bit.xml i386-64bit-core.xml i386-64bit-sse.xml"
-     target_compiler=$cross_cc_x86_64
-+    mttcg="yes"
-   ;;
-   alpha)
-     mttcg="yes"
+diff --git a/cpus.c b/cpus.c
+index b5844b7103..b23bf6fef7 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -308,6 +308,8 @@ int64_t cpu_get_ticks(void)
+ {
+     int64_t ticks;
+ 
++    g_assert(qemu_mutex_iothread_locked());
++
+     if (use_icount) {
+         return cpu_get_icount();
+     }
 -- 
 2.17.1
