@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpf1y-00065O-HK
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:31:18 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fpf4V-0007ox-1D
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:33:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpf1i-00068n-Uv
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:31:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60816)
+	(envelope-from <alex.bennee@linaro.org>) id 1fpf4F-0007Ia-2V
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:33:38 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:54394)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fpf1i-00067n-G6
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:30:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fpf1f-0006Mg-Pf
-	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 19:30:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B3DCD2E851C
-	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 19:30:43 +0000 (UTC)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fpf4E-0007H5-Ht
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:33:22 -0400
+Received: by mail-wm0-x242.google.com with SMTP id c14-v6so13392969wmb.4
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 12:33:21 -0700 (PDT)
+References: <1528768140-17894-1-git-send-email-cota@braap.org>
+	<20180813200116.GA18755@flamenco> <87d0ulfe1s.fsf@linaro.org>
+	<20180814182703.GA24096@flamenco>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180814182703.GA24096@flamenco>
+Date: Tue, 14 Aug 2018 20:33:19 +0100
+Message-ID: <87a7pog2v4.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Aug 2018 19:25:00 -0000
-From: Michele Denber <1787012@bugs.launchpad.net>
-Reply-To: Bug 1787012 <1787012@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153427470081.24411.7587190537485631648.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1787012] [NEW] Solaris build error: Bad string
+Subject: Re: [Qemu-devel] [PATCH v4 00/14] fp-test + hardfloat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,293 +31,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-Public bug reported:
 
-While building qemu2.12.0 on a Sun Oracle Enterprise M3000 SPARC64 VII
-running Solaris 10U11, opencsw toolchain, gcc 7.3.0, and python 3.3.6 I
-get:
+Emilio G. Cota <cota@braap.org> writes:
 
-# gmake
-mkdir -p dtc/libfdt
-mkdir -p dtc/tests
-Bad string
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/dumptrees.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/trees.S
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/testutils.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/value-labels.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/asm_tree_dump.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/truncated_property.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/check_path.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/overlay_bad_fixup.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/overlay.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/subnode_iterate.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/property_iterate.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/integer-expressions.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/utilfdt_test.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/path_offset_aliases.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/add_subnode_with_nop=
-s.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtbs_equal_unordered=
-.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtb_reverse.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtbs_equal_ordered.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/extra-terminating-nu=
-ll.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/incbin.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/boot-cpuid.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/phandle_format.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/path-references.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/references.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/string_escapes.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/propname_escapes.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/appendprop2.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/appendprop1.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/del_node.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/del_property.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/setprop.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/set_name.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/rw_tree1.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/open_pack.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/nopulate.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/mangle-layout.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/move_and_save.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/sw_tree1.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/nop_node.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/nop_property.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/setprop_inplace.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/stringlist.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/addr_size_cells.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/notfound.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/sized_cells.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/char_literal.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_alias.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_compa=
-tible.c         DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_check_co=
-mpatible.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_phand=
-le.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_prop_=
-value.c         DEP /export/home/denber/qemu-2.12.0/dtc/tests/parent_offset=
-.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/supernode_atdepth_of=
-fset.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_path.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_phandle.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/getprop.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_name.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/path_offset.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/subnode_offset.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/find_property.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/root_node.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_mem_rsv.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_overlay.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_addresses.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_empty_tree.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_strerror.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_rw.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_sw.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_wip.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_ro.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/util.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/fdtoverlay.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/fdtput.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/fdtget.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/fdtdump.c
-         DEP convert-dtsv0-lexer.lex.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/srcpos.c
-         DEP dtc-parser.tab.c
-         DEP dtc-lexer.lex.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/treesource.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/livetree.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/fstree.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/flattree.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/dtc.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/data.c
-         DEP /export/home/denber/qemu-2.12.0/dtc/checks.c
-Bad string
-         CC libfdt/fdt.o
-         CC libfdt/fdt_ro.o
-         CC libfdt/fdt_wip.o
-         CC libfdt/fdt_sw.o
-         CC libfdt/fdt_rw.o
-         CC libfdt/fdt_strerror.o
-         CC libfdt/fdt_empty_tree.o
-         CC libfdt/fdt_addresses.o
-         CC libfdt/fdt_overlay.o
-         AR libfdt/libfdt.a
-a - libfdt/fdt.o
-a - libfdt/fdt_ro.o
-a - libfdt/fdt_wip.o
-a - libfdt/fdt_sw.o
-a - libfdt/fdt_rw.o
-a - libfdt/fdt_strerror.o
-a - libfdt/fdt_empty_tree.o
-a - libfdt/fdt_addresses.o
-a - libfdt/fdt_overlay.o
-ar: creating libfdt/libfdt.a
-ar: writing libfdt/libfdt.a
-...
+> On Tue, Aug 14, 2018 at 11:17:03 +0100, Alex Benn=C3=A9e wrote:
+>> Emilio G. Cota <cota@braap.org> writes:
+>> > Would be great to get this in for 3.1.
+>>
+>> I would like this merged by 3.1 as well. However I think there is still
+>> some work to be done on the testing side. IIRC the fptest case works
+>> with whitelists and I'd like to understand more about why we can't use
+>> the whole test corpus? Is it testing features we don't have on all
+>> architectures or just because it wouldn't pass because of holes in our
+>> current softfloat?
+>
+> Some test patterns are just strange. For instance:
+>
+> d64+ =3D0 -1e-398 +0e-398 -> -1e-398
+>
+> I think the IBM implementation uses 128 bits and then truncates to
+> whatever precision is required (64b in this case), so those tests
+> might make sense then. But for us, those tests don't make any sense.
+>
+> The use of whitelists is a temporary workaround to avoid those weird
+> test patterns. The right fix is to keep our own set of test patterns,
+> without needing whitelisting.
+> BTW with this patchset we use 76572 out of 130471 test patterns, which
+> isn't bad at all. The whitelist is currently only 2% of the 130K.
+>
+>> Our experience of SVE has shown that despite the fairly extensive
+>> testing we did there are still a bunch of corner cases we missed.
+>> Hopefully the last few patches have fixed that but I guess it pays to be
+>> exhaustive.
+>
+> Agreed. That's why I wrote fp-test (and BTW found a bug in softfloat
+> thanks to it.)
+>
+>> We now have the check-tcg infrastructure in place so it would be nice to
+>> have proper native tests in place for each architecture. My experience
+>> of the fcvt.c test case however is you end up using inline assembler to
+>> ensure you exercise the right guest opcodes which makes it hard to
+>> generalise for lots of architectures.
+>
+> I think testing using assembly is necessary, but not sufficient.
+> That's why having tests that test the FP primitives directly
+> (like fp-test does with `-t soft`) is valuable, since you can
+> trivially exercise corner cases. Then you have to test that the
+> ISA's decoder does the right thing, but that's a separate test.
+>
+>> I had written a bunch of patches
+>> against the fptest to get it built under check-tcg but it was painful:
+>>
+>>   * needed a lot of boilerplate for each new operation
+>
+> That depends on the op. If you want to test anything other than 32/64b
+> ops, then yes, you need to add some boilerplate. But otherwise it
+> is quite simple, for instance see patch 2.
 
-gmake then completes, returning just a "#" prompt and no error messages.
-However, no executable is created.  Apparently, "Bad string" is the
-problem, but it is unclear what that means and where the two instances
-of it are coming from.  A web search for this problem returned nothing.
+Well half-precision is the next obvious thing that needs adding. If we
+ever re-factor the rest of the code for our weird 80 bit float cousins
+that will need adding as well.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+>
+>>   * a bit hacky to build as unit test and as tcg test
+>
+> It's not clear to me what the value as a TCG test is; each ISA
+> would have its own set of test patterns (and this set is distinct
+> from the test patterns we're using here, since those are only
+> a subset of the 754 standard).
 
--- =
+Well nominally they are all IEEE right? But yeah I think directed tests
+are the answer here.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1787012
+>
+> So, my proposal for a v5:
+>
+> - Commit the test files we need, instead of downloading them from
+>   the web. No whitelisting/exceptions except for tininess
+>   detection, which is necessary.
 
-Title:
-  Solaris build error: Bad string
+Sounds good to me. Perhaps we could do a one time conversion of the test
+files so they are a little more readable if we are going to own/extend
+them?
 
-Status in QEMU:
-  New
+>
+> - fp-test is added to make test. This is a unit test of softfloat,
+>   not a TCG unit test.
+>
+> - We defer TCG unit tests of FP to a later time.
 
-Bug description:
-  While building qemu2.12.0 on a Sun Oracle Enterprise M3000 SPARC64 VII
-  running Solaris 10U11, opencsw toolchain, gcc 7.3.0, and python 3.3.6
-  I get:
+Yeah mashing the two together is probably more trouble than it's worth.
 
-  # gmake
-  mkdir -p dtc/libfdt
-  mkdir -p dtc/tests
-  Bad string
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dumptrees.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/trees.S
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/testutils.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/value-labels.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/asm_tree_dump.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/truncated_property=
-.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/check_path.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/overlay_bad_fixup.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/overlay.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/subnode_iterate.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/property_iterate.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/integer-expression=
-s.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/utilfdt_test.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path_offset_aliase=
-s.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/add_subnode_with_n=
-ops.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtbs_equal_unorder=
-ed.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtb_reverse.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtbs_equal_ordered=
-.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/extra-terminating-=
-null.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/incbin.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/boot-cpuid.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/phandle_format.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path-references.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/references.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/string_escapes.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/propname_escapes.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/appendprop2.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/appendprop1.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/del_node.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/del_property.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/setprop.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/set_name.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/rw_tree1.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/open_pack.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nopulate.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/mangle-layout.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/move_and_save.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/sw_tree1.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nop_node.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nop_property.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/setprop_inplace.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/stringlist.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/addr_size_cells.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/notfound.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/sized_cells.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/char_literal.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_alias.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_com=
-patible.c         DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_check_=
-compatible.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_pha=
-ndle.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_pro=
-p_value.c         DEP /export/home/denber/qemu-2.12.0/dtc/tests/parent_offs=
-et.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/supernode_atdepth_=
-offset.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_path.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_phandle.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/getprop.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_name.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path_offset.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/subnode_offset.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/find_property.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/root_node.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_mem_rsv.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_overlay.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_addresses.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_empty_tree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_strerror.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_rw.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_sw.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_wip.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_ro.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/util.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtoverlay.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtput.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtget.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtdump.c
-           DEP convert-dtsv0-lexer.lex.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/srcpos.c
-           DEP dtc-parser.tab.c
-           DEP dtc-lexer.lex.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/treesource.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/livetree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fstree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/flattree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/dtc.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/data.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/checks.c
-  Bad string
-           CC libfdt/fdt.o
-           CC libfdt/fdt_ro.o
-           CC libfdt/fdt_wip.o
-           CC libfdt/fdt_sw.o
-           CC libfdt/fdt_rw.o
-           CC libfdt/fdt_strerror.o
-           CC libfdt/fdt_empty_tree.o
-           CC libfdt/fdt_addresses.o
-           CC libfdt/fdt_overlay.o
-           AR libfdt/libfdt.a
-  a - libfdt/fdt.o
-  a - libfdt/fdt_ro.o
-  a - libfdt/fdt_wip.o
-  a - libfdt/fdt_sw.o
-  a - libfdt/fdt_rw.o
-  a - libfdt/fdt_strerror.o
-  a - libfdt/fdt_empty_tree.o
-  a - libfdt/fdt_addresses.o
-  a - libfdt/fdt_overlay.o
-  ar: creating libfdt/libfdt.a
-  ar: writing libfdt/libfdt.a
-  ...
+I was playing around trying to improve the fcvt test (horribly WIP):
 
-  gmake then completes, returning just a "#" prompt and no error
-  messages.  However, no executable is created.  Apparently, "Bad
-  string" is the problem, but it is unclear what that means and where
-  the two instances of it are coming from.  A web search for this
-  problem returned nothing.
+ https://github.com/stsquad/qemu/tree/arm/more-fcvt-tests
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1787012/+subscriptions
+Anyway I'm coming to the conclusion that what we need for the TCG tests
+is a generalised op tester framework that make it easy to plug in new
+tests with custom inline asm with a minimal amount of fuss. I'll have a
+go at this tomorrow - lets see if I can have a common framework that
+abstracts away the 1, 2 and 3 source specifics and result size handling.
+
+--
+Alex Benn=C3=A9e
