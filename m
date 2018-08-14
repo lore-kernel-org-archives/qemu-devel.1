@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdtT-0003QW-0y
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:13 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdtT-0003Qh-5T
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdss-0005vB-2B
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdss-0005vH-2c
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:10 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:52240 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:52253 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpdsr-0005tf-9N
+	id 1fpdsr-0005u3-FG
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:17:33 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 14 Aug 2018 20:16:49 +0200
-Message-Id: <1534270621-27332-8-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 14 Aug 2018 20:16:56 +0200
+Message-Id: <1534270621-27332-15-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/19] target/mips: Add CP0 BadInstrX register
+Subject: [Qemu-devel] [PULL 14/19] target/mips: Add gen_op_addr_addi()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,112 +29,38 @@ Cc: peter.maydell@linaro.org
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add CP0 BadInstrX register. This register will be used in nanoMIPS.
+Add gen_op_addr_addi(). This function will be used in emulation of
+some nanoMIPS instructions.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  1 +
- target/mips/machine.c   |  5 +++--
- target/mips/translate.c | 22 +++++++++++++++++++++-
- 3 files changed, 25 insertions(+), 3 deletions(-)
+ target/mips/translate.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 77c638c..009202c 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -323,6 +323,7 @@ struct CPUMIPSState {
-     target_ulong CP0_BadVAddr;
-     uint32_t CP0_BadInstr;
-     uint32_t CP0_BadInstrP;
-+    uint32_t CP0_BadInstrX;
-     int32_t CP0_Count;
-     target_ulong CP0_EntryHi;
- #define CP0EnHi_EHINV 10
-diff --git a/target/mips/machine.c b/target/mips/machine.c
-index 20100d5..5ba78ac 100644
---- a/target/mips/machine.c
-+++ b/target/mips/machine.c
-@@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb =3D {
-=20
- const VMStateDescription vmstate_mips_cpu =3D {
-     .name =3D "cpu",
--    .version_id =3D 10,
--    .minimum_version_id =3D 10,
-+    .version_id =3D 11,
-+    .minimum_version_id =3D 11,
-     .post_load =3D cpu_post_load,
-     .fields =3D (VMStateField[]) {
-         /* Active TC */
-@@ -266,6 +266,7 @@ const VMStateDescription vmstate_mips_cpu =3D {
-         VMSTATE_UINTTL(env.CP0_BadVAddr, MIPSCPU),
-         VMSTATE_UINT32(env.CP0_BadInstr, MIPSCPU),
-         VMSTATE_UINT32(env.CP0_BadInstrP, MIPSCPU),
-+        VMSTATE_UINT32(env.CP0_BadInstrX, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Count, MIPSCPU),
-         VMSTATE_UINTTL(env.CP0_EntryHi, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Compare, MIPSCPU),
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 2b70d1b..ae3aaab 100644
+index 420f1df..d67e747 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -5328,7 +5328,13 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, =
-int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
-             rn =3D "BadInstrP";
-             break;
--        default:
-+        case 3:
-+            CP0_CHECK(ctx->bi);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
-+            tcg_gen_andi_tl(arg, arg, ~0xffff);
-+            rn =3D "BadInstrX";
-+            break;
-+       default:
-             goto cp0_unimplemented;
-         }
-         break;
-@@ -6019,6 +6025,10 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, =
-int reg, int sel)
-             /* ignored */
-             rn =3D "BadInstrP";
-             break;
-+        case 3:
-+            /* ignored */
-+            rn =3D "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -6724,6 +6734,12 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg,=
- int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
-             rn =3D "BadInstrP";
-             break;
-+        case 3:
-+            CP0_CHECK(ctx->bi);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
-+            tcg_gen_andi_tl(arg, arg, ~0xffff);
-+            rn =3D "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -7398,6 +7414,10 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg,=
- int reg, int sel)
-             /* ignored */
-             rn =3D "BadInstrP";
-             break;
-+        case 3:
-+            /* ignored */
-+            rn =3D "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
---=20
+@@ -1746,6 +1746,18 @@ static inline void gen_op_addr_add (DisasContext *ctx, TCGv ret, TCGv arg0, TCGv
+ #endif
+ }
+ 
++static inline void gen_op_addr_addi(DisasContext *ctx, TCGv ret, TCGv base,
++                                    target_long ofs)
++{
++    tcg_gen_addi_tl(ret, base, ofs);
++
++#if defined(TARGET_MIPS64)
++    if (ctx->hflags & MIPS_HFLAG_AWRAP) {
++        tcg_gen_ext32s_i64(ret, ret);
++    }
++#endif
++}
++
+ /* Addresses computation (translation time) */
+ static target_long addr_add(DisasContext *ctx, target_long base,
+                             target_long offset)
+-- 
 2.7.4
