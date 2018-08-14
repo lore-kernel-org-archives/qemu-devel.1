@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fpYDs-0002e7-Sg
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fpYDs-0002e9-TU
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:14:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fpYDn-000522-Rh
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fpYDn-00052I-Rh
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:14:52 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 14 Aug 2018 15:14:35 +0300
-Message-Id: <20180814121443.33114-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 0/8] dirty-bitmap: rewrite
- bdrv_dirty_iter_next_area
+Date: Tue, 14 Aug 2018 15:14:43 +0300
+Message-Id: <20180814121443.33114-9-vsementsov@virtuozzo.com>
+In-Reply-To: <20180814121443.33114-1-vsementsov@virtuozzo.com>
+References: <20180814121443.33114-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 8/8] Revert "hbitmap: Add @advance param to
+ hbitmap_iter_next()"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,57 +23,174 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Hi all.
+This reverts commit a33fbb4f8b64226becf502a123733776ce319b24.
 
-1. bdrv_dirty_iter_next_area don't use hbitmap_next_zero and uses
-inefficient loop instead. Let's improve it.
+The functionality is unused.
 
-2. bdrv_dirty_iter_next_area don't handle unaligned offset and
-max_offset correctly. I'm not sure that it is a real bug. But if it is,
-we need these series in 3.0.
+Note: in addition to automatic revert, drop second parameter in
+hbitmap_iter_next() call from hbitmap_next_dirty_area() too.
 
-Details are in 05 commit message.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ include/qemu/hbitmap.h |  5 +----
+ block/backup.c         |  2 +-
+ block/dirty-bitmap.c   |  2 +-
+ tests/test-hbitmap.c   | 26 +++++++++++++-------------
+ util/hbitmap.c         | 12 ++++--------
+ 5 files changed, 20 insertions(+), 27 deletions(-)
 
-v3:
-01: - change interface to start/end, and -1 as special end-marker instead of 0
-    - "not found" for invalid regions instead of assert
-02: rebase on 01 changes
-03: - fix mistake in hbitmap_iter_init arguments (mistake in
-      hbitmap_next_zero arguments is fixed automatically due to 01 changes)
-04: new
-
-
-v2:
-
-01: - improve comment
-    - s/bytes/count/
-    - fix forgotten function call in test
-    - introduce orig_size field here for HBitmap,
-      make checking in hbitmap_next_zero more effective and safe
-02: new
-03: - orig_size already introduced in 01
-    - fix hbitmap_next_dirty_area to not return value less than
-      offset on unaligned requests
-
-Vladimir Sementsov-Ogievskiy (8):
-  dirty-bitmap: improve bdrv_dirty_bitmap_next_zero
-  tests: add tests for hbitmap_next_zero with specified end parameter
-  dirty-bitmap: add bdrv_dirty_bitmap_next_dirty_area
-  tests: add tests for hbitmap_next_dirty_area
-  block/mirror: fix and improve do_sync_target_write
-  Revert "block/dirty-bitmap: Add bdrv_dirty_iter_next_area"
-  Revert "test-hbitmap: Add non-advancing iter_next tests"
-  Revert "hbitmap: Add @advance param to hbitmap_iter_next()"
-
- include/block/dirty-bitmap.h |   8 +-
- include/qemu/hbitmap.h       |  30 ++++++--
- block/backup.c               |   4 +-
- block/dirty-bitmap.c         |  69 +++--------------
- block/mirror.c               |  16 ++--
- nbd/server.c                 |   2 +-
- tests/test-hbitmap.c         | 176 ++++++++++++++++++++++++++++++++++++-------
- util/hbitmap.c               |  73 +++++++++++++++---
- 8 files changed, 258 insertions(+), 120 deletions(-)
-
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index 7800317bf3..6d205167ce 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -345,14 +345,11 @@ void hbitmap_free_meta(HBitmap *hb);
+ /**
+  * hbitmap_iter_next:
+  * @hbi: HBitmapIter to operate on.
+- * @advance: If true, advance the iterator.  Otherwise, the next call
+- *           of this function will return the same result (if that
+- *           position is still dirty).
+  *
+  * Return the next bit that is set in @hbi's associated HBitmap,
+  * or -1 if all remaining bits are zero.
+  */
+-int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance);
++int64_t hbitmap_iter_next(HBitmapIter *hbi);
+ 
+ /**
+  * hbitmap_iter_next_word:
+diff --git a/block/backup.c b/block/backup.c
+index 9bfd3f7189..f033148f21 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -421,7 +421,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+     HBitmapIter hbi;
+ 
+     hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
+-    while ((cluster = hbitmap_iter_next(&hbi, true)) != -1) {
++    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
+         do {
+             if (yield_and_check(job)) {
+                 return 0;
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index d9333175b3..d0d602ff52 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -525,7 +525,7 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
+ 
+ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
+ {
+-    return hbitmap_iter_next(&iter->hbi, true);
++    return hbitmap_iter_next(&iter->hbi);
+ }
+ 
+ /* Called within bdrv_dirty_bitmap_lock..unlock */
+diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+index 5e43056970..17a3c807de 100644
+--- a/tests/test-hbitmap.c
++++ b/tests/test-hbitmap.c
+@@ -46,7 +46,7 @@ static void hbitmap_test_check(TestHBitmapData *data,
+ 
+     i = first;
+     for (;;) {
+-        next = hbitmap_iter_next(&hbi, true);
++        next = hbitmap_iter_next(&hbi);
+         if (next < 0) {
+             next = data->size;
+         }
+@@ -435,25 +435,25 @@ static void test_hbitmap_iter_granularity(TestHBitmapData *data,
+     /* Note that hbitmap_test_check has to be invoked manually in this test.  */
+     hbitmap_test_init(data, 131072 << 7, 7);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
+ 
+     hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
+ 
+     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
+ 
+     hbitmap_test_set(data, (131072 << 7) - 8, 8);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
+ 
+     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
+ }
+ 
+ static void hbitmap_test_set_boundary_bits(TestHBitmapData *data, ssize_t diff)
+@@ -893,7 +893,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmapData *data,
+     for (i = 0; i < num_positions; i++) {
+         hbitmap_deserialize_zeroes(data->hb, positions[i], min_l1, true);
+         hbitmap_iter_init(&iter, data->hb, 0);
+-        next = hbitmap_iter_next(&iter, true);
++        next = hbitmap_iter_next(&iter);
+         if (i == num_positions - 1) {
+             g_assert_cmpint(next, ==, -1);
+         } else {
+@@ -919,10 +919,10 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
+ 
+     hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
+ 
+-    hbitmap_iter_next(&hbi, true);
++    hbitmap_iter_next(&hbi);
+ 
+     hbitmap_reset_all(data->hb);
+-    hbitmap_iter_next(&hbi, true);
++    hbitmap_iter_next(&hbi);
+ }
+ 
+ static void test_hbitmap_next_zero_check_range(TestHBitmapData *data,
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index bf88c1223e..b00e05a85b 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -144,7 +144,7 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
+     return cur;
+ }
+ 
+-int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance)
++int64_t hbitmap_iter_next(HBitmapIter *hbi)
+ {
+     unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
+             hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
+@@ -157,12 +157,8 @@ int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance)
+         }
+     }
+ 
+-    if (advance) {
+-        /* The next call will resume work from the next bit.  */
+-        hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
+-    } else {
+-        hbi->cur[HBITMAP_LEVELS - 1] = cur;
+-    }
++    /* The next call will resume work from the next bit.  */
++    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
+     item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
+ 
+     return item << hbi->granularity;
+@@ -256,7 +252,7 @@ bool hbitmap_next_dirty_area(const HBitmap *hb, uint64_t *offset,
+     }
+ 
+     hbitmap_iter_init(&hbi, hb, *offset);
+-    off1 = hbitmap_iter_next(&hbi, true);
++    off1 = hbitmap_iter_next(&hbi);
+ 
+     if (off1 < 0 || off1 >= end) {
+         return false;
 -- 
 2.11.1
