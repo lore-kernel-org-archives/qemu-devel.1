@@ -1,30 +1,27 @@
-Received: from [2001:4830:134:3::10] (port=59729 helo=eggs.gnu.org)
+Received: from [2001:4830:134:3::10] (port=60072 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpczf-00050v-V8
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:20:32 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fpd0P-0005ki-8r
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:21:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpczW-0002Bw-Vs
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:20:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35824 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fpczW-0002Be-OW
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:20:22 -0400
-References: <1534258018-22859-1-git-send-email-thuth@redhat.com>
-	<1534258018-22859-6-git-send-email-thuth@redhat.com>
-	<1d700466-d271-f1b6-d7e4-ea82608d984f@redhat.com>
-	<33446506-a101-69c3-9d31-c1b8ef8d8b32@redhat.com>
-	<e5535b93-990d-94c9-562f-8be49be4c2a3@redhat.com>
-	<f0d25fe6-f526-abf0-6f8a-98cc66592112@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4955cb45-df23-608b-3444-c11409894bff@redhat.com>
-Date: Tue, 14 Aug 2018 18:03:37 +0200
+	(envelope-from <rth7680@gmail.com>) id 1fpd0G-0002Oo-Hm
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:21:13 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:44158)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fpd0G-0002OD-AJ
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:21:08 -0400
+Received: by mail-pl0-x243.google.com with SMTP id ba4-v6so8573742plb.11
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 10:21:05 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180814171217.14680-1-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <07d0ba1c-f7d9-26e3-6120-3c9693ea339e@twiddle.net>
+Date: Tue, 14 Aug 2018 10:21:01 -0700
 MIME-Version: 1.0
-In-Reply-To: <f0d25fe6-f526-abf0-6f8a-98cc66592112@redhat.com>
+In-Reply-To: <20180814171217.14680-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/6] net: Silence 'has no peer' messages in
- testing mode
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix 32bit g2h()/h2g()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,53 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>
 
-On 14/08/2018 18:01, Thomas Huth wrote:
-> On 08/14/2018 05:57 PM, Paolo Bonzini wrote:
->> On 14/08/2018 17:43, Thomas Huth wrote:
->>> On 08/14/2018 05:33 PM, Paolo Bonzini wrote:
->>>> On 14/08/2018 16:46, Thomas Huth wrote:
->>>>> When running qtests with -nodefaults, we are not interested in
->>>>> these 'XYZ has no peer' messages.
->>>>>
->>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>> ---
->>>>>  vl.c | 3 +--
->>>>>  1 file changed, 1 insertion(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/vl.c b/vl.c
->>>>> index 16b913f..7055df3 100644
->>>>> --- a/vl.c
->>>>> +++ b/vl.c
->>>>> @@ -4559,11 +4559,10 @@ int main(int argc, char **argv, char **envp)
->>>>>       * (2) CONFIG_SLIRP not set, in which case the implicit "-net nic"
->>>>>       * sets up a nic that isn't connected to anything.
->>>>>       */
->>>>> -    if (!default_net) {
->>>>> +    if (!default_net && (!qtest_enabled() || has_defaults)) {
->>>>>          net_check_clients();
->>>>>      }
->>>>>  
->>>>
->>>> Why does it have no peer?  Not a nack, just curiosity.
->>>
->>> The machines which emulate an embedded system often always create a NIC
->>> (since it is hard-wired on the board, not optional). But since there is
->>> no back-end on the host side with "-nodefaults", the net_check_clients()
->>> function complains in this case.
->>
->> Ok, the has_defaults test then makes sense.  Is the qtest_enabled() part
->> still needed, or is the message unnecessary even in normal operation?
+On 08/14/2018 10:12 AM, Laurent Vivier wrote:
+> sparc32plus has 64bit long type but only 32bit virtual address space.
 > 
-> I think it is still needed, since you could also screw up your command
-> line parameters after specifying -nodefaults (e.g. "-nodefaults -net
-> nic" without giving an additional "-net user" or something similar).
+> For instance, "apt-get upgrade" failed because of a mmap()/msync()
+> sequence.
+> 
+> mmap() returned 0xff252000 but msync() used g2h(0xffffffffff252000)
+> to find the host address. The "(target_ulong)" in g2h() doesn't fix the
+> address because it is 64bit long.
+> 
+> This patch introduces an "abi_ptr" that is set to uint32_t
+> if the virtual address space is addressed using 32bit in the linux-user
+> case. It stays set to target_ulong with softmmu case.
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+> 
+> Notes:
+>     v2: s/target_ptr/abi_ptr/
+>         remove strace msync patch from the series
 
-True.  Though it cannot happen with -nic, so another possibility is to
-give it only if -net was used?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Paolo
 
-Paolo
+r~
