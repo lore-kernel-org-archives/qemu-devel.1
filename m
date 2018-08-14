@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fpPJz-0007yh-Ig
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 22:44:36 -0400
+	(envelope-from <famz@redhat.com>) id 1fpPOM-0001vj-FC
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 22:49:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fpPJy-0002em-Rl
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 22:44:35 -0400
-Date: Tue, 14 Aug 2018 10:44:25 +0800
+	(envelope-from <famz@redhat.com>) id 1fpPOJ-0003iD-EJ
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 22:49:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48652 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fpPOJ-0003i3-9g
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 22:49:03 -0400
+Date: Tue, 14 Aug 2018 10:48:58 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180814024425.GE7549@lemon.usersys.redhat.com>
-References: <20180813144320.12382-1-pbonzini@redhat.com>
+Message-ID: <20180814024858.GF7549@lemon.usersys.redhat.com>
+References: <20180808195235.5843-1-gedwards@ddn.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180813144320.12382-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] nvme: simplify code around completion
+In-Reply-To: <20180808195235.5843-1-gedwards@ddn.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] expose VIRTIO_SCSI_F_T10_PI for
+ vhost-scsi and vhost-user-scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,54 +27,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Greg Edwards <gedwards@ddn.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Nicholas A. Bellinger" <nab@linux-iscsi.org>, Felipe Franciosi <felipe@nutanix.com>
 
-On Mon, 08/13 16:43, Paolo Bonzini wrote:
-> nvme_poll_queues is already protected by q->lock, and
-> AIO callbacks are invoked outside the AioContext lock.
-> So remove the acquire/release pair in nvme_handle_event.
+On Wed, 08/08 13:52, Greg Edwards wrote:
+> Unify the get_features functions for vhost-scsi and vhost-user-scsi, including
+> their use of host_features, and expose a new 't10_pi' property to enable
+> negotiation of the VIRTIO_SCSI_F_T10_PI feature bit with the backend.
 > 
-> Remove unnecessary variable in in nvme_poll_cb.
+> Greg Edwards (3):
+>   vhost-user-scsi: move host_features into VHostSCSICommon
+>   vhost-scsi: unify vhost-scsi get_features implementations
+>   vhost-scsi: expose 't10_pi' property for VIRTIO_SCSI_F_T10_PI
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  block/nvme.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
-> 
-> diff --git a/block/nvme.c b/block/nvme.c
-> index 6f71122bf5..df2e16fabe 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -489,10 +489,8 @@ static void nvme_handle_event(EventNotifier *n)
->      BDRVNVMeState *s = container_of(n, BDRVNVMeState, irq_notifier);
->  
->      trace_nvme_handle_event(s);
-> -    aio_context_acquire(s->aio_context);
->      event_notifier_test_and_clear(n);
->      nvme_poll_queues(s);
-> -    aio_context_release(s->aio_context);
->  }
->  
->  static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
-> @@ -539,11 +537,9 @@ static bool nvme_poll_cb(void *opaque)
->  {
->      EventNotifier *e = opaque;
->      BDRVNVMeState *s = container_of(e, BDRVNVMeState, irq_notifier);
-> -    bool progress = false;
->  
->      trace_nvme_poll_cb(s);
-> -    progress = nvme_poll_queues(s);
-> -    return progress;
-> +    return nvme_poll_queues(s);
->  }
->  
->  static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-> -- 
-> 2.17.1
-> 
+>  hw/scsi/vhost-scsi-common.c           |  3 +++
+>  hw/scsi/vhost-scsi.c                  |  3 +++
+>  hw/scsi/vhost-user-scsi.c             | 28 ++++++++++-----------------
+>  include/hw/virtio/vhost-scsi-common.h |  1 +
+>  include/hw/virtio/vhost-user-scsi.h   |  1 -
+>  5 files changed, 17 insertions(+), 19 deletions(-)
 
-Could you please split it into two patches? Because the significance of the two
-hunks feels overwhelmingly imbalanced to me. :)
 
-Fam
+Reviewed-by: Fam Zheng <famz@redhat.com>
