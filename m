@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fpVk8-0006sz-Vx
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 05:36:02 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fpVrp-0000vk-FD
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 05:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fpVk8-0004eL-1A
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 05:36:01 -0400
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue, 14 Aug 2018 10:35:51 +0100
-Message-Id: <20180814093551.2749-1-berrange@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1fpVrm-000789-C5
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 05:43:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60790 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fpVrm-00077f-55
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 05:43:54 -0400
+Date: Tue, 14 Aug 2018 10:43:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180814094347.GE2580@work-vm>
+References: <20180813171132.21939-1-cota@braap.org>
+	<20180813171132.21939-3-cota@braap.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] qemu-img: fix regression copying secrets
- during convert
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180813171132.21939-3-cota@braap.org>
+Subject: Re: [Qemu-devel] [PATCH 2/3] monitor: show sync profiling info with
+ 'info sync'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,112 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>
 
-When the convert command is creating an output file that needs
-secrets, we need to ensure those secrets are passed to both the
-blk_new_open and bdrv_create API calls.
+* Emilio G. Cota (cota@braap.org) wrote:
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  monitor.c            |  7 +++++++
+>  hmp-commands-info.hx | 16 ++++++++++++++++
+>  2 files changed, 23 insertions(+)
+> 
+> diff --git a/monitor.c b/monitor.c
+> index 77861e96af..66d8d85b97 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1454,6 +1454,13 @@ static void hmp_info_opcount(Monitor *mon, const QDict *qdict)
+>  }
+>  #endif
+>  
+> +static void hmp_info_sync(Monitor *mon, const QDict *qdict)
+> +{
+> +    int64_t max = qdict_get_try_int(qdict, "max", 10);
+> +
+> +    qsp_report((FILE *)mon, monitor_fprintf, max);
+> +}
+> +
+>  static void hmp_info_history(Monitor *mon, const QDict *qdict)
+>  {
+>      int i;
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index 70639f656a..56a3249bad 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -297,6 +297,22 @@ STEXI
+>  @item info opcount
+>  @findex info opcount
+>  Show dynamic compiler opcode counters
+> +ETEXI
+> +
+> +    {
+> +        .name       = "sync",
+> +        .args_type  = "max:i?",
+> +        .params     = "[max]",
+> +        .help       = "show sync profiling info for "
+> +	              "up to max entries (default: 10). "
+> +		      "Entries are sorted by wait time.",
+> +        .cmd        = hmp_info_sync,
+> +    },
+> +
+> +STEXI
+> +@item info sync
+> +@findex sync
+> +Show sync profiling info.
+>  ETEXI
+>  
+>      {
 
-This is done by qemu-img extracting all opts matching the name
-suffix "key-secret". Unfortunately the code doing this was run after the
-call to bdrv_create(), which meant the QemuOpts it was extracting
-secrets from was now empty.
+As long as this is just for devs I'm OK with this from the HMP side;
+however, if you want to automate the display or wire it to other
+tools then you should probably wire it up via QMP.
 
-Previously this worked by luks as a bug meant the "key-secret"
-parameters were not purged from the QemuOpts. This bug was fixed in
+Dave
 
-  commit b76b4f604521e59f857d6177bc55f6f2e41fd392
-  Author: Kevin Wolf <kwolf@redhat.com>
-  Date:   Thu Jan 11 16:18:08 2018 +0100
-
-    qcow2: Use visitor for options in qcow2_create()
-
-Exposing the latent bug in qemu-img. This fix simply moves the copying
-of secrets to before the bdrv_create() call.
-
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- qemu-img.c | 33 +++++++++++++++------------------
- 1 file changed, 15 insertions(+), 18 deletions(-)
-
-diff --git a/qemu-img.c b/qemu-img.c
-index 1acddf693c..66c388986e 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -345,21 +345,6 @@ static int img_add_key_secrets(void *opaque,
-     return 0;
- }
-=20
--static BlockBackend *img_open_new_file(const char *filename,
--                                       QemuOpts *create_opts,
--                                       const char *fmt, int flags,
--                                       bool writethrough, bool quiet,
--                                       bool force_share)
--{
--    QDict *options =3D NULL;
--
--    options =3D qdict_new();
--    qemu_opt_foreach(create_opts, img_add_key_secrets, options, &error_a=
-bort);
--
--    return img_open_file(filename, options, fmt, flags, writethrough, qu=
-iet,
--                         force_share);
--}
--
-=20
- static BlockBackend *img_open(bool image_opts,
-                               const char *filename,
-@@ -2018,6 +2003,7 @@ static int img_convert(int argc, char **argv)
-     BlockDriverState *out_bs;
-     QemuOpts *opts =3D NULL, *sn_opts =3D NULL;
-     QemuOptsList *create_opts =3D NULL;
-+    QDict *open_opts =3D NULL;
-     char *options =3D NULL;
-     Error *local_err =3D NULL;
-     bool writethrough, src_writethrough, quiet =3D false, image_opts =3D=
- false,
-@@ -2362,6 +2348,16 @@ static int img_convert(int argc, char **argv)
-         }
-     }
-=20
-+    /*
-+     * The later open call will need any decryption secrets, and
-+     * bdrv_create() will purge "opts", so extract them now before
-+     * they are lost.
-+     */
-+    if (!skip_create) {
-+        open_opts =3D qdict_new();
-+        qemu_opt_foreach(opts, img_add_key_secrets, open_opts, &error_ab=
-ort);
-+    }
-+
-     if (!skip_create) {
-         /* Create the new image */
-         ret =3D bdrv_create(drv, out_filename, opts, &local_err);
-@@ -2388,8 +2384,9 @@ static int img_convert(int argc, char **argv)
-          * That has to wait for bdrv_create to be improved
-          * to allow filenames in option syntax
-          */
--        s.target =3D img_open_new_file(out_filename, opts, out_fmt,
--                                     flags, writethrough, quiet, false);
-+        s.target =3D img_open_file(out_filename, open_opts, out_fmt,
-+                                 flags, writethrough, quiet, false);
-+        open_opts =3D NULL; /* blk_new_open will have freed it */
-     }
-     if (!s.target) {
-         ret =3D -1;
-@@ -2461,9 +2458,9 @@ out:
-         qemu_progress_print(100, 0);
-     }
-     qemu_progress_end();
--    qemu_opts_del(opts);
-     qemu_opts_free(create_opts);
-     qemu_opts_del(sn_opts);
-+    qobject_unref(open_opts);
-     blk_unref(s.target);
-     if (s.src) {
-         for (bs_i =3D 0; bs_i < s.src_num; bs_i++) {
---=20
-2.17.1
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
