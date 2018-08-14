@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpSnp-0006gt-BB
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 02:27:38 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fpSo0-0006pZ-Ry
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 02:27:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpSno-0007Lf-H7
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 02:27:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fpSo0-0007Te-4i
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 02:27:48 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 14 Aug 2018 08:27:25 +0200
-Message-Id: <20180814062725.19427-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] nvme: simplify code around completion
+Date: Tue, 14 Aug 2018 08:27:39 +0200
+Message-Id: <20180814062739.19640-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] nvme: correct locking around completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
