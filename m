@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpabR-0000w9-Gb
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:22 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fpac1-0001Jj-GO
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpabQ-0005Mg-Fs
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55956 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpabQ-0005MK-7a
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:20 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 14 Aug 2018 16:46:58 +0200
-Message-Id: <1534258018-22859-7-git-send-email-thuth@redhat.com>
-In-Reply-To: <1534258018-22859-1-git-send-email-thuth@redhat.com>
-References: <1534258018-22859-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/6] tests/device-introspect: Test with all
- machines, not only with "none"
+	(envelope-from <richard.henderson@linaro.org>) id 1fpaby-0005iB-CK
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:57 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:35695)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fpaby-0005hl-50
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:54 -0400
+Received: by mail-pg1-x542.google.com with SMTP id w10-v6so9206275pgv.2
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 07:47:54 -0700 (PDT)
+References: <20180814002653.12828-1-richard.henderson@linaro.org>
+	<87bma5wdoz.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b926d1a2-0973-ee44-5a7d-3e19cb9482ac@linaro.org>
+Date: Tue, 14 Aug 2018 07:47:50 -0700
+MIME-Version: 1.0
+In-Reply-To: <87bma5wdoz.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Fix int64_to_float16
+ double-rounding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +32,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org
 
-Certain device introspection crashes used to only happen if you were
-using a certain machine, e.g. if the machine was using serial_hd() or
-nd_table[], and a device was trying to use these in its instance_init
-function, too.
+On 08/14/2018 01:32 AM, Alex Bennée wrote:
+> Can't we add the constants to the fcvt test case?
 
-To be able to catch these problems, let's extend the device-introspect
-test to check the devices on all machine types. Since this is a rather
-slow operation, and most of the problems are already handled by testing
-with the "none" machine only, the test with all machines is only run
-in the "make check SPEED=slow" mode.
+No, they're all half-to-integer.  This is integer-to-half.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/device-introspect-test.c | 32 +++++++++++++++++++++++++++++---
- 1 file changed, 29 insertions(+), 3 deletions(-)
+We could write another one, I suppose, but it's not just
+an add-one-line kind of thing.
 
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-index 5b7ec05..902153c 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -221,13 +221,13 @@ static void test_device_intro_abstract(void)
-     qtest_end();
- }
- 
--static void test_device_intro_concrete(void)
-+static void test_device_intro_concrete(const void *args)
- {
-     QList *types;
-     QListEntry *entry;
-     const char *type;
- 
--    qtest_start(common_args);
-+    qtest_start(args);
-     types = device_type_list(false);
- 
-     QLIST_FOREACH_ENTRY(types, entry) {
-@@ -239,6 +239,7 @@ static void test_device_intro_concrete(void)
- 
-     qobject_unref(types);
-     qtest_end();
-+    g_free((void *)args);
- }
- 
- static void test_abstract_interfaces(void)
-@@ -275,6 +276,26 @@ static void test_abstract_interfaces(void)
-     qtest_end();
- }
- 
-+static void add_machine_test_case(const char *mname)
-+{
-+    char *path, *args;
-+
-+    /* Ignore blacklisted machines */
-+    if (g_str_equal("xenfv", mname) || g_str_equal("xenpv", mname)) {
-+        return;
-+    }
-+
-+    path = g_strdup_printf("device/introspect/concrete/defaults/%s", mname);
-+    args = g_strdup_printf("-M %s", mname);
-+    qtest_add_data_func(path, args, test_device_intro_concrete);
-+    g_free(path);
-+
-+    path = g_strdup_printf("device/introspect/concrete/nodefaults/%s", mname);
-+    args = g_strdup_printf("-nodefaults -M %s", mname);
-+    qtest_add_data_func(path, args, test_device_intro_concrete);
-+    g_free(path);
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -283,8 +304,13 @@ int main(int argc, char **argv)
-     qtest_add_func("device/introspect/list-fields", test_qom_list_fields);
-     qtest_add_func("device/introspect/none", test_device_intro_none);
-     qtest_add_func("device/introspect/abstract", test_device_intro_abstract);
--    qtest_add_func("device/introspect/concrete", test_device_intro_concrete);
-     qtest_add_func("device/introspect/abstract-interfaces", test_abstract_interfaces);
-+    if (g_test_quick()) {
-+        qtest_add_data_func("device/introspect/concrete/defaults/none",
-+                            g_strdup(common_args), test_device_intro_concrete);
-+    } else {
-+        qtest_cb_for_every_machine(add_machine_test_case);
-+    }
- 
-     return g_test_run();
- }
--- 
-1.8.3.1
+
+r~
