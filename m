@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdtT-0003Qh-5T
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:14 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdtW-0003Sz-58
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdss-0005vH-2c
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:10 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:52253 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdss-0005vN-41
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:13 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:52251 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpdsr-0005u3-FG
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:17:33 -0400
+	id 1fpdsr-0005u2-F7
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:17:34 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 14 Aug 2018 20:16:56 +0200
-Message-Id: <1534270621-27332-15-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 14 Aug 2018 20:16:53 +0200
+Message-Id: <1534270621-27332-12-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 14/19] target/mips: Add gen_op_addr_addi()
+Subject: [Qemu-devel] [PULL 11/19] target/mips: Implement CP0 Config1.WR bit
+ functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +30,82 @@ Cc: peter.maydell@linaro.org
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add gen_op_addr_addi(). This function will be used in emulation of
-some nanoMIPS instructions.
+Add testing Config1.WR bit into watch exception handling logic.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ target/mips/translate.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 420f1df..d67e747 100644
+index e62ea96..6f4bdc9 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1746,6 +1746,18 @@ static inline void gen_op_addr_add (DisasContext *ctx, TCGv ret, TCGv arg0, TCGv
- #endif
- }
- 
-+static inline void gen_op_addr_addi(DisasContext *ctx, TCGv ret, TCGv base,
-+                                    target_long ofs)
-+{
-+    tcg_gen_addi_tl(ret, base, ofs);
-+
-+#if defined(TARGET_MIPS64)
-+    if (ctx->hflags & MIPS_HFLAG_AWRAP) {
-+        tcg_gen_ext32s_i64(ret, ret);
-+    }
-+#endif
-+}
-+
- /* Addresses computation (translation time) */
- static target_long addr_add(DisasContext *ctx, target_long base,
-                             target_long offset)
+@@ -5562,6 +5562,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(mfc0_watchlo, arg, sel);
+             rn = "WatchLo";
+             break;
+@@ -5579,6 +5580,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(mfc0_watchhi, arg, sel);
+             rn = "WatchHi";
+             break;
+@@ -6261,6 +6263,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchlo, arg, sel);
+             rn = "WatchLo";
+             break;
+@@ -6278,6 +6281,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchhi, arg, sel);
+             rn = "WatchHi";
+             break;
+@@ -6964,6 +6968,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(dmfc0_watchlo, arg, sel);
+             rn = "WatchLo";
+             break;
+@@ -6981,6 +6986,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(mfc0_watchhi, arg, sel);
+             rn = "WatchHi";
+             break;
+@@ -7645,6 +7651,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchlo, arg, sel);
+             rn = "WatchLo";
+             break;
+@@ -7662,6 +7669,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchhi, arg, sel);
+             rn = "WatchHi";
+             break;
 -- 
 2.7.4
