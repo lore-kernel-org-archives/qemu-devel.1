@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpZvh-00025f-W0
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:04:14 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fpa4X-0006iT-6u
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpZvh-0001qX-1q
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:04:13 -0400
-Date: Tue, 14 Aug 2018 16:04:03 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180814140403.GN5025@dhcp-200-186.str.redhat.com>
-References: <cover.1530270904.git.berto@igalia.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fpa4N-0000ey-NX
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:13:21 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 14 Aug 2018 16:12:46 +0200
+Message-Id: <20180814141247.32336-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1530270904.git.berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 0/5] Some bs->options fixes
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] megasas: fix sglist leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +20,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Hannes Reinecke <hare@suse.com>, "open list:megasas" <qemu-block@nongnu.org>
 
-Am 29.06.2018 um 13:36 hat Alberto Garcia geschrieben:
-> Hi everyone,
-> 
-> this is part of the blockdev-reopen work that I'm doing, but since
-> I'll be away during most of July I thought that I could send already a
-> couple of patches that I think are ready and don't need anything else
-> from the rest of the series.
-> 
-> There's two main fixes here:
-> 
->   1) bs->options are not kept up to date after an image is reopened
->      and no longer reflect its state.
-> 
->   2) bs->options and bs->explicit_options also contain the options of
->      a BDS's children, so there's data that is duplicated and will be
->      inconsistent as soon as you change the children's options
->      directly.
-> 
-> The fix for (2) involves removing all children options from both
-> QDicts. In the cases of node name references ("backing": "node-name")
-> those remain in the QDict (they're technically parent options). I
-> think we don't really need them and it should be possible to get rid
-> of them, but it's a little more complicated (we need them during
-> bdrv_reopen() to ensure that the user didn't try to change any of
-> them).
+tests/cdrom-test -p /x86_64/cdrom/boot/megasas
 
-Thanks, applied to the block branch.
+Produces the following ASAN leak.
 
-Kevin
+=3D=3D25700=3D=3DERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 16 byte(s) in 1 object(s) allocated from:
+    #0 0x7f06f8faac48 in malloc (/lib64/libasan.so.5+0xeec48)
+    #1 0x7f06f87a73c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
+    #2 0x55a729f17738 in pci_dma_sglist_init /home/elmarco/src/qq/include=
+/hw/pci/pci.h:818
+    #3 0x55a729f2a706 in megasas_map_dcmd /home/elmarco/src/qq/hw/scsi/me=
+gasas.c:698
+    #4 0x55a729f39421 in megasas_handle_dcmd /home/elmarco/src/qq/hw/scsi=
+/megasas.c:1574
+    #5 0x55a729f3f70d in megasas_handle_frame /home/elmarco/src/qq/hw/scs=
+i/megasas.c:1955
+    #6 0x55a729f40939 in megasas_mmio_write /home/elmarco/src/qq/hw/scsi/=
+megasas.c:2119
+    #7 0x55a729f41102 in megasas_port_write /home/elmarco/src/qq/hw/scsi/=
+megasas.c:2170
+    #8 0x55a729220e60 in memory_region_write_accessor /home/elmarco/src/q=
+q/memory.c:527
+    #9 0x55a7292212b3 in access_with_adjusted_size /home/elmarco/src/qq/m=
+emory.c:594
+    #10 0x55a72922cf70 in memory_region_dispatch_write /home/elmarco/src/=
+qq/memory.c:1473
+    #11 0x55a7290f5907 in flatview_write_continue /home/elmarco/src/qq/ex=
+ec.c:3255
+    #12 0x55a7290f5ceb in flatview_write /home/elmarco/src/qq/exec.c:3294
+    #13 0x55a7290f6457 in address_space_write /home/elmarco/src/qq/exec.c=
+:3384
+    #14 0x55a7290f64a8 in address_space_rw /home/elmarco/src/qq/exec.c:33=
+95
+    #15 0x55a72929ecb0 in kvm_handle_io /home/elmarco/src/qq/accel/kvm/kv=
+m-all.c:1729
+    #16 0x55a7292a0db5 in kvm_cpu_exec /home/elmarco/src/qq/accel/kvm/kvm=
+-all.c:1969
+    #17 0x55a7291c4212 in qemu_kvm_cpu_thread_fn /home/elmarco/src/qq/cpu=
+s.c:1215
+    #18 0x55a72a966a6c in qemu_thread_start /home/elmarco/src/qq/util/qem=
+u-thread-posix.c:504
+    #19 0x7f06ed486593 in start_thread (/lib64/libpthread.so.0+0x7593)
+
+Move the qemu_sglist_destroy() from megasas_complete_command() to
+megasas_unmap_frame(), so map/unmap are balanced.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/scsi/megasas.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index ba1afa3c1e..7bee734718 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -465,6 +465,7 @@ static void megasas_unmap_frame(MegasasState *s, Mega=
+sasCmd *cmd)
+     cmd->pa =3D 0;
+     cmd->pa_size =3D 0;
+     clear_bit(cmd->index, s->frame_map);
++    qemu_sglist_destroy(&cmd->qsg);
+ }
+=20
+ /*
+@@ -580,7 +581,6 @@ static void megasas_complete_frame(MegasasState *s, u=
+int64_t context)
+=20
+ static void megasas_complete_command(MegasasCmd *cmd)
+ {
+-    qemu_sglist_destroy(&cmd->qsg);
+     cmd->iov_size =3D 0;
+     cmd->iov_offset =3D 0;
+=20
+--=20
+2.18.0.547.g1d89318c48
