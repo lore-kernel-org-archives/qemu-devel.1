@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdtO-0003PP-1b
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:04 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdtT-0003QW-0y
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdsr-0005uw-VM
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:05 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:52244 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdss-0005vB-2B
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:10 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:52240 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpdsr-0005ty-9p
+	id 1fpdsr-0005tf-9N
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:17:33 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 14 Aug 2018 20:16:52 +0200
-Message-Id: <1534270621-27332-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 14 Aug 2018 20:16:49 +0200
+Message-Id: <1534270621-27332-8-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 10/19] target/mips: Fix MT ASE instructions'
- availability control
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 07/19] target/mips: Add CP0 BadInstrX register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +30,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Use bits from configuration registers for availability control
-of MT ASE instructions, rather than only ISA_MT bit in insn_flags.
+Add CP0 BadInstrX register. This register will be used in nanoMIPS.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ target/mips/cpu.h       |  1 +
+ target/mips/machine.c   |  5 +++--
+ target/mips/translate.c | 22 +++++++++++++++++++++-
+ 3 files changed, 25 insertions(+), 3 deletions(-)
 
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 77c638c..009202c 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -323,6 +323,7 @@ struct CPUMIPSState {
+     target_ulong CP0_BadVAddr;
+     uint32_t CP0_BadInstr;
+     uint32_t CP0_BadInstrP;
++    uint32_t CP0_BadInstrX;
+     int32_t CP0_Count;
+     target_ulong CP0_EntryHi;
+ #define CP0EnHi_EHINV 10
+diff --git a/target/mips/machine.c b/target/mips/machine.c
+index 20100d5..5ba78ac 100644
+--- a/target/mips/machine.c
++++ b/target/mips/machine.c
+@@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb =3D {
+=20
+ const VMStateDescription vmstate_mips_cpu =3D {
+     .name =3D "cpu",
+-    .version_id =3D 10,
+-    .minimum_version_id =3D 10,
++    .version_id =3D 11,
++    .minimum_version_id =3D 11,
+     .post_load =3D cpu_post_load,
+     .fields =3D (VMStateField[]) {
+         /* Active TC */
+@@ -266,6 +266,7 @@ const VMStateDescription vmstate_mips_cpu =3D {
+         VMSTATE_UINTTL(env.CP0_BadVAddr, MIPSCPU),
+         VMSTATE_UINT32(env.CP0_BadInstr, MIPSCPU),
+         VMSTATE_UINT32(env.CP0_BadInstrP, MIPSCPU),
++        VMSTATE_UINT32(env.CP0_BadInstrX, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Count, MIPSCPU),
+         VMSTATE_UINTTL(env.CP0_EntryHi, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Compare, MIPSCPU),
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index d827d3b..e62ea96 100644
+index 2b70d1b..ae3aaab 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -8393,7 +8393,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContext *ctx, uint32_t opc, int rt,
-         opn = "mthc0";
-         break;
-     case OPC_MFTR:
--        check_insn(ctx, ASE_MT);
-+        check_cp0_enabled(ctx);
-         if (rd == 0) {
-             /* Treat as NOP. */
-             return;
-@@ -8403,7 +8403,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContext *ctx, uint32_t opc, int rt,
-         opn = "mftr";
-         break;
-     case OPC_MTTR:
--        check_insn(ctx, ASE_MT);
-+        check_cp0_enabled(ctx);
-         gen_mttr(env, ctx, rd, rt, (ctx->opcode >> 5) & 1,
-                  ctx->opcode & 0x7, (ctx->opcode >> 4) & 1);
-         opn = "mttr";
-@@ -18619,7 +18619,7 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
-         gen_rdhwr(ctx, rt, rd, extract32(ctx->opcode, 6, 3));
-         break;
-     case OPC_FORK:
--        check_insn(ctx, ASE_MT);
-+        check_mt(ctx);
-         {
-             TCGv t0 = tcg_temp_new();
-             TCGv t1 = tcg_temp_new();
-@@ -18632,7 +18632,7 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
+@@ -5328,7 +5328,13 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
+             rn =3D "BadInstrP";
+             break;
+-        default:
++        case 3:
++            CP0_CHECK(ctx->bi);
++            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
++            tcg_gen_andi_tl(arg, arg, ~0xffff);
++            rn =3D "BadInstrX";
++            break;
++       default:
+             goto cp0_unimplemented;
          }
          break;
-     case OPC_YIELD:
--        check_insn(ctx, ASE_MT);
-+        check_mt(ctx);
-         {
-             TCGv t0 = tcg_temp_new();
- 
-@@ -19929,22 +19929,22 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-                 op2 = MASK_MFMC0(ctx->opcode);
-                 switch (op2) {
-                 case OPC_DMT:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_dmt(t0);
-                     gen_store_gpr(t0, rt);
-                     break;
-                 case OPC_EMT:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_emt(t0);
-                     gen_store_gpr(t0, rt);
-                     break;
-                 case OPC_DVPE:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_dvpe(t0, cpu_env);
-                     gen_store_gpr(t0, rt);
-                     break;
-                 case OPC_EVPE:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_evpe(t0, cpu_env);
-                     gen_store_gpr(t0, rt);
-                     break;
--- 
+@@ -6019,6 +6025,10 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+             /* ignored */
+             rn =3D "BadInstrP";
+             break;
++        case 3:
++            /* ignored */
++            rn =3D "BadInstrX";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -6724,6 +6734,12 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
+             rn =3D "BadInstrP";
+             break;
++        case 3:
++            CP0_CHECK(ctx->bi);
++            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
++            tcg_gen_andi_tl(arg, arg, ~0xffff);
++            rn =3D "BadInstrX";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -7398,6 +7414,10 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+             /* ignored */
+             rn =3D "BadInstrP";
+             break;
++        case 3:
++            /* ignored */
++            rn =3D "BadInstrX";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+--=20
 2.7.4
