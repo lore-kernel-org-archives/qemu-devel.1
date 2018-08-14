@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fpaoA-0005cR-2c
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 11:00:32 -0400
+	(envelope-from <edgari@xilinx.com>) id 1fpaup-0004FV-DD
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 11:07:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fpao5-0002wK-4m
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 11:00:30 -0400
-Date: Tue, 14 Aug 2018 16:59:56 +0200
+	(envelope-from <edgari@xilinx.com>) id 1fpaul-00064g-8Z
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 11:07:23 -0400
+Date: Tue, 14 Aug 2018 17:07:00 +0200
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20180814145956.tpdhei44ok52aj52@toto>
+Message-ID: <20180814150700.nvvrppys6zrq43pe@toto>
 References: <20180814124254.5229-1-peter.maydell@linaro.org>
-	<20180814124254.5229-8-peter.maydell@linaro.org>
+	<20180814124254.5229-9-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20180814124254.5229-8-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 07/10] target/arm: Implement ESR_EL2/HSR
- for AArch32 and no-EL2
+In-Reply-To: <20180814124254.5229-9-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 08/10] target/arm: Permit accesses to
+ ELR_Hyp from Hyp mode via MSR/MRS (banked)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,12 +27,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Luc Michel <luc.michel@greensocs.com>, edgari@xilinx.com
 
-On Tue, Aug 14, 2018 at 01:42:51PM +0100, Peter Maydell wrote:
-> The AArch32 HSR is the equivalent of AArch64 ESR_EL2;
-> we can implement it by marking our existing ESR_EL2 regdef
-> as STATE_BOTH. It also needs to be "RES0 from EL3 if
-> EL2 not implemented", so add the missing stanza to
-> el3_no_el2_cp_reginfo.
+On Tue, Aug 14, 2018 at 01:42:52PM +0100, Peter Maydell wrote:
+> The MSR (banked) and MRS (banked) instructions allow accesses to ELR_Hyp
+> from either Monitor or Hyp mode. Our translate time check
+> was overly strict and only permitted access from Monitor mode.
+> 
+> The runtime check wo do in msr_mrs_banked_exc_checks() had the
+> correct code in it, but never got there because of the earlier
+> "currmode == tgtmode" check. Special case ELR_Hyp.
 
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
@@ -40,33 +42,72 @@ Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/helper.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>  target/arm/op_helper.c | 22 +++++++++++-----------
+>  target/arm/translate.c | 10 +++++++---
+>  2 files changed, 18 insertions(+), 14 deletions(-)
 > 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index d6e98e9d606..80855302089 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -3763,6 +3763,10 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
->        .cp = 15, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 4,
->        .access = PL2_RW,
->        .type = ARM_CP_CONST, .resetvalue = 0 },
-> +    { .name = "ESR_EL2", .state = ARM_CP_STATE_BOTH,
-> +      .opc0 = 3, .opc1 = 4, .crn = 5, .crm = 2, .opc2 = 0,
-> +      .access = PL2_RW,
-> +      .type = ARM_CP_CONST, .resetvalue = 0 },
->      { .name = "CPTR_EL2", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 2,
->        .access = PL2_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-> @@ -3926,7 +3930,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
->        .opc0 = 3, .opc1 = 4, .crn = 4, .crm = 0, .opc2 = 1,
->        .access = PL2_RW,
->        .fieldoffset = offsetof(CPUARMState, elr_el[2]) },
-> -    { .name = "ESR_EL2", .state = ARM_CP_STATE_AA64,
-> +    { .name = "ESR_EL2", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .opc1 = 4, .crn = 5, .crm = 2, .opc2 = 0,
->        .access = PL2_RW, .fieldoffset = offsetof(CPUARMState, cp15.esr_el[2]) },
->      { .name = "FAR_EL2", .state = ARM_CP_STATE_BOTH,
+> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> index d550978b5b9..952b8d122b7 100644
+> --- a/target/arm/op_helper.c
+> +++ b/target/arm/op_helper.c
+> @@ -611,6 +611,14 @@ static void msr_mrs_banked_exc_checks(CPUARMState *env, uint32_t tgtmode,
+>       */
+>      int curmode = env->uncached_cpsr & CPSR_M;
+>  
+> +    if (regno == 17) {
+> +        /* ELR_Hyp: a special case because access from tgtmode is OK */
+> +        if (curmode != ARM_CPU_MODE_HYP && curmode != ARM_CPU_MODE_MON) {
+> +            goto undef;
+> +        }
+> +        return;
+> +    }
+> +
+>      if (curmode == tgtmode) {
+>          goto undef;
+>      }
+> @@ -638,17 +646,9 @@ static void msr_mrs_banked_exc_checks(CPUARMState *env, uint32_t tgtmode,
+>      }
+>  
+>      if (tgtmode == ARM_CPU_MODE_HYP) {
+> -        switch (regno) {
+> -        case 17: /* ELR_Hyp */
+> -            if (curmode != ARM_CPU_MODE_HYP && curmode != ARM_CPU_MODE_MON) {
+> -                goto undef;
+> -            }
+> -            break;
+> -        default:
+> -            if (curmode != ARM_CPU_MODE_MON) {
+> -                goto undef;
+> -            }
+> -            break;
+> +        /* SPSR_Hyp, r13_hyp: accessible from Monitor mode only */
+> +        if (curmode != ARM_CPU_MODE_MON) {
+> +            goto undef;
+>          }
+>      }
+>  
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index f845da7c638..3f5751d4826 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -4506,10 +4506,14 @@ static bool msr_banked_access_decode(DisasContext *s, int r, int sysm, int rn,
+>          }
+>          break;
+>      case ARM_CPU_MODE_HYP:
+> -        /* Note that we can forbid accesses from EL2 here because they
+> -         * must be from Hyp mode itself
+> +        /*
+> +         * SPSR_hyp and r13_hyp can only be accessed from Monitor mode
+> +         * (and so we can forbid accesses from EL2 or below). elr_hyp
+> +         * can be accessed also from Hyp mode, so forbid accesses from
+> +         * EL0 or EL1.
+>           */
+> -        if (!arm_dc_feature(s, ARM_FEATURE_EL2) || s->current_el < 3) {
+> +        if (!arm_dc_feature(s, ARM_FEATURE_EL2) || s->current_el < 2 ||
+> +            (s->current_el < 3 && *regno != 17)) {
+>              goto undef;
+>          }
+>          break;
 > -- 
 > 2.18.0
 > 
