@@ -1,28 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpZ2t-0004Vq-Sl
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:07:36 -0400
+	(envelope-from <rppt@linux.vnet.ibm.com>) id 1fpSZv-0007E0-4K
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 02:13:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpZ2p-0001PX-Rk
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:07:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39046 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fpZ2p-0001PL-KG
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:07:31 -0400
-References: <1534243693-9560-1-git-send-email-jianjay.zhou@huawei.com>
-	<2278afdb-d2a6-54b3-67c7-c1f43e4d311c@redhat.com>
-	<20180814115202.GH2580@work-vm>
-	<517f613f-3885-7b6f-aff7-cffee9d8f35f@redhat.com>
-	<B2D15215269B544CADD246097EACE7473B7345BB@DGGEMM528-MBX.china.huawei.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <954665c4-ab5f-6232-6208-19e479d41055@redhat.com>
-Date: Tue, 14 Aug 2018 15:07:28 +0200
+	(envelope-from <rppt@linux.vnet.ibm.com>) id 1fpSZr-0002HJ-TR
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 02:13:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44156
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rppt@linux.vnet.ibm.com>)
+	id 1fpSZr-0002H9-N6
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 02:13:11 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w7E6AEf8074587
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 02:13:10 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2kusbu0nbd-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 02:13:10 -0400
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <rppt@linux.vnet.ibm.com>;
+	Tue, 14 Aug 2018 07:13:08 +0100
+Date: Tue, 14 Aug 2018 09:13:01 +0300
+From: Mike Rapoport <rppt@linux.vnet.ibm.com>
+References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+	<20180629115359.GH2568@work-vm> <20180725101836.GI2479@xz-mi>
+	<20180725191736.GE2365@work-vm> <20180725200456.GM18452@redhat.com>
+	<e1c85e53-1b94-b1df-b7ee-6d93bb43caf6@redhat.com>
+	<20180726092307.GL2479@xz-mi>
+	<d1370a77-3d67-9c83-8214-3cba291744a1@virtuozzo.com>
+	<20180813190019.GH2488@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <B2D15215269B544CADD246097EACE7473B7345BB@DGGEMM528-MBX.china.huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] vl: fix migration when watchdog expires
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180813190019.GH2488@work-vm>
+Message-Id: <20180814061300.GB554@rapoport-lnx>
+Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +47,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, mike.kravetz@oracle.com
 
-On 14/08/2018 15:03, Zhoujian (jay) wrote:
->> -----Original Message-----
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> Sent: Tuesday, August 14, 2018 8:02 PM
->> To: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Cc: Zhoujian (jay) <jianjay.zhou@huawei.com>; qemu-devel@nongnu.org;
->> quintela@redhat.com; wangxin (U) <wangxinxin.wang@huawei.com>
->> Subject: Re: [RFC PATCH] vl: fix migration when watchdog expires
->>
->> On 14/08/2018 13:52, Dr. David Alan Gilbert wrote:
->>>  a) Should the watchdog expire when the VM is stopped; I think it
->>> shouldn't - hw/acpi/tco.c uses a virtual timer as does i6300esb; so is
->>> the bug here that the watchdog being used didn't use a virtual timer?
->>
->> All watchdogs do.
->>
->>>  b) If the watchdog expires just before the VM gets stopped, is there
->>> a race which could hit this?  Possibly.
->>
->> Yes, I think it is a race that happens just before vm_stop, but I don't
->> understand why the "qemu_clock_enable" in pause_all_vcpus does not prevent it.
+On Mon, Aug 13, 2018 at 08:00:19PM +0100, Dr. David Alan Gilbert wrote:
+> cc'ing in Mike*2
+> * Denis Plotnikov (dplotnikov@virtuozzo.com) wrote:
+> > 
+> > 
+> > On 26.07.2018 12:23, Peter Xu wrote:
+> > > On Thu, Jul 26, 2018 at 10:51:33AM +0200, Paolo Bonzini wrote:
+> > > > On 25/07/2018 22:04, Andrea Arcangeli wrote:
+> > > > > 
+> > > > > It may look like the uffd-wp model is wish-feature similar to an
+> > > > > optimization, but without the uffd-wp model when the WP fault is
+> > > > > triggered by kernel code, the sigsegv model falls apart and requires
+> > > > > all kind of ad-hoc changes just for this single feature. Plus uffd-wp
+> > > > > has other benefits: it makes it all reliable in terms of not
+> > > > > increasing the number of vmas in use during the snapshot. Finally it
+> > > > > makes it faster too with no mmap_sem for reading and no sigsegv
+> > > > > signals.
+> > > > > 
+> > > > > The non cooperative features got merged first because there was much
+> > > > > activity on the kernel side on that front, but this is just an ideal
+> > > > > time to nail down the remaining issues in uffd-wp I think. That I
+> > > > > believe is time better spent than trying to emulate it with sigsegv
+> > > > > and changing all drivers to send new events down to qemu specific to
+> > > > > the sigsegv handling. We considered this before doing uffd for
+> > > > > postcopy too but overall it's unreliable and more work (no single
+> > > > > change was then needed to KVM code with uffd to handle postcopy and
+> > > > > here it should be the same).
+> > > > 
+> > > > I totally agree.  The hard part in userfaultfd was the changes to the
+> > > > kernel get_user_pages API, but the payback was huge because _all_ kernel
+> > > > uses (KVM, vhost-net, syscalls, etc.) just work with userfaultfd.  Going
+> > > > back to mprotect would be a huge mistake.
+> > > 
+> > > Thanks for explaining the bits.  I'd say I wasn't aware of the
+> > > difference before I started the investigation (and only until now I
+> > > noticed that major difference between mprotect and userfaultfd).  I'm
+> > > really glad that it's much clear (at least for me) on which way we
+> > > should choose.
+> > > 
+> > > Now I'm thinking whether we can move the userfault write protect work
+> > > forward.  The latest discussion I saw so far is in 2016, when someone
+> > > from Huawei tried to use the write protect feature for that old
+> > > version of live snapshot but reported issue:
+> > > 
+> > >    https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01127.html
+> > > 
+> > > Is that the latest status for userfaultfd wr-protect?
+> > > 
+> > > If so, I'm thinking whether I can try to re-verify the work (I tried
+> > > his QEMU repository but I failed to compile somehow, so I plan to
+> > > write some even simpler code to try) to see whether I can get the same
+> > > KVM error he encountered.
+> > > 
+> > > Thoughts?
+> > 
+> > Just to sum up all being said before.
+> > 
+> > Using mprotect is a bad idea because VM's memory can be accessed from the
+> > number of places (KVM, vhost, ...) which need their own special care
+> > of tracking memory accesses and notifying QEMU which makes the mprotect
+> > using unacceptable.
+> > 
+> > Protected memory accesses tracking can be done via userfaultfd's WP mode
+> > which isn't available right now.
+> > 
+> > So, the reasonable conclusion is to wait until the WP mode is available and
+> > build the background snapshot on top of userfaultfd-wp.
+> > But, works on adding the WP-mode is pending for a quite a long time already.
+> > 
+> > Is there any way to estimate when it could be available?
 > 
-> Hi Paolo,
-> The sequence is like this I think
-> 
->          |
->          |  <-----  watchdog expired, which set reset_requested to SHUTDOWN_CAUSE_GUEST_RESET
->          | 
->          |  <-----  migration thread sets to RUN_STATE_FINISH_MIGRATE, it will disable QEMU_CLOCK_VIRTUAL clock,
->          |          but it is done after the setting of reset_requested
+> I think a question is whether anyone is actively working on it; I
+> suspect really it's on a TODO list rather than moving at the moment.
 
-So the fix would be to process the reset request here?  (In do_vm_stop
-or pause_all_vcpus).  The code is currently in main_loop_should_exit().
+I thought Andrea was working on it :)
+ 
+> What I don't really understand is what stage the last version got upto.
+> 
+> Dave
+> 
+> > > 
+> > > Regards,
+> > > 
+> > 
+> > -- 
+> > Best,
+> > Denis
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 
-Paolo
-
->          |  <-----  main loop thread sets to RUN_STATE_PRELAUNCH since it detected a reset request
->          |
->          |  <-----  migration thread sets to RUN_STATE_POSTMIGRATE
-> 
-> 
-> Regards,
-> Jay Zhou
-> 
->>
->> It should be possible to write a deterministic testcase with qtest...
->>
->> Paolo
+-- 
+Sincerely yours,
+Mike.
