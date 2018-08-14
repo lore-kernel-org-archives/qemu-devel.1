@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fpdWG-0006i2-Cs
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:54:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1fpdWI-0006yk-OU
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:54:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fpdW1-0004Dd-Cl
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:54:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37010 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fpdW3-0004FM-Mv
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:54:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49300 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fpdW1-0004DA-6S
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:53:57 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fpdW3-0004F0-Hj
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:53:59 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <1534258018-22859-1-git-send-email-thuth@redhat.com>
-	<1534258018-22859-3-git-send-email-thuth@redhat.com>
-Date: Tue, 14 Aug 2018 19:53:53 +0200
-In-Reply-To: <1534258018-22859-3-git-send-email-thuth@redhat.com> (Thomas
-	Huth's message of "Tue, 14 Aug 2018 16:46:54 +0200")
-Message-ID: <87a7pou95a.fsf@dusky.pond.sub.org>
+References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
+	<cover.1526916378.git.simon@ruderich.org>
+	<20180809144340.GA29237@ruderich.org>
+	<878t5evjqk.fsf@dusky.pond.sub.org>
+	<20180814141605.GA26651@ruderich.org>
+Date: Tue, 14 Aug 2018 17:27:52 +0200
+In-Reply-To: <20180814141605.GA26651@ruderich.org> (Simon Ruderich's message
+	of "Tue, 14 Aug 2018 16:16:05 +0200")
+Message-ID: <87bma5t1c7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/6] tests/device-introspection: Check that
- the qom-tree and qtree do not change
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Simon Ruderich <simon@ruderich.org>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, David Alan Gilbert <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Thomas Huth <thuth@redhat.com> writes:
+Simon Ruderich <simon@ruderich.org> writes:
 
-> Introspection should not change the qom-tree / qtree, so we should check
-> this in the device-introspect-test, too. This patch helped to find lots
-> of instrospection bugs during the QEMU v3.0 soft/hard-freeze period in the
-> last two months.
-
-Clever idea.
-
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/device-introspect-test.c | 23 +++++++++++++++++++----
->  1 file changed, 19 insertions(+), 4 deletions(-)
+> On Fri, Aug 10, 2018 at 08:06:11AM +0200, Markus Armbruster wrote:
+>> You neglected to cc: maintainers.  I spotted this cry for help only by
+>> chance.
+>>
+>> To find maintainers to cc:, you can use get_maintainer.pl like this:
+>>
+>>     $ scripts/get_maintainer.pl *patch
+>>     scripts/get_maintainer.pl: file '0000-cover-letter.patch' doesn't appear to be a patch.  Add -f to options?
+>>     Paolo Bonzini <pbonzini@redhat.com> (maintainer:Overall)
+>>     Peter Crosthwaite <crosthwaite.peter@gmail.com> (maintainer:Overall)
+>>     Richard Henderson <rth@twiddle.net> (maintainer:Overall)
+>>     "Dr. David Alan Gilbert" <dgilbert@redhat.com> (maintainer:Human Monitor (HMP))
+>>     Eric Blake <eblake@redhat.com> (supporter:QAPI Schema)
+>>     Markus Armbruster <armbru@redhat.com> (supporter:QAPI Schema)
+>>     qemu-devel@nongnu.org (open list:Overall)
+>>
+>> It's output is advice, not gospel.  Use your judgement.
+>>
+>> I'm copying maintainers for you now.  This should get you some review.
 >
-> diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-> index 0b4f221..5b7ec05 100644
-> --- a/tests/device-introspect-test.c
-> +++ b/tests/device-introspect-test.c
-> @@ -103,7 +103,14 @@ static QList *device_type_list(bool abstract)
->  static void test_one_device(const char *type)
->  {
->      QDict *resp;
-> -    char *help, *qom_tree;
-> +    char *help;
-> +    char *qom_tree_start, *qom_tree_end;
-> +    char *qtree_start, *qtree_end;
-> +
-> +    g_debug("Testing device '%s'", type);
+> Hello,
+>
+> Thank you for your help. I missed that part when looking through
+> the patch submission instructions.
 
-This is only the second use of g_debug() in tests/.  What are you trying
-to accomplish?
-
-> +
-> +    qom_tree_start = hmp("info qom-tree");
-> +    qtree_start = hmp("info qtree");
->  
->      resp = qmp("{'execute': 'device-list-properties',"
->                 " 'arguments': {'typename': %s}}",
-> @@ -115,10 +122,18 @@ static void test_one_device(const char *type)
->  
->      /*
->       * Some devices leave dangling pointers in QOM behind.
-> -     * "info qom-tree" has a good chance at crashing then
-> +     * "info qom-tree" or "info qtree" have a good chance at crashing then.
-> +     * Also make sure that the tree did not change.
->       */
-> -    qom_tree = hmp("info qom-tree");
-> -    g_free(qom_tree);
-> +    qom_tree_end = hmp("info qom-tree");
-> +    g_assert_cmpstr(qom_tree_start, ==, qom_tree_end);
-> +    g_free(qom_tree_start);
-> +    g_free(qom_tree_end);
-> +
-> +    qtree_end = hmp("info qtree");
-> +    g_assert_cmpstr(qtree_start, ==, qtree_end);
-> +    g_free(qtree_start);
-> +    g_free(qtree_end);
->  }
->  
->  static void test_device_intro_list(void)
-
-Output of "info qom-tree" depends on hash table iteration order, but
-that could almost be considered a feature here.
+Don't worry, we don't expect people to get it 100% right every time,
+especially not the first time.
