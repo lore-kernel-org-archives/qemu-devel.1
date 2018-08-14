@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1fpZT5-0004DO-Bg
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:34:40 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fpZvh-00025f-W0
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:04:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1fpZT2-0004iD-O4
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:34:39 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2405 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1fpZT1-0004fm-FJ
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:34:36 -0400
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Tue, 14 Aug 2018 13:34:19 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473B73463F@DGGEMM528-MBX.china.huawei.com>
-References: <1534243693-9560-1-git-send-email-jianjay.zhou@huawei.com>
-	<2278afdb-d2a6-54b3-67c7-c1f43e4d311c@redhat.com>
-	<20180814115202.GH2580@work-vm>
-	<517f613f-3885-7b6f-aff7-cffee9d8f35f@redhat.com>
-	<B2D15215269B544CADD246097EACE7473B7345BB@DGGEMM528-MBX.china.huawei.com>
-	<954665c4-ab5f-6232-6208-19e479d41055@redhat.com>
-In-Reply-To: <954665c4-ab5f-6232-6208-19e479d41055@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <kwolf@redhat.com>) id 1fpZvh-0001qX-1q
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:04:13 -0400
+Date: Tue, 14 Aug 2018 16:04:03 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180814140403.GN5025@dhcp-200-186.str.redhat.com>
+References: <cover.1530270904.git.berto@igalia.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH] vl: fix migration when watchdog expires
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1530270904.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 0/5] Some bs->options fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +22,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWls
-dG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2VudDogVHVlc2RheSwgQXVndXN0IDE0LCAyMDE4
-IDk6MDcgUE0NCj4gVG86IFpob3VqaWFuIChqYXkpIDxqaWFuamF5Lnpob3VAaHVhd2VpLmNvbT47
-IERyLiBEYXZpZCBBbGFuIEdpbGJlcnQNCj4gPGRnaWxiZXJ0QHJlZGhhdC5jb20+DQo+IENjOiBx
-ZW11LWRldmVsQG5vbmdudS5vcmc7IHF1aW50ZWxhQHJlZGhhdC5jb207IHdhbmd4aW4gKFUpDQo+
-IDx3YW5neGlueGluLndhbmdAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtSRkMgUEFUQ0hd
-IHZsOiBmaXggbWlncmF0aW9uIHdoZW4gd2F0Y2hkb2cgZXhwaXJlcw0KPiANCj4gT24gMTQvMDgv
-MjAxOCAxNTowMywgWmhvdWppYW4gKGpheSkgd3JvdGU6DQo+ID4+IC0tLS0tT3JpZ2luYWwgTWVz
-c2FnZS0tLS0tDQo+ID4+IEZyb206IFBhb2xvIEJvbnppbmkgW21haWx0bzpwYm9uemluaUByZWRo
-YXQuY29tXQ0KPiA+PiBTZW50OiBUdWVzZGF5LCBBdWd1c3QgMTQsIDIwMTggODowMiBQTQ0KPiA+
-PiBUbzogRHIuIERhdmlkIEFsYW4gR2lsYmVydCA8ZGdpbGJlcnRAcmVkaGF0LmNvbT4NCj4gPj4g
-Q2M6IFpob3VqaWFuIChqYXkpIDxqaWFuamF5Lnpob3VAaHVhd2VpLmNvbT47IHFlbXUtZGV2ZWxA
-bm9uZ251Lm9yZzsNCj4gPj4gcXVpbnRlbGFAcmVkaGF0LmNvbTsgd2FuZ3hpbiAoVSkgPHdhbmd4
-aW54aW4ud2FuZ0BodWF3ZWkuY29tPg0KPiA+PiBTdWJqZWN0OiBSZTogW1JGQyBQQVRDSF0gdmw6
-IGZpeCBtaWdyYXRpb24gd2hlbiB3YXRjaGRvZyBleHBpcmVzDQo+ID4+DQo+ID4+IE9uIDE0LzA4
-LzIwMTggMTM6NTIsIERyLiBEYXZpZCBBbGFuIEdpbGJlcnQgd3JvdGU6DQo+ID4+PiAgYSkgU2hv
-dWxkIHRoZSB3YXRjaGRvZyBleHBpcmUgd2hlbiB0aGUgVk0gaXMgc3RvcHBlZDsgSSB0aGluayBp
-dA0KPiA+Pj4gc2hvdWxkbid0IC0gaHcvYWNwaS90Y28uYyB1c2VzIGEgdmlydHVhbCB0aW1lciBh
-cyBkb2VzIGk2MzAwZXNiOyBzbw0KPiA+Pj4gaXMgdGhlIGJ1ZyBoZXJlIHRoYXQgdGhlIHdhdGNo
-ZG9nIGJlaW5nIHVzZWQgZGlkbid0IHVzZSBhIHZpcnR1YWwgdGltZXI/DQo+ID4+DQo+ID4+IEFs
-bCB3YXRjaGRvZ3MgZG8uDQo+ID4+DQo+ID4+PiAgYikgSWYgdGhlIHdhdGNoZG9nIGV4cGlyZXMg
-anVzdCBiZWZvcmUgdGhlIFZNIGdldHMgc3RvcHBlZCwgaXMNCj4gPj4+IHRoZXJlIGEgcmFjZSB3
-aGljaCBjb3VsZCBoaXQgdGhpcz8gIFBvc3NpYmx5Lg0KPiA+Pg0KPiA+PiBZZXMsIEkgdGhpbmsg
-aXQgaXMgYSByYWNlIHRoYXQgaGFwcGVucyBqdXN0IGJlZm9yZSB2bV9zdG9wLCBidXQgSQ0KPiA+
-PiBkb24ndCB1bmRlcnN0YW5kIHdoeSB0aGUgInFlbXVfY2xvY2tfZW5hYmxlIiBpbiBwYXVzZV9h
-bGxfdmNwdXMgZG9lcyBub3QNCj4gcHJldmVudCBpdC4NCj4gPg0KPiA+IEhpIFBhb2xvLA0KPiA+
-IFRoZSBzZXF1ZW5jZSBpcyBsaWtlIHRoaXMgSSB0aGluaw0KPiA+DQo+ID4gICAgICAgICAgfA0K
-PiA+ICAgICAgICAgIHwgIDwtLS0tLSAgd2F0Y2hkb2cgZXhwaXJlZCwgd2hpY2ggc2V0IHJlc2V0
-X3JlcXVlc3RlZCB0bw0KPiBTSFVURE9XTl9DQVVTRV9HVUVTVF9SRVNFVA0KPiA+ICAgICAgICAg
-IHwNCj4gPiAgICAgICAgICB8ICA8LS0tLS0gIG1pZ3JhdGlvbiB0aHJlYWQgc2V0cyB0byBSVU5f
-U1RBVEVfRklOSVNIX01JR1JBVEUsIGl0DQo+IHdpbGwgZGlzYWJsZSBRRU1VX0NMT0NLX1ZJUlRV
-QUwgY2xvY2ssDQo+ID4gICAgICAgICAgfCAgICAgICAgICBidXQgaXQgaXMgZG9uZSBhZnRlciB0
-aGUgc2V0dGluZyBvZiByZXNldF9yZXF1ZXN0ZWQNCj4gDQo+IFNvIHRoZSBmaXggd291bGQgYmUg
-dG8gcHJvY2VzcyB0aGUgcmVzZXQgcmVxdWVzdCBoZXJlPyAgKEluIGRvX3ZtX3N0b3Agb3INCj4g
-cGF1c2VfYWxsX3ZjcHVzKS4gIFRoZSBjb2RlIGlzIGN1cnJlbnRseSBpbiBtYWluX2xvb3Bfc2hv
-dWxkX2V4aXQoKS4NCg0KSSB0aGluayB0aGlzIG1ha2VzIHNlbnNlLCBwcm9jZXNzIHRoZSByZXNl
-dCByZXF1ZXN0IGFmdGVyIHRoZSBRRU1VX0NMT0NLX1ZJUlRVQUwNCmRpc2FibGVkLCB3aWxsIGhh
-dmUgYSB0cnkuDQoNClJlZ2FyZHMsDQpKYXkgWmhvdQ0KDQo+IA0KPiBQYW9sbw0KPiANCj4gPiAg
-ICAgICAgICB8ICA8LS0tLS0gIG1haW4gbG9vcCB0aHJlYWQgc2V0cyB0byBSVU5fU1RBVEVfUFJF
-TEFVTkNIIHNpbmNlIGl0DQo+IGRldGVjdGVkIGEgcmVzZXQgcmVxdWVzdA0KPiA+ICAgICAgICAg
-IHwNCj4gPiAgICAgICAgICB8ICA8LS0tLS0gIG1pZ3JhdGlvbiB0aHJlYWQgc2V0cyB0byBSVU5f
-U1RBVEVfUE9TVE1JR1JBVEUNCj4gPg0KPiA+DQo+ID4gUmVnYXJkcywNCj4gPiBKYXkgWmhvdQ0K
-PiA+DQo+ID4+DQo+ID4+IEl0IHNob3VsZCBiZSBwb3NzaWJsZSB0byB3cml0ZSBhIGRldGVybWlu
-aXN0aWMgdGVzdGNhc2Ugd2l0aCBxdGVzdC4uLg0KPiA+Pg0KPiA+PiBQYW9sbw0KDQo=
+Am 29.06.2018 um 13:36 hat Alberto Garcia geschrieben:
+> Hi everyone,
+> 
+> this is part of the blockdev-reopen work that I'm doing, but since
+> I'll be away during most of July I thought that I could send already a
+> couple of patches that I think are ready and don't need anything else
+> from the rest of the series.
+> 
+> There's two main fixes here:
+> 
+>   1) bs->options are not kept up to date after an image is reopened
+>      and no longer reflect its state.
+> 
+>   2) bs->options and bs->explicit_options also contain the options of
+>      a BDS's children, so there's data that is duplicated and will be
+>      inconsistent as soon as you change the children's options
+>      directly.
+> 
+> The fix for (2) involves removing all children options from both
+> QDicts. In the cases of node name references ("backing": "node-name")
+> those remain in the QDict (they're technically parent options). I
+> think we don't really need them and it should be possible to get rid
+> of them, but it's a little more complicated (we need them during
+> bdrv_reopen() to ensure that the user didn't try to change any of
+> them).
+
+Thanks, applied to the block branch.
+
+Kevin
