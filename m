@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpfKy-00044o-Vw
+	(envelope-from <bounces@canonical.com>) id 1fpfKz-00045B-Hh
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:50:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpfKv-0000wD-D9
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:50:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38392)
+	(envelope-from <bounces@canonical.com>) id 1fpfKw-0000wg-CL
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:50:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38402)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fpfKu-0000vj-Ap
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:50:36 -0400
+	id 1fpfKv-0000vn-C5
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:50:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fpfKs-0000nA-4E
+	id 1fpfKs-0000n8-KM
 	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 19:50:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F02342E851E
-	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 19:50:33 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 98C092E851B
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 19:50:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Aug 2018 19:37:44 -0000
+Date: Tue, 14 Aug 2018 19:44:21 -0000
 From: Michele Denber <1787012@bugs.launchpad.net>
 Reply-To: Bug 1787012 <1787012@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153427470081.24411.7587190537485631648.malonedeb@soybean.canonical.com>
-Message-Id: <153427546435.27118.6757465796583820980.malone@gac.canonical.com>
+Message-Id: <153427586176.27281.16705846219347007669.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1787012] Re: Solaris build error: Bad string
 List-Id: <qemu-devel.nongnu.org>
@@ -38,23 +38,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Solved]
+Oh, and how I found this.  From
+http://lists.xymon.com/archive/2012-July/035109.html:
 
-There's nothing like going public with a problem to find the answer
-yourself shortly after.  In case it helps someone else in the future, it
-turns out that the Makefile in dtc/ contains the following line:
+> Sorry to reply to myself. Looks like this line:
+> =
 
-HOSTOS :=3D $(shell uname -s | tr '[:upper:]' '[:lower:]' | \
-   sed -e 's/\(cygwin\|msys\).*/\1/')
+> uname -s | tr '[/]' '[_]'
+> =
 
-Apparently there's something in there that gmake doesn't like which
-causes it to emit "Bad string" so I just replaced that line with:
+> ...is not acceptable to /usr/bin/tr on Solaris 10. It worked fine
+> on 9. On 10, one receives this error:
+> =
 
-HOSTOS=3DSunOS
+> # uname -s | tr '[/]' '[_]' Bad string
 
-(a call to uname -s from the command line returns SunOS) and I'm no
-longer getting the "Bad string" from gmake.  (I'm getting soemthing else
-now but that's a different matter).
+And indeed I get:
+
+# uname -s | tr '[/]' '[_]'
+Bad string
+#
+
+So this is a bug in the Makefile, but only for Solaris 10.
 
 -- =
 
