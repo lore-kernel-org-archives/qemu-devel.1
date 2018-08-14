@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpdur-0004Q9-Gj
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:21:21 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fpduz-0004XY-FR
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:21:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpdtj-0006Xi-Oo
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:37 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44398)
+	(envelope-from <pm215@archaic.org.uk>) id 1fpdtl-0006ZI-LI
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:45 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44404)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fpdtj-0006SH-80
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:27 -0400
+	id 1fpdtk-0006Y2-Ul
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:29 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpdtc-00077V-87
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:18:20 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fpdtj-0007AV-Nh
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:18:27 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Aug 2018 19:17:32 +0100
-Message-Id: <20180814181815.23348-3-peter.maydell@linaro.org>
+Date: Tue, 14 Aug 2018 19:17:39 +0100
+Message-Id: <20180814181815.23348-10-peter.maydell@linaro.org>
 In-Reply-To: <20180814181815.23348-1-peter.maydell@linaro.org>
 References: <20180814181815.23348-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 02/45] nvic: Handle ARMv6-M SCS reserved
- registers
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 09/45] accel/tcg: Return -1 for execution from
+ MMIO regions in get_page_addr_code()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,151 +33,149 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Julia Suvorova <jusual@mail.ru>
+Now that all the callers can handle get_page_addr_code() returning -1,
+remove all the code which tries to handle execution from MMIO regions
+or small-MMU-region RAM areas. This will mean that we can correctly
+execute from these areas, rather than ending up either aborting QEMU
+or delivering an incorrect guest exception.
 
-Handle SCS reserved registers listed in ARMv6-M ARM D3.6.1.
-All reserved registers are RAZ/WI. ARM_FEATURE_M_MAIN is used for the
-checks, because these registers are reserved in ARMv8-M Baseline too.
-
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Cédric Le Goater <clg@kaod.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20180710160013.26559-6-peter.maydell@linaro.org
 ---
- hw/intc/armv7m_nvic.c | 51 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 49 insertions(+), 2 deletions(-)
+ accel/tcg/cputlb.c | 95 +++++-----------------------------------------
+ 1 file changed, 10 insertions(+), 85 deletions(-)
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index cd1e7f17299..33396ce2854 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -867,6 +867,9 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-         }
-         return val;
-     case 0xd10: /* System Control.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            goto bad_offset;
-+        }
-         return cpu->env.v7m.scr[attrs.secure];
-     case 0xd14: /* Configuration Control.  */
-         /* The BFHFNMIGN bit is the only non-banked bit; we
-@@ -988,12 +991,21 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-         }
-         return val;
-     case 0xd2c: /* Hard Fault Status.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->env.v7m.hfsr;
-     case 0xd30: /* Debug Fault Status.  */
-         return cpu->env.v7m.dfsr;
-     case 0xd34: /* MMFAR MemManage Fault Address */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->env.v7m.mmfar[attrs.secure];
-     case 0xd38: /* Bus Fault Address.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         return cpu->env.v7m.bfar;
-     case 0xd3c: /* Aux Fault Status.  */
-         /* TODO: Implement fault status registers.  */
-@@ -1288,6 +1300,9 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-         }
-         break;
-     case 0xd10: /* System Control.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            goto bad_offset;
-+        }
-         /* We don't implement deep-sleep so these bits are RAZ/WI.
-          * The other bits in the register are banked.
-          * QEMU's implementation ignores SEVONPEND and SLEEPONEXIT, which
-@@ -1389,15 +1404,24 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-         nvic_irq_update(s);
-         break;
-     case 0xd2c: /* Hard Fault Status.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         cpu->env.v7m.hfsr &= ~value; /* W1C */
-         break;
-     case 0xd30: /* Debug Fault Status.  */
-         cpu->env.v7m.dfsr &= ~value; /* W1C */
-         break;
-     case 0xd34: /* Mem Manage Address.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         cpu->env.v7m.mmfar[attrs.secure] = value;
-         return;
-     case 0xd38: /* Bus Fault Address.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-         cpu->env.v7m.bfar = value;
-         return;
-     case 0xd3c: /* Aux Fault Status.  */
-@@ -1627,6 +1651,11 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-     case 0xf00: /* Software Triggered Interrupt Register */
-     {
-         int excnum = (value & 0x1ff) + NVIC_FIRST_IRQ;
-+
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-+
-         if (excnum < s->num_irq) {
-             armv7m_nvic_set_pending(s, excnum, false);
-         }
-@@ -1771,7 +1800,13 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-             }
-         }
-         break;
--    case 0xd18 ... 0xd23: /* System Handler Priority (SHPR1, SHPR2, SHPR3) */
-+    case 0xd18: /* System Handler Priority (SHPR1) */
-+        if (!arm_feature(&s->cpu->env, ARM_FEATURE_M_MAIN)) {
-+            val = 0;
-+            break;
-+        }
-+        /* fall through */
-+    case 0xd1c ... 0xd23: /* System Handler Priority (SHPR2, SHPR3) */
-         val = 0;
-         for (i = 0; i < size; i++) {
-             unsigned hdlidx = (offset - 0xd14) + i;
-@@ -1784,6 +1819,10 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         }
-         break;
-     case 0xd28 ... 0xd2b: /* Configurable Fault Status (CFSR) */
-+        if (!arm_feature(&s->cpu->env, ARM_FEATURE_M_MAIN)) {
-+            val = 0;
-+            break;
-+        };
-         /* The BFSR bits [15:8] are shared between security states
-          * and we store them in the NS copy
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 51b1193044c..754795ff253 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -741,39 +741,6 @@ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
+                             prot, mmu_idx, size);
+ }
+ 
+-static void report_bad_exec(CPUState *cpu, target_ulong addr)
+-{
+-    /* Accidentally executing outside RAM or ROM is quite common for
+-     * several user-error situations, so report it in a way that
+-     * makes it clear that this isn't a QEMU bug and provide suggestions
+-     * about what a user could do to fix things.
+-     */
+-    error_report("Trying to execute code outside RAM or ROM at 0x"
+-                 TARGET_FMT_lx, addr);
+-    error_printf("This usually means one of the following happened:\n\n"
+-                 "(1) You told QEMU to execute a kernel for the wrong machine "
+-                 "type, and it crashed on startup (eg trying to run a "
+-                 "raspberry pi kernel on a versatilepb QEMU machine)\n"
+-                 "(2) You didn't give QEMU a kernel or BIOS filename at all, "
+-                 "and QEMU executed a ROM full of no-op instructions until "
+-                 "it fell off the end\n"
+-                 "(3) Your guest kernel has a bug and crashed by jumping "
+-                 "off into nowhere\n\n"
+-                 "This is almost always one of the first two, so check your "
+-                 "command line and that you are using the right type of kernel "
+-                 "for this machine.\n"
+-                 "If you think option (3) is likely then you can try debugging "
+-                 "your guest with the -d debug options; in particular "
+-                 "-d guest_errors will cause the log to include a dump of the "
+-                 "guest register state at this point.\n\n"
+-                 "Execution cannot continue; stopping here.\n\n");
+-
+-    /* Report also to the logs, with more detail including register dump */
+-    qemu_log_mask(LOG_GUEST_ERROR, "qemu: fatal: Trying to execute code "
+-                  "outside RAM or ROM at 0x" TARGET_FMT_lx "\n", addr);
+-    log_cpu_state_mask(LOG_GUEST_ERROR, cpu, CPU_DUMP_FPU | CPU_DUMP_CCOP);
+-}
+-
+ static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
+ {
+     ram_addr_t ram_addr;
+@@ -963,7 +930,6 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+     MemoryRegionSection *section;
+     CPUState *cpu = ENV_GET_CPU(env);
+     CPUIOTLBEntry *iotlbentry;
+-    hwaddr physaddr, mr_offset;
+ 
+     index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+     mmu_idx = cpu_mmu_index(env, true);
+@@ -977,65 +943,24 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+     if (unlikely(env->tlb_table[mmu_idx][index].addr_code & TLB_RECHECK)) {
+         /*
+          * This is a TLB_RECHECK access, where the MMU protection
+-         * covers a smaller range than a target page, and we must
+-         * repeat the MMU check here. This tlb_fill() call might
+-         * longjump out if this access should cause a guest exception.
+-         */
+-        int index;
+-        target_ulong tlb_addr;
+-
+-        tlb_fill(cpu, addr, 0, MMU_INST_FETCH, mmu_idx, 0);
+-
+-        index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+-        tlb_addr = env->tlb_table[mmu_idx][index].addr_code;
+-        if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
+-            /* RAM access. We can't handle this, so for now just stop */
+-            cpu_abort(cpu, "Unable to handle guest executing from RAM within "
+-                      "a small MPU region at 0x" TARGET_FMT_lx, addr);
+-        }
+-        /*
+-         * Fall through to handle IO accesses (which will almost certainly
+-         * also result in failure)
++         * covers a smaller range than a target page. Return -1 to
++         * indicate that we cannot simply execute from RAM here;
++         * we will perform the necessary repeat of the MMU check
++         * when the "execute a single insn" code performs the
++         * load of the guest insn.
           */
-@@ -1876,7 +1915,12 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-         }
-         nvic_irq_update(s);
-         return MEMTX_OK;
--    case 0xd18 ... 0xd23: /* System Handler Priority (SHPR1, SHPR2, SHPR3) */
-+    case 0xd18: /* System Handler Priority (SHPR1) */
-+        if (!arm_feature(&s->cpu->env, ARM_FEATURE_M_MAIN)) {
-+            return MEMTX_OK;
-+        }
-+        /* fall through */
-+    case 0xd1c ... 0xd23: /* System Handler Priority (SHPR2, SHPR3) */
-         for (i = 0; i < size; i++) {
-             unsigned hdlidx = (offset - 0xd14) + i;
-             int newprio = extract32(value, i * 8, 8);
-@@ -1890,6 +1934,9 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-         nvic_irq_update(s);
-         return MEMTX_OK;
-     case 0xd28 ... 0xd2b: /* Configurable Fault Status (CFSR) */
-+        if (!arm_feature(&s->cpu->env, ARM_FEATURE_M_MAIN)) {
-+            return MEMTX_OK;
-+        }
-         /* All bits are W1C, so construct 32 bit value with 0s in
-          * the parts not written by the access size
++        return -1;
+     }
+ 
+     iotlbentry = &env->iotlb[mmu_idx][index];
+     section = iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs);
+     mr = section->mr;
+     if (memory_region_is_unassigned(mr)) {
+-        qemu_mutex_lock_iothread();
+-        if (memory_region_request_mmio_ptr(mr, addr)) {
+-            qemu_mutex_unlock_iothread();
+-            /* A MemoryRegion is potentially added so re-run the
+-             * get_page_addr_code.
+-             */
+-            return get_page_addr_code(env, addr);
+-        }
+-        qemu_mutex_unlock_iothread();
+-
+-        /* Give the new-style cpu_transaction_failed() hook first chance
+-         * to handle this.
+-         * This is not the ideal place to detect and generate CPU
+-         * exceptions for instruction fetch failure (for instance
+-         * we don't know the length of the access that the CPU would
+-         * use, and it would be better to go ahead and try the access
+-         * and use the MemTXResult it produced). However it is the
+-         * simplest place we have currently available for the check.
++        /*
++         * Not guest RAM, so there is no ram_addr_t for it. Return -1,
++         * and we will execute a single insn from this device.
           */
+-        mr_offset = (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
+-        physaddr = mr_offset +
+-            section->offset_within_address_space -
+-            section->offset_within_region;
+-        cpu_transaction_failed(cpu, physaddr, addr, 0, MMU_INST_FETCH, mmu_idx,
+-                               iotlbentry->attrs, MEMTX_DECODE_ERROR, 0);
+-
+-        cpu_unassigned_access(cpu, addr, false, true, 0, 4);
+-        /* The CPU's unassigned access hook might have longjumped out
+-         * with an exception. If it didn't (or there was no hook) then
+-         * we can't proceed further.
+-         */
+-        report_bad_exec(cpu, addr);
+-        exit(1);
++        return -1;
+     }
+     p = (void *)((uintptr_t)addr + env->tlb_table[mmu_idx][index].addend);
+     return qemu_ram_addr_from_host_nofail(p);
 -- 
 2.18.0
