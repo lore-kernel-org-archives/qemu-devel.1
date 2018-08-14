@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fpa4X-0006iT-6u
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:13:26 -0400
+	(envelope-from <simon@ruderich.org>) id 1fpa7I-0000aN-In
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:16:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fpa4N-0000ey-NX
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:13:21 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 14 Aug 2018 16:12:46 +0200
-Message-Id: <20180814141247.32336-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] megasas: fix sglist leak
+	(envelope-from <simon@ruderich.org>) id 1fpa7E-00022k-CG
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:16:12 -0400
+Received: from zucker2.schokokeks.org ([178.63.68.90]:57409)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1fpa7E-00021j-3J
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:16:08 -0400
+Date: Tue, 14 Aug 2018 16:16:05 +0200
+From: Simon Ruderich <simon@ruderich.org>
+Message-ID: <20180814141605.GA26651@ruderich.org>
+References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
+	<cover.1526916378.git.simon@ruderich.org>
+	<20180809144340.GA29237@ruderich.org>
+	<878t5evjqk.fsf@dusky.pond.sub.org>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="=_zucker.schokokeks.org-14551-1534256166-0001-2"
+Content-Disposition: inline
+In-Reply-To: <878t5evjqk.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,82 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Hannes Reinecke <hare@suse.com>, "open list:megasas" <qemu-block@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, David Alan Gilbert <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>
 
-tests/cdrom-test -p /x86_64/cdrom/boot/megasas
+This is a MIME-formatted message.  If you see this text it means that your
+E-mail software does not support MIME-formatted messages.
 
-Produces the following ASAN leak.
+--=_zucker.schokokeks.org-14551-1534256166-0001-2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-=3D=3D25700=3D=3DERROR: LeakSanitizer: detected memory leaks
+On Fri, Aug 10, 2018 at 08:06:11AM +0200, Markus Armbruster wrote:
+> You neglected to cc: maintainers.  I spotted this cry for help only by
+> chance.
+>
+> To find maintainers to cc:, you can use get_maintainer.pl like this:
+>
+>     $ scripts/get_maintainer.pl *patch
+>     scripts/get_maintainer.pl: file '0000-cover-letter.patch' doesn't app=
+ear to be a patch.  Add -f to options?
+>     Paolo Bonzini <pbonzini@redhat.com> (maintainer:Overall)
+>     Peter Crosthwaite <crosthwaite.peter@gmail.com> (maintainer:Overall)
+>     Richard Henderson <rth@twiddle.net> (maintainer:Overall)
+>     "Dr. David Alan Gilbert" <dgilbert@redhat.com> (maintainer:Human Moni=
+tor (HMP))
+>     Eric Blake <eblake@redhat.com> (supporter:QAPI Schema)
+>     Markus Armbruster <armbru@redhat.com> (supporter:QAPI Schema)
+>     qemu-devel@nongnu.org (open list:Overall)
+>
+> It's output is advice, not gospel.  Use your judgement.
+>
+> I'm copying maintainers for you now.  This should get you some review.
 
-Direct leak of 16 byte(s) in 1 object(s) allocated from:
-    #0 0x7f06f8faac48 in malloc (/lib64/libasan.so.5+0xeec48)
-    #1 0x7f06f87a73c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
-    #2 0x55a729f17738 in pci_dma_sglist_init /home/elmarco/src/qq/include=
-/hw/pci/pci.h:818
-    #3 0x55a729f2a706 in megasas_map_dcmd /home/elmarco/src/qq/hw/scsi/me=
-gasas.c:698
-    #4 0x55a729f39421 in megasas_handle_dcmd /home/elmarco/src/qq/hw/scsi=
-/megasas.c:1574
-    #5 0x55a729f3f70d in megasas_handle_frame /home/elmarco/src/qq/hw/scs=
-i/megasas.c:1955
-    #6 0x55a729f40939 in megasas_mmio_write /home/elmarco/src/qq/hw/scsi/=
-megasas.c:2119
-    #7 0x55a729f41102 in megasas_port_write /home/elmarco/src/qq/hw/scsi/=
-megasas.c:2170
-    #8 0x55a729220e60 in memory_region_write_accessor /home/elmarco/src/q=
-q/memory.c:527
-    #9 0x55a7292212b3 in access_with_adjusted_size /home/elmarco/src/qq/m=
-emory.c:594
-    #10 0x55a72922cf70 in memory_region_dispatch_write /home/elmarco/src/=
-qq/memory.c:1473
-    #11 0x55a7290f5907 in flatview_write_continue /home/elmarco/src/qq/ex=
-ec.c:3255
-    #12 0x55a7290f5ceb in flatview_write /home/elmarco/src/qq/exec.c:3294
-    #13 0x55a7290f6457 in address_space_write /home/elmarco/src/qq/exec.c=
-:3384
-    #14 0x55a7290f64a8 in address_space_rw /home/elmarco/src/qq/exec.c:33=
-95
-    #15 0x55a72929ecb0 in kvm_handle_io /home/elmarco/src/qq/accel/kvm/kv=
-m-all.c:1729
-    #16 0x55a7292a0db5 in kvm_cpu_exec /home/elmarco/src/qq/accel/kvm/kvm=
--all.c:1969
-    #17 0x55a7291c4212 in qemu_kvm_cpu_thread_fn /home/elmarco/src/qq/cpu=
-s.c:1215
-    #18 0x55a72a966a6c in qemu_thread_start /home/elmarco/src/qq/util/qem=
-u-thread-posix.c:504
-    #19 0x7f06ed486593 in start_thread (/lib64/libpthread.so.0+0x7593)
+Hello,
 
-Move the qemu_sglist_destroy() from megasas_complete_command() to
-megasas_unmap_frame(), so map/unmap are balanced.
+Thank you for your help. I missed that part when looking through
+the patch submission instructions.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/scsi/megasas.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-index ba1afa3c1e..7bee734718 100644
---- a/hw/scsi/megasas.c
-+++ b/hw/scsi/megasas.c
-@@ -465,6 +465,7 @@ static void megasas_unmap_frame(MegasasState *s, Mega=
-sasCmd *cmd)
-     cmd->pa =3D 0;
-     cmd->pa_size =3D 0;
-     clear_bit(cmd->index, s->frame_map);
-+    qemu_sglist_destroy(&cmd->qsg);
- }
-=20
- /*
-@@ -580,7 +581,6 @@ static void megasas_complete_frame(MegasasState *s, u=
-int64_t context)
-=20
- static void megasas_complete_command(MegasasCmd *cmd)
- {
--    qemu_sglist_destroy(&cmd->qsg);
-     cmd->iov_size =3D 0;
-     cmd->iov_offset =3D 0;
-=20
+Regards
+Simon
 --=20
-2.18.0.547.g1d89318c48
++ privacy is necessary
++ using gnupg http://gnupg.org
++ public key id: 0x92FEFDB7E44C32F9
+
+--=_zucker.schokokeks.org-14551-1534256166-0001-2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEO7rfWMMObpFkF3n0kv79t+RMMvkFAlty5B8ACgkQkv79t+RM
+Mvm6BA/8DnSrDlf/48eADTZUN4F4PbDfkvCQbVTL//f5TF49qlXU76Gb2QQY4tYP
+UXcTHAFuYwE9a6Le/FkKgUfvrmG+GFCa3smy09DE0C6bF85JwhMd25yLj0QkHkkF
+z0Fe20VYWnaTD8iTNg9tPTJ5lE8HEYK+eBGHGSpk766YiSbq1itgJOfuH4f6v2Z2
+bElTh0DnUedhm/w+gHWLV3LcsEN7Nwl3uy5Ez41Eqd8i+a2RVbMMvdm2fVyJrx1j
+cazhVN3z/SzSerJXLVzc54S/SvK+KKwUlc4ghM3pdrpxJyY7tHqIe42qf8L66Lr+
+KSwf5X6471dLTrLbY2bJoeBETN5rTojAl12KTA5pUItM/VObdPYAA0qwwhqOAMaQ
+zNcDk+RBP60KBXbsfK0fSHMWOiV5lzoM1Rq83GtA6O7hmV29yNHPyKTuZA7eOwNH
+xZpv6x8LOWOwmO8aC4skrT9SXrMleyQqNvxJItBAJsCrUFqPNEqPBIYKVigcRm2m
+DX3H0/bN80H0fZXUYotfAprxgmkvJGv68jW1Zpi3pg4Pp88tM1MipetZGoYOB/U9
+Q7uGthMZXv5W6o1HGetxc5NqOhAsn1AiOruQ3w/TtzYNvVF4Ew8rsTatEjHqx0P8
+cxMRVR4dcDkGPq0jxQHIZAjx6ywwvMj5184VLXBi6yyFiu549Vk=
+=NLg+
+-----END PGP SIGNATURE-----
+
+--=_zucker.schokokeks.org-14551-1534256166-0001-2--
