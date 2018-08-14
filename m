@@ -1,36 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpfZj-0008DB-Nr
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 16:05:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1fpfZj-0008DC-Np
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 16:06:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpfZe-0001g9-Ao
+	(envelope-from <bounces@canonical.com>) id 1fpfZf-0001iR-Ai
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 16:05:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42974)
+Received: from indium.canonical.com ([91.189.90.7]:42952)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fpfZd-0001dV-JN
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 16:05:50 -0400
+	id 1fpfZe-0001dD-R8
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 16:05:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fpfZb-0003CK-73
-	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 20:05:47 +0000
+	id 1fpfZa-0003CM-HY
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 20:05:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 304672E851B
-	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 20:05:47 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 833692E8500
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 20:05:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Aug 2018 20:00:10 -0000
+Date: Tue, 14 Aug 2018 19:54:33 -0000
 From: Michele Denber <1785698@bugs.launchpad.net>
 Reply-To: Bug 1785698 <1785698@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153358448492.29549.3601216229452882398.malonedeb@chaenomeles.canonical.com>
-Message-Id: <5B7334CA.9000702@gmx.com>
+	<153414808571.8168.1723488818633453757.malone@wampee.canonical.com>
+	<5B71D4C8.7060006@gmx.com>
+	<CAFEAcA91Pj5WFfWtu+_OtpC86xeR003wx897jDJKo0cpdJAc6Q@mail.gmail.com>
+	<5B7314EF.5090005@gmx.com>
+	<CAFEAcA_EJpR6YT2gjpTrRxz9mbRfSTyZKh30Q5bchEXmb6CznA@mail.gmail.com>
+Message-Id: <5B733379.3030809@gmx.com>
 Errors-To: bounces@canonical.com
 Subject: Re: [Qemu-devel]
- =?utf-8?q?Fwd=3A_=5BBug_1785698=5D_Re=3A_Solaris_bu?=
- =?utf-8?q?ild_error=3A_unknown_type_name_=E2=80=98gcry=5Ferror=5Ft?=
- =?utf-8?b?4oCZ?=
+ =?utf-8?q?=5BBug_1785698=5D_Re=3A_Solaris_build_err?=
+ =?utf-8?b?b3I6IHVua25vd24gdHlwZSBuYW1lIOKAmGdjcnlfZXJyb3JfdOKAmQ==?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,21 +45,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+On 08-14-2018 2:17 PM, Peter Maydell wrote:
 >
->
-> >  I notice in the Makefile in dtc/ that it's calling python. My default
-> >  python is 2.6.9. I found some discussion about qemu moving to python
-> >  3. Could this be the problem?
->
-> We require either Python 2.7.x, or Python 3.x versions.  Support for
-> 2.6.x was dropped I'm afraid.
->
->
-Thanks.  I upgraded to python 3.3 though that turned out not to be the =
+>   dtc stuff really necessary?
+> It is necessary, but only for certain guest CPU types. You can
+> disable it by passing configure both "--disable-fdt" and also
+> "--target-list=3D<some list of targets which doesn't include
+> any arm, ppc, mips, microblaze or riscv targets>"
+> (for instance "--target-list=3Dx86_64-softmmu".)
+Thanks.  Turns out I found where "Bad string" was coming from - there's =
 
-problem.  I documented the solution here:
+a call to "uname -s | tr" in dtc/Makefile and that is known not to work =
 
-https://bugs.launchpad.net/qemu/+bug/1787012
+in Solaris 10..  So I just replaced that with "HOSTOS=3DSunOS" and that =
+
+took care of that.  dtc compiled just fine.
+
+Now I'm getting a "ld: fatal: unrecognized option '--'" linking libfdt =
+
+so I'm going to try a different linker.
+
+Onward :-)
 
              - Michele
 
