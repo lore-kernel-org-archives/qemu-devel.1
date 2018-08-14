@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fpf4V-0007ox-1D
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:33:54 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fpf4d-0007uT-IU
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:34:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fpf4F-0007Ia-2V
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:33:38 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:54394)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fpf4E-0007H5-Ht
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:33:22 -0400
-Received: by mail-wm0-x242.google.com with SMTP id c14-v6so13392969wmb.4
-	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 12:33:21 -0700 (PDT)
-References: <1528768140-17894-1-git-send-email-cota@braap.org>
-	<20180813200116.GA18755@flamenco> <87d0ulfe1s.fsf@linaro.org>
-	<20180814182703.GA24096@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180814182703.GA24096@flamenco>
-Date: Tue, 14 Aug 2018 20:33:19 +0100
-Message-ID: <87a7pog2v4.fsf@linaro.org>
+	(envelope-from <laurent@vivier.eu>) id 1fpf4N-0007NX-Og
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:33:46 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:57751)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fpf4N-0007MP-4h
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 15:33:31 -0400
+References: <20180809175553.18479-1-alex.bennee@linaro.org>
+	<20180809175553.18479-4-alex.bennee@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <b6621977-6ca8-e4d4-ff9c-238df764f135@vivier.eu>
+Date: Tue, 14 Aug 2018 21:32:50 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180809175553.18479-4-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 00/14] fp-test + hardfloat
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/3] linux-user: add -dfilter progtext
+ shortcut
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
+Le 09/08/2018 à 19:55, Alex Bennée a écrit :
+> When debugging you often don't care about the libraries but just the
+> code in the testcase. Rather than make the user build this by hand
+> offer a shortcut.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  linux-user/main.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index ea00dd9057..8d4427727e 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -28,6 +28,7 @@
+>  #include "qemu/config-file.h"
+>  #include "qemu/cutils.h"
+>  #include "qemu/help_option.h"
+> +#include "qemu/range.h"
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+>  #include "tcg.h"
+> @@ -51,6 +52,8 @@ unsigned long mmap_min_addr;
+>  unsigned long guest_base;
+>  int have_guest_base;
+>  
+> +static bool dfilter_progtext;
+> +
+>  /*
+>   * When running 32-on-64 we should make sure we can fit all of the possible
+>   * guest address space into a contiguous chunk of virtual host memory.
+> @@ -222,6 +225,11 @@ static void handle_arg_log(const char *arg)
+>  
+>  static void handle_arg_dfilter(const char *arg)
+>  {
+> +    if (strcmp(arg, "progtext") == 0) {
+> +        dfilter_progtext = true;
+> +        return;
+> +    }
+> +
+>      qemu_set_dfilter_ranges(arg, NULL);
+>  }
+>  
+> @@ -423,7 +431,7 @@ static const struct qemu_argument arg_table[] = {
+>       "item[,...]", "enable logging of specified items "
+>       "(use '-d help' for a list of items)"},
+>      {"dfilter",    "QEMU_DFILTER",     true,  handle_arg_dfilter,
+> -     "range[,...]","filter logging based on address range"},
+> +     "range|progtext[,...]", "filter logging based on address range"},
+>      {"D",          "QEMU_LOG_FILENAME", true, handle_arg_log_filename,
+>       "logfile",     "write logs to 'logfile' (default stderr)"},
+>      {"p",          "QEMU_PAGESIZE",    true,  handle_arg_pagesize,
+> @@ -796,6 +804,12 @@ int main(int argc, char **argv, char **envp)
+>          qemu_log("auxv_start  0x" TARGET_ABI_FMT_lx "\n", info->saved_auxv);
+>      }
+>  
+> +    if (dfilter_progtext) {
+> +        Range r;
+> +        range_set_bounds(&r, info->start_code, info->end_code);
+> +        qemu_append_dfilter_range(r, NULL);
+> +    }
+> +
+>      target_set_brk(info->brk);
+>      syscall_init();
+>      signal_init();
+> 
 
-Emilio G. Cota <cota@braap.org> writes:
-
-> On Tue, Aug 14, 2018 at 11:17:03 +0100, Alex Benn=C3=A9e wrote:
->> Emilio G. Cota <cota@braap.org> writes:
->> > Would be great to get this in for 3.1.
->>
->> I would like this merged by 3.1 as well. However I think there is still
->> some work to be done on the testing side. IIRC the fptest case works
->> with whitelists and I'd like to understand more about why we can't use
->> the whole test corpus? Is it testing features we don't have on all
->> architectures or just because it wouldn't pass because of holes in our
->> current softfloat?
->
-> Some test patterns are just strange. For instance:
->
-> d64+ =3D0 -1e-398 +0e-398 -> -1e-398
->
-> I think the IBM implementation uses 128 bits and then truncates to
-> whatever precision is required (64b in this case), so those tests
-> might make sense then. But for us, those tests don't make any sense.
->
-> The use of whitelists is a temporary workaround to avoid those weird
-> test patterns. The right fix is to keep our own set of test patterns,
-> without needing whitelisting.
-> BTW with this patchset we use 76572 out of 130471 test patterns, which
-> isn't bad at all. The whitelist is currently only 2% of the 130K.
->
->> Our experience of SVE has shown that despite the fairly extensive
->> testing we did there are still a bunch of corner cases we missed.
->> Hopefully the last few patches have fixed that but I guess it pays to be
->> exhaustive.
->
-> Agreed. That's why I wrote fp-test (and BTW found a bug in softfloat
-> thanks to it.)
->
->> We now have the check-tcg infrastructure in place so it would be nice to
->> have proper native tests in place for each architecture. My experience
->> of the fcvt.c test case however is you end up using inline assembler to
->> ensure you exercise the right guest opcodes which makes it hard to
->> generalise for lots of architectures.
->
-> I think testing using assembly is necessary, but not sufficient.
-> That's why having tests that test the FP primitives directly
-> (like fp-test does with `-t soft`) is valuable, since you can
-> trivially exercise corner cases. Then you have to test that the
-> ISA's decoder does the right thing, but that's a separate test.
->
->> I had written a bunch of patches
->> against the fptest to get it built under check-tcg but it was painful:
->>
->>   * needed a lot of boilerplate for each new operation
->
-> That depends on the op. If you want to test anything other than 32/64b
-> ops, then yes, you need to add some boilerplate. But otherwise it
-> is quite simple, for instance see patch 2.
-
-Well half-precision is the next obvious thing that needs adding. If we
-ever re-factor the rest of the code for our weird 80 bit float cousins
-that will need adding as well.
-
->
->>   * a bit hacky to build as unit test and as tcg test
->
-> It's not clear to me what the value as a TCG test is; each ISA
-> would have its own set of test patterns (and this set is distinct
-> from the test patterns we're using here, since those are only
-> a subset of the 754 standard).
-
-Well nominally they are all IEEE right? But yeah I think directed tests
-are the answer here.
-
->
-> So, my proposal for a v5:
->
-> - Commit the test files we need, instead of downloading them from
->   the web. No whitelisting/exceptions except for tininess
->   detection, which is necessary.
-
-Sounds good to me. Perhaps we could do a one time conversion of the test
-files so they are a little more readable if we are going to own/extend
-them?
-
->
-> - fp-test is added to make test. This is a unit test of softfloat,
->   not a TCG unit test.
->
-> - We defer TCG unit tests of FP to a later time.
-
-Yeah mashing the two together is probably more trouble than it's worth.
-
-I was playing around trying to improve the fcvt test (horribly WIP):
-
- https://github.com/stsquad/qemu/tree/arm/more-fcvt-tests
-
-Anyway I'm coming to the conclusion that what we need for the TCG tests
-is a generalised op tester framework that make it easy to plug in new
-tests with custom inline asm with a minimal amount of fuss. I'll have a
-go at this tomorrow - lets see if I can have a common framework that
-abstracts away the 1, 2 and 3 source specifics and result size handling.
-
---
-Alex Benn=C3=A9e
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
