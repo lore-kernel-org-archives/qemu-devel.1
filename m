@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpYfK-0005ZP-UV
+	(envelope-from <pm215@archaic.org.uk>) id 1fpYfL-0005ZR-1M
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:43:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpYfK-0002P0-4s
+	(envelope-from <pm215@archaic.org.uk>) id 1fpYfK-0002Ot-2g
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:43:14 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Aug 2018 13:42:53 +0100
-Message-Id: <20180814124254.5229-10-peter.maydell@linaro.org>
+Date: Tue, 14 Aug 2018 13:42:47 +0100
+Message-Id: <20180814124254.5229-4-peter.maydell@linaro.org>
 In-Reply-To: <20180814124254.5229-1-peter.maydell@linaro.org>
 References: <20180814124254.5229-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 09/10] target/arm: Implement AArch32 ERET
- instruction
+Subject: [Qemu-devel] [PATCH 03/10] target/arm: Implement RAZ/WI HACTLR2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +22,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Luc Michel <luc.michel@greensocs.com>, edgari@xilinx.com
 
-ARMv7VE introduced the ERET instruction, which is necessary to
-return from an exception taken to Hyp mode. Implement this.
-In A32 encoding it is a completely new encoding; in T32 it
-is an adjustment of the behaviour of the existing
-"SUBS PC, LR, #<imm8>" instruction.
+The AArch32 HACTLR2 register maps to bits [63:32] of ACTLR_EL2.
+We implement ACTLR_EL2 as RAZ/WI, so make HACTLR2 also RAZ/WI.
+(We put the regdef next to ACTLR_EL2 as a reminder in case we
+ever make ACTLR_EL2 something other than RAZ/WI).
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+ target/arm/helper.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 3f5751d4826..5ecc24f12fb 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -8887,6 +8887,25 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             tcg_temp_free_i32(tmp2);
-             store_reg(s, rd, tmp);
-             break;
-+        case 0x6: /* ERET */
-+            if (op1 != 3) {
-+                goto illegal_op;
-+            }
-+            if (!arm_dc_feature(s, ARM_FEATURE_V7VE)) {
-+                goto illegal_op;
-+            }
-+            if ((insn & 0x000fff0f) != 0x0000000e) {
-+                /* UNPREDICTABLE; we choose to UNDEF */
-+                goto illegal_op;
-+            }
-+
-+            if (s->current_el == 2) {
-+                tmp = load_cpu_field(elr_el[2]);
-+            } else {
-+                tmp = load_reg(s, 14);
-+            }
-+            gen_exception_return(s, tmp);
-+            break;
-         case 7:
-         {
-             int imm16 = extract32(insn, 0, 4) | (extract32(insn, 8, 12) << 4);
-@@ -11144,8 +11163,16 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                         if (rn != 14 || rd != 15) {
-                             goto illegal_op;
-                         }
--                        tmp = load_reg(s, rn);
--                        tcg_gen_subi_i32(tmp, tmp, insn & 0xff);
-+                        if (s->current_el == 2) {
-+                            /* ERET from Hyp uses ELR_Hyp, not LR */
-+                            if (insn & 0xff) {
-+                                goto illegal_op;
-+                            }
-+                            tmp = load_cpu_field(elr_el[2]);
-+                        } else {
-+                            tmp = load_reg(s, rn);
-+                            tcg_gen_subi_i32(tmp, tmp, insn & 0xff);
-+                        }
-                         gen_exception_return(s, tmp);
-                         break;
-                     case 6: /* MRS */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 466c8ae492e..14fd78f587a 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5436,6 +5436,11 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+               .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 0, .opc2 = 1,
+               .access = PL2_RW, .type = ARM_CP_CONST,
+               .resetvalue = 0 },
++            /* HACTLR2 maps to ACTLR_EL2[63:32] */
++            { .name = "HACTLR2", .state = ARM_CP_STATE_AA32,
++              .cp = 15, .opc1 = 4, .crn = 1, .crm = 0, .opc2 = 3,
++              .access = PL2_RW, .type = ARM_CP_CONST,
++              .resetvalue = 0 },
+             { .name = "ACTLR_EL3", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 6, .crn = 1, .crm = 0, .opc2 = 1,
+               .access = PL3_RW, .type = ARM_CP_CONST,
 -- 
 2.18.0
