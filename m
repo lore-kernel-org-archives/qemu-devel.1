@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mike.kravetz@oracle.com>) id 1fpiZd-0001JI-6l
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:18:04 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fpiib-0005YQ-5T
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mike.kravetz@oracle.com>) id 1fpiYv-00021t-Bt
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:17:20 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:50902)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mike.kravetz@oracle.com>)
-	id 1fpiYj-0001rs-5n
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:17:10 -0400
-References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
-	<20180629115359.GH2568@work-vm> <20180725101836.GI2479@xz-mi>
-	<20180725191736.GE2365@work-vm> <20180725200456.GM18452@redhat.com>
-	<e1c85e53-1b94-b1df-b7ee-6d93bb43caf6@redhat.com>
-	<20180726092307.GL2479@xz-mi>
-	<d1370a77-3d67-9c83-8214-3cba291744a1@virtuozzo.com>
-	<20180813190019.GH2488@work-vm>
-From: Mike Kravetz <mike.kravetz@oracle.com>
-Message-ID: <52144105-420c-4b35-4cb0-cf6a2ff5cd88@oracle.com>
-Date: Tue, 14 Aug 2018 16:16:33 -0700
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fpiiX-0001rB-HR
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:27:15 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45944)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fpiiW-0001nv-Du
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:27:12 -0400
+Received: by mail-wr1-x442.google.com with SMTP id f12-v6so18547157wrv.12
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 16:27:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180813190019.GH2488@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
+References: <20180713130916.4153-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20180713130916.4153-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 15 Aug 2018 01:26:59 +0200
+Message-ID: <CAJ+F1CKHrOyD91HLk16eQFjV4JfWpH6poq_Svdihav15kJ62yw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 00/29] vhost-user for input & GPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,89 +29,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, rppt@linux.vnet.ibm.com
+To: QEMU <qemu-devel@nongnu.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 08/13/2018 12:00 PM, Dr. David Alan Gilbert wrote:
-> cc'ing in Mike*2
-> * Denis Plotnikov (dplotnikov@virtuozzo.com) wrote:
->>
->>
->> On 26.07.2018 12:23, Peter Xu wrote:
->>> On Thu, Jul 26, 2018 at 10:51:33AM +0200, Paolo Bonzini wrote:
->>>> On 25/07/2018 22:04, Andrea Arcangeli wrote:
->>>>>
->>>>> It may look like the uffd-wp model is wish-feature similar to an
->>>>> optimization, but without the uffd-wp model when the WP fault is
->>>>> triggered by kernel code, the sigsegv model falls apart and requires
->>>>> all kind of ad-hoc changes just for this single feature. Plus uffd-wp
->>>>> has other benefits: it makes it all reliable in terms of not
->>>>> increasing the number of vmas in use during the snapshot. Finally it
->>>>> makes it faster too with no mmap_sem for reading and no sigsegv
->>>>> signals.
->>>>>
->>>>> The non cooperative features got merged first because there was much
->>>>> activity on the kernel side on that front, but this is just an ideal
->>>>> time to nail down the remaining issues in uffd-wp I think. That I
->>>>> believe is time better spent than trying to emulate it with sigsegv
->>>>> and changing all drivers to send new events down to qemu specific to
->>>>> the sigsegv handling. We considered this before doing uffd for
->>>>> postcopy too but overall it's unreliable and more work (no single
->>>>> change was then needed to KVM code with uffd to handle postcopy and
->>>>> here it should be the same).
->>>>
->>>> I totally agree.  The hard part in userfaultfd was the changes to the
->>>> kernel get_user_pages API, but the payback was huge because _all_ kernel
->>>> uses (KVM, vhost-net, syscalls, etc.) just work with userfaultfd.  Going
->>>> back to mprotect would be a huge mistake.
->>>
->>> Thanks for explaining the bits.  I'd say I wasn't aware of the
->>> difference before I started the investigation (and only until now I
->>> noticed that major difference between mprotect and userfaultfd).  I'm
->>> really glad that it's much clear (at least for me) on which way we
->>> should choose.
->>>
->>> Now I'm thinking whether we can move the userfault write protect work
->>> forward.  The latest discussion I saw so far is in 2016, when someone
->>> from Huawei tried to use the write protect feature for that old
->>> version of live snapshot but reported issue:
->>>
->>>    https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01127.html
->>>
->>> Is that the latest status for userfaultfd wr-protect?
->>>
->>> If so, I'm thinking whether I can try to re-verify the work (I tried
->>> his QEMU repository but I failed to compile somehow, so I plan to
->>> write some even simpler code to try) to see whether I can get the same
->>> KVM error he encountered.
->>>
->>> Thoughts?
->>
->> Just to sum up all being said before.
->>
->> Using mprotect is a bad idea because VM's memory can be accessed from the
->> number of places (KVM, vhost, ...) which need their own special care
->> of tracking memory accesses and notifying QEMU which makes the mprotect
->> using unacceptable.
->>
->> Protected memory accesses tracking can be done via userfaultfd's WP mode
->> which isn't available right now.
->>
->> So, the reasonable conclusion is to wait until the WP mode is available and
->> build the background snapshot on top of userfaultfd-wp.
->> But, works on adding the WP-mode is pending for a quite a long time already.
->>
->> Is there any way to estimate when it could be available?
-> 
-> I think a question is whether anyone is actively working on it; I
-> suspect really it's on a TODO list rather than moving at the moment.
-> 
+On Fri, Jul 13, 2018 at 3:12 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> Hi,
+>
+> vhost-user allows to drive a virtio device in a seperate
+> process. After vhost-user-net, we have seen
+> vhost-user-{scsi,blk,crypto} added more recently.
+>
+> This series, initially proposed 2 years ago
+> (https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg01905.html)
+> contributes with vhost-user-input and vhost-user-gpu.
+>
+> Additionally, to factor out common code and ease the usage, a
+> vhost-user-backend is introduced as an intermediary object between the
+> backend and the qemu device.
+>
+> You may start a vhost-user-gpu with virgl rendering in a separate
+> process like this:
+>
+> $ ./vhost-user-gpu --virgl -s vgpu.sock &
+> $ qemu...
+>   -chardev socket,id=3Dchr,path=3Dvgpu.sock
+>   -object vhost-user-backend,id=3Dvug,chardev=3Dchr
+>   -device vhost-user-vga,vhost-user=3Dvug
+>
+> You may also specify the backend command and the arguments as part of
+> vhost-user-backend qemu arguments. For example, to start a
+> vhost-user-input backend on input device /dev/input/event19:
+>
+> -object vhost-user-backend,id=3Dvuid,cmd=3D"vhost-user-input /dev/input/e=
+vent19"
+> -device virtio-input-host-pci,vhost-user=3Dvuid
+>
+> The vhost-user-gpu backend requires virgl from git.
+>
+> The libvirt support is on-going work:
+> https://github.com/elmarco/libvirt/commits/vhost-user-gpu
+>
+> The GPU benchmarks are encouraging, giving up to x5 performance on
+> Unigine Heaven 4.0.
+>
+> Feedback welcome,
 
-I am not working on it, and it is not on my TODO list.
+ping
 
-However, if someone starts making progress I will jump in and work on
-hugetlbfs support.  My intention would be to not let hugetlbfs support
-'fall behind' general uffd support.
+fwiw, there is a related series for libvirt support: "[libvirt] [RFC
+PATCH 00/17] Add vhost-user-gpu support"
 
--- 
-Mike Kravetz
+thanks
+
+>
+> v4:
+>  - move qemu_write_pidfile() in util, improve it a bit
+>  - add --pid and --fd arguments to vhost-user to help with libvirt suppor=
+t
+>  - various bug fixes for synchronization, and tearing down
+>
+> v3: deal with most comments from rfcv2 and various improvements
+>  - "vhost-user-backend: allow to specify binary to execute" as seperate
+>   patch, not for inclusion since Daniel as concerned about parsing
+>   shell strings with glib
+>  - use dmabuf to share 2d rendering result (with intel gem only atm)
+>  - document the vhost-user-gpu protocol
+>  - make vhost-user-gpu-pci and vhost-user-vga seperate devices (instead
+>    of adding vhost-user support to existing devices)
+>  - allow to specify virgl rendering, and rendernode
+>  - let's promote out of RFC status :)
+>
+> RFCv2: (addressing some of Gerd comments digged in the archives)
+>  - rebased, clean ups, various small fixes, update commit messages
+>  - teach the vhost-user-backend to take a chardev
+>  - add vhost-user-input-pci, instead of adding vhost code to virtio-input=
+-host-pci
+>
+> Marc-Andr=C3=A9 Lureau (29):
+>   chardev: avoid crash if no associated address
+>   chardev: remove qemu_chr_fe_read_all() counter
+>   chardev: unref if underlying chardev has no parent
+>   dmabuf: add y0_top, pass it to spice
+>   vhost-user: simplify vhost_user_init/vhost_user_cleanup
+>   libvhost-user: exit by default on VHOST_USER_NONE
+>   vhost-user: wrap some read/write with retry handling
+>   Add vhost-user-backend
+>   qio: add qio_channel_command_new_spawn_with_pre_exec()
+>   HACK: vhost-user-backend: allow to specify binary to execute
+>   vhost-user: split vhost_user_read()
+>   vhost-user: add vhost_user_input_get_config()
+>   libvhost-user: export vug_source_new()
+>   contrib: add vhost-user-input
+>   Add vhost-user-input-pci
+>   vhost-user: add vhost_user_gpu_set_socket()
+>   vhost-user: add vhost_user_gpu_get_num_capsets()
+>   virtio: add virtio-gpu bswap helpers header
+>   util: promote qemu_egl_rendernode_open() to libqemuutil
+>   util: add qemu_write_pidfile()
+>   util: use fcntl() for qemu_write_pidfile() locking
+>   contrib: add vhost-user-gpu
+>   virtio-gpu: remove unused qdev
+>   virtio-gpu: remove unused config_size
+>   virtio-gpu: block both 2d and 3d rendering
+>   virtio-gpu: remove useless 'waiting' field
+>   virtio-gpu: split virtio-gpu, introduce virtio-gpu-base
+>   virtio-gpu: split virtio-gpu-pci & virtio-vga
+>   hw/display: add vhost-user-vga & gpu-pci
+>
+>  contrib/libvhost-user/libvhost-user-glib.h |    3 +
+>  contrib/libvhost-user/libvhost-user.h      |    3 +
+>  contrib/vhost-user-gpu/drm.h               |   63 ++
+>  contrib/vhost-user-gpu/virgl.h             |   25 +
+>  contrib/vhost-user-gpu/vugpu.h             |  168 +++
+>  hw/display/virtio-vga.h                    |   22 +
+>  hw/virtio/virtio-pci.h                     |   27 +-
+>  include/hw/virtio/vhost-backend.h          |    6 +
+>  include/hw/virtio/vhost-user-blk.h         |    2 +-
+>  include/hw/virtio/vhost-user-scsi.h        |    2 +-
+>  include/hw/virtio/vhost-user.h             |    2 +-
+>  include/hw/virtio/virtio-gpu-bswap.h       |   61 +
+>  include/hw/virtio/virtio-gpu.h             |   90 +-
+>  include/hw/virtio/virtio-input.h           |   14 +
+>  include/io/channel-command.h               |   18 +
+>  include/qemu/drm.h                         |    6 +
+>  include/qemu/osdep.h                       |    3 +-
+>  include/sysemu/vhost-user-backend.h        |   60 +
+>  include/ui/console.h                       |    1 +
+>  backends/cryptodev-vhost-user.c            |   18 +-
+>  backends/vhost-user.c                      |  320 ++++++
+>  chardev/char-fe.c                          |   13 +-
+>  chardev/char-socket.c                      |    8 +-
+>  contrib/libvhost-user/libvhost-user-glib.c |   15 +-
+>  contrib/libvhost-user/libvhost-user.c      |    3 +-
+>  contrib/vhost-user-gpu/drm.c               |  190 ++++
+>  contrib/vhost-user-gpu/main.c              | 1164 ++++++++++++++++++++
+>  contrib/vhost-user-gpu/virgl.c             |  579 ++++++++++
+>  contrib/vhost-user-input/main.c            |  379 +++++++
+>  hw/block/vhost-user-blk.c                  |   22 +-
+>  hw/display/vhost-user-gpu-pci.c            |   51 +
+>  hw/display/vhost-user-gpu.c                |  524 +++++++++
+>  hw/display/vhost-user-vga.c                |   52 +
+>  hw/display/virtio-gpu-3d.c                 |   70 +-
+>  hw/display/virtio-gpu-base.c               |  292 +++++
+>  hw/display/virtio-gpu-pci.c                |   39 +-
+>  hw/display/virtio-gpu.c                    |  368 ++-----
+>  hw/display/virtio-vga.c                    |  127 ++-
+>  hw/input/vhost-user-input.c                |  110 ++
+>  hw/scsi/vhost-user-scsi.c                  |   20 +-
+>  hw/virtio/vhost-stub.c                     |    4 +-
+>  hw/virtio/vhost-user.c                     |  143 ++-
+>  hw/virtio/virtio-pci.c                     |   20 +
+>  io/channel-command.c                       |   33 +-
+>  net/vhost-user.c                           |   13 +-
+>  os-posix.c                                 |   24 -
+>  os-win32.c                                 |   25 -
+>  qga/main.c                                 |   54 +-
+>  scsi/qemu-pr-helper.c                      |   40 +-
+>  ui/egl-helpers.c                           |   51 +-
+>  ui/spice-display.c                         |    3 +-
+>  util/drm.c                                 |   66 ++
+>  util/oslib-posix.c                         |   39 +
+>  util/oslib-win32.c                         |   27 +
+>  vl.c                                       |    8 +-
+>  MAINTAINERS                                |   15 +-
+>  Makefile                                   |    6 +
+>  Makefile.objs                              |    2 +
+>  backends/Makefile.objs                     |    3 +-
+>  configure                                  |   35 +
+>  contrib/vhost-user-gpu/Makefile.objs       |   10 +
+>  contrib/vhost-user-input/Makefile.objs     |    1 +
+>  docs/interop/vhost-user-gpu.rst            |  236 ++++
+>  docs/interop/vhost-user.txt                |   24 +
+>  hw/display/Makefile.objs                   |    5 +-
+>  hw/input/Makefile.objs                     |    1 +
+>  qemu-options.hx                            |   24 +
+>  util/Makefile.objs                         |    1 +
+>  68 files changed, 5130 insertions(+), 723 deletions(-)
+>  create mode 100644 contrib/vhost-user-gpu/drm.h
+>  create mode 100644 contrib/vhost-user-gpu/virgl.h
+>  create mode 100644 contrib/vhost-user-gpu/vugpu.h
+>  create mode 100644 hw/display/virtio-vga.h
+>  create mode 100644 include/hw/virtio/virtio-gpu-bswap.h
+>  create mode 100644 include/qemu/drm.h
+>  create mode 100644 include/sysemu/vhost-user-backend.h
+>  create mode 100644 backends/vhost-user.c
+>  create mode 100644 contrib/vhost-user-gpu/drm.c
+>  create mode 100644 contrib/vhost-user-gpu/main.c
+>  create mode 100644 contrib/vhost-user-gpu/virgl.c
+>  create mode 100644 contrib/vhost-user-input/main.c
+>  create mode 100644 hw/display/vhost-user-gpu-pci.c
+>  create mode 100644 hw/display/vhost-user-gpu.c
+>  create mode 100644 hw/display/vhost-user-vga.c
+>  create mode 100644 hw/display/virtio-gpu-base.c
+>  create mode 100644 hw/input/vhost-user-input.c
+>  create mode 100644 util/drm.c
+>  create mode 100644 contrib/vhost-user-gpu/Makefile.objs
+>  create mode 100644 contrib/vhost-user-input/Makefile.objs
+>  create mode 100644 docs/interop/vhost-user-gpu.rst
+>
+> --
+> 2.18.0.129.ge3331758f1
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
