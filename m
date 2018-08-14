@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdtW-0003TG-AC
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:18 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdtZ-0003Vg-PB
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdss-0005vW-5E
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:14 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:52249 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdst-0005wL-Cn
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:17 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:52294 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpdsr-0005u1-GQ
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:17:34 -0400
+	id 1fpdst-0005um-0w
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:17:35 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 14 Aug 2018 20:16:54 +0200
-Message-Id: <1534270621-27332-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 14 Aug 2018 20:16:58 +0200
+Message-Id: <1534270621-27332-17-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/19] target/mips: Don't update BadVAddr
- register in Debug Mode
+Subject: [Qemu-devel] [PULL 16/19] elf: Add ELF flags for MIPS machine
+ variants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,96 +31,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-BadVAddr should not be updated if (env->hflags & MIPS_HFLAG_DM) is
-set.
+Add MIPS machine variants ELF flags so that the emulation behavior
+can be adjusted if needed.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/helper.c    |  4 +++-
- target/mips/op_helper.c | 12 +++++++++---
- 2 files changed, 12 insertions(+), 4 deletions(-)
+ include/elf.h | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index 8cf91ce..e215af9 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -502,7 +502,9 @@ static void raise_mmu_exception(CPUMIPSState *env, ta=
-rget_ulong address,
-         break;
-     }
-     /* Raise exception */
--    env->CP0_BadVAddr =3D address;
-+    if (!(env->hflags & MIPS_HFLAG_DM)) {
-+        env->CP0_BadVAddr =3D address;
-+    }
-     env->CP0_Context =3D (env->CP0_Context & ~0x007fffff) |
-                        ((address >> 9) & 0x007ffff0);
-     env->CP0_EntryHi =3D (env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask)=
- |
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 41d3634..0b2663b 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -271,7 +271,9 @@ static inline hwaddr do_translate_address(CPUMIPSStat=
-e *env,
- target_ulong helper_##name(CPUMIPSState *env, target_ulong arg, int mem_=
-idx)  \
- {                                                                       =
-      \
-     if (arg & almask) {                                                 =
-      \
--        env->CP0_BadVAddr =3D arg;                                      =
-        \
-+        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
-      \
-+            env->CP0_BadVAddr =3D arg;                                  =
-        \
-+        }                                                               =
-      \
-         do_raise_exception(env, EXCP_AdEL, GETPC());                    =
-      \
-     }                                                                   =
-      \
-     env->lladdr =3D do_translate_address(env, arg, 0, GETPC());         =
-        \
-@@ -291,7 +293,9 @@ target_ulong helper_##name(CPUMIPSState *env, target_=
-ulong arg1,              \
-     target_long tmp;                                                    =
-      \
-                                                                         =
-      \
-     if (arg2 & almask) {                                                =
-      \
--        env->CP0_BadVAddr =3D arg2;                                     =
-        \
-+        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
-      \
-+            env->CP0_BadVAddr =3D arg2;                                 =
-        \
-+        }                                                               =
-      \
-         do_raise_exception(env, EXCP_AdES, GETPC());                    =
-      \
-     }                                                                   =
-      \
-     if (do_translate_address(env, arg2, 1, GETPC()) =3D=3D env->lladdr) =
-{         \
-@@ -2437,7 +2441,9 @@ void mips_cpu_do_unaligned_access(CPUState *cs, vad=
-dr addr,
-     int error_code =3D 0;
-     int excp;
+diff --git a/include/elf.h b/include/elf.h
+index 60f6cbe..28a5a63 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -62,6 +62,29 @@ typedef int64_t  Elf64_Sxword;
+ #define EF_MIPS_FP64      0x00000200
+ #define EF_MIPS_NAN2008   0x00000400
 =20
--    env->CP0_BadVAddr =3D addr;
-+    if (!(env->hflags & MIPS_HFLAG_DM)) {
-+        env->CP0_BadVAddr =3D addr;
-+    }
-=20
-     if (access_type =3D=3D MMU_DATA_STORE) {
-         excp =3D EXCP_AdES;
++/* MIPS machine variant */
++#define EF_MIPS_MACH_NONE     0x00000000  /* A standard MIPS implementat=
+ion  */
++#define EF_MIPS_MACH_3900     0x00810000  /* Toshiba R3900              =
+     */
++#define EF_MIPS_MACH_4010     0x00820000  /* LSI R4010                  =
+     */
++#define EF_MIPS_MACH_4100     0x00830000  /* NEC VR4100                 =
+     */
++#define EF_MIPS_MACH_4650     0x00850000  /* MIPS R4650                 =
+     */
++#define EF_MIPS_MACH_4120     0x00870000  /* NEC VR4120                 =
+     */
++#define EF_MIPS_MACH_4111     0x00880000  /* NEC VR4111/VR4181          =
+     */
++#define EF_MIPS_MACH_SB1      0x008a0000  /* Broadcom SB-1              =
+     */
++#define EF_MIPS_MACH_OCTEON   0x008b0000  /* Cavium Networks Octeon     =
+     */
++#define EF_MIPS_MACH_XLR      0x008c0000  /* RMI Xlr                    =
+     */
++#define EF_MIPS_MACH_OCTEON2  0x008d0000  /* Cavium Networks Octeon2    =
+     */
++#define EF_MIPS_MACH_OCTEON3  0x008e0000  /* Cavium Networks Octeon3    =
+     */
++#define EF_MIPS_MACH_5400     0x00910000  /* NEC VR5400                 =
+     */
++#define EF_MIPS_MACH_5900     0x00920000  /* MIPS R5900                 =
+     */
++#define EF_MIPS_MACH_5500     0x00980000  /* NEC VR5500                 =
+     */
++#define EF_MIPS_MACH_9000     0x00990000  /* PMC-Sierra's RM9000        =
+     */
++#define EF_MIPS_MACH_LS2E     0x00a00000  /* ST Microelectronics Loongso=
+n 2E */
++#define EF_MIPS_MACH_LS2F     0x00a10000  /* ST Microelectronics Loongso=
+n 2F */
++#define EF_MIPS_MACH_LS3A     0x00a20000  /* ST Microelectronics Loongso=
+n 3A */
++#define EF_MIPS_MACH          0x00ff0000  /* EF_MIPS_MACH_xxx selection =
+mask */
++
++
+ /* These constants define the different elf file types */
+ #define ET_NONE   0
+ #define ET_REL    1
 --=20
 2.7.4
