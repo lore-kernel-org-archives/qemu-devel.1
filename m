@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpabG-0000ku-Ij
+	(envelope-from <edgari@xilinx.com>) id 1fpabJ-0000o6-TY
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpabD-0005CS-Eq
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57970 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpabD-0005CB-8b
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:07 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 14 Aug 2018 16:46:52 +0200
-Message-Id: <1534258018-22859-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/6] Various qtest-related patches and a
- mc146818rtc fix
+	(envelope-from <edgari@xilinx.com>) id 1fpabG-0005GU-Nz
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:13 -0400
+Date: Tue, 14 Aug 2018 16:46:56 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20180814144656.ww3gmgmdknqsfp5x@toto>
+References: <20180814124254.5229-1-peter.maydell@linaro.org>
+	<20180814124254.5229-5-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20180814124254.5229-5-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 04/10] target/arm: Implement AArch32 HVBAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,32 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Luc Michel <luc.michel@greensocs.com>, edgari@xilinx.com
 
-The basic idea for this patch series are the two patches that improve
-the device-inrospection test: We now check that the qom-tree and the
-qtree do not change during introspection, and the final patch also turns
-on testing device introspection with all machines. The other patches are
-a bug fix for the mc146818rtc device which has been discovered with the
-improved device-introspection test, and two patches to shut up annoying
-messages during "make check".
+On Tue, Aug 14, 2018 at 01:42:48PM +0100, Peter Maydell wrote:
+> Implement the AArch32 HVBAR register; we can do this just by
+> making the existing VBAR_EL2 regdefs be STATE_BOTH.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Thomas Huth (6):
-  tests/migration-test: Silence the kvm_hv message by default
-  tests/device-introspection: Check that the qom-tree and qtree do not
-    change
-  hw/timer/mc146818rtc: White space clean-up
-  hw/timer/mc146818rtc: Fix introspection problem
-  net: Silence 'has no peer' messages in testing mode
-  tests/device-introspect: Test with all machines, not only with "none"
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
- hw/ppc/prep.c                  |  3 +++
- hw/timer/mc146818rtc.c         | 20 ++++++---------
- tests/device-introspect-test.c | 55 ++++++++++++++++++++++++++++++++++++------
- tests/migration-test.c         | 20 ++++++++-------
- vl.c                           |  3 +--
- 5 files changed, 70 insertions(+), 31 deletions(-)
 
--- 
-1.8.3.1
+> ---
+>  target/arm/helper.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 14fd78f587a..b6412fe9d1f 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -3750,7 +3750,7 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
+>  
+>  /* Used to describe the behaviour of EL2 regs when EL2 does not exist.  */
+>  static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
+> -    { .name = "VBAR_EL2", .state = ARM_CP_STATE_AA64,
+> +    { .name = "VBAR_EL2", .state = ARM_CP_STATE_BOTH,
+>        .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 0, .opc2 = 0,
+>        .access = PL2_RW,
+>        .readfn = arm_cp_read_zero, .writefn = arm_cp_write_ignore },
+> @@ -3899,7 +3899,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
+>        .opc0 = 3, .opc1 = 4, .crn = 4, .crm = 0, .opc2 = 0,
+>        .access = PL2_RW,
+>        .fieldoffset = offsetof(CPUARMState, banked_spsr[BANK_HYP]) },
+> -    { .name = "VBAR_EL2", .state = ARM_CP_STATE_AA64,
+> +    { .name = "VBAR_EL2", .state = ARM_CP_STATE_BOTH,
+>        .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 0, .opc2 = 0,
+>        .access = PL2_RW, .writefn = vbar_write,
+>        .fieldoffset = offsetof(CPUARMState, cp15.vbar_el[2]),
+> -- 
+> 2.18.0
+> 
