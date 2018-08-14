@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fpdN6-0004hH-AW
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:44:59 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fpdOY-0006Fw-Q4
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:46:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fpdMq-0008L9-VO
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:44:44 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 14 Aug 2018 19:53:49 +0300
-Message-Id: <20180814165349.56344-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20180814165349.56344-1-vsementsov@virtuozzo.com>
-References: <20180814165349.56344-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [RFC] new, node-graph-based fleecing and backup
+	(envelope-from <stefanha@redhat.com>) id 1fpdOJ-0002Tp-NC
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:46:14 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 14 Aug 2018 17:27:34 +0100
+Message-Id: <20180814162739.11814-2-stefanha@redhat.com>
+In-Reply-To: <20180814162739.11814-1-stefanha@redhat.com>
+References: <20180814162739.11814-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 1/6] hw/arm: make bitbanded IO optional on
+ ARMv7-M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,636 +23,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, joel@jms.id.au, qemu-arm@nongnu.org, Subbaraya Sundeep <sundeep.lkml@gmail.com>, jim@groklearning.com, Alistair Francis <alistair@alistair23.me>, Steffen Gortz <qemu.ml@steffen-goertz.de>, mail@steffen-goertz.de, Su Hang <suhang16@mails.ucas.ac.cn>, ilg@livius.net, Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Some ARM CPUs have bitbanded IO, a memory region that allows convenient
+bit access via 32-bit memory loads/stores.  This eliminates the need for
+read-modify-update instruction sequences.
+
+This patch makes this optional feature an ARMv7MState qdev property,
+allowing boards to choose whether they want bitbanding or not.
+
+Status of boards:
+ * iotkit (Cortex M33), no bitband
+ * mps2 (Cortex M3), bitband
+ * msf2 (Cortex M3), bitband
+ * stellaris (Cortex M3), bitband
+ * stm32f205 (Cortex M3), bitband
+
+As a side-effect of this patch, Peter Maydell noted that the Ethernet
+controller on mps2 board is now accessible.  Previously they were hidden
+by the bitband region (which does not exist on the real board).
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
+ include/hw/arm/armv7m.h |  2 ++
+ hw/arm/armv7m.c         | 37 ++++++++++++++++++++-----------------
+ hw/arm/mps2.c           |  1 +
+ hw/arm/msf2-soc.c       |  1 +
+ hw/arm/stellaris.c      |  1 +
+ hw/arm/stm32f205_soc.c  |  1 +
+ 6 files changed, 26 insertions(+), 17 deletions(-)
 
-Hi all!
-
-Here is an idea and kind of proof-of-concept of how to unify and improve
-push/pull backup schemes.
-
-Let's start from fleecing, a way of importing a point-in-time snapshot not
-creating a real snapshot. Now we do it with help of backup(sync=none)..
-
-Proposal:
-
-For fleecing we need two nodes:
-
-1. fleecing hook. It's a filter which should be inserted on top of active
-disk. It's main purpose is handling guest writes by copy-on-write operation,
-i.e. it's a substitution for write-notifier in backup job.
-
-2. fleecing cache. It's a target node for COW operations by fleecing-hook.
-It also represents a point-in-time snapshot of active disk for the readers.
-
-The simplest realization of fleecing cache is a qcow2 temporary image, backed
-by active disk, i.e.:
-
-    +-------+
-    | Guest |
-    +---+---+
-        |
-        v
-    +---+-----------+  file     +-----------------------+
-    | Fleecing hook +---------->+ Fleecing cache(qcow2) |
-    +---+-----------+           +---+-------------------+
-        |                           |
-backing |                           |
-        v                           |
-    +---+---------+      backing    |
-    | Active disk +<----------------+
-    +-------------+
-
-Hm. No, because of permissions I can't do so, I have to do like this:
-
-    +-------+
-    | Guest |
-    +---+---+
-        |
-        v
-    +---+-----------+  file     +-----------------------+
-    | Fleecing hook +---------->+ Fleecing cache(qcow2) |
-    +---+-----------+           +-----+-----------------+
-        |                             |
-backing |                             | backing
-        v                             v
-    +---+---------+   backing   +-----+---------------------+
-    | Active disk +<------------+ hack children permissions |
-    +-------------+             |     filter node           |
-                                +---------------------------+
-
-Ok, this works, it's an image fleecing scheme without any block jobs.
-
-Problems with realization:
-
-1 What to do with hack-permissions-node? What is a true way to implement
-something like this? How to tune permissions to avoid this additional node?
-
-2 Inserting/removing the filter. Do we have working way or developments on
-it?
-
-3. Interesting: we can't setup backing link to active disk before inserting
-fleecing-hook, otherwise, it will damage this link on insertion. This means,
-that we can't create fleecing cache node in advance with all backing to
-reference it when creating fleecing hook. And we can't prepare all the nodes
-in advance and then insert the filter.. We have to:
-1. create all the nodes with all links in one big json, or
-2. set backing links/create nodes automatically, as it is done in this RFC
- (it's a bad way I think, not clear, not transparent)
-
-4. Is it a good idea to use "backing" and "file" links in such way?
-
-Benefits, or, what can be done:
-
-1. We can implement special Fleecing cache filter driver, which will be a real
-cache: it will store some recently written clusters and RAM, it can have a
-backing (or file?) qcow2 child, to flush some clusters to the disk, etc. So,
-for each cluster of active disk we will have the following characteristics:
-
-- changed (changed in active disk since backup start)
-- copy (we need this cluster for fleecing user. For example, in RFC patch all
-clusters are "copy", cow_bitmap is initialized to all ones. We can use some
-existent bitmap to initialize cow_bitmap, and it will provide an "incremental"
-fleecing (for use in incremental backup push or pull)
-- cached in RAM
-- cached in disk
-
-On top of these characteristics we can implement the following features:
-
-1. COR, we can cache clusters not only on writes but on reads too, if we have
-free space in ram-cache (and if not, do not cache at all, don't write to
-disk-cache). It may be done like bdrv_write(..., BDRV_REQ_UNNECESARY)
-
-2. Benefit for guest: if cluster is unchanged and ram-cached, we can skip reading
-from the devise
-
-3. If needed, we can drop unchanged ram-cached clusters from ram-cache
-
-4. On guest write, if cluster is already cached, we just mark it "changed"
-
-5. Lazy discards: in some setups, discards are not guaranteed to do something,
-so, we can at least defer some discards to the end of backup, if ram-cache is
-full.
-
-6. We can implement discard operation in fleecing cache, to make cluster
-not needed (drop from cache, drop "copy" flag), so further reads of this
-cluster will return error. So, fleecing client may read cluster by cluster
-and discard them to reduce COW-load of the drive. We even can combine read
-and discard into one command, something like "read-once", or it may be a
-flag for fleecing-cache, that all reads are "read-once".
-
-7. We can provide recommendations, on which clusters should fleecing-client
-copy first. Examples:
-a. copy ram-cached clusters first (obvious, to unload cache and reduce io
-   overhead)
-b. copy zero-clusters last (the don't occupy place in cache, so, lets copy
-   other clusters first)
-c. copy disk-cached clusters list (if we don't care about disk space,
-   we can say, that for disk-cached clusters we already have a maximum
-   io overhead, so let's copy other clusters first)
-d. copy disk-cached clusters with high priority (but after ram-cached) -
-   if we don't have enough disk space
-
-So, there is a wide range of possible politics. How to provide these
-recommendations?
-1. block_status
-2. create separate interface
-3. internal backup job may access shared fleecing object directly.
-
-About internal backup:
-Of course, we need a job which will copy clusters. But it will be simplified:
-it should not care about guest writes, it copies clusters from a kind of
-snapshot which is not changing in time. This job should follow recommendations
-from fleecing scheme [7].
-
-What about the target?
-
-We can use separate node as target, and copy from fleecing cache to the target.
-If we have only ram-cache, it would be equal to current approach (data is copied
-directly to the target, even on COW). If we have both ram- and disk- caches, it's
-a cool solution for slow-target: instead of make guest wait for long write to
-backup target (when ram-cache is full) we can write to disk-cache which is local
-and fast.
-
-Another option is to combine fleecing cache and target somehow (I didn't think
-about this really).
-
-Finally, with one - two (three?) special filters we can implement all current
-fleecing/backup schemes in unique and very configurable way  and do a lot more
-cool features and possibilities.
-
-What do you think?
-
-I really need help with fleecing graph creating/inserting/destroying, my code
-about it is a hack, I don't like it, it just works.
-
-About testing: to show that this work I use existing fleecing test - 222, a bit
-tuned (drop block-job and use new qmp command to remove filter).
-
-Based on:
-   [PATCH v3 0/8] dirty-bitmap: rewrite bdrv_dirty_iter_next_area
-   and
-   [PATCH 0/2] block: make .bdrv_close optional
- qapi/block-core.json       |  23 +++-
- block/fleecing-hook.c      | 280 +++++++++++++++++++++++++++++++++++++++++++++
- blockdev.c                 |  37 ++++++
- block/Makefile.objs        |   2 +
- tests/qemu-iotests/222     |  21 ++--
- tests/qemu-iotests/222.out |   1 -
- 6 files changed, 352 insertions(+), 12 deletions(-)
- create mode 100644 block/fleecing-hook.c
-
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 5b9084a394..70849074b3 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2549,7 +2549,8 @@
-             'host_cdrom', 'host_device', 'http', 'https', 'iscsi', 'luks',
-             'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels', 'qcow',
-             'qcow2', 'qed', 'quorum', 'raw', 'rbd', 'replication', 'sheepdog',
--            'ssh', 'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
-+            'ssh', 'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs',
-+            'fleecing-hook'] }
- 
- ##
- # @BlockdevOptionsFile:
-@@ -3636,7 +3637,8 @@
-       'vmdk':       'BlockdevOptionsGenericCOWFormat',
-       'vpc':        'BlockdevOptionsGenericFormat',
-       'vvfat':      'BlockdevOptionsVVFAT',
--      'vxhs':       'BlockdevOptionsVxHS'
-+      'vxhs':       'BlockdevOptionsVxHS',
-+      'fleecing-hook': 'BlockdevOptionsGenericCOWFormat'
-   } }
- 
- ##
-@@ -3757,6 +3759,23 @@
- { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
- 
- ##
-+# @x-drop-fleecing:
-+#
-+# Deletes fleecing-hook filter from the top of the backing chain.
-+#
-+# @node-name: Name of the fleecing-hook node name.
-+#
-+# Since: 3.1
-+#
-+# -> { "execute": "x-drop-fleecing",
-+#      "arguments": { "node-name": "fleece0" }
-+#    }
-+# <- { "return": {} }
-+#
-+##
-+{ 'command': 'x-drop-fleecing', 'data': { 'node-name': 'str' } }
-+
-+##
- # @BlockdevCreateOptionsFile:
- #
- # Driver specific image creation options for file.
-diff --git a/block/fleecing-hook.c b/block/fleecing-hook.c
-new file mode 100644
-index 0000000000..1728d503a7
---- /dev/null
-+++ b/block/fleecing-hook.c
-@@ -0,0 +1,280 @@
-+#include "qemu/osdep.h"
-+#include "qemu/cutils.h"
-+#include "qemu-common.h"
-+#include "qapi/error.h"
-+#include "block/blockjob.h"
-+#include "block/block_int.h"
-+#include "block/block_backup.h"
-+#include "block/qdict.h"
-+#include "sysemu/block-backend.h"
-+
-+typedef struct BDRVFleecingHookState {
-+    HBitmap *cow_bitmap; /* what should be copied to @file on guest write. */
-+
-+    /* use of common BlockDriverState fields:
-+     * @backing: link to active disk. Fleecing hook is a filter, which should
-+     *           replace active disk in block tree. Fleecing hook then transfers
-+     *           requests to active disk through @backing link.
-+     * @file: Fleecing cache. It's a storage for COW. @file should look like a
-+     *        point-in-time snapshot of active disk for readers.
-+     */
-+} BDRVFleecingHookState;
-+
-+static coroutine_fn int fleecing_hook_co_preadv(BlockDriverState *bs,
-+                                                uint64_t offset, uint64_t bytes,
-+                                                QEMUIOVector *qiov, int flags)
-+{
-+    /* Features to be implemented:
-+     * F1. COR. save read data to fleecing cache for fast access
-+     *     (to reduce reads)
-+     * F2. read from fleecing cache if data is in ram-cache and is unchanged
-+     */
-+
-+    return bdrv_co_preadv(bs->backing, offset, bytes, qiov, flags);
-+}
-+
-+static coroutine_fn int fleecing_hook_cow(BlockDriverState *bs, uint64_t offset,
-+                                          uint64_t bytes)
-+{
-+    int ret = 0;
-+    BDRVFleecingHookState *s = bs->opaque;
-+    uint64_t gran = 1UL << hbitmap_granularity(s->cow_bitmap);
-+    uint64_t end = QEMU_ALIGN_UP(offset + bytes, gran);
-+    uint64_t off = QEMU_ALIGN_DOWN(offset, gran), len;
-+    size_t align = MAX(bdrv_opt_mem_align(bs->backing->bs),
-+                       bdrv_opt_mem_align(bs->file->bs));
-+    struct iovec iov = {
-+        .iov_base = qemu_memalign(align, end - off),
-+        .iov_len = end - off
-+    };
-+    QEMUIOVector qiov;
-+
-+    qemu_iovec_init_external(&qiov, &iov, 1);
-+
-+    /* Features to be implemented:
-+     * F3. parallelize copying loop
-+     * F4. detect zeros
-+     * F5. use block_status ?
-+     * F6. don't cache clusters which are already cached by COR [see F1]
-+     */
-+
-+    while (hbitmap_next_dirty_area(s->cow_bitmap, &off, end, &len)) {
-+        iov.iov_len = qiov.size = len;
-+        ret = bdrv_co_preadv(bs->backing, off, len, &qiov,
-+                             BDRV_REQ_NO_SERIALISING);
-+        if (ret < 0) {
-+            goto finish;
+diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
+index 78308d1484..2ba24953b6 100644
+--- a/include/hw/arm/armv7m.h
++++ b/include/hw/arm/armv7m.h
+@@ -43,6 +43,7 @@ typedef struct {
+  *   devices will be automatically layered on top of this view.)
+  * + Property "idau": IDAU interface (forwarded to CPU object)
+  * + Property "init-svtor": secure VTOR reset value (forwarded to CPU ob=
+ject)
++ * + Property "enable-bitband": expose bitbanded IO
+  */
+ typedef struct ARMv7MState {
+     /*< private >*/
+@@ -63,6 +64,7 @@ typedef struct ARMv7MState {
+     MemoryRegion *board_memory;
+     Object *idau;
+     uint32_t init_svtor;
++    bool enable_bitband;
+ } ARMv7MState;
+=20
+ #endif
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index 6b07666057..878613994d 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -211,25 +211,27 @@ static void armv7m_realize(DeviceState *dev, Error =
+**errp)
+     memory_region_add_subregion(&s->container, 0xe000e000,
+                                 sysbus_mmio_get_region(sbd, 0));
+=20
+-    for (i =3D 0; i < ARRAY_SIZE(s->bitband); i++) {
+-        Object *obj =3D OBJECT(&s->bitband[i]);
+-        SysBusDevice *sbd =3D SYS_BUS_DEVICE(&s->bitband[i]);
++    if (s->enable_bitband) {
++        for (i =3D 0; i < ARRAY_SIZE(s->bitband); i++) {
++            Object *obj =3D OBJECT(&s->bitband[i]);
++            SysBusDevice *sbd =3D SYS_BUS_DEVICE(&s->bitband[i]);
+=20
+-        object_property_set_int(obj, bitband_input_addr[i], "base", &err=
+);
+-        if (err !=3D NULL) {
+-            error_propagate(errp, err);
+-            return;
+-        }
+-        object_property_set_link(obj, OBJECT(s->board_memory),
+-                                 "source-memory", &error_abort);
+-        object_property_set_bool(obj, true, "realized", &err);
+-        if (err !=3D NULL) {
+-            error_propagate(errp, err);
+-            return;
+-        }
++            object_property_set_int(obj, bitband_input_addr[i], "base", =
+&err);
++            if (err !=3D NULL) {
++                error_propagate(errp, err);
++                return;
++            }
++            object_property_set_link(obj, OBJECT(s->board_memory),
++                                     "source-memory", &error_abort);
++            object_property_set_bool(obj, true, "realized", &err);
++            if (err !=3D NULL) {
++                error_propagate(errp, err);
++                return;
++            }
+=20
+-        memory_region_add_subregion(&s->container, bitband_output_addr[i=
+],
+-                                    sysbus_mmio_get_region(sbd, 0));
++            memory_region_add_subregion(&s->container, bitband_output_ad=
+dr[i],
++                                        sysbus_mmio_get_region(sbd, 0));
 +        }
-+
-+        ret = bdrv_co_pwritev(bs->file, off, len, &qiov, BDRV_REQ_SERIALISING);
-+        if (ret < 0) {
-+            goto finish;
-+        }
-+        hbitmap_reset(s->cow_bitmap, off, len);
-+    }
-+
-+finish:
-+    qemu_vfree(iov.iov_base);
-+
-+    return ret;
-+}
-+
-+static int coroutine_fn fleecing_hook_co_pdiscard(
-+        BlockDriverState *bs, int64_t offset, int bytes)
-+{
-+    int ret = fleecing_hook_cow(bs, offset, bytes);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    /* Features to be implemented:
-+     * F7. possibility of lazy discard: just defer the discard after fleecing
-+     *     completion. If write (or new discard) occurs to the same area, just
-+     *     drop deferred discard.
-+     */
-+
-+    return bdrv_co_pdiscard(bs->backing, offset, bytes);
-+}
-+
-+static int coroutine_fn fleecing_hook_co_pwrite_zeroes(BlockDriverState *bs,
-+    int64_t offset, int bytes, BdrvRequestFlags flags)
-+{
-+    int ret = fleecing_hook_cow(bs, offset, bytes);
-+    if (ret < 0) {
-+        /* F8. Additional option to break fleecing instead of breaking guest
-+         * write here */
-+        return ret;
-+    }
-+
-+    return bdrv_co_pwrite_zeroes(bs->backing, offset, bytes, flags);
-+}
-+
-+static coroutine_fn int fleecing_hook_co_pwritev(BlockDriverState *bs,
-+                                                 uint64_t offset,
-+                                                 uint64_t bytes,
-+                                                 QEMUIOVector *qiov, int flags)
-+{
-+    int ret = fleecing_hook_cow(bs, offset, bytes);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    return bdrv_co_pwritev(bs->backing, offset, bytes, qiov, flags);
-+}
-+
-+static int coroutine_fn fleecing_hook_co_flush(BlockDriverState *bs)
-+{
-+    if (!bs->backing) {
-+        return 0;
-+    }
-+
-+    return bdrv_co_flush(bs->backing->bs);
-+}
-+
-+static void fleecing_hook_refresh_filename(BlockDriverState *bs, QDict *opts)
-+{
-+    if (bs->backing == NULL) {
-+        /* we can be here after failed bdrv_attach_child in
-+         * bdrv_set_backing_hd */
-+        return;
-+    }
-+    bdrv_refresh_filename(bs->backing->bs);
-+    pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
-+            bs->backing->bs->filename);
-+}
-+
-+static void fleecing_hook_child_perm(BlockDriverState *bs, BdrvChild *c,
-+                                       const BdrvChildRole *role,
-+                                       BlockReopenQueue *reopen_queue,
-+                                       uint64_t perm, uint64_t shared,
-+                                       uint64_t *nperm, uint64_t *nshared)
-+{
-+    *nperm = BLK_PERM_CONSISTENT_READ;
-+    *nshared = BLK_PERM_ALL;
-+}
-+
-+static coroutine_fn int fleecing_cheat_co_preadv(BlockDriverState *bs,
-+                                                uint64_t offset, uint64_t bytes,
-+                                                QEMUIOVector *qiov, int flags)
-+{
-+    return bdrv_co_preadv(bs->backing, offset, bytes, qiov, flags);
-+}
-+
-+static int coroutine_fn fleecing_cheat_co_pdiscard(
-+        BlockDriverState *bs, int64_t offset, int bytes)
-+{
-+    return -EINVAL;
-+}
-+
-+static coroutine_fn int fleecing_cheat_co_pwritev(BlockDriverState *bs,
-+                                                 uint64_t offset,
-+                                                 uint64_t bytes,
-+                                                 QEMUIOVector *qiov, int flags)
-+{
-+    return -EINVAL;
-+}
-+
-+BlockDriver bdrv_fleecing_cheat = {
-+    .format_name = "fleecing-cheat",
-+
-+    .bdrv_co_preadv             = fleecing_cheat_co_preadv,
-+    .bdrv_co_pwritev            = fleecing_cheat_co_pwritev,
-+    .bdrv_co_pdiscard           = fleecing_cheat_co_pdiscard,
-+
-+    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
-+
-+    .bdrv_refresh_filename      = fleecing_hook_refresh_filename,
-+    .bdrv_child_perm            = fleecing_hook_child_perm,
-+};
-+
-+static int fleecing_hook_open(BlockDriverState *bs, QDict *options, int flags,
-+                              Error **errp)
-+{
-+    BDRVFleecingHookState *s = bs->opaque;
-+    Error *local_err = NULL;
-+    const char *backing;
-+    BlockDriverState *backing_bs, *cheat;
-+
-+    backing = qdict_get_try_str(options, "backing");
-+    if (!backing) {
-+        error_setg(errp, "No backing option");
-+        return -EINVAL;
-+    }
-+
-+    backing_bs = bdrv_lookup_bs(backing, backing, errp);
-+    if (!backing_bs) {
-+        return -EINVAL;
-+    }
-+
-+    qdict_del(options, "backing");
-+
-+    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
-+                               false, errp);
-+    if (!bs->file) {
-+        return -EINVAL;
-+    }
-+
-+    bs->total_sectors = backing_bs->total_sectors;
-+    bdrv_set_aio_context(bs, bdrv_get_aio_context(backing_bs));
-+    bdrv_set_aio_context(bs->file->bs, bdrv_get_aio_context(backing_bs));
-+
-+    cheat = bdrv_new_open_driver(&bdrv_fleecing_cheat, "cheat",
-+                                         BDRV_O_RDWR, errp);
-+    cheat->total_sectors = backing_bs->total_sectors;
-+    bdrv_set_aio_context(cheat, bdrv_get_aio_context(backing_bs));
-+
-+    bdrv_drained_begin(backing_bs);
-+    bdrv_ref(bs);
-+    bdrv_append(bs, backing_bs, &local_err);
-+
-+    bdrv_set_backing_hd(cheat, backing_bs, &error_abort);
-+    bdrv_set_backing_hd(bs->file->bs, cheat, &error_abort);
-+    bdrv_unref(cheat);
-+
-+    bdrv_drained_end(backing_bs);
-+
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return -EINVAL;
-+    }
-+
-+    s->cow_bitmap = hbitmap_alloc(bdrv_getlength(backing_bs), 16);
-+    hbitmap_set(s->cow_bitmap, 0, bdrv_getlength(backing_bs));
-+
-+    return 0;
-+}
-+
-+static void fleecing_hook_close(BlockDriverState *bs)
-+{
-+    BDRVFleecingHookState *s = bs->opaque;
-+
-+    if (s->cow_bitmap) {
-+        hbitmap_free(s->cow_bitmap);
-+    }
-+}
-+
-+BlockDriver bdrv_fleecing_hook_filter = {
-+    .format_name = "fleecing-hook",
-+    .instance_size = sizeof(BDRVFleecingHookState),
-+
-+    .bdrv_co_preadv             = fleecing_hook_co_preadv,
-+    .bdrv_co_pwritev            = fleecing_hook_co_pwritev,
-+    .bdrv_co_pwrite_zeroes      = fleecing_hook_co_pwrite_zeroes,
-+    .bdrv_co_pdiscard           = fleecing_hook_co_pdiscard,
-+    .bdrv_co_flush              = fleecing_hook_co_flush,
-+
-+    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
-+
-+    .bdrv_refresh_filename      = fleecing_hook_refresh_filename,
-+    .bdrv_open                  = fleecing_hook_open,
-+    .bdrv_close                 = fleecing_hook_close,
-+
-+    .bdrv_child_perm        = bdrv_filter_default_perms,
-+};
-+
-+static void bdrv_fleecing_hook_init(void)
-+{
-+    bdrv_register(&bdrv_fleecing_hook_filter);
-+}
-+
-+block_init(bdrv_fleecing_hook_init);
-diff --git a/blockdev.c b/blockdev.c
-index dcf8c8d2ab..0b734fa670 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -4284,6 +4284,43 @@ out:
-     aio_context_release(aio_context);
+     }
  }
- 
-+void qmp_x_drop_fleecing(const char *node_name, Error **errp)
-+{
-+    AioContext *aio_context;
-+    BlockDriverState *bs;
-+
-+    bs = bdrv_find_node(node_name);
-+    if (!bs) {
-+        error_setg(errp, "Cannot find node %s", node_name);
-+        return;
-+    }
-+
-+    if (!bdrv_has_blk(bs)) {
-+        error_setg(errp, "Node %s is not inserted", node_name);
-+        return;
-+    }
-+
-+    if (!bs->backing) {
-+        error_setg(errp, "'%s' has no backing", node_name);
-+        return;
-+    }
-+
-+    aio_context = bdrv_get_aio_context(bs);
-+    aio_context_acquire(aio_context);
-+
-+    bdrv_drained_begin(bs);
-+
-+    bdrv_child_try_set_perm(bs->backing, 0, BLK_PERM_ALL, &error_abort);
-+    bdrv_replace_node(bs, backing_bs(bs), &error_abort);
-+    bdrv_set_backing_hd(bs, NULL, &error_abort);
-+
-+    bdrv_drained_end(bs);
-+
-+    qmp_blockdev_del(node_name, &error_abort);
-+
-+    aio_context_release(aio_context);
-+}
-+
- static BdrvChild *bdrv_find_child(BlockDriverState *parent_bs,
-                                   const char *child_name)
- {
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index c8337bf186..081720b14f 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -31,6 +31,8 @@ block-obj-y += throttle.o copy-on-read.o
- 
- block-obj-y += crypto.o
- 
-+block-obj-y += fleecing-hook.o
-+
- common-obj-y += stream.o
- 
- nfs.o-libs         := $(LIBNFS_LIBS)
-diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
-index 0ead56d574..bafb426f67 100644
---- a/tests/qemu-iotests/222
-+++ b/tests/qemu-iotests/222
-@@ -86,14 +86,19 @@ with iotests.FilePath('base.img') as base_img_path, \
-             "driver": "file",
-             "filename": fleece_img_path,
-         },
--        "backing": src_node,
-+        # backing is unset, otherwise we can't insert filter,
-+        # instead, fleecing_hook will set backing link for
-+        # tgt_node automatically.
-     }))
- 
--    # Establish COW from source to fleecing node
--    log(vm.qmp("blockdev-backup",
--               device=src_node,
--               target=tgt_node,
--               sync="none"))
-+    # Establish COW from source to fleecing node, also,
-+    # source becomes backing file of target.
-+    log(vm.qmp("blockdev-add", **{
-+        "driver": "fleecing-hook",
-+        "node-name": "hook",
-+        "file": tgt_node,
-+        "backing": src_node,
-+    }))
- 
-     log('')
-     log('--- Setting up NBD Export ---')
-@@ -137,10 +142,8 @@ with iotests.FilePath('base.img') as base_img_path, \
-     log('--- Cleanup ---')
-     log('')
- 
--    log(vm.qmp('block-job-cancel', device=src_node))
--    log(vm.event_wait('BLOCK_JOB_CANCELLED'),
--        filters=[iotests.filter_qmp_event])
-     log(vm.qmp('nbd-server-stop'))
-+    log(vm.qmp('x-drop-fleecing', node_name="hook"))
-     log(vm.qmp('blockdev-del', node_name=tgt_node))
-     vm.shutdown()
- 
-diff --git a/tests/qemu-iotests/222.out b/tests/qemu-iotests/222.out
-index 48f336a02b..be925601a8 100644
---- a/tests/qemu-iotests/222.out
-+++ b/tests/qemu-iotests/222.out
-@@ -50,7 +50,6 @@ read -P0 0x3fe0000 64k
- --- Cleanup ---
- 
- {u'return': {}}
--{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'drive0', u'type': u'backup', u'speed': 0, u'len': 67108864, u'offset': 393216}, u'event': u'BLOCK_JOB_CANCELLED'}
- {u'return': {}}
- {u'return': {}}
- 
--- 
-2.11.1
+=20
+@@ -239,6 +241,7 @@ static Property armv7m_properties[] =3D {
+                      MemoryRegion *),
+     DEFINE_PROP_LINK("idau", ARMv7MState, idau, TYPE_IDAU_INTERFACE, Obj=
+ect *),
+     DEFINE_PROP_UINT32("init-svtor", ARMv7MState, init_svtor, 0),
++    DEFINE_PROP_BOOL("enable-bitband", ARMv7MState, enable_bitband, fals=
+e),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index c3946da317..0a0ae867d9 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -186,6 +186,7 @@ static void mps2_common_init(MachineState *machine)
+         g_assert_not_reached();
+     }
+     qdev_prop_set_string(armv7m, "cpu-type", machine->cpu_type);
++    qdev_prop_set_bit(armv7m, "enable-bitband", true);
+     object_property_set_link(OBJECT(&mms->armv7m), OBJECT(system_memory)=
+,
+                              "memory", &error_abort);
+     object_property_set_bool(OBJECT(&mms->armv7m), true, "realized",
+diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+index dbefade644..2702e90b45 100644
+--- a/hw/arm/msf2-soc.c
++++ b/hw/arm/msf2-soc.c
+@@ -117,6 +117,7 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, =
+Error **errp)
+     armv7m =3D DEVICE(&s->armv7m);
+     qdev_prop_set_uint32(armv7m, "num-irq", 81);
+     qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
++    qdev_prop_set_bit(armv7m, "enable-bitband", true);
+     object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memor=
+y()),
+                                      "memory", &error_abort);
+     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err)=
+;
+diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+index dc521b4a5a..6c69ce79b2 100644
+--- a/hw/arm/stellaris.c
++++ b/hw/arm/stellaris.c
+@@ -1304,6 +1304,7 @@ static void stellaris_init(MachineState *ms, stella=
+ris_board_info *board)
+     nvic =3D qdev_create(NULL, TYPE_ARMV7M);
+     qdev_prop_set_uint32(nvic, "num-irq", NUM_IRQ_LINES);
+     qdev_prop_set_string(nvic, "cpu-type", ms->cpu_type);
++    qdev_prop_set_bit(nvic, "enable-bitband", true);
+     object_property_set_link(OBJECT(nvic), OBJECT(get_system_memory()),
+                                      "memory", &error_abort);
+     /* This will exit with an error if the user passed us a bad cpu_type=
+ */
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index c486d06a8b..980e5af13c 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -109,6 +109,7 @@ static void stm32f205_soc_realize(DeviceState *dev_so=
+c, Error **errp)
+     armv7m =3D DEVICE(&s->armv7m);
+     qdev_prop_set_uint32(armv7m, "num-irq", 96);
+     qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
++    qdev_prop_set_bit(armv7m, "enable-bitband", true);
+     object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memor=
+y()),
+                                      "memory", &error_abort);
+     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err)=
+;
+--=20
+2.17.1
