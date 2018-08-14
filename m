@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1fpPof-0004i9-MX
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 23:16:19 -0400
+	(envelope-from <jcody@redhat.com>) id 1fpQ8s-0002zZ-NI
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 23:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1fpPoe-0004Rz-Cs
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 23:16:17 -0400
-Received: from mail-qt0-x234.google.com ([2607:f8b0:400d:c0d::234]:42564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1fpPoe-0004Rr-6Y
-	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 23:16:16 -0400
-Received: by mail-qt0-x234.google.com with SMTP id z8-v6so19760555qto.9
-	for <qemu-devel@nongnu.org>; Mon, 13 Aug 2018 20:16:15 -0700 (PDT)
+	(envelope-from <jcody@redhat.com>) id 1fpQ8r-0004fh-Ph
+	for qemu-devel@nongnu.org; Mon, 13 Aug 2018 23:37:10 -0400
+Date: Mon, 13 Aug 2018 23:36:58 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180814033658.GA3254@localhost.localdomain>
+References: <20180813022006.7216-1-mreitz@redhat.com>
+	<20180813022006.7216-3-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180813113052.GD2488@work-vm>
-References: <CAKXe6S+OzWE92HJW-wiR3ynJmak_F556qrg5Kpn6goPn3LYDhA@mail.gmail.com>
-	<20180813093545.GB2488@work-vm>
-	<CAKXe6SKCx-=cUKMFPQQ+Wm-0==HkD9Qm6ud1Q0S0k3gi5qRKmA@mail.gmail.com>
-	<20180813113052.GD2488@work-vm>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 14 Aug 2018 11:15:35 +0800
-Message-ID: <CAKXe6SJcOX1Skoq_wL2WfvF+vWzmA0pMJ=EikpMuWbTio15ddg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Question about dirty page statistics for live
- migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180813022006.7216-3-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/17] mirror: Make
+ wait_for_any_operation() coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,91 +24,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, liqiang02@corp.netease.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
 
-2018-08-13 19:30 GMT+08:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
-
-> * Li Qiang (liq3ea@gmail.com) wrote:
-> > 2018-08-13 17:35 GMT+08:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
-> >
-> > > * Li Qiang (liq3ea@gmail.com) wrote:
-> > > > Hello Dave, Juan and all,
-> > > >
-> > > > It is useful to get the dirty page rates in guest to evaluate the
-> guest
-> > > > loads
-> > > > so that we can make a decide to live migrate it or not. So I think
-> we can
-> > > > add a on-demand qmp for showing the dirty page rates.
-> > > >
-> > > > I found someone has done this work in here:
-> > > > -->https://github.com/grivon/yabusame-qemu-dpt
-> > > > and here:
-> > > > https://github.com/btrplace/qemu-patch
-> > > >
-> > > > But seems not go to the upstream.
-> > > >
-> > > > I want to know your opinions about adding this qmp.
-> > >
-> > > Something like that could be good;
-> >
-> > one easy idea we had was
-> > > a 'migrate null:' uri and then you would use most of the existing
-> > > migration code to do the measurement; you would only have to
-> > > add a dummy file backend,
-> >
-> >
-> > As far as I understand, here dummy file backend just means the file
-> migrate
-> > to, right?
->
-> Yes; because then if you have a dummy migration destination, the rest of
-> the migration code will run, sync the bitmap and clear the bits, and
-> give you an approximation of the dirty rate.
->
-> It might still be worth having the separate code to measure it without
-> the overhead of the migration code; but then that's more complex - and
-> if you're trying to measure it to know how hard it is to migrate then
-> perhaps it's better to use the migration code anyway.
+On Mon, Aug 13, 2018 at 04:19:51AM +0200, Max Reitz wrote:
+> mirror_wait_for_any_operation() calls qemu_co_queue_wait(), which is a
+> coroutine_fn (technically it is a macro which resolves to a
+> coroutine_fn).  Therefore, this function needs to be a coroutine_fn as
+> well.
+> 
+> This patch makes it and all of its callers coroutine_fns.
 >
 
-Agree
+It'd be nice if someday coroutine_fn was actually functional during
+compile.  We can dream :)
 
-But here is another issue, if we choice 'migrate null', then we will break
-the 'migrate' interface.
-the migrate doesn't return the info, so we need to uses 'info migrate'.
-However only we want
-is the dirty pages rates. It's too heavy for the user. Anyway we just want
-to get the only dirty page rates
-using one command.
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-I will first try to implement a separate qmp.
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-Thanks,
-Li Qiang
-
-
-
-> Dave
->
-> > Thanks,
-> > Li Qiang
-> >
-> >
-> >
-> > > and something to stop the migration ever
-> > > terminating (maybe just set the downtime very low).
-> > >
-> > >
-> > > Dave
-> > >
-> > >
-> > > > Thanks,
-> > > > Li Qiang
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > >
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
+> ---
+>  block/mirror.c | 30 ++++++++++++++++--------------
+>  1 file changed, 16 insertions(+), 14 deletions(-)
+> 
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 85f5742eae..c28b6159d5 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -279,7 +279,8 @@ static int mirror_cow_align(MirrorBlockJob *s, int64_t *offset,
+>      return ret;
+>  }
+>  
+> -static inline void mirror_wait_for_any_operation(MirrorBlockJob *s, bool active)
+> +static inline void coroutine_fn
+> +    mirror_co_wait_for_any_operation(MirrorBlockJob *s, bool active)
+>  {
+>      MirrorOp *op;
+>  
+> @@ -297,10 +298,11 @@ static inline void mirror_wait_for_any_operation(MirrorBlockJob *s, bool active)
+>      abort();
+>  }
+>  
+> -static inline void mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s)
+> +static inline void coroutine_fn
+> +    mirror_co_wait_for_free_in_flight_slot(MirrorBlockJob *s)
+>  {
+>      /* Only non-active operations use up in-flight slots */
+> -    mirror_wait_for_any_operation(s, false);
+> +    mirror_co_wait_for_any_operation(s, false);
+>  }
+>  
+>  /* Perform a mirror copy operation.
+> @@ -343,7 +345,7 @@ static void coroutine_fn mirror_co_read(void *opaque)
+>  
+>      while (s->buf_free_count < nb_chunks) {
+>          trace_mirror_yield_in_flight(s, op->offset, s->in_flight);
+> -        mirror_wait_for_free_in_flight_slot(s);
+> +        mirror_co_wait_for_free_in_flight_slot(s);
+>      }
+>  
+>      /* Now make a QEMUIOVector taking enough granularity-sized chunks
+> @@ -549,7 +551,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+>  
+>          while (s->in_flight >= MAX_IN_FLIGHT) {
+>              trace_mirror_yield_in_flight(s, offset, s->in_flight);
+> -            mirror_wait_for_free_in_flight_slot(s);
+> +            mirror_co_wait_for_free_in_flight_slot(s);
+>          }
+>  
+>          if (s->ret < 0) {
+> @@ -600,10 +602,10 @@ static void mirror_free_init(MirrorBlockJob *s)
+>   * mirror_resume() because mirror_run() will begin iterating again
+>   * when the job is resumed.
+>   */
+> -static void mirror_wait_for_all_io(MirrorBlockJob *s)
+> +static void coroutine_fn mirror_co_wait_for_all_io(MirrorBlockJob *s)
+>  {
+>      while (s->in_flight > 0) {
+> -        mirror_wait_for_free_in_flight_slot(s);
+> +        mirror_co_wait_for_free_in_flight_slot(s);
+>      }
+>  }
+>  
+> @@ -762,7 +764,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+>              if (s->in_flight >= MAX_IN_FLIGHT) {
+>                  trace_mirror_yield(s, UINT64_MAX, s->buf_free_count,
+>                                     s->in_flight);
+> -                mirror_wait_for_free_in_flight_slot(s);
+> +                mirror_co_wait_for_free_in_flight_slot(s);
+>                  continue;
+>              }
+>  
+> @@ -770,7 +772,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+>              offset += bytes;
+>          }
+>  
+> -        mirror_wait_for_all_io(s);
+> +        mirror_co_wait_for_all_io(s);
+>          s->initial_zeroing_ongoing = false;
+>      }
+>  
+> @@ -916,7 +918,7 @@ static void coroutine_fn mirror_run(void *opaque)
+>          /* Do not start passive operations while there are active
+>           * writes in progress */
+>          while (s->in_active_write_counter) {
+> -            mirror_wait_for_any_operation(s, true);
+> +            mirror_co_wait_for_any_operation(s, true);
+>          }
+>  
+>          if (s->ret < 0) {
+> @@ -942,7 +944,7 @@ static void coroutine_fn mirror_run(void *opaque)
+>              if (s->in_flight >= MAX_IN_FLIGHT || s->buf_free_count == 0 ||
+>                  (cnt == 0 && s->in_flight > 0)) {
+>                  trace_mirror_yield(s, cnt, s->buf_free_count, s->in_flight);
+> -                mirror_wait_for_free_in_flight_slot(s);
+> +                mirror_co_wait_for_free_in_flight_slot(s);
+>                  continue;
+>              } else if (cnt != 0) {
+>                  delay_ns = mirror_iteration(s);
+> @@ -1028,7 +1030,7 @@ immediate_exit:
+>          assert(ret < 0 || ((s->common.job.force_cancel || !s->synced) &&
+>                 job_is_cancelled(&s->common.job)));
+>          assert(need_drain);
+> -        mirror_wait_for_all_io(s);
+> +        mirror_co_wait_for_all_io(s);
+>      }
+>  
+>      assert(s->in_flight == 0);
+> @@ -1098,11 +1100,11 @@ static void mirror_complete(Job *job, Error **errp)
+>      job_enter(job);
+>  }
+>  
+> -static void mirror_pause(Job *job)
+> +static void coroutine_fn mirror_pause(Job *job)
+>  {
+>      MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
+>  
+> -    mirror_wait_for_all_io(s);
+> +    mirror_co_wait_for_all_io(s);
+>  }
+>  
+>  static bool mirror_drained_poll(BlockJob *job)
+> -- 
+> 2.17.1
+> 
