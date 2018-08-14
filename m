@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpabH-0000m8-UR
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1fpabG-0000ku-Ij
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpabH-0005Gi-5L
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44638 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fpabD-0005CS-Eq
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57970 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpabG-0005GO-W4
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:11 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpabD-0005CB-8b
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:07 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 14 Aug 2018 16:46:54 +0200
-Message-Id: <1534258018-22859-3-git-send-email-thuth@redhat.com>
-In-Reply-To: <1534258018-22859-1-git-send-email-thuth@redhat.com>
-References: <1534258018-22859-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/6] tests/device-introspection: Check that the
- qom-tree and qtree do not change
+Date: Tue, 14 Aug 2018 16:46:52 +0200
+Message-Id: <1534258018-22859-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/6] Various qtest-related patches and a
+ mc146818rtc fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +25,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Introspection should not change the qom-tree / qtree, so we should check
-this in the device-introspect-test, too. This patch helped to find lots
-of instrospection bugs during the QEMU v3.0 soft/hard-freeze period in the
-last two months.
+The basic idea for this patch series are the two patches that improve
+the device-inrospection test: We now check that the qom-tree and the
+qtree do not change during introspection, and the final patch also turns
+on testing device introspection with all machines. The other patches are
+a bug fix for the mc146818rtc device which has been discovered with the
+improved device-introspection test, and two patches to shut up annoying
+messages during "make check".
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/device-introspect-test.c | 23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
+Thomas Huth (6):
+  tests/migration-test: Silence the kvm_hv message by default
+  tests/device-introspection: Check that the qom-tree and qtree do not
+    change
+  hw/timer/mc146818rtc: White space clean-up
+  hw/timer/mc146818rtc: Fix introspection problem
+  net: Silence 'has no peer' messages in testing mode
+  tests/device-introspect: Test with all machines, not only with "none"
 
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-index 0b4f221..5b7ec05 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -103,7 +103,14 @@ static QList *device_type_list(bool abstract)
- static void test_one_device(const char *type)
- {
-     QDict *resp;
--    char *help, *qom_tree;
-+    char *help;
-+    char *qom_tree_start, *qom_tree_end;
-+    char *qtree_start, *qtree_end;
-+
-+    g_debug("Testing device '%s'", type);
-+
-+    qom_tree_start = hmp("info qom-tree");
-+    qtree_start = hmp("info qtree");
- 
-     resp = qmp("{'execute': 'device-list-properties',"
-                " 'arguments': {'typename': %s}}",
-@@ -115,10 +122,18 @@ static void test_one_device(const char *type)
- 
-     /*
-      * Some devices leave dangling pointers in QOM behind.
--     * "info qom-tree" has a good chance at crashing then
-+     * "info qom-tree" or "info qtree" have a good chance at crashing then.
-+     * Also make sure that the tree did not change.
-      */
--    qom_tree = hmp("info qom-tree");
--    g_free(qom_tree);
-+    qom_tree_end = hmp("info qom-tree");
-+    g_assert_cmpstr(qom_tree_start, ==, qom_tree_end);
-+    g_free(qom_tree_start);
-+    g_free(qom_tree_end);
-+
-+    qtree_end = hmp("info qtree");
-+    g_assert_cmpstr(qtree_start, ==, qtree_end);
-+    g_free(qtree_start);
-+    g_free(qtree_end);
- }
- 
- static void test_device_intro_list(void)
+ hw/ppc/prep.c                  |  3 +++
+ hw/timer/mc146818rtc.c         | 20 ++++++---------
+ tests/device-introspect-test.c | 55 ++++++++++++++++++++++++++++++++++++------
+ tests/migration-test.c         | 20 ++++++++-------
+ vl.c                           |  3 +--
+ 5 files changed, 70 insertions(+), 31 deletions(-)
+
 -- 
 1.8.3.1
