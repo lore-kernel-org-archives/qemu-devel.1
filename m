@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpYfK-0005Yd-Dz
+	(envelope-from <pm215@archaic.org.uk>) id 1fpYfK-0005ZP-UV
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:43:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpYfJ-0002NE-Cb
+	(envelope-from <pm215@archaic.org.uk>) id 1fpYfK-0002P0-4s
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:43:14 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Aug 2018 13:42:49 +0100
-Message-Id: <20180814124254.5229-6-peter.maydell@linaro.org>
+Date: Tue, 14 Aug 2018 13:42:53 +0100
+Message-Id: <20180814124254.5229-10-peter.maydell@linaro.org>
 In-Reply-To: <20180814124254.5229-1-peter.maydell@linaro.org>
 References: <20180814124254.5229-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 05/10] target/arm: Implement AArch32 HCR and
- HCR2
+Subject: [Qemu-devel] [PATCH 09/10] target/arm: Implement AArch32 ERET
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +23,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Luc Michel <luc.michel@greensocs.com>, edgari@xilinx.com
 
-The AArch32 HCR and HCR2 registers alias HCR_EL2
-bits [31:0] and [63:32]; implement them.
+ARMv7VE introduced the ERET instruction, which is necessary to
+return from an exception taken to Hyp mode. Implement this.
+In A32 encoding it is a completely new encoding; in T32 it
+is an adjustment of the behaviour of the existing
+"SUBS PC, LR, #<imm8>" instruction.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 39 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 35 insertions(+), 4 deletions(-)
+ target/arm/translate.c | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index b6412fe9d1f..9701e413859 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -3754,11 +3754,15 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
-       .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 0, .opc2 = 0,
-       .access = PL2_RW,
-       .readfn = arm_cp_read_zero, .writefn = arm_cp_write_ignore },
--    { .name = "HCR_EL2", .state = ARM_CP_STATE_AA64,
-+    { .name = "HCR_EL2", .state = ARM_CP_STATE_BOTH,
-       .type = ARM_CP_NO_RAW,
-       .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 0,
-       .access = PL2_RW,
--      .readfn = arm_cp_read_zero, .writefn = arm_cp_write_ignore },
-+      .type = ARM_CP_CONST, .resetvalue = 0 },
-+    { .name = "HCR2", .state = ARM_CP_STATE_AA32,
-+      .cp = 15, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 4,
-+      .access = PL2_RW,
-+      .type = ARM_CP_CONST, .resetvalue = 0 },
-     { .name = "CPTR_EL2", .state = ARM_CP_STATE_BOTH,
-       .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 2,
-       .access = PL2_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-@@ -3872,10 +3876,26 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
-      * HCR_PTW forbids certain page-table setups
-      * HCR_DC Disables stage1 and enables stage2 translation
-      */
--    if ((raw_read(env, ri) ^ value) & (HCR_VM | HCR_PTW | HCR_DC)) {
-+    if ((env->cp15.hcr_el2 ^ value) & (HCR_VM | HCR_PTW | HCR_DC)) {
-         tlb_flush(CPU(cpu));
-     }
--    raw_write(env, ri, value);
-+    env->cp15.hcr_el2 = value;
-+}
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 3f5751d4826..5ecc24f12fb 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -8887,6 +8887,25 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+             tcg_temp_free_i32(tmp2);
+             store_reg(s, rd, tmp);
+             break;
++        case 0x6: /* ERET */
++            if (op1 != 3) {
++                goto illegal_op;
++            }
++            if (!arm_dc_feature(s, ARM_FEATURE_V7VE)) {
++                goto illegal_op;
++            }
++            if ((insn & 0x000fff0f) != 0x0000000e) {
++                /* UNPREDICTABLE; we choose to UNDEF */
++                goto illegal_op;
++            }
 +
-+static void hcr_writehigh(CPUARMState *env, const ARMCPRegInfo *ri,
-+                          uint64_t value)
-+{
-+    /* Handle HCR2 write, i.e. write to high half of HCR_EL2 */
-+    value = deposit64(env->cp15.hcr_el2, 32, 32, value);
-+    hcr_write(env, NULL, value);
-+}
-+
-+static void hcr_writelow(CPUARMState *env, const ARMCPRegInfo *ri,
-+                         uint64_t value)
-+{
-+    /* Handle HCR write, i.e. write to low half of HCR_EL2 */
-+    value = deposit64(env->cp15.hcr_el2, 0, 32, value);
-+    hcr_write(env, NULL, value);
- }
- 
- static const ARMCPRegInfo el2_cp_reginfo[] = {
-@@ -3883,6 +3903,17 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
-       .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 0,
-       .access = PL2_RW, .fieldoffset = offsetof(CPUARMState, cp15.hcr_el2),
-       .writefn = hcr_write },
-+    { .name = "HCR", .state = ARM_CP_STATE_AA32,
-+      .type = ARM_CP_ALIAS,
-+      .cp = 15, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 0,
-+      .access = PL2_RW, .fieldoffset = offsetof(CPUARMState, cp15.hcr_el2),
-+      .writefn = hcr_writelow },
-+    { .name = "HCR2", .state = ARM_CP_STATE_AA32,
-+      .type = ARM_CP_ALIAS,
-+      .cp = 15, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 4,
-+      .access = PL2_RW,
-+      .fieldoffset = offsetofhigh32(CPUARMState, cp15.hcr_el2),
-+      .writefn = hcr_writehigh },
-     { .name = "ELR_EL2", .state = ARM_CP_STATE_AA64,
-       .type = ARM_CP_ALIAS,
-       .opc0 = 3, .opc1 = 4, .crn = 4, .crm = 0, .opc2 = 1,
++            if (s->current_el == 2) {
++                tmp = load_cpu_field(elr_el[2]);
++            } else {
++                tmp = load_reg(s, 14);
++            }
++            gen_exception_return(s, tmp);
++            break;
+         case 7:
+         {
+             int imm16 = extract32(insn, 0, 4) | (extract32(insn, 8, 12) << 4);
+@@ -11144,8 +11163,16 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                         if (rn != 14 || rd != 15) {
+                             goto illegal_op;
+                         }
+-                        tmp = load_reg(s, rn);
+-                        tcg_gen_subi_i32(tmp, tmp, insn & 0xff);
++                        if (s->current_el == 2) {
++                            /* ERET from Hyp uses ELR_Hyp, not LR */
++                            if (insn & 0xff) {
++                                goto illegal_op;
++                            }
++                            tmp = load_cpu_field(elr_el[2]);
++                        } else {
++                            tmp = load_reg(s, rn);
++                            tcg_gen_subi_i32(tmp, tmp, insn & 0xff);
++                        }
+                         gen_exception_return(s, tmp);
+                         break;
+                     case 6: /* MRS */
 -- 
 2.18.0
