@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fpYDs-0002e8-TS
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fpYDs-0002eD-Uq
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:14:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fpYDn-00052R-SA
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fpYDn-000528-Ri
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:14:52 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 14 Aug 2018 15:14:41 +0300
-Message-Id: <20180814121443.33114-7-vsementsov@virtuozzo.com>
+Date: Tue, 14 Aug 2018 15:14:40 +0300
+Message-Id: <20180814121443.33114-6-vsementsov@virtuozzo.com>
 In-Reply-To: <20180814121443.33114-1-vsementsov@virtuozzo.com>
 References: <20180814121443.33114-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 6/8] Revert "block/dirty-bitmap: Add
- bdrv_dirty_iter_next_area"
+Subject: [Qemu-devel] [PATCH v3 5/8] block/mirror: fix and improve
+ do_sync_target_write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +23,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-This reverts commit 72d10a94213a954ad569095cb4491f2ae0853c40.
+Use bdrv_dirty_bitmap_next_dirty_area() instead of
+bdrv_dirty_iter_next_area(), because of the following problems of
+bdrv_dirty_iter_next_area():
 
-The function is unused now.
+1. Using HBitmap iterators we should carefully handle unaligned offset,
+as first call to hbitmap_iter_next() may return a value less than
+original offset (actually, it will be original offset rounded down to
+bitmap granularity). This handling is not done in
+do_sync_target_write().
+
+2. bdrv_dirty_iter_next_area() handles unaligned max_offset
+incorrectly:
+
+look at the code:
+    if (max_offset == iter->bitmap->size) {
+        /* If max_offset points to the image end, round it up by the
+         * bitmap granularity */
+        gran_max_offset = ROUND_UP(max_offset, granularity);
+    } else {
+        gran_max_offset = max_offset;
+    }
+
+    ret = hbitmap_iter_next(&iter->hbi, false);
+    if (ret < 0 || ret + granularity > gran_max_offset) {
+        return false;
+    }
+
+and assume that max_offset != iter->bitmap->size but still unaligned.
+if 0 < ret < max_offset we found dirty area, but the function can
+return false in this case (if ret + granularity > max_offset).
+
+3. bdrv_dirty_iter_next_area() uses inefficient loop to find the end of
+the dirty area. Let's use more efficient hbitmap_next_zero instead
+(bdrv_dirty_bitmap_next_dirty_area() do so)
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/dirty-bitmap.h |  2 --
- block/dirty-bitmap.c         | 55 --------------------------------------------
- 2 files changed, 57 deletions(-)
+ block/mirror.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index cb9162fa7e..20e1d86cb1 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -83,8 +83,6 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
- void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                     int64_t offset, int64_t bytes);
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
--bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
--                               uint64_t *offset, int *bytes);
- void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
- int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 4af20a1beb..d9333175b3 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -528,61 +528,6 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
-     return hbitmap_iter_next(&iter->hbi, true);
- }
+diff --git a/block/mirror.c b/block/mirror.c
+index b48c3f8cf5..d2806812c8 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1167,25 +1167,22 @@ static void do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
+                                  uint64_t offset, uint64_t bytes,
+                                  QEMUIOVector *qiov, int flags)
+ {
+-    BdrvDirtyBitmapIter *iter;
+     QEMUIOVector target_qiov;
+-    uint64_t dirty_offset;
+-    int dirty_bytes;
++    uint64_t dirty_offset = offset;
++    uint64_t dirty_bytes;
  
--/**
-- * Return the next consecutively dirty area in the dirty bitmap
-- * belonging to the given iterator @iter.
-- *
-- * @max_offset: Maximum value that may be returned for
-- *              *offset + *bytes
-- * @offset:     Will contain the start offset of the next dirty area
-- * @bytes:      Will contain the length of the next dirty area
-- *
-- * Returns: True if a dirty area could be found before max_offset
-- *          (which means that *offset and *bytes then contain valid
-- *          values), false otherwise.
-- *
-- * Note that @iter is never advanced if false is returned.  If an area
-- * is found (which means that true is returned), it will be advanced
-- * past that area.
-- */
--bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
--                               uint64_t *offset, int *bytes)
--{
--    uint32_t granularity = bdrv_dirty_bitmap_granularity(iter->bitmap);
--    uint64_t gran_max_offset;
--    int64_t ret;
--    int size;
+     if (qiov) {
+         qemu_iovec_init(&target_qiov, qiov->niov);
+     }
+ 
+-    iter = bdrv_dirty_iter_new(job->dirty_bitmap);
+-    bdrv_set_dirty_iter(iter, offset);
 -
--    if (max_offset == iter->bitmap->size) {
--        /* If max_offset points to the image end, round it up by the
--         * bitmap granularity */
--        gran_max_offset = ROUND_UP(max_offset, granularity);
--    } else {
--        gran_max_offset = max_offset;
--    }
--
--    ret = hbitmap_iter_next(&iter->hbi, false);
--    if (ret < 0 || ret + granularity > gran_max_offset) {
--        return false;
--    }
--
--    *offset = ret;
--    size = 0;
--
--    assert(granularity <= INT_MAX);
--
--    do {
--        /* Advance iterator */
--        ret = hbitmap_iter_next(&iter->hbi, true);
--        size += granularity;
--    } while (ret + granularity <= gran_max_offset &&
--             hbitmap_iter_next(&iter->hbi, false) == ret + granularity &&
--             size <= INT_MAX - granularity);
--
--    *bytes = MIN(size, max_offset - *offset);
--    return true;
--}
--
- /* Called within bdrv_dirty_bitmap_lock..unlock */
- void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                   int64_t offset, int64_t bytes)
+     while (true) {
+         bool valid_area;
+         int ret;
+ 
+         bdrv_dirty_bitmap_lock(job->dirty_bitmap);
+-        valid_area = bdrv_dirty_iter_next_area(iter, offset + bytes,
+-                                               &dirty_offset, &dirty_bytes);
++        valid_area = bdrv_dirty_bitmap_next_dirty_area(
++            job->dirty_bitmap, &dirty_offset,
++            MIN(offset + bytes, dirty_offset + INT_MAX), &dirty_bytes);
+         if (!valid_area) {
+             bdrv_dirty_bitmap_unlock(job->dirty_bitmap);
+             break;
+@@ -1241,9 +1238,10 @@ static void do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
+                 break;
+             }
+         }
++
++        dirty_offset += dirty_bytes;
+     }
+ 
+-    bdrv_dirty_iter_free(iter);
+     if (qiov) {
+         qemu_iovec_destroy(&target_qiov);
+     }
 -- 
 2.11.1
