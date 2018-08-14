@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fpYrZ-0002l7-FK
-	for Qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:55:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fpYs3-00037H-VR
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:56:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fpYrV-0002xR-1P
-	for Qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:55:53 -0400
-References: <20180730212249.16418-1-programmingkidx@gmail.com>
-	<5679ec6f-e2d7-e139-1b56-304540c89977@redhat.com>
-	<f6fcbd58-2462-d432-a038-cc13bb0dcf23@redhat.com>
-	<20180814084047.GD5025@dhcp-200-186.str.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <91ef77d7-026d-4930-bd4c-a94b17fa247c@redhat.com>
-Date: Tue, 14 Aug 2018 07:55:46 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1fpYrz-0003Bo-08
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:56:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38630 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fpYry-0003B3-QY
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:56:18 -0400
+References: <20180808114830.7169-1-quintela@redhat.com>
+	<20180808114830.7169-3-quintela@redhat.com>
+	<6c9bcc5b-21f0-60a8-bb8d-56861c2d4bd9@redhat.com>
+	<87ftzhw50t.fsf@trasno.org>
+	<1169fde5-2c97-bf04-d3eb-8b43d49b37f6@redhat.com>
+	<CAFEAcA-OY_4v3apC4xcB7HQwN=BGqdxuQenhnPntOXqybUx5hA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e23307f9-981f-1322-3dc1-136bc83b8ad9@redhat.com>
+Date: Tue, 14 Aug 2018 14:56:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180814084047.GD5025@dhcp-200-186.str.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFEAcA-OY_4v3apC4xcB7HQwN=BGqdxuQenhnPntOXqybUx5hA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-img.c: increase spacing between
- commands in documentation
+Subject: Re: [Qemu-devel] [PATCH v2 02/22] config: CONFIG_SERIAL* is already
+ in pci.mak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, John Arbuckle <programmingkidx@gmail.com>, qemu-block@nongnu.org, Qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 08/14/2018 03:40 AM, Kevin Wolf wrote:
->> And I've already expressed my opinion that it is already rather long, where
->> making it longer is not necessarily making it smarter.
+On 14/08/2018 14:06, Peter Maydell wrote:
+> On 14 August 2018 at 12:52, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> On 14/08/2018 13:40, Juan Quintela wrote:
+>>>> CONFIG_SERIAL is a dependency of both CONFIG_SERIAL and
+>>>> CONFIG_SERIAL_PCI.
+>>>
+>>> I guess you here mean CONFIG_SERIAL_ISA or CONFIG_SERIAL_PCI.  That is
+>>> not enough.  CONFIG_SERIAL really means CONFIG_SERIAL_COMMON, and things
+>>> like riscv* require it
+>>
+>> Right, I would put
+>>
+>>    CONFIG_SERIAL=y
+>>    CONFIG_SERIAL_ISA=y
+>>
+>> in superio.mak and
+>>
+>>    CONFIG_SERIAL=y
+>>    CONFIG_SERIAL_PCI=y
+>>
+>> in pci.mak.
 > 
-> I think if we want to improve the help text, we should split it up.
-> 
-> $ qemu-img --help
-> qemu-img version 2.12.94 (v3.0.0-rc4-5-g4fe9c3e13d-dirty)
-> Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-> usage: qemu-img [standard options] command [command options]
-> QEMU disk image utility
-> 
->      '-h', '--help'       display this help and exit
->      '-V', '--version'    output version information and exit
->      '-T', '--trace'      [[enable=]<pattern>][,events=<file>][,file=<file>]
->                           specify tracing options
-> 
-> Commands:
-> 
->      amend               Change options of an existing disk image
->      bench               Run benchmarks on a given disk image
->      check               Check the disk image for consistency or repair it
->      commit              Merge the disk image into its backing file
->      ...
-> 
-> Run 'qemu-img <command> --help' for details.
-> 
-> See <https://qemu.org/contribute/report-a-bug> for how to report bugs.
-> More information on the QEMU project at <https://qemu.org>.
+> What about the boards that use the serial.c code but do not
+> have PCI, ISA or a superio chip? That is, all the boards/devices
+> that call serial_mm_init() directly to create a memory-mapped
+> 16550.
 
-Indeed, that matches the approach that 'cvs --help' and 'git --help' 
-have taken. I could live with a split along those lines as being 
-something smarter.  When you want to learn the options for 'create', you 
-may have to ask two different --help commands to learn everything you 
-need ['--help' didn't give me enough, but told me to use 'create 
---help'], but at least you are not inundated with answers irrelevant to 
-the question you are asking, so you don't have to scroll through a wall 
-of text.
+They just add
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+   CONFIG_SERIAL=y
+
+to the .mak file.
+
+Paolo
