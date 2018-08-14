@@ -1,13 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fpdN3-0004f8-VA
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:44:57 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fpdN6-0004hH-AW
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:44:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fpdMo-0008Fd-QM
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:44:42 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fpdMq-0008L9-VO
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:44:44 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 14 Aug 2018 19:53:48 +0300
-Message-Id: <20180814165349.56344-1-vsementsov@virtuozzo.com>
+Date: Tue, 14 Aug 2018 19:53:49 +0300
+Message-Id: <20180814165349.56344-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20180814165349.56344-1-vsementsov@virtuozzo.com>
+References: <20180814165349.56344-1-vsementsov@virtuozzo.com>
 Subject: [Qemu-devel] [RFC] new, node-graph-based fleecing and backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
