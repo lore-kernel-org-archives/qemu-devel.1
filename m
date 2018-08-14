@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdtL-0003NS-Lo
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdtL-0003NU-PF
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdsq-0005tR-2v
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fpdsq-0005tO-31
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:03 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:50016 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:49989 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fpdsp-0005aq-OW
+	id 1fpdsp-0005aU-NW
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:17:31 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 14 Aug 2018 20:16:43 +0200
-Message-Id: <1534270621-27332-2-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/19] MAINTAINERS: Update target/mips
- maintainer's email addresses
+Date: Tue, 14 Aug 2018 20:16:42 +0200
+Message-Id: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL 00/19] MIPS queue for QEMU upstream, August 14,
+ 2018
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +28,77 @@ Cc: peter.maydell@linaro.org
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Update email addresses of Aleksandar Markovic and Paul Burton in the
-MAINTAINERS file. Also, add corresponding items in the .mailmap file.
+The following changes since commit 38441756b70eec5807b5f60dad11a93a91199866:
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- .mailmap    | 7 +++++--
- MAINTAINERS | 9 +++++----
- 2 files changed, 10 insertions(+), 6 deletions(-)
+  Update version for v3.0.0 release (2018-08-14 16:38:43 +0100)
 
-diff --git a/.mailmap b/.mailmap
-index 778a4d4..2c2b9b1 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -12,8 +12,11 @@ Fabrice Bellard <fabrice@bellard.org> bellard <bellard=
-@c046a42c-6fe2-441c-8c8c-7
- James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
- Jocelyn Mayer <l_indien@magic.fr> j_mayer <j_mayer@c046a42c-6fe2-441c-8c=
-8c-71466251a162>
- Paul Brook <paul@codesourcery.com> pbrook <pbrook@c046a42c-6fe2-441c-8c8=
-c-71466251a162>
--Paul Burton <paul.burton@mips.com> <paul.burton@imgtec.com>
--Paul Burton <paul.burton@mips.com> <paul@archlinuxmips.org>
-+Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@mips.c=
-om>
-+Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@imgtec=
-.com>
-+Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
-+Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
-+Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
- Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-714662=
-51a162>
- malc <av1474@comtv.ru> malc <malc@c046a42c-6fe2-441c-8c8c-71466251a162>
-=20
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 666e936..7130807 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -187,7 +187,7 @@ F: disas/microblaze.c
-=20
- MIPS
- M: Aurelien Jarno <aurelien@aurel32.net>
--M: Aleksandar Markovic <aleksandar.markovic@mips.com>
-+M: Aleksandar Markovic <amarkovic@wavecomp.com>
- S: Maintained
- F: target/mips/
- F: hw/mips/
-@@ -718,7 +718,7 @@ S: Maintained
- F: hw/mips/mips_malta.c
-=20
- Mipssim
--M: Aleksandar Markovic <aleksandar.markovic@mips.com>
-+M: Aleksandar Markovic <amarkovic@wavecomp.com>
- S: Odd Fixes
- F: hw/mips/mips_mipssim.c
- F: hw/net/mipsnet.c
-@@ -729,14 +729,15 @@ S: Maintained
- F: hw/mips/mips_r4k.c
-=20
- Fulong 2E
--M: Aleksandar Markovic <aleksandar.markovic@mips.com>
-+M: Aleksandar Markovic <amarkovic@wavecomp.com>
- S: Odd Fixes
- F: hw/mips/mips_fulong2e.c
- F: hw/isa/vt82c686.c
-+
- F: include/hw/isa/vt82c686.h
-=20
- Boston
--M: Paul Burton <paul.burton@mips.com>
-+M: Paul Burton <pburton@wavecomp.com>
- S: Maintained
- F: hw/core/loader-fit.c
- F: hw/mips/boston.c
---=20
+are available in the git repository at:
+
+  https://github.com/AMarkovic/qemu tags/mips-queue-aug-14-2018
+
+for you to fetch changes up to 20d4e01b6486b15d1f3d9ff2d51bba2bf00ebf94:
+
+  qemu-doc: Amend MIPS-related items (2018-08-14 19:59:03 +0200)
+
+----------------------------------------------------------------
+MIPS queue for QEMU upstream, August 14, 2018
+
+This is the first part of nanoMIPS support for QEMU. It contains
+various fixes and improvements that are related to nanoMIPS support,
+or are discovered while working on nanoMIPS support. Most of them are
+fairly simple changes, but each of them has its own significance and
+importance for nanoMIPS support.
+
+The second part that contains QEMU support for core nanoMIPS
+functionality will remain under review for some time.
+
+The third part that mainly contains Linux user support will likely
+remain under review for some longer period.
+
+----------------------------------------------------------------
+
+Aleksandar Markovic (9):
+  MAINTAINERS: Update target/mips maintainer's email addresses
+  target/mips: Avoid case statements formulated by ranges - part 1
+  target/mips: Mark switch fallthroughs with interpretable comments
+  target/mips: Fix two instances of shadow variables
+  target/mips: Update some CP0 registers bit definitions
+  elf: Remove duplicate preprocessor constant definition
+  elf: Add ELF flags for MIPS machine variants
+  linux-user: Update MIPS syscall numbers up to kernel 4.18 headers
+  qemu-doc: Amend MIPS-related items
+
+Aleksandar Rikalo (5):
+  target/mips: Avoid case statements formulated by ranges - part 2
+  target/mips: Add support for availability control via bit XNP
+  target/mips: Add support for availability control via bit MT
+  target/mips: Fix MT ASE instructions' availability control
+  linux-user: Add preprocessor availability control to some syscalls
+
+Stefan Markovic (3):
+  target/mips: Add CP0 BadInstrX register
+  target/mips: Implement CP0 Config1.WR bit functionality
+  target/mips: Add gen_op_addr_addi()
+
+Yongbok Kim (2):
+  target/mips: Don't update BadVAddr register in Debug Mode
+  target/mips: Check ELPA flag only in some cases of MFHC0 and MTHC0
+
+ .mailmap                       |   7 +-
+ MAINTAINERS                    |   9 +-
+ include/elf.h                  |  24 ++-
+ linux-user/mips/syscall_nr.h   |   9 +
+ linux-user/mips64/syscall_nr.h |  18 ++
+ linux-user/strace.c            |  14 +-
+ linux-user/syscall.c           |  29 +++
+ qemu-doc.texi                  |  13 +-
+ target/mips/cpu.h              | 162 ++++++++-------
+ target/mips/helper.c           |   4 +-
+ target/mips/internal.h         |   9 +-
+ target/mips/machine.c          |   5 +-
+ target/mips/op_helper.c        |  12 +-
+ target/mips/translate.c        | 443 ++++++++++++++++++++++++++++++++++-------
+ 14 files changed, 598 insertions(+), 160 deletions(-)
+
+-- 
 2.7.4
