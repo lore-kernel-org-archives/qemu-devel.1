@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpdw3-0005Oj-7N
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:22:30 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fpduo-0004PE-S3
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:21:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpduO-0006ua-Q0
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:20:51 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44436)
+	(envelope-from <pm215@archaic.org.uk>) id 1fpdte-0006US-3F
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:34 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44398)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fpduO-0006uC-H3
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:08 -0400
+	id 1fpdtc-0006SH-J0
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:21 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpduN-0007Qi-FY
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:19:07 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fpdta-00076o-B3
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:18:18 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Aug 2018 19:18:14 +0100
-Message-Id: <20180814181815.23348-45-peter.maydell@linaro.org>
-In-Reply-To: <20180814181815.23348-1-peter.maydell@linaro.org>
-References: <20180814181815.23348-1-peter.maydell@linaro.org>
+Date: Tue, 14 Aug 2018 19:17:30 +0100
+Message-Id: <20180814181815.23348-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 44/45] target/arm: Reorganize SVE WHILE
+Subject: [Qemu-devel] [PULL 00/45] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,131 +30,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+First pullreq of the 3.1 release cycle, with lots of
+Arm related patches accumulated during freeze. Most
+notable here is Luc's GICv2 virtualization support and
+my execute-from-MMIO patches.
 
-The pseudocode for this operation is an increment + compare loop,
-so comparing <= the maximum integer produces an all-true predicate.
+I stopped looking at my to-review queue towards the
+end of freeze, since 45 patches is already pushing what
+I consider a reasonable sized pullreq; once this goes into
+master I'll start working through it again.
 
-Rather than bound in both the inline code and the helper, pass the
-helper the number of predicate bits to set instead of the number
-of predicate elements to set.
+thanks
+-- PMM
 
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Message-id: 20180801123111.3595-4-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/sve_helper.c    |  5 ----
- target/arm/translate-sve.c | 49 +++++++++++++++++++++++++-------------
- 2 files changed, 32 insertions(+), 22 deletions(-)
+The following changes since commit 38441756b70eec5807b5f60dad11a93a91199866:
 
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 9bd0694d55e..87594a8adb4 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -2846,11 +2846,6 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t count, uint32_t pred_desc)
-         return flags;
-     }
- 
--    /* Scale from predicate element count to bits.  */
--    count <<= esz;
--    /* Bound to the bits in the predicate.  */
--    count = MIN(count, oprsz * 8);
--
-     /* Set all of the requested bits.  */
-     for (i = 0; i < count / 64; ++i) {
-         d->p[i] = esz_mask;
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 9dd4c38bab7..89efc80ee70 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -3173,19 +3173,19 @@ static bool trans_CTERM(DisasContext *s, arg_CTERM *a, uint32_t insn)
- 
- static bool trans_WHILE(DisasContext *s, arg_WHILE *a, uint32_t insn)
- {
--    if (!sve_access_check(s)) {
--        return true;
--    }
--
--    TCGv_i64 op0 = read_cpu_reg(s, a->rn, 1);
--    TCGv_i64 op1 = read_cpu_reg(s, a->rm, 1);
--    TCGv_i64 t0 = tcg_temp_new_i64();
--    TCGv_i64 t1 = tcg_temp_new_i64();
-+    TCGv_i64 op0, op1, t0, t1, tmax;
-     TCGv_i32 t2, t3;
-     TCGv_ptr ptr;
-     unsigned desc, vsz = vec_full_reg_size(s);
-     TCGCond cond;
- 
-+    if (!sve_access_check(s)) {
-+        return true;
-+    }
-+
-+    op0 = read_cpu_reg(s, a->rn, 1);
-+    op1 = read_cpu_reg(s, a->rm, 1);
-+
-     if (!a->sf) {
-         if (a->u) {
-             tcg_gen_ext32u_i64(op0, op0);
-@@ -3198,32 +3198,47 @@ static bool trans_WHILE(DisasContext *s, arg_WHILE *a, uint32_t insn)
- 
-     /* For the helper, compress the different conditions into a computation
-      * of how many iterations for which the condition is true.
--     *
--     * This is slightly complicated by 0 <= UINT64_MAX, which is nominally
--     * 2**64 iterations, overflowing to 0.  Of course, predicate registers
--     * aren't that large, so any value >= predicate size is sufficient.
-      */
-+    t0 = tcg_temp_new_i64();
-+    t1 = tcg_temp_new_i64();
-     tcg_gen_sub_i64(t0, op1, op0);
- 
--    /* t0 = MIN(op1 - op0, vsz).  */
--    tcg_gen_movi_i64(t1, vsz);
--    tcg_gen_umin_i64(t0, t0, t1);
-+    tmax = tcg_const_i64(vsz >> a->esz);
-     if (a->eq) {
-         /* Equality means one more iteration.  */
-         tcg_gen_addi_i64(t0, t0, 1);
-+
-+        /* If op1 is max (un)signed integer (and the only time the addition
-+         * above could overflow), then we produce an all-true predicate by
-+         * setting the count to the vector length.  This is because the
-+         * pseudocode is described as an increment + compare loop, and the
-+         * max integer would always compare true.
-+         */
-+        tcg_gen_movi_i64(t1, (a->sf
-+                              ? (a->u ? UINT64_MAX : INT64_MAX)
-+                              : (a->u ? UINT32_MAX : INT32_MAX)));
-+        tcg_gen_movcond_i64(TCG_COND_EQ, t0, op1, t1, tmax, t0);
-     }
- 
--    /* t0 = (condition true ? t0 : 0).  */
-+    /* Bound to the maximum.  */
-+    tcg_gen_umin_i64(t0, t0, tmax);
-+    tcg_temp_free_i64(tmax);
-+
-+    /* Set the count to zero if the condition is false.  */
-     cond = (a->u
-             ? (a->eq ? TCG_COND_LEU : TCG_COND_LTU)
-             : (a->eq ? TCG_COND_LE : TCG_COND_LT));
-     tcg_gen_movi_i64(t1, 0);
-     tcg_gen_movcond_i64(cond, t0, op0, op1, t0, t1);
-+    tcg_temp_free_i64(t1);
- 
-+    /* Since we're bounded, pass as a 32-bit type.  */
-     t2 = tcg_temp_new_i32();
-     tcg_gen_extrl_i64_i32(t2, t0);
-     tcg_temp_free_i64(t0);
--    tcg_temp_free_i64(t1);
-+
-+    /* Scale elements to bits.  */
-+    tcg_gen_shli_i32(t2, t2, a->esz);
- 
-     desc = (vsz / 8) - 2;
-     desc = deposit32(desc, SIMD_DATA_SHIFT, 2, a->esz);
--- 
-2.18.0
+  Update version for v3.0.0 release (2018-08-14 16:38:43 +0100)
+
+are available in the Git repository at:
+
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180814
+
+for you to fetch changes up to 054e7adf4e64e4acb3b033348ebf7cc871baa34f:
+
+  target/arm: Fix typo in helper_sve_movz_d (2018-08-14 17:17:22 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * Implement more of ARMv6-M support
+ * Support direct execution from non-RAM regions;
+   use this to implmeent execution from small (<1K) MPU regions
+ * GICv2: implement the virtualization extensions
+ * support a virtualization-capable GICv2 in the virt and
+   xlnx-zynqmp boards
+ * arm: Fix return code of arm_load_elf() so we can detect
+   failure to load the file correctly
+ * Implement HCR_EL2.TGE ("trap general exceptions") bit
+ * Implement tailchaining for M profile cores
+ * Fix bugs in SVE compare, saturating add/sub, WHILE, MOVZ
+
+----------------------------------------------------------------
+Adam Lackorzynski (1):
+      arm: Fix return code of arm_load_elf
+
+Julia Suvorova (4):
+      target/arm: Forbid unprivileged mode for M Baseline
+      nvic: Handle ARMv6-M SCS reserved registers
+      arm: Add ARMv6-M programmer's model support
+      nvic: Change NVIC to support ARMv6-M
+
+Luc Michel (20):
+      intc/arm_gic: Refactor operations on the distributor
+      intc/arm_gic: Implement GICD_ISACTIVERn and GICD_ICACTIVERn registers
+      intc/arm_gic: Remove some dead code and put some functions static
+      vmstate.h: Provide VMSTATE_UINT16_SUB_ARRAY
+      intc/arm_gic: Add the virtualization extensions to the GIC state
+      intc/arm_gic: Add virtual interface register definitions
+      intc/arm_gic: Add virtualization extensions helper macros and functions
+      intc/arm_gic: Refactor secure/ns access check in the CPU interface
+      intc/arm_gic: Add virtualization enabled IRQ helper functions
+      intc/arm_gic: Implement virtualization extensions in gic_(activate_irq|drop_prio)
+      intc/arm_gic: Implement virtualization extensions in gic_acknowledge_irq
+      intc/arm_gic: Implement virtualization extensions in gic_(deactivate|complete_irq)
+      intc/arm_gic: Implement virtualization extensions in gic_cpu_(read|write)
+      intc/arm_gic: Wire the vCPU interface
+      intc/arm_gic: Implement the virtual interface registers
+      intc/arm_gic: Implement gic_update_virt() function
+      intc/arm_gic: Implement maintenance interrupt generation
+      intc/arm_gic: Improve traces
+      xlnx-zynqmp: Improve GIC wiring and MMIO mapping
+      arm/virt: Add support for GICv2 virtualization extensions
+
+Peter Maydell (16):
+      accel/tcg: Pass read access type through to io_readx()
+      accel/tcg: Handle get_page_addr_code() returning -1 in hashtable lookups
+      accel/tcg: Handle get_page_addr_code() returning -1 in tb_check_watchpoint()
+      accel/tcg: tb_gen_code(): Create single-insn TB for execution from non-RAM
+      accel/tcg: Return -1 for execution from MMIO regions in get_page_addr_code()
+      target/arm: Allow execution from small regions
+      accel/tcg: Check whether TLB entry is RAM consistently with how we set it up
+      target/arm: Mask virtual interrupts if HCR_EL2.TGE is set
+      target/arm: Honour HCR_EL2.TGE and MDCR_EL2.TDE in debug register access checks
+      target/arm: Honour HCR_EL2.TGE when raising synchronous exceptions
+      target/arm: Provide accessor functions for HCR_EL2.{IMO, FMO, AMO}
+      target/arm: Treat SCTLR_EL1.M as if it were zero when HCR_EL2.TGE is set
+      target/arm: Improve exception-taken logging
+      target/arm: Initialize exc_secure correctly in do_v7m_exception_exit()
+      target/arm: Restore M-profile CONTROL.SPSEL before any tailchaining
+      target/arm: Implement tailchaining for M profile cores
+
+Richard Henderson (4):
+      target/arm: Fix sign of sve_cmpeq_ppzw/sve_cmpne_ppzw
+      target/arm: Fix typo in do_sat_addsub_64
+      target/arm: Reorganize SVE WHILE
+      target/arm: Fix typo in helper_sve_movz_d
+
+ accel/tcg/softmmu_template.h     |  11 +-
+ hw/intc/gic_internal.h           | 282 +++++++++--
+ include/exec/exec-all.h          |   2 -
+ include/hw/arm/virt.h            |   4 +-
+ include/hw/arm/xlnx-zynqmp.h     |   4 +-
+ include/hw/intc/arm_gic_common.h |  43 +-
+ include/hw/intc/armv7m_nvic.h    |   1 +
+ include/migration/vmstate.h      |   3 +
+ include/qom/cpu.h                |   6 +
+ target/arm/cpu.h                 |  62 ++-
+ accel/tcg/cpu-exec.c             |   3 +
+ accel/tcg/cputlb.c               | 111 +----
+ accel/tcg/translate-all.c        |  23 +-
+ exec.c                           |   6 -
+ hw/arm/boot.c                    |   8 +-
+ hw/arm/virt-acpi-build.c         |   6 +-
+ hw/arm/virt.c                    |  52 ++-
+ hw/arm/xlnx-zynqmp.c             |  92 +++-
+ hw/intc/arm_gic.c                | 987 +++++++++++++++++++++++++++++++--------
+ hw/intc/arm_gic_common.c         | 154 ++++--
+ hw/intc/arm_gic_kvm.c            |  31 +-
+ hw/intc/arm_gicv3_cpuif.c        |  19 +-
+ hw/intc/armv7m_nvic.c            |  82 +++-
+ memory.c                         |   3 +-
+ target/arm/cpu.c                 |   4 +
+ target/arm/helper.c              | 127 +++--
+ target/arm/op_helper.c           |  14 +
+ target/arm/sve_helper.c          |  19 +-
+ target/arm/translate-sve.c       |  51 +-
+ hw/intc/trace-events             |  12 +-
+ 30 files changed, 1724 insertions(+), 498 deletions(-)
