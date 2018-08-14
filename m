@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fpdQh-0008Nm-Sj
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:48:43 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fpdRy-00016z-7s
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:50:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fpdQR-0004Wm-Pn
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:48:27 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fpdRi-0004uU-4u
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:49:45 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 14 Aug 2018 17:27:39 +0100
-Message-Id: <20180814162739.11814-7-stefanha@redhat.com>
+Date: Tue, 14 Aug 2018 17:27:37 +0100
+Message-Id: <20180814162739.11814-5-stefanha@redhat.com>
 In-Reply-To: <20180814162739.11814-1-stefanha@redhat.com>
 References: <20180814162739.11814-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 6/6] Add QTest testcase for the Intel
- Hexadecimal
+Subject: [Qemu-devel] [PATCH v6 4/6] loader: add rom transaction API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,167 +22,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, joel@jms.id.au, qemu-arm@nongnu.org, Subbaraya Sundeep <sundeep.lkml@gmail.com>, jim@groklearning.com, Alistair Francis <alistair@alistair23.me>, Steffen Gortz <qemu.ml@steffen-goertz.de>, mail@steffen-goertz.de, Su Hang <suhang16@mails.ucas.ac.cn>, ilg@livius.net, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Su Hang <suhang16@mails.ucas.ac.cn>
+Image file loaders may add a series of roms.  If an error occurs partway
+through loading there is no easy way to drop previously added roms.
 
-'test.hex' file is a memory test pattern stored in Hexadecimal Object
-Format.  It loads at 0x10000 in RAM and contains values from 0 through
-255.
+This patch adds a transaction mechanism that works like this:
 
-The test case verifies that the expected memory test pattern was loaded.
+  rom_transaction_begin();
+  ...call rom_add_*()...
+  rom_transaction_end(ok);
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Suggested-by: Steffen Gortz <qemu.ml@steffen-goertz.de>
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+If ok is false then roms added in this transaction are dropped.
+
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- MAINTAINERS                          |  6 ++++
- configure                            |  4 +++
- tests/Makefile.include               |  2 ++
- tests/hexloader-test.c               | 45 ++++++++++++++++++++++++++++
- tests/hex-loader-check-data/test.hex | 18 +++++++++++
- 5 files changed, 75 insertions(+)
- create mode 100644 tests/hexloader-test.c
- create mode 100644 tests/hex-loader-check-data/test.hex
+ include/hw/loader.h | 19 +++++++++++++++++++
+ hw/core/loader.c    | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 666e936812..c48d9271cf 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1323,6 +1323,12 @@ F: hw/core/generic-loader.c
- F: include/hw/core/generic-loader.h
- F: docs/generic-loader.txt
-=20
-+Intel Hexadecimal Object File Loader
-+M: Su Hang <suhang16@mails.ucas.ac.cn>
-+S: Maintained
-+F: tests/hexloader-test.c
-+F: tests/hex-loader-check-data/test.hex
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index e98b84b8f9..5235f119a3 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -225,6 +225,25 @@ int rom_check_and_register_reset(void);
+ void rom_set_fw(FWCfgState *f);
+ void rom_set_order_override(int order);
+ void rom_reset_order_override(void);
 +
- CHRP NVRAM
- M: Thomas Huth <thuth@redhat.com>
- S: Maintained
-diff --git a/configure b/configure
-index 2a7796ea80..db97930314 100755
---- a/configure
-+++ b/configure
-@@ -7382,6 +7382,10 @@ for test_file in $(find $source_path/tests/acpi-te=
-st-data -type f)
- do
-     FILES=3D"$FILES tests/acpi-test-data$(echo $test_file | sed -e 's/.*=
-acpi-test-data//')"
- done
-+for test_file in $(find $source_path/tests/hex-loader-check-data -type f=
-)
-+do
-+    FILES=3D"$FILES tests/hex-loader-check-data$(echo $test_file | sed -=
-e 's/.*hex-loader-check-data//')"
-+done
- mkdir -p $DIRS
- for f in $FILES ; do
-     if [ -e "$source_path/$f" ] && [ "$pwd_is_source_path" !=3D "y" ]; t=
-hen
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index a49282704e..760a0f18b6 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -386,6 +386,7 @@ check-qtest-arm-y +=3D tests/test-arm-mptimer$(EXESUF=
-)
- gcov-files-arm-y +=3D hw/timer/arm_mptimer.c
- check-qtest-arm-y +=3D tests/boot-serial-test$(EXESUF)
- check-qtest-arm-y +=3D tests/sdhci-test$(EXESUF)
-+check-qtest-arm-y +=3D tests/hexloader-test$(EXESUF)
-=20
- check-qtest-aarch64-y =3D tests/numa-test$(EXESUF)
- check-qtest-aarch64-y +=3D tests/sdhci-test$(EXESUF)
-@@ -773,6 +774,7 @@ tests/qmp-test$(EXESUF): tests/qmp-test.o
- tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
- tests/rtc-test$(EXESUF): tests/rtc-test.o
- tests/m48t59-test$(EXESUF): tests/m48t59-test.o
-+tests/hexloader-test$(EXESUF): tests/hexloader-test.o
- tests/endianness-test$(EXESUF): tests/endianness-test.o
- tests/spapr-phb-test$(EXESUF): tests/spapr-phb-test.o $(libqos-obj-y)
- tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
-diff --git a/tests/hexloader-test.c b/tests/hexloader-test.c
-new file mode 100644
-index 0000000000..afb620694d
---- /dev/null
-+++ b/tests/hexloader-test.c
-@@ -0,0 +1,45 @@
-+/*
-+ * QTest testcase for the Intel Hexadecimal Object File Loader
++/**
++ * rom_transaction_begin:
 + *
-+ * Authors:
-+ *  Su Hang <suhang16@mails.ucas.ac.cn> 2018
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
++ * Call this before of a series of rom_add_*() calls.  Call
++ * rom_transaction_end() afterwards to commit or abort.  These functions are
++ * useful for undoing a series of rom_add_*() calls if image file loading fails
++ * partway through.
 + */
++void rom_transaction_begin(void);
 +
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+
-+/* Load 'test.hex' and verify that the in-memory contents are as expecte=
-d.
-+ * 'test.hex' is a memory test pattern stored in Hexadecimal Object
-+ * format.  It loads at 0x10000 in RAM and contains values from 0 throug=
-h
-+ * 255.
++/**
++ * rom_transaction_end:
++ * @commit: true to commit added roms, false to drop added roms
++ *
++ * Call this after a series of rom_add_*() calls.  See rom_transaction_begin().
 + */
-+static void hex_loader_test(void)
++void rom_transaction_end(bool commit);
++
+ int rom_copy(uint8_t *dest, hwaddr addr, size_t size);
+ void *rom_ptr(hwaddr addr, size_t size);
+ void hmp_info_roms(Monitor *mon, const QDict *qdict);
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 0c72e7c05a..612420b870 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -840,6 +840,8 @@ struct Rom {
+     char *fw_dir;
+     char *fw_file;
+ 
++    bool committed;
++
+     hwaddr addr;
+     QTAILQ_ENTRY(Rom) next;
+ };
+@@ -877,6 +879,8 @@ static void rom_insert(Rom *rom)
+         rom->as = &address_space_memory;
+     }
+ 
++    rom->committed = false;
++
+     /* List is ordered by load address in the same address space */
+     QTAILQ_FOREACH(item, &roms, next) {
+         if (rom_order_compare(rom, item)) {
+@@ -1168,6 +1172,34 @@ void rom_reset_order_override(void)
+     fw_cfg_reset_order_override(fw_cfg);
+ }
+ 
++void rom_transaction_begin(void)
 +{
-+    unsigned int i;
-+    const unsigned int base_addr =3D 0x00010000;
++    Rom *rom;
 +
-+    QTestState *s =3D qtest_startf(
-+        "-M vexpress-a9 -nographic -device loader,file=3Dtests/hex-loade=
-r-check-data/test.hex");
-+
-+    for (i =3D 0; i < 256; ++i) {
-+        uint8_t val =3D qtest_readb(s, base_addr + i);
-+        g_assert_cmpuint(i, =3D=3D, val);
++    /* Ignore ROMs added without the transaction API */
++    QTAILQ_FOREACH(rom, &roms, next) {
++        rom->committed = true;
 +    }
-+    qtest_quit(s);
 +}
 +
-+int main(int argc, char **argv)
++void rom_transaction_end(bool commit)
 +{
-+    int ret;
++    Rom *rom;
++    Rom *tmp;
 +
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_add_func("/tmp/hex_loader", hex_loader_test);
-+    ret =3D g_test_run();
-+
-+    return ret;
++    QTAILQ_FOREACH_SAFE(rom, &roms, next, tmp) {
++        if (rom->committed) {
++            continue;
++        }
++        if (commit) {
++            rom->committed = true;
++        } else {
++            QTAILQ_REMOVE(&roms, rom, next);
++            rom_free(rom);
++        }
++    }
 +}
-diff --git a/tests/hex-loader-check-data/test.hex b/tests/hex-loader-chec=
-k-data/test.hex
-new file mode 100644
-index 0000000000..008a90bd4d
---- /dev/null
-+++ b/tests/hex-loader-check-data/test.hex
-@@ -0,0 +1,18 @@
-+:020000040001F9
-+:10000000000102030405060708090a0b0c0d0e0f78
-+:10001000101112131415161718191a1b1c1d1e1f68
-+:10002000202122232425262728292a2b2c2d2e2f58
-+:10003000303132333435363738393a3b3c3d3e3f48
-+:10004000404142434445464748494a4b4c4d4e4f38
-+:10005000505152535455565758595a5b5c5d5e5f28
-+:10006000606162636465666768696a6b6c6d6e6f18
-+:10007000707172737475767778797a7b7c7d7e7f08
-+:10008000808182838485868788898a8b8c8d8e8ff8
-+:10009000909192939495969798999a9b9c9d9e9fe8
-+:1000a000a0a1a2a3a4a5a6a7a8a9aaabacadaeafd8
-+:1000b000b0b1b2b3b4b5b6b7b8b9babbbcbdbebfc8
-+:1000c000c0c1c2c3c4c5c6c7c8c9cacbcccdcecfb8
-+:1000d000d0d1d2d3d4d5d6d7d8d9dadbdcdddedfa8
-+:1000e000e0e1e2e3e4e5e6e7e8e9eaebecedeeef98
-+:1000f000f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff88
-+:00000001FF
---=20
++
+ static Rom *find_rom(hwaddr addr, size_t size)
+ {
+     Rom *rom;
+-- 
 2.17.1
