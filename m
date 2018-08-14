@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpdvq-0005EL-QJ
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:22:22 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fpdw3-0005Oq-Bo
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:22:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpduL-0006sK-BQ
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:20:38 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44432)
+	(envelope-from <pm215@archaic.org.uk>) id 1fpduP-0006us-Qx
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:20:51 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44436)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fpduL-0006qy-31
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:05 -0400
+	id 1fpduP-0006uC-I2
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:09 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpduJ-0007P9-2J
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:19:03 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fpduO-0007R8-FG
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:19:08 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Aug 2018 19:18:11 +0100
-Message-Id: <20180814181815.23348-42-peter.maydell@linaro.org>
+Date: Tue, 14 Aug 2018 19:18:15 +0100
+Message-Id: <20180814181815.23348-46-peter.maydell@linaro.org>
 In-Reply-To: <20180814181815.23348-1-peter.maydell@linaro.org>
 References: <20180814181815.23348-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 41/45] target/arm: Implement tailchaining for M
- profile cores
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 45/45] target/arm: Fix typo in helper_sve_movz_d
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +32,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Tailchaining is an optimization in handling of exception return
-for M-profile cores: if we are about to pop the exception stack
-for an exception return, but there is a pending exception which
-is higher priority than the priority we are returning to, then
-instead of unstacking and then immediately taking the exception
-and stacking registers again, we can chain to the pending
-exception without unstacking and stacking.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-For v6M and v7M it is IMPDEF whether tailchaining happens for pending
-exceptions; for v8M this is architecturally required.  Implement it
-in QEMU for all M-profile cores, since in practice v6M and v7M
-hardware implementations generally do have it.
-
-(We were already doing tailchaining for derived exceptions which
-happened during exception return, like the validity checks and
-stack access failures; these have always been required to be
-tailchained for all versions of the architecture.)
-
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Message-id: 20180801123111.3595-5-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180720145647.8810-5-peter.maydell@linaro.org
 ---
- target/arm/helper.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ target/arm/sve_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 559065131a4..8b07bf214ec 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -7162,6 +7162,22 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-         return;
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 87594a8adb4..c3cbec9cf5f 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -1042,7 +1042,7 @@ void HELPER(sve_movz_d)(void *vd, void *vn, void *vg, uint32_t desc)
+     uint64_t *d = vd, *n = vn;
+     uint8_t *pg = vg;
+     for (i = 0; i < opr_sz; i += 1) {
+-        d[i] = n[1] & -(uint64_t)(pg[H1(i)] & 1);
++        d[i] = n[i] & -(uint64_t)(pg[H1(i)] & 1);
      }
+ }
  
-+    /*
-+     * Tailchaining: if there is currently a pending exception that
-+     * is high enough priority to preempt execution at the level we're
-+     * about to return to, then just directly take that exception now,
-+     * avoiding an unstack-and-then-stack. Note that now we have
-+     * deactivated the previous exception by calling armv7m_nvic_complete_irq()
-+     * our current execution priority is already the execution priority we are
-+     * returning to -- none of the state we would unstack or set based on
-+     * the EXCRET value affects it.
-+     */
-+    if (armv7m_nvic_can_take_pending_exception(env->nvic)) {
-+        qemu_log_mask(CPU_LOG_INT, "...tailchaining to pending exception\n");
-+        v7m_exception_taken(cpu, excret, true, false);
-+        return;
-+    }
-+
-     switch_v7m_security_state(env, return_to_secure);
- 
-     {
 -- 
 2.18.0
