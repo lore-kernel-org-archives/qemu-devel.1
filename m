@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpd8E-0008Gv-9v
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:29:37 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fpd8w-0000yp-S7
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:30:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpd7z-0000fH-5T
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:29:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50310 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpd7y-0000cj-VV
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:29:07 -0400
-References: <1534258018-22859-1-git-send-email-thuth@redhat.com>
-	<1534258018-22859-6-git-send-email-thuth@redhat.com>
-	<1d700466-d271-f1b6-d7e4-ea82608d984f@redhat.com>
-	<33446506-a101-69c3-9d31-c1b8ef8d8b32@redhat.com>
-	<e5535b93-990d-94c9-562f-8be49be4c2a3@redhat.com>
-	<f0d25fe6-f526-abf0-6f8a-98cc66592112@redhat.com>
-	<4955cb45-df23-608b-3444-c11409894bff@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <86709942-5a53-0e0d-0da4-a22a96da3078@redhat.com>
-Date: Tue, 14 Aug 2018 18:11:13 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1fpd8b-0001GP-7O
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:30:06 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34683)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fpd8a-0001Ey-UQ
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 13:29:45 -0400
+Received: by mail-wm0-x244.google.com with SMTP id l2-v6so11033416wme.1
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 10:29:44 -0700 (PDT)
+References: <20180814002653.12828-1-richard.henderson@linaro.org>
+	<87bma5wdoz.fsf@linaro.org>
+	<b926d1a2-0973-ee44-5a7d-3e19cb9482ac@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <b926d1a2-0973-ee44-5a7d-3e19cb9482ac@linaro.org>
+Date: Tue, 14 Aug 2018 16:38:17 +0100
+Message-ID: <87bma5ez6e.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <4955cb45-df23-608b-3444-c11409894bff@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/6] net: Silence 'has no peer' messages in
- testing mode
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Fix int64_to_float16
+ double-rounding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org
 
-On 08/14/2018 06:03 PM, Paolo Bonzini wrote:
-> On 14/08/2018 18:01, Thomas Huth wrote:
->> On 08/14/2018 05:57 PM, Paolo Bonzini wrote:
->>> On 14/08/2018 17:43, Thomas Huth wrote:
->>>> On 08/14/2018 05:33 PM, Paolo Bonzini wrote:
->>>>> On 14/08/2018 16:46, Thomas Huth wrote:
->>>>>> When running qtests with -nodefaults, we are not interested in
->>>>>> these 'XYZ has no peer' messages.
->>>>>>
->>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>>> ---
->>>>>>  vl.c | 3 +--
->>>>>>  1 file changed, 1 insertion(+), 2 deletions(-)
->>>>>>
->>>>>> diff --git a/vl.c b/vl.c
->>>>>> index 16b913f..7055df3 100644
->>>>>> --- a/vl.c
->>>>>> +++ b/vl.c
->>>>>> @@ -4559,11 +4559,10 @@ int main(int argc, char **argv, char **envp)
->>>>>>       * (2) CONFIG_SLIRP not set, in which case the implicit "-net nic"
->>>>>>       * sets up a nic that isn't connected to anything.
->>>>>>       */
->>>>>> -    if (!default_net) {
->>>>>> +    if (!default_net && (!qtest_enabled() || has_defaults)) {
->>>>>>          net_check_clients();
->>>>>>      }
->>>>>>  
->>>>>
->>>>> Why does it have no peer?  Not a nack, just curiosity.
->>>>
->>>> The machines which emulate an embedded system often always create a NIC
->>>> (since it is hard-wired on the board, not optional). But since there is
->>>> no back-end on the host side with "-nodefaults", the net_check_clients()
->>>> function complains in this case.
->>>
->>> Ok, the has_defaults test then makes sense.  Is the qtest_enabled() part
->>> still needed, or is the message unnecessary even in normal operation?
->>
->> I think it is still needed, since you could also screw up your command
->> line parameters after specifying -nodefaults (e.g. "-nodefaults -net
->> nic" without giving an additional "-net user" or something similar).
-> 
-> True.  Though it cannot happen with -nic, so another possibility is to
-> give it only if -net was used?
 
-Sorry, I don't quite get you ... this is a generic check in vl.c, how
-should this code know whether the NICs have been specified with -nic or
--net?
+Richard Henderson <richard.henderson@linaro.org> writes:
 
- Thomas
+> On 08/14/2018 01:32 AM, Alex Benn=C3=A9e wrote:
+>> Can't we add the constants to the fcvt test case?
+>
+> No, they're all half-to-integer.  This is integer-to-half.
+
+I'll add the int-to-float conversions, the whole thing could do with a
+bit of a re-factor anyway.
+
+>
+> We could write another one, I suppose, but it's not just
+> an add-one-line kind of thing.
+>
+>
+> r~
+
+
+--
+Alex Benn=C3=A9e
