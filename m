@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpUXa-0000Vt-60
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 04:19:01 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fpUbb-0002ll-K6
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 04:23:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpUXZ-00022d-6C
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 04:18:58 -0400
-Date: Tue, 14 Aug 2018 10:18:49 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fpUba-00044q-Iw
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 04:23:07 -0400
+Date: Tue, 14 Aug 2018 10:22:59 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180814081849.GA5025@dhcp-200-186.str.redhat.com>
-References: <20180810062647.23211-1-lbloch@janustech.com>
-	<20180810062647.23211-7-lbloch@janustech.com>
-	<w5136vm8m8u.fsf@maestria.local.igalia.com>
-	<ca79bbff-163b-f50e-e17b-54d6597e6bfe@redhat.com>
-	<20180813112333.GD4323@localhost.localdomain>
-	<e9a77f1e-6b9e-3fea-69c9-c18638961a2e@redhat.com>
-	<20180813155856.GL4323@localhost.localdomain>
-	<435d9dd8-f994-f011-f62e-4568dea8fd21@janustech.com>
+Message-ID: <20180814082259.GB5025@dhcp-200-186.str.redhat.com>
+References: <20180813023958.5352-1-famz@redhat.com>
+	<20180813134206.GF4323@localhost.localdomain>
+	<20180814081252.GJ7549@lemon.usersys.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <435d9dd8-f994-f011-f62e-4568dea8fd21@janustech.com>
-Subject: Re: [Qemu-devel] [PATCH v7 6/9] qcow2: Increase the default upper
- limit on the L2 cache size
+In-Reply-To: <20180814081252.GJ7549@lemon.usersys.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] file-posix: Skip effectiveless OFD lock
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>
-Cc: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Am 13.08.2018 um 18:42 hat Leonid Bloch geschrieben:
-> > I don't actually think it's so bad to keep the cache permanently
-> > allocated, but I wouldn't object to a lower default for non-Linux hosts
-> > either. 1 MB may still be a little too low, 4 MB (covers up to 32 GB)
-> > might be more adequate. My typical desktop VMs are larger than 8 GB, but
-> > smaller than 32 GB.
+Am 14.08.2018 um 10:12 hat Fam Zheng geschrieben:
+> On Mon, 08/13 15:42, Kevin Wolf wrote:
+> > Am 13.08.2018 um 04:39 hat Fam Zheng geschrieben:
+> > > If we know we've already locked the bytes, don't do it again; similarly
+> > > don't unlock a byte if we haven't locked it. This doesn't change the
+> > > behavior, but fixes a corner case explained below.
+> > > 
+> > > Libvirt had an error handling bug that an image can get its (ownership,
+> > > file mode, SELinux) permissions changed (RHBZ 1584982) by mistake behind
+> > > QEMU. Specifically, an image in use by Libvirt VM has:
+> > > 
+> > >     $ ls -lhZ b.img
+> > >     -rw-r--r--. qemu qemu system_u:object_r:svirt_image_t:s0:c600,c690 b.img
+> > > 
+> > > Trying to attach it a second time won't work because of image locking.
+> > > And after the error, it becomes:
+> > > 
+> > >     $ ls -lhZ b.img
+> > >     -rw-r--r--. root root system_u:object_r:virt_image_t:s0 b.img
+> > > 
+> > > Then, we won't be able to do OFD lock operations with the existing fd.
+> > > In other words, the code such as in blk_detach_dev:
+> > > 
+> > >     blk_set_perm(blk, 0, BLK_PERM_ALL, &error_abort);
+> > > 
+> > > can abort() QEMU, out of environmental changes.
+> > > 
+> > > This patch is an easy fix to this and the change is regardlessly
+> > > reasonable, so do it.
+> > > 
+> > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > 
+> > Thanks, applied to the block branch.
 > 
-> And for a Windows VM just the OS installation takes above 40 GB. While we
-> probably are not running Windows VMs for our own needs, it is very common
-> that a customer of, for example, some cloud service uses QEMU (unknowingly)
-> for a full-blown Windows. So 100 GB+ images which are quite heavily used is
-> not a rare scenario. 256 GB - yeah, that would be on the higher end.
+> Self-NACK. This breaks raw_abort_perm_update(). The extra bytes locked by
+> raw_check_perm() are not tracked by s->perm (it is only updated in
+> raw_set_perm()), thus will not get released. This patch is "misusing" s->perm
+> and s->shared_perm.
+> 
+> I'll revise the implementation and send another version together with dropping
+> s->lock_fd.
 
-The OS installation is mostly sequential access, though. You only need
-that much cache when you have completely random I/O across the whole
-image. Otherwise the LRU based approach of the cache is good enough to
-keep those tables cached that are actually in use.
+Oops! I'm dequeuing the patch for now. Also, getting rid of s->lock_fd
+sounds good!
 
-The maximum cache size is maybe for huge databases or indeed random I/O
-benchmarks, both of which are important to support (on Linux at least),
-but probably not the most common use case.
-
-> So 16 MB would indeed be a reasonable default for the *max.* L2 cache now,
-> although below that would be too little, I think. 32 MB - if we want some
-> future-proofing.
-
-I think we all agree that 32 MB + cache-clean-interval is okay.
-
-It's just that for non-Linux guests, cache-clean-interval doesn't work.
-However, we probably care less about those large random I/O cases there,
-so a smaller cache size like 1 MB can do on non-Linux.
+I wonder if we can give this some test coverage, too, so that we'll
+notice the breakage earlier next time. Maybe we can check from Python
+which bits are locked?
 
 Kevin
