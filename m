@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpYs3-00037H-VR
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:56:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1fpYtP-0004CK-3S
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:57:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fpYrz-0003Bo-08
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:56:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38630 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fpYry-0003B3-QY
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:56:18 -0400
-References: <20180808114830.7169-1-quintela@redhat.com>
-	<20180808114830.7169-3-quintela@redhat.com>
-	<6c9bcc5b-21f0-60a8-bb8d-56861c2d4bd9@redhat.com>
-	<87ftzhw50t.fsf@trasno.org>
-	<1169fde5-2c97-bf04-d3eb-8b43d49b37f6@redhat.com>
-	<CAFEAcA-OY_4v3apC4xcB7HQwN=BGqdxuQenhnPntOXqybUx5hA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e23307f9-981f-1322-3dc1-136bc83b8ad9@redhat.com>
-Date: Tue, 14 Aug 2018 14:56:14 +0200
+	(envelope-from <eblake@redhat.com>) id 1fpYtO-0003f8-4e
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:57:47 -0400
+References: <20180814095847.23778-1-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <bd0e7f07-d920-17d8-d0a0-b125c46e56fe@redhat.com>
+Date: Tue, 14 Aug 2018 07:57:39 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-OY_4v3apC4xcB7HQwN=BGqdxuQenhnPntOXqybUx5hA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180814095847.23778-1-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/22] config: CONFIG_SERIAL* is already
- in pci.mak
+Subject: Re: [Qemu-devel] [PATCH] mirror: Fail gracefully for source ==
+ target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On 14/08/2018 14:06, Peter Maydell wrote:
-> On 14 August 2018 at 12:52, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 14/08/2018 13:40, Juan Quintela wrote:
->>>> CONFIG_SERIAL is a dependency of both CONFIG_SERIAL and
->>>> CONFIG_SERIAL_PCI.
->>>
->>> I guess you here mean CONFIG_SERIAL_ISA or CONFIG_SERIAL_PCI.  That is
->>> not enough.  CONFIG_SERIAL really means CONFIG_SERIAL_COMMON, and things
->>> like riscv* require it
->>
->> Right, I would put
->>
->>    CONFIG_SERIAL=y
->>    CONFIG_SERIAL_ISA=y
->>
->> in superio.mak and
->>
->>    CONFIG_SERIAL=y
->>    CONFIG_SERIAL_PCI=y
->>
->> in pci.mak.
+On 08/14/2018 04:58 AM, Kevin Wolf wrote:
+> blockdev-mirror with the same node for source and target segfaults
+> today: A node is in its own backing chain, so mirror_start_job() decides
+> that this is an active commit. When adding the intermediate nodes with
+> block_job_add_bdrv(), it starts the iteration through the subchain with
+> the backing file of source, though, so it never reaches target and
+> instead runs into NULL at the base.
 > 
-> What about the boards that use the serial.c code but do not
-> have PCI, ISA or a superio chip? That is, all the boards/devices
-> that call serial_mm_init() directly to create a memory-mapped
-> 16550.
+> While we could fix that by starting with source itself, there is no
+> point in allowing mirroring a node into itself and I wouldn't be
+> surprised if this caused more problems later.
+> 
+> So just check for this scenario and error out.
+> 
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   block/mirror.c             | 5 +++++
+>   tests/qemu-iotests/041     | 6 ++++++
+>   tests/qemu-iotests/041.out | 4 ++--
+>   3 files changed, 13 insertions(+), 2 deletions(-)
+> 
 
-They just add
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-   CONFIG_SERIAL=y
-
-to the .mak file.
-
-Paolo
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
