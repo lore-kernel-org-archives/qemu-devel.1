@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fpTkH-0002w8-AH
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:28:06 -0400
+	(envelope-from <cota@braap.org>) id 1fpTqO-0005V6-9J
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fpTkG-0007uW-CI
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:28:01 -0400
-Date: Tue, 14 Aug 2018 08:27:49 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180814072749.GB5057@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180814072551.15465-1-famz@redhat.com>
+	(envelope-from <cota@braap.org>) id 1fpTqL-0003MK-76
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:34:20 -0400
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:54473)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fpTqK-0003LS-QJ
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:34:17 -0400
+Date: Tue, 14 Aug 2018 03:34:12 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180814073412.GA32086@flamenco>
+References: <20180814013801.26036-1-cota@braap.org>
+	<20180814013801.26036-4-cota@braap.org>
+	<5a55a78e-d4f2-2528-481c-9eda97718f81@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180814072551.15465-1-famz@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] luks: Allow share-rw=on
+In-Reply-To: <5a55a78e-d4f2-2528-481c-9eda97718f81@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] target/i386/translate: use
+ thread-local storage in !user-mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-On Tue, Aug 14, 2018 at 03:25:51PM +0800, Fam Zheng wrote:
-> Format drivers such as qcow2 don't allow sharing the same image between
-> two QEMU instances in order to prevent image corruptions, because of
-> metadata cache. LUKS driver don't modify metadata except for when
-> creating image, so it is safe to relax the permission. This makes
-> share-rw=3Don property work on virtual devices.
->=20
-> Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/crypto.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/block/crypto.c b/block/crypto.c
-> index 146d81c90a..33ee01bebd 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
-> @@ -627,7 +627,9 @@ BlockDriver bdrv_crypto_luks =3D {
->      .bdrv_probe         =3D block_crypto_probe_luks,
->      .bdrv_open          =3D block_crypto_open_luks,
->      .bdrv_close         =3D block_crypto_close,
-> -    .bdrv_child_perm    =3D bdrv_format_default_perms,
-> +    /* This driver doesn't modify LUKS metadata except when creating i=
-mage.
-> +     * Allow share-rw=3Don as a special case. */
-> +    .bdrv_child_perm    =3D bdrv_filter_default_perms,
->      .bdrv_co_create     =3D block_crypto_co_create_luks,
->      .bdrv_co_create_opts =3D block_crypto_co_create_opts_luks,
->      .bdrv_co_truncate   =3D block_crypto_co_truncate,
+On Tue, Aug 14, 2018 at 08:31:02 +0200, Paolo Bonzini wrote:
+> On 14/08/2018 03:38, Emilio G. Cota wrote:
+> > Needed for MTTCG.
+> > 
+> > Signed-off-by: Emilio G. Cota <cota@braap.org>
+> 
+> Why not always use TLS, even in user-mode?
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+To avoid TLS waste; user-mode uses a single TCGContext,
+so a single copy of these variables is all that's needed because
+code generation is serialized with a lock.
 
+If in user-mode we just have a few threads it'd be no big deal,
+but apps can easily spawn thousands of threads.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+		E.
