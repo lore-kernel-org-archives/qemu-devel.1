@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fpZKq-0007pw-1Z
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:26:09 -0400
+	(envelope-from <lersek@redhat.com>) id 1fpZMj-0000Qq-Ih
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:28:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fpZKm-00016l-IS
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:26:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39652 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1fpZMg-0001xn-8w
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:28:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39702 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fpZKm-00016U-BK
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:26:04 -0400
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-44-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f8adc9b0-15f8-50ea-ab60-2e7a2cc1440e@redhat.com>
-Date: Tue, 14 Aug 2018 08:26:00 -0500
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fpZMg-0001xO-4B
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 09:28:02 -0400
+References: <1533625449-14989-1-git-send-email-jing2.liu@linux.intel.com>
+	<893d9264-7908-4e2c-ae1d-7e46eed6e6a0@redhat.com>
+	<43bf022f-6059-8e93-f8c3-61a7ecb72178@linux.intel.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <6c406b79-ff47-fbbd-a700-df38f06960db@redhat.com>
+Date: Tue, 14 Aug 2018 15:27:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180808120334.10970-44-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <43bf022f-6059-8e93-f8c3-61a7ecb72178@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 43/56] qjson: Fix qobject_from_json() &
- friends for multiple values
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/pci: add pci capability to pci-pci
+ bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +30,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: "Liu, Jing2" <jing2.liu@linux.intel.com>, qemu-devel@nongnu.org
+Cc: anthony.xu@intel.com, mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com
 
-On 08/08/2018 07:03 AM, Markus Armbruster wrote:
-> qobject_from_json() & friends use the consume_json() callback to
-> receive either a value or an error from the parser.
-> 
-> When they are fed a string that contains more than either one JSON
-> value or one JSON syntax error, consume_json() gets called multiple
-> times.
-> 
-> When the last call receives a value, qobject_from_json() returns that
-> value.  Any other values are leaked.
-> 
-> When any call receives an error, qobject_from_json() sets the first
-> error received.  Any other errors are thrown away.
-> 
-> When values follow errors, qobject_from_json() returns both a value
-> and sets an error.  That's bad.  Impact:
-> 
-> * block.c's parse_json_protocol() ignores and leaks the value.  It's
->    used to to parse pseudo-filenames starting with "json:".  The
->    pseudo-filenames can come from the user or from image meta-data such
->    as a QCOW2 image's backing file name.
+On 08/14/18 10:39, Liu, Jing2 wrote:
+> Hi Laszlo,
+> Sorry for late reply. I missed these mails because of wrong filter.
+> And thanks very much for comments. My reply as belows.
+>=20
+> On 8/7/2018 8:19 PM, Laszlo Ersek wrote:
+>> On 08/07/18 09:04, Jing Liu wrote:
+> [...]
+>>> @@ -46,6 +46,12 @@ struct PCIBridgeDev {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t flags;
+>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 OnOffAuto msi;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 /* additional resources to reserve on firmware in=
+it */
+>>> +=C2=A0=C2=A0=C2=A0 uint64_t io_reserve;
+>>> +=C2=A0=C2=A0=C2=A0 uint64_t mem_reserve;
+>>> +=C2=A0=C2=A0=C2=A0 uint64_t pref32_reserve;
+>>> +=C2=A0=C2=A0=C2=A0 uint64_t pref64_reserve;
+>>> =C2=A0 };
+>>> =C2=A0 typedef struct PCIBridgeDev PCIBridgeDev;
+>>
+>> (1) Please evaluate the following idea:
+>>
+> This is really good and I'm only not sure if DEFINE_PROP_ like,
+> DEFINE_PROP_UINT32("bus-reserve", GenPCIERootPort,
+> res_reserve.bus_reserve, -1), is a right/good way?
+> I mean the third parameter "_f".
 
-Fortunately, I don't think this falls in the category of a 
-denial-of-service attack worthy of a CVE (memory leaks in long-running 
-processes are bad, but to be an escalation attack, you'd have to 
-convince someone with more rights to repeatedly reload your malicious 
-image to cause them to suffer from the leak - but why would they load 
-your image more than once? You can reload it yourself, but then you are 
-only killing your own qemu so there is no escalation of privilege).
+Yes, I think you can refer to members within structure fields like that.
+
+>=20
+> [...]
+>>
+>> - gen_rp_props should be updated accordingly. The property names shoul=
+d
+>> stay the same, but they should reference fields of the "res_reserve"
+>> field.
+>>
+>> (2) Then, in a separate patch, you can add another "res_reserve" field
+>> to "PCIBridgeDev". (As a consequence, "bus_reserve" will also be added=
+,
+>> which I think is the right thing to do.)
+>>
+> I consider whether we need limit the bus_reserve of pci-pci bridge. For
+> old codes, we could add "unlimited" numbers of devices (but less than
+> than max) onto pci-pci bridge.
+
+In theory the bus_reserve hint makes sense too. There likely isn't a
+great use case for it in practice, but that's not reason enough IMO to
+diverge in the implementation (the factored-out structure and the
+properties). It's certainly not wrong to offer the property, IMO.
 
 
-> 
-> * vl.c's parse_display_qapi() ignores and leaks the error.  It's used
->    to parse the argument of command line option -display.
-> 
-> * vl.c's main() case QEMU_OPTION_blockdev ignores the error and leaves
->    it in @err.  main() will then pass a pointer to a non-null Error *
->    to net_init_clients(), which is forbidden.  It can lead to assertion
->    failure or other misbehavior.
-> 
-> * check-qjson.c's multiple_values() demonstrates the badness.
-> 
-> * The other callers are not affected since they only pass strings with
->    exactly one JSON value or, in the case of negative tests, one
->    error.
-> 
-> The impact on the _nofail() functions is relatively harmless.  They
-> abort when any call receives an error.  Else they return the last
-> value, and leak the others, if any.
-> 
-> Fix consume_json() as follows.  On the first call, save value and
-> error as before.  On subsequent calls, if any, don't save them.  If
-> the first call saved a value, the next call, if any, replaces the
-> value by an "Expecting at most one JSON value" error.  Take care not
-> to leak values or errors that aren't saved.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   qobject/qjson.c     | 15 ++++++++++++++-
->   tests/check-qjson.c | 10 +++-------
->   2 files changed, 17 insertions(+), 8 deletions(-)
-> 
-> diff --git a/qobject/qjson.c b/qobject/qjson.c
-> index 7395556069..7f69036487 100644
-> --- a/qobject/qjson.c
-> +++ b/qobject/qjson.c
-> @@ -33,8 +33,21 @@ static void consume_json(void *opaque, QObject *json, Error *err)
->   {
->       JSONParsingState *s = opaque;
->   
-> +    assert(!json != !err);
-> +    assert(!s->result || !s->err);
-> +
-> +    if (s->result) {
+>=20
+>> (3) There is a class that is derived from TYPE_PCI_BRIDGE_DEV:
+>> TYPE_PCI_BRIDGE_SEAT_DEV. Is it correct to add the new properties /
+>> fields to the latter as well?
+>>
+> Umm, I looked into the codes that doesn't have hotplug property?
+> So do we need add resource reserve for it?
 
-Reached whether the second item encountered was also an object (json != 
-NULL) or an error (err != NULL), but seems reasonable.
+No clue. I don't know anything about TYPE_PCI_BRIDGE_SEAT_DEV; I'll have
+to defer to Marcel and others on that.
 
-> +        qobject_unref(s->result);
-> +        s->result = NULL;
-> +        error_setg(&s->err, "Expecting at most one JSON value");
-> +    }
-> +    if (s->err) {
-> +        qobject_unref(json);
-> +        error_free(err);
-> +        return;
-> +    }
+>=20
+>>> =C2=A0 @@ -95,6 +101,13 @@ static void pci_bridge_dev_realize(PCIDevi=
+ce
+>>> *dev, Error **errp)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_free(loc=
+al_err);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> =C2=A0 +=C2=A0=C2=A0=C2=A0 err =3D pci_bridge_qemu_reserve_cap_init(d=
+ev, 0, 0,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bridge_dev->i=
+o_reserve, bridge_dev->mem_reserve,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bridge_dev->p=
+ref32_reserve, bridge_dev->pref64_reserve,
+>>> errp);
+>>> +=C2=A0=C2=A0=C2=A0 if (err) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto cap_error;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (shpc_present(dev)) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* TODO: spec =
+recommends using 64 bit prefetcheable BAR.
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Check =
+whether that works well. */
+>>> @@ -103,6 +116,8 @@ static void pci_bridge_dev_realize(PCIDevice
+>>> *dev, Error **errp)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> =C2=A0 +cap_error:
+>>> +=C2=A0=C2=A0=C2=A0 msi_uninit(dev);
+>>
+>> (4) This error handler doesn't look entirely correct; we can reach it
+>> without having initialized MSI. (MSI setup is conditional; and even if
+>> we attempt it, it is permitted to fail with "msi=3Dauto".) Therefore,
+>> msi_uninit() should be wrapped into "if (msi_present())", same as you
+>> see in pci_bridge_dev_exitfn().
+>=20
+> sure, can add a pre-check. But I don't understand why we need that,
+> msi_uninit() will check msi_present()?
 
-Worth spelling this clause as error_propagate(&s->err, err)?  Oh, I see 
-why you can't - you have to do the early return in the case that (json 
-!= NULL) so that you don't assign s->result again if this was a parse of 
-a second object.
+Thanks for pointing that out.
 
->       s->result = json;
-> -    error_propagate(&s->err, err);
-> +    s->err = err;
->   }
->   
+So, I grepped the source code for msi_uninit(). It seems that only one
+location gates it with msi_present() -- in pci_bridge_dev_exitfn() --,
+while 13 other locations just call it unconditionally.
 
-Took me a couple of reads to verify the logic makes sense, but it looks 
-right.
+I don't know what the consistent approach is here. I'll have to defer to
+the PCI maintainers; their taste will decide. Technically your code
+looks correct, then.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks
+Laszlo
