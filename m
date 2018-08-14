@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fpWNz-0002Ua-2k
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 06:17:12 -0400
+	(envelope-from <jusual@mail.ru>) id 1fpWTE-000529-Ba
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 06:22:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fpWNu-00073o-JT
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 06:17:11 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:37165)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fpWNu-00073M-AO
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 06:17:06 -0400
-Received: by mail-wm0-x241.google.com with SMTP id n11-v6so11623735wmc.2
-	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 03:17:06 -0700 (PDT)
-References: <1528768140-17894-1-git-send-email-cota@braap.org>
-	<20180813200116.GA18755@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180813200116.GA18755@flamenco>
-Date: Tue, 14 Aug 2018 11:17:03 +0100
-Message-ID: <87d0ulfe1s.fsf@linaro.org>
+	(envelope-from <jusual@mail.ru>) id 1fpWTB-0000Zq-6v
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 06:22:36 -0400
+Received: from smtp59.i.mail.ru ([217.69.128.39]:48624)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fpWTA-0000ZX-Ti
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 06:22:33 -0400
+References: <20180813102037.12097-1-jusual@mail.ru>
+	<20180813122100.GE14675@redhat.com>
+From: Julia Suvorova <jusual@mail.ru>
+Message-ID: <08a97623-879e-91a2-b13f-2695e134fcad@mail.ru>
+Date: Tue, 14 Aug 2018 13:22:29 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 00/14] fp-test + hardfloat
+In-Reply-To: <20180813122100.GE14675@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] chardev: Add websocket support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +28,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, marcandre.lureau@redhat.com
 
+On 13.08.2018 15:21, Daniel P. Berrangé wrote:
+> On Mon, Aug 13, 2018 at 01:20:37PM +0300, Julia Suvorova via Qemu-devel wrote:
+>> New option "websock" added to allow using websocket protocol for
+>> chardev socket backend.
+>> Example:
+>>      -chardev socket,websock,id=...
+>>
+>> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+>> ---
+>>   chardev/char-socket.c | 75 ++++++++++++++++++++++++++++++++++++-------
+>>   chardev/char.c        |  3 ++
+>>   qapi/char.json        |  3 ++
+>>   3 files changed, 70 insertions(+), 11 deletions(-)
+>>
+> 
+> 
+>> @@ -699,6 +706,45 @@ cont:
+>>   }
+>>   
+>>   
+>> +static void tcp_chr_websock_handshake(QIOTask *task, gpointer user_data)
+>> +{
+>> +    Chardev *chr = user_data;
+>> +
+>> +    if (qio_task_propagate_error(task, NULL)) {
+>> +        tcp_chr_disconnect(chr);
+>> +    } else {
+>> +        tcp_chr_connect(chr);
+>> +    }
+>> +}
+>> +
+>> +
+>> +static void tcp_chr_websock_init(Chardev *chr)
+>> +{
+>> +    SocketChardev *s = SOCKET_CHARDEV(chr);
+>> +    QIOChannelWebsock *wioc;
+>> +    gchar *name;
+>> +
+>> +    if (s->is_listen) {
+>> +        wioc = qio_channel_websock_new_server(s->ioc);
+>> +    } else {
+>> +        /* Websocket client is not yet implemented */
+>> +        return;
+>> +    }
+>> +    if (wioc == NULL) {
+>> +        tcp_chr_disconnect(chr);
+>> +        return;
+>> +    }
+>> +
+>> +    name = g_strdup_printf("chardev-websock-server-%s", chr->label);
+>> +    qio_channel_set_name(QIO_CHANNEL(wioc), name);
+>> +    g_free(name);
+>> +    object_unref(OBJECT(s->ioc));
+>> +    s->ioc = QIO_CHANNEL(wioc);
+>> +
+>> +    qio_channel_websock_handshake(wioc, tcp_chr_websock_handshake, chr, NULL);
+>> +}
+>> +
+>> +
+>>   static void tcp_chr_tls_handshake(QIOTask *task,
+>>                                     gpointer user_data)
+>>   {
+>> @@ -710,6 +756,8 @@ static void tcp_chr_tls_handshake(QIOTask *task,
+>>       } else {
+>>           if (s->do_telnetopt) {
+>>               tcp_chr_telnet_init(chr);
+>> +        } else if (s->is_websock) {
+>> +            tcp_chr_websock_init(chr);
+>>           } else {
+>>               tcp_chr_connect(chr);
+>>           }
+>> @@ -799,12 +847,12 @@ static int tcp_chr_new_client(Chardev *chr, QIOChannelSocket *sioc)
+>>   
+>>       if (s->tls_creds) {
+>>           tcp_chr_tls_init(chr);
+>> +    } else if (s->do_telnetopt) {
+>> +        tcp_chr_telnet_init(chr);
+>> +    } else if (s->is_websock) {
+>> +        tcp_chr_websock_init(chr);
+>>       } else {
+>> -        if (s->do_telnetopt) {
+>> -            tcp_chr_telnet_init(chr);
+>> -        } else {
+>> -            tcp_chr_connect(chr);
+>> -        }
+>> +        tcp_chr_connect(chr);
+> 
+> 
+> I don't think the ordering of init calls is correct when we have multiple options
+> enabled.
+> 
+> With tls=y & telnet=y we initialize TLS, then initialize telnet.
+> 
+> With tls=y & telnet=y & websock=y, we  initialize TLS, then initialize telnet and
+> then websock.
+> 
+> This means we're setting up a telnet session, and then running websocket over the top
+> of it.  This is wrong because there's no telnet client that exists which would be
+> able to use that.
+> 
+> The purpose of TLS & websock options in combination with telnet is to allow a normal
+> telnet session to be tunnelled over a TLS+websocket proxy.
+> 
+> So we must initailize TLS, then websock, then telnet
 
-Emilio G. Cota <cota@braap.org> writes:
+Okay, it's reasonable if all three properties are on. I'll change the order.
 
-> On Mon, Jun 11, 2018 at 21:48:46 -0400, Emilio G. Cota wrote:
->> Sending this respin (little more than a rebase) in case there's
->> reviewer bandwidth available until the soft-freeze in 3 weeks.
->
-> *ping*
->
-> Would be great to get this in for 3.1.
-
-I would like this merged by 3.1 as well. However I think there is still
-some work to be done on the testing side. IIRC the fptest case works
-with whitelists and I'd like to understand more about why we can't use
-the whole test corpus? Is it testing features we don't have on all
-architectures or just because it wouldn't pass because of holes in our
-current softfloat?
-
-Our experience of SVE has shown that despite the fairly extensive
-testing we did there are still a bunch of corner cases we missed.
-Hopefully the last few patches have fixed that but I guess it pays to be
-exhaustive.
-
-We now have the check-tcg infrastructure in place so it would be nice to
-have proper native tests in place for each architecture. My experience
-of the fcvt.c test case however is you end up using inline assembler to
-ensure you exercise the right guest opcodes which makes it hard to
-generalise for lots of architectures. I had written a bunch of patches
-against the fptest to get it built under check-tcg but it was painful:
-
-  * a bit hacky to build as unit test and as tcg test
-  * needed a lot of boilerplate for each new operation
-
-> BTW I have a paper under submission that covers this work among
-> other improvements to QEMU. Reading this paper might ease a
-> subsequent review of this patch series; ask me privately if
-> you want to get a copy.
->
-> Thanks,
->
-> 		Emilio
-
-
---
-Alex Benn=C3=A9e
+Best regards, Julia Suvorova.
