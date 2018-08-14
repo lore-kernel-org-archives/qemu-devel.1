@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fpTgk-0008GG-TT
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:24:24 -0400
+	(envelope-from <famz@redhat.com>) id 1fpTiU-0001tN-Cv
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:26:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fpTgg-0005UO-Sa
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:24:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57148 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fpTgg-0005UA-Nz
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:24:18 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-41-armbru@redhat.com>
-	<87a5ca96-5f44-5e18-a8a0-91c76f66f054@redhat.com>
-Date: Tue, 14 Aug 2018 09:24:15 +0200
-In-Reply-To: <87a5ca96-5f44-5e18-a8a0-91c76f66f054@redhat.com> (Eric Blake's
-	message of "Mon, 13 Aug 2018 11:18:48 -0500")
-Message-ID: <87d0ul2yxs.fsf@dusky.pond.sub.org>
+	(envelope-from <famz@redhat.com>) id 1fpTiT-0006RQ-HU
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 03:26:10 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Tue, 14 Aug 2018 15:25:51 +0800
+Message-Id: <20180814072551.15465-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 40/56] json: Replace %I64d, %I64u by %PRId64,
- %PRIu64
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] luks: Allow share-rw=on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +20,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
+Format drivers such as qcow2 don't allow sharing the same image between
+two QEMU instances in order to prevent image corruptions, because of
+metadata cache. LUKS driver don't modify metadata except for when
+creating image, so it is safe to relax the permission. This makes
+share-rw=3Don property work on virtual devices.
 
-> On 08/08/2018 07:03 AM, Markus Armbruster wrote:
->> Support for %I64d got addded in commit 2c0d4b36e7f "json: fix PRId64
->
-> s/addded/added/
+Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ block/crypto.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Fixing...
-
->> on Win32".  We had to hard-code I64d because we used the lexer's
->> finite state machine to check interpolations.  No more, so clean this
->> up.
->>
->> Additional conversion specifications would be easy enough to implement
->> when needed.
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   qobject/json-parser.c | 10 ++++++----
->>   tests/check-qjson.c   | 10 ++++++++++
->>   2 files changed, 16 insertions(+), 4 deletions(-)
->>
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
->>          return QOBJECT(qnum_from_int(va_arg(*ap, long)));
->> -    } else if (!strcmp(token->str, "%lld") ||
->> -               !strcmp(token->str, "%I64d")) {
->> +    } else if (!strcmp(token->str, "%lld")) {
->>          return QOBJECT(qnum_from_int(va_arg(*ap, long long)));
->> +    } else if (!strcmp(token->str, "%" PRId64)) {
->> +        return QOBJECT(qnum_from_int(va_arg(*ap, int64_t)));
->
-> I had a double-take to make sure this still works on mingw. The trick
-> used to be that the lexer had to parse the union of all forms
-> understood by any libc (making Linux understand %I64d even though only
-> mingw would generate it) then the parser had to accept all forms
-> allowed through by the lexer.  Now the lexer accepts all forms with no
-> effort (because it is no longer validates), and the parser is made
-> stricter (%I64d no longer works on Linux, where we have two redundant
-> 'if' clauses; but mingw has two distinct 'if' clauses and works as
-> desired).
-
-Exactly.  Thanks for checking!
+diff --git a/block/crypto.c b/block/crypto.c
+index 146d81c90a..33ee01bebd 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -627,7 +627,9 @@ BlockDriver bdrv_crypto_luks =3D {
+     .bdrv_probe         =3D block_crypto_probe_luks,
+     .bdrv_open          =3D block_crypto_open_luks,
+     .bdrv_close         =3D block_crypto_close,
+-    .bdrv_child_perm    =3D bdrv_format_default_perms,
++    /* This driver doesn't modify LUKS metadata except when creating ima=
+ge.
++     * Allow share-rw=3Don as a special case. */
++    .bdrv_child_perm    =3D bdrv_filter_default_perms,
+     .bdrv_co_create     =3D block_crypto_co_create_luks,
+     .bdrv_co_create_opts =3D block_crypto_co_create_opts_luks,
+     .bdrv_co_truncate   =3D block_crypto_co_truncate,
+--=20
+2.17.1
