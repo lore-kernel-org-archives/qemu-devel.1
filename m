@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fpYS1-00064n-4A
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:29:30 -0400
+	(envelope-from <berrange@redhat.com>) id 1fpYam-0002EQ-Ur
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:38:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1fpYS0-0003gL-2A
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:29:29 -0400
-References: <20180810062647.23211-1-lbloch@janustech.com>
-	<20180810062647.23211-7-lbloch@janustech.com>
-	<w5136vm8m8u.fsf@maestria.local.igalia.com>
-	<ca79bbff-163b-f50e-e17b-54d6597e6bfe@redhat.com>
-	<20180813112333.GD4323@localhost.localdomain>
-	<e9a77f1e-6b9e-3fea-69c9-c18638961a2e@redhat.com>
-	<20180813155856.GL4323@localhost.localdomain>
-	<435d9dd8-f994-f011-f62e-4568dea8fd21@janustech.com>
-	<20180814081849.GA5025@dhcp-200-186.str.redhat.com>
-	<7d026f2f-99c2-a341-c5b8-da757a995877@janustech.com>
-	<20180814114450.GJ5025@dhcp-200-186.str.redhat.com>
-From: Leonid Bloch <lbloch@janustech.com>
-Message-ID: <ad004680-81d7-cc13-6e97-d00d671f61b1@janustech.com>
-Date: Tue, 14 Aug 2018 15:29:05 +0300
+	(envelope-from <berrange@redhat.com>) id 1fpYal-0007y2-UM
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 08:38:32 -0400
+Date: Tue, 14 Aug 2018 13:38:22 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180814123822.GC24997@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180814093551.2749-1-berrange@redhat.com>
+	<20180814113824.GI5025@dhcp-200-186.str.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180814114450.GJ5025@dhcp-200-186.str.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB-large
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 6/9] qcow2: Increase the default upper
- limit on the L2 cache size
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180814113824.GI5025@dhcp-200-186.str.redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix regression copying secrets
+ during convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +27,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-stable@nongnu.org
 
-On 8/14/18 2:44 PM, Kevin Wolf wrote:
-> Am 14.08.2018 um 13:34 hat Leonid Bloch geschrieben:
->> On 8/14/18 11:18 AM, Kevin Wolf wrote:
->>> Am 13.08.2018 um 18:42 hat Leonid Bloch geschrieben:
->>>>> I don't actually think it's so bad to keep the cache permanently
->>>>> allocated, but I wouldn't object to a lower default for non-Linux hosts
->>>>> either. 1 MB may still be a little too low, 4 MB (covers up to 32 GB)
->>>>> might be more adequate. My typical desktop VMs are larger than 8 GB, but
->>>>> smaller than 32 GB.
->>>>
->>>> And for a Windows VM just the OS installation takes above 40 GB. While we
->>>> probably are not running Windows VMs for our own needs, it is very common
->>>> that a customer of, for example, some cloud service uses QEMU (unknowingly)
->>>> for a full-blown Windows. So 100 GB+ images which are quite heavily used is
->>>> not a rare scenario. 256 GB - yeah, that would be on the higher end.
->>>
->>> The OS installation is mostly sequential access, though. You only need
->>> that much cache when you have completely random I/O across the whole
->>> image. Otherwise the LRU based approach of the cache is good enough to
->>> keep those tables cached that are actually in use.
->>
->> Sorry, by "OS installation" I meant the installed size of the OS, which
->> should be available for fast and frequent access, not the installation
->> process itself. Obviously for one-time tasks like the installation process
->> it's not worth it, unless one installs all the time, instead of using ready
->> images, for some reason. :)
-> 
-> But you never use everything that is present in an OS installation of
-> 40 GB (is it really _that_ huge these days?), and you don't read OS
-> files non-stop. The most frequently used parts of the OS are actually in
-> the guest RAM.
+On Tue, Aug 14, 2018 at 01:38:24PM +0200, Kevin Wolf wrote:
+> Am 14.08.2018 um 11:35 hat Daniel P. Berrang=C3=A9 geschrieben:
+> > When the convert command is creating an output file that needs
+> > secrets, we need to ensure those secrets are passed to both the
+> > blk_new_open and bdrv_create API calls.
+> >=20
+> > This is done by qemu-img extracting all opts matching the name
+> > suffix "key-secret". Unfortunately the code doing this was run after =
+the
+> > call to bdrv_create(), which meant the QemuOpts it was extracting
+> > secrets from was now empty.
+> >=20
+> > Previously this worked by luks as a bug meant the "key-secret"
+> > parameters were not purged from the QemuOpts. This bug was fixed in
+> >=20
+> >   commit b76b4f604521e59f857d6177bc55f6f2e41fd392
+> >   Author: Kevin Wolf <kwolf@redhat.com>
+> >   Date:   Thu Jan 11 16:18:08 2018 +0100
+> >=20
+> >     qcow2: Use visitor for options in qcow2_create()
+> >=20
+> > Exposing the latent bug in qemu-img. This fix simply moves the copyin=
+g
+> > of secrets to before the bdrv_create() call.
+> >=20
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>=20
+> Cc: qemu-stable@nongnu.org
+>=20
+> > @@ -2461,9 +2458,9 @@ out:
+> >          qemu_progress_print(100, 0);
+> >      }
+> >      qemu_progress_end();
+> > -    qemu_opts_del(opts);
+>=20
+> Why don't we need to free opts any more?
 
-Yes, Windows 8.1, with all the desktop bloat - just above 40 GB. :]
-I did a proper benchmarking indeed only on heavy I/O load, where full 
-cache did show above 50% improvement, although just regular usage felt 
-faster as well, but maybe it's just psychosomatic. :)
+Urgh, that's a mistake, I deleted the wrong line. v2 arriving soon....
 
-Leonid.
+>=20
+> >      qemu_opts_free(create_opts);
+> >      qemu_opts_del(sn_opts);
+> > +    qobject_unref(open_opts);
+> >      blk_unref(s.target);
+> >      if (s.src) {
+> >          for (bs_i =3D 0; bs_i < s.src_num; bs_i++) {
 
-> 
-> I don't think you'll really notice the difference in qcow2 unless you
-> have a really I/O intensive workload - and that is not usually for OS
-> files, but for user data. For only occasional accesses, the additional
-> 64k for the metadata table wouldn't play a big role.
-> 
-> Kevin
-> 
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
