@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fpabJ-0000o6-TY
+	(envelope-from <thuth@redhat.com>) id 1fpabJ-0000o5-T7
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fpabG-0005GU-Nz
+	(envelope-from <thuth@redhat.com>) id 1fpabJ-0005Ip-5v
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:13 -0400
-Date: Tue, 14 Aug 2018 16:46:56 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20180814144656.ww3gmgmdknqsfp5x@toto>
-References: <20180814124254.5229-1-peter.maydell@linaro.org>
-	<20180814124254.5229-5-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20180814124254.5229-5-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 04/10] target/arm: Implement AArch32 HVBAR
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42314 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpabJ-0005Hz-1M
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 10:47:13 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 14 Aug 2018 16:46:55 +0200
+Message-Id: <1534258018-22859-4-git-send-email-thuth@redhat.com>
+In-Reply-To: <1534258018-22859-1-git-send-email-thuth@redhat.com>
+References: <1534258018-22859-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 3/6] hw/timer/mc146818rtc: White space clean-up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +23,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Luc Michel <luc.michel@greensocs.com>, edgari@xilinx.com
+To: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Aug 14, 2018 at 01:42:48PM +0100, Peter Maydell wrote:
-> Implement the AArch32 HVBAR register; we can do this just by
-> making the existing VBAR_EL2 regdefs be STATE_BOTH.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+mc146818rtc.c still contains some TABs. Replace them with spaces.
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/timer/mc146818rtc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-
-> ---
->  target/arm/helper.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 14fd78f587a..b6412fe9d1f 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -3750,7 +3750,7 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
->  
->  /* Used to describe the behaviour of EL2 regs when EL2 does not exist.  */
->  static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
-> -    { .name = "VBAR_EL2", .state = ARM_CP_STATE_AA64,
-> +    { .name = "VBAR_EL2", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 0, .opc2 = 0,
->        .access = PL2_RW,
->        .readfn = arm_cp_read_zero, .writefn = arm_cp_write_ignore },
-> @@ -3899,7 +3899,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
->        .opc0 = 3, .opc1 = 4, .crn = 4, .crm = 0, .opc2 = 0,
->        .access = PL2_RW,
->        .fieldoffset = offsetof(CPUARMState, banked_spsr[BANK_HYP]) },
-> -    { .name = "VBAR_EL2", .state = ARM_CP_STATE_AA64,
-> +    { .name = "VBAR_EL2", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 0, .opc2 = 0,
->        .access = PL2_RW, .writefn = vbar_write,
->        .fieldoffset = offsetof(CPUARMState, cp15.vbar_el[2]),
-> -- 
-> 2.18.0
-> 
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 6f1f723..3a14075 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -120,7 +120,7 @@ static void rtc_coalesced_timer_update(RTCState *s)
+         timer_del(s->coalesced_timer);
+     } else {
+         /* divide each RTC interval to 2 - 8 smaller intervals */
+-        int c = MIN(s->irq_coalesced, 7) + 1; 
++        int c = MIN(s->irq_coalesced, 7) + 1;
+         int64_t next_clock = qemu_clock_get_ns(rtc_clock) +
+             periodic_clock_to_ns(s->period / c);
+         timer_mod(s->coalesced_timer, next_clock);
+@@ -485,7 +485,7 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
+             s->cmos_data[s->cmos_index] = data;
+             check_update_timer(s);
+             break;
+-	case RTC_IBM_PS2_CENTURY_BYTE:
++        case RTC_IBM_PS2_CENTURY_BYTE:
+             s->cmos_index = RTC_CENTURY;
+             /* fall through */
+         case RTC_CENTURY:
+@@ -713,7 +713,7 @@ static uint64_t cmos_ioport_read(void *opaque, hwaddr addr,
+         return 0xff;
+     } else {
+         switch(s->cmos_index) {
+-	case RTC_IBM_PS2_CENTURY_BYTE:
++        case RTC_IBM_PS2_CENTURY_BYTE:
+             s->cmos_index = RTC_CENTURY;
+             /* fall through */
+         case RTC_CENTURY:
+@@ -915,7 +915,7 @@ static void rtc_reset(void *opaque)
+ 
+     if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW) {
+         s->irq_coalesced = 0;
+-        s->irq_reinject_on_ack_count = 0;		
++        s->irq_reinject_on_ack_count = 0;
+     }
+ }
+ 
+-- 
+1.8.3.1
