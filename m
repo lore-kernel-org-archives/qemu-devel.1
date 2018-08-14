@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fpdvo-0005B3-6O
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:22:17 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fpdvp-0005DC-P5
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:22:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fpduI-0006qN-Pa
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:20:36 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fpduK-0006rY-Tv
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:20:37 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44428)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fpduK-0006nb-AP
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:04 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1fpduH-0007OE-5X
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:19:01 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Aug 2018 19:18:09 +0100
+Message-Id: <20180814181815.23348-40-peter.maydell@linaro.org>
+In-Reply-To: <20180814181815.23348-1-peter.maydell@linaro.org>
+References: <20180814181815.23348-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180814162739.11814-5-stefanha@redhat.com>
-References: <20180814162739.11814-1-stefanha@redhat.com>
-	<20180814162739.11814-5-stefanha@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 14 Aug 2018 11:18:28 -0700
-Message-ID: <CAKmqyKOdA-gXYRxxd0qLkkstYJWgk4gR4H5uwW5W7WWi_57n_A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 4/6] loader: add rom transaction API
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 39/45] target/arm: Initialize exc_secure
+ correctly in do_v7m_exception_exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,120 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, mail@steffen-goertz.de, Su Hang <suhang16@mails.ucas.ac.cn>, Liviu Ionescu <ilg@livius.net>, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>
+To: qemu-devel@nongnu.org
 
-On Tue, Aug 14, 2018 at 9:27 AM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> Image file loaders may add a series of roms.  If an error occurs partway
-> through loading there is no easy way to drop previously added roms.
->
-> This patch adds a transaction mechanism that works like this:
->
->   rom_transaction_begin();
->   ...call rom_add_*()...
->   rom_transaction_end(ok);
->
-> If ok is false then roms added in this transaction are dropped.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+In do_v7m_exception_exit(), we use the exc_secure variable to track
+whether the exception we're returning from is secure or non-secure.
+Unfortunately the statement initializing this was accidentally
+inside an "if (env->v7m.exception != ARMV7M_EXCP_NMI)" conditional,
+which meant that we were using the wrong value for NMI handlers.
+Move the initialization out to the right place.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20180720145647.8810-3-peter.maydell@linaro.org
+---
+ target/arm/helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Alistair
-
-> ---
->  include/hw/loader.h | 19 +++++++++++++++++++
->  hw/core/loader.c    | 32 ++++++++++++++++++++++++++++++++
->  2 files changed, 51 insertions(+)
->
-> diff --git a/include/hw/loader.h b/include/hw/loader.h
-> index e98b84b8f9..5235f119a3 100644
-> --- a/include/hw/loader.h
-> +++ b/include/hw/loader.h
-> @@ -225,6 +225,25 @@ int rom_check_and_register_reset(void);
->  void rom_set_fw(FWCfgState *f);
->  void rom_set_order_override(int order);
->  void rom_reset_order_override(void);
-> +
-> +/**
-> + * rom_transaction_begin:
-> + *
-> + * Call this before of a series of rom_add_*() calls.  Call
-> + * rom_transaction_end() afterwards to commit or abort.  These functions are
-> + * useful for undoing a series of rom_add_*() calls if image file loading fails
-> + * partway through.
-> + */
-> +void rom_transaction_begin(void);
-> +
-> +/**
-> + * rom_transaction_end:
-> + * @commit: true to commit added roms, false to drop added roms
-> + *
-> + * Call this after a series of rom_add_*() calls.  See rom_transaction_begin().
-> + */
-> +void rom_transaction_end(bool commit);
-> +
->  int rom_copy(uint8_t *dest, hwaddr addr, size_t size);
->  void *rom_ptr(hwaddr addr, size_t size);
->  void hmp_info_roms(Monitor *mon, const QDict *qdict);
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index 0c72e7c05a..612420b870 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -840,6 +840,8 @@ struct Rom {
->      char *fw_dir;
->      char *fw_file;
->
-> +    bool committed;
-> +
->      hwaddr addr;
->      QTAILQ_ENTRY(Rom) next;
->  };
-> @@ -877,6 +879,8 @@ static void rom_insert(Rom *rom)
->          rom->as = &address_space_memory;
->      }
->
-> +    rom->committed = false;
-> +
->      /* List is ordered by load address in the same address space */
->      QTAILQ_FOREACH(item, &roms, next) {
->          if (rom_order_compare(rom, item)) {
-> @@ -1168,6 +1172,34 @@ void rom_reset_order_override(void)
->      fw_cfg_reset_order_override(fw_cfg);
->  }
->
-> +void rom_transaction_begin(void)
-> +{
-> +    Rom *rom;
-> +
-> +    /* Ignore ROMs added without the transaction API */
-> +    QTAILQ_FOREACH(rom, &roms, next) {
-> +        rom->committed = true;
-> +    }
-> +}
-> +
-> +void rom_transaction_end(bool commit)
-> +{
-> +    Rom *rom;
-> +    Rom *tmp;
-> +
-> +    QTAILQ_FOREACH_SAFE(rom, &roms, next, tmp) {
-> +        if (rom->committed) {
-> +            continue;
-> +        }
-> +        if (commit) {
-> +            rom->committed = true;
-> +        } else {
-> +            QTAILQ_REMOVE(&roms, rom, next);
-> +            rom_free(rom);
-> +        }
-> +    }
-> +}
-> +
->  static Rom *find_rom(hwaddr addr, size_t size)
->  {
->      Rom *rom;
-> --
-> 2.17.1
->
->
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 1b60c8d66c9..9d908f1c663 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -7052,6 +7052,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+             /* For all other purposes, treat ES as 0 (R_HXSR) */
+             excret &= ~R_V7M_EXCRET_ES_MASK;
+         }
++        exc_secure = excret & R_V7M_EXCRET_ES_MASK;
+     }
+ 
+     if (env->v7m.exception != ARMV7M_EXCP_NMI) {
+@@ -7062,7 +7063,6 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+          * which security state's faultmask to clear. (v8M ARM ARM R_KBNF.)
+          */
+         if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+-            exc_secure = excret & R_V7M_EXCRET_ES_MASK;
+             if (armv7m_nvic_raw_execution_priority(env->nvic) >= 0) {
+                 env->v7m.faultmask[exc_secure] = 0;
+             }
+-- 
+2.18.0
