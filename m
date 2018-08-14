@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpdvZ-0004xc-4T
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:21:59 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fpdv6-0004cE-Op
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:21:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpdu7-0006kL-RK
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:20:20 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44418)
+	(envelope-from <pm215@archaic.org.uk>) id 1fpdtt-0006dH-QO
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:19:52 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44408)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fpdu6-0006h8-Os
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:50 -0400
+	id 1fpdtt-0006ag-H6
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 14:18:37 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fpdu5-0007JN-38
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:18:49 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fpdtr-0007DS-AO
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 19:18:35 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Aug 2018 19:17:58 +0100
-Message-Id: <20180814181815.23348-29-peter.maydell@linaro.org>
+Date: Tue, 14 Aug 2018 19:17:45 +0100
+Message-Id: <20180814181815.23348-16-peter.maydell@linaro.org>
 In-Reply-To: <20180814181815.23348-1-peter.maydell@linaro.org>
 References: <20180814181815.23348-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 28/45] intc/arm_gic: Implement maintenance
- interrupt generation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 15/45] vmstate.h: Provide
+ VMSTATE_UINT16_SUB_ARRAY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,127 +35,31 @@ To: qemu-devel@nongnu.org
 
 From: Luc Michel <luc.michel@greensocs.com>
 
-Implement the maintenance interrupt generation that is part of the GICv2
-virtualization extensions.
+Provide a VMSTATE_UINT16_SUB_ARRAY macro to save a uint16_t sub-array in
+a VMState.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20180727095421.386-18-luc.michel@greensocs.com
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20180727095421.386-5-luc.michel@greensocs.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gic.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 97 insertions(+)
+ include/migration/vmstate.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 6b97e197966..6ff7da3e5d3 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -240,9 +240,106 @@ static inline bool gic_lr_entry_is_eoi(uint32_t entry)
-         && !GICH_LR_HW(entry) && GICH_LR_EOI(entry);
- }
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 42b946ce902..2b501d04669 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -923,6 +923,9 @@ extern const VMStateInfo vmstate_info_qtailq;
+ #define VMSTATE_UINT16_ARRAY(_f, _s, _n)                               \
+     VMSTATE_UINT16_ARRAY_V(_f, _s, _n, 0)
  
-+static inline void gic_extract_lr_info(GICState *s, int cpu,
-+                                int *num_eoi, int *num_valid, int *num_pending)
-+{
-+    int lr_idx;
++#define VMSTATE_UINT16_SUB_ARRAY(_f, _s, _start, _num)                \
++    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint16, uint16_t)
 +
-+    *num_eoi = 0;
-+    *num_valid = 0;
-+    *num_pending = 0;
-+
-+    for (lr_idx = 0; lr_idx < s->num_lrs; lr_idx++) {
-+        uint32_t *entry = &s->h_lr[lr_idx][cpu];
-+
-+        if (gic_lr_entry_is_eoi(*entry)) {
-+            (*num_eoi)++;
-+        }
-+
-+        if (GICH_LR_STATE(*entry) != GICH_LR_STATE_INVALID) {
-+            (*num_valid)++;
-+        }
-+
-+        if (GICH_LR_STATE(*entry) == GICH_LR_STATE_PENDING) {
-+            (*num_pending)++;
-+        }
-+    }
-+}
-+
-+static void gic_compute_misr(GICState *s, int cpu)
-+{
-+    uint32_t value = 0;
-+    int vcpu = cpu + GIC_NCPU;
-+
-+    int num_eoi, num_valid, num_pending;
-+
-+    gic_extract_lr_info(s, cpu, &num_eoi, &num_valid, &num_pending);
-+
-+    /* EOI */
-+    if (num_eoi) {
-+        value |= R_GICH_MISR_EOI_MASK;
-+    }
-+
-+    /* U: true if only 0 or 1 LR entry is valid */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_UIE_MASK) && (num_valid < 2)) {
-+        value |= R_GICH_MISR_U_MASK;
-+    }
-+
-+    /* LRENP: EOICount is not 0 */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_LRENPIE_MASK) &&
-+        ((s->h_hcr[cpu] & R_GICH_HCR_EOICount_MASK) != 0)) {
-+        value |= R_GICH_MISR_LRENP_MASK;
-+    }
-+
-+    /* NP: no pending interrupts */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_NPIE_MASK) && (num_pending == 0)) {
-+        value |= R_GICH_MISR_NP_MASK;
-+    }
-+
-+    /* VGrp0E: group0 virq signaling enabled */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_VGRP0EIE_MASK) &&
-+        (s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP0)) {
-+        value |= R_GICH_MISR_VGrp0E_MASK;
-+    }
-+
-+    /* VGrp0D: group0 virq signaling disabled */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_VGRP0DIE_MASK) &&
-+        !(s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP0)) {
-+        value |= R_GICH_MISR_VGrp0D_MASK;
-+    }
-+
-+    /* VGrp1E: group1 virq signaling enabled */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_VGRP1EIE_MASK) &&
-+        (s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP1)) {
-+        value |= R_GICH_MISR_VGrp1E_MASK;
-+    }
-+
-+    /* VGrp1D: group1 virq signaling disabled */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_VGRP1DIE_MASK) &&
-+        !(s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP1)) {
-+        value |= R_GICH_MISR_VGrp1D_MASK;
-+    }
-+
-+    s->h_misr[cpu] = value;
-+}
-+
-+static void gic_update_maintenance(GICState *s)
-+{
-+    int cpu = 0;
-+    int maint_level;
-+
-+    for (cpu = 0; cpu < s->num_cpu; cpu++) {
-+        gic_compute_misr(s, cpu);
-+        maint_level = (s->h_hcr[cpu] & R_GICH_HCR_EN_MASK) && s->h_misr[cpu];
-+
-+        qemu_set_irq(s->maintenance_irq[cpu], maint_level);
-+    }
-+}
-+
- static void gic_update_virt(GICState *s)
- {
-     gic_update_internal(s, true);
-+    gic_update_maintenance(s);
- }
+ #define VMSTATE_UINT16_2DARRAY(_f, _s, _n1, _n2)                      \
+     VMSTATE_UINT16_2DARRAY_V(_f, _s, _n1, _n2, 0)
  
- static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
 -- 
 2.18.0
