@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpwAb-0002GQ-NB
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:49:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1fpwCQ-0003Vy-AD
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:50:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpwAW-00073F-BN
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:49:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52562 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpwAW-00071p-1I
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:49:00 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8512F818F6E1
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 13:48:59 +0000 (UTC)
-References: <20180815133747.25032-1-peterx@redhat.com>
-	<20180815133747.25032-12-peterx@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <82ab9863-6c03-ccbe-e2d1-b03dcc8c636b@redhat.com>
-Date: Wed, 15 Aug 2018 15:48:57 +0200
+	(envelope-from <bounces@canonical.com>) id 1fpwCM-0001zD-Ph
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:50:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51224)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fpwCM-0001wE-G0
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:50:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fpwCJ-00076f-FV
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 13:50:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 69B962E851F
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 13:50:51 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180815133747.25032-12-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 11/13] tests: remove "0.15" prefix for
- test-qmp-cmds
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 15 Aug 2018 13:44:10 -0000
+From: =?utf-8?q?Leonardo_M=C3=BCller?= <leozinho29_eu@hotmail.com>
+Reply-To: Bug 1787070 <1787070@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153429832178.24411.17323780348611441441.malonedeb@soybean.canonical.com>
+Message-Id: <153434065019.8411.3031857886553396702.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1787070] Re: Guests using the qxl-vga are freezing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,41 +36,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 08/15/2018 03:37 PM, Peter Xu wrote:
-> The "0.15" prefix seems useless.  Remove them.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  tests/test-qmp-cmds.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-> index ba41a6161e..989819b26d 100644
-> --- a/tests/test-qmp-cmds.c
-> +++ b/tests/test-qmp-cmds.c
-> @@ -286,11 +286,11 @@ int main(int argc, char **argv)
->  {
->      g_test_init(&argc, &argv, NULL);
->  
-> -    g_test_add_func("/0.15/dispatch_cmd", test_dispatch_cmd);
-> -    g_test_add_func("/0.15/dispatch_cmd_failure", test_dispatch_cmd_failure);
-> -    g_test_add_func("/0.15/dispatch_cmd_io", test_dispatch_cmd_io);
-> -    g_test_add_func("/0.15/dealloc_types", test_dealloc_types);
-> -    g_test_add_func("/0.15/dealloc_partial", test_dealloc_partial);
-> +    g_test_add_func("/dispatch_cmd", test_dispatch_cmd);
-> +    g_test_add_func("/dispatch_cmd_failure", test_dispatch_cmd_failure);
-> +    g_test_add_func("/dispatch_cmd_io", test_dispatch_cmd_io);
-> +    g_test_add_func("/dealloc_types", test_dealloc_types);
-> +    g_test_add_func("/dealloc_partial", test_dealloc_partial);
+I have run the openSUSE guest again, the output of the gdb command can
+be seen at https://paste.ubuntu.com/p/mCRMvkNWYq/
 
-Most other tests use a common prefix, so maybe rather replace the "0.15"
-with "qmp-cmd" here? E.g.:
+-- =
 
- g_test_add_func("/qmp-cmd/dispatch_cmd", test_dispatch_cmd);
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1787070
 
-?
+Title:
+  Guests using the qxl-vga are freezing
 
- Thomas
+Status in QEMU:
+  New
+
+Bug description:
+  I have noticed that guests using qxl-vga are freezing. They may freeze
+  after a few minutes or after many hours. The freeze consists of the
+  entire system hanging, except the cursor, but the cursor animation
+  stops too. Changing to tty is not possible after this. There are three
+  things noticed in common on the guests when they freeze:
+
+  -The guest is using the QXL VGA (freezes weren't observed with other VGAs=
+);
+  -A new workload is starting;
+  -The mouse cursor is the animated as the one of loading. For example, htt=
+ps://i.imgur.com/raQFteG.png
+   =
+
+  The host is Xubuntu 18.04 amd64, QEMU version is 3.0.0-dirty. The guests =
+tested were:
+
+  -openSUSE Tumbleweed;
+  -openSUSE Leap 15;
+  -Xubuntu 18.04 Bionic Beaver;
+  -CentOS 7.
+
+  With openSUSE guests, the install process couldn't even be finished,
+  as the installer would freeze. There were 2 GB of available memory
+  (checked in a tty before the freeze) and netconsole was enabled.
+  Unfortunately, it was impossible to obtain any information from them.
+  This is an image of one openSUSE guest frozen:
+  https://i.imgur.com/ZP0eQKq.png
+
+  The command line used was:
+
+  qemu-system-x86_64 -nodefaults -m 3072 -M pc,usb=3Dtrue -accel kvm -cpu
+  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+  id=3Dcentusb,if=3Dnone,file=3Dleap.qcow2 -device usb-
+  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
+  -monitor vc -serial vc  -cdrom "openSUSE-Leap-15.0-DVD-x86_64.iso"
+  -boot d
+
+  With CentOS guests, the install process fail sometimes, but sometimes
+  it's able to install. However, on the yum update, it would freeze too.
+  In one instance it froze while updating glibc, which made the guest
+  unbootable. https://i.imgur.com/B3WhSDX.png
+
+  The command line used was:
+
+  qemu-system-x86_64 -nodefaults -m 2048 -M pc,usb=3Dtrue -accel kvm -cpu
+  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+  id=3Dcentusb,if=3Dnone,file=3Dcentos.qcow2 -device usb-
+  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+  audio,id=3Dusbaudio -device virtio-vga,virgl=3Dtrue -display gtk -monitor
+  vc -serial vc -cdrom "CentOS-7-livecd-GNOME-x86_64.iso" -bios
+  /usr/share/ovmf/OVMF.fd
+
+  With Xubuntu 18.04 guests, the system worked for many hours until the
+  freeze happened. On this case it happened when opening Audacious.
+  Fortunately, the logging services worked for some time, which allowed
+  me to get a relevant message which can be seen at
+  http://termbin.com/nuof . It repeated a few times, but then the
+  logging stopped. https://i.imgur.com/2zckqj5.png shows the guest
+  screen in the moment it froze.
+
+  The command line used was:
+
+  qemu-system-x86_64 -nodefaults -m 1024 -M pc,usb=3Dtrue -accel kvm -cpu
+  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+  id=3Dcentusb,if=3Dnone,file=3Dxubmini -device usb-
+  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
+  -monitor vc -serial vc
+
+  I'm sorry for not having more detailed information but, even setting
+  netconsole, openSUSE and CentOS guests were unable to print any
+  information.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1787070/+subscriptions
