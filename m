@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fq1LO-0006dK-R7
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:20:35 -0400
+	(envelope-from <thuth@redhat.com>) id 1fq1O1-0007vU-1q
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:23:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fq1LM-0001oM-C7
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:20:34 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:32847)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fq1LG-0001nP-Le
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:20:28 -0400
-Received: by mail-oi0-x233.google.com with SMTP id 8-v6so3863941oip.0
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 12:20:26 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1fq1Nw-0002H9-1Y
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:23:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54396 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpxuM-0006Kx-ER
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 11:40:27 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A2DA64023132
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 15:40:14 +0000 (UTC)
+References: <20180808114830.7169-1-quintela@redhat.com>
+	<20180808114830.7169-17-quintela@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <31fe45e7-0a0e-ae2f-bbdf-2d5168b79f4a@redhat.com>
+Date: Wed, 15 Aug 2018 17:40:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1534270621-27332-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 15 Aug 2018 20:20:05 +0100
-Message-ID: <CAFEAcA-fEe2TsRpd5Q1i7Z-0MC67o0xkfgLW1ifV64HpfL2czg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/19] MIPS queue for QEMU upstream,
- August 14, 2018
+In-Reply-To: <20180808114830.7169-17-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 16/22] virtio: split vhost-user-blk bits
+ from virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +35,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On 14 August 2018 at 19:16, Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> The following changes since commit 38441756b70eec5807b5f60dad11a93a91199866:
->
->   Update version for v3.0.0 release (2018-08-14 16:38:43 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/AMarkovic/qemu tags/mips-queue-aug-14-2018
->
-> for you to fetch changes up to 20d4e01b6486b15d1f3d9ff2d51bba2bf00ebf94:
->
->   qemu-doc: Amend MIPS-related items (2018-08-14 19:59:03 +0200)
->
-> ----------------------------------------------------------------
-> MIPS queue for QEMU upstream, August 14, 2018
->
-> This is the first part of nanoMIPS support for QEMU. It contains
-> various fixes and improvements that are related to nanoMIPS support,
-> or are discovered while working on nanoMIPS support. Most of them are
-> fairly simple changes, but each of them has its own significance and
-> importance for nanoMIPS support.
->
-> The second part that contains QEMU support for core nanoMIPS
-> functionality will remain under review for some time.
->
-> The third part that mainly contains Linux user support will likely
-> remain under review for some longer period.
->
-> ----------------------------------------------------------------
+On 08/08/2018 01:48 PM, Juan Quintela wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hw/virtio/Makefile.objs        |  1 +
+>  hw/virtio/vhost-user-blk-pci.c | 88 ++++++++++++++++++++++++++++++++++
+>  hw/virtio/virtio-pci.c         | 60 -----------------------
+>  3 files changed, 89 insertions(+), 60 deletions(-)
+>  create mode 100644 hw/virtio/vhost-user-blk-pci.c
 
-Hi; this fails to build on clang:
-
-/home/petmay01/linaro/qemu-for-merges/target/mips/translate.c:1749:20:
-error: unused function 'gen_op_addr_addi' [-Werror,-Wunused-funct
-ion]
-static inline void gen_op_addr_addi(DisasContext *ctx, TCGv ret, TCGv base,
-                   ^
-/home/petmay01/linaro/qemu-for-merges/target/mips/translate.c:1921:20:
-error: unused function 'check_xnp' [-Werror,-Wunused-function]
-static inline void check_xnp(DisasContext *ctx)
-                   ^
-2 errors generated.
-
-The functions do appear to be genuinely unused.
-
-thanks
--- PMM
+Reviewed-by: Thomas Huth <thuth@redhat.com>
