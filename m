@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fprpN-0003ns-5w
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 05:10:54 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fps2V-0006I1-8T
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 05:24:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fprpM-0002nn-0L
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 05:10:53 -0400
-References: <20180814124254.5229-1-peter.maydell@linaro.org>
-	<20180814124254.5229-3-peter.maydell@linaro.org>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <40cb6cd0-0a77-53d9-38fe-1c6786d1dbd5@greensocs.com>
-Date: Wed, 15 Aug 2018 11:10:36 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fps2F-0008OE-AF
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 05:24:24 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20180530003550.21531-1-eblake@redhat.com>
+	<40c5a402-9137-aff7-2622-85ab62b5fa36@virtuozzo.com>
+Message-ID: <085ca5bd-a90b-4e3a-27db-0563858c77bf@virtuozzo.com>
+Date: Wed, 15 Aug 2018 12:23:46 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180814124254.5229-3-peter.maydell@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hSkkQ020v1tV7MfegIP28u01v2zCgzXlI"
-Subject: Re: [Qemu-devel] [PATCH 02/10] target/arm: Add missing .cp = 15 to
- HMAIR1 and HAMAIR1 regdefs
+In-Reply-To: <40c5a402-9137-aff7-2622-85ab62b5fa36@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] doc: Permit BLOCK_STATUS reply to extend
+ beyond request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +25,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, edgari@xilinx.com
+To: Eric Blake <eblake@redhat.com>, nbd@other.debian.org
+Cc: w@uter.be, Paolo Bonzini <pbonzini@redhat.com>, Alex Bligh <alex@alex.org.uk>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hSkkQ020v1tV7MfegIP28u01v2zCgzXlI
-From: Luc Michel <luc.michel@greensocs.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-Cc: patches@linaro.org, edgari@xilinx.com
-Message-ID: <40cb6cd0-0a77-53d9-38fe-1c6786d1dbd5@greensocs.com>
-Subject: Re: [PATCH 02/10] target/arm: Add missing .cp = 15 to HMAIR1 and
- HAMAIR1 regdefs
-References: <20180814124254.5229-1-peter.maydell@linaro.org>
- <20180814124254.5229-3-peter.maydell@linaro.org>
-In-Reply-To: <20180814124254.5229-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+ping.
 
-On 8/14/18 2:42 PM, Peter Maydell wrote:
-> ARMCPRegInfo structs will not default to .cp =3D 15 if they
-"will default" as suggested by Edgar.
-> are ARM_CP_STATE_BOTH, but not if they are ARM_CP_STATE_AA32
-> (because a coprocessor number of 0 is valid for AArch32).
-> We forgot to explicitly set .cp =3D 15 for the HMAIR1 and
-> HAMAIR1 regdefs, which meant they would UNDEF when the guest
-> tried to access them under cp15.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Finally, Qemu 3.0 released, and it is incompatible with current NBD=20
+protocol. Please, commit this patch.
 
-Reviewed-By: Luc Michel <luc.michel@greensocs.com>
+13.08.2018 15:02, Vladimir Sementsov-Ogievskiy wrote:
+> ping
+>
+> Qemu 3.0 is near to release, and it is not correspond to current=20
+> version of spec, it corresponds to this patch. Can we push it?
+>
+> 30.05.2018 03:35, Eric Blake wrote:
+>> When the NBD_CMD_BLOCK_STATUS extension was first discussed, the
+>> idea of having the client's length be a hint was proposed, where
+>> the server could reply beyond the client's request in order to
+>> allow for fewer transactions when querying the entire disk. The
+>> portion beyond the client's original request can only occur in
+>> the final extent for a given context, and only if the additional
+>> length matches the type given for the last byte actually requested
+>> by the client.
+>>
+>> In the meantime, qemu 2.12 was released as a first client
+>> implementation of NBD_CMD_BLOCK_STATUS, which always sends the
+>> NBD_CMD_FLAG_REQ_ONE flag, and which disconnects from the server
+>> if the server's length exceeds the client request.=C2=A0 This was
+>> relaxed for subsequent qemu, but it means that we have to be
+>> explicit that a server should not send extra length except when
+>> the client is not limiting its request to exactly one extent.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>
+>> I brought this topic up a few days back, but realized I never
+>> actually posted a patch to go along with it.
+>>
+>> =C2=A0 doc/proto.md | 25 ++++++++++++++++++-------
+>> =C2=A0 1 file changed, 18 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/doc/proto.md b/doc/proto.md
+>> index 4b73e0b..bd5f61e 100644
+>> --- a/doc/proto.md
+>> +++ b/doc/proto.md
+>> @@ -1709,8 +1709,8 @@ MUST initiate a hard disconnect.
+>>
+>> =C2=A0=C2=A0=C2=A0 *length* MUST be 4 + (a positive integer multiple of =
+8). This reply
+>> =C2=A0=C2=A0=C2=A0 represents a series of consecutive block descriptors =
+where the sum
+>> -=C2=A0 of the length fields within the descriptors MUST not be greater =
+than
+>> -=C2=A0 the length of the original request. This chunk type MUST appear
+>> +=C2=A0 of the length fields within the descriptors are subject to furth=
+er
+>> +=C2=A0 constraints documented below. This chunk type MUST appear
+>> =C2=A0=C2=A0=C2=A0 exactly once per metadata ID in a structured reply.
+>>
+>> =C2=A0=C2=A0=C2=A0 The payload starts with:
+>> @@ -1725,7 +1725,14 @@ MUST initiate a hard disconnect.
+>> =C2=A0=C2=A0=C2=A0 32 bits, status flags
+>>
+>> =C2=A0=C2=A0=C2=A0 If the client used the `NBD_CMD_FLAG_REQ_ONE` flag in=
+ the request,
+>> -=C2=A0 then every reply chunk MUST NOT contain more than one descriptor=
+.
+>> +=C2=A0 then every reply chunk MUST NOT contain more than one descriptor=
+,
+>> +=C2=A0 and the descriptor MUST NOT exceed the *length* of the request.
+>> +=C2=A0 Otherwise, when the server returns N extents for a given context=
+,
+>> +=C2=A0 the sum of the *length* fields of the first N-1 extents MUST be
+>> +=C2=A0 smaller than the overall *length* of the client's request, but t=
+he
+>> +=C2=A0 final extent MAY exceed the requested length if the server has t=
+hat
+>> +=C2=A0 information anyway as a side effect of reporting the status of t=
+he
+>> +=C2=A0 requested region.
+>>
+>> =C2=A0=C2=A0=C2=A0 Even if the client did not use the `NBD_CMD_FLAG_REQ_=
+ONE` flag in
+>> =C2=A0=C2=A0=C2=A0 its request, the server MAY return fewer descriptors =
+in the reply
+>> @@ -2037,10 +2044,14 @@ The following request types exist:
+>>
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 The list of block status descriptors with=
+in the
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 `NBD_REPLY_TYPE_BLOCK_STATUS` chunk repre=
+sent consecutive portions
+>> -=C2=A0=C2=A0=C2=A0 of the file starting from specified *offset*, and th=
+e sum of the
+>> -=C2=A0=C2=A0=C2=A0 *length* fields of each descriptor MUST not be great=
+er than the
+>> -=C2=A0=C2=A0=C2=A0 overall *length* of the request. This means that the=
+ server MAY
+>> -=C2=A0=C2=A0=C2=A0 return less data than required. However the server M=
+UST return at
+>> +=C2=A0=C2=A0=C2=A0 of the file starting from specified *offset*.=C2=A0 =
+If the client used
+>> +=C2=A0=C2=A0=C2=A0 the `NBD_CMD_FLAG_REQ_ONE` flag, each chunk contains=
+ exactly one
+>> +=C2=A0=C2=A0=C2=A0 descriptor where the *length* of the descriptor MUST=
+ NOT be greater
+>> +=C2=A0=C2=A0=C2=A0 than the *length* of the request; otherwise, a chunk=
+ MAY contain
+>> +=C2=A0=C2=A0=C2=A0 multiple descriptors, and the final descriptor MAY e=
+xtend beyond
+>> +=C2=A0=C2=A0=C2=A0 the original requested size if the server can determ=
+ine a larger
+>> +=C2=A0=C2=A0=C2=A0 length without additional effort.=C2=A0 On the other=
+ hand, the server=20
+>> MAY
+>> +=C2=A0=C2=A0=C2=A0 return less data than requested. However the server =
+MUST return at
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 least one status descriptor (and since ea=
+ch status descriptor has
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 a non-zero length, a client can always ma=
+ke progress on a
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 successful return).=C2=A0 The server SHOU=
+LD use different *status*
+>
+>
 
-> ---
-> A quick grep suggests these are the only ones we got wrong.
-> ---
->  target/arm/helper.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->=20
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 2c5e02c0b1a..466c8ae492e 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -3767,14 +3767,14 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo=
-[] =3D {
->        .access =3D PL2_RW, .type =3D ARM_CP_CONST,
->        .resetvalue =3D 0 },
->      { .name =3D "HMAIR1", .state =3D ARM_CP_STATE_AA32,
-> -      .opc1 =3D 4, .crn =3D 10, .crm =3D 2, .opc2 =3D 1,
-> +      .cp =3D 15, .opc1 =3D 4, .crn =3D 10, .crm =3D 2, .opc2 =3D 1,
->        .access =3D PL2_RW, .type =3D ARM_CP_CONST, .resetvalue =3D 0 },=
 
->      { .name =3D "AMAIR_EL2", .state =3D ARM_CP_STATE_BOTH,
->        .opc0 =3D 3, .opc1 =3D 4, .crn =3D 10, .crm =3D 3, .opc2 =3D 0,
->        .access =3D PL2_RW, .type =3D ARM_CP_CONST,
->        .resetvalue =3D 0 },
->      { .name =3D "HAMAIR1", .state =3D ARM_CP_STATE_AA32,
-> -      .opc1 =3D 4, .crn =3D 10, .crm =3D 3, .opc2 =3D 1,
-> +      .cp =3D 15, .opc1 =3D 4, .crn =3D 10, .crm =3D 3, .opc2 =3D 1,
->        .access =3D PL2_RW, .type =3D ARM_CP_CONST,
->        .resetvalue =3D 0 },
->      { .name =3D "AFSR0_EL2", .state =3D ARM_CP_STATE_BOTH,
-> @@ -3917,7 +3917,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] =3D {
->        .access =3D PL2_RW, .fieldoffset =3D offsetof(CPUARMState, cp15.=
-mair_el[2]),
->        .resetvalue =3D 0 },
->      { .name =3D "HMAIR1", .state =3D ARM_CP_STATE_AA32,
-> -      .opc1 =3D 4, .crn =3D 10, .crm =3D 2, .opc2 =3D 1,
-> +      .cp =3D 15, .opc1 =3D 4, .crn =3D 10, .crm =3D 2, .opc2 =3D 1,
->        .access =3D PL2_RW, .type =3D ARM_CP_ALIAS,
->        .fieldoffset =3D offsetofhigh32(CPUARMState, cp15.mair_el[2]) },=
-
->      { .name =3D "AMAIR_EL2", .state =3D ARM_CP_STATE_BOTH,
-> @@ -3926,7 +3926,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] =3D {
->        .resetvalue =3D 0 },
->      /* HAMAIR1 is mapped to AMAIR_EL2[63:32] */
->      { .name =3D "HAMAIR1", .state =3D ARM_CP_STATE_AA32,
-> -      .opc1 =3D 4, .crn =3D 10, .crm =3D 3, .opc2 =3D 1,
-> +      .cp =3D 15, .opc1 =3D 4, .crn =3D 10, .crm =3D 3, .opc2 =3D 1,
->        .access =3D PL2_RW, .type =3D ARM_CP_CONST,
->        .resetvalue =3D 0 },
->      { .name =3D "AFSR0_EL2", .state =3D ARM_CP_STATE_BOTH,
->=20
-
-
---hSkkQ020v1tV7MfegIP28u01v2zCgzXlI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAltz7gwACgkQd8knW3Qn
-Tr69kxAArFluoL30P+J9/ql3MCcnF0PNu44YX8kGil5ho/O1tFKQ+KKy0ewMZ9Ed
-8JiwSTUlRvCVuykM45vuq+T2KGENCbYlgUSve1MQlg70+dNiPlCvzGM5be+okwLT
-+ScKB86fzkZYxEbJrHu+Qh1QYA4RyfjT42+eIx6d+xhq6I4/qvXJEz+u7hjbBLuB
-XN8RGBP8o4+Jgy5wqc6Q5jH1KGrjRvL2/7NBXnknWOhamWr+tcK82VhqfTEetBtN
-N3zHpmhL4H7zrE07NwkuOgzC4eDNtSHTDJsx+HVE5ZfBIgc47O+GV7PqCfZEvO/4
-IJL9OCTctsAf8ha4iknLRMXPfzQIkmuHwqRUwvebg3FqbVxGJGTyzFeQEZ1XDPHr
-/xQCwDEqDYzy53AT3jn4iD83ulFHVoJAmXDZGcXbtgfXn322mdC5Hi0iT7Nt3BAr
-oQd94+sMVNom4Kfekona8zYUee952FQ/JOcnDJG2UV5YpvKLkS674nJ8Ce6a9IHb
-bhHQV5JHd7AjCus3tmS7AVhlZd/mO9kBFrnjXp4ttiWKVdpx2ACehyLIeyH7kiwA
-PsUNs7djpqENHeCAIsGT+qopSEshUZxNBF1zgEIrIVwYaqnAEKRc2zFklS0GbMXw
-lFvqk7sU2MzlYg2bCXxt8SHONtl5M40GPo9ij/T5tL2WPgN0E60=
-=Mu9L
------END PGP SIGNATURE-----
-
---hSkkQ020v1tV7MfegIP28u01v2zCgzXlI--
+--=20
+Best regards,
+Vladimir
