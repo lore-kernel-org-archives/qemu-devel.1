@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49589)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fplH2-0001Io-Af
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 22:11:01 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53024)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
+	<3bJFzWwYKCj8bpbufthpphmf.dpnrfnv-efwfmopohov.psh@flex--aoates.bounces.google.com>)
+	id 1fpleg-0006lS-Vk
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 22:35:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fplGx-0008Pn-79
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 22:11:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50924)
+	(envelope-from
+	<3bJFzWwYKCj8bpbufthpphmf.dpnrfnv-efwfmopohov.psh@flex--aoates.bounces.google.com>)
+	id 1fpleg-0003ed-1A
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 22:35:26 -0400
+Received: from mail-ua1-x949.google.com ([2607:f8b0:4864:20::949]:48999)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fplGu-0008Ol-D4
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 22:10:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fplGr-000835-N3
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 02:10:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A9B532E8060
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 02:10:49 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Aug 2018 01:58:41 -0000
-From: =?utf-8?q?Leonardo_M=C3=BCller?= <leozinho29_eu@hotmail.com>
-Reply-To: Bug 1787070 <1787070@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153429832178.24411.17323780348611441441.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1787070] [NEW] Guests using the qxl-vga are
- freezing
+	(Exim 4.71) (envelope-from
+	<3bJFzWwYKCj8bpbufthpphmf.dpnrfnv-efwfmopohov.psh@flex--aoates.bounces.google.com>)
+	id 1fplef-0003eK-GK
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 22:35:25 -0400
+Received: by mail-ua1-x949.google.com with SMTP id k17-v6so11641779uao.15
+	for <qemu-devel@nongnu.org>; Tue, 14 Aug 2018 19:35:25 -0700 (PDT)
+Date: Tue, 14 Aug 2018 22:35:21 -0400
+Message-Id: <20180815023521.185705-1-aoates@google.com>
+Mime-Version: 1.0
+From: Andrew Oates <aoates@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [PATCH v3] slirp: fix ICMP handling on macOS hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,178 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: peter.maydell@linaro.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, qemu-devel@nongnu.org
+Cc: Andrew Oates <aoates@google.com>
 
-Public bug reported:
+On Linux, SOCK_DGRAM+IPPROTO_ICMP sockets give only the ICMP packet when
+read from.  On macOS, however, the socket acts like a SOCK_RAW socket
+and includes the IP header as well.
 
-I have noticed that guests using qxl-vga are freezing. They may freeze
-after a few minutes or after many hours. The freeze consists of the
-entire system hanging, except the cursor, but the cursor animation stops
-too. Changing to tty is not possible after this. There are three things
-noticed in common on the guests when they freeze:
+This change strips the extra IP header from the received packet on macOS
+before sending it to the guest.  SOCK_DGRAM ICMP sockets aren't
+supported on other BSDs, but we enable this behavior for them as well to
+treat the sockets the same as raw sockets.
 
--The guest is using the QXL VGA (freezes weren't observed with other VGAs);
--A new workload is starting;
--The mouse cursor is the animated as the one of loading. For example, https=
-://i.imgur.com/raQFteG.png
- =
+Signed-off-by: Andrew Oates <aoates@google.com>
+---
+v2: check validity of inner_hlen and update len appropriately
+v3: CONFIG_DARWIN -> CONFIG_BSD; add comment explaining #ifdef
 
-The host is Xubuntu 18.04 amd64, QEMU version is 3.0.0-dirty. The guests te=
-sted were:
+ slirp/ip_icmp.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
--openSUSE Tumbleweed;
--openSUSE Leap 15;
--Xubuntu 18.04 Bionic Beaver;
--CentOS 7.
-
-With openSUSE guests, the install process couldn't even be finished, as
-the installer would freeze. There were 2 GB of available memory (checked
-in a tty before the freeze) and netconsole was enabled. Unfortunately,
-it was impossible to obtain any information from them. This is an image
-of one openSUSE guest frozen: https://i.imgur.com/ZP0eQKq.png
-
-The command line used was:
-
-qemu-system-x86_64 -nodefaults -m 3072 -M pc,usb=3Dtrue -accel kvm -cpu
-host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-id=3Dcentusb,if=3Dnone,file=3Dleap.qcow2 -device usb-
-storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
--monitor vc -serial vc  -cdrom "openSUSE-Leap-15.0-DVD-x86_64.iso" -boot
-d
-
-With CentOS guests, the install process fail sometimes, but sometimes
-it's able to install. However, on the yum update, it would freeze too.
-In one instance it froze while updating glibc, which made the guest
-unbootable. https://i.imgur.com/B3WhSDX.png
-
-The command line used was:
-
-qemu-system-x86_64 -nodefaults -m 2048 -M pc,usb=3Dtrue -accel kvm -cpu
-host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-id=3Dcentusb,if=3Dnone,file=3Dcentos.qcow2 -device usb-
-storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-audio,id=3Dusbaudio -device virtio-vga,virgl=3Dtrue -display gtk -monitor vc
--serial vc -cdrom "CentOS-7-livecd-GNOME-x86_64.iso" -bios
-/usr/share/ovmf/OVMF.fd
-
-With Xubuntu 18.04 guests, the system worked for many hours until the
-freeze happened. On this case it happened when opening Audacious.
-Fortunately, the logging services worked for some time, which allowed me
-to get a relevant message which can be seen at http://termbin.com/nuof .
-It repeated a few times, but then the logging stopped.
-https://i.imgur.com/2zckqj5.png shows the guest screen in the moment it
-froze.
-
-The command line used was:
-
-qemu-system-x86_64 -nodefaults -m 1024 -M pc,usb=3Dtrue -accel kvm -cpu
-host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-id=3Dcentusb,if=3Dnone,file=3Dxubmini -device usb-
-storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
--monitor vc -serial vc
-
-I'm sorry for not having more detailed information but, even setting
-netconsole, openSUSE and CentOS guests were unable to print any
-information.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1787070
-
-Title:
-  Guests using the qxl-vga are freezing
-
-Status in QEMU:
-  New
-
-Bug description:
-  I have noticed that guests using qxl-vga are freezing. They may freeze
-  after a few minutes or after many hours. The freeze consists of the
-  entire system hanging, except the cursor, but the cursor animation
-  stops too. Changing to tty is not possible after this. There are three
-  things noticed in common on the guests when they freeze:
-
-  -The guest is using the QXL VGA (freezes weren't observed with other VGAs=
-);
-  -A new workload is starting;
-  -The mouse cursor is the animated as the one of loading. For example, htt=
-ps://i.imgur.com/raQFteG.png
-   =
-
-  The host is Xubuntu 18.04 amd64, QEMU version is 3.0.0-dirty. The guests =
-tested were:
-
-  -openSUSE Tumbleweed;
-  -openSUSE Leap 15;
-  -Xubuntu 18.04 Bionic Beaver;
-  -CentOS 7.
-
-  With openSUSE guests, the install process couldn't even be finished,
-  as the installer would freeze. There were 2 GB of available memory
-  (checked in a tty before the freeze) and netconsole was enabled.
-  Unfortunately, it was impossible to obtain any information from them.
-  This is an image of one openSUSE guest frozen:
-  https://i.imgur.com/ZP0eQKq.png
-
-  The command line used was:
-
-  qemu-system-x86_64 -nodefaults -m 3072 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dleap.qcow2 -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
-  -monitor vc -serial vc  -cdrom "openSUSE-Leap-15.0-DVD-x86_64.iso"
-  -boot d
-
-  With CentOS guests, the install process fail sometimes, but sometimes
-  it's able to install. However, on the yum update, it would freeze too.
-  In one instance it froze while updating glibc, which made the guest
-  unbootable. https://i.imgur.com/B3WhSDX.png
-
-  The command line used was:
-
-  qemu-system-x86_64 -nodefaults -m 2048 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dcentos.qcow2 -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device virtio-vga,virgl=3Dtrue -display gtk -monitor
-  vc -serial vc -cdrom "CentOS-7-livecd-GNOME-x86_64.iso" -bios
-  /usr/share/ovmf/OVMF.fd
-
-  With Xubuntu 18.04 guests, the system worked for many hours until the
-  freeze happened. On this case it happened when opening Audacious.
-  Fortunately, the logging services worked for some time, which allowed
-  me to get a relevant message which can be seen at
-  http://termbin.com/nuof . It repeated a few times, but then the
-  logging stopped. https://i.imgur.com/2zckqj5.png shows the guest
-  screen in the moment it froze.
-
-  The command line used was:
-
-  qemu-system-x86_64 -nodefaults -m 1024 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dxubmini -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
-  -monitor vc -serial vc
-
-  I'm sorry for not having more detailed information but, even setting
-  netconsole, openSUSE and CentOS guests were unable to print any
-  information.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1787070/+subscriptions
+diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
+index 0b667a429a..0e289fd9d9 100644
+--- a/slirp/ip_icmp.c
++++ b/slirp/ip_icmp.c
+@@ -420,7 +420,29 @@ void icmp_receive(struct socket *so)
+     icp = mtod(m, struct icmp *);
+ 
+     id = icp->icmp_id;
+-    len = qemu_recv(so->s, icp, m->m_len, 0);
++    len = qemu_recv(so->s, icp, M_ROOM(m), 0);
++    /*
++     * The behavior of reading SOCK_DGRAM+IPPROTO_ICMP sockets is inconsistent
++     * between host OSes.  On Linux, only the ICMP header and payload is
++     * included.  On macOS/Darwin, the socket acts like a raw socket and
++     * includes the IP header as well.  On other BSDs, SOCK_DGRAM+IPPROTO_ICMP
++     * sockets aren't supported at all, so we treat them like raw sockets.  It
++     * isn't possible to detect this difference at runtime, so we must use an
++     * #ifdef to determine if we need to remove the IP header.
++     */
++#ifdef CONFIG_BSD
++    if (len > 0) {
++        struct ip *inner_ip = mtod(m, struct ip *);
++        int inner_hlen = inner_ip->ip_hl << 2;
++        if (inner_hlen > len) {
++            len = -1;
++            errno = -EINVAL;
++        } else {
++            len -= inner_hlen;
++            memmove(icp, (unsigned char *)icp + inner_hlen, len);
++        }
++    }
++#endif
+     icp->icmp_id = id;
+ 
+     m->m_data -= hlen;
+-- 
+2.18.0.865.gffc8e1a3cd6-goog
