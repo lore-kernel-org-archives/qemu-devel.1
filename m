@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fpx87-0006g6-Nj
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:50:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fpxIm-0006Qt-8b
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 11:01:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fpx83-0008UI-HS
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:50:35 -0400
-Received: from mail-ua1-x944.google.com ([2607:f8b0:4864:20::944]:39532)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fpx82-0008Qf-PK
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:50:31 -0400
-Received: by mail-ua1-x944.google.com with SMTP id g18-v6so1492230uam.6
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 07:50:29 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180810132800.38549-1-eblake@redhat.com>
-	<904458f5-7eeb-649d-7aff-9d9ff6d75d64@redhat.com>
-	<874lfyenvg.fsf@dusky.pond.sub.org>
-	<cfded956-ccab-1070-ba1c-9a73bd61cc5d@redhat.com>
-	<8736vfkb1l.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <495bbabd-17db-27e3-2cdf-11b35a8d813e@amsat.org>
-Date: Wed, 15 Aug 2018 11:50:21 -0300
+	(envelope-from <kwolf@redhat.com>) id 1fpxIW-0001Wb-B5
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 11:01:35 -0400
+Date: Wed, 15 Aug 2018 17:00:29 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180815150029.GG4411@localhost.localdomain>
+References: <20180807043349.27196-1-jsnow@redhat.com>
+	<20180815144418.GG2158@andariel.pipo.sk>
 MIME-Version: 1.0
-In-Reply-To: <8736vfkb1l.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4] tests/libqtest: Improve kill_qemu()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="k1lZvvs/B4yU6o8G"
+Content-Disposition: inline
+In-Reply-To: <20180815144418.GG2158@andariel.pipo.sk>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 00/21] jobs: defer graph
+ changes until finalize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,56 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, alex.bennee@linaro.org, rth@twiddle.net
+To: Peter Krempa <pkrempa@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jtc@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On 08/15/2018 10:35 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
-> 
->> On 08/13/2018 02:17 AM, Markus Armbruster wrote:
->>> Eric Blake <eblake@redhat.com> writes:
->>>
->>>> On 08/10/2018 08:28 AM, Eric Blake wrote:
->>>>> Instead of using a raw assert, print the information in an
->>>>> easier to understand way:
->>>>>
->>>>> /i386/ahci/sanity: tests/libqtest.c:119: kill_qemu() detected QEMU death from signal 11 (Segmentation fault) (core dumped)
->>>>
->>>> Well, it would help if my commit message actually matched...
->>>>
->>>>
->>>>> +        if (wstatus) {
->>>>> +            if (WIFEXITED(wstatus)) {
->>>>> +                fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
->>>>> +                        "process but encountered exit status %d\n",
->>>>> +                        __FILE__, __LINE__, WEXITSTATUS(wstatus));
->>>>> +            } else if (WIFSIGNALED(wstatus)) {
->>>>> +                int sig = WTERMSIG(wstatus);
->>>>> +                const char *signame = strsignal(sig) ?: "unknown ???";
->>>>> +                const char *dump = WCOREDUMP(wstatus) ? " (dumped core)" : "";
->>>>> +
->>>>> +                fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
->>>>> +                        "from signal %d (%s)%s\n",
->>>>
->>>> ...the code.
->>>
->>> I got libqtest patches in my queue, and I could stick this patch in.
->>> Would you like me to touch up the commit message when I apply?  Or
->>> should I expect v5?
->>>
->>
->> If you don't mind doing the touchup (s/core dumped/dumped core/), then
->> I don't need to submit v5.
-> 
-> Since "core dumped" is how the shell traditionally reports this, I'd
-> prefer to adjust the code to match the commit message.  Okay?
-> 
 
-Apparently your commit message betrayed you =) You are also custom to
-see "core dumped" in your terminal.
+--k1lZvvs/B4yU6o8G
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I also prefer "core dumped", this is the default string I'm custom to
-fgrep for, and the quoted version I expect other people to google for.
+Am 15.08.2018 um 16:44 hat Peter Krempa geschrieben:
+> On Tue, Aug 07, 2018 at 00:33:28 -0400, John Snow wrote:
+> > This series forces all jobs to use the "finalize" semantics that were
+> > introduced previously, but only exposed via the backup jobs.
+> > This series looks huge, but it's mostly mechanical changes broken out
+> > into a series of much smaller commits so that the changes are easier
+> > to follow at each step.
+>=20
+> Please note that due to the semantics of the commands 'block-job-cancel'
+> and 'block-job-complete' at least in case of the drive/blockdev-mirror
+> job are technically blockjobs of it's own since they may fail or finish
+> in an unbounded amount of time and the actual return value on the
+> monitor does not reflect the result of the operation itself.
+>=20
+> It would be very helpful if qemu treas them as such.
 
-With code adjusted:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+'block-job-cancel' and 'block-job-complete' return immediately. They
+just move the given job into the next phase and return. That job may
+then still take some time until it finally completes (successfully or
+with an error), but that's not part of 'block-job-cancel/complete' any
+more.
+
+Kevin
+
+--k1lZvvs/B4yU6o8G
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJbdEANAAoJEH8JsnLIjy/WoyQP/0wmY+N/2TMUu+EiM1j6Q+kL
+Ht2GjNSrTydo4ETpvpAcSfN6o0ROadtNTlJ2B0U7SfjMPo4tMV2dWv5inIF0Zxrx
+VebYjmnfuFFMNGCeN1pKJomWpuaOItzLVJkzkncllkBpKc+uauoGbUuc/bea6MKX
+8+wPjcOuj32M8sYz0pDBYBcn5RlZdbNztHZ8XvLeVeUdpAOUQTmovDJGpaA0oP7Q
+S9I0rVYIeLOBCDF5gV4IKD9/ZXkKnj+xQXXQj1AE6b0uz2/LVNO5pRDSCuti4HRD
+0elAvUz59u1ixMTj1Tb4ND2/EsFyytM2aMdpkHc0aNSdfBu4TrZVIFgyufCi6Ul8
+CGKlg6uTOtpiRDpK5Y25yi32+WBUE/mm4UCRlZOdaT9QaQfSOjWij8i78AizFnSY
+8Pje9HIOHvIZ1QovxaXKUxmCv+gKGB2PvHrpWVOyhAaLvBiH5GfaZJIxwU4uCarA
+ga4OXUbiwE6v26lmiRD50mvTQuyxhS4+qeJb0AdUnWz7kGBRzYSXY46ZVmW0+hDy
+WzZamoKA5HsNDcR1okDc40T1Hk82H5g/trbhNk7pdvLpeMngVW+g1doHDhGKZTN8
+0573hsh9NSAiYiDNT5m+7Ydeln7mwAUJSkrcN7De7IrI/CK4ticu1tzuKptfJIux
+OBRdxmp6ogZQR6obztm5
+=2C8k
+-----END PGP SIGNATURE-----
+
+--k1lZvvs/B4yU6o8G--
