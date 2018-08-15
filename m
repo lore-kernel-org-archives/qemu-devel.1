@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fq1pG-0003T6-6j
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:51:30 -0400
+	(envelope-from <bounces@canonical.com>) id 1fq1se-0005XQ-2r
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:54:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fq1pE-0000vp-5B
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:51:26 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:46615)
+	(envelope-from <bounces@canonical.com>) id 1fpyOH-0002e4-4l
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 12:11:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fq1pA-0000uE-VM
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:51:22 -0400
-Received: by mail-oi0-x242.google.com with SMTP id y207-v6so3954484oie.13
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 12:51:18 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fpyOD-0002Z2-8l
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 12:11:19 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fpyOA-0006L8-FQ
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 16:11:14 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 712812E8500
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 16:11:14 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <2515-5b748080-b-e0a2440@99331474>
-References: <CAFEAcA-fEe2TsRpd5Q1i7Z-0MC67o0xkfgLW1ifV64HpfL2czg@mail.gmail.com>
-	<2515-5b748080-b-e0a2440@99331474>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 15 Aug 2018 20:50:56 +0100
-Message-ID: <CAFEAcA8B3Qvxtoh0n6RyiBJEHVG39HoEzCfEZHCuyrbdnoYGwg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/19] MIPS queue for QEMU upstream,
- August 14, 2018
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 15 Aug 2018 16:02:05 -0000
+From: Michele Denber <1787012@bugs.launchpad.net>
+Reply-To: Bug 1787012 <1787012@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153427470081.24411.7587190537485631648.malonedeb@soybean.canonical.com>
+Message-Id: <153434892581.23806.17676433008120559296.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1787012] Re: Solaris build error: Bad string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +36,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 15 August 2018 at 20:35, Aleksandar Markovic
-<Aleksandar.Markovic@rt-rk.com> wrote:
-> These functions are used in the patches that follow in nanoMIPS series, but
-> not submitted in this pull request.
->
-> Ok, I will reorganize the patches so that there is no such case, and will
-> send the new pull request soon.
->
-> Do we require that bisect works for clang builds too (meaning that after
-> each patch, clang build must be success)?
+You are absolutely correct.  I found the right problem but the wrong
+reason.  Note that:
 
-Yes, please. (As usual with breaking-bisection, if you get it wrong by
-accident we may well not notice, but it's worth trying to get right.)
+# which tr
+/usr/bin/tr
+#  uname -s | tr '[/]' '[_]'
+Bad string
+# uname -s | /usr/xpg4/bin/tr '[/]' '[_]'
+SunOS
+#
 
-thanks
--- PMM
+So it's just another POSIX problem with Solaris, not a bug.  Solaris
+provides all the POSIX stuff, it just doesn't make it the default.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1787012
+
+Title:
+  Solaris build error: Bad string
+
+Status in QEMU:
+  New
+
+Bug description:
+  While building qemu2.12.0 on a Sun Oracle Enterprise M3000 SPARC64 VII
+  running Solaris 10U11, opencsw toolchain, gcc 7.3.0, and python 3.3.6
+  I get:
+
+  # gmake
+  mkdir -p dtc/libfdt
+  mkdir -p dtc/tests
+  Bad string
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dumptrees.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/trees.S
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/testutils.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/value-labels.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/asm_tree_dump.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/truncated_property=
+.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/check_path.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/overlay_bad_fixup.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/overlay.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/subnode_iterate.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/property_iterate.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/integer-expression=
+s.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/utilfdt_test.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path_offset_aliase=
+s.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/add_subnode_with_n=
+ops.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtbs_equal_unorder=
+ed.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtb_reverse.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtbs_equal_ordered=
+.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/extra-terminating-=
+null.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/incbin.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/boot-cpuid.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/phandle_format.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path-references.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/references.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/string_escapes.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/propname_escapes.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/appendprop2.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/appendprop1.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/del_node.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/del_property.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/setprop.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/set_name.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/rw_tree1.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/open_pack.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nopulate.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/mangle-layout.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/move_and_save.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/sw_tree1.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nop_node.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nop_property.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/setprop_inplace.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/stringlist.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/addr_size_cells.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/notfound.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/sized_cells.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/char_literal.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_alias.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_com=
+patible.c         DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_check_=
+compatible.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_pha=
+ndle.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_pro=
+p_value.c         DEP /export/home/denber/qemu-2.12.0/dtc/tests/parent_offs=
+et.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/supernode_atdepth_=
+offset.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_path.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_phandle.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/getprop.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_name.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path_offset.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/subnode_offset.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/find_property.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/root_node.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_mem_rsv.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_overlay.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_addresses.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_empty_tree.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_strerror.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_rw.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_sw.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_wip.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_ro.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/util.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/fdtoverlay.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/fdtput.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/fdtget.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/fdtdump.c
+           DEP convert-dtsv0-lexer.lex.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/srcpos.c
+           DEP dtc-parser.tab.c
+           DEP dtc-lexer.lex.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/treesource.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/livetree.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/fstree.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/flattree.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/dtc.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/data.c
+           DEP /export/home/denber/qemu-2.12.0/dtc/checks.c
+  Bad string
+           CC libfdt/fdt.o
+           CC libfdt/fdt_ro.o
+           CC libfdt/fdt_wip.o
+           CC libfdt/fdt_sw.o
+           CC libfdt/fdt_rw.o
+           CC libfdt/fdt_strerror.o
+           CC libfdt/fdt_empty_tree.o
+           CC libfdt/fdt_addresses.o
+           CC libfdt/fdt_overlay.o
+           AR libfdt/libfdt.a
+  a - libfdt/fdt.o
+  a - libfdt/fdt_ro.o
+  a - libfdt/fdt_wip.o
+  a - libfdt/fdt_sw.o
+  a - libfdt/fdt_rw.o
+  a - libfdt/fdt_strerror.o
+  a - libfdt/fdt_empty_tree.o
+  a - libfdt/fdt_addresses.o
+  a - libfdt/fdt_overlay.o
+  ar: creating libfdt/libfdt.a
+  ar: writing libfdt/libfdt.a
+  ...
+
+  gmake then completes, returning just a "#" prompt and no error
+  messages.  However, no executable is created.  Apparently, "Bad
+  string" is the problem, but it is unclear what that means and where
+  the two instances of it are coming from.  A web search for this
+  problem returned nothing.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1787012/+subscriptions
