@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fq0dS-00045C-4t
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 14:35:10 -0400
+	(envelope-from <mark.kanda@oracle.com>) id 1fq10Z-0006ja-CA
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 14:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fq0dP-0005wo-Ji
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 14:35:08 -0400
-Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:45542)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fpxmu-0001yJ-70
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 11:32:45 -0400
-Received: by mail-oi0-x22a.google.com with SMTP id q11-v6so2571573oic.12
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 08:32:23 -0700 (PDT)
+	(envelope-from <mark.kanda@oracle.com>) id 1fq10U-0005YH-9N
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 14:59:03 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:49142)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.kanda@oracle.com>)
+	id 1fq10T-0005Y6-VD
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 14:58:58 -0400
+References: <20180815175704.105902-1-prasad.singamsetty@oracle.com>
+From: Mark Kanda <mark.kanda@oracle.com>
+Message-ID: <f36efa3c-c517-e91f-30b3-60463e25305d@oracle.com>
+Date: Wed, 15 Aug 2018 13:58:53 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180815031248.14908-1-famz@redhat.com>
-References: <20180815031248.14908-1-famz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 15 Aug 2018 16:31:56 +0100
-Message-ID: <CAFEAcA_02nvU+ZL6jZf-hcmbC2t5n4Jf-V7jUjCuV+aLguTpPA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/17] Block and testing patches
+In-Reply-To: <20180815175704.105902-1-prasad.singamsetty@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] kvm: add call to qemu_add_opts() for
+ -overcommit option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: prasad.singamsetty@oracle.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: konrad.wilk@oracle.com
 
-On 15 August 2018 at 04:12, Fam Zheng <famz@redhat.com> wrote:
-> The following changes since commit 38441756b70eec5807b5f60dad11a93a91199866:
->
->   Update version for v3.0.0 release (2018-08-14 16:38:43 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/famz/qemu.git tags/block-and-testing-pull-request
->
-> for you to fetch changes up to 37a81812f7b8367422a039eb09d915df543983ee:
->
->   aio-posix: Improve comment around marking node deleted (2018-08-15 10:12:35 +0800)
->
-> ----------------------------------------------------------------
-> Block and testing patches for 3.1
->
-> - aio fixes by me
-> - nvme fixes by Paolo and me
-> - test improvements by Peter, Phil and me
->
-> ----------------------------------------------------------------
 
-Applied, thanks.
 
--- PMM
+On 8/15/2018 12:57 PM, prasad.singamsetty@oracle.com wrote:
+> From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+> 
+> qemu command fails to process -overcommit option. Add the missing
+> call to qemu_add_opts() in vl.c.
+> 
+> Signed-off-by: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+
+Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
+
+> ---
+>   vl.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/vl.c b/vl.c
+> index 16b913f9d5..12d27fa028 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2987,6 +2987,7 @@ int main(int argc, char **argv, char **envp)
+>       qemu_add_opts(&qemu_object_opts);
+>       qemu_add_opts(&qemu_tpmdev_opts);
+>       qemu_add_opts(&qemu_realtime_opts);
+> +    qemu_add_opts(&qemu_overcommit_opts);
+>       qemu_add_opts(&qemu_msg_opts);
+>       qemu_add_opts(&qemu_name_opts);
+>       qemu_add_opts(&qemu_numa_opts);
+> 
