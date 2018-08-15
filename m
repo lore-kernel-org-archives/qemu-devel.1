@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fpnoL-0001fv-3Q
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 00:53:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1fponq-0000bd-3j
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 01:57:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fpnoF-0005BA-UE
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 00:53:32 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:36475)
+	(envelope-from <thuth@redhat.com>) id 1fponm-0004ro-KM
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 01:57:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41448 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fpnoE-00059V-LK
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 00:53:27 -0400
-Date: Wed, 15 Aug 2018 00:53:23 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180815045323.GA7585@flamenco>
-References: <20180813171132.21939-1-cota@braap.org>
-	<20180813171132.21939-2-cota@braap.org>
-	<20180815030942.GA14092@lemon.usersys.redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fponm-0004qk-6y
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 01:57:02 -0400
+References: <1534258018-22859-1-git-send-email-thuth@redhat.com>
+	<1534258018-22859-3-git-send-email-thuth@redhat.com>
+	<87a7pou95a.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <50453f7e-ef0e-bff4-e229-728b51017c62@redhat.com>
+Date: Wed, 15 Aug 2018 07:56:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180815030942.GA14092@lemon.usersys.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] qsp: QEMU's Synchronization Profiler
+In-Reply-To: <87a7pou95a.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/6] tests/device-introspection: Check that
+ the qom-tree and qtree do not change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Weil <sw@weilnetz.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, Aug 15, 2018 at 11:09:42 +0800, Fam Zheng wrote:
-> On Mon, 08/13 13:11, Emilio G. Cota wrote:
-> > +  --enable-sync-profiler) sync_profiler="yes"
-> > +  ;;
+On 08/14/2018 07:53 PM, Markus Armbruster wrote:
+> Thomas Huth <thuth@redhat.com> writes:
 > 
-> Curious, not asking for a change: can this be made a runtime option instead of
-> compile time, since there's no library dependencies? That should make this
-> somewhat easier to use.
-
-Good point. I'll do some profiling tomorrow to see how the latency
-of the locking primitives could be minimized (ideally, not using
-the profiler should just add a well-predicted branch).
-
-> > +
-> > +#define QSP_GEN_VOID(type_, qsp_t_, func_, impl_)                       \
-> > +    void func_(type_ *obj, const char *file, unsigned line)             \
-> > +    {                                                                   \
-> > +        struct qsp_entry *e = qsp_entry_get(obj, file, line, qsp_t_);   \
-> > +        int64_t t;                                                      \
-> > +                                                                        \
+>> Introspection should not change the qom-tree / qtree, so we should check
+>> this in the device-introspect-test, too. This patch helped to find lots
+>> of instrospection bugs during the QEMU v3.0 soft/hard-freeze period in the
+>> last two months.
 > 
-> No qsp_init()?
+> Clever idea.
 > 
-> > +        t = get_clock();                                                \
-> > +        impl_(obj, file, line);                                         \
-> > +        atomic_set(&e->ns, e->ns + get_clock() - t);                    \
-> > +        atomic_set(&e->n_acqs, e->n_acqs + 1);                          \
-> > +    }
-> > +
-> > +#define QSP_GEN_RET1(type_, qsp_t_, func_, impl_)                       \
-> > +    int func_(type_ *obj, const char *file, unsigned line)              \
-> > +    {                                                                   \
-> > +        struct qsp_entry *e = qsp_entry_get(obj, file, line, qsp_t_);   \
-> > +        int64_t t;                                                      \
-> > +        int err;                                                        \
-> > +                                                                        \
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  tests/device-introspect-test.c | 23 +++++++++++++++++++----
+>>  1 file changed, 19 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
+>> index 0b4f221..5b7ec05 100644
+>> --- a/tests/device-introspect-test.c
+>> +++ b/tests/device-introspect-test.c
+>> @@ -103,7 +103,14 @@ static QList *device_type_list(bool abstract)
+>>  static void test_one_device(const char *type)
+>>  {
+>>      QDict *resp;
+>> -    char *help, *qom_tree;
+>> +    char *help;
+>> +    char *qom_tree_start, *qom_tree_end;
+>> +    char *qtree_start, *qtree_end;
+>> +
+>> +    g_debug("Testing device '%s'", type);
 > 
-> Same here.
+> This is only the second use of g_debug() in tests/.  What are you trying
+> to accomplish?
 
-qsp_init is called by qsp_get_entry.
+When the test crashes, I need a way to determine the device which caused
+the crash. To avoid that I've then got to insert fprintf statements
+manually here and recompile, the g_debug() seems to be a good solution,
+since you can enable its output by setting some environment variable (I
+use G_MESSAGES_DEBUG=all and G_MESSAGES_PREFIXED=none).
 
-(snip)
-> > +void qsp_cond_wait(QemuCond *cond, QemuMutex *mutex, const char *file,
-> > +                   unsigned line)
-> > +{
-> > +    struct qsp_entry *e;
-> > +    int64_t t;
-> > +
-> > +    qsp_init();
-> > +
-> > +    e = qsp_entry_get(cond, file, line, QSP_CONDVAR);
-> > +    t = get_clock();
-> > +    qemu_cond_wait_impl(cond, mutex, file, line);
-> > +    atomic_set(&e->ns, e->ns + get_clock() - t);
-> > +    atomic_set(&e->n_acqs, e->n_acqs + 1);
-> 
-> Why not atomic_add (both here and in above macros)? Because fetching e->ns and
-> then updating it is not "atomic" this way.
+Or do you see a better way to provide a possibility to determine the
+device that caused a crash?
 
-This isn't a read-modify-write op; atomic_set is used here as
-"write_once".
-
-Note that struct qsp_entry is only ever modified by the current
-thread (thread_ptr is part of the struct; yes this uses a lot
-more memory but that's the price of scalability). The struct might
-be read anytime by other threads though, so we have to use atomic_set
-to avoid undefined behaviour (e.g. torn reads/writes).
-
-Thanks,
-
-		Emilio
+ Thomas
