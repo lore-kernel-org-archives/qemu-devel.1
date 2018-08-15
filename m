@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aoates@google.com>) id 1fpwMP-0007go-Kw
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:01:18 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fpwNY-0008Aj-9e
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:02:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aoates@google.com>) id 1fpwMG-0007Mt-OE
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:01:13 -0400
-Received: from mail-it0-x232.google.com ([2607:f8b0:4001:c0b::232]:50854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aoates@google.com>) id 1fpwMG-0007Jq-7T
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:01:08 -0400
-Received: by mail-it0-x232.google.com with SMTP id j81-v6so1890684ite.0
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 07:01:08 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1fpwNG-0001B4-Am
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:02:18 -0400
+Resent-Message-Id: <E1fpwNG-0001B4-Am@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21011)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fpwN2-0000ZS-UD
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:02:05 -0400
+In-Reply-To: <20180808123934.17450-1-alex.bennee@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153432813498.11690.14972227439194314970@502c9da6d61e>
 MIME-Version: 1.0
-References: <20180815023521.185705-1-aoates@google.com>
-	<20180815110339.5str3fmmyrnvkjqo@var.youpi.perso.aquilenet.fr>
-In-Reply-To: <20180815110339.5str3fmmyrnvkjqo@var.youpi.perso.aquilenet.fr>
-From: Andrew Oates <aoates@google.com>
-Date: Wed, 15 Aug 2018 10:00:55 -0400
-Message-ID: <CAJ1tprDwd9_TZrFjyhnc+eeraDRE8OrXSxjdcG0darFew0Z1eg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] slirp: fix ICMP handling on macOS hosts
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 15 Aug 2018 03:15:36 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH 0/4] add hand-rolled fallback when
+ capstone fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "J. Kiszka" <jan.kiszka@siemens.com>, qemu-devel@nongnu.org
+To: alex.bennee@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, richard.henderson@linaro.org
 
-On Wed, Aug 15, 2018 at 7:03 AM Samuel Thibault <samuel.thibault@gnu.org>
-wrote:
-
-> Andrew Oates, le mar. 14 ao=C3=BBt 2018 22:35:21 -0400, a ecrit:
-> > On Linux, SOCK_DGRAM+IPPROTO_ICMP sockets give only the ICMP packet whe=
-n
-> > read from.  On macOS, however, the socket acts like a SOCK_RAW socket
-> > and includes the IP header as well.
-> >
-> > This change strips the extra IP header from the received packet on macO=
-S
-> > before sending it to the guest.  SOCK_DGRAM ICMP sockets aren't
-> > supported on other BSDs, but we enable this behavior for them as well t=
-o
-> > treat the sockets the same as raw sockets.
-> >
-> > Signed-off-by: Andrew Oates <aoates@google.com>
-> > ---
-> > v2: check validity of inner_hlen and update len appropriately
-> > v3: CONFIG_DARWIN -> CONFIG_BSD; add comment explaining #ifdef
-> >
-> >  slirp/ip_icmp.c | 24 +++++++++++++++++++++++-
-> >  1 file changed, 23 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
-> > index 0b667a429a..0e289fd9d9 100644
-> > --- a/slirp/ip_icmp.c
-> > +++ b/slirp/ip_icmp.c
-> > @@ -420,7 +420,29 @@ void icmp_receive(struct socket *so)
-> >      icp =3D mtod(m, struct icmp *);
-> >
-> >      id =3D icp->icmp_id;
-> > -    len =3D qemu_recv(so->s, icp, m->m_len, 0);
-> > +    len =3D qemu_recv(so->s, icp, M_ROOM(m), 0);
-> > +    /*
-> > +     * The behavior of reading SOCK_DGRAM+IPPROTO_ICMP sockets is
-> inconsistent
-> > +     * between host OSes.  On Linux, only the ICMP header and payload =
-is
-> > +     * included.  On macOS/Darwin, the socket acts like a raw socket a=
-nd
-> > +     * includes the IP header as well.  On other BSDs,
-> SOCK_DGRAM+IPPROTO_ICMP
-> > +     * sockets aren't supported at all, so we treat them like raw
-> sockets.  It
-> > +     * isn't possible to detect this difference at runtime, so we must
-> use an
-> > +     * #ifdef to determine if we need to remove the IP header.
-> > +     */
-> > +#ifdef CONFIG_BSD
-> > +    if (len > 0) {
->
-> Looking at it again, this used to be
->
->   if (len >=3D sizeof(struct ip)) {
->
-> shouldn't be it that way so that
->
-> > +        struct ip *inner_ip =3D mtod(m, struct ip *);
-> > +        int inner_hlen =3D inner_ip->ip_hl << 2;
->
-> Reading in the header doesn't give uninitialized values?
->
-> I guess that to be on the safe side and trigger explicit warnings, we
-> should reject with EINVAL packets which are smaller than an IP header?
->
-
-Hmm, yeah, sorry.  That got reverted in my patch and I didn't notice.  Will
-re-send.
-
-
->
-> > +        if (inner_hlen > len) {
-> > +            len =3D -1;
-> > +            errno =3D -EINVAL;
-> > +        } else {
-> > +            len -=3D inner_hlen;
-> > +            memmove(icp, (unsigned char *)icp + inner_hlen, len);
-> > +        }
-> > +    }
-> > +#endif
-> >      icp->icmp_id =3D id;
-> >
-> >      m->m_data -=3D hlen;
-> > --
-> > 2.18.0.865.gffc8e1a3cd6-goog
-> >
->
-> --
-> Samuel
-> <N> (* If you have a precise idea of the intended use of the following
-> code, please
-> <N>    write to Eduardo.Gimenez@inria.fr and ask for the prize :-)
-> <N>    -- Eduardo (11/8/97) *)
->  -+- N sur #ens-mim - et c'=C3=A9tait un des d=C3=A9veloppeurs -+-
->
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODA4MTIzOTM0LjE3NDUwLTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
+dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCAwLzRdIGFkZCBoYW5kLXJvbGxlZCBmYWxs
+YmFjayB3aGVuIGNhcHN0b25lIGZhaWxzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
+IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmRlZjBmMWVjNDYgZGlzYXM6IGFsbG93IGNhcHN0
+b25lIHRvIGRlZmVyIHRvIGEgZmFsbGJhY2sgZnVuY3Rpb24gb24gZmFpbHVyZQowOGYyNTBiNTcx
+IHRhcmdldC9hcm06IGFkZCBhIGZhbGxiYWNrIGRpc2Fzc2VtYmxlIGZ1bmN0aW9uCjQ4OTFhOGZi
+YjcgdGFyZ2V0L2FybTogbW92ZSBkZWNvZGVyIGhlbHBlcnMgaW50byBoZWFkZXIKYjFlNDE2NTZl
+ZiBzY3JpcHRzL2RlY29kZXRyZWUucHk6IGFkZCBhIGRpc2Fzc2VtYmx5IGdlbmVyYXRvciAoSEFD
+SyEpCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQ6IHNjcmlwdHMvZGVj
+b2RldHJlZS5weTogYWRkIGEgZGlzYXNzZW1ibHkgZ2VuZXJhdG9yIChIQUNLISkuLi4KRVJST1I6
+IHVubmVjZXNzYXJ5IHdoaXRlc3BhY2UgYmVmb3JlIGEgcXVvdGVkIG5ld2xpbmUKIzY4OiBGSUxF
+OiBzY3JpcHRzL2RlY29kZXRyZWUucHk6NTAzOgorICAgICAgICBvdXRwdXQoJyIpOyBcbicpCgpX
+QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODU6IEZJTEU6IHNjcmlwdHMvZGVjb2Rl
+dHJlZS5weToxMDA5OgorICAgIGxvbmdfb3B0cyA9IFsnZGVjb2RlPScsICd0cmFuc2xhdGU9Jywg
+J291dHB1dD0nLCAnaW5zbndpZHRoPScsICdkaXNhc3NlbWJsZSddCgp0b3RhbDogMSBlcnJvcnMs
+IDEgd2FybmluZ3MsIDk4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvNDogdGFyZ2V0L2FybTogbW92ZSBkZWNvZGVy
+IGhlbHBlcnMgaW50byBoZWFkZXIuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
+ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTU6IApuZXcgZmlsZSBt
+b2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMTIgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAz
+LzQ6IHRhcmdldC9hcm06IGFkZCBhIGZhbGxiYWNrIGRpc2Fzc2VtYmxlIGZ1bmN0aW9uLi4uCldB
+Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
+bmVlZCB1cGRhdGluZz8KIzM1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCldBUk5JTkc6IGxpbmUg
+b3ZlciA4MCBjaGFyYWN0ZXJzCiM1MDogRklMRTogdGFyZ2V0L2FybS9kaXNhc3NlbWJsZS5jOjEx
+Ogorc2l6ZV90IGRvX2FhcmNoNjRfZmFsbGJhY2tfZGlzYXNzZW1ibHkoY29uc3QgdWludDhfdCAq
+aW5zbnAsIGNoYXIgKnB0ciwgc2l6ZV90IG4pCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojNzA6IEZJTEU6IHRhcmdldC9hcm0vaW50ZXJuYWxzLmg6Nzk5Ogorc2l6ZV90IGRvX2Fh
+cmNoNjRfZmFsbGJhY2tfZGlzYXNzZW1ibHkoY29uc3QgdWludDhfdCAqaW5zbiwgY2hhciAqcHRy
+LCBzaXplX3Qgbik7Cgp0b3RhbDogMCBlcnJvcnMsIDMgd2FybmluZ3MsIDM5IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0gg
+NC80OiBkaXNhczogYWxsb3cgY2Fwc3RvbmUgdG8gZGVmZXIgdG8gYSBmYWxsYmFjayBmdW5jdGlv
+biBvbiBmYWlsdXJlLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEByZWRoYXQuY29t
