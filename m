@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fpmC0-0005y5-AX
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:09:53 -0400
+	(envelope-from <famz@redhat.com>) id 1fpmF2-0006vE-6w
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:13:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fpmBx-00047H-0W
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:09:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35368 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1fpmEy-0000cc-QH
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:13:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36168 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fpmBw-00046b-OK
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:09:48 -0400
-Date: Wed, 15 Aug 2018 11:09:42 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fpmEy-0000cO-Hy
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:12:56 -0400
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180815030942.GA14092@lemon.usersys.redhat.com>
-References: <20180813171132.21939-1-cota@braap.org>
-	<20180813171132.21939-2-cota@braap.org>
+Date: Wed, 15 Aug 2018 11:12:31 +0800
+Message-Id: <20180815031248.14908-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180813171132.21939-2-cota@braap.org>
-Subject: Re: [Qemu-devel] [PATCH 1/3] qsp: QEMU's Synchronization Profiler
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/17] Block and testing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Weil <sw@weilnetz.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, 08/13 13:11, Emilio G. Cota wrote:
-> +  --enable-sync-profiler) sync_profiler="yes"
-> +  ;;
+The following changes since commit 38441756b70eec5807b5f60dad11a93a911998=
+66:
 
-Curious, not asking for a change: can this be made a runtime option instead of
-compile time, since there's no library dependencies? That should make this
-somewhat easier to use.
+  Update version for v3.0.0 release (2018-08-14 16:38:43 +0100)
 
-> +
-> +#define QSP_GEN_VOID(type_, qsp_t_, func_, impl_)                       \
-> +    void func_(type_ *obj, const char *file, unsigned line)             \
-> +    {                                                                   \
-> +        struct qsp_entry *e = qsp_entry_get(obj, file, line, qsp_t_);   \
-> +        int64_t t;                                                      \
-> +                                                                        \
+are available in the Git repository at:
 
-No qsp_init()?
+  git://github.com/famz/qemu.git tags/block-and-testing-pull-request
 
-> +        t = get_clock();                                                \
-> +        impl_(obj, file, line);                                         \
-> +        atomic_set(&e->ns, e->ns + get_clock() - t);                    \
-> +        atomic_set(&e->n_acqs, e->n_acqs + 1);                          \
-> +    }
-> +
-> +#define QSP_GEN_RET1(type_, qsp_t_, func_, impl_)                       \
-> +    int func_(type_ *obj, const char *file, unsigned line)              \
-> +    {                                                                   \
-> +        struct qsp_entry *e = qsp_entry_get(obj, file, line, qsp_t_);   \
-> +        int64_t t;                                                      \
-> +        int err;                                                        \
-> +                                                                        \
+for you to fetch changes up to 37a81812f7b8367422a039eb09d915df543983ee:
 
-Same here.
+  aio-posix: Improve comment around marking node deleted (2018-08-15 10:1=
+2:35 +0800)
 
-> +        t = get_clock();                                                \
-> +        err = impl_(obj, file, line);                                   \
-> +        atomic_set(&e->ns, e->ns + get_clock() - t);                    \
-> +        if (!err) {                                                     \
-> +            atomic_set(&e->n_acqs, e->n_acqs + 1);                      \
-> +        }                                                               \
-> +        return err;                                                     \
-> +    }
-> +
-> +QSP_GEN_VOID(QemuMutex, QSP_MUTEX, qsp_mutex_lock, qemu_mutex_lock_impl)
-> +QSP_GEN_RET1(QemuMutex, QSP_MUTEX, qsp_mutex_trylock, qemu_mutex_trylock_impl)
-> +
-> +QSP_GEN_VOID(QemuRecMutex, QSP_REC_MUTEX, qsp_rec_mutex_lock,
-> +             qemu_rec_mutex_lock_impl)
-> +QSP_GEN_RET1(QemuRecMutex, QSP_REC_MUTEX, qsp_rec_mutex_trylock,
-> +             qemu_rec_mutex_trylock_impl)
-> +
-> +void qsp_cond_wait(QemuCond *cond, QemuMutex *mutex, const char *file,
-> +                   unsigned line)
-> +{
-> +    struct qsp_entry *e;
-> +    int64_t t;
-> +
-> +    qsp_init();
-> +
-> +    e = qsp_entry_get(cond, file, line, QSP_CONDVAR);
-> +    t = get_clock();
-> +    qemu_cond_wait_impl(cond, mutex, file, line);
-> +    atomic_set(&e->ns, e->ns + get_clock() - t);
-> +    atomic_set(&e->n_acqs, e->n_acqs + 1);
+----------------------------------------------------------------
+Block and testing patches for 3.1
 
-Why not atomic_add (both here and in above macros)? Because fetching e->ns and
-then updating it is not "atomic" this way.
+- aio fixes by me
+- nvme fixes by Paolo and me
+- test improvements by Peter, Phil and me
 
-Fam
+----------------------------------------------------------------
+
+Fam Zheng (10):
+  nvme: Fix nvme_init error handling
+  aio-posix: Don't count ctx->notifier as progress when polling
+  aio: Do aio_notify_accept only during blocking aio_poll
+  docker: Install more packages in centos7
+  tests: Add an option for snapshot (default: off)
+  tests: Allow overriding archive path with SRC_ARCHIVE
+  tests: Add centos VM testing
+  tests: vm: Add vm-clean-all
+  tests/vm: Add vm-build-all/vm-clean-all in help text
+  aio-posix: Improve comment around marking node deleted
+
+Paolo Bonzini (1):
+  nvme: simplify plug/unplug
+
+Peter Maydell (4):
+  tests/vm: Pass the jobs parallelism setting to 'make check'
+  tests/vm: Propagate V=3D1 down into the make inside the VM
+  tests/vm: Bump guest RAM up from 2G to 4G
+  tests/vm: Use make's --output-sync option
+
+Philippe Mathieu-Daud=C3=A9 (2):
+  tests/vm: Only use -cpu 'host' if KVM is available
+  tests/vm: Add flex and bison to the vm image
+
+ block/nvme.c                            | 57 +++++++----------
+ docs/devel/testing.rst                  |  1 +
+ tests/docker/Makefile.include           |  7 ++-
+ tests/docker/dockerfiles/centos7.docker |  3 +
+ tests/vm/Makefile.include               | 12 +++-
+ tests/vm/basevm.py                      | 17 +++--
+ tests/vm/centos                         | 84 +++++++++++++++++++++++++
+ tests/vm/freebsd                        |  4 +-
+ tests/vm/netbsd                         |  4 +-
+ tests/vm/openbsd                        |  4 +-
+ tests/vm/ubuntu.i386                    |  6 +-
+ util/aio-posix.c                        |  9 +--
+ util/aio-win32.c                        |  3 +-
+ 13 files changed, 154 insertions(+), 57 deletions(-)
+ create mode 100755 tests/vm/centos
+
+--=20
+2.17.1
