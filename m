@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fpuhS-0005NW-GH
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:14:55 -0400
+	(envelope-from <peterx@redhat.com>) id 1fpuk5-0006bG-NX
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fpuhR-0007EO-Io
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:14:54 -0400
-References: <20180814124254.5229-1-peter.maydell@linaro.org>
-	<20180814124254.5229-4-peter.maydell@linaro.org>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <34cc09b5-a2bf-a79e-9087-60ec7006686b@greensocs.com>
-Date: Wed, 15 Aug 2018 14:14:35 +0200
+	(envelope-from <peterx@redhat.com>) id 1fpuk1-000424-Cw
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:17:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43756 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fpuk1-00041S-2h
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:17:33 -0400
+Date: Wed, 15 Aug 2018 20:17:21 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180815121721.GC2708@xz-mi>
+References: <20180815095328.32414-1-peterx@redhat.com>
+	<20180815095328.32414-3-peterx@redhat.com>
+	<87zhxnlv33.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180814124254.5229-4-peter.maydell@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JGPG30PmuVuXrvSHAzGJVnf7nFfubDN06"
-Subject: Re: [Qemu-devel] [PATCH 03/10] target/arm: Implement RAZ/WI HACTLR2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87zhxnlv33.fsf@dusky.pond.sub.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] intel-iommu: start to use
+ error_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, edgari@xilinx.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Halil Pasic <pasic@linux.ibm.com>, Eric Auger <eric.auger@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JGPG30PmuVuXrvSHAzGJVnf7nFfubDN06
-From: Luc Michel <luc.michel@greensocs.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-Cc: patches@linaro.org, edgari@xilinx.com
-Message-ID: <34cc09b5-a2bf-a79e-9087-60ec7006686b@greensocs.com>
-Subject: Re: [PATCH 03/10] target/arm: Implement RAZ/WI HACTLR2
-References: <20180814124254.5229-1-peter.maydell@linaro.org>
- <20180814124254.5229-4-peter.maydell@linaro.org>
-In-Reply-To: <20180814124254.5229-4-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Aug 15, 2018 at 01:37:04PM +0200, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
+>=20
+> > Replace existing trace_vtd_err() with error_report_once() then stderr
+> > will capture something if any of the error happens, meanwhile we don'=
+t
+> > suffer from any DDOS.  Then remove the trace point.  Since at it,
+> > provide more information where proper (now we can pass parameters int=
+o
+> > the report function).
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+>=20
+> You lost
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>=20
+> Happy to restore it when I apply.
 
-On 8/14/18 2:42 PM, Peter Maydell wrote:
-> The AArch32 HACTLR2 register maps to bits [63:32] of ACTLR_EL2.
-> We implement ACTLR_EL2 as RAZ/WI, so make HACTLR2 also RAZ/WI.
-> (We put the regdef next to ACTLR_EL2 as a reminder in case we
-> ever make ACTLR_EL2 something other than RAZ/WI).
-Putting this regdef in the auxcr_reginfo[] array makes it defined when
-the ARM_FEATURE_AUXCR is set (starting from ARM1026 ARMv5 I think).
-However I believe this register only exists for ARMv8, for AArch32 mode
-to be able to access upper bits of ACTLR_EL2. Should not we check for
-ARM_FEATURE_ARMV8 being set so we don't define it for ARMv7?
+I removed that since I modified the content of the patch for that
+extra trace_vtd_err().  But I'd say it should be a trivial change
+comparing to what this patch does, so I guess keeping Philippe's r-b
+should be fine too.
+
+(Btw, thanks for touching up again on patch 1 - I must have not
+ applied those whitespace changes onto my local tree and I totally
+ forgot it.  Maybe I am spoiled when the maintainer is so nice :)
+
+Thanks,
 
 --=20
-Luc
-
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/helper.c | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 466c8ae492e..14fd78f587a 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -5436,6 +5436,11 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->                .opc0 =3D 3, .opc1 =3D 4, .crn =3D 1, .crm =3D 0, .opc2 =
-=3D 1,
->                .access =3D PL2_RW, .type =3D ARM_CP_CONST,
->                .resetvalue =3D 0 },
-> +            /* HACTLR2 maps to ACTLR_EL2[63:32] */
-> +            { .name =3D "HACTLR2", .state =3D ARM_CP_STATE_AA32,
-> +              .cp =3D 15, .opc1 =3D 4, .crn =3D 1, .crm =3D 0, .opc2 =3D=
- 3,
-> +              .access =3D PL2_RW, .type =3D ARM_CP_CONST,
-> +              .resetvalue =3D 0 },
->              { .name =3D "ACTLR_EL3", .state =3D ARM_CP_STATE_AA64,
->                .opc0 =3D 3, .opc1 =3D 6, .crn =3D 1, .crm =3D 0, .opc2 =
-=3D 1,
->                .access =3D PL3_RW, .type =3D ARM_CP_CONST,
->=20
-
-
---JGPG30PmuVuXrvSHAzGJVnf7nFfubDN06
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlt0GSsACgkQd8knW3Qn
-Tr4VoA/+PjWyoHT8W1Jr35O0kiHRvOveDdO7Pq3gNYG6rL5zpCtIEypHPKl3j9Xt
-9IEVDNiuaUl4fuThhhquTRdN1ZVyIEqWkRBsGzLfs3y0DwAoel4yIMYC4TDI0EgC
-H8Kvnf37lP7Wxypa4vrTiiFCw9NJ8uyUjCOXotxcd8fo0hE9Pd13tLJs4+hnSDFD
-e2TJXQKLVX7yqX85Xf8TpPdQDLTbULL0TPAWSqsgm7yDDCEt3QBRepffgLaYuOLa
-kVkGfAJFh5AUwWnDl42kObFNPDAR4qDHCILtREAguFjmFhNC4wZpOsL1BrMZFYHr
-xVcy4XNNbi9f2UEwqspF3leieRNVXSWxWEYhy+5kM1828YYKIBtUqCDfU9qHJP2h
-X6owyWGRs1nTIRWvzdwpHYrpUW3Wc3jQtkb2LzCTWp9qix+3OjjCZTl9CFJ6mHhS
-rCyYVKlHfKW4rP7HOwmJJD5l2HcFyzhMdQUczehR4xtShRLHzHFSodmSAgnxy5Bl
-xZzD6bOT0YzrMlUx/TZs1PRnFoGuUKHth36SQd3NHnwtPJ+d3dui4sP+XUYLZFC4
-PXqXDWSiXK/Vv/Y5xFrUquLJxyiK+IsKzcXKsVcyPjRePq/Gk+l4QDicpk44sI+w
-VRvpVYFwAK9kfziwd07zFsw+JPCg/l61UuANqZ1MLJM6BAshD8A=
-=0jw7
------END PGP SIGNATURE-----
-
---JGPG30PmuVuXrvSHAzGJVnf7nFfubDN06--
+Peter Xu
