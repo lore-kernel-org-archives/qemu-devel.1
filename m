@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fq1se-0005XQ-2r
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:54:59 -0400
+	(envelope-from <thuth@redhat.com>) id 1fq1x3-00009T-2j
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:59:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpyOH-0002e4-4l
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 12:11:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46982)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fpyOD-0002Z2-8l
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 12:11:19 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fpyOA-0006L8-FQ
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 16:11:14 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 712812E8500
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 16:11:14 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1fpyVe-0006tf-Cl
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 12:19:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41218 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpyVd-0006hA-AJ
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 12:18:57 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 916DD40216E8
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 16:18:28 +0000 (UTC)
+References: <20180808114830.7169-1-quintela@redhat.com>
+	<20180808114830.7169-18-quintela@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <159b7f67-2484-3339-48e5-b9cd944de579@redhat.com>
+Date: Wed, 15 Aug 2018 18:18:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Aug 2018 16:02:05 -0000
-From: Michele Denber <1787012@bugs.launchpad.net>
-Reply-To: Bug 1787012 <1787012@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153427470081.24411.7587190537485631648.malonedeb@soybean.canonical.com>
-Message-Id: <153434892581.23806.17676433008120559296.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1787012] Re: Solaris build error: Bad string
+In-Reply-To: <20180808114830.7169-18-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 17/22] virtio: split vhost-user-scsi
+ bits from virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,170 +35,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-You are absolutely correct.  I found the right problem but the wrong
-reason.  Note that:
+On 08/08/2018 01:48 PM, Juan Quintela wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hw/virtio/Makefile.objs         |  1 +
+>  hw/virtio/vhost-user-scsi-pci.c | 89 +++++++++++++++++++++++++++++++++
+>  hw/virtio/virtio-pci.c          | 58 ---------------------
+>  3 files changed, 90 insertions(+), 58 deletions(-)
+>  create mode 100644 hw/virtio/vhost-user-scsi-pci.c
+> 
+> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+> index 2c95c55bd0..a5d2e38d3a 100644
+> --- a/hw/virtio/Makefile.objs
+> +++ b/hw/virtio/Makefile.objs
+> @@ -12,6 +12,7 @@ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-p
+>  obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+>  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o vhost-vsock-pci.o
+>  obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
+> +obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
+>  obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
+>  obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
+>  obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
+> diff --git a/hw/virtio/vhost-user-scsi-pci.c b/hw/virtio/vhost-user-scsi-pci.c
+> new file mode 100644
+> index 0000000000..6f3a73c2a8
+> --- /dev/null
+> +++ b/hw/virtio/vhost-user-scsi-pci.c
+> @@ -0,0 +1,89 @@
+> +/*
+> + * Virtio PCI Bindings
+> + *
+> + * Copyright IBM, Corp. 2007
+> + * Copyright (c) 2009 CodeSourcery
+> + *
+> + * Authors:
+> + *  Anthony Liguori   <aliguori@us.ibm.com>
+> + *  Paul Brook        <paul@codesourcery.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + * Contributions after 2012-01-13 are licensed under the terms of the
+> + * GNU GPL, version 2 or (at your option) any later version.
+> + */
 
-# which tr
-/usr/bin/tr
-#  uname -s | tr '[/]' '[_]'
-Bad string
-# uname -s | /usr/xpg4/bin/tr '[/]' '[_]'
-SunOS
-#
+The vhost-user-scsi code has been introduced in 2017 by Felipe
+Franciosi, so I think you could remove the above "Authors" lines, and
+adjust the GPL license statement to plain GPLv2+ here.
 
-So it's just another POSIX problem with Solaris, not a bug.  Solaris
-provides all the POSIX stuff, it just doesn't make it the default.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1787012
-
-Title:
-  Solaris build error: Bad string
-
-Status in QEMU:
-  New
-
-Bug description:
-  While building qemu2.12.0 on a Sun Oracle Enterprise M3000 SPARC64 VII
-  running Solaris 10U11, opencsw toolchain, gcc 7.3.0, and python 3.3.6
-  I get:
-
-  # gmake
-  mkdir -p dtc/libfdt
-  mkdir -p dtc/tests
-  Bad string
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dumptrees.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/trees.S
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/testutils.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/value-labels.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/asm_tree_dump.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/truncated_property=
-.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/check_path.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/overlay_bad_fixup.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/overlay.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/subnode_iterate.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/property_iterate.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/integer-expression=
-s.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/utilfdt_test.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path_offset_aliase=
-s.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/add_subnode_with_n=
-ops.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtbs_equal_unorder=
-ed.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtb_reverse.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtbs_equal_ordered=
-.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/extra-terminating-=
-null.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/incbin.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/boot-cpuid.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/phandle_format.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path-references.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/references.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/string_escapes.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/propname_escapes.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/appendprop2.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/appendprop1.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/del_node.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/del_property.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/setprop.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/set_name.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/rw_tree1.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/open_pack.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nopulate.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/mangle-layout.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/move_and_save.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/sw_tree1.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nop_node.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nop_property.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/setprop_inplace.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/stringlist.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/addr_size_cells.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/notfound.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/sized_cells.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/char_literal.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_alias.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_com=
-patible.c         DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_check_=
-compatible.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_pha=
-ndle.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_pro=
-p_value.c         DEP /export/home/denber/qemu-2.12.0/dtc/tests/parent_offs=
-et.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/supernode_atdepth_=
-offset.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_path.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_phandle.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/getprop.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_name.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path_offset.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/subnode_offset.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/find_property.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/root_node.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_mem_rsv.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_overlay.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_addresses.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_empty_tree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_strerror.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_rw.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_sw.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_wip.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_ro.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/util.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtoverlay.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtput.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtget.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtdump.c
-           DEP convert-dtsv0-lexer.lex.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/srcpos.c
-           DEP dtc-parser.tab.c
-           DEP dtc-lexer.lex.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/treesource.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/livetree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fstree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/flattree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/dtc.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/data.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/checks.c
-  Bad string
-           CC libfdt/fdt.o
-           CC libfdt/fdt_ro.o
-           CC libfdt/fdt_wip.o
-           CC libfdt/fdt_sw.o
-           CC libfdt/fdt_rw.o
-           CC libfdt/fdt_strerror.o
-           CC libfdt/fdt_empty_tree.o
-           CC libfdt/fdt_addresses.o
-           CC libfdt/fdt_overlay.o
-           AR libfdt/libfdt.a
-  a - libfdt/fdt.o
-  a - libfdt/fdt_ro.o
-  a - libfdt/fdt_wip.o
-  a - libfdt/fdt_sw.o
-  a - libfdt/fdt_rw.o
-  a - libfdt/fdt_strerror.o
-  a - libfdt/fdt_empty_tree.o
-  a - libfdt/fdt_addresses.o
-  a - libfdt/fdt_overlay.o
-  ar: creating libfdt/libfdt.a
-  ar: writing libfdt/libfdt.a
-  ...
-
-  gmake then completes, returning just a "#" prompt and no error
-  messages.  However, no executable is created.  Apparently, "Bad
-  string" is the problem, but it is unclear what that means and where
-  the two instances of it are coming from.  A web search for this
-  problem returned nothing.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1787012/+subscriptions
+ Thomas
