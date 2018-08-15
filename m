@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fpm8v-000521-CU
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:06:42 -0400
+	(envelope-from <famz@redhat.com>) id 1fpmC0-0005y5-AX
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:09:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fpm8s-0005Jk-04
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:06:41 -0400
-References: <1534161104-8253-1-git-send-email-thuth@redhat.com>
-	<87y3da5txn.fsf@dusky.pond.sub.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <a06a8e46-2710-82ba-90cc-5d48fc182e5c@redhat.com>
-Date: Wed, 15 Aug 2018 11:06:30 +0800
+	(envelope-from <famz@redhat.com>) id 1fpmBx-00047H-0W
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:09:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35368 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fpmBw-00046b-OK
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:09:48 -0400
+Date: Wed, 15 Aug 2018 11:09:42 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180815030942.GA14092@lemon.usersys.redhat.com>
+References: <20180813171132.21939-1-cota@braap.org>
+	<20180813171132.21939-2-cota@braap.org>
 MIME-Version: 1.0
-In-Reply-To: <87y3da5txn.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qemu-options: Fix bad "macaddr" property
- in the documentation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180813171132.21939-2-cota@braap.org>
+Subject: Re: [Qemu-devel] [PATCH 1/3] qsp: QEMU's Synchronization Profiler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Harald Hoyer <harald@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Weil <sw@weilnetz.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+On Mon, 08/13 13:11, Emilio G. Cota wrote:
+> +  --enable-sync-profiler) sync_profiler="yes"
+> +  ;;
 
+Curious, not asking for a change: can this be made a runtime option instead of
+compile time, since there's no library dependencies? That should make this
+somewhat easier to use.
 
-On 2018=E5=B9=B408=E6=9C=8813=E6=97=A5 20:31, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
->
->> When using the "-device" option, the property is called "mac".
->> "macaddr" is only used for the legacy "-net nic" option.
-> Indeed:
->
->      #define DEFINE_NIC_PROPERTIES(_state, _conf)                      =
-      \
-> --->    DEFINE_PROP_MACADDR("mac",   _state, _conf.macaddr),           =
-     \
->          DEFINE_PROP_NETDEV("netdev", _state, _conf.peers)
->
->> Reported-by: Harald Hoyer <harald@redhat.com>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>   qemu-options.hx | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index b1bf0f4..3495531 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -2345,7 +2345,7 @@ qemu-system-i386 linux.img \
->>                    -netdev socket,id=3Dn2,mcast=3D230.0.0.1:1234
->>   # launch yet another QEMU instance on same "bus"
->>   qemu-system-i386 linux.img \
->> -                 -device e1000,netdev=3Dn3,macaddr=3D52:54:00:12:34:5=
-8 \
->> +                 -device e1000,netdev=3Dn3,mac=3D52:54:00:12:34:58 \
->>                    -netdev socket,id=3Dn3,mcast=3D230.0.0.1:1234
->>   @end example
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->
+> +
+> +#define QSP_GEN_VOID(type_, qsp_t_, func_, impl_)                       \
+> +    void func_(type_ *obj, const char *file, unsigned line)             \
+> +    {                                                                   \
+> +        struct qsp_entry *e = qsp_entry_get(obj, file, line, qsp_t_);   \
+> +        int64_t t;                                                      \
+> +                                                                        \
 
-Applied.
+No qsp_init()?
 
-Thanks
+> +        t = get_clock();                                                \
+> +        impl_(obj, file, line);                                         \
+> +        atomic_set(&e->ns, e->ns + get_clock() - t);                    \
+> +        atomic_set(&e->n_acqs, e->n_acqs + 1);                          \
+> +    }
+> +
+> +#define QSP_GEN_RET1(type_, qsp_t_, func_, impl_)                       \
+> +    int func_(type_ *obj, const char *file, unsigned line)              \
+> +    {                                                                   \
+> +        struct qsp_entry *e = qsp_entry_get(obj, file, line, qsp_t_);   \
+> +        int64_t t;                                                      \
+> +        int err;                                                        \
+> +                                                                        \
+
+Same here.
+
+> +        t = get_clock();                                                \
+> +        err = impl_(obj, file, line);                                   \
+> +        atomic_set(&e->ns, e->ns + get_clock() - t);                    \
+> +        if (!err) {                                                     \
+> +            atomic_set(&e->n_acqs, e->n_acqs + 1);                      \
+> +        }                                                               \
+> +        return err;                                                     \
+> +    }
+> +
+> +QSP_GEN_VOID(QemuMutex, QSP_MUTEX, qsp_mutex_lock, qemu_mutex_lock_impl)
+> +QSP_GEN_RET1(QemuMutex, QSP_MUTEX, qsp_mutex_trylock, qemu_mutex_trylock_impl)
+> +
+> +QSP_GEN_VOID(QemuRecMutex, QSP_REC_MUTEX, qsp_rec_mutex_lock,
+> +             qemu_rec_mutex_lock_impl)
+> +QSP_GEN_RET1(QemuRecMutex, QSP_REC_MUTEX, qsp_rec_mutex_trylock,
+> +             qemu_rec_mutex_trylock_impl)
+> +
+> +void qsp_cond_wait(QemuCond *cond, QemuMutex *mutex, const char *file,
+> +                   unsigned line)
+> +{
+> +    struct qsp_entry *e;
+> +    int64_t t;
+> +
+> +    qsp_init();
+> +
+> +    e = qsp_entry_get(cond, file, line, QSP_CONDVAR);
+> +    t = get_clock();
+> +    qemu_cond_wait_impl(cond, mutex, file, line);
+> +    atomic_set(&e->ns, e->ns + get_clock() - t);
+> +    atomic_set(&e->n_acqs, e->n_acqs + 1);
+
+Why not atomic_add (both here and in above macros)? Because fetching e->ns and
+then updating it is not "atomic" this way.
+
+Fam
