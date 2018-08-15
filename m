@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpqQK-0001Q8-4W
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:40:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1fpqUc-0004v5-4I
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpqQI-0007Eb-29
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:40:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52316)
+	(envelope-from <bounces@canonical.com>) id 1fpqUY-0007iG-9w
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:45:22 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53392)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fpqQH-0007CU-IM
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:40:53 -0400
+	id 1fpqUY-0007hz-18
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:45:18 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fpqQG-0006e2-OG
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 07:40:52 +0000
+	id 1fpqUX-0007Be-8E
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 07:45:17 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B64442E851C
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 07:40:52 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3B6E22E851B
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 07:45:17 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Aug 2018 07:25:56 -0000
-From: Thomas Huth <1715296@bugs.launchpad.net>
-Reply-To: Bug 1715296 <1715296@bugs.launchpad.net>
+Date: Wed, 15 Aug 2018 07:30:23 -0000
+From: Thomas Huth <658904@bugs.launchpad.net>
+Reply-To: Bug 658904 <658904@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150467634266.16715.896859689385742459.malonedeb@gac.canonical.com>
-Message-Id: <153431795739.24290.3119134289218560401.launchpad@soybean.canonical.com>
+References: <20101012023257.6994.73536.malonedeb@potassium.ubuntu.com>
+Message-Id: <153431822476.26633.3475047740996162718.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715296] Re: qemu: invalid serial port
- configuration
+Subject: [Qemu-devel] [Bug 658904] Re: QEMU refers to VLAN,
+ but doesn't mean 802.1Q
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,35 +46,25 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715296
+https://bugs.launchpad.net/bugs/658904
 
 Title:
-  qemu: invalid serial port configuration
+  QEMU refers to VLAN, but doesn't mean 802.1Q
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  The tty_serial_init() function sets the port c_oflags as follows:
-  tty.c_oflag |=3D OPOST not clearing ONLCR, ONLRET and others.
-  The result is that the postprocess output is enabled and host translates =
-0xa (LF) to 0xd 0xa (CR LF) which breaks the binary transmissions on serial=
- port even if you set the port to raw mode (no matters if on host and/or gu=
-est).
-  The issue has been reported 11 years ago on qemu-devel mailing list:
-  https://lists.nongnu.org/archive/html/qemu-devel/2006-06/msg00196.html
-  There was also a FreeBSD patch including the fix:
-  https://lists.freebsd.org/pipermail/freebsd-ports/2006-October/036390.html
+  Throughout the (sparse) documentation and the cmd-line help text, Qemu
+  refers to VLAN ("virtual" LANs), which are unrelated to 802.1Q (tagged
+  ethernet) VLAN, which, IMHO is _very_ confusing. Beyond that, it's
+  also unnecessary, as the network in question isn't "virtual", only the
+  devices used to implement it are.
 
-  I think the correct port configuration is:
-  tty.c_iflag &=3D ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL|IXON|IMA=
-XBEL);
-  tty.c_oflag &=3D ~OPOST;
-
-  In such case the host will perform no output processing and will pass the=
- data as is.
-  And the guest will be able to configure input/output processing exactly a=
-s it wants.
+  To avoid further frustration and confusion, can the term VLAN,
+  _please_ be removed from source and documentation and replaced with
+  something more suitable? Perhaps vNIC (seems like VMware is using that
+  term for a similiar concept)?
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715296/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/658904/+subscriptions
