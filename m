@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpvLe-0004fE-Fh
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:56:30 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fpvjq-00046l-3y
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:21:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fpvLb-0001Gl-SO
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:56:25 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 15 Aug 2018 14:55:24 +0200
-Message-Id: <20180815125537.10651-9-kwolf@redhat.com>
-In-Reply-To: <20180815125537.10651-1-kwolf@redhat.com>
-References: <20180815125537.10651-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 08/21] block: Remove deprecated -drive option
- addr
+	(envelope-from <imammedo@redhat.com>) id 1fpvjm-0005ot-2Y
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:21:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50592 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fpvjl-0005ni-0r
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:21:21 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B8A9A4023132
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 13:21:18 +0000 (UTC)
+Date: Wed, 15 Aug 2018 15:21:16 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180815152116.423531b6@redhat.com>
+In-Reply-To: <20180810020109-mutt-send-email-mst@kernel.org>
+References: <1533741349-199141-1-git-send-email-imammedo@redhat.com>
+	<20180808231810-mutt-send-email-mst@kernel.org>
+	<20180809121324.65f741c1@redhat.com>
+	<20180810020109-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 0/4] "pc: acpi: _CST support"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,155 +35,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This reinstates commit eae3bd1eb7c6b105d30ec06008b3bc3dfc5f45bb,
-which was temporarily reverted for the 3.0 release so that libvirt gets
-some extra time to update their command lines.
+On Fri, 10 Aug 2018 02:09:58 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-The -drive option addr was deprecated in QEMU 2.10. It's time to remove
-it.
+> On Thu, Aug 09, 2018 at 12:13:24PM +0200, Igor Mammedov wrote:
+> > On Wed, 8 Aug 2018 23:20:25 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Wed, Aug 08, 2018 at 05:15:45PM +0200, Igor Mammedov wrote:  
+> > > > It's an alternative approach to
+> > > >  1) [PATCH hack dontapply v2 0/7] Dynamic _CST generation
+> > > > which instead of dynamic AML loading uses static AML with
+> > > > dynamic values.  It allows us to keep firmware blob static and
+> > > > to avoid split firmware issue (1) in case of cross version migration.    
+> > > 
+> > > I think there's a misunderstanding. That patch only declares a couple of
+> > > states but that is just for debugging/demonstration purposes.  A typical
+> > > real CPU has more states (e.g. some intel CPUs have ~10 levels).  
+> > yep, baremetal has more CStates, but that depends on what we are trying to
+> > achieve here.
+> > If goal is to use mwait/monitor instead o halt when idle
+> > to reduce wakeup latencies then 1 entry in _CST is sufficient.  
+> 
+> 1 entry is not sufficient in my testing. My testing shows
+> we want to stay in guest for states with latency up to ~200 usec
+> to get measureable latency gains.
+Ok, I'll add support for more CStates
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
----
- include/sysemu/blockdev.h |  1 -
- blockdev.c                | 17 +----------------
- device-hotplug.c          |  4 ----
- qemu-deprecated.texi      |  5 -----
- qemu-options.hx           |  5 +----
- 5 files changed, 2 insertions(+), 30 deletions(-)
+> 
+> > If target is reduce power consumption than we would need more entries.
+> > In the later case _CST is probably not sufficient as it provides only
+> > power/latency pair while intel_idle also provides target residence.
+> > So if power mgmt target is considered, we need to use new _LPI
+> > which means guest will need support for it as well, not sure if x86
+> > kernel supports it nor aware of such support in Windows (hopefully it 
+> > would just ignore unknown method)  
+> 
+> I think we want to address both goals.
+> 
+> Linux on x86 does support _LPI and I agree it's a good idea to be able
+> to pass that in. Will take a look. But intel_idle seems to just set
+> target = latency * 2 so I am not sure it's all that important.
+it's fairly recent, but if we plan in advance we can support it
+as well.
 
-diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
-index 37ea39719e..c0ae3700ec 100644
---- a/include/sysemu/blockdev.h
-+++ b/include/sysemu/blockdev.h
-@@ -28,7 +28,6 @@ typedef enum {
- } BlockInterfaceType;
- 
- struct DriveInfo {
--    const char *devaddr;
-     BlockInterfaceType type;
-     int bus;
-     int unit;
-diff --git a/blockdev.c b/blockdev.c
-index c23587b075..6c530769fd 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -731,10 +731,6 @@ QemuOptsList qemu_legacy_drive_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "interface (ide, scsi, sd, mtd, floppy, pflash, virtio)",
-         },{
--            .name = "addr",
--            .type = QEMU_OPT_STRING,
--            .help = "pci address (virtio only)",
--        },{
-             .name = "serial",
-             .type = QEMU_OPT_STRING,
-             .help = "disk serial number",
-@@ -777,7 +773,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-     DriveMediaType media = MEDIA_DISK;
-     BlockInterfaceType type;
-     int max_devs, bus_id, unit_id, index;
--    const char *devaddr;
-     const char *werror, *rerror;
-     bool read_only = false;
-     bool copy_on_read;
-@@ -786,7 +781,7 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-     Error *local_err = NULL;
-     int i;
-     const char *deprecated[] = {
--        "serial", "addr"
-+        "serial"
-     };
- 
-     /* Change legacy command line options into QMP ones */
-@@ -976,12 +971,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-     }
- 
-     /* Add virtio block device */
--    devaddr = qemu_opt_get(legacy_opts, "addr");
--    if (devaddr && type != IF_VIRTIO) {
--        error_report("addr is not supported by this bus type");
--        goto fail;
--    }
--
-     if (type == IF_VIRTIO) {
-         QemuOpts *devopts;
-         devopts = qemu_opts_create(qemu_find_opts("device"), NULL, 0,
-@@ -993,9 +982,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-         }
-         qemu_opt_set(devopts, "drive", qdict_get_str(bs_opts, "id"),
-                      &error_abort);
--        if (devaddr) {
--            qemu_opt_set(devopts, "addr", devaddr, &error_abort);
--        }
-     }
- 
-     filename = qemu_opt_get(legacy_opts, "file");
-@@ -1040,7 +1026,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-     dinfo->type = type;
-     dinfo->bus = bus_id;
-     dinfo->unit = unit_id;
--    dinfo->devaddr = devaddr;
-     dinfo->serial = g_strdup(serial);
- 
-     blk_set_legacy_dinfo(blk, dinfo);
-diff --git a/device-hotplug.c b/device-hotplug.c
-index 23fd6656f1..cd427e2c76 100644
---- a/device-hotplug.c
-+++ b/device-hotplug.c
-@@ -69,10 +69,6 @@ void hmp_drive_add(Monitor *mon, const QDict *qdict)
-     if (!dinfo) {
-         goto err;
-     }
--    if (dinfo->devaddr) {
--        monitor_printf(mon, "Parameter addr not supported\n");
--        goto err;
--    }
- 
-     switch (dinfo->type) {
-     case IF_NONE:
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index f90436da56..6d7aaab2cd 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -99,11 +99,6 @@ provided per NIC.
- The drive serial argument is replaced by the the serial argument
- that can be specified with the ``-device'' parameter.
- 
--@subsection -drive addr=... (since 2.10.0)
--
--The drive addr argument is replaced by the the addr argument
--that can be specified with the ``-device'' parameter.
--
- @subsection -usbdevice (since 2.10.0)
- 
- The ``-usbdevice DEV'' argument is now a synonym for setting
-diff --git a/qemu-options.hx b/qemu-options.hx
-index b5155c925a..a42917f41c 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -805,7 +805,7 @@ ETEXI
- DEF("drive", HAS_ARG, QEMU_OPTION_drive,
-     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
-     "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
--    "       [,snapshot=on|off][,serial=s][,addr=A][,rerror=ignore|stop|report]\n"
-+    "       [,snapshot=on|off][,serial=s][,rerror=ignore|stop|report]\n"
-     "       [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
-     "       [,readonly=on|off][,copy-on-read=on|off]\n"
-     "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
-@@ -883,9 +883,6 @@ an untrusted format header.
- This option specifies the serial number to assign to the device. This
- parameter is deprecated, use the corresponding parameter of @code{-device}
- instead.
--@item addr=@var{addr}
--Specify the controller's PCI address (if=virtio only). This parameter is
--deprecated, use the corresponding parameter of @code{-device} instead.
- @item werror=@var{action},rerror=@var{action}
- Specify which @var{action} to take on write and read errors. Valid actions are:
- "ignore" (ignore the error and try to continue), "stop" (pause QEMU),
--- 
-2.13.6
+> 
+> > >   
+> > > > ABI in this case is confined to cpu hotplug IO registers
+> > > > (i.e. do it old school way, like we used to do so far).
+> > > > This way we don't have to add yet another ABI to keep dynamic
+> > > > AML code under control (1).
+> > > > 
+> > > > Tested  with: XPsp3 - ws2106 guests.
+> > > > 
+> > > > CC: "Michael S. Tsirkin" <mst@redhat.com>
+> > > > 
+> > > > 
+> > > > Igor Mammedov (3):
+> > > >   acpi: add aml_create_byte_field()
+> > > >   pc: acpi: add _CST support
+> > > >   acpi: add support for CST update notification
+> > > > 
+> > > > Michael S. Tsirkin (1):
+> > > >   acpi: aml: add aml_register()
+> > > > 
+> > > >  include/hw/acpi/aml-build.h     |   6 ++
+> > > >  include/hw/acpi/cpu.h           |  10 +++
+> > > >  docs/specs/acpi_cpu_hotplug.txt |  21 +++++-
+> > > >  hw/acpi/aml-build.c             |  28 +++++++
+> > > >  hw/acpi/cpu.c                   | 158 +++++++++++++++++++++++++++++++++++++++-
+> > > >  hw/acpi/piix4.c                 |   2 +
+> > > >  hw/i386/acpi-build.c            |   5 +-
+> > > >  tests/bios-tables-test.c        |   1 +
+> > > >  8 files changed, 225 insertions(+), 6 deletions(-)
+> > > > 
+> > > > -- 
+> > > > 2.7.4    
