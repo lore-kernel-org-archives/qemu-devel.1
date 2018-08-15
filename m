@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fpuF2-0000bt-Cm
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 07:45:33 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fpuIF-0001SK-9o
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 07:48:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fpuEz-0002yc-35
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 07:45:32 -0400
-Date: Wed, 15 Aug 2018 13:45:18 +0200
+	(envelope-from <cohuck@redhat.com>) id 1fpuIC-0005E1-22
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 07:48:51 -0400
+Date: Wed, 15 Aug 2018 13:48:44 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180815134518.19cea8e5.cohuck@redhat.com>
-In-Reply-To: <1532521224-27235-1-git-send-email-thuth@redhat.com>
-References: <1532521224-27235-1-git-send-email-thuth@redhat.com>
+Message-ID: <20180815134844.55722b47.cohuck@redhat.com>
+In-Reply-To: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1 00/10] Move virtio-ccw devices to
- separate files
+Subject: Re: [Qemu-devel] [RFC 00/15] s390: vfio-ccw dasd ipl support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +22,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-On Wed, 25 Jul 2018 14:20:14 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On Thu,  5 Jul 2018 13:25:28 -0400
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-> For more fine-grained control over the build process, it would be good
-> to have the possibility to disable single virtio devices, too. We already
-> have CONFIG_VIRTIO_* switches in the Makefiles, but currently all
-> virtio-ccw devices are compiled in anyway. Move them to separate files
-> so we can disable them in the Makefile more easily.
+> This is to support booting from vfio-ccw dasd devices. We basically implement
+> the real hardware ipl procedure. This allows for booting Linux guests on
+> vfio-ccw devices.
 > 
-> NB: I did not move virtio-blk-ccw and virtio-net-ccw to a separate file
-> yet since they are essential for the s390x-virtio machine and thus it
-> does IMHO not make much sense to disable net and blk. But if somebody
-> needs that possibility, too, I can add two more patches on top...
-> 
-> Thomas Huth (10):
->   hw/s390x/virtio-ccw: Consolidate calls to virtio_ccw_unrealize()
->   hw/s390x: Move virtio-ccw-serial code to a separate file
->   hw/s390x: Move virtio-ccw-balloon code to a separate file
->   hw/s390x: Move virtio-ccw-scsi code to a separate file
->   hw/s390x: Move virtio-ccw-rng code to a separate file
->   hw/s390x: Move virtio-ccw-9p code to a separate file
->   hw/s390x: Move virtio-ccw-crypto code to a separate file
->   hw/s390x: Move vhost-vsock-ccw code to a separate file
->   hw/s390x: Move virtio-ccw-gpu code to a separate file
->   hw/s390x: Move virtio-ccw-input code to a separate file
-> 
->  MAINTAINERS                   |   2 +-
->  hw/s390x/Makefile.objs        |   9 +
->  hw/s390x/vhost-vsock-ccw.c    |  60 +++++
->  hw/s390x/virtio-ccw-9p.c      |  65 +++++
->  hw/s390x/virtio-ccw-balloon.c |  70 +++++
->  hw/s390x/virtio-ccw-crypto.c  |  75 ++++++
->  hw/s390x/virtio-ccw-gpu.c     |  67 +++++
->  hw/s390x/virtio-ccw-input.c   | 118 +++++++++
->  hw/s390x/virtio-ccw-rng.c     |  74 ++++++
->  hw/s390x/virtio-ccw-scsi.c    | 125 +++++++++
->  hw/s390x/virtio-ccw-serial.c  |  78 ++++++
->  hw/s390x/virtio-ccw.c         | 581 +-----------------------------------------
->  12 files changed, 749 insertions(+), 575 deletions(-)
->  create mode 100644 hw/s390x/vhost-vsock-ccw.c
->  create mode 100644 hw/s390x/virtio-ccw-9p.c
->  create mode 100644 hw/s390x/virtio-ccw-balloon.c
->  create mode 100644 hw/s390x/virtio-ccw-crypto.c
->  create mode 100644 hw/s390x/virtio-ccw-gpu.c
->  create mode 100644 hw/s390x/virtio-ccw-input.c
->  create mode 100644 hw/s390x/virtio-ccw-rng.c
->  create mode 100644 hw/s390x/virtio-ccw-scsi.c
->  create mode 100644 hw/s390x/virtio-ccw-serial.c
-> 
+> vfio-ccw's channel program prefetch algorithm complicates ipl because most ipl
+> channel programs dynamically modify themselves. Details on the ipl process and
+> how we worked around this issue can be found in docs/devel/s390-dasd-ipl.txt.
 
-Trawling through my backlog... I don't think there were any issues with
-this? I think I'll just go ahead and queue this (would not mind
-reviews, though).
+Cleaning up my mail backlog... I think there were some comments; will
+there be a new version forthcoming?
