@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpwCQ-0003Vy-AD
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:50:59 -0400
+	(envelope-from <hans-erik.floryd@rt-labs.com>) id 1fpwHW-0006Hw-F6
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:56:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpwCM-0001zD-Ph
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:50:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51224)
+	(envelope-from <hans-erik.floryd@rt-labs.com>) id 1fpwHS-0003xM-VA
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:56:14 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:47040)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fpwCM-0001wE-G0
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:50:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fpwCJ-00076f-FV
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 13:50:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 69B962E851F
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 13:50:51 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Aug 2018 13:44:10 -0000
-From: =?utf-8?q?Leonardo_M=C3=BCller?= <leozinho29_eu@hotmail.com>
-Reply-To: Bug 1787070 <1787070@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153429832178.24411.17323780348611441441.malonedeb@soybean.canonical.com>
-Message-Id: <153434065019.8411.3031857886553396702.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1787070] Re: Guests using the qxl-vga are freezing
+	(Exim 4.71) (envelope-from <hans-erik.floryd@rt-labs.com>)
+	id 1fpwHS-0003ns-AM
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:56:10 -0400
+Received: by mail-lf1-x142.google.com with SMTP id l16-v6so923294lfc.13
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 06:56:10 -0700 (PDT)
+From: Hans-Erik Floryd <hans-erik.floryd@rt-labs.com>
+Date: Wed, 15 Aug 2018 15:55:54 +0200
+Message-Id: <1534341354-11956-1-git-send-email-hans-erik.floryd@rt-labs.com>
+Subject: [Qemu-devel] [PATCH] imx_serial: Generate interrupt on receive data
+ ready if enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,100 +25,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-trivial@nongnu.org
+Cc: Hans-Erik Floryd <hans-erik.floryd@rt-labs.com>, Peter Chubb <peter.chubb@nicta.com.au>, Paolo Bonzini <pbonzini@redhat.com>, "open list:i.MX31" <qemu-arm@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-I have run the openSUSE guest again, the output of the gdb command can
-be seen at https://paste.ubuntu.com/p/mCRMvkNWYq/
+Generate an interrupt if USR2_RDR and UCR4_DREN are both set.
 
--- =
+Signed-off-by: Hans-Erik Floryd <hans-erik.floryd@rt-labs.com>
+---
+ hw/char/imx_serial.c         | 3 ++-
+ include/hw/char/imx_serial.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1787070
-
-Title:
-  Guests using the qxl-vga are freezing
-
-Status in QEMU:
-  New
-
-Bug description:
-  I have noticed that guests using qxl-vga are freezing. They may freeze
-  after a few minutes or after many hours. The freeze consists of the
-  entire system hanging, except the cursor, but the cursor animation
-  stops too. Changing to tty is not possible after this. There are three
-  things noticed in common on the guests when they freeze:
-
-  -The guest is using the QXL VGA (freezes weren't observed with other VGAs=
-);
-  -A new workload is starting;
-  -The mouse cursor is the animated as the one of loading. For example, htt=
-ps://i.imgur.com/raQFteG.png
-   =
-
-  The host is Xubuntu 18.04 amd64, QEMU version is 3.0.0-dirty. The guests =
-tested were:
-
-  -openSUSE Tumbleweed;
-  -openSUSE Leap 15;
-  -Xubuntu 18.04 Bionic Beaver;
-  -CentOS 7.
-
-  With openSUSE guests, the install process couldn't even be finished,
-  as the installer would freeze. There were 2 GB of available memory
-  (checked in a tty before the freeze) and netconsole was enabled.
-  Unfortunately, it was impossible to obtain any information from them.
-  This is an image of one openSUSE guest frozen:
-  https://i.imgur.com/ZP0eQKq.png
-
-  The command line used was:
-
-  qemu-system-x86_64 -nodefaults -m 3072 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dleap.qcow2 -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
-  -monitor vc -serial vc  -cdrom "openSUSE-Leap-15.0-DVD-x86_64.iso"
-  -boot d
-
-  With CentOS guests, the install process fail sometimes, but sometimes
-  it's able to install. However, on the yum update, it would freeze too.
-  In one instance it froze while updating glibc, which made the guest
-  unbootable. https://i.imgur.com/B3WhSDX.png
-
-  The command line used was:
-
-  qemu-system-x86_64 -nodefaults -m 2048 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dcentos.qcow2 -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device virtio-vga,virgl=3Dtrue -display gtk -monitor
-  vc -serial vc -cdrom "CentOS-7-livecd-GNOME-x86_64.iso" -bios
-  /usr/share/ovmf/OVMF.fd
-
-  With Xubuntu 18.04 guests, the system worked for many hours until the
-  freeze happened. On this case it happened when opening Audacious.
-  Fortunately, the logging services worked for some time, which allowed
-  me to get a relevant message which can be seen at
-  http://termbin.com/nuof . It repeated a few times, but then the
-  logging stopped. https://i.imgur.com/2zckqj5.png shows the guest
-  screen in the moment it froze.
-
-  The command line used was:
-
-  qemu-system-x86_64 -nodefaults -m 1024 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dxubmini -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
-  -monitor vc -serial vc
-
-  I'm sorry for not having more detailed information but, even setting
-  netconsole, openSUSE and CentOS guests were unable to print any
-  information.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1787070/+subscriptions
+diff --git a/hw/char/imx_serial.c b/hw/char/imx_serial.c
+index 0747db9..1e36319 100644
+--- a/hw/char/imx_serial.c
++++ b/hw/char/imx_serial.c
+@@ -74,8 +74,9 @@ static void imx_update(IMXSerialState *s)
+     mask = (s->ucr1 & UCR1_TXMPTYEN) ? USR2_TXFE : 0;
+     /*
+      * TCEN and TXDC are both bit 3
++     * RDR and DREN are both bit 0
+      */
+-    mask |= s->ucr4 & UCR4_TCEN;
++    mask |= s->ucr4 & (UCR4_TCEN | UCR4_DREN);
+ 
+     usr2 = s->usr2 & mask;
+ 
+diff --git a/include/hw/char/imx_serial.h b/include/hw/char/imx_serial.h
+index ee80da1..c8b7428 100644
+--- a/include/hw/char/imx_serial.h
++++ b/include/hw/char/imx_serial.h
+@@ -68,6 +68,7 @@
+ #define UCR2_RXEN       (1<<1)    /* Receiver enable */
+ #define UCR2_SRST       (1<<0)    /* Reset complete */
+ 
++#define UCR4_DREN       BIT(0)    /* Receive Data Ready interrupt enable */
+ #define UCR4_TCEN       BIT(3)    /* TX complete interrupt enable */
+ 
+ #define UTS1_TXEMPTY    (1<<6)
+-- 
+2.7.4
