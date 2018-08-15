@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fq5GB-0001bG-S6
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 19:31:28 -0400
+	(envelope-from <cota@braap.org>) id 1fq5dJ-0004eO-UF
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 19:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fq5G2-00066F-CJ
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 19:31:24 -0400
-Resent-Message-Id: <E1fq5G2-00066F-CJ@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21044)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fq5G1-00065v-TQ
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 19:31:18 -0400
-In-Reply-To: <20180813171132.21939-1-cota@braap.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153437584654.14580.14087700957046835005@502c9da6d61e>
+	(envelope-from <cota@braap.org>) id 1fq5dF-0004OB-T2
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 19:55:21 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:50181)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fq5dF-0004MZ-MP
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 19:55:17 -0400
+Date: Wed, 15 Aug 2018 19:55:14 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180815235514.GA23767@flamenco>
+References: <20180813171132.21939-1-cota@braap.org>
+	<20180813171132.21939-2-cota@braap.org>
+	<20180815030942.GA14092@lemon.usersys.redhat.com>
+	<20180815045323.GA7585@flamenco>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 15 Aug 2018 16:30:48 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/3] synchronization profiler
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180815045323.GA7585@flamenco>
+Subject: Re: [Qemu-devel] [PATCH 1/3] qsp: QEMU's Synchronization Profiler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, crosthwaite.peter@gmail.com, sw@weilnetz.de, dgilbert@redhat.com, peterx@redhat.com, armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Weil <sw@weilnetz.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODEzMTcxMTMyLjIxOTM5LTEtY290YUBicmFhcC5vcmcKU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzNdIHN5bmNocm9uaXphdGlvbiBwcm9maWxlcgoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdp
-dCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBU
-cnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9
-IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21t
-aXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4g
-MSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWls
-IHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFp
-bGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWls
-ZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0
-ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwphYzhm
-MWRjYWNhIHFzcDogdHJhY2sgQlFMIGNhbGxlcnMgZGlyZWN0bHkKNmMwYjM4OTg2NyBtb25pdG9y
-OiBzaG93IHN5bmMgcHJvZmlsaW5nIGluZm8gd2l0aCAnaW5mbyBzeW5jJwpjNDNjNmM4OTIwIHFz
-cDogUUVNVSdzIFN5bmNocm9uaXphdGlvbiBQcm9maWxlcgoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
-Q2hlY2tpbmcgUEFUQ0ggMS8zOiBxc3A6IFFFTVUncyBTeW5jaHJvbml6YXRpb24gUHJvZmlsZXIu
-Li4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJ
-TkVSUyBuZWVkIHVwZGF0aW5nPwojMjYzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBz
-cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojODUzOiBGSUxFOiB1dGls
-L3FzcC5jOjI4OToKKyAgICB2b2lkIGZ1bmNfKHR5cGVfICpvYmosIGNvbnN0IGNoYXIgKmZpbGUs
-IHVuc2lnbmVkIGxpbmUpICAgICAgICAgICAgIFwKICAgICAgICAgICAgICAgICAgICAgIF4KCkVS
-Uk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojODY1OiBGSUxF
-OiB1dGlsL3FzcC5jOjMwMToKKyAgICBpbnQgZnVuY18odHlwZV8gKm9iaiwgY29uc3QgY2hhciAq
-ZmlsZSwgdW5zaWduZWQgbGluZSkgICAgICAgICAgICAgIFwKICAgICAgICAgICAgICAgICAgICAg
-XgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiMxMDI4
-OiBGSUxFOiB1dGlsL3FzcC5jOjQ2NDoKKyAgICBlbnRyeS0+dGltZV9zID0gZS0+bnMgKiAxZS05
-OwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJl
-ZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiMxMDczOiBGSUxFOiB1dGlsL3FzcC5jOjUwOToK
-KyAgICAgICAgICAgIiIsIGUtPnRpbWVfcywgZS0+bl9hY3FzLCBlLT5uc19hdmcgKiAxZS0zKTsK
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRv
-dGFsOiA0IGVycm9ycywgMSB3YXJuaW5ncywgODQxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMzogbW9uaXRvcjog
-c2hvdyBzeW5jIHByb2ZpbGluZyBpbmZvIHdpdGggJ2luZm8gc3luYycuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMy8zOiBxc3A6IHRyYWNrIEJRTCBjYWxsZXJzIGRpcmVjdGx5Li4uCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Wed, Aug 15, 2018 at 00:53:23 -0400, Emilio G. Cota wrote:
+> On Wed, Aug 15, 2018 at 11:09:42 +0800, Fam Zheng wrote:
+> > On Mon, 08/13 13:11, Emilio G. Cota wrote:
+> > > +  --enable-sync-profiler) sync_profiler="yes"
+> > > +  ;;
+> > 
+> > Curious, not asking for a change: can this be made a runtime option instead of
+> > compile time, since there's no library dependencies? That should make this
+> > somewhat easier to use.
+> 
+> Good point. I'll do some profiling tomorrow to see how the latency
+> of the locking primitives could be minimized (ideally, not using
+> the profiler should just add a well-predicted branch).
+
+I reduced it to just a branch, but still, I measured a few percentage
+points (1-2%, depending on the machine) slowdown when this is a
+run-time option. (This is for a bootup+shutdown test of a guest.)
+
+So I'll keep it as a build-time option, then.
+
+Thanks,
+
+		Emilio
