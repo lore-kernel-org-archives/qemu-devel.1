@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fpkhA-0003kL-0e
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 21:33:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1fplH2-0001Io-Af
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 22:11:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fpkh6-0005Zf-NF
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 21:33:55 -0400
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:51189)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fpkh5-0005YD-Lz
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 21:33:51 -0400
-Date: Tue, 14 Aug 2018 21:33:47 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180815013347.GD17669@flamenco>
+	(envelope-from <bounces@canonical.com>) id 1fplGx-0008Pn-79
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 22:11:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50924)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fplGu-0008Ol-D4
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 22:10:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fplGr-000835-N3
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 02:10:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A9B532E8060
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 02:10:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o9e5rl4b.fsf@dusky.pond.sub.org>
-	<20180814094347.GE2580@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 2/3] monitor: show sync profiling info with
- 'info sync'
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 15 Aug 2018 01:58:41 -0000
+From: =?utf-8?q?Leonardo_M=C3=BCller?= <leozinho29_eu@hotmail.com>
+Reply-To: Bug 1787070 <1787070@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153429832178.24411.17323780348611441441.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1787070] [NEW] Guests using the qxl-vga are
+ freezing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +36,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Stefan Weil <sw@weilnetz.de>, Peter Xu <peterx@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Aug 14, 2018 at 10:43:47 +0100, Dr. David Alan Gilbert wrote:
-> * Emilio G. Cota (cota@braap.org) wrote:
-> > +@item info sync
-> 
-> As long as this is just for devs I'm OK with this from the HMP side;
-> however, if you want to automate the display or wire it to other
-> tools then you should probably wire it up via QMP.
+Public bug reported:
 
-On Tue, Aug 14, 2018 at 18:03:32 +0200, Markus Armbruster wrote:
-> "Emilio G. Cota" <cota@braap.org> writes:
-> > +@item info sync
-> 
-> Please explain briefly why you think this command is not going to be
-> useful in QMP.  Recommend to do that right in your commit message.  For
-> instance, you could argue that the information provided is useful only
-> to developers, and developers are just fine with getting it from HMP
-> "info sync".
-> 
-> However, if we expect developers to further process the data, providing
-> it as JSON (via QMP) makes sense, because is saves them the trouble of
-> parsing your (undocumented) HMP output format.
-> 
-> If we decide we want to provide the functionality in QMP, I can help you
-> with the necessary code changes.
+I have noticed that guests using qxl-vga are freezing. They may freeze
+after a few minutes or after many hours. The freeze consists of the
+entire system hanging, except the cursor, but the cursor animation stops
+too. Changing to tty is not possible after this. There are three things
+noticed in common on the guests when they freeze:
 
-Thanks Dave and Markus for taking a look.
+-The guest is using the QXL VGA (freezes weren't observed with other VGAs);
+-A new workload is starting;
+-The mouse cursor is the animated as the one of loading. For example, https=
+://i.imgur.com/raQFteG.png
+ =
 
-This is just for developers. This means (1) the info displayed and the
-output format could change in the future, and (2) it is only meant
-to be used from HMP "info sync-profile".
+The host is Xubuntu 18.04 amd64, QEMU version is 3.0.0-dirty. The guests te=
+sted were:
 
-I'll include the above in the commit log, as Markus suggested.
+-openSUSE Tumbleweed;
+-openSUSE Leap 15;
+-Xubuntu 18.04 Bionic Beaver;
+-CentOS 7.
 
-> > +        .name       = "sync",
-> 
-> I think "info sync-profile" would be clearer.
+With openSUSE guests, the install process couldn't even be finished, as
+the installer would freeze. There were 2 GB of available memory (checked
+in a tty before the freeze) and netconsole was enabled. Unfortunately,
+it was impossible to obtain any information from them. This is an image
+of one openSUSE guest frozen: https://i.imgur.com/ZP0eQKq.png
 
-Done.
+The command line used was:
 
-Thanks,
+qemu-system-x86_64 -nodefaults -m 3072 -M pc,usb=3Dtrue -accel kvm -cpu
+host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+id=3Dcentusb,if=3Dnone,file=3Dleap.qcow2 -device usb-
+storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
+-monitor vc -serial vc  -cdrom "openSUSE-Leap-15.0-DVD-x86_64.iso" -boot
+d
 
-		Emilio
+With CentOS guests, the install process fail sometimes, but sometimes
+it's able to install. However, on the yum update, it would freeze too.
+In one instance it froze while updating glibc, which made the guest
+unbootable. https://i.imgur.com/B3WhSDX.png
+
+The command line used was:
+
+qemu-system-x86_64 -nodefaults -m 2048 -M pc,usb=3Dtrue -accel kvm -cpu
+host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+id=3Dcentusb,if=3Dnone,file=3Dcentos.qcow2 -device usb-
+storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+audio,id=3Dusbaudio -device virtio-vga,virgl=3Dtrue -display gtk -monitor vc
+-serial vc -cdrom "CentOS-7-livecd-GNOME-x86_64.iso" -bios
+/usr/share/ovmf/OVMF.fd
+
+With Xubuntu 18.04 guests, the system worked for many hours until the
+freeze happened. On this case it happened when opening Audacious.
+Fortunately, the logging services worked for some time, which allowed me
+to get a relevant message which can be seen at http://termbin.com/nuof .
+It repeated a few times, but then the logging stopped.
+https://i.imgur.com/2zckqj5.png shows the guest screen in the moment it
+froze.
+
+The command line used was:
+
+qemu-system-x86_64 -nodefaults -m 1024 -M pc,usb=3Dtrue -accel kvm -cpu
+host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+id=3Dcentusb,if=3Dnone,file=3Dxubmini -device usb-
+storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
+-monitor vc -serial vc
+
+I'm sorry for not having more detailed information but, even setting
+netconsole, openSUSE and CentOS guests were unable to print any
+information.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1787070
+
+Title:
+  Guests using the qxl-vga are freezing
+
+Status in QEMU:
+  New
+
+Bug description:
+  I have noticed that guests using qxl-vga are freezing. They may freeze
+  after a few minutes or after many hours. The freeze consists of the
+  entire system hanging, except the cursor, but the cursor animation
+  stops too. Changing to tty is not possible after this. There are three
+  things noticed in common on the guests when they freeze:
+
+  -The guest is using the QXL VGA (freezes weren't observed with other VGAs=
+);
+  -A new workload is starting;
+  -The mouse cursor is the animated as the one of loading. For example, htt=
+ps://i.imgur.com/raQFteG.png
+   =
+
+  The host is Xubuntu 18.04 amd64, QEMU version is 3.0.0-dirty. The guests =
+tested were:
+
+  -openSUSE Tumbleweed;
+  -openSUSE Leap 15;
+  -Xubuntu 18.04 Bionic Beaver;
+  -CentOS 7.
+
+  With openSUSE guests, the install process couldn't even be finished,
+  as the installer would freeze. There were 2 GB of available memory
+  (checked in a tty before the freeze) and netconsole was enabled.
+  Unfortunately, it was impossible to obtain any information from them.
+  This is an image of one openSUSE guest frozen:
+  https://i.imgur.com/ZP0eQKq.png
+
+  The command line used was:
+
+  qemu-system-x86_64 -nodefaults -m 3072 -M pc,usb=3Dtrue -accel kvm -cpu
+  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+  id=3Dcentusb,if=3Dnone,file=3Dleap.qcow2 -device usb-
+  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
+  -monitor vc -serial vc  -cdrom "openSUSE-Leap-15.0-DVD-x86_64.iso"
+  -boot d
+
+  With CentOS guests, the install process fail sometimes, but sometimes
+  it's able to install. However, on the yum update, it would freeze too.
+  In one instance it froze while updating glibc, which made the guest
+  unbootable. https://i.imgur.com/B3WhSDX.png
+
+  The command line used was:
+
+  qemu-system-x86_64 -nodefaults -m 2048 -M pc,usb=3Dtrue -accel kvm -cpu
+  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+  id=3Dcentusb,if=3Dnone,file=3Dcentos.qcow2 -device usb-
+  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+  audio,id=3Dusbaudio -device virtio-vga,virgl=3Dtrue -display gtk -monitor
+  vc -serial vc -cdrom "CentOS-7-livecd-GNOME-x86_64.iso" -bios
+  /usr/share/ovmf/OVMF.fd
+
+  With Xubuntu 18.04 guests, the system worked for many hours until the
+  freeze happened. On this case it happened when opening Audacious.
+  Fortunately, the logging services worked for some time, which allowed
+  me to get a relevant message which can be seen at
+  http://termbin.com/nuof . It repeated a few times, but then the
+  logging stopped. https://i.imgur.com/2zckqj5.png shows the guest
+  screen in the moment it froze.
+
+  The command line used was:
+
+  qemu-system-x86_64 -nodefaults -m 1024 -M pc,usb=3Dtrue -accel kvm -cpu
+  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+  id=3Dcentusb,if=3Dnone,file=3Dxubmini -device usb-
+  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
+  -monitor vc -serial vc
+
+  I'm sorry for not having more detailed information but, even setting
+  netconsole, openSUSE and CentOS guests were unable to print any
+  information.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1787070/+subscriptions
