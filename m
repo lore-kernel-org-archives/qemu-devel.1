@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fpwNY-0008Aj-9e
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:02:29 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fpwdH-0004Bd-5H
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:18:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fpwNG-0001B4-Am
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:02:18 -0400
-Resent-Message-Id: <E1fpwNG-0001B4-Am@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21011)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fpwN2-0000ZS-UD
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:02:05 -0400
-In-Reply-To: <20180808123934.17450-1-alex.bennee@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153432813498.11690.14972227439194314970@502c9da6d61e>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fpwdG-0006dq-00
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:18:43 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180803144721.17036-1-stefanha@redhat.com>
+	<20180803144721.17036-6-stefanha@redhat.com>
+	<1a84a9fc-93f8-3573-c27e-bb60d9c48a7a@amsat.org>
+	<20180813155622.GA18429@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ba150247-7c07-b7fd-f1e8-0c07b5358999@amsat.org>
+Date: Wed, 15 Aug 2018 11:18:25 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 15 Aug 2018 03:15:36 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC PATCH 0/4] add hand-rolled fallback when
- capstone fails
+In-Reply-To: <20180813155622.GA18429@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="UuDcRjS7Zez0TYfEyWAZkHWkYt74ftEMM"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 5/6] loader: Implement .hex
+ file loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +31,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, richard.henderson@linaro.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Su Hang <suhang16@mails.ucas.ac.cn>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, mail@steffen-goertz.de, ilg@livius.net, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>, jusual@mail.ru
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODA4MTIzOTM0LjE3NDUwLTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCAwLzRdIGFkZCBoYW5kLXJvbGxlZCBmYWxs
-YmFjayB3aGVuIGNhcHN0b25lIGZhaWxzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
-IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmRlZjBmMWVjNDYgZGlzYXM6IGFsbG93IGNhcHN0
-b25lIHRvIGRlZmVyIHRvIGEgZmFsbGJhY2sgZnVuY3Rpb24gb24gZmFpbHVyZQowOGYyNTBiNTcx
-IHRhcmdldC9hcm06IGFkZCBhIGZhbGxiYWNrIGRpc2Fzc2VtYmxlIGZ1bmN0aW9uCjQ4OTFhOGZi
-YjcgdGFyZ2V0L2FybTogbW92ZSBkZWNvZGVyIGhlbHBlcnMgaW50byBoZWFkZXIKYjFlNDE2NTZl
-ZiBzY3JpcHRzL2RlY29kZXRyZWUucHk6IGFkZCBhIGRpc2Fzc2VtYmx5IGdlbmVyYXRvciAoSEFD
-SyEpCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQ6IHNjcmlwdHMvZGVj
-b2RldHJlZS5weTogYWRkIGEgZGlzYXNzZW1ibHkgZ2VuZXJhdG9yIChIQUNLISkuLi4KRVJST1I6
-IHVubmVjZXNzYXJ5IHdoaXRlc3BhY2UgYmVmb3JlIGEgcXVvdGVkIG5ld2xpbmUKIzY4OiBGSUxF
-OiBzY3JpcHRzL2RlY29kZXRyZWUucHk6NTAzOgorICAgICAgICBvdXRwdXQoJyIpOyBcbicpCgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODU6IEZJTEU6IHNjcmlwdHMvZGVjb2Rl
-dHJlZS5weToxMDA5OgorICAgIGxvbmdfb3B0cyA9IFsnZGVjb2RlPScsICd0cmFuc2xhdGU9Jywg
-J291dHB1dD0nLCAnaW5zbndpZHRoPScsICdkaXNhc3NlbWJsZSddCgp0b3RhbDogMSBlcnJvcnMs
-IDEgd2FybmluZ3MsIDk4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvNDogdGFyZ2V0L2FybTogbW92ZSBkZWNvZGVy
-IGhlbHBlcnMgaW50byBoZWFkZXIuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
-ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTU6IApuZXcgZmlsZSBt
-b2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMTIgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAz
-LzQ6IHRhcmdldC9hcm06IGFkZCBhIGZhbGxiYWNrIGRpc2Fzc2VtYmxlIGZ1bmN0aW9uLi4uCldB
-Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
-bmVlZCB1cGRhdGluZz8KIzM1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCldBUk5JTkc6IGxpbmUg
-b3ZlciA4MCBjaGFyYWN0ZXJzCiM1MDogRklMRTogdGFyZ2V0L2FybS9kaXNhc3NlbWJsZS5jOjEx
-Ogorc2l6ZV90IGRvX2FhcmNoNjRfZmFsbGJhY2tfZGlzYXNzZW1ibHkoY29uc3QgdWludDhfdCAq
-aW5zbnAsIGNoYXIgKnB0ciwgc2l6ZV90IG4pCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojNzA6IEZJTEU6IHRhcmdldC9hcm0vaW50ZXJuYWxzLmg6Nzk5Ogorc2l6ZV90IGRvX2Fh
-cmNoNjRfZmFsbGJhY2tfZGlzYXNzZW1ibHkoY29uc3QgdWludDhfdCAqaW5zbiwgY2hhciAqcHRy
-LCBzaXplX3Qgbik7Cgp0b3RhbDogMCBlcnJvcnMsIDMgd2FybmluZ3MsIDM5IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0gg
-NC80OiBkaXNhczogYWxsb3cgY2Fwc3RvbmUgdG8gZGVmZXIgdG8gYSBmYWxsYmFjayBmdW5jdGlv
-biBvbiBmYWlsdXJlLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEByZWRoYXQuY29t
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UuDcRjS7Zez0TYfEyWAZkHWkYt74ftEMM
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Su Hang <suhang16@mails.ucas.ac.cn>, qemu-devel@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com,
+ mail@steffen-goertz.de, ilg@livius.net,
+ Alistair Francis <alistair@alistair23.me>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, jusual@mail.ru
+Message-ID: <ba150247-7c07-b7fd-f1e8-0c07b5358999@amsat.org>
+Subject: Re: [Qemu-arm] [PATCH v4 5/6] loader: Implement .hex file loader
+References: <20180803144721.17036-1-stefanha@redhat.com>
+ <20180803144721.17036-6-stefanha@redhat.com>
+ <1a84a9fc-93f8-3573-c27e-bb60d9c48a7a@amsat.org>
+ <20180813155622.GA18429@stefanha-x1.localdomain>
+In-Reply-To: <20180813155622.GA18429@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+
+On 08/13/2018 12:56 PM, Stefan Hajnoczi wrote:
+> On Fri, Aug 10, 2018 at 02:00:44AM -0300, Philippe Mathieu-Daud=E9 wrot=
+e:
+>> On 08/03/2018 11:47 AM, Stefan Hajnoczi wrote:
+>>> +        parser->rom_start_address =3D parser->next_address_to_write;=
+
+>>> +        parser->current_rom_index =3D 0;
+>>> +        break;
+>>> +
+>>> +    case START_SEG_ADDR_RECORD:
+>>> +        if (line->byte_count !=3D 4 && line->address !=3D 0) {
+>>> +            return -1;
+>>> +        }
+>>> +
+>>> +        /* x86 16-bit CS:IP segmented addressing */
+>>> +        *(parser->start_addr) =3D (((line->data[0] << 8) | line->dat=
+a[1]) << 4) |
+>>> +                                (line->data[2] << 8) | line->data[3]=
+;
+>>
+>> Can you add a qtest for this case?
+>> For the HEX loader I understand the specs as this is the same parsing =
+as
+>> the START_LINEAR_ADDR_RECORD case; so I disagree with data[0] and
+>> data[1] shifts.
+>=20
+> x86 real-mode CS:IP addressing means (CS << 4) + IP.  It produces 24-bi=
+t
+> addresses on 80286 and later.  This is not the same as
+> START_LINEAR_ADDR_RECORD.
+
+OK!
+
+>=20
+> GNU bfd implements it as follows:
+>=20
+>   abfd->start_address +=3D (HEX4 (buf) << 4) + HEX4 (buf + 4);
+
+Hmm any idea why they use +4 ?
+
+>=20
+> https://sourceware.org/git/?p=3Dbinutils.git;a=3Dblob;f=3Dbfd/ihex.c;h=3D=
+09f756a1c2c11e57c5da15a6ff96491275575b86;hb=3DHEAD#l415
+>=20
+> Thanks for commenting on this, I had written (CS << 4) | IP instead of
+> (CS << 4) + IP.  This will be fixed in the next revision.
+>=20
+>> This is different for the consumer (i386 expects 2 16-bit registers bu=
+t
+>> HexParser->start_addr is a hwaddr, used as a single (at least) 32-bit
+>> register.
+>=20
+> I think you're saying that on x86 the guest CS:IP registers should be
+> set.  This loader is never called from hw/i386/ so it doesn't matter at=
+
+> this time.
+
+OK.
+
+>=20
+> GNU bfd uses START_SEG_ADDR_RECORD records on non-x86 architectures
+> where there are no segment registers and that's where we've encountered=
+
+> them.
+>=20
+
+
+--UuDcRjS7Zez0TYfEyWAZkHWkYt74ftEMM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlt0NjIACgkQ4+MsLN6t
+wN4F8A//SCak8dOCJ1TDvHVZwz8dbBSmkf1ag8MypGWL+3ytETg0Fs4fUydOqRty
+rL7avDtYE7EQIz5aps/sOzeNtnNqbudNkgNkudzIaAywxIMF17PBta+0IueKQoWX
+btgu+Gq/OdQeEWC4bz9Ez8BH0/I+9kJAjuzfSAR2yJXA8zc70qZ+lWC4iTfJ/+Wi
+xqulS/C6PC9K68L+8Fxa2CyiA86BA+sc28cdwOuQogYVjS6a3wwZe3deYmWMvLxX
+3cmqOTq+Twjp+A9bdbGyEVz15p+dA1xvNvJlxTYN+IaQ8Yg5PIbxUdB1tAOWivE2
+mt7G7Qex+1vG8jGS5Ae+9ZLDhtQsv/uQGXFBLphopc8Q3S4Tjz2WHEyXmG6FYxFi
+3fVsmxVwAGxjDusl6N0LWqvq/BhU/eAFBK0l+WPVhClI3gRpiW6YZd9XVx+4yX+n
+SmV+hWpENDbUyLccfyrPVZ2fswkMxXT3o/F7kPw0JNIPQx2MDg1SuKiHBjWjCeeZ
+HTaFf8UWSZ4lrLCAjjssnsQNIelvQiVxJzyP6WBXEUFAhlQH/xD0DEy6AJxWyrYn
++zFNHgb6ijNYX07MNJ0fq5z5ANb3fFtpA0GVumJezXxc780RBVonVBwIkAtEp169
+b3oPTPCDxnbL4ZcGDZR79GUCT8EfBOq07z6GsVzeJnjDukPkEOM=
+=z7DE
+-----END PGP SIGNATURE-----
+
+--UuDcRjS7Zez0TYfEyWAZkHWkYt74ftEMM--
