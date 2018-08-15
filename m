@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fpmFb-0007Jz-Dn
+	(envelope-from <famz@redhat.com>) id 1fpmFZ-0007Jj-Bc
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:13:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fpmFa-0001t2-Mf
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:13:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35490 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1fpmFY-0001mC-Kc
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:13:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36198 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fpmFa-0001qx-F2
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:13:34 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fpmFY-0001k8-AI
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:13:32 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 15 Aug 2018 11:12:48 +0800
-Message-Id: <20180815031248.14908-18-famz@redhat.com>
+Date: Wed, 15 Aug 2018 11:12:47 +0800
+Message-Id: <20180815031248.14908-17-famz@redhat.com>
 In-Reply-To: <20180815031248.14908-1-famz@redhat.com>
 References: <20180815031248.14908-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 17/17] aio-posix: Improve comment around marking
- node deleted
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 16/17] tests/vm: Add vm-build-all/vm-clean-all
+ in help text
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +30,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-The counter is for qemu_lockcnt_inc/dec sections (read side),
-qemu_lockcnt_lock/unlock is for the write side.
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Suggested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20180803063917.30292-1-famz@redhat.com>
+Message-Id: <20180727083445.21436-1-famz@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- util/aio-posix.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/vm/Makefile.include | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index b5c609b68b..131ba6b4a8 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -232,7 +232,7 @@ void aio_set_fd_handler(AioContext *ctx,
-             g_source_remove_poll(&ctx->source, &node->pfd);
-         }
- 
--        /* If the lock is held, just mark the node as deleted */
-+        /* If a read is in progress, just mark the node as deleted */
-         if (qemu_lockcnt_count(&ctx->list_lock)) {
-             node->deleted = 1;
-             node->pfd.revents = 0;
--- 
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index 76f416286e..a98fb3027f 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -15,6 +15,9 @@ vm-test:
+ 	@echo "  vm-build-netbsd                 - Build QEMU in NetBSD VM"
+ 	@echo "  vm-build-openbsd                - Build QEMU in OpenBSD VM"
+ 	@echo "  vm-build-centos                 - Build QEMU in CentOS VM, wit=
+h Docker"
++	@echo ""
++	@echo "  vm-build-all                    - Build QEMU in all VMs"
++	@echo "  vm-clean-all                    - Clean up VM images"
+=20
+ vm-build-all: $(addprefix vm-build-, $(IMAGES))
+=20
+--=20
 2.17.1
