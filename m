@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpqoa-0001bQ-TW
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 04:06:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1fpqv0-0004B2-Mt
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 04:12:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpqoV-0003Sl-GW
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 04:06:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60638)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fpqoU-0003QN-Tr
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 04:05:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fpqoS-0001ct-Qn
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 08:05:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AEA4A2E851F
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 08:05:52 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1fpquz-0005Xd-Cx
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 04:12:38 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180725151011.25951-1-armbru@redhat.com>
+	<5e713599-997f-7dda-917c-80902f6ef328@redhat.com>
+	<20180725160144.GJ12855@redhat.com>
+	<20180728043238.GC1325070@localhost.localdomain>
+	<371fc437-1330-6873-7f6d-99af8d56c5df@redhat.com>
+Date: Wed, 15 Aug 2018 10:12:12 +0200
+In-Reply-To: <371fc437-1330-6873-7f6d-99af8d56c5df@redhat.com> (Max Reitz's
+	message of "Sun, 29 Jul 2018 16:51:40 +0200")
+Message-ID: <87ftzgnj4z.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Aug 2018 07:59:17 -0000
-From: Daniel Berrange <1787012@bugs.launchpad.net>
-Reply-To: Bug 1787012 <1787012@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153427470081.24411.7587190537485631648.malonedeb@soybean.canonical.com>
-Message-Id: <153431995789.26794.7090448134920388983.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1787012] Re: Solaris build error: Bad string
+Subject: Re: [Qemu-devel] [RFC PATCH] rbd: Don't convert keypairs to JSON
+ and back
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,163 +28,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: Jeff Cody <jcody@redhat.com>, "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>, kwolf@redhat.com, jdurgin@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-It sounds more like a bug / limited featureset in the Solaris 'tr'
-binary.
+Max Reitz <mreitz@redhat.com> writes:
 
-What is your $PATH ?  Make sure /usr/xpg4/bin  directory appears
-*before* /usr/bin in $PATH to get a more functional version of 'tr',
-though I'm not sure if that'll fix it or not.
+> On 2018-07-28 06:32, Jeff Cody wrote:
+>> On Wed, Jul 25, 2018 at 05:01:44PM +0100, Daniel P. Berrang=C3=A9 wrote:
+>>> On Wed, Jul 25, 2018 at 10:56:48AM -0500, Eric Blake wrote:
+>>>> On 07/25/2018 10:10 AM, Markus Armbruster wrote:
+>>>>> qemu_rbd_parse_filename() builds a keypairs QList, converts it to JSO=
+N, and
+>>>>> stores the resulting QString in a QDict.
+>>>>>
+>>>>> qemu_rbd_co_create_opts() and qemu_rbd_open() get the QString from the
+>>>>> QDict, pass it to qemu_rbd_set_keypairs(), which converts it back into
+>>>>> a QList.
+>>>>>
+>>>>> Drop both conversions, store the QList instead.
+>>>>>
+>>>>> This affects output of qemu-img info.  Before this patch:
+>>>>>
+>>>>>      $ qemu-img info rbd:rbd/testimg.raw:mon_host=3D192.168.15.180:rb=
+d_cache=3Dtrue:conf=3D/tmp/ceph.conf
+>>>>>      [junk printed by Ceph library code...]
+>>>>>      image: json:{"driver": "raw", "file": {"pool": "rbd", "image": "=
+testimg.raw", "conf": "/tmp/ceph.conf", "driver": "rbd", "=3Dkeyvalue-pairs=
+": "[\"mon_host\", \"192.168.15.180\", \"rbd_cache\", \"true\"]"}}
+>>>>>      [more output, not interesting here]
+>>>>>
+>>>>> After this patch, we get
+>>>>>
+>>>>>      image: json:{"driver": "raw", "file": {"pool": "rbd", "image": "=
+testimg.raw", "conf": "/tmp/ceph.conf", "driver": "rbd", "=3Dkeyvalue-pairs=
+": ["mon_host", "192.168.15.180", "rbd_cache", "true"]}}
+>>>>>
+>>>>> The value of member "=3Dkeyvalue-pairs" changes from a string contain=
+ing
+>>>>> a JSON array to that JSON array.  That's an improvement of sorts.  Ho=
+wever:
+>>>>>
+>>>>> * Should "=3Dkeyvalue-pairs" even be visible here?  It's supposed to =
+be
+>>>>>    purely internal...
+>>>>
+>>>> I'd argue that since it is supposed to be internal (as evidenced by the
+>>>> leading '=3D' that does not name a normal variable), changing it doesn=
+'t hurt
+>>>> stability. But yes, it would be nicer if we could filter it entirely s=
+o that
+>>>> it does not appear in json: output, if it doesn't truly affect the con=
+tents
+>>>> that the guest would see.
+>>>
+>>> If it appears in the json: output, then that means it could get written
+>>> into qcow2 headers as a backing file name, which would make it ABI
+>>> sensitive. This makes it even more important to filter it if it is supp=
+osed
+>>> to be internal only, with no ABI guarantee.
+>>>
+>>=20
+>> It's been present for a couple releases (counting 3.0); is it safe to
+>> assume that, although it could be present in the qcow2 headers, that it =
+will
+>> not break anything by altering it or removing it?
+>
+> Did =3Dkeyvalue-pairs even work in json:{} filename?  If so, it will
+> continue to work even after filtering it.  If not, then filtering it
+> won't break existing files because they didn't work before either.
 
--- =
+I'm afraid it does work:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1787012
+    $ gdb --args upstream-qemu -nodefaults -S -display vnc=3D:0 -readconfig=
+ test.cfg 'json:{"driver": "raw", "file": {"pool": "rbd", "image": "testimg=
+.raw", "conf": "/tmp/ceph.conf", "driver": "rbd", "=3Dkeyvalue-pairs": "[\"=
+mon_host\", \"192.168.15.180\", \"rbd_cache\", \"true\"]"}}'
+    GNU gdb (GDB) Fedora 8.1-25.fc28
+    [...]
+    (gdb) b qemu_rbd_open=20
+    Breakpoint 1 at 0x845f83: file /work/armbru/qemu/block/rbd.c, line 660.
+    (gdb) r
+    Starting program: /home/armbru/bin/upstream-qemu -nodefaults -S -displa=
+y vnc=3D:0 -readconfig test.cfg json:\{\"driver\":\ \"raw\",\ \"file\":\ \{=
+\"pool\":\ \"rbd\",\ \"image\":\ \"testimg.raw\",\ \"conf\":\ \"/tmp/ceph.c=
+onf\",\ \"driver\":\ \"rbd\",\ \"=3Dkeyvalue-pairs\":\ \"\[\\\"mon_host\\\"=
+,\ \\\"192.168.15.180\\\",\ \\\"rbd_cache\\\",\ \\\"true\\\"\]\"\}\}
+    [...]
+    Thread 1 "upstream-qemu" hit Breakpoint 1, qemu_rbd_open (bs=3D0x555556=
+a5a970,=20
+        options=3D0x555556a5ec40, flags=3D24578, errp=3D0x7fffffffd370)
+        at /work/armbru/qemu/block/rbd.c:660
+    660	{
+    [...]
+    (gdb) n
+    661	    BDRVRBDState *s =3D bs->opaque;
+    (gdb)=20
+    662	    BlockdevOptionsRbd *opts =3D NULL;
+    (gdb)=20
+    665	    Error *local_err =3D NULL;
+    (gdb)=20
+    669	    keypairs =3D g_strdup(qdict_get_try_str(options, "=3Dkeyvalue-p=
+airs"));
+    (gdb)=20
+    670	    if (keypairs) {
+    (gdb) p keypairs=20
+    $1 =3D 0x5555569e54c0 "[\"mon_host\", \"192.168.15.180\", \"rbd_cache\"=
+, \"true\"]"
 
-Title:
-  Solaris build error: Bad string
+It really, really, really should not work.
 
-Status in QEMU:
-  New
+It doesn't work with anything that relies on QAPI to represent
+configuration (such as QMP's blockdev-add), because BlockdevOptionsRbd
+doesn't have it.
 
-Bug description:
-  While building qemu2.12.0 on a Sun Oracle Enterprise M3000 SPARC64 VII
-  running Solaris 10U11, opencsw toolchain, gcc 7.3.0, and python 3.3.6
-  I get:
+It works with -drive only with a pseudo-filename (more on that below),
+even though -drive uses QemuOpts and QDict rather than QAPI, because the
+(carefully chosen) name "=3Dkeyvalue-pairs" is impossible to use with
+QemuOpts.
 
-  # gmake
-  mkdir -p dtc/libfdt
-  mkdir -p dtc/tests
-  Bad string
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dumptrees.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/trees.S
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/testutils.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/value-labels.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/asm_tree_dump.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/truncated_property=
-.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/check_path.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/overlay_bad_fixup.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/overlay.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/subnode_iterate.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/property_iterate.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/integer-expression=
-s.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/utilfdt_test.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path_offset_aliase=
-s.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/add_subnode_with_n=
-ops.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtbs_equal_unorder=
-ed.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtb_reverse.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/dtbs_equal_ordered=
-.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/extra-terminating-=
-null.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/incbin.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/boot-cpuid.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/phandle_format.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path-references.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/references.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/string_escapes.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/propname_escapes.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/appendprop2.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/appendprop1.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/del_node.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/del_property.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/setprop.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/set_name.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/rw_tree1.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/open_pack.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nopulate.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/mangle-layout.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/move_and_save.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/sw_tree1.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nop_node.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/nop_property.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/setprop_inplace.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/stringlist.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/addr_size_cells.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/notfound.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/sized_cells.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/char_literal.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_alias.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_com=
-patible.c         DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_check_=
-compatible.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_pha=
-ndle.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/node_offset_by_pro=
-p_value.c         DEP /export/home/denber/qemu-2.12.0/dtc/tests/parent_offs=
-et.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/supernode_atdepth_=
-offset.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_path.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_phandle.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/getprop.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_name.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/path_offset.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/subnode_offset.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/find_property.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/root_node.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/tests/get_mem_rsv.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_overlay.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_addresses.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_empty_tree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_strerror.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_rw.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_sw.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_wip.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt_ro.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/libfdt/fdt.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/util.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtoverlay.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtput.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtget.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fdtdump.c
-           DEP convert-dtsv0-lexer.lex.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/srcpos.c
-           DEP dtc-parser.tab.c
-           DEP dtc-lexer.lex.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/treesource.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/livetree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/fstree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/flattree.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/dtc.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/data.c
-           DEP /export/home/denber/qemu-2.12.0/dtc/checks.c
-  Bad string
-           CC libfdt/fdt.o
-           CC libfdt/fdt_ro.o
-           CC libfdt/fdt_wip.o
-           CC libfdt/fdt_sw.o
-           CC libfdt/fdt_rw.o
-           CC libfdt/fdt_strerror.o
-           CC libfdt/fdt_empty_tree.o
-           CC libfdt/fdt_addresses.o
-           CC libfdt/fdt_overlay.o
-           AR libfdt/libfdt.a
-  a - libfdt/fdt.o
-  a - libfdt/fdt_ro.o
-  a - libfdt/fdt_wip.o
-  a - libfdt/fdt_sw.o
-  a - libfdt/fdt_rw.o
-  a - libfdt/fdt_strerror.o
-  a - libfdt/fdt_empty_tree.o
-  a - libfdt/fdt_addresses.o
-  a - libfdt/fdt_overlay.o
-  ar: creating libfdt/libfdt.a
-  ar: writing libfdt/libfdt.a
-  ...
+However, we missed the json:... backdoor :(
 
-  gmake then completes, returning just a "#" prompt and no error
-  messages.  However, no executable is created.  Apparently, "Bad
-  string" is the problem, but it is unclear what that means and where
-  the two instances of it are coming from.  A web search for this
-  problem returned nothing.
+Block device configuration has become waaaaay too baroque.  I can't keep
+enough of it in my mind at the same time to change it safely.  I believe
+none of us can.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1787012/+subscriptions
+> To me personally the issue is that if you can specify a plain filename,
+> bdrv_refresh_filename() should give you that plain filename back.  So
+> rbd's implementation of that is lacking.  Well, it just doesn't exist.
+
+I'm not even sure I understand what you're talking about.
+
+>> If so, and we are comfortable changing the output the way this patch does
+>> (technically altering ABI anyway), we might as well go all the way and
+>> filter it out completely.  That would be preferable to cleaning up the j=
+son
+>> output of the internal key/value pairs, IMO.
+>
+> Well, this filtering at least is done by my "Fix some filename
+> generation issues" series.
+
+Likewise.
+
+Back to rbd.  =3Dkeyvalue-pairs exists only to implement the part after
+':' in pseudo-filenames
+rbd:poolname/devicename[@snapshotname][:option1=3Dvalue1[:option2=3Dvalue2.=
+..]]
+
+Lets you pass arbitrary configuration to rados_conf_set().  We pass it
+before we pass configuration the rbd driver computes (such as
+rbd_cache), which should get conflicting key-value pairs silently
+ignored.
+
+We treat "id" and "conf" specially.  "id" gets passed to rados_create(),
+not rados_conf_set().  "conf" names a configuration file, i.e. it's yet
+another way to pass arbitrary configuration, this time via
+rados_conf_read_file().  We call that before passing the non-special
+key-value pairs to rados_conf_set(), which should get conflicting
+settings in the conf file silently ignored.
+
+We provide the equivalent to "id" and "conf" in QAPI, but we refused to
+provide key-value pairs.
+
+Same for -drive without a pseudo-filename.
+
+Unfortunately, our attempt to confine the unloved key-value pair feature
+to pseudo-filenames has failed: it escaped through the json: backdoor.
+
+Can we get rid of the key-value pair feature?
