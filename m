@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fpmFB-00070R-5q
+	(envelope-from <famz@redhat.com>) id 1fpmFB-00070S-5u
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fpmF9-0000xD-Na
+	(envelope-from <famz@redhat.com>) id 1fpmF7-0000qZ-JK
 	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:13:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35710 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35706 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fpmF9-0000vq-Ce
-	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:13:07 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fpmF7-0000pI-Ax
+	for qemu-devel@nongnu.org; Tue, 14 Aug 2018 23:13:05 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 15 Aug 2018 11:12:36 +0800
-Message-Id: <20180815031248.14908-6-famz@redhat.com>
+Date: Wed, 15 Aug 2018 11:12:35 +0800
+Message-Id: <20180815031248.14908-5-famz@redhat.com>
 In-Reply-To: <20180815031248.14908-1-famz@redhat.com>
 References: <20180815031248.14908-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 05/17] aio-posix: Don't count ctx->notifier as
- progress when polling
+Subject: [Qemu-devel] [PULL 04/17] nvme: simplify plug/unplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +26,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-The same logic exists in fd polling. This change is especially important
-to avoid busy loop once we limit aio_notify_accept() to blocking
-aio_poll().
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20180809132259.18402-2-famz@redhat.com>
+bdrv_io_plug/bdrv_io_unplug take care of keeping a nesting count,
+so change s->plugged to just a bool.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20180813144320.12382-2-pbonzini@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- util/aio-posix.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ block/nvme.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index 118bf5784b..b5c7f463aa 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -494,7 +494,8 @@ static bool run_poll_handlers_once(AioContext *ctx)
-     QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-         if (!node->deleted && node->io_poll &&
-             aio_node_check(ctx, node->is_external) &&
--            node->io_poll(node->opaque)) {
-+            node->io_poll(node->opaque) &&
-+            node->opaque != &ctx->notifier) {
-             progress = true;
-         }
+diff --git a/block/nvme.c b/block/nvme.c
+index 37805e8890..781d77d6d2 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -104,7 +104,7 @@ typedef struct {
+     uint64_t nsze; /* Namespace size reported by identify command */
+     int nsid;      /* The namespace id to read/write data. */
+     uint64_t max_transfer;
+-    int plugged;
++    bool plugged;
+ 
+     CoMutex dma_map_lock;
+     CoQueue dma_flush_queue;
+@@ -1101,7 +1101,8 @@ static void nvme_attach_aio_context(BlockDriverState *bs,
+ static void nvme_aio_plug(BlockDriverState *bs)
+ {
+     BDRVNVMeState *s = bs->opaque;
+-    s->plugged++;
++    assert(!s->plugged);
++    s->plugged = true;
+ }
+ 
+ static void nvme_aio_unplug(BlockDriverState *bs)
+@@ -1109,14 +1110,13 @@ static void nvme_aio_unplug(BlockDriverState *bs)
+     int i;
+     BDRVNVMeState *s = bs->opaque;
+     assert(s->plugged);
+-    if (!--s->plugged) {
+-        for (i = 1; i < s->nr_queues; i++) {
+-            NVMeQueuePair *q = s->queues[i];
+-            qemu_mutex_lock(&q->lock);
+-            nvme_kick(s, q);
+-            nvme_process_completion(s, q);
+-            qemu_mutex_unlock(&q->lock);
+-        }
++    s->plugged = false;
++    for (i = 1; i < s->nr_queues; i++) {
++        NVMeQueuePair *q = s->queues[i];
++        qemu_mutex_lock(&q->lock);
++        nvme_kick(s, q);
++        nvme_process_completion(s, q);
++        qemu_mutex_unlock(&q->lock);
+     }
+ }
  
 -- 
 2.17.1
