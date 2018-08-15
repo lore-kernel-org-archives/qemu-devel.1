@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fq1x3-00009T-2j
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:59:33 -0400
+	(envelope-from <simon@ruderich.org>) id 1fq26Q-0007Eg-J4
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 16:09:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fpyVe-0006tf-Cl
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 12:19:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41218 helo=mx1.redhat.com)
+	(envelope-from <simon@ruderich.org>) id 1fq26L-0000Zb-LU
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 16:09:10 -0400
+Received: from zucker2.schokokeks.org ([178.63.68.90]:53569)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fpyVd-0006hA-AJ
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 12:18:57 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 916DD40216E8
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 16:18:28 +0000 (UTC)
-References: <20180808114830.7169-1-quintela@redhat.com>
-	<20180808114830.7169-18-quintela@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <159b7f67-2484-3339-48e5-b9cd944de579@redhat.com>
-Date: Wed, 15 Aug 2018 18:18:25 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180808114830.7169-18-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 17/22] virtio: split vhost-user-scsi
- bits from virtio-pci
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1fpy6K-00028V-LX
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 11:53:27 -0400
+Date: Wed, 15 Aug 2018 17:46:26 +0200
+From: Simon Ruderich <simon@ruderich.org>
+Message-ID: <20180815154626.GA23638@ruderich.org>
+References: <cover.1526916378.git.simon@ruderich.org>
+	<851d095cd457109e4a22a2e5ecd36ccbdacbf48b.1526916378.git.simon@ruderich.org>
+	<20180810103650.GA2391@work-vm>
+	<20180814141826.GA26558@ruderich.org>
+	<871sb1t0cn.fsf@dusky.pond.sub.org>
+	<20180814190329.GA13798@ruderich.org>
+	<87pnykqmw4.fsf@dusky.pond.sub.org>
+	<20180815124154.GA1116@ruderich.org>
+	<87bma3ityy.fsf@dusky.pond.sub.org>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="=_zucker.schokokeks.org-3487-1534347986-0001-2"
+Content-Disposition: inline
+In-Reply-To: <87bma3ityy.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,55 +36,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 08/08/2018 01:48 PM, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hw/virtio/Makefile.objs         |  1 +
->  hw/virtio/vhost-user-scsi-pci.c | 89 +++++++++++++++++++++++++++++++++
->  hw/virtio/virtio-pci.c          | 58 ---------------------
->  3 files changed, 90 insertions(+), 58 deletions(-)
->  create mode 100644 hw/virtio/vhost-user-scsi-pci.c
-> 
-> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-> index 2c95c55bd0..a5d2e38d3a 100644
-> --- a/hw/virtio/Makefile.objs
-> +++ b/hw/virtio/Makefile.objs
-> @@ -12,6 +12,7 @@ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-p
->  obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
->  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o vhost-vsock-pci.o
->  obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
-> +obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
->  obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
->  obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
->  obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
-> diff --git a/hw/virtio/vhost-user-scsi-pci.c b/hw/virtio/vhost-user-scsi-pci.c
-> new file mode 100644
-> index 0000000000..6f3a73c2a8
-> --- /dev/null
-> +++ b/hw/virtio/vhost-user-scsi-pci.c
-> @@ -0,0 +1,89 @@
-> +/*
-> + * Virtio PCI Bindings
-> + *
-> + * Copyright IBM, Corp. 2007
-> + * Copyright (c) 2009 CodeSourcery
-> + *
-> + * Authors:
-> + *  Anthony Liguori   <aliguori@us.ibm.com>
-> + *  Paul Brook        <paul@codesourcery.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.  See
-> + * the COPYING file in the top-level directory.
-> + *
-> + * Contributions after 2012-01-13 are licensed under the terms of the
-> + * GNU GPL, version 2 or (at your option) any later version.
-> + */
+This is a MIME-formatted message.  If you see this text it means that your
+E-mail software does not support MIME-formatted messages.
 
-The vhost-user-scsi code has been introduced in 2017 by Felipe
-Franciosi, so I think you could remove the above "Authors" lines, and
-adjust the GPL license statement to plain GPLv2+ here.
+--=_zucker.schokokeks.org-3487-1534347986-0001-2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- Thomas
+On Wed, Aug 15, 2018 at 04:29:25PM +0200, Markus Armbruster wrote:
+>> For the HMP or the QMP interface?
+>
+> Both.
+
+Ok.
+
+>> If you think 'offset' is not necessary I can also drop it
+>> completely.
+>
+> I think it's a reasonable feature, and since you already coded it up...
+
+In that case, should size also become optional? As already
+suggested in this thread (and similar for QMP):
+
+On Fri, Aug 10, 2018 at 11:36:51AM +0100, Dr. David Alan Gilbert wrote:
+> Also, had you considered rearranging and making them optional,
+> for example if you do:
+>
+> val:l,filename:F,offset:i?,size:i?
+>
+> I think that would mean you can do the fairly obvious:
+>   pmemload addr "myfile"
+>
+> with the assumption that loads the whole file.
+
+This would deviate from pmemsave/memsave, but feels more natural.
+
+How are multiple optional parameters handled? Filled from
+left-to-right?
+
+Regards
+Simon
+--=20
++ privacy is necessary
++ using gnupg http://gnupg.org
++ public key id: 0x92FEFDB7E44C32F9
+
+--=_zucker.schokokeks.org-3487-1534347986-0001-2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEO7rfWMMObpFkF3n0kv79t+RMMvkFAlt0Ss4ACgkQkv79t+RM
+MvmBGxAAkhnc7ERUTAqXUULFbkPqk0dLV6/W4RLt2PO+y6Csw9EjKvz1yA8qwaa5
+0+sWY+dEqUo1w18chd3RFQoAv6WkVADvt048H9w2Vyru6Frzr/M83l6inOKleCdA
+ZGHNyVLfoIM85qusNu1FB2BtHF8JT1/IyRQhMOOwm+214hyVHZfVkdpB/KArQ16R
+soboPq6RlwHDkCx1q3/pFJTaS9Wfz2OxJ+lMcEIovKJv98Ssdfv99eAJt0raV2tX
+CoS7YhSxH+Kg29nLrswY7lHMCLJfYVPKoeZG/nnR4K1/2AFeblV79+fBKk0YzEV4
+JnvqJO1O0G+UtrrzolUIljL9WXxy+wJ51B/FikhRid5Q6WZIaSLIeVoCh0t164Pa
+dQxfYxb60l/AKkEHFIwSxvFDVx0z9QBTzjCAv4q4rHUWkesNzhIw2N489irj4Igd
+ApbaLce1h8J+W9Xuw7zG5YR7b1DZqeQ3a8I+pMBG+t7AuYXZKeuPYbLSHolFzr6s
+NHLJHhzzqXxd+N/UgFlivc6UcJ3kGzaHIezmfSb7sJvYMn9TxozX8bxrYrc0+kuT
+Mr1GJYlOb3G6sc3TULXPgNt/FnJ3eNZUn3hjAIo9kIkM16/km108cVeMzgl0yBLE
+/quImyu8r9EqtQRjydNROd8U4hZskCdE7ScY2IkoQ/cfRMMzzjo=
+=/Ux3
+-----END PGP SIGNATURE-----
+
+--=_zucker.schokokeks.org-3487-1534347986-0001-2--
