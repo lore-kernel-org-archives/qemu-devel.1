@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fq1P0-00004w-G0
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:24:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1fq1Vg-0008Ml-Ms
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:31:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fq1Oo-0002Su-O6
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:24:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47364)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fpyOM-0002ea-Lv
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 12:11:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fpyOI-0006Vz-Q5
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 16:11:22 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A08EE2E851E
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 16:11:22 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1fq1VZ-0004Ac-OA
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:31:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60708 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fq1VZ-0004AX-JX
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:31:05 -0400
+References: <20180810132800.38549-1-eblake@redhat.com>
+	<904458f5-7eeb-649d-7aff-9d9ff6d75d64@redhat.com>
+	<874lfyenvg.fsf@dusky.pond.sub.org>
+	<cfded956-ccab-1070-ba1c-9a73bd61cc5d@redhat.com>
+	<8736vfkb1l.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <66dcfc08-46a5-499b-79cd-bc811a1fdb51@redhat.com>
+Date: Wed, 15 Aug 2018 14:31:01 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Aug 2018 15:56:37 -0000
-From: Michele Denber <1785698@bugs.launchpad.net>
-Reply-To: Bug 1785698 <1785698@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153358448492.29549.3601216229452882398.malonedeb@chaenomeles.canonical.com>
-	<153433022571.24449.6367170153969202549.malone@soybean.canonical.com>
-Message-Id: <5B744D35.80805@gmx.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BBug_1785698=5D_Re=3A_Solaris_build_err?=
- =?utf-8?b?b3I6IHVua25vd24gdHlwZSBuYW1lIOKAmGdjcnlfZXJyb3JfdOKAmQ==?=
+In-Reply-To: <8736vfkb1l.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] tests/libqtest: Improve kill_qemu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,300 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, mst@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org, alex.bennee@linaro.org, rth@twiddle.net
 
-On 08-15-2018 6:50 AM, Peter Maydell wrote:
-> The executables are created in the subdirectories for each target, so
-> x86_64-softmmu/qemu-system-x86_64 and so on.
->
-Oh duh!  :-)  I'm really glad I asked.  I've been trying to figure out =
+On 08/15/2018 08:35 AM, Markus Armbruster wrote:
 
-why there was no executable and no errors.  Sure enough, I found =
+>>>>> /i386/ahci/sanity: tests/libqtest.c:119: kill_qemu() detected QEMU death from signal 11 (Segmentation fault) (core dumped)
+>>>>
+>>>> Well, it would help if my commit message actually matched...
 
-qemu-system-x86_64 right there in the x86_64-softmmu directory.  I ran =
+>>>>> +                const char *dump = WCOREDUMP(wstatus) ? " (dumped core)" : "";
 
-that and it started right up.  I guess I was thinking more along the =
+>>>> ...the code.
+>>>
+>>> I got libqtest patches in my queue, and I could stick this patch in.
+>>> Would you like me to touch up the commit message when I apply?  Or
+>>> should I expect v5?
+>>>
+>>
+>> If you don't mind doing the touchup (s/core dumped/dumped core/), then
+>> I don't need to submit v5.
+> 
+> Since "core dumped" is how the shell traditionally reports this, I'd
+> prefer to adjust the code to match the commit message.  Okay?
 
-lines of VirtualBox where you start one program and choose a VM from =
+Yes.
 
-there.  Thanks!
-
-             - Michele
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1785698
-
-Title:
-  Solaris build error: unknown type name =E2=80=98gcry_error_t=E2=80=99
-
-Status in QEMU:
-  New
-
-Bug description:
-  Building qemu 2.12.0 on a Sun Oracle Enterprise M3000 SPARC64 VII,
-  Solaris 10 Update 11, opencsw toolchain and gcc 7.3.0, gmake fails
-  with a bunch of related errors all in cypher-gcrypt.c:
-
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:262:32: error: =E2=
-=80=98gcry_cipher_hd_t=E2=80=99 undeclared (first use in this function); di=
-d you mean =E2=80=98gcry_cipher_info=E2=80=99?
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_encrypt((gcry_cipher_hd=
-_t)ctx, dst, length, src, length);                                ^~~~~~~~~=
-~~~~~~~
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_cipher_info
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:262:49: error: exp=
-ected =E2=80=98)=E2=80=99 before =E2=80=98ctx=E2=80=99
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_encrypt((gcry_cipher_hd=
-_t)ctx, dst, length, src, length);                                         =
-        ^~~
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:262:11: error: too=
- few arguments to function =E2=80=98gcry_cipher_encrypt=E2=80=99
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_encrypt((gcry_cipher_hd=
-_t)ctx, dst, length, src, length);           ^~~~~~~~~~~~~~~~~~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
-t.c:25:0,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
-ipher.c:153:
-  /usr/include/gcrypt.h:566:5: note: declared here
-  =C2=A0int gcry_cipher_encrypt (GcryCipherHd h,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
-:0:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c: In function =E2=
-=80=98qcrypto_gcrypt_xts_decrypt=E2=80=99:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:271:5: error: unkn=
-own type name =E2=80=98gcry_error_t=E2=80=99; did you mean =E2=80=98g_error=
-=E2=80=99?
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_error_t err;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_error
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:272:32: error: =E2=
-=80=98gcry_cipher_hd_t=E2=80=99 undeclared (first use in this function); di=
-d you mean =E2=80=98gcry_cipher_info=E2=80=99?
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_decrypt((gcry_cipher_hd=
-_t)ctx, dst, length, src, length);                                ^~~~~~~~~=
-~~~~~~~
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_cipher_info
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:272:49: error: exp=
-ected =E2=80=98)=E2=80=99 before =E2=80=98ctx=E2=80=99
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_decrypt((gcry_cipher_hd=
-_t)ctx, dst, length, src, length);                                         =
-        ^~~
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:272:11: error: too=
- few arguments to function =E2=80=98gcry_cipher_decrypt=E2=80=99
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_decrypt((gcry_cipher_hd=
-_t)ctx, dst, length, src, length);           ^~~~~~~~~~~~~~~~~~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
-t.c:25:0,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
-ipher.c:153:
-  /usr/include/gcrypt.h:571:5: note: declared here
-  =C2=A0int gcry_cipher_decrypt (GcryCipherHd h,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
-:0:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c: In function =E2=
-=80=98qcrypto_gcrypt_cipher_encrypt=E2=80=99:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:284:5: error: unkn=
-own type name =E2=80=98gcry_error_t=E2=80=99; did you mean =E2=80=98g_error=
-=E2=80=99?
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_error_t err;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_error
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:293:21: warning: p=
-assing argument 1 of =E2=80=98xts_encrypt=E2=80=99 makes pointer from integ=
-er without a cast [-Wint-conversion]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0xts_encrypt(ctx->ha=
-ndle, ctx->tweakhandle,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
-t.c:22:0,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
-ipher.c:153:
-  /export/home/denber/qemu-2.12.0/include/crypto/xts.h:73:6: note: expected=
- =E2=80=98const void *=E2=80=99 but argument is of type =E2=80=98int=E2=80=
-=99
-  =C2=A0void xts_encrypt(const void *datactx,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
-:0:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:293:34: warning: p=
-assing argument 2 of =E2=80=98xts_encrypt=E2=80=99 makes pointer from integ=
-er without a cast [-Wint-conversion]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0xts_encrypt(ctx->ha=
-ndle, ctx->tweakhandle,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
-t.c:22:0,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
-ipher.c:153:
-  /export/home/denber/qemu-2.12.0/include/crypto/xts.h:73:6: note: expected=
- =E2=80=98const void *=E2=80=99 but argument is of type =E2=80=98int=E2=80=
-=99
-  =C2=A0void xts_encrypt(const void *datactx,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
-:0:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:298:35: warning: p=
-assing argument 1 of =E2=80=98gcry_cipher_encrypt=E2=80=99 makes pointer fr=
-om integer without a cast [-Wint-conversion]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher=
-_encrypt(ctx->handle,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
-t.c:25:0,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
-ipher.c:153:
-  /usr/include/gcrypt.h:566:5: note: expected =E2=80=98GcryCipherHd {aka st=
-ruct gcry_cipher_handle *}=E2=80=99 but argument is of type =E2=80=98int=E2=
-=80=99
-  =C2=A0int gcry_cipher_encrypt (GcryCipherHd h,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
-:0:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c: In function =E2=
-=80=98qcrypto_gcrypt_cipher_decrypt=E2=80=99:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:320:5: error: unkn=
-own type name =E2=80=98gcry_error_t=E2=80=99; did you mean =E2=80=98g_error=
-=E2=80=99?
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_error_t err;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_error
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:329:21: warning: p=
-assing argument 1 of =E2=80=98xts_decrypt=E2=80=99 makes pointer from integ=
-er without a cast [-Wint-conversion]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0xts_decrypt(ctx->ha=
-ndle, ctx->tweakhandle,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
-t.c:22:0,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
-ipher.c:153:
-  /export/home/denber/qemu-2.12.0/include/crypto/xts.h:51:6: note: expected=
- =E2=80=98const void *=E2=80=99 but argument is of type =E2=80=98int=E2=80=
-=99
-  =C2=A0void xts_decrypt(const void *datactx,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
-:0:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:329:34: warning: p=
-assing argument 2 of =E2=80=98xts_decrypt=E2=80=99 makes pointer from integ=
-er without a cast [-Wint-conversion]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0xts_decrypt(ctx->ha=
-ndle, ctx->tweakhandle,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
-t.c:22:0,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
-ipher.c:153:
-  /export/home/denber/qemu-2.12.0/include/crypto/xts.h:51:6: note: expected=
- =E2=80=98const void *=E2=80=99 but argument is of type =E2=80=98int=E2=80=
-=99
-  =C2=A0void xts_decrypt(const void *datactx,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
-:0:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:334:35: warning: p=
-assing argument 1 of =E2=80=98gcry_cipher_decrypt=E2=80=99 makes pointer fr=
-om integer without a cast [-Wint-conversion]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher=
-_decrypt(ctx->handle,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
-t.c:25:0,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
-ipher.c:153:
-  /usr/include/gcrypt.h:571:5: note: expected =E2=80=98GcryCipherHd {aka st=
-ruct gcry_cipher_handle *}=E2=80=99 but argument is of type =E2=80=98int=E2=
-=80=99
-  =C2=A0int gcry_cipher_decrypt (GcryCipherHd h,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
-:0:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c: In function =E2=
-=80=98qcrypto_gcrypt_cipher_setiv=E2=80=99:
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:353:5: error: unkn=
-own type name =E2=80=98gcry_error_t=E2=80=99; did you mean =E2=80=98g_error=
-=E2=80=99?
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_error_t err;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_error
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:365:19: warning: i=
-mplicit declaration of function =E2=80=98gcry_cipher_setctr=E2=80=99; did y=
-ou mean =E2=80=98gcry_cipher_setiv=E2=80=99? [-Wimplicit-function-declarati=
-on]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0err =3D gcry_cipher_setctr(ctx->handle, iv, niv);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_cipher_setiv
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:365:19: warning: n=
-ested extern declaration of =E2=80=98gcry_cipher_setctr=E2=80=99 [-Wnested-=
-externs]
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:372:13: warning: i=
-mplicit declaration of function =E2=80=98gcry_cipher_reset=E2=80=99; did yo=
-u mean =E2=80=98gcry_cipher_close=E2=80=99? [-Wimplicit-function-declaratio=
-n]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0gcry_cipher_reset(ctx->handle);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0^~~~~~~~~~~~~~~~~
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0gcry_cipher_close
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:372:13: warning: n=
-ested extern declaration of =E2=80=98gcry_cipher_reset=E2=80=99 [-Wnested-e=
-xterns]
-  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:373:19: warning: p=
-assing argument 1 of =E2=80=98gcry_cipher_ctl=E2=80=99 makes pointer from i=
-nteger without a cast [-Wint-conversion]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0err =3D gcry_cipher_setiv(ctx->handle, iv, niv);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~
-  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
-t.c:25:0,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
-ipher.c:153:
-  /usr/include/gcrypt.h:540:5: note: expected =E2=80=98GcryCipherHd {aka st=
-ruct gcry_cipher_handle *}=E2=80=99 but argument is of type =E2=80=98int=E2=
-=80=99
-  =C2=A0int gcry_cipher_ctl( GcryCipherHd h, int cmd, void *buffer, size_t =
-buflen);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~
-  gmake: *** [/export/home/denber/qemu-2.12.0/rules.mak:67: crypto/cipher.o=
-] Error 1
-
-  ---------------------------------------------------------------------
-
-  I do have libgcrypt, libgcrypt_dev, and libgcrypt_utils installed from
-  opencsw.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1785698/+subscriptions
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
