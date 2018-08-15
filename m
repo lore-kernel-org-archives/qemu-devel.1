@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fpp0x-0004Lc-Hw
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 02:10:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1fppEx-0003kn-1P
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 02:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fpp0r-0000oc-Hi
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 02:10:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53066 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fppEr-0000A4-Pm
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 02:25:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60834 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fpp0p-0000ip-B1
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 02:10:33 -0400
-Date: Wed, 15 Aug 2018 14:10:20 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180815061020.GA2708@xz-mi>
-References: <20180524044454.11792-1-peterx@redhat.com>
-	<87mutop3vn.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fppEr-00007f-Cw
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 02:25:01 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1534258018-22859-1-git-send-email-thuth@redhat.com>
+	<1534258018-22859-3-git-send-email-thuth@redhat.com>
+	<87a7pou95a.fsf@dusky.pond.sub.org>
+	<44875a85-ddcf-6a81-ca42-24fe9b268b93@redhat.com>
+Date: Wed, 15 Aug 2018 08:24:56 +0200
+In-Reply-To: <44875a85-ddcf-6a81-ca42-24fe9b268b93@redhat.com> (Thomas Huth's
+	message of "Wed, 15 Aug 2018 08:00:53 +0200")
+Message-ID: <878t58p2o7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87mutop3vn.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v4 0/2] error-report: introduce
- {error|warn}_report_once
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/6] tests/device-introspection: Check that
+ the qom-tree and qtree do not change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathie?= =?utf-8?Q?u-Daud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, Aug 15, 2018 at 07:58:52AM +0200, Markus Armbruster wrote:
-> I'm afraid I let this fall through the cracks.  Sorry about that!
-> 
-> PATCH 2 conflicts semantically with commmit 63b88968f13: the latter adds
-> a trace_vtd_err() the former doesn't replace.  Please respin.
+Thomas Huth <thuth@redhat.com> writes:
 
-Will do.
+> On 08/14/2018 07:53 PM, Markus Armbruster wrote:
+>> Thomas Huth <thuth@redhat.com> writes:
+> [...]
+>>> @@ -115,10 +122,18 @@ static void test_one_device(const char *type)
+>>>  
+>>>      /*
+>>>       * Some devices leave dangling pointers in QOM behind.
+>>> -     * "info qom-tree" has a good chance at crashing then
+>>> +     * "info qom-tree" or "info qtree" have a good chance at crashing then.
+>>> +     * Also make sure that the tree did not change.
+>>>       */
+>>> -    qom_tree = hmp("info qom-tree");
+>>> -    g_free(qom_tree);
+>>> +    qom_tree_end = hmp("info qom-tree");
+>>> +    g_assert_cmpstr(qom_tree_start, ==, qom_tree_end);
+>>> +    g_free(qom_tree_start);
+>>> +    g_free(qom_tree_end);
+>>> +
+>>> +    qtree_end = hmp("info qtree");
+>>> +    g_assert_cmpstr(qtree_start, ==, qtree_end);
+>>> +    g_free(qtree_start);
+>>> +    g_free(qtree_end);
+>>>  }
+>>>  
+>>>  static void test_device_intro_list(void)
+>> 
+>> Output of "info qom-tree" depends on hash table iteration order, but
+>> that could almost be considered a feature here.
+>
+> Currently, it seems to work fine. If we hit a false positive with
+> ordering later, we still can add some code for sorting the output, I guess?
 
-Regards,
+I'm fine with comparing output of info qom-tree and info qtree.
 
--- 
-Peter Xu
+I figure the most likely cause for a change of order would be a series
+of QOM tree modifications that cancels out.  There should be *no* QOM
+tree modifications.  Thus, "almost a feature".
