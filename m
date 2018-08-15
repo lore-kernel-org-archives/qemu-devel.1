@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fq3Gz-0000gl-Hk
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 17:24:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1fq3IZ-0003Gc-Pa
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 17:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fq3Gv-0004iO-PR
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 17:24:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1fq3IZ-0005H2-3v
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 17:25:47 -0400
 References: <c449263bbcaffbd3db25d833fb57867fda8e3199.1534348766.git.jcody@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ca52dfff-35c0-3a1a-a5f8-83f2a510cc5a@redhat.com>
-Date: Wed, 15 Aug 2018 17:23:43 -0400
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <79de10c5-28fb-5be2-3141-f09fb4bb5f09@redhat.com>
+Date: Wed, 15 Aug 2018 16:25:16 -0500
 MIME-Version: 1.0
 In-Reply-To: <c449263bbcaffbd3db25d833fb57867fda8e3199.1534348766.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] block: for jobs,
@@ -25,11 +25,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org
 
-
-
-On 08/15/2018 11:59 AM, Jeff Cody wrote:
+On 08/15/2018 10:59 AM, Jeff Cody wrote:
 > The function job_cancel_async() will always cause an assert for blockjob
 > user resume.  We set job->user_paused to false, and then call
 > job->driver->user_resume().  In the case of blockjobs, this is the
@@ -44,28 +42,15 @@ On 08/15/2018 11:59 AM, Jeff Cody wrote:
 > 
 > Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->  job.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/job.c b/job.c
-> index fa671b431a..e36ebaafd8 100644
-> --- a/job.c
-> +++ b/job.c
-> @@ -732,10 +732,10 @@ static void job_cancel_async(Job *job, bool force)
->  {
->      if (job->user_paused) {
->          /* Do not call job_enter here, the caller will handle it.  */
-> -        job->user_paused = false;
->          if (job->driver->user_resume) {
->              job->driver->user_resume(job);
->          }
-> +        job->user_paused = false;
->          assert(job->pause_count > 0);
->          job->pause_count--;
->      }
+>   job.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 
-Looks right to me; are you going to make good on your threat of a v2
-with a unit test?
+Does this need to CC qemu-stable?
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
