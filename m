@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpqH6-0006gv-Us
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:31:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1fpqH9-0006iI-IO
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:31:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fpqGi-0004ly-1U
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:31:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49888)
+	(envelope-from <bounces@canonical.com>) id 1fpqH4-00050P-PP
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:31:26 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50118)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fpqGg-0004j5-TI
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:30:59 -0400
+	id 1fpqGq-0004pv-4e
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 03:31:17 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fpqGf-0005Rp-Pq
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 07:30:57 +0000
+	id 1fpqGj-0005Zw-Et
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 07:31:01 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AA3722E851D
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 07:30:57 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 524412E852B
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 07:31:01 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Aug 2018 07:25:12 -0000
-From: Thomas Huth <1772086@bugs.launchpad.net>
-Reply-To: Bug 1772086 <1772086@bugs.launchpad.net>
+Date: Wed, 15 Aug 2018 07:22:38 -0000
+From: Thomas Huth <1769189@bugs.launchpad.net>
+Reply-To: Bug 1769189 <1769189@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <152666797097.2555.6897470014572103765.malonedeb@gac.canonical.com>
-Message-Id: <153431791322.27075.4771158624282661187.launchpad@gac.canonical.com>
+References: <152544791493.32626.6219738999075353422.malonedeb@gac.canonical.com>
+Message-Id: <153431775987.24212.2307076453056932861.launchpad@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1772086] Re: malformed serial data being sent
- from guest
+Subject: [Qemu-devel] [Bug 1769189] Re: Issue with qemu 2.12.0 + SATA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,18 +45,30 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1772086
+https://bugs.launchpad.net/bugs/1769189
 
 Title:
-  malformed serial data being sent from guest
+  Issue with qemu 2.12.0 + SATA
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  When sending data through serial from guest each time 0x0A byte is
-  sent 0x0D is sent before it. For example, when sending {0x29, 0x0A} on
-  the other end I receive {0x29, 0x0D, 0x0A}.
+  [EDIT: I first thought that OVMF was the issue, but it turns out to be
+  SATA]
+
+  I had a Windows 10 VM running perfectly fine with a SATA drive, since
+  I upgraded to qemu 2.12, the guests hangs for a couple of minutes,
+  works for a few seconds, and hangs again, etc. By "hang" I mean it
+  doesn't freeze, but it looks like it's waiting on IO or something, I
+  can move the mouse but everything needing disk access is unresponsive.
+
+  What doesn't work: qemu 2.12 with SATA
+  What works: using VirIO-SCSI with qemu 2.12 or downgrading qemu to 2.11.1=
+ and keep using SATA.
+
+  Platform is arch linux 4.16.7 on skylake and Haswell, I have attached
+  the vm xml file.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1772086/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1769189/+subscriptions
