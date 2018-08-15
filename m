@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fq1p3-0003JT-Nt
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:51:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fq1pG-0003T6-6j
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:51:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fq1ow-0000sI-Q3
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:51:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37046 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fq1ow-0000rr-Ie
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:51:06 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2CB43AE7D
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 19:51:05 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 15 Aug 2018 21:50:51 +0200
-Message-Id: <20180815195051.24586-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20180815195051.24586-1-marcandre.lureau@redhat.com>
-References: <20180815195051.24586-1-marcandre.lureau@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fq1pE-0000vp-5B
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:51:26 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:46615)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fq1pA-0000uE-VM
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 15:51:22 -0400
+Received: by mail-oi0-x242.google.com with SMTP id y207-v6so3954484oie.13
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 12:51:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/2] qemu-option: improve
- qemu_opts_print_help() output
+In-Reply-To: <2515-5b748080-b-e0a2440@99331474>
+References: <CAFEAcA-fEe2TsRpd5Q1i7Z-0MC67o0xkfgLW1ifV64HpfL2czg@mail.gmail.com>
+	<2515-5b748080-b-e0a2440@99331474>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 15 Aug 2018 20:50:56 +0100
+Message-ID: <CAFEAcA8B3Qvxtoh0n6RyiBJEHVG39HoEzCfEZHCuyrbdnoYGwg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/19] MIPS queue for QEMU upstream,
+ August 14, 2018
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,121 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Modify qemu_opts_print_help():
-- to print expected argument type
-- skip description if not available
-- sort lines
-- prefix with the list name (like qdev, to avoid confusion)
-- drop 16-chars alignment, use a '-' as seperator for option name and
-  description
+On 15 August 2018 at 20:35, Aleksandar Markovic
+<Aleksandar.Markovic@rt-rk.com> wrote:
+> These functions are used in the patches that follow in nanoMIPS series, but
+> not submitted in this pull request.
+>
+> Ok, I will reorganize the patches so that there is no such case, and will
+> send the new pull request soon.
+>
+> Do we require that bisect works for clang builds too (meaning that after
+> each patch, clang build must be success)?
 
-For ex, "-spice ?" output is changed from:
+Yes, please. (As usual with breaking-bisection, if you get it wrong by
+accident we may well not notice, but it's worth trying to get right.)
 
-port             No description available
-tls-port         No description available
-addr             No description available
-[...]
-gl               No description available
-rendernode       No description available
-
-to:
-
-spice.addr=3Dstr
-spice.agent-mouse=3Dbool (on/off)
-spice.disable-agent-file-xfer=3Dbool (on/off)
-[...]
-spice.x509-key-password=3Dstr
-spice.zlib-glz-wan-compression=3Dstr
-
-"qemu-img create -f qcow2 -o ?", changed from:
-
-size             Virtual disk size
-compat           Compatibility level (0.10 or 1.1)
-backing_file     File name of a base image
-[...]
-lazy_refcounts   Postpone refcount updates
-refcount_bits    Width of a reference count entry in bits
-
-to:
-
-backing_file=3Dstr - File name of a base image
-backing_fmt=3Dstr - Image format of the base image
-cluster_size=3Dsize - qcow2 cluster size
-[...]
-refcount_bits=3Dnum - Width of a reference count entry in bits
-size=3Dsize - Virtual disk size
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- util/qemu-option.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 42 insertions(+), 2 deletions(-)
-
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 8839ee6523..9b99f0d0be 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -208,17 +208,57 @@ out:
-     return result;
- }
-=20
-+static const char *opt_type_to_string(enum QemuOptType type)
-+{
-+    switch (type) {
-+    case QEMU_OPT_STRING:
-+        return "str";
-+    case QEMU_OPT_BOOL:
-+        return "bool (on/off)";
-+    case QEMU_OPT_NUMBER:
-+        return "num";
-+    case QEMU_OPT_SIZE:
-+        return "size";
-+    }
-+
-+    g_assert_not_reached();
-+}
-+
-+static gint
-+pstrcmp(const char **a, const char **b)
-+{
-+    return g_strcmp0(*a, *b);
-+}
-+
- void qemu_opts_print_help(QemuOptsList *list)
- {
-     QemuOptDesc *desc;
-+    int i;
-+    GPtrArray *array =3D g_ptr_array_new();
-=20
-     assert(list);
-     desc =3D list->desc;
-     while (desc && desc->name) {
--        printf("%-16s %s\n", desc->name,
--               desc->help ? desc->help : "No description available");
-+        GString *str =3D g_string_new(NULL);
-+        if (list->name) {
-+            g_string_append_printf(str, "%s.", list->name);
-+        }
-+        g_string_append_printf(str, "%s=3D%s", desc->name,
-+                               opt_type_to_string(desc->type));
-+        if (desc->help) {
-+            g_string_append_printf(str, " - %s", desc->help);
-+        }
-+        g_ptr_array_add(array, g_string_free(str, false));
-         desc++;
-     }
-+
-+    g_ptr_array_sort(array, (GCompareFunc)pstrcmp);
-+    for (i =3D 0; i < array->len; i++) {
-+        printf("%s\n", (char *)array->pdata[i]);
-+    }
-+    g_ptr_array_set_free_func(array, g_free);
-+    g_ptr_array_free(array, true);
-+
- }
- /* ------------------------------------------------------------------ */
-=20
---=20
-2.18.0.547.g1d89318c48
+thanks
+-- PMM
