@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1fpx2I-0002Fl-Qa
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:44:38 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fpx2d-0002qN-5d
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:44:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1fpx2F-0000WX-7g
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:44:33 -0400
-Date: Wed, 15 Aug 2018 16:44:18 +0200
-From: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20180815144418.GG2158@andariel.pipo.sk>
-References: <20180807043349.27196-1-jsnow@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fpx2Z-0000wg-3T
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:44:55 -0400
+Received: from mail-ua1-x944.google.com ([2607:f8b0:4864:20::944]:38482)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fpx2Y-0000ux-MP
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 10:44:50 -0400
+Received: by mail-ua1-x944.google.com with SMTP id o11-v6so1471887uak.5
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 07:44:50 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180815141945.10457-1-armbru@redhat.com>
+	<20180815141945.10457-2-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <95680fcb-9c9a-cc9a-3a15-ec208046a20a@amsat.org>
+Date: Wed, 15 Aug 2018 11:44:44 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="TmwHKJoIRFM7Mu/A"
-Content-Disposition: inline
-In-Reply-To: <20180807043349.27196-1-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 00/21] jobs: defer graph
- changes until finalize
+In-Reply-To: <20180815141945.10457-2-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] libqtest: Improve error reporting for
+ bad read from QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +36,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jtc@redhat.com, Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, pbonzini@redhat.com, thuth@redhat.com
 
+On 08/15/2018 11:19 AM, Markus Armbruster wrote:
+> When read() from the qtest socket or the QMP socket fails or EOFs, we
+> report "Broken pipe" and exit(1).  This commonly happens when QEMU
+> crashes.  It also happens when QEMU refuses to run because the test
+> passed it bad arguments.  Sadly, we neglect to report either.
+> 
+> Improve this by calling abort() instead of exit(1), so kill_qemu()
+> runs, and reports how QEMU died.  This improves error reporting to
+> something like
+> 
+>     /x86_64/device/introspect/list: Broken pipe
+>     tests/libqtest.c:129: kill_qemu() detected QEMU death from signal 6 (Aborted) (dumped core)
+> 
+> Three exit() remain in libqtest.c:
+> 
+> * In qmp_response(), when we can't parse a QMP reply read from the QMP
+>   socket.  Change to abort() for consistency.
+> 
+> * In qtest_qemu_binary(), when QTEST_QEMU_BINARY isn't in the
+>   environment.  This can only happen before we start QEMU.  Leave
+>   alone.
+> 
+> * In qtest_init_without_qmp_handshake(), when the fork()ed child fails
+>   to execlp().  Leave alone.
+> 
+> exit() elsewhere are unlikely due to QEMU dying on us.  If that should
+> turn out to be wrong, we can move kill_qemu() from the abrt handler to
 
---TmwHKJoIRFM7Mu/A
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+"abort handler"?
 
-On Tue, Aug 07, 2018 at 00:33:28 -0400, John Snow wrote:
-> This series forces all jobs to use the "finalize" semantics that were
-> introduced previously, but only exposed via the backup jobs.
-> This series looks huge, but it's mostly mechanical changes broken out
-> into a series of much smaller commits so that the changes are easier
-> to follow at each step.
+> atexit() or something.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Please note that due to the semantics of the commands 'block-job-cancel'
-and 'block-job-complete' at least in case of the drive/blockdev-mirror
-job are technically blockjobs of it's own since they may fail or finish
-in an unbounded amount of time and the actual return value on the
-monitor does not reflect the result of the operation itself.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-It would be very helpful if qemu treas them as such.
-
---TmwHKJoIRFM7Mu/A
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlt0PEAACgkQHGwCByjY
-1Goe2g//ejt93EI6yeZs/ONnchuQQzBTt9KJoCB8XDyH/H9bFXzh4GuCjgO9qSj2
-l80NTltVqYEqac5fvlNvezLFl6khfq8qN4yUFk3KAHYQIIDPg1u107AJTTWfzhMO
-wP2+mjaFD/l+oxYemUOoGXAE6PSuLTy8fTgMm++4GaGtc55cd+7d85QGztMYdIa2
-JjMt9SKLYmefbyf4SKMaWUyW8VNaPhcCJ+RfdgS9OqYwvtv08/JzilDeL+3UEsTm
-EUEZB64O9nOyVpXxDm8+BGQcKamBSgb+G78xzeHvlm+Fk0yACgMPohWDVeL2G2t1
-p+RHCx+IYg8tf+gggwzHLDL9+Au8yIz0g8eWiS5HGrMDM4Q90GS/YK9EtI4tKWV4
-vwVJIY1xYwNTXQifbTQTUNJdSuI7d+NzhfzUvMYNKbgzMJcYKW7lwKwT6lMl8yZL
-kv/o+suSF5ElORzdL75T23zOZaowWc+P3KYExMe/L8Yv6KxnXvt+g1R2LGivsg94
-74kNT0p2PHqae59VionHFGhoCTcIBhOzy8jKXQlpxCI9obmnDcDPl6B+r1FoOtrJ
-P1aRJTHTJNo8e8F8kDaFwDDAzATY6etHxtjPoqJkGfZgTGwZmQAY/j6cMt3ctP/N
-m+tYhQbUC3j/PsFc2IW1HOWADQ9dQ7yz5EZde7DctwGKuJAwKFU=
-=J/+n
------END PGP SIGNATURE-----
-
---TmwHKJoIRFM7Mu/A--
+> ---
+>  tests/libqtest.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index b703fca26d..852ccff1ce 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -367,7 +367,7 @@ static GString *qtest_recv_line(QTestState *s)
+>  
+>          if (len == -1 || len == 0) {
+>              fprintf(stderr, "Broken pipe\n");
+> -            exit(1);
+> +            abort();
+>          }
+>  
+>          g_string_append_len(s->rx, buffer, len);
+> @@ -454,7 +454,7 @@ static void qmp_response(JSONMessageParser *parser, GQueue *tokens)
+>      obj = json_parser_parse(tokens, NULL);
+>      if (!obj) {
+>          fprintf(stderr, "QMP JSON response parsing failed\n");
+> -        exit(1);
+> +        abort();
+>      }
+>  
+>      g_assert(!qmp->response);
+> @@ -480,7 +480,7 @@ QDict *qmp_fd_receive(int fd)
+>  
+>          if (len == -1 || len == 0) {
+>              fprintf(stderr, "Broken pipe\n");
+> -            exit(1);
+> +            abort();
+>          }
+>  
+>          if (log) {
+> 
