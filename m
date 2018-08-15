@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fpux0-0002Sa-Hi
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:31:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1fpv53-0004HR-A3
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:39:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fpuwT-0007J0-1w
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:30:26 -0400
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:44310)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fpuw2-0005s3-6Y
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:30:01 -0400
-Received: by mail-oi0-x22d.google.com with SMTP id s198-v6so1578053oih.11
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 05:29:56 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fpv51-0004s8-UC
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 08:39:17 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com>
+Date: Wed, 15 Aug 2018 14:38:58 +0200
+In-Reply-To: <20180813101453.10200-1-e.emanuelegiuseppe@gmail.com> (Emanuele
+	Giuseppe Esposito's message of "Mon, 13 Aug 2018 12:14:20 +0200")
+Message-ID: <87wosrkdnh.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180814181815.23348-1-peter.maydell@linaro.org>
-References: <20180814181815.23348-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 15 Aug 2018 13:29:34 +0100
-Message-ID: <CAFEAcA86XV13pSpYQYDm-NgLFmhP3MzOCkS4PSa-P11DxAg3iw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/45] target-arm queue
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 00/33] Qtest driver framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +22,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Amit Shah <amit@kernel.org>, Alexander Graf <agraf@suse.de>, Philippe =?utf-8?Q?M?= =?utf-8?Q?athieu-Daud=C3=A9?= <f4bug@amsat.org>, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 14 August 2018 at 19:17, Peter Maydell <peter.maydell@linaro.org> wrote:
-> First pullreq of the 3.1 release cycle, with lots of
-> Arm related patches accumulated during freeze. Most
-> notable here is Luc's GICv2 virtualization support and
-> my execute-from-MMIO patches.
->
-> I stopped looking at my to-review queue towards the
-> end of freeze, since 45 patches is already pushing what
-> I consider a reasonable sized pullreq; once this goes into
-> master I'll start working through it again.
->
-> thanks
-> -- PMM
->
-> The following changes since commit 38441756b70eec5807b5f60dad11a93a91199866:
->
->   Update version for v3.0.0 release (2018-08-14 16:38:43 +0100)
->
-> are available in the Git repository at:
->
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180814
->
-> for you to fetch changes up to 054e7adf4e64e4acb3b033348ebf7cc871baa34f:
->
->   target/arm: Fix typo in helper_sve_movz_d (2018-08-14 17:17:22 +0100)
->
+Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com> writes:
 
-Applied, thanks.
+> Qgraph API for the qtest driver framework
+>
+> This series of patches introduce a different qtest driver
+> organization, viewing machines, drivers and tests as node in a
+> graph, each having one or multiple edges relations.
+>
+> The idea is to have a framework where each test asks for a specific
+> driver, and the framework takes care of allocating the proper devices
+> required and passing the correct command line arguments to QEMU.
+>
+> A node can be of four types:
+> - MACHINE:   for example "arm/raspi2"
+> - DRIVER:    for example "generic-sdhci"
+> - INTERFACE: for example "sdhci" (interface for all "-sdhci" drivers)
+> - TEST:      for example "sdhci-test", consumes an interface and tests
+>              the functions provided
+>
+> An edge relation between two nodes (drivers or machines) X and Y can be:
+> - X CONSUMES Y: Y can be plugged into X
+> - X PRODUCES Y: X provides the interface Y
+> - X CONTAINS Y: Y is part of X component
+>
+> Basic framework steps are the following:
+> - All nodes and edges are created in their respective machine/driver/test files
+> - The framework starts QEMU and asks for a list of available devices
+>   and machines
+> - The framework walks the graph starting from the available machines and
+>   performs a Depth First Search for tests
+> - Once a test is found, the path is walked again and all drivers are
+>   allocated accordingly and the final interface is passed to the test
+> - The test is executed
+> - Unused objects are cleaned and the path discovery is continued
+>
+> Depending on the QEMU binary used, only some drivers/machines will be available
+> and only test that are reached by them will be executed.
+>
+> This work is being done as Google Summer of Code 2018 project for QEMU,
+> my mentors are Paolo Bonzini and Laurent Vivier.
+> Additional infos on the project can be found at:
+> https://wiki.qemu.org/Features/qtest_driver_framework
 
--- PMM
+You've likely answered this question somewhere already, but it should be
+answered right here: what does this framework buy us?
+
+I figure the main benefit is running tests in all possible contexts,
+with automated context setup.  Instead, you feed the framework
+declarations of how things are related (the graph stuff described
+above).
+
+Taking a step back: your cover letter describes a solution at a high
+level.  That's good.  But it should *first* describe the problem you're
+trying to solve.
+
+> v3:
+> - Minor fixes regarding memory leaks and naming
+>
+> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
