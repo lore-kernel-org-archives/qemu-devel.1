@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59959)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1fpvyU-0001P6-Vq
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:36:36 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60300)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peterx@redhat.com>) id 1fpw05-0002Mi-Gi
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:38:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1fpvyM-0000Mr-9F
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:36:34 -0400
-Received: from mout.gmx.net ([212.227.15.18]:32783)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1fpvy7-0007tY-OJ
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:36:23 -0400
-References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
-	<d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
-	<8bf07395-4872-ce74-c201-9fca232edd01@gmail.com>
-	<80532e46-ffbf-9c87-5296-741bbb6f83ac@redhat.com>
-	<d5ad3096-86b1-29e4-47bd-1ca71b8e7879@bluestop.org>
-	<1feb3cc1-86ee-f708-6dc7-b9e20a7588ac@redhat.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <327f3e04-dd5b-06bd-f672-5f180521db32@gmx.com>
-Date: Wed, 15 Aug 2018 15:37:02 +0200
-MIME-Version: 1.0
-In-Reply-To: <1feb3cc1-86ee-f708-6dc7-b9e20a7588ac@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hcAy0uoPFjNpd5P7Wz75qxk2HuvQ7uWc1"
-Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
+	(envelope-from <peterx@redhat.com>) id 1fpvzp-0002Mm-6o
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:38:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50938 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fpvzo-0002Lk-TU
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:37:57 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7F73E4023461
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 13:37:56 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Wed, 15 Aug 2018 21:37:34 +0800
+Message-Id: <20180815133747.25032-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 00/13] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,97 +27,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Rebecca Cran <rebecca@bluestop.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yuval Shaia <yuval.shaia@oracle.com>, Brad Smith <brad@comstyle.com>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hcAy0uoPFjNpd5P7Wz75qxk2HuvQ7uWc1
-From: Kamil Rytarowski <n54@gmx.com>
-To: Thomas Huth <thuth@redhat.com>, Rebecca Cran <rebecca@bluestop.org>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Yuval Shaia <yuval.shaia@oracle.com>, Brad Smith <brad@comstyle.com>
-Message-ID: <327f3e04-dd5b-06bd-f672-5f180521db32@gmx.com>
-Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
-References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
- <d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
- <8bf07395-4872-ce74-c201-9fca232edd01@gmail.com>
- <80532e46-ffbf-9c87-5296-741bbb6f83ac@redhat.com>
- <d5ad3096-86b1-29e4-47bd-1ca71b8e7879@bluestop.org>
- <1feb3cc1-86ee-f708-6dc7-b9e20a7588ac@redhat.com>
-In-Reply-To: <1feb3cc1-86ee-f708-6dc7-b9e20a7588ac@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi, Markus, Marc-Andre,
 
-On 06.08.2018 10:51, Thomas Huth wrote:
-> On 07/28/2018 05:50 AM, Rebecca Cran wrote:
->> On 7/25/18 5:14 AM, Thomas Huth wrote:
->>
->>>
->>> Note that the error has been reported to happen on FreeBSD - so I dou=
-bt
->>> that this <linux/types.h> header should be here.
->>>
->>> Anyway, our include/standard-headers/linux/types.h is also empty ... =
-so
->>> could you try whether it compiles if you simply remove this #include
->>> line, Rebecca?
->>
->>
->> Sorry for the delay, I'm just getting back to this. Removing the inclu=
-de
->> causes it to fail later on, with:
->>
->> /home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning:
->> implicit declaration of function 'mremap' is invalid in C99
->> [-Wimplicit-function-declaration]
->> =C2=A0=C2=A0=C2=A0 host_virt =3D mremap(curr_page, 0, length, MREMAP_M=
-AYMOVE);
->=20
-> OK, thanks for checking. According to
->=20
->  https://www.freebsd.org/cgi/man.cgi?query=3Dmremap&manpath=3DNetBSD+5.=
-0
->=20
-> that syscall should also be available on FreeBSD. So could you please d=
-o
-> one more test and see whether it works when you add the following line
-> somewhere at the beginning of the file:
->=20
->   #include <sys/mman.h>
->=20
->  Thanks,
->   Thomas
->=20
+I didn't follow up the latest discussions on the response queue or
+monitor changes.  For now this series still makes sense to me, so I'm
+just rebasing the series to master and repost (with some additional
+changes/patches to address Markus's concerns). Please let me know if
+you have made any conclusion that I'm not aware of, or if this work
+needs any further rebasing.
 
-I'm a little bit disoriented. The linked page is from NetBSD in a very
-old version 5.x. We have 8.0 out now.
+v6 (previous version of the series might be incorrect; from this
+version, I continued to use the old version counts):
+- collect r-bs
+- use Markus's version of build_params() [Markus]
+- use \' instead of \" in Python codes [Markus]
+- in qapi_event_send_*() still pass in &error_abort instead of NULL
+  [Markus]
+- remove COMMAND_DROPPED from document too
+- add missing pieces for test-qmp-cmds [Markus]
+- add one patch to remove as much different code path for oob as
+  possible [Markus]
 
-The thread is about FreeBSD. If there are any questions regarding
-NetBSD, please let me know.
+TODO:
+- flow control test is still missing; I still didn't consider it much,
+  also we possibly need to touch up monitor_puts() to use limited
+  sized buffer to complete the flow control of QMP channel
 
+Please review.  Thanks,
 
---hcAy0uoPFjNpd5P7Wz75qxk2HuvQ7uWc1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Markus Armbruster (1):
+  qapi: Fix build_params() for empty parameter list
 
------BEGIN PGP SIGNATURE-----
+Peter Xu (12):
+  monitor: simplify monitor_qmp_setup_handlers_bh
+  qapi: remove error checks for event emission
+  monitor: move need_resume flag into monitor struct
+  monitor: suspend monitor instead of send CMD_DROP
+  qapi: remove COMMAND_DROPPED event
+  monitor: restrict response queue length too
+  monitor: remove "x-oob", turn oob on by default
+  Revert "tests: Add parameter to qtest_init_without_qmp_handshake"
+  monitor: add traces for qmp queues
+  tests: remove "0.15" prefix for test-qmp-cmds
+  tests: add oob functional test for test-qmp-cmds
+  monitor: reduce different code path for oob
 
-iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlt0LH4MHG41NEBnbXgu
-Y29tAAoJEEuzCOmwLnZs2K0P/3sSNQ+dzoTiiEZcSbXPqhypEPqdSPw1lJB4GhQl
-oYfp/WD4lr0WT9WDIU5OmKtSW6aPNj4+kuHqWN1zKKjAOoa2IetaL0aBv5LR7EIr
-nzNhDx4w1bJ93XIi+jJjWisGxfI2j850K8gvPK7ZgKvkYY3rJk4OkvGsULVpEoZ+
-AOavsbYzYkfrMqV8jrfGu035FhWg8RZA9HZ3YzNUVt/eT9lEyL2/4RNSC6rRpbah
-L+FU+wN2HgdMwYODGLpKKDc4P0ni2IVp/4Rtu51Mdbw6DFksXnAOthnCcYZliU29
-Y8D5VFsJGAD3UpyZMiaJh/2C1WTB7DeCNGyDtHJq7GZR20u9R8PiZKY5YkQ7cI/a
-vHueqEIcmsW/rDzy0YIIEN7LJMbGex9W+pBJj4w3IsTtcnTw9WBEIxioUvW5Lj7A
-Q5u/IyjEE2B0gx9vZzRsWblTzkiDOOIruGvtuqeinaWgRbOWH3NoJWBJxi9y0Zlm
-5dNiUf02QOlYvcfLTl3SE21RHfwdr41WwMTYnDkdv89QQ4H9Nk3cjE8sC2cnR5lE
-l2Cx2pVCCgfbtPYIx4eDB8nSY58lX55Yaguvc/S4IIpPXCZmB/QgtbPP3Go/TqaA
-nDZzgqhyhU8bojJ2+CcWBrW7XuQwf3UkpFmAElFtJqdHBK02T4wO2C6ooFAJPkP+
-WClS
-=SsDO
------END PGP SIGNATURE-----
+ block/block-backend.c        |   8 +-
+ block/qcow2.c                |   2 +-
+ block/quorum.c               |   4 +-
+ block/write-threshold.c      |   3 +-
+ blockjob.c                   |  13 +--
+ cpus.c                       |   8 +-
+ docs/devel/qapi-code-gen.txt |   6 +-
+ docs/interop/qmp-spec.txt    |   5 +-
+ dump.c                       |   3 +-
+ hw/acpi/core.c               |   2 +-
+ hw/acpi/cpu.c                |   2 +-
+ hw/acpi/memory_hotplug.c     |   5 +-
+ hw/char/virtio-console.c     |   3 +-
+ hw/core/qdev.c               |   3 +-
+ hw/net/virtio-net.c          |   2 +-
+ hw/ppc/spapr_rtc.c           |   2 +-
+ hw/timer/mc146818rtc.c       |   2 +-
+ hw/virtio/virtio-balloon.c   |   3 +-
+ hw/watchdog/watchdog.c       |  15 ++-
+ include/monitor/monitor.h    |   1 -
+ include/qapi/qmp-event.h     |   3 +-
+ job.c                        |   2 +-
+ migration/migration.c        |   4 +-
+ migration/ram.c              |   2 +-
+ monitor.c                    | 194 +++++++++++++++++++----------------
+ qapi/misc.json               |  40 --------
+ scripts/qapi/common.py       |  10 +-
+ scripts/qapi/events.py       |  23 ++---
+ scsi/pr-manager-helper.c     |   3 +-
+ tests/libqtest.c             |  10 +-
+ tests/libqtest.h             |   4 +-
+ tests/qmp-test.c             |   6 +-
+ tests/test-qmp-cmds.c        |  26 ++++-
+ tests/test-qmp-event.c       |  11 +-
+ trace-events                 |   4 +
+ ui/spice-core.c              |  10 +-
+ ui/vnc.c                     |   7 +-
+ vl.c                         |  21 ++--
+ 38 files changed, 210 insertions(+), 262 deletions(-)
 
---hcAy0uoPFjNpd5P7Wz75qxk2HuvQ7uWc1--
+-- 
+2.17.1
