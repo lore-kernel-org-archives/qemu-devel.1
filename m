@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fq2mQ-00005b-84
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 16:52:39 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fq34R-0007fJ-6u
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 17:11:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fq2mK-0006KJ-4w
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 16:52:31 -0400
-References: <20180807043349.27196-1-jsnow@redhat.com>
-	<20180807043349.27196-5-jsnow@redhat.com>
-	<20180808162948.GF15410@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <b9704bc0-4871-a8dc-0759-48e6872d2624@redhat.com>
-Date: Wed, 15 Aug 2018 16:52:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fq34Q-0000gl-DZ
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 17:11:11 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:43721)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fq34Q-0000gO-8J
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 17:11:10 -0400
+Received: by mail-oi0-x243.google.com with SMTP id b15-v6so4351830oib.10
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 14:11:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180808162948.GF15410@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/21] block/commit: utilize job_exit shim
+In-Reply-To: <20180815071308.11777-1-armbru@redhat.com>
+References: <20180815071308.11777-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 15 Aug 2018 22:10:48 +0100
+Message-ID: <CAFEAcA95Q71YhC2kBxPdJfSFndyhFSQPjU6iKYswO2i9f3uuHA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] Miscellaneous patches for 2018-08-15
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 15 August 2018 at 08:13, Markus Armbruster <armbru@redhat.com> wrote:
+> The following changes since commit 38441756b70eec5807b5f60dad11a93a91199866:
+>
+>   Update version for v3.0.0 release (2018-08-14 16:38:43 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2018-08-15
+>
+> for you to fetch changes up to cb9ec42f33c07cd07d2e2971422bf7636c761202:
+>
+>   monitor: fix oob command leak (2018-08-15 08:12:57 +0200)
+>
+> ----------------------------------------------------------------
+> Miscellaneous patches for 2018-08-15
+>
+> ----------------------------------------------------------------
+Applied, thanks.
 
-
-On 08/08/2018 12:29 PM, Kevin Wolf wrote:
-> Am 07.08.2018 um 06:33 hat John Snow geschrieben:
->> Change the manual deferment to commit_complete into the implicit
->> callback to job_exit.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
-> 
-> There is one tricky thing in this patch that the commit message could be
-> a bit more explicit about, which is moving job_completed() to a later
-> point.
-> 
-> This is the code that happens between the old call of job_completed()
-> and the new one:
-> 
->     /* If bdrv_drop_intermediate() didn't already do that, remove the commit
->      * filter driver from the backing chain. Do this as the final step so that
->      * the 'consistent read' permission can be granted.  */
->     if (remove_commit_top_bs) {
->         bdrv_child_try_set_perm(commit_top_bs->backing, 0, BLK_PERM_ALL,
->                                 &error_abort);
->         bdrv_replace_node(commit_top_bs, backing_bs(commit_top_bs),
->                           &error_abort);
->     }
-> 
->     bdrv_unref(commit_top_bs);
->     bdrv_unref(top);
-> 
-> As the comment states, bdrv_replace_node() requires that the permission
-> restrictions that the commit job made are already lifted. The most
-> important part is done by the explicit block_job_remove_all_bdrv() call
-> right before this hunk. It still leaves bjob->blk around, which could
-> have implications, but luckily we didn't take any permissions for that
-> one:
-> 
->     s = block_job_create(job_id, &commit_job_driver, NULL, bs, 0, BLK_PERM_ALL,
->                          speed, JOB_DEFAULT, NULL, NULL, errp);
-> 
-> So I think we got everything out of the way and bdrv_replace_node() can
-> do what it wants to do.
-> 
-> Kevin
-> 
-
-I suppose it will be up to the author of a job to be aware of any
-permissions they pick up at creation time that might have an effect on
-the cleanup they wish to do during completion time.
-
---js
+-- PMM
