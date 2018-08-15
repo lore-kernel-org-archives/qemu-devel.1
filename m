@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fpw0z-0002yf-7z
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:39:09 -0400
+	(envelope-from <peterx@redhat.com>) id 1fpw0v-0002vF-9o
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fpw0y-0003fd-7k
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:39:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53130 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fpw0t-0003co-Ti
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:39:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52286 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fpw0x-0003f9-Rx
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:39:08 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fpw0t-0003cN-Io
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 09:39:03 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 751677D84D
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 13:39:07 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id ED8A18197001
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 13:39:02 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 15 Aug 2018 21:37:47 +0800
-Message-Id: <20180815133747.25032-14-peterx@redhat.com>
+Date: Wed, 15 Aug 2018 21:37:46 +0800
+Message-Id: <20180815133747.25032-13-peterx@redhat.com>
 In-Reply-To: <20180815133747.25032-1-peterx@redhat.com>
 References: <20180815133747.25032-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 13/13] monitor: reduce different code path
- for oob
+Subject: [Qemu-devel] [PATCH v6 12/13] tests: add oob functional test for
+ test-qmp-cmds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +33,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Markus suggests that we should reduce special code paths for out-of-band
-if possible, so that QMP logic can be simplified.  Apply this rule to
-two places where use_io_thread is used but not completely necessary.
+Straightforward test just to let the test-qmp-cmds be complete.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- monitor.c | 33 +++++++++++----------------------
- 1 file changed, 11 insertions(+), 22 deletions(-)
+ tests/test-qmp-cmds.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/monitor.c b/monitor.c
-index b24a934437..7494885890 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -552,23 +552,15 @@ static void qmp_send_response(Monitor *mon, QDict *rsp)
- 
- static void qmp_queue_response(Monitor *mon, QDict *rsp)
- {
--    if (mon->use_io_thread) {
--        /*
--         * Push a reference to the response queue.  The I/O thread
--         * drains that queue and emits.
--         */
--        qemu_mutex_lock(&mon->qmp.qmp_lock);
--        g_queue_push_tail(mon->qmp.qmp_responses, qobject_ref(rsp));
--        trace_monitor_qmp_response_queue(mon, mon->qmp.qmp_responses->length);
--        qemu_mutex_unlock(&mon->qmp.qmp_lock);
--        qemu_bh_schedule(qmp_respond_bh);
--    } else {
--        /*
--         * Not using monitor I/O thread, i.e. we are in the main thread.
--         * Emit right away.
--         */
--        qmp_send_response(mon, rsp);
--    }
-+    /*
-+     * Push a reference to the response queue.  The I/O thread drains
-+     * that queue and emits.
-+     */
-+    qemu_mutex_lock(&mon->qmp.qmp_lock);
-+    g_queue_push_tail(mon->qmp.qmp_responses, qobject_ref(rsp));
-+    trace_monitor_qmp_response_queue(mon, mon->qmp.qmp_responses->length);
-+    qemu_mutex_unlock(&mon->qmp.qmp_lock);
-+    qemu_bh_schedule(qmp_respond_bh);
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index 989819b26d..a51432f09d 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -122,6 +122,21 @@ static void test_dispatch_cmd(void)
+     qobject_unref(req);
  }
  
- struct QMPResponse {
-@@ -4433,12 +4425,9 @@ void monitor_resume(Monitor *mon)
-     if (atomic_dec_fetch(&mon->suspend_cnt) == 0) {
-         if (monitor_is_qmp(mon)) {
-             /*
--             * For QMP monitors that are running in the I/O thread,
--             * let's kick the thread in case it's sleeping.
-+             * Let's kick the thread in case it's sleeping.
-              */
--            if (mon->use_io_thread) {
--                aio_notify(iothread_get_aio_context(mon_iothread));
--            }
-+            aio_notify(iothread_get_aio_context(mon_iothread));
-         } else {
-             assert(mon->rs);
-             readline_show_prompt(mon->rs);
++static void test_dispatch_cmd_oob(void)
++{
++    QDict *req = qdict_new();
++    QDict *resp;
++
++    qdict_put_str(req, "exec-oob", "test-flags-command");
++
++    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), true);
++    assert(resp != NULL);
++    assert(!qdict_haskey(resp, "error"));
++
++    qobject_unref(resp);
++    qobject_unref(req);
++}
++
+ /* test commands that return an error due to invalid parameters */
+ static void test_dispatch_cmd_failure(void)
+ {
+@@ -287,6 +302,7 @@ int main(int argc, char **argv)
+     g_test_init(&argc, &argv, NULL);
+ 
+     g_test_add_func("/dispatch_cmd", test_dispatch_cmd);
++    g_test_add_func("/dispatch_cmd_oob", test_dispatch_cmd_oob);
+     g_test_add_func("/dispatch_cmd_failure", test_dispatch_cmd_failure);
+     g_test_add_func("/dispatch_cmd_io", test_dispatch_cmd_io);
+     g_test_add_func("/dealloc_types", test_dealloc_types);
 -- 
 2.17.1
