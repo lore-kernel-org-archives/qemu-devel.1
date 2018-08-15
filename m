@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fq3Np-0006JO-I2
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 17:31:16 -0400
+	(envelope-from <jcody@redhat.com>) id 1fq3P9-00071a-EF
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 17:32:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fq3Nj-0007jX-Q1
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 17:31:09 -0400
-Date: Wed, 15 Aug 2018 17:30:54 -0400
+	(envelope-from <jcody@redhat.com>) id 1fq3P0-0008IE-M1
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 17:32:31 -0400
+Date: Wed, 15 Aug 2018 17:31:55 -0400
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180815213054.GF3254@localhost.localdomain>
+Message-ID: <20180815213155.GG3254@localhost.localdomain>
 References: <c449263bbcaffbd3db25d833fb57867fda8e3199.1534348766.git.jcody@redhat.com>
-	<79de10c5-28fb-5be2-3141-f09fb4bb5f09@redhat.com>
+	<ca52dfff-35c0-3a1a-a5f8-83f2a510cc5a@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <79de10c5-28fb-5be2-3141-f09fb4bb5f09@redhat.com>
+In-Reply-To: <ca52dfff-35c0-3a1a-a5f8-83f2a510cc5a@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] block: for jobs,
  do not clear user_paused until after the resume
 List-Id: <qemu-devel.nongnu.org>
@@ -24,39 +24,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, qemu-block@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Wed, Aug 15, 2018 at 04:25:16PM -0500, Eric Blake wrote:
-> On 08/15/2018 10:59 AM, Jeff Cody wrote:
-> >The function job_cancel_async() will always cause an assert for blockjob
-> >user resume.  We set job->user_paused to false, and then call
-> >job->driver->user_resume().  In the case of blockjobs, this is the
-> >block_job_user_resume() function.
-> >
-> >In that function, we assert that job.user_paused is set to true.
-> >Unfortunately, right before calling this function, it has explicitly
-> >been set to false.
-> >
-> >The fix is pretty simple: set job->user_paused to false only after the
-> >job user_resume() function has been called.
-> >
-> >Signed-off-by: Jeff Cody <jcody@redhat.com>
-> >---
+On Wed, Aug 15, 2018 at 05:23:43PM -0400, John Snow wrote:
+> 
+> 
+> On 08/15/2018 11:59 AM, Jeff Cody wrote:
+> > The function job_cancel_async() will always cause an assert for blockjob
+> > user resume.  We set job->user_paused to false, and then call
+> > job->driver->user_resume().  In the case of blockjobs, this is the
+> > block_job_user_resume() function.
+> > 
+> > In that function, we assert that job.user_paused is set to true.
+> > Unfortunately, right before calling this function, it has explicitly
+> > been set to false.
+> > 
+> > The fix is pretty simple: set job->user_paused to false only after the
+> > job user_resume() function has been called.
+> > 
+> > Signed-off-by: Jeff Cody <jcody@redhat.com>
+> > ---
 > >  job.c | 2 +-
 > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
+> > 
+> > diff --git a/job.c b/job.c
+> > index fa671b431a..e36ebaafd8 100644
+> > --- a/job.c
+> > +++ b/job.c
+> > @@ -732,10 +732,10 @@ static void job_cancel_async(Job *job, bool force)
+> >  {
+> >      if (job->user_paused) {
+> >          /* Do not call job_enter here, the caller will handle it.  */
+> > -        job->user_paused = false;
+> >          if (job->driver->user_resume) {
+> >              job->driver->user_resume(job);
+> >          }
+> > +        job->user_paused = false;
+> >          assert(job->pause_count > 0);
+> >          job->pause_count--;
+> >      }
+> > 
 > 
-> Does this need to CC qemu-stable?
-> 
+> Looks right to me; are you going to make good on your threat of a v2
+> with a unit test?
+>
 
-Good point, yes.  I'm going to do a v2 with an iotest, and I'll CC
-qemu-stable on that one.
+Yep!
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
+> Reviewed-by: John Snow <jsnow@redhat.com>
 
 Thanks
-
 
 -Jeff
