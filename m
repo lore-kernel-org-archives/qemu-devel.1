@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqKTc-0001JB-5v
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:46:21 -0400
+	(envelope-from <mlureau@redhat.com>) id 1fqKU1-0001kZ-8w
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:46:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqKTZ-0001WW-FN
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:46:19 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:45320)
+	(envelope-from <mlureau@redhat.com>) id 1fqKTv-0001gk-IA
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:46:45 -0400
+Received: from mail-io0-f194.google.com ([209.85.223.194]:43131)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqKTY-0001Vx-MN
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:46:16 -0400
-Received: by mail-oi0-x244.google.com with SMTP id q11-v6so8796863oic.12
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:46:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fqKTu-0001fO-6c
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:46:39 -0400
+Received: by mail-io0-f194.google.com with SMTP id y10-v6so4233091ioa.10
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:46:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180806100114.21410-2-contrib@steffen-goertz.de>
-References: <20180806100114.21410-1-contrib@steffen-goertz.de>
-	<20180806100114.21410-2-contrib@steffen-goertz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Aug 2018 16:45:54 +0100
-Message-ID: <CAFEAcA9XLUz5qOXtRrYZ=K4zBPMc6QYGwiga0xQtSaf0P8MBaQ@mail.gmail.com>
+In-Reply-To: <1534433563-30865-1-git-send-email-yury-kotov@yandex-team.ru>
+References: <1534433563-30865-1-git-send-email-yury-kotov@yandex-team.ru>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 16 Aug 2018 17:46:36 +0200
+Message-ID: <CAMxuvazEvrsXJ+oXYO_-4BD3P9qK9ZOai6PEH2_in-yxRY0apQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/7] hw/misc/nrf51_rng: Add NRF51 random
- number generator peripheral
+Subject: Re: [Qemu-devel] [PATCH 0/3] vhost-user reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Thomas Huth <thuth@redhat.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>
 
-On 6 August 2018 at 11:01, Steffen G=C3=B6rtz <contrib@steffen-goertz.de> w=
-rote:
-> Add a model of the NRF51 random number generator peripheral.
-> This is a simple random generator that continuously generates
-> new random values after startup.
+Hi
+
+On Thu, Aug 16, 2018 at 5:32 PM, Yury Kotov <yury-kotov@yandex-team.ru> wrote:
+> We are using QEMU (2.12.0) with SPDK (18.04.1) over vhost-user to emulate block
+> devices. One of our cases it to restart SPDK without restarting VM (in case
+> of some updates or smth like it). We tried to use the 'reconnect' option for
+> the '-chardev' device:
+>   -object memory-backend-file,id=mem0,size=1G,mem-path=/dev/hugepages,share=on \
+>   -numa node,memdev=mem0 \
+>   -chardev socket,id=spdk_vhost_blk1,path=/var/tmp/vhost.1,reconnect=10 \
+>   -device vhost-user-blk-pci,chardev=spdk_vhost_blk1,num-queues=4
 >
-> Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
+> After this, vhost-user-blk initialization fails with an error below:
+>   qemu-system-x86_64: -device ...: Failed to set msg fds.
+>   qemu-system-x86_64: -device ...: vhost-user-blk: vhost initialization failed:
+>                                    Operation not permitted
 >
-> Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-> ---
->  hw/misc/Makefile.objs       |   1 +
->  hw/misc/nrf51_rng.c         | 273 ++++++++++++++++++++++++++++++++++++
->  include/hw/misc/nrf51_rng.h |  71 ++++++++++
->  3 files changed, 345 insertions(+)
->  create mode 100644 hw/misc/nrf51_rng.c
->  create mode 100644 include/hw/misc/nrf51_rng.h
+> We got the same error with the latest QEMU (c542a9f9794ec8e0bc3f).
 
-> +static void update_irq(Nrf51RNGState *s)
+Why not setup qemu socket chardev in server mode? This is the only
+vhost-user reconnect setup that is supported atm (see
+vhost-user-test.c). You avoid having a reconnect loop that way.
 
-See remark on other patch about consistency of struct naming.
-
-> +{
-> +    bool irq =3D false;
-> +    irq |=3D s->interrupt_enabled && s->event_valrdy;
-
-You don't need to set irq to false and then modify it;
-this is equivalent to
-   bool irq =3D s->interrupt_enabled && s->event_valrdy;
-
-> +    qemu_set_irq(s->irq, irq);
-> +}
-
-> +static void nrf51_rng_reset(DeviceState *dev)
-> +{
-> +    Nrf51RNGState *s =3D NRF51_RNG(dev);
-
-This seems to be missing code to actually reset the fields ?
-
-> +
-> +    rng_update_timer(s);
-> +}
-
-Otherwise the device looks good.
-
-thanks
--- PMM
+>
+> We made some investigations and found out that there are several issues:
+>
+> 1. Reconnect option postpones the first connection till machine init done event.
+>    But we need this connection during vhost blk device initialization which
+>    happens before the machine init done handling.
+>
+> 2. If the connection is forced, then the reconnection will be successful
+>    after SPDK restart. The problem is that virtual queue will not start.
+>    The reason for it is that virtual queue initialization commands
+>    should be resent:
+>    * VHOST_USER_SET_FEATURES
+>    * VHOST_USER_SET_MEM_TABLE
+>    * VHOST_USER_SET_VRING_NUM
+>    * VHOST_USER_SET_VRING_BASE
+>    * VHOST_USER_SET_VRING_ADDR
+>    * VHOST_USER_SET_VRING_KICK
+>    * VHOST_USER_SET_VRING_CALL
+>
+> The patch set resolves both of these issues.
+>
+> Test case:
+>
+> 1. Start fio process (inside VM):
+>      fio --name test --ioengine=libaio --iodepth=64 --bs=4096 \
+>          --rw=randrw --direct=1 --sync=1 --verify=md5 \
+>          --size=64M --filename=/dev/vda --loops=100
+>
+> 2. Restart SPDK many times.
+>    We are expecting that during SPDK restart fio will pause and fio should
+>    continue to work after restart completion.
+>
+> 3. fio process completed successfully without any error.
+>
+> Yury Kotov (3):
+>   chardev: prevent extra connection attempt in tcp_chr_machine_done_hook
+>   vhost: refactor vhost_dev_start and vhost_virtqueue_start
+>   vhost-user: add reconnect support for vhost-user
+>
+>  chardev/char-socket.c     |   5 +-
+>  hw/virtio/vhost-user.c    |  65 ++++++++++++--
+>  hw/virtio/vhost.c         | 223 +++++++++++++++++++++++++++++++---------------
+>  include/hw/virtio/vhost.h |   2 +
+>  4 files changed, 215 insertions(+), 80 deletions(-)
+>
+> --
+> 2.7.4
+>
