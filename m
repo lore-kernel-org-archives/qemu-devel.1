@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQh-0000lF-8x
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:11 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQj-0000p0-3O
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQd-00021N-OQ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:10 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44470)
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQh-000271-CJ
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:12 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44474)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fqIQd-00020P-Gt
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:07 -0400
+	id 1fqIQg-00024i-Dq
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:11 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQc-00009G-HQ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:06 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQf-0000Ac-D5
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:09 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Aug 2018 14:34:30 +0100
-Message-Id: <20180816133438.17061-23-peter.maydell@linaro.org>
+Date: Thu, 16 Aug 2018 14:34:33 +0100
+Message-Id: <20180816133438.17061-26-peter.maydell@linaro.org>
 In-Reply-To: <20180816133438.17061-1-peter.maydell@linaro.org>
 References: <20180816133438.17061-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 22/30] aspeed_sdmc: Handle ECC training
+Subject: [Qemu-devel] [PULL 25/30] target/arm: Ignore
+ float_flag_input_denormal from fp_status_f16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +30,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Joel Stanley <joel@jms.id.au>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-This is required to ensure u-boot SDRAM training completes.
+When FZ is set, input_denormal exceptions are recognized, but this does
+not happen with FZ16.  The softfloat code has no way to distinguish
+these bits and will raise such exceptions into fp_status_f16.flags,
+so ignore them when computing the accumulated flags.
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Tested-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20180807075757.7242-6-joel@jms.id.au
+Cc: qemu-stable@nongnu.org (3.0.1)
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Message-id: 20180810193129.1556-3-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/misc/aspeed_sdmc.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ target/arm/helper.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-index 522e01ef8c0..89de3138aff 100644
---- a/hw/misc/aspeed_sdmc.c
-+++ b/hw/misc/aspeed_sdmc.c
-@@ -27,6 +27,10 @@
- #define R_STATUS1         (0x60 / 4)
- #define   PHY_BUSY_STATE      BIT(0)
- 
-+#define R_ECC_TEST_CTRL   (0x70 / 4)
-+#define   ECC_TEST_FINISHED   BIT(12)
-+#define   ECC_TEST_FAIL       BIT(13)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 0fc6d2e2139..a3124082a63 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11312,9 +11312,13 @@ uint32_t HELPER(vfp_get_fpscr)(CPUARMState *env)
+     fpscr = (env->vfp.xregs[ARM_VFP_FPSCR] & 0xffc8ffff)
+             | (env->vfp.vec_len << 16)
+             | (env->vfp.vec_stride << 20);
 +
- /*
-  * Configuration register Ox4 (for Aspeed AST2400 SOC)
-  *
-@@ -148,6 +152,11 @@ static void aspeed_sdmc_write(void *opaque, hwaddr addr, uint64_t data,
-             /* Will never return 'busy' */
-             data &= ~PHY_BUSY_STATE;
-             break;
-+        case R_ECC_TEST_CTRL:
-+            /* Always done, always happy */
-+            data |= ECC_TEST_FINISHED;
-+            data &= ~ECC_TEST_FAIL;
-+            break;
-         default:
-             break;
-         }
+     i = get_float_exception_flags(&env->vfp.fp_status);
+     i |= get_float_exception_flags(&env->vfp.standard_fp_status);
+-    i |= get_float_exception_flags(&env->vfp.fp_status_f16);
++    /* FZ16 does not generate an input denormal exception.  */
++    i |= (get_float_exception_flags(&env->vfp.fp_status_f16)
++          & ~float_flag_input_denormal);
++
+     fpscr |= vfp_exceptbits_from_host(i);
+     return fpscr;
+ }
 -- 
 2.18.0
