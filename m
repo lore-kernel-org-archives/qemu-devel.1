@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqHjx-0003gL-Ct
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:51:03 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqHoB-0006oD-Mf
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:55:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqHjv-00042Q-1j
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:51:01 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:43173)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqHjr-000417-TW
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:50:58 -0400
-Received: by mail-oi0-x242.google.com with SMTP id b15-v6so7731089oib.10
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 05:50:54 -0700 (PDT)
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqHo8-0006OX-Fm
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:55:23 -0400
+Received: from mail-by2nam03on0121.outbound.protection.outlook.com
+	([104.47.42.121]:46624
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fqHo8-0006NL-2B
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:55:20 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 16 Aug 2018 12:55:14 +0000
+Message-ID: <BN7PR08MB486850C58D2721C0A503C122C63E0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1534182832-554-59-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1534182832-554-59-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20180810193129.1556-1-richard.henderson@linaro.org>
-References: <20180810193129.1556-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Aug 2018 13:50:34 +0100
-Message-ID: <CAFEAcA_Hs7oyHBu6vS5p0eaA1KEQaW4Zzn7m7eR3UYwmvY+i=g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/6] target/arm: More sve-ish fixes
+Subject: Re: [Qemu-devel] [PATCH v8 58/87] elf: Add EM_NANOMIPS value as a
+ valid one for e_machine field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Desnogues <laurent.desnogues@gmail.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-On 10 August 2018 at 20:31, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> All from problems reported by Laurent this week.  Five of them are
-> SVE related, but while trying to simplify one of the reports I
-> discovered that I had broken ARMv8.3 just before final commit.
->
->
-> r~
->
->
-> Richard Henderson (6):
->   target/arm: Adjust FPCR_MASK for FZ16
->   target/arm: Ignore float_flag_input_denormal from fp_status_f16
->   target/arm: Use fp_status_fp16 for do_fmpa_zpzzz_h
->   target/arm: Use FZ not FZ16 for SVE FCVT single-half and double-half
->   target/arm: Fix aa64 FCADD and FCMLA decode
->   softfloat: Fix missing inexact for floating-point add
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Monday, August 13, 2018 7:53 PM
+>=20
+> Subject: [PATCH v8 58/87] elf: Add EM_NANOMIPS value as a valid one for e=
+_machine field
+>=20
+> From: Aleksandar Rikalo <arikalo@wavecomp.com>
+>=20
+> Value 249 is registered as valid for usage for nanoMIPS executables.
+>=20
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  include/elf.h | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/include/elf.h b/include/elf.h
+> index 28a5a63..312f68a 100644
+> --- a/include/elf.h
+> +++ b/include/elf.h
+> @@ -143,6 +143,8 @@ typedef int64_t  Elf64_Sxword;
+>=20
+>  #define EM_RISCV        243     /* RISC-V */
+>=20
+> +#define EM_NANOMIPS     249     /* Wave Computing nanoMIPS */
+> +
+>  /*
+>   * This is an interim value that we will use until the committee comes
+>   * up with a final number.
+> --
+> 2.7.4=20
+>=20
 
-
-
-Applied to target-arm.next, thanks.
-
--- PMM
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
