@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlA-0005WW-OE
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:28 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlS-0005tM-Sq
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJl1-0000lv-At
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:21 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:43711 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlA-00016D-MQ
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:33 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:43763 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJkx-0000gF-8w
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:13 -0400
+	id 1fqJl3-0000hL-Qq
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:21 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:57:43 +0200
-Message-Id: <1534431497-1385-51-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:57:48 +0200
+Message-Id: <1534431497-1385-56-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v9 50/84] target/mips: Add updating BadInstr,
- BadInstrP, BadInstrX for nanoMIPS
+Subject: [Qemu-devel] [PATCH v9 55/84] elf: Add EM_NANOMIPS value as a valid
+ one for e_machine field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +28,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Update BadInstr, BadInstrP,and BadInstrX registers for nanoMIPS.
-The same support for pre-nanoMIPS remains unimplemented.
+Value 249 is registered as valid for usage for nanoMIPS executables.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/helper.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ include/elf.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index e215af9..b25e000 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -682,6 +682,31 @@ static void set_hflags_for_handler (CPUMIPSState *env)
+diff --git a/include/elf.h b/include/elf.h
+index 28a5a63..312f68a 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -143,6 +143,8 @@ typedef int64_t  Elf64_Sxword;
  
- static inline void set_badinstr_registers(CPUMIPSState *env)
- {
-+    if (env->insn_flags & ISA_NANOMIPS32) {
-+        if (env->CP0_Config3 & (1 << CP0C3_BI)) {
-+            uint32_t instr = (cpu_lduw_code(env, env->active_tc.PC)) << 16;
-+            if ((instr & 0x10000000) == 0) {
-+                instr |= cpu_lduw_code(env, env->active_tc.PC + 2);
-+            }
-+            env->CP0_BadInstr = instr;
+ #define EM_RISCV        243     /* RISC-V */
+ 
++#define EM_NANOMIPS     249     /* Wave Computing nanoMIPS */
 +
-+            if ((instr & 0xFC000000) == 0x60000000) {
-+                instr = cpu_lduw_code(env, env->active_tc.PC + 4) << 16;
-+                env->CP0_BadInstrX = instr;
-+            }
-+        }
-+        if ((env->CP0_Config3 & (1 << CP0C3_BP)) &&
-+            (env->hflags & MIPS_HFLAG_BMASK)) {
-+            if (!(env->hflags & MIPS_HFLAG_B16)) {
-+                env->CP0_BadInstrP = cpu_ldl_code(env, env->active_tc.PC - 4);
-+            } else {
-+                env->CP0_BadInstrP =
-+                    (cpu_lduw_code(env, env->active_tc.PC - 2)) << 16;
-+            }
-+        }
-+        return;
-+    }
-+
-     if (env->hflags & MIPS_HFLAG_M16) {
-         /* TODO: add BadInstr support for microMIPS */
-         return;
+ /*
+  * This is an interim value that we will use until the committee comes
+  * up with a final number.
 -- 
 2.7.4
