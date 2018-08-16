@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqGZU-0001BD-F9
+	(envelope-from <thuth@redhat.com>) id 1fqGZV-0001BG-5K
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:36:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqGZS-0003LX-QW
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:36:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42208 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fqGZU-0003MV-GV
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:36:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55742 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fqGZS-0003LI-L0
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:36:06 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fqGZU-0003MB-9N
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:36:08 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 16 Aug 2018 13:35:51 +0200
-Message-Id: <1534419358-10932-2-git-send-email-thuth@redhat.com>
+Date: Thu, 16 Aug 2018 13:35:52 +0200
+Message-Id: <1534419358-10932-3-git-send-email-thuth@redhat.com>
 In-Reply-To: <1534419358-10932-1-git-send-email-thuth@redhat.com>
 References: <1534419358-10932-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/8] tests/migration-test: Silence the
- kvm_hv message by default
+Subject: [Qemu-devel] [PATCH v2 2/8] net: Silence 'has no peer' messages in
+ testing mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +27,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-When running "make check" on a non-POWER host, the output is quite
-distorted like this:
+When running qtests with -nodefaults, we are not interested in
+these 'XYZ has no peer' messages.
 
-  [...]
-  GTESTER check-qtest-nios2
-  GTESTER check-qtest-or1k
-  GTESTER check-qtest-ppc64
-Skipping test: kvm_hv not available Skipping test: kvm_hv not available Skipping test: kvm_hv not available Skipping test: kvm_hv not available   GTESTER check-qtest-ppcemb
-  GTESTER check-qtest-ppc
-  GTESTER check-qtest-riscv32
-  GTESTER check-qtest-riscv64
-  [...]
-
-Move the check to the beginning of the main function instead, so that
-we do not have to test the condition again and again for each test,
-and better use g_test_message() instead of g_print() here, like it is
-also done in ufd_version_check() already.
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/migration-test.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ vl.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index eb58d0a..0e687b7 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -438,15 +438,6 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-                                   " -incoming %s",
-                                   accel, tmpfs, bootpath, uri);
-     } else if (strcmp(arch, "ppc64") == 0) {
--
--        /* On ppc64, the test only works with kvm-hv, but not with kvm-pr
--         * and TCG is touchy due to race conditions on dirty bits
--         * (especially on PPC for some reason)
--         */
--        if (access("/sys/module/kvm_hv", F_OK)) {
--            g_print("Skipping test: kvm_hv not available ");
--            return -1;
--        }
-         cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
-                                   " -name source,debug-threads=on"
-                                   " -serial file:%s/src_serial"
-@@ -750,6 +741,17 @@ int main(int argc, char **argv)
-         return 0;
+diff --git a/vl.c b/vl.c
+index 16b913f..7055df3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4559,11 +4559,10 @@ int main(int argc, char **argv, char **envp)
+      * (2) CONFIG_SLIRP not set, in which case the implicit "-net nic"
+      * sets up a nic that isn't connected to anything.
+      */
+-    if (!default_net) {
++    if (!default_net && (!qtest_enabled() || has_defaults)) {
+         net_check_clients();
      }
  
-+    /*
-+     * On ppc64, the test only works with kvm-hv, but not with kvm-pr and TCG
-+     * is touchy due to race conditions on dirty bits (especially on PPC for
-+     * some reason)
-+     */
-+    if (g_str_equal(qtest_get_arch(), "ppc64") &&
-+        access("/sys/module/kvm_hv", F_OK)) {
-+        g_test_message("Skipping test: kvm_hv not available");
-+        return 0;
-+    }
-+
-     tmpfs = mkdtemp(template);
-     if (!tmpfs) {
-         g_test_message("mkdtemp on path (%s): %s\n", template, strerror(errno));
+-
+     if (boot_once) {
+         qemu_boot_set(boot_once, &error_fatal);
+         qemu_register_reset(restore_boot_order, g_strdup(boot_order));
 -- 
 1.8.3.1
