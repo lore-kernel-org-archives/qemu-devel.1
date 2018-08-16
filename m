@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fqMzy-0004ew-49
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:27:54 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fqN76-0008Cr-3b
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fqMzx-00072A-9O
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:27:53 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38220)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fqMzx-00071x-2k
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:27:53 -0400
-Received: by mail-wr1-x441.google.com with SMTP id w11-v6so2411171wrc.5
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 11:27:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <20180306053320.15401-1-peterx@redhat.com>
-	<20180306053320.15401-8-peterx@redhat.com>
-	<CAJ+F1CKL3yunvzx3_uNeCjecoCdM2Cm+LwGBgSxfxChS=d_D6g@mail.gmail.com>
-In-Reply-To: <CAJ+F1CKL3yunvzx3_uNeCjecoCdM2Cm+LwGBgSxfxChS=d_D6g@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 16 Aug 2018 20:27:40 +0200
-Message-ID: <CAJ+F1CL3iC7UND=N53VUGJCKimLPSDwBY0zWigWeO1ijqdgjpA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 7/9] chardev: tcp: postpone async
- connection setup
+	(envelope-from <ehabkost@redhat.com>) id 1fqN72-0002k1-SW
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fqN72-0002j3-Mo
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:12 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2EF9B83F45
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 18:35:11 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Thu, 16 Aug 2018 15:35:09 -0300
+Message-Id: <20180816183509.8231-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH] i386: Fix arch_query_cpu_model_expansion() leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,90 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi
-On Thu, Aug 16, 2018 at 7:49 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
->
-> Hi
-> On Tue, Mar 6, 2018 at 6:41 AM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > This patch allows the socket chardev async connection be setup with
-> > non-default gcontext.  We do it by postponing the setup to machine done=
-,
-> > since until then we can know which context we should run the async
-> > operation on.
-> >
-> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  chardev/char-socket.c | 17 ++++++++++++++---
-> >  1 file changed, 14 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> > index 1ce5adad9a..165612845a 100644
-> > --- a/chardev/char-socket.c
-> > +++ b/chardev/char-socket.c
-> > @@ -1004,9 +1004,8 @@ static void qmp_chardev_open_socket(Chardev *chr,
-> >          s->reconnect_time =3D reconnect;
-> >      }
-> >
-> > -    if (s->reconnect_time) {
-> > -        tcp_chr_connect_async(chr);
-> > -    } else {
-> > +    /* If reconnect_time is set, will do that in chr_machine_done. */
-> > +    if (!s->reconnect_time) {
-> >          if (s->is_listen) {
-> >              char *name;
-> >              s->listener =3D qio_net_listener_new();
-> > @@ -1138,6 +1137,17 @@ char_socket_get_connected(Object *obj, Error **e=
-rrp)
-> >      return s->connected;
-> >  }
-> >
-> > +static int tcp_chr_machine_done_hook(Chardev *chr)
-> > +{
-> > +    SocketChardev *s =3D SOCKET_CHARDEV(chr);
-> > +
-> > +    if (s->reconnect_time) {
-> > +        tcp_chr_connect_async(chr);
-> > +    }
-> > +
-> > +    return 0;
-> > +}
->
-> This patch broke /vhost-user/reconnect test, since it is using
-> reconnect chardev sockets under a test program, where no machine done
-> hook exist.
->
+Reported by Coverity:
 
-What about chardev created after machine done?
+Error: RESOURCE_LEAK (CWE-772): [#def439]
+qemu-2.12.0/target/i386/cpu.c:3179: alloc_fn: Storage is returned from allocation function "qdict_new".
+qemu-2.12.0/qobject/qdict.c:34:5: alloc_fn: Storage is returned from allocation function "g_malloc0".
+qemu-2.12.0/qobject/qdict.c:34:5: var_assign: Assigning: "qdict" = "g_malloc0(4120UL)".
+qemu-2.12.0/qobject/qdict.c:37:5: return_alloc: Returning allocated memory "qdict".
+qemu-2.12.0/target/i386/cpu.c:3179: var_assign: Assigning: "props" = storage returned from "qdict_new()".
+qemu-2.12.0/target/i386/cpu.c:3217: leaked_storage: Variable "props" going out of scope leaks the storage it points to.
 
-> > +
-> >  static void char_socket_class_init(ObjectClass *oc, void *data)
-> >  {
-> >      ChardevClass *cc =3D CHARDEV_CLASS(oc);
-> > @@ -1153,6 +1163,7 @@ static void char_socket_class_init(ObjectClass *o=
-c, void *data)
-> >      cc->chr_add_client =3D tcp_chr_add_client;
-> >      cc->chr_add_watch =3D tcp_chr_add_watch;
-> >      cc->chr_update_read_handler =3D tcp_chr_update_read_handler;
-> > +    cc->chr_machine_done =3D tcp_chr_machine_done_hook;
-> >
-> >      object_class_property_add(oc, "addr", "SocketAddress",
-> >                                char_socket_get_addr, NULL,
-> > --
-> > 2.14.3
-> >
-> >
->
->
-> --
-> Marc-Andr=C3=A9 Lureau
+This was introduced by commit b8097deb359b ("i386: Improve
+query-cpu-model-expansion full mode").
 
+The leak is only theoretical: if ret->model->props is set to
+props, the qapi_free_CpuModelExpansionInfo() call will free props
+too in case of errors.  The only way for this to not happen is if
+we enter the default branch of the switch statement, which would
+never happen because all CpuModelExpansionType values are being
+handled.
 
+It's still worth to change this to make the allocation logic
+easier to follow and make the Coverity error go away.  To make
+everything simpler, initialize ret->model and ret->model->props
+earlier in the function.
 
---=20
-Marc-Andr=C3=A9 Lureau
+While at it, remove redundant check for !prop because prop is
+always initialized at the beginning of the function.
+
+Fixes: b8097deb359bbbd92592b9670adfe9e245b2d0bd
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 723e02221e..e23c05c4e1 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3758,6 +3758,9 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
+     }
+ 
+     props = qdict_new();
++    ret->model = g_new0(CpuModelInfo, 1);
++    ret->model->props = QOBJECT(props);
++    ret->model->has_props = true;
+ 
+     switch (type) {
+     case CPU_MODEL_EXPANSION_TYPE_STATIC:
+@@ -3778,15 +3781,9 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
+         goto out;
+     }
+ 
+-    if (!props) {
+-        props = qdict_new();
+-    }
+     x86_cpu_to_dict(xc, props);
+ 
+-    ret->model = g_new0(CpuModelInfo, 1);
+     ret->model->name = g_strdup(base_name);
+-    ret->model->props = QOBJECT(props);
+-    ret->model->has_props = true;
+ 
+ out:
+     object_unref(OBJECT(xc));
+-- 
+2.18.0.rc1.1.g3f1ff2140
