@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqHuA-0003QU-L4
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:39 -0400
+	(envelope-from <berrange@redhat.com>) id 1fqHu6-0003Pg-QB
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqHu3-0001Qf-Kp
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58564 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fqHu4-0001Sk-Q0
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60558 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqHu3-0001Nh-5c
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:27 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqHu4-0001SI-Ee
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:28 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 16 Aug 2018 14:01:09 +0100
-Message-Id: <20180816130118.31841-3-berrange@redhat.com>
+Date: Thu, 16 Aug 2018 14:01:10 +0100
+Message-Id: <20180816130118.31841-4-berrange@redhat.com>
 In-Reply-To: <20180816130118.31841-1-berrange@redhat.com>
 References: <20180816130118.31841-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 02/11] qom: don't require user creatable
- objects to be registered
+Subject: [Qemu-devel] [PATCH v4 03/11] hw/usb: don't set IN_ISDIR for
+ inotify watch in MTP driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +30,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-When an object is in turn owned by another user object, it is not
-desirable to expose this in the QOM object hierarchy, as it is
-just an internal implementation detail, we should be free to change
-without exposure.
+IN_ISDIR is not a bit that one can request when registering a
+watch with inotify_add_watch. Rather it is a bit that is set
+automatically when reading events from the kernel.
 
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- qom/object.c            | 12 ++++++++----
- qom/object_interfaces.c | 16 ++++++++++------
- 2 files changed, 18 insertions(+), 10 deletions(-)
+ hw/usb/dev-mtp.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index 75d1d48944..fff85d6d62 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -600,15 +600,19 @@ Object *object_new_with_propv(const char *typename,
-         goto error;
-     }
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 1ded7ac9a3..80f88e40fa 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -638,8 +638,7 @@ static void usb_mtp_inotify_cleanup(MTPState *s)
 =20
--    object_property_add_child(parent, id, obj, &local_err);
--    if (local_err) {
--        goto error;
-+    if (id !=3D NULL) {
-+        object_property_add_child(parent, id, obj, &local_err);
-+        if (local_err) {
-+            goto error;
-+        }
-     }
+ static int usb_mtp_add_watch(int inotifyfd, char *path)
+ {
+-    uint32_t mask =3D IN_CREATE | IN_DELETE | IN_MODIFY |
+-        IN_ISDIR;
++    uint32_t mask =3D IN_CREATE | IN_DELETE | IN_MODIFY;
 =20
-     if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
-         user_creatable_complete(obj, &local_err);
-         if (local_err) {
--            object_unparent(obj);
-+            if (id !=3D NULL) {
-+                object_unparent(obj);
-+            }
-             goto error;
-         }
-     }
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index 72b97a8bed..e0f12c0a9b 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -83,16 +83,20 @@ Object *user_creatable_add_type(const char *type, con=
-st char *id,
-         goto out;
-     }
-=20
--    object_property_add_child(object_get_objects_root(),
--                              id, obj, &local_err);
--    if (local_err) {
--        goto out;
-+    if (id !=3D NULL) {
-+        object_property_add_child(object_get_objects_root(),
-+                                  id, obj, &local_err);
-+        if (local_err) {
-+            goto out;
-+        }
-     }
-=20
-     user_creatable_complete(obj, &local_err);
-     if (local_err) {
--        object_property_del(object_get_objects_root(),
--                            id, &error_abort);
-+        if (id !=3D NULL) {
-+            object_property_del(object_get_objects_root(),
-+                                id, &error_abort);
-+        }
-         goto out;
-     }
- out:
+     return inotify_add_watch(inotifyfd, path, mask);
+ }
 --=20
 2.17.1
