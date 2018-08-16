@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fqDN1-0003Rr-HE
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:11:04 -0400
+	(envelope-from <simon@ruderich.org>) id 1fqDPK-0004jK-Bn
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fqDMz-0002RJ-Mf
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:11:02 -0400
-References: <20180814124254.5229-1-peter.maydell@linaro.org>
-	<20180814124254.5229-10-peter.maydell@linaro.org>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <f41e91ae-324e-17dc-f7c3-34c499dbe027@greensocs.com>
-Date: Thu, 16 Aug 2018 10:10:43 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180814124254.5229-10-peter.maydell@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
+	(envelope-from <simon@ruderich.org>) id 1fqDPG-0003gm-Cl
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:13:26 -0400
+Received: from zucker2.schokokeks.org ([178.63.68.90]:51361)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1fqDPG-0003gH-3v
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:13:22 -0400
+Date: Thu, 16 Aug 2018 10:13:20 +0200
+From: Simon Ruderich <simon@ruderich.org>
+Message-ID: <20180816081320.GA16148@ruderich.org>
+References: <851d095cd457109e4a22a2e5ecd36ccbdacbf48b.1526916378.git.simon@ruderich.org>
+	<20180810103650.GA2391@work-vm>
+	<20180814141826.GA26558@ruderich.org>
+	<871sb1t0cn.fsf@dusky.pond.sub.org>
+	<20180814190329.GA13798@ruderich.org>
+	<87pnykqmw4.fsf@dusky.pond.sub.org>
+	<20180815124154.GA1116@ruderich.org>
+	<87bma3ityy.fsf@dusky.pond.sub.org>
+	<20180815154626.GA23638@ruderich.org>
+	<87pnyig92q.fsf@dusky.pond.sub.org>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
 	protocol="application/pgp-signature";
-	boundary="oANo8G3AxHELt1pdVopR5dxkChviLCjS8"
-Subject: Re: [Qemu-devel] [PATCH 09/10] target/arm: Implement AArch32 ERET
- instruction
+	boundary="=_zucker.schokokeks.org-29738-1534407200-0001-2"
+Content-Disposition: inline
+In-Reply-To: <87pnyig92q.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +37,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, edgari@xilinx.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oANo8G3AxHELt1pdVopR5dxkChviLCjS8
-From: Luc Michel <luc.michel@greensocs.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-Cc: patches@linaro.org, edgari@xilinx.com
-Message-ID: <f41e91ae-324e-17dc-f7c3-34c499dbe027@greensocs.com>
-Subject: Re: [PATCH 09/10] target/arm: Implement AArch32 ERET instruction
-References: <20180814124254.5229-1-peter.maydell@linaro.org>
- <20180814124254.5229-10-peter.maydell@linaro.org>
-In-Reply-To: <20180814124254.5229-10-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+This is a MIME-formatted message.  If you see this text it means that your
+E-mail software does not support MIME-formatted messages.
+
+--=_zucker.schokokeks.org-29738-1534407200-0001-2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 8/14/18 2:42 PM, Peter Maydell wrote:
-> ARMv7VE introduced the ERET instruction, which is necessary to
-> return from an exception taken to Hyp mode. Implement this.
-> In A32 encoding it is a completely new encoding; in T32 it
-> is an adjustment of the behaviour of the existing
-> "SUBS PC, LR, #<imm8>" instruction.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Thu, Aug 16, 2018 at 07:43:41AM +0200, Markus Armbruster wrote:
+>> On Fri, Aug 10, 2018 at 11:36:51AM +0100, Dr. David Alan Gilbert wrote:
+>>> Also, had you considered rearranging and making them optional,
+>>> for example if you do:
+>>>
+>>> val:l,filename:F,offset:i?,size:i?
+>>>
+>>> I think that would mean you can do the fairly obvious:
+>>>   pmemload addr "myfile"
+>>>
+>>> with the assumption that loads the whole file.
+>>
+>> This would deviate from pmemsave/memsave, but feels more natural.
+>
+> The different order or arguments in HMP is somewhat ugly.  Okay if it
+> makes the command more pleasant to use.  Up to you and Dave to decide.
+>
+> If you decide to deviate, consider
+>
+>     filename:F,address:l,size:i?,offset:i?
 
-Reviewed-By: Luc Michel <luc.michel@greensocs.com>
+=46rom what I understand we can't have optional arguments in the
+middle. Would you prefer mandatory size/offset parameters in HMP
+or optional parameters but inconsistent with pmemsave/memsave?
+Both works for me.
 
-> ---
->  target/arm/translate.c | 31 +++++++++++++++++++++++++++++--
->  1 file changed, 29 insertions(+), 2 deletions(-)
->=20
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 3f5751d4826..5ecc24f12fb 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -8887,6 +8887,25 @@ static void disas_arm_insn(DisasContext *s, unsi=
-gned int insn)
->              tcg_temp_free_i32(tmp2);
->              store_reg(s, rd, tmp);
->              break;
-> +        case 0x6: /* ERET */
-> +            if (op1 !=3D 3) {
-> +                goto illegal_op;
-> +            }
-> +            if (!arm_dc_feature(s, ARM_FEATURE_V7VE)) {
-> +                goto illegal_op;
-> +            }
-> +            if ((insn & 0x000fff0f) !=3D 0x0000000e) {
-> +                /* UNPREDICTABLE; we choose to UNDEF */
-> +                goto illegal_op;
-> +            }
-> +
-> +            if (s->current_el =3D=3D 2) {
-> +                tmp =3D load_cpu_field(elr_el[2]);
-> +            } else {
-> +                tmp =3D load_reg(s, 14);
-> +            }
-> +            gen_exception_return(s, tmp);
-> +            break;
->          case 7:
->          {
->              int imm16 =3D extract32(insn, 0, 4) | (extract32(insn, 8, =
-12) << 4);
-> @@ -11144,8 +11163,16 @@ static void disas_thumb2_insn(DisasContext *s,=
- uint32_t insn)
->                          if (rn !=3D 14 || rd !=3D 15) {
->                              goto illegal_op;
->                          }
-> -                        tmp =3D load_reg(s, rn);
-> -                        tcg_gen_subi_i32(tmp, tmp, insn & 0xff);
-> +                        if (s->current_el =3D=3D 2) {
-> +                            /* ERET from Hyp uses ELR_Hyp, not LR */
-> +                            if (insn & 0xff) {
-> +                                goto illegal_op;
-> +                            }
-> +                            tmp =3D load_cpu_field(elr_el[2]);
-> +                        } else {
-> +                            tmp =3D load_reg(s, rn);
-> +                            tcg_gen_subi_i32(tmp, tmp, insn & 0xff);
-> +                        }
->                          gen_exception_return(s, tmp);
->                          break;
->                      case 6: /* MRS */
->=20
+Regards
+Simon
+--=20
++ privacy is necessary
++ using gnupg http://gnupg.org
++ public key id: 0x92FEFDB7E44C32F9
 
-
---oANo8G3AxHELt1pdVopR5dxkChviLCjS8
+--=_zucker.schokokeks.org-29738-1534407200-0001-2
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Content-Transfer-Encoding: 7bit
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlt1MYMACgkQd8knW3Qn
-Tr7SpQ/8CHqZ+TQe90ZlRA1TH73UdRfQ87LJIOlLRo1eXHqr+e2IKwruiTSx1/pL
-UP/itM4Ljb3BDWMznBfXA2sxGKfkCykaG7y5BS7NJ/wvswi5P7SvPTvPx6o9YYlv
-iKS+ojLfx2sQU+qow7OEBgJ5kjMKMUId8m4gVhwos+8OKhlcGugJTOlY97HUMUtg
-+Yh2a9bdnR+f+qHVOceD9oxVN9bGDIYXE+Jewt7v1xG1q4M3Fa7c7c8pprPRAu7q
-6mhuu1dhw7w2UpTuEDhiJsoO4rcV+H/cndLnwez4Gm8yQL+RC0gQlr6/dNj9M6NJ
-N1bsTMdc4NP4LYebYXD5exdS+m9WBSLZTI+vA3eDxZI60AMAOT+tWVpDNBE767mN
-WA3iTk2daYsgWH2ItI9sjL7uA1L/wmF7S58tY6o7VwLM2tW2eOt4efhxKd6kxAYd
-fJX/mthvnKP8NjVSW1C7D/32DV7gbE6SwTugj5wnf82IPirYvwlgjqhVv7SCYPQI
-XSdb8Q6qnkC7vfc/P1tqNOvmbiJgPfwLJ7pPstHyqBaCoR29mW5TOmJPOF/JdGoh
-RQ3ReWQVusG/7gbnPen54AETQMy11RVOB/vUm1ZamqZ6OqE+cn8kSnEbVf9XP3e3
-3wxW6m0ASii8pJodhnr2dkm7fCoelWH/EZxqQCvMxjE2mKN6Q+c=
-=Hzw6
+iQIzBAEBCgAdFiEEO7rfWMMObpFkF3n0kv79t+RMMvkFAlt1MhsACgkQkv79t+RM
+MvlPkA/+PTLB6N9uGAA5fpYQ4It6GIvU6M0zHHTTxHJCqJuyH1P3bKwjneQ0f1hh
+ha51IGtP2uxfIftHETxv1XiU2XC0J0LeClKf2zGqvsjwWWdtGgwk8lNdRHbPoW4L
+wrDsrVScDsB0ObqzBLPKad/eai8OjCsDJhtyMpUH176b+kT5Dnhh24q8JZB+U8yE
+YY2+MLEI8jiBmjOgVNycquTJHCcTuicFO7Rakdwb22V++vPc5XvwvxmFqmMu6gZg
+DjUHfcnLcQIMl5+LHNwOkMh1egaY/rxtHLGgC5i69VL7iKTjsKQfgQAS6wfSBxz4
+tP1JtEvobuMWYZidDi0iwyjUjxmMgPKdNGiMKcfTdHF3g2IKgHymb3PTjkKMNj9L
+syXHvllhySya/V0ELAZreqwNKBxlm0v1gkigHJLVhNbjRpy8/2ZvBBrYZeaAUqQG
+j2uoeBickqj+miILk46LMQswHyWj36rv0joXiqKMZjsTgSKP+G/RF42zejT46LXO
+IZg8IbiWCsIjtJ3VKx1pn8scUZQWNfWil9EudxruXtQ89e98GECQ7o25Qgpt8w5/
+Z+NozNX46EjYr7ZZrdvdFqNA+F5CiZK2aYi3BkUmS6phR3XHnHHV5u2uxtxBK7OG
+KwLai6BnE0hyohUcbCoJaHBgycnRExD+WZ1fNgvP2LMOSCgZ8Eg=
+=4fOk
 -----END PGP SIGNATURE-----
 
---oANo8G3AxHELt1pdVopR5dxkChviLCjS8--
+--=_zucker.schokokeks.org-29738-1534407200-0001-2--
