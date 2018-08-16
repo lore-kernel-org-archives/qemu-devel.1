@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqHe7-0007Nk-ER
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:45:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fqHha-0000ai-7C
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:48:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqHe4-0001UD-6m
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:44:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59818 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqHdz-0001Pq-IP
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:44:52 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-6-armbru@redhat.com>
-	<36518ac8-f022-c54d-2e57-6a709b3678ce@redhat.com>
-	<87d0uqmiq9.fsf@dusky.pond.sub.org>
-	<b1ad880a-7561-f784-b47e-ca3ea6d7b524@redhat.com>
-Date: Thu, 16 Aug 2018 14:44:43 +0200
-In-Reply-To: <b1ad880a-7561-f784-b47e-ca3ea6d7b524@redhat.com> (Eric Blake's
-	message of "Fri, 10 Aug 2018 09:06:07 -0500")
-Message-ID: <87o9e2bhvo.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fqHhY-0002zN-5Q
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:48:34 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:40121)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fqHhX-0002yz-TZ
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:48:32 -0400
+Received: by mail-oi0-x243.google.com with SMTP id w126-v6so7747637oie.7
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 05:48:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 05/56] qmp-test: Cover syntax and lexical
- errors
+In-Reply-To: <20180807075757.7242-7-joel@jms.id.au>
+References: <20180807075757.7242-1-joel@jms.id.au>
+	<20180807075757.7242-7-joel@jms.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Aug 2018 13:48:10 +0100
+Message-ID: <CAFEAcA8eUOzyHgF6YEBo80xQLzdnaVeZMYRiPPJWFBNv7dhZTQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 6/7] aspeed: add a max_ram_size property to
+ the memory controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +31,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Joel Stanley <joel@jms.id.au>
+Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 08/10/2018 08:52 AM, Markus Armbruster wrote:
+On 7 August 2018 at 08:57, Joel Stanley <joel@jms.id.au> wrote:
+> From: C=C3=A9dric Le Goater <clg@kaod.org>
 >
->>>> +    /* lexical error: impossible byte outside string */
->>>> +    qtest_qmp_send_raw(qts, "{\xFF");
->>>
->>> \xff is an impossible byte inside a string as well; plus it has
->>> special meaning to at least QMP for commanding a parser reset. Is a
->>> better byte more appropriate (maybe \x7f), either in replacement to
->>> \xff or as an additional test?
->>
->> \xFF is documented to have special meaning for QGA, but as far as the
->> code's concerned, it's a lexical error like any other.  I'm fixing the
->> documentation in PATCH 56.  Want me to move that patch to the front of
->> the series?
+> This will be used to construct a memory region beyond the RAM region
+> to let firmwares scan the address space with load/store to guess how
+> much RAM the SoC has.
 >
-> Might not hurt. We also have a potential design decision to make: for
-> most lexical errors, we report the error (with QGA, the user then
-> requests that the first valid command after the client's induced
-> lexical error also include an 0xff reply byte so that the client can
-> easily skip over all the line noise, including said error reports).
-> Thus, we COULD decide to make our parser specifically accept 0xff as a
-> new token, different from the lexical error token, so that it inhibits
-> wasted error messages to the client on the grounds that the client
-> sent it on purpose, differently from all other ways the client can use
-> a lexical error to cause a reset.
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+> ---
+>  hw/arm/aspeed.c               | 31 +++++++++++++++++++++++++++++++
+>  hw/arm/aspeed_soc.c           |  2 ++
+>  hw/misc/aspeed_sdmc.c         |  3 +++
+>  include/hw/misc/aspeed_sdmc.h |  1 +
+>  4 files changed, 37 insertions(+)
+>
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index bb9d33848d3f..e078269266bc 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -31,6 +31,7 @@ static struct arm_boot_info aspeed_board_binfo =3D {
+>  typedef struct AspeedBoardState {
+>      AspeedSoCState soc;
+>      MemoryRegion ram;
+> +    MemoryRegion max_ram;
+>  } AspeedBoardState;
+>
+>  typedef struct AspeedBoardConfig {
+> @@ -127,6 +128,27 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
+>      },
+>  };
+>
+> +/*
+> + * The max ram region is for firmwares that scan the address space
+> + * with load/store to guess how much RAM the SoC has.
+> + */
+> +static uint64_t max_ram_read(void *opaque, hwaddr offset, unsigned size)
+> +{
+> +    return 0;
+> +}
+> +
+> +static void max_ram_write(void *opaque, hwaddr offset, uint64_t value,
+> +                           unsigned size)
+> +{
+> +    /* Disacard writes */
+> +}
+> +
+> +static const MemoryRegionOps max_ram_ops =3D {
+> +    .read =3D max_ram_read,
+> +    .write =3D max_ram_write,
+> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> +};
+> +
+>  #define FIRMWARE_ADDR 0x0
+>
+>  static void write_boot_rom(DriveInfo *dinfo, hwaddr addr, size_t rom_siz=
+e,
+> @@ -187,6 +209,7 @@ static void aspeed_board_init(MachineState *machine,
+>      AspeedBoardState *bmc;
+>      AspeedSoCClass *sc;
+>      DriveInfo *drive0 =3D drive_get(IF_MTD, 0, 0);
+> +    ram_addr_t max_ram_size;
+>
+>      bmc =3D g_new0(AspeedBoardState, 1);
+>      object_initialize(&bmc->soc, (sizeof(bmc->soc)), cfg->soc_name);
+> @@ -226,6 +249,14 @@ static void aspeed_board_init(MachineState *machine,
+>      object_property_add_const_link(OBJECT(&bmc->soc), "ram", OBJECT(&bmc=
+->ram),
+>                                     &error_abort);
+>
+> +    max_ram_size =3D object_property_get_uint(OBJECT(&bmc->soc), "max-ra=
+m-size",
+> +                                            &error_abort);
+> +    memory_region_init_io(&bmc->max_ram, NULL, &max_ram_ops, NULL,
+> +                          "max_ram", max_ram_size  - ram_size);
+> +    memory_region_add_subregion(get_system_memory(),
+> +                                sc->info->sdram_base + ram_size,
+> +                                &bmc->max_ram);
 
-I don't think that's worthwhile.  Let me explain.
+I'm surprised that you need the IO ops, ie that it doesn't work
+just to define an empty container region with memory_region_init().
 
-I see one and a half use cases.
-
-The full use case is of course QGA synchronization.  Why is that even
-necessary?  I believe it's a work-around for transports that fail to
-provide proper connection semantics, such as virtio-serial.
-
-When a transport provides it (sockets do), every connection starts with
-a clean slate.  The only way it can get de-synchronized is either peer
-getting confused enough to send garbage, and then it's probably best to
-close the session and start over.  Evidence: we don't bother with
-synchronization for QMP, which commonly uses socket transports.
-
-I guess the problem for QGA is reconnecting with virtio-serial.  The
-slate isn't clean then.  If the previous connection left some of the
-peer's output unread, you'll get that before your own, and it may not be
-valid JSON.  Same for the other direction.
-
-To reset the peer's parser, we provoke a lexical error by sending \xFF.
-
-We still have to read and ignore stale peer output.  We do that with the
-help of command guest-sync-delimited.  Whether lexical error caused by
-\xFF are suppressed or not makes no appreciable difference.
-
-I therefore think suppressing it is not worth the bother.  What we have
-seems good enough.
-
-The half use case is human interactive use.  It's fairly easy to
-miscount parenthesis and get the peer into some unresponsive state.
-Provoking a lexical error lets me start over.  However, I'd rather not
-use \xFF to provoke it, because how do you type that?  Sending a
-suitable ASCII control character is easier, and will do the trick after
-PATCH 17 fixes our JSON parser.
+thanks
+-- PMM
