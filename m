@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fqCVB-0007ss-54
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:15:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqCYP-0000XQ-Gs
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:18:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fqCV9-0002DH-TP
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:15:25 -0400
-Date: Thu, 16 Aug 2018 09:15:15 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180816071515.GC5511@localhost.localdomain>
-References: <20180815025614.53588-1-eblake@redhat.com>
-	<20180815025614.53588-3-eblake@redhat.com>
-	<48010463-405e-bb08-f9c5-8263dcf3bb48@redhat.com>
-	<4aa899d3-c622-6acf-128c-513f95c55ed5@redhat.com>
-	<d8c5df8d-7ae2-8ddc-aa71-38ec06b79988@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1fqCYM-0004j9-DC
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:18:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37334)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqCYL-0004fj-Kv
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:18:42 -0400
+Received: from smtp.corp.redhat.com (int-mx11.intmail.prod.int.phx2.redhat.com
+	[10.5.11.26])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 09D20C057F87
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 07:18:40 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180815195051.24586-1-marcandre.lureau@redhat.com>
+Date: Thu, 16 Aug 2018 09:18:36 +0200
+In-Reply-To: <20180815195051.24586-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 15 Aug 2018 21:50:50 +0200")
+Message-ID: <87pnyieq43.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="HlL+5n6rz5pIUxbD"
-Content-Disposition: inline
-In-Reply-To: <d8c5df8d-7ae2-8ddc-aa71-38ec06b79988@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-img: Add dd seek= option
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-option: add help fallback to
+ print the list of options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,93 +35,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, fullmanet@gmail.com, qemu-block@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
---HlL+5n6rz5pIUxbD
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> QDev options accept '?' or 'help' in the list of parameters, which is
+> really handy to list the available options.
+>
+> Unfortunately, this isn't built in QemuOpts. qemu_opts_parse_noisily()
+> seems to be the common path for command line options, so place a
+> fallback to check for '?' and print help listing available options.
 
-Am 16.08.2018 um 04:49 hat Max Reitz geschrieben:
-> On 2018-08-16 04:39, Eric Blake wrote:
-> > If convert were more powerful, I'd be fine dropping 'qemu-img dd' after
-> > a proper deprecation period.
->=20
-> Technically it has those features already, with the raw block driver's
-> offset and size parameters.
+My immediate reaction was "how come this doesn't break -device help"?
+It doesn't, because...
 
-In a way, yes. It requires you to precreate the target image, though,
-because --target-image-opts requires -n.
+> This is very handy, for example with qemu "-spice ?".
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  util/qemu-option.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/util/qemu-option.c b/util/qemu-option.c
+> index 01886efe90..8839ee6523 100644
+> --- a/util/qemu-option.c
+> +++ b/util/qemu-option.c
+> @@ -889,7 +889,12 @@ QemuOpts *qemu_opts_parse_noisily(QemuOptsList *list=
+, const char *params,
+>=20=20
+>      opts =3D opts_parse(list, params, permit_abbrev, false, &err);
+>      if (err) {
+> -        error_report_err(err);
+> +        if (has_help_option(params)) {
+> +            qemu_opts_print_help(list);
+> +            error_free(err);
+> +        } else {
+> +            error_report_err(err);
+> +        }
+>      }
+>      return opts;
+>  }
 
-We'll probably want to fix something in this area anyway because in the
-common case, you already need those options to even precreate the image,
-and qemu-img create doesn't support open options for the protocol layer
-either (unlike blockdev-create).
+... it only kicks in when parsing failed, and it doesn't for option
+argument "help".
 
-> >> ((That gave me a good idea.=A0 Actually, it's probably not such a good
-> >> idea, but I guess I'll do it in my spare time anyway.=A0 A qemu-img fu=
-se
-> >> might be nice which represents an image as a raw image at some mount
-> >> point.=A0 Benefits over qemu-nbd: (1) You don't need root, (2) you don=
-'t
-> >> need to type modprobe nbd.))
-> >=20
-> > So the kernel->userspace translation would be happening via the FUSE
-> > interface instead of the NBD interface.=A0 Data still bounces around ju=
-st
-> > as much, but it might be a fun project.=A0 Does fuse behave well when
-> > serving exactly one file at the mountpoint, rather than the more typical
-> > file system rooted in a directory?=A0 NBD at least has the benefit of
-> > claiming to be a block device all along, rather than complicating the
-> > user interface with POSIX file system rules (which you'll be bending,
-> > because you are serving exactly one file instead of a system).
+However, it *can* break for some option arguments:
 
-To make it more real, you could expose a snapshots/ subdirectory. Or
-maybe better not.
+    $ upstream-qemu -device e1000,id=3D@
+    upstream-qemu: -device e1000,id=3D@: Parameter 'id' expects an identifi=
+er
+    Identifiers consist of letters, digits, '-', '.', '_', starting with a =
+letter.
+    [Exit 1 ]
+    $ upstream-qemu -device e1000,id=3D@,help
+    [Exit 1 ]
 
-> Well, but I can just pretend my FUSE file is a block device, no?
->=20
-> Also, I just discovered something really interesting: FUSE allows you to
-> specify a single file as a mountpoint.
->=20
-> And you know what?  You can open the original file before you replace it
-> by the FUSE "filesystem".
->=20
-> So my fun interface is going to looks like this:
->=20
-> $ qemu-img fuse foo.qcow2
->=20
-> And then your foo.qcow2 is a raw image until the next "fusermount -u
-> foo.qcow2"!  Isn't that fun?
+In the second test case, the error message gets replaced by (empty)
+help.
 
-Yes, sounds fun. Until you realise that I'd actually like to merge
-something like this when it exists. ;-)
-
-For a more serious implementation, maybe it should even be a separate
-qemu-fuse rather than a qemu-img subcommand.
-
-Kevin
-
---HlL+5n6rz5pIUxbD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJbdSSDAAoJEH8JsnLIjy/WFc8P/1k9yN8Cvyp6aMisTa2LwlCm
-o/qvuJTBOq3o6gasDETy6TEtrp9ySWM/C469ai25E7Q9EIFy/LNzlndsGlHbNuig
-YV08mw/e693lcH6edg0ksH+wTPmhmgQr7Lw+HSTE93zKOCF44+PV1iHRhipuM89v
-EEdPNZCkvB+y5+fICUMktXVPPl9KC+LXkx45Gwzn8/HDodEO/rmJ47+CKCELmiZs
-3geQ+Xw2e2zY2ju/5nNX6TeFHfKyG/Twr79NHr51P+RJvcWGEK+5Yesvoz5DDlpj
-hojq0W5J3AUDGMOpK/z7slIkLryzx2TLMoKND8QctBs27l83ZS6FY2rZLr/It3tu
-aBcEHKF/MGDtYHBZq5jZ4icHKGXk4/H4LEAxhENwOfa7DUpD3am9t/bPFZCNGgGK
-o/Er9ulIBQ6DGQNNmEUXsjywzk5C85ZvU/ytI0NsC3Rlqj9dHmp4JBCA1xdE3ie9
-lXs/y8/FnLK/3obKm2qmI8x7oYDdGgQv+23CDQYiDc4b+xVS4m8jP0GTqyyiyoLe
-6M6GAasrENLc4fDk2jg9fSxznvTTNCkCieb1YlKjLue/v443D1Eodmx5JqE0sgjc
-4WFTNJQGH0gwTYAiAamo781Ar5/REDYTA4cljt3CoPk9PdxRIVqg79UCt4ZotC00
-OI2kBLZ4m+zS4a0mp75r
-=3d0l
------END PGP SIGNATURE-----
-
---HlL+5n6rz5pIUxbD--
+I love patches improving help, but I can't immediately see how to
+salvage this one.
