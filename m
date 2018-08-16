@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqN76-0008Cr-3b
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:16 -0400
+	(envelope-from <jcody@redhat.com>) id 1fqNHx-0006hp-S4
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:46:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqN72-0002k1-SW
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57480)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fqN72-0002j3-Mo
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:12 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2EF9B83F45
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 18:35:11 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 16 Aug 2018 15:35:09 -0300
-Message-Id: <20180816183509.8231-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] i386: Fix arch_query_cpu_model_expansion() leak
+	(envelope-from <jcody@redhat.com>) id 1fqNHx-0002O0-4N
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:46:29 -0400
+From: Jeff Cody <jcody@redhat.com>
+Date: Thu, 16 Aug 2018 14:46:06 -0400
+Message-Id: <cover.1534444235.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] block: for jobs,
+ do not clear user_paused until after the resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +19,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org, jsnow@redhat.com, eblake@redhat.com
 
-Reported by Coverity:
+v2 changes:
 
-Error: RESOURCE_LEAK (CWE-772): [#def439]
-qemu-2.12.0/target/i386/cpu.c:3179: alloc_fn: Storage is returned from allocation function "qdict_new".
-qemu-2.12.0/qobject/qdict.c:34:5: alloc_fn: Storage is returned from allocation function "g_malloc0".
-qemu-2.12.0/qobject/qdict.c:34:5: var_assign: Assigning: "qdict" = "g_malloc0(4120UL)".
-qemu-2.12.0/qobject/qdict.c:37:5: return_alloc: Returning allocated memory "qdict".
-qemu-2.12.0/target/i386/cpu.c:3179: var_assign: Assigning: "props" = storage returned from "qdict_new()".
-qemu-2.12.0/target/i386/cpu.c:3217: leaked_storage: Variable "props" going out of scope leaks the storage it points to.
+    Patch 1: Added r-b from John, Eric (Thanks)
+    Patch 2: Attached an iotest as patch 2
 
-This was introduced by commit b8097deb359b ("i386: Improve
-query-cpu-model-expansion full mode").
+    * cc'ed qemu-stable
 
-The leak is only theoretical: if ret->model->props is set to
-props, the qapi_free_CpuModelExpansionInfo() call will free props
-too in case of errors.  The only way for this to not happen is if
-we enter the default branch of the switch statement, which would
-never happen because all CpuModelExpansionType values are being
-handled.
+For the test in patch 2, failure here is the failure output w/o patch 1:
 
-It's still worth to change this to make the allocation logic
-easier to follow and make the Coverity error go away.  To make
-everything simpler, initialize ret->model and ret->model->props
-earlier in the function.
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "testdisk"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
+-{"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
+-*** done
++QEMU_PROG: blockjob.c:460: block_job_iostatus_reset: Assertion `job->job.user_paused && job->job.pause_count > 0' failed.
++Wrong response matching Assertion on handle 0
+Failures: 229
+Failed 1 of 1 tests
 
-While at it, remove redundant check for !prop because prop is
-always initialized at the beginning of the function.
 
-Fixes: b8097deb359bbbd92592b9670adfe9e245b2d0bd
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/cpu.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+git-backport-diff from v1:
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 723e02221e..e23c05c4e1 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3758,6 +3758,9 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
-     }
- 
-     props = qdict_new();
-+    ret->model = g_new0(CpuModelInfo, 1);
-+    ret->model->props = QOBJECT(props);
-+    ret->model->has_props = true;
- 
-     switch (type) {
-     case CPU_MODEL_EXPANSION_TYPE_STATIC:
-@@ -3778,15 +3781,9 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
-         goto out;
-     }
- 
--    if (!props) {
--        props = qdict_new();
--    }
-     x86_cpu_to_dict(xc, props);
- 
--    ret->model = g_new0(CpuModelInfo, 1);
-     ret->model->name = g_strdup(base_name);
--    ret->model->props = QOBJECT(props);
--    ret->model->has_props = true;
- 
- out:
-     object_unref(OBJECT(xc));
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/2:[----] [--] 'block: for jobs, do not clear user_paused until after the resume'
+002/2:[down] 'block: iotest to catch abort on forced blockjob cancel'
+
+
+Jeff Cody (2):
+  block: for jobs, do not clear user_paused until after the resume
+  block: iotest to catch abort on forced blockjob cancel
+
+ job.c                      |  2 +-
+ tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/229.out | 23 +++++++++
+ tests/qemu-iotests/group   |  1 +
+ 4 files changed, 120 insertions(+), 1 deletion(-)
+ create mode 100755 tests/qemu-iotests/229
+ create mode 100644 tests/qemu-iotests/229.out
+
 -- 
-2.18.0.rc1.1.g3f1ff2140
+2.17.1
