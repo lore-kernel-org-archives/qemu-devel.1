@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fqGgO-0002EH-9h
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:43:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1fqGjV-0005eW-3J
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:46:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fqGgL-0008QQ-2N
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:43:16 -0400
-Received: from mail-bl2nam02on0716.outbound.protection.outlook.com
-	([2a01:111:f400:fe46::716]:8857
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fqGgK-0008QC-TF
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:43:12 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 16 Aug 2018 11:43:10 +0000
-Message-ID: <BN7PR08MB4868B337F36BDD9CE705B86EC63E0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<153440739836.16762.17614063002249746532@502c9da6d61e>
-In-Reply-To: <153440739836.16762.17614063002249746532@502c9da6d61e>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1fqGjP-0002Km-2w
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:46:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34834 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fqGjO-0002Ie-TH
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:46:22 -0400
+References: <CAB3eZfsv+JDr+C=BaKEmZvW9meTwNub2HfwXO5DX7mf+BJqO0A@mail.gmail.com>
+	<20180816082200.GD8612@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <90d7f44b-03ad-c075-e344-3c52c4268965@redhat.com>
+Date: Thu, 16 Aug 2018 06:46:21 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v8 00/87] Add nanoMIPS support to QEMU
+In-Reply-To: <20180816082200.GD8612@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] How do you do when write more than 16TB data to
+ qcow2 on ext4?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "aleksandar.markovic@rt-rk.com" <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "famz@redhat.com" <famz@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Paul Burton <pburton@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, lampahome <pahome.chen@mirlab.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-> From: no-reply@patchew.org <no-reply@patchew.org>
-> Sent: Thursday, August 16, 2018 10:16 AM
->
-> Subject: Re: [Qemu-devel] [PATCH v8 00/87] Add nanoMIPS support to QEMU
+On 08/16/2018 03:22 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Aug 16, 2018 at 09:35:52AM +0800, lampahome wrote:
+>> We all know there's a file size limit 16TB in ext4 and other fs has th=
+eir
+>> limit,too.
+>>
+>> If I create an qcow2 20TB on ext4 and write to it more than 16TB. Data=
+ more
+>> than 16TB can't be written to qcow2.
+>>
+>> So, is there any better ways to solve this situation?
 >=20
-> Hi,
->=20
-> This series seems to have some coding style problems. See output below fo=
-r
-more information:
->=20
-> ...
->
+> I'd really just recommend using a different filesystem, in particular X=
+FS
+> has massively higher file size limit - tested to 500 TB in RHEL-7, with=
+ a
+> theoretical max size of 8 EB. It is a very mature filesystem & the defa=
+ult
+> in RHEL-7.
 
-We are aware of all these warnings. As Stefan explained earlier, they are a=
-ll "false positives" for given circumstances, and we don't plan to fix any =
-of the patches.
+Or target raw block devices instead of using a filesystem. LVM works grea=
+t.
 
-Yours,
-Aleksandar=
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
