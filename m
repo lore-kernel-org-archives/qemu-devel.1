@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqNXY-0000mh-Ux
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:02:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fqNdI-0004Iy-2A
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:08:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqNXY-0002Ul-6b
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:02:36 -0400
-References: <20180809213528.14738-1-mreitz@redhat.com>
-	<20180809213528.14738-3-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3cd9b4a9-f5da-75b2-990a-1c296862ced7@redhat.com>
-Date: Thu, 16 Aug 2018 14:02:30 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1fqNdE-0005Aq-WD
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:08:32 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:44424)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fqNdA-0005AX-O9
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:08:25 -0400
+Received: by mail-pl0-x242.google.com with SMTP id ba4-v6so2522998plb.11
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 12:08:24 -0700 (PDT)
+References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1534431497-1385-50-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7e2fc906-4396-5d97-2599-018e9812c47c@linaro.org>
+Date: Thu, 16 Aug 2018 12:08:20 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180809213528.14738-3-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1534431497-1385-50-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 02/31] block: Use children list
- in bdrv_refresh_filename
+Subject: Re: [Qemu-devel] [PATCH v9 49/84] target/mips: Add handling of ISA
+ mode bit for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,29 +32,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-On 08/09/2018 04:34 PM, Max Reitz wrote:
-> bdrv_refresh_filename() should invoke itself recursively on all
-> children, not just on file.
+On 08/16/2018 07:57 AM, Aleksandar Markovic wrote:
+> From: Matthew Fortune <matthew.fortune@mips.com>
 > 
-> With that change, we can remove the manual invocations in blkverify,
-> quorum, commit, mirror, and blklogwrites.
+> ISA mode bit (LSB of address) is no longer required but is also
+> masked to allow for tools transition. The flag has_isa_mode has the
+> key role in the implementation.
 > 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 > ---
->   block.c              | 9 +++++----
->   block/blklogwrites.c | 3 ---
->   block/blkverify.c    | 3 ---
->   block/commit.c       | 1 -
->   block/mirror.c       | 1 -
->   block/quorum.c       | 1 -
->   6 files changed, 5 insertions(+), 13 deletions(-)
+>  target/mips/translate.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Is this still on the to-be-cleaned-up list?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+
+r~
