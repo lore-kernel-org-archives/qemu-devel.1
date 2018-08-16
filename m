@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqDmf-0000yk-HD
+	(envelope-from <armbru@redhat.com>) id 1fqDmf-0000yi-HH
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqDmS-0005Fn-Dm
+	(envelope-from <armbru@redhat.com>) id 1fqDmQ-0005F8-JD
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37564 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37568 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqDmH-00059X-Uf
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:14 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqDmH-00059z-Pi
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:11 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DF1EA406C7A3
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:37:04 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-56.ams2.redhat.com
-	[10.36.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B67D1010416
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:37:04 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 350DD406C7A9
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:37:06 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 16 Aug 2018 10:36:42 +0200
-Message-Id: <20180816083701.3932-7-armbru@redhat.com>
+Date: Thu, 16 Aug 2018 10:36:54 +0200
+Message-Id: <20180816083701.3932-19-armbru@redhat.com>
 In-Reply-To: <20180816083701.3932-1-armbru@redhat.com>
 References: <20180816083701.3932-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 06/25] qobject: Replace qobject_from_jsonf() by
- qobject_from_jsonf_nofail()
+Subject: [Qemu-devel] [PULL 18/25] migration-test: Clean up string
+ interpolation into QMP, part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,206 +31,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Commit ab45015a968 "qobject: Let qobject_from_jsonf() fail instead of
-abort" fails to accomplish its stated aim: the function can still
-abort due to its use of &error_abort.
+Leaving interpolation into JSON to qmp() is more robust than building
+QMP input manually, as explained in the recent commit "tests: Clean up
+string interpolation into QMP input (simple cases)".
 
-Its rationale for letting it fail is that all remaining users cope
-fine with failure.  Well, they're just fine with aborting, too; it's
-what they do on failure.
+migrate_recover() builds QMP input manually because wait_command()
+can't interpolate.  Well, it can since the previous commit.  Simplify
+accordingly.
 
-Simply reverting the broken commit would bring back the unfortunate
-asymmetry between qobject_from_jsonf() and qobject_from_jsonv(): one
-aborts, the other returns null.  So also rename it to
-qobject_from_jsonf_nofail().
+Bonus: gets rid of a non-literal format string.  A step towards
+compile-time format string checking without triggering
+-Wformat-nonliteral.
 
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180806065344.7103-7-armbru@redhat.com>
+Message-Id: <20180806065344.7103-19-armbru@redhat.com>
 ---
- include/qapi/qmp/qjson.h |  6 ++++--
- qobject/qjson.c          |  8 +++++++-
- tests/check-qjson.c      | 15 ++++++++-------
- tests/libqtest.h         | 24 ++++++++++++------------
- 4 files changed, 31 insertions(+), 22 deletions(-)
+ tests/migration-test.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/qapi/qmp/qjson.h b/include/qapi/qmp/qjson.h
-index 43b2ce2f33..dc509d51ae 100644
---- a/include/qapi/qmp/qjson.h
-+++ b/include/qapi/qmp/qjson.h
-@@ -15,11 +15,13 @@
- #define QJSON_H
- 
- QObject *qobject_from_json(const char *string, Error **errp);
--QObject *qobject_from_jsonf(const char *string, ...) GCC_FMT_ATTR(1, 2);
- QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
-     GCC_FMT_ATTR(1, 0);
- 
--QDict *qdict_from_jsonf_nofail(const char *string, ...) GCC_FMT_ATTR(1, 2);
-+QObject *qobject_from_jsonf_nofail(const char *string, ...)
-+    GCC_FMT_ATTR(1, 2);
-+QDict *qdict_from_jsonf_nofail(const char *string, ...)
-+    GCC_FMT_ATTR(1, 2);
- 
- QString *qobject_to_json(const QObject *obj);
- QString *qobject_to_json_pretty(const QObject *obj);
-diff --git a/qobject/qjson.c b/qobject/qjson.c
-index 2f6a590e44..4a9dcff343 100644
---- a/qobject/qjson.c
-+++ b/qobject/qjson.c
-@@ -59,7 +59,12 @@ QObject *qobject_from_json(const char *string, Error **errp)
-     return qobject_from_jsonv(string, NULL, errp);
- }
- 
--QObject *qobject_from_jsonf(const char *string, ...)
-+/*
-+ * Parse @string as JSON value with %-escapes interpolated.
-+ * Abort on error.  Do not use with untrusted @string.
-+ * Return the resulting QObject.  It is never null.
-+ */
-+QObject *qobject_from_jsonf_nofail(const char *string, ...)
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 7bffcd2e4d..4b8d4cc119 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -159,6 +159,7 @@ static void stop_cb(void *opaque, const char *name, QDict *data)
+ /*
+  * Events can get in the way of responses we are actually waiting for.
+  */
++GCC_FMT_ATTR(2, 3)
+ static QDict *wait_command(QTestState *who, const char *command, ...)
  {
-     QObject *obj;
      va_list ap;
-@@ -68,6 +73,7 @@ QObject *qobject_from_jsonf(const char *string, ...)
-     obj = qobject_from_jsonv(string, &ap, &error_abort);
-     va_end(ap);
+@@ -357,13 +358,12 @@ static void migrate_pause(QTestState *who)
+ static void migrate_recover(QTestState *who, const char *uri)
+ {
+     QDict *rsp;
+-    gchar *cmd = g_strdup_printf(
+-        "{ 'execute': 'migrate-recover', "
+-        "  'id': 'recover-cmd', "
+-        "  'arguments': { 'uri': '%s' } }", uri);
  
-+    assert(obj);
-     return obj;
+-    rsp = wait_command(who, cmd);
+-    g_free(cmd);
++    rsp = wait_command(who,
++                       "{ 'execute': 'migrate-recover', "
++                       "  'id': 'recover-cmd', "
++                       "  'arguments': { 'uri': %s } }",
++                       uri);
+     qobject_unref(rsp);
  }
  
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index da582df3e9..eaf5d20663 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -865,7 +865,8 @@ static void vararg_string(void)
-         QString *str;
- 
-         str = qobject_to(QString,
--                         qobject_from_jsonf("%s", test_cases[i].decoded));
-+                         qobject_from_jsonf_nofail("%s",
-+                                                   test_cases[i].decoded));
-         g_assert(str);
-         g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
- 
-@@ -998,17 +999,17 @@ static void vararg_number(void)
-     double valuef = 2.323423423;
-     int64_t val;
- 
--    qnum = qobject_to(QNum, qobject_from_jsonf("%d", value));
-+    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%d", value));
-     g_assert(qnum_get_try_int(qnum, &val));
-     g_assert_cmpint(val, ==, value);
-     qobject_unref(qnum);
- 
--    qnum = qobject_to(QNum, qobject_from_jsonf("%lld", value_ll));
-+    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%lld", value_ll));
-     g_assert(qnum_get_try_int(qnum, &val));
-     g_assert_cmpint(val, ==, value_ll);
-     qobject_unref(qnum);
- 
--    qnum = qobject_to(QNum, qobject_from_jsonf("%f", valuef));
-+    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%f", valuef));
-     g_assert(qnum_get_double(qnum) == valuef);
-     qobject_unref(qnum);
- }
-@@ -1042,13 +1043,13 @@ static void keyword_literal(void)
- 
-     qobject_unref(qbool);
- 
--    qbool = qobject_to(QBool, qobject_from_jsonf("%i", false));
-+    qbool = qobject_to(QBool, qobject_from_jsonf_nofail("%i", false));
-     g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == false);
-     qobject_unref(qbool);
- 
-     /* Test that non-zero values other than 1 get collapsed to true */
--    qbool = qobject_to(QBool, qobject_from_jsonf("%i", 2));
-+    qbool = qobject_to(QBool, qobject_from_jsonf_nofail("%i", 2));
-     g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == true);
-     qobject_unref(qbool);
-@@ -1298,7 +1299,7 @@ static void simple_varargs(void)
-     embedded_obj = qobject_from_json("[32, 42]", &error_abort);
-     g_assert(embedded_obj != NULL);
- 
--    obj = qobject_from_jsonf("[%d, 2, %p]", 1, embedded_obj);
-+    obj = qobject_from_jsonf_nofail("[%d, 2, %p]", 1, embedded_obj);
-     g_assert(qlit_equal_qobject(&decoded, obj));
- 
-     qobject_unref(obj);
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index da13ea00ef..0eff8763ce 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -77,8 +77,8 @@ void qtest_quit(QTestState *s);
-  * qtest_qmp:
-  * @s: #QTestState instance to operate on.
-  * @fmt...: QMP message to send to qemu, formatted like
-- * qobject_from_jsonf().  See parse_escape() for what's supported
-- * after '%'.
-+ * qobject_from_jsonf_nofail().  See parse_escape() for what's
-+ * supported after '%'.
-  *
-  * Sends a QMP message to QEMU and returns the response.
-  */
-@@ -88,8 +88,8 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
-  * qtest_qmp_send:
-  * @s: #QTestState instance to operate on.
-  * @fmt...: QMP message to send to qemu, formatted like
-- * qobject_from_jsonf().  See parse_escape() for what's supported
-- * after '%'.
-+ * qobject_from_jsonf_nofail().  See parse_escape() for what's
-+ * supported after '%'.
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-  */
-@@ -99,8 +99,8 @@ void qtest_qmp_send(QTestState *s, const char *fmt, ...);
-  * qtest_qmpv:
-  * @s: #QTestState instance to operate on.
-  * @fmt: QMP message to send to QEMU, formatted like
-- * qobject_from_jsonf().  See parse_escape() for what's supported
-- * after '%'.
-+ * qobject_from_jsonf_nofail().  See parse_escape() for what's
-+ * supported after '%'.
-  * @ap: QMP message arguments
-  *
-  * Sends a QMP message to QEMU and returns the response.
-@@ -111,8 +111,8 @@ QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap);
-  * qtest_qmp_vsend:
-  * @s: #QTestState instance to operate on.
-  * @fmt: QMP message to send to QEMU, formatted like
-- * qobject_from_jsonf().  See parse_escape() for what's supported
-- * after '%'.
-+ * qobject_from_jsonf_nofail().  See parse_escape() for what's
-+ * supported after '%'.
-  * @ap: QMP message arguments
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-@@ -552,8 +552,8 @@ static inline void qtest_end(void)
- /**
-  * qmp:
-  * @fmt...: QMP message to send to qemu, formatted like
-- * qobject_from_jsonf().  See parse_escape() for what's supported
-- * after '%'.
-+ * qobject_from_jsonf_nofail().  See parse_escape() for what's
-+ * supported after '%'.
-  *
-  * Sends a QMP message to QEMU and returns the response.
-  */
-@@ -562,8 +562,8 @@ QDict *qmp(const char *fmt, ...);
- /**
-  * qmp_send:
-  * @fmt...: QMP message to send to qemu, formatted like
-- * qobject_from_jsonf().  See parse_escape() for what's supported
-- * after '%'.
-+ * qobject_from_jsonf_nofail().  See parse_escape() for what's
-+ * supported after '%'.
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-  */
 -- 
 2.17.1
