@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkz-0005Kt-9p
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkz-0005Ko-8Z
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkt-0000cP-0j
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkt-0000cJ-0V
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:11 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:58732 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:58712 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJkq-0008WC-7F
+	id 1fqJkq-0008W8-78
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:06 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:56:57 +0200
-Message-Id: <1534431497-1385-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:56:56 +0200
+Message-Id: <1534431497-1385-4-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 04/84] target/mips: Mark switch fallthroughs
- with interpretable comments
+Subject: [Qemu-devel] [PATCH v9 03/84] target/mips: Avoid case statements
+ formulated by ranges - part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +28,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Mark switch fallthroughs with comments, in cases fallthroughs
-are intentional.
+Remove "range style" case statements to make code analysis easier.
+This patch handles cases when the values in the range in question
+were not properly defined.
 
-The comments "/* fall through */" are interpreted by compilers and
-other tools, and they will not issue warnings in such cases. For gcc,
-the warning is turnend on by -Wimplicit-fallthrough. With this patch,
-there will be no such warnings in target/mips directory. If such
-warning appears in future, it should be checked if it is intentional,
-and, if yes, marked with a comment similar to those from this patch.
-
-The comment must be just before next "case", otherwise gcc won't
-understand it.
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ target/mips/translate.c | 78 ++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 71 insertions(+), 7 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index b944ea2..3dd66b6 100644
+index 051dda5..b944ea2 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -14290,8 +14290,8 @@ static void decode_micromips32_opc(CPUMIPSState *=
-env, DisasContext *ctx)
-         case SDP:
-             check_insn(ctx, ISA_MIPS3);
-             check_mips_64(ctx);
--            /* Fallthrough */
- #endif
-+            /* fall through */
-         case LWP:
-         case SWP:
-             gen_ldst_pair(ctx, minor, rt, rs, SIMM(ctx->opcode, 0, 12));
-@@ -14301,8 +14301,8 @@ static void decode_micromips32_opc(CPUMIPSState *=
-env, DisasContext *ctx)
-         case SDM:
-             check_insn(ctx, ISA_MIPS3);
-             check_mips_64(ctx);
--            /* Fallthrough */
- #endif
-+            /* fall through */
-         case LWM32:
-         case SWM32:
-             gen_ldst_multiple(ctx, minor, rt, rs, SIMM(ctx->opcode, 0, 1=
-2));
-@@ -20087,6 +20087,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
-ntext *ctx)
-         case OPC_MTHC1:
-             check_cp1_enabled(ctx);
-             check_insn(ctx, ISA_MIPS32R2);
-+            /* fall through */
-         case OPC_MFC1:
-         case OPC_CFC1:
-         case OPC_MTC1:
---=20
+@@ -902,8 +902,21 @@ enum {
+     OPC_MTTR     = (0x0C << 21) | OPC_CP0,
+     OPC_WRPGPR   = (0x0E << 21) | OPC_CP0,
+     OPC_C0       = (0x10 << 21) | OPC_CP0,
+-    OPC_C0_FIRST = (0x10 << 21) | OPC_CP0,
+-    OPC_C0_LAST  = (0x1F << 21) | OPC_CP0,
++    OPC_C0_1     = (0x11 << 21) | OPC_CP0,
++    OPC_C0_2     = (0x12 << 21) | OPC_CP0,
++    OPC_C0_3     = (0x13 << 21) | OPC_CP0,
++    OPC_C0_4     = (0x14 << 21) | OPC_CP0,
++    OPC_C0_5     = (0x15 << 21) | OPC_CP0,
++    OPC_C0_6     = (0x16 << 21) | OPC_CP0,
++    OPC_C0_7     = (0x17 << 21) | OPC_CP0,
++    OPC_C0_8     = (0x18 << 21) | OPC_CP0,
++    OPC_C0_9     = (0x19 << 21) | OPC_CP0,
++    OPC_C0_A     = (0x1A << 21) | OPC_CP0,
++    OPC_C0_B     = (0x1B << 21) | OPC_CP0,
++    OPC_C0_C     = (0x1C << 21) | OPC_CP0,
++    OPC_C0_D     = (0x1D << 21) | OPC_CP0,
++    OPC_C0_E     = (0x1E << 21) | OPC_CP0,
++    OPC_C0_F     = (0x1F << 21) | OPC_CP0,
+ };
+ 
+ /* MFMC0 opcodes */
+@@ -12490,10 +12503,22 @@ enum {
+ /* PCREL Instructions perform PC-Relative address calculation. bits 20..16 */
+ enum {
+     ADDIUPC_00 = 0x00,
++    ADDIUPC_01 = 0x01,
++    ADDIUPC_02 = 0x02,
++    ADDIUPC_03 = 0x03,
++    ADDIUPC_04 = 0x04,
++    ADDIUPC_05 = 0x05,
++    ADDIUPC_06 = 0x06,
+     ADDIUPC_07 = 0x07,
+     AUIPC = 0x1e,
+     ALUIPC = 0x1f,
+     LWPC_08 = 0x08,
++    LWPC_09 = 0x09,
++    LWPC_0A = 0x0A,
++    LWPC_0B = 0x0B,
++    LWPC_0C = 0x0C,
++    LWPC_0D = 0x0D,
++    LWPC_0E = 0x0E,
+     LWPC_0F = 0x0F,
+ };
+ 
+@@ -12928,12 +12953,16 @@ enum {
+     R6_LWM16    = 0x02,
+     R6_JRC16    = 0x03,
+     MOVEP       = 0x04,
++    MOVEP_05    = 0x05,
++    MOVEP_06    = 0x06,
+     MOVEP_07    = 0x07,
+     R6_XOR16    = 0x08,
+     R6_OR16     = 0x09,
+     R6_SWM16    = 0x0a,
+     JALRC16     = 0x0b,
+     MOVEP_0C    = 0x0c,
++    MOVEP_0D    = 0x0d,
++    MOVEP_0E    = 0x0e,
+     MOVEP_0F    = 0x0f,
+     JRCADDIUSP  = 0x13,
+     R6_BREAK16  = 0x1b,
+@@ -13251,8 +13280,14 @@ static void gen_pool16c_r6_insn(DisasContext *ctx)
+             gen_compute_branch(ctx, OPC_JR, 2, rs, 0, 0, 0);
+         }
+         break;
+-    case MOVEP ... MOVEP_07:
+-    case MOVEP_0C ... MOVEP_0F:
++    case MOVEP:
++    case MOVEP_05:
++    case MOVEP_06:
++    case MOVEP_07:
++    case MOVEP_0C:
++    case MOVEP_0D:
++    case MOVEP_0E:
++    case MOVEP_0F:
+         {
+             int enc_dest = uMIPS_RD(ctx->opcode);
+             int enc_rt = uMIPS_RS2(ctx->opcode);
+@@ -15230,7 +15265,14 @@ static void decode_micromips32_opc(CPUMIPSState *env, DisasContext *ctx)
+         if (ctx->insn_flags & ISA_MIPS32R6) {
+             /* PCREL: ADDIUPC, AUIPC, ALUIPC, LWPC */
+             switch ((ctx->opcode >> 16) & 0x1f) {
+-            case ADDIUPC_00 ... ADDIUPC_07:
++            case ADDIUPC_00:
++            case ADDIUPC_01:
++            case ADDIUPC_02:
++            case ADDIUPC_03:
++            case ADDIUPC_04:
++            case ADDIUPC_05:
++            case ADDIUPC_06:
++            case ADDIUPC_07:
+                 gen_pcrel(ctx, OPC_ADDIUPC, ctx->base.pc_next & ~0x3, rt);
+                 break;
+             case AUIPC:
+@@ -15239,7 +15281,14 @@ static void decode_micromips32_opc(CPUMIPSState *env, DisasContext *ctx)
+             case ALUIPC:
+                 gen_pcrel(ctx, OPC_ALUIPC, ctx->base.pc_next, rt);
+                 break;
+-            case LWPC_08 ... LWPC_0F:
++            case LWPC_08:
++            case LWPC_09:
++            case LWPC_0A:
++            case LWPC_0B:
++            case LWPC_0C:
++            case LWPC_0D:
++            case LWPC_0E:
++            case LWPC_0F:
+                 gen_pcrel(ctx, R6_OPC_LWPC, ctx->base.pc_next & ~0x3, rt);
+                 break;
+             default:
+@@ -19790,7 +19839,22 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+             gen_cp0(env, ctx, op1, rt, rd);
+ #endif /* !CONFIG_USER_ONLY */
+             break;
+-        case OPC_C0_FIRST ... OPC_C0_LAST:
++        case OPC_C0:
++        case OPC_C0_1:
++        case OPC_C0_2:
++        case OPC_C0_3:
++        case OPC_C0_4:
++        case OPC_C0_5:
++        case OPC_C0_6:
++        case OPC_C0_7:
++        case OPC_C0_8:
++        case OPC_C0_9:
++        case OPC_C0_A:
++        case OPC_C0_B:
++        case OPC_C0_C:
++        case OPC_C0_D:
++        case OPC_C0_E:
++        case OPC_C0_F:
+ #ifndef CONFIG_USER_ONLY
+             gen_cp0(env, ctx, MASK_C0(ctx->opcode), rt, rd);
+ #endif /* !CONFIG_USER_ONLY */
+-- 
 2.7.4
