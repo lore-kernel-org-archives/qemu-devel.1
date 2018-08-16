@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqDml-000152-CV
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqDmq-0001AK-H1
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqDmY-0005II-Kj
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53668 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqDmf-0005NQ-Hk
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53666 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqDmQ-00059R-9Y
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:20 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqDmT-00059P-2G
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:25 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 860D84076510
+	by mx1.redhat.com (Postfix) with ESMTPS id 79C854076076
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:37:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-56.ams2.redhat.com
+	[10.36.116.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 567A410194
 	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:37:04 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 16 Aug 2018 10:36:49 +0200
-Message-Id: <20180816083701.3932-14-armbru@redhat.com>
+Date: Thu, 16 Aug 2018 10:36:47 +0200
+Message-Id: <20180816083701.3932-12-armbru@redhat.com>
 In-Reply-To: <20180816083701.3932-1-armbru@redhat.com>
 References: <20180816083701.3932-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 13/25] cpu-plug-test: Don't pass integers as
- strings to device_add
+Subject: [Qemu-devel] [PULL 11/25] tests: Pass literal format strings
+ directly to qmp_FOO()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,58 +38,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
 
-test_plug_with_device_add_x86() plugs Haswell-i386-cpu and
-Haswell-x86_64-cpu with device_add.  It passes socket-id, core-id,
-thread-id as JSON strings.  The properties are actually integers.
+The qmp_FOO() take a printf-like format string.  In a few places, we
+assign a string literal to a variable and pass that instead of simply
+passing the literal.  Clean that up.
 
-test_plug_with_device_add_coreid() plugs power8_v2.0-spapr-cpu-core
-and qemu-s390x-cpu with device_add.  It passes core-id as JSON string.
-The properties are actually integers.
+Bonus: gets rid of non-literal format strings.  A step towards
+compile-time format string checking without triggering
+-Wformat-nonliteral.
 
-Passing JSON string values to integer properties works only due to
-device_add implementation accidents.  Fix the test to pass JSON
-numbers.  While there, use %u rather than %i with unsigned int.
-
-Cc: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180806065344.7103-14-armbru@redhat.com>
+Message-Id: <20180806065344.7103-12-armbru@redhat.com>
 ---
- tests/cpu-plug-test.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tests/ahci-test.c | 4 +---
+ tests/ide-test.c  | 4 +---
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-index 5f39ba0df3..ab3bf6df90 100644
---- a/tests/cpu-plug-test.c
-+++ b/tests/cpu-plug-test.c
-@@ -88,8 +88,8 @@ static void test_plug_with_device_add_x86(gconstpointer=
- data)
-         for (c =3D 0; c < td->cores; c++) {
-             for (t =3D 0; t < td->threads; t++) {
-                 char *id =3D g_strdup_printf("id-%i-%i-%i", s, c, t);
--                qtest_qmp_device_add(td->device_model, id, "'socket-id':=
-'%i', "
--                                     "'core-id':'%i', 'thread-id':'%i'",
-+                qtest_qmp_device_add(td->device_model, id, "'socket-id':=
-%u, "
-+                                     "'core-id':%u, 'thread-id':%u",
-                                      s, c, t);
-                 g_free(id);
-             }
-@@ -114,7 +114,7 @@ static void test_plug_with_device_add_coreid(gconstpo=
-inter data)
+diff --git a/tests/ahci-test.c b/tests/ahci-test.c
+index 555f02112e..60ba32f4f2 100644
+--- a/tests/ahci-test.c
++++ b/tests/ahci-test.c
+@@ -1355,7 +1355,6 @@ static void test_flush_migrate(void)
+     AHCIQState *src, *dst;
+     AHCICommand *cmd;
+     uint8_t px;
+-    const char *s;
+     char *uri =3D g_strdup_printf("unix:%s", mig_socket);
 =20
-     for (c =3D td->cores; c < td->maxcpus / td->sockets / td->threads; c=
-++) {
-         char *id =3D g_strdup_printf("id-%i", c);
--        qtest_qmp_device_add(td->device_model, id, "'core-id':'%i'", c);
-+        qtest_qmp_device_add(td->device_model, id, "'core-id':%u", c);
-         g_free(id);
-     }
+     prepare_blkdebug_script(debug_path, "flush_to_disk");
+@@ -1391,8 +1390,7 @@ static void test_flush_migrate(void)
+     ahci_migrate(src, dst, uri);
 =20
+     /* Complete the command */
+-    s =3D "{'execute':'cont' }";
+-    qmp_send(s);
++    qmp_send("{'execute':'cont' }");
+     qmp_eventwait("RESUME");
+     ahci_command_wait(dst, cmd);
+     ahci_command_verify(dst, cmd);
+diff --git a/tests/ide-test.c b/tests/ide-test.c
+index 7ab09c3448..89c4468c83 100644
+--- a/tests/ide-test.c
++++ b/tests/ide-test.c
+@@ -697,7 +697,6 @@ static void test_retry_flush(const char *machine)
+     QPCIDevice *dev;
+     QPCIBar bmdma_bar, ide_bar;
+     uint8_t data;
+-    const char *s;
+=20
+     prepare_blkdebug_script(debug_path, "flush_to_disk");
+=20
+@@ -725,8 +724,7 @@ static void test_retry_flush(const char *machine)
+     qmp_eventwait("STOP");
+=20
+     /* Complete the command */
+-    s =3D "{'execute':'cont' }";
+-    qmp_discard_response(s);
++    qmp_discard_response("{'execute':'cont' }");
+=20
+     /* Check registers */
+     data =3D qpci_io_readb(dev, ide_bar, reg_device);
 --=20
 2.17.1
