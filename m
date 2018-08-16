@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fqEGH-0002ep-Io
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:08:10 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fqEOR-0006pV-TN
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:16:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fqEGB-0004wa-Pa
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:08:07 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:54748)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fqEGB-0004v4-B1
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:08:03 -0400
-Received: by mail-wm0-x235.google.com with SMTP id c14-v6so3731272wmb.4
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 02:08:02 -0700 (PDT)
-References: <0c215752-5cd2-3b7c-bc3c-f435f1dbbfed@bluestop.org>
-	<d6acc012-fb6c-9f9d-9cbe-8dd92727c64b@redhat.com>
-	<8bf07395-4872-ce74-c201-9fca232edd01@gmail.com>
-	<80532e46-ffbf-9c87-5296-741bbb6f83ac@redhat.com>
-	<d5ad3096-86b1-29e4-47bd-1ca71b8e7879@bluestop.org>
-	<1feb3cc1-86ee-f708-6dc7-b9e20a7588ac@redhat.com>
-	<327f3e04-dd5b-06bd-f672-5f180521db32@gmx.com>
-	<3ed5e351-80be-9707-773d-0b65a7e0b4dc@gmail.com>
-	<bb77b1ca-a5da-4023-26d9-b330f476d249@redhat.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <38b5343b-9645-674f-65a0-ef75e3eeec1a@gmail.com>
-Date: Thu, 16 Aug 2018 12:07:59 +0300
+	(envelope-from <luc.michel@greensocs.com>) id 1fqEOP-00013j-Up
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:16:35 -0400
+References: <20180814124254.5229-1-peter.maydell@linaro.org>
+	<20180814124254.5229-8-peter.maydell@linaro.org>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <0b5b7ec5-0955-95ff-8967-503f639c6171@greensocs.com>
+Date: Thu, 16 Aug 2018 11:16:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <bb77b1ca-a5da-4023-26d9-b330f476d249@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] RDMA wrongly detected as being supported on FreeBSD
+In-Reply-To: <20180814124254.5229-8-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AopwHDsiapTafFGpOWDxis63yaKWlpbu8"
+Subject: Re: [Qemu-devel] [PATCH 07/10] target/arm: Implement ESR_EL2/HSR
+ for AArch32 and no-EL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,63 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Kamil Rytarowski <n54@gmx.com>, Rebecca Cran <rebecca@bluestop.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yuval Shaia <yuval.shaia@oracle.com>, Brad Smith <brad@comstyle.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, edgari@xilinx.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AopwHDsiapTafFGpOWDxis63yaKWlpbu8
+From: Luc Michel <luc.michel@greensocs.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: patches@linaro.org, edgari@xilinx.com
+Message-ID: <0b5b7ec5-0955-95ff-8967-503f639c6171@greensocs.com>
+Subject: Re: [PATCH 07/10] target/arm: Implement ESR_EL2/HSR for AArch32 and
+ no-EL2
+References: <20180814124254.5229-1-peter.maydell@linaro.org>
+ <20180814124254.5229-8-peter.maydell@linaro.org>
+In-Reply-To: <20180814124254.5229-8-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 8/14/18 2:42 PM, Peter Maydell wrote:
+> The AArch32 HSR is the equivalent of AArch64 ESR_EL2;
+> we can implement it by marking our existing ESR_EL2 regdef
+> as STATE_BOTH. It also needs to be "RES0 from EL3 if
+> EL2 not implemented", so add the missing stanza to
+> el3_no_el2_cp_reginfo.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-By: Luc Michel <luc.michel@greensocs.com>
+
+> ---
+>  target/arm/helper.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index d6e98e9d606..80855302089 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -3763,6 +3763,10 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo[=
+] =3D {
+>        .cp =3D 15, .opc1 =3D 4, .crn =3D 1, .crm =3D 1, .opc2 =3D 4,
+>        .access =3D PL2_RW,
+>        .type =3D ARM_CP_CONST, .resetvalue =3D 0 },
+> +    { .name =3D "ESR_EL2", .state =3D ARM_CP_STATE_BOTH,
+> +      .opc0 =3D 3, .opc1 =3D 4, .crn =3D 5, .crm =3D 2, .opc2 =3D 0,
+> +      .access =3D PL2_RW,
+> +      .type =3D ARM_CP_CONST, .resetvalue =3D 0 },
+>      { .name =3D "CPTR_EL2", .state =3D ARM_CP_STATE_BOTH,
+>        .opc0 =3D 3, .opc1 =3D 4, .crn =3D 1, .crm =3D 1, .opc2 =3D 2,
+>        .access =3D PL2_RW, .type =3D ARM_CP_CONST, .resetvalue =3D 0 },=
+
+> @@ -3926,7 +3930,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] =3D {
+>        .opc0 =3D 3, .opc1 =3D 4, .crn =3D 4, .crm =3D 0, .opc2 =3D 1,
+>        .access =3D PL2_RW,
+>        .fieldoffset =3D offsetof(CPUARMState, elr_el[2]) },
+> -    { .name =3D "ESR_EL2", .state =3D ARM_CP_STATE_AA64,
+> +    { .name =3D "ESR_EL2", .state =3D ARM_CP_STATE_BOTH,
+>        .opc0 =3D 3, .opc1 =3D 4, .crn =3D 5, .crm =3D 2, .opc2 =3D 0,
+>        .access =3D PL2_RW, .fieldoffset =3D offsetof(CPUARMState, cp15.=
+esr_el[2]) },
+>      { .name =3D "FAR_EL2", .state =3D ARM_CP_STATE_BOTH,
+>=20
 
 
+--AopwHDsiapTafFGpOWDxis63yaKWlpbu8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 08/16/2018 12:02 PM, Thomas Huth wrote:
-> On 08/16/2018 10:55 AM, Marcel Apfelbaum wrote:
->>
->> On 08/15/2018 04:37 PM, Kamil Rytarowski wrote:
->>> On 06.08.2018 10:51, Thomas Huth wrote:
->>>> On 07/28/2018 05:50 AM, Rebecca Cran wrote:
->>>>> On 7/25/18 5:14 AM, Thomas Huth wrote:
->>>>>
->>>>>> Note that the error has been reported to happen on FreeBSD - so I
->>>>>> doubt
->>>>>> that this <linux/types.h> header should be here.
->>>>>>
->>>>>> Anyway, our include/standard-headers/linux/types.h is also empty
->>>>>> ... so
->>>>>> could you try whether it compiles if you simply remove this #include
->>>>>> line, Rebecca?
->>>>> Sorry for the delay, I'm just getting back to this. Removing the
->>>>> include
->>>>> causes it to fail later on, with:
->>>>>
->>>>> /home/bcran/workspace/qemu/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning:
->>>>> implicit declaration of function 'mremap' is invalid in C99
->>>>> [-Wimplicit-function-declaration]
->>>>>       host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
->>>> OK, thanks for checking. According to
->>>>
->>>>    https://www.freebsd.org/cgi/man.cgi?query=mremap&manpath=NetBSD+5.0
->>>>
->>>> that syscall should also be available on FreeBSD. So could you please do
->>>> one more test and see whether it works when you add the following line
->>>> somewhere at the beginning of the file:
->>>>
->>>>     #include <sys/mman.h>
->>>>
->>>>    Thanks,
->>>>     Thomas
->>>>
->>> I'm a little bit disoriented. The linked page is from NetBSD in a very
->>> old version 5.x. We have 8.0 out now.
->>>
->>> The thread is about FreeBSD. If there are any questions regarding
->>> NetBSD, please let me know.
->> Indeed, the linked page didn't help, we are referring to FreeBSD
->> which doesn't support mremap, at least by default.
-> Sorry, my bad, I was tricked by the freebsd.org domain. So I guess the
-> right thing to do is a check for mremap in the configure script and only
-> include that rdma code if mremap is available?
+-----BEGIN PGP SIGNATURE-----
 
-Only pvrdma should be left out for bsd systems, the RDMA migration
-can be compiled. I just sent a patch doing that.
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlt1QN0ACgkQd8knW3Qn
+Tr4dtA//auATy1uk9vkFotcKoKXE7FJ8sLKPvghVxGxYearGIa435seo4hhEU911
+or/G9g5jiJyqiF1+ThdVyZ1vMDfyRJVl3NAYgoUkQaX4jMZkkxcSpSGQlnZGuKkk
+Ks+yjbER401hDL18Hr3gKTdpjtaNGFY2qKM6sDtFu0qzlf5+uMCdTmyv+6emKaCx
+WpMMU+EMWCFsWTH6h+40/wNqZAA9LSMK+EBqmfHdVqAmpAvWgc2OW0CVOhmE9/G8
+e2ymJPzEHgVcL0Kg5dQhr2PmThBUeCYD57AIQNEax+mcQF2GECo3r75S/Ss9AmYd
+0LDUSHOlgfltE/+fEXGnZgJ+iEv7XHsk7aYufqQQZnDpshqf/SSDRbyVmeSgjdUI
++dhJ0NkuVUfEFtXNZ0wUoIPFvefBYMtLl7dsiSvPnfnekBWevvkpqNaVgNgz9/f2
+odT8iKJrk5/5yBlQdGloFV4W6aFt5akc0KtyFAdOwy6M1WlAH8NO2yGRKRhExqt7
+FpkZulHoBFjRigT0mP6+ErDzVJRAuB3ebYu62oP6GYCMO+OvWqLwQj0/RwActXUa
+I2GCKx2tQxf+B9FWK7EbbaG+V8IGDUq4ZuCRmbnxldtrLEZ6qtY/pjWeV4ameGTx
+BVBraglvzi1sVAHfPS1jYL/RkRPmP844d1BewlnAvypntJ0duPA=
+=QMwA
+-----END PGP SIGNATURE-----
 
-Thanks,
-Marcel
-
->   Thomas
+--AopwHDsiapTafFGpOWDxis63yaKWlpbu8--
