@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fqKsE-0008Tw-VK
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:11:47 -0400
+	(envelope-from <prvs=759fd99b3=Alistair.Francis@wdc.com>)
+	id 1fqKsJ-000062-DH
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:11:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fqKsB-000084-Jz
+	(envelope-from <prvs=759fd99b3=Alistair.Francis@wdc.com>)
+	id 1fqKsF-0000BC-4B
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:11:51 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:29288)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=759fd99b3=Alistair.Francis@wdc.com>)
+	id 1fqKsE-00009Y-Gj
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:11:46 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:34738)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fqKs9-0008V5-Qp
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:11:42 -0400
-Received: by mail-pl0-x244.google.com with SMTP id f6-v6so2323963plo.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 09:11:39 -0700 (PDT)
-References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1534431497-1385-29-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9b24b204-ed70-2708-97b5-47014af250d6@linaro.org>
-Date: Thu, 16 Aug 2018 09:11:35 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Thu, 16 Aug 2018 09:11:34 -0700
+Message-Id: <170c5841b13e1854f276592dfe4296b942edb15e.1534435831.git.alistair.francis@wdc.com>
+In-Reply-To: <cover.1534435831.git.alistair.francis@wdc.com>
+References: <cover.1534435831.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <1534431497-1385-29-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 28/84] target/mips: Add emulation of
- some common nanoMIPS 32-bit instructions
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 1/6] hw/riscv/virtio: Set the soc device
+ tree node as a simple-bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
+To: qemu-devel@nongnu.org, mjc@sifive.com
+Cc: alistair.francis@wdc.com, alistair23@gmail.com
 
-On 08/16/2018 07:57 AM, Aleksandar Markovic wrote:
-> +            imm = extract32(ctx->opcode, 0, 16);
-> +            if (rs != 0) {
-> +                tcg_gen_addi_tl(cpu_gpr[rt], cpu_gpr[rs], imm);
-> +                tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
-> +            } else {
-> +                tcg_gen_movi_tl(cpu_gpr[rt], imm);
-> +            }
+To allow Linux to ennumerate devices on the /soc/ node set it as a
+"simple-bus".
 
-The nanomips pseudocode says ADDIU always sign-extends from 32-bit.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/riscv/virt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm hoping for the sake of nanomips64 that the legacy "inputs to 32-bit
-instructions must always be sign-extended" rule has gone?
-
-> +                    } else if (rt == 0 && shift == 5) {
-> +                        /* PAUSE */
-> +                        if (ctx->hflags & MIPS_HFLAG_BMASK) {
-> +                            generate_exception_end(ctx, EXCP_RI);
-> +                        }
-
-No delay slots for nanomips, so no BMASK.
-Probably best to comment that we're implementing PAUSE as a nop.
-
-
-r~
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 248bbdffd3..e8ba4d192d 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -121,7 +121,7 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+ 
+     qemu_fdt_add_subnode(fdt, "/soc");
+     qemu_fdt_setprop(fdt, "/soc", "ranges", NULL, 0);
+-    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "riscv-virtio-soc");
++    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "simple-bus");
+     qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
+     qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
+ 
+-- 
+2.17.1
