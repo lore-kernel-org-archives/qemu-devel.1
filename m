@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fqJ1w-0006bs-7x
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:13:41 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1fqJ25-0006j5-QF
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:13:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fqJ1v-0004Rs-0r
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:13:40 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1fqJ22-0004Xz-66
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:13:49 -0400
 Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
 From: Joel Stanley <joel@jms.id.au>
-Date: Thu, 16 Aug 2018 23:43:02 +0930
-Message-Id: <20180816141303.20518-3-joel@jms.id.au>
+Date: Thu, 16 Aug 2018 23:43:03 +0930
+Message-Id: <20180816141303.20518-4-joel@jms.id.au>
 In-Reply-To: <20180816141303.20518-1-joel@jms.id.au>
 References: <20180816141303.20518-1-joel@jms.id.au>
-Subject: [Qemu-devel] [PATCH v5 2/3] arm: Add Nordic Semiconductor nRF51 SoC
+Subject: [Qemu-devel] [PATCH v5 3/3] arm: Add BBC micro:bit machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +23,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
-The nRF51 is a Cortex-M0 microcontroller with an on-board radio module,
-plus other common ARM SoC peripherals.
+This adds the base for a machine model of the BBC micro:bit:
 
- http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
+  https://en.wikipedia.org/wiki/Micro_Bit
 
-This defines a basic model of the CPU and memory, with no peripherals
-implemented at this stage.
+This is a system with a nRF51 SoC containing the main processor, with
+various peripherals on board.
 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Joel Stanley <joel@jms.id.au>
 ---
 v2:
-  put memory as struct fileds in state structure
-  pass OBJECT(s) as owner, not NULL
-  Add missing addresses for ficr
-  Fix flash and sram sizes for microbit
-  Embed cpu object in state object an initalise it without use of armv7m_init
-  Link to datasheet
+ - Instead of setting kernel filename property, load the image directly
+ - Add link to hardware overview website
 v3:
-  rebase nrf51 on m0 changes
-  remove unused kernel_filename
-  clarify flash and sram size
-  make flash and sram size properties of the soc state
-v4:
-  set the number of interrupts to 32
+ - Rebase microbit on m0 changes
+ - Remove hard-coded flash size and retrieve from the soc
+ - Add Stefan's reviewed-by
 v5:
- move back to armv7m calls, as v4 of Stefan's patch removed the
+ - move back to armv7m calls, as v4 of Stefan's patch removed the
  m_profile changes
 ---
- default-configs/arm-softmmu.mak |   1 +
- hw/arm/Makefile.objs            |   1 +
- hw/arm/nrf51_soc.c              | 119 ++++++++++++++++++++++++++++++++
- include/hw/arm/nrf51_soc.h      |  42 +++++++++++
- 4 files changed, 163 insertions(+)
- create mode 100644 hw/arm/nrf51_soc.c
- create mode 100644 include/hw/arm/nrf51_soc.h
+ hw/arm/Makefile.objs |  2 +-
+ hw/arm/microbit.c    | 54 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+), 1 deletion(-)
+ create mode 100644 hw/arm/microbit.c
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 311584fd74eb..2ff27c2e1d5a 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -101,6 +101,7 @@ CONFIG_STM32F2XX_SYSCFG=y
- CONFIG_STM32F2XX_ADC=y
- CONFIG_STM32F2XX_SPI=y
- CONFIG_STM32F205_SOC=y
-+CONFIG_NRF51_SOC=y
- 
- CONFIG_CMSDK_APB_TIMER=y
- CONFIG_CMSDK_APB_UART=y
 diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 2902f47b4c4c..ae4e20373b9e 100644
+index ae4e20373b9e..5f88062c666d 100644
 --- a/hw/arm/Makefile.objs
 +++ b/hw/arm/Makefile.objs
-@@ -37,3 +37,4 @@ obj-$(CONFIG_IOTKIT) += iotkit.o
+@@ -37,4 +37,4 @@ obj-$(CONFIG_IOTKIT) += iotkit.o
  obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
  obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o smmuv3.o
  obj-$(CONFIG_FSL_IMX6UL) += fsl-imx6ul.o mcimx6ul-evk.o
-+obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
+-obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o
++obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o microbit.o
+diff --git a/hw/arm/microbit.c b/hw/arm/microbit.c
 new file mode 100644
-index 000000000000..9f9649c7807d
+index 000000000000..467cfbda2348
 --- /dev/null
-+++ b/hw/arm/nrf51_soc.c
-@@ -0,0 +1,119 @@
++++ b/hw/arm/microbit.c
+@@ -0,0 +1,54 @@
 +/*
-+ * Nordic Semiconductor nRF51 SoC
-+ * http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.1.pdf
++ * BBC micro:bit machine
++ * http://tech.microbit.org/hardware/
 + *
 + * Copyright 2018 Joel Stanley <joel@jms.id.au>
 + *
@@ -98,160 +77,47 @@ index 000000000000..9f9649c7807d
 +
 +#include "qemu/osdep.h"
 +#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "hw/arm/arm.h"
-+#include "hw/sysbus.h"
 +#include "hw/boards.h"
-+#include "hw/devices.h"
-+#include "hw/misc/unimp.h"
++#include "hw/arm/arm.h"
 +#include "exec/address-spaces.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/log.h"
-+#include "cpu.h"
 +
 +#include "hw/arm/nrf51_soc.h"
 +
-+#define IOMEM_BASE      0x40000000
-+#define IOMEM_SIZE      0x20000000
++typedef struct {
++    MachineState parent;
 +
-+#define FICR_BASE       0x10000000
-+#define FICR_SIZE       0x000000fc
++    NRF51State nrf51;
++} MICROBITMachineState;
 +
-+#define FLASH_BASE      0x00000000
-+#define SRAM_BASE       0x20000000
++#define TYPE_MICROBIT_MACHINE "microbit"
 +
-+/* The size and base is for the NRF51822 part. If other parts
-+ * are supported in the future, add a sub-class of NRF51SoC for
-+ * the specific variants */
-+#define NRF51822_FLASH_SIZE     (256 * 1024)
-+#define NRF51822_SRAM_SIZE      (16 * 1024)
++#define MICROBIT_MACHINE(obj) \
++    OBJECT_CHECK(MICROBITMachineState, obj, TYPE_MICROBIT_MACHINE)
 +
-+static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
++static void microbit_init(MachineState *machine)
 +{
-+    NRF51State *s = NRF51_SOC(dev_soc);
-+    Error *err = NULL;
++    MICROBITMachineState *s = g_new(MICROBITMachineState, 1);
++    MemoryRegion *system_memory = get_system_memory();
++    Object *soc;
 +
-+    if (!s->board_memory) {
-+        error_setg(errp, "memory property was not set");
-+        return;
-+    }
++    object_initialize(&s->nrf51, sizeof(s->nrf51), TYPE_NRF51_SOC);
++    soc = OBJECT(&s->nrf51);
++    object_property_add_child(OBJECT(machine), "nrf51", soc, &error_fatal);
++    object_property_set_link(soc, OBJECT(system_memory),
++                             "memory", &error_abort);
 +
-+    object_property_set_link(OBJECT(&s->cpu), OBJECT(&s->container), "memory",
-+            &err);
-+    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
++    object_property_set_bool(soc, true, "realized", &error_abort);
 +
-+    memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
-+
-+    memory_region_init_ram(&s->flash, OBJECT(s), "nrf51.flash", s->flash_size,
-+            &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    memory_region_set_readonly(&s->flash, true);
-+    memory_region_add_subregion(&s->container, FLASH_BASE, &s->flash);
-+
-+    memory_region_init_ram(&s->sram, NULL, "nrf51.sram", s->sram_size, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    memory_region_add_subregion(&s->container, SRAM_BASE, &s->sram);
-+
-+    create_unimplemented_device("nrf51_soc.io", IOMEM_BASE, IOMEM_SIZE);
-+    create_unimplemented_device("nrf51_soc.ficr", FICR_BASE, FICR_SIZE);
-+    create_unimplemented_device("nrf51_soc.private", 0xF0000000, 0x10000000);
++    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
++            NRF51_SOC(soc)->flash_size);
 +}
 +
-+static void nrf51_soc_init(Object *obj)
++static void microbit_machine_init(MachineClass *mc)
 +{
-+    NRF51State *s = NRF51_SOC(obj);
-+
-+    memory_region_init(&s->container, obj, "nrf51-container", UINT64_MAX);
-+
-+    object_initialize(&s->cpu, sizeof(s->cpu), TYPE_ARMV7M);
-+    object_property_add_child(OBJECT(s), "armv6m", OBJECT(&s->cpu), &error_abort);
-+    qdev_set_parent_bus(DEVICE(&s->cpu), sysbus_get_default());
-+    qdev_prop_set_string(DEVICE(&s->cpu), "cpu-type", ARM_CPU_TYPE_NAME("cortex-m0"));
-+    qdev_prop_set_uint32(DEVICE(&s->cpu), "num-irq", 32);
++    mc->desc = "BBC micro:bit";
++    mc->init = microbit_init;
++    mc->max_cpus = 1;
 +}
-+
-+static Property nrf51_soc_properties[] = {
-+    DEFINE_PROP_LINK("memory", NRF51State, board_memory, TYPE_MEMORY_REGION,
-+                     MemoryRegion *),
-+    DEFINE_PROP_UINT32("sram-size", NRF51State, sram_size, NRF51822_SRAM_SIZE),
-+    DEFINE_PROP_UINT32("flash-size", NRF51State, flash_size, NRF51822_FLASH_SIZE),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void nrf51_soc_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = nrf51_soc_realize;
-+    dc->props = nrf51_soc_properties;
-+}
-+
-+static const TypeInfo nrf51_soc_info = {
-+    .name          = TYPE_NRF51_SOC,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(NRF51State),
-+    .instance_init = nrf51_soc_init,
-+    .class_init    = nrf51_soc_class_init,
-+};
-+
-+static void nrf51_soc_types(void)
-+{
-+    type_register_static(&nrf51_soc_info);
-+}
-+type_init(nrf51_soc_types)
-diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
-new file mode 100644
-index 000000000000..e380ec26b8eb
---- /dev/null
-+++ b/include/hw/arm/nrf51_soc.h
-@@ -0,0 +1,42 @@
-+/*
-+ * Nordic Semiconductor nRF51  SoC
-+ *
-+ * Copyright 2018 Joel Stanley <joel@jms.id.au>
-+ *
-+ * This code is licensed under the GPL version 2 or later.  See
-+ * the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef NRF51_SOC_H
-+#define NRF51_SOC_H
-+
-+#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
-+#include "hw/arm/armv7m.h"
-+
-+#define TYPE_NRF51_SOC "nrf51-soc"
-+#define NRF51_SOC(obj) \
-+    OBJECT_CHECK(NRF51State, (obj), TYPE_NRF51_SOC)
-+
-+typedef struct NRF51State {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    ARMv7MState cpu;
-+
-+    MemoryRegion iomem;
-+    MemoryRegion sram;
-+    MemoryRegion flash;
-+
-+    uint32_t sram_size;
-+    uint32_t flash_size;
-+
-+    MemoryRegion *board_memory;
-+
-+    MemoryRegion container;
-+
-+} NRF51State;
-+
-+#endif
-+
++DEFINE_MACHINE("microbit", microbit_machine_init);
 -- 
 2.17.1
