@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1fqInl-0006Br-Aw
+	(envelope-from <jcfaracco@gmail.com>) id 1fqInl-0006Bs-Ay
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1fqInj-0000Gl-Pf
+	(envelope-from <jcfaracco@gmail.com>) id 1fqInj-0000GO-NS
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:59:00 -0400
 From: Julio Faracco <jcfaracco@gmail.com>
-Date: Thu, 16 Aug 2018 10:58:36 -0300
-Message-Id: <20180816135837.13149-4-jcfaracco@gmail.com>
+Date: Thu, 16 Aug 2018 10:58:35 -0300
+Message-Id: <20180816135837.13149-3-jcfaracco@gmail.com>
 In-Reply-To: <20180816135837.13149-1-jcfaracco@gmail.com>
 References: <20180816135837.13149-1-jcfaracco@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 3/4] dmg: including dmg-lzfse module inside
- dmg block driver.
+Subject: [Qemu-devel] [PATCH v2 2/4] configure: adding support to lzfse
+ library.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +23,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-This commit includes the support to new module dmg-lzfse into dmg block
-driver. It includes the support for block type ULFO (0x80000007).
+This commit includes the support to lzfse opensource library. With this
+library dmg block driver can decompress images with this type of
+compression inside.
 
 Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
 ---
- block/dmg.c | 28 ++++++++++++++++++++++++++++
- block/dmg.h |  3 +++
- 2 files changed, 31 insertions(+)
+ block/Makefile.objs |  2 ++
+ configure           | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/block/dmg.c b/block/dmg.c
-index c9b3c519c4..615f818c5a 100644
---- a/block/dmg.c
-+++ b/block/dmg.c
-@@ -33,6 +33,9 @@
- int (*dmg_uncompress_bz2)(char *next_in, unsigned int avail_in,
-                           char *next_out, unsigned int avail_out);
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index c8337bf186..f4ddbb9c7b 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -47,6 +47,8 @@ ssh.o-cflags       := $(LIBSSH2_CFLAGS)
+ ssh.o-libs         := $(LIBSSH2_LIBS)
+ block-obj-$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
+ dmg-bz2.o-libs     := $(BZIP2_LIBS)
++block-obj-$(if $(CONFIG_LZFSE),m,n) += dmg-lzfse.o
++dmg-lzfse.o-libs   := $(LZFSE_LIBS)
+ qcow.o-libs        := -lz
+ linux-aio.o-libs   := -laio
+ parallels.o-cflags := $(LIBXML2_CFLAGS)
+diff --git a/configure b/configure
+index 2a7796ea80..c5a4628f98 100755
+--- a/configure
++++ b/configure
+@@ -432,6 +432,7 @@ capstone=""
+ lzo=""
+ snappy=""
+ bzip2=""
++lzfse=""
+ guest_agent=""
+ guest_agent_with_vss="no"
+ guest_agent_ntddscsi="no"
+@@ -1300,6 +1301,10 @@ for opt do
+   ;;
+   --enable-bzip2) bzip2="yes"
+   ;;
++  --enable-lzfse) lzfse="yes"
++  ;;
++  --disable-lzfse) lzfse="no"
++  ;;
+   --enable-guest-agent) guest_agent="yes"
+   ;;
+   --disable-guest-agent) guest_agent="no"
+@@ -1689,6 +1694,8 @@ disabled with --disable-FEATURE, default is enabled if available:
+   snappy          support of snappy compression library
+   bzip2           support of bzip2 compression library
+                   (for reading bzip2-compressed dmg images)
++  lzfse           support of lzfse compression library
++                  (for reading lzfse-compressed dmg images)
+   seccomp         seccomp support
+   coroutine-pool  coroutine freelist (better performance)
+   glusterfs       GlusterFS backend
+@@ -2213,6 +2220,24 @@ EOF
+     fi
+ fi
  
-+int (*dmg_uncompress_lzfse)(char *next_in, unsigned int avail_in,
-+                            char *next_out, unsigned int avail_out);
++##########################################
++# lzfse check
 +
- enum {
-     /* Limit chunk sizes to prevent unreasonable amounts of memory being used
-      * or truncating when converting to 32-bit types
-@@ -107,6 +110,7 @@ static void update_max_chunk_size(BDRVDMGState *s, uint32_t chunk,
-     switch (s->types[chunk]) {
-     case 0x80000005: /* zlib compressed */
-     case 0x80000006: /* bzip2 compressed */
-+    case 0x80000007: /* lzfse compressed */
-         compressed_size = s->lengths[chunk];
-         uncompressed_sectors = s->sectorcounts[chunk];
-         break;
-@@ -188,6 +192,8 @@ static bool dmg_is_known_block_type(uint32_t entry_type)
-         return true;
-     case 0x80000006:    /* bzip2 */
-         return !!dmg_uncompress_bz2;
-+    case 0x80000007:    /* lzfse */
-+        return !!dmg_uncompress_lzfse;
-     default:
-         return false;
-     }
-@@ -431,6 +437,7 @@ static int dmg_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     block_module_load_one("dmg-bz2");
-+    block_module_load_one("dmg-lzfse");
- 
-     s->n_chunks = 0;
-     s->offsets = s->lengths = s->sectors = s->sectorcounts = NULL;
-@@ -629,6 +636,27 @@ static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
-                 return ret;
-             }
-             break;
-+        case 0x80000007:
-+            if (!dmg_uncompress_lzfse) {
-+                break;
-+            }
-+            /* we need to buffer, because only the chunk as whole can be
-+             * inflated. */
-+            ret = bdrv_pread(bs->file, s->offsets[chunk],
-+                             s->compressed_chunk, s->lengths[chunk]);
-+            if (ret != s->lengths[chunk]) {
-+                return -1;
-+            }
++if test "$lzfse" != "no" ; then
++    cat > $TMPC << EOF
++#include <lzfse.h>
++int main(void) { lzfse_decode_scratch_size(); return 0; }
++EOF
++    if compile_prog "" "-llzfse" ; then
++        lzfse="yes"
++    else
++        if test "$lzfse" = "yes"; then
++            feature_not_found "lzfse" "Install lzfse devel"
++        fi
++        lzfse="no"
++    fi
++fi
 +
-+            ret = dmg_uncompress_lzfse((char *)s->compressed_chunk,
-+                                       (unsigned int) s->lengths[chunk],
-+                                       (char *)s->uncompressed_chunk,
-+                                       (unsigned int)
-+                                           (512 * s->sectorcounts[chunk]));
-+            if (ret < 0) {
-+                return ret;
-+            }
-+            break;
-         case 1: /* copy */
-             ret = bdrv_pread(bs->file, s->offsets[chunk],
-                              s->uncompressed_chunk, s->lengths[chunk]);
-diff --git a/block/dmg.h b/block/dmg.h
-index 2ecf239ba5..f28929998f 100644
---- a/block/dmg.h
-+++ b/block/dmg.h
-@@ -55,4 +55,7 @@ typedef struct BDRVDMGState {
- extern int (*dmg_uncompress_bz2)(char *next_in, unsigned int avail_in,
-                                  char *next_out, unsigned int avail_out);
+ ##########################################
+ # libseccomp check
  
-+extern int (*dmg_uncompress_lzfse)(char *next_in, unsigned int avail_in,
-+                                   char *next_out, unsigned int avail_out);
+@@ -6001,6 +6026,7 @@ echo "Live block migration $live_block_migration"
+ echo "lzo support       $lzo"
+ echo "snappy support    $snappy"
+ echo "bzip2 support     $bzip2"
++echo "lzfse support     $lzfse"
+ echo "NUMA host support $numa"
+ echo "libxml2           $libxml2"
+ echo "tcmalloc support  $tcmalloc"
+@@ -6525,6 +6551,11 @@ if test "$bzip2" = "yes" ; then
+   echo "BZIP2_LIBS=-lbz2" >> $config_host_mak
+ fi
+ 
++if test "$lzfse" = "yes" ; then
++  echo "CONFIG_LZFSE=y" >> $config_host_mak
++  echo "LZFSE_LIBS=-llzfse" >> $config_host_mak
++fi
 +
- #endif
+ if test "$libiscsi" = "yes" ; then
+   echo "CONFIG_LIBISCSI=m" >> $config_host_mak
+   echo "LIBISCSI_CFLAGS=$libiscsi_cflags" >> $config_host_mak
 -- 
 2.17.1
