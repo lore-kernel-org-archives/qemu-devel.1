@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqBxF-0006fe-28
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 02:40:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fqByk-0007ID-P8
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 02:41:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqBx4-0005oh-CU
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 02:40:15 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180725151011.25951-1-armbru@redhat.com>
-	<5e713599-997f-7dda-917c-80902f6ef328@redhat.com>
-	<20180725160144.GJ12855@redhat.com>
-	<20180728043238.GC1325070@localhost.localdomain>
-	<371fc437-1330-6873-7f6d-99af8d56c5df@redhat.com>
-	<87ftzgnj4z.fsf@dusky.pond.sub.org>
-	<8b037e11-87bf-9258-2615-ae17e34ab353@redhat.com>
-Date: Thu, 16 Aug 2018 08:40:02 +0200
-In-Reply-To: <8b037e11-87bf-9258-2615-ae17e34ab353@redhat.com> (Max Reitz's
-	message of "Thu, 16 Aug 2018 01:55:36 +0200")
-Message-ID: <87zhxmerwd.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1fqByf-0006cH-IX
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 02:41:53 -0400
+Date: Thu, 16 Aug 2018 08:41:28 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180816064128.GA5511@localhost.localdomain>
+References: <20180807043349.27196-1-jsnow@redhat.com>
+	<20180807043349.27196-5-jsnow@redhat.com>
+	<20180808162948.GF15410@localhost.localdomain>
+	<b9704bc0-4871-a8dc-0759-48e6872d2624@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH] rbd: Don't convert keypairs to JSON
- and back
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b9704bc0-4871-a8dc-0759-48e6872d2624@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 04/21] block/commit: utilize job_exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,111 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: kwolf@redhat.com, jdurgin@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Max Reitz <mreitz@redhat.com> writes:
+Am 15.08.2018 um 22:52 hat John Snow geschrieben:
+> On 08/08/2018 12:29 PM, Kevin Wolf wrote:
+> > Am 07.08.2018 um 06:33 hat John Snow geschrieben:
+> >> Change the manual deferment to commit_complete into the implicit
+> >> callback to job_exit.
+> >>
+> >> Signed-off-by: John Snow <jsnow@redhat.com>
+> > 
+> > There is one tricky thing in this patch that the commit message could be
+> > a bit more explicit about, which is moving job_completed() to a later
+> > point.
+> > 
+> > This is the code that happens between the old call of job_completed()
+> > and the new one:
+> > 
+> >     /* If bdrv_drop_intermediate() didn't already do that, remove the commit
+> >      * filter driver from the backing chain. Do this as the final step so that
+> >      * the 'consistent read' permission can be granted.  */
+> >     if (remove_commit_top_bs) {
+> >         bdrv_child_try_set_perm(commit_top_bs->backing, 0, BLK_PERM_ALL,
+> >                                 &error_abort);
+> >         bdrv_replace_node(commit_top_bs, backing_bs(commit_top_bs),
+> >                           &error_abort);
+> >     }
+> > 
+> >     bdrv_unref(commit_top_bs);
+> >     bdrv_unref(top);
+> > 
+> > As the comment states, bdrv_replace_node() requires that the permission
+> > restrictions that the commit job made are already lifted. The most
+> > important part is done by the explicit block_job_remove_all_bdrv() call
+> > right before this hunk. It still leaves bjob->blk around, which could
+> > have implications, but luckily we didn't take any permissions for that
+> > one:
+> > 
+> >     s = block_job_create(job_id, &commit_job_driver, NULL, bs, 0, BLK_PERM_ALL,
+> >                          speed, JOB_DEFAULT, NULL, NULL, errp);
+> > 
+> > So I think we got everything out of the way and bdrv_replace_node() can
+> > do what it wants to do.
+> > 
+> > Kevin
+> > 
+> 
+> I suppose it will be up to the author of a job to be aware of any
+> permissions they pick up at creation time that might have an effect on
+> the cleanup they wish to do during completion time.
 
-> On 2018-08-15 10:12, Markus Armbruster wrote:
->> Max Reitz <mreitz@redhat.com> writes:
->
-> [...]
->
->>> To me personally the issue is that if you can specify a plain filename,
->>> bdrv_refresh_filename() should give you that plain filename back.  So
->>> rbd's implementation of that is lacking.  Well, it just doesn't exist.
->> 
->> I'm not even sure I understand what you're talking about.
->
-> We have this bdrv_refresh_filename() thing which can do this:
->
-> $ qemu-img info \
->     "json:{'driver':'raw',
->            'file':{'driver':'nbd','host':'localhost'}}"
-> image: nbd://localhost:10809
-> [...]
->
-> So it can reconstruct a plain filename even if you specify it as options
-> instead of just using a plain filename.
->
->
-> Now here's my fault: I thought it might be necessary for a driver to
-> implement that function (which rbd doesn't) so that you'd get a nice
-> filename back (instead of just json:{} garbled things).   But you don't.
->  For protocol drivers, you'll just get the initial filename back.  (So
-> my comment was just wrong.)
->
-> So what I was thinking about was some case where you specified a normal
-> plain filename and qemu would give you back json:{}.  (If rbd
-> implemented bdrv_refresh_filename(), that wouldn't happen, because it
-> would reconstruct a nice normal filename.)  It turns out, I don't think
-> that can happen so easily.  You'll just get your filename back.
->
-> Because here's what I'm thinking: If someone uses an option that is
-> undocumented and starts with =, well, too bad.  If someone uses a normal
-> filename, but gets back a json:{} filename...  Then they are free to use
-> that anywhere, and their use of "=" is legitimized.
->
->
-> Now that issue kind of reappears when you open an RBD volume, and then
-> e.g. take a blockdev-snapshot.  Then your overlay has an overridden
-> backing file (one that may be different from what its image header says)
-> and its filename may well become a json:{} one (to arrange for the
-> overridden backing file options).  Of course, if you opened the RBD
-> volume with a filename with some of the options warranting
-> =keyvalue-pairs, then your json:{} filename will contain those options
-> under =keyvalue-pairs.
->
-> So...  I'm not quite sure what I want to say?  I think there are edge
-> cases where the user may not have put any weird option into qemu, but
-> they do get a json:{} filename with =keyvalue-pairs out of it.  And I
-> think users are free to use json:{} filenames qemu spews at them, and we
-> can't blame them for it.
+I'm really only talking about the commit job, the specific conversion
+in this patch and the terse commit message.
 
-Makes sense.
-
-More reason to deprecate key-value pairs in pseudo-filenames.
-
-The only alternative would be to also provide them in QAPI
-BlockdevOptionsRbd.  I find that as distasteful as ever, but if the
-block maintainers decide we need it, I'll hold my nose.
-
->>>> If so, and we are comfortable changing the output the way this patch does
->>>> (technically altering ABI anyway), we might as well go all the way and
->>>> filter it out completely.  That would be preferable to cleaning up the json
->>>> output of the internal key/value pairs, IMO.
->>>
->>> Well, this filtering at least is done by my "Fix some filename
->>> generation issues" series.
->> 
->> Likewise.
->
-> The series overhauls quite a bit of the bdrv_refresh_filename()
-> infrastructure.  That function is also responsible for generating
-> json:{} filenames.
->
-> One thing it introduces is a BlockDriver field where a driver can
-> specify which of the runtime options are actually important.  The rest
-> is omitted from the generated json:{} filename.
->
-> I may have taken the liberty not to include =keyvalue-pairs in RBD's
-> "strong runtime options" list.
-
-I see.
-
-Permit me to digress a bit.
-
-I understand one application for generating a json: filename is for
-putting it into an image file header (say as a COW's backing image).
-
-Having image file headers point to other images is not as simple as it
-may look at first glance.  The basic case of image format plus plain
-filename (not containing '/') is straightforward enough.  But if I make
-the filename absolute (with a leading '/'), the image becomes less easy
-to move to another machine.
-
-Similarly, certain Ceph configuration bits may make no sense on another
-machine, and putting them into an image file header may not be a good
-idea.
-
-Rather vague, I'm afraid.
+Kevin
