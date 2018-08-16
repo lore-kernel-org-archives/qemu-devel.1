@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJm5-00070F-BM
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:01:27 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJmD-0007FU-3a
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:01:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJls-0001Xm-UI
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:01:18 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:43781 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJm3-0001eH-AG
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:01:25 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:47649 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJlc-0000hh-Nr
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:58 -0400
+	id 1fqJlo-0001Ir-Lo
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:01:06 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:57:50 +0200
-Message-Id: <1534431497-1385-58-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:58:13 +0200
+Message-Id: <1534431497-1385-81-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v9 57/84] elf: Don't check FCR31_NAN2008 bit
- for nanoMIPS
+Subject: [Qemu-devel] [PATCH v9 80/84] linux-user: Add nanoMIPS linux user
+ mode configuration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +28,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-nanoMIPS is always NaN2008 compliant, and rules for checking
-FCR31's NAN2008 bit are obsoleted.
+Add new linux user mode configuration for nanoMIPS.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/mips/cpu_loop.c | 3 +++
- 1 file changed, 3 insertions(+)
+ configure                               | 13 ++++++++++++-
+ default-configs/nanomips-linux-user.mak |  1 +
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+ create mode 100644 default-configs/nanomips-linux-user.mak
 
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 1d3dc9e..c9c20cf 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -747,6 +747,9 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-     if (regs->cp0_epc & 1) {
-         env->hflags |= MIPS_HFLAG_M16;
-     }
-+    if (env->insn_flags & ISA_NANOMIPS32) {
-+        return;
-+    }
-     if (((info->elf_flags & EF_MIPS_NAN2008) != 0) !=
-         ((env->active_fpu.fcr31 & (1 << FCR31_NAN2008)) != 0)) {
-         if ((env->active_fpu.fcr31_rw_bitmask &
+diff --git a/configure b/configure
+index 2a7796e..86c8b28 100755
+--- a/configure
++++ b/configure
+@@ -742,6 +742,9 @@ case "$cpu" in
+     supported_cpu="yes"
+     cross_cc_mips=$host_cc
+   ;;
++  nanomips*)
++    cpu="mips"
++  ;;
+   sparc|sun4[cdmuv])
+     cpu="sparc"
+     supported_cpu="yes"
+@@ -6883,7 +6886,7 @@ target_name=$(echo $target | cut -d '-' -f 1)
+ target_bigendian="no"
+ 
+ case "$target_name" in
+-  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
++  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|nanomipseb|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
+   target_bigendian=yes
+   ;;
+ esac
+@@ -6999,6 +7002,11 @@ case "$target_name" in
+   moxie)
+     target_compiler=$cross_cc_moxie
+   ;;
++  nanomips|nanomipseb)
++    TARGET_ARCH=nanomips
++    TARGET_BASE_ARCH=mips
++    echo "TARGET_ABI_MIPSP32=y" >> $config_target_mak
++  ;;
+   nios2)
+     target_compiler=$cross_cc_nios2
+   ;;
+@@ -7256,6 +7264,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+   moxie*)
+     disas_config "MOXIE"
+   ;;
++  nanomips*)
++    disas_config "MIPS"
++  ;;
+   nios2)
+     disas_config "NIOS2"
+   ;;
+diff --git a/default-configs/nanomips-linux-user.mak b/default-configs/nanomips-linux-user.mak
+new file mode 100644
+index 0000000..68fc1f7
+--- /dev/null
++++ b/default-configs/nanomips-linux-user.mak
+@@ -0,0 +1 @@
++# Default configuration for nanomips-linux-user
 -- 
 2.7.4
