@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fqICK-00078Y-PZ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:20:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1fqICX-0007VE-Nz
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:20:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fqICC-0006dv-Be
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:20:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33318 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fqICT-00070e-2m
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:20:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45398 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fqICA-0006YV-J0
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:20:12 -0400
-Date: Thu, 16 Aug 2018 21:20:02 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180816132002.GF2708@xz-mi>
-References: <20180813171132.21939-1-cota@braap.org>
-	<20180813171132.21939-3-cota@braap.org>
-	<2f2b1597-6cb1-b6ae-b2a0-38c54e1c34d1@redhat.com>
-	<20180815012609.GC17669@flamenco>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fqICS-00070K-RP
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:20:28 -0400
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-48-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5803f1ba-9bb5-8baa-2423-40ac6ec0ab77@redhat.com>
+Date: Thu, 16 Aug 2018 08:20:25 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180815012609.GC17669@flamenco>
-Subject: Re: [Qemu-devel] [PATCH 2/3] monitor: show sync profiling info with
- 'info sync'
+In-Reply-To: <20180808120334.10970-48-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 47/56] qjson: Have qobject_from_json() &
+ friends reject empty and blank
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On Tue, Aug 14, 2018 at 09:26:09PM -0400, Emilio G. Cota wrote:
-> On Tue, Aug 14, 2018 at 10:14:01 +0200, Paolo Bonzini wrote:
-> > On 13/08/2018 19:11, Emilio G. Cota wrote:
-> > Would it make sense to add a flag to sort by average wait time
+On 08/08/2018 07:03 AM, Markus Armbruster wrote:
+> The last case where qobject_from_json() & friends return null without
+> setting an error is empty or blank input.  Callers:
 > 
-> Done:
-> 
-> (qemu) help info sync-profile
-> info sync-profile [-m] [max] -- show sync profiling info \
-> for up to max entries (default: 10). By default, entries \
-> are sorted by total wait time; -m sorts by mean wait time.
-> 
-> (qemu) info sync-profile 3 
-> Type               Object  Call site       Wait Time (s)         Count  Average (us)
-> ------------------------------------------------------------------------------------
-> condvar    0x560cc9909e50  cpus.c:1165          63.63428         16081       3957.11
-> condvar    0x560cc9909e50  cpus.c:1415           0.21074             2     105371.07
-> BQL mutex  0x560cc85a3fa0  util/rcu.c:269        0.20227            20      10113.60
-> ------------------------------------------------------------------------------------
-> 
-> (qemu) info sync-profile -m 3
-> Type               Object  Call site       Wait Time (s)         Count  Average (us)
-> ------------------------------------------------------------------------------------
-> condvar    0x560cc9909e50  cpus.c:1415           0.21074             2     105371.07
-> BQL mutex  0x560cc85a3fa0  util/rcu.c:269        0.20227            21       9632.00
-> condvar    0x560cc9909e50  cpus.c:1165          71.92799         18167       3959.27
-> ------------------------------------------------------------------------------------
-> 
-> >, and one to coalesce all mutexes for the same call site?
-> 
-> I am not sure I understand. Do you mean to pass a specific call site,
-> so that we coalesce all entries related to the call site's object?
-> Or to keep the call sites separate, but only report entries related
-> to that specific call site's object?
+> * block.c's parse_json_protocol() reports "Could not parse the JSON
+>    options".  It's marked as a work-around, because it also covered
+>    actual bugs, but they got fixed in the previous few commits.
 
-I would guess Paolo means that whether we can merge entries that have
-the same call site but with different object addresses.  I copied one
-example from the commit message of your patch 1:
+How would you trigger this? I guess that would be by using the 
+pseud-json block specification spelled "json:" rather than the usual 
+"json:{...}".
 
-Type               Object  Call site          Wait Time (s)         Count  Average (us)
----------------------------------------------------------------------------------------
-condvar    0x557ee3090e80  cpus.c:1084              1.69207          2916        580.27
-condvar    0x557ee30ceb10  cpus.c:1084              1.43442          2404        596.68
-...
+> 
+> * qobject_input_visitor_new_str() reports "JSON parse error".  Also
+>    marked as work-around.  The recent fixes have made this unreachable,
+>    because it currently gets called only for input starting with '{'.
 
-IMHO merging of these two entries might be helpful when e.g. the
-condvar used there is dynamically created/destroyed, then in this case
-the object pointer might not that helpful, instead the statistics of
-all the entries for the same call site might tell more.
+Indeed, no triggers to this.
 
-Regards,
+> 
+> * check-qjson.c's empty_input() and blank_input() demonstrate the
+>    behavior.
+> 
+> * The other callers are not affected since they only pass input with
+>    exactly one JSON value or, in the case of negative tests, one error.
+
+As long as sending back-to-back newlines to QMP does not treat the empty 
+line as an error, you should be okay. (If sending two newlines in a row 
+now results in a {"error":...} response from the server for the blank 
+line, then you've regressed).
+
+> 
+> Fail with "Expecting a JSON value" instead of returning null, and
+> simplify callers.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+
+Yay for getting rid of the inconsistent error reporting!
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
-Peter Xu
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
