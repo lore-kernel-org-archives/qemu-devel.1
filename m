@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fqNHy-0006i4-7I
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:46:31 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fqNNU-0003Gh-2p
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:52:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fqNHx-0002O7-6T
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:46:30 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Thu, 16 Aug 2018 14:46:08 -0400
-Message-Id: <fa938f6c5e7aa523a6ddcf578f052f02d97a3720.1534444235.git.jcody@redhat.com>
-In-Reply-To: <cover.1534444235.git.jcody@redhat.com>
-References: <cover.1534444235.git.jcody@redhat.com>
-In-Reply-To: <cover.1534444235.git.jcody@redhat.com>
-References: <cover.1534444235.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] block: iotest to catch abort on forced
- blockjob cancel
+	(envelope-from <dgilbert@redhat.com>) id 1fqNNN-0004j0-FC
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:52:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50210 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fqNNN-0004iU-7M
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:52:05 -0400
+Date: Thu, 16 Aug 2018 19:51:59 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180816185158.GE2664@work-vm>
+References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
+	<cover.1534409363.git.simon@ruderich.org>
+	<fce204f66589995fb1470a9e2a490b2dd24cf551.1534409363.git.simon@ruderich.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fce204f66589995fb1470a9e2a490b2dd24cf551.1534409363.git.simon@ruderich.org>
+Subject: Re: [Qemu-devel] [PATCH v4 4/7] hmp: use l for size argument in
+ memsave/pmemsave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,156 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org, jsnow@redhat.com, eblake@redhat.com
+To: Simon Ruderich <simon@ruderich.org>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/229.out | 23 +++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 119 insertions(+)
- create mode 100755 tests/qemu-iotests/229
- create mode 100644 tests/qemu-iotests/229.out
+* Simon Ruderich (simon@ruderich.org) wrote:
+> i is only 32-bit. To prevent possible truncation when dumping large
+> memory regions use l which is target long.
+> 
+> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Simon Ruderich <simon@ruderich.org>
 
-diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
-new file mode 100755
-index 0000000000..2af04c8028
---- /dev/null
-+++ b/tests/qemu-iotests/229
-@@ -0,0 +1,95 @@
-+#!/bin/bash
-+#
-+# Test for force canceling a running blockjob that is paused in
-+# an error state.
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=jcody@redhat.com
-+
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
-+
-+here="$PWD"
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_qemu
-+    _cleanup_test_img
-+    rm -f "$TEST_IMG" "$DEST_IMG"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+# Needs backing file and backing format support
-+_supported_fmt qcow2 qed
-+_supported_proto file
-+_supported_os Linux
-+
-+
-+DEST_IMG="$TEST_DIR/d.$IMGFMT"
-+TEST_IMG="$TEST_DIR/b.$IMGFMT"
-+
-+_make_test_img 2M
-+
-+# destination for mirror will be too small, causing error
-+TEST_IMG=$DEST_IMG _make_test_img 1M
-+
-+$QEMU_IO -c 'write 0 2M' "$TEST_IMG" | _filter_qemu_io
-+
-+_launch_qemu -drive id=testdisk,file="$TEST_IMG",format="$IMGFMT"
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{'execute': 'qmp_capabilities'}" \
-+    'return'
-+
-+echo
-+echo '=== Starting drive-mirror, causing error & stop  ==='
-+echo
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{'execute': 'drive-mirror',
-+                 'arguments': {'device': 'testdisk',
-+                               'mode':   'absolute-paths',
-+                               'format': 'qcow2',
-+                               'target': '$DEST_IMG',
-+                               'sync':   'full',
-+                               'mode':   'existing',
-+                               'on-source-error': 'stop',
-+                               'on-target-error': 'stop' }}"    \
-+     "BLOCK_JOB_ERROR"
-+
-+echo
-+echo '=== Force cancel job paused in error state  ==='
-+echo
-+
-+success_or_failure="y" _send_qemu_cmd $QEMU_HANDLE \
-+    "{'execute': 'block-job-cancel',
-+                 'arguments': { 'device': 'testdisk',
-+                                'force': true}}" \
-+     "BLOCK_JOB_CANCELLED" "Assertion"
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
-new file mode 100644
-index 0000000000..d5dea5cdd2
---- /dev/null
-+++ b/tests/qemu-iotests/229.out
-@@ -0,0 +1,23 @@
-+QA output created by 229
-+Formatting 'TEST_DIR/b.IMGFMT', fmt=IMGFMT size=2097152
-+Formatting 'TEST_DIR/d.IMGFMT', fmt=IMGFMT size=1048576
-+wrote 2097152/2097152 bytes at offset 0
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": {}}
-+
-+=== Starting drive-mirror, causing error & stop  ===
-+
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "testdisk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
-+
-+=== Force cancel job paused in error state  ===
-+
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "testdisk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index b973dc842d..743790745b 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -225,3 +225,4 @@
- 225 rw auto quick
- 226 auto quick
- 227 auto quick
-+229 auto quick
--- 
-2.17.1
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  hmp-commands.hx | 4 ++--
+>  hmp.c           | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 91dfe51c37..79c158a140 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -818,7 +818,7 @@ ETEXI
+>  
+>      {
+>          .name       = "memsave",
+> -        .args_type  = "val:l,size:i,filename:s",
+> +        .args_type  = "val:l,size:l,filename:s",
+>          .params     = "addr size file",
+>          .help       = "save to disk virtual memory dump starting at 'addr' of size 'size'",
+>          .cmd        = hmp_memsave,
+> @@ -832,7 +832,7 @@ ETEXI
+>  
+>      {
+>          .name       = "pmemsave",
+> -        .args_type  = "val:l,size:i,filename:s",
+> +        .args_type  = "val:l,size:l,filename:s",
+>          .params     = "addr size file",
+>          .help       = "save to disk physical memory dump starting at 'addr' of size 'size'",
+>          .cmd        = hmp_pmemsave,
+> diff --git a/hmp.c b/hmp.c
+> index 2aafb50e8e..1fb0724107 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -1094,7 +1094,7 @@ void hmp_cpu(Monitor *mon, const QDict *qdict)
+>  
+>  void hmp_memsave(Monitor *mon, const QDict *qdict)
+>  {
+> -    uint32_t size = qdict_get_int(qdict, "size");
+> +    uint64_t size = qdict_get_int(qdict, "size");
+>      const char *filename = qdict_get_str(qdict, "filename");
+>      uint64_t addr = qdict_get_int(qdict, "val");
+>      Error *err = NULL;
+> @@ -1111,7 +1111,7 @@ void hmp_memsave(Monitor *mon, const QDict *qdict)
+>  
+>  void hmp_pmemsave(Monitor *mon, const QDict *qdict)
+>  {
+> -    uint32_t size = qdict_get_int(qdict, "size");
+> +    uint64_t size = qdict_get_int(qdict, "size");
+>      const char *filename = qdict_get_str(qdict, "filename");
+>      uint64_t addr = qdict_get_int(qdict, "val");
+>      Error *err = NULL;
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
