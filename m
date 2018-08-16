@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqDml-000151-CQ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqDmi-00011s-NO
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqDmY-0005ID-Kc
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53670 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqDmV-0005HL-D1
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51382 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqDmQ-00059f-87
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:20 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqDmM-0005CQ-Mu
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 919CB40776DB
+	by mx1.redhat.com (Postfix) with ESMTPS id 96C124027E54
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:37:05 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-56.ams2.redhat.com
+	[10.36.116.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 734111010416
 	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:37:05 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 16 Aug 2018 10:36:53 +0200
-Message-Id: <20180816083701.3932-18-armbru@redhat.com>
+Date: Thu, 16 Aug 2018 10:36:59 +0200
+Message-Id: <20180816083701.3932-24-armbru@redhat.com>
 In-Reply-To: <20180816083701.3932-1-armbru@redhat.com>
 References: <20180816083701.3932-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 17/25] migration-test: Make wait_command() cope
- with '%'
+Subject: [Qemu-devel] [PULL 23/25] libqtest: Rename qtest_FOOv() to
+ qtest_vFOO() for consistency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +35,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-wait_command() passes its argument @command to qtest_qmp_send().
-Falls apart if @command contain '%'.  Two ways to disarm this trap:
-suppress interpretation of '%' by passing @command as argument to
-format string "%s", or fix it by having wait_command() take the
-variable arguments to go with @command.  Do the latter.
+13 of 13 C99 library function pairs taking ... or a va_list parameter
+are called FOO() and vFOO().  In QEMU, we sometimes call the one
+taking a va_list FOOv() instead.  Bad taste.  libqtest.h uses both
+spellings.  Normalize it to the standard spelling.
 
-This is another step towards compile-time format string checking
-without triggering -Wformat-nonliteral.
-
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180806065344.7103-18-armbru@redhat.com>
+Message-Id: <20180806065344.7103-24-armbru@redhat.com>
 ---
- tests/migration-test.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ tests/libqtest.c | 12 ++++++------
+ tests/libqtest.h |  4 ++--
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 402c82bdc4..7bffcd2e4d 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -159,9 +159,14 @@ static void stop_cb(void *opaque, const char *name, QDict *data)
- /*
-  * Events can get in the way of responses we are actually waiting for.
-  */
--static QDict *wait_command(QTestState *who, const char *command)
-+static QDict *wait_command(QTestState *who, const char *command, ...)
- {
--    qtest_qmp_send(who, command);
-+    va_list ap;
-+
-+    va_start(ap, command);
-+    qtest_qmp_vsend(who, command, ap);
-+    va_end(ap);
-+
-     return qtest_qmp_receive_success(who, stop_cb, NULL);
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index a0d44793fa..3706f30aa2 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -538,7 +538,7 @@ QDict *qmp_fdv(int fd, const char *fmt, va_list ap)
+     return qmp_fd_receive(fd);
  }
  
+-QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap)
++QDict *qtest_vqmp(QTestState *s, const char *fmt, va_list ap)
+ {
+     qtest_qmp_vsend(s, fmt, ap);
+ 
+@@ -572,7 +572,7 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
+     QDict *response;
+ 
+     va_start(ap, fmt);
+-    response = qtest_qmpv(s, fmt, ap);
++    response = qtest_vqmp(s, fmt, ap);
+     va_end(ap);
+     return response;
+ }
+@@ -608,7 +608,7 @@ void qtest_qmp_eventwait(QTestState *s, const char *event)
+     qobject_unref(response);
+ }
+ 
+-char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
++char *qtest_vhmp(QTestState *s, const char *fmt, va_list ap)
+ {
+     char *cmd;
+     QDict *resp;
+@@ -637,7 +637,7 @@ char *qtest_hmp(QTestState *s, const char *fmt, ...)
+     char *ret;
+ 
+     va_start(ap, fmt);
+-    ret = qtest_hmpv(s, fmt, ap);
++    ret = qtest_vhmp(s, fmt, ap);
+     va_end(ap);
+     return ret;
+ }
+@@ -943,7 +943,7 @@ QDict *qmp(const char *fmt, ...)
+     QDict *response;
+ 
+     va_start(ap, fmt);
+-    response = qtest_qmpv(global_qtest, fmt, ap);
++    response = qtest_vqmp(global_qtest, fmt, ap);
+     va_end(ap);
+     return response;
+ }
+@@ -963,7 +963,7 @@ char *hmp(const char *fmt, ...)
+     char *ret;
+ 
+     va_start(ap, fmt);
+-    ret = qtest_hmpv(global_qtest, fmt, ap);
++    ret = qtest_vhmp(global_qtest, fmt, ap);
+     va_end(ap);
+     return ret;
+ }
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index b92a8070a5..def1edaafa 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -106,7 +106,7 @@ void qtest_qmp_send(QTestState *s, const char *fmt, ...)
+  *
+  * Sends a QMP message to QEMU and returns the response.
+  */
+-QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap)
++QDict *qtest_vqmp(QTestState *s, const char *fmt, va_list ap)
+     GCC_FMT_ATTR(2, 0);
+ 
+ /**
+@@ -189,7 +189,7 @@ char *qtest_hmp(QTestState *s, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+  *
+  * Returns: the command's output.  The caller should g_free() it.
+  */
+-char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
++char *qtest_vhmp(QTestState *s, const char *fmt, va_list ap)
+     GCC_FMT_ATTR(2, 0);
+ 
+ /**
 -- 
 2.17.1
