@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqMRD-0003Em-Bg
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:52:00 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqMRJ-0003Nv-Hg
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:52:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqMRC-0008KI-G6
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:51:59 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56548 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqMRG-0008Lf-DB
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:52:05 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56554 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqMRC-0008Jx-5S
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:51:58 -0400
+	id 1fqMRG-0008LL-5t
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:52:02 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 19:48:59 +0200
-Message-Id: <1534441747-4197-8-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 19:49:00 +0200
+Message-Id: <1534441747-4197-9-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534441747-4197-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534441747-4197-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 07/15] target/mips: Add CP0 BadInstrX register
+Subject: [Qemu-devel] [PULL v2 08/15] target/mips: Implement CP0 Config1.WR
+ bit functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,112 +30,83 @@ Cc: peter.maydell@linaro.org
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add CP0 BadInstrX register. This register will be used in nanoMIPS.
+Add testing Config1.WR bit into watch exception handling logic.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  1 +
- target/mips/machine.c   |  5 +++--
- target/mips/translate.c | 22 +++++++++++++++++++++-
- 3 files changed, 25 insertions(+), 3 deletions(-)
+ target/mips/translate.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 77c638c..009202c 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -323,6 +323,7 @@ struct CPUMIPSState {
-     target_ulong CP0_BadVAddr;
-     uint32_t CP0_BadInstr;
-     uint32_t CP0_BadInstrP;
-+    uint32_t CP0_BadInstrX;
-     int32_t CP0_Count;
-     target_ulong CP0_EntryHi;
- #define CP0EnHi_EHINV 10
-diff --git a/target/mips/machine.c b/target/mips/machine.c
-index 20100d5..5ba78ac 100644
---- a/target/mips/machine.c
-+++ b/target/mips/machine.c
-@@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb =3D {
-=20
- const VMStateDescription vmstate_mips_cpu =3D {
-     .name =3D "cpu",
--    .version_id =3D 10,
--    .minimum_version_id =3D 10,
-+    .version_id =3D 11,
-+    .minimum_version_id =3D 11,
-     .post_load =3D cpu_post_load,
-     .fields =3D (VMStateField[]) {
-         /* Active TC */
-@@ -266,6 +266,7 @@ const VMStateDescription vmstate_mips_cpu =3D {
-         VMSTATE_UINTTL(env.CP0_BadVAddr, MIPSCPU),
-         VMSTATE_UINT32(env.CP0_BadInstr, MIPSCPU),
-         VMSTATE_UINT32(env.CP0_BadInstrP, MIPSCPU),
-+        VMSTATE_UINT32(env.CP0_BadInstrX, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Count, MIPSCPU),
-         VMSTATE_UINTTL(env.CP0_EntryHi, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Compare, MIPSCPU),
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 2b70d1b..ae3aaab 100644
+index ae3aaab..395368b 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -5328,7 +5328,13 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, =
-int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
-             rn =3D "BadInstrP";
+@@ -5521,6 +5521,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(mfc0_watchlo, arg, sel);
+             rn = "WatchLo";
              break;
--        default:
-+        case 3:
-+            CP0_CHECK(ctx->bi);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
-+            tcg_gen_andi_tl(arg, arg, ~0xffff);
-+            rn =3D "BadInstrX";
-+            break;
-+       default:
-             goto cp0_unimplemented;
-         }
-         break;
-@@ -6019,6 +6025,10 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, =
-int reg, int sel)
-             /* ignored */
-             rn =3D "BadInstrP";
+@@ -5538,6 +5539,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(mfc0_watchhi, arg, sel);
+             rn = "WatchHi";
              break;
-+        case 3:
-+            /* ignored */
-+            rn =3D "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -6724,6 +6734,12 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg,=
- int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
-             rn =3D "BadInstrP";
+@@ -6220,6 +6222,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchlo, arg, sel);
+             rn = "WatchLo";
              break;
-+        case 3:
-+            CP0_CHECK(ctx->bi);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
-+            tcg_gen_andi_tl(arg, arg, ~0xffff);
-+            rn =3D "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -7398,6 +7414,10 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg,=
- int reg, int sel)
-             /* ignored */
-             rn =3D "BadInstrP";
+@@ -6237,6 +6240,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchhi, arg, sel);
+             rn = "WatchHi";
              break;
-+        case 3:
-+            /* ignored */
-+            rn =3D "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
---=20
+@@ -6923,6 +6927,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(dmfc0_watchlo, arg, sel);
+             rn = "WatchLo";
+             break;
+@@ -6940,6 +6945,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(mfc0_watchhi, arg, sel);
+             rn = "WatchHi";
+             break;
+@@ -7604,6 +7610,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchlo, arg, sel);
+             rn = "WatchLo";
+             break;
+@@ -7621,6 +7628,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         case 5:
+         case 6:
+         case 7:
++            CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchhi, arg, sel);
+             rn = "WatchHi";
+             break;
+-- 
 2.7.4
