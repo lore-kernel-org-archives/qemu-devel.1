@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fqFOf-0000CM-Aj
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 06:20:54 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fqFl9-0001xp-Hj
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 06:44:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fqFOb-00009M-It
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 06:20:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41490)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fqFl6-0000vL-H7
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 06:44:06 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39542)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fqFOX-000087-SN
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 06:20:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fqFOW-0006Um-1M
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 10:20:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 092FE2E851F
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 10:20:44 +0000 (UTC)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fqFl4-0000uS-CJ
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 06:44:02 -0400
+Received: by mail-wr1-x441.google.com with SMTP id h10-v6so3710356wre.6
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 03:44:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20180815195051.24586-1-marcandre.lureau@redhat.com>
+	<87pnyieq43.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+GEerjpUED38b5caVO-ZUsp4anS-gcTR8_7KZuM5uTVg@mail.gmail.com>
+In-Reply-To: <CAJ+F1C+GEerjpUED38b5caVO-ZUsp4anS-gcTR8_7KZuM5uTVg@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 16 Aug 2018 12:43:49 +0200
+Message-ID: <CAJ+F1CJ_snhfjNVv2RGju5vz449NPDZPVKqeV4kVAnnmhZWVww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Aug 2018 10:11:31 -0000
-From: Gerd Hoffmann <1787070@bugs.launchpad.net>
-Reply-To: Bug 1787070 <1787070@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153429832178.24411.17323780348611441441.malonedeb@soybean.canonical.com>
-Message-Id: <153441429142.24099.11320758998255871648.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1787070] Re: Guests using the qxl-vga are freezing
+Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-option: add help fallback to
+ print the list of options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,102 +32,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-Hmm, nothing obvious in the stack trace.
-Also doesn't reproduce here.
-What qemu version is this?
-If older than 3.0:  Does it still happen for you with qemu 3.0?
+On Thu, Aug 16, 2018 at 12:01 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+>
+> Hi
+>
+> On Thu, Aug 16, 2018 at 9:19 AM Markus Armbruster <armbru@redhat.com> wro=
+te:
+> >
+> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+> >
+> > > QDev options accept '?' or 'help' in the list of parameters, which is
+> > > really handy to list the available options.
+> > >
+> > > Unfortunately, this isn't built in QemuOpts. qemu_opts_parse_noisily(=
+)
+> > > seems to be the common path for command line options, so place a
+> > > fallback to check for '?' and print help listing available options.
+> >
+> > My immediate reaction was "how come this doesn't break -device help"?
+> > It doesn't, because...
+> >
+> > > This is very handy, for example with qemu "-spice ?".
+> > >
+> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > > ---
+> > >  util/qemu-option.c | 7 ++++++-
+> > >  1 file changed, 6 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/util/qemu-option.c b/util/qemu-option.c
+> > > index 01886efe90..8839ee6523 100644
+> > > --- a/util/qemu-option.c
+> > > +++ b/util/qemu-option.c
+> > > @@ -889,7 +889,12 @@ QemuOpts *qemu_opts_parse_noisily(QemuOptsList *=
+list, const char *params,
+> > >
+> > >      opts =3D opts_parse(list, params, permit_abbrev, false, &err);
+> > >      if (err) {
+> > > -        error_report_err(err);
+> > > +        if (has_help_option(params)) {
+> > > +            qemu_opts_print_help(list);
+> > > +            error_free(err);
+> > > +        } else {
+> > > +            error_report_err(err);
+> > > +        }
+> > >      }
+> > >      return opts;
+> > >  }
+> >
+> > ... it only kicks in when parsing failed, and it doesn't for option
+> > argument "help".
+> >
+> > However, it *can* break for some option arguments:
+> >
+> >     $ upstream-qemu -device e1000,id=3D@
+> >     upstream-qemu: -device e1000,id=3D@: Parameter 'id' expects an iden=
+tifier
+> >     Identifiers consist of letters, digits, '-', '.', '_', starting wit=
+h a letter.
+> >     [Exit 1 ]
+> >     $ upstream-qemu -device e1000,id=3D@,help
+> >     [Exit 1 ]
+> >
+> > In the second test case, the error message gets replaced by (empty)
+> > help.
+>
+> Good catch
+>
+> >
+> > I love patches improving help, but I can't immediately see how to
+> > salvage this one.
+> >
+>
+> We can pass a with_help option down to opt_set(), and print help
+> there? Alternatively, pass a bool *invalid_parameter, to be set in
+> this case, so qemu_opts_parse_noisly() would only print help when it
+> is set.
+>
+> Do you see a problem with any of those 2 options?
 
--- =
+This is the second option, that I can amend and send v2 if you are ok with =
+it:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1787070
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 9b99f0d0be..a54cf74b49 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -526,7 +526,7 @@ int qemu_opt_unset(QemuOpts *opts, const char *name)
+ }
 
-Title:
-  Guests using the qxl-vga are freezing
+ static void opt_set(QemuOpts *opts, const char *name, char *value,
+-                    bool prepend, Error **errp)
++                    bool prepend, bool *invalidp, Error **errp)
+ {
+     QemuOpt *opt;
+     const QemuOptDesc *desc;
+@@ -536,6 +536,9 @@ static void opt_set(QemuOpts *opts, const char
+*name, char *value,
+     if (!desc && !opts_accepts_any(opts)) {
+         g_free(value);
+         error_setg(errp, QERR_INVALID_PARAMETER, name);
++        if (invalidp) {
++            *invalidp =3D true;
++        }
+         return;
+     }
 
-Status in QEMU:
-  New
+@@ -559,7 +562,7 @@ static void opt_set(QemuOpts *opts, const char
+*name, char *value,
+ void qemu_opt_set(QemuOpts *opts, const char *name, const char *value,
+                   Error **errp)
+ {
+-    opt_set(opts, name, g_strdup(value), false, errp);
++    opt_set(opts, name, g_strdup(value), false, NULL, errp);
+ }
 
-Bug description:
-  I have noticed that guests using qxl-vga are freezing. They may freeze
-  after a few minutes or after many hours. The freeze consists of the
-  entire system hanging, except the cursor, but the cursor animation
-  stops too. Changing to tty is not possible after this. There are three
-  things noticed in common on the guests when they freeze:
+ void qemu_opt_set_bool(QemuOpts *opts, const char *name, bool val,
+@@ -790,7 +793,8 @@ void qemu_opts_print(QemuOpts *opts, const char *separa=
+tor)
+ }
 
-  -The guest is using the QXL VGA (freezes weren't observed with other VGAs=
-);
-  -A new workload is starting;
-  -The mouse cursor is the animated as the one of loading. For example, htt=
-ps://i.imgur.com/raQFteG.png
-   =
+ static void opts_do_parse(QemuOpts *opts, const char *params,
+-                          const char *firstname, bool prepend, Error **err=
+p)
++                          const char *firstname, bool prepend,
++                          bool *invalidp, Error **errp)
+ {
+     char *option =3D NULL;
+     char *value =3D NULL;
+@@ -825,7 +829,7 @@ static void opts_do_parse(QemuOpts *opts, const
+char *params,
+         }
+         if (strcmp(option, "id") !=3D 0) {
+             /* store and parse */
+-            opt_set(opts, option, value, prepend, &local_err);
++            opt_set(opts, option, value, prepend, invalidp, &local_err);
+             value =3D NULL;
+             if (local_err) {
+                 error_propagate(errp, local_err);
+@@ -854,11 +858,12 @@ static void opts_do_parse(QemuOpts *opts, const
+char *params,
+ void qemu_opts_do_parse(QemuOpts *opts, const char *params,
+                        const char *firstname, Error **errp)
+ {
+-    opts_do_parse(opts, params, firstname, false, errp);
++    opts_do_parse(opts, params, firstname, false, NULL, errp);
+ }
 
-  The host is Xubuntu 18.04 amd64, QEMU version is 3.0.0-dirty. The guests =
-tested were:
+ static QemuOpts *opts_parse(QemuOptsList *list, const char *params,
+-                            bool permit_abbrev, bool defaults, Error **err=
+p)
++                            bool permit_abbrev, bool defaults,
++                            bool *invalidp, Error **errp)
+ {
+     const char *firstname;
+     char *id =3D NULL;
+@@ -890,7 +895,7 @@ static QemuOpts *opts_parse(QemuOptsList *list,
+const char *params,
+         return NULL;
+     }
 
-  -openSUSE Tumbleweed;
-  -openSUSE Leap 15;
-  -Xubuntu 18.04 Bionic Beaver;
-  -CentOS 7.
+-    opts_do_parse(opts, params, firstname, defaults, &local_err);
++    opts_do_parse(opts, params, firstname, defaults, invalidp, &local_err)=
+;
+     if (local_err) {
+         error_propagate(errp, local_err);
+         qemu_opts_del(opts);
+@@ -910,7 +915,7 @@ static QemuOpts *opts_parse(QemuOptsList *list,
+const char *params,
+ QemuOpts *qemu_opts_parse(QemuOptsList *list, const char *params,
+                           bool permit_abbrev, Error **errp)
+ {
+-    return opts_parse(list, params, permit_abbrev, false, errp);
++    return opts_parse(list, params, permit_abbrev, false, NULL, errp);
+ }
 
-  With openSUSE guests, the install process couldn't even be finished,
-  as the installer would freeze. There were 2 GB of available memory
-  (checked in a tty before the freeze) and netconsole was enabled.
-  Unfortunately, it was impossible to obtain any information from them.
-  This is an image of one openSUSE guest frozen:
-  https://i.imgur.com/ZP0eQKq.png
+ /**
+@@ -926,10 +931,11 @@ QemuOpts *qemu_opts_parse_noisily(QemuOptsList
+*list, const char *params,
+ {
+     Error *err =3D NULL;
+     QemuOpts *opts;
++    bool invalidp =3D false;
 
-  The command line used was:
+-    opts =3D opts_parse(list, params, permit_abbrev, false, &err);
++    opts =3D opts_parse(list, params, permit_abbrev, false, &invalidp, &er=
+r);
+     if (err) {
+-        if (has_help_option(params)) {
++        if (invalidp && has_help_option(params)) {
+             qemu_opts_print_help(list);
+             error_free(err);
+         } else {
+@@ -944,7 +950,7 @@ void qemu_opts_set_defaults(QemuOptsList *list,
+const char *params,
+ {
+     QemuOpts *opts;
 
-  qemu-system-x86_64 -nodefaults -m 3072 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dleap.qcow2 -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
-  -monitor vc -serial vc  -cdrom "openSUSE-Leap-15.0-DVD-x86_64.iso"
-  -boot d
+-    opts =3D opts_parse(list, params, permit_abbrev, true, NULL);
++    opts =3D opts_parse(list, params, permit_abbrev, true, NULL, NULL);
+     assert(opts);
+ }
 
-  With CentOS guests, the install process fail sometimes, but sometimes
-  it's able to install. However, on the yum update, it would freeze too.
-  In one instance it froze while updating glibc, which made the guest
-  unbootable. https://i.imgur.com/B3WhSDX.png
 
-  The command line used was:
 
-  qemu-system-x86_64 -nodefaults -m 2048 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dcentos.qcow2 -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device virtio-vga,virgl=3Dtrue -display gtk -monitor
-  vc -serial vc -cdrom "CentOS-7-livecd-GNOME-x86_64.iso" -bios
-  /usr/share/ovmf/OVMF.fd
 
-  With Xubuntu 18.04 guests, the system worked for many hours until the
-  freeze happened. On this case it happened when opening Audacious.
-  Fortunately, the logging services worked for some time, which allowed
-  me to get a relevant message which can be seen at
-  http://termbin.com/nuof . It repeated a few times, but then the
-  logging stopped. https://i.imgur.com/2zckqj5.png shows the guest
-  screen in the moment it froze.
 
-  The command line used was:
-
-  qemu-system-x86_64 -nodefaults -m 1024 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dxubmini -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
-  -monitor vc -serial vc
-
-  I'm sorry for not having more detailed information but, even setting
-  netconsole, openSUSE and CentOS guests were unable to print any
-  information.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1787070/+subscriptions
+--=20
+Marc-Andr=C3=A9 Lureau
