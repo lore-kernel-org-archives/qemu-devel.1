@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <psusi@ubuntu.com>) id 1fqLvP-0004U1-30
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:19:07 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fqLx1-0007IX-Cq
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <psusi@ubuntu.com>) id 1fqLvK-0000n4-5z
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:19:07 -0400
-Received: from ec2-34-202-238-73.compute-1.amazonaws.com
-	([34.202.238.73]:46650 helo=vps.thesusis.net)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <psusi@ubuntu.com>) id 1fqLvJ-0000mi-Vm
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:19:02 -0400
-From: Phillip Susi <psusi@ubuntu.com>
-Message-ID: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
-Date: Thu, 16 Aug 2018 13:11:05 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fqLww-0001aT-QV
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:20:47 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 16 Aug 2018 20:20:24 +0300
+Message-Id: <1534440027-10528-2-git-send-email-vsementsov@virtuozzo.com>
+In-Reply-To: <1534440027-10528-1-git-send-email-vsementsov@virtuozzo.com>
+References: <1534440027-10528-1-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ZydjlvnrC41CumyMtC9kSpSJTnpD0DF6H"
-Subject: [Qemu-devel] Pipe key broken on US keyboards
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 1/4] block: improve blk_root_get_parent_desc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +21,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: crosa@redhat.com, ehabkost@redhat.com, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, stefanha@redhat.com, pbonzini@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZydjlvnrC41CumyMtC9kSpSJTnpD0DF6H
-From: Phillip Susi <psusi@ubuntu.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
-Subject: Pipe key broken on US keyboards
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Make blk_root_get_parent_desc return different descriptions for
+different blk's in worst case.
 
-Hello, I recently upgraded my Xen server from Ubuntu 16.04 to 18.04 and
-am no longer able to type a | over vnc to the xen vms.  When I press \
-it works, but when I hold down shift and press \ which should generate a
-|, the vm sees the scan code for some key that the keymap thinks should
-sit between left shift and Z, but does not exist on US keyboards, and
-that scan code produces a > when combined with shift.  I'm betting it
-was this commit that broke it:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/block-backend.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-commit ab8f9d49d62c82a12409475547e4420a46da56ed
-Author: Daniel P. Berrange <berrange@redhat.com>
-Date:   Wed Jan 17 16:41:15 2018 +0000
-
-    hw: convert ps2 device to keycodemapdb
-
-    Replace the qcode_to_keycode_set1, qcode_to_keycode_set2,
-    and qcode_to_keycode_set3 tables with automatically
-    generated tables.
-
-Any ideas?
-
-According to xev in the vm, they scan code for \ is 51, and when I hold
-down shift, it changes to scan code 94.
-
-
-
---ZydjlvnrC41CumyMtC9kSpSJTnpD0DF6H
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAEBCAAGBQJbdbAsAAoJENsuw7lhAP6E+fwH+gMgMXGzlBgzPTr27+oBjMjJ
-/YHhs06q0EPMBKBks6r5nMnBQjBysIaMCI4vhIAubMc46YqhogDagEBWUJvR70uK
-jNvlXdiERdq06XsQnO7EXfiYLwrgIX56HnpMiPUnX9+nO12Ax5NhGxGf74lqDjBN
-ACXaFj62p4uXXe9CVcInnqNqNID6aDNudVntRpqcnn7AmrE7TApBRBezIiQTMQX0
-Zk2je49THLWSiiBZfXML0JqPcLWVE04tb73g3ceSp/n4dB/NRfXodJ7oG1rUPHR7
-dcQ4UmKnLeW2/5gDEbHzn5cDjm1B0hLOM3xSEUyNaeYYYEuDKeGXPrQ6nu+h2pk=
-=Dgwn
------END PGP SIGNATURE-----
-
---ZydjlvnrC41CumyMtC9kSpSJTnpD0DF6H--
+diff --git a/block/block-backend.c b/block/block-backend.c
+index fa120630be..e5707a0f8c 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -141,7 +141,7 @@ static char *blk_root_get_parent_desc(BdrvChild *child)
+     } else {
+         /* TODO Callback into the BB owner for something more detailed */
+         g_free(dev_id);
+-        return g_strdup("a block device");
++        return g_strdup_printf("a block device %p", blk);
+     }
+ }
+ 
+-- 
+2.11.1
