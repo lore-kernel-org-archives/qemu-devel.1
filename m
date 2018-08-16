@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlS-0005tJ-Sl
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:43 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlV-0005vd-16
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlA-00016L-N7
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlC-000181-KK
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:33 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44130 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:44756 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJl3-0000jD-Qi
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:21 -0400
+	id 1fqJl7-0000n3-5c
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:22 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:57:54 +0200
-Message-Id: <1534431497-1385-62-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:57:58 +0200
+Message-Id: <1534431497-1385-66-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 61/84] mips_malta: Fix semihosting argument
- passing for nanoMIPS bare metal
+Subject: [Qemu-devel] [PATCH v9 65/84] linux-user: Add target_signal.h
+ header for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +28,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Fix passing argument for nanoMIPS bare metal related to the
-semihosting regime.
+nanoMIPS signal handling is much closer to the signal handling in
+other mainstream platforms than to the signal handling in preceding
+MIPS platforms.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- hw/mips/mips_malta.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ linux-user/nanomips/target_signal.h | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+ create mode 100644 linux-user/nanomips/target_signal.h
 
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index f261dd6..40041d5 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -630,8 +630,14 @@ static void write_bootloader_nanomips(uint8_t *base,=
- int64_t run_addr,
-                                 /* nop */
-=20
-     /* to_here: */
--    stw_p(p++, 0x0080); stw_p(p++, 0x0002);
-+    if (semihosting_get_argc()) {
-+        /* Preserve a0 content as arguments have been passed    */
-+        stw_p(p++, 0x8000); stw_p(p++, 0xc000);
-+                                /* nop                          */
-+    } else {
-+        stw_p(p++, 0x0080); stw_p(p++, 0x0002);
-                                 /* li a0,2                      */
-+    }
-=20
-     stw_p(p++, 0xe3a0 | NM_HI1(ENVP_ADDR - 64));
-=20
---=20
+diff --git a/linux-user/nanomips/target_signal.h b/linux-user/nanomips/target_signal.h
+new file mode 100644
+index 0000000..604e853
+--- /dev/null
++++ b/linux-user/nanomips/target_signal.h
+@@ -0,0 +1,22 @@
++#ifndef NANOMIPS_TARGET_SIGNAL_H
++#define NANOMIPS_TARGET_SIGNAL_H
++
++#include "../generic/signal.h"
++#undef TARGET_SIGRTMIN
++#define TARGET_SIGRTMIN       35
++
++/* this struct defines a stack used during syscall handling */
++typedef struct target_sigaltstack {
++    abi_long ss_sp;
++    abi_ulong ss_size;
++    abi_long ss_flags;
++} target_stack_t;
++
++/* sigaltstack controls */
++#define TARGET_SS_ONSTACK     1
++#define TARGET_SS_DISABLE     2
++
++#define TARGET_MINSIGSTKSZ    6144
++#define TARGET_SIGSTKSZ       12288
++
++#endif
+-- 
 2.7.4
