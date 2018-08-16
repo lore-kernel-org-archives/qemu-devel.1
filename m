@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fq8RB-0002IU-3z
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 22:55:01 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fq8RB-0002IV-3v
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 22:55:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fq8R8-0006ix-Mk
+	(envelope-from <richard.henderson@linaro.org>) id 1fq8R7-0006hs-P0
 	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 22:55:01 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:35049)
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37998)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fq8R8-0006iK-GC
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 22:54:58 -0400
-Received: by mail-pg1-x533.google.com with SMTP id w10-v6so1361295pgv.2
-	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 19:54:58 -0700 (PDT)
+	id 1fq8R7-0006gM-8v
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 22:54:57 -0400
+Received: by mail-pf1-x443.google.com with SMTP id x17-v6so1332455pfh.5
+	for <qemu-devel@nongnu.org>; Wed, 15 Aug 2018 19:54:55 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 15 Aug 2018 19:54:49 -0700
-Message-Id: <20180816025452.21358-3-richard.henderson@linaro.org>
-In-Reply-To: <20180816025452.21358-1-richard.henderson@linaro.org>
-References: <20180816025452.21358-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/5] target/i386: Convert to HAVE_CMPXCHG128
+Date: Wed, 15 Aug 2018 19:54:47 -0700
+Message-Id: <20180816025452.21358-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/5] tcg: Reorg 128-bit atomic operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +27,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org, pbonzini@redhat.com
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/i386/mem_helper.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+The other day Emilio noticed that we weren't setting CONFIG_ATOMIC128
+for x86_64, despite forcing -mcx16 on the command-line.  It seems that
+gcc has changed behaviour with version 7.
 
-diff --git a/target/i386/mem_helper.c b/target/i386/mem_helper.c
-index 30c26b9d9c..6cc53bcb40 100644
---- a/target/i386/mem_helper.c
-+++ b/target/i386/mem_helper.c
-@@ -23,6 +23,7 @@
- #include "exec/exec-all.h"
- #include "exec/cpu_ldst.h"
- #include "qemu/int128.h"
-+#include "qemu/atomic128.h"
- #include "tcg.h"
- 
- void helper_cmpxchg8b_unlocked(CPUX86State *env, target_ulong a0)
-@@ -137,10 +138,7 @@ void helper_cmpxchg16b(CPUX86State *env, target_ulong a0)
- 
-     if ((a0 & 0xf) != 0) {
-         raise_exception_ra(env, EXCP0D_GPF, ra);
--    } else {
--#ifndef CONFIG_ATOMIC128
--        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
--#else
-+    } else if (HAVE_CMPXCHG128) {
-         int eflags = cpu_cc_compute_all(env, CC_OP);
- 
-         Int128 cmpv = int128_make128(env->regs[R_EAX], env->regs[R_EDX]);
-@@ -159,7 +157,8 @@ void helper_cmpxchg16b(CPUX86State *env, target_ulong a0)
-             eflags &= ~CC_Z;
-         }
-         CC_SRC = eflags;
--#endif
-+    } else {
-+        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
-     }
- }
- #endif
+There's a rather long discussion about this:
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80878
+
+It does not appear that gcc will ever quite align with our needs here.
+I have added a second configure test, and have split the test to be 
+used by the rest of QEMU into two compile-time constants.  This lets
+us refactor the code a bit and remove some conditional compilation.
+
+In addition, no version of gcc supports __sync_compare_and_swap_16
+for aarch64.  Inline some asm for that case.
+
+I've also checked power8, which does support CONFIG_ATOMIC128.
+
+Comments?
+
+
+r~
+
+
+Richard Henderson (5):
+  tcg: Split CONFIG_ATOMIC128
+  target/i386: Convert to HAVE_CMPXCHG128
+  target/s390x: Convert to HAVE_CMPXCHG128 and HAVE_ATOMIC128
+  target/arm: Convert to HAVE_CMPXCHG128
+  target/ppc: Convert to HAVE_CMPXCHG128 and HAVE_ATOMIC128
+
+ accel/tcg/atomic_template.h |  22 ++-
+ include/qemu/atomic128.h    | 162 ++++++++++++++++++++++
+ target/ppc/helper.h         |   2 +-
+ tcg/tcg.h                   |  29 ++--
+ accel/tcg/cputlb.c          |   3 +-
+ accel/tcg/user-exec.c       |   5 +-
+ target/arm/helper-a64.c     | 259 ++++++++++++++++++------------------
+ target/i386/mem_helper.c    |   9 +-
+ target/ppc/mem_helper.c     |  33 ++++-
+ target/ppc/translate.c      | 115 ++++++++--------
+ target/s390x/mem_helper.c   |  87 ++++++------
+ configure                   |  19 +++
+ 12 files changed, 481 insertions(+), 264 deletions(-)
+ create mode 100644 include/qemu/atomic128.h
+
 -- 
 2.17.1
