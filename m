@@ -1,14 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fqNHx-0006hp-S4
+	(envelope-from <jcody@redhat.com>) id 1fqNHy-0006hw-1W
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:46:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fqNHx-0002O0-4N
+	(envelope-from <jcody@redhat.com>) id 1fqNHx-0002OD-7j
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:46:29 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Thu, 16 Aug 2018 14:46:06 -0400
-Message-Id: <cover.1534444235.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] block: for jobs,
+Date: Thu, 16 Aug 2018 14:46:07 -0400
+Message-Id: <68da830d390658684c0b5688c4c91858c8ea3930.1534444235.git.jcody@redhat.com>
+In-Reply-To: <cover.1534444235.git.jcody@redhat.com>
+References: <cover.1534444235.git.jcody@redhat.com>
+In-Reply-To: <cover.1534444235.git.jcody@redhat.com>
+References: <cover.1534444235.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] block: for jobs,
  do not clear user_paused until after the resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,50 +25,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org, jsnow@redhat.com, eblake@redhat.com
 
-v2 changes:
+The function job_cancel_async() will always cause an assert for blockjob
+user resume.  We set job->user_paused to false, and then call
+job->driver->user_resume().  In the case of blockjobs, this is the
+block_job_user_resume() function.
 
-    Patch 1: Added r-b from John, Eric (Thanks)
-    Patch 2: Attached an iotest as patch 2
+In that function, we assert that job.user_paused is set to true.
+Unfortunately, right before calling this function, it has explicitly
+been set to false.
 
-    * cc'ed qemu-stable
+The fix is pretty simple: set job->user_paused to false only after the
+job user_resume() function has been called.
 
-For the test in patch 2, failure here is the failure output w/o patch 1:
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+---
+ job.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "testdisk"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
--{"return": {}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
--*** done
-+QEMU_PROG: blockjob.c:460: block_job_iostatus_reset: Assertion `job->job.user_paused && job->job.pause_count > 0' failed.
-+Wrong response matching Assertion on handle 0
-Failures: 229
-Failed 1 of 1 tests
-
-
-git-backport-diff from v1:
-
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/2:[----] [--] 'block: for jobs, do not clear user_paused until after the resume'
-002/2:[down] 'block: iotest to catch abort on forced blockjob cancel'
-
-
-Jeff Cody (2):
-  block: for jobs, do not clear user_paused until after the resume
-  block: iotest to catch abort on forced blockjob cancel
-
- job.c                      |  2 +-
- tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/229.out | 23 +++++++++
- tests/qemu-iotests/group   |  1 +
- 4 files changed, 120 insertions(+), 1 deletion(-)
- create mode 100755 tests/qemu-iotests/229
- create mode 100644 tests/qemu-iotests/229.out
-
+diff --git a/job.c b/job.c
+index fa671b431a..e36ebaafd8 100644
+--- a/job.c
++++ b/job.c
+@@ -732,10 +732,10 @@ static void job_cancel_async(Job *job, bool force)
+ {
+     if (job->user_paused) {
+         /* Do not call job_enter here, the caller will handle it.  */
+-        job->user_paused = false;
+         if (job->driver->user_resume) {
+             job->driver->user_resume(job);
+         }
++        job->user_paused = false;
+         assert(job->pause_count > 0);
+         job->pause_count--;
+     }
 -- 
 2.17.1
