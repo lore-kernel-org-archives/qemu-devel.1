@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <simon@ruderich.org>) id 1fqEAQ-00057x-En
+	(envelope-from <simon@ruderich.org>) id 1fqEAP-00056Y-98
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:02:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <simon@ruderich.org>) id 1fqEAK-0002OO-Mk
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:02:06 -0400
-Received: from zucker2.schokokeks.org ([178.63.68.90]:41839)
+	(envelope-from <simon@ruderich.org>) id 1fqEAL-0002PM-CI
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:02:05 -0400
+Received: from zucker2.schokokeks.org ([178.63.68.90]:33919)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1fqEAI-0002Nd-MX
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:02:00 -0400
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1fqEAL-0002NB-4t
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:02:01 -0400
 From: Simon Ruderich <simon@ruderich.org>
-Date: Thu, 16 Aug 2018 11:01:50 +0200
-Message-Id: <07cfe62acc1e955eaa626096e86b848092391a64.1534409363.git.simon@ruderich.org>
+Date: Thu, 16 Aug 2018 11:01:55 +0200
+Message-Id: <08abbfe999a37182099280e20964525d36dd3606.1534409363.git.simon@ruderich.org>
 In-Reply-To: <cover.1534409363.git.simon@ruderich.org>
 References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
 	<cover.1534409363.git.simon@ruderich.org>
-Subject: [Qemu-devel] [PATCH v4 2/7] cpus: convert qmp_memsave/qmp_pmemsave
- to use qemu_open
+Subject: [Qemu-devel] [PATCH v4 7/7] hmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +27,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: David Alan Gilbert <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Simon Ruderich <simon@ruderich.org>
 
-qemu_open() allow passing file descriptors to qemu which is used in
-restricted environments like libvirt where open() is prohibited.
+Adapted patch from Baojun Wang [1] with the following commit message:
 
-Suggested-by: Eric Blake <eblake@redhat.com>
+    I found this could be useful to have qemu-softmmu as a cross
+    debugger (launch with -s -S command line option), then if we can
+    have a command to load guest physical memory, we can use cross gdb
+    to do some target debug which gdb cannot do directly.
+
+This patch contains only the hmp changes of the original patch.
+
+[1]: https://lists.gnu.org/archive/html/qemu-trivial/2014-04/msg00074.html
+
+Based-on-patch-by: Baojun Wang <wangbj@gmail.com>
 Signed-off-by: Simon Ruderich <simon@ruderich.org>
 ---
- cpus.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ hmp-commands.hx | 14 ++++++++++++++
+ hmp.c           | 12 ++++++++++++
+ hmp.h           |  1 +
+ 3 files changed, 27 insertions(+)
 
-diff --git a/cpus.c b/cpus.c
-index 125adc4da4..dd8ba36d2f 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -2293,7 +2293,7 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
- void qmp_memsave(int64_t addr, int64_t size, const char *filename,
-                  bool has_cpu, int64_t cpu_index, Error **errp)
- {
--    FILE *f;
-+    int fd;
-     uint32_t l;
-     CPUState *cpu;
-     uint8_t buf[1024];
-@@ -2310,8 +2310,8 @@ void qmp_memsave(int64_t addr, int64_t size, const char *filename,
-         return;
-     }
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 5715bd7b51..c39d745a22 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -842,6 +842,20 @@ STEXI
+ @item pmemsave @var{addr} @var{size} @var{file}
+ @findex pmemsave
+ save to disk physical memory dump starting at @var{addr} of size @var{size}.
++ETEXI
++
++    {
++        .name       = "pmemload",
++        .args_type  = "val:l,size:l,offset:l,filename:F",
++        .params     = "addr size offset file",
++        .help       = "load from disk physical memory dump starting at 'addr' of size 'size' at file offset 'offset'",
++        .cmd        = hmp_pmemload,
++    },
++
++STEXI
++@item pmemload @var{addr} @var{size} @var{offset} @var{file}
++@findex pmemload
++load from disk physical memory dump starting at @var{addr} of size @var{size} at file offset @var{offset}.
+ ETEXI
  
--    f = fopen(filename, "wb");
--    if (!f) {
-+    fd = qemu_open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0600);
-+    if (fd < 0) {
-         error_setg_file_open(errp, errno, filename);
-         return;
-     }
-@@ -2326,7 +2326,7 @@ void qmp_memsave(int64_t addr, int64_t size, const char *filename,
-                              " specified", orig_addr, orig_size);
-             goto exit;
-         }
--        if (fwrite(buf, 1, l, f) != l) {
-+        if (qemu_write_full(fd, buf, l) != l) {
-             error_setg(errp, QERR_IO_ERROR);
-             goto exit;
-         }
-@@ -2335,18 +2335,18 @@ void qmp_memsave(int64_t addr, int64_t size, const char *filename,
-     }
- 
- exit:
--    fclose(f);
-+    qemu_close(fd);
+     {
+diff --git a/hmp.c b/hmp.c
+index 1fb0724107..293e067ed5 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1120,6 +1120,18 @@ void hmp_pmemsave(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, &err);
  }
  
- void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
-                   Error **errp)
++void hmp_pmemload(Monitor *mon, const QDict *qdict)
++{
++    uint64_t size = qdict_get_int(qdict, "size");
++    uint64_t offset = qdict_get_int(qdict, "offset");
++    const char *filename = qdict_get_str(qdict, "filename");
++    uint64_t addr = qdict_get_int(qdict, "val");
++    Error *err = NULL;
++
++    qmp_pmemload(addr, filename, true, size, true, offset, &err);
++    hmp_handle_error(mon, &err);
++}
++
+ void hmp_ringbuf_write(Monitor *mon, const QDict *qdict)
  {
--    FILE *f;
-+    int fd;
-     uint32_t l;
-     uint8_t buf[1024];
- 
--    f = fopen(filename, "wb");
--    if (!f) {
-+    fd = qemu_open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0600);
-+    if (fd < 0) {
-         error_setg_file_open(errp, errno, filename);
-         return;
-     }
-@@ -2357,7 +2357,7 @@ void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
-             l = size;
-         }
-         cpu_physical_memory_read(addr, buf, l);
--        if (fwrite(buf, 1, l, f) != l) {
-+        if (qemu_write_full(fd, buf, l) != l) {
-             error_setg(errp, QERR_IO_ERROR);
-             goto exit;
-         }
-@@ -2366,7 +2366,7 @@ void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
-     }
- 
- exit:
--    fclose(f);
-+    qemu_close(fd);
- }
- 
- void qmp_inject_nmi(Error **errp)
+     const char *chardev = qdict_get_str(qdict, "device");
+diff --git a/hmp.h b/hmp.h
+index 33354f1bdd..f2b2a72a29 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -48,6 +48,7 @@ void hmp_exit_preconfig(Monitor *mon, const QDict *qdict);
+ void hmp_cpu(Monitor *mon, const QDict *qdict);
+ void hmp_memsave(Monitor *mon, const QDict *qdict);
+ void hmp_pmemsave(Monitor *mon, const QDict *qdict);
++void hmp_pmemload(Monitor *mon, const QDict *qdict);
+ void hmp_ringbuf_write(Monitor *mon, const QDict *qdict);
+ void hmp_ringbuf_read(Monitor *mon, const QDict *qdict);
+ void hmp_cont(Monitor *mon, const QDict *qdict);
 -- 
 2.17.1
