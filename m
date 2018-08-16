@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqGwY-0004cd-Gi
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:59:59 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqH24-0007uD-J9
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqGwX-0001SV-OQ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:59:58 -0400
-References: <1531470464-21522-1-git-send-email-thuth@redhat.com>
-	<1531470464-21522-2-git-send-email-thuth@redhat.com>
-	<20180713225718.GP914@localhost.localdomain>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4551aa70-343e-1362-cfd3-d567c476d6fe@redhat.com>
-Date: Thu, 16 Aug 2018 13:59:49 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180713225718.GP914@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqH21-000422-Dw
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:05:40 -0400
+Received: from mail-sn1nam02on0114.outbound.protection.outlook.com
+	([104.47.36.114]:33313
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fqH21-00041b-6U
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:05:37 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 16 Aug 2018 12:05:33 +0000
+Message-ID: <BN7PR08MB4868602A6910D3F01ACE23D1C63E0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1534182832-554-56-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1534182832-554-56-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/16] qom/object: Add a new function
- object_initialize_child()
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v8 55/87] target/mips: Adjust
+ set_hflags_for_handler() for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, Markus Armbruster <armbru@redhat.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-On 07/14/2018 12:57 AM, Eduardo Habkost wrote:
-> On Fri, Jul 13, 2018 at 10:27:29AM +0200, Thomas Huth wrote:
->> A lot of code is using the object_initialize() function followed by a call
->> to object_property_add_child() to add the newly initialized object as a child
->> of the current object. Both functions increase the reference counter of the
->> new object, but many spots that call these two functions then forget to drop
->> one of the superfluous references. So the newly created object is often not
->> cleaned up correctly when the parent is destroyed. In the worst case, this
->> can cause crashes, e.g. because device objects are not correctly removed from
->> their parent_bus.
->>
->> Since this is a common pattern between many code spots, let's introdcue a
->> new function that takes care of calling all three required initialization
->> functions, first object_initialize(), then object_property_add_child() and
->> finally object_unref().
->>
->> And while we're at object.h, also fix some copy-n-paste errors in the
->> comments there ("to store the area" --> "to store the error").
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> 
-> Potential candidates for using the new function, found using the
-> following Coccinelle patch:
-> 
-> @@
-> expression child, size, type, parent, errp, propname;
-> @@
-> -object_initialize(child, size, type);
-> -object_property_add_child(
-> +object_initialize_child(
->                            parent, propname, 
-> -                          OBJECT(child),
-> +                          child, size, type,
->                            errp);
-> 
-> Some of them (very few) already call object_unref() and need to
-> be fixed manually.
-> 
-> Most of the remaining ~50 object_initialize() callers are also
-> candidates, even if they don't call object_property_add_child()
-> today.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Monday, August 13, 2018 7:53 PM
+>=20
+> Subject: [PATCH v8 55/87] target/mips: Adjust set_hflags_for_handler() fo=
+r nanoMIPS
+>=20
+> From: James Hogan <james.hogan@mips.com>
+>=20
+> We shouldn't clear M16 mode when entering an interrupt on nanoMIPS,
+> otherwise we'll start interpreting the code as normal MIPS code.
+>=20
+> Signed-off-by: James Hogan <james.hogan@mips.com>
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+> target/mips/helper.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-Care to turn this into a proper patch, now that we left the freeze period?
+This code segment should be re-thought and redesigned in future cleanups. F=
+or now:
 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index d4e4d98b59..acf7b4e40e 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2232,8 +2232,8 @@ void virtio_instance_init_common(Object *proxy_obj, void *data,
->  {
->      DeviceState *vdev = data;
->  
-> -    object_initialize(vdev, vdev_size, vdev_name);
-> -    object_property_add_child(proxy_obj, "virtio-backend", OBJECT(vdev), NULL);
-> +    object_initialize_child(proxy_obj, "virtio-backend",  vdev, vdev_size,
-> +                            vdev_name, NULL);
->      object_unref(OBJECT(vdev));
->      qdev_alias_all_properties(vdev, proxy_obj);
->  }
-> diff --git a/qom/object.c b/qom/object.c
-> index 7be7638db1..91ff795b38 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -396,8 +396,7 @@ void object_initialize_child(Object *parentobj, const char *propname,
->                               void *childobj, size_t size, const char *type,
->                               Error **errp)
->  {
-> -    object_initialize(childobj, size, type);
-> -    object_property_add_child(parentobj, propname, OBJECT(childobj), errp);
-> +    object_initialize_child(parentobj, propname,  childobj, size, type, errp);
->      /*
->       * Since object_property_add_child added a reference to the child object,
->       * we can drop the reference added by object_initialize(), so the child
-
-At least these two hunks need manual adjustment.
-
- Thomas
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
