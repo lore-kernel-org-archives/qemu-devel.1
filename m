@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqDby-00026F-4f
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:26:30 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqDmT-0000qc-3H
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqDbu-0000Vd-4e
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:26:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57358 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqDmH-0005C6-Qs
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51368 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqDbr-0000UR-On
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:26:24 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqDmB-00058t-Ts
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 613FB40150F8
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:37:03 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-56.ams2.redhat.com
+	[10.36.116.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E9C22026D7E
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:37:03 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-References: <851d095cd457109e4a22a2e5ecd36ccbdacbf48b.1526916378.git.simon@ruderich.org>
-	<20180810103650.GA2391@work-vm> <20180814141826.GA26558@ruderich.org>
-	<871sb1t0cn.fsf@dusky.pond.sub.org>
-	<20180814190329.GA13798@ruderich.org>
-	<87pnykqmw4.fsf@dusky.pond.sub.org>
-	<20180815124154.GA1116@ruderich.org>
-	<87bma3ityy.fsf@dusky.pond.sub.org>
-	<20180815154626.GA23638@ruderich.org>
-	<87pnyig92q.fsf@dusky.pond.sub.org>
-	<20180816081320.GA16148@ruderich.org>
-Date: Thu, 16 Aug 2018 10:26:18 +0200
-In-Reply-To: <20180816081320.GA16148@ruderich.org> (Simon Ruderich's message
-	of "Thu, 16 Aug 2018 10:13:20 +0200")
-Message-ID: <87h8jud8et.fsf@dusky.pond.sub.org>
+Date: Thu, 16 Aug 2018 10:36:36 +0200
+Message-Id: <20180816083701.3932-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] qmp: add pmemload command
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/25] Testing patches for 2018-08-16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,37 +34,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Simon Ruderich <simon@ruderich.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
-Simon Ruderich <simon@ruderich.org> writes:
+The following changes since commit c146b54c7fdbd926ee8fc4369699e3480d54f6=
+fa:
 
-> On Thu, Aug 16, 2018 at 07:43:41AM +0200, Markus Armbruster wrote:
->>> On Fri, Aug 10, 2018 at 11:36:51AM +0100, Dr. David Alan Gilbert wrote:
->>>> Also, had you considered rearranging and making them optional,
->>>> for example if you do:
->>>>
->>>> val:l,filename:F,offset:i?,size:i?
->>>>
->>>> I think that would mean you can do the fairly obvious:
->>>>   pmemload addr "myfile"
->>>>
->>>> with the assumption that loads the whole file.
->>>
->>> This would deviate from pmemsave/memsave, but feels more natural.
->>
->> The different order or arguments in HMP is somewhat ugly.  Okay if it
->> makes the command more pleasant to use.  Up to you and Dave to decide.
->>
->> If you decide to deviate, consider
->>
->>     filename:F,address:l,size:i?,offset:i?
->
-> From what I understand we can't have optional arguments in the
-> middle. Would you prefer mandatory size/offset parameters in HMP
-> or optional parameters but inconsistent with pmemsave/memsave?
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2018-08-15'=
+ into staging (2018-08-15 20:20:34 +0100)
 
-If you guys decide you want consistency with memsave, that's fine with
-me.  If you decide you want to rearrange arguments for better usability,
-that's also fine.  I just wanted to throw in another rearrangement for
-you to consider.
+are available in the Git repository at:
+
+  git://repo.or.cz/qemu/armbru.git tags/pull-tests-2018-08-16
+
+for you to fetch changes up to f9e986d237881fda3ce599a89c26433531f5acbb:
+
+  libqtest: Improve error reporting for bad read from QEMU (2018-08-16 08=
+:43:53 +0200)
+
+----------------------------------------------------------------
+Testing patches for 2018-08-16
+
+----------------------------------------------------------------
+Eric Blake (2):
+      libqtest: Document calling conventions
+      tests/libqtest: Improve kill_qemu()
+
+Markus Armbruster (23):
+      libqtest: Rename functions to send QMP messages
+      libqtest: Clean up how we read device_del messages
+      libqtest: Clean up how we read the QMP greeting
+      libqtest: Remove qtest_qmp_discard_response() & friends
+      qobject: Replace qobject_from_jsonf() by qobject_from_jsonf_nofail(=
+)
+      qobject: New qobject_from_vjsonf_nofail(), qdict_from_vjsonf_nofail=
+()
+      libqtest: Simplify qmp_fd_vsend() a bit
+      test-qobject-input-visitor: Avoid format string ambiguity
+      qobject: qobject_from_jsonv() is dangerous, hide it away
+      tests: Pass literal format strings directly to qmp_FOO()
+      tests: Clean up string interpolation into QMP input (simple cases)
+      cpu-plug-test: Don't pass integers as strings to device_add
+      tests: Clean up string interpolation around qtest_qmp_device_add()
+      migration-test: Make wait_command() return the "return" member
+      tests: New helper qtest_qmp_receive_success()
+      migration-test: Make wait_command() cope with '%'
+      migration-test: Clean up string interpolation into QMP, part 1
+      migration-test: Clean up string interpolation into QMP, part 2
+      migration-test: Clean up string interpolation into QMP, part 3
+      libqtest: Enable compile-time format string checking
+      libqtest: Replace qtest_startf() by qtest_initf()
+      libqtest: Rename qtest_FOOv() to qtest_vFOO() for consistency
+      libqtest: Improve error reporting for bad read from QEMU
+
+ include/qapi/qmp/qjson.h           |  12 +-
+ qobject/qjson.c                    |  89 +++++++++++----
+ tests/ahci-test.c                  |  15 +--
+ tests/boot-order-test.c            |  13 ++-
+ tests/boot-serial-test.c           |  10 +-
+ tests/cdrom-test.c                 |   6 +-
+ tests/check-qjson.c                |  15 +--
+ tests/cpu-plug-test.c              |   7 +-
+ tests/drive_del-test.c             |   3 +
+ tests/e1000e-test.c                |   6 +-
+ tests/endianness-test.c            |  24 ++--
+ tests/fdc-test.c                   |   4 +
+ tests/ide-test.c                   |   9 +-
+ tests/ipmi-bt-test.c               |   2 +-
+ tests/ivshmem-test.c               |   8 +-
+ tests/libqos/ahci.c                |   4 +-
+ tests/libqos/pci-pc.c              |   9 +-
+ tests/libqos/pci.c                 |   7 --
+ tests/libqos/pci.h                 |   2 -
+ tests/libqos/usb.c                 |  10 +-
+ tests/libqos/usb.h                 |   2 +-
+ tests/libqtest.c                   | 219 ++++++++++++++++++++-----------=
+------
+ tests/libqtest.h                   | 124 +++++++++++----------
+ tests/m25p80-test.c                |   6 +-
+ tests/m48t59-test.c                |   2 +-
+ tests/machine-none-test.c          |   2 +-
+ tests/migration-test.c             | 187 ++++++++++++++-----------------
+ tests/numa-test.c                  |   4 +-
+ tests/pnv-xscom-test.c             |   8 +-
+ tests/prom-env-test.c              |  10 +-
+ tests/qmp-test.c                   |  20 ++--
+ tests/sdhci-test.c                 |   6 +-
+ tests/tco-test.c                   |   6 +-
+ tests/test-filter-mirror.c         |   6 +-
+ tests/test-filter-redirector.c     |   8 +-
+ tests/test-qga.c                   | 150 +++++++++++--------------
+ tests/test-qobject-input-visitor.c |  19 ++--
+ tests/tpm-util.c                   |  41 ++-----
+ tests/usb-hcd-ehci-test.c          |   2 +-
+ tests/usb-hcd-ohci-test.c          |   2 +-
+ tests/usb-hcd-uhci-test.c          |   4 +-
+ tests/usb-hcd-xhci-test.c          |  10 +-
+ tests/vhost-user-test.c            |   6 +-
+ tests/virtio-balloon-test.c        |   4 +-
+ tests/virtio-blk-test.c            |  17 ++-
+ tests/virtio-console-test.c        |  12 +-
+ tests/virtio-net-test.c            |   3 +-
+ tests/virtio-rng-test.c            |   3 +-
+ tests/virtio-scsi-test.c           |   2 +-
+ tests/virtio-serial-test.c         |   6 +-
+ tests/vmgenid-test.c               |   6 +-
+ 51 files changed, 585 insertions(+), 567 deletions(-)
+
+--=20
+2.17.1
