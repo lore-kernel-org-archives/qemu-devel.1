@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlS-0005tH-Sm
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:43 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlS-0005tL-So
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlC-000186-Kg
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJl9-00014z-Op
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:33 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44777 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:44132 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJl6-0000ng-Hc
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:22 -0400
+	id 1fqJl1-0000jB-9K
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:17 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:58:01 +0200
-Message-Id: <1534431497-1385-69-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:57:56 +0200
+Message-Id: <1534431497-1385-64-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v9 68/84] linux-user: Add target_fcntl.h header
- for nanoMIPS
+Subject: [Qemu-devel] [PATCH v9 63/84] elf: Add nanoMIPS specific variations
+ in ELF header fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +30,45 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Add fcntl-related constants and structures for nanoMIPS.
+Add nanoMIPS-related values in ELF header fields as specified in
+nanoMIPS' "ELF ABI Supplement".
 
-Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/nanomips/target_fcntl.h | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
- create mode 100644 linux-user/nanomips/target_fcntl.h
+ include/elf.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/linux-user/nanomips/target_fcntl.h b/linux-user/nanomips/target_fcntl.h
-new file mode 100644
-index 0000000..4203825
---- /dev/null
-+++ b/linux-user/nanomips/target_fcntl.h
-@@ -0,0 +1,38 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
+diff --git a/include/elf.h b/include/elf.h
+index 312f68a..341960c 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -62,6 +62,24 @@ typedef int64_t  Elf64_Sxword;
+ #define EF_MIPS_FP64      0x00000200
+ #define EF_MIPS_NAN2008   0x00000400
+ 
++/* nanoMIPS architecture bits, EF_NANOMIPS_ARCH */
++#define EF_NANOMIPS_ARCH_32R6 0x00000000  /* 32-bit nanoMIPS Release 6 ISA   */
++#define EF_NANOMIPS_ARCH_64R6 0x10000000  /* 62-bit nanoMIPS Release 6 ISA   */
 +
-+#ifndef NANOMIPS_TARGET_FCNTL_H
-+#define NANOMIPS_TARGET_FCNTL_H
++/* nanoMIPS ABI bits, EF_NANOMIPS_ABI */
++#define EF_NANOMIPS_ABI_P32   0x00001000  /* 32-bit nanoMIPS ABI             */
++#define EF_NANOMIPS_ABI_P64   0x00002000  /* 64-bit nanoMIPS ABI             */
 +
-+#define TARGET_O_APPEND         0x000400
-+#define TARGET_O_DSYNC          0x001000
-+#define TARGET_O_NONBLOCK       0x000800
-+#define TARGET_O_CREAT          0x000040
-+#define TARGET_O_TRUNC          0x000200
-+#define TARGET_O_EXCL           0x000080
-+#define TARGET_O_NOCTTY         0x000100
-+#define TARGET_FASYNC           0x002000
-+#define TARGET_O_LARGEFILE      0x008000
-+#define TARGET___O_SYNC         0x101000
-+#define TARGET_O_DIRECT         0x004000
-+#define TARGET_O_CLOEXEC        0x080000
++/* nanoMIPS processor specific flags, e_flags */
++#define EF_NANOMIPS_LINKRELAX 0x00000001  /* Link-time relaxation            */
++#define EF_NANOMIPS_PIC       0x00000002  /* Position independent code       */
++#define EF_NANOMIPS_32BITMODE 0x00000004  /* 32-bit object for 64-bit arch.  */
++#define EF_NANOMIPS_PID       0x00000008  /* Position independent data       */
++#define EF_NANOMIPS_PCREL     0x00000010  /* PC-relative mode                */
++#define EF_NANOMIPS_ABI       0x0000f000  /* nanoMIPS ABI                    */
++#define EF_NANOMIPS_MACH      0x00ff0000  /* Machine variant                 */
++#define EF_NANOMIPS_ARCH      0xf0000000  /* nanoMIPS architecture           */
 +
-+#define TARGET_F_GETLK         5
-+#define TARGET_F_SETLK         6
-+#define TARGET_F_SETLKW        7
-+#define TARGET_F_SETOWN        8       /*  for sockets. */
-+#define TARGET_F_GETOWN        9       /*  for sockets. */
-+
-+#define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
-+#define TARGET_ARCH_FLOCK64_PAD
-+
-+#define TARGET_F_GETLK64       12      /*  using 'struct flock64' */
-+#define TARGET_F_SETLK64       13
-+#define TARGET_F_SETLKW64      14
-+
-+#include "../generic/fcntl.h"
-+#endif
+ /* MIPS machine variant */
+ #define EF_MIPS_MACH_NONE     0x00000000  /* A standard MIPS implementation  */
+ #define EF_MIPS_MACH_3900     0x00810000  /* Toshiba R3900                   */
 -- 
 2.7.4
