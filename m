@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fqLDL-000400-2I
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:33:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fqLEw-0005cx-5t
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:35:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fqLDG-0004kB-JS
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:33:35 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45257)
+	(envelope-from <peter.maydell@linaro.org>) id 1fqLEv-0005ct-E6
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:35:14 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:43537)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fqLDE-0004jH-QH
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:33:28 -0400
-Received: by mail-pf1-x443.google.com with SMTP id i26-v6so2248138pfo.12
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 09:33:28 -0700 (PDT)
-References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1534431497-1385-23-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ade97260-3d27-4a52-a040-c259a7545149@linaro.org>
-Date: Thu, 16 Aug 2018 09:33:24 -0700
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fqLEv-0005cX-7h
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:35:13 -0400
+Received: by mail-oi0-x243.google.com with SMTP id b15-v6so9088413oib.10
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 09:35:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1534431497-1385-23-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 22/84] target/mips: Add emulation of
- nanoMIPS 16-bit branch instructions
+In-Reply-To: <20180816120533.6587-1-rka@sysgo.com>
+References: <20180816120533.6587-1-rka@sysgo.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Aug 2018 17:34:52 +0100
+Message-ID: <CAFEAcA9DB_xNyxsFbWL9aNcV_ZoUAhj2B+d8Y7gg9qOLCQgFvg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] target/arm: crash on conditional instr
+ in it block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
+To: Roman Kapl <rka@sysgo.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 08/16/2018 07:57 AM, Aleksandar Markovic wrote:
-> From: Yongbok Kim <yongbok.kim@mips.com>
-> 
-> Add emulation of nanoMIPS 16-bit branch instructions.
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+On 16 August 2018 at 13:05, Roman Kapl <rka@sysgo.com> wrote:
+> If an instruction is conditional (like CBZ) and it is executed conditionally
+> (using the ITx instruction), a jump to undefined label is generated.
+> CBZ in IT block is an unpredictable behavior, and honouring the condition code
+> is allowed by the spec in this case (constrained unpredictable, ARMv8, section
+> K1.1.7).
+>
+> Fix the 'skip on condtion' code to create a new label only if it does not
+> already exist. Previously multiple labels were created, but only the last one of
+> them was set.
+>
+> Signed-off-by: Roman Kapl <rka@sysgo.com>
 > ---
->  target/mips/translate.c | 36 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
+> v1 -> v2
+>  Split arm_conditional_skip into arm_gen_condlabel and arm_skip_unless to
+>  a) cover all usages
+>  b) do not force callers to ^1 the condition
+>
+>  Add note about CBZ in IT block to the commit message.
 
-This patch needs the gen_compute_compact_branch_nm you add in patch 39.
-All of the uses of gen_compute_branch are incorrect.
 
 
-r~
+Applied to target-arm.next, thanks.
+
+-- PMM
