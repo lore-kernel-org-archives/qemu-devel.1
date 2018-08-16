@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1fqCbw-0005AE-Tv
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:22:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1fqCeL-00068Q-SV
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:24:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1fqCbt-0007zR-OH
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:22:24 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2280 helo=huawei.com)
+	(envelope-from <thuth@redhat.com>) id 1fqCeI-0008U0-On
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:24:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50836 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1fqCbt-0007xS-7k
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:22:21 -0400
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Thu, 16 Aug 2018 07:22:03 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473B7376B5@DGGEMM528-MBX.china.huawei.com>
-References: <1534243693-9560-1-git-send-email-jianjay.zhou@huawei.com>
-	<2278afdb-d2a6-54b3-67c7-c1f43e4d311c@redhat.com>
-	<20180814115202.GH2580@work-vm>
-	<517f613f-3885-7b6f-aff7-cffee9d8f35f@redhat.com>
-	<B2D15215269B544CADD246097EACE7473B7345BB@DGGEMM528-MBX.china.huawei.com>
-	<954665c4-ab5f-6232-6208-19e479d41055@redhat.com>
-In-Reply-To: <954665c4-ab5f-6232-6208-19e479d41055@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fqCeI-0008Tw-JL
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:24:50 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1AD83818A6B0
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 07:24:50 +0000 (UTC)
+References: <20180808114830.7169-1-quintela@redhat.com>
+	<20180808114830.7169-23-quintela@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c563a524-6803-f3dd-c2af-4453d16fce15@redhat.com>
+Date: Thu, 16 Aug 2018 09:24:44 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH] vl: fix migration when watchdog expires
+In-Reply-To: <20180808114830.7169-23-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 22/22] virtio: split virtio-serial bits
+ rom virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +35,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWls
-dG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2VudDogVHVlc2RheSwgQXVndXN0IDE0LCAyMDE4
-IDk6MDcgUE0NCj4gVG86IFpob3VqaWFuIChqYXkpIDxqaWFuamF5Lnpob3VAaHVhd2VpLmNvbT47
-IERyLiBEYXZpZCBBbGFuIEdpbGJlcnQNCj4gPGRnaWxiZXJ0QHJlZGhhdC5jb20+DQo+IENjOiBx
-ZW11LWRldmVsQG5vbmdudS5vcmc7IHF1aW50ZWxhQHJlZGhhdC5jb207IHdhbmd4aW4gKFUpDQo+
-IDx3YW5neGlueGluLndhbmdAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtSRkMgUEFUQ0hd
-IHZsOiBmaXggbWlncmF0aW9uIHdoZW4gd2F0Y2hkb2cgZXhwaXJlcw0KPiANCj4gT24gMTQvMDgv
-MjAxOCAxNTowMywgWmhvdWppYW4gKGpheSkgd3JvdGU6DQo+ID4+IC0tLS0tT3JpZ2luYWwgTWVz
-c2FnZS0tLS0tDQo+ID4+IEZyb206IFBhb2xvIEJvbnppbmkgW21haWx0bzpwYm9uemluaUByZWRo
-YXQuY29tXQ0KPiA+PiBTZW50OiBUdWVzZGF5LCBBdWd1c3QgMTQsIDIwMTggODowMiBQTQ0KPiA+
-PiBUbzogRHIuIERhdmlkIEFsYW4gR2lsYmVydCA8ZGdpbGJlcnRAcmVkaGF0LmNvbT4NCj4gPj4g
-Q2M6IFpob3VqaWFuIChqYXkpIDxqaWFuamF5Lnpob3VAaHVhd2VpLmNvbT47IHFlbXUtZGV2ZWxA
-bm9uZ251Lm9yZzsNCj4gPj4gcXVpbnRlbGFAcmVkaGF0LmNvbTsgd2FuZ3hpbiAoVSkgPHdhbmd4
-aW54aW4ud2FuZ0BodWF3ZWkuY29tPg0KPiA+PiBTdWJqZWN0OiBSZTogW1JGQyBQQVRDSF0gdmw6
-IGZpeCBtaWdyYXRpb24gd2hlbiB3YXRjaGRvZyBleHBpcmVzDQo+ID4+DQo+ID4+IE9uIDE0LzA4
-LzIwMTggMTM6NTIsIERyLiBEYXZpZCBBbGFuIEdpbGJlcnQgd3JvdGU6DQo+ID4+PiAgYSkgU2hv
-dWxkIHRoZSB3YXRjaGRvZyBleHBpcmUgd2hlbiB0aGUgVk0gaXMgc3RvcHBlZDsgSSB0aGluayBp
-dA0KPiA+Pj4gc2hvdWxkbid0IC0gaHcvYWNwaS90Y28uYyB1c2VzIGEgdmlydHVhbCB0aW1lciBh
-cyBkb2VzIGk2MzAwZXNiOyBzbw0KPiA+Pj4gaXMgdGhlIGJ1ZyBoZXJlIHRoYXQgdGhlIHdhdGNo
-ZG9nIGJlaW5nIHVzZWQgZGlkbid0IHVzZSBhIHZpcnR1YWwgdGltZXI/DQo+ID4+DQo+ID4+IEFs
-bCB3YXRjaGRvZ3MgZG8uDQo+ID4+DQo+ID4+PiAgYikgSWYgdGhlIHdhdGNoZG9nIGV4cGlyZXMg
-anVzdCBiZWZvcmUgdGhlIFZNIGdldHMgc3RvcHBlZCwgaXMNCj4gPj4+IHRoZXJlIGEgcmFjZSB3
-aGljaCBjb3VsZCBoaXQgdGhpcz8gIFBvc3NpYmx5Lg0KPiA+Pg0KPiA+PiBZZXMsIEkgdGhpbmsg
-aXQgaXMgYSByYWNlIHRoYXQgaGFwcGVucyBqdXN0IGJlZm9yZSB2bV9zdG9wLCBidXQgSQ0KPiA+
-PiBkb24ndCB1bmRlcnN0YW5kIHdoeSB0aGUgInFlbXVfY2xvY2tfZW5hYmxlIiBpbiBwYXVzZV9h
-bGxfdmNwdXMgZG9lcyBub3QNCj4gcHJldmVudCBpdC4NCj4gPg0KPiA+IEhpIFBhb2xvLA0KPiA+
-IFRoZSBzZXF1ZW5jZSBpcyBsaWtlIHRoaXMgSSB0aGluaw0KPiA+DQo+ID4gICAgICAgICAgfA0K
-PiA+ICAgICAgICAgIHwgIDwtLS0tLSAgd2F0Y2hkb2cgZXhwaXJlZCwgd2hpY2ggc2V0IHJlc2V0
-X3JlcXVlc3RlZCB0bw0KPiBTSFVURE9XTl9DQVVTRV9HVUVTVF9SRVNFVA0KPiA+ICAgICAgICAg
-IHwNCj4gPiAgICAgICAgICB8ICA8LS0tLS0gIG1pZ3JhdGlvbiB0aHJlYWQgc2V0cyB0byBSVU5f
-U1RBVEVfRklOSVNIX01JR1JBVEUsIGl0DQo+IHdpbGwgZGlzYWJsZSBRRU1VX0NMT0NLX1ZJUlRV
-QUwgY2xvY2ssDQo+ID4gICAgICAgICAgfCAgICAgICAgICBidXQgaXQgaXMgZG9uZSBhZnRlciB0
-aGUgc2V0dGluZyBvZiByZXNldF9yZXF1ZXN0ZWQNCj4gDQo+IFNvIHRoZSBmaXggd291bGQgYmUg
-dG8gcHJvY2VzcyB0aGUgcmVzZXQgcmVxdWVzdCBoZXJlPyAgKEluIGRvX3ZtX3N0b3Agb3INCj4g
-cGF1c2VfYWxsX3ZjcHVzKS4gIFRoZSBjb2RlIGlzIGN1cnJlbnRseSBpbiBtYWluX2xvb3Bfc2hv
-dWxkX2V4aXQoKS4NCg0KQWZ0ZXIgYSBzZWNvbmQgdGhvdWdodCwgSSB0aGluayBpdCBzaG91bGQg
-a2VlcCB0aGUgcmVzZXQgcmVxdWVzdCBwcm9jZXNzDQppbiBtYWluX2xvb3Bfc2hvdWxkX2V4aXQo
-KSwgc2luY2UgcGF1c2VfYWxsX3ZjcHVzKG9yIGRvX3ZtX3N0b3ApIGlzIG5vdCBpbg0KYSBsb29w
-LCBpdCBjYW4ndCBkZXRlY3QgYWxsIHRoZSByZXNldCByZXF1ZXN0cyBpbW1lZGlhdGVseS4NCklm
-IHByb2Nlc3NpbmcgdGhlIHJlc2V0IHJlcXVlc3QgYm90aCBpbiBtYWluX2xvb3Bfc2hvdWxkX2V4
-aXQoKSBhbmQgZG9fdm1fc3RvcA0Kb3IgcGF1c2VfYWxsX3ZjcHVzIHdpbGwgbGVhZCB0byBhIHJh
-Y2Ugb2YgcmVmZXJlbmNpbmcgdG8gdGhlIGdsb2JhbCB2YXJpYWJsZQ0KJ3Jlc2V0X3JlcXVlc3Rl
-ZCcuDQpDb3VsZCB3ZSBhZGQgdGhlIGNoZWNrICFydW5zdGF0ZV9jaGVjayhSVU5fU1RBVEVfRklO
-SVNIX01JR1JBVEUpIGJlZm9yZSBzZXR0aW5nDQp0byBSVU5fU1RBVEVfUFJFTEFVTkNILCBqdXN0
-IGxpa2UgIXJ1bnN0YXRlX2NoZWNrKFJVTl9TVEFURV9SVU5OSU5HKSBhbmQNCiFydW5zdGF0ZV9j
-aGVjayhSVU5fU1RBVEVfSU5NSUdSQVRFKSBkaWQ/IEJ1dCBJJ20gbm90IHN1cmUgd2hldGhlciB0
-aGlzIHdpbGwNCmNhdXNlIGFueSBzaWRlIGVmZmVjdC4NCg0KUmVnYXJkcywNCkpheSBaaG91DQoN
-Cj4gDQo+IFBhb2xvDQo+IA0KPiA+ICAgICAgICAgIHwgIDwtLS0tLSAgbWFpbiBsb29wIHRocmVh
-ZCBzZXRzIHRvIFJVTl9TVEFURV9QUkVMQVVOQ0ggc2luY2UgaXQNCj4gZGV0ZWN0ZWQgYSByZXNl
-dCByZXF1ZXN0DQo+ID4gICAgICAgICAgfA0KPiA+ICAgICAgICAgIHwgIDwtLS0tLSAgbWlncmF0
-aW9uIHRocmVhZCBzZXRzIHRvIFJVTl9TVEFURV9QT1NUTUlHUkFURQ0KPiA+DQo+ID4NCj4gPiBS
-ZWdhcmRzLA0KPiA+IEpheSBaaG91DQo+ID4NCj4gPj4NCj4gPj4gSXQgc2hvdWxkIGJlIHBvc3Np
-YmxlIHRvIHdyaXRlIGEgZGV0ZXJtaW5pc3RpYyB0ZXN0Y2FzZSB3aXRoIHF0ZXN0Li4uDQo+ID4+
-DQo+ID4+IFBhb2xvDQoNCg==
+On 08/08/2018 01:48 PM, Juan Quintela wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hw/virtio/Makefile.objs       |  1 +
+>  hw/virtio/virtio-pci.c        | 74 --------------------------
+>  hw/virtio/virtio-serial-pci.c | 97 +++++++++++++++++++++++++++++++++++
+>  tests/Makefile.include        | 12 ++---
+>  4 files changed, 104 insertions(+), 80 deletions(-)
+>  create mode 100644 hw/virtio/virtio-serial-pci.c
+[...]
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index a1352ccefb..8666206ea4 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -143,7 +143,7 @@ check-unit-y += tests/test-crypto-secret$(EXESUF)
+>  check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlscredsx509$(EXESUF)
+>  check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlssession$(EXESUF)
+>  ifneq (,$(findstring qemu-ga,$(TOOLS)))
+> -check-unit-$(CONFIG_LINUX) += tests/test-qga$(EXESUF)
+> +check-unit-$(land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) += tests/test-qga$(EXESUF)
+
+Maybe mention qga's dependency in the patch description?
+
+Anyway:
+Reviewed-by: Thomas Huth <thuth@redhat.com>
