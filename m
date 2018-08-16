@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fqIHg-0004G5-A0
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:25:53 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fqIMq-0006iN-8Q
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:31:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fqIHb-0003XK-99
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:25:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56006)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fqIHb-0003WP-2I
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:25:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fqIHZ-00040c-O5
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 13:25:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B37D22E851C
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 13:25:45 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1fqIMo-0007zI-6G
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:31:12 -0400
+Resent-Message-Id: <E1fqIMo-0007zI-6G@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21082)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fqIMn-0007yg-2j
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:31:10 -0400
+In-Reply-To: <20180814165954.9892-1-rka@sysgo.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153442621685.18098.8343839376792968723@502c9da6d61e>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Aug 2018 13:11:15 -0000
-From: =?utf-8?q?Leonardo_M=C3=BCller?= <leozinho29_eu@hotmail.com>
-Reply-To: Bug 1787070 <1787070@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153429832178.24411.17323780348611441441.malonedeb@soybean.canonical.com>
-Message-Id: <153442507641.7907.16895617974341939387.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1787070] Re: Guests using the qxl-vga are freezing
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 16 Aug 2018 06:30:18 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: add external PID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,110 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: rka@sysgo.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, agraf@suse.de
 
-QEMU version I'm using now is v3.0.0-65-g1d746ee95d-dirty and has the
-problem, the first version I observed the problem was 2.11 from Ubuntu's
-repositories.
-
-The fact you are unable to reproduce the bug is unsurprising to me: this
-is not the first time I have a problem with QXL VGA and others are
-unable to reproduce. I don't understand why QXL fails so consistently
-here.
-
-Another QXL bug I reported:
-
-https://bugs.launchpad.net/ubuntu/bionic/+source/qemu/+bug/1755912
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1787070
-
-Title:
-  Guests using the qxl-vga are freezing
-
-Status in QEMU:
-  New
-
-Bug description:
-  I have noticed that guests using qxl-vga are freezing. They may freeze
-  after a few minutes or after many hours. The freeze consists of the
-  entire system hanging, except the cursor, but the cursor animation
-  stops too. Changing to tty is not possible after this. There are three
-  things noticed in common on the guests when they freeze:
-
-  -The guest is using the QXL VGA (freezes weren't observed with other VGAs=
-);
-  -A new workload is starting;
-  -The mouse cursor is the animated as the one of loading. For example, htt=
-ps://i.imgur.com/raQFteG.png
-   =
-
-  The host is Xubuntu 18.04 amd64, QEMU version is 3.0.0-dirty. The guests =
-tested were:
-
-  -openSUSE Tumbleweed;
-  -openSUSE Leap 15;
-  -Xubuntu 18.04 Bionic Beaver;
-  -CentOS 7.
-
-  With openSUSE guests, the install process couldn't even be finished,
-  as the installer would freeze. There were 2 GB of available memory
-  (checked in a tty before the freeze) and netconsole was enabled.
-  Unfortunately, it was impossible to obtain any information from them.
-  This is an image of one openSUSE guest frozen:
-  https://i.imgur.com/ZP0eQKq.png
-
-  The command line used was:
-
-  qemu-system-x86_64 -nodefaults -m 3072 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dleap.qcow2 -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
-  -monitor vc -serial vc  -cdrom "openSUSE-Leap-15.0-DVD-x86_64.iso"
-  -boot d
-
-  With CentOS guests, the install process fail sometimes, but sometimes
-  it's able to install. However, on the yum update, it would freeze too.
-  In one instance it froze while updating glibc, which made the guest
-  unbootable. https://i.imgur.com/B3WhSDX.png
-
-  The command line used was:
-
-  qemu-system-x86_64 -nodefaults -m 2048 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dcentos.qcow2 -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device virtio-vga,virgl=3Dtrue -display gtk -monitor
-  vc -serial vc -cdrom "CentOS-7-livecd-GNOME-x86_64.iso" -bios
-  /usr/share/ovmf/OVMF.fd
-
-  With Xubuntu 18.04 guests, the system worked for many hours until the
-  freeze happened. On this case it happened when opening Audacious.
-  Fortunately, the logging services worked for some time, which allowed
-  me to get a relevant message which can be seen at
-  http://termbin.com/nuof . It repeated a few times, but then the
-  logging stopped. https://i.imgur.com/2zckqj5.png shows the guest
-  screen in the moment it froze.
-
-  The command line used was:
-
-  qemu-system-x86_64 -nodefaults -m 1024 -M pc,usb=3Dtrue -accel kvm -cpu
-  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
-  id=3Dcentusb,if=3Dnone,file=3Dxubmini -device usb-
-  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
-  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
-  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
-  -monitor vc -serial vc
-
-  I'm sorry for not having more detailed information but, even setting
-  netconsole, openSUSE and CentOS guests were unable to print any
-  information.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1787070/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODE0MTY1OTU0Ljk4OTItMS1ya2FAc3lzZ28uY29tClN1YmplY3Q6IFtR
+ZW11LWRldmVsXSBbUEFUQ0hdIHRhcmdldC9wcGM6IGFkZCBleHRlcm5hbCBQSUQgc3VwcG9ydAoK
+PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
+bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNv
+bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
+ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
+b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
+PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
+ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
+ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
+NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
+dy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDgx
+NjEzMDExOC4zMTg0MS0xLWJlcnJhbmdlQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDgxNjEz
+MDExOC4zMTg0MS0xLWJlcnJhbmdlQHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAg
+ICAgcGF0Y2hldy8yMDE4MDgxNjEzMDQxNS4yNjA1Ny0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0
+LmNvbSAtPiBwYXRjaGV3LzIwMTgwODE2MTMwNDE1LjI2MDU3LTEtbWFyY2FuZHJlLmx1cmVhdUBy
+ZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOTAxOWViNGMwMyB0YXJn
+ZXQvcHBjOiBhZGQgZXh0ZXJuYWwgUElEIHN1cHBvcnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
+ZWNraW5nIFBBVENIIDEvMTogdGFyZ2V0L3BwYzogYWRkIGV4dGVybmFsIFBJRCBzdXBwb3J0Li4u
+CkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4g
+cGFyZW50aGVzaXMKIzY2OTogRklMRTogdGFyZ2V0L3BwYy90cmFuc2xhdGUuYzo3MTY1OgorI2Rl
+ZmluZSBHRU5fTERFUFgobmFtZSwgbGRvcCwgb3BjMiwgb3BjMykgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXAorR0VOX0hBTkRMRVJfRShuYW1lIyNlcHgsIDB4MUYsIG9wYzIs
+IG9wYzMsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAgICAg
+ICAweDAwMDAwMDAxLCBQUENfSU5URUdFUiwgUFBDMl9CT09LRTIwNiksCgpFUlJPUjogTWFjcm9z
+IHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiM2
+ODg6IEZJTEU6IHRhcmdldC9wcGMvdHJhbnNsYXRlLmM6NzIxMToKKyNkZWZpbmUgR0VOX1NURVBY
+KG5hbWUsIGxkb3AsIG9wYzIsIG9wYzMpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIFwKK0dFTl9IQU5ETEVSX0UobmFtZSMjZXB4LCAweDFGLCBvcGMyLCBvcGMzLCAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgICAgICAgMHgwMDAwMDAwMSwg
+UFBDX0lOVEVHRVIsIFBQQzJfQk9PS0UyMDYpLAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdz
+LCA3MTggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
