@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fqEX2-0004em-Hz
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:25:29 -0400
+	(envelope-from <linzhecheng@huawei.com>) id 1fqEpi-0005h5-Du
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:44:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fqEX1-0007HN-9d
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:25:28 -0400
-Received: from mga07.intel.com ([134.134.136.100]:21438)
+	(envelope-from <linzhecheng@huawei.com>) id 1fqEpd-0000OJ-SG
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:44:46 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2562 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
-	id 1fqEWx-0007By-4b
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:25:25 -0400
-From: Jing Liu <jing2.liu@linux.intel.com>
-Date: Thu, 16 Aug 2018 17:28:16 +0800
-Message-Id: <1534411696-6454-4-git-send-email-jing2.liu@linux.intel.com>
-In-Reply-To: <1534411696-6454-1-git-send-email-jing2.liu@linux.intel.com>
-References: <1534411696-6454-1-git-send-email-jing2.liu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] hw/pci: add PCI resource reserve
- capability to legacy PCI bridge
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1fqEpd-0000JE-5T
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 05:44:41 -0400
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Thu, 16 Aug 2018 17:43:56 +0800
+Message-ID: <20180816094356.16396-1-linzhecheng@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] usb-host: insert usb device into hostdevs to
+ be scaned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,79 +26,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: anthony.xu@intel.com, mst@redhat.com, marcel.apfelbaum@gmail.com, lersek@redhat.com, pbonzini@redhat.com, Jing Liu <jing2.liu@linux.intel.com>
+Cc: kraxel@redhat.com, wangxinxin.wang@huawei.com, linzhecheng <linzhecheng@huawei.com>
 
-Add hint to firmware (e.g. SeaBIOS) to reserve addtional
-BUS/IO/MEM/PREF resource for legacy pci-pci bridge.
+According to the comment of usb_host_post_load_bh, after removing the
+usb device passed through, we will kick host to scan it again, but the emulated
+usb device is not added to global list hostdevs, so it can never be discovered then.
+So just do it before usb_host_auto_check. What's more, it's futile to walk devs in
+usb_host_auto_check periodically if hostdevs is empty, so let's delete the usb_auto_timer.
 
-Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
----
- hw/pci-bridge/pci_bridge_dev.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 
-diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-index b2d861d..874e618 100644
---- a/hw/pci-bridge/pci_bridge_dev.c
-+++ b/hw/pci-bridge/pci_bridge_dev.c
-@@ -46,6 +46,8 @@ struct PCIBridgeDev {
-     uint32_t flags;
- 
-     OnOffAuto msi;
-+
-+    PCIResReserve res_reserve;
- };
- typedef struct PCIBridgeDev PCIBridgeDev;
- 
-@@ -95,6 +97,12 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
-         error_free(local_err);
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index f31e9cbbb8..632abaa390 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -1534,6 +1534,10 @@ static void usb_host_post_load_bh(void *opaque)
+         usb_device_detach(udev);
      }
+     dev->bh_postld_pending = false;
++    if (!dev->needs_autoscan) {
++        dev->needs_autoscan = true;
++        QTAILQ_INSERT_TAIL(&hostdevs, dev, next);
++    }
+     usb_host_auto_check(NULL);
+ }
  
-+    err = pci_bridge_qemu_reserve_cap_init(dev, 0,
-+                                         bridge_dev->res_reserve, errp);
-+    if (err) {
-+        goto cap_error;
+@@ -1631,6 +1635,14 @@ static void usb_host_auto_check(void *unused)
+     int unconnected = 0;
+     int i, n;
+ 
++    if (QTAILQ_EMPTY(&hostdevs)) {
++        if (usb_auto_timer) {
++            timer_del(usb_auto_timer);
++            usb_auto_timer = NULL;
++        }
++        return;
 +    }
 +
-     if (shpc_present(dev)) {
-         /* TODO: spec recommends using 64 bit prefetcheable BAR.
-          * Check whether that works well. */
-@@ -103,6 +111,10 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
+     if (usb_host_init() != 0) {
+         return;
      }
-     return;
- 
-+cap_error:
-+    if (msi_present(dev)) {
-+        msi_uninit(dev);
-+    }
- msi_error:
-     slotid_cap_cleanup(dev);
- slotid_error:
-@@ -116,6 +128,8 @@ shpc_error:
- static void pci_bridge_dev_exitfn(PCIDevice *dev)
- {
-     PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
-+
-+    pci_bridge_qemu_reserve_cap_uninit(dev);
-     if (msi_present(dev)) {
-         msi_uninit(dev);
-     }
-@@ -162,6 +176,17 @@ static Property pci_bridge_dev_properties[] = {
-                             ON_OFF_AUTO_AUTO),
-     DEFINE_PROP_BIT(PCI_BRIDGE_DEV_PROP_SHPC, PCIBridgeDev, flags,
-                     PCI_BRIDGE_DEV_F_SHPC_REQ, true),
-+    DEFINE_PROP_UINT32("bus-reserve", PCIBridgeDev,
-+                       res_reserve.bus_reserve, -1),
-+    DEFINE_PROP_SIZE("io-reserve", PCIBridgeDev,
-+                     res_reserve.io_reserve, -1),
-+    DEFINE_PROP_SIZE("mem-reserve", PCIBridgeDev,
-+                     res_reserve.mem_reserve, -1),
-+    DEFINE_PROP_SIZE("pref32-reserve", PCIBridgeDev,
-+                     res_reserve.pref32_reserve, -1),
-+    DEFINE_PROP_SIZE("pref64-reserve", PCIBridgeDev,
-+                     res_reserve.pref64_reserve, -1),
-+
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
+@@ -1682,6 +1694,8 @@ static void usb_host_auto_check(void *unused)
+                     s->errcount++;
+                     continue;
+                 }
++                s->needs_autoscan = false;
++                QTAILQ_REMOVE(&hostdevs, s, next);
+                 break;
+             }
+         }
 -- 
-1.8.3.1
+2.12.2.windows.2
