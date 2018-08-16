@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fq5dy-00054e-S2
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 19:56:05 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fq5je-0008V9-6J
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 20:01:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fq5dw-0004m1-Kt
-	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 19:56:02 -0400
-References: <20180725151011.25951-1-armbru@redhat.com>
-	<5e713599-997f-7dda-917c-80902f6ef328@redhat.com>
-	<20180725160144.GJ12855@redhat.com>
-	<20180728043238.GC1325070@localhost.localdomain>
-	<371fc437-1330-6873-7f6d-99af8d56c5df@redhat.com>
-	<87ftzgnj4z.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1fq5jd-00072f-EU
+	for qemu-devel@nongnu.org; Wed, 15 Aug 2018 20:01:54 -0400
+References: <153430460784.10304.668502576933473446@502c9da6d61e>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8b037e11-87bf-9258-2615-ae17e34ab353@redhat.com>
-Date: Thu, 16 Aug 2018 01:55:36 +0200
+Message-ID: <91d64820-89d3-c0dc-741b-f6fb13175174@redhat.com>
+Date: Thu, 16 Aug 2018 02:01:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <87ftzgnj4z.fsf@dusky.pond.sub.org>
+In-Reply-To: <153430460784.10304.668502576933473446@502c9da6d61e>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="MUbwnp1ru5jlgR5gfIh6sPKPfZrevhNjX"
-Subject: Re: [Qemu-devel] [RFC PATCH] rbd: Don't convert keypairs to JSON
- and back
+	boundary="rcMarWx9LzmjBgCy9DsNGOzEZwt1fosyG"
+Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 00/31] block: Fix some filename
+ generation issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,130 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Jeff Cody <jcody@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, kwolf@redhat.com, jdurgin@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, berto@igalia.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MUbwnp1ru5jlgR5gfIh6sPKPfZrevhNjX
+--rcMarWx9LzmjBgCy9DsNGOzEZwt1fosyG
 From: Max Reitz <mreitz@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Jeff Cody <jcody@redhat.com>, =?UTF-8?Q?Daniel_P._Berrang=c3=a9?=
- <berrange@redhat.com>, kwolf@redhat.com, jdurgin@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <8b037e11-87bf-9258-2615-ae17e34ab353@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH] rbd: Don't convert keypairs to JSON and
- back
-References: <20180725151011.25951-1-armbru@redhat.com>
- <5e713599-997f-7dda-917c-80902f6ef328@redhat.com>
- <20180725160144.GJ12855@redhat.com>
- <20180728043238.GC1325070@localhost.localdomain>
- <371fc437-1330-6873-7f6d-99af8d56c5df@redhat.com>
- <87ftzgnj4z.fsf@dusky.pond.sub.org>
-In-Reply-To: <87ftzgnj4z.fsf@dusky.pond.sub.org>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, berto@igalia.com
+Message-ID: <91d64820-89d3-c0dc-741b-f6fb13175174@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 00/31] block: Fix some filename
+ generation issues
+References: <153430460784.10304.668502576933473446@502c9da6d61e>
+In-Reply-To: <153430460784.10304.668502576933473446@502c9da6d61e>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-08-15 10:12, Markus Armbruster wrote:
-> Max Reitz <mreitz@redhat.com> writes:
+On 2018-08-15 05:43, no-reply@patchew.org wrote:
+> Hi,
+>=20
+> This series seems to have some coding style problems. See output below =
+for
+> more information:
 
 [...]
 
->> To me personally the issue is that if you can specify a plain filename=
-,
->> bdrv_refresh_filename() should give you that plain filename back.  So
->> rbd's implementation of that is lacking.  Well, it just doesn't exist.=
-
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> Checking PATCH 1/31: block: Use bdrv_refresh_filename() to pull...
+> Checking PATCH 2/31: block: Use children list in bdrv_refresh_filename.=
+=2E.
+> Checking PATCH 3/31: block: Skip implicit nodes for filename info...
+> Checking PATCH 4/31: block: Add BDS.auto_backing_file...
+> Checking PATCH 5/31: block: Respect backing bs in bdrv_refresh_filename=
+=2E..
+> ERROR: return is not a function, parentheses are not required
+> #46: FILE: block.c:5192:
+> +        return (bs->auto_backing_file[0] !=3D '\0');
 >=20
-> I'm not even sure I understand what you're talking about.
+> total: 1 errors, 0 warnings, 136 lines checked
 
-We have this bdrv_refresh_filename() thing which can do this:
-
-$ qemu-img info \
-    "json:{'driver':'raw',
-           'file':{'driver':'nbd','host':'localhost'}}"
-image: nbd://localhost:10809
-[...]
-
-So it can reconstruct a plain filename even if you specify it as options
-instead of just using a plain filename.
-
-
-Now here's my fault: I thought it might be necessary for a driver to
-implement that function (which rbd doesn't) so that you'd get a nice
-filename back (instead of just json:{} garbled things).   But you don't.
- For protocol drivers, you'll just get the initial filename back.  (So
-my comment was just wrong.)
-
-So what I was thinking about was some case where you specified a normal
-plain filename and qemu would give you back json:{}.  (If rbd
-implemented bdrv_refresh_filename(), that wouldn't happen, because it
-would reconstruct a nice normal filename.)  It turns out, I don't think
-that can happen so easily.  You'll just get your filename back.
-
-Because here's what I'm thinking: If someone uses an option that is
-undocumented and starts with =3D, well, too bad.  If someone uses a norma=
-l
-filename, but gets back a json:{} filename...  Then they are free to use
-that anywhere, and their use of "=3D" is legitimized.
-
-
-Now that issue kind of reappears when you open an RBD volume, and then
-e.g. take a blockdev-snapshot.  Then your overlay has an overridden
-backing file (one that may be different from what its image header says)
-and its filename may well become a json:{} one (to arrange for the
-overridden backing file options).  Of course, if you opened the RBD
-volume with a filename with some of the options warranting
-=3Dkeyvalue-pairs, then your json:{} filename will contain those options
-under =3Dkeyvalue-pairs.
-
-So...  I'm not quite sure what I want to say?  I think there are edge
-cases where the user may not have put any weird option into qemu, but
-they do get a json:{} filename with =3Dkeyvalue-pairs out of it.  And I
-think users are free to use json:{} filenames qemu spews at them, and we
-can't blame them for it.
-
->>> If so, and we are comfortable changing the output the way this patch =
-does
->>> (technically altering ABI anyway), we might as well go all the way an=
-d
->>> filter it out completely.  That would be preferable to cleaning up th=
-e json
->>> output of the internal key/value pairs, IMO.
->>
->> Well, this filtering at least is done by my "Fix some filename
->> generation issues" series.
->=20
-> Likewise.
-
-The series overhauls quite a bit of the bdrv_refresh_filename()
-infrastructure.  That function is also responsible for generating
-json:{} filenames.
-
-One thing it introduces is a BlockDriver field where a driver can
-specify which of the runtime options are actually important.  The rest
-is omitted from the generated json:{} filename.
-
-I may have taken the liberty not to include =3Dkeyvalue-pairs in RBD's
-"strong runtime options" list.
+Sure, but I'd hate you personally if you omitted them.
 
 Max
 
 
---MUbwnp1ru5jlgR5gfIh6sPKPfZrevhNjX
+--rcMarWx9LzmjBgCy9DsNGOzEZwt1fosyG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt0vXgACgkQ9AfbAGHV
-z0B1kAf+LDM9Uu/qrjyOZ6d6/JfMsGVWyHQVH+2rWLkerlG8y7/gf230hUGrjCbZ
-1x6cHo5Oqa1YFxaNuydnRvNR/llSUQgI/Xx+WdGmed4Ywhm8xfFKlDzU1pGql8Z3
-lU3W4vlFNhVWQbYWH04hJ4fy/Se00i6va2o2aX9IXbovqEcRDvZddKZpBl/BQEUe
-MG/599SPdlu37IUAX+hsZNghOuNLGa85Xqx+M/5vbWuLZsRFnceNN26cCQLNy3AN
-o+xWNyEvb9Mvobq9vBb+/1jdv468b6pKa1WYkU+xLmr1qpZy3Y8sd3tV/FHW5eTP
-3Nugc1z5XagqU4OeFnaVeEcRmIUbVg==
-=oBp/
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt0vugACgkQ9AfbAGHV
+z0DygAgAiMJwlWc3d6zQ24Zy5A2k+Dz225HKxTPDQE7PlYLY92xmEQoKMWrDoXrW
+4nN/uGCkwmGhslt0syW4h9yLKIGRGUedwRBnkxMuhaopfF6YKBv3pqP4XxWOgTbL
+1tbB5MogLNNBFXTk0m4Fi+xK9t41XPUthJgNwDkaJfe5VyZblTdxDdT4M6VSOfpS
+87fR6bUGdUnwiQA0FKlPYPcVJPYmRPJ+3dXdE7x4w5a3zjXLSocTVjfTbsxAMTNs
+/8jQmAy2eyMhum0RxmP7OGZsE6b3tjM+dSx9kqzxEY7AyjuRhAX+qQwYoO2M8ImP
+DCX0vFaCXBwFigiwX6WGLo4zT8TGcA==
+=mx3O
 -----END PGP SIGNATURE-----
 
---MUbwnp1ru5jlgR5gfIh6sPKPfZrevhNjX--
+--rcMarWx9LzmjBgCy9DsNGOzEZwt1fosyG--
