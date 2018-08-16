@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fqDvt-0005y1-Fg
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:47:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fqDzl-0002ek-PW
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fqDvh-0001cE-FS
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:47:01 -0400
-Resent-Message-Id: <E1fqDvh-0001cE-FS@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21095)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fqDvX-0001WN-Mm
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:46:47 -0400
-In-Reply-To: <20180814002653.12828-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153438123143.14580.11880092034733012823@502c9da6d61e>
+	(envelope-from <peter.maydell@linaro.org>) id 1fqDzi-0004Ws-3I
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:51:04 -0400
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:41205)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fqDzh-0004V9-Hk
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:51:01 -0400
+Received: by mail-oi0-x236.google.com with SMTP id k12-v6so6689509oiw.8
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 01:50:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 15 Aug 2018 18:00:32 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Fix int64_to_float16
- double-rounding
+In-Reply-To: <20180815125537.10651-1-kwolf@redhat.com>
+References: <20180815125537.10651-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Aug 2018 09:50:37 +0100
+Message-ID: <CAFEAcA-vOac_u5q86fmzLuy9UYPnqB2ZinYtTbt9AWrQd1URvw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/21] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org, alex.bennee@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODE0MDAyNjUzLjEyODI4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gdGFyZ2V0L2FybTogRml4IGlu
-dDY0X3RvX2Zsb2F0MTYgZG91YmxlLXJvdW5kaW5nCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
-PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
-aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
-LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
-ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjcwOWZiZTYwM2QgdGFyZ2V0L2FybTog
-VXNlIHRoZSBmbG9hdC10by1pbnQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVzCmIxNThjOGQ3Mzcg
-dGFyZ2V0L2FybTogVXNlIHRoZSBpbnQtdG8tZmxvYXQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVz
-CjVmODY3OTgwNjcgc29mdGZsb2F0OiBBZGQgc2NhbGluZyBmbG9hdC10by1pbnQgcm91dGluZXMK
-OGVjM2ZjNDllYSBzb2Z0ZmxvYXQ6IEFkZCBzY2FsaW5nIGludC10by1mbG9hdCByb3V0aW5lcwoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBzb2Z0ZmxvYXQ6IEFkZCBz
-Y2FsaW5nIGludC10by1mbG9hdCByb3V0aW5lcy4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IHNvZnRm
-bG9hdDogQWRkIHNjYWxpbmcgZmxvYXQtdG8taW50IHJvdXRpbmVzLi4uCkNoZWNraW5nIFBBVENI
-IDMvNDogdGFyZ2V0L2FybTogVXNlIHRoZSBpbnQtdG8tZmxvYXQtc2NhbGUgc29mdGZsb2F0IHJv
-dXRpbmVzLi4uCkNoZWNraW5nIFBBVENIIDQvNDogdGFyZ2V0L2FybTogVXNlIHRoZSBmbG9hdC10
-by1pbnQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVzLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVk
-IGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojNTc6IEZJTEU6IHRhcmdldC9hcm0v
-aGVscGVyLmM6MTE1MzE6CisgICAgICAgICAgICAgICAgICAgICAgICAgZ2V0X2Zsb2F0X3JvdW5k
-aW5nX21vZGUoZnBzdCksICkKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNs
-b3NlIHBhcmVudGhlc2lzICcpJwojNjM6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6MTE1MzY6
-CisgICAgICAgICAgICAgICAgICAgICAgICAgZ2V0X2Zsb2F0X3JvdW5kaW5nX21vZGUoZnBzdCks
-ICkKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTQyIGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 15 August 2018 at 13:55, Kevin Wolf <kwolf@redhat.com> wrote:
+> The following changes since commit 38441756b70eec5807b5f60dad11a93a91199866:
+>
+>   Update version for v3.0.0 release (2018-08-14 16:38:43 +0100)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to b5fc2d306664c0c1c6c5cf8e164ffa7b8892283e:
+>
+>   qapi: block: Remove mentions of error types which were removed (2018-08-15 12:50:39 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - Remove deprecated -drive options for geometry/serial/addr
+> - luks: Allow shared writers if the parents allow them (share-rw=on)
+> - qemu-img: Fix error when trying to convert to encrypted target image
+> - mirror: Fail gracefully for source == target
+> - I/O throttling: Fix behaviour during drain (always ignore the limits)
+> - bdrv_reopen() related fixes for bs->options/explicit_options content
+> - Documentation improvements
+>
+
+Applied, thanks.
+
+-- PMM
