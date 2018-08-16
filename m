@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fqGV9-0008PG-HE
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:31:40 -0400
+	(envelope-from <thuth@redhat.com>) id 1fqGZU-0001BE-G2
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:36:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fqGV6-0000xd-6s
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:31:39 -0400
-Resent-Message-Id: <E1fqGV6-0000xd-6s@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21017)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fqGV5-0000vZ-HC
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:31:35 -0400
-In-Reply-To: <20180809213528.14738-1-mreitz@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153430460784.10304.668502576933473446@502c9da6d61e>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 14 Aug 2018 20:43:29 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 00/31] block: Fix some filename
- generation issues
+	(envelope-from <thuth@redhat.com>) id 1fqGZR-0003KW-7z
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:36:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57756 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fqGZR-0003K7-2O
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:36:05 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 16 Aug 2018 13:35:50 +0200
+Message-Id: <1534419358-10932-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/8] Various qtest-related patches and a
+ mc146818rtc fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +22,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mreitz@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, berto@igalia.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODA5MjEzNTI4LjE0NzM4LTEtbXJlaXR6QHJlZGhhdC5jb20KU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBmb3ItMy4xIHYxMCAwMC8zMV0gYmxvY2s6IEZpeCBzb21l
-IGZpbGVuYW1lIGdlbmVyYXRpb24gaXNzdWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
-LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
-IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
-a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
-ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
-IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApT
-d2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjRkMmE2ODAxZTMgaW90ZXN0czogVGVzdCBq
-c29uOnt9IGZpbGVuYW1lcyBvZiBpbnRlcm5hbCBCRFNzCjkyODYxYjBkMjMgYmxvY2s6IEJEUyBv
-cHRpb25zIG1heSBsYWNrIHRoZSAiZHJpdmVyIiBvcHRpb24KNWU1MzlhOTllZSBibG9jay9udWxs
-OiBHZW5lcmF0ZSBmaWxlbmFtZSBldmVuIHdpdGggbGF0ZW5jeS1ucwozMDExZTE4MDk3IGJsb2Nr
-L2N1cmw6IEltcGxlbWVudCBiZHJ2X3JlZnJlc2hfZmlsZW5hbWUoKQpjM2QzYmEwNGM0IGJsb2Nr
-L2N1cmw6IEhhcm1vbml6ZSBvcHRpb24gZGVmYXVsdHMKMGYwMDE2OGZkYyBibG9jay9udm1lOiBG
-aXggYmRydl9yZWZyZXNoX2ZpbGVuYW1lKCkKMTBmZDdhODIzYiBibG9jazogRG8gbm90IGNvcHkg
-ZXhhY3RfZmlsZW5hbWUgZnJvbSBmb3JtYXQgZmlsZQoxNzA1NDgwNzg1IGJsb2NrOiBQdXJpZnkg
-LmJkcnZfcmVmcmVzaF9maWxlbmFtZSgpCmQ1ZmFjZThhMzcgYmxvY2s6IEdlbmVyaWNhbGx5IHJl
-ZnJlc2ggcnVudGltZSBvcHRpb25zCmQ4M2I5OTMyMDggYmxvY2s6IEFkZCBCbG9ja0RyaXZlci5i
-ZHJ2X2dhdGhlcl9jaGlsZF9vcHRpb25zCjM4Mzg0MTA3ZGMgYmxvY2s6IEFkZCBzdHJvbmdfcnVu
-dGltZV9vcHRzIHRvIEJsb2NrRHJpdmVyCmI5YjMzMTBmNWQgaW90ZXN0czogQWRkIHF1b3J1bSBj
-YXNlIHRvIHRlc3QgMTEwCjI5MmU2ZTVjOTYgYmxvY2s6IFVzZSBiZHJ2X2Rpcm5hbWUoKSBmb3Ig
-cmVsYXRpdmUgZmlsZW5hbWVzCmYxZmQ3NDhhY2EgYmxvY2svbmZzOiBJbXBsZW1lbnQgYmRydl9k
-aXJuYW1lKCkKOGRmYmY4OTZiNiBibG9jay9uYmQ6IE1ha2UgYmRydl9kaXJuYW1lKCkgcmV0dXJu
-IE5VTEwKYTUxODc4NTNmNiBxdW9ydW06IE1ha2UgYmRydl9kaXJuYW1lKCkgcmV0dXJuIE5VTEwK
-NGY2MmQwNTBjZCBibGt2ZXJpZnk6IE1ha2UgYmRydl9kaXJuYW1lKCkgcmV0dXJuIE5VTEwKZjRh
-ZTcyMjViMCBibG9jazogQWRkIGJkcnZfZGlybmFtZSgpCjliNWFkODRiODQgYmxvY2s6IEZpeCBi
-ZHJ2X2ZpbmRfYmFja2luZ19pbWFnZSgpCjMyNGFkZTEwMjYgYmxvY2s6IEFkZCBiZHJ2X21ha2Vf
-YWJzb2x1dGVfZmlsZW5hbWUoKQo2OGRlZjcyOTVmIGJsb2NrOiBiZHJ2X2dldF9mdWxsX2JhY2tp
-bmdfZmlsZW5hbWUncyByZXQuIHZhbC4KZTVlNTVmY2JiMyBibG9jazogYmRydl9nZXRfZnVsbF9i
-YWNraW5nX2ZpbGVuYW1lX2Zyb21fLi4uJ3MgcmV0LiB2YWwuCmI0MzRlYzViMzQgYmxvY2s6IE1h
-a2UgcGF0aF9jb21iaW5lKCkgcmV0dXJuIHRoZSBwYXRoCmEzNTQyYTk2NmIgaW90ZXN0czogQWRk
-IHRlc3QgZm9yIGJhY2tpbmcgZmlsZSBvdmVycmlkZXMKNmFmZmFhNzBhMCBpb3Rlc3RzLnB5OiBB
-ZGQgbm9kZV9pbmZvKCkKMTNkMmU5OGZlMyBpb3Rlc3RzLnB5OiBBZGQgZmlsdGVyX2ltZ2ZtdCgp
-CmE0NmFiYjIyZTMgYmxvY2s6IFJlc3BlY3QgYmFja2luZyBicyBpbiBiZHJ2X3JlZnJlc2hfZmls
-ZW5hbWUKOGIwY2QzMjFmNyBibG9jazogQWRkIEJEUy5hdXRvX2JhY2tpbmdfZmlsZQowYjljOTk5
-ZTE2IGJsb2NrOiBTa2lwIGltcGxpY2l0IG5vZGVzIGZvciBmaWxlbmFtZSBpbmZvCmI0YjdhMTBj
-YzIgYmxvY2s6IFVzZSBjaGlsZHJlbiBsaXN0IGluIGJkcnZfcmVmcmVzaF9maWxlbmFtZQo5MjIx
-MGMzNGI0IGJsb2NrOiBVc2UgYmRydl9yZWZyZXNoX2ZpbGVuYW1lKCkgdG8gcHVsbAoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zMTogYmxvY2s6IFVzZSBiZHJ2X3JlZnJl
-c2hfZmlsZW5hbWUoKSB0byBwdWxsLi4uCkNoZWNraW5nIFBBVENIIDIvMzE6IGJsb2NrOiBVc2Ug
-Y2hpbGRyZW4gbGlzdCBpbiBiZHJ2X3JlZnJlc2hfZmlsZW5hbWUuLi4KQ2hlY2tpbmcgUEFUQ0gg
-My8zMTogYmxvY2s6IFNraXAgaW1wbGljaXQgbm9kZXMgZm9yIGZpbGVuYW1lIGluZm8uLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNC8zMTogYmxvY2s6IEFkZCBCRFMuYXV0b19iYWNraW5nX2ZpbGUuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNS8zMTogYmxvY2s6IFJlc3BlY3QgYmFja2luZyBicyBpbiBiZHJ2X3JlZnJl
-c2hfZmlsZW5hbWUuLi4KRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVz
-ZXMgYXJlIG5vdCByZXF1aXJlZAojNDY6IEZJTEU6IGJsb2NrLmM6NTE5MjoKKyAgICAgICAgcmV0
-dXJuIChicy0+YXV0b19iYWNraW5nX2ZpbGVbMF0gIT0gJ1wwJyk7Cgp0b3RhbDogMSBlcnJvcnMs
-IDAgd2FybmluZ3MsIDEzNiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA2LzMxOiBpb3Rlc3RzLnB5OiBBZGQgZmlsdGVy
-X2ltZ2ZtdCgpLi4uCkNoZWNraW5nIFBBVENIIDcvMzE6IGlvdGVzdHMucHk6IEFkZCBub2RlX2lu
-Zm8oKS4uLgpDaGVja2luZyBQQVRDSCA4LzMxOiBpb3Rlc3RzOiBBZGQgdGVzdCBmb3IgYmFja2lu
-ZyBmaWxlIG92ZXJyaWRlcy4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
-KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMDogCm5ldyBmaWxlIG1vZGUg
-MTAwNzU1Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMyMyBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDkvMzE6
-IGJsb2NrOiBNYWtlIHBhdGhfY29tYmluZSgpIHJldHVybiB0aGUgcGF0aC4uLgpDaGVja2luZyBQ
-QVRDSCAxMC8zMTogYmxvY2s6IGJkcnZfZ2V0X2Z1bGxfYmFja2luZ19maWxlbmFtZV9mcm9tXy4u
-LidzIHJldC4gdmFsLi4uLgpDaGVja2luZyBQQVRDSCAxMS8zMTogYmxvY2s6IGJkcnZfZ2V0X2Z1
-bGxfYmFja2luZ19maWxlbmFtZSdzIHJldC4gdmFsLi4uLgpDaGVja2luZyBQQVRDSCAxMi8zMTog
-YmxvY2s6IEFkZCBiZHJ2X21ha2VfYWJzb2x1dGVfZmlsZW5hbWUoKS4uLgpDaGVja2luZyBQQVRD
-SCAxMy8zMTogYmxvY2s6IEZpeCBiZHJ2X2ZpbmRfYmFja2luZ19pbWFnZSgpLi4uCkNoZWNraW5n
-IFBBVENIIDE0LzMxOiBibG9jazogQWRkIGJkcnZfZGlybmFtZSgpLi4uCkNoZWNraW5nIFBBVENI
-IDE1LzMxOiBibGt2ZXJpZnk6IE1ha2UgYmRydl9kaXJuYW1lKCkgcmV0dXJuIE5VTEwuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTYvMzE6IHF1b3J1bTogTWFrZSBiZHJ2X2Rpcm5hbWUoKSByZXR1cm4gTlVM
-TC4uLgpDaGVja2luZyBQQVRDSCAxNy8zMTogYmxvY2svbmJkOiBNYWtlIGJkcnZfZGlybmFtZSgp
-IHJldHVybiBOVUxMLi4uCkNoZWNraW5nIFBBVENIIDE4LzMxOiBibG9jay9uZnM6IEltcGxlbWVu
-dCBiZHJ2X2Rpcm5hbWUoKS4uLgpDaGVja2luZyBQQVRDSCAxOS8zMTogYmxvY2s6IFVzZSBiZHJ2
-X2Rpcm5hbWUoKSBmb3IgcmVsYXRpdmUgZmlsZW5hbWVzLi4uCkNoZWNraW5nIFBBVENIIDIwLzMx
-OiBpb3Rlc3RzOiBBZGQgcXVvcnVtIGNhc2UgdG8gdGVzdCAxMTAuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MjEvMzE6IGJsb2NrOiBBZGQgc3Ryb25nX3J1bnRpbWVfb3B0cyB0byBCbG9ja0RyaXZlci4uLgpD
-aGVja2luZyBQQVRDSCAyMi8zMTogYmxvY2s6IEFkZCBCbG9ja0RyaXZlci5iZHJ2X2dhdGhlcl9j
-aGlsZF9vcHRpb25zLi4uCkNoZWNraW5nIFBBVENIIDIzLzMxOiBibG9jazogR2VuZXJpY2FsbHkg
-cmVmcmVzaCBydW50aW1lIG9wdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjQvMzE6IGJsb2NrOiBQ
-dXJpZnkgLmJkcnZfcmVmcmVzaF9maWxlbmFtZSgpLi4uCkNoZWNraW5nIFBBVENIIDI1LzMxOiBi
-bG9jazogRG8gbm90IGNvcHkgZXhhY3RfZmlsZW5hbWUgZnJvbSBmb3JtYXQgZmlsZS4uLgpDaGVj
-a2luZyBQQVRDSCAyNi8zMTogYmxvY2svbnZtZTogRml4IGJkcnZfcmVmcmVzaF9maWxlbmFtZSgp
-Li4uCkNoZWNraW5nIFBBVENIIDI3LzMxOiBibG9jay9jdXJsOiBIYXJtb25pemUgb3B0aW9uIGRl
-ZmF1bHRzLi4uCkNoZWNraW5nIFBBVENIIDI4LzMxOiBibG9jay9jdXJsOiBJbXBsZW1lbnQgYmRy
-dl9yZWZyZXNoX2ZpbGVuYW1lKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjkvMzE6IGJsb2NrL251bGw6
-IEdlbmVyYXRlIGZpbGVuYW1lIGV2ZW4gd2l0aCBsYXRlbmN5LW5zLi4uCkNoZWNraW5nIFBBVENI
-IDMwLzMxOiBibG9jazogQkRTIG9wdGlvbnMgbWF5IGxhY2sgdGhlICJkcml2ZXIiIG9wdGlvbi4u
-LgpDaGVja2luZyBQQVRDSCAzMS8zMTogaW90ZXN0czogVGVzdCBqc29uOnt9IGZpbGVuYW1lcyBv
-ZiBpbnRlcm5hbCBCRFNzLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
-cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzEwOiAKbmV3IGZpbGUgbW9kZSAx
-MDA3NTUKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTY0IGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+The basic idea for this patch series are the two patches that improve
+the device-inrospection test: We now check that the qom-tree and the
+qtree do not change during introspection, and the we also turn on the
+device introspection test with all machines when running in SPEED=slow
+mode. The other patches are a bug fix for the mc146818rtc device which
+has been discovered with the improved device-introspection test, two
+patches to shut up annoying messages during "make check", a patch to
+speed up the tests that iterate over all machine types and an update
+to the MAINTAINERS file.
+
+v2:
+ - Added Reviewed-bys from v1
+ - Use g_test_message() instead of g_debug()
+ - Improved the patch descriptions a little bit
+ - Added patch to skip old versioned machine types in quick mode
+ - Added Paolo's update to MAINTAINERS
+
+Paolo Bonzini (1):
+  MAINTAINERS: add maintainers for qtest
+
+Thomas Huth (7):
+  tests/migration-test: Silence the kvm_hv message by default
+  net: Silence 'has no peer' messages in testing mode
+  hw/timer/mc146818rtc: White space clean-up
+  hw/timer/mc146818rtc: Fix introspection problem
+  tests: Skip old versioned machine types in quick testing mode
+  tests/device-introspection: Check that the qom-tree and qtree do not
+    change
+  tests/device-introspect: Test with all machines, not only with "none"
+
+ MAINTAINERS                    | 10 ++++++++
+ hw/ppc/prep.c                  |  3 +++
+ hw/timer/mc146818rtc.c         | 20 ++++++---------
+ tests/cpu-plug-test.c          |  6 ++---
+ tests/device-introspect-test.c | 55 ++++++++++++++++++++++++++++++++++++------
+ tests/libqtest.c               | 52 +++++++++++++++++++++++++++++++++++++--
+ tests/libqtest.h               |  4 ++-
+ tests/migration-test.c         | 20 ++++++++-------
+ tests/qom-test.c               |  2 +-
+ tests/test-hmp.c               |  2 +-
+ vl.c                           |  3 +--
+ 11 files changed, 138 insertions(+), 39 deletions(-)
+
+-- 
+1.8.3.1
