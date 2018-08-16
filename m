@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJks-0005Fg-Gi
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:08 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkz-0005Kr-9W
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkg-0000Vw-MX
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:00 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:40309 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkt-0000eO-TK
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:11 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:43373 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJkg-0000UP-7N
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:59:54 -0400
+	id 1fqJkt-0000bm-H1
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:07 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:57:03 +0200
-Message-Id: <1534431497-1385-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:57:14 +0200
+Message-Id: <1534431497-1385-22-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 10/84] target/mips: Check ELPA flag only in
- some cases of MFHC0 and MTHC0
+Subject: [Qemu-devel] [PATCH v9 21/84] target/mips: Add emulation of
+ nanoMIPS 16-bit arithmetic instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +30,151 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-MFHC0 and MTHC0 used to handle EntryLo0 and EntryLo1 registers only,
-and placing ELPA flag checks before switch statement were technically
-correct. However, after adding handling more registers, these checks
-should be moved to act only in cases of handling EntryLo0 and
-EntryLo1.
+Add emulation of nanoMIPS 16-bit arithmetic instructions.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ target/mips/translate.c | 125 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 125 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 395368b..bdd880b 100644
+index 557b96b..f9ec95b 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -4897,12 +4897,11 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg=
-, int reg, int sel)
+@@ -16640,6 +16640,131 @@ static inline int decode_gpr_gpr4_zero(int r)
+ 
+ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
  {
-     const char *rn =3D "invalid";
-=20
--    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
--
-     switch (reg) {
-     case 2:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0))=
-;
-             rn =3D "EntryLo0";
-             break;
-@@ -4913,6 +4912,7 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, =
-int reg, int sel)
-     case 3:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1))=
-;
-             rn =3D "EntryLo1";
-             break;
-@@ -4965,12 +4965,11 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg=
-, int reg, int sel)
-     const char *rn =3D "invalid";
-     uint64_t mask =3D ctx->PAMask >> 36;
-=20
--    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
--
-     switch (reg) {
-     case 2:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             tcg_gen_andi_tl(arg, arg, mask);
-             gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0))=
-;
-             rn =3D "EntryLo0";
-@@ -4982,6 +4981,7 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, =
-int reg, int sel)
-     case 3:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             tcg_gen_andi_tl(arg, arg, mask);
-             gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1))=
-;
-             rn =3D "EntryLo1";
---=20
++    uint32_t op;
++    int rt = decode_gpr_gpr3(NANOMIPS_EXTRACT_RD(ctx->opcode));
++    int rs = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS(ctx->opcode));
++    int rd = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS1(ctx->opcode));
++    int imm;
++
++    /* make sure instructions are on a halfword boundary */
++    if (ctx->base.pc_next & 0x1) {
++        TCGv tmp = tcg_const_tl(ctx->base.pc_next);
++        tcg_gen_st_tl(tmp, cpu_env, offsetof(CPUMIPSState, CP0_BadVAddr));
++        tcg_temp_free(tmp);
++        generate_exception_end(ctx, EXCP_AdEL);
++        return 2;
++    }
++
++    op = extract32(ctx->opcode, 10, 6);
++    switch (op) {
++    case NM_P16_MV:
++        break;
++    case NM_P16_SHIFT:
++        break;
++    case NM_P16C:
++        break;
++    case NM_P16_A1:
++        switch (extract32(ctx->opcode, 6, 1)) {
++        case NM_ADDIUR1SP:
++            imm = extract32(ctx->opcode, 0, 6) << 2;
++            gen_arith_imm(ctx, OPC_ADDIU, rt, 29, imm);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++        break;
++    case NM_P16_A2:
++        switch (extract32(ctx->opcode, 3, 1)) {
++        case NM_ADDIUR2:
++            imm = extract32(ctx->opcode, 0, 3) << 2;
++            gen_arith_imm(ctx, OPC_ADDIU, rt, rs, imm);
++            break;
++        case NM_P_ADDIURS5:
++            rt = extract32(ctx->opcode, 5, 5);
++            if (rt != 0) {
++                /* imm = sign_extend(s[3] . s[2:0] , from_nbits = 4) */
++                imm = (sextract32(ctx->opcode, 4, 1) << 3) |
++                      (extract32(ctx->opcode, 0, 3));
++                gen_arith_imm(ctx, OPC_ADDIU, rt, rt, imm);
++            }
++            break;
++        }
++        break;
++    case NM_P16_ADDU:
++        switch (ctx->opcode & 0x1) {
++        case NM_ADDU16:
++            gen_arith(ctx, OPC_ADDU, rd, rs, rt);
++            break;
++        case NM_SUBU16:
++            gen_arith(ctx, OPC_SUBU, rd, rs, rt);
++            break;
++        }
++        break;
++    case NM_P16_4X4:
++        rt = (extract32(ctx->opcode, 9, 1) << 3) |
++              extract32(ctx->opcode, 5, 3);
++        rs = (extract32(ctx->opcode, 4, 1) << 3) |
++              extract32(ctx->opcode, 0, 3);
++        rt = decode_gpr_gpr4(rt);
++        rs = decode_gpr_gpr4(rs);
++        switch ((extract32(ctx->opcode, 7, 2) & 0x2) |
++                (extract32(ctx->opcode, 3, 1))) {
++        case NM_ADDU4X4:
++            gen_arith(ctx, OPC_ADDU, rt, rs, rt);
++            break;
++        case NM_MUL4X4:
++            gen_r6_muldiv(ctx, R6_OPC_MUL, rt, rs, rt);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++        break;
++    case NM_LI16:
++        break;
++    case NM_ANDI16:
++        break;
++    case NM_P16_LB:
++        break;
++    case NM_P16_LH:
++        break;
++    case NM_LW16:
++        break;
++    case NM_LWSP16:
++        break;
++    case NM_LW4X4:
++        break;
++    case NM_SW4X4:
++        break;
++    case NM_LWGP16:
++        break;
++    case NM_SWSP16:
++        break;
++    case NM_SW16:
++        break;
++    case NM_SWGP16:
++        break;
++    case NM_BC16:
++        break;
++    case NM_BALC16:
++        break;
++    case NM_BEQZC16:
++        break;
++    case NM_BNEZC16:
++        break;
++    case NM_P16_BR:
++        break;
++    case NM_P16_SR:
++        break;
++    case NM_MOVEP:
++        break;
++    case NM_MOVEPREV:
++        break;
++    default:
++        break;
++    }
++
+     return 2;
+ }
+ 
+-- 
 2.7.4
