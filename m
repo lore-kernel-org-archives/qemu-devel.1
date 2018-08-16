@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqMRa-0003de-7U
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:52:25 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqMRd-0003hN-Su
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:52:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqMRQ-0008Pe-TM
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:52:17 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56579 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqMRa-0008Rd-7s
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:52:25 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56912 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqMRN-0008Ou-65
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:52:10 -0400
+	id 1fqMRU-0008Pp-9B
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:52:18 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 19:49:02 +0200
-Message-Id: <1534441747-4197-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 19:49:04 +0200
+Message-Id: <1534441747-4197-13-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534441747-4197-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534441747-4197-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 10/15] target/mips: Check ELPA flag only in
- some cases of MFHC0 and MTHC0
+Subject: [Qemu-devel] [PULL v2 12/15] elf: Add ELF flags for MIPS machine
+ variants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +31,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-MFHC0 and MTHC0 used to handle EntryLo0 and EntryLo1 registers only,
-and placing ELPA flag checks before switch statement were technically
-correct. However, after adding handling more registers, these checks
-should be moved to act only in cases of handling EntryLo0 and
-EntryLo1.
+Add MIPS machine variants ELF flags so that the emulation behavior
+can be adjusted if needed.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/elf.h | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 395368b..bdd880b 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -4897,12 +4897,11 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg=
-, int reg, int sel)
- {
-     const char *rn =3D "invalid";
+diff --git a/include/elf.h b/include/elf.h
+index 60f6cbe..28a5a63 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -62,6 +62,29 @@ typedef int64_t  Elf64_Sxword;
+ #define EF_MIPS_FP64      0x00000200
+ #define EF_MIPS_NAN2008   0x00000400
 =20
--    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
--
-     switch (reg) {
-     case 2:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0))=
-;
-             rn =3D "EntryLo0";
-             break;
-@@ -4913,6 +4912,7 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, =
-int reg, int sel)
-     case 3:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1))=
-;
-             rn =3D "EntryLo1";
-             break;
-@@ -4965,12 +4965,11 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg=
-, int reg, int sel)
-     const char *rn =3D "invalid";
-     uint64_t mask =3D ctx->PAMask >> 36;
-=20
--    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
--
-     switch (reg) {
-     case 2:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             tcg_gen_andi_tl(arg, arg, mask);
-             gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0))=
-;
-             rn =3D "EntryLo0";
-@@ -4982,6 +4981,7 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, =
-int reg, int sel)
-     case 3:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             tcg_gen_andi_tl(arg, arg, mask);
-             gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1))=
-;
-             rn =3D "EntryLo1";
++/* MIPS machine variant */
++#define EF_MIPS_MACH_NONE     0x00000000  /* A standard MIPS implementat=
+ion  */
++#define EF_MIPS_MACH_3900     0x00810000  /* Toshiba R3900              =
+     */
++#define EF_MIPS_MACH_4010     0x00820000  /* LSI R4010                  =
+     */
++#define EF_MIPS_MACH_4100     0x00830000  /* NEC VR4100                 =
+     */
++#define EF_MIPS_MACH_4650     0x00850000  /* MIPS R4650                 =
+     */
++#define EF_MIPS_MACH_4120     0x00870000  /* NEC VR4120                 =
+     */
++#define EF_MIPS_MACH_4111     0x00880000  /* NEC VR4111/VR4181          =
+     */
++#define EF_MIPS_MACH_SB1      0x008a0000  /* Broadcom SB-1              =
+     */
++#define EF_MIPS_MACH_OCTEON   0x008b0000  /* Cavium Networks Octeon     =
+     */
++#define EF_MIPS_MACH_XLR      0x008c0000  /* RMI Xlr                    =
+     */
++#define EF_MIPS_MACH_OCTEON2  0x008d0000  /* Cavium Networks Octeon2    =
+     */
++#define EF_MIPS_MACH_OCTEON3  0x008e0000  /* Cavium Networks Octeon3    =
+     */
++#define EF_MIPS_MACH_5400     0x00910000  /* NEC VR5400                 =
+     */
++#define EF_MIPS_MACH_5900     0x00920000  /* MIPS R5900                 =
+     */
++#define EF_MIPS_MACH_5500     0x00980000  /* NEC VR5500                 =
+     */
++#define EF_MIPS_MACH_9000     0x00990000  /* PMC-Sierra's RM9000        =
+     */
++#define EF_MIPS_MACH_LS2E     0x00a00000  /* ST Microelectronics Loongso=
+n 2E */
++#define EF_MIPS_MACH_LS2F     0x00a10000  /* ST Microelectronics Loongso=
+n 2F */
++#define EF_MIPS_MACH_LS3A     0x00a20000  /* ST Microelectronics Loongso=
+n 3A */
++#define EF_MIPS_MACH          0x00ff0000  /* EF_MIPS_MACH_xxx selection =
+mask */
++
++
+ /* These constants define the different elf file types */
+ #define ET_NONE   0
+ #define ET_REL    1
 --=20
 2.7.4
