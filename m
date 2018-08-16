@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJmS-0008AP-R2
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJmS-0008AS-RO
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:01:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJmO-000230-0j
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJmP-000245-2v
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:01:44 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46076 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:46540 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJmA-00015h-1a
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:01:31 -0400
+	id 1fqJmD-00018K-Qr
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:01:35 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:58:07 +0200
-Message-Id: <1534431497-1385-75-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:58:11 +0200
+Message-Id: <1534431497-1385-79-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v9 74/84] linux-user: Add signal.c for nanoMIPS
+Subject: [Qemu-devel] [PATCH v9 78/84] linux-user: Add support for statx()
+ syscall for all platforms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,124 +28,206 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Dimitrije Nikolic <dnikolic@wavecomp.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Add signal.c as a redirection to regular mips' signal.c, but at the
-same time amend regular mips' signal.c with bits and pieces specific
-for nanoMIPS. This was done this way to avoid duplication of large
-pieces of code.
+Implement support for translation of system call statx(). The
+implementation includes invoking other (more mature) syscalls
+(from the same 'stat' family) on the host side. This way,
+problems of availability of statx() on the host side are
+avoided.
 
-Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/mips/signal.c     | 25 ++++++++++++++++++++-----
- linux-user/nanomips/signal.c |  1 +
- 2 files changed, 21 insertions(+), 5 deletions(-)
- create mode 100644 linux-user/nanomips/signal.c
+ linux-user/syscall.c      | 121 +++++++++++++++++++++++++++++++++++++++++++++-
+ linux-user/syscall_defs.h |  38 +++++++++++++++
+ 2 files changed, 158 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
-index 6aa303e..ab66429 100644
---- a/linux-user/mips/signal.c
-+++ b/linux-user/mips/signal.c
-@@ -21,7 +21,15 @@
- #include "signal-common.h"
- #include "linux-user/trace.h"
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index bced9b8..f1b6d71 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8002,7 +8002,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+     abi_long ret;
+ #if defined(TARGET_NR_stat) || defined(TARGET_NR_stat64) \
+     || defined(TARGET_NR_lstat) || defined(TARGET_NR_lstat64) \
+-    || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64)
++    || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64) \
++    || defined(TARGET_NR_statx)
+     struct stat st;
+ #endif
+ #if defined(TARGET_NR_statfs) || defined(TARGET_NR_statfs64) \
+@@ -10025,6 +10026,124 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         }
+         break;
+ #endif
++#if defined(TARGET_NR_statx)
++    case TARGET_NR_statx:
++        {
++            struct target_statx *target_stx;
++            int dirfd = tswap32(arg1);
++            int flags = tswap32(arg3);
++
++            p = lock_user_string(arg2);
++            if (p == NULL) {
++                goto efault;
++            }
++#if defined(__NR_statx)
++            {
++                /* We assume that struct statx is arhitecture independent */
++                struct target_statx host_stx;
++                int mask = tswap32(arg4);
++
++                ret = get_errno(syscall(__NR_statx, dirfd, p, flags, mask,
++                                        &host_stx));
++                if (!is_error(ret)) {
++                    unlock_user(p, arg2, 0);
++                    if (!lock_user_struct(VERIFY_WRITE, target_stx, arg5, 0)) {
++                        goto efault;
++                    }
++                    memset(target_stx, 0, sizeof(*target_stx));
++
++                    __put_user(host_stx.stx_mask, &target_stx->stx_mask);
++                    __put_user(host_stx.stx_blksize, &target_stx->stx_blksize);
++                    __put_user(host_stx.stx_attributes,
++                               &target_stx->stx_attributes);
++                    __put_user(host_stx.stx_nlink, &target_stx->stx_nlink);
++                    __put_user(host_stx.stx_uid, &target_stx->stx_uid);
++                    __put_user(host_stx.stx_gid, &target_stx->stx_gid);
++                    __put_user(host_stx.stx_mode, &target_stx->stx_mode);
++                    __put_user(host_stx.stx_ino, &target_stx->stx_ino);
++                    __put_user(host_stx.stx_size, &target_stx->stx_size);
++                    __put_user(host_stx.stx_blocks, &target_stx->stx_blocks);
++                    __put_user(host_stx.stx_attributes_mask,
++                               &target_stx->stx_attributes_mask);
++                    __put_user(host_stx.stx_atime.tv_sec,
++                               &target_stx->stx_atime.tv_sec);
++                    __put_user(host_stx.stx_atime.tv_nsec,
++                               &target_stx->stx_atime.tv_nsec);
++                    __put_user(host_stx.stx_btime.tv_sec,
++                               &target_stx->stx_atime.tv_sec);
++                    __put_user(host_stx.stx_btime.tv_nsec,
++                               &target_stx->stx_atime.tv_nsec);
++                    __put_user(host_stx.stx_ctime.tv_sec,
++                               &target_stx->stx_atime.tv_sec);
++                    __put_user(host_stx.stx_ctime.tv_nsec,
++                               &target_stx->stx_atime.tv_nsec);
++                    __put_user(host_stx.stx_mtime.tv_sec,
++                               &target_stx->stx_atime.tv_sec);
++                    __put_user(host_stx.stx_mtime.tv_nsec,
++                               &target_stx->stx_atime.tv_nsec);
++                    __put_user(host_stx.stx_rdev_major,
++                               &target_stx->stx_rdev_major);
++                    __put_user(host_stx.stx_rdev_minor,
++                               &target_stx->stx_rdev_minor);
++                    __put_user(host_stx.stx_dev_major,
++                               &target_stx->stx_dev_major);
++                    __put_user(host_stx.stx_dev_minor,
++                               &target_stx->stx_dev_minor);
++                }
++
++                if (ret != TARGET_ENOSYS) {
++                    break;
++                }
++            }
++#endif
++            if ((p == NULL) || (*((char *)p) == 0)) {
++                /* By file descriptor */
++                ret = get_errno(fstat(dirfd, &st));
++                unlock_user(p, arg2, 0);
++            } else if (*((char *)p) == '/') {
++                /* Absolute pathname */
++                ret = get_errno(stat(path(p), &st));
++                unlock_user(p, arg2, 0);
++            } else {
++                if (dirfd == AT_FDCWD) {
++                    /* Pathname relative to the current working directory */
++                    ret = get_errno(stat(path(p), &st));
++                    unlock_user(p, arg2, 0);
++                } else {
++                    /*
++                     * Pathname relative to the directory referred to by the
++                     * file descriptor dirfd
++                     */
++                    ret = get_errno(fstatat(dirfd, path(p), &st, flags));
++                    unlock_user(p, arg2, 0);
++                }
++            }
++
++            if (!is_error(ret)) {
++                if (!lock_user_struct(VERIFY_WRITE, target_stx, arg5, 0)) {
++                    goto efault;
++                }
++                memset(target_stx, 0, sizeof(*target_stx));
++                __put_user(major(st.st_dev), &target_stx->stx_dev_major);
++                __put_user(minor(st.st_dev), &target_stx->stx_dev_minor);
++                __put_user(st.st_ino, &target_stx->stx_ino);
++                __put_user(st.st_mode, &target_stx->stx_mode);
++                __put_user(st.st_uid, &target_stx->stx_uid);
++                __put_user(st.st_gid, &target_stx->stx_gid);
++                __put_user(st.st_nlink, &target_stx->stx_nlink);
++                __put_user(major(st.st_rdev), &target_stx->stx_rdev_major);
++                __put_user(minor(st.st_rdev), &target_stx->stx_rdev_minor);
++                __put_user(st.st_size, &target_stx->stx_size);
++                __put_user(st.st_blksize, &target_stx->stx_blksize);
++                __put_user(st.st_blocks, &target_stx->stx_blocks);
++                __put_user(st.st_atime, &target_stx->stx_atime.tv_sec);
++                __put_user(st.st_mtime, &target_stx->stx_mtime.tv_sec);
++                __put_user(st.st_ctime, &target_stx->stx_ctime.tv_sec);
++                unlock_user_struct(target_stx, arg5, 1);
++            }
++        }
++        break;
++#endif
+ #ifdef TARGET_NR_olduname
+     case TARGET_NR_olduname:
+         goto unimplemented;
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index abf94b8..34cc6e0 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -2530,4 +2530,42 @@ struct target_user_cap_data {
+ /* Return size of the log buffer */
+ #define TARGET_SYSLOG_ACTION_SIZE_BUFFER   10
  
--# if defined(TARGET_ABI_MIPSO32)
-+#if defined(TARGET_ABI_MIPSP32)
-+struct target_sigcontext {
-+    uint64_t sc_regs[32];
-+    uint64_t sc_pc;
-+    uint32_t sc_used_math;
-+    uint32_t sc_reserved;
++struct target_statx_timestamp {
++   int64_t tv_sec;
++   uint32_t tv_nsec;
++   int32_t __reserved;
 +};
-+#define TARGET_ALMASK  (~15)
-+#elif defined(TARGET_ABI_MIPSO32)
- struct target_sigcontext {
-     uint32_t   sc_regmask;     /* Unused */
-     uint32_t   sc_status;
-@@ -43,6 +51,7 @@ struct target_sigcontext {
-     target_ulong   sc_hi3;
-     target_ulong   sc_lo3;
- };
-+#define TARGET_ALMASK  (~7)
- # else /* N32 || N64 */
- struct target_sigcontext {
-     uint64_t sc_regs[32];
-@@ -61,6 +70,7 @@ struct target_sigcontext {
-     uint32_t sc_dsp;
-     uint32_t sc_reserved;
- };
-+#define TARGET_ALMASK  (~15)
- # endif /* O32 */
- 
- struct sigframe {
-@@ -100,6 +110,7 @@ static inline int install_sigtramp(unsigned int *tramp,   unsigned int syscall)
- 
-     __put_user(0x24020000 + syscall, tramp + 0);
-     __put_user(0x0000000c          , tramp + 1);
 +
-     return err;
- }
- 
-@@ -116,6 +127,7 @@ static inline void setup_sigcontext(CPUMIPSState *regs,
-         __put_user(regs->active_tc.gpr[i], &sc->sc_regs[i]);
-     }
- 
-+#if !defined(TARGET_ABI_MIPSP32)
-     __put_user(regs->active_tc.HI[0], &sc->sc_mdhi);
-     __put_user(regs->active_tc.LO[0], &sc->sc_mdlo);
- 
-@@ -137,6 +149,7 @@ static inline void setup_sigcontext(CPUMIPSState *regs,
-     for (i = 0; i < 32; ++i) {
-         __put_user(regs->active_fpu.fpr[i].d, &sc->sc_fpregs[i]);
-     }
-+#endif
- }
- 
- static inline void
-@@ -146,13 +159,14 @@ restore_sigcontext(CPUMIPSState *regs, struct target_sigcontext *sc)
- 
-     __get_user(regs->CP0_EPC, &sc->sc_pc);
- 
--    __get_user(regs->active_tc.HI[0], &sc->sc_mdhi);
--    __get_user(regs->active_tc.LO[0], &sc->sc_mdlo);
--
-     for (i = 1; i < 32; ++i) {
-         __get_user(regs->active_tc.gpr[i], &sc->sc_regs[i]);
-     }
- 
-+#if !defined(TARGET_ABI_MIPSP32)
-+    __get_user(regs->active_tc.HI[0], &sc->sc_mdhi);
-+    __get_user(regs->active_tc.LO[0], &sc->sc_mdlo);
++struct target_statx {
++   /* 0x00 */
++   uint32_t stx_mask;       /* What results were written [uncond] */
++   uint32_t stx_blksize;    /* Preferred general I/O size [uncond] */
++   uint64_t stx_attributes; /* Flags conveying information about the file */
++   /* 0x10 */
++   uint32_t stx_nlink;      /* Number of hard links */
++   uint32_t stx_uid;        /* User ID of owner */
++   uint32_t stx_gid;        /* Group ID of owner */
++   uint16_t stx_mode;       /* File mode */
++   uint16_t __spare0[1];
++   /* 0x20 */
++   uint64_t stx_ino;        /* Inode number */
++   uint64_t stx_size;       /* File size */
++   uint64_t stx_blocks;     /* Number of 512-byte blocks allocated */
++   uint64_t stx_attributes_mask; /* Mask to show what's supported in
++                                    stx_attributes */
++   /* 0x40 */
++   struct target_statx_timestamp  stx_atime;  /* Last access time */
++   struct target_statx_timestamp  stx_btime;  /* File creation time */
++   struct target_statx_timestamp  stx_ctime;  /* Last attribute change time */
++   struct target_statx_timestamp  stx_mtime;  /* Last data modification time */
++   /* 0x80 */
++   uint32_t stx_rdev_major;   /* Device ID of special file [if bdev/cdev] */
++   uint32_t stx_rdev_minor;
++   uint32_t stx_dev_major; /* ID of device containing file [uncond] */
++   uint32_t stx_dev_minor;
++   /* 0x90 */
++   uint64_t __spare2[14];  /* Spare space for future expansion */
++   /* 0x100 */
++};
 +
-     __get_user(regs->active_tc.HI[1], &sc->sc_hi1);
-     __get_user(regs->active_tc.HI[2], &sc->sc_hi2);
-     __get_user(regs->active_tc.HI[3], &sc->sc_hi3);
-@@ -168,6 +182,7 @@ restore_sigcontext(CPUMIPSState *regs, struct target_sigcontext *sc)
-     for (i = 0; i < 32; ++i) {
-         __get_user(regs->active_fpu.fpr[i].d, &sc->sc_fpregs[i]);
-     }
-+#endif
- }
- 
- /*
-@@ -185,7 +200,7 @@ get_sigframe(struct target_sigaction *ka, CPUMIPSState *regs, size_t frame_size)
-      */
-     sp = target_sigsp(get_sp_from_cpustate(regs) - 32, ka);
- 
--    return (sp - frame_size) & ~7;
-+    return (sp - frame_size) & TARGET_ALMASK;
- }
- 
- static void mips_set_hflags_isa_mode_from_pc(CPUMIPSState *env)
-diff --git a/linux-user/nanomips/signal.c b/linux-user/nanomips/signal.c
-new file mode 100644
-index 0000000..86efc21
---- /dev/null
-+++ b/linux-user/nanomips/signal.c
-@@ -0,0 +1 @@
-+#include "../mips/signal.c"
+ #endif
 -- 
 2.7.4
