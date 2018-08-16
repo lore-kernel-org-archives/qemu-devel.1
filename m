@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJl0-0005Kw-KG
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:24 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJl9-0005U6-Pq
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkt-0000cx-4u
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:11 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41120 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkv-0000gB-2k
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:17 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:43460 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJks-0000Wb-Mn
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:07 -0400
+	id 1fqJku-0000dO-6v
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:08 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:57:11 +0200
-Message-Id: <1534431497-1385-19-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:57:27 +0200
+Message-Id: <1534431497-1385-35-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v9 18/84] target/mips: Add nanoMIPS DSP ASE
- opcodes
+Subject: [Qemu-devel] [PATCH v9 34/84] target/mips: Add emulation of misc
+ nanoMIPS instructions (p_lsx)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,258 +28,181 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add nanoMIPS opcodes for DSP ASE instruction pools and instructions.
+Add emulation of nanoMIPS instructions situated in pool p_lsx, and
+emulation of LSA instruction as well.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 215 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 215 insertions(+)
+ target/mips/translate.c | 132 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 131 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 0075dbc..4f95b9a 100644
+index 8a0e2b3..0ac9f0d 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16010,6 +16010,79 @@ enum {
-     NM_SOV      = 0x7a,
- };
+@@ -16983,6 +16983,125 @@ static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
+     }
+ }
  
-+/* POOL32A5 instruction pool */
-+enum {
-+    NM_CMP_EQ_PH        = 0x00,
-+    NM_CMP_LT_PH        = 0x08,
-+    NM_CMP_LE_PH        = 0x10,
-+    NM_CMPGU_EQ_QB      = 0x18,
-+    NM_CMPGU_LT_QB      = 0x20,
-+    NM_CMPGU_LE_QB      = 0x28,
-+    NM_CMPGDU_EQ_QB     = 0x30,
-+    NM_CMPGDU_LT_QB     = 0x38,
-+    NM_CMPGDU_LE_QB     = 0x40,
-+    NM_CMPU_EQ_QB       = 0x48,
-+    NM_CMPU_LT_QB       = 0x50,
-+    NM_CMPU_LE_QB       = 0x58,
-+    NM_ADDQ_S_W         = 0x60,
-+    NM_SUBQ_S_W         = 0x68,
-+    NM_ADDSC            = 0x70,
-+    NM_ADDWC            = 0x78,
 +
-+    NM_ADDQ_S_PH   = 0x01,
-+    NM_ADDQH_R_PH  = 0x09,
-+    NM_ADDQH_R_W   = 0x11,
-+    NM_ADDU_S_QB   = 0x19,
-+    NM_ADDU_S_PH   = 0x21,
-+    NM_ADDUH_R_QB  = 0x29,
-+    NM_SHRAV_R_PH  = 0x31,
-+    NM_SHRAV_R_QB  = 0x39,
-+    NM_SUBQ_S_PH   = 0x41,
-+    NM_SUBQH_R_PH  = 0x49,
-+    NM_SUBQH_R_W   = 0x51,
-+    NM_SUBU_S_QB   = 0x59,
-+    NM_SUBU_S_PH   = 0x61,
-+    NM_SUBUH_R_QB  = 0x69,
-+    NM_SHLLV_S_PH  = 0x71,
-+    NM_PRECR_SRA_R_PH_W = 0x79,
++static void gen_p_lsx(DisasContext *ctx, int rd, int rs, int rt)
++{
++    TCGv t0, t1;
++    t0 = tcg_temp_new();
++    t1 = tcg_temp_new();
 +
-+    NM_MULEU_S_PH_QBL   = 0x12,
-+    NM_MULEU_S_PH_QBR   = 0x1a,
-+    NM_MULQ_RS_PH       = 0x22,
-+    NM_MULQ_S_PH        = 0x2a,
-+    NM_MULQ_RS_W        = 0x32,
-+    NM_MULQ_S_W         = 0x3a,
-+    NM_APPEND           = 0x42,
-+    NM_MODSUB           = 0x52,
-+    NM_SHRAV_R_W        = 0x5a,
-+    NM_SHRLV_PH         = 0x62,
-+    NM_SHRLV_QB         = 0x6a,
-+    NM_SHLLV_QB         = 0x72,
-+    NM_SHLLV_S_W        = 0x7a,
++    gen_load_gpr(t0, rs);
++    gen_load_gpr(t1, rt);
 +
-+    NM_SHILO            = 0x03,
++    if ((extract32(ctx->opcode, 6, 1)) == 1) {
++        /* PP.LSXS instructions require shifting */
++        switch (extract32(ctx->opcode, 7, 4)) {
++        case NM_LHXS:
++        case NM_SHXS:
++        case NM_LHUXS:
++            tcg_gen_shli_tl(t0, t0, 1);
++            break;
++        case NM_LWXS:
++        case NM_SWXS:
++        case NM_LWC1XS:
++        case NM_SWC1XS:
++            tcg_gen_shli_tl(t0, t0, 2);
++            break;
++        case NM_LDC1XS:
++        case NM_SDC1XS:
++            tcg_gen_shli_tl(t0, t0, 3);
++            break;
++        }
++    }
++    gen_op_addr_add(ctx, t0, t0, t1);
 +
-+    NM_MULEQ_S_W_PHL    = 0x04,
-+    NM_MULEQ_S_W_PHR    = 0x0c,
++    switch (extract32(ctx->opcode, 7, 4)) {
++    case NM_LBX:
++        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
++                           MO_SB);
++        gen_store_gpr(t0, rd);
++        break;
++    case NM_LHX:
++    /*case NM_LHXS:*/
++        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
++                           MO_TESW);
++        gen_store_gpr(t0, rd);
++        break;
++    case NM_LWX:
++    /*case NM_LWXS:*/
++        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
++                           MO_TESL);
++        gen_store_gpr(t0, rd);
++        break;
++    case NM_LBUX:
++        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
++                           MO_UB);
++        gen_store_gpr(t0, rd);
++        break;
++    case NM_LHUX:
++    /*case NM_LHUXS:*/
++        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
++                           MO_TEUW);
++        gen_store_gpr(t0, rd);
++        break;
++    case NM_SBX:
++        gen_load_gpr(t1, rd);
++        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx,
++                           MO_8);
++        break;
++    case NM_SHX:
++    /*case NM_SHXS:*/
++        gen_load_gpr(t1, rd);
++        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx,
++                           MO_TEUW);
++        break;
++    case NM_SWX:
++    /*case NM_SWXS:*/
++        gen_load_gpr(t1, rd);
++        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx,
++                           MO_TEUL);
++        break;
++    case NM_LWC1X:
++    /*case NM_LWC1XS:*/
++    case NM_LDC1X:
++    /*case NM_LDC1XS:*/
++    case NM_SWC1X:
++    /*case NM_SWC1XS:*/
++    case NM_SDC1X:
++    /*case NM_SDC1XS:*/
++        if (ctx->CP0_Config1 & (1 << CP0C1_FP)) {
++            check_cp1_enabled(ctx);
++            switch (extract32(ctx->opcode, 7, 4)) {
++            case NM_LWC1X:
++            /*case NM_LWC1XS:*/
++                gen_flt_ldst(ctx, OPC_LWC1, rd, t0);
++                break;
++            case NM_LDC1X:
++            /*case NM_LDC1XS:*/
++                gen_flt_ldst(ctx, OPC_LDC1, rd, t0);
++                break;
++            case NM_SWC1X:
++            /*case NM_SWC1XS:*/
++                gen_flt_ldst(ctx, OPC_SWC1, rd, t0);
++                break;
++            case NM_SDC1X:
++            /*case NM_SDC1XS:*/
++                gen_flt_ldst(ctx, OPC_SDC1, rd, t0);
++                break;
++            }
++        } else {
++            generate_exception_err(ctx, EXCP_CpU, 1);
++        }
++        break;
++    default:
++        generate_exception_end(ctx, EXCP_RI);
++        break;
++    }
 +
-+    NM_MUL_S_PH         = 0x05,
-+    NM_PRECR_QB_PH      = 0x0d,
-+    NM_PRECRQ_QB_PH     = 0x15,
-+    NM_PRECRQ_PH_W      = 0x1d,
-+    NM_PRECRQ_RS_PH_W   = 0x25,
-+    NM_PRECRQU_S_QB_PH  = 0x2d,
-+    NM_PACKRL_PH        = 0x35,
-+    NM_PICK_QB          = 0x3d,
-+    NM_PICK_PH          = 0x45,
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++}
 +
-+    NM_SHRA_R_W         = 0x5e,
-+    NM_SHRA_R_PH        = 0x66,
-+    NM_SHLL_S_PH        = 0x76,
-+    NM_SHLL_S_W         = 0x7e,
-+
-+    NM_REPL_PH          = 0x07
-+};
-+
- /* POOL32A7 instruction pool */
- enum {
-     NM_P_LSX        = 0x00,
-@@ -16199,8 +16272,127 @@ enum {
+ static void gen_pool32f_nanomips_insn(DisasContext *ctx)
+ {
+     int rt, rs, rd;
+@@ -17286,7 +17405,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+ {
+     uint16_t insn;
+     uint32_t op;
+-    int rt, rs;
++    int rt, rs, rd;
+     int offset;
+     int imm;
  
- /* POOL32Axf instruction pool */
- enum {
-+    NM_POOL32AXF_1 = 0x01,
-+    NM_POOL32AXF_2 = 0x02,
-     NM_POOL32AXF_4 = 0x04,
-     NM_POOL32AXF_5 = 0x05,
-+    NM_POOL32AXF_7 = 0x07,
-+};
-+
-+/* POOL32Axf_1 instruction pool */
-+enum {
-+    NM_POOL32AXF_1_0 = 0x00,
-+    NM_POOL32AXF_1_1 = 0x01,
-+    NM_POOL32AXF_1_3 = 0x03,
-+    NM_POOL32AXF_1_4 = 0x04,
-+    NM_POOL32AXF_1_5 = 0x05,
-+    NM_POOL32AXF_1_7 = 0x07,
-+};
-+
-+/* POOL32Axf_2 instruction pool */
-+enum {
-+    NM_POOL32AXF_2_0_7     = 0x00,
-+    NM_POOL32AXF_2_8_15    = 0x01,
-+    NM_POOL32AXF_2_16_23   = 0x02,
-+    NM_POOL32AXF_2_24_31   = 0x03,
-+};
-+
-+/* POOL32Axf_7 instruction pool */
-+enum {
-+    NM_SHRA_R_QB    = 0x0,
-+    NM_SHRL_PH      = 0x1,
-+    NM_REPL_QB      = 0x2,
-+};
-+
-+/* POOL32Axf_1_0 instruction pool */
-+enum {
-+    NM_MFHI = 0x0,
-+    NM_MFLO = 0x1,
-+    NM_MTHI = 0x2,
-+    NM_MTLO = 0x3,
-+};
-+
-+/* POOL32Axf_1_1 instruction pool */
-+enum {
-+    NM_MTHLIP = 0x0,
-+    NM_SHILOV = 0x1,
-+};
-+
-+/* POOL32Axf_1_3 instruction pool */
-+enum {
-+    NM_RDDSP    = 0x0,
-+    NM_WRDSP    = 0x1,
-+    NM_EXTP     = 0x2,
-+    NM_EXTPDP   = 0x3,
-+};
-+
-+/* POOL32Axf_1_4 instruction pool */
-+enum {
-+    NM_SHLL_QB  = 0x0,
-+    NM_SHRL_QB  = 0x1,
-+};
-+
-+/* POOL32Axf_1_5 instruction pool */
-+enum {
-+    NM_MAQ_S_W_PHR   = 0x0,
-+    NM_MAQ_S_W_PHL   = 0x1,
-+    NM_MAQ_SA_W_PHR  = 0x2,
-+    NM_MAQ_SA_W_PHL  = 0x3,
-+};
-+
-+/* POOL32Axf_1_7 instruction pool */
-+enum {
-+    NM_EXTR_W       = 0x0,
-+    NM_EXTR_R_W     = 0x1,
-+    NM_EXTR_RS_W    = 0x2,
-+    NM_EXTR_S_H     = 0x3,
-+};
-+
-+/* POOL32Axf_2_0_7 instruction pool */
-+enum {
-+    NM_DPA_W_PH     = 0x0,
-+    NM_DPAQ_S_W_PH  = 0x1,
-+    NM_DPS_W_PH     = 0x2,
-+    NM_DPSQ_S_W_PH  = 0x3,
-+    NM_BALIGN       = 0x4,
-+    NM_MADD         = 0x5,
-+    NM_MULT         = 0x6,
-+    NM_EXTRV_W      = 0x7,
-+};
-+
-+/* POOL32Axf_2_8_15 instruction pool */
-+enum {
-+    NM_DPAX_W_PH    = 0x0,
-+    NM_DPAQ_SA_L_W  = 0x1,
-+    NM_DPSX_W_PH    = 0x2,
-+    NM_DPSQ_SA_L_W  = 0x3,
-+    NM_MADDU        = 0x5,
-+    NM_MULTU        = 0x6,
-+    NM_EXTRV_R_W    = 0x7,
-+};
-+
-+/* POOL32Axf_2_16_23 instruction pool */
-+enum {
-+    NM_DPAU_H_QBL       = 0x0,
-+    NM_DPAQX_S_W_PH     = 0x1,
-+    NM_DPSU_H_QBL       = 0x2,
-+    NM_DPSQX_S_W_PH     = 0x3,
-+    NM_EXTPV            = 0x4,
-+    NM_MSUB             = 0x5,
-+    NM_MULSA_W_PH       = 0x6,
-+    NM_EXTRV_RS_W       = 0x7,
-+};
-+
-+/* POOL32Axf_2_24_31 instruction pool */
-+enum {
-+    NM_DPAU_H_QBR       = 0x0,
-+    NM_DPAQX_SA_W_PH    = 0x1,
-+    NM_DPSU_H_QBR       = 0x2,
-+    NM_DPSQX_SA_W_PH    = 0x3,
-+    NM_EXTPDPV          = 0x4,
-+    NM_MSUBU            = 0x5,
-+    NM_MULSAQ_S_W_PH    = 0x6,
-+    NM_EXTRV_S_H        = 0x7,
- };
+@@ -17295,6 +17414,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
  
- /* POOL32Axf_{4, 5} instruction pool */
-@@ -16221,6 +16413,29 @@ enum {
-     NM_WAIT     = 0x61,
-     NM_DERET    = 0x71,
-     NM_ERETX    = 0x79,
-+
-+    /* nanoMIPS DSP instructions */
-+    NM_ABSQ_S_QB        = 0x00,
-+    NM_ABSQ_S_PH        = 0x08,
-+    NM_ABSQ_S_W         = 0x10,
-+    NM_PRECEQ_W_PHL     = 0x28,
-+    NM_PRECEQ_W_PHR     = 0x30,
-+    NM_PRECEQU_PH_QBL   = 0x38,
-+    NM_PRECEQU_PH_QBR   = 0x48,
-+    NM_PRECEU_PH_QBL    = 0x58,
-+    NM_PRECEU_PH_QBR    = 0x68,
-+    NM_PRECEQU_PH_QBLA  = 0x39,
-+    NM_PRECEQU_PH_QBRA  = 0x49,
-+    NM_PRECEU_PH_QBLA   = 0x59,
-+    NM_PRECEU_PH_QBRA   = 0x69,
-+    NM_REPLV_PH         = 0x01,
-+    NM_REPLV_QB         = 0x09,
-+    NM_BITREV           = 0x18,
-+    NM_INSV             = 0x20,
-+    NM_RADDU_W_QB       = 0x78,
-+
-+    NM_BITSWAP          = 0x05,
-+    NM_WSBH             = 0x3d,
- };
+     rt = extract32(ctx->opcode, 21, 5);
+     rs = extract32(ctx->opcode, 16, 5);
++    rd = extract32(ctx->opcode, 11, 5);
  
- /* PP.SR instruction pool */
+     op = extract32(ctx->opcode, 26, 6);
+     switch (op) {
+@@ -17353,6 +17473,16 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+             break;
+         case NM_POOL32A7:
+             switch (extract32(ctx->opcode, 3, 3)) {
++            case NM_P_LSX:
++                gen_p_lsx(ctx, rd, rs, rt);
++                break;
++            case NM_LSA:
++                /* In nanoMIPS, the shift field directly encodes the shift
++                 * amount, meaning that the supported shift values are in
++                 * the range 0 to 3 (instead of 1 to 4 in MIPSR6). */
++                gen_lsa(ctx, OPC_LSA, rd, rs, rt,
++                        extract32(ctx->opcode, 9, 2) - 1);
++                break;
+             case NM_POOL32AXF:
+                 gen_pool32axf_nanomips_insn(env, ctx);
+                 break;
 -- 
 2.7.4
