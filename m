@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqLZD-0001O9-MH
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:56:12 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqLjX-0008II-4M
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqLZC-0007SL-OM
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:56:11 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:41998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqLZC-0007RX-Cy
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:56:10 -0400
-Received: by mail-oi0-x244.google.com with SMTP id b16-v6so9221684oic.9
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 09:56:10 -0700 (PDT)
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqLjU-0005Pw-0L
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:06:51 -0400
+Received: from mail-eopbgr690094.outbound.protection.outlook.com
+	([40.107.69.94]:19791
+	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fqLjT-0005Pb-IL
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 13:06:47 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 16 Aug 2018 17:06:41 +0000
+Message-ID: <BN7PR08MB486867F6E966AB071EAC4ADBC63E0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1534431497-1385-41-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<97501a9d-c00f-7aba-1af2-256629f9abf5@linaro.org>
+In-Reply-To: <97501a9d-c00f-7aba-1af2-256629f9abf5@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <1534341354-11956-1-git-send-email-hans-erik.floryd@rt-labs.com>
-References: <1534341354-11956-1-git-send-email-hans-erik.floryd@rt-labs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Aug 2018 17:55:49 +0100
-Message-ID: <CAFEAcA9DdtZ6+vrX9e30DX-9-68oFo5+FBeVq-B7QQsiQRM7BA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] imx_serial: Generate interrupt on receive
- data ready if enabled
+Subject: Re: [Qemu-devel] [PATCH v9 40/84] target/mips: Fix pre-nanoMIPS MT
+ ASE instructions availability control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +33,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hans-Erik Floryd <hans-erik.floryd@rt-labs.com>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "open list:i.MX31" <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-On 15 August 2018 at 14:55, Hans-Erik Floryd
-<hans-erik.floryd@rt-labs.com> wrote:
-> Generate an interrupt if USR2_RDR and UCR4_DREN are both set.
->
-> Signed-off-by: Hans-Erik Floryd <hans-erik.floryd@rt-labs.com>
-> ---
->  hw/char/imx_serial.c         | 3 ++-
->  include/hw/char/imx_serial.h | 1 +
->  2 files changed, 3 insertions(+), 1 deletion(-)
+> From: Richard Henderson <richard.henderson@linaro.org>
+> Sent: Thursday, August 16, 2018 6:37 PM
+>=20
+> Subject: Re: [PATCH v9 40/84] target/mips: Fix pre-nanoMIPS MT ASE instru=
+ctions availability control
+>=20
+> On 08/16/2018 07:57 AM, Aleksandar Markovic wrote:
+> > From: Aleksandar Rikalo <arikalo@wavecomp.com>
+> >
+> > Use bits from configuration registers for availability control
+> > of MT ASE instructions, rather than only ISA_MT bit in insn_flags.
+> > This is done by adding a field in hflags for MT bit, and adding
+> > functions check_mt() and check_cp0_mt().
+> >
+> > Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> > Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> > ---
+> >  target/mips/cpu.h       |  3 ++-
+> >  target/mips/internal.h  |  6 +++++-
+> >  target/mips/translate.c | 45 +++++++++++++++++++++++++++++++++++++----=
+----
+> >  3 files changed, 44 insertions(+), 10 deletions(-)
+>=20
+> What was wrong with using insn_flags?
+>=20
 
+The problem with using ISA_MT from insn_flags is that it doesn't provide th=
+e correct availability control. Even though all instructions from MT ASE ar=
+e related, they are available under different conditions:
 
+Case 1 - DMT, DVPE, EMT, EVPE:
+   =20
+    if IsCoprocessorEnabled(0) then
+        if Config3 MT then
+            <main fuctionality>
+        else
+            SignalException(ReservedInstruction)
+        endif
+    else
+        SignalException(CoprocessorUnusable, 0)
+    endif
 
-Applied to target-arm.next, thanks.
+Case 2 - FORK, YIELD:
 
--- PMM
+    if Config3 MT then
+        <main fuctionality>
+    else
+        SignalException(ReservedInstruction)
+    endif
+
+Case 3 - MFTR, MTTR:
+
+    if IsCoprocessorEnabled(0) then
+        <main fuctionality>
+    else
+        SignalException(CoprocessorUnusable, 0)
+    endif
+
+> I'll note that hflags should be reserved for things that can change at ru=
+ntime.
+>  I thought all of these configuration registers were read-only.
+>=20
+> Anyway, with this plus the XNP patch from earlier, you now only have one
+> remaining bit within hflags and then that resource is exhausted.
+>=20
+
+I think some of the previously-implemented similar cases involving read-onl=
+y bits were handled the same way, and we just built on that. What would you=
+ suggest as a more appropriate solution in such cases (of accessing "preset=
+ by hardware" bits)?
+
+Regards,
+Aleksandar=
