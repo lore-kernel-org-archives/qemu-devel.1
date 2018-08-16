@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqDXx-0000m3-KE
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:22:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqDby-00026F-4f
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:26:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqDXo-0007Qp-12
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:22:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57110 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqDbu-0000Vd-4e
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:26:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57358 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqDXn-0007Oq-DR
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:22:11 -0400
-Date: Thu, 16 Aug 2018 09:22:00 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180816082200.GD8612@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CAB3eZfsv+JDr+C=BaKEmZvW9meTwNub2HfwXO5DX7mf+BJqO0A@mail.gmail.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqDbr-0000UR-On
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:26:24 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <851d095cd457109e4a22a2e5ecd36ccbdacbf48b.1526916378.git.simon@ruderich.org>
+	<20180810103650.GA2391@work-vm> <20180814141826.GA26558@ruderich.org>
+	<871sb1t0cn.fsf@dusky.pond.sub.org>
+	<20180814190329.GA13798@ruderich.org>
+	<87pnykqmw4.fsf@dusky.pond.sub.org>
+	<20180815124154.GA1116@ruderich.org>
+	<87bma3ityy.fsf@dusky.pond.sub.org>
+	<20180815154626.GA23638@ruderich.org>
+	<87pnyig92q.fsf@dusky.pond.sub.org>
+	<20180816081320.GA16148@ruderich.org>
+Date: Thu, 16 Aug 2018 10:26:18 +0200
+In-Reply-To: <20180816081320.GA16148@ruderich.org> (Simon Ruderich's message
+	of "Thu, 16 Aug 2018 10:13:20 +0200")
+Message-ID: <87h8jud8et.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAB3eZfsv+JDr+C=BaKEmZvW9meTwNub2HfwXO5DX7mf+BJqO0A@mail.gmail.com>
-Subject: Re: [Qemu-devel] How do you do when write more than 16TB data to
- qcow2 on ext4?
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +35,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: lampahome <pahome.chen@mirlab.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Simon Ruderich <simon@ruderich.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, Aug 16, 2018 at 09:35:52AM +0800, lampahome wrote:
-> We all know there's a file size limit 16TB in ext4 and other fs has their
-> limit,too.
-> 
-> If I create an qcow2 20TB on ext4 and write to it more than 16TB. Data more
-> than 16TB can't be written to qcow2.
-> 
-> So, is there any better ways to solve this situation?
+Simon Ruderich <simon@ruderich.org> writes:
 
-I'd really just recommend using a different filesystem, in particular XFS
-has massively higher file size limit - tested to 500 TB in RHEL-7, with a
-theoretical max size of 8 EB. It is a very mature filesystem & the default
-in RHEL-7.
+> On Thu, Aug 16, 2018 at 07:43:41AM +0200, Markus Armbruster wrote:
+>>> On Fri, Aug 10, 2018 at 11:36:51AM +0100, Dr. David Alan Gilbert wrote:
+>>>> Also, had you considered rearranging and making them optional,
+>>>> for example if you do:
+>>>>
+>>>> val:l,filename:F,offset:i?,size:i?
+>>>>
+>>>> I think that would mean you can do the fairly obvious:
+>>>>   pmemload addr "myfile"
+>>>>
+>>>> with the assumption that loads the whole file.
+>>>
+>>> This would deviate from pmemsave/memsave, but feels more natural.
+>>
+>> The different order or arguments in HMP is somewhat ugly.  Okay if it
+>> makes the command more pleasant to use.  Up to you and Dave to decide.
+>>
+>> If you decide to deviate, consider
+>>
+>>     filename:F,address:l,size:i?,offset:i?
+>
+> From what I understand we can't have optional arguments in the
+> middle. Would you prefer mandatory size/offset parameters in HMP
+> or optional parameters but inconsistent with pmemsave/memsave?
 
-> What I thought is to create new qcow2 called qcow2-new and setup the
-> backing file be the previous qcow2.
-
-A bit of a hack but it could work, albeit with the extra pain for managing
-your VMs. If you create the qcow2 layer and the guest rewrites existing
-written blocks you're going to end up storing data twice (used original
-data in the backing file, and new active data in the top layer). So your
-20 TB disk may end up storing waaay more than 20 TB.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+If you guys decide you want consistency with memsave, that's fine with
+me.  If you decide you want to rearrange arguments for better usability,
+that's also fine.  I just wanted to throw in another rearrangement for
+you to consider.
