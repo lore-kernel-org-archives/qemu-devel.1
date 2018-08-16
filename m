@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fqNXW-0000ld-33
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:02:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1fqNXY-0000mh-Ux
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:02:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fqNXV-00020G-6z
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:02:33 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <2e8b4754-2f83-d263-f562-b753aea90d42@virtuozzo.com>
-Date: Thu, 16 Aug 2018 22:02:16 +0300
+	(envelope-from <eblake@redhat.com>) id 1fqNXY-0002Ul-6b
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:02:36 -0400
+References: <20180809213528.14738-1-mreitz@redhat.com>
+	<20180809213528.14738-3-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3cd9b4a9-f5da-75b2-990a-1c296862ced7@redhat.com>
+Date: Thu, 16 Aug 2018 14:02:30 -0500
 MIME-Version: 1.0
+In-Reply-To: <20180809213528.14738-3-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Subject: [Qemu-devel] nbd oldstyle negotiation
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 02/31] block: Use children list
+ in bdrv_refresh_filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,30 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, nbd list <nbd@other.debian.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Hi Eric!
+On 08/09/2018 04:34 PM, Max Reitz wrote:
+> bdrv_refresh_filename() should invoke itself recursively on all
+> children, not just on file.
+> 
+> With that change, we can remove the manual invocations in blkverify,
+> quorum, commit, mirror, and blklogwrites.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   block.c              | 9 +++++----
+>   block/blklogwrites.c | 3 ---
+>   block/blkverify.c    | 3 ---
+>   block/commit.c       | 1 -
+>   block/mirror.c       | 1 -
+>   block/quorum.c       | 1 -
+>   6 files changed, 5 insertions(+), 13 deletions(-)
 
-There is a small problem with our qemu-nbd cmdline interface: people=20
-forget to use option -x or don't know about it and face into problems=20
-with old protocol version. One of may colleagues after such situation=20
-(because of this option, he could not use utility nbd-client, which=20
-doesn't support old version) asked me to add comments about version=20
-selection by -x option into --help of qemu-nbd. And really, it's not an=20
-obvious interface solution...
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Now I think, should not we use new version by default? Or, even drop old=20
-version support at all? Anybody uses it?
-
-from nbd spec:
- =C2=A0... the old style negotiation is now no longer developed; starting=20
-with version 3.10 of the reference implementation, it is also no longer=20
-supported.
-
-it's unsupported, I think it's ok to drop it. I can create patches, if=20
-you agree.
-
---=20
-Best regards,
-Vladimir
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
