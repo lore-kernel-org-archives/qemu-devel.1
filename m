@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqJiH-0003av-1O
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:57:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fqJjX-0004KG-5f
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqJi5-0006z7-Ev
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:57:17 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:45807)
+	(envelope-from <peter.maydell@linaro.org>) id 1fqJjT-00082e-CS
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:58:42 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:40561)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqJhy-0006wr-Ik
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:57:07 -0400
-Received: by mail-oi0-x243.google.com with SMTP id q11-v6so8489439oic.12
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 07:57:05 -0700 (PDT)
+	id 1fqJjN-0007z1-3L
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:58:33 -0400
+Received: by mail-oi0-x243.google.com with SMTP id w126-v6so8525530oie.7
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 07:58:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180811090836.4024-2-contrib@steffen-goertz.de>
+In-Reply-To: <20180811090836.4024-3-contrib@steffen-goertz.de>
 References: <20180811090836.4024-1-contrib@steffen-goertz.de>
-	<20180811090836.4024-2-contrib@steffen-goertz.de>
+	<20180811090836.4024-3-contrib@steffen-goertz.de>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Aug 2018 15:56:44 +0100
-Message-ID: <CAFEAcA-9ZXojPExwPpzWWYka8QPByYj0D5a2eULzgHTtcDj4SQ@mail.gmail.com>
+Date: Thu, 16 Aug 2018 15:58:12 +0100
+Message-ID: <CAFEAcA933sH19gCXqQq7ycNwpmGRHY+HekbXvHRn4CVZ_DBCwg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/7] hw/arm/nrf51_soc: nRF51 Calculate
- peripheral id from base address
+Subject: Re: [Qemu-devel] [PATCH 2/7] arm: Move nRF51 machine state to
+ dedicated header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +36,23 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Stef
 
 On 11 August 2018 at 10:08, Steffen G=C3=B6rtz <contrib@steffen-goertz.de> =
 wrote:
-> The base address determines a peripherals id, which identifies its
-> interrupt line, see NRF51 reference manual section 10 peripheral
-> interface. This little gem calculates the peripheral id based
-> on its base address.
+> The machine state will be used to host the SOC
+> and board level devices like the LED matrix and
+> devices to handle to pushbuttons A and B.
 >
 > Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
 > ---
->  hw/arm/nrf51_soc.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-> index 9f9649c780..441d05e1ef 100644
-> --- a/hw/arm/nrf51_soc.c
-> +++ b/hw/arm/nrf51_soc.c
-> @@ -38,6 +38,9 @@
->  #define NRF51822_FLASH_SIZE     (256 * 1024)
->  #define NRF51822_SRAM_SIZE      (16 * 1024)
->
-> +/* IRQ lines can be derived from peripheral base addresses */
-> +#define BASE_TO_IRQ(base) (((base) >> 12) & 0x1F)
-> +
+>  hw/arm/microbit.c         | 38 ++++++++++++++++++++++++--------------
+>  include/hw/arm/microbit.h | 29 +++++++++++++++++++++++++++++
+>  2 files changed, 53 insertions(+), 14 deletions(-)
+>  create mode 100644 include/hw/arm/microbit.h
 
-You could also have macros for getting the base address
-from the peripheral ID and the IRQ line from the
-peripheral ID, but this is fine too.
+These changes should be squashed into Joel's initial
+patch creating the machine, as per discussion on that patch.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+I don't think we really need a separate header file,
+unless there's something I'm missing because I haven't yet
+read later patches in the series.
 
 thanks
 -- PMM
