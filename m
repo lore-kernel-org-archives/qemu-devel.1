@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fqNUM-0007me-01
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:59:18 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fqNXW-0000ld-33
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:02:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fqNUG-0007er-J7
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:59:17 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:36595)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fqNUG-0007eQ-A3
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:59:12 -0400
-References: <20180811082328.11268-1-laurent@vivier.eu>
-	<7195617a-1f47-00e1-638f-50d20c21ba9e@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <7cd759fa-8d2b-f63b-3bd9-75fe528373a8@vivier.eu>
-Date: Thu, 16 Aug 2018 20:58:17 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fqNXV-00020G-6z
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:02:33 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2e8b4754-2f83-d263-f562-b753aea90d42@virtuozzo.com>
+Date: Thu, 16 Aug 2018 22:02:16 +0300
 MIME-Version: 1.0
-In-Reply-To: <7195617a-1f47-00e1-638f-50d20c21ba9e@linaro.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] sh4: fix use_icount with linux-user
+Subject: [Qemu-devel] nbd oldstyle negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +21,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Riku Voipio <riku.voipio@iki.fi>
+To: Eric Blake <eblake@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, nbd list <nbd@other.debian.org>
 
-Le 11/08/2018 à 17:26, Richard Henderson a écrit :
-> On 08/11/2018 01:23 AM, Laurent Vivier wrote:
->> This fixes java in a linux-user chroot:
->>   $ java --version
->>   qemu-sh4: .../accel/tcg/cpu-exec.c:634: cpu_loop_exec_tb: Assertion `use_icount' failed.
->>   qemu: uncaught target signal 6 (Aborted) - core dumped
->>   Aborted (core dumped)
->>
->> In gen_conditional_jump() in the GUSA_EXCLUSIVE part, we must reset
->> base.is_jmp to DISAS_NEXT after the gen_goto_tb() as it is done in
->> gen_delayed_conditional_jump() after the gen_jump().
->>
->> Bug: https://bugs.launchpad.net/qemu/+bug/1768246
->> Fixes: 4834871bc95b67343248100e2a75ae0d287bc08b
->>        ("target/sh4: Convert to DisasJumpType")
->> Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>
->> Notes:
->>     v2:
->>       don't revert the part of the original patch,
->>       but fixes the state problem in gen_conditional_jump()
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Hi Eric!
 
-Aurélien,
+There is a small problem with our qemu-nbd cmdline interface: people=20
+forget to use option -x or don't know about it and face into problems=20
+with old protocol version. One of may colleagues after such situation=20
+(because of this option, he could not use utility nbd-client, which=20
+doesn't support old version) asked me to add comments about version=20
+selection by -x option into --help of qemu-nbd. And really, it's not an=20
+obvious interface solution...
 
-do you agree if I push this patch through a linux-user pull request?
+Now I think, should not we use new version by default? Or, even drop old=20
+version support at all? Anybody uses it?
 
-Thanks,
-Laurent
+from nbd spec:
+ =C2=A0... the old style negotiation is now no longer developed; starting=20
+with version 3.10 of the reference implementation, it is also no longer=20
+supported.
+
+it's unsupported, I think it's ok to drop it. I can create patches, if=20
+you agree.
+
+--=20
+Best regards,
+Vladimir
