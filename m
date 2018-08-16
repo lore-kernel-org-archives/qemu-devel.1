@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkz-0005Kr-9W
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:18 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJks-0005Ff-Gk
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkt-0000eO-TK
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:11 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:43373 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkg-0000WD-ON
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:00 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:40308 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJkt-0000bm-H1
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:07 -0400
+	id 1fqJkg-0000UO-8b
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:59:54 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:57:14 +0200
-Message-Id: <1534431497-1385-22-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:57:02 +0200
+Message-Id: <1534431497-1385-10-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v9 21/84] target/mips: Add emulation of
- nanoMIPS 16-bit arithmetic instructions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v9 09/84] target/mips: Don't update BadVAddr
+ register in Debug Mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,151 +33,94 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add emulation of nanoMIPS 16-bit arithmetic instructions.
+BadVAddr should not be updated if (env->hflags & MIPS_HFLAG_DM) is
+set.
 
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 125 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 125 insertions(+)
+ target/mips/helper.c    |  4 +++-
+ target/mips/op_helper.c | 12 +++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 557b96b..f9ec95b 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -16640,6 +16640,131 @@ static inline int decode_gpr_gpr4_zero(int r)
- 
- static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
- {
-+    uint32_t op;
-+    int rt = decode_gpr_gpr3(NANOMIPS_EXTRACT_RD(ctx->opcode));
-+    int rs = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS(ctx->opcode));
-+    int rd = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS1(ctx->opcode));
-+    int imm;
-+
-+    /* make sure instructions are on a halfword boundary */
-+    if (ctx->base.pc_next & 0x1) {
-+        TCGv tmp = tcg_const_tl(ctx->base.pc_next);
-+        tcg_gen_st_tl(tmp, cpu_env, offsetof(CPUMIPSState, CP0_BadVAddr));
-+        tcg_temp_free(tmp);
-+        generate_exception_end(ctx, EXCP_AdEL);
-+        return 2;
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index 8cf91ce..e215af9 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -502,7 +502,9 @@ static void raise_mmu_exception(CPUMIPSState *env, ta=
+rget_ulong address,
+         break;
+     }
+     /* Raise exception */
+-    env->CP0_BadVAddr =3D address;
++    if (!(env->hflags & MIPS_HFLAG_DM)) {
++        env->CP0_BadVAddr =3D address;
 +    }
-+
-+    op = extract32(ctx->opcode, 10, 6);
-+    switch (op) {
-+    case NM_P16_MV:
-+        break;
-+    case NM_P16_SHIFT:
-+        break;
-+    case NM_P16C:
-+        break;
-+    case NM_P16_A1:
-+        switch (extract32(ctx->opcode, 6, 1)) {
-+        case NM_ADDIUR1SP:
-+            imm = extract32(ctx->opcode, 0, 6) << 2;
-+            gen_arith_imm(ctx, OPC_ADDIU, rt, 29, imm);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_P16_A2:
-+        switch (extract32(ctx->opcode, 3, 1)) {
-+        case NM_ADDIUR2:
-+            imm = extract32(ctx->opcode, 0, 3) << 2;
-+            gen_arith_imm(ctx, OPC_ADDIU, rt, rs, imm);
-+            break;
-+        case NM_P_ADDIURS5:
-+            rt = extract32(ctx->opcode, 5, 5);
-+            if (rt != 0) {
-+                /* imm = sign_extend(s[3] . s[2:0] , from_nbits = 4) */
-+                imm = (sextract32(ctx->opcode, 4, 1) << 3) |
-+                      (extract32(ctx->opcode, 0, 3));
-+                gen_arith_imm(ctx, OPC_ADDIU, rt, rt, imm);
-+            }
-+            break;
-+        }
-+        break;
-+    case NM_P16_ADDU:
-+        switch (ctx->opcode & 0x1) {
-+        case NM_ADDU16:
-+            gen_arith(ctx, OPC_ADDU, rd, rs, rt);
-+            break;
-+        case NM_SUBU16:
-+            gen_arith(ctx, OPC_SUBU, rd, rs, rt);
-+            break;
-+        }
-+        break;
-+    case NM_P16_4X4:
-+        rt = (extract32(ctx->opcode, 9, 1) << 3) |
-+              extract32(ctx->opcode, 5, 3);
-+        rs = (extract32(ctx->opcode, 4, 1) << 3) |
-+              extract32(ctx->opcode, 0, 3);
-+        rt = decode_gpr_gpr4(rt);
-+        rs = decode_gpr_gpr4(rs);
-+        switch ((extract32(ctx->opcode, 7, 2) & 0x2) |
-+                (extract32(ctx->opcode, 3, 1))) {
-+        case NM_ADDU4X4:
-+            gen_arith(ctx, OPC_ADDU, rt, rs, rt);
-+            break;
-+        case NM_MUL4X4:
-+            gen_r6_muldiv(ctx, R6_OPC_MUL, rt, rs, rt);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_LI16:
-+        break;
-+    case NM_ANDI16:
-+        break;
-+    case NM_P16_LB:
-+        break;
-+    case NM_P16_LH:
-+        break;
-+    case NM_LW16:
-+        break;
-+    case NM_LWSP16:
-+        break;
-+    case NM_LW4X4:
-+        break;
-+    case NM_SW4X4:
-+        break;
-+    case NM_LWGP16:
-+        break;
-+    case NM_SWSP16:
-+        break;
-+    case NM_SW16:
-+        break;
-+    case NM_SWGP16:
-+        break;
-+    case NM_BC16:
-+        break;
-+    case NM_BALC16:
-+        break;
-+    case NM_BEQZC16:
-+        break;
-+    case NM_BNEZC16:
-+        break;
-+    case NM_P16_BR:
-+        break;
-+    case NM_P16_SR:
-+        break;
-+    case NM_MOVEP:
-+        break;
-+    case NM_MOVEPREV:
-+        break;
-+    default:
-+        break;
+     env->CP0_Context =3D (env->CP0_Context & ~0x007fffff) |
+                        ((address >> 9) & 0x007ffff0);
+     env->CP0_EntryHi =3D (env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask)=
+ |
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 41d3634..0b2663b 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -271,7 +271,9 @@ static inline hwaddr do_translate_address(CPUMIPSStat=
+e *env,
+ target_ulong helper_##name(CPUMIPSState *env, target_ulong arg, int mem_=
+idx)  \
+ {                                                                       =
+      \
+     if (arg & almask) {                                                 =
+      \
+-        env->CP0_BadVAddr =3D arg;                                      =
+        \
++        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
+      \
++            env->CP0_BadVAddr =3D arg;                                  =
+        \
++        }                                                               =
+      \
+         do_raise_exception(env, EXCP_AdEL, GETPC());                    =
+      \
+     }                                                                   =
+      \
+     env->lladdr =3D do_translate_address(env, arg, 0, GETPC());         =
+        \
+@@ -291,7 +293,9 @@ target_ulong helper_##name(CPUMIPSState *env, target_=
+ulong arg1,              \
+     target_long tmp;                                                    =
+      \
+                                                                         =
+      \
+     if (arg2 & almask) {                                                =
+      \
+-        env->CP0_BadVAddr =3D arg2;                                     =
+        \
++        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
+      \
++            env->CP0_BadVAddr =3D arg2;                                 =
+        \
++        }                                                               =
+      \
+         do_raise_exception(env, EXCP_AdES, GETPC());                    =
+      \
+     }                                                                   =
+      \
+     if (do_translate_address(env, arg2, 1, GETPC()) =3D=3D env->lladdr) =
+{         \
+@@ -2437,7 +2441,9 @@ void mips_cpu_do_unaligned_access(CPUState *cs, vad=
+dr addr,
+     int error_code =3D 0;
+     int excp;
+=20
+-    env->CP0_BadVAddr =3D addr;
++    if (!(env->hflags & MIPS_HFLAG_DM)) {
++        env->CP0_BadVAddr =3D addr;
 +    }
-+
-     return 2;
- }
- 
--- 
+=20
+     if (access_type =3D=3D MMU_DATA_STORE) {
+         excp =3D EXCP_AdES;
+--=20
 2.7.4
