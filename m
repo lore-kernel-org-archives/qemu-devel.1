@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fqDov-0002sa-EQ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:39:54 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fqDvt-0005y1-Fg
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:47:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fqDop-0006ah-Eh
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:39:51 -0400
-Received: from mga11.intel.com ([192.55.52.93]:47720)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
-	id 1fqDoj-0006Pu-OH
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:39:44 -0400
-References: <1533625449-14989-1-git-send-email-jing2.liu@linux.intel.com>
-	<893d9264-7908-4e2c-ae1d-7e46eed6e6a0@redhat.com>
-	<43bf022f-6059-8e93-f8c3-61a7ecb72178@linux.intel.com>
-	<6c406b79-ff47-fbbd-a700-df38f06960db@redhat.com>
-From: "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <86ebb075-5642-2c7e-220c-0194e3b90191@linux.intel.com>
-Date: Thu, 16 Aug 2018 16:39:31 +0800
+	(envelope-from <no-reply@patchew.org>) id 1fqDvh-0001cE-FS
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:47:01 -0400
+Resent-Message-Id: <E1fqDvh-0001cE-FS@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21095)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fqDvX-0001WN-Mm
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:46:47 -0400
+In-Reply-To: <20180814002653.12828-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153438123143.14580.11880092034733012823@502c9da6d61e>
 MIME-Version: 1.0
-In-Reply-To: <6c406b79-ff47-fbbd-a700-df38f06960db@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/pci: add pci capability to pci-pci
- bridge
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 15 Aug 2018 18:00:32 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Fix int64_to_float16
+ double-rounding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, anthony.xu@intel.com, mst@redhat.com
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org, alex.bennee@linaro.org
 
-
-
-On 8/14/2018 9:27 PM, Laszlo Ersek wrote:
-[...]
->>>>    +cap_error:
->>>> +    msi_uninit(dev);
->>>
->>> (4) This error handler doesn't look entirely correct; we can reach it
->>> without having initialized MSI. (MSI setup is conditional; and even if
->>> we attempt it, it is permitted to fail with "msi=auto".) Therefore,
->>> msi_uninit() should be wrapped into "if (msi_present())", same as you
->>> see in pci_bridge_dev_exitfn().
->>
->> sure, can add a pre-check. But I don't understand why we need that,
->> msi_uninit() will check msi_present()?
-> 
-> Thanks for pointing that out.
-> 
-> So, I grepped the source code for msi_uninit(). It seems that only one
-> location gates it with msi_present() -- in pci_bridge_dev_exitfn() --,
-> while 13 other locations just call it unconditionally.
-> 
-> I don't know what the consistent approach is here. I'll have to defer to
-> the PCI maintainers; their taste will decide. Technically your code
-> looks correct, then.
-Yes, I also grep that. I guess if we directly use msi_uninit, this is 
-because msi_init is non-conditional too.
-Anyway, I added check in my version two. BTW, other comments are 
-included in v2.
-
-Thanks,
-Jing
-
-> 
-> Thanks
-> Laszlo
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODE0MDAyNjUzLjEyODI4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gdGFyZ2V0L2FybTogRml4IGlu
+dDY0X3RvX2Zsb2F0MTYgZG91YmxlLXJvdW5kaW5nCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjcwOWZiZTYwM2QgdGFyZ2V0L2FybTog
+VXNlIHRoZSBmbG9hdC10by1pbnQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVzCmIxNThjOGQ3Mzcg
+dGFyZ2V0L2FybTogVXNlIHRoZSBpbnQtdG8tZmxvYXQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVz
+CjVmODY3OTgwNjcgc29mdGZsb2F0OiBBZGQgc2NhbGluZyBmbG9hdC10by1pbnQgcm91dGluZXMK
+OGVjM2ZjNDllYSBzb2Z0ZmxvYXQ6IEFkZCBzY2FsaW5nIGludC10by1mbG9hdCByb3V0aW5lcwoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBzb2Z0ZmxvYXQ6IEFkZCBz
+Y2FsaW5nIGludC10by1mbG9hdCByb3V0aW5lcy4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IHNvZnRm
+bG9hdDogQWRkIHNjYWxpbmcgZmxvYXQtdG8taW50IHJvdXRpbmVzLi4uCkNoZWNraW5nIFBBVENI
+IDMvNDogdGFyZ2V0L2FybTogVXNlIHRoZSBpbnQtdG8tZmxvYXQtc2NhbGUgc29mdGZsb2F0IHJv
+dXRpbmVzLi4uCkNoZWNraW5nIFBBVENIIDQvNDogdGFyZ2V0L2FybTogVXNlIHRoZSBmbG9hdC10
+by1pbnQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVzLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVk
+IGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojNTc6IEZJTEU6IHRhcmdldC9hcm0v
+aGVscGVyLmM6MTE1MzE6CisgICAgICAgICAgICAgICAgICAgICAgICAgZ2V0X2Zsb2F0X3JvdW5k
+aW5nX21vZGUoZnBzdCksICkKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNs
+b3NlIHBhcmVudGhlc2lzICcpJwojNjM6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6MTE1MzY6
+CisgICAgICAgICAgICAgICAgICAgICAgICAgZ2V0X2Zsb2F0X3JvdW5kaW5nX21vZGUoZnBzdCks
+ICkKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTQyIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
