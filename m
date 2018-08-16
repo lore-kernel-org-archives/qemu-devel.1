@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJku-0005GT-Ex
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJku-0005Gt-Qo
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkq-0000aL-7x
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkt-0000cF-0S
 	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:08 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41048 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:58636 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJki-0000Vp-Fa
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 10:59:59 -0400
+	id 1fqJkq-0008VX-78
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:06 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:57:05 +0200
-Message-Id: <1534431497-1385-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:56:54 +0200
+Message-Id: <1534431497-1385-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 12/84] elf: Add ELF flags for MIPS machine
- variants
+Subject: [Qemu-devel] [PATCH v9 01/84] MAINTAINERS: Update target/mips
+ maintainer's email addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +33,80 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add MIPS machine variants ELF flags so that the emulation behavior
-can be adjusted if needed.
+Update email addresses of Aleksandar Markovic and Paul Burton in the
+MAINTAINERS file. Also, add corresponding items in the .mailmap file.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- include/elf.h | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ .mailmap    | 7 +++++--
+ MAINTAINERS | 9 +++++----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/include/elf.h b/include/elf.h
-index 60f6cbe..28a5a63 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -62,6 +62,29 @@ typedef int64_t  Elf64_Sxword;
- #define EF_MIPS_FP64      0x00000200
- #define EF_MIPS_NAN2008   0x00000400
+diff --git a/.mailmap b/.mailmap
+index 778a4d4..2c2b9b1 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -12,8 +12,11 @@ Fabrice Bellard <fabrice@bellard.org> bellard <bellard=
+@c046a42c-6fe2-441c-8c8c-7
+ James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+ Jocelyn Mayer <l_indien@magic.fr> j_mayer <j_mayer@c046a42c-6fe2-441c-8c=
+8c-71466251a162>
+ Paul Brook <paul@codesourcery.com> pbrook <pbrook@c046a42c-6fe2-441c-8c8=
+c-71466251a162>
+-Paul Burton <paul.burton@mips.com> <paul.burton@imgtec.com>
+-Paul Burton <paul.burton@mips.com> <paul@archlinuxmips.org>
++Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@mips.c=
+om>
++Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@imgtec=
+.com>
++Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
++Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
++Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
+ Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-714662=
+51a162>
+ malc <av1474@comtv.ru> malc <malc@c046a42c-6fe2-441c-8c8c-71466251a162>
 =20
-+/* MIPS machine variant */
-+#define EF_MIPS_MACH_NONE     0x00000000  /* A standard MIPS implementat=
-ion  */
-+#define EF_MIPS_MACH_3900     0x00810000  /* Toshiba R3900              =
-     */
-+#define EF_MIPS_MACH_4010     0x00820000  /* LSI R4010                  =
-     */
-+#define EF_MIPS_MACH_4100     0x00830000  /* NEC VR4100                 =
-     */
-+#define EF_MIPS_MACH_4650     0x00850000  /* MIPS R4650                 =
-     */
-+#define EF_MIPS_MACH_4120     0x00870000  /* NEC VR4120                 =
-     */
-+#define EF_MIPS_MACH_4111     0x00880000  /* NEC VR4111/VR4181          =
-     */
-+#define EF_MIPS_MACH_SB1      0x008a0000  /* Broadcom SB-1              =
-     */
-+#define EF_MIPS_MACH_OCTEON   0x008b0000  /* Cavium Networks Octeon     =
-     */
-+#define EF_MIPS_MACH_XLR      0x008c0000  /* RMI Xlr                    =
-     */
-+#define EF_MIPS_MACH_OCTEON2  0x008d0000  /* Cavium Networks Octeon2    =
-     */
-+#define EF_MIPS_MACH_OCTEON3  0x008e0000  /* Cavium Networks Octeon3    =
-     */
-+#define EF_MIPS_MACH_5400     0x00910000  /* NEC VR5400                 =
-     */
-+#define EF_MIPS_MACH_5900     0x00920000  /* MIPS R5900                 =
-     */
-+#define EF_MIPS_MACH_5500     0x00980000  /* NEC VR5500                 =
-     */
-+#define EF_MIPS_MACH_9000     0x00990000  /* PMC-Sierra's RM9000        =
-     */
-+#define EF_MIPS_MACH_LS2E     0x00a00000  /* ST Microelectronics Loongso=
-n 2E */
-+#define EF_MIPS_MACH_LS2F     0x00a10000  /* ST Microelectronics Loongso=
-n 2F */
-+#define EF_MIPS_MACH_LS3A     0x00a20000  /* ST Microelectronics Loongso=
-n 3A */
-+#define EF_MIPS_MACH          0x00ff0000  /* EF_MIPS_MACH_xxx selection =
-mask */
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 666e936..7130807 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -187,7 +187,7 @@ F: disas/microblaze.c
+=20
+ MIPS
+ M: Aurelien Jarno <aurelien@aurel32.net>
+-M: Aleksandar Markovic <aleksandar.markovic@mips.com>
++M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ S: Maintained
+ F: target/mips/
+ F: hw/mips/
+@@ -718,7 +718,7 @@ S: Maintained
+ F: hw/mips/mips_malta.c
+=20
+ Mipssim
+-M: Aleksandar Markovic <aleksandar.markovic@mips.com>
++M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ S: Odd Fixes
+ F: hw/mips/mips_mipssim.c
+ F: hw/net/mipsnet.c
+@@ -729,14 +729,15 @@ S: Maintained
+ F: hw/mips/mips_r4k.c
+=20
+ Fulong 2E
+-M: Aleksandar Markovic <aleksandar.markovic@mips.com>
++M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ S: Odd Fixes
+ F: hw/mips/mips_fulong2e.c
+ F: hw/isa/vt82c686.c
 +
-+
- /* These constants define the different elf file types */
- #define ET_NONE   0
- #define ET_REL    1
+ F: include/hw/isa/vt82c686.h
+=20
+ Boston
+-M: Paul Burton <paul.burton@mips.com>
++M: Paul Burton <pburton@wavecomp.com>
+ S: Maintained
+ F: hw/core/loader-fit.c
+ F: hw/mips/boston.c
 --=20
 2.7.4
