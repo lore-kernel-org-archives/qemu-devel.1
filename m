@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqHuG-0003UV-Q2
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:42 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqHuG-0003UZ-S0
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqHuA-0001VJ-Oy
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60564 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqHu8-0001U7-Rb
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:34 -0400
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 16 Aug 2018 14:01:12 +0100
-Message-Id: <20180816130118.31841-6-berrange@redhat.com>
-In-Reply-To: <20180816130118.31841-1-berrange@redhat.com>
-References: <20180816130118.31841-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqHuA-0001Uh-Jg
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:40 -0400
+Received: from mail-sn1nam01on0113.outbound.protection.outlook.com
+	([104.47.32.113]:44032
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fqHu6-0001T7-Ni
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:01:32 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 16 Aug 2018 13:01:26 +0000
+Message-ID: <BN7PR08MB4868A573D7E52993A214F274C63E0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1534182832-554-53-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1534182832-554-53-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 05/11] hw/usb: switch MTP to use new inotify
- APIs
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v8 52/87] target/mips: Add handling of
+ branch delay slots for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,464 +32,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-The internal inotify APIs allow alot of conditional statements to be
-cleared out, and provide a simpler callback for handling events.
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Monday, August 13, 2018 7:53 PM
+>=20
+> Subject: [PATCH v8 52/87] target/mips: Add handling of branch delay slots=
+ for nanoMIPS
+>=20
+> From: Matthew Fortune <matthew.fortune@mips.com>
+>=20
+> ISA mode bit (LSB of address) is no longer required but is also
+> masked to allow for tools transition. The flag has_isa_mode has the
+> key role in the implementation.
+>=20
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  target/mips/translate.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 3282fca..e4427e4 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -1471,6 +1471,7 @@ typedef struct DisasContext {
+>      bool mrp;
+>      bool nan2008;
+>      bool abs2008;
+> +    bool has_isa_mode;
+>  } DisasContext;
+>=20
+>  #define DISAS_STOP       DISAS_TARGET_0
+> @@ -4674,7 +4675,7 @@ static void gen_compute_branch (DisasContext *ctx, =
+uint32_t opc,
+>=20
+>      if (blink > 0) {
+>          int post_delay =3D insn_bytes + delayslot_size;
+> -        int lowbit =3D !!(ctx->hflags & MIPS_HFLAG_M16);
+> +        int lowbit =3D ctx->has_isa_mode && !!(ctx->hflags & MIPS_HFLAG_=
+M16);
+>=20
+>          tcg_gen_movi_tl(cpu_gpr[blink],
+>                          ctx->base.pc_next + post_delay + lowbit);
+> @@ -11171,7 +11172,7 @@ static void gen_compute_compact_branch(DisasConte=
+xt *ctx, uint32_t opc,
+>      int bcond_compute =3D 0;
+>      TCGv t0 =3D tcg_temp_new();
+>      TCGv t1 =3D tcg_temp_new();
+> -    int m16_lowbit =3D (ctx->hflags & MIPS_HFLAG_M16) !=3D 0;
+> +    int m16_lowbit =3D ctx->has_isa_mode && ((ctx->hflags & MIPS_HFLAG_M=
+16) !=3D 0);
+>=20
+>      if (ctx->hflags & MIPS_HFLAG_BMASK) {
+>  #ifdef MIPS_DEBUG_DISAS
+> @@ -24970,6 +24971,7 @@ static void mips_tr_init_disas_context(DisasConte=
+xtBase *dcbase, > CPUState *cs)
+>      ctx->mrp =3D (env->CP0_Config5 >> CP0C5_MRP) & 1;
+>      ctx->nan2008 =3D (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
+>      ctx->abs2008 =3D (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
+> +    ctx->has_isa_mode =3D ((env->CP0_Config3 >> CP0C3_MMAR) & 0x7) < 3;
+>      restore_cpu_state(env, ctx);
+>  #ifdef CONFIG_USER_ONLY
+>          ctx->mem_idx =3D MIPS_HFLAG_UM;
+> --
+> 2.7.4
+>=20
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- hw/usb/dev-mtp.c    | 250 ++++++++++++++++----------------------------
- hw/usb/trace-events |   2 +-
- 2 files changed, 93 insertions(+), 159 deletions(-)
+This patch should be renamed to reflect its real content. Also, the code se=
+gments in question should be re-examined in follow-up clean ups. That said,=
+ it isn't still show-stopper:
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index d5f570fb56..68309ce66d 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -15,13 +15,11 @@
- #include <dirent.h>
-=20
- #include <sys/statvfs.h>
--#ifdef CONFIG_INOTIFY1
--#include <sys/inotify.h>
--#include "qemu/main-loop.h"
--#endif
-+
-=20
- #include "qemu-common.h"
- #include "qemu/iov.h"
-+#include "qemu/filemonitor.h"
- #include "trace.h"
- #include "hw/usb.h"
- #include "desc.h"
-@@ -123,7 +121,6 @@ enum {
-     EP_EVENT,
- };
-=20
--#ifdef CONFIG_INOTIFY1
- typedef struct MTPMonEntry MTPMonEntry;
-=20
- struct MTPMonEntry {
-@@ -132,7 +129,6 @@ struct MTPMonEntry {
-=20
-     QTAILQ_ENTRY(MTPMonEntry) next;
- };
--#endif
-=20
- struct MTPControl {
-     uint16_t     code;
-@@ -158,10 +154,8 @@ struct MTPObject {
-     char         *name;
-     char         *path;
-     struct stat  stat;
--#ifdef CONFIG_INOTIFY1
--    /* inotify watch cookie */
-+    /* file monitor watch cookie */
-     int          watchfd;
--#endif
-     MTPObject    *parent;
-     uint32_t     nchildren;
-     QLIST_HEAD(, MTPObject) children;
-@@ -184,11 +178,8 @@ struct MTPState {
-     bool         readonly;
-=20
-     QTAILQ_HEAD(, MTPObject) objects;
--#ifdef CONFIG_INOTIFY1
--    /* inotify descriptor */
--    int          inotifyfd;
-+    QFileMonitor *file_monitor;
-     QTAILQ_HEAD(events, MTPMonEntry) events;
--#endif
-     /* Responder is expecting a write operation */
-     bool write_pending;
-     struct {
-@@ -473,6 +464,10 @@ static MTPObject *usb_mtp_object_lookup_name(MTPObje=
-ct *parent,
- {
-     MTPObject *iter;
-=20
-+    if (len =3D=3D -1) {
-+        len =3D strlen(name);
-+    }
-+
-     QLIST_FOREACH(iter, &parent->children, list) {
-         if (strncmp(iter->name, name, len) =3D=3D 0) {
-             return iter;
-@@ -482,7 +477,6 @@ static MTPObject *usb_mtp_object_lookup_name(MTPObjec=
-t *parent,
-     return NULL;
- }
-=20
--#ifdef CONFIG_INOTIFY1
- static MTPObject *usb_mtp_object_lookup_wd(MTPState *s, int wd)
- {
-     MTPObject *iter;
-@@ -496,158 +490,98 @@ static MTPObject *usb_mtp_object_lookup_wd(MTPStat=
-e *s, int wd)
-     return NULL;
- }
-=20
--static void inotify_watchfn(void *arg)
-+static void file_monitor_event(int wd,
-+                               QFileMonitorEvent ev,
-+                               const char *name,
-+                               void *opaque)
- {
--    MTPState *s =3D arg;
--    ssize_t bytes;
--    /* From the man page: atleast one event can be read */
--    int pos;
--    char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
--
--    for (;;) {
--        bytes =3D read(s->inotifyfd, buf, sizeof(buf));
--        pos =3D 0;
--
--        if (bytes <=3D 0) {
--            /* Better luck next time */
-+    MTPState *s =3D opaque;
-+    int watchfd =3D 0;
-+    MTPObject *parent =3D usb_mtp_object_lookup_wd(s, wd);
-+    MTPMonEntry *entry =3D NULL;
-+    MTPObject *o;
-+
-+    if (!parent) {
-+        return;
-+    }
-+
-+    switch (ev) {
-+    case QFILE_MONITOR_EVENT_CREATED:
-+        if (usb_mtp_object_lookup_name(parent, name, -1)) {
-+            /* Duplicate create event */
-             return;
-         }
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D s->next_handle;
-+        entry->event =3D EVT_OBJ_ADDED;
-+        o =3D usb_mtp_add_child(s, parent, name);
-+        if (!o) {
-+            g_free(entry);
-+            return;
-+        }
-+        o->watchfd =3D watchfd;
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, name, "Obj Added")=
-;
-+        break;
-=20
-+    case QFILE_MONITOR_EVENT_DELETED:
-         /*
--         * TODO: Ignore initiator initiated events.
--         * For now we are good because the store is RO
-+         * The kernel issues a IN_IGNORED event
-+         * when a dir containing a watchpoint is
-+         * deleted, so we don't have to delete the
-+         * watchpoint
-          */
--        while (bytes > 0) {
--            char *p =3D buf + pos;
--            struct inotify_event *event =3D (struct inotify_event *)p;
--            int watchfd =3D 0;
--            uint32_t mask =3D event->mask & (IN_CREATE | IN_DELETE |
--                                           IN_MODIFY | IN_IGNORED);
--            MTPObject *parent =3D usb_mtp_object_lookup_wd(s, event->wd)=
-;
--            MTPMonEntry *entry =3D NULL;
--            MTPObject *o;
--
--            pos =3D pos + sizeof(struct inotify_event) + event->len;
--            bytes =3D bytes - pos;
--
--            if (!parent) {
--                continue;
--            }
--
--            switch (mask) {
--            case IN_CREATE:
--                if (usb_mtp_object_lookup_name
--                    (parent, event->name, event->len)) {
--                    /* Duplicate create event */
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D s->next_handle;
--                entry->event =3D EVT_OBJ_ADDED;
--                o =3D usb_mtp_add_child(s, parent, event->name);
--                if (!o) {
--                    g_free(entry);
--                    continue;
--                }
--                o->watchfd =3D watchfd;
--                trace_usb_mtp_inotify_event(s->dev.addr, event->name,
--                                            event->mask, "Obj Added");
--                break;
--
--            case IN_DELETE:
--                /*
--                 * The kernel issues a IN_IGNORED event
--                 * when a dir containing a watchpoint is
--                 * deleted, so we don't have to delete the
--                 * watchpoint
--                 */
--                o =3D usb_mtp_object_lookup_name(parent, event->name, ev=
-ent->len);
--                if (!o) {
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D o->handle;
--                entry->event =3D EVT_OBJ_REMOVED;
--                trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                      event->mask, "Obj Deleted");
--                usb_mtp_object_free(s, o);
--                break;
--
--            case IN_MODIFY:
--                o =3D usb_mtp_object_lookup_name(parent, event->name, ev=
-ent->len);
--                if (!o) {
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D o->handle;
--                entry->event =3D EVT_OBJ_INFO_CHANGED;
--                trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                      event->mask, "Obj Modified");
--                break;
--
--            case IN_IGNORED:
--                trace_usb_mtp_inotify_event(s->dev.addr, parent->path,
--                                      event->mask, "Obj parent dir ignor=
-ed");
--                break;
--
--            default:
--                fprintf(stderr, "usb-mtp: failed to parse inotify event\=
-n");
--                continue;
--            }
-+        o =3D usb_mtp_object_lookup_name(parent, name, -1);
-+        if (!o) {
-+            return;
-+        }
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D o->handle;
-+        entry->event =3D EVT_OBJ_REMOVED;
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, o->path, "Obj Dele=
-ted");
-+        usb_mtp_object_free(s, o);
-+        break;
-=20
--            if (entry) {
--                QTAILQ_INSERT_HEAD(&s->events, entry, next);
--            }
-+    case QFILE_MONITOR_EVENT_MODIFIED:
-+        o =3D usb_mtp_object_lookup_name(parent, name, -1);
-+        if (!o) {
-+            return;
-         }
--    }
--}
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D o->handle;
-+        entry->event =3D EVT_OBJ_INFO_CHANGED;
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, o->path, "Obj Modi=
-fied");
-+        break;
-=20
--static int usb_mtp_inotify_init(MTPState *s)
--{
--    int fd;
-+    case QFILE_MONITOR_EVENT_IGNORED:
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, parent->path,
-+                                    "Obj parent dir ignored");
-+        break;
-=20
--    fd =3D inotify_init1(IN_NONBLOCK);
--    if (fd =3D=3D -1) {
--        return 1;
-+    default:
-+        g_assert_not_reached();
-     }
-=20
--    QTAILQ_INIT(&s->events);
--    s->inotifyfd =3D fd;
--
--    qemu_set_fd_handler(fd, inotify_watchfn, NULL, s);
--
--    return 0;
-+    if (entry) {
-+        QTAILQ_INSERT_HEAD(&s->events, entry, next);
-+    }
- }
-=20
--static void usb_mtp_inotify_cleanup(MTPState *s)
-+static void usb_mtp_file_monitor_cleanup(MTPState *s)
- {
-     MTPMonEntry *e, *p;
-=20
--    if (!s->inotifyfd) {
--        return;
--    }
--
--    qemu_set_fd_handler(s->inotifyfd, NULL, NULL, s);
--    close(s->inotifyfd);
--
-     QTAILQ_FOREACH_SAFE(e, &s->events, next, p) {
-         QTAILQ_REMOVE(&s->events, e, next);
-         g_free(e);
-     }
- }
-=20
--static int usb_mtp_add_watch(int inotifyfd, const char *path)
--{
--    uint32_t mask =3D IN_CREATE | IN_DELETE | IN_MODIFY;
--
--    return inotify_add_watch(inotifyfd, path, mask);
--}
--#endif
-=20
- static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
- {
-     struct dirent *entry;
-     DIR *dir;
-+    Error *err =3D NULL;
-=20
-     if (o->have_children) {
-         return;
-@@ -658,16 +592,19 @@ static void usb_mtp_object_readdir(MTPState *s, MTP=
-Object *o)
-     if (!dir) {
-         return;
-     }
--#ifdef CONFIG_INOTIFY1
--    int watchfd =3D usb_mtp_add_watch(s->inotifyfd, o->path);
-+
-+    int watchfd =3D qemu_file_monitor_add_watch(s->file_monitor, o->path=
-, NULL,
-+                                              file_monitor_event, s, &er=
-r);
-     if (watchfd =3D=3D -1) {
--        fprintf(stderr, "usb-mtp: failed to add watch for %s\n", o->path=
-);
-+        fprintf(stderr, "usb-mtp: failed to add watch for %s: %s\n", o->=
-path,
-+                error_get_pretty(err));
-+        error_free(err);
-     } else {
--        trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                    0, "Watch Added");
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, o->path,
-+                                         "Watch Added");
-         o->watchfd =3D watchfd;
-     }
--#endif
-+
-     while ((entry =3D readdir(dir)) !=3D NULL) {
-         usb_mtp_add_child(s, o, entry->d_name);
-     }
-@@ -1175,13 +1112,11 @@ enum {
- /* Assumes that children, if any, have been already freed */
- static void usb_mtp_object_free_one(MTPState *s, MTPObject *o)
- {
--#ifndef CONFIG_INOTIFY1
-     assert(o->nchildren =3D=3D 0);
-     QTAILQ_REMOVE(&s->objects, o, next);
-     g_free(o->name);
-     g_free(o->path);
-     g_free(o);
--#endif
- }
-=20
- static int usb_mtp_deletefn(MTPState *s, MTPObject *o, uint32_t trans)
-@@ -1280,6 +1215,7 @@ static void usb_mtp_command(MTPState *s, MTPControl=
- *c)
-     MTPData *data_in =3D NULL;
-     MTPObject *o =3D NULL;
-     uint32_t nres =3D 0, res0 =3D 0;
-+    Error *err =3D NULL;
-=20
-     /* sanity checks */
-     if (c->code >=3D CMD_CLOSE_SESSION && s->session =3D=3D 0) {
-@@ -1307,19 +1243,21 @@ static void usb_mtp_command(MTPState *s, MTPContr=
-ol *c)
-         trace_usb_mtp_op_open_session(s->dev.addr);
-         s->session =3D c->argv[0];
-         usb_mtp_object_alloc(s, s->next_handle++, NULL, s->root);
--#ifdef CONFIG_INOTIFY1
--        if (usb_mtp_inotify_init(s)) {
--            fprintf(stderr, "usb-mtp: file monitoring init failed\n");
-+
-+        s->file_monitor =3D qemu_file_monitor_get_instance(&err);
-+        if (err) {
-+            fprintf(stderr, "usb-mtp: file monitoring init failed: %s\n"=
-,
-+                    error_get_pretty(err));
-+            error_free(err);
-+        } else {
-+            QTAILQ_INIT(&s->events);
-         }
--#endif
-         break;
-     case CMD_CLOSE_SESSION:
-         trace_usb_mtp_op_close_session(s->dev.addr);
-         s->session =3D 0;
-         s->next_handle =3D 0;
--#ifdef CONFIG_INOTIFY1
--        usb_mtp_inotify_cleanup(s);
--#endif
-+        usb_mtp_file_monitor_cleanup(s);
-         usb_mtp_object_free(s, QTAILQ_FIRST(&s->objects));
-         assert(QTAILQ_EMPTY(&s->objects));
-         break;
-@@ -1532,9 +1470,7 @@ static void usb_mtp_handle_reset(USBDevice *dev)
-=20
-     trace_usb_mtp_reset(s->dev.addr);
-=20
--#ifdef CONFIG_INOTIFY1
--    usb_mtp_inotify_cleanup(s);
--#endif
-+    usb_mtp_file_monitor_cleanup(s);
-     usb_mtp_object_free(s, QTAILQ_FIRST(&s->objects));
-     s->session =3D 0;
-     usb_mtp_data_free(s->data_in);
-@@ -1899,7 +1835,6 @@ static void usb_mtp_handle_data(USBDevice *dev, USB=
-Packet *p)
-         }
-         break;
-     case EP_EVENT:
--#ifdef CONFIG_INOTIFY1
-         if (!QTAILQ_EMPTY(&s->events)) {
-             struct MTPMonEntry *e =3D QTAILQ_LAST(&s->events, events);
-             uint32_t handle;
-@@ -1923,7 +1858,6 @@ static void usb_mtp_handle_data(USBDevice *dev, USB=
-Packet *p)
-             g_free(e);
-             return;
-         }
--#endif
-         p->status =3D USB_RET_NAK;
-         return;
-     default:
-diff --git a/hw/usb/trace-events b/hw/usb/trace-events
-index 2c18770ca5..99b1e8b8ce 100644
---- a/hw/usb/trace-events
-+++ b/hw/usb/trace-events
-@@ -237,7 +237,7 @@ usb_mtp_op_unknown(int dev, uint32_t code) "dev %d, c=
-ommand code 0x%x"
- usb_mtp_object_alloc(int dev, uint32_t handle, const char *path) "dev %d=
-, handle 0x%x, path %s"
- usb_mtp_object_free(int dev, uint32_t handle, const char *path) "dev %d,=
- handle 0x%x, path %s"
- usb_mtp_add_child(int dev, uint32_t handle, const char *path) "dev %d, h=
-andle 0x%x, path %s"
--usb_mtp_inotify_event(int dev, const char *path, uint32_t mask, const ch=
-ar *s) "dev %d, path %s mask 0x%x event %s"
-+usb_mtp_file_monitor_event(int dev, const char *path, const char *s) "de=
-v %d, path %s event %s"
-=20
- # hw/usb/host-libusb.c
- usb_host_open_started(int bus, int addr) "dev %d:%d"
---=20
-2.17.1
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
