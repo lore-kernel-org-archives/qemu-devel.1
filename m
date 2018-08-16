@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqMbI-0007Sk-RQ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:02:25 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fqMnl-0005zz-9Z
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:15:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqMbH-0005NQ-QW
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:02:24 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:45765)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqMbH-0005NC-LE
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:02:23 -0400
-Received: by mail-oi0-x242.google.com with SMTP id q11-v6so9573475oic.12
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 11:02:23 -0700 (PDT)
+	(envelope-from <alex.williamson@redhat.com>) id 1fqMnh-0002Th-Ar
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:15:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54918 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1fqMng-0002TF-DB
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:15:13 -0400
+Date: Thu, 16 Aug 2018 12:15:01 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180816121501.3cf8781a@t450s.home>
+In-Reply-To: <20180807193125.30378-3-alex.williamson@redhat.com>
+References: <20180807193125.30378-1-alex.williamson@redhat.com>
+	<20180807193125.30378-3-alex.williamson@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180809130115.28951-1-peter.maydell@linaro.org>
-References: <20180809130115.28951-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Aug 2018 19:02:02 +0100
-Message-ID: <CAFEAcA-AD=cxpGzgyZDU3vhCwthVaPg+WKWNLH+gjP=devvWZw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 00/16] arm: Implement MPS2
- watchdogs and DMA
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] kvm: Use inhibit to prevent
+ ballooning without synchronous mmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>
+To: alex.williamson@redhat.com, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: peterx@redhat.com, Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org, david@redhat.com
 
-Ping for code review, please?
+On Tue,  7 Aug 2018 13:31:23 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-(It's only been a week so this is a little bit eager, but
-I have some more MPS patches which wire up the PL022 SPI
-controllers, which I'm holding off on posting until this
-and the preceding FPGAIO set get reviewed and committed, so
-as not to have too many MPS patches in flight at once.)
+> Remove KVM specific tests in balloon_page(), instead marking
+> ballooning as inhibited without KVM_CAP_SYNC_MMU support.
+> 
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  accel/kvm/kvm-all.c        | 4 ++++
+>  hw/virtio/virtio-balloon.c | 4 +---
+>  2 files changed, 5 insertions(+), 3 deletions(-)
 
-thanks
--- PMM
+Paolo and Michael, can I get an ack for this one?  Otherwise I can drop
+it from the series and let this continue to be a special case.  Thanks,
 
-On 9 August 2018 at 14:00, Peter Maydell <peter.maydell@linaro.org> wrote:
-> This patchset adds some more missing devices to the MPS2 AN505
-> board model:
->
-> Patches 1-3 implement and wire up the CMSDK APB watchdog devices.
->
-> Patch 4 adds a CMSDK timer device that had been forgotten.
->
-> Ppatches 5-6 implement and wire up the "system control element",
-> which is some simple control/ID registers in the IoTKit
->
-> Patches 7-16 are the meat of the patchset, and add support
-> for the DMA controllers and their associated Master Security
-> Controllers. A TrustZone MSC sits in front of a device which
-> can be a bus master (such as a DMA controller) and allows secure
-> software to configure it to either pass through or reject transactions
-> made by that bus master. Rejected transactions may be configured to
-> either be aborted, or to behave as RAZ/WI. An interrupt can be
-> signalled for a rejected transaction. The AN505 has four
-> PL081 DMA controllers, each with its own MSC.
->
-> Patches 10-15 are various minor cleanups and bugfixes in
-> the PL081 model that are needed for its use in the AN505.
-> In particular the PL081 was previously entirely broken as
-> it would hw_error() as soon as the guest enabled the DMA
-> engine. I assume this was either accidentally left-in debug code,
-> or a deliberate choice to guard a never-tested implementation
-> so as to be able to identify when we had guest code to test it
-> with. (Linux for the realview/versatile boards never tries to
-> use the PL08x there for DMA.)
->
-> This patchset is sufficient for the "DMA" test in the AN505
-> self-test binary to pass. (I suspect it is not giving the
-> PL081 or MSC a very thorough workout, though.)
->
-> Based-on: <20180730162458.23186-1-peter.maydell@linaro.org>
-> ("[PATCH 0/5] mps2: Implement FPGAIO counters and dual-timer")
->
-> thanks
-> -- PMM
->
-> Peter Maydell (16):
->   hw/watchdog/cmsdk_apb_watchdog: Implement CMSDK APB watchdog module
->   nvic: Expose NMI line
->   hw/arm/iotkit: Wire up the watchdogs
->   hw/arm/iotkit: Wire up the S32KTIMER
->   hw/misc/iotkit-sysctl: Implement IoTKit system control element
->   hw/misc/iotkit: Wire up the system control element
->   hw/misc/tz-msc: Model TrustZone Master Security Controller
->   hw/misc/iotkit-secctl: Wire up registers for controlling MSCs
->   hw/arm/iotkit: Wire up the lines for MSCs
->   hw/dma/pl080: Allow use as embedded-struct device
->   hw/dma/pl080: Support all three interrupt lines
->   hw/dma/pl080: Don't use CPU address space for DMA accesses
->   hw/dma/pl080: Provide device reset function
->   hw/dma/pl080: Correct bug in register address decode logic
->   hw/dma/pl080: Remove hw_error() if DMA is enabled
->   hw/arm/mps2-tz: Create PL081s and MSCs
->
->  Makefile.objs                            |   1 +
->  hw/misc/Makefile.objs                    |   2 +
->  hw/watchdog/Makefile.objs                |   1 +
->  include/hw/arm/iotkit.h                  |  20 +-
->  include/hw/dma/pl080.h                   |  71 +++++
->  include/hw/misc/iotkit-secctl.h          |  14 +
->  include/hw/misc/iotkit-sysctl.h          |  50 ++++
->  include/hw/misc/tz-msc.h                 |  79 ++++++
->  include/hw/watchdog/cmsdk-apb-watchdog.h |  59 ++++
->  hw/arm/armv7m.c                          |   1 +
->  hw/arm/iotkit.c                          |  99 ++++++-
->  hw/arm/mps2-tz.c                         | 101 ++++++-
->  hw/arm/realview.c                        |   8 +-
->  hw/arm/versatilepb.c                     |   9 +-
->  hw/dma/pl080.c                           | 113 ++++----
->  hw/intc/armv7m_nvic.c                    |  19 ++
->  hw/misc/iotkit-secctl.c                  |  73 ++++-
->  hw/misc/iotkit-sysctl.c                  | 324 ++++++++++++++++++++++
->  hw/misc/tz-msc.c                         | 308 +++++++++++++++++++++
->  hw/watchdog/cmsdk-apb-watchdog.c         | 326 +++++++++++++++++++++++
->  MAINTAINERS                              |   7 +
->  default-configs/arm-softmmu.mak          |   3 +
->  hw/intc/trace-events                     |   1 +
->  hw/misc/trace-events                     |  16 ++
->  hw/watchdog/trace-events                 |   6 +
->  25 files changed, 1632 insertions(+), 79 deletions(-)
->  create mode 100644 include/hw/dma/pl080.h
->  create mode 100644 include/hw/misc/iotkit-sysctl.h
->  create mode 100644 include/hw/misc/tz-msc.h
->  create mode 100644 include/hw/watchdog/cmsdk-apb-watchdog.h
->  create mode 100644 hw/misc/iotkit-sysctl.c
->  create mode 100644 hw/misc/tz-msc.c
->  create mode 100644 hw/watchdog/cmsdk-apb-watchdog.c
->  create mode 100644 hw/watchdog/trace-events
->
-> --
-> 2.17.1
+Alex
+ 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index eb7db92a5e3b..38f468d8e2b1 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -39,6 +39,7 @@
+>  #include "trace.h"
+>  #include "hw/irq.h"
+>  #include "sysemu/sev.h"
+> +#include "sysemu/balloon.h"
+>  
+>  #include "hw/boards.h"
+>  
+> @@ -1698,6 +1699,9 @@ static int kvm_init(MachineState *ms)
+>      s->many_ioeventfds = kvm_check_many_ioeventfds();
+>  
+>      s->sync_mmu = !!kvm_vm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
+> +    if (!s->sync_mmu) {
+> +        qemu_balloon_inhibit(true);
+> +    }
+>  
+>      return 0;
+>  
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index 1f7a87f09429..b5425080c5fb 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -21,7 +21,6 @@
+>  #include "hw/mem/pc-dimm.h"
+>  #include "sysemu/balloon.h"
+>  #include "hw/virtio/virtio-balloon.h"
+> -#include "sysemu/kvm.h"
+>  #include "exec/address-spaces.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-events-misc.h"
+> @@ -36,8 +35,7 @@
+>  
+>  static void balloon_page(void *addr, int deflate)
+>  {
+> -    if (!qemu_balloon_is_inhibited() && (!kvm_enabled() ||
+> -                                         kvm_has_sync_mmu())) {
+> +    if (!qemu_balloon_is_inhibited()) {
+>          qemu_madvise(addr, BALLOON_PAGE_SIZE,
+>                  deflate ? QEMU_MADV_WILLNEED : QEMU_MADV_DONTNEED);
+>      }
