@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fqCpI-0003HX-Qk
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:36:13 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fqDBE-0004yn-Uo
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fqCpF-0003fw-L9
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:36:12 -0400
-Resent-Message-Id: <E1fqCpF-0003fw-L9@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21010)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fqCpF-0003fa-B0
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:36:09 -0400
-In-Reply-To: <20180814121443.33114-1-vsementsov@virtuozzo.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153440493495.16600.7445205006347681894@502c9da6d61e>
+	(envelope-from <luc.michel@greensocs.com>) id 1fqDBD-0004ph-Td
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:58:52 -0400
+References: <20180814124254.5229-1-peter.maydell@linaro.org>
+	<20180814124254.5229-9-peter.maydell@linaro.org>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <191d7d48-ed11-ae83-f776-ddf0b935646b@greensocs.com>
+Date: Thu, 16 Aug 2018 09:58:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 16 Aug 2018 00:35:37 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] dirty-bitmap: rewrite
- bdrv_dirty_iter_next_area
+In-Reply-To: <20180814124254.5229-9-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="irU1cVSBqZwgVQraAa9XFkoEjIuTjhgmg"
+Subject: Re: [Qemu-devel] [PATCH 08/10] target/arm: Permit accesses to
+ ELR_Hyp from Hyp mode via MSR/MRS (banked)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +25,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vsementsov@virtuozzo.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.comfamz@redhat.com, jcody@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, edgari@xilinx.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODE0MTIxNDQzLjMzMTE0LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29t
-ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC84XSBkaXJ0eS1iaXRtYXA6IHJld3Jp
-dGUgYmRydl9kaXJ0eV9pdGVyX25leHRfYXJlYQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNF
-Li4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
-SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
-Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
-CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
-Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
-ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
-RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
-U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplOGQ0OTUxYWRmIFJldmVydCAiaGJpdG1h
-cDogQWRkIEBhZHZhbmNlIHBhcmFtIHRvIGhiaXRtYXBfaXRlcl9uZXh0KCkiCmY2OWVjMzI0NGQg
-UmV2ZXJ0ICJ0ZXN0LWhiaXRtYXA6IEFkZCBub24tYWR2YW5jaW5nIGl0ZXJfbmV4dCB0ZXN0cyIK
-YzkyNGUxM2JiZSBSZXZlcnQgImJsb2NrL2RpcnR5LWJpdG1hcDogQWRkIGJkcnZfZGlydHlfaXRl
-cl9uZXh0X2FyZWEiCmRhOTExZjQyMDEgYmxvY2svbWlycm9yOiBmaXggYW5kIGltcHJvdmUgZG9f
-c3luY190YXJnZXRfd3JpdGUKZTQ2OTllZDkwZSB0ZXN0czogYWRkIHRlc3RzIGZvciBoYml0bWFw
-X25leHRfZGlydHlfYXJlYQphZDJhZjNmYWU4IGRpcnR5LWJpdG1hcDogYWRkIGJkcnZfZGlydHlf
-Yml0bWFwX25leHRfZGlydHlfYXJlYQpiODVkYmJlZDkxIHRlc3RzOiBhZGQgdGVzdHMgZm9yIGhi
-aXRtYXBfbmV4dF96ZXJvIHdpdGggc3BlY2lmaWVkIGVuZCBwYXJhbWV0ZXIKNzhhODAyZDRkMyBk
-aXJ0eS1iaXRtYXA6IGltcHJvdmUgYmRydl9kaXJ0eV9iaXRtYXBfbmV4dF96ZXJvCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzg6IGRpcnR5LWJpdG1hcDogaW1wcm92ZSBi
-ZHJ2X2RpcnR5X2JpdG1hcF9uZXh0X3plcm8uLi4KQ2hlY2tpbmcgUEFUQ0ggMi84OiB0ZXN0czog
-YWRkIHRlc3RzIGZvciBoYml0bWFwX25leHRfemVybyB3aXRoIHNwZWNpZmllZCBlbmQgcGFyYW1l
-dGVyLi4uCkNoZWNraW5nIFBBVENIIDMvODogZGlydHktYml0bWFwOiBhZGQgYmRydl9kaXJ0eV9i
-aXRtYXBfbmV4dF9kaXJ0eV9hcmVhLi4uCkNoZWNraW5nIFBBVENIIDQvODogdGVzdHM6IGFkZCB0
-ZXN0cyBmb3IgaGJpdG1hcF9uZXh0X2RpcnR5X2FyZWEuLi4KRVJST1I6IHN1c3BlY3QgY29kZSBp
-bmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDQsIDQpCiMzNjogRklMRTogdGVzdHMv
-dGVzdC1oYml0bWFwLmM6MTAzODoKKyAgICBmb3IgKGxlbjIgPSAxOyBvZmYyICsgbGVuMiA8IGVu
-ZCAmJiBoYml0bWFwX2dldChkYXRhLT5oYiwgb2ZmMiArIGxlbjIpOwpbLi4uXQorICAgIHsKCnRv
-dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTE4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvODogYmxvY2svbWly
-cm9yOiBmaXggYW5kIGltcHJvdmUgZG9fc3luY190YXJnZXRfd3JpdGUuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNi84OiBSZXZlcnQgImJsb2NrL2RpcnR5LWJpdG1hcDogQWRkIGJkcnZfZGlydHlfaXRlcl9u
-ZXh0X2FyZWEiLi4uCkNoZWNraW5nIFBBVENIIDcvODogUmV2ZXJ0ICJ0ZXN0LWhiaXRtYXA6IEFk
-ZCBub24tYWR2YW5jaW5nIGl0ZXJfbmV4dCB0ZXN0cyIuLi4KQ2hlY2tpbmcgUEFUQ0ggOC84OiBS
-ZXZlcnQgImhiaXRtYXA6IEFkZCBAYWR2YW5jZSBwYXJhbSB0byBoYml0bWFwX2l0ZXJfbmV4dCgp
-Ii4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
-CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
-YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
-cmVkaGF0LmNvbQ==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--irU1cVSBqZwgVQraAa9XFkoEjIuTjhgmg
+From: Luc Michel <luc.michel@greensocs.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: patches@linaro.org, edgari@xilinx.com
+Message-ID: <191d7d48-ed11-ae83-f776-ddf0b935646b@greensocs.com>
+Subject: Re: [PATCH 08/10] target/arm: Permit accesses to ELR_Hyp from Hyp
+ mode via MSR/MRS (banked)
+References: <20180814124254.5229-1-peter.maydell@linaro.org>
+ <20180814124254.5229-9-peter.maydell@linaro.org>
+In-Reply-To: <20180814124254.5229-9-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 8/14/18 2:42 PM, Peter Maydell wrote:
+> The MSR (banked) and MRS (banked) instructions allow accesses to ELR_Hy=
+p
+> from either Monitor or Hyp mode. Our translate time check
+> was overly strict and only permitted access from Monitor mode.
+>=20
+> The runtime check wo do in msr_mrs_banked_exc_checks() had the
+"we"
+> correct code in it, but never got there because of the earlier
+> "currmode =3D=3D tgtmode" check. Special case ELR_Hyp.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-By: Luc Michel <luc.michel@greensocs.com>
+
+> ---
+>  target/arm/op_helper.c | 22 +++++++++++-----------
+>  target/arm/translate.c | 10 +++++++---
+>  2 files changed, 18 insertions(+), 14 deletions(-)
+>=20
+> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> index d550978b5b9..952b8d122b7 100644
+> --- a/target/arm/op_helper.c
+> +++ b/target/arm/op_helper.c
+> @@ -611,6 +611,14 @@ static void msr_mrs_banked_exc_checks(CPUARMState =
+*env, uint32_t tgtmode,
+>       */
+>      int curmode =3D env->uncached_cpsr & CPSR_M;
+> =20
+> +    if (regno =3D=3D 17) {
+> +        /* ELR_Hyp: a special case because access from tgtmode is OK *=
+/
+> +        if (curmode !=3D ARM_CPU_MODE_HYP && curmode !=3D ARM_CPU_MODE=
+_MON) {
+> +            goto undef;
+> +        }
+> +        return;
+> +    }
+> +
+>      if (curmode =3D=3D tgtmode) {
+>          goto undef;
+>      }
+> @@ -638,17 +646,9 @@ static void msr_mrs_banked_exc_checks(CPUARMState =
+*env, uint32_t tgtmode,
+>      }
+> =20
+>      if (tgtmode =3D=3D ARM_CPU_MODE_HYP) {
+> -        switch (regno) {
+> -        case 17: /* ELR_Hyp */
+> -            if (curmode !=3D ARM_CPU_MODE_HYP && curmode !=3D ARM_CPU_=
+MODE_MON) {
+> -                goto undef;
+> -            }
+> -            break;
+> -        default:
+> -            if (curmode !=3D ARM_CPU_MODE_MON) {
+> -                goto undef;
+> -            }
+> -            break;
+> +        /* SPSR_Hyp, r13_hyp: accessible from Monitor mode only */
+> +        if (curmode !=3D ARM_CPU_MODE_MON) {
+> +            goto undef;
+>          }
+>      }
+> =20
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index f845da7c638..3f5751d4826 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -4506,10 +4506,14 @@ static bool msr_banked_access_decode(DisasConte=
+xt *s, int r, int sysm, int rn,
+>          }
+>          break;
+>      case ARM_CPU_MODE_HYP:
+> -        /* Note that we can forbid accesses from EL2 here because they=
+
+> -         * must be from Hyp mode itself
+> +        /*
+> +         * SPSR_hyp and r13_hyp can only be accessed from Monitor mode=
+
+> +         * (and so we can forbid accesses from EL2 or below). elr_hyp
+> +         * can be accessed also from Hyp mode, so forbid accesses from=
+
+> +         * EL0 or EL1.
+>           */
+> -        if (!arm_dc_feature(s, ARM_FEATURE_EL2) || s->current_el < 3) =
+{
+> +        if (!arm_dc_feature(s, ARM_FEATURE_EL2) || s->current_el < 2 |=
+|
+> +            (s->current_el < 3 && *regno !=3D 17)) {
+>              goto undef;
+>          }
+>          break;
+>=20
+
+
+--irU1cVSBqZwgVQraAa9XFkoEjIuTjhgmg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlt1LqUACgkQd8knW3Qn
+Tr7rmQ//bFe09MUm2UXJWB5J7qRDvZoTtq7KKroHbAoeEBEIIJeVgltgd5ZZg1SW
+1MGX5Edk++MDsMYQlx4MdTnPkwnP/Dec597i8KcaP4iXoiGTvaKhibvrIaghknkO
+SnTF90a1uSPbcJixOyKQ8nMyn3t1YV5b25xouC/y2cbdM3tShY5o4RZKXgQIe3IL
+ThxHwo07v7hfEagEMu3LkwVDm/KifHwwuzOd+ttpe9Xnu9K4BlPPOWnTZCkuazBU
+eKiwIWCa6RgSSITqMC6xiGdQg1P49Ao+QXItGBM7PemSm+o9QACkI4MtQZqmLtvB
+IA8T5ZU+5/CytQfGfPB9d11X1R9tv3KzQtvnxPMhw84pCUv+/jy4qyaYyFSTSIbo
+4LU1K3KMlsjTEWTUv6euMo18a+yydO/3O+Fgqs/uzIAaOYmk4pIe1FoYFKaOQYOy
+V85Z0qcxEWkYIWKoaBeIIxyS9eEabJ2Vk/VeVaO6hSzZ7PtQ49HcTffhGhS96l0B
+YzEUkFrMHr94YLxnWuqHn78HTwD7hU6eLUShge+1r1L8jk9YQ4jLOeA2di4jihXw
+wUVt6j1pUeLuA4rQdgPKy1cZPwv6WRHrxdCAAVcXM1sPoZuLkRbiqN/tmqfaizSc
+ZdpRPaIs1Q5iDiaHhdOv9nNlwyXS4/R5m7P+3ZmfNoTn3Bi5mlU=
+=ryVX
+-----END PGP SIGNATURE-----
+
+--irU1cVSBqZwgVQraAa9XFkoEjIuTjhgmg--
