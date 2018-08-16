@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQh-0000lL-9s
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:15 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQY-0000Op-3v
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQe-00021u-Kd
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:10 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44472)
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQV-0001vl-JB
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:01 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44464)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fqIQe-00021R-CV
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:08 -0400
+	id 1fqIQV-0001vC-8F
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:34:59 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQd-00009j-GJ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:07 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQU-000069-Am
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:34:58 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Aug 2018 14:34:31 +0100
-Message-Id: <20180816133438.17061-24-peter.maydell@linaro.org>
+Date: Thu, 16 Aug 2018 14:34:23 +0100
+Message-Id: <20180816133438.17061-16-peter.maydell@linaro.org>
 In-Reply-To: <20180816133438.17061-1-peter.maydell@linaro.org>
 References: <20180816133438.17061-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 23/30] aspeed: add a max_ram_size property to
- the memory controller
+Subject: [Qemu-devel] [PULL 15/30] loader: Implement .hex file loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,139 +29,324 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Cédric Le Goater <clg@kaod.org>
+From: Su Hang <suhang16@mails.ucas.ac.cn>
 
-This will be used to construct a memory region beyond the RAM region
-to let firmwares scan the address space with load/store to guess how
-much RAM the SoC has.
+This patch adds Intel Hexadecimal Object File format support to the
+generic loader device.  The file format specification is available here:
+http://www.piclist.com/techref/fileext/hex/intel.htm
 
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Signed-off-by: Joel Stanley <joel@jms.id.au>
-Tested-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20180807075757.7242-7-joel@jms.id.au
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+This file format is often used with microcontrollers such as the
+micro:bit, Arduino, STM32, etc.  Users expect to be able to run .hex
+files directly with without first converting them to ELF.  Most
+micro:bit code is developed in web-based IDEs without direct user access
+to binutils so it is important for QEMU to handle this file format
+natively.
+
+Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 20180814162739.11814-6-stefanha@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/misc/aspeed_sdmc.h |  1 +
- hw/arm/aspeed.c               | 31 +++++++++++++++++++++++++++++++
- hw/arm/aspeed_soc.c           |  2 ++
- hw/misc/aspeed_sdmc.c         |  3 +++
- 4 files changed, 37 insertions(+)
+ include/hw/loader.h      |  12 ++
+ hw/core/generic-loader.c |   4 +
+ hw/core/loader.c         | 249 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 265 insertions(+)
 
-diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.h
-index e079c66a7d7..b3c926acae9 100644
---- a/include/hw/misc/aspeed_sdmc.h
-+++ b/include/hw/misc/aspeed_sdmc.h
-@@ -27,6 +27,7 @@ typedef struct AspeedSDMCState {
-     uint32_t silicon_rev;
-     uint32_t ram_bits;
-     uint64_t ram_size;
-+    uint64_t max_ram_size;
-     uint32_t fixed_conf;
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index 5235f119a3a..3c112975f48 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -28,6 +28,18 @@ ssize_t load_image_size(const char *filename, void *addr, size_t size);
+ int load_image_targphys_as(const char *filename,
+                            hwaddr addr, uint64_t max_sz, AddressSpace *as);
  
- } AspeedSDMCState;
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index bb9d33848d3..bb9590f1aed 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -31,6 +31,7 @@ static struct arm_boot_info aspeed_board_binfo = {
- typedef struct AspeedBoardState {
-     AspeedSoCState soc;
-     MemoryRegion ram;
-+    MemoryRegion max_ram;
- } AspeedBoardState;
- 
- typedef struct AspeedBoardConfig {
-@@ -127,6 +128,27 @@ static const AspeedBoardConfig aspeed_boards[] = {
-     },
- };
- 
-+/*
-+ * The max ram region is for firmwares that scan the address space
-+ * with load/store to guess how much RAM the SoC has.
++/**load_targphys_hex_as:
++ * @filename: Path to the .hex file
++ * @entry: Store the entry point given by the .hex file
++ * @as: The AddressSpace to load the .hex file to. The value of
++ *      address_space_memory is used if nothing is supplied here.
++ *
++ * Load a fixed .hex file into memory.
++ *
++ * Returns the size of the loaded .hex file on success, -1 otherwise.
 + */
-+static uint64_t max_ram_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    return 0;
-+}
++int load_targphys_hex_as(const char *filename, hwaddr *entry, AddressSpace *as);
 +
-+static void max_ram_write(void *opaque, hwaddr offset, uint64_t value,
-+                           unsigned size)
-+{
-+    /* Discard writes */
-+}
+ /** load_image_targphys:
+  * Same as load_image_targphys_as(), but doesn't allow the caller to specify
+  * an AddressSpace.
+diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
+index cb0e68486df..fde32cbda12 100644
+--- a/hw/core/generic-loader.c
++++ b/hw/core/generic-loader.c
+@@ -147,6 +147,10 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
+                 size = load_uimage_as(s->file, &entry, NULL, NULL, NULL, NULL,
+                                       as);
+             }
 +
-+static const MemoryRegionOps max_ram_ops = {
-+    .read = max_ram_read,
-+    .write = max_ram_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
++            if (size < 0) {
++                size = load_targphys_hex_as(s->file, &entry, as);
++            }
+         }
+ 
+         if (size < 0 || s->force_raw) {
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 612420b870c..390987a05cf 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -1321,3 +1321,252 @@ void hmp_info_roms(Monitor *mon, const QDict *qdict)
+         }
+     }
+ }
++
++typedef enum HexRecord HexRecord;
++enum HexRecord {
++    DATA_RECORD = 0,
++    EOF_RECORD,
++    EXT_SEG_ADDR_RECORD,
++    START_SEG_ADDR_RECORD,
++    EXT_LINEAR_ADDR_RECORD,
++    START_LINEAR_ADDR_RECORD,
 +};
 +
- #define FIRMWARE_ADDR 0x0
- 
- static void write_boot_rom(DriveInfo *dinfo, hwaddr addr, size_t rom_size,
-@@ -187,6 +209,7 @@ static void aspeed_board_init(MachineState *machine,
-     AspeedBoardState *bmc;
-     AspeedSoCClass *sc;
-     DriveInfo *drive0 = drive_get(IF_MTD, 0, 0);
-+    ram_addr_t max_ram_size;
- 
-     bmc = g_new0(AspeedBoardState, 1);
-     object_initialize(&bmc->soc, (sizeof(bmc->soc)), cfg->soc_name);
-@@ -226,6 +249,14 @@ static void aspeed_board_init(MachineState *machine,
-     object_property_add_const_link(OBJECT(&bmc->soc), "ram", OBJECT(&bmc->ram),
-                                    &error_abort);
- 
-+    max_ram_size = object_property_get_uint(OBJECT(&bmc->soc), "max-ram-size",
-+                                            &error_abort);
-+    memory_region_init_io(&bmc->max_ram, NULL, &max_ram_ops, NULL,
-+                          "max_ram", max_ram_size  - ram_size);
-+    memory_region_add_subregion(get_system_memory(),
-+                                sc->info->sdram_base + ram_size,
-+                                &bmc->max_ram);
++/* Each record contains a 16-bit address which is combined with the upper 16
++ * bits of the implicit "next address" to form a 32-bit address.
++ */
++#define NEXT_ADDR_MASK 0xffff0000
 +
-     aspeed_board_init_flashes(&bmc->soc.fmc, cfg->fmc_model, &error_abort);
-     aspeed_board_init_flashes(&bmc->soc.spi[0], cfg->spi_model, &error_abort);
- 
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index e68911af0f9..a27233d4876 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -155,6 +155,8 @@ static void aspeed_soc_init(Object *obj)
-                          sc->info->silicon_rev);
-     object_property_add_alias(obj, "ram-size", OBJECT(&s->sdmc),
-                               "ram-size", &error_abort);
-+    object_property_add_alias(obj, "max-ram-size", OBJECT(&s->sdmc),
-+                              "max-ram-size", &error_abort);
- 
-     for (i = 0; i < sc->info->wdts_num; i++) {
-         object_initialize(&s->wdt[i], sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
-diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-index 89de3138aff..eec77f24350 100644
---- a/hw/misc/aspeed_sdmc.c
-+++ b/hw/misc/aspeed_sdmc.c
-@@ -242,12 +242,14 @@ static void aspeed_sdmc_realize(DeviceState *dev, Error **errp)
-     case AST2400_A0_SILICON_REV:
-     case AST2400_A1_SILICON_REV:
-         s->ram_bits = ast2400_rambits(s);
-+        s->max_ram_size = 512 << 20;
-         s->fixed_conf = ASPEED_SDMC_VGA_COMPAT |
-             ASPEED_SDMC_DRAM_SIZE(s->ram_bits);
-         break;
-     case AST2500_A0_SILICON_REV:
-     case AST2500_A1_SILICON_REV:
-         s->ram_bits = ast2500_rambits(s);
-+        s->max_ram_size = 1024 << 20;
-         s->fixed_conf = ASPEED_SDMC_HW_VERSION(1) |
-             ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
-             ASPEED_SDMC_CACHE_INITIAL_DONE |
-@@ -275,6 +277,7 @@ static const VMStateDescription vmstate_aspeed_sdmc = {
- static Property aspeed_sdmc_properties[] = {
-     DEFINE_PROP_UINT32("silicon-rev", AspeedSDMCState, silicon_rev, 0),
-     DEFINE_PROP_UINT64("ram-size", AspeedSDMCState, ram_size, 0),
-+    DEFINE_PROP_UINT64("max-ram-size", AspeedSDMCState, max_ram_size, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
++#define DATA_FIELD_MAX_LEN 0xff
++#define LEN_EXCEPT_DATA 0x5
++/* 0x5 = sizeof(byte_count) + sizeof(address) + sizeof(record_type) +
++ *       sizeof(checksum) */
++typedef struct {
++    uint8_t byte_count;
++    uint16_t address;
++    uint8_t record_type;
++    uint8_t data[DATA_FIELD_MAX_LEN];
++    uint8_t checksum;
++} HexLine;
++
++/* return 0 or -1 if error */
++static bool parse_record(HexLine *line, uint8_t *our_checksum, const uint8_t c,
++                         uint32_t *index, const bool in_process)
++{
++    /* +-------+---------------+-------+---------------------+--------+
++     * | byte  |               |record |                     |        |
++     * | count |    address    | type  |        data         |checksum|
++     * +-------+---------------+-------+---------------------+--------+
++     * ^       ^               ^       ^                     ^        ^
++     * |1 byte |    2 bytes    |1 byte |     0-255 bytes     | 1 byte |
++     */
++    uint8_t value = 0;
++    uint32_t idx = *index;
++    /* ignore space */
++    if (g_ascii_isspace(c)) {
++        return true;
++    }
++    if (!g_ascii_isxdigit(c) || !in_process) {
++        return false;
++    }
++    value = g_ascii_xdigit_value(c);
++    value = (idx & 0x1) ? (value & 0xf) : (value << 4);
++    if (idx < 2) {
++        line->byte_count |= value;
++    } else if (2 <= idx && idx < 6) {
++        line->address <<= 4;
++        line->address += g_ascii_xdigit_value(c);
++    } else if (6 <= idx && idx < 8) {
++        line->record_type |= value;
++    } else if (8 <= idx && idx < 8 + 2 * line->byte_count) {
++        line->data[(idx - 8) >> 1] |= value;
++    } else if (8 + 2 * line->byte_count <= idx &&
++               idx < 10 + 2 * line->byte_count) {
++        line->checksum |= value;
++    } else {
++        return false;
++    }
++    *our_checksum += value;
++    ++(*index);
++    return true;
++}
++
++typedef struct {
++    const char *filename;
++    HexLine line;
++    uint8_t *bin_buf;
++    hwaddr *start_addr;
++    int total_size;
++    uint32_t next_address_to_write;
++    uint32_t current_address;
++    uint32_t current_rom_index;
++    uint32_t rom_start_address;
++    AddressSpace *as;
++} HexParser;
++
++/* return size or -1 if error */
++static int handle_record_type(HexParser *parser)
++{
++    HexLine *line = &(parser->line);
++    switch (line->record_type) {
++    case DATA_RECORD:
++        parser->current_address =
++            (parser->next_address_to_write & NEXT_ADDR_MASK) | line->address;
++        /* verify this is a contiguous block of memory */
++        if (parser->current_address != parser->next_address_to_write) {
++            if (parser->current_rom_index != 0) {
++                rom_add_blob_fixed_as(parser->filename, parser->bin_buf,
++                                      parser->current_rom_index,
++                                      parser->rom_start_address, parser->as);
++            }
++            parser->rom_start_address = parser->current_address;
++            parser->current_rom_index = 0;
++        }
++
++        /* copy from line buffer to output bin_buf */
++        memcpy(parser->bin_buf + parser->current_rom_index, line->data,
++               line->byte_count);
++        parser->current_rom_index += line->byte_count;
++        parser->total_size += line->byte_count;
++        /* save next address to write */
++        parser->next_address_to_write =
++            parser->current_address + line->byte_count;
++        break;
++
++    case EOF_RECORD:
++        if (parser->current_rom_index != 0) {
++            rom_add_blob_fixed_as(parser->filename, parser->bin_buf,
++                                  parser->current_rom_index,
++                                  parser->rom_start_address, parser->as);
++        }
++        return parser->total_size;
++    case EXT_SEG_ADDR_RECORD:
++    case EXT_LINEAR_ADDR_RECORD:
++        if (line->byte_count != 2 && line->address != 0) {
++            return -1;
++        }
++
++        if (parser->current_rom_index != 0) {
++            rom_add_blob_fixed_as(parser->filename, parser->bin_buf,
++                                  parser->current_rom_index,
++                                  parser->rom_start_address, parser->as);
++        }
++
++        /* save next address to write,
++         * in case of non-contiguous block of memory */
++        parser->next_address_to_write = (line->data[0] << 12) |
++                                        (line->data[1] << 4);
++        if (line->record_type == EXT_LINEAR_ADDR_RECORD) {
++            parser->next_address_to_write <<= 12;
++        }
++
++        parser->rom_start_address = parser->next_address_to_write;
++        parser->current_rom_index = 0;
++        break;
++
++    case START_SEG_ADDR_RECORD:
++        if (line->byte_count != 4 && line->address != 0) {
++            return -1;
++        }
++
++        /* x86 16-bit CS:IP segmented addressing */
++        *(parser->start_addr) = (((line->data[0] << 8) | line->data[1]) << 4) +
++                                ((line->data[2] << 8) | line->data[3]);
++        break;
++
++    case START_LINEAR_ADDR_RECORD:
++        if (line->byte_count != 4 && line->address != 0) {
++            return -1;
++        }
++
++        *(parser->start_addr) = ldl_be_p(line->data);
++        break;
++
++    default:
++        return -1;
++    }
++
++    return parser->total_size;
++}
++
++/* return size or -1 if error */
++static int parse_hex_blob(const char *filename, hwaddr *addr, uint8_t *hex_blob,
++                          size_t hex_blob_size, AddressSpace *as)
++{
++    bool in_process = false; /* avoid re-enter and
++                              * check whether record begin with ':' */
++    uint8_t *end = hex_blob + hex_blob_size;
++    uint8_t our_checksum = 0;
++    uint32_t record_index = 0;
++    HexParser parser = {
++        .filename = filename,
++        .bin_buf = g_malloc(hex_blob_size),
++        .start_addr = addr,
++        .as = as,
++    };
++
++    rom_transaction_begin();
++
++    for (; hex_blob < end; ++hex_blob) {
++        switch (*hex_blob) {
++        case '\r':
++        case '\n':
++            if (!in_process) {
++                break;
++            }
++
++            in_process = false;
++            if ((LEN_EXCEPT_DATA + parser.line.byte_count) * 2 !=
++                    record_index ||
++                our_checksum != 0) {
++                parser.total_size = -1;
++                goto out;
++            }
++
++            if (handle_record_type(&parser) == -1) {
++                parser.total_size = -1;
++                goto out;
++            }
++            break;
++
++        /* start of a new record. */
++        case ':':
++            memset(&parser.line, 0, sizeof(HexLine));
++            in_process = true;
++            record_index = 0;
++            break;
++
++        /* decoding lines */
++        default:
++            if (!parse_record(&parser.line, &our_checksum, *hex_blob,
++                              &record_index, in_process)) {
++                parser.total_size = -1;
++                goto out;
++            }
++            break;
++        }
++    }
++
++out:
++    g_free(parser.bin_buf);
++    rom_transaction_end(parser.total_size != -1);
++    return parser.total_size;
++}
++
++/* return size or -1 if error */
++int load_targphys_hex_as(const char *filename, hwaddr *entry, AddressSpace *as)
++{
++    gsize hex_blob_size;
++    gchar *hex_blob;
++    int total_size = 0;
++
++    if (!g_file_get_contents(filename, &hex_blob, &hex_blob_size, NULL)) {
++        return -1;
++    }
++
++    total_size = parse_hex_blob(filename, entry, (uint8_t *)hex_blob,
++                                hex_blob_size, as);
++
++    g_free(hex_blob);
++    return total_size;
++}
 -- 
 2.18.0
