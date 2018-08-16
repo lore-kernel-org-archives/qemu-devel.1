@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqIEM-0000pI-PJ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:22:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1fqIHg-0004G5-A0
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqIEI-0000Ow-4l
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:22:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38256 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fqIEH-0000Oc-WE
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:22:22 -0400
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-49-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0ab1a7fe-35bc-a8d8-fc0a-3321ec41eb29@redhat.com>
-Date: Thu, 16 Aug 2018 08:22:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1fqIHb-0003XK-99
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:25:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fqIHb-0003WP-2I
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:25:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fqIHZ-00040c-O5
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 13:25:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B37D22E851C
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 13:25:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180808120334.10970-49-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 48/56] json: Enforce token count and size
- limits more tightly
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 16 Aug 2018 13:11:15 -0000
+From: =?utf-8?q?Leonardo_M=C3=BCller?= <leozinho29_eu@hotmail.com>
+Reply-To: Bug 1787070 <1787070@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153429832178.24411.17323780348611441441.malonedeb@soybean.canonical.com>
+Message-Id: <153442507641.7907.16895617974341939387.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1787070] Re: Guests using the qxl-vga are freezing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +36,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-On 08/08/2018 07:03 AM, Markus Armbruster wrote:
-> Token count and size limits exist to guard against excessive heap
-> usage.  We check them only after we created the token on the heap.
-> That's assigning a cowboy to the barn to lasso the horse after it has
-> bolted.  Close the barn door instead: check before we create the
-> token.
+QEMU version I'm using now is v3.0.0-65-g1d746ee95d-dirty and has the
+problem, the first version I observed the problem was 2.11 from Ubuntu's
+repositories.
 
-Love the imagery.
+The fact you are unable to reproduce the bug is unsurprising to me: this
+is not the first time I have a problem with QXL VGA and others are
+unable to reproduce. I don't understand why QXL fails so consistently
+here.
 
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   qobject/json-streamer.c | 36 ++++++++++++++++++------------------
->   1 file changed, 18 insertions(+), 18 deletions(-)
+Another QXL bug I reported:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+https://bugs.launchpad.net/ubuntu/bionic/+source/qemu/+bug/1755912
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1787070
+
+Title:
+  Guests using the qxl-vga are freezing
+
+Status in QEMU:
+  New
+
+Bug description:
+  I have noticed that guests using qxl-vga are freezing. They may freeze
+  after a few minutes or after many hours. The freeze consists of the
+  entire system hanging, except the cursor, but the cursor animation
+  stops too. Changing to tty is not possible after this. There are three
+  things noticed in common on the guests when they freeze:
+
+  -The guest is using the QXL VGA (freezes weren't observed with other VGAs=
+);
+  -A new workload is starting;
+  -The mouse cursor is the animated as the one of loading. For example, htt=
+ps://i.imgur.com/raQFteG.png
+   =
+
+  The host is Xubuntu 18.04 amd64, QEMU version is 3.0.0-dirty. The guests =
+tested were:
+
+  -openSUSE Tumbleweed;
+  -openSUSE Leap 15;
+  -Xubuntu 18.04 Bionic Beaver;
+  -CentOS 7.
+
+  With openSUSE guests, the install process couldn't even be finished,
+  as the installer would freeze. There were 2 GB of available memory
+  (checked in a tty before the freeze) and netconsole was enabled.
+  Unfortunately, it was impossible to obtain any information from them.
+  This is an image of one openSUSE guest frozen:
+  https://i.imgur.com/ZP0eQKq.png
+
+  The command line used was:
+
+  qemu-system-x86_64 -nodefaults -m 3072 -M pc,usb=3Dtrue -accel kvm -cpu
+  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+  id=3Dcentusb,if=3Dnone,file=3Dleap.qcow2 -device usb-
+  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
+  -monitor vc -serial vc  -cdrom "openSUSE-Leap-15.0-DVD-x86_64.iso"
+  -boot d
+
+  With CentOS guests, the install process fail sometimes, but sometimes
+  it's able to install. However, on the yum update, it would freeze too.
+  In one instance it froze while updating glibc, which made the guest
+  unbootable. https://i.imgur.com/B3WhSDX.png
+
+  The command line used was:
+
+  qemu-system-x86_64 -nodefaults -m 2048 -M pc,usb=3Dtrue -accel kvm -cpu
+  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+  id=3Dcentusb,if=3Dnone,file=3Dcentos.qcow2 -device usb-
+  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+  audio,id=3Dusbaudio -device virtio-vga,virgl=3Dtrue -display gtk -monitor
+  vc -serial vc -cdrom "CentOS-7-livecd-GNOME-x86_64.iso" -bios
+  /usr/share/ovmf/OVMF.fd
+
+  With Xubuntu 18.04 guests, the system worked for many hours until the
+  freeze happened. On this case it happened when opening Audacious.
+  Fortunately, the logging services worked for some time, which allowed
+  me to get a relevant message which can be seen at
+  http://termbin.com/nuof . It repeated a few times, but then the
+  logging stopped. https://i.imgur.com/2zckqj5.png shows the guest
+  screen in the moment it froze.
+
+  The command line used was:
+
+  qemu-system-x86_64 -nodefaults -m 1024 -M pc,usb=3Dtrue -accel kvm -cpu
+  host -smp cores=3D2,threads=3D2 -device qemu-xhci -drive
+  id=3Dcentusb,if=3Dnone,file=3Dxubmini -device usb-
+  storage,id=3Dcentusb,drive=3Dcentusb -netdev user,id=3Dn0 -device usb-
+  tablet,id=3Dusbtablet -device e1000,netdev=3Dn0 -device usb-
+  audio,id=3Dusbaudio -device qxl-vga,xres=3D1366,yres=3D768 -display gtk
+  -monitor vc -serial vc
+
+  I'm sorry for not having more detailed information but, even setting
+  netconsole, openSUSE and CentOS guests were unable to print any
+  information.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1787070/+subscriptions
