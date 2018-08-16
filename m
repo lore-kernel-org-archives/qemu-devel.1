@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJll-0006OZ-86
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:01:03 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlr-0006Vc-0A
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:01:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlV-0001PG-1R
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:50 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46067 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJla-0001RD-Rf
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:54 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:43753 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJlJ-00015f-3w
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:33 -0400
+	id 1fqJlM-0000hB-5f
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:42 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:58:06 +0200
-Message-Id: <1534431497-1385-74-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:57:45 +0200
+Message-Id: <1534431497-1385-53-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v9 73/84] linux-user: Add target_elf.h header
- for nanoMIPS
+Subject: [Qemu-devel] [PATCH v9 52/84] target/mips: Adjust
+ set_hflags_for_handler() for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +28,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Dimitrije Nikolic <dnikolic@wavecomp.com>
+From: James Hogan <james.hogan@mips.com>
 
-This header includes common elf header, and adds cpu_get_model()
-function.
+We shouldn't clear M16 mode when entering an interrupt on nanoMIPS,
+otherwise we'll start interpreting the code as normal MIPS code.
 
-Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: James Hogan <james.hogan@mips.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/nanomips/target_elf.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
- create mode 100644 linux-user/nanomips/target_elf.h
+ target/mips/helper.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/linux-user/nanomips/target_elf.h b/linux-user/nanomips/target_elf.h
-new file mode 100644
-index 0000000..ca68dab
---- /dev/null
-+++ b/linux-user/nanomips/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef NANOMIPS_TARGET_ELF_H
-+#define NANOMIPS_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "I7200";
-+}
-+#endif
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index b429671..0c15e65 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -671,6 +671,9 @@ target_ulong exception_resume_pc (CPUMIPSState *env)
+ #if !defined(CONFIG_USER_ONLY)
+ static void set_hflags_for_handler (CPUMIPSState *env)
+ {
++    if (env->insn_flags & ISA_NANOMIPS32) {
++        return;
++    }
+     /* Exception handlers are entered in 32-bit mode.  */
+     env->hflags &= ~(MIPS_HFLAG_M16);
+     /* ...except that microMIPS lets you choose.  */
 -- 
 2.7.4
