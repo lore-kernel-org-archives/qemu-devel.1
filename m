@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQr-0000xS-2h
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1fqIWQ-0002px-Ct
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQp-0002Dq-Ms
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:20 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44472)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fqIQo-00021R-V2
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:19 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQi-0000Bj-8f
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:12 +0100
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Aug 2018 14:34:36 +0100
-Message-Id: <20180816133438.17061-29-peter.maydell@linaro.org>
-In-Reply-To: <20180816133438.17061-1-peter.maydell@linaro.org>
-References: <20180816133438.17061-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 28/30] target/arm: Fix aa64 FCADD and FCMLA
- decode
+	(envelope-from <eblake@redhat.com>) id 1fqIWM-0005ii-Da
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:41:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38876 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fqIWM-0005iO-7s
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:41:02 -0400
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-50-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <00ae28b2-a3a3-428a-abfe-4948a5b70bc8@redhat.com>
+Date: Thu, 16 Aug 2018 08:40:58 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180808120334.10970-50-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 49/56] json: Streamline
+ json_message_process_token()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-From: Richard Henderson <richard.henderson@linaro.org>
+On 08/08/2018 07:03 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   qobject/json-streamer.c | 13 +++++--------
+>   1 file changed, 5 insertions(+), 8 deletions(-)
+> 
+> diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+> index 810aae521f..954bf9d468 100644
+> --- a/qobject/json-streamer.c
+> +++ b/qobject/json-streamer.c
+> @@ -99,16 +99,13 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+>   
+>       g_queue_push_tail(parser->tokens, token);
+>   
+> -    if (parser->brace_count < 0 ||
+> -        parser->bracket_count < 0 ||
 
-These insns require u=1; failed to include that in the switch
-cases.  This probably happened during one of the rebases just
-before final commit.
+Old: if we are unbalanced (more right tokens read than left)...
 
-Fixes: d17b7cdcf4e
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Message-id: 20180810193129.1556-6-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/translate-a64.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+> -        (parser->brace_count == 0 &&
+> -         parser->bracket_count == 0)) {
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index b29dc49c4f8..8ca3876707c 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11423,12 +11423,12 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
-         }
-         feature = ARM_FEATURE_V8_DOTPROD;
-         break;
--    case 0x8: /* FCMLA, #0 */
--    case 0x9: /* FCMLA, #90 */
--    case 0xa: /* FCMLA, #180 */
--    case 0xb: /* FCMLA, #270 */
--    case 0xc: /* FCADD, #90 */
--    case 0xe: /* FCADD, #270 */
-+    case 0x18: /* FCMLA, #0 */
-+    case 0x19: /* FCMLA, #90 */
-+    case 0x1a: /* FCMLA, #180 */
-+    case 0x1b: /* FCMLA, #270 */
-+    case 0x1c: /* FCADD, #90 */
-+    case 0x1e: /* FCADD, #270 */
-         if (size == 0
-             || (size == 1 && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))
-             || (size == 3 && !is_q)) {
+...or if we uniformly ended nesting,...
+
+> -        json = json_parser_parse(parser->tokens, parser->ap, &err);
+
+...then parse (to either diagnose the unbalance, or to see if the 
+balanced construct is valid), with weird flow control that skips over an 
+early return.
+
+Or put another way, if we invert the condition, we find the cases where 
+we want an early return instead of parsing (and can thus use that to get 
+rid of an unsightly goto over a single early return).
+
+Applying deMorgan's rules:
+
+!(brace < 0 || bracket < 0 || (brace == 0 && bracket == 0))
+!(brace < 0) && !(bracket < 0) && !(brace == 0 && bracket == 0)
+brace >= 0 && bracket >= 0 && (!(brace == 0) || !(bracket == 0))
+brace >= 0 && bracket >= 0 && (brace != 0 || bracket != 0)
+
+But based on what we learned in the first two conjunctions, we can 
+rewrite the third:
+
+brace >= 0 && bracket >= 0 && (brace > 0 || bracket > 0)
+
+and then commute the logic:
+
+(brace > 0 || bracket > 0) && brace >= 0 && bracket >= 0
+
+> -        parser->tokens = NULL;
+> -        goto out_emit;
+> +    if ((parser->brace_count > 0 || parser->bracket_count > 0)
+> +        && parser->bracket_count >= 0 && parser->bracket_count >= 0) {
+
+So the new condition is correct, and reads as:
+
+If either struct is still awaiting closure, and both structs have not 
+gone unbalanced, then early exit.
+
+It was not intuitive, but stepping through the logic shows it is identical.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.18.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
