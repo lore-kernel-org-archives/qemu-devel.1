@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQp-0000ux-1Y
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:19 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQr-0000xS-2h
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQm-0002CM-Up
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:18 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQp-0002Dq-Ms
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:20 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44472)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fqIQl-00021R-VZ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:16 -0400
+	id 1fqIQo-00021R-V2
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:19 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQk-0000CZ-CM
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:14 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQi-0000Bj-8f
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:12 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Aug 2018 14:34:38 +0100
-Message-Id: <20180816133438.17061-31-peter.maydell@linaro.org>
+Date: Thu, 16 Aug 2018 14:34:36 +0100
+Message-Id: <20180816133438.17061-29-peter.maydell@linaro.org>
 In-Reply-To: <20180816133438.17061-1-peter.maydell@linaro.org>
 References: <20180816133438.17061-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 30/30] hw/arm/mps2-tz: Replace
- init_sysbus_child() with sysbus_init_child_obj()
+Subject: [Qemu-devel] [PULL 28/30] target/arm: Fix aa64 FCADD and FCMLA
+ decode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +30,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Thomas Huth <thuth@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Now that we've got the common sysbus_init_child_obj() function, we do
-not need the local init_sysbus_child() anymore.
+These insns require u=1; failed to include that in the switch
+cases.  This probably happened during one of the rebases just
+before final commit.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-id: 1534420566-15799-1-git-send-email-thuth@redhat.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Fixes: d17b7cdcf4e
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Message-id: 20180810193129.1556-6-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/mps2-tz.c | 32 +++++++++++---------------------
- 1 file changed, 11 insertions(+), 21 deletions(-)
+ target/arm/translate-a64.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index 22180c56fb7..dc0f34abe53 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -107,16 +107,6 @@ static void make_ram_alias(MemoryRegion *mr, const char *name,
-     memory_region_add_subregion(get_system_memory(), base, mr);
- }
- 
--static void init_sysbus_child(Object *parent, const char *childname,
--                              void *child, size_t childsize,
--                              const char *childtype)
--{
--    object_initialize(child, childsize, childtype);
--    object_property_add_child(parent, childname, OBJECT(child), &error_abort);
--    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
--
--}
--
- /* Most of the devices in the AN505 FPGA image sit behind
-  * Peripheral Protection Controllers. These data structures
-  * define the layout of which devices sit behind which PPCs.
-@@ -149,9 +139,9 @@ static MemoryRegion *make_unimp_dev(MPS2TZMachineState *mms,
-      */
-     UnimplementedDeviceState *uds = opaque;
- 
--    init_sysbus_child(OBJECT(mms), name, uds,
--                      sizeof(UnimplementedDeviceState),
--                      TYPE_UNIMPLEMENTED_DEVICE);
-+    sysbus_init_child_obj(OBJECT(mms), name, uds,
-+                          sizeof(UnimplementedDeviceState),
-+                          TYPE_UNIMPLEMENTED_DEVICE);
-     qdev_prop_set_string(DEVICE(uds), "name", name);
-     qdev_prop_set_uint64(DEVICE(uds), "size", size);
-     object_property_set_bool(OBJECT(uds), true, "realized", &error_fatal);
-@@ -170,8 +160,8 @@ static MemoryRegion *make_uart(MPS2TZMachineState *mms, void *opaque,
-     DeviceState *iotkitdev = DEVICE(&mms->iotkit);
-     DeviceState *orgate_dev = DEVICE(&mms->uart_irq_orgate);
- 
--    init_sysbus_child(OBJECT(mms), name, uart,
--                      sizeof(mms->uart[0]), TYPE_CMSDK_APB_UART);
-+    sysbus_init_child_obj(OBJECT(mms), name, uart, sizeof(mms->uart[0]),
-+                          TYPE_CMSDK_APB_UART);
-     qdev_prop_set_chr(DEVICE(uart), "chardev", serial_hd(i));
-     qdev_prop_set_uint32(DEVICE(uart), "pclk-frq", SYSCLK_FRQ);
-     object_property_set_bool(OBJECT(uart), true, "realized", &error_fatal);
-@@ -248,8 +238,8 @@ static MemoryRegion *make_mpc(MPS2TZMachineState *mms, void *opaque,
- 
-     memory_region_init_ram(ssram, NULL, name, ramsize[i], &error_fatal);
- 
--    init_sysbus_child(OBJECT(mms), mpcname, mpc,
--                      sizeof(mms->ssram_mpc[0]), TYPE_TZ_MPC);
-+    sysbus_init_child_obj(OBJECT(mms), mpcname, mpc, sizeof(mms->ssram_mpc[0]),
-+                          TYPE_TZ_MPC);
-     object_property_set_link(OBJECT(mpc), OBJECT(ssram),
-                              "downstream", &error_fatal);
-     object_property_set_bool(OBJECT(mpc), true, "realized", &error_fatal);
-@@ -288,8 +278,8 @@ static void mps2tz_common_init(MachineState *machine)
-         exit(1);
-     }
- 
--    init_sysbus_child(OBJECT(machine), "iotkit", &mms->iotkit,
--                      sizeof(mms->iotkit), TYPE_IOTKIT);
-+    sysbus_init_child_obj(OBJECT(machine), "iotkit", &mms->iotkit,
-+                          sizeof(mms->iotkit), TYPE_IOTKIT);
-     iotkitdev = DEVICE(&mms->iotkit);
-     object_property_set_link(OBJECT(&mms->iotkit), OBJECT(system_memory),
-                              "memory", &error_abort);
-@@ -421,8 +411,8 @@ static void mps2tz_common_init(MachineState *machine)
-         int port;
-         char *gpioname;
- 
--        init_sysbus_child(OBJECT(machine), ppcinfo->name, ppc,
--                          sizeof(TZPPC), TYPE_TZ_PPC);
-+        sysbus_init_child_obj(OBJECT(machine), ppcinfo->name, ppc,
-+                              sizeof(TZPPC), TYPE_TZ_PPC);
-         ppcdev = DEVICE(ppc);
- 
-         for (port = 0; port < TZ_NUM_PORTS; port++) {
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index b29dc49c4f8..8ca3876707c 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11423,12 +11423,12 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
+         }
+         feature = ARM_FEATURE_V8_DOTPROD;
+         break;
+-    case 0x8: /* FCMLA, #0 */
+-    case 0x9: /* FCMLA, #90 */
+-    case 0xa: /* FCMLA, #180 */
+-    case 0xb: /* FCMLA, #270 */
+-    case 0xc: /* FCADD, #90 */
+-    case 0xe: /* FCADD, #270 */
++    case 0x18: /* FCMLA, #0 */
++    case 0x19: /* FCMLA, #90 */
++    case 0x1a: /* FCMLA, #180 */
++    case 0x1b: /* FCMLA, #270 */
++    case 0x1c: /* FCADD, #90 */
++    case 0x1e: /* FCADD, #270 */
+         if (size == 0
+             || (size == 1 && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))
+             || (size == 3 && !is_q)) {
 -- 
 2.18.0
