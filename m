@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1fqKGi-00047m-HW
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:33:01 -0400
+	(envelope-from <mlureau@redhat.com>) id 1fqKKV-0000Tx-Sa
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:36:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1fqKGh-0002ou-8a
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:33:00 -0400
-Received: from forwardcorp1j.cmail.yandex.net ([2a02:6b8:0:1630::190]:52981)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1fqKGg-0002nW-R0
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:32:59 -0400
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-Date: Thu, 16 Aug 2018 18:32:42 +0300
-Message-Id: <1534433563-30865-3-git-send-email-yury-kotov@yandex-team.ru>
+	(envelope-from <mlureau@redhat.com>) id 1fqKKT-0004lB-3v
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:36:55 -0400
+Received: from mail-it0-f67.google.com ([209.85.214.67]:35461)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fqKKS-0004ks-V2
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:36:53 -0400
+Received: by mail-it0-f67.google.com with SMTP id 139-v6so7250920itf.0
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:36:52 -0700 (PDT)
+MIME-Version: 1.0
 In-Reply-To: <1534433563-30865-1-git-send-email-yury-kotov@yandex-team.ru>
 References: <1534433563-30865-1-git-send-email-yury-kotov@yandex-team.ru>
-Subject: [Qemu-devel] [PATCH 2/3] vhost: refactor vhost_dev_start and
- vhost_virtqueue_start
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 16 Aug 2018 17:36:51 +0200
+Message-ID: <CAMxuvayBTG7XghOmdTdxT8uR+WH68GC00i3=jWHDU8w+-Ym4Tw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/3] vhost-user reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,344 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>
 
-vhost_dev_start and vhost_virtqueue_start do two things:
-1. Initialize its own structs vhost_dev and vhost_virtqueue,
-2. Sync with vhost backend.
+On Thu, Aug 16, 2018 at 5:32 PM, Yury Kotov <yury-kotov@yandex-team.ru> wrote:
+> We are using QEMU (2.12.0) with SPDK (18.04.1) over vhost-user to emulate block
+> devices. One of our cases it to restart SPDK without restarting VM (in case
+> of some updates or smth like it). We tried to use the 'reconnect' option for
+> the '-chardev' device:
+>   -object memory-backend-file,id=mem0,size=1G,mem-path=/dev/hugepages,share=on \
+>   -numa node,memdev=mem0 \
+>   -chardev socket,id=spdk_vhost_blk1,path=/var/tmp/vhost.1,reconnect=10 \
+>   -device vhost-user-blk-pci,chardev=spdk_vhost_blk1,num-queues=4
+>
+> After this, vhost-user-blk initialization fails with an error below:
+>   qemu-system-x86_64: -device ...: Failed to set msg fds.
+>   qemu-system-x86_64: -device ...: vhost-user-blk: vhost initialization failed:
+>                                    Operation not permitted
+>
+> We got the same error with the latest QEMU (c542a9f9794ec8e0bc3f).
+>
+> We made some investigations and found out that there are several issues:
+>
+> 1. Reconnect option postpones the first connection till machine init done event.
+>    But we need this connection during vhost blk device initialization which
+>    happens before the machine init done handling.
+>
+> 2. If the connection is forced, then the reconnection will be successful
+>    after SPDK restart. The problem is that virtual queue will not start.
+>    The reason for it is that virtual queue initialization commands
+>    should be resent:
+>    * VHOST_USER_SET_FEATURES
+>    * VHOST_USER_SET_MEM_TABLE
+>    * VHOST_USER_SET_VRING_NUM
+>    * VHOST_USER_SET_VRING_BASE
+>    * VHOST_USER_SET_VRING_ADDR
+>    * VHOST_USER_SET_VRING_KICK
+>    * VHOST_USER_SET_VRING_CALL
+>
+> The patch set resolves both of these issues.
+>
+> Test case:
+>
+> 1. Start fio process (inside VM):
+>      fio --name test --ioengine=libaio --iodepth=64 --bs=4096 \
+>          --rw=randrw --direct=1 --sync=1 --verify=md5 \
+>          --size=64M --filename=/dev/vda --loops=100
+>
+> 2. Restart SPDK many times.
+>    We are expecting that during SPDK restart fio will pause and fio should
+>    continue to work after restart completion.
+>
+> 3. fio process completed successfully without any error.
 
-It's ok, but we want to do sync part separately.
-This refactoring is needed for the next patch, which adds reconnect
-support for vhost-user.
+Can you write a test case in vhost-user-test.c ? (perhaps under
+QTEST_VHOST_USER_FIXME scope...)
 
-So,
-1. Move initialization part of vhost_dev_start which syncs with backend
-   to the separate function: vhost_dev_sync_backend.
-2. Divide vhost_virtqueue_start into two functions:
-   * vhost_virtqueue_setup: prepares vhost_virtqueue to work with
-     corresponding VirtQueue,
-   * vhost_virtqueue_sync_backend: syncs vhost_virtqueue and backend.
-
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
----
- hw/virtio/vhost.c         | 192 ++++++++++++++++++++++++++++------------------
- include/hw/virtio/vhost.h |   1 +
- 2 files changed, 119 insertions(+), 74 deletions(-)
-
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index d4cb589..6fcfb87 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -941,15 +941,14 @@ out:
-     return ret;
- }
- 
--static int vhost_virtqueue_start(struct vhost_dev *dev,
--                                struct VirtIODevice *vdev,
--                                struct vhost_virtqueue *vq,
--                                unsigned idx)
-+static int vhost_virtqueue_sync_backend(struct vhost_dev *dev,
-+                                        struct VirtIODevice *vdev,
-+                                        struct vhost_virtqueue *vq,
-+                                        unsigned idx)
- {
-     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
-     VirtioBusState *vbus = VIRTIO_BUS(qbus);
-     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
--    hwaddr s, l, a;
-     int r;
-     int vhost_vq_index = dev->vhost_ops->vhost_get_vq_index(dev, idx);
-     struct vhost_vring_file file = {
-@@ -960,13 +959,7 @@ static int vhost_virtqueue_start(struct vhost_dev *dev,
-     };
-     struct VirtQueue *vvq = virtio_get_queue(vdev, idx);
- 
--    a = virtio_queue_get_desc_addr(vdev, idx);
--    if (a == 0) {
--        /* Queue might not be ready for start */
--        return 0;
--    }
--
--    vq->num = state.num = virtio_queue_get_num(vdev, idx);
-+    state.num = virtio_queue_get_num(vdev, idx);
-     r = dev->vhost_ops->vhost_set_vring_num(dev, &state);
-     if (r) {
-         VHOST_OPS_DEBUG("vhost_set_vring_num failed");
-@@ -989,32 +982,10 @@ static int vhost_virtqueue_start(struct vhost_dev *dev,
-         }
-     }
- 
--    vq->desc_size = s = l = virtio_queue_get_desc_size(vdev, idx);
--    vq->desc_phys = a;
--    vq->desc = vhost_memory_map(dev, a, &l, 0);
--    if (!vq->desc || l != s) {
--        r = -ENOMEM;
--        goto fail_alloc_desc;
--    }
--    vq->avail_size = s = l = virtio_queue_get_avail_size(vdev, idx);
--    vq->avail_phys = a = virtio_queue_get_avail_addr(vdev, idx);
--    vq->avail = vhost_memory_map(dev, a, &l, 0);
--    if (!vq->avail || l != s) {
--        r = -ENOMEM;
--        goto fail_alloc_avail;
--    }
--    vq->used_size = s = l = virtio_queue_get_used_size(vdev, idx);
--    vq->used_phys = a = virtio_queue_get_used_addr(vdev, idx);
--    vq->used = vhost_memory_map(dev, a, &l, 1);
--    if (!vq->used || l != s) {
--        r = -ENOMEM;
--        goto fail_alloc_used;
--    }
--
-     r = vhost_virtqueue_set_addr(dev, vq, vhost_vq_index, dev->log_enabled);
-     if (r < 0) {
-         r = -errno;
--        goto fail_alloc;
-+        goto fail;
-     }
- 
-     file.fd = event_notifier_get_fd(virtio_queue_get_host_notifier(vvq));
-@@ -1022,7 +993,7 @@ static int vhost_virtqueue_start(struct vhost_dev *dev,
-     if (r) {
-         VHOST_OPS_DEBUG("vhost_set_vring_kick failed");
-         r = -errno;
--        goto fail_kick;
-+        goto fail;
-     }
- 
-     /* Clear and discard previous events if any. */
-@@ -1042,15 +1013,56 @@ static int vhost_virtqueue_start(struct vhost_dev *dev,
-         file.fd = -1;
-         r = dev->vhost_ops->vhost_set_vring_call(dev, &file);
-         if (r) {
--            goto fail_vector;
-+            goto fail;
-         }
-     }
- 
-     return 0;
- 
--fail_vector:
--fail_kick:
--fail_alloc:
-+fail:
-+    return r;
-+}
-+
-+static int vhost_virtqueue_setup(struct vhost_dev *dev,
-+                                 struct VirtIODevice *vdev,
-+                                 struct vhost_virtqueue *vq,
-+                                 unsigned idx)
-+{
-+    hwaddr s, l, a;
-+    int r;
-+
-+    a = virtio_queue_get_desc_addr(vdev, idx);
-+    if (a == 0) {
-+        /* Queue might not be ready for start */
-+        return 0;
-+    }
-+
-+    vq->num = virtio_queue_get_num(vdev, idx);
-+
-+    vq->desc_size = s = l = virtio_queue_get_desc_size(vdev, idx);
-+    vq->desc_phys = a;
-+    vq->desc = vhost_memory_map(dev, a, &l, 0);
-+    if (!vq->desc || l != s) {
-+        r = -ENOMEM;
-+        goto fail_alloc_desc;
-+    }
-+    vq->avail_size = s = l = virtio_queue_get_avail_size(vdev, idx);
-+    vq->avail_phys = a = virtio_queue_get_avail_addr(vdev, idx);
-+    vq->avail = vhost_memory_map(dev, a, &l, 0);
-+    if (!vq->avail || l != s) {
-+        r = -ENOMEM;
-+        goto fail_alloc_avail;
-+    }
-+    vq->used_size = s = l = virtio_queue_get_used_size(vdev, idx);
-+    vq->used_phys = a = virtio_queue_get_used_addr(vdev, idx);
-+    vq->used = vhost_memory_map(dev, a, &l, 1);
-+    if (!vq->used || l != s) {
-+        r = -ENOMEM;
-+        goto fail_alloc_used;
-+    }
-+
-+    return 0;
-+
-     vhost_memory_unmap(dev, vq->used, virtio_queue_get_used_size(vdev, idx),
-                        0, 0);
- fail_alloc_used:
-@@ -1158,6 +1170,7 @@ static int vhost_virtqueue_init(struct vhost_dev *dev,
-         return r;
-     }
- 
-+    dev->vqs[n].masked = true;
-     file.fd = event_notifier_get_fd(&vq->masked_notifier);
-     r = dev->vhost_ops->vhost_set_vring_call(dev, &file);
-     if (r) {
-@@ -1417,6 +1430,7 @@ void vhost_virtqueue_mask(struct vhost_dev *hdev, VirtIODevice *vdev, int n,
-     } else {
-         file.fd = event_notifier_get_fd(virtio_queue_get_guest_notifier(vvq));
-     }
-+    hdev->vqs[index].masked = mask;
- 
-     file.index = hdev->vhost_ops->vhost_get_vq_index(hdev, n);
-     r = hdev->vhost_ops->vhost_set_vring_call(hdev, &file);
-@@ -1483,56 +1497,41 @@ void vhost_dev_set_config_notifier(struct vhost_dev *hdev,
-     hdev->config_ops = ops;
- }
- 
--/* Host notifiers must be enabled at this point. */
--int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
-+static int vhost_dev_sync_backend(struct vhost_dev *hdev)
- {
-     int i, r;
--
--    /* should only be called after backend is connected */
-     assert(hdev->vhost_ops);
--
--    hdev->started = true;
--    hdev->vdev = vdev;
-+    assert(hdev->vdev);
- 
-     r = vhost_dev_set_features(hdev, hdev->log_enabled);
-     if (r < 0) {
--        goto fail_features;
--    }
--
--    if (vhost_dev_has_iommu(hdev)) {
--        memory_listener_register(&hdev->iommu_listener, vdev->dma_as);
-+        goto fail;
-     }
- 
-     r = hdev->vhost_ops->vhost_set_mem_table(hdev, hdev->mem);
-     if (r < 0) {
--        VHOST_OPS_DEBUG("vhost_set_mem_table failed");
-         r = -errno;
--        goto fail_mem;
-+        goto fail;
-     }
-+
-     for (i = 0; i < hdev->nvqs; ++i) {
--        r = vhost_virtqueue_start(hdev,
--                                  vdev,
--                                  hdev->vqs + i,
--                                  hdev->vq_index + i);
-+        r = vhost_virtqueue_sync_backend(hdev,
-+                                         hdev->vdev,
-+                                         hdev->vqs + i,
-+                                         hdev->vq_index + i);
-         if (r < 0) {
--            goto fail_vq;
-+            goto fail;
-         }
-     }
- 
-     if (hdev->log_enabled) {
-         uint64_t log_base;
--
--        hdev->log_size = vhost_get_log_size(hdev);
--        hdev->log = vhost_log_get(hdev->log_size,
--                                  vhost_dev_log_is_shared(hdev));
--        log_base = (uintptr_t)hdev->log->log;
--        r = hdev->vhost_ops->vhost_set_log_base(hdev,
--                                                hdev->log_size ? log_base : 0,
--                                                hdev->log);
-+        assert(hdev->log);
-+        log_base = hdev->log_size ? (uintptr_t)hdev->log->log : 0;
-+        r = hdev->vhost_ops->vhost_set_log_base(hdev, log_base, hdev->log);
-         if (r < 0) {
--            VHOST_OPS_DEBUG("vhost_set_log_base failed");
-             r = -errno;
--            goto fail_log;
-+            goto fail;
-         }
-     }
- 
-@@ -1546,20 +1545,65 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
-             vhost_device_iotlb_miss(hdev, vq->used_phys, true);
-         }
-     }
-+
-     return 0;
--fail_log:
-+
-+fail:
-+    return r;
-+}
-+
-+/* Host notifiers must be enabled at this point. */
-+int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
-+{
-+    int i, r;
-+
-+    /* should only be called after backend is connected */
-+    assert(hdev->vhost_ops);
-+
-+    hdev->started = true;
-+    hdev->vdev = vdev;
-+
-+    if (vhost_dev_has_iommu(hdev)) {
-+        memory_listener_register(&hdev->iommu_listener, vdev->dma_as);
-+    }
-+
-+    for (i = 0; i < hdev->nvqs; ++i) {
-+        r = vhost_virtqueue_setup(hdev,
-+                                  vdev,
-+                                  hdev->vqs + i,
-+                                  hdev->vq_index + i);
-+        if (r < 0) {
-+            goto fail_vq;
-+        }
-+    }
-+
-+    if (hdev->log_enabled) {
-+        hdev->log_size = vhost_get_log_size(hdev);
-+        hdev->log = vhost_log_get(hdev->log_size,
-+                                  vhost_dev_log_is_shared(hdev));
-+    }
-+
-+    r = vhost_dev_sync_backend(hdev);
-+    if (r < 0) {
-+        goto fail_sync;
-+    }
-+
-+    return 0;
-+
-+fail_sync:
-     vhost_log_put(hdev, false);
-+
- fail_vq:
-+    if (vhost_dev_has_iommu(hdev)) {
-+        memory_listener_unregister(&hdev->iommu_listener);
-+    }
-+
-     while (--i >= 0) {
-         vhost_virtqueue_stop(hdev,
-                              vdev,
-                              hdev->vqs + i,
-                              hdev->vq_index + i);
-     }
--    i = hdev->nvqs;
--
--fail_mem:
--fail_features:
- 
-     hdev->started = false;
-     return r;
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index a7f449f..a43db26 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -20,6 +20,7 @@ struct vhost_virtqueue {
-     unsigned avail_size;
-     unsigned long long used_phys;
-     unsigned used_size;
-+    bool masked;
-     EventNotifier masked_notifier;
-     struct vhost_dev *dev;
- };
--- 
-2.7.4
+>
+> Yury Kotov (3):
+>   chardev: prevent extra connection attempt in tcp_chr_machine_done_hook
+>   vhost: refactor vhost_dev_start and vhost_virtqueue_start
+>   vhost-user: add reconnect support for vhost-user
+>
+>  chardev/char-socket.c     |   5 +-
+>  hw/virtio/vhost-user.c    |  65 ++++++++++++--
+>  hw/virtio/vhost.c         | 223 +++++++++++++++++++++++++++++++---------------
+>  include/hw/virtio/vhost.h |   2 +
+>  4 files changed, 215 insertions(+), 80 deletions(-)
+>
+> --
+> 2.7.4
+>
