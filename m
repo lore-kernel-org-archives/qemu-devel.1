@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJl3-0005NB-77
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:21 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJl3-0005Nn-Sr
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkv-0000hD-BJ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:14 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:43475 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkv-0000hN-BN
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:15 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:43527 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJku-0000dZ-I9
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:08 -0400
+	id 1fqJku-0000e5-KE
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:09 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:57:28 +0200
-Message-Id: <1534431497-1385-36-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:57:33 +0200
+Message-Id: <1534431497-1385-41-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v9 35/84] target/mips: Implement emulation of
- nanoMIPS ROTX instruction
+Subject: [Qemu-devel] [PATCH v9 40/84] target/mips: Fix pre-nanoMIPS MT ASE
+ instructions availability control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,166 +28,169 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Matthew Fortune <matthew.fortune@mips.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Added a helper for ROTX based on the pseudocode from the
-architecture spec. This instraction was not present in previous
-MIPS instruction sets.
+Use bits from configuration registers for availability control
+of MT ASE instructions, rather than only ISA_MT bit in insn_flags.
+This is done by adding a field in hflags for MT bit, and adding
+functions check_mt() and check_cp0_mt().
 
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/mips/helper.h    |  2 ++
- target/mips/op_helper.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++
- target/mips/translate.c | 15 ++++++++
- 3 files changed, 111 insertions(+)
+ target/mips/cpu.h       |  3 ++-
+ target/mips/internal.h  |  6 +++++-
+ target/mips/translate.c | 45 +++++++++++++++++++++++++++++++++++++--------
+ 3 files changed, 44 insertions(+), 10 deletions(-)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 5f49234..b2a780a 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -40,6 +40,8 @@ DEF_HELPER_FLAGS_1(bitswap, TCG_CALL_NO_RWG_SE, tl, tl)
- DEF_HELPER_FLAGS_1(dbitswap, TCG_CALL_NO_RWG_SE, tl, tl)
- #endif
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 468b686..bf9c634 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -556,7 +556,7 @@ struct CPUMIPSState {
+ #define EXCP_INST_NOTAVAIL 0x2 /* No valid instruction word for BadInstr */
+     uint32_t hflags;    /* CPU State */
+     /* TMASK defines different execution modes */
+-#define MIPS_HFLAG_TMASK  0x3F5807FF
++#define MIPS_HFLAG_TMASK  0x7F5807FF
+ #define MIPS_HFLAG_MODE   0x00007 /* execution modes                    */
+     /* The KSU flags must be the lowest bits in hflags. The flag order
+        must be the same as defined for CP0 Status. This allows to use
+@@ -608,6 +608,7 @@ struct CPUMIPSState {
+ #define MIPS_HFLAG_ITC_CACHE  0x8000000 /* CACHE instr. operates on ITC tag */
+ #define MIPS_HFLAG_ERL   0x10000000 /* error level flag */
+ #define MIPS_HFLAG_XNP   0x20000000
++#define MIPS_HFLAG_MT    0x40000000
+     target_ulong btarget;        /* Jump / branch target               */
+     target_ulong bcond;          /* Branch condition (if needed)       */
  
-+DEF_HELPER_FLAGS_4(rotx, TCG_CALL_NO_RWG_SE, tl, tl, i32, i32, i32)
-+
- #ifndef CONFIG_USER_ONLY
- /* CP0 helpers */
- DEF_HELPER_1(mfc0_mvpcontrol, tl, env)
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 0b2663b..b3eef9f 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -249,6 +249,100 @@ target_ulong helper_bitswap(target_ulong rt)
-     return (int32_t)bitswap(rt);
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index 97485da..c0e447b 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -308,7 +308,8 @@ static inline void compute_hflags(CPUMIPSState *env)
+                      MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
+                      MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
+                      MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA | MIPS_HFLAG_FRE |
+-                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL | MIPS_HFLAG_XNP);
++                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL | MIPS_HFLAG_XNP |
++                     MIPS_HFLAG_MT);
+     if (env->CP0_Status & (1 << CP0St_ERL)) {
+         env->hflags |= MIPS_HFLAG_ERL;
+     }
+@@ -405,6 +406,9 @@ static inline void compute_hflags(CPUMIPSState *env)
+     if (env->CP0_Config5 & (1 << CP0C5_XNP)) {
+         env->hflags |= MIPS_HFLAG_XNP;
+     }
++    if (env->CP0_Config3 & (1 << CP0C3_MT)) {
++        env->hflags |= MIPS_HFLAG_MT;
++    }
  }
  
-+target_ulong helper_rotx(target_ulong rs, uint32_t shift, uint32_t shiftx,
-+                        uint32_t stripe)
-+{
-+    int i;
-+    uint64_t tmp0 = ((uint64_t)rs) << 32 | ((uint64_t)rs & 0xffffffff);
-+    uint64_t tmp1 = tmp0;
-+    for (i = 0; i <= 46; i++) {
-+        int s;
-+        if (i & 0x8) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+
-+        if (stripe != 0 && !(i & 0x4)) {
-+            s = ~s;
-+        }
-+        if (s & 0x10) {
-+            if (tmp0 & (1LL << (i + 16))) {
-+                tmp1 |= 1LL << i;
-+            } else {
-+                tmp1 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp2 = tmp1;
-+    for (i = 0; i <= 38; i++) {
-+        int s;
-+        if (i & 0x4) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+
-+        if (s & 0x8) {
-+            if (tmp1 & (1LL << (i + 8))) {
-+                tmp2 |= 1LL << i;
-+            } else {
-+                tmp2 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp3 = tmp2;
-+    for (i = 0; i <= 34; i++) {
-+        int s;
-+        if (i & 0x2) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+        if (s & 0x4) {
-+            if (tmp2 & (1LL << (i + 4))) {
-+                tmp3 |= 1LL << i;
-+            } else {
-+                tmp3 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp4 = tmp3;
-+    for (i = 0; i <= 32; i++) {
-+        int s;
-+        if (i & 0x1) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+        if (s & 0x2) {
-+            if (tmp3 & (1LL << (i + 2))) {
-+                tmp4 |= 1LL << i;
-+            } else {
-+                tmp4 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp5 = tmp4;
-+    for (i = 0; i <= 31; i++) {
-+        int s;
-+        s = shift;
-+        if (s & 0x1) {
-+            if (tmp4 & (1LL << (i + 1))) {
-+                tmp5 |= 1LL << i;
-+            } else {
-+                tmp5 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    return (int64_t)(int32_t)(uint32_t)tmp5;
-+}
-+
- #ifndef CONFIG_USER_ONLY
- 
- static inline hwaddr do_translate_address(CPUMIPSState *env,
+ void cpu_mips_tlb_flush(CPUMIPSState *env);
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 0ac9f0d..90415da 100644
+index dcb3d25..e8c0509 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -17681,6 +17681,21 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-             }
-             break;
-         case NM_P_ROTX:
-+            if (rt != 0) {
-+                TCGv t0 = tcg_temp_new();
-+                TCGv_i32 shift = tcg_const_i32(extract32(ctx->opcode, 0, 5));
-+                TCGv_i32 shiftx = tcg_const_i32(extract32(ctx->opcode, 7, 4)
-+                                                << 1);
-+                TCGv_i32 stripe = tcg_const_i32(extract32(ctx->opcode, 6, 1));
+@@ -1925,6 +1925,35 @@ static inline void check_xnp(DisasContext *ctx)
+     }
+ }
+ 
++/*
++ * This code generates a "reserved instruction" exception if the
++ * Config5 MT bit is NOT set.
++ */
++static inline void check_mt(DisasContext *ctx)
++{
++    if (unlikely(!(ctx->hflags & MIPS_HFLAG_MT))) {
++        generate_exception_end(ctx, EXCP_RI);
++    }
++}
 +
-+                gen_load_gpr(t0, rs);
-+                gen_helper_rotx(cpu_gpr[rt], t0, shift, shiftx, stripe);
-+                tcg_temp_free(t0);
++/*
++ * This code generates a "coprocessor unusable" exception if CP0 is not
++ * available, and, if that is not the case, generates a "reserved instruction"
++ * exception if the Config5 MT bit is NOT set. This is needed for availability
++ * control of some of MT ASE instructions.
++ */
++static inline void check_cp0_mt(DisasContext *ctx)
++{
++    if (unlikely(!(ctx->hflags & MIPS_HFLAG_CP0))) {
++        generate_exception_err(ctx, EXCP_CpU, 0);
++    } else {
++        if (unlikely(!(ctx->hflags & MIPS_HFLAG_MT))) {
++            generate_exception_err(ctx, EXCP_RI, 0);
++        }
++    }
++}
 +
-+                tcg_temp_free_i32(shift);
-+                tcg_temp_free_i32(shiftx);
-+                tcg_temp_free_i32(stripe);
-+            }
-             break;
-         case NM_P_INS:
-             switch (((ctx->opcode >> 10) & 2) |
++
+ 
+ /* Define small wrappers for gen_load_fpr* so that we have a uniform
+    calling interface for 32 and 64-bit FPRs.  No sense in changing
+@@ -8471,7 +8500,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContext *ctx, uint32_t opc, int rt,
+         opn = "mthc0";
+         break;
+     case OPC_MFTR:
+-        check_insn(ctx, ASE_MT);
++        check_cp0_enabled(ctx);
+         if (rd == 0) {
+             /* Treat as NOP. */
+             return;
+@@ -8481,7 +8510,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContext *ctx, uint32_t opc, int rt,
+         opn = "mftr";
+         break;
+     case OPC_MTTR:
+-        check_insn(ctx, ASE_MT);
++        check_cp0_enabled(ctx);
+         gen_mttr(env, ctx, rd, rt, (ctx->opcode >> 5) & 1,
+                  ctx->opcode & 0x7, (ctx->opcode >> 4) & 1);
+         opn = "mttr";
+@@ -21797,7 +21826,7 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
+         gen_rdhwr(ctx, rt, rd, extract32(ctx->opcode, 6, 3));
+         break;
+     case OPC_FORK:
+-        check_insn(ctx, ASE_MT);
++        check_mt(ctx);
+         {
+             TCGv t0 = tcg_temp_new();
+             TCGv t1 = tcg_temp_new();
+@@ -21810,7 +21839,7 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case OPC_YIELD:
+-        check_insn(ctx, ASE_MT);
++        check_mt(ctx);
+         {
+             TCGv t0 = tcg_temp_new();
+ 
+@@ -23107,22 +23136,22 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+                 op2 = MASK_MFMC0(ctx->opcode);
+                 switch (op2) {
+                 case OPC_DMT:
+-                    check_insn(ctx, ASE_MT);
++                    check_cp0_mt(ctx);
+                     gen_helper_dmt(t0);
+                     gen_store_gpr(t0, rt);
+                     break;
+                 case OPC_EMT:
+-                    check_insn(ctx, ASE_MT);
++                    check_cp0_mt(ctx);
+                     gen_helper_emt(t0);
+                     gen_store_gpr(t0, rt);
+                     break;
+                 case OPC_DVPE:
+-                    check_insn(ctx, ASE_MT);
++                    check_cp0_mt(ctx);
+                     gen_helper_dvpe(t0, cpu_env);
+                     gen_store_gpr(t0, rt);
+                     break;
+                 case OPC_EVPE:
+-                    check_insn(ctx, ASE_MT);
++                    check_cp0_mt(ctx);
+                     gen_helper_evpe(t0, cpu_env);
+                     gen_store_gpr(t0, rt);
+                     break;
 -- 
 2.7.4
