@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqCU6-0007Co-To
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:14:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fqCVB-0007ss-54
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:15:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqCU2-0001xM-Ry
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:14:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48838 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fqCU0-0001wZ-S1
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:14:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7D0D440150F8
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 07:14:10 +0000 (UTC)
-References: <20180808114830.7169-1-quintela@redhat.com>
-	<20180808114830.7169-22-quintela@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <069c5752-9824-535b-c986-881e0aa1dda0@redhat.com>
-Date: Thu, 16 Aug 2018 09:14:04 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fqCV9-0002DH-TP
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 03:15:25 -0400
+Date: Thu, 16 Aug 2018 09:15:15 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180816071515.GC5511@localhost.localdomain>
+References: <20180815025614.53588-1-eblake@redhat.com>
+	<20180815025614.53588-3-eblake@redhat.com>
+	<48010463-405e-bb08-f9c5-8263dcf3bb48@redhat.com>
+	<4aa899d3-c622-6acf-128c-513f95c55ed5@redhat.com>
+	<d8c5df8d-7ae2-8ddc-aa71-38ec06b79988@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180808114830.7169-22-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 21/22] virtio: split virtio-net bits rom
- virtio-pci
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="HlL+5n6rz5pIUxbD"
+Content-Disposition: inline
+In-Reply-To: <d8c5df8d-7ae2-8ddc-aa71-38ec06b79988@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-img: Add dd seek= option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,207 +27,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, fullmanet@gmail.com, qemu-block@nongnu.org
 
-On 08/08/2018 01:48 PM, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hw/virtio/Makefile.objs    |  1 +
->  hw/virtio/virtio-net-pci.c | 81 ++++++++++++++++++++++++++++++++++++++
->  hw/virtio/virtio-pci.c     | 56 --------------------------
->  tests/Makefile.include     |  4 +-
->  4 files changed, 84 insertions(+), 58 deletions(-)
->  create mode 100644 hw/virtio/virtio-net-pci.c
-> 
-> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-> index c28b740dca..0810553ab8 100644
-> --- a/hw/virtio/Makefile.objs
-> +++ b/hw/virtio/Makefile.objs
-> @@ -21,6 +21,7 @@ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
->  obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
->  obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
->  obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
-> +obj-$(CONFIG_VIRTIO_NET) += virtio-net-pci.o
->  endif
->  
->  common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO),$(CONFIG_LINUX))) += vhost-stub.o
-> diff --git a/hw/virtio/virtio-net-pci.c b/hw/virtio/virtio-net-pci.c
-> new file mode 100644
-> index 0000000000..cf8cf7535c
-> --- /dev/null
-> +++ b/hw/virtio/virtio-net-pci.c
-> @@ -0,0 +1,81 @@
-> +/*
-> + * Virtio net PCI Bindings
-> + *
-> + * Copyright IBM, Corp. 2007
-> + * Copyright (c) 2009 CodeSourcery
-> + *
-> + * Authors:
-> + *  Anthony Liguori   <aliguori@us.ibm.com>
-> + *  Paul Brook        <paul@codesourcery.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.  See
-> + * the COPYING file in the top-level directory.
-> + *
-> + * Contributions after 2012-01-13 are licensed under the terms of the
-> + * GNU GPL, version 2 or (at your option) any later version.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "virtio-pci.h"
-> +#include "qapi/error.h"
-> +
-> +static Property virtio_net_properties[] = {
-> +    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
-> +                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
-> +    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 3),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void virtio_net_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> +{
-> +    DeviceState *qdev = DEVICE(vpci_dev);
-> +    VirtIONetPCI *dev = VIRTIO_NET_PCI(vpci_dev);
-> +    DeviceState *vdev = DEVICE(&dev->vdev);
-> +
-> +    virtio_net_set_netclient_name(&dev->vdev, qdev->id,
-> +                                  object_get_typename(OBJECT(qdev)));
-> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-> +}
-> +
-> +static void virtio_net_pci_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> +    VirtioPCIClass *vpciklass = VIRTIO_PCI_CLASS(klass);
-> +
-> +    k->romfile = "efi-virtio.rom";
-> +    k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-> +    k->device_id = PCI_DEVICE_ID_VIRTIO_NET;
-> +    k->revision = VIRTIO_PCI_ABI_VERSION;
-> +    k->class_id = PCI_CLASS_NETWORK_ETHERNET;
-> +    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-> +    dc->props = virtio_net_properties;
-> +    vpciklass->realize = virtio_net_pci_realize;
-> +}
-> +
-> +static void virtio_net_pci_instance_init(Object *obj)
-> +{
-> +    VirtIONetPCI *dev = VIRTIO_NET_PCI(obj);
-> +
-> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-> +                                TYPE_VIRTIO_NET);
-> +    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
-> +                              "bootindex", &error_abort);
-> +}
-> +
-> +static const TypeInfo virtio_net_pci_info = {
-> +    .name          = TYPE_VIRTIO_NET_PCI,
-> +    .parent        = TYPE_VIRTIO_PCI,
-> +    .instance_size = sizeof(VirtIONetPCI),
-> +    .instance_init = virtio_net_pci_instance_init,
-> +    .class_init    = virtio_net_pci_class_init,
-> +};
-> +
-> +static void virtio_net_pci_register(void)
-> +{
-> +    type_register_static(&virtio_net_pci_info);
-> +}
-> +
-> +type_init(virtio_net_pci_register)
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index e1c6088019..589e565746 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -1957,61 +1957,6 @@ static const TypeInfo virtio_serial_pci_info = {
->      .class_init    = virtio_serial_pci_class_init,
->  };
->  
-> -/* virtio-net-pci */
-> -
-> -static Property virtio_net_properties[] = {
-> -    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
-> -                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
-> -    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 3),
-> -    DEFINE_PROP_END_OF_LIST(),
-> -};
-> -
-> -static void virtio_net_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> -{
-> -    DeviceState *qdev = DEVICE(vpci_dev);
-> -    VirtIONetPCI *dev = VIRTIO_NET_PCI(vpci_dev);
-> -    DeviceState *vdev = DEVICE(&dev->vdev);
-> -
-> -    virtio_net_set_netclient_name(&dev->vdev, qdev->id,
-> -                                  object_get_typename(OBJECT(qdev)));
-> -    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-> -    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-> -}
-> -
-> -static void virtio_net_pci_class_init(ObjectClass *klass, void *data)
-> -{
-> -    DeviceClass *dc = DEVICE_CLASS(klass);
-> -    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> -    VirtioPCIClass *vpciklass = VIRTIO_PCI_CLASS(klass);
-> -
-> -    k->romfile = "efi-virtio.rom";
-> -    k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-> -    k->device_id = PCI_DEVICE_ID_VIRTIO_NET;
-> -    k->revision = VIRTIO_PCI_ABI_VERSION;
-> -    k->class_id = PCI_CLASS_NETWORK_ETHERNET;
-> -    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-> -    dc->props = virtio_net_properties;
-> -    vpciklass->realize = virtio_net_pci_realize;
-> -}
-> -
-> -static void virtio_net_pci_instance_init(Object *obj)
-> -{
-> -    VirtIONetPCI *dev = VIRTIO_NET_PCI(obj);
-> -
-> -    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-> -                                TYPE_VIRTIO_NET);
-> -    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
-> -                              "bootindex", &error_abort);
-> -}
-> -
-> -static const TypeInfo virtio_net_pci_info = {
-> -    .name          = TYPE_VIRTIO_NET_PCI,
-> -    .parent        = TYPE_VIRTIO_PCI,
-> -    .instance_size = sizeof(VirtIONetPCI),
-> -    .instance_init = virtio_net_pci_instance_init,
-> -    .class_init    = virtio_net_pci_class_init,
-> -};
-> -
->  /* virtio-pci-bus */
->  
->  static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
-> @@ -2062,7 +2007,6 @@ static void virtio_pci_register_types(void)
->      type_register_static(&virtio_pci_bus_info);
->      type_register_static(&virtio_pci_info);
->      type_register_static(&virtio_serial_pci_info);
-> -    type_register_static(&virtio_net_pci_info);
->  }
->  
->  type_init(virtio_pci_register_types)
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 296e04f704..a1352ccefb 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -189,8 +189,8 @@ check-qtest-virtioserial-y += tests/virtio-console-test$(EXESUF)
->  gcov-files-virtioserial-y += hw/char/virtio-console.c
->  
->  gcov-files-virtio-y += i386-softmmu/hw/virtio/virtio.c
-> -check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
-> -gcov-files-virtio-y += i386-softmmu/hw/net/virtio-net.c
-> +check-qtest-virtio-$(CONFIG_VIRTIO_NET) += tests/virtio-net-test$(EXESUF)
-> +gcov-files-virtio-$(CONFIG_VIRTIO_NET) += i386-softmmu/hw/net/virtio-net.c
->  check-qtest-virtio-$(CONFIG_VIRTIO_BALLOON) += tests/virtio-balloon-test$(EXESUF)
->  gcov-files-virtio-$(CONFIG_VIRTIO_BALLOON) += i386-softmmu/hw/virtio/virtio-balloon.c
->  check-qtest-virtio-$(CONFIG_VIRTIO_BLK) += tests/virtio-blk-test$(EXESUF)
-> 
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+--HlL+5n6rz5pIUxbD
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 16.08.2018 um 04:49 hat Max Reitz geschrieben:
+> On 2018-08-16 04:39, Eric Blake wrote:
+> > If convert were more powerful, I'd be fine dropping 'qemu-img dd' after
+> > a proper deprecation period.
+>=20
+> Technically it has those features already, with the raw block driver's
+> offset and size parameters.
+
+In a way, yes. It requires you to precreate the target image, though,
+because --target-image-opts requires -n.
+
+We'll probably want to fix something in this area anyway because in the
+common case, you already need those options to even precreate the image,
+and qemu-img create doesn't support open options for the protocol layer
+either (unlike blockdev-create).
+
+> >> ((That gave me a good idea.=A0 Actually, it's probably not such a good
+> >> idea, but I guess I'll do it in my spare time anyway.=A0 A qemu-img fu=
+se
+> >> might be nice which represents an image as a raw image at some mount
+> >> point.=A0 Benefits over qemu-nbd: (1) You don't need root, (2) you don=
+'t
+> >> need to type modprobe nbd.))
+> >=20
+> > So the kernel->userspace translation would be happening via the FUSE
+> > interface instead of the NBD interface.=A0 Data still bounces around ju=
+st
+> > as much, but it might be a fun project.=A0 Does fuse behave well when
+> > serving exactly one file at the mountpoint, rather than the more typical
+> > file system rooted in a directory?=A0 NBD at least has the benefit of
+> > claiming to be a block device all along, rather than complicating the
+> > user interface with POSIX file system rules (which you'll be bending,
+> > because you are serving exactly one file instead of a system).
+
+To make it more real, you could expose a snapshots/ subdirectory. Or
+maybe better not.
+
+> Well, but I can just pretend my FUSE file is a block device, no?
+>=20
+> Also, I just discovered something really interesting: FUSE allows you to
+> specify a single file as a mountpoint.
+>=20
+> And you know what?  You can open the original file before you replace it
+> by the FUSE "filesystem".
+>=20
+> So my fun interface is going to looks like this:
+>=20
+> $ qemu-img fuse foo.qcow2
+>=20
+> And then your foo.qcow2 is a raw image until the next "fusermount -u
+> foo.qcow2"!  Isn't that fun?
+
+Yes, sounds fun. Until you realise that I'd actually like to merge
+something like this when it exists. ;-)
+
+For a more serious implementation, maybe it should even be a separate
+qemu-fuse rather than a qemu-img subcommand.
+
+Kevin
+
+--HlL+5n6rz5pIUxbD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJbdSSDAAoJEH8JsnLIjy/WFc8P/1k9yN8Cvyp6aMisTa2LwlCm
+o/qvuJTBOq3o6gasDETy6TEtrp9ySWM/C469ai25E7Q9EIFy/LNzlndsGlHbNuig
+YV08mw/e693lcH6edg0ksH+wTPmhmgQr7Lw+HSTE93zKOCF44+PV1iHRhipuM89v
+EEdPNZCkvB+y5+fICUMktXVPPl9KC+LXkx45Gwzn8/HDodEO/rmJ47+CKCELmiZs
+3geQ+Xw2e2zY2ju/5nNX6TeFHfKyG/Twr79NHr51P+RJvcWGEK+5Yesvoz5DDlpj
+hojq0W5J3AUDGMOpK/z7slIkLryzx2TLMoKND8QctBs27l83ZS6FY2rZLr/It3tu
+aBcEHKF/MGDtYHBZq5jZ4icHKGXk4/H4LEAxhENwOfa7DUpD3am9t/bPFZCNGgGK
+o/Er9ulIBQ6DGQNNmEUXsjywzk5C85ZvU/ytI0NsC3Rlqj9dHmp4JBCA1xdE3ie9
+lXs/y8/FnLK/3obKm2qmI8x7oYDdGgQv+23CDQYiDc4b+xVS4m8jP0GTqyyiyoLe
+6M6GAasrENLc4fDk2jg9fSxznvTTNCkCieb1YlKjLue/v443D1Eodmx5JqE0sgjc
+4WFTNJQGH0gwTYAiAamo781Ar5/REDYTA4cljt3CoPk9PdxRIVqg79UCt4ZotC00
+OI2kBLZ4m+zS4a0mp75r
+=3d0l
+-----END PGP SIGNATURE-----
+
+--HlL+5n6rz5pIUxbD--
