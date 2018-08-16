@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJl3-0005No-Sn
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:29 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJlA-0005WY-Oj
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkv-0000hU-C7
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:15 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:43496 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqJkt-0000di-EZ
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:21 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:41117 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqJku-0000do-Lf
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:09 -0400
+	id 1fqJkt-0000Wa-30
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:00:07 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 16 Aug 2018 16:57:31 +0200
-Message-Id: <1534431497-1385-39-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 16 Aug 2018 16:57:09 +0200
+Message-Id: <1534431497-1385-17-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v9 38/84] target/mips: Implement emulation of
- nanoMIPS LLWP/SCWP pair
+Subject: [Qemu-devel] [PATCH v9 16/84] target/mips: Add preprocessor
+ constants for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,255 +28,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Implement support for nanoMIPS LLWP/SCWP instructions. Beside
-adding core functionality of these instructions, this patch adds
-support for availability control via configuration bit XNP.
+Add ISA_NANOMIPS32 and CPU_NANOMIPS32 preprocessor constants.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Dimitrije Nikolic <dnikolic@wavecomp.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/mips/cpu_loop.c | 25 +++++++++++---
- target/mips/cpu.h          |  5 ++-
- target/mips/internal.h     |  5 ++-
- target/mips/translate.c    | 86 ++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 114 insertions(+), 7 deletions(-)
+ target/mips/mips-defs.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 084ad6a..1d3dc9e 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -397,10 +397,13 @@ static int do_store_exclusive(CPUMIPSState *env)
-     target_ulong addr;
-     target_ulong page_addr;
-     target_ulong val;
-+    uint32_t val_wp = 0;
-+    uint32_t llnewval_wp = 0;
-     int flags;
-     int segv = 0;
-     int reg;
-     int d;
-+    int wp;
+diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+index d239069..c8e9979 100644
+--- a/target/mips/mips-defs.h
++++ b/target/mips/mips-defs.h
+@@ -39,6 +39,7 @@
+ #define   ISA_MIPS64R5  0x00001000
+ #define   ISA_MIPS32R6  0x00002000
+ #define   ISA_MIPS64R6  0x00004000
++#define   ISA_NANOMIPS32  0x00008000
  
-     addr = env->lladdr;
-     page_addr = addr & TARGET_PAGE_MASK;
-@@ -412,19 +415,31 @@ static int do_store_exclusive(CPUMIPSState *env)
-     } else {
-         reg = env->llreg & 0x1f;
-         d = (env->llreg & 0x20) != 0;
--        if (d) {
--            segv = get_user_s64(val, addr);
-+        wp = (env->llreg & 0x40) != 0;
-+        if (!wp) {
-+            if (d) {
-+                segv = get_user_s64(val, addr);
-+            } else {
-+                segv = get_user_s32(val, addr);
-+            }
-         } else {
-             segv = get_user_s32(val, addr);
-+            segv |= get_user_s32(val_wp, addr);
-+            llnewval_wp = env->llnewval_wp;
-         }
-         if (!segv) {
--            if (val != env->llval) {
-+            if (val != env->llval && val_wp == llnewval_wp) {
-                 env->active_tc.gpr[reg] = 0;
-             } else {
--                if (d) {
--                    segv = put_user_u64(env->llnewval, addr);
-+                if (!wp) {
-+                    if (d) {
-+                        segv = put_user_u64(env->llnewval, addr);
-+                    } else {
-+                        segv = put_user_u32(env->llnewval, addr);
-+                    }
-                 } else {
-                     segv = put_user_u32(env->llnewval, addr);
-+                    segv |= put_user_u32(env->llnewval_wp, addr + 4);
-                 }
-                 if (!segv) {
-                     env->active_tc.gpr[reg] = 1;
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 009202c..468b686 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -506,6 +506,8 @@ struct CPUMIPSState {
-     uint64_t lladdr;
-     target_ulong llval;
-     target_ulong llnewval;
-+    uint64_t llval_wp;
-+    uint32_t llnewval_wp;
-     target_ulong llreg;
-     uint64_t CP0_LLAddr_rw_bitmask;
-     int CP0_LLAddr_shift;
-@@ -554,7 +556,7 @@ struct CPUMIPSState {
- #define EXCP_INST_NOTAVAIL 0x2 /* No valid instruction word for BadInstr */
-     uint32_t hflags;    /* CPU State */
-     /* TMASK defines different execution modes */
--#define MIPS_HFLAG_TMASK  0x1F5807FF
-+#define MIPS_HFLAG_TMASK  0x3F5807FF
- #define MIPS_HFLAG_MODE   0x00007 /* execution modes                    */
-     /* The KSU flags must be the lowest bits in hflags. The flag order
-        must be the same as defined for CP0 Status. This allows to use
-@@ -605,6 +607,7 @@ struct CPUMIPSState {
- #define MIPS_HFLAG_ELPA  0x4000000
- #define MIPS_HFLAG_ITC_CACHE  0x8000000 /* CACHE instr. operates on ITC tag */
- #define MIPS_HFLAG_ERL   0x10000000 /* error level flag */
-+#define MIPS_HFLAG_XNP   0x20000000
-     target_ulong btarget;        /* Jump / branch target               */
-     target_ulong bcond;          /* Branch condition (if needed)       */
+ /* MIPS ASEs. */
+ #define   ASE_MIPS16    0x00010000
+@@ -87,6 +88,9 @@
+ #define CPU_MIPS32R6 (CPU_MIPS32R5 | ISA_MIPS32R6)
+ #define CPU_MIPS64R6 (CPU_MIPS64R5 | CPU_MIPS32R6 | ISA_MIPS64R6)
  
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index e41051f..97485da 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -308,7 +308,7 @@ static inline void compute_hflags(CPUMIPSState *env)
-                      MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
-                      MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
-                      MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA | MIPS_HFLAG_FRE |
--                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
-+                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL | MIPS_HFLAG_XNP);
-     if (env->CP0_Status & (1 << CP0St_ERL)) {
-         env->hflags |= MIPS_HFLAG_ERL;
-     }
-@@ -402,6 +402,9 @@ static inline void compute_hflags(CPUMIPSState *env)
-             env->hflags |= MIPS_HFLAG_ELPA;
-         }
-     }
-+    if (env->CP0_Config5 & (1 << CP0C5_XNP)) {
-+        env->hflags |= MIPS_HFLAG_XNP;
-+    }
- }
- 
- void cpu_mips_tlb_flush(CPUMIPSState *env);
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 33e5e73..3648079 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -1914,6 +1914,18 @@ static inline void check_mvh(DisasContext *ctx)
- }
- #endif
- 
-+/*
-+ * This code generates a "reserved instruction" exception if the
-+ * Config5 XNP bit is set.
-+ */
-+static inline void check_xnp(DisasContext *ctx)
-+{
-+    if (unlikely(ctx->hflags & MIPS_HFLAG_XNP)) {
-+        generate_exception_end(ctx, EXCP_RI);
-+    }
-+}
++/* Wave Computing: "nanoMIPS" */
++#define CPU_NANOMIPS32 (CPU_MIPS32R6 | ISA_NANOMIPS32)
 +
-+
- /* Define small wrappers for gen_load_fpr* so that we have a uniform
-    calling interface for 32 and 64-bit FPRs.  No sense in changing
-    all callers for gen_load_fpr32 when we need the CTX parameter for
-@@ -2360,6 +2372,31 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
-     tcg_temp_free(t0);
- }
- 
-+static void gen_llwp(DisasContext *ctx, uint32_t base, int16_t offset,
-+                    uint32_t reg1, uint32_t reg2)
-+{
-+    TCGv taddr = tcg_temp_new();
-+    TCGv_i64 tval = tcg_temp_new_i64();
-+    TCGv tmp1 = tcg_temp_new();
-+    TCGv tmp2 = tcg_temp_new();
-+
-+    gen_base_offset_addr(ctx, taddr, base, offset);
-+    tcg_gen_qemu_ld64(tval, taddr, ctx->mem_idx);
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    tcg_gen_extr_i64_tl(tmp2, tmp1, tval);
-+#else
-+    tcg_gen_extr_i64_tl(tmp1, tmp2, tval);
-+#endif
-+    gen_store_gpr(tmp1, reg1);
-+    tcg_temp_free(tmp1);
-+    gen_store_gpr(tmp2, reg2);
-+    tcg_temp_free(tmp2);
-+    tcg_gen_st_i64(tval, cpu_env, offsetof(CPUMIPSState, llval_wp));
-+    tcg_temp_free_i64(tval);
-+    tcg_gen_st_tl(taddr, cpu_env, offsetof(CPUMIPSState, lladdr));
-+    tcg_temp_free(taddr);
-+}
-+
- /* Store */
- static void gen_st (DisasContext *ctx, uint32_t opc, int rt,
-                     int base, int offset)
-@@ -2456,6 +2493,51 @@ static void gen_st_cond (DisasContext *ctx, uint32_t opc, int rt,
-     tcg_temp_free(t0);
- }
- 
-+static void gen_scwp(DisasContext *ctx, uint32_t base, int16_t offset,
-+                    uint32_t reg1, uint32_t reg2)
-+{
-+    TCGv taddr = tcg_temp_local_new();
-+    TCGv lladdr = tcg_temp_local_new();
-+    TCGv_i64 tval = tcg_temp_new_i64();
-+    TCGv_i64 llval = tcg_temp_new_i64();
-+    TCGv_i64 val = tcg_temp_new_i64();
-+    TCGv tmp1 = tcg_temp_new();
-+    TCGv tmp2 = tcg_temp_new();
-+    TCGLabel *lab_fail = gen_new_label();
-+    TCGLabel *lab_done = gen_new_label();
-+
-+    gen_base_offset_addr(ctx, taddr, base, offset);
-+
-+    tcg_gen_ld_tl(lladdr, cpu_env, offsetof(CPUMIPSState, lladdr));
-+    tcg_gen_brcond_tl(TCG_COND_NE, taddr, lladdr, lab_fail);
-+
-+    gen_load_gpr(tmp1, reg1);
-+    gen_load_gpr(tmp2, reg2);
-+
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    tcg_gen_concat_tl_i64(tval, tmp2, tmp1);
-+#else
-+    tcg_gen_concat_tl_i64(tval, tmp1, tmp2);
-+#endif
-+
-+    tcg_gen_ld_i64(llval, cpu_env, offsetof(CPUMIPSState, llval_wp));
-+    tcg_gen_atomic_cmpxchg_i64(val, taddr, llval, tval,
-+                               ctx->mem_idx, MO_64);
-+    if (reg1 != 0) {
-+        tcg_gen_movi_tl(cpu_gpr[reg1], 1);
-+    }
-+    tcg_gen_brcond_i64(TCG_COND_EQ, val, llval, lab_done);
-+
-+    gen_set_label(lab_fail);
-+
-+    if (reg1 != 0) {
-+        tcg_gen_movi_tl(cpu_gpr[reg1], 0);
-+    }
-+    gen_set_label(lab_done);
-+    tcg_gen_movi_tl(lladdr, -1);
-+    tcg_gen_st_tl(lladdr, cpu_env, offsetof(CPUMIPSState, lladdr));
-+}
-+
- /* Load and store */
- static void gen_flt_ldst (DisasContext *ctx, uint32_t opc, int ft,
-                           TCGv t0)
-@@ -17986,6 +18068,8 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                         gen_ld(ctx, OPC_LL, rt, rs, s);
-                         break;
-                     case NM_LLWP:
-+                        check_xnp(ctx);
-+                        gen_llwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5));
-                         break;
-                     }
-                     break;
-@@ -17995,6 +18079,8 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                         gen_st_cond(ctx, OPC_SC, rt, rs, s);
-                         break;
-                     case NM_SCWP:
-+                        check_xnp(ctx);
-+                        gen_scwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5));
-                         break;
-                     }
-                     break;
+ /* Strictly follow the architecture standard:
+    - Disallow "special" instruction handling for PMON/SPIM.
+    Note that we still maintain Count/Compare to match the host clock. */
 -- 
 2.7.4
