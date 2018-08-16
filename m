@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fqLZB-0001Hg-D6
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:56:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fqLZD-0001O9-MH
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:56:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fqLZ5-0007Oc-88
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:56:09 -0400
-Received: from mail-bn3nam01on0115.outbound.protection.outlook.com
-	([104.47.33.115]:32792
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fqLZ4-0007Mm-VR
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:56:03 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 16 Aug 2018 16:55:58 +0000
-Message-ID: <BN7PR08MB4868A40586A86698B355ED27C63E0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1534431497-1385-40-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<0b4d8d60-98d2-8515-c08e-f767a886e331@linaro.org>
-In-Reply-To: <0b4d8d60-98d2-8515-c08e-f767a886e331@linaro.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peter.maydell@linaro.org>) id 1fqLZC-0007SL-OM
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:56:11 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:41998)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fqLZC-0007RX-Cy
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 12:56:10 -0400
+Received: by mail-oi0-x244.google.com with SMTP id b16-v6so9221684oic.9
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 09:56:10 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v9 39/84] target/mips: Add emulation of
- nanoMIPS 32-bit branch instructions
+In-Reply-To: <1534341354-11956-1-git-send-email-hans-erik.floryd@rt-labs.com>
+References: <1534341354-11956-1-git-send-email-hans-erik.floryd@rt-labs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Aug 2018 17:55:49 +0100
+Message-ID: <CAFEAcA9DdtZ6+vrX9e30DX-9-68oFo5+FBeVq-B7QQsiQRM7BA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] imx_serial: Generate interrupt on receive
+ data ready if enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: Hans-Erik Floryd <hans-erik.floryd@rt-labs.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "open list:i.MX31" <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-> From: Richard Henderson <richard.henderson@linaro.org>
-> Sent: Thursday, August 16, 2018 6:31 PM
->=20
-> Subject: Re: [PATCH v9 39/84] target/mips: Add emulation of nanoMIPS 32-b=
-it branch instructions
->=20
-> On 08/16/2018 07:57 AM, Aleksandar Markovic wrote:
-> > +    } else {
-> > +        /* Conditional compact branch */
-> > +        TCGLabel *fs =3D gen_new_label();
-> > +        save_cpu_state(ctx, 0);
->=20
-> I will note that save_cpu_state(ctx, 0) is concerned about updating the B=
-MASK
-> bits for branch delay slots, which nanomips does not have.  The function =
-could
-> probably usefully be renamed so that's clearer.
->=20
+On 15 August 2018 at 14:55, Hans-Erik Floryd
+<hans-erik.floryd@rt-labs.com> wrote:
+> Generate an interrupt if USR2_RDR and UCR4_DREN are both set.
+>
+> Signed-off-by: Hans-Erik Floryd <hans-erik.floryd@rt-labs.com>
+> ---
+>  hw/char/imx_serial.c         | 3 ++-
+>  include/hw/char/imx_serial.h | 1 +
+>  2 files changed, 3 insertions(+), 1 deletion(-)
 
-This and other similar cases will be fixed in v10. Perhaps even the naming =
-of save_cpu_state().
 
->=20
-> >      case NM_P_J:
-> > +        switch (extract32(ctx->opcode, 12, 4)) {
-> > +        case NM_JALRC:
-> > +        case NM_JALRC_HB:
-> > +            gen_compute_branch(ctx, OPC_JALR, 4, rs, rt, 0, 0);
-> > +            break;
->=20
-> All of these branches need to be using the new functions that you just ad=
-ded.
-> There are even more incorrect uses to follow.
->=20
 
-All occurrences will be fixed in v10.=
+Applied to target-arm.next, thanks.
+
+-- PMM
