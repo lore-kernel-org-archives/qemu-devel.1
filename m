@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqGZo-0001LN-0u
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:36:28 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqGgO-0002EH-9h
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:43:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqGZj-0003Sv-2Q
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:36:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42216 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fqGZc-0003Q2-Jz
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:36:18 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 16 Aug 2018 13:35:56 +0200
-Message-Id: <1534419358-10932-7-git-send-email-thuth@redhat.com>
-In-Reply-To: <1534419358-10932-1-git-send-email-thuth@redhat.com>
-References: <1534419358-10932-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/8] tests/device-introspection: Check that
- the qom-tree and qtree do not change
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqGgL-0008QQ-2N
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:43:16 -0400
+Received: from mail-bl2nam02on0716.outbound.protection.outlook.com
+	([2a01:111:f400:fe46::716]:8857
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fqGgK-0008QC-TF
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 07:43:12 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 16 Aug 2018 11:43:10 +0000
+Message-ID: <BN7PR08MB4868B337F36BDD9CE705B86EC63E0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<153440739836.16762.17614063002249746532@502c9da6d61e>
+In-Reply-To: <153440739836.16762.17614063002249746532@502c9da6d61e>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v8 00/87] Add nanoMIPS support to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: "aleksandar.markovic@rt-rk.com" <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "famz@redhat.com" <famz@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Paul Burton <pburton@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-Introspection should not change the qom-tree / qtree, so we should check
-this in the device-introspect-test, too. This patch helped to find lots
-of instrospection bugs during the QEMU v3.0 soft/hard-freeze period in the
-last two months.
+> From: no-reply@patchew.org <no-reply@patchew.org>
+> Sent: Thursday, August 16, 2018 10:16 AM
+>
+> Subject: Re: [Qemu-devel] [PATCH v8 00/87] Add nanoMIPS support to QEMU
+>=20
+> Hi,
+>=20
+> This series seems to have some coding style problems. See output below fo=
+r
+more information:
+>=20
+> ...
+>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/device-introspect-test.c | 23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
+We are aware of all these warnings. As Stefan explained earlier, they are a=
+ll "false positives" for given circumstances, and we don't plan to fix any =
+of the patches.
 
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-index 0b4f221..a38193b 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -103,7 +103,14 @@ static QList *device_type_list(bool abstract)
- static void test_one_device(const char *type)
- {
-     QDict *resp;
--    char *help, *qom_tree;
-+    char *help;
-+    char *qom_tree_start, *qom_tree_end;
-+    char *qtree_start, *qtree_end;
-+
-+    g_test_message("Testing device '%s'", type);
-+
-+    qom_tree_start = hmp("info qom-tree");
-+    qtree_start = hmp("info qtree");
- 
-     resp = qmp("{'execute': 'device-list-properties',"
-                " 'arguments': {'typename': %s}}",
-@@ -115,10 +122,18 @@ static void test_one_device(const char *type)
- 
-     /*
-      * Some devices leave dangling pointers in QOM behind.
--     * "info qom-tree" has a good chance at crashing then
-+     * "info qom-tree" or "info qtree" have a good chance at crashing then.
-+     * Also make sure that the tree did not change.
-      */
--    qom_tree = hmp("info qom-tree");
--    g_free(qom_tree);
-+    qom_tree_end = hmp("info qom-tree");
-+    g_assert_cmpstr(qom_tree_start, ==, qom_tree_end);
-+    g_free(qom_tree_start);
-+    g_free(qom_tree_end);
-+
-+    qtree_end = hmp("info qtree");
-+    g_assert_cmpstr(qtree_start, ==, qtree_end);
-+    g_free(qtree_start);
-+    g_free(qtree_end);
- }
- 
- static void test_device_intro_list(void)
--- 
-1.8.3.1
+Yours,
+Aleksandar=
