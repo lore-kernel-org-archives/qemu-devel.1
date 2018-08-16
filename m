@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqHd7-0006Lw-Sy
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:43:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqHe7-0007Nk-ER
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:45:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqHcy-0000mI-74
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:43:50 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:37615)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqHcw-0000kF-91
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:43:48 -0400
-Received: by mail-oi0-x242.google.com with SMTP id j205-v6so7731322oib.4
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 05:43:43 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fqHe4-0001UD-6m
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:44:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59818 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqHdz-0001Pq-IP
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 08:44:52 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-6-armbru@redhat.com>
+	<36518ac8-f022-c54d-2e57-6a709b3678ce@redhat.com>
+	<87d0uqmiq9.fsf@dusky.pond.sub.org>
+	<b1ad880a-7561-f784-b47e-ca3ea6d7b524@redhat.com>
+Date: Thu, 16 Aug 2018 14:44:43 +0200
+In-Reply-To: <b1ad880a-7561-f784-b47e-ca3ea6d7b524@redhat.com> (Eric Blake's
+	message of "Fri, 10 Aug 2018 09:06:07 -0500")
+Message-ID: <87o9e2bhvo.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180731201056.29257-1-tpiepho@impinj.com>
-References: <20180731201056.29257-1-tpiepho@impinj.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Aug 2018 13:43:23 +0100
-Message-ID: <CAFEAcA_8zRtZJ060+6k0tG95Q0vvEz4=TwL3gMt5ATdcLvMNmQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] imx_spi: Unset XCH when TX FIFO
- becomes empty
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 05/56] qmp-test: Cover syntax and lexical
+ errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Trent Piepho <tpiepho@impinj.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>
+To: Eric Blake <eblake@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-On 31 July 2018 at 21:10, Trent Piepho via Qemu-arm <qemu-arm@nongnu.org> w=
-rote:
-> The current emulation will clear the XCH bit when a burst finishes.
-> This is not quite correct.  According to the i.MX7d referemce manual,
-> Rev 0.1, =C2=A710.1.7.3:
->
->     This bit [XCH] is cleared automatically when all data in the TXFIFO
->     and the shift register has been shifted out.
->
-> So XCH should be cleared when the FIFO empties, not on completion of a
-> burst.  The FIFO is 64 x 32 bits =3D 2048 bits, while the max burst size
-> is larger at 4096 bits.  So it's possible that the burst is not finished
-> after the TXFIFO empties.
->
-> Sending a large block (> 2048 bits) with the Linux driver will use a
-> burst that is larger than the TXFIFO.  After the TXFIFO has emptied XCH
-> does not become unset, as the burst is not yet finished.
->
-> What should happen after the TXFIFO empties is the driver will refill it
-> and set XCH.  The rising edge of XCH will trigger another transfer to
-> begin.  However, since the emulation does not set XCH to 0, there is no
-> rising edge and the next trasfer never begins.
->
-> Signed-off-by: Trent Piepho <tpiepho@impinj.com>
+Eric Blake <eblake@redhat.com> writes:
 
-Applied to target-arm.next. Thanks for the detailed commit message,
-it made the patch much easier to review.
+> On 08/10/2018 08:52 AM, Markus Armbruster wrote:
+>
+>>>> +    /* lexical error: impossible byte outside string */
+>>>> +    qtest_qmp_send_raw(qts, "{\xFF");
+>>>
+>>> \xff is an impossible byte inside a string as well; plus it has
+>>> special meaning to at least QMP for commanding a parser reset. Is a
+>>> better byte more appropriate (maybe \x7f), either in replacement to
+>>> \xff or as an additional test?
+>>
+>> \xFF is documented to have special meaning for QGA, but as far as the
+>> code's concerned, it's a lexical error like any other.  I'm fixing the
+>> documentation in PATCH 56.  Want me to move that patch to the front of
+>> the series?
+>
+> Might not hurt. We also have a potential design decision to make: for
+> most lexical errors, we report the error (with QGA, the user then
+> requests that the first valid command after the client's induced
+> lexical error also include an 0xff reply byte so that the client can
+> easily skip over all the line noise, including said error reports).
+> Thus, we COULD decide to make our parser specifically accept 0xff as a
+> new token, different from the lexical error token, so that it inhibits
+> wasted error messages to the client on the grounds that the client
+> sent it on purpose, differently from all other ways the client can use
+> a lexical error to cause a reset.
 
--- PMM
+I don't think that's worthwhile.  Let me explain.
+
+I see one and a half use cases.
+
+The full use case is of course QGA synchronization.  Why is that even
+necessary?  I believe it's a work-around for transports that fail to
+provide proper connection semantics, such as virtio-serial.
+
+When a transport provides it (sockets do), every connection starts with
+a clean slate.  The only way it can get de-synchronized is either peer
+getting confused enough to send garbage, and then it's probably best to
+close the session and start over.  Evidence: we don't bother with
+synchronization for QMP, which commonly uses socket transports.
+
+I guess the problem for QGA is reconnecting with virtio-serial.  The
+slate isn't clean then.  If the previous connection left some of the
+peer's output unread, you'll get that before your own, and it may not be
+valid JSON.  Same for the other direction.
+
+To reset the peer's parser, we provoke a lexical error by sending \xFF.
+
+We still have to read and ignore stale peer output.  We do that with the
+help of command guest-sync-delimited.  Whether lexical error caused by
+\xFF are suppressed or not makes no appreciable difference.
+
+I therefore think suppressing it is not worth the bother.  What we have
+seems good enough.
+
+The half use case is human interactive use.  It's fairly easy to
+miscount parenthesis and get the peer into some unresponsive state.
+Provoking a lexical error lets me start over.  However, I'd rather not
+use \xFF to provoke it, because how do you type that?  Sending a
+suitable ASCII control character is easier, and will do the trick after
+PATCH 17 fixes our JSON parser.
