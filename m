@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <psusi@ubuntu.com>) id 1fqOCh-0002n7-Fu
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:45:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fqOHj-0005z1-Kb
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:50:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <psusi@ubuntu.com>) id 1fqOCc-0002pH-3s
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:45:07 -0400
-Received: from ec2-34-202-238-73.compute-1.amazonaws.com
-	([34.202.238.73]:46742 helo=vps.thesusis.net)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <psusi@ubuntu.com>) id 1fqOCb-0002od-Uj
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:45:02 -0400
-References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
-	<20180816172722.GK23515@redhat.com>
-From: Phillip Susi <psusi@ubuntu.com>
-Message-ID: <83320617-5d60-fe71-3ef5-8ac7c384a3b1@ubuntu.com>
-Date: Thu, 16 Aug 2018 15:44:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fqOHg-0004TS-10
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:50:19 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:46472)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fqOHf-0004Sa-P3
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 15:50:15 -0400
+Received: by mail-pg1-x530.google.com with SMTP id f14-v6so2511615pgv.13
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 12:50:15 -0700 (PDT)
+References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1534431497-1385-59-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <76d69150-0801-4f13-666f-cde0c53aff80@linaro.org>
+Date: Thu, 16 Aug 2018 12:50:11 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180816172722.GK23515@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RusTNGyHcagxKENa1Z5Ewq5wWByIIybGV"
-Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
+In-Reply-To: <1534431497-1385-59-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v9 58/84] elf: On elf loading,
+ treat both EM_MIPS and EM_NANOMIPS as legal for MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RusTNGyHcagxKENa1Z5Ewq5wWByIIybGV
-From: Phillip Susi <psusi@ubuntu.com>
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <83320617-5d60-fe71-3ef5-8ac7c384a3b1@ubuntu.com>
-Subject: Re: Pipe key broken on US keyboards
-References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
- <20180816172722.GK23515@redhat.com>
-In-Reply-To: <20180816172722.GK23515@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 08/16/2018 07:57 AM, Aleksandar Markovic wrote:
+> From: Aleksandar Rikalo <arikalo@wavecomp.com>
+> 
+> Modify load_elf32()/load_elf64() to treat EM_NANOMIPS as legal as
+> EM_MIPS is.
+> 
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  include/hw/elf_ops.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 
-On 8/16/2018 1:27 PM, Daniel P. Berrang=C3=A9 wrote:
-> Did you actually 'git bisect' to that commit, or is that just a guess ?=
-
-
-No, I haven't actually tried to build it from sources myself yet so I
-just found the source file that handles the keyboard, saw a bunch of
-scancode translation stuff in it, did a git log on that file and that
-first commit sticks out like a sore thumb; it changes the way scancodes
-are translated in a big way and the timing of it seems about right.  The
-other commits talk about fixing specific key codes that are unrelated to
-pipe, and it looks like this commit threw out the code those commits
-touched anyhow and refactored the whole thing.
-
-> If not, could you 'git bisect' to confirm the actual commit, as there
-> have been lots of changes in this area.
-
-I'll try.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-
---RusTNGyHcagxKENa1Z5Ewq5wWByIIybGV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAEBCAAGBQJbddQ7AAoJENsuw7lhAP6E76AIAK3OtZXdcp5gtjlPC0OkmKkh
-+1kNmcbaxcOqezlDfPIwKLJgERG6BIZagT9DiEDtA+WoQUJKBRIZMfLNWJnKPoVb
-5dADrkw8u1WTJBuTQ3zgMEvAn2WjJ2hyagL6eO3fHe08FWEIl+h/u/Oc/Qv4I3y/
-T2cNpPvFP5So3EwZ58OS/Z9YFk7E+gm18RLjB40j4qaExeXs3uagJzqNJS07KyUn
-dPeQ6RStobojuOUmi3DXs9Mng9UahGfQ+R+tvjDq/tHIZk8t4N1fyIHyj98gBrly
-S+dlL/jYJbxzEpZxpP27qNOPyAG76w8uDjRM/h4bw1jFhxjc9ybzxcoNmeshm5o=
-=ktYZ
------END PGP SIGNATURE-----
-
---RusTNGyHcagxKENa1Z5Ewq5wWByIIybGV--
+r~
