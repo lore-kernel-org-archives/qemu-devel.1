@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQa-0000R7-2C
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:11 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQm-0000rJ-SZ
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQZ-0001yu-96
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:04 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44468)
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQk-00029K-Os
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:16 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44472)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fqIQZ-0001yS-1G
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:03 -0400
+	id 1fqIQi-00021R-Ub
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 09:35:13 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqIQY-00007x-5O
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:02 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fqIQg-0000Aq-BO
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 14:35:10 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Aug 2018 14:34:27 +0100
-Message-Id: <20180816133438.17061-20-peter.maydell@linaro.org>
+Date: Thu, 16 Aug 2018 14:34:34 +0100
+Message-Id: <20180816133438.17061-27-peter.maydell@linaro.org>
 In-Reply-To: <20180816133438.17061-1-peter.maydell@linaro.org>
 References: <20180816133438.17061-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 19/30] aspeed_sdmc: Fix saved values
+Subject: [Qemu-devel] [PULL 26/30] target/arm: Use fp_status_fp16 for
+ do_fmpa_zpzzz_h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,96 +30,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Joel Stanley <joel@jms.id.au>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-This fixes the intended protection of read-only values in the
-configuration register. They were being always set to zero by mistake.
+This makes float16_muladd correctly use FZ16 not FZ.
 
-The read-only fields depend on the configured memory size of the system,
-so they cannot be fixed at compile time. The most straight forward
-option was to store them in the state structure.
-
-Signed-off-by: Joel Stanley <joel@jms.id.au>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Tested-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20180807075757.7242-3-joel@jms.id.au
+Fixes: 6ceabaad110
+Cc: qemu-stable@nongnu.org (3.0.1)
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Message-id: 20180810193129.1556-4-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/misc/aspeed_sdmc.h |  1 +
- hw/misc/aspeed_sdmc.c         | 27 ++++++++-------------------
- 2 files changed, 9 insertions(+), 19 deletions(-)
+ target/arm/sve_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.h
-index 682f0f5d56d..e079c66a7d7 100644
---- a/include/hw/misc/aspeed_sdmc.h
-+++ b/include/hw/misc/aspeed_sdmc.h
-@@ -27,6 +27,7 @@ typedef struct AspeedSDMCState {
-     uint32_t silicon_rev;
-     uint32_t ram_bits;
-     uint64_t ram_size;
-+    uint32_t fixed_conf;
- 
- } AspeedSDMCState;
- 
-diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-index 0df008e52a1..24fd4aee2d8 100644
---- a/hw/misc/aspeed_sdmc.c
-+++ b/hw/misc/aspeed_sdmc.c
-@@ -126,10 +126,12 @@ static void aspeed_sdmc_write(void *opaque, hwaddr addr, uint64_t data,
-         case AST2400_A0_SILICON_REV:
-         case AST2400_A1_SILICON_REV:
-             data &= ~ASPEED_SDMC_READONLY_MASK;
-+            data |= s->fixed_conf;
-             break;
-         case AST2500_A0_SILICON_REV:
-         case AST2500_A1_SILICON_REV:
-             data &= ~ASPEED_SDMC_AST2500_READONLY_MASK;
-+            data |= s->fixed_conf;
-             break;
-         default:
-             g_assert_not_reached();
-@@ -198,25 +200,7 @@ static void aspeed_sdmc_reset(DeviceState *dev)
-     memset(s->regs, 0, sizeof(s->regs));
- 
-     /* Set ram size bit and defaults values */
--    switch (s->silicon_rev) {
--    case AST2400_A0_SILICON_REV:
--    case AST2400_A1_SILICON_REV:
--        s->regs[R_CONF] |=
--            ASPEED_SDMC_VGA_COMPAT |
--            ASPEED_SDMC_DRAM_SIZE(s->ram_bits);
--        break;
--
--    case AST2500_A0_SILICON_REV:
--    case AST2500_A1_SILICON_REV:
--        s->regs[R_CONF] |=
--            ASPEED_SDMC_HW_VERSION(1) |
--            ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
--            ASPEED_SDMC_DRAM_SIZE(s->ram_bits);
--        break;
--
--    default:
--        g_assert_not_reached();
--    }
-+    s->regs[R_CONF] = s->fixed_conf;
- }
- 
- static void aspeed_sdmc_realize(DeviceState *dev, Error **errp)
-@@ -234,10 +218,15 @@ static void aspeed_sdmc_realize(DeviceState *dev, Error **errp)
-     case AST2400_A0_SILICON_REV:
-     case AST2400_A1_SILICON_REV:
-         s->ram_bits = ast2400_rambits(s);
-+        s->fixed_conf = ASPEED_SDMC_VGA_COMPAT |
-+            ASPEED_SDMC_DRAM_SIZE(s->ram_bits);
-         break;
-     case AST2500_A0_SILICON_REV:
-     case AST2500_A1_SILICON_REV:
-         s->ram_bits = ast2500_rambits(s);
-+        s->fixed_conf = ASPEED_SDMC_HW_VERSION(1) |
-+            ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
-+            ASPEED_SDMC_DRAM_SIZE(s->ram_bits);
-         break;
-     default:
-         g_assert_not_reached();
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index e03f954a264..0f980972535 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -3358,7 +3358,7 @@ static void do_fmla_zpzzz_h(CPUARMState *env, void *vg, uint32_t desc,
+                 e1 = *(uint16_t *)(vn + H1_2(i)) ^ neg1;
+                 e2 = *(uint16_t *)(vm + H1_2(i));
+                 e3 = *(uint16_t *)(va + H1_2(i)) ^ neg3;
+-                r = float16_muladd(e1, e2, e3, 0, &env->vfp.fp_status);
++                r = float16_muladd(e1, e2, e3, 0, &env->vfp.fp_status_f16);
+                 *(uint16_t *)(vd + H1_2(i)) = r;
+             }
+         } while (i & 63);
 -- 
 2.18.0
