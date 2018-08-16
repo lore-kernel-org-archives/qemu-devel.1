@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fqKPO-0004vX-J2
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:41:59 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqKQ2-0005ig-Nf
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:42:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fqKPG-0007TZ-NM
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:41:56 -0400
-Received: from mail-io0-f193.google.com ([209.85.223.193]:34347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fqKPG-0007T9-Fy
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:41:50 -0400
-Received: by mail-io0-f193.google.com with SMTP id l7-v6so4246415ioj.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:41:50 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fqKPz-0007fH-UJ
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:42:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37442 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqKPz-0007f9-PD
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:42:35 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-50-armbru@redhat.com>
+	<00ae28b2-a3a3-428a-abfe-4948a5b70bc8@redhat.com>
+Date: Thu, 16 Aug 2018 17:42:32 +0200
+In-Reply-To: <00ae28b2-a3a3-428a-abfe-4948a5b70bc8@redhat.com> (Eric Blake's
+	message of "Thu, 16 Aug 2018 08:40:58 -0500")
+Message-ID: <87h8ju71xz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1534433563-30865-2-git-send-email-yury-kotov@yandex-team.ru>
-References: <1534433563-30865-1-git-send-email-yury-kotov@yandex-team.ru>
-	<1534433563-30865-2-git-send-email-yury-kotov@yandex-team.ru>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 16 Aug 2018 17:41:49 +0200
-Message-ID: <CAMxuvaz8Ji1v69Gq0XvN2kjcSpZ0QCsmsU11gQE6g4ctgKyHxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] chardev: prevent extra connection
- attempt in tcp_chr_machine_done_hook
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 49/56] json: Streamline
+ json_message_process_token()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yury Kotov <yury-kotov@yandex-team.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-Hi
+Eric Blake <eblake@redhat.com> writes:
 
-On Thu, Aug 16, 2018 at 5:32 PM, Yury Kotov <yury-kotov@yandex-team.ru> wro=
-te:
-> Usually chardev connects to specified address during the initialization.
-> But if reconnect_time is specified then connection will be postponed unti=
-l
-> machine done event.
+> On 08/08/2018 07:03 AM, Markus Armbruster wrote:
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   qobject/json-streamer.c | 13 +++++--------
+>>   1 file changed, 5 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+>> index 810aae521f..954bf9d468 100644
+>> --- a/qobject/json-streamer.c
+>> +++ b/qobject/json-streamer.c
+>> @@ -99,16 +99,13 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+>>         g_queue_push_tail(parser->tokens, token);
+>>   -    if (parser->brace_count < 0 ||
+>> -        parser->bracket_count < 0 ||
 >
-> Thus if reconnect is specified and some device forces connection during
-> initialization, tcp_chr_machine_done_hook will do useless connection atte=
-mpt.
+> Old: if we are unbalanced (more right tokens read than left)...
 >
-> So add a check to prevent it.
+>> -        (parser->brace_count == 0 &&
+>> -         parser->bracket_count == 0)) {
 >
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-> Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
+> ...or if we uniformly ended nesting,...
+>
+>> -        json = json_parser_parse(parser->tokens, parser->ap, &err);
+>
+> ...then parse (to either diagnose the unbalance, or to see if the
+> balanced construct is valid), with weird flow control that skips over
+> an early return.
+>
+> Or put another way, if we invert the condition, we find the cases
+> where we want an early return instead of parsing (and can thus use
+> that to get rid of an unsightly goto over a single early return).
+>
+> Applying deMorgan's rules:
+>
+> !(brace < 0 || bracket < 0 || (brace == 0 && bracket == 0))
+> !(brace < 0) && !(bracket < 0) && !(brace == 0 && bracket == 0)
+> brace >= 0 && bracket >= 0 && (!(brace == 0) || !(bracket == 0))
+> brace >= 0 && bracket >= 0 && (brace != 0 || bracket != 0)
+>
+> But based on what we learned in the first two conjunctions, we can
+> rewrite the third:
+>
+> brace >= 0 && bracket >= 0 && (brace > 0 || bracket > 0)
+>
+> and then commute the logic:
+>
+> (brace > 0 || bracket > 0) && brace >= 0 && bracket >= 0
+>
+>> -        parser->tokens = NULL;
+>> -        goto out_emit;
+>> +    if ((parser->brace_count > 0 || parser->bracket_count > 0)
+>> +        && parser->bracket_count >= 0 && parser->bracket_count >= 0) {
+>
+> So the new condition is correct, and reads as:
+>
+> If either struct is still awaiting closure, and both structs have not
+> gone unbalanced, then early exit.
+>
+> It was not intuitive, but stepping through the logic shows it is identical.
 
-It would be better with a test case in tests/test-char.c, but lgtm,
+My first version had a "simpler" condition there.  My test cases proved
+it wrong %-}
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> ---
->  chardev/char-socket.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index efbad6e..116dcc4 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -1165,7 +1165,10 @@ static int tcp_chr_machine_done_hook(Chardev *chr)
->  {
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
->
-> -    if (s->reconnect_time) {
-> +    /* It's possible that connection was established during the device
-> +     * initialization. So check if the socket is already connected to
-> +     * prevent extra connection attempt. */
-> +    if (!s->connected && s->reconnect_time) {
->          tcp_chr_connect_async(chr);
->      }
->
-> --
-> 2.7.4
->
+Thanks!
