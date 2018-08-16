@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqKVo-00055M-CU
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:48:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqKWM-0005UB-Bu
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:49:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqKVk-0004b3-40
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:48:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40590 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqKWI-0004on-3u
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:49:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43788 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fqKVj-0004UM-T4
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:48:32 -0400
-References: <20180816151637.24553-1-marcel.apfelbaum@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e69c3f04-acce-b6e8-7254-22edd5d04e4e@redhat.com>
-Date: Thu, 16 Aug 2018 17:48:28 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqKWD-0004nv-Rq
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 11:49:02 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-52-armbru@redhat.com>
+	<fbe4443d-5c86-70dc-4d81-cd882283782e@redhat.com>
+Date: Thu, 16 Aug 2018 17:48:58 +0200
+In-Reply-To: <fbe4443d-5c86-70dc-4d81-cd882283782e@redhat.com> (Eric Blake's
+	message of "Thu, 16 Aug 2018 08:45:32 -0500")
+Message-ID: <87bma271n9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180816151637.24553-1-marcel.apfelbaum@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2] config: split PVRDMA from RDMA
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 51/56] json: Eliminate lexer state IN_ERROR
+ and pseudo-token JSON_MIN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
-Cc: yuval.shaia@oracle.com, rebecca@bluestop.org, peter.maydell@linaro.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 08/16/2018 05:16 PM, Marcel Apfelbaum wrote:
-> In some BSD systems RDMA migration is possible while
-> the pvrdma device can't be used because the mremap system call
-> is missing.
-> 
-> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> ---
->  configure             | 55 ++++++++++++++++++++++++++++++++++++++++++-
->  hw/rdma/Makefile.objs |  2 +-
->  2 files changed, 55 insertions(+), 2 deletions(-)
-[...]
-> diff --git a/hw/rdma/Makefile.objs b/hw/rdma/Makefile.objs
-> index 3504c39d21..bd36cbf51c 100644
-> --- a/hw/rdma/Makefile.objs
-> +++ b/hw/rdma/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -ifeq ($(CONFIG_RDMA),y)
-> +ifeq ($(CONFIG_PVRDMA),y)
->  obj-$(CONFIG_PCI) += rdma_utils.o rdma_backend.o rdma_rm.o
->  obj-$(CONFIG_PCI) += vmw/pvrdma_dev_ring.o vmw/pvrdma_cmd.o \
->                       vmw/pvrdma_qp_ops.o vmw/pvrdma_main.o
-> 
+Eric Blake <eblake@redhat.com> writes:
 
-Again: Shouldn't the CONFIG_PVRDMA only guard the second line? I thought
-the first list should be fine with CONFIG_RDMA?
+> On 08/08/2018 07:03 AM, Markus Armbruster wrote:
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   include/qapi/qmp/json-lexer.h | 10 ++++------
+>>   qobject/json-lexer.c          | 18 ++++++++----------
+>>   2 files changed, 12 insertions(+), 16 deletions(-)
+>>
+>
+>> @@ -335,8 +334,7 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+>>               json_message_process_token(lexer, lexer->token, JSON_ERROR,
+>>                                          lexer->x, lexer->y);
+>>               g_string_truncate(lexer->token, 0);
+>> -            new_state = lexer->start_state;
+>> -            lexer->state = new_state;
+>> +            lexer->state = lexer->start_state;
+>
+> Does this simplification belong in an earlier patch?
 
- Thomas
+Hmm, PATCH 37 would be a better fit indeed.
+
+> Otherwise,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
