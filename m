@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqDmo-000183-71
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:43 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqDml-000152-CV
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqDmZ-0005Ig-De
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53674 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqDmY-0005II-Kj
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53668 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqDmQ-0005C0-Ic
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqDmQ-00059R-9Y
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 04:37:20 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BA56F40776F4
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:37:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 860D84076510
+	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 08:37:04 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 16 Aug 2018 10:36:56 +0200
-Message-Id: <20180816083701.3932-21-armbru@redhat.com>
+Date: Thu, 16 Aug 2018 10:36:49 +0200
+Message-Id: <20180816083701.3932-14-armbru@redhat.com>
 In-Reply-To: <20180816083701.3932-1-armbru@redhat.com>
 References: <20180816083701.3932-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 20/25] migration-test: Clean up string
- interpolation into QMP, part 3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 13/25] cpu-plug-test: Don't pass integers as
+ strings to device_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,210 +34,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
 
-Leaving interpolation into JSON to qmp() is more robust than building
-QMP input manually, as explained in the recent commit "tests: Clean up
-string interpolation into QMP input (simple cases)".
+test_plug_with_device_add_x86() plugs Haswell-i386-cpu and
+Haswell-x86_64-cpu with device_add.  It passes socket-id, core-id,
+thread-id as JSON strings.  The properties are actually integers.
 
-migration-test.c interpolates strings into JSON in a few places:
+test_plug_with_device_add_coreid() plugs power8_v2.0-spapr-cpu-core
+and qemu-s390x-cpu with device_add.  It passes core-id as JSON string.
+The properties are actually integers.
 
-* migrate_set_parameter() interpolates string parameter @value as a
-  JSON number.  Change it to long long.  This requires changing
-  migrate_check_parameter() similarly.
+Passing JSON string values to integer properties works only due to
+device_add implementation accidents.  Fix the test to pass JSON
+numbers.  While there, use %u rather than %i with unsigned int.
 
-* migrate_set_capability() interpolates string parameter @value as a
-  JSON boolean.  Change it to bool.
-
-* deprecated_set_speed() interpolates string parameter @value as a
-  JSON number.  Change it to long long.
-
-Bonus: gets rid of non-literal format strings.  A step towards
-compile-time format string checking without triggering
--Wformat-nonliteral.
-
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180806065344.7103-21-armbru@redhat.com>
+Message-Id: <20180806065344.7103-14-armbru@redhat.com>
 ---
- tests/migration-test.c | 74 +++++++++++++++++-------------------------
- 1 file changed, 29 insertions(+), 45 deletions(-)
+ tests/cpu-plug-test.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index c7f3267fa0..eb58d0a48e 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -318,31 +318,25 @@ static void cleanup(const char *filename)
- }
- 
- static void migrate_check_parameter(QTestState *who, const char *parameter,
--                                    const char *value)
-+                                    long long value)
- {
-     QDict *rsp_return;
--    char *result;
- 
-     rsp_return = wait_command(who,
-                               "{ 'execute': 'query-migrate-parameters' }");
--    result = g_strdup_printf("%" PRId64,
--                             qdict_get_try_int(rsp_return,  parameter, -1));
--    g_assert_cmpstr(result, ==, value);
--    g_free(result);
-+    g_assert_cmpint(qdict_get_int(rsp_return, parameter), ==, value);
-     qobject_unref(rsp_return);
- }
- 
- static void migrate_set_parameter(QTestState *who, const char *parameter,
--                                  const char *value)
-+                                  long long value)
- {
-     QDict *rsp;
--    gchar *cmd;
- 
--    cmd = g_strdup_printf("{ 'execute': 'migrate-set-parameters',"
--                          "'arguments': { '%s': %s } }",
--                          parameter, value);
--    rsp = qtest_qmp(who, cmd);
--    g_free(cmd);
-+    rsp = qtest_qmp(who,
-+                    "{ 'execute': 'migrate-set-parameters',"
-+                    "'arguments': { %s: %lld } }",
-+                    parameter, value);
-     g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
-     migrate_check_parameter(who, parameter, value);
-@@ -369,18 +363,16 @@ static void migrate_recover(QTestState *who, const char *uri)
- }
- 
- static void migrate_set_capability(QTestState *who, const char *capability,
--                                   const char *value)
-+                                   bool value)
- {
-     QDict *rsp;
--    gchar *cmd;
- 
--    cmd = g_strdup_printf("{ 'execute': 'migrate-set-capabilities',"
--                          "'arguments': { "
--                          "'capabilities': [ { "
--                          "'capability': '%s', 'state': %s } ] } }",
--                          capability, value);
--    rsp = qtest_qmp(who, cmd);
--    g_free(cmd);
-+    rsp = qtest_qmp(who,
-+                    "{ 'execute': 'migrate-set-capabilities',"
-+                    "'arguments': { "
-+                    "'capabilities': [ { "
-+                    "'capability': %s, 'state': %i } ] } }",
-+                    capability, value);
-     g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
- }
-@@ -530,29 +522,21 @@ static void test_migrate_end(QTestState *from, QTestState *to, bool test_dest)
- static void deprecated_set_downtime(QTestState *who, const double value)
- {
-     QDict *rsp;
--    char *expected;
--    int64_t result_int;
- 
-     rsp = qtest_qmp(who,
-                     "{ 'execute': 'migrate_set_downtime',"
-                     " 'arguments': { 'value': %f } }", value);
-     g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
--    result_int = value * 1000L;
--    expected = g_strdup_printf("%" PRId64, result_int);
--    migrate_check_parameter(who, "downtime-limit", expected);
--    g_free(expected);
-+    migrate_check_parameter(who, "downtime-limit", value * 1000);
- }
- 
--static void deprecated_set_speed(QTestState *who, const char *value)
-+static void deprecated_set_speed(QTestState *who, long long value)
- {
-     QDict *rsp;
--    gchar *cmd;
- 
--    cmd = g_strdup_printf("{ 'execute': 'migrate_set_speed',"
--                          "'arguments': { 'value': %s } }", value);
--    rsp = qtest_qmp(who, cmd);
--    g_free(cmd);
-+    rsp = qtest_qmp(who, "{ 'execute': 'migrate_set_speed',"
-+                          "'arguments': { 'value': %lld } }", value);
-     g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
-     migrate_check_parameter(who, "max-bandwidth", value);
-@@ -565,7 +549,7 @@ static void test_deprecated(void)
-     from = qtest_start("");
- 
-     deprecated_set_downtime(from, 0.12345);
--    deprecated_set_speed(from, "12345");
-+    deprecated_set_speed(from, 12345);
- 
-     qtest_quit(from);
- }
-@@ -581,16 +565,16 @@ static int migrate_postcopy_prepare(QTestState **from_ptr,
-         return -1;
+diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+index 5f39ba0df3..ab3bf6df90 100644
+--- a/tests/cpu-plug-test.c
++++ b/tests/cpu-plug-test.c
+@@ -88,8 +88,8 @@ static void test_plug_with_device_add_x86(gconstpointer=
+ data)
+         for (c =3D 0; c < td->cores; c++) {
+             for (t =3D 0; t < td->threads; t++) {
+                 char *id =3D g_strdup_printf("id-%i-%i-%i", s, c, t);
+-                qtest_qmp_device_add(td->device_model, id, "'socket-id':=
+'%i', "
+-                                     "'core-id':'%i', 'thread-id':'%i'",
++                qtest_qmp_device_add(td->device_model, id, "'socket-id':=
+%u, "
++                                     "'core-id':%u, 'thread-id':%u",
+                                      s, c, t);
+                 g_free(id);
+             }
+@@ -114,7 +114,7 @@ static void test_plug_with_device_add_coreid(gconstpo=
+inter data)
+=20
+     for (c =3D td->cores; c < td->maxcpus / td->sockets / td->threads; c=
+++) {
+         char *id =3D g_strdup_printf("id-%i", c);
+-        qtest_qmp_device_add(td->device_model, id, "'core-id':'%i'", c);
++        qtest_qmp_device_add(td->device_model, id, "'core-id':%u", c);
+         g_free(id);
      }
- 
--    migrate_set_capability(from, "postcopy-ram", "true");
--    migrate_set_capability(to, "postcopy-ram", "true");
--    migrate_set_capability(to, "postcopy-blocktime", "true");
-+    migrate_set_capability(from, "postcopy-ram", true);
-+    migrate_set_capability(to, "postcopy-ram", true);
-+    migrate_set_capability(to, "postcopy-blocktime", true);
- 
-     /* We want to pick a speed slow enough that the test completes
-      * quickly, but that it doesn't complete precopy even on a slow
-      * machine, so also set the downtime.
-      */
--    migrate_set_parameter(from, "max-bandwidth", "100000000");
--    migrate_set_parameter(from, "downtime-limit", "1");
-+    migrate_set_parameter(from, "max-bandwidth", 100000000);
-+    migrate_set_parameter(from, "downtime-limit", 1);
- 
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-@@ -641,7 +625,7 @@ static void test_postcopy_recovery(void)
-     }
- 
-     /* Turn postcopy speed down, 4K/s is slow enough on any machines */
--    migrate_set_parameter(from, "max-postcopy-bandwidth", "4096");
-+    migrate_set_parameter(from, "max-postcopy-bandwidth", 4096);
- 
-     /* Now we start the postcopy */
-     migrate_postcopy_start(from, to);
-@@ -682,7 +666,7 @@ static void test_postcopy_recovery(void)
-     g_free(uri);
- 
-     /* Restore the postcopy bandwidth to unlimited */
--    migrate_set_parameter(from, "max-postcopy-bandwidth", "0");
-+    migrate_set_parameter(from, "max-postcopy-bandwidth", 0);
- 
-     migrate_postcopy_complete(from, to);
- }
-@@ -728,9 +712,9 @@ static void test_precopy_unix(void)
-      * machine, so also set the downtime.
-      */
-     /* 1 ms should make it not converge*/
--    migrate_set_parameter(from, "downtime-limit", "1");
-+    migrate_set_parameter(from, "downtime-limit", 1);
-     /* 1GB/s */
--    migrate_set_parameter(from, "max-bandwidth", "1000000000");
-+    migrate_set_parameter(from, "max-bandwidth", 1000000000);
- 
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-@@ -740,7 +724,7 @@ static void test_precopy_unix(void)
-     wait_for_migration_pass(from);
- 
-     /* 300 ms should converge */
--    migrate_set_parameter(from, "downtime-limit", "300");
-+    migrate_set_parameter(from, "downtime-limit", 300);
- 
-     if (!got_stop) {
-         qtest_qmp_eventwait(from, "STOP");
--- 
+=20
+--=20
 2.17.1
