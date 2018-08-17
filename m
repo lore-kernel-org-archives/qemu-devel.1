@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqeVQ-0007DN-Dz
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:09:37 -0400
+	(envelope-from <psusi@ubuntu.com>) id 1fqeWx-00028s-Po
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqeVL-0008Mk-Lk
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:09:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55288 helo=mx1.redhat.com)
+	(envelope-from <psusi@ubuntu.com>) id 1fqeWq-0000xx-9g
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:11:05 -0400
+Received: from ec2-34-202-238-73.compute-1.amazonaws.com
+	([34.202.238.73]:47166 helo=vps.thesusis.net)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqeVK-0008MO-Vt
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:09:27 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180817105157.7486-1-pbonzini@redhat.com>
-Date: Fri, 17 Aug 2018 15:09:25 +0200
-In-Reply-To: <20180817105157.7486-1-pbonzini@redhat.com> (Paolo Bonzini's
-	message of "Fri, 17 Aug 2018 12:51:57 +0200")
-Message-ID: <87efex16nu.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <psusi@ubuntu.com>) id 1fqeWq-0000xQ-3P
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:11:00 -0400
+References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
+	<20180816172722.GK23515@redhat.com>
+	<83320617-5d60-fe71-3ef5-8ac7c384a3b1@ubuntu.com>
+	<20180817085656.GA11124@redhat.com>
+	<a115c4d1-0a78-efa1-0364-f41a06aca124@ubuntu.com>
+	<20180817125808.GO11124@redhat.com>
+From: Phillip Susi <psusi@ubuntu.com>
+Message-ID: <b4872310-41f3-d2bc-22b2-0f41e8848a55@ubuntu.com>
+Date: Fri, 17 Aug 2018 09:10:54 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH correct] checkpatch: allow space in more
- places before a bracket
+In-Reply-To: <20180817125808.GO11124@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="evGgxlfFoePgrgv3BSpeAZyIcU8mxNgUw"
+Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, richard.henderson@linaro.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--evGgxlfFoePgrgv3BSpeAZyIcU8mxNgUw
+From: Phillip Susi <psusi@ubuntu.com>
+To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <b4872310-41f3-d2bc-22b2-0f41e8848a55@ubuntu.com>
+Subject: Re: Pipe key broken on US keyboards
+References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
+ <20180816172722.GK23515@redhat.com>
+ <83320617-5d60-fe71-3ef5-8ac7c384a3b1@ubuntu.com>
+ <20180817085656.GA11124@redhat.com>
+ <a115c4d1-0a78-efa1-0364-f41a06aca124@ubuntu.com>
+ <20180817125808.GO11124@redhat.com>
+In-Reply-To: <20180817125808.GO11124@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> From: Heinrich Schuchardt <xypron.glpk@gmx.de>
->
-> Allow a space between a colon and subsequent opening bracket.  This
-> sequence may occur in inline assembler statements like
->
-> 	asm(
-> 		"ldr %[out], [%[in]]\n\t"
-> 		: [out] "=r" (ret)
-> 		: [in] "r" (addr)
-> 	);
->
-> Allow a space between a comma and subsequent opening bracket.  This
-> sequence may occur in designated initializers.
->
-> To ease backporting the patch, I am also changing the comma-bracket
-> detection (added in QEMU by commit 409db6eb7199af7a2f09f746bd1b793e9daefe5f)
-> to use the same regex as brackets and colons (as done independently
-> by Linux commit daebc534ac15f991961a5bb433e515988220e9bf).
->
-> Link: http://lkml.kernel.org/r/20180403191655.23700-1-xypron.glpk@gmx.de
-> Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
-> Acked-by: Joe Perches <joe@perches.com>
-> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
-> Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  scripts/checkpatch.pl | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index 52ab18bfce..33b5771120 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -1977,9 +1977,8 @@ sub process {
->  			my ($where, $prefix) = ($-[1], $1);
->  			if ($prefix !~ /$Type\s+$/ &&
->  			    ($where != 0 || $prefix !~ /^.\s+$/) &&
-> -			    $prefix !~ /{\s+$/ &&
->  			    $prefix !~ /\#\s*define[^(]*\([^)]*\)\s+$/ &&
-> -			    $prefix !~ /,\s+$/) {
-> +			    $prefix !~ /[,{:]\s+$/) {
->  				ERROR("space prohibited before open square bracket '['\n" . $herecurr);
->  			}
->  		}
+On 8/17/2018 8:58 AM, Daniel P. Berrang=C3=A9 wrote:
+> Actually for QEMU there is no default localized keymap. This is desirab=
+le
+> because it allows VNC to activate its raw scancode extension which is m=
+ore
+> reliable than passing translated X11 key symbols.
+>=20
+> I guess there's a chance that Xen might secretly pass a '-k' arg anyway=
+,
+> but hopefully it doesn't...
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+It also happens when I just run qemu.  How can I check to see if it is
+using raw scancodes or keycodes?
+
+
+
+
+--evGgxlfFoePgrgv3BSpeAZyIcU8mxNgUw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJbdslhAAoJENsuw7lhAP6E/LMH/ipmpABChrRpCR5lXNmvTMzt
+QPjLF+5nuH+DB2R9KukF2J586NT61AqN5qcIggWjsMa7ZHbBrgHPDJcNxRqZjhza
+gcb/c1i5rfFtvEu9J68/0r9/3A6y+ex7skBjBIR6Iv5zsmoL3Lp7G6YVK6ubcDPH
+Xzw0DVGMqIuGrqRC9eYCCbJzQOCg6hBbTWmSKCDofvQcvX4RpUWi6xvxR7LKCatJ
+eLUtUA+r+Oy0hokhq9HRpkH/HJX4GWgaOLCpNllSNJZx3uXHQ6r1G5YwmPeXYIEN
+QszKb5PkyB3/28pBRZ1ZPlyOmSCEm6pYWVnPi6hWf0qQmikJY3xmkW03LbdT3jg=
+=yU+J
+-----END PGP SIGNATURE-----
+
+--evGgxlfFoePgrgv3BSpeAZyIcU8mxNgUw--
