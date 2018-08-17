@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqjC5-0003j1-Fn
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 14:09:54 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fqjDH-00060H-Oj
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 14:11:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqjC1-0000on-B4
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 14:09:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48582 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fqjDD-0001P7-Nf
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 14:11:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59422)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fqjC1-0000oK-1N
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 14:09:49 -0400
-References: <20180817150559.16243-1-armbru@redhat.com>
-	<20180817150559.16243-59-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e22978e1-9b4a-c185-62a0-ed38481f11b0@redhat.com>
-Date: Fri, 17 Aug 2018 13:09:45 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fqjDD-0001Oq-IA
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 14:11:03 -0400
+Date: Fri, 17 Aug 2018 15:10:57 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180817181057.GJ15372@localhost.localdomain>
+References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
+	<1533909989-56115-2-git-send-email-robert.hu@linux.intel.com>
+	<f859ae02-015a-5ef8-66b4-f54a630d1f5f@redhat.com>
+	<20180817155524.GF15372@localhost.localdomain>
+	<d0df647b-ed1c-e497-10a7-f64a048b9f19@redhat.com>
+	<20180817174814.GI15372@localhost.localdomain>
+	<1b71dd1c-59d2-324d-0284-0ea5869f4ec1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180817150559.16243-59-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 58/60] json: Keep interpolation state in
- JSONParserContext
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1b71dd1c-59d2-324d-0284-0ea5869f4ec1@redhat.com>
+Subject: Re: [Qemu-devel] X86CPU "feature-words" property on QEMU (was Re:
+ [PATCH v3 1/3] x86: Data structure changes to support MSR based) features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Robert Hoo <robert.hu@linux.intel.com>, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org, robert.hu@intel.com, jingqi.liu@intel.com, Jiri Denemark <jdenemar@redhat.com>, libvir-list@redhat.com
 
-On 08/17/2018 10:05 AM, Markus Armbruster wrote:
-> The recursive descent parser passes along a pointer to
-> JSONParserContext.  It additionally passes a pointer to interpolation
-> state (a va_alist *) as needed to reach its consumer
-> parse_interpolation().
+On Fri, Aug 17, 2018 at 07:59:40PM +0200, Paolo Bonzini wrote:
+> On 17/08/2018 19:48, Eduardo Habkost wrote:
+> > So let's do what's necessary to remove it.  But I don't think the
+> > removal of "feature-words" should block the inclusion of this
+> > series.
+> > 
+> > Now, should QOM properties follow our feature deprecation policy,
+> > or they were never a supported external API and we can remove it
+> > immediately?
+> > 
+> > CCing Jiri and libvir-list, because I just found that there's
+> > code on libvirt that uses it, but I don't know exactly it does
+> > with that info.
 > 
-> Stuffing the latter pointer into JSONParserContext saves us the
-> trouble of passing it along, so do that.
+> It is used to check whether the host supports invtsc and pv-unhalt and
+> avoid changing the guest ABI when migrating: see
+> https://marc.info/?l=libvir-list&m=152445761414746&w=2 for a patch that
+> introduces one user.
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   qobject/json-parser.c | 59 ++++++++++++++++++++++---------------------
->   1 file changed, 30 insertions(+), 29 deletions(-)
-> 
+> I think we should extend it to MSRs, not remove it.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Well, I would prefer if libvirt simply did (e.g.)
+"qom-get property=invtsc" instead of fetching raw feature-words
+data.  But if we do have an existing user, I now agree with you:
+let's keep it working and extend it to include MSR info too.
+
+BTW, libvirt must stop using this hardcoded QOM path:
+
+  #define QOM_CPU_PATH  "/machine/unattached/device[0]"
+
+It should use the "qom_path" field of "query-cpus" instead.
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eduardo
