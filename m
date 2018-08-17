@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKc-0003O4-7V
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:32 -0400
+	(envelope-from <berrange@redhat.com>) id 1fqgKz-0003jF-Ir
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKG-0001p5-P7
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57106 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fqgKy-0002Fp-U4
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56306 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKG-0001jL-7D
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:08 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:31 +0200
-Message-Id: <20180817150559.16243-33-armbru@redhat.com>
-In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
-References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 32/60] json: Have lexer call streamer
- directly
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqgKy-0002FA-Mp
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:52 -0400
+Date: Fri, 17 Aug 2018 16:06:49 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180817150649.GU11124@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
+	<20180816172722.GK23515@redhat.com>
+	<83320617-5d60-fe71-3ef5-8ac7c384a3b1@ubuntu.com>
+	<20180817085656.GA11124@redhat.com>
+	<a115c4d1-0a78-efa1-0364-f41a06aca124@ubuntu.com>
+	<20180817125808.GO11124@redhat.com>
+	<b4872310-41f3-d2bc-22b2-0f41e8848a55@ubuntu.com>
+	<20180817131226.GP11124@redhat.com>
+	<e88687b0-f116-e6eb-0432-12e38ecece2f@ubuntu.com>
+	<20180817144421.GS11124@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180817144421.GS11124@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,140 +37,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
+To: Phillip Susi <psusi@ubuntu.com>
+Cc: qemu-devel@nongnu.org
 
-json_lexer_init() takes the function to process a token as an
-argument.  It's always json_message_process_token().  Makes the code
-harder to understand for no actual gain.  Drop the indirection.
+On Fri, Aug 17, 2018 at 03:44:21PM +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Fri, Aug 17, 2018 at 10:36:14AM -0400, Phillip Susi wrote:
+> > I've been reading up here:
+> > http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
+> >=20
+> > And man, what a mess keyboards are!  Worse than floppy controllers.
+> > According to that site, the scan code for \ should be 0x2b, so why do=
+es
+> > xev say the keycode is 51?  Is keycode something else entirely from s=
+can
+> > codes and keysyms?  If so how can I see the scan code?
+>=20
+> 0x2b is 43 in hex.
+>=20
+> xev reports the Xorg scancode, which is the same as the XT/AT-set1
+> scancodes, with an offset of 8 added
+>=20
+> IOW, 51 from xev does actually match 0x2b from XT scancode set
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- include/qapi/qmp/json-lexer.h    | 13 +++----------
- include/qapi/qmp/json-streamer.h |  3 +++
- qobject/json-lexer.c             | 13 ++++++++-----
- qobject/json-streamer.c          |  6 +++---
- 4 files changed, 17 insertions(+), 18 deletions(-)
+Opps, slight mistake there.  On *old* Xorg using the 'kbd' driver it
+would correspond to XT/AT-set1 scancodes. On *new* Xorg using the 'evdev'
+driver it would correspond to Linux keycodes.
 
-diff --git a/include/qapi/qmp/json-lexer.h b/include/qapi/qmp/json-lexer.h
-index 66ccf0357c..44bcf2ca64 100644
---- a/include/qapi/qmp/json-lexer.h
-+++ b/include/qapi/qmp/json-lexer.h
-@@ -32,20 +32,13 @@ typedef enum json_token_type {
-     JSON_ERROR,
- } JSONTokenType;
- 
--typedef struct JSONLexer JSONLexer;
--
--typedef void (JSONLexerEmitter)(JSONLexer *, GString *,
--                                JSONTokenType, int x, int y);
--
--struct JSONLexer
--{
--    JSONLexerEmitter *emit;
-+typedef struct JSONLexer {
-     int state;
-     GString *token;
-     int x, y;
--};
-+} JSONLexer;
- 
--void json_lexer_init(JSONLexer *lexer, JSONLexerEmitter func);
-+void json_lexer_init(JSONLexer *lexer);
- 
- void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size);
- 
-diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-streamer.h
-index cb808cf27d..7922e185a5 100644
---- a/include/qapi/qmp/json-streamer.h
-+++ b/include/qapi/qmp/json-streamer.h
-@@ -33,6 +33,9 @@ typedef struct JSONMessageParser
-     uint64_t token_size;
- } JSONMessageParser;
- 
-+void json_message_process_token(JSONLexer *lexer, GString *input,
-+                                JSONTokenType type, int x, int y);
-+
- void json_message_parser_init(JSONMessageParser *parser,
-                               void (*func)(JSONMessageParser *, GQueue *));
- 
-diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index 87cdd41f29..0b54b1af56 100644
---- a/qobject/json-lexer.c
-+++ b/qobject/json-lexer.c
-@@ -14,6 +14,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qapi/qmp/json-lexer.h"
-+#include "qapi/qmp/json-streamer.h"
- 
- #define MAX_TOKEN_SIZE (64ULL << 20)
- 
-@@ -278,9 +279,8 @@ static const uint8_t json_lexer[][256] =  {
-     },
- };
- 
--void json_lexer_init(JSONLexer *lexer, JSONLexerEmitter func)
-+void json_lexer_init(JSONLexer *lexer)
- {
--    lexer->emit = func;
-     lexer->state = IN_START;
-     lexer->token = g_string_sized_new(3);
-     lexer->x = lexer->y = 0;
-@@ -316,7 +316,8 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
-         case JSON_FLOAT:
-         case JSON_KEYWORD:
-         case JSON_STRING:
--            lexer->emit(lexer, lexer->token, new_state, lexer->x, lexer->y);
-+            json_message_process_token(lexer, lexer->token, new_state,
-+                                       lexer->x, lexer->y);
-             /* fall through */
-         case JSON_SKIP:
-             g_string_truncate(lexer->token, 0);
-@@ -336,7 +337,8 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
-              * never a valid ASCII/UTF-8 sequence, so this should reliably
-              * induce an error/flush state.
-              */
--            lexer->emit(lexer, lexer->token, JSON_ERROR, lexer->x, lexer->y);
-+            json_message_process_token(lexer, lexer->token, JSON_ERROR,
-+                                       lexer->x, lexer->y);
-             g_string_truncate(lexer->token, 0);
-             new_state = IN_START;
-             lexer->state = new_state;
-@@ -351,7 +353,8 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
-      * this is a security consideration.
-      */
-     if (lexer->token->len > MAX_TOKEN_SIZE) {
--        lexer->emit(lexer, lexer->token, lexer->state, lexer->x, lexer->y);
-+        json_message_process_token(lexer, lexer->token, lexer->state,
-+                                   lexer->x, lexer->y);
-         g_string_truncate(lexer->token, 0);
-         lexer->state = IN_START;
-     }
-diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index 78dfff2aa0..9f57ebf2bd 100644
---- a/qobject/json-streamer.c
-+++ b/qobject/json-streamer.c
-@@ -34,8 +34,8 @@ static void json_message_free_tokens(JSONMessageParser *parser)
-     }
- }
- 
--static void json_message_process_token(JSONLexer *lexer, GString *input,
--                                       JSONTokenType type, int x, int y)
-+void json_message_process_token(JSONLexer *lexer, GString *input,
-+                                JSONTokenType type, int x, int y)
- {
-     JSONMessageParser *parser = container_of(lexer, JSONMessageParser, lexer);
-     JSONToken *token;
-@@ -115,7 +115,7 @@ void json_message_parser_init(JSONMessageParser *parser,
-     parser->tokens = g_queue_new();
-     parser->token_size = 0;
- 
--    json_lexer_init(&parser->lexer, json_message_process_token);
-+    json_lexer_init(&parser->lexer);
- }
- 
- void json_message_parser_feed(JSONMessageParser *parser,
--- 
-2.17.1
+Fortunately in this particular case the Linux keycode is the same as
+the XT scancode so the conversion I illustrate was still correct :-)
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
