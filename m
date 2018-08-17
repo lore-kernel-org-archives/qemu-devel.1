@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgSG-00051R-Pa
+	(envelope-from <armbru@redhat.com>) id 1fqgSF-00051N-QF
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgSF-0008Pw-LH
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46756 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgSF-0008Nq-7C
+	(envelope-from <armbru@redhat.com>) id 1fqgSE-0008NN-EI
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46740 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgSE-0008MZ-5o
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:22 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:50 +0200
-Message-Id: <20180817150559.16243-52-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:42 +0200
+Message-Id: <20180817150559.16243-44-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 51/60] json: Eliminate lexer state IN_ERROR
- and pseudo-token JSON_MIN
+Subject: [Qemu-devel] [PATCH v2 43/60] qjson: Fix qobject_from_json() &
+ friends for multiple values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +27,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
+qobject_from_json() & friends use the consume_json() callback to
+receive either a value or an error from the parser.
+
+When they are fed a string that contains more than either one JSON
+value or one JSON syntax error, consume_json() gets called multiple
+times.
+
+When the last call receives a value, qobject_from_json() returns that
+value.  Any other values are leaked.
+
+When any call receives an error, qobject_from_json() sets the first
+error received.  Any other errors are thrown away.
+
+When values follow errors, qobject_from_json() returns both a value
+and sets an error.  That's bad.  Impact:
+
+* block.c's parse_json_protocol() ignores and leaks the value.  It's
+  used to to parse pseudo-filenames starting with "json:".  The
+  pseudo-filenames can come from the user or from image meta-data such
+  as a QCOW2 image's backing file name.
+
+* vl.c's parse_display_qapi() ignores and leaks the error.  It's used
+  to parse the argument of command line option -display.
+
+* vl.c's main() case QEMU_OPTION_blockdev ignores the error and leaves
+  it in @err.  main() will then pass a pointer to a non-null Error *
+  to net_init_clients(), which is forbidden.  It can lead to assertion
+  failure or other misbehavior.
+
+* check-qjson.c's multiple_values() demonstrates the badness.
+
+* The other callers are not affected since they only pass strings with
+  exactly one JSON value or, in the case of negative tests, one
+  error.
+
+The impact on the _nofail() functions is relatively harmless.  They
+abort when any call receives an error.  Else they return the last
+value, and leak the others, if any.
+
+Fix consume_json() as follows.  On the first call, save value and
+error as before.  On subsequent calls, if any, don't save them.  If
+the first call saved a value, the next call, if any, replaces the
+value by an "Expecting at most one JSON value" error.  Take care not
+to leak values or errors that aren't saved.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/qapi/qmp/json-lexer.h | 10 ++++------
- qobject/json-lexer.c          | 15 +++++++--------
- 2 files changed, 11 insertions(+), 14 deletions(-)
+ qobject/qjson.c     | 15 ++++++++++++++-
+ tests/check-qjson.c | 10 +++-------
+ 2 files changed, 17 insertions(+), 8 deletions(-)
 
-diff --git a/include/qapi/qmp/json-lexer.h b/include/qapi/qmp/json-lexer.h
-index 8058695e40..f3524de07a 100644
---- a/include/qapi/qmp/json-lexer.h
-+++ b/include/qapi/qmp/json-lexer.h
-@@ -14,10 +14,9 @@
- #ifndef QEMU_JSON_LEXER_H
- #define QEMU_JSON_LEXER_H
+diff --git a/qobject/qjson.c b/qobject/qjson.c
+index 7395556069..7f69036487 100644
+--- a/qobject/qjson.c
++++ b/qobject/qjson.c
+@@ -33,8 +33,21 @@ static void consume_json(void *opaque, QObject *json, Error *err)
+ {
+     JSONParsingState *s = opaque;
  
--
--typedef enum json_token_type {
--    JSON_MIN = 100,
--    JSON_LCURLY = JSON_MIN,
-+typedef enum {
-+    JSON_ERROR = 0,             /* must be zero */
-+    JSON_LCURLY,
-     JSON_RCURLY,
-     JSON_LSQUARE,
-     JSON_RSQUARE,
-@@ -29,8 +28,7 @@ typedef enum json_token_type {
-     JSON_STRING,
-     JSON_INTERPOL,
-     JSON_SKIP,
--    JSON_ERROR,
--    JSON_END_OF_INPUT
-+    JSON_END_OF_INPUT           /* must be last */
- } JSONTokenType;
++    assert(!json != !err);
++    assert(!s->result || !s->err);
++
++    if (s->result) {
++        qobject_unref(s->result);
++        s->result = NULL;
++        error_setg(&s->err, "Expecting at most one JSON value");
++    }
++    if (s->err) {
++        qobject_unref(json);
++        error_free(err);
++        return;
++    }
+     s->result = json;
+-    error_propagate(&s->err, err);
++    s->err = err;
+ }
  
- typedef struct JSONLexer {
-diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index ef29e2782d..49e075a51e 100644
---- a/qobject/json-lexer.c
-+++ b/qobject/json-lexer.c
-@@ -101,8 +101,9 @@
-  * - Decoding and validating is left to the parser.
-  */
+ /*
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index d741d29733..22a3225358 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -1443,17 +1443,13 @@ static void multiple_values(void)
+     Error *err = NULL;
+     QObject *obj;
  
--enum json_lexer_state {
--    IN_ERROR = 0,               /* must really be 0, see json_lexer[] */
-+enum {
-+    IN_START = JSON_END_OF_INPUT + 1,
-+    IN_START_INTERPOL,          /* must be IN_START + 1 */
-     IN_DQ_STRING_ESCAPE,
-     IN_DQ_STRING,
-     IN_SQ_STRING_ESCAPE,
-@@ -119,11 +120,9 @@ enum json_lexer_state {
-     IN_KEYWORD,
-     IN_INTERPOL,
-     IN_WHITESPACE,
--    IN_START,
--    IN_START_INTERPOL,          /* must be IN_START + 1 */
- };
+-    /* BUG this leaks the syntax tree for "false" */
+     obj = qobject_from_json("false true", &err);
+-    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
+-    g_assert(!err);
+-    qobject_unref(obj);
++    error_free_or_abort(&err);
++    g_assert(obj == NULL);
  
--QEMU_BUILD_BUG_ON((int)JSON_MIN <= (int)IN_START_INTERPOL);
-+QEMU_BUILD_BUG_ON(JSON_ERROR != 0); /* json_lexer[] relies on this */
- QEMU_BUILD_BUG_ON(IN_START_INTERPOL != IN_START + 1);
+-    /* BUG simultaneously succeeds and fails */
+     obj = qobject_from_json("} true", &err);
+-    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
+     error_free_or_abort(&err);
+-    qobject_unref(obj);
++    g_assert(obj == NULL);
+ }
  
- #define TERMINAL(state) [0 ... 0x7F] = (state)
-@@ -132,10 +131,10 @@ QEMU_BUILD_BUG_ON(IN_START_INTERPOL != IN_START + 1);
-    from OLD_STATE required lookahead.  This happens whenever the table
-    below uses the TERMINAL macro.  */
- #define TERMINAL_NEEDED_LOOKAHEAD(old_state, terminal) \
--    (terminal != IN_ERROR && json_lexer[(old_state)][0] == (terminal))
-+    (terminal != JSON_ERROR && json_lexer[(old_state)][0] == (terminal))
- 
- static const uint8_t json_lexer[][256] =  {
--    /* Relies on default initialization to IN_ERROR! */
-+    /* Relies on default initialization to JSON_ERROR */
- 
-     /* double quote string */
-     [IN_DQ_STRING_ESCAPE] = {
-@@ -303,7 +302,7 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
-             g_string_truncate(lexer->token, 0);
-             new_state = lexer->start_state;
-             break;
--        case IN_ERROR:
-+        case JSON_ERROR:
-             /* XXX: To avoid having previous bad input leaving the parser in an
-              * unresponsive state where we consume unpredictable amounts of
-              * subsequent "good" input, percolate this error state up to the
+ int main(int argc, char **argv)
 -- 
 2.17.1
