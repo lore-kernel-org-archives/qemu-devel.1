@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKc-0003O6-7i
+	(envelope-from <armbru@redhat.com>) id 1fqgKc-0003O9-7n
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKG-0001pI-QK
+	(envelope-from <armbru@redhat.com>) id 1fqgKG-0001oj-KR
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46196 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56254 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKG-0001mI-C3
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKF-0001jN-Vz
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:08 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:59 +0200
-Message-Id: <20180817150559.16243-61-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:25 +0200
+Message-Id: <20180817150559.16243-27-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 60/60] json: Support %% in JSON strings when
- interpolating
+Subject: [Qemu-devel] [PATCH v2 26/60] json: Simplify parse_string()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +26,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-The previous commit makes JSON strings containing '%' awkward to
-express in templates: you'd have to mask the '%' with an Unicode
-escape \u0025.  No template currently contains such JSON strings.
-Support the printf conversion specification %% in JSON strings as a
-convenience anyway, because it's trivially easy to do.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-parser.c | 3 ++-
- tests/check-qjson.c   | 4 ++--
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ qobject/json-parser.c | 42 +++++++++++++++++++-----------------------
+ 1 file changed, 19 insertions(+), 23 deletions(-)
 
 diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 273e354ccd..a63e2c33c8 100644
+index fa8d0fe416..8bb278bc7d 100644
 --- a/qobject/json-parser.c
 +++ b/qobject/json-parser.c
-@@ -208,10 +208,11 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
-             }
-             break;
-         case '%':
--            if (ctxt->ap) {
-+            if (ctxt->ap && ptr[1] != '%') {
-                 parse_error(ctxt, token, "can't interpolate into string");
+@@ -101,8 +101,7 @@ static int hex2decimal(char ch)
+     } else if (ch >= 'A' && ch <= 'F') {
+         return 10 + (ch - 'A');
+     }
+-
+-    return -1;
++    abort();
+ }
+ 
+ /**
+@@ -144,7 +143,7 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
+     const char *ptr = token->str;
+     QString *str;
+     char quote;
+-    int cp;
++    int cp, i;
+     char *end;
+     ssize_t len;
+     char utf8_buf[5];
+@@ -159,51 +158,48 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
+             ptr++;
+             switch (*ptr++) {
+             case '"':
+-                qstring_append(str, "\"");
++                qstring_append_chr(str, '"');
+                 break;
+             case '\'':
+-                qstring_append(str, "'");
++                qstring_append_chr(str, '\'');
+                 break;
+             case '\\':
+-                qstring_append(str, "\\");
++                qstring_append_chr(str, '\\');
+                 break;
+             case '/':
+-                qstring_append(str, "/");
++                qstring_append_chr(str, '/');
+                 break;
+             case 'b':
+-                qstring_append(str, "\b");
++                qstring_append_chr(str, '\b');
+                 break;
+             case 'f':
+-                qstring_append(str, "\f");
++                qstring_append_chr(str, '\f');
+                 break;
+             case 'n':
+-                qstring_append(str, "\n");
++                qstring_append_chr(str, '\n');
+                 break;
+             case 'r':
+-                qstring_append(str, "\r");
++                qstring_append_chr(str, '\r');
+                 break;
+             case 't':
+-                qstring_append(str, "\t");
++                qstring_append_chr(str, '\t');
+                 break;
+-            case 'u': {
+-                uint16_t unicode_char = 0;
+-                char utf8_char[4];
+-                int i = 0;
+-
++            case 'u':
++                cp = 0;
+                 for (i = 0; i < 4; i++) {
+-                    if (qemu_isxdigit(*ptr)) {
+-                        unicode_char |= hex2decimal(*ptr) << ((3 - i) * 4);
+-                    } else {
++                    if (!qemu_isxdigit(*ptr)) {
+                         parse_error(ctxt, token,
+                                     "invalid hex escape sequence in string");
+                         goto out;
+                     }
++                    cp <<= 4;
++                    cp |= hex2decimal(*ptr);
+                     ptr++;
+                 }
+ 
+-                wchar_to_utf8(unicode_char, utf8_char, sizeof(utf8_char));
+-                qstring_append(str, utf8_char);
+-            }   break;
++                wchar_to_utf8(cp, utf8_buf, sizeof(utf8_buf));
++                qstring_append(str, utf8_buf);
++                break;
+             default:
+                 parse_error(ctxt, token, "invalid escape sequence in string");
                  goto out;
-             }
-+            ptr++;
-             /* fall through */
-         default:
-             cp = mod_utf8_codepoint(ptr, 6, &end);
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 89fd6ad6f6..d086b146f7 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -1270,7 +1270,7 @@ static void simple_interpolation(void)
-     QObject *obj;
-     QLitObject decoded = QLIT_QLIST(((QLitObject[]){
-             QLIT_QNUM(1),
--            QLIT_QNUM(2),
-+            QLIT_QSTR("100%"),
-             QLIT_QLIST(((QLitObject[]){
-                         QLIT_QNUM(32),
-                         QLIT_QNUM(42),
-@@ -1280,7 +1280,7 @@ static void simple_interpolation(void)
-     embedded_obj = qobject_from_json("[32, 42]", &error_abort);
-     g_assert(embedded_obj != NULL);
- 
--    obj = qobject_from_jsonf_nofail("[%d, 2, %p]", 1, embedded_obj);
-+    obj = qobject_from_jsonf_nofail("[%d, '100%%', %p]", 1, embedded_obj);
-     g_assert(qlit_equal_qobject(&decoded, obj));
- 
-     qobject_unref(obj);
 -- 
 2.17.1
