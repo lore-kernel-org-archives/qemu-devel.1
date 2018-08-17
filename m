@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqjRg-0006fw-J7
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 14:26:01 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fqjW4-0000wW-OI
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 14:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqjRf-0002jb-NQ
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 14:26:00 -0400
-Date: Fri, 17 Aug 2018 15:25:43 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fqjW1-000698-FZ
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 14:30:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59034)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fqjW1-000690-A4
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 14:30:29 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180817182543.GK15372@localhost.localdomain>
-References: <1b072083-700b-9853-e525-e2726bf17476@virtuozzo.com>
-	<20180817180440.49687-1-vsementsov@virtuozzo.com>
-	<20180817180440.49687-2-vsementsov@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180817180440.49687-2-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] scripts: add render_block_graph
- function for QEMUMachine
+Date: Fri, 17 Aug 2018 15:30:23 -0300
+Message-Id: <20180817183026.32662-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL 0/3] Machine queue, 2018-08-17
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +21,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, crosa@redhat.com, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Fri, Aug 17, 2018 at 09:04:39PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> Render block nodes graph with help of graphviz. This new function is
-> for debugging, so there is no sense to put it into qemu.py as a method
-> of QEMUMachine. Let's instead put it separately.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  scripts/render_block_graph.py | 78 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 78 insertions(+)
->  create mode 100644 scripts/render_block_graph.py
-> 
-> diff --git a/scripts/render_block_graph.py b/scripts/render_block_graph.py
-> new file mode 100644
-> index 0000000000..7048a0bac8
-> --- /dev/null
-> +++ b/scripts/render_block_graph.py
-> @@ -0,0 +1,78 @@
-> +# Render Qemu Block Graph
-[...]
+The following changes since commit bb16c0412a572c2c9cd44496deb3ad430bc49c1a:
 
-What about making the script work from the command-line?
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180816' into staging (2018-08-16 14:35:50 +0100)
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-diff --git a/scripts/render_block_graph.py b/scripts/render_block_graph.py
-old mode 100644
-new mode 100755
-index 7048a0bac8..e29fe0fc41
---- a/scripts/render_block_graph.py
-+++ b/scripts/render_block_graph.py
-@@ -1,3 +1,4 @@
-+#!/usr/bin/env python
- # Render Qemu Block Graph
- #
- # Copyright (c) 2017 Parallels International GmbH
-@@ -16,8 +17,9 @@
- # along with this program.  If not, see <http://www.gnu.org/licenses/>.
- #
- 
--import os
-+import os, sys
- from graphviz import Digraph
-+from qmp.qmp import QEMUMonitorProtocol
- 
- def perm(arr):
-     s = 'w' if 'write' in arr else '_'
-@@ -27,16 +29,16 @@ def perm(arr):
-     s += 's' if 'resize' in arr else '_'
-     return s
- 
--def render_block_graph(vm, filename, pointers=False, format='png'):
-+def render_block_graph(qmp, filename, pointers=False, format='png'):
-     '''
-     Render graph in text (dot) representation into "@filename" and
-     representation in @format into "@filename.@format"
-     '''
- 
--    nodes = vm.command('query-named-block-nodes')
-+    nodes = qmp.command('query-named-block-nodes')
-     nodes_info = {n['node-name']: n for n in nodes}
- 
--    block_graph = vm.command('x-query-block-graph')
-+    block_graph = qmp.command('x-query-block-graph')
- 
-     graph = Digraph(comment='Block Nodes Graph')
-     graph.format = format
-@@ -76,3 +78,9 @@ def render_block_graph(vm, filename, pointers=False, format='png'):
-         graph.edge(str(e['parent']), str(e['child']), label=label)
- 
-     graph.render(filename)
-+
-+if __name__ == '__main__':
-+    #TODO: use argparse for command-line arguments
-+    qmp = QEMUMonitorProtocol(sys.argv[1])
-+    qmp.connect()
-+    render_block_graph(qmp, sys.argv[2])
+are available in the Git repository at:
 
+  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+
+for you to fetch changes up to 907aac2f6af6ef775367c368b87cc1720e39d407:
+
+  fw_cfg: ignore suffixes in the bootdevice list dependent on machine class (2018-08-16 22:27:43 -0300)
+
+----------------------------------------------------------------
+Machine queue, 2018-08-17
+
+* Allow machine classes to specify if boot device suffixes should
+  be ignored by get_boot_devices_list()
+* Tiny coding style fixup
+
+----------------------------------------------------------------
+
+Queue for Machine Core patches
+
+
+Dou Liyang (1):
+  machine: Fix coding style at machine_run_board_init()
+
+Mark Cave-Ayland (2):
+  sysbus: always allow explicit_ofw_unit_address() to override address
+    generation
+  fw_cfg: ignore suffixes in the bootdevice list dependent on machine
+    class
+
+ include/hw/boards.h     |  1 +
+ include/sysemu/sysemu.h |  2 +-
+ bootdevice.c            |  5 ++++-
+ hw/core/machine.c       |  3 ++-
+ hw/core/sysbus.c        | 15 +++++++--------
+ hw/nvram/fw_cfg.c       |  2 +-
+ hw/ppc/spapr.c          |  3 ++-
+ 7 files changed, 18 insertions(+), 13 deletions(-)
 
 -- 
-Eduardo
+2.18.0.rc1.1.g3f1ff2140
