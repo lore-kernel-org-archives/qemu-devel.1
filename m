@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqhO3-0008LV-Jt
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:14:08 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fqhOD-0000wb-NT
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:14:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqh8h-0004aV-WF
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:58:16 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34115)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqh8h-0004aC-PS
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:58:15 -0400
-Received: by mail-oi0-x242.google.com with SMTP id 13-v6so14802268ois.1
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 08:58:15 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180809042206.15726-5-richard.henderson@linaro.org>
-References: <20180809042206.15726-1-richard.henderson@linaro.org>
-	<20180809042206.15726-5-richard.henderson@linaro.org>
+	(envelope-from <pm215@archaic.org.uk>) id 1fqhOC-0006zM-Uw
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:14:17 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44538)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fqhOC-0006rY-LJ
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:14:16 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Aug 2018 16:57:54 +0100
-Message-ID: <CAFEAcA9V27aT81_eK21F0TtagN8mvsoPCPubtnTWPjZ8d+pYdw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 04/20] target/arm: Adjust sve_exception_el
+Date: Fri, 17 Aug 2018 17:14:04 +0100
+Message-Id: <20180817161404.9420-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] tests/boot-serial-test: Bump timeout to 6
+ minutes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Desnogues <laurent.desnogues@gmail.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Thomas Huth <thuth@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 9 August 2018 at 05:21, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Check for EL3 before testing CPTR_EL3.EZ.  Return 0 when the exception
-> should be routed via AdvSIMDFPAccessTrap.  Mirror the structure of
-> CheckSVEEnabled more closely.
->
-> Fixes: 5be5e8eda78
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper.c | 96 ++++++++++++++++++++++-----------------------
->  1 file changed, 46 insertions(+), 50 deletions(-)
->
+On a SPARC host that I'm using as a build test machine, the
+boot-serial-test for the SPARC guest machines takes about 65
+seconds to execute. This means that it hits the current
+60 second timer on these tests. Push the timeout up so
+that it doesn't trigger spuriously on slow hosts like this one.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ tests/boot-serial-test.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-thanks
--- PMM
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index 1355df924dd..fca5f2f5da9 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -116,8 +116,8 @@ static bool check_guest_output(const testdef_t *test, int fd)
+     int i, nbr = 0, pos = 0, ccnt;
+     char ch;
+ 
+-    /* Poll serial output... Wait at most 60 seconds */
+-    for (i = 0; i < 6000; ++i) {
++    /* Poll serial output... Wait at most 360 seconds */
++    for (i = 0; i < 36000; ++i) {
+         ccnt = 0;
+         while (ccnt++ < 512 && (nbr = read(fd, &ch, 1)) == 1) {
+             if (ch == test->expect[pos]) {
+-- 
+2.18.0
