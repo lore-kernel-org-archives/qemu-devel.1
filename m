@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fqihK-0007k7-Jj
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:38:07 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fqiiB-00088W-3R
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:38:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fqihG-0004tw-Bg
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:38:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51050 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fqii7-0003yy-Rs
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:38:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50688 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fqihG-0004sT-3N
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:38:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0E5A819703D
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 17:38:01 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 17 Aug 2018 19:37:52 +0200
-Message-Id: <20180817173752.19136-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fqiht-0001VY-VJ
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:38:44 -0400
+References: <20180816011903.39816-1-andrew@andrewoates.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b45d87b9-38ac-427a-8622-ac9c49350511@redhat.com>
+Date: Fri, 17 Aug 2018 19:38:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] monitor: accept input on resume
+In-Reply-To: <20180816011903.39816-1-andrew@andrewoates.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target-i386: fix segment limit check in
+ ljmp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: andrew@andrewoates.com, rth@twiddle.net, ehabkost@redhat.com, qemu-devel@nongnu.org
+Cc: Andrew Oates <aoates@google.com>
 
-A chardev may stop trying to write if the associated can_read()
-callback returned 0. This happens when the monitor is suspended.
-The frontend is supposed to call qemu_chr_fe_accept_input() when it is
-ready to accept data again.
+On 16/08/2018 03:19, andrew@andrewoates.com wrote:
+> From: Andrew Oates <aoates@google.com>
+> 
+> The current implementation has three bugs,
+>  * segment limits are not enforced in protected mode if the L bit is set
+>    in the target segment descriptor[1]
+>  * segment limits are not enforced in compatability mode (ljmp to 32-bit
+>    code segment in long mode)
+>  * #GP(new_cs) is generated rather than #GP(0)
+> 
+> Now the segment limits are enforced if we're not in long mode OR the
+> target code segment doesn't have the L bit set.
+> 
+> [1] this is an invalid configuration (in protected mode the L bit is
+> reserved and should be set to zero), but qemu doesn't enforce that.
 
-An issue was observed with a spice port: pending commands may be
-delayed, as the chardev is not flushed. Most chardev don't use the
-accept_input() callback, and instead check regularly if they can
-write. The ones that do use it are braille, mux, msmouse,
-spice (abstract), spicevmc, spiceport, wctablet.
+Stupid question, why not fix that instead at least for this case?
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: Markus Armbruster <armbru@redhat.com>
----
- monitor.c | 1 +
- 1 file changed, 1 insertion(+)
+> Signed-off-by: Andrew Oates <aoates@google.com>
+> ---
+> The limit check is still incorrect for ljmp-through-call-gate in 64-bit
+> mode.  That's a larger fix I'm still working on.
 
-diff --git a/monitor.c b/monitor.c
-index a1999e396c..33823b035a 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4407,6 +4407,7 @@ void monitor_resume(Monitor *mon)
-             assert(mon->rs);
-             readline_show_prompt(mon->rs);
-         }
-+        qemu_chr_fe_accept_input(&mon->chr);
-     }
-     trace_monitor_suspend(mon, -1);
- }
---=20
-2.18.0.547.g1d89318c48
+Can you resend the call-gate for both ljmp and lcall when you're done
+(there's plenty of time until 3.1)?
+
+Thanks,
+
+Paolo
+
+>  target/i386/seg_helper.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
+> index 00301a0c04..975365fd30 100644
+> --- a/target/i386/seg_helper.c
+> +++ b/target/i386/seg_helper.c
+> @@ -1628,8 +1628,8 @@ void helper_ljmp_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
+>          }
+>          limit = get_seg_limit(e1, e2);
+>          if (new_eip > limit &&
+> -            !(env->hflags & HF_LMA_MASK) && !(e2 & DESC_L_MASK)) {
+> -            raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, GETPC());
+> +            (!(env->hflags & HF_LMA_MASK) || !(e2 & DESC_L_MASK))) {
+> +            raise_exception_err_ra(env, EXCP0D_GPF, 0, GETPC());
+>          }
+>          cpu_x86_load_seg_cache(env, R_CS, (new_cs & 0xfffc) | cpl,
+>                         get_seg_base(e1, e2), limit, e2);
+> 
