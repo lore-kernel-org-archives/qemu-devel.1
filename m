@@ -1,31 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqeYN-0003zP-1Q
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:12:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqeZJ-0004Uk-Od
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:13:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqeYI-0001qp-7i
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:12:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42828 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqeZE-0002Zr-Fw
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:13:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38180)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqeYH-0001qP-Uz
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:12:30 -0400
-Date: Fri, 17 Aug 2018 14:12:26 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180817131226.GP11124@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
-	<20180816172722.GK23515@redhat.com>
-	<83320617-5d60-fe71-3ef5-8ac7c384a3b1@ubuntu.com>
-	<20180817085656.GA11124@redhat.com>
-	<a115c4d1-0a78-efa1-0364-f41a06aca124@ubuntu.com>
-	<20180817125808.GO11124@redhat.com>
-	<b4872310-41f3-d2bc-22b2-0f41e8848a55@ubuntu.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqeZE-0002ZT-AJ
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:13:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B57AE3084218
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 13:13:27 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
+	<20180817092936.GC11124@redhat.com>
+	<e8a14a22915569b492adb414e5ccc98dcf64a24d.camel@redhat.com>
+	<20180817104351.GG11124@redhat.com>
+Date: Fri, 17 Aug 2018 15:13:22 +0200
+In-Reply-To: <20180817104351.GG11124@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
+	=?utf-8?Q?rang=C3=A9=22's?=
+	message of "Fri, 17 Aug 2018 11:43:51 +0100")
+Message-ID: <878t5516h9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b4872310-41f3-d2bc-22b2-0f41e8848a55@ubuntu.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
+Subject: Re: [Qemu-devel] [libvirt] clean/simple Q35 support in libvirt+QEMU
+ for guest OSes that don't support virtio-1.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,37 +38,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Phillip Susi <psusi@ubuntu.com>
-Cc: qemu-devel@nongnu.org
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: Andrea Bolognani <abologna@redhat.com>, Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>, Laine Stump <laine@redhat.com>
 
-On Fri, Aug 17, 2018 at 09:10:54AM -0400, Phillip Susi wrote:
-> On 8/17/2018 8:58 AM, Daniel P. Berrang=C3=A9 wrote:
-> > Actually for QEMU there is no default localized keymap. This is desir=
-able
-> > because it allows VNC to activate its raw scancode extension which is=
- more
-> > reliable than passing translated X11 key symbols.
-> >=20
-> > I guess there's a chance that Xen might secretly pass a '-k' arg anyw=
-ay,
-> > but hopefully it doesn't...
->=20
-> It also happens when I just run qemu.  How can I check to see if it is
-> using raw scancodes or keycodes?
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-It depends on what the VNC client asks for too. With no '-k' arg, if the
-VNC client asks for raw scancodes it'll get that, otherwise QEMU will
-fallback to en-US.    GTK-VNC based clients (remote-viewer, virt-viewer,
-vinagre, virt-manager, GNOME boxes) use the raw scancodes. Most other
-clients do not.
+> On Fri, Aug 17, 2018 at 12:35:11PM +0200, Andrea Bolognani wrote:
+>> On Fri, 2018-08-17 at 10:29 +0100, Daniel P. Berrang=C3=A9 wrote:
+>> > On Thu, Aug 16, 2018 at 06:20:29PM -0400, Laine Stump wrote:
+>> > > 5) Some guest OSes that we still want to support (and which would
+>> > > otherwise work okay on a Q35 virtual machine) have virtio drivers too
+>> > > old to support virtio-1.0 (CentOS6 and RHEL6 are examples of such OS=
+es),
+>> > > but due to the chain of reasons listed above, the "standard" config =
+for
+>> > > a Q35 guest generated by libvirt doesn't support virtio-0.9, hence
+>> > > doesn't support these guest OSes.
+>> >=20
+>> > Note when talking about "support" you're really saying it from the
+>> > downstream vendor, specifically RHEL, POV. From upstream or Fedora POV
+>> > essentially all x86 OS ever made are in scope for running under QEMU
+>> > if suitable virtual hardware models have been provided. QEMU doesn't
+>> > maintain any whitelist of "supported" OS that differs from what is
+>> > technically capable of being run, in the way downstream vendors do.
+>>=20
+>> Well, at least in the case of RHEL 6, "not supported" means that it
+>> will not boot at all on q35 with the default guest topology created
+>> by libvirt, so that's not really a downstream-only problem :)
+>
+> I mean from an upstream POV we still support RHEL-6 fine in i440fx,
+> so there's no reason to particularly care about RHEL-6 with q35
+> upstream.
 
+Only true if Q35 provides nothing of value over i440FX for RHEL-6
+guests.  Does it?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>           It is only downstream decision to try to force it to
+> use q35, despite it not working right today.
