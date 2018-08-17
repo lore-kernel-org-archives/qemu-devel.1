@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqh1u-0005Yl-2m
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:51:14 -0400
+	(envelope-from <berrange@redhat.com>) id 1fqh2d-0006F0-8F
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:52:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqh1q-0000Yy-Tm
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:51:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58788 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fqh2a-00018Q-1q
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:51:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57746 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fqh1p-0000Xz-3G
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:51:09 -0400
-References: <20180817150559.16243-1-armbru@redhat.com>
-	<20180817150559.16243-6-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5150f7dd-d6f7-d09d-6881-6d45f097cf21@redhat.com>
-Date: Fri, 17 Aug 2018 10:51:06 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqh2Z-000189-TD
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:51:55 -0400
+Date: Fri, 17 Aug 2018 16:51:52 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180817155152.GV11124@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
+	<20180817150513.GT11124@redhat.com>
+	<6bf952d9-0269-c5df-6cac-70104ec88f81@ubuntu.com>
 MIME-Version: 1.0
-In-Reply-To: <20180817150559.16243-6-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/60] qmp-test: Cover syntax and
- lexical errors
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6bf952d9-0269-c5df-6cac-70104ec88f81@ubuntu.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Phillip Susi <psusi@ubuntu.com>
+Cc: qemu-devel@nongnu.org
 
-On 08/17/2018 10:05 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
+On Fri, Aug 17, 2018 at 11:16:29AM -0400, Phillip Susi wrote:
+> On 8/17/2018 11:05 AM, Daniel P. Berrang=C3=A9 wrote:
+> > Reading again, this is a bit odd. On most keyboards, holding down shi=
+ft
+> > key generally would NOT change the scan code that is reported (there =
+are a
+>=20
+> Right; a real keyboard won't change the scan code, but it seems that
+> European keyboards have this extra key that can also produce a |, so
+> when qemu gets the key code for |, it has to pick one scan code or the
+> other to translate the | into, and it picks the wrong one.
+>=20
+> Looking at the code it looks like qemu has its own qcode set and
+> translates between that and all of these other sets.  I'm guessing
+> either input-keymap-linux-to-qcode.c or input-keymap-x11-to-qcode.c is
+> where the error is, but these do not exist so I guess they must be auto
+> generated somehow by the build process?
+>=20
+> Actually, which one of those code sets is vnc using?
 
-Might be worth mentioning the addition of qtest_qmp_send_raw() in the 
-commit message body.
+Since you're using tightvnc on Windows, it won't be using the raw scancod=
+e
+extension to RFB, so it'll be sending X keysyms across the wire eg=20
 
->   tests/libqtest.c | 17 +++++++++++++++++
->   tests/libqtest.h | 11 +++++++++++
->   tests/qmp-test.c | 41 ++++++++++++++++++++++++++++++++++++++++-
->   3 files changed, 68 insertions(+), 1 deletion(-)
-> 
+  "|" has X11 keysym 0x7c  (XK_bar)
+  "\" has X11 keysym 0x5c  (XK_backslash)
 
-> +/**
-> + * qtest_qmp_send_raw:
-> + * @s: #QTestState instance to operate on.
-> + * @fmt...: text to send, formatted like sprintf()
-> + *
-> + * Sends text to the QMP monitor verbatim.  Need not be valid JSON;
-> + * this is useful for negative tests.
-> + */
-> +void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
-> +    GCC_FMT_ATTR(2, 3);
-> +
+First thing is the converting keysym number to a name, which
+uses name2keysym[] data table.  This gives 'bar' and 'backslash'
+as names, respectively
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+The names are now looked up in the keymap (pc-bios/keymaps/en-us)
+which says
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  backslash 0x2b
+  bar 0x2b shift
+
+QEMU now has a Qcode that it can pass to the ps2 frontend
+which converts to the AT set 1/2 scancode for injection to
+the guest.
+
+Any one of those many steps could be going wrong and its hard
+to see which, without being able to reproduce it myself
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
