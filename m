@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqcUU-0001Ew-S6
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:00:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fqcYH-0003qx-9I
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:04:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqcUR-0000tN-F2
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:00:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48780 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fqcYG-0003xF-7d
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:04:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48794 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqcUR-0000tB-A0
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:00:23 -0400
-Date: Fri, 17 Aug 2018 12:00:18 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180817110018.GI11124@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CAFEAcA-bvTeWRjBbNder0Ewf_27ksefr8djsWicEC2eMjyWSxA@mail.gmail.com>
-	<20180817104706.GH11124@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fqcYG-0003wx-1v
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:04:20 -0400
+Date: Fri, 17 Aug 2018 12:04:15 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180817110414.GE2459@work-vm>
+References: <20180811205924.4113-1-zhangckid@gmail.com>
+	<20180811205924.4113-6-zhangckid@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180817104706.GH11124@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] vm-tests images disks filling up?
+In-Reply-To: <20180811205924.4113-6-zhangckid@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V11 05/20] COLO: Add block replication into
+ colo process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +28,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <chen.zhang@intel.com>
 
-On Fri, Aug 17, 2018 at 11:47:06AM +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Aug 17, 2018 at 11:26:39AM +0100, Peter Maydell wrote:
-> > I just ran into a build failure using the tests/vm/ BSD build tests,
-> > because the NetBSD build image's disk filled up.
-> >=20
-> > Looking more closely there seemed to be 9 stale build trees in
-> > the VM's /var/tmp/qemu-test.* , which is why the disk was full
-> > (they'd used up about 18GB between them).
-> >=20
-> > The other VMs (freebsd, openbsd) also had the same problem of
-> > /var/tmp gradually filling with stale trees, they just hadn't
-> > quite run out of space yet...
-> >=20
-> > What's the process for managing the disk space on these images?
-> > How are stale or completed build trees deleted ?
->=20
-> I'd prefer to see the test process honouring the build directory instea=
-d
-> of putting stuff in /var/tmp, so that a developer's normal approach to
-> cleaning up build artifacts works.
+* Zhang Chen (zhangckid@gmail.com) wrote:
+> Make sure master start block replication after slave's block
+> replication started.
+> 
+> Besides, we need to activate VM's blocks before goes into
+> COLO state.
+> 
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 
-Oh, wait I'm stupid,  you're talking about the /var/tmp inside the guest
-disk images, not the host !
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-IIUC, the problem is that we create the tests/vm/freebsd.img file
-by deep copying the template cached under $HOME and never purge it,
-so it gradually fills up.
-
-It would be desirable to guarantee a clean image for every build test
-to avoid risk of previous problems affecting subsequent builds.
-
-So how about we create tests/vm/freebsd.img as a qcow2 overlay that
-points back to the cached image in $HOME. That makes it cheap to create,
-so on every test we can just throw away the previous overlay to get
-pristine state.
-
-NB, don't delete the overlay at end of build - only start of the next
-build. That gives devs a way to launch the VM to debug a failed build
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> ---
+>  migration/colo.c      | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  migration/migration.c |  9 +++++++++
+>  2 files changed, 52 insertions(+)
+> 
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 081df1835f..e06640c3d6 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -27,6 +27,7 @@
+>  #include "replication.h"
+>  #include "net/colo-compare.h"
+>  #include "net/colo.h"
+> +#include "block/block.h"
+>  
+>  static bool vmstate_loading;
+>  static Notifier packets_compare_notifier;
+> @@ -56,6 +57,7 @@ static void secondary_vm_do_failover(void)
+>  {
+>      int old_state;
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+> +    Error *local_err = NULL;
+>  
+>      /* Can not do failover during the process of VM's loading VMstate, Or
+>       * it will break the secondary VM.
+> @@ -73,6 +75,11 @@ static void secondary_vm_do_failover(void)
+>      migrate_set_state(&mis->state, MIGRATION_STATUS_COLO,
+>                        MIGRATION_STATUS_COMPLETED);
+>  
+> +    replication_stop_all(true, &local_err);
+> +    if (local_err) {
+> +        error_report_err(local_err);
+> +    }
+> +
+>      if (!autostart) {
+>          error_report("\"-S\" qemu option will be ignored in secondary side");
+>          /* recover runstate to normal migration finish state */
+> @@ -110,6 +117,7 @@ static void primary_vm_do_failover(void)
+>  {
+>      MigrationState *s = migrate_get_current();
+>      int old_state;
+> +    Error *local_err = NULL;
+>  
+>      migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
+>                        MIGRATION_STATUS_COMPLETED);
+> @@ -133,6 +141,13 @@ static void primary_vm_do_failover(void)
+>                       FailoverStatus_str(old_state));
+>          return;
+>      }
+> +
+> +    replication_stop_all(true, &local_err);
+> +    if (local_err) {
+> +        error_report_err(local_err);
+> +        local_err = NULL;
+> +    }
+> +
+>      /* Notify COLO thread that failover work is finished */
+>      qemu_sem_post(&s->colo_exit_sem);
+>  }
+> @@ -356,6 +371,11 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+>      qemu_savevm_state_header(fb);
+>      qemu_savevm_state_setup(fb);
+>      qemu_mutex_lock_iothread();
+> +    replication_do_checkpoint_all(&local_err);
+> +    if (local_err) {
+> +        qemu_mutex_unlock_iothread();
+> +        goto out;
+> +    }
+>      qemu_savevm_state_complete_precopy(fb, false, false);
+>      qemu_mutex_unlock_iothread();
+>  
+> @@ -446,6 +466,12 @@ static void colo_process_checkpoint(MigrationState *s)
+>      object_unref(OBJECT(bioc));
+>  
+>      qemu_mutex_lock_iothread();
+> +    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
+> +    if (local_err) {
+> +        qemu_mutex_unlock_iothread();
+> +        goto out;
+> +    }
+> +
+>      vm_start();
+>      qemu_mutex_unlock_iothread();
+>      trace_colo_vm_state_change("stop", "run");
+> @@ -585,6 +611,11 @@ void *colo_process_incoming_thread(void *opaque)
+>      object_unref(OBJECT(bioc));
+>  
+>      qemu_mutex_lock_iothread();
+> +    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
+> +    if (local_err) {
+> +        qemu_mutex_unlock_iothread();
+> +        goto out;
+> +    }
+>      vm_start();
+>      trace_colo_vm_state_change("stop", "run");
+>      qemu_mutex_unlock_iothread();
+> @@ -665,6 +696,18 @@ void *colo_process_incoming_thread(void *opaque)
+>              goto out;
+>          }
+>  
+> +        replication_get_error_all(&local_err);
+> +        if (local_err) {
+> +            qemu_mutex_unlock_iothread();
+> +            goto out;
+> +        }
+> +        /* discard colo disk buffer */
+> +        replication_do_checkpoint_all(&local_err);
+> +        if (local_err) {
+> +            qemu_mutex_unlock_iothread();
+> +            goto out;
+> +        }
+> +
+>          vmstate_loading = false;
+>          vm_start();
+>          trace_colo_vm_state_change("stop", "run");
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 33a2fd74c6..71492c642d 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -385,6 +385,7 @@ static void process_incoming_migration_co(void *opaque)
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+>      PostcopyState ps;
+>      int ret;
+> +    Error *local_err = NULL;
+>  
+>      assert(mis->from_src_file);
+>      mis->largest_page_size = qemu_ram_pagesize_largest();
+> @@ -416,6 +417,14 @@ static void process_incoming_migration_co(void *opaque)
+>  
+>      /* we get COLO info, and know if we are in COLO mode */
+>      if (!ret && migration_incoming_enable_colo()) {
+> +        /* Make sure all file formats flush their mutable metadata */
+> +        bdrv_invalidate_cache_all(&local_err);
+> +        if (local_err) {
+> +            migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> +                    MIGRATION_STATUS_FAILED);
+> +            error_report_err(local_err);
+> +            exit(EXIT_FAILURE);
+> +        }
+>          mis->migration_incoming_co = qemu_coroutine_self();
+>          qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+>               colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
+> -- 
+> 2.17.GIT
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
