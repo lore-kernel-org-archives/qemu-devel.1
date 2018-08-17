@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKG-000343-6T
+	(envelope-from <armbru@redhat.com>) id 1fqgKG-00034B-7v
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKC-0001h2-Kp
+	(envelope-from <armbru@redhat.com>) id 1fqgKE-0001jW-2H
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46112 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56216 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKC-0001gW-Bl
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:04 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKD-0001h5-3O
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:05 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:04 +0200
-Message-Id: <20180817150559.16243-6-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:13 +0200
+Message-Id: <20180817150559.16243-15-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 05/60] qmp-test: Cover syntax and lexical
- errors
+Subject: [Qemu-devel] [PATCH v2 14/60] check-qjson qmp-test: Cover control
+ characters more thoroughly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,125 +27,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- tests/libqtest.c | 17 +++++++++++++++++
- tests/libqtest.h | 11 +++++++++++
- tests/qmp-test.c | 41 ++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 68 insertions(+), 1 deletion(-)
+RFC 7159 requires control characters in strings to be escaped.
+Demonstrate the JSON parser accepts U+0001 .. U+001F unescaped.
 
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 852ccff1ce..dc42347da3 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -604,6 +604,23 @@ void qtest_qmp_send(QTestState *s, const char *fmt, ...)
-     va_end(ap);
- }
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ tests/check-qjson.c | 36 ++++++++++++++++++++++++++++++------
+ tests/qmp-test.c    | 14 ++++++++++++++
+ 2 files changed, 44 insertions(+), 6 deletions(-)
+
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index e81fbb95a3..1581fbf170 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -192,6 +192,26 @@ static void utf8_string(void)
+          *   We may choose to define this as feature
+          */
  
-+void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
-+{
-+    bool log = getenv("QTEST_LOG") != NULL;
-+    va_list ap;
-+    char *str;
-+
-+    va_start(ap, fmt);
-+    str = g_strdup_vprintf(fmt, ap);
-+    va_end(ap);
-+
-+    if (log) {
-+        fprintf(stderr, "%s", str);
-+    }
-+    socket_send(s->qmp_fd, str, strlen(str));
-+    g_free(str);
-+}
-+
- QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event)
- {
-     QDict *response;
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index def1edaafa..1e831973ff 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -96,6 +96,17 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
- void qtest_qmp_send(QTestState *s, const char *fmt, ...)
-     GCC_FMT_ATTR(2, 3);
++        /* 0  Control characters */
++        {
++            /*
++             * Note: \x00 is impossible, other representations of
++             * U+0000 are covered under 4.3
++             */
++            "\x01\x02\x03\x04\x05\x06\x07"
++            "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++            "\x10\x11\x12\x13\x14\x15\x16\x17"
++            "\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F",
++            /* bug: not corrected (valid UTF-8, but invalid JSON) */
++            "\x01\x02\x03\x04\x05\x06\x07"
++            "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++            "\x10\x11\x12\x13\x14\x15\x16\x17"
++            "\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F",
++            "\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007"
++            "\\b\\t\\n\\u000B\\f\\r\\u000E\\u000F"
++            "\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017"
++            "\\u0018\\u0019\\u001A\\u001B\\u001C\\u001D\\u001E\\u001F",
++        },
+         /* 1  Some correct UTF-8 text */
+         {
+             /* a bit of German */
+@@ -211,14 +231,14 @@ static void utf8_string(void)
+         /* 2  Boundary condition test cases */
+         /* 2.1  First possible sequence of a certain length */
+         /*
+-         * 2.1.1  1 byte U+0001
+-         * \x00 is impossible, test \x01 instead.  Other
+-         * representations of U+0000 are covered under 4.3.
++         * 2.1.1 1 byte U+0020
++         * Control characters are already covered by their own test
++         * case under 0.  Test the first 1 byte non-control character
++         * here.
+          */
+         {
+-            "\x01",
+-            "\x01",
+-            "\\u0001",
++            " ",
++            " ",
+         },
+         /* 2.1.2  2 bytes U+0080 */
+         {
+@@ -1333,6 +1353,10 @@ static void junk_input(void)
+     g_assert(!err);             /* BUG */
+     g_assert(obj == NULL);
  
-+/**
-+ * qtest_qmp_send_raw:
-+ * @s: #QTestState instance to operate on.
-+ * @fmt...: text to send, formatted like sprintf()
-+ *
-+ * Sends text to the QMP monitor verbatim.  Need not be valid JSON;
-+ * this is useful for negative tests.
-+ */
-+void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
-+    GCC_FMT_ATTR(2, 3);
++    obj = qobject_from_json("{\x01", &err);
++    g_assert(!err);             /* BUG */
++    g_assert(obj == NULL);
 +
- /**
-  * qtest_qmpv:
-  * @s: #QTestState instance to operate on.
+     obj = qobject_from_json("[0\xFF]", &err);
+     error_free_or_abort(&err);
+     g_assert(obj == NULL);
 diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index dbc8f6c16e..17153192fe 100644
+index 17153192fe..5edc97f63f 100644
 --- a/tests/qmp-test.c
 +++ b/tests/qmp-test.c
-@@ -1,7 +1,7 @@
- /*
-  * QMP protocol test cases
-  *
-- * Copyright (c) 2017 Red Hat Inc.
-+ * Copyright (c) 2017-2018 Red Hat Inc.
-  *
-  * Authors:
-  *  Markus Armbruster <armbru@redhat.com>
-@@ -42,10 +42,49 @@ static void test_version(QObject *version)
-     visit_free(v);
- }
+@@ -71,6 +71,13 @@ static void test_malformed(QTestState *qts)
+     qobject_unref(resp);
+     g_assert(recovered(qts));
  
-+static bool recovered(QTestState *qts)
-+{
-+    QDict *resp;
-+    bool ret;
-+
-+    resp = qtest_qmp(qts, "{ 'execute': 'no-such-cmd' }");
-+    ret = !strcmp(get_error_class(resp), "CommandNotFound");
++    /* lexical error: funny control character outside string */
++    qtest_qmp_send_raw(qts, "{\x01");
++    resp = qtest_qmp_receive(qts);
++    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
 +    qobject_unref(resp);
-+    return ret;
-+}
++    g_assert(recovered(qts));
 +
- static void test_malformed(QTestState *qts)
- {
-     QDict *resp;
+     /* lexical error: impossible byte in string */
+     qtest_qmp_send_raw(qts, "{'bad \xFF");
+     resp = qtest_qmp_receive(qts);
+@@ -78,6 +85,13 @@ static void test_malformed(QTestState *qts)
+     qobject_unref(resp);
+     g_assert(recovered(qts));
  
-+    /* syntax error */
-+    qtest_qmp_send_raw(qts, "{]\n");
++    /* lexical error: control character in string */
++    qtest_qmp_send_raw(qts, "{'execute': 'nonexistent', 'id':'\n'}");
 +    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
++    g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound"); /* BUG */
 +    qobject_unref(resp);
 +    g_assert(recovered(qts));
 +
-+    /* lexical error: impossible byte outside string */
-+    qtest_qmp_send_raw(qts, "{\xFF");
-+    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    qobject_unref(resp);
-+    g_assert(recovered(qts));
-+
-+    /* lexical error: impossible byte in string */
-+    qtest_qmp_send_raw(qts, "{'bad \xFF");
-+    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    qobject_unref(resp);
-+    g_assert(recovered(qts));
-+
-+    /* lexical error: interpolation */
-+    qtest_qmp_send_raw(qts, "%%p\n");
-+    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    qobject_unref(resp);
-+    g_assert(recovered(qts));
-+
-     /* Not even a dictionary */
-     resp = qtest_qmp(qts, "null");
-     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+     /* lexical error: interpolation */
+     qtest_qmp_send_raw(qts, "%%p\n");
+     resp = qtest_qmp_receive(qts);
 -- 
 2.17.1
