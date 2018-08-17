@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fqiXL-000457-5y
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:27:48 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fqiZp-0006bd-Sn
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:30:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fqiXJ-0002GI-WC
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:27:47 -0400
-References: <1511196664-85304-1-git-send-email-anton.nefedov@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <63b51f2b-0521-411f-8129-cba35d0cfcea@redhat.com>
-Date: Fri, 17 Aug 2018 19:27:32 +0200
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fqiZf-0003RH-Sb
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:30:18 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:37538
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1fqiZT-0003GR-DN
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:30:01 -0400
+References: <20180817161404.9420-1-peter.maydell@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <18149229-d8e4-b469-b0f5-f074a97e0806@ilande.co.uk>
+Date: Fri, 17 Aug 2018 18:29:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <1511196664-85304-1-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20180817161404.9420-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/7] discard blockstats
+Subject: Re: [Qemu-devel] [PATCH] tests/boot-serial-test: Bump timeout to 6
+ minutes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,112 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, eblake@redhat.com, den@virtuozzo.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, patches@linaro.org
 
-On 20/11/2017 17:50, Anton Nefedov wrote:
-> qmp query-blockstats provides stats info for write/read/flush ops.
-> 
-> Patches 1-5 implement the similar for discard (unmap) command for scsi
-> and ide disks.
-> Discard stat "unmap_ops / unmap_bytes" is supposed to account the ops that
-> have completed without an error.
-> 
-> However, discard operation is advisory. Specifically,
->  - common block layer ignores ENOTSUP error code.
->    That might be returned if the block driver does not support discard,
->    or discard has been configured to be ignored.
->  - format drivers such as qcow2 may ignore discard if they were configured
->    to ignore that, or if the corresponding area is already marked unused
->    (unallocated / zero clusters).
-> 
-> And what is actually useful is the number of bytes actually discarded
-> down on the host filesystem.
-> To achieve that, driver-specific statistics has been added to blockstats
-> (patch 7).
-> With patch 6, file-posix driver accounts discard operations on its level too.
-> 
-> query-blockstat result:
-> 
-> (note the difference between blockdevice unmap and file discard stats. qcow2
-> sends a few ops down to the file as the clusters are actually unallocated
-> on qcow2 level)
-> 
-> {"return": [
-> {"device": "drive-scsi0-0-0-0"
->   "parent": {
->     "stats": {
->>      "unmap_operations": 0
->>      "unmap_merged": 0
->       "flush_total_time_ns": 0
->       "wr_highest_offset": 8111718400
->       [..]
->       "invalid_wr_operations": 0
->       "invalid_rd_operations": 0}
->     "node-name": "#block047"
->>    "driver_stats": {
->>      "type": "file"
->>      "data": {
->>        "discard_bytes_ok": 1572864
->>        "discard_nb_failed": 0
->>        "discard_nb_ok": 5}}}
->   "stats": {
->>   "unmap_operations": 472
->>   "unmap_merged": 0
->     "flush_total_time_ns": 44530540
->     "wr_highest_offset": 7106662400
->     "wr_total_time_ns": 45518856
->     "failed_wr_operations": 0
->     "failed_rd_operations": 0
->     "wr_merged": 0
->     "wr_bytes": 889856
->     "timed_stats": []
->>    "failed_unmap_operations": 0
->     "failed_flush_operations": 0
->     "account_invalid": true
->     "rd_total_time_ns": 3306264098
->>    "invalid_unmap_operations": 0
->     "flush_operations": 18
->     "wr_operations": 120
->>    "unmap_bytes": 12312014848
->     "rd_merged": 0
->     "rd_bytes": 137103360
->>    "unmap_total_time_ns": 22664692
->     "invalid_flush_operations": 0
->     "account_failed": true
->     "idle_time_ns": 437316567
->     "rd_operations": 5636
->     "invalid_wr_operations": 0
->     "invalid_rd_operations": 0}
->   "node-name": "#block128"}
-> 
->   {"device": "drive-ide0-0-0"
->   [..]
-> 
-> Anton Nefedov (7):
->   qapi: add unmap to BlockDeviceStats
->   ide: account UNMAP (TRIM) operations
->   scsi: store unmap offset and nb_sectors in request struct
->   scsi: move unmap error checking to the complete callback
->   scsi: account unmap operations
->   file-posix: account discard operations
->   qapi: query-blockstat: add driver specific file-posix stats
-> 
->  qapi/block-core.json       | 57 ++++++++++++++++++++++++++++++++++++++++++++++
->  include/block/accounting.h |  1 +
->  include/block/block.h      |  1 +
->  include/block/block_int.h  |  1 +
->  block.c                    |  9 ++++++++
->  block/file-posix.c         | 42 ++++++++++++++++++++++++++++++++--
->  block/qapi.c               | 11 +++++++++
->  hw/ide/core.c              | 12 ++++++++++
->  hw/scsi/scsi-disk.c        | 29 ++++++++++++++---------
->  9 files changed, 150 insertions(+), 13 deletions(-)
-> 
+On 17/08/18 17:14, Peter Maydell wrote:
 
-Hey, looks like this series has fallen through the cracks.  Anton, are
-you going to send an updated version?
+> On a SPARC host that I'm using as a build test machine, the
+> boot-serial-test for the SPARC guest machines takes about 65
+> seconds to execute. This means that it hits the current
+> 60 second timer on these tests. Push the timeout up so
+> that it doesn't trigger spuriously on slow hosts like this one.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  tests/boot-serial-test.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> index 1355df924dd..fca5f2f5da9 100644
+> --- a/tests/boot-serial-test.c
+> +++ b/tests/boot-serial-test.c
+> @@ -116,8 +116,8 @@ static bool check_guest_output(const testdef_t *test, int fd)
+>      int i, nbr = 0, pos = 0, ccnt;
+>      char ch;
+>  
+> -    /* Poll serial output... Wait at most 60 seconds */
+> -    for (i = 0; i < 6000; ++i) {
+> +    /* Poll serial output... Wait at most 360 seconds */
+> +    for (i = 0; i < 36000; ++i) {
+>          ccnt = 0;
+>          while (ccnt++ < 512 && (nbr = read(fd, &ch, 1)) == 1) {
+>              if (ch == test->expect[pos]) {
 
-Thanks,
+Wow that is amazingly slow... however I guess it's not completely
+unreasonable to increase the timeout accordingly.
 
-Paolo
+Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+
+ATB,
+
+Mark.
