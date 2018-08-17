@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMe-0004n7-FC
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:38 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMh-0004qh-1l
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMW-0007XX-DW
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:31 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44574 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMZ-0007dI-Cp
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:33 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45534 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqfMV-0007U4-Qa
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:24 -0400
+	id 1fqfMY-0007Zt-L5
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:27 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 17 Aug 2018 16:03:24 +0200
-Message-Id: <1534514633-13725-37-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 17 Aug 2018 16:03:53 +0200
+Message-Id: <1534514633-13725-66-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534514633-13725-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534514633-13725-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v10 36/65] elf: Add EM_NANOMIPS value as a
- valid one for e_machine field
+Subject: [Qemu-devel] [PATCH v10 65/65] qemu-doc: Add nanoMIPS-related items
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +27,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Value 249 is registered as valid for usage for nanoMIPS executables.
+Add nanoMIPS-related items in qemu-doc.texi
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- include/elf.h | 2 ++
+ qemu-doc.texi | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/include/elf.h b/include/elf.h
-index 28a5a63..312f68a 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -143,6 +143,8 @@ typedef int64_t  Elf64_Sxword;
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index f74542a..ddac713 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2711,6 +2711,8 @@ The binary format is detected automatically.
  
- #define EM_RISCV        243     /* RISC-V */
+ @command{qemu-mipsn32el} executes 32-bit little endian MIPS binaries (MIPS N32 ABI).
  
-+#define EM_NANOMIPS     249     /* Wave Computing nanoMIPS */
++@command{qemu-nanomips} executes 32-bit little endian nanoMIPS binaries (MIPS P32 ABI).
 +
- /*
-  * This is an interim value that we will use until the committee comes
-  * up with a final number.
+ @cindex user mode (NiosII)
+ @command{qemu-nios2} TODO.
+ 
 -- 
 2.7.4
