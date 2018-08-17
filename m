@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fqf85-0007RK-I3
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:49:30 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fqfB4-0001Hd-86
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fqf84-0004ga-Rd
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:49:29 -0400
-References: <20180802144834.520904-1-eblake@redhat.com>
-	<20180802144834.520904-3-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <c7dc405d-0b83-b680-6e45-db4b211d3ef2@virtuozzo.com>
-Date: Fri, 17 Aug 2018 16:49:17 +0300
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fqfB1-00074D-4S
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:52:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56500 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fqfB1-00073o-0F
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:52:31 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8E7E940122DD
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 13:52:29 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 17 Aug 2018 15:52:20 +0200
+Message-Id: <20180817135224.22971-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180802144834.520904-3-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 2/4] nbd/server: Advertise actual minimum
- block size
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/4] Fix socket chardev regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, rjones@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, berrange@redhat.com, peterx@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-02.08.2018 17:48, Eric Blake wrote:
-> Both NBD_CMD_BLOCK_STATUS and structured NBD_CMD_READ will split
-> their reply according to bdrv_block_status() boundaries. If the
-> block device has a request_alignment smaller than 512, but we
-> advertise a block alignment of 512 to the client, then this can
-> result in the server reply violating client expectations by
-> reporting a smaller region of the export than what the client
-> is permitted to address.  Thus, it is imperative that we
-> advertise the actual minimum block limit, rather than blindly
-> rounding it up to 512 (bdrv_block_status() cannot return status
-> aligned any smaller than request_alignment).
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->   nbd/server.c | 10 ++++++----
->   1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/nbd/server.c b/nbd/server.c
-> index ea5fe0eb336..cd3c41f895b 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -608,10 +608,12 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint16_t myflags,
->       /* Send NBD_INFO_BLOCK_SIZE always, but tweak the minimum size
->        * according to whether the client requested it, and according to
->        * whether this is OPT_INFO or OPT_GO. */
-> -    /* minimum - 1 for back-compat, or 512 if client is new enough.
-> -     * TODO: consult blk_bs(blk)->bl.request_alignment? */
-> -    sizes[0] =
-> -            (client->opt == NBD_OPT_INFO || blocksize) ? BDRV_SECTOR_SIZE : 1;
-> +    /* minimum - 1 for back-compat, or actual if client will obey it. */
-> +    if (client->opt == NBD_OPT_INFO || blocksize) {
-> +        sizes[0] = blk_get_request_alignment(exp->blk);
-> +    } else {
-> +        sizes[0] = 1;
-> +    }
->       /* preferred - Hard-code to 4096 for now.
->        * TODO: is blk_bs(blk)->bl.opt_transfer appropriate? */
->       sizes[1] = 4096;
+Hi,
 
-Here, what about dirty bitmap export through BLOCK_STATUS? Could it's 
-granularity be less than request_alignment? Shouldn't we handle it somehow?
+In commit 25679e5d58e "chardev: tcp: postpone async connection setup"
+(and its follow up 99f2f54174a59), Peter moved chardev socket
+connection to machine_done event. However, chardev created later will
+no longer attempt to connect, and chardev created in tests do not have
+machine_done event (breaking some of vhost-user-test).
 
--- 
-Best regards,
-Vladimir
+The goal was to move the "connect" source to the chardev frontend
+context (the monitor thread context in his case). chr->gcontext is set
+with qemu_chr_fe_set_handlers(). But there is no guarantee that the
+function will be called in general, so we can't delay connection until
+then: the chardev should still attempt to connect during open(), using
+the main context.
+
+An alternative would be to specify the iothread during chardev
+creation. Setting up monitor OOB would be quite different too, it
+would take the same iothread as argument.
+
+99f2f54174a595e is also a bit problematic, since it will behave
+differently before and after machine_done (the first case gives a
+chance to use a different context reliably, the second looks racy)
+
+In the end, I am not sure this is all necessary, as chardev callbacks
+are called after qemu_chr_fe_set_handlers(), at which point the
+context of sources are updated. In "char-socket: update all ioc
+handlers when changing context", I moved also the hup handler to the
+updated context. So unless the main thread is already stuck, we can
+setup a different context for the chardev at that time. Or not?
+
+Marc-Andr=C3=A9 Lureau (4):
+  Revert "chardev: tcp: postpone TLS work until machine done"
+  Revert "chardev: tcp: postpone async connection setup"
+  char-socket: update all ioc handlers when changing context
+  test-char: add socket reconnect test
+
+ chardev/char-socket.c | 86 ++++++++++++++++++-------------------------
+ tests/test-char.c     | 18 +++++++--
+ 2 files changed, 50 insertions(+), 54 deletions(-)
+
+--=20
+2.18.0.547.g1d89318c48
