@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqajd-0007Ff-FK
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:07:58 -0400
+	(envelope-from <berrange@redhat.com>) id 1fqb7z-0005f0-7W
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:33:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqajc-0004MO-Gq
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:07:57 -0400
-Date: Fri, 17 Aug 2018 10:07:47 +0100
+	(envelope-from <berrange@redhat.com>) id 1fqb4h-0006DK-3Z
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:29:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36744 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqb4g-0006Ci-TJ
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:29:43 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 768D9814FDCE
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 09:29:42 +0000 (UTC)
+Date: Fri, 17 Aug 2018 10:29:36 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180817090747.GB11124@redhat.com>
+Message-ID: <20180817092936.GC11124@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <2e8b4754-2f83-d263-f562-b753aea90d42@virtuozzo.com>
-	<d5e88645-e43f-1d3c-6dd1-e20e04733d4f@redhat.com>
+References: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <d5e88645-e43f-1d3c-6dd1-e20e04733d4f@redhat.com>
-Subject: Re: [Qemu-devel] nbd oldstyle negotiation
+In-Reply-To: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
+Subject: Re: [Qemu-devel] clean/simple Q35 support in libvirt+QEMU for guest
+ OSes that don't support virtio-1.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +34,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, nbd list <nbd@other.debian.org>
+To: Laine Stump <laine@redhat.com>
+Cc: Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>
 
-On Thu, Aug 16, 2018 at 02:56:10PM -0500, Eric Blake wrote:
-> On 08/16/2018 02:02 PM, Vladimir Sementsov-Ogievskiy wrote:
-> > Hi Eric!
-> > 
-> > There is a small problem with our qemu-nbd cmdline interface: people
-> > forget to use option -x or don't know about it and face into problems
-> > with old protocol version. One of may colleagues after such situation
-> > (because of this option, he could not use utility nbd-client, which
-> > doesn't support old version) asked me to add comments about version
-> > selection by -x option into --help of qemu-nbd. And really, it's not an
-> > obvious interface solution...
-> > 
-> > Now I think, should not we use new version by default? Or, even drop old
-> > version support at all? Anybody uses it?
+On Thu, Aug 16, 2018 at 06:20:29PM -0400, Laine Stump wrote:
+> Summary of the problem:
 > 
-> nbdkit 1.3 switched its default to newstyle (Jan 2018):
-> https://github.com/libguestfs/nbdkit/commit/b2a8aecc
-> https://github.com/libguestfs/nbdkit/commit/8158e773
+> 1) We want to persuade libvirt+QEMU users to move away from the i440fx
+> machinetype in favor of Q35. (NB: Someday this *might* lead to the
+> ability to deprecate and even remove the 440fx machinetype, but even if
+> that were to happen, it would be a *very long* time from now, so this
+> discussion is *not* about that!)
+
+There are plenty of OS that will never support Q35 and are still interesting
+to use under Q35. The set which could use Q35, but lack virtio1.0 is fairly
+small. So removal of i440fx is really only something for downstream KVM vendors
+to consider. Those vendors only care about modern OS, but upstream is much
+more open minded about what QEMU is used for, so I see it probably living
+forever in upstream, or at least long enough that current maintaniers will
+be retired ;-P.
+
+
+> 2) When Q35 machinetype is used, libvirt assigns virtio devices to a
+> slot on a PCI Express controller (because why have modern PCIe
+> controllers/slots available but force everything onto clunky old legacy
+> controllers?).
 > 
-> and you are correct that nbd 3.10 dropped oldstyle long ago (Mar 2015):
-> https://github.com/NetworkBlockDevice/nbd/commit/36940193
+> 3) When a virtio device is plugged into an Express controller, QEMU
+> disables the device's IO port space, and it is put into "modern-only"
+> mode (this is done to avoid a rapid exhaustion of limited IO port space).
 > 
-> oldstyle is severely lacking in features (it can't do TLS or efficient
-> sparse file handling, for example).  Do we need a formal qemu deprecation
-> period (where you still get oldstyle if -x was not used, but a nice big
-> warning) before flipping the default in 3.2/3.3 [1], or are we okay flipping
-> it in 3.1?
+> 4) modern-only virtio devices won't work with a legacy (virtio-0.9-only)
+> guest driver, because virtio-0.9 requires IO port space.
 > 
-> [1] Okay, I know that our new equally-arbitrary policy on when to bump qemu
-> version number components means that we'll probably see 3.1 in 2018 then 4.0
-> in 2019, rather than 3.2.
+> 5) Some guest OSes that we still want to support (and which would
+> otherwise work okay on a Q35 virtual machine) have virtio drivers too
+> old to support virtio-1.0 (CentOS6 and RHEL6 are examples of such OSes),
+> but due to the chain of reasons listed above, the "standard" config for
+> a Q35 guest generated by libvirt doesn't support virtio-0.9, hence
+> doesn't support these guest OSes.
+
+Note when talking about "support" you're really saying it from the
+downstream vendor, specifically RHEL, POV. From upstream or Fedora POV
+essentially all x86 OS ever made are in scope for running under QEMU
+if suitable virtual hardware models have been provided. QEMU doesn't
+maintain any whitelist of "supported" OS that differs from what is
+technically capable of being run, in the way downstream vendors do.
+
+> And here's a list of possible solutions to this problem (note that
+> "consumers" means management applications such as OpenStack, oVirt,
+> virt-manager, virt-install, gnome-boxes, etc. In all cases, it's assumed
+> that the consumer's decision on the action to take will be based on
+> information from libosinfo). For completeness, I've included even the
+> possibilities that have been rejected, along with a brief synopsis of
+> (at least part of) the reason for rejection:
 > 
-> And, if we switch the default now (which I am in favor of), do we want to
-> add a -o switch to still make it possible to select oldstyle for a couple
-> more releases in case someone was relying on it?  Then again, if you have to
-> amend your script to use -o to keep things from breaking, why not just amend
-> your setup to use newstyle?
+>   (1) Add some way libvirt consumers can ask libvirt to place
+>       virtio devices on a legacy pci slot instead of pcie when
+>       the machinetype is q35 (qemu sets virtio devices in legacy
+>       PCI slots to transitional mode, so io port space is enabled
+>       and virtio-0.0 drivers will work).
 > 
-> My personal preference: completely drop oldstyle support from qemu, for 3.1,
-> with no deprecation period. Do so by making '-x ""' the default for any
-> qemu-nbd command line that did not otherwise specify an export name.  If
-> someone still needs interoperability, they can use nbdkit in the middle,
-> which will still support oldstyle, and provides a plugin for connecting:
+>       This has been proposed on libvir-list, but rejected. Here is
+>       the most elquently stated reasoning for the rejection I could
+>       find (with thanks to Dan Berrange):
+> 
+>          The domain XML is a way to express the configuration
+>          of the guest virtual machine.  What we're talking about
+>          here is a policy tunable for an internal libvirt QEMU
+>          driver algorithm, as so does not belong anywhere in the
+>          domain XML.
 
-So the key question is if the server switches to newstyle with "" export
-name, what versions of qemu client will cease to work. Originally the QEMU
-client would refuse to use new style protocol if not export name was given.
+Indeed, that's a guiding principal in general, not just for this PCI
+question.
 
-I fixed that in
+>   (2) Add full-blown pci enumeration support to all libvirt consumers
+>       (i.e. they will need to build a model of the PCI bus topology
+>       of each guest, and keep track of which addresses are in use).
+>       They can then manually place virtio devices on legacy pci slots
+>       (again, triggering transitional mode) when the intended guest
+>       OS doesn't support virtio-0.9.
+> 
+>       (This is seen as requiring too much duplicated effort for
+>       development and support/maintenance, since up until now libvirt
+>       has been the single point of action for PCI address assignment
+>       (well, QEMU can do it too, but for > 10 years libvirt has
+>       *always* provided full PCI addresses for all devices)
 
-commit 69b49502d8b7b582af79fac5bef7b7ccc2dc9c1e
-Author: Daniel P. Berrange <berrange@redhat.com>
-Date:   Wed Feb 10 18:41:10 2016 +0000
+It really depends on the scope of the mgmt app - at some point the mgmt
+apps needs to take charge to some degree if it has particular ideas
+about how a machine should look. Libvirt's placement strategy is a good
+default for 95% of use cases, but it'll never be 100%. An example is
+setting up a particular PCI topology that is guest NUMA node aware,
+using expander buses.
 
-    nbd: use "" as a default export name if none provided
-    
+So some apps might take this option, but in the common case it is
+undesirable.
 
-So if we mandate new style in the server then we break compat with any
-QEMU client that is < 2.6.0
+>   (3) Add virtio-1.0 support to all guest OSes. If this is done,
+>       existing libvirt configs will work.
+> 
+>       (Aside from the difficulty of backporting, and the fact that
+>       there are going to be some OSes that don't get it *at all*,
+>       there will always be older releases that haven't gotten the
+>       backport. So this isn't a complete solution).
 
-I think that is acceptable as this point in time, as that'll be about
-3 years old by time 3.1 comes out.
+Yep, there will always be guest OS that don't support 1.0. So that's
+only a solution if the person who cares about Q35 support also controls
+the guest OS in question.
+
+>   (4) Consumers can continue using the 440fx machinetype for guest
+>       OSes that don't support virtio-0.9
+> 
+>       (This would work, but perpetuates use of the 440fx
+>       machinetype, and all for just this one reason (at least in
+>       the case of CentOS6/RHEL6, which otherwise work just fine with
+>       Q35)).
+
+>From an usptream POV this is always going to be the case. This is
+really only an undesirable thing for downstream who are trying to
+artificially restrict what QEMU features users have available to
+them.
+
+>   (5) Introduce  virtio-0.9, virtio-1.0 models in libvirt
+>       which are explicitly legacy-only and modern-only.
+>       QEMU doesn't need to change, as libvirt can simply set
+>       the right params on existing QEMU models to force the
+>       behavior.
+> 
+>       (NB: it's unclear to me whether virtio-0.9 simply won't
+>       work without forcing the device to be on a legacy PCI
+>       slot, or if that's just "a very bad idea" because it
+>       will mean that the device uses up extra io port space)
+
+> As a starter for continuing the discussion, it seems to me that for
+> option (5):
+> 
+> a) we don't really need the virtio-1.0 model, since that's what you
+> currently get anyway when you ask for "virtio" on Q35 (and on 440fx,
+> "virtio" gives you transitional, which works for everybody).
+
+At some point we might have a virtio-2.0 and find ourselves in a
+similar problem again. IMHO it is preferrable to have both explicit
+versioned models, and discourage use of the magical 'virtio' model from
+mgmt apps. Use libosinfo to identify which virtio model is supported
+for the OS in question and use that explicitly.  Only use the magical
+'virtio' model if there's no information about what version the OS
+supports.
+
+> b) Rather than a "legacy-only" model for virtio-0.9, it would be more
+> useful to have "transitional". This way the config would work for older
+> OSes that don't support virtio-1.0, and when/if the OS was upgraded such
+> that it supported virtio-1.0, that would be automatically used without
+> needing to change the config.
+
+I don't think the case of OS suddenly gaining support for 1.0 in an update
+is frequent enough to be worth worrying about.
+
+> c) Even if it's possible to force a device on an Express slot into
+> transitional mode, this is extremely wasteful of io port space, so
+> libvirt should consider virtio-0.9 devices to be legacy PCI, and thus
+> plug them into legacy PCI slots. And once we're doing this, it's
+> unnecessary to add any extra option to the qemu commandline to force
+> legacy support (i.e. transitional mode), as that is what QEMU already
+> does when the device is connected to a legacy PCI slot.
+
+Yes, it should plug them into legacy PCI slots by default, but if a
+mgmt app has done explicit placement itself, it should honour that
+even if it means wasting IO space.
+
+> So making the naive assumption that we agree on implementing option (5)
+> and there are no objections to my points a-c (Hah! As if!), how does
+> this sound as a plan:
+> 
+> 
+> A) libosinfo starts telling consumers that the preferred virtio device
+> model for the relevant OSes is "virtio-0.9", and leaves the
+> recommendation for other OSes as "virtio".
+
+Libosinfo already uses 'virtio' as the prefix identifying virtio-0.9
+support (the old PCI product IDs), and 'virtio-1.0' as the prefix for
+identifying virtio-1.0 support (the new PCI product IDs).  That these
+don't match libvirt model names doesn't matter.
+
+> B) libvirt adds a "virtio-0.9" model for all virtio devices that
+> actually have virtio-0.9 support (a couple of devices never existed
+> prior to virtio-1.0 (rng and ???) so virtio-0.9 would be nonsensical for
+> them).
+
+> 
+> C) inside libvirt, the implementation of the "virtio-0.9" model is
+> identical to "virtio", except that the VIR_PCI_CONNECT_TYPE flags for
+> these devices contain VIR_PCI_CONNECT_TYPE_PCI rather than
+> VIR_PCI_CONNECT_TYPE_PCIE, resulting in those devices being assigned to
+> a legacy PCI slot, and thus they would be transitional mode by default.
+
+
+For 'virtio-0.9' libvirt should set "disable-modern=yes" in QEMU args
+
+For 'virtio-1.0' libvirt should set "disable-legacy=yes" in QEMU args
 
 
 Regards,
