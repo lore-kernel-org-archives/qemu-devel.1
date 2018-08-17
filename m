@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fqZT3-0002CJ-Gp
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 03:46:46 -0400
+	(envelope-from <simon@ruderich.org>) id 1fqZWq-0006Z0-6h
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 03:50:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fqZT0-0005pf-AY
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 03:46:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46478 helo=mx1.redhat.com)
+	(envelope-from <simon@ruderich.org>) id 1fqZWl-0000MB-5x
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 03:50:40 -0400
+Received: from zucker2.schokokeks.org ([178.63.68.90]:56113)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fqZT0-0005oE-3B
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 03:46:42 -0400
-References: <20180807193125.30378-1-alex.williamson@redhat.com>
-	<20180807193125.30378-3-alex.williamson@redhat.com>
-	<20180816121501.3cf8781a@t450s.home>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5f9add58-ad08-513a-10bf-c63707f42d62@redhat.com>
-Date: Fri, 17 Aug 2018 09:46:28 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180816121501.3cf8781a@t450s.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] kvm: Use inhibit to prevent
- ballooning without synchronous mmu
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1fqZWk-0000C0-Vf
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 03:50:35 -0400
+Date: Fri, 17 Aug 2018 09:50:29 +0200
+From: Simon Ruderich <simon@ruderich.org>
+Message-ID: <20180817075029.GA14678@ruderich.org>
+References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
+	<cover.1534409363.git.simon@ruderich.org>
+	<82b093e763e784aea8f8a4e589318b25146a3a24.1534409363.git.simon@ruderich.org>
+	<abbc398b-0ded-5531-aba5-bd95200c937c@redhat.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="=_zucker.schokokeks.org-12280-1534492229-0001-2"
+Content-Disposition: inline
+In-Reply-To: <abbc398b-0ded-5531-aba5-bd95200c937c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 6/7] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: peterx@redhat.com, Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org, david@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, David Alan Gilbert <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>
 
-On 16/08/2018 20:15, Alex Williamson wrote:
-> On Tue,  7 Aug 2018 13:31:23 -0600
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
->> Remove KVM specific tests in balloon_page(), instead marking
->> ballooning as inhibited without KVM_CAP_SYNC_MMU support.
->>
->> Reviewed-by: David Hildenbrand <david@redhat.com>
->> Reviewed-by: Peter Xu <peterx@redhat.com>
->> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
->> ---
->>  accel/kvm/kvm-all.c        | 4 ++++
->>  hw/virtio/virtio-balloon.c | 4 +---
->>  2 files changed, 5 insertions(+), 3 deletions(-)
-> 
-> Paolo and Michael, can I get an ack for this one?  Otherwise I can drop
-> it from the series and let this continue to be a special case.  Thanks,
-> 
-> Alex
->  
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> index eb7db92a5e3b..38f468d8e2b1 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -39,6 +39,7 @@
->>  #include "trace.h"
->>  #include "hw/irq.h"
->>  #include "sysemu/sev.h"
->> +#include "sysemu/balloon.h"
->>  
->>  #include "hw/boards.h"
->>  
->> @@ -1698,6 +1699,9 @@ static int kvm_init(MachineState *ms)
->>      s->many_ioeventfds = kvm_check_many_ioeventfds();
->>  
->>      s->sync_mmu = !!kvm_vm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
->> +    if (!s->sync_mmu) {
->> +        qemu_balloon_inhibit(true);
+This is a MIME-formatted message.  If you see this text it means that your
+E-mail software does not support MIME-formatted messages.
+
+--=_zucker.schokokeks.org-12280-1534492229-0001-2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Aug 16, 2018 at 03:01:31PM -0500, Eric Blake wrote:
 >> +    }
->>  
->>      return 0;
->>  
->> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
->> index 1f7a87f09429..b5425080c5fb 100644
->> --- a/hw/virtio/virtio-balloon.c
->> +++ b/hw/virtio/virtio-balloon.c
->> @@ -21,7 +21,6 @@
->>  #include "hw/mem/pc-dimm.h"
->>  #include "sysemu/balloon.h"
->>  #include "hw/virtio/virtio-balloon.h"
->> -#include "sysemu/kvm.h"
->>  #include "exec/address-spaces.h"
->>  #include "qapi/error.h"
->>  #include "qapi/qapi-events-misc.h"
->> @@ -36,8 +35,7 @@
->>  
->>  static void balloon_page(void *addr, int deflate)
->>  {
->> -    if (!qemu_balloon_is_inhibited() && (!kvm_enabled() ||
->> -                                         kvm_has_sync_mmu())) {
->> +    if (!qemu_balloon_is_inhibited()) {
->>          qemu_madvise(addr, BALLOON_PAGE_SIZE,
->>                  deflate ? QEMU_MADV_WILLNEED : QEMU_MADV_DONTNEED);
->>      }
-> 
+>> +    if (!has_size) {
+>> +        struct stat s;
+>> +        if (fstat(fd, &s)) {
+>> +            error_setg_errno(errp, errno, "could not fstat fd to get si=
+ze");
+>> +            goto exit;
+>> +        }
+>> +        size =3D s.st_size;
+>> +    }
+>
+> This works for regular files, but not for block devices.
+>
+> Do we have a helper function for easily determining the size of an arbitr=
+ary
+> fd (whether file or block device)?  If not, should we?  As there are
+> multiple spots in the code that grab this sort of information.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+I found raw_getlength() in block/file-posix.c, but its static and
+it takes a BlockDriverState* as argument. For most systems it
+could be extracted without too much trouble, but some (e.g
+__sun__ and BSD) are quite entangled with BlockDriverState code.
 
-Thanks,
+> Otherwise looks okay to me.
 
-Paolo
+Should I check for S_ISCHR() and S_ISBLK() and abort with an
+error? I don't think it's a common use case for pmemload anyway.
+
+Regards
+Simon
+--=20
++ privacy is necessary
++ using gnupg http://gnupg.org
++ public key id: 0x92FEFDB7E44C32F9
+
+--=_zucker.schokokeks.org-12280-1534492229-0001-2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEO7rfWMMObpFkF3n0kv79t+RMMvkFAlt2fjsACgkQkv79t+RM
+MvlJug/+K+wsVdV9QWLTbIcIG+4IjCo8YBG29ji6IqFcjhk6SPfszy4H/uwNTbA2
+3nZ+rj+BN08FoisbTqdei+L/A5Y4rP/92q0R+r+T5F13o8qsy9v6bgIsaWKO+MOn
+kjs0fvm1iSX1uCj/wcWG/uwHbxK/6Ea46jGw2/hVC5t1rj5dF2yIfD7ZkDBC08OS
+h8Gcbk2/LdjTk8rBjELsw8W5DxDet1FXP3ifpdv/U2lr3nDAlPmQXjB+grTRiA5r
+rn2jz8JJS4utA06CTgaJGlizSTNciWlWfHy64j2OyvcXnAAyuHfQRI7nXKFaEhyE
+lAq64opWSOxdiH5Ldd6QFwQufyyEd/r6Vm+S/GRWtkbtaAEXTEcfE2wz+C1t9fxi
+OxrvjK/DHaGNfNWeKDg3OIEYQsfd/NupHe4H68tvTPT0+HVYy5hFSDYkYofqUoCJ
+QPXzaMj3TTfixUDm78MtleCGgZcGTgrzkXG7nny8lZBDbspjYd/egRO1GGxwOq7D
+Q2U2dovjOseWsPylqOGhe9WQY6lsrnRwVBE5PJW46lLp2ekdrkXTP+BGNKm/m1r0
+okgkEJkPPat9q4Vy9il/I+vOck+ICcdqUVWkkBtUORZPoDe6JApGPxz3rSjU++U3
+FfpPYa4NBnveuztltavS2duYZunfhme1qTQsgSOTQ/k3eq4ljpc=
+=4Ukd
+-----END PGP SIGNATURE-----
+
+--=_zucker.schokokeks.org-12280-1534492229-0001-2--
