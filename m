@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fqhO0-0008WA-1e
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:14:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fqhO3-0008LV-Jt
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fqh9n-0005ms-UY
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:59:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60258 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fqh9n-0005mj-QF
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:59:23 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 610AF401EF07
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 15:59:23 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 17 Aug 2018 17:59:09 +0200
-Message-Id: <20180817155910.5722-1-marcandre.lureau@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fqh8h-0004aV-WF
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:58:16 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34115)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fqh8h-0004aC-PS
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:58:15 -0400
+Received: by mail-oi0-x242.google.com with SMTP id 13-v6so14802268ois.1
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 08:58:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/2] update-linux-headers.sh: add qemu_fw_cfg.h
+In-Reply-To: <20180809042206.15726-5-richard.henderson@linaro.org>
+References: <20180809042206.15726-1-richard.henderson@linaro.org>
+	<20180809042206.15726-5-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Aug 2018 16:57:54 +0100
+Message-ID: <CAFEAcA9V27aT81_eK21F0TtagN8mvsoPCPubtnTWPjZ8d+pYdw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 04/20] target/arm: Adjust sve_exception_el
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Desnogues <laurent.desnogues@gmail.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-The fw_cfg header was added during 4.17 cycle.
+On 9 August 2018 at 05:21, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Check for EL3 before testing CPTR_EL3.EZ.  Return 0 when the exception
+> should be routed via AdvSIMDFPAccessTrap.  Mirror the structure of
+> CheckSVEEnabled more closely.
+>
+> Fixes: 5be5e8eda78
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.c | 96 ++++++++++++++++++++++-----------------------
+>  1 file changed, 46 insertions(+), 50 deletions(-)
+>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- scripts/update-linux-headers.sh | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-heade=
-rs.sh
-index feb75390aa..0a964fe240 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -165,7 +165,9 @@ EOF
-=20
- rm -rf "$output/include/standard-headers/linux"
- mkdir -p "$output/include/standard-headers/linux"
--for i in "$tmpdir"/include/linux/*virtio*.h "$tmpdir/include/linux/input=
-.h" \
-+for i in "$tmpdir"/include/linux/*virtio*.h \
-+         "$tmpdir/include/linux/qemu_fw_cfg.h" \
-+         "$tmpdir/include/linux/input.h" \
-          "$tmpdir/include/linux/input-event-codes.h" \
-          "$tmpdir/include/linux/pci_regs.h" \
-          "$tmpdir/include/linux/ethtool.h" "$tmpdir/include/linux/kernel=
-.h" \
---=20
-2.18.0.547.g1d89318c48
+thanks
+-- PMM
