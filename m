@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqf3m-0004zA-8X
-	for Qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:45:03 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fqf6O-0006c3-Tm
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:47:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqf3j-00027a-1b
-	for Qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:45:02 -0400
-References: <20180730212249.16418-1-programmingkidx@gmail.com>
-	<5679ec6f-e2d7-e139-1b56-304540c89977@redhat.com>
-	<f6fcbd58-2462-d432-a038-cc13bb0dcf23@redhat.com>
-	<20180814084047.GD5025@dhcp-200-186.str.redhat.com>
-	<D08F395C-E55A-4FF1-9844-02B606FDDF8E@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c1f8aba9-4a63-4dfa-cf0b-9521c869c9ff@redhat.com>
-Date: Fri, 17 Aug 2018 08:44:56 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1fqf6O-0003g4-4y
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:47:44 -0400
+Date: Fri, 17 Aug 2018 10:47:27 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180817134727.GC15372@localhost.localdomain>
+References: <1534440027-10528-1-git-send-email-vsementsov@virtuozzo.com>
+	<1534440027-10528-4-git-send-email-vsementsov@virtuozzo.com>
+	<20180817015429.GW15372@localhost.localdomain>
+	<deec540b-aaf7-4f8d-5c9f-0684fb2b9b34@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <D08F395C-E55A-4FF1-9844-02B606FDDF8E@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-img.c: increase spacing between
- commands in documentation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <deec540b-aaf7-4f8d-5c9f-0684fb2b9b34@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] scripts/qemu: add render_block_graph
+ method for QEMUMachine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, Qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, crosa@redhat.com, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On 08/16/2018 08:27 PM, Programmingkid wrote:
-
-> I am by no means an expert at qemu-img. But I did try my best to create what I think should be the new output for qemu-img <command> --help. This is just the text I plan on using in a future patch. It is easier to read right now than it will be in patch form, so please let me know if there are any errors in this documentation. Thank you.
+On Fri, Aug 17, 2018 at 01:08:42PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> 17.08.2018 04:54, Eduardo Habkost wrote:
+> > On Thu, Aug 16, 2018 at 08:20:26PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> > > Render block nodes graph with help of graphviz
+> > > 
+> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > Thanks for your patch.  Comments below:
+> > 
+> > > ---
+> > >   scripts/qemu.py | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > >   1 file changed, 53 insertions(+)
+> > > 
+> > > diff --git a/scripts/qemu.py b/scripts/qemu.py
+> > > index f099ce7278..cff562c713 100644
+> > > --- a/scripts/qemu.py
+> > > +++ b/scripts/qemu.py
+> > > @@ -460,3 +460,56 @@ class QEMUMachine(object):
+> > >                                                    socket.SOCK_STREAM)
+> > >               self._console_socket.connect(self._console_address)
+> > >           return self._console_socket
+> > > +
+> > > +    def render_block_graph(self, filename):
+> > > +        '''
+> > > +        Render graph in text (dot) representation into "filename" and graphical
+> > > +        representation into pdf file "filename".pdf
+> > > +        '''
+> > > +
+> > > +        try:
+> > > +            from graphviz import Digraph
+> > I'm not convinced that this belongs to qemu.py, if most code
+> > using the qemu.py module will never use it.  Do you see any
+> > problem in moving this code to a scripts/render_block_graph.py
+> > script?
 > 
-> 
-> <amend>
-> 
+> Not a problem, I can do it.. Just one thought:
+> Isn't it better to keep all function doing something with one vm as methods,
+> not separate functions?
 
-Just reviewing the first for now, to give you a feel for what to consider.
+I don't think so.  We don't need to create a new QEMUMachine
+method every time we write a function that takes a QEMUMachine as
+argument in our scripts.
 
-> usage: qemu-img amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt]
-> [-t cache] -o options filename
-> 
-> Command parameters:
->   -f             'fmt' is the disk image format. It is guessed automatically
->                  in most cases.
+There are cases when we're forced to create a method: when the
+new code is tightly coupled to the QEMUMachine code and need
+access to its private attributes.
 
-Bad advice. We WANT users to use -f (if you don't, and the automatic 
-guessing sees something that is not raw, but your image SHOULD have been 
--f raw, then you have a security hole: the guest can write anything into 
-a raw image to make the host access files it shouldn't based on 
-interpreting the raw file as something else).  I'd drop the last 
-sentence, and use just the first.
+There are cases where we probably want to place the code in
+qemu.py (as a method): when we expect many users of qemu.py to
+call it.
 
-> 
-> --image-opts    Treat filename as a set of image options, instead of a plain
->                  filename.
-> 
->   -o             Used with a comma separated list of format specific options in a
->                  name=value format. Use "-o ?" for an overview of the options
+But in other cases, I don't see any problem with another
+script/module having a regular function like:
 
-Please spell that "-o help", not "-o ?".   Otherwise, the user has to 
-quote the ? to avoid it globbing into any single-byte file lying around 
-in the current directory.
+  def my_special_purpose_function(vm, ...):
+     ...
 
->                  supported by the used format
-> 
-> --object        'objectdef' is a QEMU user creatable object definition. See the
->                  qemu(1) manual page for a description of the object properties.
->                  The most common object type is a 'secret', which is used to
->                  supply passwords and/or encryption keys.
-> 
->   -p             Display progress bar. If the -p option is not used for a command
->                  that supports it, the progress is reported when the process
->                  receives a "SIGUSR1" signal.
-> 
->   -q             Quiet mode - do not print any output (except errors). There's no
->                  progress bar in case both -q and -p options are used.
-
-Not your fault, but I don't like it when interfaces take mutually 
-exclusive operations but the last one does not win.  Either '-p -q' 
-should behave like '-q', and '-q -p' behave like '-p' (because we accept 
-the mutual exclusion but last one wins), or both forms should error 
-(because they are incompatible).  But having both forms silently behave 
-like '-q' is evil.  So, as long as you're willing to patch up 
-interfaces, that's a project to consider.
-
-> 
->   -t             Specifies the cache mode that should be used with the
->                  destination file.
-
-And what are those modes?  If you're going to be wordy, then give the 
-user enough information to be useful.  Otherwise, being terse in --help 
-is fine (and let the man page be wordy instead).
-> 
-> Example:
->      qemu-img amend -o compat=0.10 -f qcow2 image.qcow2
-
-Where's an example with --image-opts and --object secret?
-
-We're trying to move away from compat=0.10 (also spelled compat=v2), and 
-instead start encouraging compat=v3.
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eduardo
