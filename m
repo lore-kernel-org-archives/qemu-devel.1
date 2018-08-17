@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fqdtc-0003EV-0p
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 08:30:33 -0400
+	(envelope-from <psusi@ubuntu.com>) id 1fqe7S-000420-4f
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 08:44:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fqdtQ-0003e7-Lp
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 08:30:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51206 helo=mx1.redhat.com)
+	(envelope-from <psusi@ubuntu.com>) id 1fqe7O-0001lc-Od
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 08:44:46 -0400
+Received: from ec2-34-202-238-73.compute-1.amazonaws.com
+	([34.202.238.73]:47142 helo=vps.thesusis.net)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fqdtQ-0003de-G3
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 08:30:16 -0400
-References: <20180817114619.22354-1-peter.maydell@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <74dcadc5-f4c8-3cab-dfe7-0799a124b881@redhat.com>
-Date: Fri, 17 Aug 2018 14:30:11 +0200
+	(Exim 4.71) (envelope-from <psusi@ubuntu.com>) id 1fqe7O-0001jv-FZ
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 08:44:42 -0400
+References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
+	<20180816172722.GK23515@redhat.com>
+	<83320617-5d60-fe71-3ef5-8ac7c384a3b1@ubuntu.com>
+	<20180817085656.GA11124@redhat.com>
+From: Phillip Susi <psusi@ubuntu.com>
+Message-ID: <a115c4d1-0a78-efa1-0364-f41a06aca124@ubuntu.com>
+Date: Fri, 17 Aug 2018 08:44:36 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180817114619.22354-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] Drop obsolete memory system
- request_ptr API
+In-Reply-To: <20180817085656.GA11124@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ul410uJvmfhv2uKirai9veK7spWCzLNs2"
+Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 17/08/2018 13:46, Peter Maydell wrote:
-> Now that support has hit master for direct execution from
-> arbitrary MMIO regions, we can remove the MMIO request_ptr
-> API, which required special case support in each device that
-> wanted to handle it, and also had bad race conditions that
-> resulted in crashes if you tried to use it heavily.
-> 
-> This API was only ever used in one device in the source
-> tree, the Xilinx SPIPS. These three patches remove the
-> now-unneeded code from the Xilinx device and then the
-> core memory subsystem code.
-> 
-> thanks
-> -- PMM
-> 
-> Peter Maydell (3):
->   hw/ssi/xilinx_spips: Remove unneeded MMIO request_ptr code
->   memory: Remove MMIO request_ptr APIs
->   hw/misc: Remove mmio_interface device
-> 
->  hw/misc/Makefile.objs            |   1 -
->  include/exec/memory.h            |  35 --------
->  include/hw/misc/mmio_interface.h |  49 -----------
->  hw/misc/mmio_interface.c         | 135 -------------------------------
->  hw/ssi/xilinx_spips.c            |  46 -----------
->  memory.c                         | 110 -------------------------
->  6 files changed, 376 deletions(-)
->  delete mode 100644 include/hw/misc/mmio_interface.h
->  delete mode 100644 hw/misc/mmio_interface.c
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ul410uJvmfhv2uKirai9veK7spWCzLNs2
+From: Phillip Susi <psusi@ubuntu.com>
+To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <a115c4d1-0a78-efa1-0364-f41a06aca124@ubuntu.com>
+Subject: Re: Pipe key broken on US keyboards
+References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
+ <20180816172722.GK23515@redhat.com>
+ <83320617-5d60-fe71-3ef5-8ac7c384a3b1@ubuntu.com>
+ <20180817085656.GA11124@redhat.com>
+In-Reply-To: <20180817085656.GA11124@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The diffstat speaks for itself, go ahead and include it via the ARM tree.
+On 8/17/2018 4:56 AM, Daniel P. Berrang=C3=A9 wrote:
+> Oh one other thing, is whether your QEMU process has an explicit keymap=
 
-Thanks,
+> configured (this is the -k arg to QEMU), as when that it set, it
+> completely changes the way keyboard input is handled in VNC. That code
+> has also been massively refactored recently.
 
-Paolo
+I'm not using that argument.  I just checked the man page and it says it
+defaults to en-us, which should be correct.
+
+
+
+--ul410uJvmfhv2uKirai9veK7spWCzLNs2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJbdsM4AAoJENsuw7lhAP6EAUEH/2lnx4bx8o6loN+9xFMmNtUV
+/Qxc7mzXZlM8agWQpKwFL7Q/23fgWnM3YlX6QdYMCtwv5euC7X4OnX9uccq89xEn
+PVEX/PZS5uyYZOn1EScjxka5VCT8SB1M+7n5XZwcTR5MdIMP34RWVKsV5wvp1HT/
+kI375uCf7CdKmGGxM3OyPsYWHQmQNC8ax/YzggxaFKcvdpy6Ucl4sojZWbuh2uUY
+UA2+jeZP92rOFCnfazYN6x8mstaak6JOdKkSukIjy9dkZYXxk978sRwigm5ORnBn
+yPQvFQIf0gmKOHTFIiQPefZrPakDQO3JYzHIdXfHYb1up/sAh6dd59FUhhp3K8c=
+=Xpw7
+-----END PGP SIGNATURE-----
+
+--ul410uJvmfhv2uKirai9veK7spWCzLNs2--
