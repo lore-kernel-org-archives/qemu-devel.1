@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqirJ-0007DR-Ra
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:48:26 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fqisp-00008T-8P
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:50:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqirE-0003Be-Qk
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:48:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34420)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fqirE-0003BF-KX
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:48:20 -0400
-Date: Fri, 17 Aug 2018 14:48:14 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180817174814.GI15372@localhost.localdomain>
-References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
-	<1533909989-56115-2-git-send-email-robert.hu@linux.intel.com>
-	<f859ae02-015a-5ef8-66b4-f54a630d1f5f@redhat.com>
-	<20180817155524.GF15372@localhost.localdomain>
-	<d0df647b-ed1c-e497-10a7-f64a048b9f19@redhat.com>
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fqisk-0004Fp-62
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:49:59 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40102)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fqisj-0004FQ-UV
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:49:54 -0400
+Received: by mail-wm0-x244.google.com with SMTP id y9-v6so8114811wma.5
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 10:49:53 -0700 (PDT)
+References: <1533796458-22306-1-git-send-email-whois.zihan.yang@gmail.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <af1df9c5-852e-82ab-a1bb-854a4ce6a24e@gmail.com>
+Date: Fri, 17 Aug 2018 20:49:49 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d0df647b-ed1c-e497-10a7-f64a048b9f19@redhat.com>
-Subject: [Qemu-devel] X86CPU "feature-words" property on QEMU (was Re:
- [PATCH v3 1/3] x86: Data structure changes to support MSR based) features
+In-Reply-To: <1533796458-22306-1-git-send-email-whois.zihan.yang@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [RFC v4 3/6] i386/acpi-build: describe new pci
+ domain in AML
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +31,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Robert Hoo <robert.hu@linux.intel.com>, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org, robert.hu@intel.com, jingqi.liu@intel.com, Jiri Denemark <jdenemar@redhat.com>, libvir-list@redhat.com
+To: Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Fri, Aug 17, 2018 at 07:34:13PM +0200, Paolo Bonzini wrote:
-> On 17/08/2018 17:55, Eduardo Habkost wrote:
-> >> The names will be X86_CPU_FEATURE_WORD_TYPE_CPUID and
-> >> X86_CPU_FEATURE_WORD_TYPE_MSR.
-> > I wouldn't like to make this an external API unless really
-> > necessary.  I would rather deprecate the "feature-words" property
-> > because nobody ended up using it.
-> 
-> I think we should either remove it directly, or extend it to support MSR
-> features.  Deprecating and only supporting CPUID features is the worst
-> of both worlds...
 
-So let's do what's necessary to remove it.  But I don't think the
-removal of "feature-words" should block the inclusion of this
-series.
 
-Now, should QOM properties follow our feature deprecation policy,
-or they were never a supported external API and we can remove it
-immediately?
+On 08/09/2018 09:34 AM, Zihan Yang wrote:
+> Describe new pci segments of host bridges in AML as new pci devices,
+> with _SEG and _BBN to let them be in DSDT.
+>
+> Besides, bus_nr indicates the bus number of pxb-pcie under pcie.0 bus,
+> but since we put it into separate domain, it should be zero,
 
-CCing Jiri and libvir-list, because I just found that there's
-code on libvirt that uses it, but I don't know exactly it does
-with that info.
+Why should it be 0? Isn't possible we start another domain from bus_nr> 0?
 
--- 
-Eduardo
+>   which is
+> equal to BBN.
+>
+> Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
+> ---
+>   hw/i386/acpi-build.c                | 63 ++++++++++++++++++++-----------------
+>   hw/pci-bridge/pci_expander_bridge.c |  8 +++++
+>   hw/pci/pci.c                        |  5 +++
+>   include/hw/pci/pci.h                |  1 +
+>   include/hw/pci/pci_bus.h            |  1 +
+>   5 files changed, 50 insertions(+), 28 deletions(-)
+>
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index c0fc2b4..a7d9af2 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -828,7 +828,7 @@ static Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set)
+>       Aml *crs = aml_resource_template();
+>       CrsRangeSet temp_range_set;
+>       CrsRangeEntry *entry;
+> -    uint8_t max_bus = pci_bus_num(host->bus);
+> +    uint8_t max_bus = 0, host_bus = 0;
+>       uint8_t type;
+>       int devfn;
+>       int i;
+> @@ -967,10 +967,10 @@ static Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set)
+>       aml_append(crs,
+>           aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
+>                               0,
+> -                            pci_bus_num(host->bus),
+> +                            host_bus,
+>                               max_bus,
+>                               0,
+> -                            max_bus - pci_bus_num(host->bus) + 1));
+> +                            max_bus - host_bus + 1));
+
+I don't understand the above, can you please explain?
+
+
+>   
+>       return crs;
+>   }
+> @@ -1832,6 +1832,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>           aml_append(dev, aml_name_decl("_UID", aml_int(1)));
+>           aml_append(dev, build_q35_osc_method());
+>           aml_append(sb_scope, dev);
+> +
+
+No need for this line
+
+
+Thanks,
+Marcel
+
+>           aml_append(dsdt, sb_scope);
+>   
+>           build_hpet_aml(dsdt);
+> @@ -1875,10 +1876,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>   
+>       crs_range_set_init(&crs_range_set);
+>       bus = PC_MACHINE(machine)->bus;
+> +    i = 1; // PCI0 is q35 host, pxb starts from 1
+>       if (bus) {
+>           QLIST_FOREACH(bus, &bus->child, sibling) {
+>               uint8_t bus_num = pci_bus_num(bus);
+>               uint8_t numa_node = pci_bus_numa_node(bus);
+> +            int domain_nr = pci_domain_num(bus);
+>   
+>               /* look only for expander root buses */
+>               if (!pci_bus_is_root(bus)) {
+> @@ -1890,10 +1893,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>               }
+>   
+>               scope = aml_scope("\\_SB");
+> -            dev = aml_device("PC%.02X", bus_num);
+> +            dev = aml_device("PCI%d", i++);
+>               aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
+>               aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
+> -            aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
+> +            aml_append(dev, aml_name_decl("_ADR", aml_int(bus_num)));
+> +            aml_append(dev, aml_name_decl("_SEG", aml_int(domain_nr)));
+> +            aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
+>               if (pci_bus_is_express(bus)) {
+>                   aml_append(dev, build_q35_osc_method());
+>               }
+> @@ -2126,35 +2131,37 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>       {
+>           Object *pci_host;
+>           PCIBus *bus = NULL;
+> +        int index = 0;
+>   
+>           pci_host = acpi_get_i386_pci_host();
+> -        if (pci_host) {
+> +        while (pci_host) {
+>               bus = PCI_HOST_BRIDGE(pci_host)->bus;
+> -        }
+> +            if (bus) {
+> +                Aml *scope = aml_scope("PCI%d", index);
+> +                /* Scan all PCI buses. Generate tables to support hotplug. */
+> +                build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
+>   
+> -        if (bus) {
+> -            Aml *scope = aml_scope("PCI0");
+> -            /* Scan all PCI buses. Generate tables to support hotplug. */
+> -            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
+> +                /* Only add TPM once */
+> +                if (index++ == 0 && TPM_IS_TIS(tpm_find())) {
+> +                    dev = aml_device("ISA.TPM");
+> +                    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
+> +                    aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
+> +                    crs = aml_resource_template();
+> +                    aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
+> +                               TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
+> +                    /*
+> +                        FIXME: TPM_TIS_IRQ=5 conflicts with PNP0C0F irqs,
+> +                        Rewrite to take IRQ from TPM device model and
+> +                        fix default IRQ value there to use some unused IRQ
+> +                     */
+> +                    /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
+> +                    aml_append(dev, aml_name_decl("_CRS", crs));
+> +                    aml_append(scope, dev);
+> +                }
+>   
+> -            if (TPM_IS_TIS(tpm_find())) {
+> -                dev = aml_device("ISA.TPM");
+> -                aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
+> -                aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
+> -                crs = aml_resource_template();
+> -                aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
+> -                           TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
+> -                /*
+> -                    FIXME: TPM_TIS_IRQ=5 conflicts with PNP0C0F irqs,
+> -                    Rewrite to take IRQ from TPM device model and
+> -                    fix default IRQ value there to use some unused IRQ
+> -                 */
+> -                /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
+> -                aml_append(dev, aml_name_decl("_CRS", crs));
+> -                aml_append(scope, dev);
+> +                aml_append(sb_scope, scope);
+>               }
+> -
+> -            aml_append(sb_scope, scope);
+> +            pci_host = OBJECT(QTAILQ_NEXT(PCI_HOST_BRIDGE(pci_host), next));
+>           }
+>       }
+>   
+> diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
+> index f50938f..d28a64c 100644
+> --- a/hw/pci-bridge/pci_expander_bridge.c
+> +++ b/hw/pci-bridge/pci_expander_bridge.c
+> @@ -87,6 +87,13 @@ static int pxb_bus_num(PCIBus *bus)
+>       return pxb->bus_nr;
+>   }
+>   
+> +static int pxb_domain_num(PCIBus *bus)
+> +{
+> +    PXBDev *pxb = convert_to_pxb(bus->parent_dev);
+> +
+> +    return pxb->domain_nr;
+> +}
+> +
+>   static bool pxb_is_root(PCIBus *bus)
+>   {
+>       return true; /* by definition */
+> @@ -104,6 +111,7 @@ static void pxb_bus_class_init(ObjectClass *class, void *data)
+>       PCIBusClass *pbc = PCI_BUS_CLASS(class);
+>   
+>       pbc->bus_num = pxb_bus_num;
+> +    pbc->domain_num = pxb_domain_num;
+>       pbc->is_root = pxb_is_root;
+>       pbc->numa_node = pxb_bus_numa_node;
+>   }
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index ddc27ba..e72887f 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -445,6 +445,11 @@ int pci_bus_num(PCIBus *s)
+>       return PCI_BUS_GET_CLASS(s)->bus_num(s);
+>   }
+>   
+> +int pci_domain_num(PCIBus *s)
+> +{
+> +    return PCI_BUS_GET_CLASS(s)->domain_num(s);
+> +}
+> +
+>   int pci_bus_numa_node(PCIBus *bus)
+>   {
+>       return PCI_BUS_GET_CLASS(bus)->numa_node(bus);
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index 990d6fc..de514d3 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -436,6 +436,7 @@ static inline PCIBus *pci_get_bus(const PCIDevice *dev)
+>       return PCI_BUS(qdev_get_parent_bus(DEVICE(dev)));
+>   }
+>   int pci_bus_num(PCIBus *s);
+> +int pci_domain_num(PCIBus *s);
+>   static inline int pci_dev_bus_num(const PCIDevice *dev)
+>   {
+>       return pci_bus_num(pci_get_bus(dev));
+> diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
+> index b7da8f5..415da90 100644
+> --- a/include/hw/pci/pci_bus.h
+> +++ b/include/hw/pci/pci_bus.h
+> @@ -15,6 +15,7 @@ typedef struct PCIBusClass {
+>   
+>       bool (*is_root)(PCIBus *bus);
+>       int (*bus_num)(PCIBus *bus);
+> +    int (*domain_num)(PCIBus *bus);
+>       uint16_t (*numa_node)(PCIBus *bus);
+>   } PCIBusClass;
+>   
