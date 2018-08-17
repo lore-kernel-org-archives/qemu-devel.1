@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqnrR-0007IR-KU
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:08:54 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fqoP1-0004q3-Jd
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:43:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqnrM-00005u-Gv
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:08:53 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:38558)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqnrM-00005L-4C
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:08:48 -0400
-Received: by mail-vk0-x242.google.com with SMTP id k82-v6so3957530vkd.5
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 16:08:47 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1534435831.git.alistair.francis@wdc.com>
-	<170c5841b13e1854f276592dfe4296b942edb15e.1534435831.git.alistair.francis@wdc.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <77344daf-098f-ca8d-ee44-b0b5ed96c6b3@amsat.org>
-Date: Fri, 17 Aug 2018 20:08:42 -0300
+	(envelope-from <no-reply@patchew.org>) id 1fqoGF-00062U-A5
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:34:34 -0400
+Resent-Message-Id: <E1fqoGF-00062U-A5@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21093)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fqoGF-0005xF-17
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:34:31 -0400
+In-Reply-To: <20180817013400.13353-1-ehabkost@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153454883519.25705.3377304370687056631@502c9da6d61e>
 MIME-Version: 1.0
-In-Reply-To: <170c5841b13e1854f276592dfe4296b942edb15e.1534435831.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] hw/riscv/virtio: Set the soc device
- tree node as a simple-bus
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 17 Aug 2018 16:33:56 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/8] x86 queue, 2018-08-16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org, mjc@sifive.com
-Cc: alistair23@gmail.com
+To: ehabkost@redhat.com
+Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, rth@twiddle.net
 
-Hi Alistair,
-
-On 08/16/2018 01:11 PM, Alistair Francis wrote:
-> To allow Linux to ennumerate devices on the /soc/ node set it as a
-
-enumerate
-
-> "simple-bus".
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  hw/riscv/virt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 248bbdffd3..e8ba4d192d 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -121,7 +121,7 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->  
->      qemu_fdt_add_subnode(fdt, "/soc");
->      qemu_fdt_setprop(fdt, "/soc", "ranges", NULL, 0);
-> -    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "riscv-virtio-soc");
-> +    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "simple-bus");
-
-For consistency can you do the same patch for the Spike board?
-
->      qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
->      qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
->  
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODE3MDEzNDAwLjEzMzUzLTEtZWhhYmtvc3RAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC84XSB4ODYgcXVldWUsIDIwMTgtMDgtMTYKCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
+aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRz
+PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
+bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
+IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
+bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
+aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
+bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
+NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTI0
+OTRkOWY5MyBpMzg2OiBEaXNhYmxlIFRPUE9FWFQgYnkgZGVmYXVsdCBvbiAiLWNwdSBob3N0Igpi
+M2ZhODMyY2IwIHRhcmdldC1pMzg2OiBhZGRzIFBWX1NFTkRfSVBJIENQVUlEIGZlYXR1cmUgYml0
+CjljNGE4NjExOTMgaTM4NjogQWRkIG5ldyBDUFUgbW9kZWwgSWNlbGFrZS17U2VydmVyLCBDbGll
+bnR9CjVjMGEzZWU1NGMgaTM4NjogQWRkIENQVUlEIGJpdCBmb3IgV0JOT0lOVkQKODJhMWVkZjI1
+YiBpMzg2OiBBZGQgQ1BVSUQgYml0IGZvciBQQ09ORklHCmQ3OGYyZTA4MzQgaTM4NjogQWRkIENQ
+VUlEIGJpdCBhbmQgZmVhdHVyZSB3b3JkcyBmb3IgSUEzMl9BUkNIX0NBUEFCSUxJVElFUyBNU1IK
+ZWI0YWU0YzM3YSBpMzg2OiBBZGQgbmV3IE1TUiBpbmRpY2VzIGZvciBJQTMyX1BSRURfQ01EIGFu
+ZCBJQTMyX0FSQ0hfQ0FQQUJJTElUSUVTCjhhY2Q1ZDc3M2EgZG9jczogYWRkIGd1aWRhbmNlIG9u
+IGNvbmZpZ3VyaW5nIENQVSBtb2RlbHMgZm9yIHg4NgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hl
+Y2tpbmcgUEFUQ0ggMS84OiBkb2NzOiBhZGQgZ3VpZGFuY2Ugb24gY29uZmlndXJpbmcgQ1BVIG1v
+ZGVscyBmb3IgeDg2Li4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzgyOiAKbmV3IGZpbGUgbW9kZSAxMDA2
+NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTQ2IGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi84OiBpMzg2
+OiBBZGQgbmV3IE1TUiBpbmRpY2VzIGZvciBJQTMyX1BSRURfQ01EIGFuZCBJQTMyX0FSQ0hfQ0FQ
+QUJJTElUSUVTLi4uCkNoZWNraW5nIFBBVENIIDMvODogaTM4NjogQWRkIENQVUlEIGJpdCBhbmQg
+ZmVhdHVyZSB3b3JkcyBmb3IgSUEzMl9BUkNIX0NBUEFCSUxJVElFUyBNU1IuLi4KQ2hlY2tpbmcg
+UEFUQ0ggNC84OiBpMzg2OiBBZGQgQ1BVSUQgYml0IGZvciBQQ09ORklHLi4uCkNoZWNraW5nIFBB
+VENIIDUvODogaTM4NjogQWRkIENQVUlEIGJpdCBmb3IgV0JOT0lOVkQuLi4KRVJST1I6IGxpbmUg
+b3ZlciA5MCBjaGFyYWN0ZXJzCiMzNjogRklMRTogdGFyZ2V0L2kzODYvY3B1Lmg6Njk4OgorICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBkbyBub3QgaW52YWxpZGF0ZSBjYWNoZSAqLwoKdG90YWw6IDEgZXJy
+b3JzLCAwIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA2Lzg6IGkzODY6IEFkZCBuZXcgQ1BVIG1v
+ZGVsIEljZWxha2Ute1NlcnZlciwgQ2xpZW50fS4uLgpDaGVja2luZyBQQVRDSCA3Lzg6IHRhcmdl
+dC1pMzg2OiBhZGRzIFBWX1NFTkRfSVBJIENQVUlEIGZlYXR1cmUgYml0Li4uCkNoZWNraW5nIFBB
+VENIIDgvODogaTM4NjogRGlzYWJsZSBUT1BPRVhUIGJ5IGRlZmF1bHQgb24gIi1jcHUgaG9zdCIu
+Li4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
