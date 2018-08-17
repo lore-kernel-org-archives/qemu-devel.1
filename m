@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fqXA8-0000dB-On
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:06 -0400
+	(envelope-from <cota@braap.org>) id 1fqXA8-0000dE-SA
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fqXA5-0005Z1-FM
+	(envelope-from <cota@braap.org>) id 1fqXA7-0005bZ-IQ
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:04 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:59001)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:52175)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fqXA3-0005Vo-Dt
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:18:59 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fqXA6-0005Yx-KV
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:03 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri, 17 Aug 2018 01:18:49 -0400
-Message-Id: <20180817051853.23792-6-cota@braap.org>
+Date: Fri, 17 Aug 2018 01:18:50 -0400
+Message-Id: <20180817051853.23792-7-cota@braap.org>
 In-Reply-To: <20180817051853.23792-1-cota@braap.org>
 References: <20180817051853.23792-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 5/9] qsp: track BQL callers explicitly
+Subject: [Qemu-devel] [PATCH 6/9] tests/atomic_add-bench: add -p to enable
+ sync profiler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,132 +27,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Fam Zheng <famz@redhat.com>
 
-The BQL is acquired via qemu_mutex_lock_iothread(), which makes
-the profiler assign the associated wait time (i.e. most of
-BQL wait time) entirely to that function. This loses the original
-call site information, which does not help diagnose BQL contention.
-Fix it by tracking the callers explicitly.
+When used together with -m, this allows us to benchmark the
+profiler's performance impact on qemu_mutex_lock.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qemu/main-loop.h |  4 +++-
- include/qemu/thread.h    |  1 +
- cpus.c                   | 10 ++++++++--
- stubs/iothread-lock.c    |  2 +-
- util/qsp.c               |  6 ++++++
- 5 files changed, 19 insertions(+), 4 deletions(-)
+ tests/atomic_add-bench.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-index 721aa2416a..e59f9ae1e9 100644
---- a/include/qemu/main-loop.h
-+++ b/include/qemu/main-loop.h
-@@ -276,7 +276,9 @@ bool qemu_mutex_iothread_locked(void);
-  * NOTE: tools currently are single-threaded and qemu_mutex_lock_iothread
-  * is a no-op there.
-  */
--void qemu_mutex_lock_iothread(void);
-+#define qemu_mutex_lock_iothread()                      \
-+    qemu_mutex_lock_iothread_impl(__FILE__, __LINE__)
-+void qemu_mutex_lock_iothread_impl(const char *file, int line);
+diff --git a/tests/atomic_add-bench.c b/tests/atomic_add-bench.c
+index f96d448f77..2f6c72f63a 100644
+--- a/tests/atomic_add-bench.c
++++ b/tests/atomic_add-bench.c
+@@ -26,6 +26,7 @@ static bool test_stop;
+ static const char commands_string[] =
+     " -n = number of threads\n"
+     " -m = use mutexes instead of atomic increments\n"
++    " -p = enable sync profiler\n"
+     " -d = duration in seconds\n"
+     " -r = range (will be rounded up to pow2)";
  
- /**
-  * qemu_mutex_unlock_iothread: Unlock the main loop mutex.
-diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-index ab508df3cd..b41c0ae16a 100644
---- a/include/qemu/thread.h
-+++ b/include/qemu/thread.h
-@@ -35,6 +35,7 @@ typedef int (*QemuRecMutexTrylockFunc)(QemuRecMutex *m, const char *f, int l);
- typedef void (*QemuCondWaitFunc)(QemuCond *c, QemuMutex *m, const char *f,
-                                  int l);
+@@ -143,7 +144,7 @@ static void parse_args(int argc, char *argv[])
+     int c;
  
-+extern QemuMutexLockFunc qemu_bql_mutex_lock_func;
- extern QemuMutexLockFunc qemu_mutex_lock_func;
- extern QemuMutexTrylockFunc qemu_mutex_trylock_func;
- extern QemuRecMutexLockFunc qemu_rec_mutex_lock_func;
-diff --git a/cpus.c b/cpus.c
-index b5844b7103..a5ea3eef80 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1762,10 +1762,16 @@ bool qemu_mutex_iothread_locked(void)
-     return iothread_locked;
- }
- 
--void qemu_mutex_lock_iothread(void)
-+/*
-+ * The BQL is taken from so many places that it is worth profiling the
-+ * callers directly, instead of funneling them all through a single function.
-+ */
-+void qemu_mutex_lock_iothread_impl(const char *file, int line)
- {
-+    QemuMutexLockFunc bql_lock = atomic_read(&qemu_bql_mutex_lock_func);
-+
-     g_assert(!qemu_mutex_iothread_locked());
--    qemu_mutex_lock(&qemu_global_mutex);
-+    bql_lock(&qemu_global_mutex, file, line);
-     iothread_locked = true;
- }
- 
-diff --git a/stubs/iothread-lock.c b/stubs/iothread-lock.c
-index 9b6db2e740..eb745d7d6a 100644
---- a/stubs/iothread-lock.c
-+++ b/stubs/iothread-lock.c
-@@ -7,7 +7,7 @@ bool qemu_mutex_iothread_locked(void)
-     return true;
- }
- 
--void qemu_mutex_lock_iothread(void)
-+void qemu_mutex_lock_iothread_impl(const char *file, int line)
- {
- }
- 
-diff --git a/util/qsp.c b/util/qsp.c
-index ea128d3748..65d9d8f0d6 100644
---- a/util/qsp.c
-+++ b/util/qsp.c
-@@ -65,6 +65,7 @@
- 
- enum QSPType {
-     QSP_MUTEX,
-+    QSP_BQL_MUTEX,
-     QSP_REC_MUTEX,
-     QSP_CONDVAR,
- };
-@@ -116,10 +117,12 @@ static bool qsp_initialized, qsp_initializing;
- 
- static const char * const qsp_typenames[] = {
-     [QSP_MUTEX]     = "mutex",
-+    [QSP_BQL_MUTEX] = "BQL mutex",
-     [QSP_REC_MUTEX] = "rec_mutex",
-     [QSP_CONDVAR]   = "condvar",
- };
- 
-+QemuMutexLockFunc qemu_bql_mutex_lock_func = qemu_mutex_lock_impl;
- QemuMutexLockFunc qemu_mutex_lock_func = qemu_mutex_lock_impl;
- QemuMutexTrylockFunc qemu_mutex_trylock_func = qemu_mutex_trylock_impl;
- QemuRecMutexLockFunc qemu_rec_mutex_lock_func = qemu_rec_mutex_lock_impl;
-@@ -368,6 +371,7 @@ static QSPEntry *qsp_entry_get(const void *obj, const char *file, int line,
-         return err;                                                     \
-     }
- 
-+QSP_GEN_VOID(QemuMutex, QSP_BQL_MUTEX, qsp_bql_mutex_lock, qemu_mutex_lock_impl)
- QSP_GEN_VOID(QemuMutex, QSP_MUTEX, qsp_mutex_lock, qemu_mutex_lock_impl)
- QSP_GEN_RET1(QemuMutex, QSP_MUTEX, qsp_mutex_trylock, qemu_mutex_trylock_impl)
- 
-@@ -403,6 +407,7 @@ void qsp_enable(void)
- {
-     atomic_set(&qemu_mutex_lock_func, qsp_mutex_lock);
-     atomic_set(&qemu_mutex_trylock_func, qsp_mutex_trylock);
-+    atomic_set(&qemu_bql_mutex_lock_func, qsp_bql_mutex_lock);
-     atomic_set(&qemu_rec_mutex_lock_func, qsp_rec_mutex_lock);
-     atomic_set(&qemu_rec_mutex_trylock_func, qsp_rec_mutex_trylock);
-     atomic_set(&qemu_cond_wait_func, qsp_cond_wait);
-@@ -412,6 +417,7 @@ void qsp_disable(void)
- {
-     atomic_set(&qemu_mutex_lock_func, qemu_mutex_lock_impl);
-     atomic_set(&qemu_mutex_trylock_func, qemu_mutex_trylock_impl);
-+    atomic_set(&qemu_bql_mutex_lock_func, qemu_mutex_lock_impl);
-     atomic_set(&qemu_rec_mutex_lock_func, qemu_rec_mutex_lock_impl);
-     atomic_set(&qemu_rec_mutex_trylock_func, qemu_rec_mutex_trylock_impl);
-     atomic_set(&qemu_cond_wait_func, qemu_cond_wait_impl);
+     for (;;) {
+-        c = getopt(argc, argv, "hd:n:mr:");
++        c = getopt(argc, argv, "hd:n:mpr:");
+         if (c < 0) {
+             break;
+         }
+@@ -160,6 +161,9 @@ static void parse_args(int argc, char *argv[])
+         case 'm':
+             use_mutex = true;
+             break;
++        case 'p':
++            qsp_enable();
++            break;
+         case 'r':
+             range = pow2ceil(atoi(optarg));
+             break;
 -- 
 2.17.1
