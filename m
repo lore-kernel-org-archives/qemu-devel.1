@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKc-0003O8-7p
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqgKc-0003O4-7V
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKG-0001of-KW
+	(envelope-from <armbru@redhat.com>) id 1fqgKG-0001p5-P7
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57118 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57106 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKF-0001lK-UM
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKG-0001jL-7D
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:08 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:49 +0200
-Message-Id: <20180817150559.16243-51-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:31 +0200
+Message-Id: <20180817150559.16243-33-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 50/60] json: Unbox tokens queue in
- JSONMessageParser
+Subject: [Qemu-devel] [PATCH v2 32/60] json: Have lexer call streamer
+ directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,129 +27,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
+json_lexer_init() takes the function to process a token as an
+argument.  It's always json_message_process_token().  Makes the code
+harder to understand for no actual gain.  Drop the indirection.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/qapi/qmp/json-streamer.h |  2 +-
- qobject/json-parser.c            |  1 -
- qobject/json-streamer.c          | 30 +++++++++++-------------------
- 3 files changed, 12 insertions(+), 21 deletions(-)
+ include/qapi/qmp/json-lexer.h    | 13 +++----------
+ include/qapi/qmp/json-streamer.h |  3 +++
+ qobject/json-lexer.c             | 13 ++++++++-----
+ qobject/json-streamer.c          |  6 +++---
+ 4 files changed, 17 insertions(+), 18 deletions(-)
 
+diff --git a/include/qapi/qmp/json-lexer.h b/include/qapi/qmp/json-lexer.h
+index 66ccf0357c..44bcf2ca64 100644
+--- a/include/qapi/qmp/json-lexer.h
++++ b/include/qapi/qmp/json-lexer.h
+@@ -32,20 +32,13 @@ typedef enum json_token_type {
+     JSON_ERROR,
+ } JSONTokenType;
+ 
+-typedef struct JSONLexer JSONLexer;
+-
+-typedef void (JSONLexerEmitter)(JSONLexer *, GString *,
+-                                JSONTokenType, int x, int y);
+-
+-struct JSONLexer
+-{
+-    JSONLexerEmitter *emit;
++typedef struct JSONLexer {
+     int state;
+     GString *token;
+     int x, y;
+-};
++} JSONLexer;
+ 
+-void json_lexer_init(JSONLexer *lexer, JSONLexerEmitter func);
++void json_lexer_init(JSONLexer *lexer);
+ 
+ void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size);
+ 
 diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-streamer.h
-index e162fd01da..d1d7fe2595 100644
+index cb808cf27d..7922e185a5 100644
 --- a/include/qapi/qmp/json-streamer.h
 +++ b/include/qapi/qmp/json-streamer.h
-@@ -31,7 +31,7 @@ typedef struct JSONMessageParser
-     JSONLexer lexer;
-     int brace_count;
-     int bracket_count;
--    GQueue *tokens;
-+    GQueue tokens;
+@@ -33,6 +33,9 @@ typedef struct JSONMessageParser
      uint64_t token_size;
  } JSONMessageParser;
  
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 8f13c8f062..8dafadb833 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -552,7 +552,6 @@ QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp)
-         parser_context_pop_token(&ctxt);
-     }
-     g_free(ctxt.current);
--    g_queue_free(ctxt.buf);
++void json_message_process_token(JSONLexer *lexer, GString *input,
++                                JSONTokenType type, int x, int y);
++
+ void json_message_parser_init(JSONMessageParser *parser,
+                               void (*func)(JSONMessageParser *, GQueue *));
  
-     return result;
- }
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index 87cdd41f29..0b54b1af56 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -14,6 +14,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qapi/qmp/json-lexer.h"
++#include "qapi/qmp/json-streamer.h"
+ 
+ #define MAX_TOKEN_SIZE (64ULL << 20)
+ 
+@@ -278,9 +279,8 @@ static const uint8_t json_lexer[][256] =  {
+     },
+ };
+ 
+-void json_lexer_init(JSONLexer *lexer, JSONLexerEmitter func)
++void json_lexer_init(JSONLexer *lexer)
+ {
+-    lexer->emit = func;
+     lexer->state = IN_START;
+     lexer->token = g_string_sized_new(3);
+     lexer->x = lexer->y = 0;
+@@ -316,7 +316,8 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+         case JSON_FLOAT:
+         case JSON_KEYWORD:
+         case JSON_STRING:
+-            lexer->emit(lexer, lexer->token, new_state, lexer->x, lexer->y);
++            json_message_process_token(lexer, lexer->token, new_state,
++                                       lexer->x, lexer->y);
+             /* fall through */
+         case JSON_SKIP:
+             g_string_truncate(lexer->token, 0);
+@@ -336,7 +337,8 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+              * never a valid ASCII/UTF-8 sequence, so this should reliably
+              * induce an error/flush state.
+              */
+-            lexer->emit(lexer, lexer->token, JSON_ERROR, lexer->x, lexer->y);
++            json_message_process_token(lexer, lexer->token, JSON_ERROR,
++                                       lexer->x, lexer->y);
+             g_string_truncate(lexer->token, 0);
+             new_state = IN_START;
+             lexer->state = new_state;
+@@ -351,7 +353,8 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+      * this is a security consideration.
+      */
+     if (lexer->token->len > MAX_TOKEN_SIZE) {
+-        lexer->emit(lexer, lexer->token, lexer->state, lexer->x, lexer->y);
++        json_message_process_token(lexer, lexer->token, lexer->state,
++                                   lexer->x, lexer->y);
+         g_string_truncate(lexer->token, 0);
+         lexer->state = IN_START;
+     }
 diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index 954bf9d468..9210281a65 100644
+index 78dfff2aa0..9f57ebf2bd 100644
 --- a/qobject/json-streamer.c
 +++ b/qobject/json-streamer.c
-@@ -22,17 +22,12 @@
- #define MAX_TOKEN_COUNT (2ULL << 20)
- #define MAX_NESTING (1 << 10)
+@@ -34,8 +34,8 @@ static void json_message_free_tokens(JSONMessageParser *parser)
+     }
+ }
  
--static void json_message_free_token(void *token, void *opaque)
--{
--    g_free(token);
--}
--
- static void json_message_free_tokens(JSONMessageParser *parser)
+-static void json_message_process_token(JSONLexer *lexer, GString *input,
+-                                       JSONTokenType type, int x, int y)
++void json_message_process_token(JSONLexer *lexer, GString *input,
++                                JSONTokenType type, int x, int y)
  {
--    if (parser->tokens) {
--        g_queue_foreach(parser->tokens, json_message_free_token, NULL);
--        g_queue_free(parser->tokens);
--        parser->tokens = NULL;
-+    JSONToken *token;
-+
-+    while ((token = g_queue_pop_head(&parser->tokens))) {
-+        g_free(token);
-     }
- }
- 
-@@ -61,11 +56,10 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
-         error_setg(&err, "JSON parse error, stray '%s'", input->str);
-         goto out_emit;
-     case JSON_END_OF_INPUT:
--        if (g_queue_is_empty(parser->tokens)) {
-+        if (g_queue_is_empty(&parser->tokens)) {
-             return;
-         }
--        json = json_parser_parse(parser->tokens, parser->ap, &err);
--        parser->tokens = NULL;
-+        json = json_parser_parse(&parser->tokens, parser->ap, &err);
-         goto out_emit;
-     default:
-         break;
-@@ -79,7 +73,7 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
-         error_setg(&err, "JSON token size limit exceeded");
-         goto out_emit;
-     }
--    if (g_queue_get_length(parser->tokens) + 1 > MAX_TOKEN_COUNT) {
-+    if (g_queue_get_length(&parser->tokens) + 1 > MAX_TOKEN_COUNT) {
-         error_setg(&err, "JSON token count limit exceeded");
-         goto out_emit;
-     }
-@@ -97,21 +91,19 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
- 
-     parser->token_size += input->len;
- 
--    g_queue_push_tail(parser->tokens, token);
-+    g_queue_push_tail(&parser->tokens, token);
- 
-     if ((parser->brace_count > 0 || parser->bracket_count > 0)
-         && parser->bracket_count >= 0 && parser->bracket_count >= 0) {
-         return;
-     }
- 
--    json = json_parser_parse(parser->tokens, parser->ap, &err);
--    parser->tokens = NULL;
-+    json = json_parser_parse(&parser->tokens, parser->ap, &err);
- 
- out_emit:
-     parser->brace_count = 0;
-     parser->bracket_count = 0;
-     json_message_free_tokens(parser);
--    parser->tokens = g_queue_new();
-     parser->token_size = 0;
-     parser->emit(parser->opaque, json, err);
- }
-@@ -126,7 +118,7 @@ void json_message_parser_init(JSONMessageParser *parser,
-     parser->ap = ap;
-     parser->brace_count = 0;
-     parser->bracket_count = 0;
--    parser->tokens = g_queue_new();
-+    g_queue_init(&parser->tokens);
+     JSONMessageParser *parser = container_of(lexer, JSONMessageParser, lexer);
+     JSONToken *token;
+@@ -115,7 +115,7 @@ void json_message_parser_init(JSONMessageParser *parser,
+     parser->tokens = g_queue_new();
      parser->token_size = 0;
  
-     json_lexer_init(&parser->lexer, !!ap);
-@@ -141,7 +133,7 @@ void json_message_parser_feed(JSONMessageParser *parser,
- void json_message_parser_flush(JSONMessageParser *parser)
- {
-     json_lexer_flush(&parser->lexer);
--    assert(g_queue_is_empty(parser->tokens));
-+    assert(g_queue_is_empty(&parser->tokens));
+-    json_lexer_init(&parser->lexer, json_message_process_token);
++    json_lexer_init(&parser->lexer);
  }
  
- void json_message_parser_destroy(JSONMessageParser *parser)
+ void json_message_parser_feed(JSONMessageParser *parser,
 -- 
 2.17.1
