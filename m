@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMZ-0004kq-En
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:34 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMf-0004oo-Vy
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMV-0007Vp-IH
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:27 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44369 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMY-0007bY-7I
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:32 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45269 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqfMU-0007SE-QW
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:23 -0400
+	id 1fqfMX-0007Xy-IC
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:25 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 17 Aug 2018 16:03:13 +0200
-Message-Id: <1534514633-13725-26-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 17 Aug 2018 16:03:43 +0200
+Message-Id: <1534514633-13725-56-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534514633-13725-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534514633-13725-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v10 25/65] target/mips: Fix pre-nanoMIPS MT ASE
- instructions availability control
+Subject: [Qemu-devel] [PATCH v10 55/65] linux-user: Add signal.c for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,169 +27,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Dimitrije Nikolic <dnikolic@wavecomp.com>
 
-Use bits from configuration registers for availability control
-of MT ASE instructions, rather than only ISA_MT bit in insn_flags.
-This is done by adding a field in hflags for MT bit, and adding
-functions check_mt() and check_cp0_mt().
+Add signal.c as a redirection to regular mips' signal.c, but at the
+same time amend regular mips' signal.c with bits and pieces specific
+for nanoMIPS. This was done this way to avoid duplication of large
+pieces of code.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  3 ++-
- target/mips/internal.h  |  6 +++++-
- target/mips/translate.c | 45 +++++++++++++++++++++++++++++++++++++--------
- 3 files changed, 44 insertions(+), 10 deletions(-)
+ linux-user/mips/signal.c     | 25 ++++++++++++++++++++-----
+ linux-user/nanomips/signal.c |  1 +
+ 2 files changed, 21 insertions(+), 5 deletions(-)
+ create mode 100644 linux-user/nanomips/signal.c
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 468b686..bf9c634 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -556,7 +556,7 @@ struct CPUMIPSState {
- #define EXCP_INST_NOTAVAIL 0x2 /* No valid instruction word for BadInstr */
-     uint32_t hflags;    /* CPU State */
-     /* TMASK defines different execution modes */
--#define MIPS_HFLAG_TMASK  0x3F5807FF
-+#define MIPS_HFLAG_TMASK  0x7F5807FF
- #define MIPS_HFLAG_MODE   0x00007 /* execution modes                    */
-     /* The KSU flags must be the lowest bits in hflags. The flag order
-        must be the same as defined for CP0 Status. This allows to use
-@@ -608,6 +608,7 @@ struct CPUMIPSState {
- #define MIPS_HFLAG_ITC_CACHE  0x8000000 /* CACHE instr. operates on ITC tag */
- #define MIPS_HFLAG_ERL   0x10000000 /* error level flag */
- #define MIPS_HFLAG_XNP   0x20000000
-+#define MIPS_HFLAG_MT    0x40000000
-     target_ulong btarget;        /* Jump / branch target               */
-     target_ulong bcond;          /* Branch condition (if needed)       */
+diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
+index 6aa303e..ab66429 100644
+--- a/linux-user/mips/signal.c
++++ b/linux-user/mips/signal.c
+@@ -21,7 +21,15 @@
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
  
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index 97485da..c0e447b 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -308,7 +308,8 @@ static inline void compute_hflags(CPUMIPSState *env)
-                      MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
-                      MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
-                      MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA | MIPS_HFLAG_FRE |
--                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL | MIPS_HFLAG_XNP);
-+                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL | MIPS_HFLAG_XNP |
-+                     MIPS_HFLAG_MT);
-     if (env->CP0_Status & (1 << CP0St_ERL)) {
-         env->hflags |= MIPS_HFLAG_ERL;
-     }
-@@ -405,6 +406,9 @@ static inline void compute_hflags(CPUMIPSState *env)
-     if (env->CP0_Config5 & (1 << CP0C5_XNP)) {
-         env->hflags |= MIPS_HFLAG_XNP;
-     }
-+    if (env->CP0_Config3 & (1 << CP0C3_MT)) {
-+        env->hflags |= MIPS_HFLAG_MT;
-+    }
+-# if defined(TARGET_ABI_MIPSO32)
++#if defined(TARGET_ABI_MIPSP32)
++struct target_sigcontext {
++    uint64_t sc_regs[32];
++    uint64_t sc_pc;
++    uint32_t sc_used_math;
++    uint32_t sc_reserved;
++};
++#define TARGET_ALMASK  (~15)
++#elif defined(TARGET_ABI_MIPSO32)
+ struct target_sigcontext {
+     uint32_t   sc_regmask;     /* Unused */
+     uint32_t   sc_status;
+@@ -43,6 +51,7 @@ struct target_sigcontext {
+     target_ulong   sc_hi3;
+     target_ulong   sc_lo3;
+ };
++#define TARGET_ALMASK  (~7)
+ # else /* N32 || N64 */
+ struct target_sigcontext {
+     uint64_t sc_regs[32];
+@@ -61,6 +70,7 @@ struct target_sigcontext {
+     uint32_t sc_dsp;
+     uint32_t sc_reserved;
+ };
++#define TARGET_ALMASK  (~15)
+ # endif /* O32 */
+ 
+ struct sigframe {
+@@ -100,6 +110,7 @@ static inline int install_sigtramp(unsigned int *tramp,   unsigned int syscall)
+ 
+     __put_user(0x24020000 + syscall, tramp + 0);
+     __put_user(0x0000000c          , tramp + 1);
++
+     return err;
  }
  
- void cpu_mips_tlb_flush(CPUMIPSState *env);
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f870199..7abce57 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -1925,6 +1925,35 @@ static inline void check_xnp(DisasContext *ctx)
+@@ -116,6 +127,7 @@ static inline void setup_sigcontext(CPUMIPSState *regs,
+         __put_user(regs->active_tc.gpr[i], &sc->sc_regs[i]);
      }
+ 
++#if !defined(TARGET_ABI_MIPSP32)
+     __put_user(regs->active_tc.HI[0], &sc->sc_mdhi);
+     __put_user(regs->active_tc.LO[0], &sc->sc_mdlo);
+ 
+@@ -137,6 +149,7 @@ static inline void setup_sigcontext(CPUMIPSState *regs,
+     for (i = 0; i < 32; ++i) {
+         __put_user(regs->active_fpu.fpr[i].d, &sc->sc_fpregs[i]);
+     }
++#endif
  }
  
-+/*
-+ * This code generates a "reserved instruction" exception if the
-+ * Config5 MT bit is NOT set.
-+ */
-+static inline void check_mt(DisasContext *ctx)
-+{
-+    if (unlikely(!(ctx->hflags & MIPS_HFLAG_MT))) {
-+        generate_exception_end(ctx, EXCP_RI);
-+    }
-+}
-+
-+/*
-+ * This code generates a "coprocessor unusable" exception if CP0 is not
-+ * available, and, if that is not the case, generates a "reserved instruction"
-+ * exception if the Config5 MT bit is NOT set. This is needed for availability
-+ * control of some of MT ASE instructions.
-+ */
-+static inline void check_cp0_mt(DisasContext *ctx)
-+{
-+    if (unlikely(!(ctx->hflags & MIPS_HFLAG_CP0))) {
-+        generate_exception_err(ctx, EXCP_CpU, 0);
-+    } else {
-+        if (unlikely(!(ctx->hflags & MIPS_HFLAG_MT))) {
-+            generate_exception_err(ctx, EXCP_RI, 0);
-+        }
-+    }
-+}
-+
-+
+ static inline void
+@@ -146,13 +159,14 @@ restore_sigcontext(CPUMIPSState *regs, struct target_sigcontext *sc)
  
- /* Define small wrappers for gen_load_fpr* so that we have a uniform
-    calling interface for 32 and 64-bit FPRs.  No sense in changing
-@@ -8593,7 +8622,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContext *ctx, uint32_t opc, int rt,
-         opn = "mthc0";
-         break;
-     case OPC_MFTR:
--        check_insn(ctx, ASE_MT);
-+        check_cp0_enabled(ctx);
-         if (rd == 0) {
-             /* Treat as NOP. */
-             return;
-@@ -8603,7 +8632,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContext *ctx, uint32_t opc, int rt,
-         opn = "mftr";
-         break;
-     case OPC_MTTR:
--        check_insn(ctx, ASE_MT);
-+        check_cp0_enabled(ctx);
-         gen_mttr(env, ctx, rd, rt, (ctx->opcode >> 5) & 1,
-                  ctx->opcode & 0x7, (ctx->opcode >> 4) & 1);
-         opn = "mttr";
-@@ -21958,7 +21987,7 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
-         gen_rdhwr(ctx, rt, rd, extract32(ctx->opcode, 6, 3));
-         break;
-     case OPC_FORK:
--        check_insn(ctx, ASE_MT);
-+        check_mt(ctx);
-         {
-             TCGv t0 = tcg_temp_new();
-             TCGv t1 = tcg_temp_new();
-@@ -21971,7 +22000,7 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case OPC_YIELD:
--        check_insn(ctx, ASE_MT);
-+        check_mt(ctx);
-         {
-             TCGv t0 = tcg_temp_new();
+     __get_user(regs->CP0_EPC, &sc->sc_pc);
  
-@@ -23268,22 +23297,22 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-                 op2 = MASK_MFMC0(ctx->opcode);
-                 switch (op2) {
-                 case OPC_DMT:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_dmt(t0);
-                     gen_store_gpr(t0, rt);
-                     break;
-                 case OPC_EMT:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_emt(t0);
-                     gen_store_gpr(t0, rt);
-                     break;
-                 case OPC_DVPE:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_dvpe(t0, cpu_env);
-                     gen_store_gpr(t0, rt);
-                     break;
-                 case OPC_EVPE:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_evpe(t0, cpu_env);
-                     gen_store_gpr(t0, rt);
-                     break;
+-    __get_user(regs->active_tc.HI[0], &sc->sc_mdhi);
+-    __get_user(regs->active_tc.LO[0], &sc->sc_mdlo);
+-
+     for (i = 1; i < 32; ++i) {
+         __get_user(regs->active_tc.gpr[i], &sc->sc_regs[i]);
+     }
+ 
++#if !defined(TARGET_ABI_MIPSP32)
++    __get_user(regs->active_tc.HI[0], &sc->sc_mdhi);
++    __get_user(regs->active_tc.LO[0], &sc->sc_mdlo);
++
+     __get_user(regs->active_tc.HI[1], &sc->sc_hi1);
+     __get_user(regs->active_tc.HI[2], &sc->sc_hi2);
+     __get_user(regs->active_tc.HI[3], &sc->sc_hi3);
+@@ -168,6 +182,7 @@ restore_sigcontext(CPUMIPSState *regs, struct target_sigcontext *sc)
+     for (i = 0; i < 32; ++i) {
+         __get_user(regs->active_fpu.fpr[i].d, &sc->sc_fpregs[i]);
+     }
++#endif
+ }
+ 
+ /*
+@@ -185,7 +200,7 @@ get_sigframe(struct target_sigaction *ka, CPUMIPSState *regs, size_t frame_size)
+      */
+     sp = target_sigsp(get_sp_from_cpustate(regs) - 32, ka);
+ 
+-    return (sp - frame_size) & ~7;
++    return (sp - frame_size) & TARGET_ALMASK;
+ }
+ 
+ static void mips_set_hflags_isa_mode_from_pc(CPUMIPSState *env)
+diff --git a/linux-user/nanomips/signal.c b/linux-user/nanomips/signal.c
+new file mode 100644
+index 0000000..86efc21
+--- /dev/null
++++ b/linux-user/nanomips/signal.c
+@@ -0,0 +1 @@
++#include "../mips/signal.c"
 -- 
 2.7.4
