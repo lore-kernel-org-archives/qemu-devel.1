@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fqeNF-0005ie-Dd
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:01:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqeVQ-0007DN-Dz
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fqeN9-0003kY-Gq
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:01:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56988)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fqeN9-0003js-Ab
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:00:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fqeN7-0005Ls-0R
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 13:00:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9F82B2E8507
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 13:00:56 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1fqeVL-0008Mk-Lk
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:09:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55288 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqeVK-0008MO-Vt
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:09:27 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180817105157.7486-1-pbonzini@redhat.com>
+Date: Fri, 17 Aug 2018 15:09:25 +0200
+In-Reply-To: <20180817105157.7486-1-pbonzini@redhat.com> (Paolo Bonzini's
+	message of "Fri, 17 Aug 2018 12:51:57 +0200")
+Message-ID: <87efex16nu.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Aug 2018 12:52:52 -0000
-From: Thomas Huth <1787505@bugs.launchpad.net>
-Reply-To: Bug 1787505 <1787505@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153446472677.27869.256879611828000197.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153451037266.3280.12516874639177914681.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1787505] Re: Solaris host: no network connection,
- mouse pointer mismatch
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH correct] checkpatch: allow space in more
+ places before a bracket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, richard.henderson@linaro.org
 
-You should maybe try a different NIC model. According to
-https://wiki.qemu.org/Documentation/Networking the rtl8139 seems to be a
-good choice?
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Concerning USB, you've also got to enable an emulated "USB host
-controller" to use USB devices. The easiest way to do that is to simply
-start QEMU with the "-usb" parameter.
+> From: Heinrich Schuchardt <xypron.glpk@gmx.de>
+>
+> Allow a space between a colon and subsequent opening bracket.  This
+> sequence may occur in inline assembler statements like
+>
+> 	asm(
+> 		"ldr %[out], [%[in]]\n\t"
+> 		: [out] "=r" (ret)
+> 		: [in] "r" (addr)
+> 	);
+>
+> Allow a space between a comma and subsequent opening bracket.  This
+> sequence may occur in designated initializers.
+>
+> To ease backporting the patch, I am also changing the comma-bracket
+> detection (added in QEMU by commit 409db6eb7199af7a2f09f746bd1b793e9daefe5f)
+> to use the same regex as brackets and colons (as done independently
+> by Linux commit daebc534ac15f991961a5bb433e515988220e9bf).
+>
+> Link: http://lkml.kernel.org/r/20180403191655.23700-1-xypron.glpk@gmx.de
+> Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+> Acked-by: Joe Perches <joe@perches.com>
+> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+> Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  scripts/checkpatch.pl | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index 52ab18bfce..33b5771120 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -1977,9 +1977,8 @@ sub process {
+>  			my ($where, $prefix) = ($-[1], $1);
+>  			if ($prefix !~ /$Type\s+$/ &&
+>  			    ($where != 0 || $prefix !~ /^.\s+$/) &&
+> -			    $prefix !~ /{\s+$/ &&
+>  			    $prefix !~ /\#\s*define[^(]*\([^)]*\)\s+$/ &&
+> -			    $prefix !~ /,\s+$/) {
+> +			    $prefix !~ /[,{:]\s+$/) {
+>  				ERROR("space prohibited before open square bracket '['\n" . $herecurr);
+>  			}
+>  		}
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1787505
-
-Title:
-  Solaris host: no network connection, mouse pointer mismatch
-
-Status in QEMU:
-  New
-
-Bug description:
-  This is probably a bit far afield but on a Solaris 10 SPARC host (Sun
-  M3000) running a Windows XP guest like this:
-
-  ./qemu-system-x86_64 -m 1024 -boot d  -smp 3 -net nic -net user -hda
-  /bkpool/qemuimages/XP.img -cdrom /bkpool/qemuimages/xp.iso &
-
-  the vnc server starts up and Windows boots normally.  However, there
-  is no network connectivity.  There are no network devices visible in
-  XP's Networking tab of Control Panel and a ping of the local router
-  reports "unreachable".
-
-  Also, the keyboard works fine but the guest mouse pointer is offset
-  from the host mouse position by an amount that varies by screen
-  position.  This makes it impossible to point to locations near the
-  edge of the qemu window.  This seems to be a previously reported
-  problem, but the suggested fix, " -device usb-tablet", prevents qemu
-  from even starting:
-
-  qemu-system-x86_64: -device usb-tablet: No 'usb-bus' bus found for
-  device 'usb-tablet'
-
-  The physical mouse is connected to the USB port of a Sun Ray 2fs
-  controlling the M3000 via Sun Ray server.  I apologize if this is a
-  configuration issue and not a bug but I don't know where else to
-  report it and have been unable to find a solution in the
-  documentation.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1787505/+subscriptions
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
