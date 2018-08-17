@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqhNc-0008UK-7Q
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:13:43 -0400
+	(envelope-from <cota@braap.org>) id 1fqhNh-0008SR-I6
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:13:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqhHo-00039J-BH
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:07:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58586 helo=mx1.redhat.com)
+	(envelope-from <cota@braap.org>) id 1fqhFk-0001tH-Ki
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:05:35 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:37951)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fqhHo-000395-6n
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:07:40 -0400
-References: <20180817150559.16243-1-armbru@redhat.com>
-	<20180817150559.16243-53-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fa470eb3-cc13-1ab3-b0d5-19343bc3b038@redhat.com>
-Date: Fri, 17 Aug 2018 11:07:35 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fqhFk-0001sM-3D
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:05:32 -0400
+Date: Fri, 17 Aug 2018 12:05:27 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180817160527.GA4415@flamenco>
+References: <20180817051853.23792-1-cota@braap.org>
+	<20180817051853.23792-10-cota@braap.org>
 MIME-Version: 1.0
-In-Reply-To: <20180817150559.16243-53-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 52/60] json: Eliminate lexer state
- IN_WHITESPACE, pseudo-token JSON_SKIP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180817051853.23792-10-cota@braap.org>
+Subject: Re: [Qemu-devel] [PATCH 9/9] hmp-commands-info: add sync-profile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +27,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On 08/17/2018 10:05 AM, Markus Armbruster wrote:
-> Bonus: static json_lexer[] loses its unused elements.  It shrinks from
-> 8KiB to 4.75KiB for me.
+On Fri, Aug 17, 2018 at 01:18:53 -0400, Emilio G. Cota wrote:
+> The command introduced here is just for developers. This means that:
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
+> - the info displayed and the output format could change in the future
+> - the command is only meant to be used from HMP, not from QMP
+> 
+> Sample output:
+(snip)
+> BQL mutex  0x55a0171b7140  util/main-loop.c:236            0.00894          6425          1.39
+> mutex      [           3]  util/qemu-timer.c:520           0.00342         50611          0.07
+> mutex      [           2]  util/qemu-timer.c:426           0.00254         31336          0.08
+> mutex      [           3] util/qemu-timer.c:234           0.00107         19275          0.06
+                           ^^
+I manually updated the commit message after switching to brackets
+(initially didn't have them), so in case you're wondering,
+the missing space is not due to a bug in the code.
 
->           ['a' ... 'z'] = IN_KEYWORD,
-> -        [' '] = IN_WHITESPACE,
-> -        ['\t'] = IN_WHITESPACE,
-> -        ['\r'] = IN_WHITESPACE,
-> -        ['\n'] = IN_WHITESPACE,
-> +        [' '] = IN_START,
-> +        ['\t'] = IN_START,
-> +        ['\r'] = IN_START,
-> +        ['\n'] = IN_START,
->       },
->       [IN_START_INTERPOL]['%'] = IN_INTERPOL,
-> +    [IN_START_INTERPOL][' '] = IN_START_INTERPOL,
-> +    [IN_START_INTERPOL]['\t'] = IN_START_INTERPOL,
-> +    [IN_START_INTERPOL]['\r'] = IN_START_INTERPOL,
-> +    [IN_START_INTERPOL]['\n'] = IN_START_INTERPOL,
+Thanks,
 
-Hmm, if we did this:
-
-[IN_START_INTERPOL] {
-   ['%'] = IN_INTERPOL,
-   ['\t'] = IN_START_INTERPOL,
-...
-}
-
-for similarity with all our other constructs, will gcc remember that 
-we've already initialized other members not listed in the clause before, 
-or will it mistakenly re-0-initialize the array members not mentioned?
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+		E.
