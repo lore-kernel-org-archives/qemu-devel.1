@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKJ-00037J-MX
+	(envelope-from <armbru@redhat.com>) id 1fqgKI-00036J-Nj
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKF-0001mv-Vr
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46180 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqgKF-0001lT-64
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56258 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKF-0001ki-6J
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:07 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKE-0001ja-Ff
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:06 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:41 +0200
-Message-Id: <20180817150559.16243-43-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:33 +0200
+Message-Id: <20180817150559.16243-35-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 42/60] json: Improve names of lexer states
- related to numbers
+Subject: [Qemu-devel] [PATCH v2 34/60] json: Don't pass null @tokens to
+ json_parser_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,93 +27,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
+json_parser_parse() normally returns the QObject on success.  Except
+it returns null when its @tokens argument is null.
+
+Its only caller json_message_process_token() passes null @tokens when
+emitting a lexical error.  The call is a rather opaque way to say json
+= NULL then.
+
+Simplify matters by lifting the assignment to json out of the emit
+path: initialize json to null, set it to the value of
+json_parser_parse() when there's no lexical error.  Drop the special
+case from json_parser_parse().
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-lexer.c | 34 +++++++++++++++++-----------------
- 1 file changed, 17 insertions(+), 17 deletions(-)
+ qobject/json-parser.c   |  4 ----
+ qobject/json-streamer.c | 25 ++++++++++++-------------
+ 2 files changed, 12 insertions(+), 17 deletions(-)
 
-diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index 4028f39f28..6a3b89c855 100644
---- a/qobject/json-lexer.c
-+++ b/qobject/json-lexer.c
-@@ -109,13 +109,13 @@ enum json_lexer_state {
-     IN_SQ_STRING,
-     IN_ZERO,
-     IN_BAD_ZERO,
--    IN_DIGITS,
--    IN_DIGIT,
-+    IN_EXP_DIGITS,
-+    IN_EXP_SIGN,
-     IN_EXP_E,
-     IN_MANTISSA,
-     IN_MANTISSA_DIGITS,
--    IN_NONZERO_NUMBER,
--    IN_NEG_NONZERO_NUMBER,
-+    IN_DIGITS,
-+    IN_SIGN,
-     IN_KEYWORD,
-     IN_INTERPOL,
-     IN_WHITESPACE,
-@@ -169,19 +169,19 @@ static const uint8_t json_lexer[][256] =  {
-     },
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index f2646dce84..866f7e3f14 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -546,10 +546,6 @@ QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp)
+     JSONParserContext ctxt = { .buf = tokens };
+     QObject *result;
  
-     /* Float */
--    [IN_DIGITS] = {
-+    [IN_EXP_DIGITS] = {
-         TERMINAL(JSON_FLOAT),
--        ['0' ... '9'] = IN_DIGITS,
-+        ['0' ... '9'] = IN_EXP_DIGITS,
-     },
+-    if (!tokens) {
+-        return NULL;
+-    }
+-
+     result = parse_value(&ctxt, ap);
  
--    [IN_DIGIT] = {
--        ['0' ... '9'] = IN_DIGITS,
-+    [IN_EXP_SIGN] = {
-+        ['0' ... '9'] = IN_EXP_DIGITS,
-     },
+     error_propagate(errp, ctxt.err);
+diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+index 7fd0ff8756..0c33186e8e 100644
+--- a/qobject/json-streamer.c
++++ b/qobject/json-streamer.c
+@@ -39,9 +39,9 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+                                 JSONTokenType type, int x, int y)
+ {
+     JSONMessageParser *parser = container_of(lexer, JSONMessageParser, lexer);
++    QObject *json = NULL;
+     Error *err = NULL;
+     JSONToken *token;
+-    QObject *json;
  
-     [IN_EXP_E] = {
--        ['-'] = IN_DIGIT,
--        ['+'] = IN_DIGIT,
--        ['0' ... '9'] = IN_DIGITS,
-+        ['-'] = IN_EXP_SIGN,
-+        ['+'] = IN_EXP_SIGN,
-+        ['0' ... '9'] = IN_EXP_DIGITS,
-     },
+     switch (type) {
+     case JSON_LCURLY:
+@@ -72,34 +72,33 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+     g_queue_push_tail(parser->tokens, token);
  
-     [IN_MANTISSA_DIGITS] = {
-@@ -196,17 +196,17 @@ static const uint8_t json_lexer[][256] =  {
-     },
+     if (type == JSON_ERROR) {
+-        goto out_emit_bad;
+-    } else if (parser->brace_count < 0 ||
++        goto out_emit;
++    }
++
++    if (parser->brace_count < 0 ||
+         parser->bracket_count < 0 ||
+         (parser->brace_count == 0 &&
+          parser->bracket_count == 0)) {
++        json = json_parser_parse(parser->tokens, parser->ap, &err);
++        parser->tokens = NULL;
+         goto out_emit;
+-    } else if (parser->token_size > MAX_TOKEN_SIZE ||
++    }
++
++    if (parser->token_size > MAX_TOKEN_SIZE ||
+                g_queue_get_length(parser->tokens) > MAX_TOKEN_COUNT ||
+                parser->bracket_count + parser->brace_count > MAX_NESTING) {
+         /* Security consideration, we limit total memory allocated per object
+          * and the maximum recursion depth that a message can force.
+          */
+-        goto out_emit_bad;
++        goto out_emit;
+     }
  
-     /* Number */
--    [IN_NONZERO_NUMBER] = {
-+    [IN_DIGITS] = {
-         TERMINAL(JSON_INTEGER),
--        ['0' ... '9'] = IN_NONZERO_NUMBER,
-+        ['0' ... '9'] = IN_DIGITS,
-         ['e'] = IN_EXP_E,
-         ['E'] = IN_EXP_E,
-         ['.'] = IN_MANTISSA,
-     },
+     return;
  
--    [IN_NEG_NONZERO_NUMBER] = {
-+    [IN_SIGN] = {
-         ['0'] = IN_ZERO,
--        ['1' ... '9'] = IN_NONZERO_NUMBER,
-+        ['1' ... '9'] = IN_DIGITS,
-     },
- 
-     /* keywords */
-@@ -241,8 +241,8 @@ static const uint8_t json_lexer[][256] =  {
-         ['"'] = IN_DQ_STRING,
-         ['\''] = IN_SQ_STRING,
-         ['0'] = IN_ZERO,
--        ['1' ... '9'] = IN_NONZERO_NUMBER,
--        ['-'] = IN_NEG_NONZERO_NUMBER,
-+        ['1' ... '9'] = IN_DIGITS,
-+        ['-'] = IN_SIGN,
-         ['{'] = JSON_LCURLY,
-         ['}'] = JSON_RCURLY,
-         ['['] = JSON_LSQUARE,
+-out_emit_bad:
+-    /*
+-     * Clear out token list and tell the parser to emit an error
+-     * indication by passing it a NULL list
+-     */
+-    json_message_free_tokens(parser);
+ out_emit:
+-    /* send current list of tokens to parser and reset tokenizer */
+     parser->brace_count = 0;
+     parser->bracket_count = 0;
+-    json = json_parser_parse(parser->tokens, parser->ap, &err);
++    json_message_free_tokens(parser);
+     parser->tokens = g_queue_new();
+     parser->token_size = 0;
+     parser->emit(parser->opaque, json, err);
 -- 
 2.17.1
