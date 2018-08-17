@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1fqkeO-0004gG-UL
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:43:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fqkxl-00086Q-IY
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 16:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1fqkeN-0002lH-TB
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:43:12 -0400
-References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
-	<13910182-771b-c5dc-26a7-0958a7241fe8@redhat.com>
-	<6c318533-dc87-daeb-1fe8-6b11b0cbec8d@virtuozzo.com>
-	<747506be-aceb-0ab8-a4ee-c79f9a6b929a@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <aeaf148e-f87d-8426-3131-6d6fccec607d@openvz.org>
-Date: Fri, 17 Aug 2018 22:43:09 +0300
+	(envelope-from <mreitz@redhat.com>) id 1fqkxk-0007Mv-Q8
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 16:03:13 -0400
+References: <153430460784.10304.668502576933473446@502c9da6d61e>
+	<91d64820-89d3-c0dc-741b-f6fb13175174@redhat.com>
+	<87lg96g87u.fsf@dusky.pond.sub.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c8e243b1-5940-3c22-1ee0-f9da41883c39@redhat.com>
+Date: Fri, 17 Aug 2018 22:03:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <747506be-aceb-0ab8-a4ee-c79f9a6b929a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 0/7] qcow2: async handling of fragmented io
+In-Reply-To: <87lg96g87u.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4VZ1XIsj26FLRJyGdqOZ9SUmZTjsjVx0y"
+Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 00/31] block: Fix some filename
+ generation issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,126 +26,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, berto@igalia.com, famz@redhat.com, qemu-block@nongnu.org
 
-On 08/17/2018 10:34 PM, Max Reitz wrote:
-> On 2018-08-16 15:58, Vladimir Sementsov-Ogievskiy wrote:
->> 16.08.2018 03:51, Max Reitz wrote:
->>> On 2018-08-07 19:43, Vladimir Sementsov-Ogievskiy wrote:
->>>> Hi all!
->>>>
->>>> Here is an asynchronous scheme for handling fragmented qcow2
->>>> reads and writes. Both qcow2 read and write functions loops through
->>>> sequential portions of data. The series aim it to parallelize these
->>>> loops iterations.
->>>>
->>>> It improves performance for fragmented qcow2 images, I've tested it
->>>> as follows:
->>>>
->>>> I have four 4G qcow2 images (with default 64k block size) on my ssd disk:
->>>> t-seq.qcow2 - sequentially written qcow2 image
->>>> t-reverse.qcow2 - filled by writing 64k portions from end to the start
->>>> t-rand.qcow2 - filled by writing 64k portions (aligned) in random order
->>>> t-part-rand.qcow2 - filled by shuffling order of 64k writes in 1m clusters
->>>> (see source code of image generation in the end for details)
->>>>
->>>> and the test (sequential io by 1mb chunks):
->>>>
->>>> test write:
->>>>     for t in /ssd/t-*; \
->>>>         do sync; echo 1 > /proc/sys/vm/drop_caches; echo ===  $t  ===; \
->>>>         ./qemu-img bench -c 4096 -d 1 -f qcow2 -n -s 1m -t none -w $t; \
->>>>     done
->>>>
->>>> test read (same, just drop -w parameter):
->>>>     for t in /ssd/t-*; \
->>>>         do sync; echo 1 > /proc/sys/vm/drop_caches; echo ===  $t  ===; \
->>>>         ./qemu-img bench -c 4096 -d 1 -f qcow2 -n -s 1m -t none $t; \
->>>>     done
->>>>
->>>> short info about parameters:
->>>>   -w - do writes (otherwise do reads)
->>>>   -c - count of blocks
->>>>   -s - block size
->>>>   -t none - disable cache
->>>>   -n - native aio
->>>>   -d 1 - don't use parallel requests provided by qemu-img bench itself
->>> Hm, actually, why not?  And how does a guest behave?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4VZ1XIsj26FLRJyGdqOZ9SUmZTjsjVx0y
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, berto@igalia.com,
+ famz@redhat.com, qemu-block@nongnu.org
+Message-ID: <c8e243b1-5940-3c22-1ee0-f9da41883c39@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 00/31] block: Fix some filename
+ generation issues
+References: <153430460784.10304.668502576933473446@502c9da6d61e>
+ <91d64820-89d3-c0dc-741b-f6fb13175174@redhat.com>
+ <87lg96g87u.fsf@dusky.pond.sub.org>
+In-Reply-To: <87lg96g87u.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-08-16 08:02, Markus Armbruster wrote:
+> Max Reitz <mreitz@redhat.com> writes:
+>=20
+>> On 2018-08-15 05:43, no-reply@patchew.org wrote:
+>>> Hi,
 >>>
->>> If parallel requests on an SSD perform better, wouldn't a guest issue
->>> parallel requests to the virtual device and thus to qcow2 anyway?
->> Guest knows nothing about qcow2 fragmentation, so this kind of
->> "asynchronization" could be done only at qcow2 level.
-> Hm, yes.  I'm sorry, but without having looked closer at the series
-> (which is why I'm sorry in advance), I would suspect that the
-> performance improvement comes from us being able to send parallel
-> requests to an SSD.
->
-> So if you send large requests to an SSD, you may either send them in
-> parallel or sequentially, it doesn't matter.  But for small requests,
-> it's better to send them in parallel so the SSD always has requests in
-> its queue.
->
-> I would think this is where the performance improvement comes from.  But
-> I would also think that a guest OS knows this and it would also send
-> many requests in parallel so the virtual block device never runs out of
-> requests.
->
->> However, if guest do async io, send a lot of parallel requests, it
->> behave like qemu-img without -d 1 option, and in this case,
->> parallel loop iterations in qcow2 doesn't have such great sense.
->> However, I think that async parallel requests are better in
->> general than sequential, because if device have some unused opportunity
->> of parallelization, it will be utilized.
-> I agree that it probably doesn't make things worse performance-wise, but
-> it's always added complexity (see the diffstat), which is why I'm just
-> routinely asking how useful it is in practice. :-)
->
-> Anyway, I suspect there are indeed cases where a guest doesn't send many
-> requests in parallel but it makes sense for the qcow2 driver to
-> parallelize it.  That would be mainly when the guest reads seemingly
-> sequential data that is then fragmented in the qcow2 file.  So basically
-> what your benchmark is testing. :-)
->
-> Then, the guest could assume that there is no sense in parallelizing it
-> because the latency from the device is large enough, whereas in qemu
-> itself we always run dry and wait for different parts of the single
-> large request to finish.  So, yes, in that case, parallelization that's
-> internal to qcow2 would make sense.
->
-> Now another question is, does this negatively impact devices where
-> seeking is slow, i.e. HDDs?  Unfortunately I'm not home right now, so I
-> don't have access to an HDD to test myself...
-There are different situations and different load pattern, f.e. there
-are situations when the guest executes sequential read
-in a single thread. This looks obvious and dummy, but this is for sure
-is possible in the real life. Also there is an observation, that Windows
-guest prefers long requests. There is not unusual to observe 4Mb
-requests in a pipeline.
+>>> This series seems to have some coding style problems. See output belo=
+w for
+>>> more information:
+>>
+>> [...]
+>>
+>>> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+>>> Checking PATCH 1/31: block: Use bdrv_refresh_filename() to pull...
+>>> Checking PATCH 2/31: block: Use children list in bdrv_refresh_filenam=
+e...
+>>> Checking PATCH 3/31: block: Skip implicit nodes for filename info...
+>>> Checking PATCH 4/31: block: Add BDS.auto_backing_file...
+>>> Checking PATCH 5/31: block: Respect backing bs in bdrv_refresh_filena=
+me...
+>>> ERROR: return is not a function, parentheses are not required
+>>> #46: FILE: block.c:5192:
+>>> +        return (bs->auto_backing_file[0] !=3D '\0');
+>>>
+>>> total: 1 errors, 0 warnings, 136 lines checked
+>>
+>> Sure, but I'd hate you personally if you omitted them.
+>=20
+> @@
+> expression E;
+> @@
+> -    return (E);
+> +    return E;
+>=20
+> You're welcome!
 
-Thus for such a load in a scattered file the performance difference should
-be very big, even on SSD as without this SSD will starve without requests.
+Well, I really don't like not putting parenthesis when returning
+something that is not an identifier or a function call.
 
-Here we are speaking in terms of latency, which definitely will be bigger
-in sequential case.
+In fact, before I drop the parentheses, I'd drop the "!=3D '\0'", because=
 
-Den
+that is optional, too.  (And then I could drop the parentheses anyway.)
 
->> We've already
->> use this approach in mirror and qemu-img convert.
-> Indeed, but here you could always argue that this is just what guests
-> do, so we should, too.
->
->> In Virtuozzo we have
->> backup, improved by parallelization of requests
->> loop too. I think, it would be good to have some general code for such
->> things in future.
-> Well, those are different things, I'd think.  Parallelization in
-> mirror/backup/convert is useful not just because of qcow2 issues, but
-> also because you have a volume to read from and a volume to write to, so
-> that's where parallelization gives you some pipelining.  And it gives
-> you buffers for latency spikes, I guess.
->
-> Max
->
+Or write it with an explicit if-else (return true - return false).
+
+Max
+
+
+--4VZ1XIsj26FLRJyGdqOZ9SUmZTjsjVx0y
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt3KfUACgkQ9AfbAGHV
+z0A1wQf/aHMugEM0t1CXf8sDqkH8CKAGRyHqtH5+vzNa9YDT2NsWx54fewH0dtF4
+kk0TGrX7yMadqUKZZoO/kroYqNZLitBHwVDlo667ogFnN6rMUYEcq3Msc+0cSb5l
+Jot3GWv2FogfUgx5fH4HsSNoAEfSIMKfnw3jR0MCElpExL2dNPPH5jPSN9lAOiDs
+ZjPewN4msbjsk+mtapRPO2UNljnp89/2L09ZX5MXW1StVufanKfu2SDlAoewGcD8
+Eh0HaY2qVpssIg+KA/vXTWc3AWzTAgf+FjIFbgDEuXix2rW82vNt4jyzD7DOj+M4
+epstsCpIa5jZ7KulgBOSz5lTTkP0lQ==
+=OHU0
+-----END PGP SIGNATURE-----
+
+--4VZ1XIsj26FLRJyGdqOZ9SUmZTjsjVx0y--
