@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKH-00035A-CJ
+	(envelope-from <armbru@redhat.com>) id 1fqgKI-00035f-07
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKE-0001kr-OB
+	(envelope-from <armbru@redhat.com>) id 1fqgKF-0001lO-7F
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46138 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46442 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKE-0001iB-2E
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKE-0001iG-Cp
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:06 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:18 +0200
-Message-Id: <20180817150559.16243-20-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:21 +0200
+Message-Id: <20180817150559.16243-23-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 19/60] json: Tighten and simplify
- qstring_from_escaped_str()'s loop
+Subject: [Qemu-devel] [PATCH v2 22/60] json: Report first rather than last
+ parse error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +27,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Simplify loop control, and assert that the string ends with the
-appropriate quote (the lexer ensures it does).
+Quiz time!  When a parser reports multiple errors, but the user gets
+to see just one, which one is (on average) the least useful one?
+
+Yes, you're right, it's the last one!  You're clearly familiar with
+compilers.
+
+Which one does QEMU report?
+
+Right again, the last one!  You're clearly familiar with QEMU.
+
+Reproducer: feeding
+
+    {"abc\xC2ijk": 1}\n
+
+to QMP produces
+
+    {"error": {"class": "GenericError", "desc": "JSON parse error, key is not a string in object"}}
+
+Report the first error instead.  The reproducer now produces
+
+    {"error": {"class": "GenericError", "desc": "JSON parse error, invalid UTF-8 sequence in string"}}
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-parser.c | 30 +++++++-----------------------
- 1 file changed, 7 insertions(+), 23 deletions(-)
+ qobject/json-parser.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index a5aa790d62..164b86769b 100644
+index 0e232ff101..b77931614b 100644
 --- a/qobject/json-parser.c
 +++ b/qobject/json-parser.c
-@@ -132,65 +132,49 @@ static QString *qstring_from_escaped_str(JSONParserContext *ctxt,
+@@ -54,13 +54,13 @@ static void GCC_FMT_ATTR(3, 4) parse_error(JSONParserContext *ctxt,
  {
-     const char *ptr = token->str;
-     QString *str;
--    int double_quote = 1;
--
--    if (*ptr == '"') {
--        double_quote = 1;
--    } else {
--        double_quote = 0;
--    }
--    ptr++;
-+    char quote;
- 
-+    assert(*ptr == '"' || *ptr == '\'');
-+    quote = *ptr++;
-     str = qstring_new();
--    while (*ptr && 
--           ((double_quote && *ptr != '"') || (!double_quote && *ptr != '\''))) {
+     va_list ap;
+     char message[1024];
 +
-+    while (*ptr != quote) {
-+        assert(*ptr);
-         if (*ptr == '\\') {
-             ptr++;
--
--            switch (*ptr) {
-+            switch (*ptr++) {
-             case '"':
-                 qstring_append(str, "\"");
--                ptr++;
-                 break;
-             case '\'':
-                 qstring_append(str, "'");
--                ptr++;
-                 break;
-             case '\\':
-                 qstring_append(str, "\\");
--                ptr++;
-                 break;
-             case '/':
-                 qstring_append(str, "/");
--                ptr++;
-                 break;
-             case 'b':
-                 qstring_append(str, "\b");
--                ptr++;
-                 break;
-             case 'f':
-                 qstring_append(str, "\f");
--                ptr++;
-                 break;
-             case 'n':
-                 qstring_append(str, "\n");
--                ptr++;
-                 break;
-             case 'r':
-                 qstring_append(str, "\r");
--                ptr++;
-                 break;
-             case 't':
-                 qstring_append(str, "\t");
--                ptr++;
-                 break;
-             case 'u': {
-                 uint16_t unicode_char = 0;
-                 char utf8_char[4];
-                 int i = 0;
++    if (ctxt->err) {
++        return;
++    }
+     va_start(ap, msg);
+     vsnprintf(message, sizeof(message), msg, ap);
+     va_end(ap);
+-    if (ctxt->err) {
+-        error_free(ctxt->err);
+-        ctxt->err = NULL;
+-    }
+     error_setg(&ctxt->err, "JSON parse error, %s", message);
+ }
  
--                ptr++;
--
-                 for (i = 0; i < 4; i++) {
-                     if (qemu_isxdigit(*ptr)) {
-                         unicode_char |= hex2decimal(*ptr) << ((3 - i) * 4);
 -- 
 2.17.1
