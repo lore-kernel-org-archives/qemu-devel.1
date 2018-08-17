@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fqhRz-00050I-2s
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:18:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1fqhVz-0000Y0-85
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:22:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fqhRu-0001PV-IJ
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:18:10 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:51302)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fqhRu-0001Nq-9m
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:18:06 -0400
-Received: by mail-wm0-x242.google.com with SMTP id y2-v6so8100933wma.1
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 09:18:06 -0700 (PDT)
-References: <1534411696-6454-1-git-send-email-jing2.liu@linux.intel.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <1d4e89eb-073e-2883-aa65-6f379627694f@gmail.com>
-Date: Fri, 17 Aug 2018 19:18:03 +0300
+	(envelope-from <eblake@redhat.com>) id 1fqhVv-0004U2-Uw
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:22:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59932 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fqhVv-0004TM-N5
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:22:15 -0400
+References: <20180817150559.16243-1-armbru@redhat.com>
+	<20180817150559.16243-8-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <51121d8e-9e44-e027-a590-b69956531c8f@redhat.com>
+Date: Fri, 17 Aug 2018 11:22:12 -0500
 MIME-Version: 1.0
-In-Reply-To: <1534411696-6454-1-git-send-email-jing2.liu@linux.intel.com>
+In-Reply-To: <20180817150559.16243-8-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] hw/pci: PCI resource reserve
- capability
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 07/60] check-qjson: Cover escaped
+ characters more thoroughly, part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jing Liu <jing2.liu@linux.intel.com>, qemu-devel@nongnu.org
-Cc: anthony.xu@intel.com, mst@redhat.com, lersek@redhat.com, pbonzini@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-Hi Jing,
+On 08/17/2018 10:05 AM, Markus Armbruster wrote:
+> escaped_string() first tests double quoted strings, then repeats a few
+> tests with single quotes.  Repeat all of them: store the strings to
+> test without quotes, and wrap them in either kind of quote for
+> testing.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   tests/check-qjson.c | 96 +++++++++++++++++++++++++++------------------
+>   1 file changed, 57 insertions(+), 39 deletions(-)
+> 
+> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+> index 188f683317..2f1890929d 100644
+> --- a/tests/check-qjson.c
+> +++ b/tests/check-qjson.c
+> @@ -22,55 +22,73 @@
+>   #include "qapi/qmp/qstring.h"
+>   #include "qemu-common.h"
+>   
+> +static QString *from_json_str(const char *jstr, Error **errp, bool single)
 
-On 08/16/2018 12:28 PM, Jing Liu wrote:
-> This patch serial is about PCI resource reserve capability.
->
-> First patch refactors the resource reserve fields in GenPCIERoorPort
-> structure out to another new structure, called "PCIResReserve". Modify
-> the parameter list of pci_bridge_qemu_reserve_cap_init().
->
-> Then we add the teardown function called pci_bridge_qemu_reserve_cap_uninit().
->
-> Last we enable the resource reserve capability for legacy PCI bridge
-> so that firmware can reserve additional resources for the bridge.
+Unusual to put Error **errp in the middle rather than last. Worth 
+swapping 'single' to come before 'errp'?
 
-The series looks good to me, please see some minor comments
-in the patches.
+>          int skip;
 
-Can you please point me to the SeaBIOS / OVMF counterpart?
+Pre-existing, but since you are touching this, is it worth making this bool?
 
-Thanks,
-Marcel
+> +    for (i = 0; test_cases[i].json_in; i++) {
+> +        for (j = 0; j < 2; j++) {
+> +            cstr = from_json_str(test_cases[i].json_in, &error_abort, j);
 
+Only one caller to adjust here (and maybe a couple more later in the 
+series).
 
-> Change Log:
-> v2 -> v1
-> * add refactoring patch
-> * add teardown function
-> * some other fixes
->
-> Jing Liu (3):
->    hw/pci: factor PCI reserve resources to a separate structure
->    hw/pci: add teardown function for PCI resource reserve capability
->    hw/pci: add PCI resource reserve capability to legacy PCI bridge
->
->   hw/pci-bridge/gen_pcie_root_port.c | 32 +++++++++++++-------------
->   hw/pci-bridge/pci_bridge_dev.c     | 25 ++++++++++++++++++++
->   hw/pci/pci_bridge.c                | 47 +++++++++++++++++++++-----------------
->   include/hw/pci/pci_bridge.h        | 18 +++++++++++----
->   4 files changed, 80 insertions(+), 42 deletions(-)
->
+That's bike-shedding, so either way,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+> +            g_assert_cmpstr(qstring_get_try_str(cstr),
+> +                            ==, test_cases[i].utf8_out);
+> +            if (test_cases[i].skip == 0) {
+> +                jstr = to_json_str(cstr);
+> +                g_assert_cmpstr(jstr, ==, test_cases[i].json_in);
+> +                g_free(jstr);
+> +            }
+> +            qobject_unref(cstr);
+>           }
+> -
+> -        qobject_unref(str);
+>       }
+>   }
+>   
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
