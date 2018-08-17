@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fqcJA-0005KJ-LG
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:48:47 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fqcMN-0007R3-Bv
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:52:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fqcJ9-0001GG-NE
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:48:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51476 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fqcMJ-0003V8-Jc
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:52:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38936 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fqcJ9-0001G2-Ga
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:48:43 -0400
-Date: Fri, 17 Aug 2018 11:48:34 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180817104833.GC2459@work-vm>
-References: <20180817051853.23792-1-cota@braap.org>
-	<20180817051853.23792-9-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180817051853.23792-9-cota@braap.org>
-Subject: Re: [Qemu-devel] [PATCH 8/9] hmp-commands: add sync-profile
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fqcMJ-0003Uw-Ez
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:51:59 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 17 Aug 2018 12:51:57 +0200
+Message-Id: <20180817105157.7486-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH correct] checkpatch: allow space in more places
+ before a bracket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,103 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: richard.henderson@linaro.org
 
-* Emilio G. Cota (cota@braap.org) wrote:
-> The command introduced here is just for developers. This means that:
-> 
-> - the interface implemented here could change in the future
-> - the command is only meant to be used from HMP, not from QMP
-> 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  hmp.h           |  1 +
->  hmp.c           | 24 ++++++++++++++++++++++++
->  hmp-commands.hx | 15 +++++++++++++++
->  3 files changed, 40 insertions(+)
-> 
-> diff --git a/hmp.h b/hmp.h
-> index 33354f1bdd..5f1addcca2 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -42,6 +42,7 @@ void hmp_info_tpm(Monitor *mon, const QDict *qdict);
->  void hmp_info_iothreads(Monitor *mon, const QDict *qdict);
->  void hmp_quit(Monitor *mon, const QDict *qdict);
->  void hmp_stop(Monitor *mon, const QDict *qdict);
-> +void hmp_sync_profile(Monitor *mon, const QDict *qdict);
->  void hmp_system_reset(Monitor *mon, const QDict *qdict);
->  void hmp_system_powerdown(Monitor *mon, const QDict *qdict);
->  void hmp_exit_preconfig(Monitor *mon, const QDict *qdict);
-> diff --git a/hmp.c b/hmp.c
-> index 2aafb50e8e..d94a47f7c7 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1062,6 +1062,30 @@ void hmp_stop(Monitor *mon, const QDict *qdict)
->      qmp_stop(NULL);
->  }
->  
-> +void hmp_sync_profile(Monitor *mon, const QDict *qdict)
-> +{
-> +    const char *op = qdict_get_try_str(qdict, "op");
-> +
-> +    if (op == NULL) {
-> +        bool on = qsp_is_enabled();
-> +
-> +        monitor_printf(mon, "sync-profile is %s\n", on ? "on" : "off");
-> +        return;
-> +    }
-> +    if (!strcmp(op, "on")) {
-> +        qsp_enable();
-> +    } else if (!strcmp(op, "off")) {
-> +        qsp_disable();
-> +    } else if (!strcmp(op, "reset")) {
-> +        qsp_reset();
-> +    } else {
-> +        Error *err = NULL;
-> +
-> +        error_setg(&err, QERR_INVALID_PARAMETER, op);
-> +        hmp_handle_error(mon, &err);
-> +    }
-> +}
-> +
->  void hmp_system_reset(Monitor *mon, const QDict *qdict)
->  {
->      qmp_system_reset(NULL);
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index c1fc747403..db0c681f74 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -643,6 +643,21 @@ sendkey ctrl-alt-f1
->  
->  This command is useful to send keys that your graphical user interface
->  intercepts at low level, such as @code{ctrl-alt-f1} in X Window.
-> +ETEXI
-> +    {
-> +        .name       = "sync-profile",
-> +        .args_type  = "op:s?",
-> +        .params     = "[on|off|reset]",
-> +        .help       = "enable, disable or reset synchronization profiling. "
-> +                      "With no arguments, prints whether profiling is on or off.",
-> +        .cmd        = hmp_sync_profile,
-> +    },
+From: Heinrich Schuchardt <xypron.glpk@gmx.de>
 
-That's OK; it'a  little odd way to do it (I'd have expected a couple of
-booleans instead of the string); but it's OK, so
+Allow a space between a colon and subsequent opening bracket.  This
+sequence may occur in inline assembler statements like
 
+	asm(
+		"ldr %[out], [%[in]]\n\t"
+		: [out] "=r" (ret)
+		: [in] "r" (addr)
+	);
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Allow a space between a comma and subsequent opening bracket.  This
+sequence may occur in designated initializers.
 
-> +STEXI
-> +@item sync-profile [on|off|reset]
-> +@findex sync-profile
-> +Enable, disable or reset synchronization profiling. With no arguments, prints
-> +whether profiling is on or off.
->  ETEXI
->  
->      {
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+To ease backporting the patch, I am also changing the comma-bracket
+detection (added in QEMU by commit 409db6eb7199af7a2f09f746bd1b793e9daefe5f)
+to use the same regex as brackets and colons (as done independently
+by Linux commit daebc534ac15f991961a5bb433e515988220e9bf).
+
+Link: http://lkml.kernel.org/r/20180403191655.23700-1-xypron.glpk@gmx.de
+Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+Acked-by: Joe Perches <joe@perches.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/checkpatch.pl | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 52ab18bfce..33b5771120 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -1977,9 +1977,8 @@ sub process {
+ 			my ($where, $prefix) = ($-[1], $1);
+ 			if ($prefix !~ /$Type\s+$/ &&
+ 			    ($where != 0 || $prefix !~ /^.\s+$/) &&
+-			    $prefix !~ /{\s+$/ &&
+ 			    $prefix !~ /\#\s*define[^(]*\([^)]*\)\s+$/ &&
+-			    $prefix !~ /,\s+$/) {
++			    $prefix !~ /[,{:]\s+$/) {
+ 				ERROR("space prohibited before open square bracket '['\n" . $herecurr);
+ 			}
+ 		}
+-- 
+2.17.1
