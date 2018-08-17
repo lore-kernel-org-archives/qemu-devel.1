@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fqkGQ-00034W-PP
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:18:27 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fqkKQ-0007BT-RL
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:22:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fqkGP-0007Uk-Vz
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:18:26 -0400
-References: <20180817190457.8292-1-jsnow@redhat.com>
-	<20180817190457.8292-5-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8290bf09-1525-a09b-5582-f20a70022025@redhat.com>
-Date: Fri, 17 Aug 2018 15:18:11 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fqkKP-0001yx-SA
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:22:34 -0400
+References: <20180815025614.53588-1-eblake@redhat.com>
+	<20180815025614.53588-3-eblake@redhat.com>
+	<48010463-405e-bb08-f9c5-8263dcf3bb48@redhat.com>
+	<4aa899d3-c622-6acf-128c-513f95c55ed5@redhat.com>
+	<d8c5df8d-7ae2-8ddc-aa71-38ec06b79988@redhat.com>
+	<20180816071515.GC5511@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f349dcef-2a59-8a8c-38d5-641d83833561@redhat.com>
+Date: Fri, 17 Aug 2018 21:22:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180817190457.8292-5-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/7] block/commit: utilize job_exit shim
+In-Reply-To: <20180816071515.GC5511@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oNdzxwOTZ1kAcIaAKNGxfhJP1BkTAukuW"
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-img: Add dd seek= option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,114 +28,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, fullmanet@gmail.com, qemu-block@nongnu.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oNdzxwOTZ1kAcIaAKNGxfhJP1BkTAukuW
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
+ fullmanet@gmail.com, qemu-block@nongnu.org
+Message-ID: <f349dcef-2a59-8a8c-38d5-641d83833561@redhat.com>
+Subject: Re: [PATCH 2/2] qemu-img: Add dd seek= option
+References: <20180815025614.53588-1-eblake@redhat.com>
+ <20180815025614.53588-3-eblake@redhat.com>
+ <48010463-405e-bb08-f9c5-8263dcf3bb48@redhat.com>
+ <4aa899d3-c622-6acf-128c-513f95c55ed5@redhat.com>
+ <d8c5df8d-7ae2-8ddc-aa71-38ec06b79988@redhat.com>
+ <20180816071515.GC5511@localhost.localdomain>
+In-Reply-To: <20180816071515.GC5511@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
+On 2018-08-16 09:15, Kevin Wolf wrote:
+> Am 16.08.2018 um 04:49 hat Max Reitz geschrieben:
+>> On 2018-08-16 04:39, Eric Blake wrote:
+>>> If convert were more powerful, I'd be fine dropping 'qemu-img dd' aft=
+er
+>>> a proper deprecation period.
+>>
+>> Technically it has those features already, with the raw block driver's=
 
-On 08/17/2018 03:04 PM, John Snow wrote:
-> Change the manual deferment to commit_complete into the implicit
-> callback to job_exit, renaming commit_complete to commit_exit.
+>> offset and size parameters.
 >=20
-> This conversion does change the timing of when job_completed is
-> called to after the bdrv_replace_node and bdrv_unref calls, which
-> could have implications for bjob->blk which will now be put down
-> after this cleanup.
+> In a way, yes. It requires you to precreate the target image, though,
+> because --target-image-opts requires -n.
 >=20
-> Kevin highlights that we did not take any permissions for that backend
-> at job creation time, so it is safe to reorder these operations.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/commit.c | 20 ++++----------------
->  1 file changed, 4 insertions(+), 16 deletions(-)
->=20
-> diff --git a/block/commit.c b/block/commit.c
-> index 4a17bb73ec..93c3b6a39e 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -68,19 +68,13 @@ static int coroutine_fn commit_populate(BlockBacken=
-d *bs, BlockBackend *base,
->      return 0;
->  }
-> =20
-> -typedef struct {
-> -    int ret;
-> -} CommitCompleteData;
-> -
-> -static void commit_complete(Job *job, void *opaque)
-> +static void commit_exit(Job *job)
->  {
->      CommitBlockJob *s =3D container_of(job, CommitBlockJob, common.job=
-);
->      BlockJob *bjob =3D &s->common;
-> -    CommitCompleteData *data =3D opaque;
->      BlockDriverState *top =3D blk_bs(s->top);
->      BlockDriverState *base =3D blk_bs(s->base);
->      BlockDriverState *commit_top_bs =3D s->commit_top_bs;
-> -    int ret =3D data->ret;
->      bool remove_commit_top_bs =3D false;
-> =20
->      /* Make sure commit_top_bs and top stay around until bdrv_replace_=
-node() */
-> @@ -93,8 +87,8 @@ static void commit_complete(Job *job, void *opaque)
-> =20
->      if (!job_is_cancelled(job) && ret =3D=3D 0) {
+> We'll probably want to fix something in this area anyway because in the=
 
-forgot to actually squash the change in here that replaces `ret` with
-`job->ret`.
+> common case, you already need those options to even precreate the image=
+,
+> and qemu-img create doesn't support open options for the protocol layer=
 
->          /* success */
-> -        ret =3D bdrv_drop_intermediate(s->commit_top_bs, base,
-> -                                     s->backing_file_str);
-> +        job->ret =3D bdrv_drop_intermediate(s->commit_top_bs, base,
-> +                                          s->backing_file_str);
->      } else {
->          /* XXX Can (or should) we somehow keep 'consistent read' block=
-ed even
->           * after the failed/cancelled commit job is gone? If we alread=
-y wrote
-> @@ -117,9 +111,6 @@ static void commit_complete(Job *job, void *opaque)
->       * bdrv_set_backing_hd() to fail. */
->      block_job_remove_all_bdrv(bjob);
-> =20
-> -    job_completed(job, ret);
-> -    g_free(data);
-> -
->      /* If bdrv_drop_intermediate() didn't already do that, remove the =
-commit
->       * filter driver from the backing chain. Do this as the final step=
- so that
->       * the 'consistent read' permission can be granted.  */
-> @@ -137,7 +128,6 @@ static void commit_complete(Job *job, void *opaque)
->  static int coroutine_fn commit_run(Job *job, Error **errp)
->  {
->      CommitBlockJob *s =3D container_of(job, CommitBlockJob, common.job=
-);
-> -    CommitCompleteData *data;
->      int64_t offset;
->      uint64_t delay_ns =3D 0;
->      int ret =3D 0;
-> @@ -210,9 +200,6 @@ static int coroutine_fn commit_run(Job *job, Error =
-**errp)
->  out:
->      qemu_vfree(buf);
-> =20
-> -    data =3D g_malloc(sizeof(*data));
-> -    data->ret =3D ret;
-> -    job_defer_to_main_loop(&s->common.job, commit_complete, data);
->      return ret;
->  }
-> =20
-> @@ -224,6 +211,7 @@ static const BlockJobDriver commit_job_driver =3D {
->          .user_resume   =3D block_job_user_resume,
->          .drain         =3D block_job_drain,
->          .run           =3D commit_run,
-> +        .exit          =3D commit_exit,
->      },
->  };
-> =20
+> either (unlike blockdev-create).
 >=20
+>>>> ((That gave me a good idea.=A0 Actually, it's probably not such a go=
+od
+>>>> idea, but I guess I'll do it in my spare time anyway.=A0 A qemu-img =
+fuse
+>>>> might be nice which represents an image as a raw image at some mount=
 
---=20
-=E2=80=94js
+>>>> point.=A0 Benefits over qemu-nbd: (1) You don't need root, (2) you d=
+on't
+>>>> need to type modprobe nbd.))
+>>>
+>>> So the kernel->userspace translation would be happening via the FUSE
+>>> interface instead of the NBD interface.=A0 Data still bounces around =
+just
+>>> as much, but it might be a fun project.=A0 Does fuse behave well when=
+
+>>> serving exactly one file at the mountpoint, rather than the more typi=
+cal
+>>> file system rooted in a directory?=A0 NBD at least has the benefit of=
+
+>>> claiming to be a block device all along, rather than complicating the=
+
+>>> user interface with POSIX file system rules (which you'll be bending,=
+
+>>> because you are serving exactly one file instead of a system).
+>=20
+> To make it more real, you could expose a snapshots/ subdirectory. Or
+> maybe better not.
+>=20
+>> Well, but I can just pretend my FUSE file is a block device, no?
+>>
+>> Also, I just discovered something really interesting: FUSE allows you =
+to
+>> specify a single file as a mountpoint.
+>>
+>> And you know what?  You can open the original file before you replace =
+it
+>> by the FUSE "filesystem".
+>>
+>> So my fun interface is going to looks like this:
+>>
+>> $ qemu-img fuse foo.qcow2
+>>
+>> And then your foo.qcow2 is a raw image until the next "fusermount -u
+>> foo.qcow2"!  Isn't that fun?
+>=20
+> Yes, sounds fun. Until you realise that I'd actually like to merge
+> something like this when it exists. ;-)
+
+Well, for reference:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/qemu-img-fuse
+
+(The main issue now is that you don't see FUSE error messages,
+because...  Well.  FUSE likes to fork the daemon process itself, but for
+some reason that doesn't really work with qemu.  I don't really want to
+investigate that, instead I rather like to declare it broken and launch
+FUSE in foreground mode, and then do the forking ourselves (like
+qemu-nbd does).  But then we lose all error output from FUSE, because we
+have to close stderr before we get to the main loop...
+
+(I suppose I can just look into what fuse_main() does exactly and
+replicate that.  The doc says using fuse_main() is just lazy anyway. O:-P=
+))
+
+> For a more serious implementation, maybe it should even be a separate
+> qemu-fuse rather than a qemu-img subcommand.
+
+True.  It doesn't really fit well into qemu-img.
+
+(To me, qemu-img is about exposing block layer features without the user
+having to use qemu proper.  Exporting an image over FUSE really is not a
+block layer feature.)
+
+Max
+
+
+--oNdzxwOTZ1kAcIaAKNGxfhJP1BkTAukuW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt3IG8ACgkQ9AfbAGHV
+z0CPrAf6A003gvl9Dz+iiqkvPh0Xxpt7aNH7vu5kpr6NtcyH18+ISHykxxaai9PB
++zfIUnP3fAxEJ0cZsSgXsNzCNr4/kcGE1Y77cvEOkUDJSnzKO5P7CP5bxo5oP/yc
+IRPUtlCp3KhFQphL2z2TCtWnjwTywaqA5QDywb6hoQEsxTXgEBeNei6ZOUT1mxu9
+fCTlHCeTjv/XgUG6ZadEQifpVi1CspYHnub3sEtO69e72cpjh5wjrx+QcxUJwcec
+RPYXDaI/JuL9BElxH8FafQZrQmsAFjEjrVvPBgw8SUJduSa0czg6wx3Z1mutA5mw
+rbUlyghqHNwib3j+2iOF/j3XCtB91w==
+=o5De
+-----END PGP SIGNATURE-----
+
+--oNdzxwOTZ1kAcIaAKNGxfhJP1BkTAukuW--
