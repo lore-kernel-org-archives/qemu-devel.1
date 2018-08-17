@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqf6O-0006c3-Tm
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:47:48 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqf7M-00076j-R1
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:48:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqf6O-0003g4-4y
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:47:44 -0400
-Date: Fri, 17 Aug 2018 10:47:27 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180817134727.GC15372@localhost.localdomain>
-References: <1534440027-10528-1-git-send-email-vsementsov@virtuozzo.com>
-	<1534440027-10528-4-git-send-email-vsementsov@virtuozzo.com>
-	<20180817015429.GW15372@localhost.localdomain>
-	<deec540b-aaf7-4f8d-5c9f-0684fb2b9b34@virtuozzo.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1fqf7J-0004Q9-MX
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:48:44 -0400
+Received: from mail-by2nam05on0703.outbound.protection.outlook.com
+	([2a01:111:f400:fe52::703]:28128
+	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fqf7J-0004Pd-B6
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:48:41 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 17 Aug 2018 13:48:20 +0000
+Message-ID: <BN7PR08MB4868A7DAB03930DC49C88EFCC63D0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1534431497-1385-41-git-send-email-aleksandar.markovic@rt-rk.com>
+	<97501a9d-c00f-7aba-1af2-256629f9abf5@linaro.org>
+	<BN7PR08MB486867F6E966AB071EAC4ADBC63E0@BN7PR08MB4868.namprd08.prod.outlook.com>,
+	<444c2388-6f96-71ae-db7c-38a1d72c8954@linaro.org>
+In-Reply-To: <444c2388-6f96-71ae-db7c-38a1d72c8954@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <deec540b-aaf7-4f8d-5c9f-0684fb2b9b34@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] scripts/qemu: add render_block_graph
- method for QEMUMachine
+Subject: Re: [Qemu-devel] [PATCH v9 40/84] target/mips: Fix pre-nanoMIPS MT
+ ASE instructions availability control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, crosa@redhat.com, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-
-On Fri, Aug 17, 2018 at 01:08:42PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> 17.08.2018 04:54, Eduardo Habkost wrote:
-> > On Thu, Aug 16, 2018 at 08:20:26PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> > > Render block nodes graph with help of graphviz
-> > > 
-> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > Thanks for your patch.  Comments below:
-> > 
-> > > ---
-> > >   scripts/qemu.py | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > >   1 file changed, 53 insertions(+)
-> > > 
-> > > diff --git a/scripts/qemu.py b/scripts/qemu.py
-> > > index f099ce7278..cff562c713 100644
-> > > --- a/scripts/qemu.py
-> > > +++ b/scripts/qemu.py
-> > > @@ -460,3 +460,56 @@ class QEMUMachine(object):
-> > >                                                    socket.SOCK_STREAM)
-> > >               self._console_socket.connect(self._console_address)
-> > >           return self._console_socket
-> > > +
-> > > +    def render_block_graph(self, filename):
-> > > +        '''
-> > > +        Render graph in text (dot) representation into "filename" and graphical
-> > > +        representation into pdf file "filename".pdf
-> > > +        '''
-> > > +
-> > > +        try:
-> > > +            from graphviz import Digraph
-> > I'm not convinced that this belongs to qemu.py, if most code
-> > using the qemu.py module will never use it.  Do you see any
-> > problem in moving this code to a scripts/render_block_graph.py
-> > script?
-> 
-> Not a problem, I can do it.. Just one thought:
-> Isn't it better to keep all function doing something with one vm as methods,
-> not separate functions?
-
-I don't think so.  We don't need to create a new QEMUMachine
-method every time we write a function that takes a QEMUMachine as
-argument in our scripts.
-
-There are cases when we're forced to create a method: when the
-new code is tightly coupled to the QEMUMachine code and need
-access to its private attributes.
-
-There are cases where we probably want to place the code in
-qemu.py (as a method): when we expect many users of qemu.py to
-call it.
-
-But in other cases, I don't see any problem with another
-script/module having a regular function like:
-
-  def my_special_purpose_function(vm, ...):
-     ...
+To: Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
 
--- 
-Eduardo
+> > I think some of the previously-implemented similar cases involving read=
+-only bits were handled the same way, and we just built on that. What would=
+ you suggest as a more appropriate solution in such cases (of accessing "pr=
+eset by hardware" bits)?
+>
+> Well, ctx->insn_flags and ctx->CP0_Config1 are good examples.
+> These are 100% read-only and fixed at cpu instantiation.
+>=20
+> I see that CP0_Config3 has one writable bit for micromips, but
+> is fully readonly for nanomips.  Therefore XNP and MT need not
+> be copied to hflags because they will never vary.
+>=20
+> I'd suggest copying CP0_Config3 to ctx as with Config1.
+>
+>
+> r~
+
+Hi, Richard,
+
+The opinion within the team is that we should leave such changes for follow=
+-up clean-up - clean-up of CP0-related functionalities is scheduled anyway =
+soon.
+
+The reason is that the current implementation (in v9) works fine, and this =
+is very late in our dev cycle to change features with no observed bugs.
+
+All other your concerns will be addressed in v10, which is planned to be se=
+nt soon.
+
+Yours,
+Aleksandar
