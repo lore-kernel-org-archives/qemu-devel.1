@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgSI-00052M-2w
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:27 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgSF-0008Qq-R2
+	(envelope-from <armbru@redhat.com>) id 1fqgSG-00051T-V6
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46770 helo=mx1.redhat.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1fqgSF-0008Q8-M1
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46520 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgSF-0008Oa-FI
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgSF-0008Nt-8z
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:23 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:39 +0200
-Message-Id: <20180817150559.16243-41-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:48 +0200
+Message-Id: <20180817150559.16243-50-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 40/60] json: Replace %I64d, %I64u by %PRId64,
- %PRIu64
+Subject: [Qemu-devel] [PATCH v2 49/60] json: Streamline
+ json_message_process_token()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +27,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Support for %I64d got added in commit 2c0d4b36e7f "json: fix PRId64 on
-Win32".  We had to hard-code I64d because we used the lexer's finite
-state machine to check interpolations.  No more, so clean this up.
-
-Additional conversion specifications would be easy enough to implement
-when needed.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-parser.c | 10 ++++++----
- tests/check-qjson.c   | 10 ++++++++++
- 2 files changed, 16 insertions(+), 4 deletions(-)
+ qobject/json-streamer.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 32131c08d5..c367dfc420 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -438,16 +438,18 @@ static QObject *parse_interpolation(JSONParserContext *ctxt, va_list *ap)
-         return QOBJECT(qnum_from_int(va_arg(*ap, int)));
-     } else if (!strcmp(token->str, "%ld")) {
-         return QOBJECT(qnum_from_int(va_arg(*ap, long)));
--    } else if (!strcmp(token->str, "%lld") ||
--               !strcmp(token->str, "%I64d")) {
-+    } else if (!strcmp(token->str, "%lld")) {
-         return QOBJECT(qnum_from_int(va_arg(*ap, long long)));
-+    } else if (!strcmp(token->str, "%" PRId64)) {
-+        return QOBJECT(qnum_from_int(va_arg(*ap, int64_t)));
-     } else if (!strcmp(token->str, "%u")) {
-         return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned int)));
-     } else if (!strcmp(token->str, "%lu")) {
-         return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned long)));
--    } else if (!strcmp(token->str, "%llu") ||
--               !strcmp(token->str, "%I64u")) {
-+    } else if (!strcmp(token->str, "%llu")) {
-         return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned long long)));
-+    } else if (!strcmp(token->str, "%" PRIu64)) {
-+        return QOBJECT(qnum_from_uint(va_arg(*ap, uint64_t)));
-     } else if (!strcmp(token->str, "%s")) {
-         return QOBJECT(qstring_from_str(va_arg(*ap, const char *)));
-     } else if (!strcmp(token->str, "%f")) {
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 6a1dbbae43..d741d29733 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -945,9 +945,11 @@ static void keyword_literal(void)
- static void interpolation_valid(void)
- {
-     long long value_lld = 0x123456789abcdefLL;
-+    int64_t value_d64 = value_lld;
-     long value_ld = (long)value_lld;
-     int value_d = (int)value_lld;
-     unsigned long long value_llu = 0xfedcba9876543210ULL;
-+    uint64_t value_u64 = value_llu;
-     unsigned long value_lu = (unsigned long)value_llu;
-     unsigned value_u = (unsigned)value_llu;
-     double value_f = 2.323423423;
-@@ -985,6 +987,10 @@ static void interpolation_valid(void)
-     g_assert_cmpint(qnum_get_int(qnum), ==, value_lld);
-     qobject_unref(qnum);
+diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+index 810aae521f..954bf9d468 100644
+--- a/qobject/json-streamer.c
++++ b/qobject/json-streamer.c
+@@ -99,16 +99,13 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
  
-+    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%" PRId64, value_d64));
-+    g_assert_cmpint(qnum_get_int(qnum), ==, value_lld);
-+    qobject_unref(qnum);
-+
-     qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%u", value_u));
-     g_assert_cmpuint(qnum_get_uint(qnum), ==, value_u);
-     qobject_unref(qnum);
-@@ -997,6 +1003,10 @@ static void interpolation_valid(void)
-     g_assert_cmpuint(qnum_get_uint(qnum), ==, value_llu);
-     qobject_unref(qnum);
+     g_queue_push_tail(parser->tokens, token);
  
-+    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%" PRIu64, value_u64));
-+    g_assert_cmpuint(qnum_get_uint(qnum), ==, value_llu);
-+    qobject_unref(qnum);
-+
-     qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%f", value_f));
-     g_assert(qnum_get_double(qnum) == value_f);
-     qobject_unref(qnum);
+-    if (parser->brace_count < 0 ||
+-        parser->bracket_count < 0 ||
+-        (parser->brace_count == 0 &&
+-         parser->bracket_count == 0)) {
+-        json = json_parser_parse(parser->tokens, parser->ap, &err);
+-        parser->tokens = NULL;
+-        goto out_emit;
++    if ((parser->brace_count > 0 || parser->bracket_count > 0)
++        && parser->bracket_count >= 0 && parser->bracket_count >= 0) {
++        return;
+     }
+ 
+-    return;
++    json = json_parser_parse(parser->tokens, parser->ap, &err);
++    parser->tokens = NULL;
+ 
+ out_emit:
+     parser->brace_count = 0;
 -- 
 2.17.1
