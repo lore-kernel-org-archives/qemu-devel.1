@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fqXA8-0000dC-Ov
+	(envelope-from <cota@braap.org>) id 1fqXA8-0000d9-OS
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fqXA7-0005bg-Ik
+	(envelope-from <cota@braap.org>) id 1fqXA5-0005ZH-GF
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:04 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:33471)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:41993)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fqXA6-0005Ys-Ko
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:03 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fqXA3-0005VR-Du
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:00 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri, 17 Aug 2018 01:18:52 -0400
-Message-Id: <20180817051853.23792-9-cota@braap.org>
-In-Reply-To: <20180817051853.23792-1-cota@braap.org>
-References: <20180817051853.23792-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 8/9] hmp-commands: add sync-profile
+Date: Fri, 17 Aug 2018 01:18:44 -0400
+Message-Id: <20180817051853.23792-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v2 0/9] synchronization profiler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +24,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Fam Zheng <famz@redhat.com>
 
-The command introduced here is just for developers. This means that:
+v1: https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg02186.html
 
-- the interface implemented here could change in the future
-- the command is only meant to be used from HMP, not from QMP
+Changes since v1:
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
+- Rebase on current master.
+- Update copyright to 2018.
+- Add -m option to the HMP info command to sort by average wait time,
+  as suggested by Paolo.
+- Add -n option to the HMP info command to NOT merge call sites.
+  The default does merge call sites, as suggested by Paolo (thanks
+  to Peter for the clarification).
+- Switch to camel case in qsp.c
+- Update the commit logs of the two HMP patches to clearly state
+  that this is only for developers, so it is HMP-only.
+- Rename the HMP command from "sync" to "sync-profile", as suggested
+  by Markus.
+- Use int for line info consistently (was using unsigned sometimes)
+- Drop qsp_init from qsp_cond_wait, as suggested by Fam.
+- #undef QSP_GEN_{VOID,RET1} once they're no longer used.
+- Add qsp_reset()
+  This uses a snapshot to avoid deleting items, which would require
+  adding rcu_read_lock/unlock to the fast path.
+- Convert to run-time option, as suggested by Fam
+  - Add -enable-sync-profile to qemu-options
+  - Add sync-profile HMP command: "sync-profile on|off|reset"
+- allocate QSPEntry with g_new0
+
+I added most new bits as separate patches to ease review.
+
+The first patch has some perf numbers; the last patch shows
+sample output from the monitor.
+
+Checkpatch gives some errors, but they're false positives.
+
+You can fetch this series from:
+  https://github.com/cota/qemu/tree/sync-profiler-v2
+
+Diffstat below.
+
+Thanks,
+
+		Emilio
 ---
- hmp.h           |  1 +
- hmp.c           | 24 ++++++++++++++++++++++++
- hmp-commands.hx | 15 +++++++++++++++
- 3 files changed, 40 insertions(+)
-
-diff --git a/hmp.h b/hmp.h
-index 33354f1bdd..5f1addcca2 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -42,6 +42,7 @@ void hmp_info_tpm(Monitor *mon, const QDict *qdict);
- void hmp_info_iothreads(Monitor *mon, const QDict *qdict);
- void hmp_quit(Monitor *mon, const QDict *qdict);
- void hmp_stop(Monitor *mon, const QDict *qdict);
-+void hmp_sync_profile(Monitor *mon, const QDict *qdict);
- void hmp_system_reset(Monitor *mon, const QDict *qdict);
- void hmp_system_powerdown(Monitor *mon, const QDict *qdict);
- void hmp_exit_preconfig(Monitor *mon, const QDict *qdict);
-diff --git a/hmp.c b/hmp.c
-index 2aafb50e8e..d94a47f7c7 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1062,6 +1062,30 @@ void hmp_stop(Monitor *mon, const QDict *qdict)
-     qmp_stop(NULL);
- }
- 
-+void hmp_sync_profile(Monitor *mon, const QDict *qdict)
-+{
-+    const char *op = qdict_get_try_str(qdict, "op");
-+
-+    if (op == NULL) {
-+        bool on = qsp_is_enabled();
-+
-+        monitor_printf(mon, "sync-profile is %s\n", on ? "on" : "off");
-+        return;
-+    }
-+    if (!strcmp(op, "on")) {
-+        qsp_enable();
-+    } else if (!strcmp(op, "off")) {
-+        qsp_disable();
-+    } else if (!strcmp(op, "reset")) {
-+        qsp_reset();
-+    } else {
-+        Error *err = NULL;
-+
-+        error_setg(&err, QERR_INVALID_PARAMETER, op);
-+        hmp_handle_error(mon, &err);
-+    }
-+}
-+
- void hmp_system_reset(Monitor *mon, const QDict *qdict)
- {
-     qmp_system_reset(NULL);
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index c1fc747403..db0c681f74 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -643,6 +643,21 @@ sendkey ctrl-alt-f1
- 
- This command is useful to send keys that your graphical user interface
- intercepts at low level, such as @code{ctrl-alt-f1} in X Window.
-+ETEXI
-+    {
-+        .name       = "sync-profile",
-+        .args_type  = "op:s?",
-+        .params     = "[on|off|reset]",
-+        .help       = "enable, disable or reset synchronization profiling. "
-+                      "With no arguments, prints whether profiling is on or off.",
-+        .cmd        = hmp_sync_profile,
-+    },
-+
-+STEXI
-+@item sync-profile [on|off|reset]
-+@findex sync-profile
-+Enable, disable or reset synchronization profiling. With no arguments, prints
-+whether profiling is on or off.
- ETEXI
- 
-     {
--- 
-2.17.1
+ cpus.c                      |  10 +-
+ hmp-commands-info.hx        |  22 ++
+ hmp-commands.hx             |  15 +
+ hmp.c                       |  24 ++
+ hmp.h                       |   1 +
+ include/qemu/main-loop.h    |   4 +-
+ include/qemu/qht.h          |   1 +
+ include/qemu/qsp.h          |  29 ++
+ include/qemu/thread-posix.h |   4 +-
+ include/qemu/thread-win32.h |   5 +-
+ include/qemu/thread.h       |  66 +++-
+ monitor.c                   |  11 +
+ qemu-options.hx             |  10 +
+ stubs/iothread-lock.c       |   2 +-
+ tests/atomic_add-bench.c    |   6 +-
+ util/Makefile.objs          |   1 +
+ util/qemu-thread-win32.c    |   4 +-
+ util/qht.c                  |  47 ++-
+ util/qsp.c                  | 779 +++++++++++++++++++++++++++++++++++++++
+ vl.c                        |   3 +
+ 20 files changed, 1016 insertions(+), 28 deletions(-)
+ create mode 100644 include/qemu/qsp.h
+ create mode 100644 util/qsp.c
