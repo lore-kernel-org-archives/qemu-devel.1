@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fqh33-0006bx-7P
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:52:25 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fqh62-0006wk-QU
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:55:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fqh31-0001NT-Ae
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:52:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57758 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fqh5z-0002oQ-LP
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:55:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40416)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fqh31-0001N9-3U
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:52:23 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fqh5z-0002nx-Ff
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:55:27 -0400
+Date: Fri, 17 Aug 2018 12:55:24 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180817155524.GF15372@localhost.localdomain>
 References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
-	<1533909989-56115-4-git-send-email-robert.hu@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9e06fe89-2688-1e6e-16ec-d5e8cdc87ce4@redhat.com>
-Date: Fri, 17 Aug 2018 17:52:17 +0200
+	<1533909989-56115-2-git-send-email-robert.hu@linux.intel.com>
+	<f859ae02-015a-5ef8-66b4-f54a630d1f5f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1533909989-56115-4-git-send-email-robert.hu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] Change other funcitons referring to
- feature_word_info[]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f859ae02-015a-5ef8-66b4-f54a630d1f5f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] x86: Data structure changes to
+ support MSR based features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Robert Hoo <robert.hu@linux.intel.com>, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com
-Cc: qemu-devel@nongnu.org, robert.hu@intel.com, jingqi.liu@intel.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Robert Hoo <robert.hu@linux.intel.com>, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org, robert.hu@intel.com, jingqi.liu@intel.com
 
-On 10/08/2018 16:06, Robert Hoo wrote:
-> x86_cpu_get_feature_words(): limit to CPUID_FEATURE_WORD only.
+On Fri, Aug 17, 2018 at 05:50:15PM +0200, Paolo Bonzini wrote:
+> On 10/08/2018 16:06, Robert Hoo wrote:
+> > +typedef enum FeatureWordType {
+> > +   CPUID_FEATURE_WORD,
+> > +   MSR_FEATURE_WORD,
+> > +} FeatureWordType;
+> 
+> This enum probably should be defined with QAPI, so that it can be reused
+> in the feature-words property:
+> 
+> # @X86CPUFeatureWordType:
+> #
+> # Kinds of X86 CPU feature words
+> #
+> # @cpuid: A CPUID leaf
+> #
+> # @msr: An MSR
+> ##
+> { 'enum': 'X86CPUFeatureWordType',
+>   'data': 'cpuid', 'msr' }
+> 
+> The names will be X86_CPU_FEATURE_WORD_TYPE_CPUID and
+> X86_CPU_FEATURE_WORD_TYPE_MSR.
 
-This should also grow support for MSR feature words.
+I wouldn't like to make this an external API unless really
+necessary.  I would rather deprecate the "feature-words" property
+because nobody ended up using it.
 
-My suggestion is that you add another patch after patch 1 that expands
-the definition of X86CPUFeatureWordInfo like this, and adjusts
-x86_cpu_get_feature_words() to match the new C structs.  Then this
-patch can add MSR feature support somewhat easily.
-
-The QAPI definitions would then look like this:
-
-diff --git a/qapi/misc.json b/qapi/misc.json
-index d450cfef21..eae9243976 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2663,9 +2663,9 @@
-   'data': [ 'EAX', 'EBX', 'ECX', 'EDX', 'ESP', 'EBP', 'ESI', 'EDI' ] }
- 
- ##
--# @X86CPUFeatureWordInfo:
-+# @X86CPUIDFeatureWordInfo:
- #
--# Information about a X86 CPU feature word
-+# Information about an X86 CPUID feature word
- #
- # @cpuid-input-eax: Input EAX value for CPUID instruction for that feature word
- #
-@@ -2678,12 +2690,45 @@
- #
- # Since: 1.5
- ##
--{ 'struct': 'X86CPUFeatureWordInfo',
-+{ 'struct': 'X86CPUIDFeatureWordInfo',
-   'data': { 'cpuid-input-eax': 'int',
-             '*cpuid-input-ecx': 'int',
-             'cpuid-register': 'X86CPURegister32',
-             'features': 'int' } }
- 
-+##
-+# @X86MSRFeatureWordInfo:
-+#
-+# Information about an X86 MSR feature word
-+#
-+# @index: Index of the model specific register
-+#
-+# @cpuid-feature: CPUID feature name that communicates the existance of the MSR
-+#
-+# @features: value of output register, containing the feature bits
-+#
-+# Since: 3.1
-+##
-+{ 'struct': 'X86MSRFeatureWordInfo',
-+  'data': { 'index': 'int',
-+            'cpuid-feature': 'str',
-+            'features': 'int' } }
-+
-+##
-+# @X86CPUFeatureWordInfo:
-+#
-+# A discriminated record of X86 CPU feature words
-+#
-+# Since: 3.1
-+##
-+
-+{ 'union': 'X86CPUFeatureWordInfo',
-+  'base': { 'type': 'X86CPUFeatureWordType' },
-+  'discriminator': 'type',
-+  'data': {
-+    'cpuid': 'X86CPUIDFeatureWordInfo',
-+    'msr': 'X86MSRFeatureWordInfo' }}
-+
- ##
- # @DummyForceArrays:
- #
-
-I'm not sure if the cpuid-feature field is useful for libvirt and
-other management applications.  Eduardo, what do you think?
-
-Thanks,
-
-Paolo
+-- 
+Eduardo
