@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKJ-000374-Ek
+	(envelope-from <armbru@redhat.com>) id 1fqgKK-00037m-52
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKF-0001mb-Ul
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56244 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqgKG-0001n1-2F
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56272 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKF-0001iq-5q
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKF-0001kh-8F
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:07 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:24 +0200
-Message-Id: <20180817150559.16243-26-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:37 +0200
+Message-Id: <20180817150559.16243-39-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 25/60] json: Leave rejecting invalid escape
- sequences to parser
+Subject: [Qemu-devel] [PATCH v2 38/60] json: Pass lexical errors and limit
+ violations to callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,234 +27,223 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Both lexer and parser reject invalid escape sequences in strings.  The
-parser's check is useless.
+The callback to consume JSON values takes QObject *json, Error *err.
+If both are null, the callback is supposed to make up an error by
+itself.  This sucks.
 
-The lexer ends the token right after the first non-well-formed byte.
-This tends to lead to suboptimal error reporting.  For instance, input
+qjson.c's consume_json() neglects to do so, which makes
+qobject_from_json() null instead of failing.  I consider that a bug.
 
-    {"abc\@ijk": 1}
+The culprit is json_message_process_token(): it passes two null
+pointers when it runs into a lexical error or a limit violation.  Fix
+it to pass a proper Error object then.  Update the callbacks:
 
-produces the tokens
+* monitor.c's handle_qmp_command(): the code to make up an error is
+  now dead, drop it.
 
-    JSON_LCURLY   {
-    JSON_ERROR    "abc\@
-    JSON_KEYWORD  ijk
-    JSON_ERROR   ": 1}\n
+* qga/main.c's process_event(): lumps the "both null" case together
+  with the "not a JSON object" case.  The former is now gone.  The
+  error message "Invalid JSON syntax" is misleading for the latter.
+  Improve it to "Input must be a JSON object".
 
-The parser then reports three errors
+* qobject/qjson.c's consume_json(): no update; check-qjson
+  demonstrates qobject_from_json() now sets an error on lexical
+  errors, but still doesn't on some other errors.
 
-    Invalid JSON syntax
-    JSON parse error, invalid keyword 'ijk'
-    Invalid JSON syntax
-
-before it recovers at the newline.
-
-Drop the lexer's escape sequence checking, and make it accept the same
-characters after backslash it accepts elsewhere in strings.  It now
-produces
-
-    JSON_LCURLY   {
-    JSON_STRING   "abc\@ijk"
-    JSON_COLON    :
-    JSON_INTEGER  1
-    JSON_RCURLY
-
-and the parser reports just
-
-    JSON parse error, invalid escape sequence in string
-
-While there, fix parse_string()'s inaccurate function comment.
+* tests/libqtest.c's qmp_response(): the Error object is now reliable,
+  so use it to improve the error message.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-lexer.c  | 72 +++----------------------------------------
- qobject/json-parser.c | 56 +++++++++++++++++++--------------
- 2 files changed, 37 insertions(+), 91 deletions(-)
+ include/qapi/qmp/qerror.h |  3 ---
+ monitor.c                 |  5 +----
+ qga/main.c                |  3 ++-
+ qobject/json-streamer.c   | 22 ++++++++++++++++------
+ tests/check-qjson.c       | 15 ++++++++-------
+ tests/libqtest.c          |  7 +++++--
+ 6 files changed, 32 insertions(+), 23 deletions(-)
 
-diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index 36fb665b12..af0a7fdb8a 100644
---- a/qobject/json-lexer.c
-+++ b/qobject/json-lexer.c
-@@ -80,6 +80,8 @@
-  *    escape = %x5C              ; \
-  *    quotation-mark = %x22      ; "
-  *    unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
-+ *    [This lexer accepts any non-control character after escape, and
-+ *    leaves rejecting invalid ones to the parser.]
-  *
-  *
-  * Extensions over RFC 7159:
-@@ -99,16 +101,8 @@
+diff --git a/include/qapi/qmp/qerror.h b/include/qapi/qmp/qerror.h
+index c82360f429..145571f618 100644
+--- a/include/qapi/qmp/qerror.h
++++ b/include/qapi/qmp/qerror.h
+@@ -61,9 +61,6 @@
+ #define QERR_IO_ERROR \
+     "An IO error has occurred"
  
- enum json_lexer_state {
-     IN_ERROR = 0,               /* must really be 0, see json_lexer[] */
--    IN_DQ_UCODE3,
--    IN_DQ_UCODE2,
--    IN_DQ_UCODE1,
--    IN_DQ_UCODE0,
-     IN_DQ_STRING_ESCAPE,
-     IN_DQ_STRING,
--    IN_SQ_UCODE3,
--    IN_SQ_UCODE2,
--    IN_SQ_UCODE1,
--    IN_SQ_UCODE0,
-     IN_SQ_STRING_ESCAPE,
-     IN_SQ_STRING,
-     IN_ZERO,
-@@ -144,37 +138,8 @@ static const uint8_t json_lexer[][256] =  {
-     /* Relies on default initialization to IN_ERROR! */
+-#define QERR_JSON_PARSING \
+-    "Invalid JSON syntax"
+-
+ #define QERR_MIGRATION_ACTIVE \
+     "There's a migration process in progress"
  
-     /* double quote string */
--    [IN_DQ_UCODE3] = {
--        ['0' ... '9'] = IN_DQ_STRING,
--        ['a' ... 'f'] = IN_DQ_STRING,
--        ['A' ... 'F'] = IN_DQ_STRING,
--    },
--    [IN_DQ_UCODE2] = {
--        ['0' ... '9'] = IN_DQ_UCODE3,
--        ['a' ... 'f'] = IN_DQ_UCODE3,
--        ['A' ... 'F'] = IN_DQ_UCODE3,
--    },
--    [IN_DQ_UCODE1] = {
--        ['0' ... '9'] = IN_DQ_UCODE2,
--        ['a' ... 'f'] = IN_DQ_UCODE2,
--        ['A' ... 'F'] = IN_DQ_UCODE2,
--    },
--    [IN_DQ_UCODE0] = {
--        ['0' ... '9'] = IN_DQ_UCODE1,
--        ['a' ... 'f'] = IN_DQ_UCODE1,
--        ['A' ... 'F'] = IN_DQ_UCODE1,
--    },
-     [IN_DQ_STRING_ESCAPE] = {
--        ['b'] = IN_DQ_STRING,
--        ['f'] =  IN_DQ_STRING,
--        ['n'] =  IN_DQ_STRING,
--        ['r'] =  IN_DQ_STRING,
--        ['t'] =  IN_DQ_STRING,
--        ['/'] = IN_DQ_STRING,
--        ['\\'] = IN_DQ_STRING,
--        ['\''] = IN_DQ_STRING,
--        ['\"'] = IN_DQ_STRING,
--        ['u'] = IN_DQ_UCODE0,
-+        [0x20 ... 0xFD] = IN_DQ_STRING,
-     },
-     [IN_DQ_STRING] = {
-         [0x20 ... 0xFD] = IN_DQ_STRING,
-@@ -183,37 +148,8 @@ static const uint8_t json_lexer[][256] =  {
-     },
+diff --git a/monitor.c b/monitor.c
+index 392659324f..c99dc4737d 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4251,10 +4251,7 @@ static void handle_qmp_command(void *opaque, QObject *req, Error *err)
+     QDict *qdict;
+     QMPRequest *req_obj;
  
-     /* single quote string */
--    [IN_SQ_UCODE3] = {
--        ['0' ... '9'] = IN_SQ_STRING,
--        ['a' ... 'f'] = IN_SQ_STRING,
--        ['A' ... 'F'] = IN_SQ_STRING,
--    },
--    [IN_SQ_UCODE2] = {
--        ['0' ... '9'] = IN_SQ_UCODE3,
--        ['a' ... 'f'] = IN_SQ_UCODE3,
--        ['A' ... 'F'] = IN_SQ_UCODE3,
--    },
--    [IN_SQ_UCODE1] = {
--        ['0' ... '9'] = IN_SQ_UCODE2,
--        ['a' ... 'f'] = IN_SQ_UCODE2,
--        ['A' ... 'F'] = IN_SQ_UCODE2,
--    },
--    [IN_SQ_UCODE0] = {
--        ['0' ... '9'] = IN_SQ_UCODE1,
--        ['a' ... 'f'] = IN_SQ_UCODE1,
--        ['A' ... 'F'] = IN_SQ_UCODE1,
--    },
-     [IN_SQ_STRING_ESCAPE] = {
--        ['b'] = IN_SQ_STRING,
--        ['f'] =  IN_SQ_STRING,
--        ['n'] =  IN_SQ_STRING,
--        ['r'] =  IN_SQ_STRING,
--        ['t'] =  IN_SQ_STRING,
--        ['/'] = IN_SQ_STRING,
--        ['\\'] = IN_SQ_STRING,
--        ['\''] = IN_SQ_STRING,
--        ['\"'] = IN_SQ_STRING,
--        ['u'] = IN_SQ_UCODE0,
-+        [0x20 ... 0xFD] = IN_SQ_STRING,
-     },
-     [IN_SQ_STRING] = {
-         [0x20 ... 0xFD] = IN_SQ_STRING,
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index a9b227f56c..fa8d0fe416 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -106,30 +106,40 @@ static int hex2decimal(char ch)
+-    if (!req && !err) {
+-        /* json_parser_parse() sucks: can fail without setting @err */
+-        error_setg(&err, QERR_JSON_PARSING);
+-    }
++    assert(!req != !err);
+ 
+     qdict = qobject_to(QDict, req);
+     if (qdict) {
+diff --git a/qga/main.c b/qga/main.c
+index 2fc49d00d8..b74e1241ef 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -603,12 +603,13 @@ static void process_event(void *opaque, QObject *obj, Error *err)
+     int ret;
+ 
+     g_debug("process_event: called");
++    assert(!obj != !err);
+     if (err) {
+         goto err;
+     }
+     req = qobject_to(QDict, obj);
+     if (!req) {
+-        error_setg(&err, QERR_JSON_PARSING);
++        error_setg(&err, "Input must be a JSON object");
+         goto err;
+     }
+     if (!qdict_haskey(req, "execute")) {
+diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+index a373e0114a..e372ecc895 100644
+--- a/qobject/json-streamer.c
++++ b/qobject/json-streamer.c
+@@ -13,6 +13,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
++#include "qapi/error.h"
+ #include "qapi/qmp/json-lexer.h"
+ #include "qapi/qmp/json-parser.h"
+ #include "qapi/qmp/json-streamer.h"
+@@ -57,6 +58,7 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+         parser->bracket_count--;
+         break;
+     case JSON_ERROR:
++        error_setg(&err, "JSON parse error, stray '%s'", input->str);
+         goto out_emit;
+     default:
+         break;
+@@ -82,12 +84,20 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+         goto out_emit;
+     }
+ 
+-    if (parser->token_size > MAX_TOKEN_SIZE ||
+-               g_queue_get_length(parser->tokens) > MAX_TOKEN_COUNT ||
+-               parser->bracket_count + parser->brace_count > MAX_NESTING) {
+-        /* Security consideration, we limit total memory allocated per object
+-         * and the maximum recursion depth that a message can force.
+-         */
++    /*
++     * Security consideration, we limit total memory allocated per object
++     * and the maximum recursion depth that a message can force.
++     */
++    if (parser->token_size > MAX_TOKEN_SIZE) {
++        error_setg(&err, "JSON token size limit exceeded");
++        goto out_emit;
++    }
++    if (g_queue_get_length(parser->tokens) > MAX_TOKEN_COUNT) {
++        error_setg(&err, "JSON token count limit exceeded");
++        goto out_emit;
++    }
++    if (parser->bracket_count + parser->brace_count > MAX_NESTING) {
++        error_setg(&err, "JSON nesting depth limit exceeded");
+         goto out_emit;
+     }
+ 
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index 8cccac838b..3bd216f357 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -1021,6 +1021,7 @@ static void interpolation_unknown(void)
+     }
+     g_test_trap_subprocess(NULL, 0, 0);
+     g_test_trap_assert_failed();
++    g_test_trap_assert_stderr("*Unexpected error*stray '%x'*");
  }
  
- /**
-- * parse_string(): Parse a json string and return a QObject
-+ * parse_string(): Parse a JSON string
-  *
-- *  string
-- *      ""
-- *      " chars "
-- *  chars
-- *      char
-- *      char chars
-- *  char
-- *      any-Unicode-character-
-- *          except-"-or-\-or-
-- *          control-character
-- *      \"
-- *      \\
-- *      \/
-- *      \b
-- *      \f
-- *      \n
-- *      \r
-- *      \t
-- *      \u four-hex-digits 
-+ * From RFC 7159 "The JavaScript Object Notation (JSON) Data
-+ * Interchange Format":
-+ *
-+ *    char = unescaped /
-+ *        escape (
-+ *            %x22 /          ; "    quotation mark  U+0022
-+ *            %x5C /          ; \    reverse solidus U+005C
-+ *            %x2F /          ; /    solidus         U+002F
-+ *            %x62 /          ; b    backspace       U+0008
-+ *            %x66 /          ; f    form feed       U+000C
-+ *            %x6E /          ; n    line feed       U+000A
-+ *            %x72 /          ; r    carriage return U+000D
-+ *            %x74 /          ; t    tab             U+0009
-+ *            %x75 4HEXDIG )  ; uXXXX                U+XXXX
-+ *    escape = %x5C              ; \
-+ *    quotation-mark = %x22      ; "
-+ *    unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
-+ *
-+ * Extensions over RFC 7159:
-+ * - Extra escape sequence in strings:
-+ *   0x27 (apostrophe) is recognized after escape, too
-+ * - Single-quoted strings:
-+ *   Like double-quoted strings, except they're delimited by %x27
-+ *   (apostrophe) instead of %x22 (quotation mark), and can't contain
-+ *   unescaped apostrophe, but can contain unescaped quotation mark.
-+ *
-+ * Note:
-+ * - Encoding is modified UTF-8.
-+ * - Invalid Unicode characters are rejected.
-+ * - Control characters \x00..\x1F are rejected by the lexer.
-  */
--static QString *qstring_from_escaped_str(JSONParserContext *ctxt,
--                                         JSONToken *token)
-+static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
- {
-     const char *ptr = token->str;
-     QString *str;
-@@ -495,7 +505,7 @@ static QObject *parse_literal(JSONParserContext *ctxt)
+ static void interpolation_string(void)
+@@ -1296,11 +1297,11 @@ static void junk_input(void)
+     QObject *obj;
  
-     switch (token->type) {
-     case JSON_STRING:
--        return QOBJECT(qstring_from_escaped_str(ctxt, token));
-+        return QOBJECT(parse_string(ctxt, token));
-     case JSON_INTEGER: {
-         /*
-          * Represent JSON_INTEGER as QNUM_I64 if possible, else as
+     obj = qobject_from_json("@", &err);
+-    g_assert(!err);             /* BUG */
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ 
+     obj = qobject_from_json("{\x01", &err);
+-    g_assert(!err);             /* BUG */
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ 
+     obj = qobject_from_json("[0\xFF]", &err);
+@@ -1308,11 +1309,11 @@ static void junk_input(void)
+     g_assert(obj == NULL);
+ 
+     obj = qobject_from_json("00", &err);
+-    g_assert(!err);             /* BUG */
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ 
+     obj = qobject_from_json("[1e", &err);
+-    g_assert(!err);             /* BUG */
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ 
+     obj = qobject_from_json("truer", &err);
+@@ -1324,7 +1325,7 @@ static void unterminated_string(void)
+ {
+     Error *err = NULL;
+     QObject *obj = qobject_from_json("\"abc", &err);
+-    g_assert(!err);             /* BUG */
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ }
+ 
+@@ -1332,7 +1333,7 @@ static void unterminated_sq_string(void)
+ {
+     Error *err = NULL;
+     QObject *obj = qobject_from_json("'abc", &err);
+-    g_assert(!err);             /* BUG */
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ }
+ 
+@@ -1340,7 +1341,7 @@ static void unterminated_escape(void)
+ {
+     Error *err = NULL;
+     QObject *obj = qobject_from_json("\"abc\\\"", &err);
+-    g_assert(!err);             /* BUG */
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ }
+ 
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index e17fe4fbd2..6a9151eebd 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -450,8 +450,11 @@ static void qmp_response(void *opaque, QObject *obj, Error *err)
+ {
+     QMPResponseParser *qmp = opaque;
+ 
+-    if (!obj) {
+-        fprintf(stderr, "QMP JSON response parsing failed\n");
++    assert(!obj != !err);
++
++    if (err) {
++        error_prepend(&err, "QMP JSON response parsing failed: ");
++        error_report_err(err);
+         abort();
+     }
+ 
 -- 
 2.17.1
