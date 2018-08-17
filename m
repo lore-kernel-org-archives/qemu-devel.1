@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fqk8x-0000x6-Tv
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:10:44 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fqk8y-0001Dr-HK
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fqk3z-0006u3-Ov
+	(envelope-from <jsnow@redhat.com>) id 1fqk3z-0006uC-R3
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:05:38 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 17 Aug 2018 15:04:55 -0400
-Message-Id: <20180817190457.8292-6-jsnow@redhat.com>
+Date: Fri, 17 Aug 2018 15:04:54 -0400
+Message-Id: <20180817190457.8292-5-jsnow@redhat.com>
 In-Reply-To: <20180817190457.8292-1-jsnow@redhat.com>
 References: <20180817190457.8292-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/7] block/mirror: utilize job_exit shim
+Subject: [Qemu-devel] [PATCH 4/7] block/commit: utilize job_exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,127 +22,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-Change the manual deferment to mirror_exit into the implicit
-callback to job_exit and the mirror_exit callback.
+Change the manual deferment to commit_complete into the implicit
+callback to job_exit, renaming commit_complete to commit_exit.
 
-This does change the order of some bdrv_unref calls and job_completed,
-but thanks to the new context in which we call .job_exit, this is safe
-to defer the possible flushing of any nodes to the job_finalize_single
-cleanup stage.
+This conversion does change the timing of when job_completed is
+called to after the bdrv_replace_node and bdrv_unref calls, which
+could have implications for bjob->blk which will now be put down
+after this cleanup.
+
+Kevin highlights that we did not take any permissions for that backend
+at job creation time, so it is safe to reorder these operations.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/mirror.c | 25 +++++++++----------------
- 1 file changed, 9 insertions(+), 16 deletions(-)
+ block/commit.c | 20 ++++----------------
+ 1 file changed, 4 insertions(+), 16 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index be5dc6b7b0..57b4ac97d8 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -607,21 +607,17 @@ static void mirror_wait_for_all_io(MirrorBlockJob *s)
-     }
+diff --git a/block/commit.c b/block/commit.c
+index 4a17bb73ec..93c3b6a39e 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -68,19 +68,13 @@ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
+     return 0;
  }
  
 -typedef struct {
 -    int ret;
--} MirrorExitData;
+-} CommitCompleteData;
 -
--static void mirror_exit(Job *job, void *opaque)
-+static void mirror_exit(Job *job)
+-static void commit_complete(Job *job, void *opaque)
++static void commit_exit(Job *job)
  {
-     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
+     CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
      BlockJob *bjob = &s->common;
--    MirrorExitData *data = opaque;
-     MirrorBDSOpaque *bs_opaque = s->mirror_top_bs->opaque;
-     AioContext *replace_aio_context = NULL;
-     BlockDriverState *src = s->mirror_top_bs->backing->bs;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     BlockDriverState *mirror_top_bs = s->mirror_top_bs;
-     Error *local_err = NULL;
-+    int ret = job->ret;
+-    CommitCompleteData *data = opaque;
+     BlockDriverState *top = blk_bs(s->top);
+     BlockDriverState *base = blk_bs(s->base);
+     BlockDriverState *commit_top_bs = s->commit_top_bs;
+-    int ret = data->ret;
+     bool remove_commit_top_bs = false;
  
-     bdrv_release_dirty_bitmap(src, s->dirty_bitmap);
+     /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
+@@ -93,8 +87,8 @@ static void commit_complete(Job *job, void *opaque)
  
-@@ -652,7 +648,7 @@ static void mirror_exit(Job *job, void *opaque)
-             bdrv_set_backing_hd(target_bs, backing, &local_err);
-             if (local_err) {
-                 error_report_err(local_err);
--                data->ret = -EPERM;
-+                ret = -EPERM;
-             }
-         }
-     }
-@@ -662,7 +658,7 @@ static void mirror_exit(Job *job, void *opaque)
-         aio_context_acquire(replace_aio_context);
-     }
+     if (!job_is_cancelled(job) && ret == 0) {
+         /* success */
+-        ret = bdrv_drop_intermediate(s->commit_top_bs, base,
+-                                     s->backing_file_str);
++        job->ret = bdrv_drop_intermediate(s->commit_top_bs, base,
++                                          s->backing_file_str);
+     } else {
+         /* XXX Can (or should) we somehow keep 'consistent read' blocked even
+          * after the failed/cancelled commit job is gone? If we already wrote
+@@ -117,9 +111,6 @@ static void commit_complete(Job *job, void *opaque)
+      * bdrv_set_backing_hd() to fail. */
+     block_job_remove_all_bdrv(bjob);
  
--    if (s->should_complete && data->ret == 0) {
-+    if (s->should_complete && ret == 0) {
-         BlockDriverState *to_replace = src;
-         if (s->to_replace) {
-             to_replace = s->to_replace;
-@@ -679,7 +675,7 @@ static void mirror_exit(Job *job, void *opaque)
-         bdrv_drained_end(target_bs);
-         if (local_err) {
-             error_report_err(local_err);
--            data->ret = -EPERM;
-+            ret = -EPERM;
-         }
-     }
-     if (s->to_replace) {
-@@ -710,12 +706,12 @@ static void mirror_exit(Job *job, void *opaque)
-     blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
- 
-     bs_opaque->job = NULL;
--    job_completed(job, data->ret);
- 
+-    job_completed(job, ret);
 -    g_free(data);
-     bdrv_drained_end(src);
-     bdrv_unref(mirror_top_bs);
-     bdrv_unref(src);
-+
-+    job->ret = ret;
- }
- 
- static void mirror_throttle(MirrorBlockJob *s)
-@@ -815,7 +811,6 @@ static int mirror_flush(MirrorBlockJob *s)
- static int coroutine_fn mirror_run(Job *job, Error **errp)
+-
+     /* If bdrv_drop_intermediate() didn't already do that, remove the commit
+      * filter driver from the backing chain. Do this as the final step so that
+      * the 'consistent read' permission can be granted.  */
+@@ -137,7 +128,6 @@ static void commit_complete(Job *job, void *opaque)
+ static int coroutine_fn commit_run(Job *job, Error **errp)
  {
-     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
--    MirrorExitData *data;
-     BlockDriverState *bs = s->mirror_top_bs->backing->bs;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     bool need_drain = true;
-@@ -1035,14 +1030,10 @@ immediate_exit:
-     g_free(s->in_flight_bitmap);
-     bdrv_dirty_iter_free(s->dbi);
+     CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
+-    CommitCompleteData *data;
+     int64_t offset;
+     uint64_t delay_ns = 0;
+     int ret = 0;
+@@ -210,9 +200,6 @@ static int coroutine_fn commit_run(Job *job, Error **errp)
+ out:
+     qemu_vfree(buf);
  
 -    data = g_malloc(sizeof(*data));
 -    data->ret = ret;
--
-     if (need_drain) {
-         bdrv_drained_begin(bs);
-     }
- 
--    job_defer_to_main_loop(&s->common.job, mirror_exit, data);
+-    job_defer_to_main_loop(&s->common.job, commit_complete, data);
      return ret;
  }
  
-@@ -1141,6 +1132,7 @@ static const BlockJobDriver mirror_job_driver = {
-         .user_resume            = block_job_user_resume,
-         .drain                  = block_job_drain,
-         .run                    = mirror_run,
-+        .exit                   = mirror_exit,
-         .pause                  = mirror_pause,
-         .complete               = mirror_complete,
+@@ -224,6 +211,7 @@ static const BlockJobDriver commit_job_driver = {
+         .user_resume   = block_job_user_resume,
+         .drain         = block_job_drain,
+         .run           = commit_run,
++        .exit          = commit_exit,
      },
-@@ -1157,6 +1149,7 @@ static const BlockJobDriver commit_active_job_driver = {
-         .user_resume            = block_job_user_resume,
-         .drain                  = block_job_drain,
-         .run                    = mirror_run,
-+        .exit                   = mirror_exit,
-         .pause                  = mirror_pause,
-         .complete               = mirror_complete,
-     },
+ };
+ 
 -- 
 2.14.4
