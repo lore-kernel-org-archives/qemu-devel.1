@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqhfr-0007c4-VN
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:32:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fqhiq-0001v5-Ob
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:35:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqhfr-0002DS-7V
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:32:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60240 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fqhfr-0002DE-2V
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:32:31 -0400
-References: <20180817150559.16243-1-armbru@redhat.com>
-	<20180817150559.16243-26-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <58df6e5a-a25a-6a98-2fdb-abf50bd4e5f8@redhat.com>
-Date: Fri, 17 Aug 2018 11:32:28 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1fqhiq-0004E2-4n
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:35:36 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:44897)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fqhiq-0004DC-0L
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:35:36 -0400
+Received: by mail-oi0-x243.google.com with SMTP id s198-v6so14971069oih.11
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 09:35:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180817150559.16243-26-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 25/60] json: Leave rejecting invalid
- escape sequences to parser
+In-Reply-To: <20180809042206.15726-11-richard.henderson@linaro.org>
+References: <20180809042206.15726-1-richard.henderson@linaro.org>
+	<20180809042206.15726-11-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Aug 2018 17:35:15 +0100
+Message-ID: <CAFEAcA9K2SR+Y0JHwP1WKcsWs=diE+H_1xDX2Z7UoCTfCL3YXw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 10/20] target/arm: Adjust
+ aarch64_cpu_dump_state for system mode SVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Desnogues <laurent.desnogues@gmail.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On 08/17/2018 10:05 AM, Markus Armbruster wrote:
-> Both lexer and parser reject invalid escape sequences in strings.  The
-> parser's check is useless.
-> 
-
-> While there, fix parse_string()'s inaccurate function comment.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On 9 August 2018 at 05:21, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Use the existing helpers to determine if (1) the fpu is enabled,
+> (2) sve state is enabled, and (3) the current sve vector length.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
+>  target/arm/cpu.h           | 4 ++++
+>  target/arm/helper.c        | 6 +++---
+>  target/arm/translate-a64.c | 8 ++++++--
+>  3 files changed, 13 insertions(+), 5 deletions(-)
 
-> + * From RFC 7159 "The JavaScript Object Notation (JSON) Data
-> + * Interchange Format":
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-You did point out in the cover letter that you intend to rewrite this to 
-point to 8259. (That's saying something - when portions of these patches 
-have been around on our mailing list prior to the point of the RFC being 
-updated). Here, and elsewhere in the series, that's minor enough that I 
-don't see it invalidating any of my R-b.
+I can't think of a reason why we'd want to look at the FPU
+state with the FPU disabled, so I guess this is ok...
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+thanks
+-- PMM
