@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKI-00036J-Nj
+	(envelope-from <armbru@redhat.com>) id 1fqgKI-00036Q-R7
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKF-0001lT-64
+	(envelope-from <armbru@redhat.com>) id 1fqgKF-0001ln-Cu
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56258 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46146 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKE-0001ja-Ff
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKE-0001iR-NO
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:06 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:33 +0200
-Message-Id: <20180817150559.16243-35-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:22 +0200
+Message-Id: <20180817150559.16243-24-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 34/60] json: Don't pass null @tokens to
- json_parser_parse()
+Subject: [Qemu-devel] [PATCH v2 23/60] json: Leave rejecting invalid UTF-8
+ to parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +27,99 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-json_parser_parse() normally returns the QObject on success.  Except
-it returns null when its @tokens argument is null.
+Both the lexer and the parser (attempt to) validate UTF-8 in JSON
+strings.
 
-Its only caller json_message_process_token() passes null @tokens when
-emitting a lexical error.  The call is a rather opaque way to say json
-= NULL then.
+The lexer rejects bytes that can't occur in valid UTF-8: \xC0..\xC1,
+\xF5..\xFF.  This rejects some, but not all invalid UTF-8.  It also
+rejects ASCII control characters \x00..\x1F, in accordance with RFC
+7159 (see recent commit "json: Reject unescaped control characters").
 
-Simplify matters by lifting the assignment to json out of the emit
-path: initialize json to null, set it to the value of
-json_parser_parse() when there's no lexical error.  Drop the special
-case from json_parser_parse().
+When the lexer rejects, it ends the token right after the first bad
+byte.  Good when the bad byte is a newline.  Not so good when it's
+something like an overlong sequence in the middle of a string.  For
+instance, input
+
+    {"abc\xC0\xAFijk": 1}\n
+
+produces the tokens
+
+    JSON_LCURLY   {
+    JSON_ERROR    "abc\xC0
+    JSON_ERROR    \xAF
+    JSON_KEYWORD  ijk
+    JSON_ERROR   ": 1}\n
+
+The parser then reports four errors
+
+    Invalid JSON syntax
+    Invalid JSON syntax
+    JSON parse error, invalid keyword 'ijk'
+    Invalid JSON syntax
+
+before it recovers at the newline.
+
+The commit before previous made the parser reject invalid UTF-8
+sequences.  Since then, anything the lexer rejects, the parser would
+reject as well.  Thus, the lexer's rejecting is unnecessary for
+correctness, and harmful for error reporting.
+
+However, we want to keep rejecting ASCII control characters in the
+lexer, because that produces the behavior we want for unclosed
+strings.
+
+We also need to keep rejecting \xFF in the lexer, because we
+documented that as a way to reset the JSON parser
+(docs/interop/qmp-spec.txt section 2.6 QGA Synchronization), which
+means we can't change how we recover from this error now.  I wish we
+hadn't done that.
+
+I think we should treat \xFE the same as \xFF.
+
+Change the lexer to accept \xC0..\xC1 and \xF5..\xFD.  It now rejects
+only \x00..\x1F and \xFE..\xFF.  Error reporting for invalid UTF-8 in
+strings is much improved, except for \xFE and \xFF.  For the example
+above, the lexer now produces
+
+    JSON_LCURLY   {
+    JSON_STRING   "abc\xC0\xAFijk"
+    JSON_COLON    :
+    JSON_INTEGER  1
+    JSON_RCURLY
+
+and the parser reports just
+
+    JSON parse error, invalid UTF-8 sequence in string
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-parser.c   |  4 ----
- qobject/json-streamer.c | 25 ++++++++++++-------------
- 2 files changed, 12 insertions(+), 17 deletions(-)
+ qobject/json-lexer.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index f2646dce84..866f7e3f14 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -546,10 +546,6 @@ QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp)
-     JSONParserContext ctxt = { .buf = tokens };
-     QObject *result;
- 
--    if (!tokens) {
--        return NULL;
--    }
--
-     result = parse_value(&ctxt, ap);
- 
-     error_propagate(errp, ctxt.err);
-diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index 7fd0ff8756..0c33186e8e 100644
---- a/qobject/json-streamer.c
-+++ b/qobject/json-streamer.c
-@@ -39,9 +39,9 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
-                                 JSONTokenType type, int x, int y)
- {
-     JSONMessageParser *parser = container_of(lexer, JSONMessageParser, lexer);
-+    QObject *json = NULL;
-     Error *err = NULL;
-     JSONToken *token;
--    QObject *json;
- 
-     switch (type) {
-     case JSON_LCURLY:
-@@ -72,34 +72,33 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
-     g_queue_push_tail(parser->tokens, token);
- 
-     if (type == JSON_ERROR) {
--        goto out_emit_bad;
--    } else if (parser->brace_count < 0 ||
-+        goto out_emit;
-+    }
-+
-+    if (parser->brace_count < 0 ||
-         parser->bracket_count < 0 ||
-         (parser->brace_count == 0 &&
-          parser->bracket_count == 0)) {
-+        json = json_parser_parse(parser->tokens, parser->ap, &err);
-+        parser->tokens = NULL;
-         goto out_emit;
--    } else if (parser->token_size > MAX_TOKEN_SIZE ||
-+    }
-+
-+    if (parser->token_size > MAX_TOKEN_SIZE ||
-                g_queue_get_length(parser->tokens) > MAX_TOKEN_COUNT ||
-                parser->bracket_count + parser->brace_count > MAX_NESTING) {
-         /* Security consideration, we limit total memory allocated per object
-          * and the maximum recursion depth that a message can force.
-          */
--        goto out_emit_bad;
-+        goto out_emit;
-     }
- 
-     return;
- 
--out_emit_bad:
--    /*
--     * Clear out token list and tell the parser to emit an error
--     * indication by passing it a NULL list
--     */
--    json_message_free_tokens(parser);
- out_emit:
--    /* send current list of tokens to parser and reset tokenizer */
-     parser->brace_count = 0;
-     parser->bracket_count = 0;
--    json = json_parser_parse(parser->tokens, parser->ap, &err);
-+    json_message_free_tokens(parser);
-     parser->tokens = g_queue_new();
-     parser->token_size = 0;
-     parser->emit(parser->opaque, json, err);
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index 109a7d8bb8..ca1e0e2c03 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -177,8 +177,7 @@ static const uint8_t json_lexer[][256] =  {
+         ['u'] = IN_DQ_UCODE0,
+     },
+     [IN_DQ_STRING] = {
+-        [0x20 ... 0xBF] = IN_DQ_STRING,
+-        [0xC2 ... 0xF4] = IN_DQ_STRING,
++        [0x20 ... 0xFD] = IN_DQ_STRING,
+         ['\\'] = IN_DQ_STRING_ESCAPE,
+         ['"'] = JSON_STRING,
+     },
+@@ -217,8 +216,7 @@ static const uint8_t json_lexer[][256] =  {
+         ['u'] = IN_SQ_UCODE0,
+     },
+     [IN_SQ_STRING] = {
+-        [0x20 ... 0xBF] = IN_SQ_STRING,
+-        [0xC2 ... 0xF4] = IN_SQ_STRING,
++        [0x20 ... 0xFD] = IN_SQ_STRING,
+         ['\\'] = IN_SQ_STRING_ESCAPE,
+         ['\''] = JSON_STRING,
+     },
 -- 
 2.17.1
