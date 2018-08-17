@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fqXA8-0000d9-OS
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:05 -0400
+	(envelope-from <cota@braap.org>) id 1fqXA8-0000dD-Oy
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fqXA5-0005ZH-GF
+	(envelope-from <cota@braap.org>) id 1fqXA5-0005Yo-FV
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:04 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:41993)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:48295)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fqXA3-0005VR-Du
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:19:00 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fqXA3-0005Vw-Du
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:18:59 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri, 17 Aug 2018 01:18:44 -0400
-Message-Id: <20180817051853.23792-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v2 0/9] synchronization profiler
+Date: Fri, 17 Aug 2018 01:18:48 -0400
+Message-Id: <20180817051853.23792-5-cota@braap.org>
+In-Reply-To: <20180817051853.23792-1-cota@braap.org>
+References: <20180817051853.23792-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 4/9] qsp: support call site coalescing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +26,225 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Fam Zheng <famz@redhat.com>
 
-v1: https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg02186.html
-
-Changes since v1:
-
-- Rebase on current master.
-- Update copyright to 2018.
-- Add -m option to the HMP info command to sort by average wait time,
-  as suggested by Paolo.
-- Add -n option to the HMP info command to NOT merge call sites.
-  The default does merge call sites, as suggested by Paolo (thanks
-  to Peter for the clarification).
-- Switch to camel case in qsp.c
-- Update the commit logs of the two HMP patches to clearly state
-  that this is only for developers, so it is HMP-only.
-- Rename the HMP command from "sync" to "sync-profile", as suggested
-  by Markus.
-- Use int for line info consistently (was using unsigned sometimes)
-- Drop qsp_init from qsp_cond_wait, as suggested by Fam.
-- #undef QSP_GEN_{VOID,RET1} once they're no longer used.
-- Add qsp_reset()
-  This uses a snapshot to avoid deleting items, which would require
-  adding rcu_read_lock/unlock to the fast path.
-- Convert to run-time option, as suggested by Fam
-  - Add -enable-sync-profile to qemu-options
-  - Add sync-profile HMP command: "sync-profile on|off|reset"
-- allocate QSPEntry with g_new0
-
-I added most new bits as separate patches to ease review.
-
-The first patch has some perf numbers; the last patch shows
-sample output from the monitor.
-
-Checkpatch gives some errors, but they're false positives.
-
-You can fetch this series from:
-  https://github.com/cota/qemu/tree/sync-profiler-v2
-
-Diffstat below.
-
-Thanks,
-
-		Emilio
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- cpus.c                      |  10 +-
- hmp-commands-info.hx        |  22 ++
- hmp-commands.hx             |  15 +
- hmp.c                       |  24 ++
- hmp.h                       |   1 +
- include/qemu/main-loop.h    |   4 +-
- include/qemu/qht.h          |   1 +
- include/qemu/qsp.h          |  29 ++
- include/qemu/thread-posix.h |   4 +-
- include/qemu/thread-win32.h |   5 +-
- include/qemu/thread.h       |  66 +++-
- monitor.c                   |  11 +
- qemu-options.hx             |  10 +
- stubs/iothread-lock.c       |   2 +-
- tests/atomic_add-bench.c    |   6 +-
- util/Makefile.objs          |   1 +
- util/qemu-thread-win32.c    |   4 +-
- util/qht.c                  |  47 ++-
- util/qsp.c                  | 779 +++++++++++++++++++++++++++++++++++++++
- vl.c                        |   3 +
- 20 files changed, 1016 insertions(+), 28 deletions(-)
- create mode 100644 include/qemu/qsp.h
- create mode 100644 util/qsp.c
+ include/qemu/qsp.h |   2 +-
+ util/qsp.c         | 102 ++++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 89 insertions(+), 15 deletions(-)
+
+diff --git a/include/qemu/qsp.h b/include/qemu/qsp.h
+index f8c6c9648a..a94c464f90 100644
+--- a/include/qemu/qsp.h
++++ b/include/qemu/qsp.h
+@@ -19,7 +19,7 @@ enum QSPSortBy {
+ };
+ 
+ void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
+-                enum QSPSortBy sort_by);
++                enum QSPSortBy sort_by, bool callsite_coalesce);
+ 
+ bool qsp_is_enabled(void);
+ void qsp_enable(void);
+diff --git a/util/qsp.c b/util/qsp.c
+index ea4bb82a03..ea128d3748 100644
+--- a/util/qsp.c
++++ b/util/qsp.c
+@@ -27,11 +27,9 @@
+  * Reports are generated as a table where each row represents a call site. A
+  * call site is the triplet formed by the __file__ and __LINE__ of the caller
+  * as well as the address of the "object" (i.e. mutex, rec. mutex or condvar)
+- * being operated on. Focusing on call sites instead of just on objects might
+- * seem puzzling. However, it is a sensible choice since otherwise dealing with
+- * dynamically-allocated objects becomes difficult (e.g. what to do when an
+- * object is destroyed, or reused?). Furthermore, the call site info is of most
+- * importance, since it is callers, and not objects, what cause wait time.
++ * being operated on. Optionally, call sites that operate on different objects
++ * of the same type can be coalesced, which can be particularly useful when
++ * profiling dynamically-allocated objects.
+  *
+  * Alternative designs considered:
+  *
+@@ -84,6 +82,7 @@ struct QSPEntry {
+     const QSPCallSite *callsite;
+     uint64_t n_acqs;
+     uint64_t ns;
++    unsigned int n_objs; /* count of coalesced objs; only used for reporting */
+ };
+ typedef struct QSPEntry QSPEntry;
+ 
+@@ -163,6 +162,17 @@ static uint32_t qsp_entry_no_thread_hash(const QSPEntry *entry)
+     return do_qsp_entry_hash(entry, 0);
+ }
+ 
++/* without the objects we need to hash the file name to get a decent hash */
++static uint32_t qsp_entry_no_thread_obj_hash(const QSPEntry *entry)
++{
++    const QSPCallSite *callsite = entry->callsite;
++    uint64_t a = g_str_hash(callsite->file);
++    uint64_t b = callsite->line;
++    uint32_t e = callsite->type;
++
++    return tb_hash_func7(a, b, e, 0, 0);
++}
++
+ static bool qsp_callsite_cmp(const void *ap, const void *bp)
+ {
+     const QSPCallSite *a = ap;
+@@ -175,6 +185,17 @@ static bool qsp_callsite_cmp(const void *ap, const void *bp)
+          (a->file == b->file || !strcmp(a->file, b->file)));
+ }
+ 
++static bool qsp_callsite_no_obj_cmp(const void *ap, const void *bp)
++{
++    const QSPCallSite *a = ap;
++    const QSPCallSite *b = bp;
++
++    return a == b ||
++        (a->line == b->line &&
++         a->type == b->type &&
++         (a->file == b->file || !strcmp(a->file, b->file)));
++}
++
+ static bool qsp_entry_no_thread_cmp(const void *ap, const void *bp)
+ {
+     const QSPEntry *a = ap;
+@@ -183,6 +204,14 @@ static bool qsp_entry_no_thread_cmp(const void *ap, const void *bp)
+     return qsp_callsite_cmp(a->callsite, b->callsite);
+ }
+ 
++static bool qsp_entry_no_thread_obj_cmp(const void *ap, const void *bp)
++{
++    const QSPEntry *a = ap;
++    const QSPEntry *b = bp;
++
++    return qsp_callsite_no_obj_cmp(a->callsite, b->callsite);
++}
++
+ static bool qsp_entry_cmp(const void *ap, const void *bp)
+ {
+     const QSPEntry *a = ap;
+@@ -499,15 +528,36 @@ static void qsp_diff(struct qht *orig, struct qht *new)
+     qht_iter(orig, qsp_iter_diff, new);
+ }
+ 
++static void
++qsp_iter_callsite_coalesce(struct qht *orig, void *p, uint32_t h, void *htp)
++{
++    struct qht *ht = htp;
++    QSPEntry *old = p;
++    QSPEntry *e;
++    uint32_t hash;
++
++    hash = qsp_entry_no_thread_obj_hash(old);
++    e = qht_lookup(ht, old, hash);
++    if (e == NULL) {
++        e = qsp_entry_create(ht, old, hash);
++        e->n_objs = 1;
++    } else if (e->callsite->obj != old->callsite->obj) {
++        e->n_objs++;
++    }
++    e->ns += old->ns;
++    e->n_acqs += old->n_acqs;
++}
++
+ static void qsp_ht_delete(struct qht *ht, void *p, uint32_t h, void *htp)
+ {
+     g_free(p);
+ }
+ 
+-static void qsp_mktree(GTree *tree)
++static void qsp_mktree(GTree *tree, bool callsite_coalesce)
+ {
+     QSPSnapshot *snap;
+-    struct qht ht;
++    struct qht ht, coalesce_ht;
++    struct qht *htp;
+ 
+     /*
+      * First, see if there's a prior snapshot, so that we read the global hash
+@@ -532,11 +582,23 @@ static void qsp_mktree(GTree *tree)
+     /* done with the snapshot; RCU can reclaim it */
+     rcu_read_unlock();
+ 
++    htp = &ht;
++    if (callsite_coalesce) {
++        qht_init(&coalesce_ht, qsp_entry_no_thread_obj_cmp, QSP_INITIAL_SIZE,
++                 QHT_MODE_AUTO_RESIZE | QHT_MODE_RAW_MUTEXES);
++        qht_iter(&ht, qsp_iter_callsite_coalesce, &coalesce_ht);
++
++        /* free the previous hash table, and point htp to coalesce_ht */
++        qht_iter(&ht, qsp_ht_delete, NULL);
++        qht_destroy(&ht);
++        htp = &coalesce_ht;
++    }
++
+     /* sort the hash table elements by using a tree */
+-    qht_iter(&ht, qsp_sort, tree);
++    qht_iter(htp, qsp_sort, tree);
+ 
+     /* free the hash table, but keep the elements (those are in the tree now) */
+-    qht_destroy(&ht);
++    qht_destroy(htp);
+ }
+ 
+ /* free string with g_free */
+@@ -562,6 +624,7 @@ struct QSPReportEntry {
+     double time_s;
+     double ns_avg;
+     uint64_t n_acqs;
++    unsigned int n_objs;
+ };
+ typedef struct QSPReportEntry QSPReportEntry;
+ 
+@@ -585,6 +648,7 @@ static gboolean qsp_tree_report(gpointer key, gpointer value, gpointer udata)
+     report->n_entries++;
+ 
+     entry->obj = e->callsite->obj;
++    entry->n_objs = e->n_objs;
+     entry->callsite_at = qsp_at(e->callsite);
+     entry->typename = qsp_typenames[e->callsite->type];
+     entry->time_s = e->ns * 1e-9;
+@@ -629,10 +693,20 @@ pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
+ 
+     for (i = 0; i < rep->n_entries; i++) {
+         const QSPReportEntry *e = &rep->entries[i];
++        GString *s = g_string_new(NULL);
+ 
+-        pr(f, "%-9s  %14p  %s%*s  %13.5f  %12" PRIu64 "  %12.2f\n", e->typename,
+-           e->obj, e->callsite_at, callsite_len - (int)strlen(e->callsite_at),
+-           "", e->time_s, e->n_acqs, e->ns_avg * 1e-3);
++        g_string_append_printf(s, "%-9s  ", e->typename);
++        if (e->n_objs > 1) {
++            g_string_append_printf(s, "[%12u]", e->n_objs);
++        } else {
++            g_string_append_printf(s, "%14p", e->obj);
++        }
++        g_string_append_printf(s, "  %s%*s  %13.5f  %12" PRIu64 "  %12.2f\n",
++                               e->callsite_at,
++                               callsite_len - (int)strlen(e->callsite_at), "",
++                               e->time_s, e->n_acqs, e->ns_avg * 1e-3);
++        pr(f, "%s", s->str);
++        g_string_free(s, TRUE);
+     }
+ 
+     pr(f, "%s\n", dashes);
+@@ -652,7 +726,7 @@ static void report_destroy(QSPReport *rep)
+ }
+ 
+ void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
+-                enum QSPSortBy sort_by)
++                enum QSPSortBy sort_by, bool callsite_coalesce)
+ {
+     GTree *tree = g_tree_new_full(qsp_tree_cmp, &sort_by, g_free, NULL);
+     QSPReport rep;
+@@ -663,7 +737,7 @@ void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
+     rep.n_entries = 0;
+     rep.max_n_entries = max;
+ 
+-    qsp_mktree(tree);
++    qsp_mktree(tree, callsite_coalesce);
+     g_tree_foreach(tree, qsp_tree_report, &rep);
+     g_tree_destroy(tree);
+ 
+-- 
+2.17.1
