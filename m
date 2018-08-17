@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqb7z-0005f0-7W
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:33:11 -0400
+	(envelope-from <berrange@redhat.com>) id 1fqbGA-0002te-TO
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:41:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqb4h-0006DK-3Z
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:29:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36744 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fqbG6-0001nu-Ib
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:41:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37320 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqb4g-0006Ci-TJ
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:29:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 768D9814FDCE
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 09:29:42 +0000 (UTC)
-Date: Fri, 17 Aug 2018 10:29:36 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqbG4-0001jp-Sn
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:41:29 -0400
+Date: Fri, 17 Aug 2018 10:41:23 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180817092936.GC11124@redhat.com>
+Message-ID: <20180817094123.GD11124@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
+References: <56f721bc-6e1d-05de-2f6b-c410f4dee711@profihost.ag>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
-Subject: Re: [Qemu-devel] clean/simple Q35 support in libvirt+QEMU for guest
- OSes that don't support virtio-1.0
+In-Reply-To: <56f721bc-6e1d-05de-2f6b-c410f4dee711@profihost.ag>
+Subject: Re: [Qemu-devel] Qemu and Spectre_V4 + l1tf + IBRS_FW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,205 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laine Stump <laine@redhat.com>
-Cc: Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>
+To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Thu, Aug 16, 2018 at 06:20:29PM -0400, Laine Stump wrote:
-> Summary of the problem:
+On Fri, Aug 17, 2018 at 08:44:38AM +0200, Stefan Priebe - Profihost AG wrote:
+> Hello,
 > 
-> 1) We want to persuade libvirt+QEMU users to move away from the i440fx
-> machinetype in favor of Q35. (NB: Someday this *might* lead to the
-> ability to deprecate and even remove the 440fx machinetype, but even if
-> that were to happen, it would be a *very long* time from now, so this
-> discussion is *not* about that!)
-
-There are plenty of OS that will never support Q35 and are still interesting
-to use under Q35. The set which could use Q35, but lack virtio1.0 is fairly
-small. So removal of i440fx is really only something for downstream KVM vendors
-to consider. Those vendors only care about modern OS, but upstream is much
-more open minded about what QEMU is used for, so I see it probably living
-forever in upstream, or at least long enough that current maintaniers will
-be retired ;-P.
-
-
-> 2) When Q35 machinetype is used, libvirt assigns virtio devices to a
-> slot on a PCI Express controller (because why have modern PCIe
-> controllers/slots available but force everything onto clunky old legacy
-> controllers?).
+> i haven't found anything on the web regarding qemu and mentioned variants.
 > 
-> 3) When a virtio device is plugged into an Express controller, QEMU
-> disables the device's IO port space, and it is put into "modern-only"
-> mode (this is done to avoid a rapid exhaustion of limited IO port space).
+> While my host says:
+> l1tf:Mitigation: PTE Inversion; VMX: SMT vulnerable, L1D conditional
+> cache flushes
+> meltdown:Mitigation: PTI
+> spec_store_bypass:Mitigation: Speculative Store Bypass disabled via
+> prctl and seccomp
+> spectre_v1:Mitigation: __user pointer sanitization
+> spectre_v2:Mitigation: Full generic retpoline, IBPB, IBRS_FW
 > 
-> 4) modern-only virtio devices won't work with a legacy (virtio-0.9-only)
-> guest driver, because virtio-0.9 requires IO port space.
+> My guests bootet with pcid and spec-ctrl only say:
+> l1tf:Mitigation: PTE Inversion
+> meltdown:Mitigation: PTI
+> spec_store_bypass:Vulnerable
+> spectre_v1:Mitigation: __user pointer sanitization
+> spectre_v2:Mitigation: Full generic retpoline, IBPB
 > 
-> 5) Some guest OSes that we still want to support (and which would
-> otherwise work okay on a Q35 virtual machine) have virtio drivers too
-> old to support virtio-1.0 (CentOS6 and RHEL6 are examples of such OSes),
-> but due to the chain of reasons listed above, the "standard" config for
-> a Q35 guest generated by libvirt doesn't support virtio-0.9, hence
-> doesn't support these guest OSes.
+> * What is about spec_store_bypass in Qemu?
 
-Note when talking about "support" you're really saying it from the
-downstream vendor, specifically RHEL, POV. From upstream or Fedora POV
-essentially all x86 OS ever made are in scope for running under QEMU
-if suitable virtual hardware models have been provided. QEMU doesn't
-maintain any whitelist of "supported" OS that differs from what is
-technically capable of being run, in the way downstream vendors do.
+The guest needs an 'ssbd' feature for Intel CPU models and either a
+'virt-ssbd' or 'amd-ssbd' feature for AMD CPU models.
 
-> And here's a list of possible solutions to this problem (note that
-> "consumers" means management applications such as OpenStack, oVirt,
-> virt-manager, virt-install, gnome-boxes, etc. In all cases, it's assumed
-> that the consumer's decision on the action to take will be based on
-> information from libosinfo). For completeness, I've included even the
-> possibilities that have been rejected, along with a brief synopsis of
-> (at least part of) the reason for rejection:
-> 
->   (1) Add some way libvirt consumers can ask libvirt to place
->       virtio devices on a legacy pci slot instead of pcie when
->       the machinetype is q35 (qemu sets virtio devices in legacy
->       PCI slots to transitional mode, so io port space is enabled
->       and virtio-0.0 drivers will work).
-> 
->       This has been proposed on libvir-list, but rejected. Here is
->       the most elquently stated reasoning for the rejection I could
->       find (with thanks to Dan Berrange):
-> 
->          The domain XML is a way to express the configuration
->          of the guest virtual machine.  What we're talking about
->          here is a policy tunable for an internal libvirt QEMU
->          driver algorithm, as so does not belong anywhere in the
->          domain XML.
+> * What is about IBRS_FW feature?
 
-Indeed, that's a guiding principal in general, not just for this PCI
-question.
+I'm not sure what IBRS_FW is referring to, but don't worry about it.
+The fact the the guest kernel says "Mitigation" instead of "Vulnerable"
+means you are protected with your current config.
 
->   (2) Add full-blown pci enumeration support to all libvirt consumers
->       (i.e. they will need to build a model of the PCI bus topology
->       of each guest, and keep track of which addresses are in use).
->       They can then manually place virtio devices on legacy pci slots
->       (again, triggering transitional mode) when the intended guest
->       OS doesn't support virtio-0.9.
-> 
->       (This is seen as requiring too much duplicated effort for
->       development and support/maintenance, since up until now libvirt
->       has been the single point of action for PCI address assignment
->       (well, QEMU can do it too, but for > 10 years libvirt has
->       *always* provided full PCI addresses for all devices)
+For Intel CPU models Spectre v2 needs the guest to have the 'spec-ctrl'
+feature. On AMD models Spectre v2 the guest needs 'ibpb' feature.
 
-It really depends on the scope of the mgmt app - at some point the mgmt
-apps needs to take charge to some degree if it has particular ideas
-about how a machine should look. Libvirt's placement strategy is a good
-default for 95% of use cases, but it'll never be 100%. An example is
-setting up a particular PCI topology that is guest NUMA node aware,
-using expander buses.
+> * What is about L1TF?
 
-So some apps might take this option, but in the common case it is
-undesirable.
+No extra CPU flags are required for QEMU guests for L1TF. The new CPU
+feature is merely an perf optimization for the host hypervisor fixes.
 
->   (3) Add virtio-1.0 support to all guest OSes. If this is done,
->       existing libvirt configs will work.
-> 
->       (Aside from the difficulty of backporting, and the fact that
->       there are going to be some OSes that don't get it *at all*,
->       there will always be older releases that haven't gotten the
->       backport. So this isn't a complete solution).
+Note that with L1TF there are extra steps you need to consider wrt
+hyperthreading, that won't be reflected in the 'vulnerabilities'
+data published by the kernel.
 
-Yep, there will always be guest OS that don't support 1.0. So that's
-only a solution if the person who cares about Q35 support also controls
-the guest OS in question.
+You can read more about the procedure for dealing with L1TF in
+virt hosts in the "Resolve" tab of this article:
 
->   (4) Consumers can continue using the 440fx machinetype for guest
->       OSes that don't support virtio-0.9
-> 
->       (This would work, but perpetuates use of the 440fx
->       machinetype, and all for just this one reason (at least in
->       the case of CentOS6/RHEL6, which otherwise work just fine with
->       Q35)).
+  https://access.redhat.com/security/vulnerabilities/L1TF
 
->From an usptream POV this is always going to be the case. This is
-really only an undesirable thing for downstream who are trying to
-artificially restrict what QEMU features users have available to
-them.
+> Or are those just irrelevant to Qemu guests? Would be great to have some
+> informations.
 
->   (5) Introduce  virtio-0.9, virtio-1.0 models in libvirt
->       which are explicitly legacy-only and modern-only.
->       QEMU doesn't need to change, as libvirt can simply set
->       the right params on existing QEMU models to force the
->       behavior.
-> 
->       (NB: it's unclear to me whether virtio-0.9 simply won't
->       work without forcing the device to be on a legacy PCI
->       slot, or if that's just "a very bad idea" because it
->       will mean that the device uses up extra io port space)
+We have some QEMU docs providing guidance on guest CPU model/feature config
+but they are not yet published. In the meantime this blog post of mine gives
+the same info, covering what's needed for Spectre v2, Meltdown and SSBD and
+guidance in general for CPU config:
 
-> As a starter for continuing the discussion, it seems to me that for
-> option (5):
-> 
-> a) we don't really need the virtio-1.0 model, since that's what you
-> currently get anyway when you ask for "virtio" on Q35 (and on 440fx,
-> "virtio" gives you transitional, which works for everybody).
-
-At some point we might have a virtio-2.0 and find ourselves in a
-similar problem again. IMHO it is preferrable to have both explicit
-versioned models, and discourage use of the magical 'virtio' model from
-mgmt apps. Use libosinfo to identify which virtio model is supported
-for the OS in question and use that explicitly.  Only use the magical
-'virtio' model if there's no information about what version the OS
-supports.
-
-> b) Rather than a "legacy-only" model for virtio-0.9, it would be more
-> useful to have "transitional". This way the config would work for older
-> OSes that don't support virtio-1.0, and when/if the OS was upgraded such
-> that it supported virtio-1.0, that would be automatically used without
-> needing to change the config.
-
-I don't think the case of OS suddenly gaining support for 1.0 in an update
-is frequent enough to be worth worrying about.
-
-> c) Even if it's possible to force a device on an Express slot into
-> transitional mode, this is extremely wasteful of io port space, so
-> libvirt should consider virtio-0.9 devices to be legacy PCI, and thus
-> plug them into legacy PCI slots. And once we're doing this, it's
-> unnecessary to add any extra option to the qemu commandline to force
-> legacy support (i.e. transitional mode), as that is what QEMU already
-> does when the device is connected to a legacy PCI slot.
-
-Yes, it should plug them into legacy PCI slots by default, but if a
-mgmt app has done explicit placement itself, it should honour that
-even if it means wasting IO space.
-
-> So making the naive assumption that we agree on implementing option (5)
-> and there are no objections to my points a-c (Hah! As if!), how does
-> this sound as a plan:
-> 
-> 
-> A) libosinfo starts telling consumers that the preferred virtio device
-> model for the relevant OSes is "virtio-0.9", and leaves the
-> recommendation for other OSes as "virtio".
-
-Libosinfo already uses 'virtio' as the prefix identifying virtio-0.9
-support (the old PCI product IDs), and 'virtio-1.0' as the prefix for
-identifying virtio-1.0 support (the new PCI product IDs).  That these
-don't match libvirt model names doesn't matter.
-
-> B) libvirt adds a "virtio-0.9" model for all virtio devices that
-> actually have virtio-0.9 support (a couple of devices never existed
-> prior to virtio-1.0 (rng and ???) so virtio-0.9 would be nonsensical for
-> them).
-
-> 
-> C) inside libvirt, the implementation of the "virtio-0.9" model is
-> identical to "virtio", except that the VIR_PCI_CONNECT_TYPE flags for
-> these devices contain VIR_PCI_CONNECT_TYPE_PCI rather than
-> VIR_PCI_CONNECT_TYPE_PCIE, resulting in those devices being assigned to
-> a legacy PCI slot, and thus they would be transitional mode by default.
-
-
-For 'virtio-0.9' libvirt should set "disable-modern=yes" in QEMU args
-
-For 'virtio-1.0' libvirt should set "disable-legacy=yes" in QEMU args
+  https://www.berrange.com/posts/2018/06/29/cpu-model-configuration-for-qemu-kvm-on-x86-hosts/
 
 
 Regards,
