@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqbhI-00009d-UR
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:09:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fqbnB-0007xs-0f
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:15:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fqbWJ-0006hP-R5
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:58:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46612 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fqbWI-0006dL-IR
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 05:58:14 -0400
-References: <1534491213-24748-1-git-send-email-thuth@redhat.com>
-	<20180817094819.GE11124@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <adc83475-3772-ca87-8498-3b5df1ddf046@redhat.com>
-Date: Fri, 17 Aug 2018 11:58:07 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fqbnA-0002fz-4e
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:15:40 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:32824)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fqbn9-0002fZ-TD
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:15:40 -0400
+Received: by mail-oi0-x244.google.com with SMTP id 8-v6so13159195oip.0
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 03:15:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180817094819.GE11124@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] qom: Rename object_new_with_props to
- object_new_child
+In-Reply-To: <20180814124254.5229-1-peter.maydell@linaro.org>
+References: <20180814124254.5229-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Aug 2018 11:15:18 +0100
+Message-ID: <CAFEAcA99e2sO8dz3J42+BHO=AJDfx90z1GKGAOreNiWSo3KELw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 00/10] target/arm: Some pieces
+ of support for 32-bit Hyp mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Edgar Iglesias <edgari@xilinx.com>, Luc Michel <luc.michel@greensocs.com>, "patches@linaro.org" <patches@linaro.org>
 
-On 08/17/2018 11:48 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Aug 17, 2018 at 09:33:33AM +0200, Thomas Huth wrote:
->> While adding the object_initialize_child() function, Paolo suggested
->> to rename the similar object_new_with_props() function accordingly:
->>
->> http://marc.info/?i=3De034610d-9a1d-a8a5-ee92-b2e3f0ba2891@redhat.com
->>
->> This way it is more obvious that this function creates a new object
->> as a child of another object.
->=20
-> I'd expect 'object_new_with_child' to be the same as 'object_new',
-> but with only 'parent' & 'id' args added, which isn't the case here.
->=20
-> If we want the full & consistent design then we should have
->=20
->   object_new(typename)
->   object_new_with_child(typename, parent, id)
->   object_new_props(typename, ...)
->   object_new_propv(typename, va_arg props)
->   object_new_with_child_props(typename, parent, id, ...)
->   object_new_with_child_propv(typename, parent, id, va_arg props)
+On 14 August 2018 at 13:42, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Now we have virtualization support in the GICv2 emulation,
+> I thought I'd have a look at how much we were still missing
+> for being able to enable EL2 support for AArch32.
+> This set of patches fixes some minor missing pieces:
+>  * various small bugs in cp15 registers or places where
+>    we were missing the 32-bit version of a 64-bit register
+>  * a bugfix for MSR/MRS (banked), which were not allowing
+>    Hyp mode to access ELR_Hyp
+>  * implementation of the ERET instruction for A32/T32
+>  * support for taking exceptions to Hyp mode (the largest
+>    of these missing bits)
+>
+> This isn't complete, but I thought I'd push these patches
+> out for review. My test setup is that I have another
+> couple of patches, one which fixes up hw/arm/boot.c to
+> boot AArch32 kernels in Hyp mode if it exists, and one
+> which sets ARM_FEATURE_EL2 on our A15 model. With those I
+> can get an outer kernel to boot with KVM support and try
+> to run an inner guest kernel. The inner kernel boots OK
+> but gets random segfaults in its userspace -- I haven't
+> tracked down why this is yet...
 
-"new_with_child" sounds wrong, too, since the parent is not created
-here, but the child. Anyway, I guess the naming of these functions is
-too much subject to bikeshedding, so never mind, let's keep it as it
-currently is.
+I've put patches 1, 2, 4, 6, 7, 8, 9:
 
- Thomas
+>   target/arm: Correct typo in HAMAIR1 regdef name
+>   target/arm: Add missing .cp = 15 to HMAIR1 and HAMAIR1 regdefs
+>   target/arm: Implement RAZ/WI HACTLR2
+>   target/arm: Implement AArch32 HVBAR
+>   target/arm: Implement AArch32 HCR and HCR2
+>   target/arm: Implement AArch32 Hyp FARs
+>   target/arm: Implement ESR_EL2/HSR for AArch32 and no-EL2
+>   target/arm: Permit accesses to ELR_Hyp from Hyp mode via MSR/MRS
+>     (banked)
+>   target/arm: Implement AArch32 ERET instruction
+
+into target-arm.next.
+
+Patches 3, 5, 10 had issues in code review and I'll
+rework those and send a v2 at some point:
+
+>   target/arm: Implement RAZ/WI HACTLR2
+>   target/arm: Implement AArch32 HCR and HCR2
+>   target/arm: Implement support for taking exceptions to Hyp mode
+
+thanks
+-- PMM
