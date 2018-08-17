@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fqiEu-0000qV-26
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:08:45 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fqiF3-0000xX-UU
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:08:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fqiEt-0007lf-4P
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:08:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33516 helo=mx1.redhat.com)
+	(envelope-from <alex.williamson@redhat.com>) id 1fqiEy-0007pp-US
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:08:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47164 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fqiEs-0007l7-V9
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:08:43 -0400
+	id 1fqiEy-0007pO-OV
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:08:48 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A30AD4B765
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 17:08:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 710C6401DEC6
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 17:08:48 +0000 (UTC)
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Fri, 17 Aug 2018 11:08:40 -0600
-Message-ID: <153452572005.13804.10175795676768932286.stgit@gimli.home>
+Date: Fri, 17 Aug 2018 11:08:47 -0600
+Message-ID: <153452572774.13804.6638165053676391508.stgit@gimli.home>
 In-Reply-To: <153452552631.13804.12031418293966530953.stgit@gimli.home>
 References: <153452552631.13804.12031418293966530953.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL 3/4] vfio: Inhibit ballooning based on group
- attachment to a container
+Subject: [Qemu-devel] [PULL 4/4] vfio/ccw/pci: Allow devices to opt-in for
+ ballooning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,109 +36,185 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-We use a VFIOContainer to associate an AddressSpace to one or more
-VFIOGroups.  The VFIOContainer represents the DMA context for that
-AdressSpace for those VFIOGroups and is synchronized to changes in
-that AddressSpace via a MemoryListener.  For IOMMU backed devices,
-maintaining the DMA context for a VFIOGroup generally involves
-pinning a host virtual address in order to create a stable host
-physical address and then mapping a translation from the associated
-guest physical address to that host physical address into the IOMMU.
+If a vfio assigned device makes use of a physical IOMMU, then memory
+ballooning is necessarily inhibited due to the page pinning, lack of
+page level granularity at the IOMMU, and sufficient notifiers to both
+remove the page on balloon inflation and add it back on deflation.
+However, not all devices are backed by a physical IOMMU.  In the case
+of mediated devices, if a vendor driver is well synchronized with the
+guest driver, such that only pages actively used by the guest driver
+are pinned by the host mdev vendor driver, then there should be no
+overlap between pages available for the balloon driver and pages
+actively in use by the device.  Under these conditions, ballooning
+should be safe.
 
-While the above maintains the VFIOContainer synchronized to the QEMU
-memory API of the VM, memory ballooning occurs outside of that API.
-Inflating the memory balloon (ie. cooperatively capturing pages from
-the guest for use by the host) simply uses MADV_DONTNEED to "zap"
-pages from QEMU's host virtual address space.  The page pinning and
-IOMMU mapping above remains in place, negating the host's ability to
-reuse the page, but the host virtual to host physical mapping of the
-page is invalidated outside of QEMU's memory API.
+vfio-ccw devices are always mediated devices and always operate under
+the constraints above.  Therefore we can consider all vfio-ccw devices
+as balloon compatible.
 
-When the balloon is later deflated, attempting to cooperatively
-return pages to the guest, the page is simply freed by the guest
-balloon driver, allowing it to be used in the guest and incurring a
-page fault when that occurs.  The page fault maps a new host physical
-page backing the existing host virtual address, meanwhile the
-VFIOContainer still maintains the translation to the original host
-physical address.  At this point the guest vCPU and any assigned
-devices will map different host physical addresses to the same guest
-physical address.  Badness.
+The situation is far from straightforward with vfio-pci.  These
+devices can be physical devices with physical IOMMU backing or
+mediated devices where it is unknown whether a physical IOMMU is in
+use or whether the vendor driver is well synchronized to the working
+set of the guest driver.  The safest approach is therefore to assume
+all vfio-pci devices are incompatible with ballooning, but allow user
+opt-in should they have further insight into mediated devices.
 
-The IOMMU typically does not have page level granularity with which
-it can track this mapping without also incurring inefficiencies in
-using page size mappings throughout.  MMU notifiers in the host
-kernel also provide indicators for invalidating the mapping on
-balloon inflation, not for updating the mapping when the balloon is
-deflated.  For these reasons we assume a default behavior that the
-mapping of each VFIOGroup into the VFIOContainer is incompatible
-with memory ballooning and increment the balloon inhibitor to match
-the attached VFIOGroups.
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/vfio/common.c |   30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ hw/vfio/ccw.c                 |    9 +++++++++
+ hw/vfio/common.c              |   23 ++++++++++++++++++++++-
+ hw/vfio/pci.c                 |   26 +++++++++++++++++++++++++-
+ hw/vfio/trace-events          |    1 +
+ include/hw/vfio/vfio-common.h |    2 ++
+ 5 files changed, 59 insertions(+), 2 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index fb396cf00ac4..a3d758af8d8f 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -32,6 +32,7 @@
- #include "hw/hw.h"
- #include "qemu/error-report.h"
- #include "qemu/range.h"
-+#include "sysemu/balloon.h"
- #include "sysemu/kvm.h"
- #include "trace.h"
- #include "qapi/error.h"
-@@ -1044,6 +1045,33 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
- 
-     space = vfio_get_address_space(as);
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index 351b305e1ae7..e96bbdc78b48 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -349,6 +349,15 @@ static void vfio_ccw_get_device(VFIOGroup *group, VFIOCCWDevice *vcdev,
+         }
+     }
  
 +    /*
-+     * VFIO is currently incompatible with memory ballooning insofar as the
-+     * madvise to purge (zap) the page from QEMU's address space does not
-+     * interact with the memory API and therefore leaves stale virtual to
-+     * physical mappings in the IOMMU if the page was previously pinned.  We
-+     * therefore add a balloon inhibit for each group added to a container,
-+     * whether the container is used individually or shared.  This provides
-+     * us with options to allow devices within a group to opt-in and allow
-+     * ballooning, so long as it is done consistently for a group (for instance
-+     * if the device is an mdev device where it is known that the host vendor
-+     * driver will never pin pages outside of the working set of the guest
-+     * driver, which would thus not be ballooning candidates).
-+     *
-+     * The first opportunity to induce pinning occurs here where we attempt to
-+     * attach the group to existing containers within the AddressSpace.  If any
-+     * pages are already zapped from the virtual address space, such as from a
-+     * previous ballooning opt-in, new pinning will cause valid mappings to be
-+     * re-established.  Likewise, when the overall MemoryListener for a new
-+     * container is registered, a replay of mappings within the AddressSpace
-+     * will occur, re-establishing any previously zapped pages as well.
-+     *
-+     * NB. Balloon inhibiting does not currently block operation of the
-+     * balloon driver or revoke previously pinned pages, it only prevents
-+     * calling madvise to modify the virtual mapping of ballooned pages.
++     * All vfio-ccw devices are believed to operate in a way compatible with
++     * memory ballooning, ie. pages pinned in the host are in the current
++     * working set of the guest driver and therefore never overlap with pages
++     * available to the guest balloon driver.  This needs to be set before
++     * vfio_get_device() for vfio common to handle the balloon inhibitor.
 +     */
-+    qemu_balloon_inhibit(true);
++    vcdev->vdev.balloon_allowed = true;
 +
-     QLIST_FOREACH(container, &space->containers, next) {
-         if (!ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &container->fd)) {
-             group->container = container;
-@@ -1232,6 +1260,7 @@ close_fd_exit:
-     close(fd);
- 
- put_space_exit:
-+    qemu_balloon_inhibit(false);
-     vfio_put_address_space(space);
- 
-     return ret;
-@@ -1352,6 +1381,7 @@ void vfio_put_group(VFIOGroup *group)
+     if (vfio_get_device(group, vcdev->cdev.mdevid, &vcdev->vdev, errp)) {
+         goto out_err;
+     }
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index a3d758af8d8f..cd1f4af18abb 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1381,7 +1381,9 @@ void vfio_put_group(VFIOGroup *group)
          return;
      }
  
-+    qemu_balloon_inhibit(false);
+-    qemu_balloon_inhibit(false);
++    if (!group->balloon_allowed) {
++        qemu_balloon_inhibit(false);
++    }
      vfio_kvm_device_del_group(group);
      vfio_disconnect_container(group);
      QLIST_REMOVE(group, next);
+@@ -1417,6 +1419,25 @@ int vfio_get_device(VFIOGroup *group, const char *name,
+         return ret;
+     }
+ 
++    /*
++     * Clear the balloon inhibitor for this group if the driver knows the
++     * device operates compatibly with ballooning.  Setting must be consistent
++     * per group, but since compatibility is really only possible with mdev
++     * currently, we expect singleton groups.
++     */
++    if (vbasedev->balloon_allowed != group->balloon_allowed) {
++        if (!QLIST_EMPTY(&group->device_list)) {
++            error_setg(errp,
++                       "Inconsistent device balloon setting within group");
++            return -1;
++        }
++
++        if (!group->balloon_allowed) {
++            group->balloon_allowed = true;
++            qemu_balloon_inhibit(false);
++        }
++    }
++
+     vbasedev->fd = fd;
+     vbasedev->group = group;
+     QLIST_INSERT_HEAD(&group->device_list, vbasedev, next);
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 6cbb8fa0549d..056f3a887a8f 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2804,12 +2804,13 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+     VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+     VFIODevice *vbasedev_iter;
+     VFIOGroup *group;
+-    char *tmp, group_path[PATH_MAX], *group_name;
++    char *tmp, *subsys, group_path[PATH_MAX], *group_name;
+     Error *err = NULL;
+     ssize_t len;
+     struct stat st;
+     int groupid;
+     int i, ret;
++    bool is_mdev;
+ 
+     if (!vdev->vbasedev.sysfsdev) {
+         if (!(~vdev->host.domain || ~vdev->host.bus ||
+@@ -2869,6 +2870,27 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         }
+     }
+ 
++    /*
++     * Mediated devices *might* operate compatibly with memory ballooning, but
++     * we cannot know for certain, it depends on whether the mdev vendor driver
++     * stays in sync with the active working set of the guest driver.  Prevent
++     * the x-balloon-allowed option unless this is minimally an mdev device.
++     */
++    tmp = g_strdup_printf("%s/subsystem", vdev->vbasedev.sysfsdev);
++    subsys = realpath(tmp, NULL);
++    g_free(tmp);
++    is_mdev = (strcmp(subsys, "/sys/bus/mdev") == 0);
++    free(subsys);
++
++    trace_vfio_mdev(vdev->vbasedev.name, is_mdev);
++
++    if (vdev->vbasedev.balloon_allowed && !is_mdev) {
++        error_setg(errp, "x-balloon-allowed only potentially compatible "
++                   "with mdev devices");
++        vfio_put_group(group);
++        goto error;
++    }
++
+     ret = vfio_get_device(group, vdev->vbasedev.name, &vdev->vbasedev, errp);
+     if (ret) {
+         vfio_put_group(group);
+@@ -3170,6 +3192,8 @@ static Property vfio_pci_dev_properties[] = {
+     DEFINE_PROP_BIT("x-igd-opregion", VFIOPCIDevice, features,
+                     VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT, false),
+     DEFINE_PROP_BOOL("x-no-mmap", VFIOPCIDevice, vbasedev.no_mmap, false),
++    DEFINE_PROP_BOOL("x-balloon-allowed", VFIOPCIDevice,
++                     vbasedev.balloon_allowed, false),
+     DEFINE_PROP_BOOL("x-no-kvm-intx", VFIOPCIDevice, no_kvm_intx, false),
+     DEFINE_PROP_BOOL("x-no-kvm-msi", VFIOPCIDevice, no_kvm_msi, false),
+     DEFINE_PROP_BOOL("x-no-kvm-msix", VFIOPCIDevice, no_kvm_msix, false),
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index d2a74952e389..a85e8662eadb 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -39,6 +39,7 @@ vfio_pci_hot_reset_result(const char *name, const char *result) "%s hot reset: %
+ vfio_populate_device_config(const char *name, unsigned long size, unsigned long offset, unsigned long flags) "Device %s config:\n  size: 0x%lx, offset: 0x%lx, flags: 0x%lx"
+ vfio_populate_device_get_irq_info_failure(void) "VFIO_DEVICE_GET_IRQ_INFO failure: %m"
+ vfio_realize(const char *name, int group_id) " (%s) group %d"
++vfio_mdev(const char *name, bool is_mdev) " (%s) is_mdev %d"
+ vfio_add_ext_cap_dropped(const char *name, uint16_t cap, uint16_t offset) "%s 0x%x@0x%x"
+ vfio_pci_reset(const char *name) " (%s)"
+ vfio_pci_reset_flr(const char *name) "%s FLR/VFIO_DEVICE_RESET"
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index a9036929b220..15ea6c26fdbc 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -112,6 +112,7 @@ typedef struct VFIODevice {
+     bool reset_works;
+     bool needs_reset;
+     bool no_mmap;
++    bool balloon_allowed;
+     VFIODeviceOps *ops;
+     unsigned int num_irqs;
+     unsigned int num_regions;
+@@ -131,6 +132,7 @@ typedef struct VFIOGroup {
+     QLIST_HEAD(, VFIODevice) device_list;
+     QLIST_ENTRY(VFIOGroup) next;
+     QLIST_ENTRY(VFIOGroup) container_next;
++    bool balloon_allowed;
+ } VFIOGroup;
+ 
+ typedef struct VFIODMABuf {
