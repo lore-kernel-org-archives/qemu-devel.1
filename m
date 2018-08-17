@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fqcb6-0006qg-VM
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:07:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqckN-0004Dh-GW
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fqcb4-0006gj-8J
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:07:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39486 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqckK-0007zZ-SN
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:16:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49234 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fqcb3-0006gP-UF
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:07:14 -0400
-Date: Fri, 17 Aug 2018 12:07:09 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180817110709.GF2459@work-vm>
-References: <20180722193350.6028-1-zhangckid@gmail.com>
-	<20180722193350.6028-6-zhangckid@gmail.com>
-	<20180807143036.GJ2556@work-vm>
-	<CAK3tnvK=yQz8=mE8_7OMHiiNwPiRY8dG-7yek_iv_yXHgQYqKg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqckK-0007zE-Mk
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:16:48 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180808120334.10970-1-armbru@redhat.com>
+	<20180808120334.10970-57-armbru@redhat.com>
+	<0b4553ab-1938-0632-89a4-fa77d0518d76@redhat.com>
+Date: Fri, 17 Aug 2018 13:16:44 +0200
+In-Reply-To: <0b4553ab-1938-0632-89a4-fa77d0518d76@redhat.com> (Eric Blake's
+	message of "Fri, 10 Aug 2018 09:30:02 -0500")
+Message-ID: <87y3d51bvn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK3tnvK=yQz8=mE8_7OMHiiNwPiRY8dG-7yek_iv_yXHgQYqKg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH V10 05/20] COLO: Add block replication into
- colo process
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 56/56] docs/interop/qmp-spec: How to force
+ known good parser state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,210 +29,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, jasowang@redhat.com, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-* Zhang Chen (zhangckid@gmail.com) wrote:
-> On Tue, Aug 7, 2018 at 10:30 PM Dr. David Alan Gilbert <dgilbert@redhat.com>
-> wrote:
-> 
-> > * Zhang Chen (zhangckid@gmail.com) wrote:
-> > > Make sure master start block replication after slave's block
-> > > replication started.
-> > >
-> > > Besides, we need to activate VM's blocks before goes into
-> > > COLO state.
-> > >
-> > > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> > > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > > ---
-> > >  migration/colo.c      | 43 +++++++++++++++++++++++++++++++++++++++++++
-> > >  migration/migration.c |  9 +++++++++
-> > >  2 files changed, 52 insertions(+)
-> > >
-> > > diff --git a/migration/colo.c b/migration/colo.c
-> > > index 081df1835f..e06640c3d6 100644
-> > > --- a/migration/colo.c
-> > > +++ b/migration/colo.c
-> > > @@ -27,6 +27,7 @@
-> > >  #include "replication.h"
-> > >  #include "net/colo-compare.h"
-> > >  #include "net/colo.h"
-> > > +#include "block/block.h"
-> > >
-> > >  static bool vmstate_loading;
-> > >  static Notifier packets_compare_notifier;
-> > > @@ -56,6 +57,7 @@ static void secondary_vm_do_failover(void)
-> > >  {
-> > >      int old_state;
-> > >      MigrationIncomingState *mis = migration_incoming_get_current();
-> > > +    Error *local_err = NULL;
-> > >
-> > >      /* Can not do failover during the process of VM's loading VMstate,
-> > Or
-> > >       * it will break the secondary VM.
-> > > @@ -73,6 +75,11 @@ static void secondary_vm_do_failover(void)
-> > >      migrate_set_state(&mis->state, MIGRATION_STATUS_COLO,
-> > >                        MIGRATION_STATUS_COMPLETED);
-> > >
-> > > +    replication_stop_all(true, &local_err);
-> > > +    if (local_err) {
-> > > +        error_report_err(local_err);
-> > > +    }
-> > > +
-> > >      if (!autostart) {
-> > >          error_report("\"-S\" qemu option will be ignored in secondary
-> > side");
-> > >          /* recover runstate to normal migration finish state */
-> > > @@ -110,6 +117,7 @@ static void primary_vm_do_failover(void)
-> > >  {
-> > >      MigrationState *s = migrate_get_current();
-> > >      int old_state;
-> > > +    Error *local_err = NULL;
-> > >
-> > >      migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
-> > >                        MIGRATION_STATUS_COMPLETED);
-> > > @@ -133,6 +141,13 @@ static void primary_vm_do_failover(void)
-> > >                       FailoverStatus_str(old_state));
-> > >          return;
-> > >      }
-> > > +
-> > > +    replication_stop_all(true, &local_err);
-> > > +    if (local_err) {
-> > > +        error_report_err(local_err);
-> > > +        local_err = NULL;
-> > > +    }
-> > > +
-> > >      /* Notify COLO thread that failover work is finished */
-> > >      qemu_sem_post(&s->colo_exit_sem);
-> > >  }
-> > > @@ -356,6 +371,11 @@ static int
-> > colo_do_checkpoint_transaction(MigrationState *s,
-> > >      qemu_savevm_state_header(fb);
-> > >      qemu_savevm_state_setup(fb);
-> > >      qemu_mutex_lock_iothread();
-> > > +    replication_do_checkpoint_all(&local_err);
-> > > +    if (local_err) {
-> > > +        qemu_mutex_unlock_iothread();
-> > > +        goto out;
-> > > +    }
-> >
-> > In docs/block-replication.txt it says:
-> >   b. replication_do_checkpoint_all()
-> >    This interface is called after all VM state is transferred to
-> >    Secondary QEMU. The Disk buffer will be dropped in this interface.
-> >    The caller must hold the I/O mutex lock if it is in migration/checkpoint
-> >    thread.
-> >
-> > but we're making this call before the call below that actually transfers
-> > all the state.  Which is right?
-> >
-> 
-> Hi Dave,
-> 
-> The "docs/block-replication.txt" means we should call the
-> replication_do_checkpoint_all() after VM state is transferred in secondary
-> node,
-> and in primary node this function no need to call before transfers all the
-> state.
+Eric Blake <eblake@redhat.com> writes:
 
-OK, it might be worth clarifying the docs.
+> On 08/08/2018 07:03 AM, Markus Armbruster wrote:
+>> Section "QGA Synchronization" specifies that sending "a raw 0xFF
+>> sentinel byte" makes the server "reset its state and discard all
+>> pending data prior to the sentinel."  What actually happens there is a
+>> lexical error, which will produce one ore more error responses.
+>> Moreover, it's not specific to QGA.
+>
+> Hoisting my review of this, as you may want to move it sooner in the series.
+>
+>>
+>> Create new section "Forcing the JSON parser into known-good state" to
+>> document the technique properly.  Rewrite section "QGA
+>> Synchronization" to document just the other direction, i.e. command
+>> guest-sync-delimited.
+>>
+>> Section "Protocol Specification" mentions "synchronization bytes
+>> (documented below)".  Delete that.
+>>
+>> While there, fix it not to claim '"Server" is QEMU itself', but
+>> '"Server" is either QEMU or the QEMU Guest Agent'.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   docs/interop/qmp-spec.txt | 37 ++++++++++++++++++++++++-------------
+>>   1 file changed, 24 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
+>> index 1566b8ae5e..d4a42fe2cc 100644
+>> --- a/docs/interop/qmp-spec.txt
+>> +++ b/docs/interop/qmp-spec.txt
+>> @@ -20,9 +20,9 @@ operating system.
+>>   2. Protocol Specification
+>>   =========================
+>>   -This section details the protocol format. For the purpose of this
+>> document
+>> -"Client" is any application which is using QMP to communicate with QEMU and
+>> -"Server" is QEMU itself.
+>> +This section details the protocol format. For the purpose of this
+>> +document, "Server" is either QEMU or the QEMU Guest Agent, and
+>> +"Client" is any application communicating with it via QMP.
+>>   
+[...]
+>>   JSON data structures, when mentioned in this document, are always in the
+>>   following format:
+>> @@ -34,9 +34,8 @@ by the JSON standard:
+>>     http://www.ietf.org/rfc/rfc7159.txt
+>>   -The protocol is always encoded in UTF-8 except for
+>> synchronization
+>> -bytes (documented below); although thanks to json-string escape
+>> -sequences, the server will reply using only the strict ASCII subset.
+>> +The sever expects its input to be encoded in UTF-8, and sends its
+>> +output encoded in ASCII.
+>>   
+[...]
+>>   For convenience, json-object members mentioned in this document will
+>>   be in a certain order. However, in real protocol usage they can be in
+>> @@ -215,16 +214,28 @@ Some events are rate-limited to at most one per second.  If additional
+>>   dropped, and the last one is delayed.  "Similar" normally means same
+>>   event type.  See qmp-events.txt for details.
+>>   -2.6 QGA Synchronization
+>> +2.6 Forcing the JSON parser into known-good state
+>> +-------------------------------------------------
+>> +
+>> +Incomplete or invalid input can leave the server's JSON parser in a
+>> +state where it can't parse additional commands.  To get it back into
+>> +known-good state, the client should provoke a lexical error.
+>> +
+>> +The cleanest way to do that is sending an ASCII control character
+>> +other than '\t' (horizontal tab), '\r' (carriage return), and '\n'
+>
+> s/and/or/
+>
+>> +(new line).
+>> +
+>> +Sadly, older versions of QEMU can fail to flag this as an error.  If a
+>> +client needs to deal with them, it should send a 0xFF byte.
+[...]
+>> +
+>> +2.7 QGA Synchronization
+>>   -----------------------
+>>     When using QGA, an additional synchronization feature is built
+>> into
+>> -the protocol.  If the Client sends a raw 0xFF sentinel byte (not valid
+>> -JSON), then the Server will reset its state and discard all pending
+>> -data prior to the sentinel.  Conversely, if the Client makes use of
+>> -the 'guest-sync-delimited' command, the Server will send a raw 0xFF
+>> -sentinel byte prior to its response, to aid the Client in discarding
+>> -any data prior to the sentinel.
+>> +the protocol. If the Client makes use of the 'guest-sync-delimited'
+>> +command, the Server will send a raw 0xFF sentinel byte prior to its
+>> +response, to aid the Client in discarding any data prior to the
+>> +sentinel.
+>
+> Maybe worth mentioning "including error messages reported about any
+> lexical errors received prior to the guest-sync-delimited command"
+>
+>>       3. QMP Examples
+>>
 
-Dave
+What about:
 
-> Thanks
-> Zhang Chen
-> 
-> 
-> 
-> >
-> > Other than that I think it's OK.
-> >
-> > Dave
-> >
-> > >      qemu_savevm_state_complete_precopy(fb, false, false);
-> > >      qemu_mutex_unlock_iothread();
-> > >
-> > > @@ -446,6 +466,12 @@ static void colo_process_checkpoint(MigrationState
-> > *s)
-> > >      object_unref(OBJECT(bioc));
-> > >
-> > >      qemu_mutex_lock_iothread();
-> > > +    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
-> > > +    if (local_err) {
-> > > +        qemu_mutex_unlock_iothread();
-> > > +        goto out;
-> > > +    }
-> > > +
-> > >      vm_start();
-> > >      qemu_mutex_unlock_iothread();
-> > >      trace_colo_vm_state_change("stop", "run");
-> > > @@ -585,6 +611,11 @@ void *colo_process_incoming_thread(void *opaque)
-> > >      object_unref(OBJECT(bioc));
-> > >
-> > >      qemu_mutex_lock_iothread();
-> > > +    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
-> > > +    if (local_err) {
-> > > +        qemu_mutex_unlock_iothread();
-> > > +        goto out;
-> > > +    }
-> > >      vm_start();
-> > >      trace_colo_vm_state_change("stop", "run");
-> > >      qemu_mutex_unlock_iothread();
-> > > @@ -665,6 +696,18 @@ void *colo_process_incoming_thread(void *opaque)
-> > >              goto out;
-> > >          }
-> > >
-> > > +        replication_get_error_all(&local_err);
-> > > +        if (local_err) {
-> > > +            qemu_mutex_unlock_iothread();
-> > > +            goto out;
-> > > +        }
-> > > +        /* discard colo disk buffer */
-> > > +        replication_do_checkpoint_all(&local_err);
-> > > +        if (local_err) {
-> > > +            qemu_mutex_unlock_iothread();
-> > > +            goto out;
-> > > +        }
-> > > +
-> > >          vmstate_loading = false;
-> > >          vm_start();
-> > >          trace_colo_vm_state_change("stop", "run");
-> > > diff --git a/migration/migration.c b/migration/migration.c
-> > > index ce06941706..c97b7660af 100644
-> > > --- a/migration/migration.c
-> > > +++ b/migration/migration.c
-> > > @@ -385,6 +385,7 @@ static void process_incoming_migration_co(void
-> > *opaque)
-> > >      MigrationIncomingState *mis = migration_incoming_get_current();
-> > >      PostcopyState ps;
-> > >      int ret;
-> > > +    Error *local_err = NULL;
-> > >
-> > >      assert(mis->from_src_file);
-> > >      mis->largest_page_size = qemu_ram_pagesize_largest();
-> > > @@ -416,6 +417,14 @@ static void process_incoming_migration_co(void
-> > *opaque)
-> > >
-> > >      /* we get COLO info, and know if we are in COLO mode */
-> > >      if (!ret && migration_incoming_enable_colo()) {
-> > > +        /* Make sure all file formats flush their mutable metadata */
-> > > +        bdrv_invalidate_cache_all(&local_err);
-> > > +        if (local_err) {
-> > > +            migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-> > > +                    MIGRATION_STATUS_FAILED);
-> > > +            error_report_err(local_err);
-> > > +            exit(EXIT_FAILURE);
-> > > +        }
-> > >          mis->migration_incoming_co = qemu_coroutine_self();
-> > >          qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
-> > >               colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
-> > > --
-> > > 2.17.1
-> > >
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+    2.7 QGA Synchronization
+    -----------------------
+
+    When a client connects to QGA over a transport lacking proper
+    connection semantics such as virtio-serial, QGA may have read partial
+    input from a previous client.  The client needs to force QGA's parser
+    into known-good state using the previous section's technique.
+    Moreover, the client may receive output a previous client didn't read.
+    To help with skipping that output, QGA provides the
+    'guest-sync-delimited' command.  Refer to its documentation for
+    details.
