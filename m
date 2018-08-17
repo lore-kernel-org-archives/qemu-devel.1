@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKI-00036Q-R7
+	(envelope-from <armbru@redhat.com>) id 1fqgKJ-00036z-Br
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKF-0001ln-Cu
+	(envelope-from <armbru@redhat.com>) id 1fqgKF-0001mL-MM
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46146 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46166 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKE-0001iR-NO
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:06 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKE-0001jM-Sa
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:07 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:22 +0200
-Message-Id: <20180817150559.16243-24-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:29 +0200
+Message-Id: <20180817150559.16243-31-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 23/60] json: Leave rejecting invalid UTF-8
- to parser
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 30/60] json: remove useless return value
+ from lexer/parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +30,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Both the lexer and the parser (attempt to) validate UTF-8 in JSON
-strings.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The lexer rejects bytes that can't occur in valid UTF-8: \xC0..\xC1,
-\xF5..\xFF.  This rejects some, but not all invalid UTF-8.  It also
-rejects ASCII control characters \x00..\x1F, in accordance with RFC
-7159 (see recent commit "json: Reject unescaped control characters").
+The lexer always returns 0 when char feeding. Furthermore, none of the
+caller care about the return value.
 
-When the lexer rejects, it ends the token right after the first bad
-byte.  Good when the bad byte is a newline.  Not so good when it's
-something like an overlong sequence in the middle of a string.  For
-instance, input
-
-    {"abc\xC0\xAFijk": 1}\n
-
-produces the tokens
-
-    JSON_LCURLY   {
-    JSON_ERROR    "abc\xC0
-    JSON_ERROR    \xAF
-    JSON_KEYWORD  ijk
-    JSON_ERROR   ": 1}\n
-
-The parser then reports four errors
-
-    Invalid JSON syntax
-    Invalid JSON syntax
-    JSON parse error, invalid keyword 'ijk'
-    Invalid JSON syntax
-
-before it recovers at the newline.
-
-The commit before previous made the parser reject invalid UTF-8
-sequences.  Since then, anything the lexer rejects, the parser would
-reject as well.  Thus, the lexer's rejecting is unnecessary for
-correctness, and harmful for error reporting.
-
-However, we want to keep rejecting ASCII control characters in the
-lexer, because that produces the behavior we want for unclosed
-strings.
-
-We also need to keep rejecting \xFF in the lexer, because we
-documented that as a way to reset the JSON parser
-(docs/interop/qmp-spec.txt section 2.6 QGA Synchronization), which
-means we can't change how we recover from this error now.  I wish we
-hadn't done that.
-
-I think we should treat \xFE the same as \xFF.
-
-Change the lexer to accept \xC0..\xC1 and \xF5..\xFD.  It now rejects
-only \x00..\x1F and \xFE..\xFF.  Error reporting for invalid UTF-8 in
-strings is much improved, except for \xFE and \xFF.  For the example
-above, the lexer now produces
-
-    JSON_LCURLY   {
-    JSON_STRING   "abc\xC0\xAFijk"
-    JSON_COLON    :
-    JSON_INTEGER  1
-    JSON_RCURLY
-
-and the parser reports just
-
-    JSON parse error, invalid UTF-8 sequence in string
-
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20180326150916.9602-10-marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-lexer.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ include/qapi/qmp/json-lexer.h    |  4 ++--
+ include/qapi/qmp/json-streamer.h |  4 ++--
+ qobject/json-lexer.c             | 23 ++++++++---------------
+ qobject/json-streamer.c          |  8 ++++----
+ 4 files changed, 16 insertions(+), 23 deletions(-)
 
+diff --git a/include/qapi/qmp/json-lexer.h b/include/qapi/qmp/json-lexer.=
+h
+index afee7828cd..66ccf0357c 100644
+--- a/include/qapi/qmp/json-lexer.h
++++ b/include/qapi/qmp/json-lexer.h
+@@ -47,9 +47,9 @@ struct JSONLexer
+=20
+ void json_lexer_init(JSONLexer *lexer, JSONLexerEmitter func);
+=20
+-int json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size);
++void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size);
+=20
+-int json_lexer_flush(JSONLexer *lexer);
++void json_lexer_flush(JSONLexer *lexer);
+=20
+ void json_lexer_destroy(JSONLexer *lexer);
+=20
+diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-str=
+eamer.h
+index 00d8a23af8..cb808cf27d 100644
+--- a/include/qapi/qmp/json-streamer.h
++++ b/include/qapi/qmp/json-streamer.h
+@@ -36,10 +36,10 @@ typedef struct JSONMessageParser
+ void json_message_parser_init(JSONMessageParser *parser,
+                               void (*func)(JSONMessageParser *, GQueue *=
+));
+=20
+-int json_message_parser_feed(JSONMessageParser *parser,
++void json_message_parser_feed(JSONMessageParser *parser,
+                              const char *buffer, size_t size);
+=20
+-int json_message_parser_flush(JSONMessageParser *parser);
++void json_message_parser_flush(JSONMessageParser *parser);
+=20
+ void json_message_parser_destroy(JSONMessageParser *parser);
+=20
 diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index 109a7d8bb8..ca1e0e2c03 100644
+index af0a7fdb8a..87cdd41f29 100644
 --- a/qobject/json-lexer.c
 +++ b/qobject/json-lexer.c
-@@ -177,8 +177,7 @@ static const uint8_t json_lexer[][256] =  {
-         ['u'] = IN_DQ_UCODE0,
-     },
-     [IN_DQ_STRING] = {
--        [0x20 ... 0xBF] = IN_DQ_STRING,
--        [0xC2 ... 0xF4] = IN_DQ_STRING,
-+        [0x20 ... 0xFD] = IN_DQ_STRING,
-         ['\\'] = IN_DQ_STRING_ESCAPE,
-         ['"'] = JSON_STRING,
-     },
-@@ -217,8 +216,7 @@ static const uint8_t json_lexer[][256] =  {
-         ['u'] = IN_SQ_UCODE0,
-     },
-     [IN_SQ_STRING] = {
--        [0x20 ... 0xBF] = IN_SQ_STRING,
--        [0xC2 ... 0xF4] = IN_SQ_STRING,
-+        [0x20 ... 0xFD] = IN_SQ_STRING,
-         ['\\'] = IN_SQ_STRING_ESCAPE,
-         ['\''] = JSON_STRING,
-     },
--- 
+@@ -286,7 +286,7 @@ void json_lexer_init(JSONLexer *lexer, JSONLexerEmitt=
+er func)
+     lexer->x =3D lexer->y =3D 0;
+ }
+=20
+-static int json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
++static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+ {
+     int char_consumed, new_state;
+=20
+@@ -340,7 +340,7 @@ static int json_lexer_feed_char(JSONLexer *lexer, cha=
+r ch, bool flush)
+             g_string_truncate(lexer->token, 0);
+             new_state =3D IN_START;
+             lexer->state =3D new_state;
+-            return 0;
++            return;
+         default:
+             break;
+         }
+@@ -355,29 +355,22 @@ static int json_lexer_feed_char(JSONLexer *lexer, c=
+har ch, bool flush)
+         g_string_truncate(lexer->token, 0);
+         lexer->state =3D IN_START;
+     }
+-
+-    return 0;
+ }
+=20
+-int json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size)
++void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size)
+ {
+     size_t i;
+=20
+     for (i =3D 0; i < size; i++) {
+-        int err;
+-
+-        err =3D json_lexer_feed_char(lexer, buffer[i], false);
+-        if (err < 0) {
+-            return err;
+-        }
++        json_lexer_feed_char(lexer, buffer[i], false);
+     }
+-
+-    return 0;
+ }
+=20
+-int json_lexer_flush(JSONLexer *lexer)
++void json_lexer_flush(JSONLexer *lexer)
+ {
+-    return lexer->state =3D=3D IN_START ? 0 : json_lexer_feed_char(lexer=
+, 0, true);
++    if (lexer->state !=3D IN_START) {
++        json_lexer_feed_char(lexer, 0, true);
++    }
+ }
+=20
+ void json_lexer_destroy(JSONLexer *lexer)
+diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+index c51c2021f9..78dfff2aa0 100644
+--- a/qobject/json-streamer.c
++++ b/qobject/json-streamer.c
+@@ -118,15 +118,15 @@ void json_message_parser_init(JSONMessageParser *pa=
+rser,
+     json_lexer_init(&parser->lexer, json_message_process_token);
+ }
+=20
+-int json_message_parser_feed(JSONMessageParser *parser,
++void json_message_parser_feed(JSONMessageParser *parser,
+                              const char *buffer, size_t size)
+ {
+-    return json_lexer_feed(&parser->lexer, buffer, size);
++    json_lexer_feed(&parser->lexer, buffer, size);
+ }
+=20
+-int json_message_parser_flush(JSONMessageParser *parser)
++void json_message_parser_flush(JSONMessageParser *parser)
+ {
+-    return json_lexer_flush(&parser->lexer);
++    json_lexer_flush(&parser->lexer);
+ }
+=20
+ void json_message_parser_destroy(JSONMessageParser *parser)
+--=20
 2.17.1
