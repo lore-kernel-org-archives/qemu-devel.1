@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgSF-00051N-QF
+	(envelope-from <armbru@redhat.com>) id 1fqgSH-00051y-Nz
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgSE-0008NN-EI
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46740 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqgSF-0008OR-4x
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46744 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgSE-0008MZ-5o
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgSE-0008NS-Rl
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:22 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:42 +0200
-Message-Id: <20180817150559.16243-44-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:56 +0200
+Message-Id: <20180817150559.16243-58-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 43/60] qjson: Fix qobject_from_json() &
- friends for multiple values
+Subject: [Qemu-devel] [PATCH v2 57/60] tests/drive_del-test: Fix harmless
+ JSON interpolation bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,109 +27,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-qobject_from_json() & friends use the consume_json() callback to
-receive either a value or an error from the parser.
+test_after_failed_device_add() does this:
 
-When they are fed a string that contains more than either one JSON
-value or one JSON syntax error, consume_json() gets called multiple
-times.
+    response = qmp("{'execute': 'device_add',"
+                   " 'arguments': {"
+                   "   'driver': 'virtio-blk-%s',"
+                   "   'drive': 'drive0'"
+                   "}}", qvirtio_get_dev_type());
 
-When the last call receives a value, qobject_from_json() returns that
-value.  Any other values are leaked.
+Wrong.  An interpolation specification must be a JSON token, it
+doesn't work within JSON string tokens.  The code above doesn't use
+the value of qvirtio_get_dev_type(), and sends arguments
 
-When any call receives an error, qobject_from_json() sets the first
-error received.  Any other errors are thrown away.
+    {"driver": "virtio-blk-%s", "drive": "drive0"}}
 
-When values follow errors, qobject_from_json() returns both a value
-and sets an error.  That's bad.  Impact:
+The command fails because there is no driver named "virtio-blk-%".
+Harmless, since the test wants the command to fail.  Screwed up in
+commit 2f84a92ec63.
 
-* block.c's parse_json_protocol() ignores and leaks the value.  It's
-  used to to parse pseudo-filenames starting with "json:".  The
-  pseudo-filenames can come from the user or from image meta-data such
-  as a QCOW2 image's backing file name.
-
-* vl.c's parse_display_qapi() ignores and leaks the error.  It's used
-  to parse the argument of command line option -display.
-
-* vl.c's main() case QEMU_OPTION_blockdev ignores the error and leaves
-  it in @err.  main() will then pass a pointer to a non-null Error *
-  to net_init_clients(), which is forbidden.  It can lead to assertion
-  failure or other misbehavior.
-
-* check-qjson.c's multiple_values() demonstrates the badness.
-
-* The other callers are not affected since they only pass strings with
-  exactly one JSON value or, in the case of negative tests, one
-  error.
-
-The impact on the _nofail() functions is relatively harmless.  They
-abort when any call receives an error.  Else they return the last
-value, and leak the others, if any.
-
-Fix consume_json() as follows.  On the first call, save value and
-error as before.  On subsequent calls, if any, don't save them.  If
-the first call saved a value, the next call, if any, replaces the
-value by an "Expecting at most one JSON value" error.  Take care not
-to leak values or errors that aren't saved.
+Fix the obvious way.  The command now fails because the drive is
+empty, like it did before commit 2f84a92ec63.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/qjson.c     | 15 ++++++++++++++-
- tests/check-qjson.c | 10 +++-------
- 2 files changed, 17 insertions(+), 8 deletions(-)
+ tests/drive_del-test.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/qobject/qjson.c b/qobject/qjson.c
-index 7395556069..7f69036487 100644
---- a/qobject/qjson.c
-+++ b/qobject/qjson.c
-@@ -33,8 +33,21 @@ static void consume_json(void *opaque, QObject *json, Error *err)
+diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
+index 2d0b176b36..673c10140f 100644
+--- a/tests/drive_del-test.c
++++ b/tests/drive_del-test.c
+@@ -65,9 +65,13 @@ static void test_drive_without_dev(void)
+ 
+ static void test_after_failed_device_add(void)
  {
-     JSONParsingState *s = opaque;
++    char driver[32];
+     QDict *response;
+     QDict *error;
  
-+    assert(!json != !err);
-+    assert(!s->result || !s->err);
++    snprintf(driver, sizeof(driver), "virtio-blk-%s",
++             qvirtio_get_dev_type());
 +
-+    if (s->result) {
-+        qobject_unref(s->result);
-+        s->result = NULL;
-+        error_setg(&s->err, "Expecting at most one JSON value");
-+    }
-+    if (s->err) {
-+        qobject_unref(json);
-+        error_free(err);
-+        return;
-+    }
-     s->result = json;
--    error_propagate(&s->err, err);
-+    s->err = err;
- }
+     qtest_start("-drive if=none,id=drive0");
  
- /*
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index d741d29733..22a3225358 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -1443,17 +1443,13 @@ static void multiple_values(void)
-     Error *err = NULL;
-     QObject *obj;
- 
--    /* BUG this leaks the syntax tree for "false" */
-     obj = qobject_from_json("false true", &err);
--    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
--    g_assert(!err);
--    qobject_unref(obj);
-+    error_free_or_abort(&err);
-+    g_assert(obj == NULL);
- 
--    /* BUG simultaneously succeeds and fails */
-     obj = qobject_from_json("} true", &err);
--    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
-     error_free_or_abort(&err);
--    qobject_unref(obj);
-+    g_assert(obj == NULL);
- }
- 
- int main(int argc, char **argv)
+     /* Make device_add fail. If this leaks the virtio-blk device then a
+@@ -75,9 +79,9 @@ static void test_after_failed_device_add(void)
+      */
+     response = qmp("{'execute': 'device_add',"
+                    " 'arguments': {"
+-                   "   'driver': 'virtio-blk-%s',"
++                   "   'driver': %s,"
+                    "   'drive': 'drive0'"
+-                   "}}", qvirtio_get_dev_type());
++                   "}}", driver);
+     g_assert(response);
+     error = qdict_get_qdict(response, "error");
+     g_assert_cmpstr(qdict_get_try_str(error, "class"), ==, "GenericError");
 -- 
 2.17.1
