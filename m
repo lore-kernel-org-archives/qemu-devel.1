@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqgAo-0001nU-7Q
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:56:22 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fqgDp-0004Fe-Kv
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:59:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqgAi-0001g7-Bu
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:56:18 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:39899)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqgAe-0001bo-Np
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:56:14 -0400
-Received: by mail-oi0-x242.google.com with SMTP id d189-v6so14447561oib.6
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 07:56:10 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1fqgDl-0004ag-1F
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:59:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56688 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fqgDk-0004a3-P8
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:59:24 -0400
+Date: Fri, 17 Aug 2018 15:59:20 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180817145920.GK2459@work-vm>
+References: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
+	<1533562177-16447-12-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20180723142224.11e912ec@redhat.com>
-References: <20180704124923.32483-1-drjones@redhat.com>
-	<20180704124923.32483-2-drjones@redhat.com>
-	<20180723142224.11e912ec@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Aug 2018 15:55:49 +0100
-Message-ID: <CAFEAcA8QoaGLOVJn-JYQKsgfiLrqChXRP5wdAY3BwZHnz8ssZg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH 1/6] hw/arm/virt: Add virt-3.1 machine
- type
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1533562177-16447-12-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v6 11/11] migration: create a dedicated
+ thread to release rdma resource
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +28,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Andrew Jones <drjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>, Wei Huang <wei@redhat.com>
+To: Lidong Chen <jemmy858585@gmail.com>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-On 23 July 2018 at 13:22, Igor Mammedov <imammedo@redhat.com> wrote:
-> On Wed,  4 Jul 2018 14:49:18 +0200
-> Andrew Jones <drjones@redhat.com> wrote:
->
->> Signed-off-by: Andrew Jones <drjones@redhat.com>
->
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+* Lidong Chen (jemmy858585@gmail.com) wrote:
+> ibv_dereg_mr wait for a long time for big memory size virtual server.
+> 
+> The test result is:
+>   10GB  326ms
+>   20GB  699ms
+>   30GB  1021ms
+>   40GB  1387ms
+>   50GB  1712ms
+>   60GB  2034ms
+>   70GB  2457ms
+>   80GB  2807ms
+>   90GB  3107ms
+>   100GB 3474ms
+>   110GB 3735ms
+>   120GB 4064ms
+>   130GB 4567ms
+>   140GB 4886ms
+> 
+> this will cause the guest os hang for a while when migration finished.
+> So create a dedicated thread to release rdma resource.
+> 
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+> ---
+>  migration/migration.c |  6 ++++++
+>  migration/migration.h |  3 +++
+>  migration/rdma.c      | 47 +++++++++++++++++++++++++++++++----------------
+>  3 files changed, 40 insertions(+), 16 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index f7d6e26..25d9009 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1499,6 +1499,7 @@ void migrate_init(MigrationState *s)
+>      s->vm_was_running = false;
+>      s->iteration_initial_bytes = 0;
+>      s->threshold_size = 0;
+> +    s->rdma_cleanup_thread_quit = true;
+>  }
+>  
+>  static GSList *migration_blockers;
+> @@ -1660,6 +1661,10 @@ static bool migrate_prepare(MigrationState *s, bool blk, bool blk_inc,
+>          return false;
+>      }
+>  
+> +    if (s->rdma_cleanup_thread_quit != true) {
+> +        return false;
+> +    }
 
-We're going to want a virt-3.1 machine anyway, so I'm
-going to take just this patch from this series and apply it
-to target-arm.next.
+That's not good! We error out without saying anything to the user
+about why;  if we error we must always say why, otherwise we'll get
+bug reports from people without anyway to debug them.
 
-thanks
--- PMM
+However, we also don't need to; all we need to do is turn this into
+a semaphore or similar, and then wait for it at the start of 
+'rdma_start_outgoing_migration' - that way there's no error exit, it
+just waits a few seconds and then carries on correctly.
+(Maybe we need to wait in incoming as well to cope with
+postcopy-recovery).
+
+Dave
+
+>      if (runstate_check(RUN_STATE_INMIGRATE)) {
+>          error_setg(errp, "Guest is waiting for an incoming migration");
+>          return false;
+> @@ -3213,6 +3218,7 @@ static void migration_instance_init(Object *obj)
+>  
+>      ms->state = MIGRATION_STATUS_NONE;
+>      ms->mbps = -1;
+> +    ms->rdma_cleanup_thread_quit = true;
+>      qemu_sem_init(&ms->pause_sem, 0);
+>      qemu_mutex_init(&ms->error_mutex);
+>  
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 64a7b33..60138dd 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -224,6 +224,9 @@ struct MigrationState
+>       * do not trigger spurious decompression errors.
+>       */
+>      bool decompress_error_check;
+> +
+> +    /* Set this when rdma resource have released */
+> +    bool rdma_cleanup_thread_quit;
+>  };
+>  
+>  void migrate_set_state(int *state, int old_state, int new_state);
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index e1498f2..3282f35 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -2995,35 +2995,50 @@ static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
+>      }
+>  }
+>  
+> -static int qio_channel_rdma_close(QIOChannel *ioc,
+> -                                  Error **errp)
+> +static void *qio_channel_rdma_close_thread(void *arg)
+>  {
+> -    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
+> -    RDMAContext *rdmain, *rdmaout;
+> -    trace_qemu_rdma_close();
+> -
+> -    rdmain = rioc->rdmain;
+> -    if (rdmain) {
+> -        atomic_rcu_set(&rioc->rdmain, NULL);
+> -    }
+> +    RDMAContext **rdma = arg;
+> +    RDMAContext *rdmain = rdma[0];
+> +    RDMAContext *rdmaout = rdma[1];
+> +    MigrationState *s = migrate_get_current();
+>  
+> -    rdmaout = rioc->rdmaout;
+> -    if (rdmaout) {
+> -        atomic_rcu_set(&rioc->rdmaout, NULL);
+> -    }
+> +    rcu_register_thread();
+>  
+>      synchronize_rcu();
+> -
+>      if (rdmain) {
+>          qemu_rdma_cleanup(rdmain);
+>      }
+> -
+>      if (rdmaout) {
+>          qemu_rdma_cleanup(rdmaout);
+>      }
+>  
+>      g_free(rdmain);
+>      g_free(rdmaout);
+> +    g_free(rdma);
+> +
+> +    rcu_unregister_thread();
+> +    s->rdma_cleanup_thread_quit = true;
+> +    return NULL;
+> +}
+> +
+> +static int qio_channel_rdma_close(QIOChannel *ioc,
+> +                                  Error **errp)
+> +{
+> +    QemuThread t;
+> +    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
+> +    RDMAContext **rdma = g_new0(RDMAContext*, 2);
+> +    MigrationState *s = migrate_get_current();
+> +
+> +    trace_qemu_rdma_close();
+> +    if (rioc->rdmain || rioc->rdmaout) {
+> +        rdma[0] =  rioc->rdmain;
+> +        rdma[1] =  rioc->rdmaout;
+> +        atomic_rcu_set(&rioc->rdmain, NULL);
+> +        atomic_rcu_set(&rioc->rdmaout, NULL);
+> +        s->rdma_cleanup_thread_quit = false;
+> +        qemu_thread_create(&t, "rdma cleanup", qio_channel_rdma_close_thread,
+> +                           rdma, QEMU_THREAD_DETACHED);
+> +    }
+>  
+>      return 0;
+>  }
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
