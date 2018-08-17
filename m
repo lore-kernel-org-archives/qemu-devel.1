@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqeKU-0002ra-UG
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 08:58:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1fqeNF-0005ie-Dd
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:01:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fqeKR-00027e-OE
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 08:58:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52034 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqeKR-00027W-JX
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 08:58:11 -0400
-Date: Fri, 17 Aug 2018 13:58:08 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180817125808.GO11124@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
-	<20180816172722.GK23515@redhat.com>
-	<83320617-5d60-fe71-3ef5-8ac7c384a3b1@ubuntu.com>
-	<20180817085656.GA11124@redhat.com>
-	<a115c4d1-0a78-efa1-0364-f41a06aca124@ubuntu.com>
+	(envelope-from <bounces@canonical.com>) id 1fqeN9-0003kY-Gq
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:01:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56988)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fqeN9-0003js-Ab
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:00:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fqeN7-0005Ls-0R
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 13:00:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9F82B2E8507
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 13:00:56 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a115c4d1-0a78-efa1-0364-f41a06aca124@ubuntu.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
+Date: Fri, 17 Aug 2018 12:52:52 -0000
+From: Thomas Huth <1787505@bugs.launchpad.net>
+Reply-To: Bug 1787505 <1787505@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153446472677.27869.256879611828000197.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153451037266.3280.12516874639177914681.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1787505] Re: Solaris host: no network connection,
+ mouse pointer mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Phillip Susi <psusi@ubuntu.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Fri, Aug 17, 2018 at 08:44:36AM -0400, Phillip Susi wrote:
-> On 8/17/2018 4:56 AM, Daniel P. Berrang=C3=A9 wrote:
-> > Oh one other thing, is whether your QEMU process has an explicit keym=
-ap
-> > configured (this is the -k arg to QEMU), as when that it set, it
-> > completely changes the way keyboard input is handled in VNC. That cod=
-e
-> > has also been massively refactored recently.
->=20
-> I'm not using that argument.  I just checked the man page and it says i=
-t
-> defaults to en-us, which should be correct.
+You should maybe try a different NIC model. According to
+https://wiki.qemu.org/Documentation/Networking the rtl8139 seems to be a
+good choice?
 
-Actually for QEMU there is no default localized keymap. This is desirable
-because it allows VNC to activate its raw scancode extension which is mor=
-e
-reliable than passing translated X11 key symbols.
+Concerning USB, you've also got to enable an emulated "USB host
+controller" to use USB devices. The easiest way to do that is to simply
+start QEMU with the "-usb" parameter.
 
-I guess there's a chance that Xen might secretly pass a '-k' arg anyway,
-but hopefully it doesn't...
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1787505
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Title:
+  Solaris host: no network connection, mouse pointer mismatch
+
+Status in QEMU:
+  New
+
+Bug description:
+  This is probably a bit far afield but on a Solaris 10 SPARC host (Sun
+  M3000) running a Windows XP guest like this:
+
+  ./qemu-system-x86_64 -m 1024 -boot d  -smp 3 -net nic -net user -hda
+  /bkpool/qemuimages/XP.img -cdrom /bkpool/qemuimages/xp.iso &
+
+  the vnc server starts up and Windows boots normally.  However, there
+  is no network connectivity.  There are no network devices visible in
+  XP's Networking tab of Control Panel and a ping of the local router
+  reports "unreachable".
+
+  Also, the keyboard works fine but the guest mouse pointer is offset
+  from the host mouse position by an amount that varies by screen
+  position.  This makes it impossible to point to locations near the
+  edge of the qemu window.  This seems to be a previously reported
+  problem, but the suggested fix, " -device usb-tablet", prevents qemu
+  from even starting:
+
+  qemu-system-x86_64: -device usb-tablet: No 'usb-bus' bus found for
+  device 'usb-tablet'
+
+  The physical mouse is connected to the USB port of a Sun Ray 2fs
+  controlling the M3000 via Sun Ray server.  I apologize if this is a
+  configuration issue and not a bug but I don't know where else to
+  report it and have been unable to find a solution in the
+  documentation.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1787505/+subscriptions
