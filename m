@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fqhNh-0008SR-I6
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:13:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fqhNl-0008Bg-Nr
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:13:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fqhFk-0001tH-Ki
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:05:35 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:37951)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fqhFk-0001sM-3D
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:05:32 -0400
-Date: Fri, 17 Aug 2018 12:05:27 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180817160527.GA4415@flamenco>
-References: <20180817051853.23792-1-cota@braap.org>
-	<20180817051853.23792-10-cota@braap.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fqhEY-00011s-92
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:04:18 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:34185)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fqhEY-00011m-4E
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:04:18 -0400
+Received: by mail-oi0-x241.google.com with SMTP id 13-v6so14838108ois.1
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 09:04:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180817051853.23792-10-cota@braap.org>
-Subject: Re: [Qemu-devel] [PATCH 9/9] hmp-commands-info: add sync-profile
+In-Reply-To: <20180809042206.15726-8-richard.henderson@linaro.org>
+References: <20180809042206.15726-1-richard.henderson@linaro.org>
+	<20180809042206.15726-8-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Aug 2018 17:03:52 +0100
+Message-ID: <CAFEAcA8Pb+HNsndA=8KU0+bq5jirK_0JipLR7gdspb1LstthTQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 07/20] target/arm: Fix is_a64 for user-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,26 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Desnogues <laurent.desnogues@gmail.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Fri, Aug 17, 2018 at 01:18:53 -0400, Emilio G. Cota wrote:
-> The command introduced here is just for developers. This means that:
-> 
-> - the info displayed and the output format could change in the future
-> - the command is only meant to be used from HMP, not from QMP
-> 
-> Sample output:
-(snip)
-> BQL mutex  0x55a0171b7140  util/main-loop.c:236            0.00894          6425          1.39
-> mutex      [           3]  util/qemu-timer.c:520           0.00342         50611          0.07
-> mutex      [           2]  util/qemu-timer.c:426           0.00254         31336          0.08
-> mutex      [           3] util/qemu-timer.c:234           0.00107         19275          0.06
-                           ^^
-I manually updated the commit message after switching to brackets
-(initially didn't have them), so in case you're wondering,
-the missing space is not due to a bug in the code.
+On 9 August 2018 at 05:21, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Saves about 8k code size in qemu-aarch64.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index aedaf2631e..ed51a2f5aa 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -918,7 +918,15 @@ void aarch64_sync_64_to_32(CPUARMState *env);
+>
+>  static inline bool is_a64(CPUARMState *env)
+>  {
+> +#ifdef CONFIG_USER_ONLY
+> +# ifdef TARGET_AARCH64
+> +    return true;
+> +# else
+> +    return false;
+> +# endif
+> +#else
+>      return env->aarch64;
+> +#endif
+>  }
 
-Thanks,
+And again. I don't want to pepper the code with ifdefs if
+we can do the right thing without them.
 
-		E.
+thanks
+-- PMM
