@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqeww-0007OY-K7
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:37:59 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fqeyg-0008Ly-SX
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:39:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqewv-0007dT-Sb
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:37:58 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41367)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqewv-0007cv-JZ
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:37:57 -0400
-Received: by mail-oi0-x241.google.com with SMTP id k12-v6so13976113oiw.8
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 06:37:57 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1fqeyd-0008IC-M3
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:39:46 -0400
+Resent-Message-Id: <E1fqeyd-0008IC-M3@eggs.gnu.org>
+In-Reply-To: <20180810030139.25916-1-pavel.zbitskiy@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153451316528.23454.9587077929487727470@502c9da6d61e>
 MIME-Version: 1.0
-In-Reply-To: <1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Aug 2018 14:37:36 +0100
-Message-ID: <CAFEAcA9hivJzqksiSZbco4+EysYj=_y0t3k_L7TobxNPS8T2dQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 17 Aug 2018 06:39:27 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/7] Some improvements in z/Arch
+ instructions support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hongbo Zhang <hongbo.zhang@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>
+To: pavel.zbitskiy@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, richard.henderson@linaro.org, david@redhat.com
 
-On 25 July 2018 at 06:30, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
-> For the Aarch64, there is one machine 'virt', it is primarily meant to
-> run on KVM and execute virtualization workloads, but we need an
-> environment as faithful as possible to physical hardware, for supporting
-> firmware and OS development for pysical Aarch64 machines.
->
-> This patch introduces new machine type 'Enterprise' with main features:
->  - Based on 'virt' machine type.
->  - Re-designed memory map.
->  - EL2 and EL3 are enabled by default.
->  - GIC version 3 by default.
->  - AHCI controller attached to system bus, and then CDROM and hard disc
->    can be added to it.
->  - EHCI controller attached to system bus, with USB mouse and key board
->    installed by default.
->  - E1000E ethernet card on PCIE bus.
->  - VGA display adaptor on PCIE bus.
->  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
->  - No virtio functions enabled, since this is to emulate real hardware.
->  - No paravirtualized fw_cfg device either.
->
-> Arm Trusted Firmware and UEFI porting to this are done accordingly.
->
-> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
-> ---
-> Changes since v1:
->  - rebase on v3.0.0-rc0
->  - introduce another auxillary patch as 1/2, so this is 2/2
->  - rename 'sbsa' to 'enterprise'
->  - remove paravirualized fw_cfg
->  - set gic_vertion to 3 instead of 2
->  - edit commit message to describe purpose of this platform
-
-Hi; there's been a lot of discussion on this thread. I'm going
-to assume that you don't need any further review commentary for
-the moment, and will wait for a v3. If there are any specific
-questions you want guidance on to produce that v3, let me know.
-
-thanks
--- PMM
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODEwMDMwMTM5LjI1OTE2LTEtcGF2ZWwuemJpdHNraXlAZ21haWwuY29t
+ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC83XSBTb21lIGltcHJvdmVtZW50cyBpbiB6
+L0FyY2ggaW5zdHJ1Y3Rpb25zIHN1cHBvcnQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
+YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
+IHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUgg
+LS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNr
+aW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgog
+ICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNo
+LnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAg
+ZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQg
+PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3
+aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYmQzZTAzODJjZSB0YXJnZXQvczM5MHg6IGlt
+cGxlbWVudCBDVkIsIENWQlkgYW5kIENWQkcKZjRmYmE1OGYxYyB0YXJnZXQvczM5MHg6IGZpeCBQ
+QUNLIHJlYWRpbmcgMSBieXRlIGxlc3MgYW5kIHdyaXRpbmcgMSBieXRlIG1vcmUKMTY0YWZkY2Y1
+ZiB0YXJnZXQvczM5MHg6IGFkZCBFWCBzdXBwb3J0IGZvciBUUlQgYW5kIFRSVFIKNTZkMGY0MTli
+NyB0YXJnZXQvczM5MHg6IGZpeCBJUE0gcG9sbHV0aW5nIGlycmVsZXZhbnQgYml0cwpmNDhhZGMy
+NWExIHRhcmdldC9zMzkweDogZml4IENTU1QgZGVjb2RpbmcgYW5kIHJ1bnRpbWUgYWxpZ25tZW50
+IGNoZWNrCjYzZmQ5Y2U4NGIgdGFyZ2V0L3MzOTB4OiBhZGQgQkFMIGFuZCBCQUxSIGluc3RydWN0
+aW9ucwpkN2QwMjhlNzZmIHRlc3RzL3RjZzogYWRkIGEgc2ltcGxlIHMzOTB4IHRlc3QKCj09PSBP
+VVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNzogdGVzdHMvdGNnOiBhZGQgYSBzaW1w
+bGUgczM5MHggdGVzdC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
+LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNDogCm5ldyBmaWxlIG1vZGUgMTAw
+NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEwIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi83OiB0YXJn
+ZXQvczM5MHg6IGFkZCBCQUwgYW5kIEJBTFIgaW5zdHJ1Y3Rpb25zLi4uCkNoZWNraW5nIFBBVENI
+IDMvNzogdGFyZ2V0L3MzOTB4OiBmaXggQ1NTVCBkZWNvZGluZyBhbmQgcnVudGltZSBhbGlnbm1l
+bnQgY2hlY2suLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9l
+cyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNzI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
+RVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM5
+ODogRklMRTogdGVzdHMvdGNnL3MzOTB4L2Nzc3QuYzoyMjoKKyAgICAgICAgOiBbb3AxXSAiK20i
+IChvcDEpLAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNr
+ZXQgJ1snCiMxMDI6IEZJTEU6IHRlc3RzL3RjZy9zMzkweC9jc3N0LmM6MjY6CisgICAgICAgIDog
+W2ZsYWdzXSAiSyIgKDB4MDMwMSksCgp0b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDY2IGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
+aW5nIFBBVENIIDQvNzogdGFyZ2V0L3MzOTB4OiBmaXggSVBNIHBvbGx1dGluZyBpcnJlbGV2YW50
+IGJpdHMuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBN
+QUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNTc6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJS
+T1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM3NDog
+RklMRTogdGVzdHMvdGNnL3MzOTB4L2lwbS5jOjEzOgorICAgICAgICA6IFtjY10gIityIiAoY2Mp
+CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycK
+Izc1OiBGSUxFOiB0ZXN0cy90Y2cvczM5MHgvaXBtLmM6MTQ6CisgICAgICAgIDogW29wMV0gInIi
+ICgmb3AxKSwKCnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywgNTMgbGluZXMgY2hlY2tlZAoK
+WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS83
+OiB0YXJnZXQvczM5MHg6IGFkZCBFWCBzdXBwb3J0IGZvciBUUlQgYW5kIFRSVFIuLi4KV0FSTklO
+RzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVk
+IHVwZGF0aW5nPwojNzA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IHNwYWNlIHByb2hp
+Yml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMxMDE6IEZJTEU6IHRlc3RzL3Rj
+Zy9zMzkweC9leHJsLXRydC5jOjI3OgorICAgICAgICA6IFtyMV0gIityIiAocjEpLAoKRVJST1I6
+IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMxMDQ6IEZJ
+TEU6IHRlc3RzL3RjZy9zMzkweC9leHJsLXRydC5jOjMwOgorICAgICAgICA6IFtvcDFdICJyIiAo
+Jm9wMSksCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tl
+dCAnWycKIzE1NTogRklMRTogdGVzdHMvdGNnL3MzOTB4L2V4cmwtdHJ0ci5jOjI3OgorICAgICAg
+ICA6IFtyMV0gIityIiAocjEpLAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4g
+c3F1YXJlIGJyYWNrZXQgJ1snCiMxNTg6IEZJTEU6IHRlc3RzL3RjZy9zMzkweC9leHJsLXRydHIu
+YzozMDoKKyAgICAgICAgOiBbb3AxXSAiciIgKCZvcDEpLAoKdG90YWw6IDQgZXJyb3JzLCAxIHdh
+cm5pbmdzLCAxNDEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNi83OiB0YXJnZXQvczM5MHg6IGZpeCBQQUNLIHJlYWRp
+bmcgMSBieXRlIGxlc3MgYW5kIHdyaXRpbmcgMSBieXRlIG1vcmUuLi4KV0FSTklORzogYWRkZWQs
+IG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5n
+PwojNTY6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVm
+b3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM3MjogRklMRTogdGVzdHMvdGNnL3MzOTB4L3Bh
+Y2suYzoxMjoKKyAgICAgICAgOiBbZGF0YV0gInIiICgmZGF0YVswXSkKCnRvdGFsOiAxIGVycm9y
+cywgMSB3YXJuaW5ncywgNDMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
+YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
+b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
+IE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNy83OiB0YXJnZXQvczM5MHg6IGltcGxlbWVu
+dCBDVkIsIENWQlkgYW5kIENWQkcuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
+ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTM5OiAKbmV3IGZpbGUg
+bW9kZSAxMDA2NDQKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBi
+cmFja2V0ICdbJwojMTU0OiBGSUxFOiB0ZXN0cy90Y2cvczM5MHgvY3ZiLmM6MTE6CisgICAgICAg
+IDogW3Jlc3VsdF0gIityIiAocmVzdWx0KQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3Jl
+IG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMxNTU6IEZJTEU6IHRlc3RzL3RjZy9zMzkweC9jdmIu
+YzoxMjoKKyAgICAgICAgOiBbZGF0YV0gIm0iIChkYXRhKSk7Cgp0b3RhbDogMiBlcnJvcnMsIDEg
+d2FybmluZ3MsIDExNyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
+b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
