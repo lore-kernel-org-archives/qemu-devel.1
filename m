@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laine@redhat.com>) id 1fqQdJ-0005Wm-Vd
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 18:20:47 -0400
+	(envelope-from <bounces@canonical.com>) id 1fqSVZ-0004W5-7V
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 20:20:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laine@redhat.com>) id 1fqQdE-0002TN-Rb
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 18:20:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46602 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laine@redhat.com>) id 1fqQd9-0002Lw-46
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 18:20:36 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BC99740241FB
-	for <qemu-devel@nongnu.org>; Thu, 16 Aug 2018 22:20:33 +0000 (UTC)
-From: Laine Stump <laine@redhat.com>
-Message-ID: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
-Date: Thu, 16 Aug 2018 18:20:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1fqSVS-0007sG-HX
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 20:20:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33778)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fqSVN-0007ng-BW
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 20:20:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fqSVL-0006Yy-M0
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 00:20:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A4C212E8499
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 00:20:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] clean/simple Q35 support in libvirt+QEMU for guest
- OSes that don't support virtio-1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Aug 2018 00:12:06 -0000
+From: Michele Denber <1787505@bugs.launchpad.net>
+Reply-To: Bug 1787505 <1787505@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153446472677.27869.256879611828000197.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1787505] [NEW] Solaris host: no network
+ connection, mouse pointer mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,159 +36,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-(Several of us started an offline discussion on this topic, and it
-quickly became complicated, so we decided it should continue upstream.
-Here is a synopsis of the discussion so far (as *I've* interpreted it,
-so corrections are welcome and apologies in advance for anything I got
-wrong!) Some of the things are stated here as givens, but feel free to
-rip them apart.)
+Public bug reported:
 
-Summary of the problem:
+This is probably a bit far afield but on a Solaris 10 SPARC host (Sun
+M3000) running a Windows XP guest like this:
 
-1) We want to persuade libvirt+QEMU users to move away from the i440fx
-machinetype in favor of Q35. (NB: Someday this *might* lead to the
-ability to deprecate and even remove the 440fx machinetype, but even if
-that were to happen, it would be a *very long* time from now, so this
-discussion is *not* about that!)
+./qemu-system-x86_64 -m 1024 -boot d  -smp 3 -net nic -net user -hda
+/bkpool/qemuimages/XP.img -cdrom /bkpool/qemuimages/xp.iso &
 
-2) When Q35 machinetype is used, libvirt assigns virtio devices to a
-slot on a PCI Express controller (because why have modern PCIe
-controllers/slots available but force everything onto clunky old legacy
-controllers?).
+the vnc server starts up and Windows boots normally.  However, there is
+no network connectivity.  There are no network devices visible in XP's
+Networking tab of Control Panel and a ping of the local router reports
+"unreachable".
 
-3) When a virtio device is plugged into an Express controller, QEMU
-disables the device's IO port space, and it is put into "modern-only"
-mode (this is done to avoid a rapid exhaustion of limited IO port space).
+Also, the keyboard works fine but the guest mouse pointer is offset from
+the host mouse position by an amount that varies by screen position.
+This makes it impossible to point to locations near the edge of the qemu
+window.  This seems to be a previously reported problem, but the
+suggested fix, " -device usb-tablet", prevents qemu from even starting:
 
-4) modern-only virtio devices won't work with a legacy (virtio-0.9-only)
-guest driver, because virtio-0.9 requires IO port space.
+qemu-system-x86_64: -device usb-tablet: No 'usb-bus' bus found for
+device 'usb-tablet'
 
-5) Some guest OSes that we still want to support (and which would
-otherwise work okay on a Q35 virtual machine) have virtio drivers too
-old to support virtio-1.0 (CentOS6 and RHEL6 are examples of such OSes),
-but due to the chain of reasons listed above, the "standard" config for
-a Q35 guest generated by libvirt doesn't support virtio-0.9, hence
-doesn't support these guest OSes.
+The physical mouse is connected to the USB port of a Sun Ray 2fs
+controlling the M3000 via Sun Ray server.  I apologize if this is a
+configuration issue and not a bug but I don't know where else to report
+it and have been unable to find a solution in the documentation.
 
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
+-- =
 
-And here's a list of possible solutions to this problem (note that
-"consumers" means management applications such as OpenStack, oVirt,
-virt-manager, virt-install, gnome-boxes, etc. In all cases, it's assumed
-that the consumer's decision on the action to take will be based on
-information from libosinfo). For completeness, I've included even the
-possibilities that have been rejected, along with a brief synopsis of
-(at least part of) the reason for rejection:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1787505
 
-  (1) Add some way libvirt consumers can ask libvirt to place
-      virtio devices on a legacy pci slot instead of pcie when
-      the machinetype is q35 (qemu sets virtio devices in legacy
-      PCI slots to transitional mode, so io port space is enabled
-      and virtio-0.0 drivers will work).
+Title:
+  Solaris host: no network connection, mouse pointer mismatch
 
-      This has been proposed on libvir-list, but rejected. Here is
-      the most elquently stated reasoning for the rejection I could
-      find (with thanks to Dan Berrange):
+Status in QEMU:
+  New
 
-         The domain XML is a way to express the configuration
-         of the guest virtual machine.  What we're talking about
-         here is a policy tunable for an internal libvirt QEMU
-         driver algorithm, as so does not belong anywhere in the
-         domain XML.
+Bug description:
+  This is probably a bit far afield but on a Solaris 10 SPARC host (Sun
+  M3000) running a Windows XP guest like this:
 
+  ./qemu-system-x86_64 -m 1024 -boot d  -smp 3 -net nic -net user -hda
+  /bkpool/qemuimages/XP.img -cdrom /bkpool/qemuimages/xp.iso &
 
-  (2) Add full-blown pci enumeration support to all libvirt consumers
-      (i.e. they will need to build a model of the PCI bus topology
-      of each guest, and keep track of which addresses are in use).
-      They can then manually place virtio devices on legacy pci slots
-      (again, triggering transitional mode) when the intended guest
-      OS doesn't support virtio-0.9.
+  the vnc server starts up and Windows boots normally.  However, there
+  is no network connectivity.  There are no network devices visible in
+  XP's Networking tab of Control Panel and a ping of the local router
+  reports "unreachable".
 
-      (This is seen as requiring too much duplicated effort for
-      development and support/maintenance, since up until now libvirt
-      has been the single point of action for PCI address assignment
-      (well, QEMU can do it too, but for > 10 years libvirt has
-      *always* provided full PCI addresses for all devices)
+  Also, the keyboard works fine but the guest mouse pointer is offset
+  from the host mouse position by an amount that varies by screen
+  position.  This makes it impossible to point to locations near the
+  edge of the qemu window.  This seems to be a previously reported
+  problem, but the suggested fix, " -device usb-tablet", prevents qemu
+  from even starting:
 
+  qemu-system-x86_64: -device usb-tablet: No 'usb-bus' bus found for
+  device 'usb-tablet'
 
-  (3) Add virtio-1.0 support to all guest OSes. If this is done,
-      existing libvirt configs will work.
+  The physical mouse is connected to the USB port of a Sun Ray 2fs
+  controlling the M3000 via Sun Ray server.  I apologize if this is a
+  configuration issue and not a bug but I don't know where else to
+  report it and have been unable to find a solution in the
+  documentation.
 
-      (Aside from the difficulty of backporting, and the fact that
-      there are going to be some OSes that don't get it *at all*,
-      there will always be older releases that haven't gotten the
-      backport. So this isn't a complete solution).
-
-
-  (4) Consumers can continue using the 440fx machinetype for guest
-      OSes that don't support virtio-0.9
-
-      (This would work, but perpetuates use of the 440fx
-      machinetype, and all for just this one reason (at least in
-      the case of CentOS6/RHEL6, which otherwise work just fine with
-      Q35)).
-
-
-  (5) Introduce  virtio-0.9, virtio-1.0 models in libvirt
-      which are explicitly legacy-only and modern-only.
-      QEMU doesn't need to change, as libvirt can simply set
-      the right params on existing QEMU models to force the
-      behavior.
-
-      (NB: it's unclear to me whether virtio-0.9 simply won't
-      work without forcing the device to be on a legacy PCI
-      slot, or if that's just "a very bad idea" because it
-      will mean that the device uses up extra io port space)
-
-The offline discussion had basically come to the point of saying that
-options (4) and (5) were the only reasonable ones, with option (5) being
-preferred (I think).
-
-As a starter for continuing the discussion, it seems to me that for
-option (5):
-
-a) we don't really need the virtio-1.0 model, since that's what you
-currently get anyway when you ask for "virtio" on Q35 (and on 440fx,
-"virtio" gives you transitional, which works for everybody).
-
-b) Rather than a "legacy-only" model for virtio-0.9, it would be more
-useful to have "transitional". This way the config would work for older
-OSes that don't support virtio-1.0, and when/if the OS was upgraded such
-that it supported virtio-1.0, that would be automatically used without
-needing to change the config.
-
-c) Even if it's possible to force a device on an Express slot into
-transitional mode, this is extremely wasteful of io port space, so
-libvirt should consider virtio-0.9 devices to be legacy PCI, and thus
-plug them into legacy PCI slots. And once we're doing this, it's
-unnecessary to add any extra option to the qemu commandline to force
-legacy support (i.e. transitional mode), as that is what QEMU already
-does when the device is connected to a legacy PCI slot.
-
-So making the naive assumption that we agree on implementing option (5)
-and there are no objections to my points a-c (Hah! As if!), how does
-this sound as a plan:
-
-
-A) libosinfo starts telling consumers that the preferred virtio device
-model for the relevant OSes is "virtio-0.9", and leaves the
-recommendation for other OSes as "virtio".
-
-B) libvirt adds a "virtio-0.9" model for all virtio devices that
-actually have virtio-0.9 support (a couple of devices never existed
-prior to virtio-1.0 (rng and ???) so virtio-0.9 would be nonsensical for
-them).
-
-C) inside libvirt, the implementation of the "virtio-0.9" model is
-identical to "virtio", except that the VIR_PCI_CONNECT_TYPE flags for
-these devices contain VIR_PCI_CONNECT_TYPE_PCI rather than
-VIR_PCI_CONNECT_TYPE_PCIE, resulting in those devices being assigned to
-a legacy PCI slot, and thus they would be transitional mode by default.
-
-(If there is disagreement about putting these devices on a legacy PCI
-slot, then (C) could be changed to add "disable-legacy=off" to the qemu
-commandline. But again, even if that works, it would use up 4k of IO
-port space for each device, causing it to rapidly run out, and I don't
-think that should be the default mode of operation).
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1787505/+subscriptions
