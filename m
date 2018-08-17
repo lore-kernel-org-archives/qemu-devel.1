@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fqkQ8-0002rL-EN
-	for Qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:28:29 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fqkWN-0006az-S9
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:34:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fqkQ7-0004Un-LE
-	for Qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:28:28 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <c1f8aba9-4a63-4dfa-cf0b-9521c869c9ff@redhat.com>
-Date: Fri, 17 Aug 2018 15:28:17 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D1319041-4F97-49CD-A53C-BFFA6D39BC16@gmail.com>
-References: <20180730212249.16418-1-programmingkidx@gmail.com>
-	<5679ec6f-e2d7-e139-1b56-304540c89977@redhat.com>
-	<f6fcbd58-2462-d432-a038-cc13bb0dcf23@redhat.com>
-	<20180814084047.GD5025@dhcp-200-186.str.redhat.com>
-	<D08F395C-E55A-4FF1-9844-02B606FDDF8E@gmail.com>
-	<c1f8aba9-4a63-4dfa-cf0b-9521c869c9ff@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img.c: increase spacing between
- commands in documentation
+	(envelope-from <mreitz@redhat.com>) id 1fqkWM-0007jK-Ua
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:34:55 -0400
+References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
+	<13910182-771b-c5dc-26a7-0958a7241fe8@redhat.com>
+	<6c318533-dc87-daeb-1fe8-6b11b0cbec8d@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <747506be-aceb-0ab8-a4ee-c79f9a6b929a@redhat.com>
+Date: Fri, 17 Aug 2018 21:34:39 +0200
+MIME-Version: 1.0
+In-Reply-To: <6c318533-dc87-daeb-1fe8-6b11b0cbec8d@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="PRRPgYe0w87EZNo5sA2zGj5NSRhEU9Q6p"
+Subject: Re: [Qemu-devel] [PATCH 0/7] qcow2: async handling of fragmented io
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,110 +25,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PRRPgYe0w87EZNo5sA2zGj5NSRhEU9Q6p
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org
+Message-ID: <747506be-aceb-0ab8-a4ee-c79f9a6b929a@redhat.com>
+Subject: Re: [PATCH 0/7] qcow2: async handling of fragmented io
+References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
+ <13910182-771b-c5dc-26a7-0958a7241fe8@redhat.com>
+ <6c318533-dc87-daeb-1fe8-6b11b0cbec8d@virtuozzo.com>
+In-Reply-To: <6c318533-dc87-daeb-1fe8-6b11b0cbec8d@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Aug 17, 2018, at 9:44 AM, Eric Blake <eblake@redhat.com> wrote:
+On 2018-08-16 15:58, Vladimir Sementsov-Ogievskiy wrote:
+> 16.08.2018 03:51, Max Reitz wrote:
+>> On 2018-08-07 19:43, Vladimir Sementsov-Ogievskiy wrote:
+>>> Hi all!
+>>>
+>>> Here is an asynchronous scheme for handling fragmented qcow2
+>>> reads and writes. Both qcow2 read and write functions loops through
+>>> sequential portions of data. The series aim it to parallelize these
+>>> loops iterations.
+>>>
+>>> It improves performance for fragmented qcow2 images, I've tested it
+>>> as follows:
+>>>
+>>> I have four 4G qcow2 images (with default 64k block size) on my ssd d=
+isk:
+>>> t-seq.qcow2 - sequentially written qcow2 image
+>>> t-reverse.qcow2 - filled by writing 64k portions from end to the star=
+t
+>>> t-rand.qcow2 - filled by writing 64k portions (aligned) in random ord=
+er
+>>> t-part-rand.qcow2 - filled by shuffling order of 64k writes in 1m clu=
+sters
+>>> (see source code of image generation in the end for details)
+>>>
+>>> and the test (sequential io by 1mb chunks):
+>>>
+>>> test write:
+>>>     for t in /ssd/t-*; \
+>>>         do sync; echo 1 > /proc/sys/vm/drop_caches; echo =3D=3D=3D  $=
+t  =3D=3D=3D; \
+>>>         ./qemu-img bench -c 4096 -d 1 -f qcow2 -n -s 1m -t none -w $t=
+; \
+>>>     done
+>>>
+>>> test read (same, just drop -w parameter):
+>>>     for t in /ssd/t-*; \
+>>>         do sync; echo 1 > /proc/sys/vm/drop_caches; echo =3D=3D=3D  $=
+t  =3D=3D=3D; \
+>>>         ./qemu-img bench -c 4096 -d 1 -f qcow2 -n -s 1m -t none $t; \=
+
+>>>     done
+>>>
+>>> short info about parameters:
+>>>   -w - do writes (otherwise do reads)
+>>>   -c - count of blocks
+>>>   -s - block size
+>>>   -t none - disable cache
+>>>   -n - native aio
+>>>   -d 1 - don't use parallel requests provided by qemu-img bench itsel=
+f
+>> Hm, actually, why not?  And how does a guest behave?
+>>
+>> If parallel requests on an SSD perform better, wouldn't a guest issue
+>> parallel requests to the virtual device and thus to qcow2 anyway?
 >=20
-> On 08/16/2018 08:27 PM, Programmingkid wrote:
->=20
->> I am by no means an expert at qemu-img. But I did try my best to =
-create what I think should be the new output for qemu-img <command> =
---help. This is just the text I plan on using in a future patch. It is =
-easier to read right now than it will be in patch form, so please let me =
-know if there are any errors in this documentation. Thank you.
->> <amend>
->=20
-> Just reviewing the first for now, to give you a feel for what to =
-consider.
->=20
->> usage: qemu-img amend [--object objectdef] [--image-opts] [-p] [-q] =
-[-f fmt]
->> [-t cache] -o options filename
->> Command parameters:
->>  -f             'fmt' is the disk image format. It is guessed =
-automatically
->>                 in most cases.
->=20
-> Bad advice. We WANT users to use -f (if you don't, and the automatic =
-guessing sees something that is not raw, but your image SHOULD have been =
--f raw, then you have a security hole: the guest can write anything into =
-a raw image to make the host access files it shouldn't based on =
-interpreting the raw file as something else).  I'd drop the last =
-sentence, and use just the first.
+> Guest knows nothing about qcow2 fragmentation, so this kind of
+> "asynchronization" could be done only at qcow2 level.
 
-Ok.=20
+Hm, yes.  I'm sorry, but without having looked closer at the series
+(which is why I'm sorry in advance), I would suspect that the
+performance improvement comes from us being able to send parallel
+requests to an SSD.
 
->=20
->> --image-opts    Treat filename as a set of image options, instead of =
-a plain
->>                 filename.
->>  -o             Used with a comma separated list of format specific =
-options in a
->>                 name=3Dvalue format. Use "-o ?" for an overview of =
-the options
->=20
-> Please spell that "-o help", not "-o ?".   Otherwise, the user has to =
-quote the ? to avoid it globbing into any single-byte file lying around =
-in the current directory.
+So if you send large requests to an SSD, you may either send them in
+parallel or sequentially, it doesn't matter.  But for small requests,
+it's better to send them in parallel so the SSD always has requests in
+its queue.
 
-"-o ?" and "-o help" does not appear to work for this command. Maybe it =
-should be removed.
-This is what I tried:
-	qemu-img amend -o help
-	qemu-img amend -o ?
+I would think this is where the performance improvement comes from.  But
+I would also think that a guest OS knows this and it would also send
+many requests in parallel so the virtual block device never runs out of
+requests.
 
-This is what I see in both instances: qemu-img: Expecting one image file =
-name
+> However, if guest do async io, send a lot of parallel requests, it
+> behave like qemu-img without -d 1 option, and in this case,
+> parallel loop iterations in qcow2 doesn't have such great sense.
+> However, I think that async parallel requests are better in
+> general than sequential, because if device have some unused opportunity=
 
->=20
->>                 supported by the used format
->> --object        'objectdef' is a QEMU user creatable object =
-definition. See the
->>                 qemu(1) manual page for a description of the object =
-properties.
->>                 The most common object type is a 'secret', which is =
-used to
->>                 supply passwords and/or encryption keys.
->>  -p             Display progress bar. If the -p option is not used =
-for a command
->>                 that supports it, the progress is reported when the =
-process
->>                 receives a "SIGUSR1" signal.
->>  -q             Quiet mode - do not print any output (except errors). =
-There's no
->>                 progress bar in case both -q and -p options are used.
->=20
-> Not your fault, but I don't like it when interfaces take mutually =
-exclusive operations but the last one does not win.  Either '-p -q' =
-should behave like '-q', and '-q -p' behave like '-p' (because we accept =
-the mutual exclusion but last one wins), or both forms should error =
-(because they are incompatible).  But having both forms silently behave =
-like '-q' is evil.  So, as long as you're willing to patch up =
-interfaces, that's a project to consider.
->=20
->>  -t             Specifies the cache mode that should be used with the
->>                 destination file.
->=20
-> And what are those modes?  If you're going to be wordy, then give the =
-user enough information to be useful.  Otherwise, being terse in --help =
-is fine (and let the man page be wordy instead).
+> of parallelization, it will be utilized.
 
-I don't know what the modes are. Anyone care to fill us in?=20
+I agree that it probably doesn't make things worse performance-wise, but
+it's always added complexity (see the diffstat), which is why I'm just
+routinely asking how useful it is in practice. :-)
+
+Anyway, I suspect there are indeed cases where a guest doesn't send many
+requests in parallel but it makes sense for the qcow2 driver to
+parallelize it.  That would be mainly when the guest reads seemingly
+sequential data that is then fragmented in the qcow2 file.  So basically
+what your benchmark is testing. :-)
+
+Then, the guest could assume that there is no sense in parallelizing it
+because the latency from the device is large enough, whereas in qemu
+itself we always run dry and wait for different parts of the single
+large request to finish.  So, yes, in that case, parallelization that's
+internal to qcow2 would make sense.
+
+Now another question is, does this negatively impact devices where
+seeking is slow, i.e. HDDs?  Unfortunately I'm not home right now, so I
+don't have access to an HDD to test myself...
+
+> We've already
+> use this approach in mirror and qemu-img convert.
+
+Indeed, but here you could always argue that this is just what guests
+do, so we should, too.
+
+> In Virtuozzo we have
+> backup, improved by parallelization of requests
+> loop too. I think, it would be good to have some general code for such
+> things in future.
+Well, those are different things, I'd think.  Parallelization in
+mirror/backup/convert is useful not just because of qcow2 issues, but
+also because you have a volume to read from and a volume to write to, so
+that's where parallelization gives you some pipelining.  And it gives
+you buffers for latency spikes, I guess.
+
+Max
 
 
->> Example:
->>     qemu-img amend -o compat=3D0.10 -f qcow2 image.qcow2
->=20
-> Where's an example with --image-opts and --object secret?
+--PRRPgYe0w87EZNo5sA2zGj5NSRhEU9Q6p
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I prefer examples that I think a user would actually use. The =
---image-opts and -object options are not necessary to use this command.
+-----BEGIN PGP SIGNATURE-----
 
-> We're trying to move away from compat=3D0.10 (also spelled compat=3Dv2),=
- and instead start encouraging compat=3Dv3.
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt3I08ACgkQ9AfbAGHV
+z0CyhAf/UraXMGpz7il/jbRNrcmm5bwQMrli7Z1ZDS6hwYkM49Q/MruGLtomPxig
+Pj2hfxBrjCY6amtYWSQoD+wcSBrQMExXjjhpUToLxJaNMRmzMHhkGmSUaxmWynjx
+G0PFQUP05O1HsGErVTyELkkQCi72NtCPdHLGrCbj+J8QJbGYjoTADEIiEN6s0nCG
+gekVrytpieV2fWp/6jPX4O8jSAn4ejXN4G+Q5RuAGXHOYzDtgP/Rp2tbauGu+bn8
+z8TSTRlZo9Xs4ZPuvL1SnUaXFXrQ95bbj1MHhevTpBuTict0a3uyMkC6sijhL4tL
+XdheQ1P7LTpzMX+H1sZPH0D7UgfRVg==
+=xxNh
+-----END PGP SIGNATURE-----
 
-So you want this: qemu-img amend -o compat=3Dv3 -f qcow2 image.qcow2
-
-Thank you for reviewing my documentation.=
+--PRRPgYe0w87EZNo5sA2zGj5NSRhEU9Q6p--
