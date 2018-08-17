@@ -1,25 +1,21 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:57566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fqoP1-0004q3-Jd
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:43:38 -0400
+	(envelope-from <cota@braap.org>) id 1fqoPA-0004q3-MR
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:43:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fqoGF-00062U-A5
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:34:34 -0400
-Resent-Message-Id: <E1fqoGF-00062U-A5@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21093)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fqoGF-0005xF-17
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:34:31 -0400
-In-Reply-To: <20180817013400.13353-1-ehabkost@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153454883519.25705.3377304370687056631@502c9da6d61e>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 17 Aug 2018 16:33:56 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/8] x86 queue, 2018-08-16
+	(envelope-from <cota@braap.org>) id 1fqoBj-0003Hp-S4
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:29:55 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:58609)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fqoBj-0003HE-N5
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 19:29:51 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Fri, 17 Aug 2018 19:29:21 -0400
+Message-Id: <20180817232923.28899-5-cota@braap.org>
+In-Reply-To: <20180817232923.28899-1-cota@braap.org>
+References: <20180817232923.28899-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 4/6] test-qht: test removal of non-existent
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ehabkost@redhat.com
-Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODE3MDEzNDAwLjEzMzUzLTEtZWhhYmtvc3RAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC84XSB4ODYgcXVldWUsIDIwMTgtMDgtMTYKCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
-aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRz
-PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
-bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
-IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
-bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
-aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
-bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTI0
-OTRkOWY5MyBpMzg2OiBEaXNhYmxlIFRPUE9FWFQgYnkgZGVmYXVsdCBvbiAiLWNwdSBob3N0Igpi
-M2ZhODMyY2IwIHRhcmdldC1pMzg2OiBhZGRzIFBWX1NFTkRfSVBJIENQVUlEIGZlYXR1cmUgYml0
-CjljNGE4NjExOTMgaTM4NjogQWRkIG5ldyBDUFUgbW9kZWwgSWNlbGFrZS17U2VydmVyLCBDbGll
-bnR9CjVjMGEzZWU1NGMgaTM4NjogQWRkIENQVUlEIGJpdCBmb3IgV0JOT0lOVkQKODJhMWVkZjI1
-YiBpMzg2OiBBZGQgQ1BVSUQgYml0IGZvciBQQ09ORklHCmQ3OGYyZTA4MzQgaTM4NjogQWRkIENQ
-VUlEIGJpdCBhbmQgZmVhdHVyZSB3b3JkcyBmb3IgSUEzMl9BUkNIX0NBUEFCSUxJVElFUyBNU1IK
-ZWI0YWU0YzM3YSBpMzg2OiBBZGQgbmV3IE1TUiBpbmRpY2VzIGZvciBJQTMyX1BSRURfQ01EIGFu
-ZCBJQTMyX0FSQ0hfQ0FQQUJJTElUSUVTCjhhY2Q1ZDc3M2EgZG9jczogYWRkIGd1aWRhbmNlIG9u
-IGNvbmZpZ3VyaW5nIENQVSBtb2RlbHMgZm9yIHg4NgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hl
-Y2tpbmcgUEFUQ0ggMS84OiBkb2NzOiBhZGQgZ3VpZGFuY2Ugb24gY29uZmlndXJpbmcgQ1BVIG1v
-ZGVscyBmb3IgeDg2Li4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
-IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzgyOiAKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTQ2IGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi84OiBpMzg2
-OiBBZGQgbmV3IE1TUiBpbmRpY2VzIGZvciBJQTMyX1BSRURfQ01EIGFuZCBJQTMyX0FSQ0hfQ0FQ
-QUJJTElUSUVTLi4uCkNoZWNraW5nIFBBVENIIDMvODogaTM4NjogQWRkIENQVUlEIGJpdCBhbmQg
-ZmVhdHVyZSB3b3JkcyBmb3IgSUEzMl9BUkNIX0NBUEFCSUxJVElFUyBNU1IuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNC84OiBpMzg2OiBBZGQgQ1BVSUQgYml0IGZvciBQQ09ORklHLi4uCkNoZWNraW5nIFBB
-VENIIDUvODogaTM4NjogQWRkIENQVUlEIGJpdCBmb3IgV0JOT0lOVkQuLi4KRVJST1I6IGxpbmUg
-b3ZlciA5MCBjaGFyYWN0ZXJzCiMzNjogRklMRTogdGFyZ2V0L2kzODYvY3B1Lmg6Njk4OgorICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBkbyBub3QgaW52YWxpZGF0ZSBjYWNoZSAqLwoKdG90YWw6IDEgZXJy
-b3JzLCAwIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA2Lzg6IGkzODY6IEFkZCBuZXcgQ1BVIG1v
-ZGVsIEljZWxha2Ute1NlcnZlciwgQ2xpZW50fS4uLgpDaGVja2luZyBQQVRDSCA3Lzg6IHRhcmdl
-dC1pMzg2OiBhZGRzIFBWX1NFTkRfSVBJIENQVUlEIGZlYXR1cmUgYml0Li4uCkNoZWNraW5nIFBB
-VENIIDgvODogaTM4NjogRGlzYWJsZSBUT1BPRVhUIGJ5IGRlZmF1bHQgb24gIi1jcHUgaG9zdCIu
-Li4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+This improves qht.c code coverage from 89.44% to 90.00%.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ tests/test-qht.c | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test-qht.c b/tests/test-qht.c
+index 283fb3db39..05b1d6807a 100644
+--- a/tests/test-qht.c
++++ b/tests/test-qht.c
+@@ -41,7 +41,7 @@ static void insert(int a, int b)
+     }
+ }
+ 
+-static void rm(int init, int end)
++static void do_rm(int init, int end, bool exist)
+ {
+     int i;
+ 
+@@ -49,10 +49,24 @@ static void rm(int init, int end)
+         uint32_t hash;
+ 
+         hash = arr[i];
+-        g_assert_true(qht_remove(&ht, &arr[i], hash));
++        if (exist) {
++            g_assert_true(qht_remove(&ht, &arr[i], hash));
++        } else {
++            g_assert_false(qht_remove(&ht, &arr[i], hash));
++        }
+     }
+ }
+ 
++static void rm(int init, int end)
++{
++    do_rm(init, end, true);
++}
++
++static void rm_nonexist(int init, int end)
++{
++    do_rm(init, end, false);
++}
++
+ static void check(int a, int b, bool expected)
+ {
+     struct qht_stats stats;
+@@ -157,8 +171,15 @@ static void qht_do_test(unsigned int mode, size_t init_entries)
+     check_n(0);
+ 
+     qht_init(&ht, is_equal, 0, mode);
++    rm_nonexist(0, 4);
++    insert(0, 4);
++    rm_nonexist(5, 6);
++    insert(4, 6);
++    rm_nonexist(7, 8);
++    iter_rm_mod(1);
+ 
+     check_n(0);
++    rm_nonexist(0, 10);
+     insert(0, N);
+     check(0, N, true);
+     check_n(N);
+@@ -183,6 +204,7 @@ static void qht_do_test(unsigned int mode, size_t init_entries)
+ 
+     qht_reset(&ht);
+     insert(0, N);
++    rm_nonexist(N, N + 32);
+     iter_rm_mod(10);
+     iter_rm_mod_check(10);
+     check_n(N * 9 / 10);
+-- 
+2.17.1
