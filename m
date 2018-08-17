@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fqVcd-0002j7-LV
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 23:40:24 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fqX49-0005y2-4S
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:12:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fqVca-0005Jz-HI
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 23:40:23 -0400
-Received: from mga04.intel.com ([192.55.52.120]:21102)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
-	id 1fqVca-0005JH-89
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 23:40:20 -0400
-References: <1534411696-6454-1-git-send-email-jing2.liu@linux.intel.com>
-	<24b8defb-ea03-2fe8-6a54-c9fe43255591@redhat.com>
-From: "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <81a732f2-dcc5-c529-d274-45394c7787dd@linux.intel.com>
-Date: Fri, 17 Aug 2018 11:39:47 +0800
+	(envelope-from <no-reply@patchew.org>) id 1fqX44-0008CK-DU
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:12:53 -0400
+Resent-Message-Id: <E1fqX44-0008CK-DU@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21010)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fqX43-00088Q-Rq
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:12:48 -0400
+In-Reply-To: <20180816025452.21358-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153448271903.21563.17126347304953344999@502c9da6d61e>
 MIME-Version: 1.0
-In-Reply-To: <24b8defb-ea03-2fe8-6a54-c9fe43255591@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] hw/pci: PCI resource reserve
- capability
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 16 Aug 2018 22:12:00 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/5] tcg: Reorg 128-bit atomic operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: mst@redhat.com, SeaBIOS devel list <SeaBIOS@seabios.org>, qemu-devel@nongnu.org, anthony.xu@intel.com, pbonzini@redhat.com, "Marcel Apfelbaum (GMail address)" <marcel.apfelbaum@gmail.com>
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, cota@braap.org
 
-Hi Laszlo,
-Thanks very much for your reminder.
-Looking forward to comments from all!
-
-Thanks,
-Jing
-
-On 8/17/2018 12:17 AM, Laszlo Ersek wrote:
-> Hi,
-> 
-> On 08/16/18 11:28, Jing Liu wrote:
->> This patch serial is about PCI resource reserve capability.
->>
->> First patch refactors the resource reserve fields in GenPCIERoorPort
->> structure out to another new structure, called "PCIResReserve". Modify
->> the parameter list of pci_bridge_qemu_reserve_cap_init().
->>
->> Then we add the teardown function called pci_bridge_qemu_reserve_cap_uninit().
->>
->> Last we enable the resource reserve capability for legacy PCI bridge
->> so that firmware can reserve additional resources for the bridge.
->>
->> Change Log:
->> v2 -> v1
->> * add refactoring patch
->> * add teardown function
->> * some other fixes
->>
->> Jing Liu (3):
->>    hw/pci: factor PCI reserve resources to a separate structure
->>    hw/pci: add teardown function for PCI resource reserve capability
->>    hw/pci: add PCI resource reserve capability to legacy PCI bridge
->>
->>   hw/pci-bridge/gen_pcie_root_port.c | 32 +++++++++++++-------------
->>   hw/pci-bridge/pci_bridge_dev.c     | 25 ++++++++++++++++++++
->>   hw/pci/pci_bridge.c                | 47 +++++++++++++++++++++-----------------
->>   include/hw/pci/pci_bridge.h        | 18 +++++++++++----
->>   4 files changed, 80 insertions(+), 42 deletions(-)
->>
-> 
-> just some meta comments for now:
-> 
-> - I've added Marcel; please keep him CC'd on this set (and the SeaBIOS
-> counterpart, [SeaBIOS] [PATCH v2 0/3] pci: resource reserve capability
-> found)
-> 
-> - my task queue has blown up and I'm unsure when I'll get to reviewing
-> this set. The same applies to the SeaBIOS counterpart.
-> 
-> This is just to say that you should feel free to go ahead and work with
-> the (sub)maintainers; I'll try to get back to this as time allows, but
-> don't wait for me.
-> 
-> If further versions are necessary, I'd appreciate being CC'd on those,
-> just so I know what to look at when I find the time again.
-> 
-> Thanks!
-> Laszlo
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODE2MDI1NDUyLjIxMzU4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNV0gdGNnOiBSZW9yZyAxMjgtYml0
+IGF0b21pYyBvcGVyYXRpb25zCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
+KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
+ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
+SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
+Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
+PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjMzOTVlNmIzOTUgdGFyZ2V0L3BwYzogQ29udmVydCB0byBI
+QVZFX0NNUFhDSEcxMjggYW5kIEhBVkVfQVRPTUlDMTI4CmJiNzkyODBkMTggdGFyZ2V0L2FybTog
+Q29udmVydCB0byBIQVZFX0NNUFhDSEcxMjgKNDk0YzkyZTMzZiB0YXJnZXQvczM5MHg6IENvbnZl
+cnQgdG8gSEFWRV9DTVBYQ0hHMTI4IGFuZCBIQVZFX0FUT01JQzEyOAo5Y2ZiN2VjY2U0IHRhcmdl
+dC9pMzg2OiBDb252ZXJ0IHRvIEhBVkVfQ01QWENIRzEyOApiOTgwZTk3NDA1IHRjZzogU3BsaXQg
+Q09ORklHX0FUT01JQzEyOAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS81
+OiB0Y2c6IFNwbGl0IENPTkZJR19BVE9NSUMxMjguLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
+IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTgxOiAK
+bmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVu
+IHNxdWFyZSBicmFja2V0ICdbJwojMjU1OiBGSUxFOiBpbmNsdWRlL3FlbXUvYXRvbWljMTI4Lmg6
+NzA6CisgICAgICAgIDogW21lbV0gIittIigqcHRyKSwgW3RtcF0gIj0mciIodG1wKSwKCkVSUk9S
+OiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojMjU3OiBG
+SUxFOiBpbmNsdWRlL3FlbXUvYXRvbWljMTI4Lmg6NzI6CisgICAgICAgIDogW2NtcGxdICJyIihj
+bXBsKSwgW2NtcGhdICJyIihjbXBoKSwKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBk
+ZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMyODA6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMx
+MjguaDo5NToKKyMgaWZkZWYgX19hYXJjaDY0X18KCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJl
+Zm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojMjkxOiBGSUxFOiBpbmNsdWRlL3FlbXUvYXRv
+bWljMTI4Lmg6MTA2OgorICAgICAgICA6IFttZW1dICIrbSIoKnB0ciksIFt0bXBdICI9ciIodG1w
+KSwgW2xdICI9ciIobCksIFtoXSAiPXIiKGgpKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJl
+Zm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojMzA0OiBGSUxFOiBpbmNsdWRlL3FlbXUvYXRv
+bWljMTI4Lmg6MTE5OgorICAgICAgICA6IFttZW1dICIrbSIoKnB0ciksIFt0MV0gIj0mciIodDEp
+LCBbdDJdICI9JnIiKHQyKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1
+YXJlIGJyYWNrZXQgJ1snCiMzMDU6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMxMjguaDoxMjA6
+CisgICAgICAgIDogW2xdICJyIihsKSwgW2hdICJyIihoKSk7Cgp0b3RhbDogNSBlcnJvcnMsIDIg
+d2FybmluZ3MsIDM1MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzU6IHRhcmdldC9pMzg2OiBDb252ZXJ0IHRvIEhB
+VkVfQ01QWENIRzEyOC4uLgpDaGVja2luZyBQQVRDSCAzLzU6IHRhcmdldC9zMzkweDogQ29udmVy
+dCB0byBIQVZFX0NNUFhDSEcxMjggYW5kIEhBVkVfQVRPTUlDMTI4Li4uCkNoZWNraW5nIFBBVENI
+IDQvNTogdGFyZ2V0L2FybTogQ29udmVydCB0byBIQVZFX0NNUFhDSEcxMjguLi4KQ2hlY2tpbmcg
+UEFUQ0ggNS81OiB0YXJnZXQvcHBjOiBDb252ZXJ0IHRvIEhBVkVfQ01QWENIRzEyOCBhbmQgSEFW
+RV9BVE9NSUMxMjguLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
+dGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQHJlZGhhdC5jb20=
