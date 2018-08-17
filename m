@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqdD1-0004Xj-Qm
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:46:28 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fqdD3-0004Y3-75
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:46:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fqdD1-0008DD-1Q
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:46:27 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fqdD2-0008Dw-0z
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:46:29 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44492)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fqdD0-0008CL-PC
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:46:26 -0400
+	id 1fqdD1-0008CL-Oz
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:46:27 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Aug 2018 12:46:17 +0100
-Message-Id: <20180817114619.22354-2-peter.maydell@linaro.org>
+Date: Fri, 17 Aug 2018 12:46:18 +0100
+Message-Id: <20180817114619.22354-3-peter.maydell@linaro.org>
 In-Reply-To: <20180817114619.22354-1-peter.maydell@linaro.org>
 References: <20180817114619.22354-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/3] hw/ssi/xilinx_spips: Remove unneeded MMIO
- request_ptr code
+Subject: [Qemu-devel] [PATCH 2/3] memory: Remove MMIO request_ptr APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +27,195 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
 
-We now support direct execution from MMIO regions in the
-core memory subsystem. This means that we don't need to
-have device-specific support for it, and we can remove
-the request_ptr handling from the Xilinx SPIPS device.
-(It was broken anyway due to race conditions, and disabled
-by default.)
-
-This device is the only in-tree user of this API.
+Remove the obsolete MMIO request_ptr APIs; they have no
+users now.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/ssi/xilinx_spips.c | 46 -------------------------------------------
- 1 file changed, 46 deletions(-)
+ include/exec/memory.h |  35 --------------
+ memory.c              | 110 ------------------------------------------
+ 2 files changed, 145 deletions(-)
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index c052bfc4b3c..16f88f74029 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -1031,14 +1031,6 @@ static const MemoryRegionOps spips_ops = {
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 448d41a7529..68636561821 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -141,15 +141,6 @@ struct MemoryRegionOps {
+                                     uint64_t data,
+                                     unsigned size,
+                                     MemTxAttrs attrs);
+-    /* Instruction execution pre-callback:
+-     * @addr is the address of the access relative to the @mr.
+-     * @size is the size of the area returned by the callback.
+-     * @offset is the location of the pointer inside @mr.
+-     *
+-     * Returns a pointer to a location which contains guest code.
+-     */
+-    void *(*request_ptr)(void *opaque, hwaddr addr, unsigned *size,
+-                         unsigned *offset);
  
- static void xilinx_qspips_invalidate_mmio_ptr(XilinxQSPIPS *q)
- {
--    XilinxSPIPS *s = &q->parent_obj;
+     enum device_endian endianness;
+     /* Guest-visible constraints: */
+@@ -1667,32 +1658,6 @@ void memory_global_dirty_log_stop(void);
+ void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
+                 bool dispatch_tree, bool owner);
+ 
+-/**
+- * memory_region_request_mmio_ptr: request a pointer to an mmio
+- * MemoryRegion. If it is possible map a RAM MemoryRegion with this pointer.
+- * When the device wants to invalidate the pointer it will call
+- * memory_region_invalidate_mmio_ptr.
+- *
+- * @mr: #MemoryRegion to check
+- * @addr: address within that region
+- *
+- * Returns true on success, false otherwise.
+- */
+-bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
 -
--    if ((q->mmio_execution_enabled) && (q->lqspi_cached_addr != ~0ULL)) {
--        /* Invalidate the current mapped mmio */
--        memory_region_invalidate_mmio_ptr(&s->mmlqspi, q->lqspi_cached_addr,
--                                          LQSPI_CACHE_SIZE);
--    }
+-/**
+- * memory_region_invalidate_mmio_ptr: invalidate the pointer to an mmio
+- * previously requested.
+- * In the end that means that if something wants to execute from this area it
+- * will need to request the pointer again.
+- *
+- * @mr: #MemoryRegion associated to the pointer.
+- * @offset: offset within the memory region
+- * @size: size of that area.
+- */
+-void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
+-                                       unsigned size);
 -
-     q->lqspi_cached_addr = ~0ULL;
+ /**
+  * memory_region_dispatch_read: perform a read directly to the specified
+  * MemoryRegion.
+diff --git a/memory.c b/memory.c
+index 2ea16e7bfb0..8b44672c132 100644
+--- a/memory.c
++++ b/memory.c
+@@ -29,7 +29,6 @@
+ #include "exec/ram_addr.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/sysemu.h"
+-#include "hw/misc/mmio_interface.h"
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
+ 
+@@ -2680,115 +2679,6 @@ void memory_listener_unregister(MemoryListener *listener)
+     listener->address_space = NULL;
  }
  
-@@ -1207,23 +1199,6 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
-     }
- }
- 
--static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
--                                    unsigned *offset)
+-bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr)
 -{
--    XilinxQSPIPS *q = opaque;
--    hwaddr offset_within_the_region;
+-    void *host;
+-    unsigned size = 0;
+-    unsigned offset = 0;
+-    Object *new_interface;
 -
--    if (!q->mmio_execution_enabled) {
--        return NULL;
+-    if (!mr || !mr->ops->request_ptr) {
+-        return false;
 -    }
 -
--    offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
--    lqspi_load_cache(opaque, offset_within_the_region);
--    *size = LQSPI_CACHE_SIZE;
--    *offset = offset_within_the_region;
--    return q->lqspi_buf;
+-    /*
+-     * Avoid an update if the request_ptr call
+-     * memory_region_invalidate_mmio_ptr which seems to be likely when we use
+-     * a cache.
+-     */
+-    memory_region_transaction_begin();
+-
+-    host = mr->ops->request_ptr(mr->opaque, addr - mr->addr, &size, &offset);
+-
+-    if (!host || !size) {
+-        memory_region_transaction_commit();
+-        return false;
+-    }
+-
+-    new_interface = object_new("mmio_interface");
+-    qdev_prop_set_uint64(DEVICE(new_interface), "start", offset);
+-    qdev_prop_set_uint64(DEVICE(new_interface), "end", offset + size - 1);
+-    qdev_prop_set_bit(DEVICE(new_interface), "ro", true);
+-    qdev_prop_set_ptr(DEVICE(new_interface), "host_ptr", host);
+-    qdev_prop_set_ptr(DEVICE(new_interface), "subregion", mr);
+-    object_property_set_bool(OBJECT(new_interface), true, "realized", NULL);
+-
+-    memory_region_transaction_commit();
+-    return true;
 -}
 -
- static uint64_t
- lqspi_read(void *opaque, hwaddr addr, unsigned int size)
- {
-@@ -1245,7 +1220,6 @@ lqspi_read(void *opaque, hwaddr addr, unsigned int size)
- 
- static const MemoryRegionOps lqspi_ops = {
-     .read = lqspi_read,
--    .request_ptr = lqspi_request_mmio_ptr,
-     .endianness = DEVICE_NATIVE_ENDIAN,
-     .valid = {
-         .min_access_size = 1,
-@@ -1322,15 +1296,6 @@ static void xilinx_qspips_realize(DeviceState *dev, Error **errp)
-     sysbus_init_mmio(sbd, &s->mmlqspi);
- 
-     q->lqspi_cached_addr = ~0ULL;
+-typedef struct MMIOPtrInvalidate {
+-    MemoryRegion *mr;
+-    hwaddr offset;
+-    unsigned size;
+-    int busy;
+-    int allocated;
+-} MMIOPtrInvalidate;
 -
--    /* mmio_execution breaks migration better aborting than having strange
--     * bugs.
--     */
--    if (q->mmio_execution_enabled) {
--        error_setg(&q->migration_blocker,
--                   "enabling mmio_execution breaks migration");
--        migrate_add_blocker(q->migration_blocker, &error_fatal);
+-#define MAX_MMIO_INVALIDATE 10
+-static MMIOPtrInvalidate mmio_ptr_invalidate_list[MAX_MMIO_INVALIDATE];
+-
+-static void memory_region_do_invalidate_mmio_ptr(CPUState *cpu,
+-                                                 run_on_cpu_data data)
+-{
+-    MMIOPtrInvalidate *invalidate_data = (MMIOPtrInvalidate *)data.host_ptr;
+-    MemoryRegion *mr = invalidate_data->mr;
+-    hwaddr offset = invalidate_data->offset;
+-    unsigned size = invalidate_data->size;
+-    MemoryRegionSection section = memory_region_find(mr, offset, size);
+-
+-    qemu_mutex_lock_iothread();
+-
+-    /* Reset dirty so this doesn't happen later. */
+-    cpu_physical_memory_test_and_clear_dirty(offset, size, 1);
+-
+-    if (section.mr != mr) {
+-        /* memory_region_find add a ref on section.mr */
+-        memory_region_unref(section.mr);
+-        if (MMIO_INTERFACE(section.mr->owner)) {
+-            /* We found the interface just drop it. */
+-            object_property_set_bool(section.mr->owner, false, "realized",
+-                                     NULL);
+-            object_unref(section.mr->owner);
+-            object_unparent(section.mr->owner);
+-        }
 -    }
- }
- 
- static void xlnx_zynqmp_qspips_realize(DeviceState *dev, Error **errp)
-@@ -1427,16 +1392,6 @@ static Property xilinx_zynqmp_qspips_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--static Property xilinx_qspips_properties[] = {
--    /* We had to turn this off for 2.10 as it is not compatible with migration.
--     * It can be enabled but will prevent the device to be migrated.
--     * This will go aways when a fix will be released.
--     */
--    DEFINE_PROP_BOOL("x-mmio-exec", XilinxQSPIPS, mmio_execution_enabled,
--                     false),
--    DEFINE_PROP_END_OF_LIST(),
--};
 -
- static Property xilinx_spips_properties[] = {
-     DEFINE_PROP_UINT8("num-busses", XilinxSPIPS, num_busses, 1),
-     DEFINE_PROP_UINT8("num-ss-bits", XilinxSPIPS, num_cs, 4),
-@@ -1450,7 +1405,6 @@ static void xilinx_qspips_class_init(ObjectClass *klass, void * data)
-     XilinxSPIPSClass *xsc = XILINX_SPIPS_CLASS(klass);
- 
-     dc->realize = xilinx_qspips_realize;
--    dc->props = xilinx_qspips_properties;
-     xsc->reg_ops = &qspips_ops;
-     xsc->rx_fifo_size = RXFF_A_Q;
-     xsc->tx_fifo_size = TXFF_A_Q;
+-    qemu_mutex_unlock_iothread();
+-
+-    if (invalidate_data->allocated) {
+-        g_free(invalidate_data);
+-    } else {
+-        invalidate_data->busy = 0;
+-    }
+-}
+-
+-void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
+-                                       unsigned size)
+-{
+-    size_t i;
+-    MMIOPtrInvalidate *invalidate_data = NULL;
+-
+-    for (i = 0; i < MAX_MMIO_INVALIDATE; i++) {
+-        if (atomic_cmpxchg(&(mmio_ptr_invalidate_list[i].busy), 0, 1) == 0) {
+-            invalidate_data = &mmio_ptr_invalidate_list[i];
+-            break;
+-        }
+-    }
+-
+-    if (!invalidate_data) {
+-        invalidate_data = g_malloc0(sizeof(MMIOPtrInvalidate));
+-        invalidate_data->allocated = 1;
+-    }
+-
+-    invalidate_data->mr = mr;
+-    invalidate_data->offset = offset;
+-    invalidate_data->size = size;
+-
+-    async_safe_run_on_cpu(first_cpu, memory_region_do_invalidate_mmio_ptr,
+-                          RUN_ON_CPU_HOST_PTR(invalidate_data));
+-}
+-
+ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
+ {
+     memory_region_ref(root);
 -- 
 2.18.0
