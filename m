@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqTf3-0005eh-Jz
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 21:34:46 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fqTkn-0005fN-MJ
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 21:40:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqTf2-0006QI-Df
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 21:34:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60600)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fqTf2-0006PG-4u
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 21:34:44 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fqTkm-0002Gf-FC
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 21:40:41 -0400
+Date: Thu, 16 Aug 2018 22:40:29 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 16 Aug 2018 22:34:00 -0300
-Message-Id: <20180817013400.13353-9-ehabkost@redhat.com>
-In-Reply-To: <20180817013400.13353-1-ehabkost@redhat.com>
-References: <20180817013400.13353-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 8/8] i386: Disable TOPOEXT by default on "-cpu
- host"
+Message-ID: <20180817014029.GV15372@localhost.localdomain>
+References: <1531470464-21522-1-git-send-email-thuth@redhat.com>
+	<1531470464-21522-2-git-send-email-thuth@redhat.com>
+	<20180713225718.GP914@localhost.localdomain>
+	<4551aa70-343e-1362-cfd3-d567c476d6fe@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4551aa70-343e-1362-cfd3-d567c476d6fe@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 01/16] qom/object: Add a new function
+ object_initialize_child()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, Markus Armbruster <armbru@redhat.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
 
-Enabling TOPOEXT is always allowed, but it can't be enabled
-blindly by "-cpu host" because it may make guests crash if the
-rest of the cache topology information isn't provided or isn't
-consistent.
+On Thu, Aug 16, 2018 at 01:59:49PM +0200, Thomas Huth wrote:
+> On 07/14/2018 12:57 AM, Eduardo Habkost wrote:
+> > On Fri, Jul 13, 2018 at 10:27:29AM +0200, Thomas Huth wrote:
+> >> A lot of code is using the object_initialize() function followed by a call
+> >> to object_property_add_child() to add the newly initialized object as a child
+> >> of the current object. Both functions increase the reference counter of the
+> >> new object, but many spots that call these two functions then forget to drop
+> >> one of the superfluous references. So the newly created object is often not
+> >> cleaned up correctly when the parent is destroyed. In the worst case, this
+> >> can cause crashes, e.g. because device objects are not correctly removed from
+> >> their parent_bus.
+> >>
+> >> Since this is a common pattern between many code spots, let's introdcue a
+> >> new function that takes care of calling all three required initialization
+> >> functions, first object_initialize(), then object_property_add_child() and
+> >> finally object_unref().
+> >>
+> >> And while we're at object.h, also fix some copy-n-paste errors in the
+> >> comments there ("to store the area" --> "to store the error").
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > 
+> > Potential candidates for using the new function, found using the
+> > following Coccinelle patch:
+> > 
+> > @@
+> > expression child, size, type, parent, errp, propname;
+> > @@
+> > -object_initialize(child, size, type);
+> > -object_property_add_child(
+> > +object_initialize_child(
+> >                            parent, propname, 
+> > -                          OBJECT(child),
+> > +                          child, size, type,
+> >                            errp);
+> > 
+> > Some of them (very few) already call object_unref() and need to
+> > be fixed manually.
+> > 
+> > Most of the remaining ~50 object_initialize() callers are also
+> > candidates, even if they don't call object_property_add_child()
+> > today.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
+> Care to turn this into a proper patch, now that we left the freeze period?
 
-This addresses the bug reported at:
-https://bugzilla.redhat.com/show_bug.cgi?id=1613277
+It's possible, but we need a volunteer to review each hunk
+because the existing code might be (correctly) calling
+object_unref() (either immediately or when parent is finalized).
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180809221852.15285-1-ehabkost@redhat.com>
-Tested-by: Richard W.M. Jones <rjones@redhat.com>
-Reviewed-by: Babu Moger <babu.moger@amd.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/cpu.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+I will keep this in my TODO list, but it's not my top priority
+right now.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 52a77a7d08..4e4fe8fa8b 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -849,6 +849,12 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         },
-         .cpuid_eax = 0x80000001, .cpuid_reg = R_ECX,
-         .tcg_features = TCG_EXT3_FEATURES,
-+        /*
-+         * TOPOEXT is always allowed but can't be enabled blindly by
-+         * "-cpu host", as it requires consistent cache topology info
-+         * to be provided so it doesn't confuse guests.
-+         */
-+        .no_autoenable_flags = CPUID_EXT3_TOPOEXT,
-     },
-     [FEAT_C000_0001_EDX] = {
-         .feat_names = {
 -- 
-2.18.0.rc1.1.g3f1ff2140
+Eduardo
