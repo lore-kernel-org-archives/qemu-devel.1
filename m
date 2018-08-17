@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fqk96-0001Jh-V6
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:10:56 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fqkGQ-00034W-PP
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:18:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fqjyZ-0002Vj-57
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:00:00 -0400
-References: <1b072083-700b-9853-e525-e2726bf17476@virtuozzo.com>
-	<20180817180440.49687-1-vsementsov@virtuozzo.com>
-	<20180817180440.49687-2-vsementsov@virtuozzo.com>
-	<20180817182543.GK15372@localhost.localdomain>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <20662248-c334-6479-36a8-937f622151ab@virtuozzo.com>
-Date: Fri, 17 Aug 2018 21:59:41 +0300
+	(envelope-from <jsnow@redhat.com>) id 1fqkGP-0007Uk-Vz
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:18:26 -0400
+References: <20180817190457.8292-1-jsnow@redhat.com>
+	<20180817190457.8292-5-jsnow@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8290bf09-1525-a09b-5582-f20a70022025@redhat.com>
+Date: Fri, 17 Aug 2018 15:18:11 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180817182543.GK15372@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180817190457.8292-5-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] scripts: add render_block_graph
- function for QEMUMachine
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/7] block/commit: utilize job_exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,130 +24,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, crosa@redhat.com, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com, Max Reitz <mreitz@redhat.com>
 
-17.08.2018 21:25, Eduardo Habkost wrote:
-> On Fri, Aug 17, 2018 at 09:04:39PM +0300, Vladimir Sementsov-Ogievskiy wr=
-ote:
->> Render block nodes graph with help of graphviz. This new function is
->> for debugging, so there is no sense to put it into qemu.py as a method
->> of QEMUMachine. Let's instead put it separately.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   scripts/render_block_graph.py | 78 +++++++++++++++++++++++++++++++++++=
-++++++++
->>   1 file changed, 78 insertions(+)
->>   create mode 100644 scripts/render_block_graph.py
->>
->> diff --git a/scripts/render_block_graph.py b/scripts/render_block_graph.=
-py
->> new file mode 100644
->> index 0000000000..7048a0bac8
->> --- /dev/null
->> +++ b/scripts/render_block_graph.py
->> @@ -0,0 +1,78 @@
->> +# Render Qemu Block Graph
-> [...]
->
-> What about making the script work from the command-line?
->
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+
+
+On 08/17/2018 03:04 PM, John Snow wrote:
+> Change the manual deferment to commit_complete into the implicit
+> callback to job_exit, renaming commit_complete to commit_exit.
+>=20
+> This conversion does change the timing of when job_completed is
+> called to after the bdrv_replace_node and bdrv_unref calls, which
+> could have implications for bjob->blk which will now be put down
+> after this cleanup.
+>=20
+> Kevin highlights that we did not take any permissions for that backend
+> at job creation time, so it is safe to reorder these operations.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
-> diff --git a/scripts/render_block_graph.py b/scripts/render_block_graph.p=
-y
-> old mode 100644
-> new mode 100755
-> index 7048a0bac8..e29fe0fc41
-> --- a/scripts/render_block_graph.py
-> +++ b/scripts/render_block_graph.py
-> @@ -1,3 +1,4 @@
-> +#!/usr/bin/env python
->   # Render Qemu Block Graph
->   #
->   # Copyright (c) 2017 Parallels International GmbH
-> @@ -16,8 +17,9 @@
->   # along with this program.  If not, see <http://www.gnu.org/licenses/>.
->   #
->  =20
-> -import os
-> +import os, sys
->   from graphviz import Digraph
-> +from qmp.qmp import QEMUMonitorProtocol
->  =20
->   def perm(arr):
->       s =3D 'w' if 'write' in arr else '_'
-> @@ -27,16 +29,16 @@ def perm(arr):
->       s +=3D 's' if 'resize' in arr else '_'
->       return s
->  =20
-> -def render_block_graph(vm, filename, pointers=3DFalse, format=3D'png'):
-> +def render_block_graph(qmp, filename, pointers=3DFalse, format=3D'png'):
->       '''
->       Render graph in text (dot) representation into "@filename" and
->       representation in @format into "@filename.@format"
->       '''
->  =20
-> -    nodes =3D vm.command('query-named-block-nodes')
-> +    nodes =3D qmp.command('query-named-block-nodes')
->       nodes_info =3D {n['node-name']: n for n in nodes}
->  =20
-> -    block_graph =3D vm.command('x-query-block-graph')
-> +    block_graph =3D qmp.command('x-query-block-graph')
->  =20
->       graph =3D Digraph(comment=3D'Block Nodes Graph')
->       graph.format =3D format
-> @@ -76,3 +78,9 @@ def render_block_graph(vm, filename, pointers=3DFalse, =
-format=3D'png'):
->           graph.edge(str(e['parent']), str(e['child']), label=3Dlabel)
->  =20
->       graph.render(filename)
-> +
-> +if __name__ =3D=3D '__main__':
-> +    #TODO: use argparse for command-line arguments
-> +    qmp =3D QEMUMonitorProtocol(sys.argv[1])
-> +    qmp.connect()
-> +    render_block_graph(qmp, sys.argv[2])
->
->
+>  block/commit.c | 20 ++++----------------
+>  1 file changed, 4 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/block/commit.c b/block/commit.c
+> index 4a17bb73ec..93c3b6a39e 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
+> @@ -68,19 +68,13 @@ static int coroutine_fn commit_populate(BlockBacken=
+d *bs, BlockBackend *base,
+>      return 0;
+>  }
+> =20
+> -typedef struct {
+> -    int ret;
+> -} CommitCompleteData;
+> -
+> -static void commit_complete(Job *job, void *opaque)
+> +static void commit_exit(Job *job)
+>  {
+>      CommitBlockJob *s =3D container_of(job, CommitBlockJob, common.job=
+);
+>      BlockJob *bjob =3D &s->common;
+> -    CommitCompleteData *data =3D opaque;
+>      BlockDriverState *top =3D blk_bs(s->top);
+>      BlockDriverState *base =3D blk_bs(s->base);
+>      BlockDriverState *commit_top_bs =3D s->commit_top_bs;
+> -    int ret =3D data->ret;
+>      bool remove_commit_top_bs =3D false;
+> =20
+>      /* Make sure commit_top_bs and top stay around until bdrv_replace_=
+node() */
+> @@ -93,8 +87,8 @@ static void commit_complete(Job *job, void *opaque)
+> =20
+>      if (!job_is_cancelled(job) && ret =3D=3D 0) {
 
-Cool, thanks.
+forgot to actually squash the change in here that replaces `ret` with
+`job->ret`.
 
-so, how to use it then?
-
-for python iotest a proper parameter would be vm._qmp, yes?
-
-is there a way to dump running libvirt vm graph?
-
-I've started libvirt guest, qemu process has cmdline parameters
--chardev=20
-socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-3-tmp/monitor.s=
-ock,server,nowait
--mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol
-
-command
-virsh qemu-monitor-command tmp '{"execute": "x-query-block-graph"}'
-works fine,
-
-but script hangs on connection:
-# python ./scripts/render_block_graph.py=20
-/var/lib/libvirt/qemu/domain-3-tmp/monitor.sock
-^CTraceback (most recent call last):
- =C2=A0 File "./scripts/render_block_graph.py", line 85, in <module>
- =C2=A0=C2=A0=C2=A0 qmp.connect()
- =C2=A0 File "/work/src/qemu/up-new-fleecing/scripts/qmp/qmp.py", line 140,=
-=20
-in connect
- =C2=A0=C2=A0=C2=A0 self.__sock.connect(self.__address)
- =C2=A0 File "/usr/lib64/python2.7/socket.py", line 224, in meth
- =C2=A0=C2=A0=C2=A0 return getattr(self._sock,name)(*args)
-KeyboardInterrupt
-
-./scripts/qmp/qmp-shell /var/lib/libvirt/qemu/domain-3-tmp/monitor.sock
-outputs nothing...
-
+>          /* success */
+> -        ret =3D bdrv_drop_intermediate(s->commit_top_bs, base,
+> -                                     s->backing_file_str);
+> +        job->ret =3D bdrv_drop_intermediate(s->commit_top_bs, base,
+> +                                          s->backing_file_str);
+>      } else {
+>          /* XXX Can (or should) we somehow keep 'consistent read' block=
+ed even
+>           * after the failed/cancelled commit job is gone? If we alread=
+y wrote
+> @@ -117,9 +111,6 @@ static void commit_complete(Job *job, void *opaque)
+>       * bdrv_set_backing_hd() to fail. */
+>      block_job_remove_all_bdrv(bjob);
+> =20
+> -    job_completed(job, ret);
+> -    g_free(data);
+> -
+>      /* If bdrv_drop_intermediate() didn't already do that, remove the =
+commit
+>       * filter driver from the backing chain. Do this as the final step=
+ so that
+>       * the 'consistent read' permission can be granted.  */
+> @@ -137,7 +128,6 @@ static void commit_complete(Job *job, void *opaque)
+>  static int coroutine_fn commit_run(Job *job, Error **errp)
+>  {
+>      CommitBlockJob *s =3D container_of(job, CommitBlockJob, common.job=
+);
+> -    CommitCompleteData *data;
+>      int64_t offset;
+>      uint64_t delay_ns =3D 0;
+>      int ret =3D 0;
+> @@ -210,9 +200,6 @@ static int coroutine_fn commit_run(Job *job, Error =
+**errp)
+>  out:
+>      qemu_vfree(buf);
+> =20
+> -    data =3D g_malloc(sizeof(*data));
+> -    data->ret =3D ret;
+> -    job_defer_to_main_loop(&s->common.job, commit_complete, data);
+>      return ret;
+>  }
+> =20
+> @@ -224,6 +211,7 @@ static const BlockJobDriver commit_job_driver =3D {
+>          .user_resume   =3D block_job_user_resume,
+>          .drain         =3D block_job_drain,
+>          .run           =3D commit_run,
+> +        .exit          =3D commit_exit,
+>      },
+>  };
+> =20
+>=20
 
 --=20
-Best regards,
-Vladimir
+=E2=80=94js
