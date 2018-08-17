@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fqZEv-0006Om-Vk
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 03:32:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1fqZGT-00076K-7A
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 03:33:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fqZEs-0007rB-P5
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 03:32:09 -0400
-References: <CABLmASE2HTZPBVFM=grds+9RmPyh2naJ2KwNjb81LD0+E+yrtA@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <b897eaf6-9504-ddfc-ae60-1ac4a865d12e@redhat.com>
-Date: Fri, 17 Aug 2018 09:32:03 +0200
-MIME-Version: 1.0
-In-Reply-To: <CABLmASE2HTZPBVFM=grds+9RmPyh2naJ2KwNjb81LD0+E+yrtA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Bugs when cross-compiling qemu for Windows with
- mingw 8.1, executable doesn't run
+	(envelope-from <thuth@redhat.com>) id 1fqZGP-0000hF-UT
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 03:33:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59234 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fqZGP-0000gx-Ny
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 03:33:41 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 17 Aug 2018 09:33:33 +0200
+Message-Id: <1534491213-24748-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH] qom: Rename object_new_with_props to
+ object_new_child
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,175 +22,666 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>
+To: qemu-devel@nongnu.org, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-On 18.07.2018 08:33, Howard Spoelstra wrote:
-> Hi all,
->=20
-> I have two issues when cross compiling current master for Windows with
-> mingw 8.1. Host is Fedora29. See further below for gcc and mingw
-> versions.
->=20
-> Reproduce with:
-> ./configure --cross-prefix=3Dx86_64-w64-mingw32-
-> --target-list=3D"ppc-softmmu" --enable-gtk --with-gtkabi=3D3.0
-> --enable-sdl --with-sdlabi=3D2.0
->=20
-> Issue 1: Two bugs show up during compilation related to strncpy.
-> Replacing the offenders with memcpy seems to fix this.
->=20
-> First time:
-> block/sheepdog.c: In function 'find_vdi_name':
-> block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals
-> destination size [-Werror=3Dstringop-truncation]
->      strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
->      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> Second time:
-> migration/global_state.c: In function 'global_state_store_running':
-> migration/global_state.c:45:5: error: 'strncpy' specified bound 100
-> equals destination size [-Werror=3Dstringop-truncation]
->      strncpy((char *)global_state.runstate,
->      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->             state, sizeof(global_state.runstate));
->             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
+While adding the object_initialize_child() function, Paolo suggested
+to rename the similar object_new_with_props() function accordingly:
 
-These two reports should be independent of general functionality
-(sheepdog, migration). So what you see is most likely unrelated to this.
+http://marc.info/?i=e034610d-9a1d-a8a5-ee92-b2e3f0ba2891@redhat.com
 
-> Issue 2: once strncpy has been replaced with memcpy in these two
-> instances, I can successfully compile, but the executable doesn't run
-> in Windows.
-> I tried to debug, and this is what gdb told me:
->=20
-> (gdb) run
-> Starting program: c:\qemu-fedora29beta\qemu-system-ppc-debug.exe -L
-> c:\qemu-fedora29beta\pc-bios -boot c -m 256 -M "mac99,via=3Dpmu"
-> -prom-env "boot-args=3D-v" -prom-env "auto-boot?=3Dtrue" -prom-env
-> "vga-ndrv?=3Dtrue" -hda c:\Mac-disks\9.2.qcow2 -netdev
-> "user,id=3Dnetwork01" -device "sungem,netdev=3Dnetwork01" -sdl -d int
-> [New Thread 948.0x6d8]
-> [New Thread 948.0x2778]
-> [New Thread 948.0x286c]
-> [New Thread 948.0x3d0]
->=20
-> Program received signal SIGSEGV, Segmentation fault.
-> getpagesize () at util/oslib-win32.c:535
-> 535     util/oslib-win32.c: No such file or directory.
+This way it is more obvious that this function creates a new object
+as a child of another object.
 
-This warning is just from GDB, not able to locate you sources I guess.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/misc/auxbus.c                 |  4 +--
+ include/crypto/tlscredsanon.h    |  4 +--
+ include/crypto/tlscredspsk.h     |  4 +--
+ include/crypto/tlscredsx509.h    |  4 +--
+ include/qom/object.h             | 44 +++++++++++++--------------
+ iothread.c                       |  6 ++--
+ qom/object.c                     | 22 +++++++-------
+ tests/check-qom-proplist.c       | 66 +++++++++++++++++++---------------------
+ tests/test-crypto-block.c        |  2 +-
+ tests/test-crypto-secret.c       | 44 +++++++++++++--------------
+ tests/test-crypto-tlscredsx509.c |  2 +-
+ tests/test-crypto-tlssession.c   |  4 +--
+ tests/test-io-channel-tls.c      |  2 +-
+ ui/vnc.c                         | 28 ++++++++---------
+ 14 files changed, 116 insertions(+), 120 deletions(-)
 
-> (gdb) bt full
-> #0  getpagesize () at util/oslib-win32.c:535
-
-Wonder why we should get a SEGFAULT in that simple function. As
-discussed offline, the functionality in general seems to work (if this
-function is compiled and run independently in your environment).
-
-But maybe this backtrace is just misleading.
-
->         system_info =3D {{dwOemId =3D 56491488, {wProcessorArchitecture=
- =3D
-> 64992, wReserved =3D 861}}, dwPageSize =3D 0,
->           lpMinimumApplicationAddress =3D 0x99cca4
-> <register_module_init+60>, lpMaximumApplicationAddress =3D 0x3,
->           dwActiveProcessorMask =3D 11102192, dwNumberOfProcessors =3D
-> 56584576, dwProcessorType =3D 0,
->           dwAllocationGranularity =3D 200, wProcessorLevel =3D 0,
-> wProcessorRevision =3D 0}
-
-dwPageSize =3D 0, I assume this is some random data on the stack and
-GetSystemInfo never got executed. I wonder where this segfault comes from=
-.
-
-> #1  0x00000000009b7fcd in init_real_host_page_size () at util/pagesize.=
-c:16
-> No locals.
-> #2  0x00000000009bc5f2 in __do_global_ctors ()
-> No symbol table info available.
-> #3  0x00000000004013ca in __tmainCRTStartup () at ../crt/crtexe.c:324
->         lock_free =3D <optimized out>
->         fiberid =3D <optimized out>
->         nested =3D <optimized out>
->         lpszCommandLine =3D <optimized out>
->         StartupInfo =3D {cb =3D 104, lpReserved =3D 0x3778e00 "", lpDes=
-ktop
-> =3D 0x377f440 "Winsta0\\Default",
->           lpTitle =3D 0x3786280
-> "c:\\qemu-fedora29beta\\qemu-system-ppc-debug.exe", dwX =3D 0, dwY =3D =
-0,
-> dwXSize =3D 0,
->           dwYSize =3D 0, dwXCountChars =3D 0, dwYCountChars =3D 0,
-> dwFillAttribute =3D 0, dwFlags =3D 0, wShowWindow =3D 0,
->           cbReserved2 =3D 0, lpReserved2 =3D 0x0, hStdInput =3D
-> 0xffffffffffffffff, hStdOutput =3D 0xffffffffffffffff,
->           hStdError =3D 0xffffffffffffffff}
->         inDoubleQuote =3D <optimized out>
-> #4  0x00000000004014fb in WinMainCRTStartup () at ../crt/crtexe.c:184
->         ret =3D 255
-> (gdb)
->=20
->=20
-> Gcc and mingw versions used:
->=20
-> [hsp@localhost qemu-master]$ gcc -v
-> Using built-in specs.
-> COLLECT_GCC=3Dgcc
-> COLLECT_LTO_WRAPPER=3D/usr/libexec/gcc/x86_64-redhat-linux/8/lto-wrappe=
-r
-> OFFLOAD_TARGET_NAMES=3Dnvptx-none
-> OFFLOAD_TARGET_DEFAULT=3D1
-> Target: x86_64-redhat-linux
-> Configured with: ../configure --enable-bootstrap
-> --enable-languages=3Dc,c++,fortran,objc,obj-c++,ada,go,lto --prefix=3D/=
-usr
-> --mandir=3D/usr/share/man --infodir=3D/usr/share/info
-> --with-bugurl=3Dhttp://bugzilla.redhat.com/bugzilla --enable-shared
-> --enable-threads=3Dposix --enable-checking=3Drelease --enable-multilib
-> --with-system-zlib --enable-__cxa_atexit
-> --disable-libunwind-exceptions --enable-gnu-unique-object
-> --enable-linker-build-id --with-gcc-major-version-only
-> --with-linker-hash-style=3Dgnu --enable-plugin --enable-initfini-array
-> --with-isl --enable-libmpx --enable-offload-targets=3Dnvptx-none
-> --without-cuda-driver --enable-gnu-indirect-function --enable-cet
-> --with-tune=3Dgeneric --with-arch_32=3Di686 --build=3Dx86_64-redhat-lin=
-ux
-> Thread model: posix
-> gcc version 8.1.1 20180626 (Red Hat 8.1.1-4) (GCC)
->=20
-> [hsp@localhost qemu-master]$ x86_64-w64-mingw32-gcc -v
-> Using built-in specs.
-> COLLECT_GCC=3Dx86_64-w64-mingw32-gcc
-> COLLECT_LTO_WRAPPER=3D/usr/libexec/gcc/x86_64-w64-mingw32/8.1.0/lto-wra=
-pper
-> Target: x86_64-w64-mingw32
-> Configured with: ../configure --prefix=3D/usr --bindir=3D/usr/bin
-> --includedir=3D/usr/include --mandir=3D/usr/share/man
-> --infodir=3D/usr/share/info --datadir=3D/usr/share
-> --build=3Dx86_64-redhat-linux-gnu --host=3Dx86_64-redhat-linux-gnu
-> --with-gnu-as --with-gnu-ld --verbose --without-newlib
-> --disable-multilib --disable-plugin --with-system-zlib --disable-nls
-> --without-included-gettext --disable-win32-registry
-> --enable-languages=3Dc,c++,objc,obj-c++,fortran
-> --with-bugurl=3Dhttp://bugzilla.redhat.com/bugzilla --with-cloog
-> --enable-threads=3Dposix --enable-libgomp --target=3Dx86_64-w64-mingw32
-> --with-sysroot=3D/usr/x86_64-w64-mingw32/sys-root
-> --with-gxx-include-dir=3D/usr/x86_64-w64-mingw32/sys-root/mingw/include=
-/c++
-> Thread model: posix
-> gcc version 8.1.0 20180502 (Fedora MinGW 8.1.0-1.fc29) (GCC)
->=20
-> Thanks for looking into this,
->=20
-> Best,
-> Howard
->=20
-
-No being a win32/mingw expert, Stefan any idea?
-
---=20
-
-Thanks,
-
-David / dhildenb
+diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
+index 0e56d9a..c3729e5 100644
+--- a/hw/misc/auxbus.c
++++ b/hw/misc/auxbus.c
+@@ -67,8 +67,8 @@ AUXBus *aux_init_bus(DeviceState *parent, const char *name)
+     Object *auxtoi2c;
+ 
+     bus = AUX_BUS(qbus_create(TYPE_AUX_BUS, parent, name));
+-    auxtoi2c = object_new_with_props(TYPE_AUXTOI2C, OBJECT(bus), "i2c",
+-                                     &error_abort, NULL);
++    auxtoi2c = object_new_child(TYPE_AUXTOI2C, OBJECT(bus), "i2c",
++                                &error_abort, NULL);
+     qdev_set_parent_bus(DEVICE(auxtoi2c), BUS(bus));
+ 
+     bus->bridge = AUXTOI2C(auxtoi2c);
+diff --git a/include/crypto/tlscredsanon.h b/include/crypto/tlscredsanon.h
+index 4d6b7e4..7cfa03f 100644
+--- a/include/crypto/tlscredsanon.h
++++ b/include/crypto/tlscredsanon.h
+@@ -41,14 +41,14 @@ typedef struct QCryptoTLSCredsAnonClass QCryptoTLSCredsAnonClass;
+  * due to lacking MITM attack protection amongst other problems.
+  *
+  * This is a user creatable object, which can be instantiated
+- * via object_new_propv():
++ * via object_new_child():
+  *
+  * <example>
+  *   <title>Creating anonymous TLS credential objects in code</title>
+  *   <programlisting>
+  *   Object *obj;
+  *   Error *err = NULL;
+- *   obj = object_new_propv(TYPE_QCRYPTO_TLS_CREDS_ANON,
++ *   obj = object_new_child(TYPE_QCRYPTO_TLS_CREDS_ANON,
+  *                          "tlscreds0",
+  *                          &err,
+  *                          "endpoint", "server",
+diff --git a/include/crypto/tlscredspsk.h b/include/crypto/tlscredspsk.h
+index 306d36c..781ac56 100644
+--- a/include/crypto/tlscredspsk.h
++++ b/include/crypto/tlscredspsk.h
+@@ -39,14 +39,14 @@ typedef struct QCryptoTLSCredsPSKClass QCryptoTLSCredsPSKClass;
+  * of the Pre-Shared Key credential used to perform a TLS handshake.
+  *
+  * This is a user creatable object, which can be instantiated
+- * via object_new_propv():
++ * via object_new_child():
+  *
+  * <example>
+  *   <title>Creating TLS-PSK credential objects in code</title>
+  *   <programlisting>
+  *   Object *obj;
+  *   Error *err = NULL;
+- *   obj = object_new_propv(TYPE_QCRYPTO_TLS_CREDS_PSK,
++ *   obj = object_new_child(TYPE_QCRYPTO_TLS_CREDS_PSK,
+  *                          "tlscreds0",
+  *                          &err,
+  *                          "dir", "/path/to/dir",
+diff --git a/include/crypto/tlscredsx509.h b/include/crypto/tlscredsx509.h
+index 66ad6a7..d0ef017 100644
+--- a/include/crypto/tlscredsx509.h
++++ b/include/crypto/tlscredsx509.h
+@@ -45,14 +45,14 @@ typedef struct QCryptoTLSCredsX509Class QCryptoTLSCredsX509Class;
+  * of x509 credentials used to perform a TLS handshake.
+  *
+  * This is a user creatable object, which can be instantiated
+- * via object_new_propv():
++ * via object_new_child():
+  *
+  * <example>
+  *   <title>Creating x509 TLS credential objects in code</title>
+  *   <programlisting>
+  *   Object *obj;
+  *   Error *err = NULL;
+- *   obj = object_new_propv(TYPE_QCRYPTO_TLS_CREDS_X509,
++ *   obj = object_new_child(TYPE_QCRYPTO_TLS_CREDS_X509,
+  *                          "tlscreds0",
+  *                          &err,
+  *                          "endpoint", "server",
+diff --git a/include/qom/object.h b/include/qom/object.h
+index f0b0bf3..88f9b59 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -609,7 +609,7 @@ struct InterfaceClass
+ Object *object_new(const char *typename);
+ 
+ /**
+- * object_new_with_props:
++ * object_new_child:
+  * @typename:  The name of the type of the object to instantiate.
+  * @parent: the parent object
+  * @id: The unique ID of the object
+@@ -635,15 +635,15 @@ Object *object_new(const char *typename);
+  *   Error *err = NULL;
+  *   Object *obj;
+  *
+- *   obj = object_new_with_props(TYPE_MEMORY_BACKEND_FILE,
+- *                               object_get_objects_root(),
+- *                               "hostmem0",
+- *                               &err,
+- *                               "share", "yes",
+- *                               "mem-path", "/dev/shm/somefile",
+- *                               "prealloc", "yes",
+- *                               "size", "1048576",
+- *                               NULL);
++ *   obj = object_new_child(TYPE_MEMORY_BACKEND_FILE,
++ *                          object_get_objects_root(),
++ *                          "hostmem0",
++ *                          &err,
++ *                          "share", "yes",
++ *                          "mem-path", "/dev/shm/somefile",
++ *                          "prealloc", "yes",
++ *                          "size", "1048576",
++ *                          NULL);
+  *
+  *   if (!obj) {
+  *     g_printerr("Cannot create memory backend: %s\n",
+@@ -657,27 +657,27 @@ Object *object_new(const char *typename);
+  *
+  * Returns: The newly allocated, instantiated & initialized object.
+  */
+-Object *object_new_with_props(const char *typename,
+-                              Object *parent,
+-                              const char *id,
+-                              Error **errp,
+-                              ...) QEMU_SENTINEL;
++Object *object_new_child(const char *typename,
++                         Object *parent,
++                         const char *id,
++                         Error **errp,
++                         ...) QEMU_SENTINEL;
+ 
+ /**
+- * object_new_with_propv:
++ * object_new_childv:
+  * @typename:  The name of the type of the object to instantiate.
+  * @parent: the parent object
+  * @id: The unique ID of the object
+  * @errp: pointer to error object
+  * @vargs: list of property names and values
+  *
+- * See object_new_with_props() for documentation.
++ * See object_new_child() for documentation.
+  */
+-Object *object_new_with_propv(const char *typename,
+-                              Object *parent,
+-                              const char *id,
+-                              Error **errp,
+-                              va_list vargs);
++Object *object_new_childv(const char *typename,
++                          Object *parent,
++                          const char *id,
++                          Error **errp,
++                          va_list vargs);
+ 
+ /**
+  * object_set_props:
+diff --git a/iothread.c b/iothread.c
+index aff1281..02dfeaa 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -363,9 +363,9 @@ IOThread *iothread_create(const char *id, Error **errp)
+ {
+     Object *obj;
+ 
+-    obj = object_new_with_props(TYPE_IOTHREAD,
+-                                object_get_internal_root(),
+-                                id, errp, NULL);
++    obj = object_new_child(TYPE_IOTHREAD,
++                           object_get_internal_root(),
++                           id, errp, NULL);
+ 
+     return IOTHREAD(obj);
+ }
+diff --git a/qom/object.c b/qom/object.c
+index 75d1d48..aa3074a 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -557,28 +557,28 @@ Object *object_new(const char *typename)
+ }
+ 
+ 
+-Object *object_new_with_props(const char *typename,
+-                              Object *parent,
+-                              const char *id,
+-                              Error **errp,
+-                              ...)
++Object *object_new_child(const char *typename,
++                         Object *parent,
++                         const char *id,
++                         Error **errp,
++                         ...)
+ {
+     va_list vargs;
+     Object *obj;
+ 
+     va_start(vargs, errp);
+-    obj = object_new_with_propv(typename, parent, id, errp, vargs);
++    obj = object_new_childv(typename, parent, id, errp, vargs);
+     va_end(vargs);
+ 
+     return obj;
+ }
+ 
+ 
+-Object *object_new_with_propv(const char *typename,
+-                              Object *parent,
+-                              const char *id,
+-                              Error **errp,
+-                              va_list vargs)
++Object *object_new_childv(const char *typename,
++                          Object *parent,
++                          const char *id,
++                          Error **errp,
++                          va_list vargs)
+ {
+     Object *obj;
+     ObjectClass *klass;
+diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
+index 92898e1..b11ddf6 100644
+--- a/tests/check-qom-proplist.c
++++ b/tests/check-qom-proplist.c
+@@ -344,14 +344,14 @@ static void test_dummy_createv(void)
+     Error *err = NULL;
+     Object *parent = object_get_objects_root();
+     DummyObject *dobj = DUMMY_OBJECT(
+-        object_new_with_props(TYPE_DUMMY,
+-                              parent,
+-                              "dummy0",
+-                              &err,
+-                              "bv", "yes",
+-                              "sv", "Hiss hiss hiss",
+-                              "av", "platypus",
+-                              NULL));
++        object_new_child(TYPE_DUMMY,
++                         parent,
++                         "dummy0",
++                         &err,
++                         "bv", "yes",
++                         "sv", "Hiss hiss hiss",
++                         "av", "platypus",
++                         NULL));
+ 
+     g_assert(err == NULL);
+     g_assert_cmpstr(dobj->sv, ==, "Hiss hiss hiss");
+@@ -373,11 +373,7 @@ static Object *new_helper(Error **errp,
+     Object *obj;
+ 
+     va_start(vargs, parent);
+-    obj = object_new_with_propv(TYPE_DUMMY,
+-                                parent,
+-                                "dummy0",
+-                                errp,
+-                                vargs);
++    obj = object_new_childv(TYPE_DUMMY, parent, "dummy0", errp, vargs);
+     va_end(vargs);
+     return obj;
+ }
+@@ -452,14 +448,14 @@ static void test_dummy_badenum(void)
+     Error *err = NULL;
+     Object *parent = object_get_objects_root();
+     Object *dobj =
+-        object_new_with_props(TYPE_DUMMY,
+-                              parent,
+-                              "dummy0",
+-                              &err,
+-                              "bv", "yes",
+-                              "sv", "Hiss hiss hiss",
+-                              "av", "yeti",
+-                              NULL);
++        object_new_child(TYPE_DUMMY,
++                         parent,
++                         "dummy0",
++                         &err,
++                         "bv", "yes",
++                         "sv", "Hiss hiss hiss",
++                         "av", "yeti",
++                          NULL);
+ 
+     g_assert(dobj == NULL);
+     g_assert(err != NULL);
+@@ -479,7 +475,7 @@ static void test_dummy_getenum(void)
+     int val;
+     Object *parent = object_get_objects_root();
+     DummyObject *dobj = DUMMY_OBJECT(
+-        object_new_with_props(TYPE_DUMMY,
++        object_new_child(TYPE_DUMMY,
+                          parent,
+                          "dummy0",
+                          &err,
+@@ -521,14 +517,14 @@ static void test_dummy_iterator(void)
+ {
+     Object *parent = object_get_objects_root();
+     DummyObject *dobj = DUMMY_OBJECT(
+-        object_new_with_props(TYPE_DUMMY,
+-                              parent,
+-                              "dummy0",
+-                              &error_abort,
+-                              "bv", "yes",
+-                              "sv", "Hiss hiss hiss",
+-                              "av", "platypus",
+-                              NULL));
++        object_new_child(TYPE_DUMMY,
++                         parent,
++                         "dummy0",
++                         &error_abort,
++                         "bv", "yes",
++                         "sv", "Hiss hiss hiss",
++                         "av", "platypus",
++                         NULL));
+ 
+     ObjectProperty *prop;
+     ObjectPropertyIterator iter;
+@@ -563,11 +559,11 @@ static void test_dummy_delchild(void)
+ {
+     Object *parent = object_get_objects_root();
+     DummyDev *dev = DUMMY_DEV(
+-        object_new_with_props(TYPE_DUMMY_DEV,
+-                              parent,
+-                              "dev0",
+-                              &error_abort,
+-                              NULL));
++        object_new_child(TYPE_DUMMY_DEV,
++                         parent,
++                         "dev0",
++                         &error_abort,
++                         NULL));
+ 
+     object_unparent(OBJECT(dev));
+ }
+diff --git a/tests/test-crypto-block.c b/tests/test-crypto-block.c
+index fd29a04..6e14c47 100644
+--- a/tests/test-crypto-block.c
++++ b/tests/test-crypto-block.c
+@@ -239,7 +239,7 @@ static ssize_t test_block_write_func(QCryptoBlock *block,
+ 
+ static Object *test_block_secret(void)
+ {
+-    return object_new_with_props(
++    return object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+diff --git a/tests/test-crypto-secret.c b/tests/test-crypto-secret.c
+index 13fc6c4..335bd3d 100644
+--- a/tests/test-crypto-secret.c
++++ b/tests/test-crypto-secret.c
+@@ -27,7 +27,7 @@
+ 
+ static void test_secret_direct(void)
+ {
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -58,7 +58,7 @@ static void test_secret_indirect_good(void)
+ 
+     g_assert(write(fd, "123456", 6) == 6);
+ 
+-    sec = object_new_with_props(
++    sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -81,7 +81,7 @@ static void test_secret_indirect_good(void)
+ 
+ static void test_secret_indirect_badfile(void)
+ {
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -104,7 +104,7 @@ static void test_secret_indirect_emptyfile(void)
+     g_assert(fd >= 0);
+     g_assert_nonnull(fname);
+ 
+-    sec = object_new_with_props(
++    sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -127,7 +127,7 @@ static void test_secret_indirect_emptyfile(void)
+ 
+ static void test_secret_noconv_base64_good(void)
+ {
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -148,7 +148,7 @@ static void test_secret_noconv_base64_good(void)
+ 
+ static void test_secret_noconv_base64_bad(void)
+ {
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -163,7 +163,7 @@ static void test_secret_noconv_base64_bad(void)
+ 
+ static void test_secret_noconv_utf8(void)
+ {
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -184,7 +184,7 @@ static void test_secret_noconv_utf8(void)
+ 
+ static void test_secret_conv_base64_utf8valid(void)
+ {
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -205,7 +205,7 @@ static void test_secret_conv_base64_utf8valid(void)
+ 
+ static void test_secret_conv_base64_utf8invalid(void)
+ {
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -224,7 +224,7 @@ static void test_secret_conv_base64_utf8invalid(void)
+ 
+ static void test_secret_conv_utf8_base64(void)
+ {
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -244,7 +244,7 @@ static void test_secret_conv_utf8_base64(void)
+ 
+ static void test_secret_crypt_raw(void)
+ {
+-    Object *master = object_new_with_props(
++    Object *master = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "master",
+@@ -252,7 +252,7 @@ static void test_secret_crypt_raw(void)
+         "data", "9miloPQCzGy+TL6aonfzVcptibCmCIhKzrnlfwiWivk=",
+         "format", "base64",
+         NULL);
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -277,7 +277,7 @@ static void test_secret_crypt_raw(void)
+ 
+ static void test_secret_crypt_base64(void)
+ {
+-    Object *master = object_new_with_props(
++    Object *master = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "master",
+@@ -285,7 +285,7 @@ static void test_secret_crypt_base64(void)
+         "data", "9miloPQCzGy+TL6aonfzVcptibCmCIhKzrnlfwiWivk=",
+         "format", "base64",
+         NULL);
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -309,7 +309,7 @@ static void test_secret_crypt_base64(void)
+ 
+ static void test_secret_crypt_short_key(void)
+ {
+-    Object *master = object_new_with_props(
++    Object *master = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "master",
+@@ -317,7 +317,7 @@ static void test_secret_crypt_short_key(void)
+         "data", "9miloPQCzGy+TL6aonfzVc",
+         "format", "base64",
+         NULL);
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -335,7 +335,7 @@ static void test_secret_crypt_short_key(void)
+ 
+ static void test_secret_crypt_short_iv(void)
+ {
+-    Object *master = object_new_with_props(
++    Object *master = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "master",
+@@ -343,7 +343,7 @@ static void test_secret_crypt_short_iv(void)
+         "data", "9miloPQCzGy+TL6aonfzVcptibCmCIhKzrnlfwiWivk=",
+         "format", "base64",
+         NULL);
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -361,7 +361,7 @@ static void test_secret_crypt_short_iv(void)
+ 
+ static void test_secret_crypt_missing_iv(void)
+ {
+-    Object *master = object_new_with_props(
++    Object *master = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "master",
+@@ -369,7 +369,7 @@ static void test_secret_crypt_missing_iv(void)
+         "data", "9miloPQCzGy+TL6aonfzVcptibCmCIhKzrnlfwiWivk=",
+         "format", "base64",
+         NULL);
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+@@ -386,7 +386,7 @@ static void test_secret_crypt_missing_iv(void)
+ 
+ static void test_secret_crypt_bad_iv(void)
+ {
+-    Object *master = object_new_with_props(
++    Object *master = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "master",
+@@ -394,7 +394,7 @@ static void test_secret_crypt_bad_iv(void)
+         "data", "9miloPQCzGy+TL6aonfzVcptibCmCIhKzrnlfwiWivk=",
+         "format", "base64",
+         NULL);
+-    Object *sec = object_new_with_props(
++    Object *sec = object_new_child(
+         TYPE_QCRYPTO_SECRET,
+         object_get_objects_root(),
+         "sec0",
+diff --git a/tests/test-crypto-tlscredsx509.c b/tests/test-crypto-tlscredsx509.c
+index 30f9ac4..19d8aa0 100644
+--- a/tests/test-crypto-tlscredsx509.c
++++ b/tests/test-crypto-tlscredsx509.c
+@@ -42,7 +42,7 @@ static QCryptoTLSCreds *test_tls_creds_create(QCryptoTLSCredsEndpoint endpoint,
+                                               Error **errp)
+ {
+     Object *parent = object_get_objects_root();
+-    Object *creds = object_new_with_props(
++    Object *creds = object_new_child(
+         TYPE_QCRYPTO_TLS_CREDS_X509,
+         parent,
+         "testtlscreds",
+diff --git a/tests/test-crypto-tlssession.c b/tests/test-crypto-tlssession.c
+index 6fa9950..6e4c268 100644
+--- a/tests/test-crypto-tlssession.c
++++ b/tests/test-crypto-tlssession.c
+@@ -55,7 +55,7 @@ static QCryptoTLSCreds *test_tls_creds_psk_create(
+     const char *dir)
+ {
+     Object *parent = object_get_objects_root();
+-    Object *creds = object_new_with_props(
++    Object *creds = object_new_child(
+         TYPE_QCRYPTO_TLS_CREDS_PSK,
+         parent,
+         (endpoint == QCRYPTO_TLS_CREDS_ENDPOINT_SERVER ?
+@@ -187,7 +187,7 @@ static QCryptoTLSCreds *test_tls_creds_x509_create(
+     const char *certdir)
+ {
+     Object *parent = object_get_objects_root();
+-    Object *creds = object_new_with_props(
++    Object *creds = object_new_child(
+         TYPE_QCRYPTO_TLS_CREDS_X509,
+         parent,
+         (endpoint == QCRYPTO_TLS_CREDS_ENDPOINT_SERVER ?
+diff --git a/tests/test-io-channel-tls.c b/tests/test-io-channel-tls.c
+index 4900c6d..2118b61 100644
+--- a/tests/test-io-channel-tls.c
++++ b/tests/test-io-channel-tls.c
+@@ -68,7 +68,7 @@ static QCryptoTLSCreds *test_tls_creds_create(QCryptoTLSCredsEndpoint endpoint,
+                                               const char *certdir)
+ {
+     Object *parent = object_get_objects_root();
+-    Object *creds = object_new_with_props(
++    Object *creds = object_new_child(
+         TYPE_QCRYPTO_TLS_CREDS_X509,
+         parent,
+         (endpoint == QCRYPTO_TLS_CREDS_ENDPOINT_SERVER ?
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 3596932..4e1cefa 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3536,21 +3536,21 @@ vnc_display_create_creds(bool x509,
+     Error *err = NULL;
+ 
+     if (x509) {
+-        creds = object_new_with_props(TYPE_QCRYPTO_TLS_CREDS_X509,
+-                                      parent,
+-                                      credsid,
+-                                      &err,
+-                                      "endpoint", "server",
+-                                      "dir", dir,
+-                                      "verify-peer", x509verify ? "yes" : "no",
+-                                      NULL);
++        creds = object_new_child(TYPE_QCRYPTO_TLS_CREDS_X509,
++                                 parent,
++                                 credsid,
++                                 &err,
++                                 "endpoint", "server",
++                                 "dir", dir,
++                                 "verify-peer", x509verify ? "yes" : "no",
++                                  NULL);
+     } else {
+-        creds = object_new_with_props(TYPE_QCRYPTO_TLS_CREDS_ANON,
+-                                      parent,
+-                                      credsid,
+-                                      &err,
+-                                      "endpoint", "server",
+-                                      NULL);
++        creds = object_new_child(TYPE_QCRYPTO_TLS_CREDS_ANON,
++                                 parent,
++                                 credsid,
++                                 &err,
++                                 "endpoint", "server",
++                                 NULL);
+     }
+ 
+     g_free(credsid);
+-- 
+1.8.3.1
