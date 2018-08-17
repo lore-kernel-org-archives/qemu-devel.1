@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKG-000347-7X
+	(envelope-from <armbru@redhat.com>) id 1fqgKG-00034A-7Z
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKC-0001hX-RV
+	(envelope-from <armbru@redhat.com>) id 1fqgKB-0001g0-Oj
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57078 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56194 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKC-0001gc-Hh
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:04 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKB-0001fM-EI
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:03 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:07 +0200
-Message-Id: <20180817150559.16243-9-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:01 +0200
+Message-Id: <20180817150559.16243-3-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 08/60] check-qjson: Streamline
- escaped_string()'s test strings
+Subject: [Qemu-devel] [PATCH v2 02/60] check-qjson: Cover blank and
+ lexically erroneous input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +27,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Merge a few closely related test strings, and drop a few redundant
-ones.
+qobject_from_json() can return null without setting an error on
+lexical errors.  I call that a bug.  Add test coverage to demonstrate
+it.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/check-qjson.c | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
+ tests/check-qjson.c | 40 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 37 insertions(+), 3 deletions(-)
 
 diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 2f1890929d..730de46815 100644
+index cc952c56ea..4daadc272b 100644
 --- a/tests/check-qjson.c
 +++ b/tests/check-qjson.c
-@@ -56,18 +56,8 @@ static void escaped_string(void)
-         const char *utf8_out;
-         int skip;
-     } test_cases[] = {
--        { "\\b", "\b" },
--        { "\\f", "\f" },
--        { "\\n", "\n" },
--        { "\\r", "\r" },
--        { "\\t", "\t" },
--        { "/", "/" },
-+        { "\\b\\f\\n\\r\\t\\\\\\\"", "\b\f\n\r\t\\\"" },
-         { "\\/", "/", .skip = 1 },
--        { "\\\\", "\\" },
--        { "\\\"", "\"" },
--        { "hello world \\\"embedded string\\\"",
--          "hello world \"embedded string\"" },
--        { "hello world\\nwith new line", "hello world\nwith new line" },
-         { "single byte utf-8 \\u0020", "single byte utf-8  ", .skip = 1 },
-         { "double byte utf-8 \\u00A2", "double byte utf-8 \xc2\xa2" },
-         { "triple byte utf-8 \\u20AC", "triple byte utf-8 \xe2\x82\xac" },
+@@ -1307,8 +1307,40 @@ static void simple_varargs(void)
+ 
+ static void empty_input(void)
+ {
+-    const char *empty = "";
+-    QObject *obj = qobject_from_json(empty, &error_abort);
++    QObject *obj = qobject_from_json("", &error_abort);
++    g_assert(obj == NULL);
++}
++
++static void blank_input(void)
++{
++    QObject *obj = qobject_from_json("\n ", &error_abort);
++    g_assert(obj == NULL);
++}
++
++static void junk_input(void)
++{
++    /* Note: junk within strings is covered elsewhere */
++    Error *err = NULL;
++    QObject *obj;
++
++    obj = qobject_from_json("@", &err);
++    g_assert(!err);             /* BUG */
++    g_assert(obj == NULL);
++
++    obj = qobject_from_json("[0\xFF]", &err);
++    error_free_or_abort(&err);
++    g_assert(obj == NULL);
++
++    obj = qobject_from_json("00", &err);
++    g_assert(!err);             /* BUG */
++    g_assert(obj == NULL);
++
++    obj = qobject_from_json("[1e", &err);
++    g_assert(!err);             /* BUG */
++    g_assert(obj == NULL);
++
++    obj = qobject_from_json("truer", &err);
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ }
+ 
+@@ -1462,7 +1494,9 @@ int main(int argc, char **argv)
+ 
+     g_test_add_func("/varargs/simple_varargs", simple_varargs);
+ 
+-    g_test_add_func("/errors/empty_input", empty_input);
++    g_test_add_func("/errors/empty", empty_input);
++    g_test_add_func("/errors/blank", blank_input);
++    g_test_add_func("/errors/junk", junk_input);
+     g_test_add_func("/errors/unterminated/string", unterminated_string);
+     g_test_add_func("/errors/unterminated/escape", unterminated_escape);
+     g_test_add_func("/errors/unterminated/sq_string", unterminated_sq_string);
 -- 
 2.17.1
