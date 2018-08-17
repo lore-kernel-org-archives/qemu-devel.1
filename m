@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fqf7M-00076j-R1
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:48:45 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fqf85-0007RK-I3
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:49:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fqf7J-0004Q9-MX
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:48:44 -0400
-Received: from mail-by2nam05on0703.outbound.protection.outlook.com
-	([2a01:111:f400:fe52::703]:28128
-	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fqf7J-0004Pd-B6
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:48:41 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 17 Aug 2018 13:48:20 +0000
-Message-ID: <BN7PR08MB4868A7DAB03930DC49C88EFCC63D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1534431497-1385-41-git-send-email-aleksandar.markovic@rt-rk.com>
-	<97501a9d-c00f-7aba-1af2-256629f9abf5@linaro.org>
-	<BN7PR08MB486867F6E966AB071EAC4ADBC63E0@BN7PR08MB4868.namprd08.prod.outlook.com>,
-	<444c2388-6f96-71ae-db7c-38a1d72c8954@linaro.org>
-In-Reply-To: <444c2388-6f96-71ae-db7c-38a1d72c8954@linaro.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fqf84-0004ga-Rd
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:49:29 -0400
+References: <20180802144834.520904-1-eblake@redhat.com>
+	<20180802144834.520904-3-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <c7dc405d-0b83-b680-6e45-db4b211d3ef2@virtuozzo.com>
+Date: Fri, 17 Aug 2018 16:49:17 +0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v9 40/84] target/mips: Fix pre-nanoMIPS MT
- ASE instructions availability control
+In-Reply-To: <20180802144834.520904-3-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 2/4] nbd/server: Advertise actual minimum
+ block size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, rjones@redhat.com, qemu-block@nongnu.org
 
-
-> > I think some of the previously-implemented similar cases involving read=
--only bits were handled the same way, and we just built on that. What would=
- you suggest as a more appropriate solution in such cases (of accessing "pr=
-eset by hardware" bits)?
+02.08.2018 17:48, Eric Blake wrote:
+> Both NBD_CMD_BLOCK_STATUS and structured NBD_CMD_READ will split
+> their reply according to bdrv_block_status() boundaries. If the
+> block device has a request_alignment smaller than 512, but we
+> advertise a block alignment of 512 to the client, then this can
+> result in the server reply violating client expectations by
+> reporting a smaller region of the export than what the client
+> is permitted to address.  Thus, it is imperative that we
+> advertise the actual minimum block limit, rather than blindly
+> rounding it up to 512 (bdrv_block_status() cannot return status
+> aligned any smaller than request_alignment).
 >
-> Well, ctx->insn_flags and ctx->CP0_Config1 are good examples.
-> These are 100% read-only and fixed at cpu instantiation.
->=20
-> I see that CP0_Config3 has one writable bit for micromips, but
-> is fully readonly for nanomips.  Therefore XNP and MT need not
-> be copied to hflags because they will never vary.
->=20
-> I'd suggest copying CP0_Config3 to ctx as with Config1.
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>   nbd/server.c | 10 ++++++----
+>   1 file changed, 6 insertions(+), 4 deletions(-)
 >
->
-> r~
+> diff --git a/nbd/server.c b/nbd/server.c
+> index ea5fe0eb336..cd3c41f895b 100644
+> --- a/nbd/server.c
+> +++ b/nbd/server.c
+> @@ -608,10 +608,12 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint16_t myflags,
+>       /* Send NBD_INFO_BLOCK_SIZE always, but tweak the minimum size
+>        * according to whether the client requested it, and according to
+>        * whether this is OPT_INFO or OPT_GO. */
+> -    /* minimum - 1 for back-compat, or 512 if client is new enough.
+> -     * TODO: consult blk_bs(blk)->bl.request_alignment? */
+> -    sizes[0] =
+> -            (client->opt == NBD_OPT_INFO || blocksize) ? BDRV_SECTOR_SIZE : 1;
+> +    /* minimum - 1 for back-compat, or actual if client will obey it. */
+> +    if (client->opt == NBD_OPT_INFO || blocksize) {
+> +        sizes[0] = blk_get_request_alignment(exp->blk);
+> +    } else {
+> +        sizes[0] = 1;
+> +    }
+>       /* preferred - Hard-code to 4096 for now.
+>        * TODO: is blk_bs(blk)->bl.opt_transfer appropriate? */
+>       sizes[1] = 4096;
 
-Hi, Richard,
+Here, what about dirty bitmap export through BLOCK_STATUS? Could it's 
+granularity be less than request_alignment? Shouldn't we handle it somehow?
 
-The opinion within the team is that we should leave such changes for follow=
--up clean-up - clean-up of CP0-related functionalities is scheduled anyway =
-soon.
-
-The reason is that the current implementation (in v9) works fine, and this =
-is very late in our dev cycle to change features with no observed bugs.
-
-All other your concerns will be addressed in v10, which is planned to be se=
-nt soon.
-
-Yours,
-Aleksandar
+-- 
+Best regards,
+Vladimir
