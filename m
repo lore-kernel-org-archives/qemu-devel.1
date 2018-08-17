@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fqXcO-0005Mv-6i
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:48:17 -0400
+	(envelope-from <famz@redhat.com>) id 1fqXcR-0005Pf-5T
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fqXcN-00033C-4z
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:48:16 -0400
+	(envelope-from <famz@redhat.com>) id 1fqXcQ-00037j-8w
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:48:19 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 17 Aug 2018 13:47:56 +0800
-Message-Id: <20180817054758.14515-2-famz@redhat.com>
+Date: Fri, 17 Aug 2018 13:47:57 +0800
+Message-Id: <20180817054758.14515-3-famz@redhat.com>
 In-Reply-To: <20180817054758.14515-1-famz@redhat.com>
 References: <20180817054758.14515-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/3] file-posix: Skip effectiveless OFD lock
- operations
+Subject: [Qemu-devel] [PATCH v3 2/3] file-posix: Drop s->lock_fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,181 +22,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-If we know we've already locked the bytes, don't do it again; similarly
-don't unlock a byte if we haven't locked it. This doesn't change the
-behavior, but fixes a corner case explained below.
-
-Libvirt had an error handling bug that an image can get its (ownership,
-file mode, SELinux) permissions changed (RHBZ 1584982) by mistake behind
-QEMU. Specifically, an image in use by Libvirt VM has:
-
-    $ ls -lhZ b.img
-    -rw-r--r--. qemu qemu system_u:object_r:svirt_image_t:s0:c600,c690 b.img
-
-Trying to attach it a second time won't work because of image locking.
-And after the error, it becomes:
-
-    $ ls -lhZ b.img
-    -rw-r--r--. root root system_u:object_r:virt_image_t:s0 b.img
-
-Then, we won't be able to do OFD lock operations with the existing fd.
-In other words, the code such as in blk_detach_dev:
-
-    blk_set_perm(blk, 0, BLK_PERM_ALL, &error_abort);
-
-can abort() QEMU, out of environmental changes.
-
-This patch is an easy fix to this and the change is regardlessly
-reasonable, so do it.
+The lock_fd field is not strictly necessary because transferring locked
+bytes from old fd to the new one shouldn't fail anyway. This spares the
+user one fd per image.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-
 ---
-
-v3: Don't misuse s->perm and s->shared_perm.
-v2: For s == NULL, unlock all bits. [Kevin]
----
- block/file-posix.c | 54 +++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 44 insertions(+), 10 deletions(-)
+ block/file-posix.c | 37 +++++++++++++------------------------
+ 1 file changed, 13 insertions(+), 24 deletions(-)
 
 diff --git a/block/file-posix.c b/block/file-posix.c
-index fe83cbf0eb..f062e477e9 100644
+index f062e477e9..26d4e487d2 100644
 --- a/block/file-posix.c
 +++ b/block/file-posix.c
-@@ -152,6 +152,11 @@ typedef struct BDRVRawState {
-     uint64_t perm;
+@@ -142,7 +142,6 @@ do { \
+ 
+ typedef struct BDRVRawState {
+     int fd;
+-    int lock_fd;
+     bool use_lock;
+     int type;
+     int open_flags;
+@@ -153,7 +152,7 @@ typedef struct BDRVRawState {
      uint64_t shared_perm;
  
-+    /* The perms bits whose corresponding bytes are already locked in
-+     * s->lock_fd. */
-+    uint64_t locked_perm;
-+    uint64_t locked_shared_perm;
-+
- #ifdef CONFIG_XFS
-     bool is_xfs:1;
- #endif
-@@ -680,43 +685,72 @@ typedef enum {
-  * file; if @unlock == true, also unlock the unneeded bytes.
-  * @shared_perm_lock_bits is the mask of all permissions that are NOT shared.
-  */
--static int raw_apply_lock_bytes(int fd,
-+static int raw_apply_lock_bytes(BDRVRawState *s, int fd,
-                                 uint64_t perm_lock_bits,
-                                 uint64_t shared_perm_lock_bits,
-                                 bool unlock, Error **errp)
- {
-     int ret;
-     int i;
-+    uint64_t locked_perm, locked_shared_perm;
-+
-+    if (s) {
-+        locked_perm = s->locked_perm;
-+        locked_shared_perm = s->locked_shared_perm;
-+    } else {
-+        /*
-+         * We don't have the previous bits, just lock/unlock for each of the
-+         * requested bits.
-+         */
-+        if (unlock) {
-+            locked_perm = BLK_PERM_ALL;
-+            locked_shared_perm = BLK_PERM_ALL;
-+        } else {
-+            locked_perm = 0;
-+            locked_shared_perm = 0;
-+        }
-+    }
+     /* The perms bits whose corresponding bytes are already locked in
+-     * s->lock_fd. */
++     * s->fd. */
+     uint64_t locked_perm;
+     uint64_t locked_shared_perm;
  
-     PERM_FOREACH(i) {
-         int off = RAW_LOCK_PERM_BASE + i;
--        if (perm_lock_bits & (1ULL << i)) {
-+        uint64_t bit = (1ULL << i);
-+        if ((perm_lock_bits & bit) && !(locked_perm & bit)) {
-             ret = qemu_lock_fd(fd, off, 1, false);
-             if (ret) {
-                 error_setg(errp, "Failed to lock byte %d", off);
-                 return ret;
-+            } else if (s) {
-+                s->locked_perm |= bit;
-             }
--        } else if (unlock) {
-+        } else if (unlock && (locked_perm & bit) && !(perm_lock_bits & bit)) {
-             ret = qemu_unlock_fd(fd, off, 1);
-             if (ret) {
-                 error_setg(errp, "Failed to unlock byte %d", off);
-                 return ret;
-+            } else if (s) {
-+                s->locked_perm &= ~bit;
-             }
-         }
+@@ -542,18 +541,6 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
      }
-     PERM_FOREACH(i) {
-         int off = RAW_LOCK_SHARED_BASE + i;
--        if (shared_perm_lock_bits & (1ULL << i)) {
-+        uint64_t bit = (1ULL << i);
-+        if ((shared_perm_lock_bits & bit) && !(locked_shared_perm & bit)) {
-             ret = qemu_lock_fd(fd, off, 1, false);
-             if (ret) {
-                 error_setg(errp, "Failed to lock byte %d", off);
-                 return ret;
-+            } else if (s) {
-+                s->locked_shared_perm |= bit;
-             }
--        } else if (unlock) {
-+        } else if (unlock && (locked_shared_perm & bit) &&
-+                   !(shared_perm_lock_bits & bit)) {
-             ret = qemu_unlock_fd(fd, off, 1);
-             if (ret) {
-                 error_setg(errp, "Failed to unlock byte %d", off);
-                 return ret;
-+            } else if (s) {
-+                s->locked_shared_perm &= ~bit;
-             }
-         }
-     }
-@@ -788,7 +822,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
+     s->fd = fd;
  
+-    s->lock_fd = -1;
+-    if (s->use_lock) {
+-        fd = qemu_open(filename, s->open_flags);
+-        if (fd < 0) {
+-            ret = -errno;
+-            error_setg_errno(errp, errno, "Could not open '%s' for locking",
+-                             filename);
+-            qemu_close(s->fd);
+-            goto fail;
+-        }
+-        s->lock_fd = fd;
+-    }
+     s->perm = 0;
+     s->shared_perm = BLK_PERM_ALL;
+ 
+@@ -818,15 +805,13 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
+         return 0;
+     }
+ 
+-    assert(s->lock_fd > 0);
+-
      switch (op) {
      case RAW_PL_PREPARE:
--        ret = raw_apply_lock_bytes(s->lock_fd, s->perm | new_perm,
-+        ret = raw_apply_lock_bytes(s, s->lock_fd, s->perm | new_perm,
+-        ret = raw_apply_lock_bytes(s, s->lock_fd, s->perm | new_perm,
++        ret = raw_apply_lock_bytes(s, s->fd, s->perm | new_perm,
                                     ~s->shared_perm | ~new_shared,
                                     false, errp);
          if (!ret) {
-@@ -800,7 +834,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
+-            ret = raw_check_lock_bytes(s->lock_fd, new_perm, new_shared, errp);
++            ret = raw_check_lock_bytes(s->fd, new_perm, new_shared, errp);
+             if (!ret) {
+                 return 0;
+             }
+@@ -834,7 +819,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
          op = RAW_PL_ABORT;
          /* fall through to unlock bytes. */
      case RAW_PL_ABORT:
--        raw_apply_lock_bytes(s->lock_fd, s->perm, ~s->shared_perm,
-+        raw_apply_lock_bytes(s, s->lock_fd, s->perm, ~s->shared_perm,
+-        raw_apply_lock_bytes(s, s->lock_fd, s->perm, ~s->shared_perm,
++        raw_apply_lock_bytes(s, s->fd, s->perm, ~s->shared_perm,
                               true, &local_err);
          if (local_err) {
              /* Theoretically the above call only unlocks bytes and it cannot
-@@ -810,7 +844,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
+@@ -844,7 +829,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
          }
          break;
      case RAW_PL_COMMIT:
--        raw_apply_lock_bytes(s->lock_fd, new_perm, ~new_shared,
-+        raw_apply_lock_bytes(s, s->lock_fd, new_perm, ~new_shared,
+-        raw_apply_lock_bytes(s, s->lock_fd, new_perm, ~new_shared,
++        raw_apply_lock_bytes(s, s->fd, new_perm, ~new_shared,
                               true, &local_err);
          if (local_err) {
              /* Theoretically the above call only unlocks bytes and it cannot
-@@ -2209,7 +2243,7 @@ raw_co_create(BlockdevCreateOptions *options, Error **errp)
-     shared = BLK_PERM_ALL & ~BLK_PERM_RESIZE;
+@@ -956,10 +941,18 @@ static void raw_reopen_commit(BDRVReopenState *state)
+ {
+     BDRVRawReopenState *rs = state->opaque;
+     BDRVRawState *s = state->bs->opaque;
++    Error *local_err = NULL;
  
-     /* Step one: Take locks */
--    result = raw_apply_lock_bytes(fd, perm, ~shared, false, errp);
-+    result = raw_apply_lock_bytes(NULL, fd, perm, ~shared, false, errp);
-     if (result < 0) {
-         goto out_close;
-     }
-@@ -2250,7 +2284,7 @@ raw_co_create(BlockdevCreateOptions *options, Error **errp)
-     }
+     s->check_cache_dropped = rs->check_cache_dropped;
+     s->open_flags = rs->open_flags;
  
- out_unlock:
--    raw_apply_lock_bytes(fd, 0, 0, true, &local_err);
-+    raw_apply_lock_bytes(NULL, fd, 0, 0, true, &local_err);
-     if (local_err) {
-         /* The above call should not fail, and if it does, that does
-          * not mean the whole creation operation has failed.  So
++    /* Copy locks to the new fd before closing the old one. */
++    raw_apply_lock_bytes(NULL, rs->fd, s->locked_perm,
++                         ~s->locked_shared_perm, false, &local_err);
++    if (local_err) {
++        /* shouldn't fail in a sane host, but report it just in case. */
++        error_report_err(local_err);
++    }
+     qemu_close(s->fd);
+     s->fd = rs->fd;
+ 
+@@ -1952,10 +1945,6 @@ static void raw_close(BlockDriverState *bs)
+         qemu_close(s->fd);
+         s->fd = -1;
+     }
+-    if (s->lock_fd >= 0) {
+-        qemu_close(s->lock_fd);
+-        s->lock_fd = -1;
+-    }
+ }
+ 
+ /**
 -- 
 2.17.1
