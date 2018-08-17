@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKH-00034o-0D
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:17 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqgKI-00036T-TJ
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKD-0001iu-OW
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46128 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fqgKF-0001lG-32
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46438 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKD-0001h7-26
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:05 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKE-0001i8-B7
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:06 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:12 +0200
-Message-Id: <20180817150559.16243-14-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:17 +0200
+Message-Id: <20180817150559.16243-19-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 13/60] check-qjson: Fix utf8_string() to
- test all invalid sequences
+Subject: [Qemu-devel] [PATCH v2 18/60] json: Revamp lexer documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +26,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Some of utf8_string()'s test_cases[] contain multiple invalid
-sequences.  Testing that qobject_from_json() fails only tests we
-reject at least one invalid sequence.  That's incomplete.
-
-Additionally test each non-space sequence in isolation.
-
-This demonstrates that the JSON parser accepts invalid sequences
-starting with \xC2..\xF4.  Add a FIXME comment.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/check-qjson.c | 33 ++++++++++++++++++++++++++++-----
- 1 file changed, 28 insertions(+), 5 deletions(-)
+ qobject/json-lexer.c | 80 +++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 71 insertions(+), 9 deletions(-)
 
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index dd87a4962f..e81fbb95a3 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -20,6 +20,7 @@
- #include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
-+#include "qemu/unicode.h"
- #include "qemu-common.h"
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index e85e9a78ff..109a7d8bb8 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -18,21 +18,83 @@
+ #define MAX_TOKEN_SIZE (64ULL << 20)
  
- static QString *from_json_str(const char *jstr, Error **errp, bool single)
-@@ -410,7 +411,7 @@ static void utf8_string(void)
-             "\xC8 \xC9 \xCA \xCB \xCC \xCD \xCE \xCF "
-             "\xD0 \xD1 \xD2 \xD3 \xD4 \xD5 \xD6 \xD7 "
-             "\xD8 \xD9 \xDA \xDB \xDC \xDD \xDE \xDF ",
--            NULL,               /* bug: rejected */
-+            NULL,               /* bug: rejected (partly, see FIXME below) */
-             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
-             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
-             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
-@@ -429,7 +430,7 @@ static void utf8_string(void)
-         /* 3.2.3  All 8 first bytes of 4-byte sequences, followed by space */
-         {
-             "\xF0 \xF1 \xF2 \xF3 \xF4 \xF5 \xF6 \xF7 ",
--            NULL,               /* bug: rejected */
-+            NULL,               /* bug: rejected (partly, see FIXME below) */
-             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD ",
-         },
-         /* 3.2.4  All 4 first bytes of 5-byte sequences, followed by space */
-@@ -509,7 +510,7 @@ static void utf8_string(void)
-         {
-             "\xC0\xE0\x80\xF0\x80\x80\xF8\x80\x80\x80\xFC\x80\x80\x80\x80"
-             "\xDF\xEF\xBF\xF7\xBF\xBF\xFB\xBF\xBF\xBF\xFD\xBF\xBF\xBF\xBF",
--            NULL,               /* bug: rejected */
-+            NULL,               /* bug: rejected (partly, see FIXME below) */
-             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD"
-             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD",
-         },
-@@ -792,8 +793,8 @@ static void utf8_string(void)
-     };
-     int i, j;
-     QString *str;
--    const char *json_in, *utf8_out, *utf8_in, *json_out;
--    char *jstr;
-+    const char *json_in, *utf8_out, *utf8_in, *json_out, *tail;
-+    char *end, *in, *jstr;
+ /*
+- * Required by JSON (RFC 7159):
++ * From RFC 7159 "The JavaScript Object Notation (JSON) Data
++ * Interchange Format", with [comments in brackets]:
+  *
+- * \"([^\\\"]|\\[\"'\\/bfnrt]|\\u[0-9a-fA-F]{4})*\"
+- * -?(0|[1-9][0-9]*)(.[0-9]+)?([eE][-+]?[0-9]+)?
+- * [{}\[\],:]
+- * [a-z]+   # covers null, true, false
++ * The set of tokens includes six structural characters, strings,
++ * numbers, and three literal names.
+  *
+- * Extension of '' strings:
++ * These are the six structural characters:
+  *
+- * '([^\\']|\\[\"'\\/bfnrt]|\\u[0-9a-fA-F]{4})*'
++ *    begin-array     = ws %x5B ws  ; [ left square bracket
++ *    begin-object    = ws %x7B ws  ; { left curly bracket
++ *    end-array       = ws %x5D ws  ; ] right square bracket
++ *    end-object      = ws %x7D ws  ; } right curly bracket
++ *    name-separator  = ws %x3A ws  ; : colon
++ *    value-separator = ws %x2C ws  ; , comma
+  *
+- * Extension for vararg handling in JSON construction:
++ * Insignificant whitespace is allowed before or after any of the six
++ * structural characters.
++ * [This lexer accepts it before or after any token, which is actually
++ * the same, as the grammar always has structural characters between
++ * other tokens.]
+  *
+- * %((l|ll|I64)?d|[ipsf])
++ *    ws = *(
++ *           %x20 /              ; Space
++ *           %x09 /              ; Horizontal tab
++ *           %x0A /              ; Line feed or New line
++ *           %x0D )              ; Carriage return
+  *
++ * [...] three literal names:
++ *    false null true
++ *  [This lexer accepts [a-z]+, and leaves rejecting unknown literal
++ *  names to the parser.]
++ *
++ * [Numbers:]
++ *
++ *    number = [ minus ] int [ frac ] [ exp ]
++ *    decimal-point = %x2E       ; .
++ *    digit1-9 = %x31-39         ; 1-9
++ *    e = %x65 / %x45            ; e E
++ *    exp = e [ minus / plus ] 1*DIGIT
++ *    frac = decimal-point 1*DIGIT
++ *    int = zero / ( digit1-9 *DIGIT )
++ *    minus = %x2D               ; -
++ *    plus = %x2B                ; +
++ *    zero = %x30                ; 0
++ *
++ * [Strings:]
++ *    string = quotation-mark *char quotation-mark
++ *
++ *    char = unescaped /
++ *        escape (
++ *            %x22 /          ; "    quotation mark  U+0022
++ *            %x5C /          ; \    reverse solidus U+005C
++ *            %x2F /          ; /    solidus         U+002F
++ *            %x62 /          ; b    backspace       U+0008
++ *            %x66 /          ; f    form feed       U+000C
++ *            %x6E /          ; n    line feed       U+000A
++ *            %x72 /          ; r    carriage return U+000D
++ *            %x74 /          ; t    tab             U+0009
++ *            %x75 4HEXDIG )  ; uXXXX                U+XXXX
++ *    escape = %x5C              ; \
++ *    quotation-mark = %x22      ; "
++ *    unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
++ *
++ *
++ * Extensions over RFC 7159:
++ * - Extra escape sequence in strings:
++ *   0x27 (apostrophe) is recognized after escape, too
++ * - Single-quoted strings:
++ *   Like double-quoted strings, except they're delimited by %x27
++ *   (apostrophe) instead of %x22 (quotation mark), and can't contain
++ *   unescaped apostrophe, but can contain unescaped quotation mark.
++ * - Interpolation:
++ *   interpolation = %((l|ll|I64)[du]|[ipsf])
++ *
++ * Note:
++ * - Input must be encoded in UTF-8.
++ * - Decoding and validating is left to the parser.
+  */
  
-     for (i = 0; test_cases[i].json_in; i++) {
-         for (j = 0; j < 2; j++) {
-@@ -810,6 +811,28 @@ static void utf8_string(void)
-             } else {
-                 str = from_json_str(json_in, NULL, j);
-                 g_assert(!str);
-+                /*
-+                 * Failure may be due to any sequence, but *all* sequences
-+                 * are expected to fail.  Test each one in isolation.
-+                 */
-+                for (tail = json_in; *tail; tail = end) {
-+                    mod_utf8_codepoint(tail, 6, &end);
-+                    if (*end == ' ') {
-+                        end++;
-+                    }
-+                    in = strndup(tail, end - tail);
-+                    str = from_json_str(in, NULL, j);
-+                    /*
-+                     * FIXME JSON parser accepts invalid sequence
-+                     * starting with \xC2..\xF4
-+                     */
-+                    if (*in >= '\xC2' && *in <= '\xF4') {
-+                        g_free(str);
-+                        str = NULL;
-+                    }
-+                    g_assert(!str);
-+                    g_free(in);
-+                }
-             }
- 
-             /* Unparse @utf8_in, expect @json_out */
+ enum json_lexer_state {
 -- 
 2.17.1
