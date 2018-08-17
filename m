@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqTef-00056i-PQ
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 21:34:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fqTei-00058b-6m
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 21:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqTed-00066O-2c
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 21:34:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38966)
+	(envelope-from <ehabkost@redhat.com>) id 1fqTeg-0006A5-65
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 21:34:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fqTea-000645-Ai
-	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 21:34:18 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fqTef-000691-Kc
+	for qemu-devel@nongnu.org; Thu, 16 Aug 2018 21:34:21 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 16 Aug 2018 22:33:54 -0300
-Message-Id: <20180817013400.13353-3-ehabkost@redhat.com>
+Date: Thu, 16 Aug 2018 22:33:55 -0300
+Message-Id: <20180817013400.13353-4-ehabkost@redhat.com>
 In-Reply-To: <20180817013400.13353-1-ehabkost@redhat.com>
 References: <20180817013400.13353-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 2/8] i386: Add new MSR indices for IA32_PRED_CMD
- and IA32_ARCH_CAPABILITIES
+Subject: [Qemu-devel] [PULL 3/8] i386: Add CPUID bit and feature words for
+ IA32_ARCH_CAPABILITIES MSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +29,50 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Ed
 
 From: Robert Hoo <robert.hu@linux.intel.com>
 
-IA32_PRED_CMD MSR gives software a way to issue commands that affect the state
-of indirect branch predictors. Enumerated by CPUID.(EAX=7H,ECX=0):EDX[26].
-IA32_ARCH_CAPABILITIES MSR enumerates architectural features of RDCL_NO and
-IBRS_ALL. Enumerated by CPUID.(EAX=07H, ECX=0):EDX[29].
+Support of IA32_PRED_CMD MSR already be enumerated by same CPUID bit as
+SPEC_CTRL.
 
-https://software.intel.com/sites/default/files/managed/c5/63/336996-Speculative-Execution-Side-Channel-Mitigations.pdf
+At present, mark CPUID_7_0_EDX_ARCH_CAPABILITIES unmigratable, per Paolo's
+comment.
 
 Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-Message-Id: <1530781798-183214-2-git-send-email-robert.hu@linux.intel.com>
+Message-Id: <1530781798-183214-3-git-send-email-robert.hu@linux.intel.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.h | 2 ++
- 1 file changed, 2 insertions(+)
+ target/i386/cpu.h | 1 +
+ target/i386/cpu.c | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index c18863ec7a..b5c6686fe2 100644
+index b5c6686fe2..878444755f 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -354,6 +354,8 @@ typedef enum X86Seg {
- #define MSR_TSC_ADJUST                  0x0000003b
- #define MSR_IA32_SPEC_CTRL              0x48
- #define MSR_VIRT_SSBD                   0xc001011f
-+#define MSR_IA32_PRED_CMD               0x49
-+#define MSR_IA32_ARCH_CAPABILITIES      0x10a
- #define MSR_IA32_TSCDEADLINE            0x6e0
+@@ -690,6 +690,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
+ #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
+ #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
++#define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities*/
+ #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
  
- #define FEATURE_CONTROL_LOCKED                    (1<<0)
+ #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 723e02221e..2bf9fcc556 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1000,12 +1000,13 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, "spec-ctrl", NULL,
+-            NULL, NULL, NULL, "ssbd",
++            NULL, "arch-capabilities", NULL, "ssbd",
+         },
+         .cpuid_eax = 7,
+         .cpuid_needs_ecx = true, .cpuid_ecx = 0,
+         .cpuid_reg = R_EDX,
+         .tcg_features = TCG_7_0_EDX_FEATURES,
++        .unmigratable_flags = CPUID_7_0_EDX_ARCH_CAPABILITIES,
+     },
+     [FEAT_8000_0007_EDX] = {
+         .feat_names = {
 -- 
 2.18.0.rc1.1.g3f1ff2140
