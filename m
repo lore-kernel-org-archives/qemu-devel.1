@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKG-00034C-8B
+	(envelope-from <armbru@redhat.com>) id 1fqgKG-000344-6k
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKB-0001fY-Df
+	(envelope-from <armbru@redhat.com>) id 1fqgKC-0001hg-Tr
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46098 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56208 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKB-0001ef-4z
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:03 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKC-0001gg-Jy
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:04 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:00 +0200
-Message-Id: <20180817150559.16243-2-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:09 +0200
+Message-Id: <20180817150559.16243-11-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 01/60] check-qjson: Cover multiple JSON
- objects in same string
+Subject: [Qemu-devel] [PATCH v2 10/60] check-qjson: Consolidate partly
+ redundant string tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +27,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-qobject_from_json() & friends misbehave when the JSON text has more
-than one JSON value.  Add test coverage to demonstrate the bugs.
+simple_string() and single_quote_string() have become redundant with
+escaped_string(), except fot embedded single and double quotes.
+Replace them by a test that covers just that.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/check-qjson.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ tests/check-qjson.c | 64 ++++++++++-----------------------------------
+ 1 file changed, 14 insertions(+), 50 deletions(-)
 
 diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index eaf5d20663..cc952c56ea 100644
+index ce843283eb..e35942d922 100644
 --- a/tests/check-qjson.c
 +++ b/tests/check-qjson.c
-@@ -1418,6 +1418,25 @@ static void limits_nesting(void)
-     g_assert(obj == NULL);
+@@ -126,59 +126,24 @@ static void escaped_string(void)
+     }
  }
  
-+static void multiple_values(void)
-+{
-+    Error *err = NULL;
-+    QObject *obj;
-+
-+    /* BUG this leaks the syntax tree for "false" */
-+    obj = qobject_from_json("false true", &err);
-+    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
-+    g_assert(!err);
-+    qobject_unref(obj);
-+
-+    /* BUG simultaneously succeeds and fails */
-+    /* BUG calls json_parser_parse() with errp pointing to non-null */
-+    obj = qobject_from_json("} true", &err);
-+    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
-+    error_free_or_abort(&err);
-+    qobject_unref(obj);
-+}
-+
- int main(int argc, char **argv)
+-static void simple_string(void)
++static void string_with_quotes(void)
+ {
+-    int i;
+-    struct {
+-        const char *encoded;
+-        const char *decoded;
+-    } test_cases[] = {
+-        { "\"hello world\"", "hello world" },
+-        { "\"the quick brown fox jumped over the fence\"",
+-          "the quick brown fox jumped over the fence" },
+-        {}
++    const char *test_cases[] = {
++        "\"the bee's knees\"",
++        "'double quote \"'",
++        NULL
+     };
+-
+-    for (i = 0; test_cases[i].encoded; i++) {
+-        QObject *obj;
+-        QString *str;
+-
+-        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+-        str = qobject_to(QString, obj);
+-        g_assert(str);
+-        g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
+-
+-        str = qobject_to_json(obj);
+-        g_assert(strcmp(qstring_get_str(str), test_cases[i].encoded) == 0);
+-
+-        qobject_unref(obj);
+-        
+-        qobject_unref(str);
+-    }
+-}
+-
+-static void single_quote_string(void)
+-{
+     int i;
+-    struct {
+-        const char *encoded;
+-        const char *decoded;
+-    } test_cases[] = {
+-        { "'hello world'", "hello world" },
+-        { "'the quick brown fox \\' jumped over the fence'",
+-          "the quick brown fox ' jumped over the fence" },
+-        {}
+-    };
++    QString *str;
++    char *cstr;
+ 
+-    for (i = 0; test_cases[i].encoded; i++) {
+-        QObject *obj;
+-        QString *str;
+-
+-        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+-        str = qobject_to(QString, obj);
++    for (i = 0; test_cases[i]; i++) {
++        str = qobject_to(QString,
++                         qobject_from_json(test_cases[i], &error_abort));
+         g_assert(str);
+-        g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
+-
++        cstr = g_strndup(test_cases[i] + 1, strlen(test_cases[i]) - 2);
++        g_assert_cmpstr(qstring_get_str(str), ==, cstr);
++        g_free(cstr);
+         qobject_unref(str);
+     }
+ }
+@@ -1525,10 +1490,9 @@ int main(int argc, char **argv)
  {
      g_test_init(&argc, &argv, NULL);
-@@ -1455,6 +1474,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/errors/invalid_dict_comma", invalid_dict_comma);
-     g_test_add_func("/errors/unterminated/literal", unterminated_literal);
-     g_test_add_func("/errors/limits/nesting", limits_nesting);
-+    g_test_add_func("/errors/multiple_values", multiple_values);
  
-     return g_test_run();
- }
+-    g_test_add_func("/literals/string/simple", simple_string);
+     g_test_add_func("/literals/string/escaped", escaped_string);
++    g_test_add_func("/literals/string/quotes", string_with_quotes);
+     g_test_add_func("/literals/string/utf8", utf8_string);
+-    g_test_add_func("/literals/string/single_quote", single_quote_string);
+     g_test_add_func("/literals/string/vararg", vararg_string);
+ 
+     g_test_add_func("/literals/number/simple", simple_number);
 -- 
 2.17.1
