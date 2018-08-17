@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqk8L-0000x6-Aq
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:10:08 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fqk8v-0001Dr-7f
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:10:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fqk7y-0001gT-8l
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:09:43 -0400
-Date: Fri, 17 Aug 2018 16:09:20 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180817190920.GL15372@localhost.localdomain>
-References: <1b072083-700b-9853-e525-e2726bf17476@virtuozzo.com>
-	<20180817180440.49687-1-vsementsov@virtuozzo.com>
-	<20180817180440.49687-2-vsementsov@virtuozzo.com>
-	<20180817182543.GK15372@localhost.localdomain>
-	<20662248-c334-6479-36a8-937f622151ab@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20662248-c334-6479-36a8-937f622151ab@virtuozzo.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] scripts: add render_block_graph
- function for QEMUMachine
+	(envelope-from <jsnow@redhat.com>) id 1fqk43-0006wZ-7V
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 15:05:40 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Fri, 17 Aug 2018 15:04:56 -0400
+Message-Id: <20180817190457.8292-7-jsnow@redhat.com>
+In-Reply-To: <20180817190457.8292-1-jsnow@redhat.com>
+References: <20180817190457.8292-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH 6/7] jobs: utilize job_exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,140 +19,287 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, crosa@redhat.com, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Fri, Aug 17, 2018 at 09:59:41PM +0300, Vladimir Sementsov-Ogievskiy wr=
-ote:
-> 17.08.2018 21:25, Eduardo Habkost wrote:
-> > On Fri, Aug 17, 2018 at 09:04:39PM +0300, Vladimir Sementsov-Ogievski=
-y wrote:
-> > > Render block nodes graph with help of graphviz. This new function i=
-s
-> > > for debugging, so there is no sense to put it into qemu.py as a met=
-hod
-> > > of QEMUMachine. Let's instead put it separately.
-> > >=20
-> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
-om>
-> > > ---
-> > >   scripts/render_block_graph.py | 78 ++++++++++++++++++++++++++++++=
-+++++++++++++
-> > >   1 file changed, 78 insertions(+)
-> > >   create mode 100644 scripts/render_block_graph.py
-> > >=20
-> > > diff --git a/scripts/render_block_graph.py b/scripts/render_block_g=
-raph.py
-> > > new file mode 100644
-> > > index 0000000000..7048a0bac8
-> > > --- /dev/null
-> > > +++ b/scripts/render_block_graph.py
-> > > @@ -0,0 +1,78 @@
-> > > +# Render Qemu Block Graph
-> > [...]
-> >=20
-> > What about making the script work from the command-line?
-> >=20
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> > diff --git a/scripts/render_block_graph.py b/scripts/render_block_gra=
-ph.py
-> > old mode 100644
-> > new mode 100755
-> > index 7048a0bac8..e29fe0fc41
-> > --- a/scripts/render_block_graph.py
-> > +++ b/scripts/render_block_graph.py
-> > @@ -1,3 +1,4 @@
-> > +#!/usr/bin/env python
-> >   # Render Qemu Block Graph
-> >   #
-> >   # Copyright (c) 2017 Parallels International GmbH
-> > @@ -16,8 +17,9 @@
-> >   # along with this program.  If not, see <http://www.gnu.org/license=
-s/>.
-> >   #
-> > -import os
-> > +import os, sys
-> >   from graphviz import Digraph
-> > +from qmp.qmp import QEMUMonitorProtocol
-> >   def perm(arr):
-> >       s =3D 'w' if 'write' in arr else '_'
-> > @@ -27,16 +29,16 @@ def perm(arr):
-> >       s +=3D 's' if 'resize' in arr else '_'
-> >       return s
-> > -def render_block_graph(vm, filename, pointers=3DFalse, format=3D'png=
-'):
-> > +def render_block_graph(qmp, filename, pointers=3DFalse, format=3D'pn=
-g'):
-> >       '''
-> >       Render graph in text (dot) representation into "@filename" and
-> >       representation in @format into "@filename.@format"
-> >       '''
-> > -    nodes =3D vm.command('query-named-block-nodes')
-> > +    nodes =3D qmp.command('query-named-block-nodes')
-> >       nodes_info =3D {n['node-name']: n for n in nodes}
-> > -    block_graph =3D vm.command('x-query-block-graph')
-> > +    block_graph =3D qmp.command('x-query-block-graph')
-> >       graph =3D Digraph(comment=3D'Block Nodes Graph')
-> >       graph.format =3D format
-> > @@ -76,3 +78,9 @@ def render_block_graph(vm, filename, pointers=3DFal=
-se, format=3D'png'):
-> >           graph.edge(str(e['parent']), str(e['child']), label=3Dlabel=
-)
-> >       graph.render(filename)
-> > +
-> > +if __name__ =3D=3D '__main__':
-> > +    #TODO: use argparse for command-line arguments
-> > +    qmp =3D QEMUMonitorProtocol(sys.argv[1])
-> > +    qmp.connect()
-> > +    render_block_graph(qmp, sys.argv[2])
-> >=20
-> >=20
->=20
-> Cool, thanks.
->=20
-> so, how to use it then?
->=20
-> for python iotest a proper parameter would be vm._qmp, yes?
+Utilize the job_exit shim by not calling job_defer_to_main_loop, and
+where applicable, converting the deferred callback into the job_exit
+callback.
 
-Yes, assuming you just want to do it locally just for debugging.
+This converts backup, stream, create, and the unit tests all at once.
+None of these jobs undergo and order of operations changes, so it should
+be a mechanical change.
 
-One thing we could do later: refactor QEMUMachine and
-QEMUMonitorProtocol so their method names are the same and both
-'vm' and 'vm._qmp' work here.
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block/backup.c            | 16 ----------------
+ block/create.c            | 14 +++-----------
+ block/stream.c            | 22 +++++++---------------
+ tests/test-bdrv-drain.c   |  6 ------
+ tests/test-blockjob-txn.c | 11 ++---------
+ tests/test-blockjob.c     | 10 ++++------
+ 6 files changed, 16 insertions(+), 63 deletions(-)
 
->=20
-> is there a way to dump running libvirt vm graph?
->=20
-> I've started libvirt guest, qemu process has cmdline parameters
-> -chardev socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-3-=
-tmp/monitor.sock,server,nowait
-> -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol
->=20
-> command
-> virsh qemu-monitor-command tmp '{"execute": "x-query-block-graph"}'
-> works fine,
->=20
-> but script hangs on connection:
-> # python ./scripts/render_block_graph.py
-> /var/lib/libvirt/qemu/domain-3-tmp/monitor.sock
-> ^CTraceback (most recent call last):
-> =A0 File "./scripts/render_block_graph.py", line 85, in <module>
-> =A0=A0=A0 qmp.connect()
-> =A0 File "/work/src/qemu/up-new-fleecing/scripts/qmp/qmp.py", line 140,=
- in
-> connect
-> =A0=A0=A0 self.__sock.connect(self.__address)
-> =A0 File "/usr/lib64/python2.7/socket.py", line 224, in meth
-> =A0=A0=A0 return getattr(self._sock,name)(*args)
-> KeyboardInterrupt
->=20
-> ./scripts/qmp/qmp-shell /var/lib/libvirt/qemu/domain-3-tmp/monitor.sock
-> outputs nothing...
-
-I don't know why it doesn't work with a running instance started
-by libvirt, but it works if I run QEMU manually using "-qmp
-unix:/tmp/qmp,server".
-
---=20
-Eduardo
+diff --git a/block/backup.c b/block/backup.c
+index 1e965d54e5..a67b7fa96b 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -380,18 +380,6 @@ static BlockErrorAction backup_error_action(BackupBlockJob *job,
+     }
+ }
+ 
+-typedef struct {
+-    int ret;
+-} BackupCompleteData;
+-
+-static void backup_complete(Job *job, void *opaque)
+-{
+-    BackupCompleteData *data = opaque;
+-
+-    job_completed(job, data->ret);
+-    g_free(data);
+-}
+-
+ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
+ {
+     uint64_t delay_ns;
+@@ -483,7 +471,6 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+ static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
+ {
+     BackupBlockJob *job = container_of(opaque_job, BackupBlockJob, common.job);
+-    BackupCompleteData *data;
+     BlockDriverState *bs = blk_bs(job->common.blk);
+     int64_t offset, nb_clusters;
+     int ret = 0;
+@@ -584,9 +571,6 @@ static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
+     qemu_co_rwlock_unlock(&job->flush_rwlock);
+     hbitmap_free(job->copy_bitmap);
+ 
+-    data = g_malloc(sizeof(*data));
+-    data->ret = ret;
+-    job_defer_to_main_loop(&job->common.job, backup_complete, data);
+     return ret;
+ }
+ 
+diff --git a/block/create.c b/block/create.c
+index 26a385c6c7..95341219ef 100644
+--- a/block/create.c
++++ b/block/create.c
+@@ -34,28 +34,20 @@ typedef struct BlockdevCreateJob {
+     Job common;
+     BlockDriver *drv;
+     BlockdevCreateOptions *opts;
+-    int ret;
+ } BlockdevCreateJob;
+ 
+-static void blockdev_create_complete(Job *job, void *opaque)
+-{
+-    BlockdevCreateJob *s = container_of(job, BlockdevCreateJob, common);
+-
+-    job_completed(job, s->ret);
+-}
+-
+ static int coroutine_fn blockdev_create_run(Job *job, Error **errp)
+ {
+     BlockdevCreateJob *s = container_of(job, BlockdevCreateJob, common);
++    int ret;
+ 
+     job_progress_set_remaining(&s->common, 1);
+-    s->ret = s->drv->bdrv_co_create(s->opts, errp);
++    ret = s->drv->bdrv_co_create(s->opts, errp);
+     job_progress_update(&s->common, 1);
+ 
+     qapi_free_BlockdevCreateOptions(s->opts);
+-    job_defer_to_main_loop(&s->common, blockdev_create_complete, NULL);
+ 
+-    return s->ret;
++    return ret;
+ }
+ 
+ static const JobDriver blockdev_create_job_driver = {
+diff --git a/block/stream.c b/block/stream.c
+index 26a775386b..67e1e72e23 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -54,20 +54,16 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
+     return blk_co_preadv(blk, offset, qiov.size, &qiov, BDRV_REQ_COPY_ON_READ);
+ }
+ 
+-typedef struct {
+-    int ret;
+-} StreamCompleteData;
+-
+-static void stream_complete(Job *job, void *opaque)
++static void stream_exit(Job *job)
+ {
+     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
+     BlockJob *bjob = &s->common;
+-    StreamCompleteData *data = opaque;
+     BlockDriverState *bs = blk_bs(bjob->blk);
+     BlockDriverState *base = s->base;
+     Error *local_err = NULL;
++    int ret = job->ret;
+ 
+-    if (!job_is_cancelled(job) && bs->backing && data->ret == 0) {
++    if (!job_is_cancelled(job) && bs->backing && ret == 0) {
+         const char *base_id = NULL, *base_fmt = NULL;
+         if (base) {
+             base_id = s->backing_file_str;
+@@ -75,11 +71,11 @@ static void stream_complete(Job *job, void *opaque)
+                 base_fmt = base->drv->format_name;
+             }
+         }
+-        data->ret = bdrv_change_backing_file(bs, base_id, base_fmt);
++        ret = bdrv_change_backing_file(bs, base_id, base_fmt);
+         bdrv_set_backing_hd(bs, base, &local_err);
+         if (local_err) {
+             error_report_err(local_err);
+-            data->ret = -EPERM;
++            ret = -EPERM;
+             goto out;
+         }
+     }
+@@ -93,14 +89,12 @@ out:
+     }
+ 
+     g_free(s->backing_file_str);
+-    job_completed(job, data->ret);
+-    g_free(data);
++    job->ret = ret;
+ }
+ 
+ static int coroutine_fn stream_run(Job *job, Error **errp)
+ {
+     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
+-    StreamCompleteData *data;
+     BlockBackend *blk = s->common.blk;
+     BlockDriverState *bs = blk_bs(blk);
+     BlockDriverState *base = s->base;
+@@ -203,9 +197,6 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
+ 
+ out:
+     /* Modify backing chain and close BDSes in main loop */
+-    data = g_malloc(sizeof(*data));
+-    data->ret = ret;
+-    job_defer_to_main_loop(&s->common.job, stream_complete, data);
+     return ret;
+ }
+ 
+@@ -215,6 +206,7 @@ static const BlockJobDriver stream_job_driver = {
+         .job_type      = JOB_TYPE_STREAM,
+         .free          = block_job_free,
+         .run           = stream_run,
++        .exit          = stream_exit,
+         .user_resume   = block_job_user_resume,
+         .drain         = block_job_drain,
+     },
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 00604dfc0c..9bcb3c72af 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -752,11 +752,6 @@ typedef struct TestBlockJob {
+     bool should_complete;
+ } TestBlockJob;
+ 
+-static void test_job_completed(Job *job, void *opaque)
+-{
+-    job_completed(job, 0);
+-}
+-
+ static int coroutine_fn test_job_run(Job *job, Error **errp)
+ {
+     TestBlockJob *s = container_of(job, TestBlockJob, common.job);
+@@ -770,7 +765,6 @@ static int coroutine_fn test_job_run(Job *job, Error **errp)
+         job_pause_point(&s->common.job);
+     }
+ 
+-    job_defer_to_main_loop(&s->common.job, test_job_completed, NULL);
+     return 0;
+ }
+ 
+diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+index 82cedee78b..ef29f35e44 100644
+--- a/tests/test-blockjob-txn.c
++++ b/tests/test-blockjob-txn.c
+@@ -24,17 +24,11 @@ typedef struct {
+     int *result;
+ } TestBlockJob;
+ 
+-static void test_block_job_complete(Job *job, void *opaque)
++static void test_block_job_exit(Job *job)
+ {
+     BlockJob *bjob = container_of(job, BlockJob, job);
+     BlockDriverState *bs = blk_bs(bjob->blk);
+-    int rc = (intptr_t)opaque;
+ 
+-    if (job_is_cancelled(job)) {
+-        rc = -ECANCELED;
+-    }
+-
+-    job_completed(job, rc);
+     bdrv_unref(bs);
+ }
+ 
+@@ -54,8 +48,6 @@ static int coroutine_fn test_block_job_run(Job *job, Error **errp)
+         }
+     }
+ 
+-    job_defer_to_main_loop(job, test_block_job_complete,
+-                           (void *)(intptr_t)s->rc);
+     return s->rc;
+ }
+ 
+@@ -81,6 +73,7 @@ static const BlockJobDriver test_block_job_driver = {
+         .user_resume   = block_job_user_resume,
+         .drain         = block_job_drain,
+         .run           = test_block_job_run,
++        .exit          = test_block_job_exit,
+     },
+ };
+ 
+diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+index 408a226939..ad4a65bc78 100644
+--- a/tests/test-blockjob.c
++++ b/tests/test-blockjob.c
+@@ -163,11 +163,10 @@ typedef struct CancelJob {
+     bool completed;
+ } CancelJob;
+ 
+-static void cancel_job_completed(Job *job, void *opaque)
++static void cancel_job_exit(Job *job)
+ {
+-    CancelJob *s = opaque;
++    CancelJob *s = container_of(job, CancelJob, common.job);
+     s->completed = true;
+-    job_completed(job, 0);
+ }
+ 
+ static void cancel_job_complete(Job *job, Error **errp)
+@@ -182,7 +181,7 @@ static int coroutine_fn cancel_job_run(Job *job, Error **errp)
+ 
+     while (!s->should_complete) {
+         if (job_is_cancelled(&s->common.job)) {
+-            goto defer;
++            return 0;
+         }
+ 
+         if (!job_is_ready(&s->common.job) && s->should_converge) {
+@@ -192,8 +191,6 @@ static int coroutine_fn cancel_job_run(Job *job, Error **errp)
+         job_sleep_ns(&s->common.job, 100000);
+     }
+ 
+- defer:
+-    job_defer_to_main_loop(&s->common.job, cancel_job_completed, s);
+     return 0;
+ }
+ 
+@@ -204,6 +201,7 @@ static const BlockJobDriver test_cancel_driver = {
+         .user_resume   = block_job_user_resume,
+         .drain         = block_job_drain,
+         .run           = cancel_job_run,
++        .exit          = cancel_job_exit,
+         .complete      = cancel_job_complete,
+     },
+ };
+-- 
+2.14.4
