@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cminyard@mvista.com>) id 1fqief-0006Dp-Ua
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:35:26 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fqihK-0007k7-Jj
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:38:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cminyard@mvista.com>) id 1fqieY-00063i-J0
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:35:19 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:43523)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1fqieY-00062q-9a
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:35:14 -0400
-Received: by mail-oi0-x242.google.com with SMTP id b15-v6so15266345oib.10
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 10:35:11 -0700 (PDT)
-References: <1512683181-8420-1-git-send-email-minyard@acm.org>
-	<1512683181-8420-2-git-send-email-minyard@acm.org>
-	<3d8659d1-57ba-3043-7098-5b74c28c34bb@redhat.com>
-From: Corey Minyard <cminyard@mvista.com>
-Message-ID: <a77d2165-bc5f-7e89-e83f-a6057acbdeaf@mvista.com>
-Date: Fri, 17 Aug 2018 12:33:02 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fqihG-0004tw-Bg
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:38:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51050 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fqihG-0004sT-3N
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:38:02 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A0E5A819703D
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 17:38:01 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 17 Aug 2018 19:37:52 +0200
+Message-Id: <20180817173752.19136-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3d8659d1-57ba-3043-7098-5b74c28c34bb@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH 01/14] i2c:pm_smbus: Clean up some style
- issues
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] monitor: accept input on resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, minyard@acm.org, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 08/17/2018 12:24 PM, Paolo Bonzini wrote:
-> On 07/12/2017 22:46, minyard@acm.org wrote:
->> From: Corey Minyard <cminyard@mvista.com>
->>
->> Fix some spacing issues, remove extraneous comments, add some
->> defines instead of hard-coding numbers.
->>
->> Signed-off-by: Corey Minyard <cminyard@mvista.com>
->> Cc: Michael S. Tsirkin <mst@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>   hw/i2c/pm_smbus.c | 58 ++++++++++++++++++++++++++++++++++++-------------------
->>   1 file changed, 38 insertions(+), 20 deletions(-)
-> Hi Corey, I just found this patch and the rest of the series.  If it
-> still applies, could you please resend it?
->
-> Thanks,
->
-> Paolo
+A chardev may stop trying to write if the associated can_read()
+callback returned 0. This happens when the monitor is suspended.
+The frontend is supposed to call qemu_chr_fe_accept_input() when it is
+ready to accept data again.
 
-I've been meaning to resend this and some other thing, but I've been
-distracted with a lot of other things.  I'll resend as soon as I can.  
-Is this
-pressing for another reason?  I can increase the priority if so.
+An issue was observed with a spice port: pending commands may be
+delayed, as the chardev is not flushed. Most chardev don't use the
+accept_input() callback, and instead check regularly if they can
+write. The ones that do use it are braille, mux, msmouse,
+spice (abstract), spicevmc, spiceport, wctablet.
 
--corey
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Markus Armbruster <armbru@redhat.com>
+---
+ monitor.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/monitor.c b/monitor.c
+index a1999e396c..33823b035a 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4407,6 +4407,7 @@ void monitor_resume(Monitor *mon)
+             assert(mon->rs);
+             readline_show_prompt(mon->rs);
+         }
++        qemu_chr_fe_accept_input(&mon->chr);
+     }
+     trace_monitor_suspend(mon, -1);
+ }
+--=20
+2.18.0.547.g1d89318c48
