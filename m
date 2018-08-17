@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMg-0004ph-83
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMe-0004n6-F2
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMZ-0007cf-6F
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:33 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45449 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMX-0007Z9-2V
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:31 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:44735 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqfMY-0007ZS-AR
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:26 -0400
+	id 1fqfMW-0007Uw-9o
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:24 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 17 Aug 2018 16:03:49 +0200
-Message-Id: <1534514633-13725-62-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 17 Aug 2018 16:03:29 +0200
+Message-Id: <1534514633-13725-42-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534514633-13725-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534514633-13725-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v10 61/65] linux-user: Add nanoMIPS linux user
- mode configuration support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v10 41/65] mips_malta: Add setting up GT64120
+ BARs to the nanoMIPS bootloader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +31,239 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Paul Burton <pburton@wavecomp.com>
 
-Add new linux user mode configuration for nanoMIPS.
+Setup the GT64120 BARs in the nanoMIPS bootloader, in the same way that
+they are setup in the MIPS32 bootloader. This is necessary for Linux to
+be able to access peripherals, including the UART.
 
-Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Paul Burton <pburton@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- configure                               | 13 ++++++++++++-
- default-configs/nanomips-linux-user.mak |  1 +
- 2 files changed, 13 insertions(+), 1 deletion(-)
- create mode 100644 default-configs/nanomips-linux-user.mak
+ hw/mips/mips_malta.c | 177 +++++++++++++++++++++++++++++++++++++++++++++=
++-----
+ 1 file changed, 160 insertions(+), 17 deletions(-)
 
-diff --git a/configure b/configure
-index db97930..becec5a 100755
---- a/configure
-+++ b/configure
-@@ -742,6 +742,9 @@ case "$cpu" in
-     supported_cpu="yes"
-     cross_cc_mips=$host_cc
-   ;;
-+  nanomips*)
-+    cpu="mips"
-+  ;;
-   sparc|sun4[cdmuv])
-     cpu="sparc"
-     supported_cpu="yes"
-@@ -6883,7 +6886,7 @@ target_name=$(echo $target | cut -d '-' -f 1)
- target_bigendian="no"
- 
- case "$target_name" in
--  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
-+  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|nanomipseb|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
-   target_bigendian=yes
-   ;;
- esac
-@@ -6999,6 +7002,11 @@ case "$target_name" in
-   moxie)
-     target_compiler=$cross_cc_moxie
-   ;;
-+  nanomips|nanomipseb)
-+    TARGET_ARCH=nanomips
-+    TARGET_BASE_ARCH=mips
-+    echo "TARGET_ABI_MIPSP32=y" >> $config_target_mak
-+  ;;
-   nios2)
-     target_compiler=$cross_cc_nios2
-   ;;
-@@ -7256,6 +7264,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-   moxie*)
-     disas_config "MOXIE"
-   ;;
-+  nanomips*)
-+    disas_config "MIPS"
-+  ;;
-   nios2)
-     disas_config "NIOS2"
-   ;;
-diff --git a/default-configs/nanomips-linux-user.mak b/default-configs/nanomips-linux-user.mak
-new file mode 100644
-index 0000000..68fc1f7
---- /dev/null
-+++ b/default-configs/nanomips-linux-user.mak
-@@ -0,0 +1 @@
-+# Default configuration for nanomips-linux-user
--- 
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 2e851d9..f261dd6 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -609,47 +609,190 @@ static void write_bootloader_nanomips(uint8_t *bas=
+e, int64_t run_addr,
+=20
+ #define NM_HI1(VAL) (((VAL) >> 16) & 0x1f)
+ #define NM_HI2(VAL) \
+-            (((VAL) & 0xf000) | (((VAL) >> 19) & 0xffc) | (((VAL) >> 31)=
+ & 0x1))
++          (((VAL) & 0xf000) | (((VAL) >> 19) & 0xffc) | (((VAL) >> 31) &=
+ 0x1))
+ #define NM_LO(VAL)  ((VAL) & 0xfff)
+=20
+-    stw_p(p++, 0x2800); stw_p(p++, 0x001c); /* bc to_here */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x2800); stw_p(p++, 0x001c);
++                                /* bc to_here */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
+=20
+     /* to_here: */
+-    stw_p(p++, 0x0080); stw_p(p++, 0x0002); /* li a0,2 */
++    stw_p(p++, 0x0080); stw_p(p++, 0x0002);
++                                /* li a0,2                      */
++
+     stw_p(p++, 0xe3a0 | NM_HI1(ENVP_ADDR - 64));
++
+     stw_p(p++, NM_HI2(ENVP_ADDR - 64));
+-                                /* lui sp,%hi(ENVP_ADDR - 64) */
++                                /* lui sp,%hi(ENVP_ADDR - 64)   */
++
+     stw_p(p++, 0x83bd); stw_p(p++, NM_LO(ENVP_ADDR - 64));
+                                 /* ori sp,sp,%lo(ENVP_ADDR - 64) */
++
+     stw_p(p++, 0xe0a0 | NM_HI1(ENVP_ADDR));
++
+     stw_p(p++, NM_HI2(ENVP_ADDR));
+-                                /* lui a1,%hi(ENVP_ADDR) */
++                                /* lui a1,%hi(ENVP_ADDR)        */
++
+     stw_p(p++, 0x80a5); stw_p(p++, NM_LO(ENVP_ADDR));
+-                                /* ori a1,a1,%lo(ENVP_ADDR) */
++                                /* ori a1,a1,%lo(ENVP_ADDR)     */
++
+     stw_p(p++, 0xe0c0 | NM_HI1(ENVP_ADDR + 8));
++
+     stw_p(p++, NM_HI2(ENVP_ADDR + 8));
+-                                /* lui a2,%hi(ENVP_ADDR + 8) */
++                                /* lui a2,%hi(ENVP_ADDR + 8)    */
++
+     stw_p(p++, 0x80c6); stw_p(p++, NM_LO(ENVP_ADDR + 8));
+                                 /* ori a2,a2,%lo(ENVP_ADDR + 8) */
++
+     stw_p(p++, 0xe0e0 | NM_HI1(loaderparams.ram_low_size));
++
+     stw_p(p++, NM_HI2(loaderparams.ram_low_size));
+                                 /* lui a3,%hi(loaderparams.ram_low_size)=
+ */
++
+     stw_p(p++, 0x80e7); stw_p(p++, NM_LO(loaderparams.ram_low_size));
+                                 /* ori a3,a3,%lo(loaderparams.ram_low_si=
+ze) */
++
++    /*
++     * Load BAR registers as done by YAMON:
++     *
++     *  - set up PCI0 I/O BARs from 0x18000000 to 0x181fffff
++     *  - set up PCI0 MEM0 at 0x10000000, size 0x8000000
++     *  - set up PCI0 MEM1 at 0x18200000, size 0xbe00000
++     *
++     */
++    stw_p(p++, 0xe040); stw_p(p++, 0x0681);
++                                /* lui t1, %hi(0xb4000000)      */
++
++#ifdef TARGET_WORDS_BIGENDIAN
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0be1);
++                                /* lui t0, %hi(0xdf000000)      */
++
++    /* 0x68 corresponds to GT_ISD (from hw/mips/gt64xxx_pci.c)  */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9068);
++                                /* sw t0, 0x68(t1)              */
++
++    stw_p(p++, 0xe040); stw_p(p++, 0x077d);
++                                /* lui t1, %hi(0xbbe00000)      */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0801);
++                                /* lui t0, %hi(0xc0000000)      */
++
++    /* 0x48 corresponds to GT_PCI0IOLD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9048);
++                                /* sw t0, 0x48(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0800);
++                                /* lui t0, %hi(0x40000000)      */
++
++    /* 0x50 corresponds to GT_PCI0IOHD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9050);
++                                /* sw t0, 0x50(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0001);
++                                /* lui t0, %hi(0x80000000)      */
++
++    /* 0x58 corresponds to GT_PCI0M0LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9058);
++                                /* sw t0, 0x58(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x07e0);
++                                /* lui t0, %hi(0x3f000000)      */
++
++    /* 0x60 corresponds to GT_PCI0M0HD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9060);
++                                /* sw t0, 0x60(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0821);
++                                /* lui t0, %hi(0xc1000000)      */
++
++    /* 0x80 corresponds to GT_PCI0M1LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9080);
++                                /* sw t0, 0x80(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0bc0);
++                                /* lui t0, %hi(0x5e000000)      */
++
++#else
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x00df);
++                                /* addiu[32] t0, $0, 0xdf       */
++
++    /* 0x68 corresponds to GT_ISD                               */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9068);
++                                /* sw t0, 0x68(t1)              */
++
++    /* Use kseg2 remapped address 0x1be00000                    */
++    stw_p(p++, 0xe040); stw_p(p++, 0x077d);
++                                /* lui t1, %hi(0xbbe00000)      */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x00c0);
++                                /* addiu[32] t0, $0, 0xc0       */
++
++    /* 0x48 corresponds to GT_PCI0IOLD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9048);
++                                /* sw t0, 0x48(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x0040);
++                                /* addiu[32] t0, $0, 0x40       */
++
++    /* 0x50 corresponds to GT_PCI0IOHD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9050);
++                                /* sw t0, 0x50(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x0080);
++                                /* addiu[32] t0, $0, 0x80       */
++
++    /* 0x58 corresponds to GT_PCI0M0LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9058);
++                                /* sw t0, 0x58(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x003f);
++                                /* addiu[32] t0, $0, 0x3f       */
++
++    /* 0x60 corresponds to GT_PCI0M0HD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9060);
++                                /* sw t0, 0x60(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x00c1);
++                                /* addiu[32] t0, $0, 0xc1       */
++
++    /* 0x80 corresponds to GT_PCI0M1LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9080);
++                                /* sw t0, 0x80(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x005e);
++                                /* addiu[32] t0, $0, 0x5e       */
++
++#endif
++
++    /* 0x88 corresponds to GT_PCI0M1HD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9088);
++                                /* sw t0, 0x88(t1)              */
++
+     stw_p(p++, 0xe320 | NM_HI1(kernel_entry));
++
+     stw_p(p++, NM_HI2(kernel_entry));
+-                                /* lui t9,%hi(kernel_entry) */
++                                /* lui t9,%hi(kernel_entry)     */
++
+     stw_p(p++, 0x8339); stw_p(p++, NM_LO(kernel_entry));
+-                                /* ori t9,t9,%lo(kernel_entry) */
++                                /* ori t9,t9,%lo(kernel_entry)  */
++
+     stw_p(p++, 0x4bf9); stw_p(p++, 0x0000);
+-                                /* jalrc   t8 */
++                                /* jalrc   t8                   */
+ }
+=20
+ /* ROM and pseudo bootloader
+--=20
 2.7.4
