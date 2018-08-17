@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fqc5A-0003gg-4V
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:34:16 -0400
+	(envelope-from <quintela@redhat.com>) id 1fqc5z-0005Qk-9F
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:35:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fqc55-0007ry-T0
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:34:16 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:37832)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fqc55-0007qq-Jt
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:34:11 -0400
-Received: by mail-wr1-f66.google.com with SMTP id u12-v6so6678665wrr.4
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 03:34:11 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1fqc5u-0000Ot-Vx
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:35:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38588 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fqc5u-0000Od-RK
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 06:35:02 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1534419358-10932-7-git-send-email-thuth@redhat.com> (Thomas
+	Huth's message of "Thu, 16 Aug 2018 13:35:56 +0200")
 References: <1534419358-10932-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <92751ce7-6ecd-a819-4ffb-1701e787331e@redhat.com>
-Date: Fri, 17 Aug 2018 12:34:07 +0200
+	<1534419358-10932-7-git-send-email-thuth@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Fri, 17 Aug 2018 12:34:52 +0200
+Message-ID: <87mutluvqr.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <1534419358-10932-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/8] Various qtest-related patches and a
- mc146818rtc fix
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] tests/device-introspection: Check
+ that the qom-tree and qtree do not change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +29,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On 16/08/2018 13:35, Thomas Huth wrote:
-> The basic idea for this patch series are the two patches that improve
-> the device-inrospection test: We now check that the qom-tree and the
-> qtree do not change during introspection, and the we also turn on the
-> device introspection test with all machines when running in SPEED=slow
-> mode. The other patches are a bug fix for the mc146818rtc device which
-> has been discovered with the improved device-introspection test, two
-> patches to shut up annoying messages during "make check", a patch to
-> speed up the tests that iterate over all machine types and an update
-> to the MAINTAINERS file.
-> 
-> v2:
->  - Added Reviewed-bys from v1
->  - Use g_test_message() instead of g_debug()
->  - Improved the patch descriptions a little bit
->  - Added patch to skip old versioned machine types in quick mode
->  - Added Paolo's update to MAINTAINERS
-> 
-> Paolo Bonzini (1):
->   MAINTAINERS: add maintainers for qtest
-> 
-> Thomas Huth (7):
->   tests/migration-test: Silence the kvm_hv message by default
->   net: Silence 'has no peer' messages in testing mode
->   hw/timer/mc146818rtc: White space clean-up
->   hw/timer/mc146818rtc: Fix introspection problem
->   tests: Skip old versioned machine types in quick testing mode
->   tests/device-introspection: Check that the qom-tree and qtree do not
->     change
->   tests/device-introspect: Test with all machines, not only with "none"
-> 
->  MAINTAINERS                    | 10 ++++++++
->  hw/ppc/prep.c                  |  3 +++
->  hw/timer/mc146818rtc.c         | 20 ++++++---------
->  tests/cpu-plug-test.c          |  6 ++---
->  tests/device-introspect-test.c | 55 ++++++++++++++++++++++++++++++++++++------
->  tests/libqtest.c               | 52 +++++++++++++++++++++++++++++++++++++--
->  tests/libqtest.h               |  4 ++-
->  tests/migration-test.c         | 20 ++++++++-------
->  tests/qom-test.c               |  2 +-
->  tests/test-hmp.c               |  2 +-
->  vl.c                           |  3 +--
->  11 files changed, 138 insertions(+), 39 deletions(-)
-> 
+Thomas Huth <thuth@redhat.com> wrote:
+> Introspection should not change the qom-tree / qtree, so we should check
+> this in the device-introspect-test, too. This patch helped to find lots
+> of instrospection bugs during the QEMU v3.0 soft/hard-freeze period in the
+> last two months.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Queued, thanks.
-
-Paolo
+Reviewed-by: Juan Quintela <quintela@redhat.com>
