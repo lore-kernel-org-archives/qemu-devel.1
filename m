@@ -1,32 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <psusi@ubuntu.com>) id 1fqeig-0005pz-P7
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:23:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1fqejq-0006RS-Sp
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:24:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <psusi@ubuntu.com>) id 1fqeic-0004WL-O7
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:23:14 -0400
-Received: from ec2-34-202-238-73.compute-1.amazonaws.com
-	([34.202.238.73]:47212 helo=vps.thesusis.net)
+	(envelope-from <berrange@redhat.com>) id 1fqejm-00061M-Sf
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:24:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53308 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <psusi@ubuntu.com>) id 1fqeic-0004Vu-Ii
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:23:10 -0400
-References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
-	<20180816172722.GK23515@redhat.com>
-	<83320617-5d60-fe71-3ef5-8ac7c384a3b1@ubuntu.com>
-	<20180817085656.GA11124@redhat.com>
-	<a115c4d1-0a78-efa1-0364-f41a06aca124@ubuntu.com>
-	<20180817125808.GO11124@redhat.com>
-	<b4872310-41f3-d2bc-22b2-0f41e8848a55@ubuntu.com>
-	<20180817131226.GP11124@redhat.com>
-From: Phillip Susi <psusi@ubuntu.com>
-Message-ID: <438249b4-e35e-4946-6234-7d3e8a24d48b@ubuntu.com>
-Date: Fri, 17 Aug 2018 09:23:05 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fqejm-00060w-Lt
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 09:24:22 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0FD5126A43
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 13:24:22 +0000 (UTC)
+Date: Fri, 17 Aug 2018 14:24:15 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180817132415.GQ11124@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
+	<20180817092936.GC11124@redhat.com>
+	<e8a14a22915569b492adb414e5ccc98dcf64a24d.camel@redhat.com>
+	<20180817104351.GG11124@redhat.com>
+	<878t5516h9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180817131226.GP11124@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Tq5dPTI2JkCmJEZn4uoOr1R0Wds23edmP"
-Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <878t5516h9.fsf@dusky.pond.sub.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] clean/simple Q35 support in libvirt+QEMU
+ for guest OSes that don't support virtio-1.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +39,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Andrea Bolognani <abologna@redhat.com>, Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>, Laine Stump <laine@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Tq5dPTI2JkCmJEZn4uoOr1R0Wds23edmP
-From: Phillip Susi <psusi@ubuntu.com>
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <438249b4-e35e-4946-6234-7d3e8a24d48b@ubuntu.com>
-Subject: Re: Pipe key broken on US keyboards
-References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
- <20180816172722.GK23515@redhat.com>
- <83320617-5d60-fe71-3ef5-8ac7c384a3b1@ubuntu.com>
- <20180817085656.GA11124@redhat.com>
- <a115c4d1-0a78-efa1-0364-f41a06aca124@ubuntu.com>
- <20180817125808.GO11124@redhat.com>
- <b4872310-41f3-d2bc-22b2-0f41e8848a55@ubuntu.com>
- <20180817131226.GP11124@redhat.com>
-In-Reply-To: <20180817131226.GP11124@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Aug 17, 2018 at 03:13:22PM +0200, Markus Armbruster wrote:
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>=20
+> > On Fri, Aug 17, 2018 at 12:35:11PM +0200, Andrea Bolognani wrote:
+> >> On Fri, 2018-08-17 at 10:29 +0100, Daniel P. Berrang=C3=A9 wrote:
+> >> > On Thu, Aug 16, 2018 at 06:20:29PM -0400, Laine Stump wrote:
+> >> > > 5) Some guest OSes that we still want to support (and which woul=
+d
+> >> > > otherwise work okay on a Q35 virtual machine) have virtio driver=
+s too
+> >> > > old to support virtio-1.0 (CentOS6 and RHEL6 are examples of suc=
+h OSes),
+> >> > > but due to the chain of reasons listed above, the "standard" con=
+fig for
+> >> > > a Q35 guest generated by libvirt doesn't support virtio-0.9, hen=
+ce
+> >> > > doesn't support these guest OSes.
+> >> >=20
+> >> > Note when talking about "support" you're really saying it from the
+> >> > downstream vendor, specifically RHEL, POV. From upstream or Fedora=
+ POV
+> >> > essentially all x86 OS ever made are in scope for running under QE=
+MU
+> >> > if suitable virtual hardware models have been provided. QEMU doesn=
+'t
+> >> > maintain any whitelist of "supported" OS that differs from what is
+> >> > technically capable of being run, in the way downstream vendors do=
+.
+> >>=20
+> >> Well, at least in the case of RHEL 6, "not supported" means that it
+> >> will not boot at all on q35 with the default guest topology created
+> >> by libvirt, so that's not really a downstream-only problem :)
+> >
+> > I mean from an upstream POV we still support RHEL-6 fine in i440fx,
+> > so there's no reason to particularly care about RHEL-6 with q35
+> > upstream.
+>=20
+> Only true if Q35 provides nothing of value over i440FX for RHEL-6
+> guests.  Does it?
 
-On 8/17/2018 9:12 AM, Daniel P. Berrang=C3=A9 wrote:
-> It depends on what the VNC client asks for too. With no '-k' arg, if th=
-e
-> VNC client asks for raw scancodes it'll get that, otherwise QEMU will
-> fallback to en-US.    GTK-VNC based clients (remote-viewer, virt-viewer=
-,
-> vinagre, virt-manager, GNOME boxes) use the raw scancodes. Most other
-> clients do not.
+Q35 has little technical benefit over i440fx for the majority of guest
+deployments, regardless of guest OS.
 
-I'm using "tightvnc" from my Windows computer at work and it says it is
-using keyboard layout 00000409 ( whatever that means ), so it sounds
-like it is sending a keycode and qemu is translating it into the wrong
-scancode.
+It provides a more moderning looking platform (nice, but few users are
+going to especially care about that), and lets you do secure boot with
+OVMF firmware (blocker if you want that feature).
 
+The desire to have everything use Q35 instead of i440fx is more about
+downstream vendor testing / support, rather than a strong technical
+feature gap requiring it.
 
+> >           It is only downstream decision to try to force it to
+> > use q35, despite it not working right today.
 
---Tq5dPTI2JkCmJEZn4uoOr1R0Wds23edmP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAEBCAAGBQJbdsw9AAoJENsuw7lhAP6EsXAH/2svAPbJAw+eyiVkaZtLXEcx
-/2/ybLaW7hb5/Z5QTc3rt710yzhTWSYdzexfJ6MVDxUBkoYf34BoT5zvOUYtHtzu
-M32+IS1gTDOJnnJ/5nd53OoaPKaVPQCny5V6nIUtqiCfBgcswwVXp8Ioo1ZNj7MR
-H1/zjnB4wK8LflYZftur5Gq14ZgC/rDYsuRL7GkEk9D/ppWaKvtSFnz7MqMHGocI
-b+axrj5UwH9XN+mEOaZpsa5ygRi0AC9RfaL2e90BUxAY5Z1doPZxDdXvWZn3uBDa
-5IA5E2yToDDEnlZzJHVMcc444Xm4t12xccyFAYBdRqsjlYKcwloczo2t8AuArGw=
-=TkAB
------END PGP SIGNATURE-----
-
---Tq5dPTI2JkCmJEZn4uoOr1R0Wds23edmP--
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
