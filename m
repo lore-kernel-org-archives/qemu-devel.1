@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fqfau-0006Nc-Ot
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:19:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1fqfcH-0000cB-M0
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fqfaq-0002kd-NI
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:19:16 -0400
-Received: from mail-bn3nam01on0137.outbound.protection.outlook.com
-	([104.47.33.137]:20521
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fqfaq-0002kN-IW
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:19:12 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 17 Aug 2018 14:19:10 +0000
-Message-ID: <BN7PR08MB4868AC7A52778443C22B5FB3C63D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1534431497-1385-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1534431497-1385-48-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<e277dd47-fe10-4e70-3e0e-58aeabe13153@linaro.org>
-In-Reply-To: <e277dd47-fe10-4e70-3e0e-58aeabe13153@linaro.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1fqfcD-0003jg-NE
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:20:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57346 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fqfcD-0003jW-IU
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:20:37 -0400
+References: <CAB3eZfsv+JDr+C=BaKEmZvW9meTwNub2HfwXO5DX7mf+BJqO0A@mail.gmail.com>
+	<20180816082200.GD8612@redhat.com>
+	<90d7f44b-03ad-c075-e344-3c52c4268965@redhat.com>
+	<CAB3eZfvdT22SKvcqXtEHFfHhvDvWWFzXa+nvDRYag852TotZUA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <15521427-c38a-0e95-ad03-05e81016e846@redhat.com>
+Date: Fri, 17 Aug 2018 09:20:36 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v9 47/84] target/mips: Add emulation of DSP
- ASE for nanoMIPS - part 6
+In-Reply-To: <CAB3eZfvdT22SKvcqXtEHFfHhvDvWWFzXa+nvDRYag852TotZUA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] How do you do when write more than 16TB data to
+ qcow2 on ext4?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: lampahome <pahome.chen@mirlab.org>
+Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-> From: Richard Henderson <richard.henderson@linaro.org>
-> Sent: Thursday, August 16, 2018 7:38 PM
->=20
-> Subject: Re: [PATCH v9 47/84] target/mips: Add emulation of DSP ASE for n=
-anoMIPS - part 6
->=20
-> On 08/16/2018 07:57 AM, Aleksandar Markovic wrote:
-> > From: Stefan Markovic <smarkovic@wavecomp.com>
-> >
-> > Add emulation of DSP ASE instructions for nanoMIPS - part 6.
-> >
-> > Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-> > ---
-> >  target/mips/translate.c | 62 +++++++++++++++++++++++++++++++++++++++++=
-++++++++
-> >  1 file changed, 62 insertions(+)
-> >
-> > diff --git a/target/mips/translate.c b/target/mips/translate.c
-> > index 420a296..02ae3d9 100644
-> > --- a/target/mips/translate.c
-> > +++ b/target/mips/translate.c
-> > @@ -17777,6 +17777,64 @@ static void gen_pool32axf_4_nanomips_insn(Disa=
-sContext *ctx, uint32_t opc,
-> >      tcg_temp_free(t0);
-> >  }
-> >
-> > +static void gen_pool32axf_7_nanomips_insn(DisasContext *ctx, uint32_t =
-opc,
-> > +                                          int rt, int rs, int rd)
-> > +{
-> > +    TCGv t0;
-> > +    TCGv rs_t;
-> > +
-> > +    if (rt =3D=3D 0) {
-> > +        /* Treat as NOP. */
-> > +        return;
-> > +    }
->=20
-> This...
->=20
-> > +
-> > +    t0 =3D tcg_temp_new();
-> > +    rs_t =3D tcg_temp_new();
-> > +
-> > +    gen_load_gpr(rs_t, rs);
-> > +
-> > +    switch (opc) {
-> > +    case NM_SHRA_R_QB:
-> > +        check_dspr2(ctx);
->=20
-> ... misses out on these checks.
-> Better off with the gen_store_gpr calls from the other ASE patches.
->=20
+On 08/17/2018 03:05 AM, lampahome wrote:
+> Really? How to mount a blk device to /dev/nbdN?
+> I always find tips to mount from file-like image to /dev/nbdN
 
-Yes, we switched to the gen_store_gpr() calls in v10, removed if(rt =3D=3D =
-0) block, and harmonized handling that case with handling in other DSP patc=
-hes.=
+Please don't top-post on technical lists, it makes the conversation 
+harder to follow.
+
+I'm not sure how your question about /dev/nbdN relates to your setup of 
+trying to produce a large guest image. You can export ANYTHING that qemu 
+can recognize to /dev/nbdN, via:
+
+qemu-nbd -c /dev/nbd$n $image_that_qemu_recognizes
+
+This is true for raw images:
+qemu-nbd -c /dev/nbd$n -f raw /path/to/file
+
+for block devices such as LVM storing qcow2 format:
+qemu-nbd -c /dev/nbd$n -f qcow2 /dev/mapper/vg_$whatever
+
+for remote access to another NBD server:
+qemu-nbd -c /dev/nbd$n -f raw nbd://remote:10809/export
+
+again, but this time with only a 1M subset exported:
+qemu-nbd -c /dev/nbd$n --image-opts 
+driver=raw,offset=1M,size=1M,file.driver=nbd,\
+file.server.type=inet,file.server.host=remote,\
+file.server.port=10809,file.export=export
+
+and so on.
+
+Basically, if qemu can access storage, it can also export that storage 
+as NBD, and you can then hook up the kernel's NBD client to expose that 
+storage as a local block device for inspecting what the guest image 
+contains (word of caution: don't mount untrusted guest images in this 
+manner, as the guest could have planted a malicious file system bug that 
+will crash the host. Instead, use libguestfs for mounting guest images 
+in a safe VM environment where at most you crash the VM instead of the 
+host).  And there's no requirement that you have to involve the kernel 
+via /dev/nbdN - you can instead access NBD servers via userspace 
+(qemu-img is one such userspace client, and Nir Soffer recently posted 
+to this list about a client being written in python).
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
