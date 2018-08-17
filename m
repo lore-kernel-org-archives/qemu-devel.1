@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMe-0004nB-FZ
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMe-0004nG-Fm
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMX-0007b5-Rr
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMZ-0007cI-2G
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:31 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45142 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:45378 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fqfMX-0007XJ-DG
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:25 -0400
+	id 1fqfMY-0007Yt-04
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:26 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 17 Aug 2018 16:03:39 +0200
-Message-Id: <1534514633-13725-52-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 17 Aug 2018 16:03:46 +0200
+Message-Id: <1534514633-13725-59-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534514633-13725-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534514633-13725-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v10 51/65] linux-user: Add target_syscall.h
- header for nanoMIPS
+Subject: [Qemu-devel] [PATCH v10 58/65] linux-user: Amend support for
+ sigaction() syscall for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +30,29 @@ Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.ma
 
 From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Add target_syscall.h header for nanoMIPS.
+Amend sigaction syscall support for nanoMIPS. This must be done
+since nanoMIPS' signal handling is different than MIPS' signal
+handling.
 
 Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/nanomips/target_syscall.h | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
- create mode 100644 linux-user/nanomips/target_syscall.h
+ linux-user/syscall.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/linux-user/nanomips/target_syscall.h b/linux-user/nanomips/target_syscall.h
-new file mode 100644
-index 0000000..b40e36b
---- /dev/null
-+++ b/linux-user/nanomips/target_syscall.h
-@@ -0,0 +1,30 @@
-+/* this struct defines the way the registers are stored on the
-+   stack during a system call. */
-+
-+struct target_pt_regs {
-+    /* Pad bytes for argument save space on the stack. */
-+    abi_ulong pad0[6];
-+
-+    /* Saved main processor registers. */
-+    abi_ulong regs[32];
-+
-+    /* Saved special registers. */
-+    abi_ulong cp0_status;
-+    abi_ulong lo;
-+    abi_ulong hi;
-+    abi_ulong cp0_badvaddr;
-+    abi_ulong cp0_cause;
-+    abi_ulong cp0_epc;
-+};
-+
-+/* Nasty hack: define a fake errno value for use by sigreturn.  */
-+#undef TARGET_QEMU_ESIGRETURN
-+#define TARGET_QEMU_ESIGRETURN 255
-+
-+#define UNAME_MACHINE "nanomips"
-+#define UNAME_MINIMUM_RELEASE "2.6.32"
-+
-+#define TARGET_CLONE_BACKWARDS
-+#define TARGET_MINSIGSTKSZ 6144
-+#define TARGET_MLOCKALL_MCL_CURRENT 1
-+#define TARGET_MLOCKALL_MCL_FUTURE  2
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index bb42a22..df91001 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8825,7 +8825,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+                 old_act->sa_flags = oact.sa_flags;
+                 unlock_user_struct(old_act, arg3, 1);
+             }
+-#elif defined(TARGET_MIPS)
++#elif defined(TARGET_MIPS) && !defined(TARGET_NANOMIPS)
+ 	    struct target_sigaction act, oact, *pact, *old_act;
+ 
+ 	    if (arg2) {
 -- 
 2.7.4
