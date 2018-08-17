@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqhNS-0008WA-9r
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:13:33 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fqhNV-0008Bg-QL
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:13:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqhDg-0000ek-LF
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:03:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59430 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fqhJk-0004Ba-Bn
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:09:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60812 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fqhDg-0000eT-GR
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:03:24 -0400
-References: <20180817150559.16243-1-armbru@redhat.com>
-	<20180817150559.16243-42-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2ad9b303-8108-3f66-c478-65081fc4062a@redhat.com>
-Date: Fri, 17 Aug 2018 11:03:21 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fqhJi-0004AD-Bj
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:09:38 -0400
+Date: Fri, 17 Aug 2018 17:09:34 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180817160934.GM2459@work-vm>
+References: <1534243693-9560-1-git-send-email-jianjay.zhou@huawei.com>
+	<2278afdb-d2a6-54b3-67c7-c1f43e4d311c@redhat.com>
+	<20180814115202.GH2580@work-vm>
+	<517f613f-3885-7b6f-aff7-cffee9d8f35f@redhat.com>
+	<B2D15215269B544CADD246097EACE7473B7345BB@DGGEMM528-MBX.china.huawei.com>
+	<954665c4-ab5f-6232-6208-19e479d41055@redhat.com>
+	<B2D15215269B544CADD246097EACE7473B7376B5@DGGEMM528-MBX.china.huawei.com>
+	<92f38a00-e46b-90f9-5af1-b8dfa830a09c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180817150559.16243-42-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 41/60] json: Nicer recovery from invalid
- leading zero
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <92f38a00-e46b-90f9-5af1-b8dfa830a09c@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] vl: fix migration when watchdog expires
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +33,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
 
-On 08/17/2018 10:05 AM, Markus Armbruster wrote:
-> For input 0123, the lexer produces the tokens
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 16/08/2018 09:22, Zhoujian (jay) wrote:
+> > Could we add the check !runstate_check(RUN_STATE_FINISH_MIGRATE) before setting
+> > to RUN_STATE_PRELAUNCH, just like !runstate_check(RUN_STATE_RUNNING) and
+> > !runstate_check(RUN_STATE_INMIGRATE) did? But I'm not sure whether this will
+> > cause any side effect.
 > 
->      JSON_ERROR    01
->      JSON_INTEGER  23
+> I think there is a bigger problem to fix before.  global_state_store
+> sees RUNNING, not PRELAUNCH; the VM is migrated with state that is
+> already reset, but the state on the destination is RUNNING and the VM
+> restarts running on the destination.  Likewise, if migration fails the
+> VM is resumed on the source because s->vm_was_running is true.
 > 
-> Reporting an error is correct; 0123 is invalid according to RFC 7159.
-> But the error recovery isn't nice.
-> 
-> Make the finite state machine eat digits before going into the error
-> state.  The lexer now produces
-> 
->      JSON_ERROR    0123
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> David, Juan, do you have any ideas here?
 
-Did you also want to reject invalid attempts at hex numbers, by adding 
-[xXa-fA-F] to the set of characters eaten by IN_BAD_ZERO?
+Would it help if we didn't process the reset-request at all while the
+guest was paused; so the guest state didn't get reset?
+I think you'd have to then migrate the 'reset-requested' flag to cause
+it to happen on the destination.
 
->   
-> +    [IN_BAD_ZERO] = {
-> +        ['0' ... '9'] = IN_BAD_ZERO,
-> +    },
-> +
+Dave
 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> Paolo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
