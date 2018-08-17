@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fqisp-00008T-8P
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:50:00 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fqiu1-0002Sf-Cn
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:51:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fqisk-0004Fp-62
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:49:59 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40102)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fqiu0-0005C9-9Z
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:51:13 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43463)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fqisj-0004FQ-UV
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:49:54 -0400
-Received: by mail-wm0-x244.google.com with SMTP id y9-v6so8114811wma.5
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 10:49:53 -0700 (PDT)
-References: <1533796458-22306-1-git-send-email-whois.zihan.yang@gmail.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <af1df9c5-852e-82ab-a1bb-854a4ce6a24e@gmail.com>
-Date: Fri, 17 Aug 2018 20:49:49 +0300
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fqiu0-0005BS-2S
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 13:51:12 -0400
+Received: by mail-wr1-x441.google.com with SMTP id b15-v6so7747694wrv.10
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 10:51:11 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1533796458-22306-1-git-send-email-whois.zihan.yang@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [RFC v4 3/6] i386/acpi-build: describe new pci
- domain in AML
+References: <20180801093401.9160-1-marcandre.lureau@redhat.com>
+	<871sbi8bsm.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJj=WPs0FOx8QJU76iFqhc11N7m+FnRG2t0USu0Jm6JTA@mail.gmail.com>
+	<874lge6s4u.fsf@dusky.pond.sub.org>
+In-Reply-To: <874lge6s4u.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 17 Aug 2018 19:50:59 +0200
+Message-ID: <CAJ+F1C+WmBtMG26nG0KmQCkKg9iUk6nxTi2P=t_qC22z3i5CWQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] monitor: avoid potential dead-lock when
+ cleaning up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,229 +33,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-
-
-On 08/09/2018 09:34 AM, Zihan Yang wrote:
-> Describe new pci segments of host bridges in AML as new pci devices,
-> with _SEG and _BBN to let them be in DSDT.
+Hi
+On Wed, Aug 1, 2018 at 5:09 PM Markus Armbruster <armbru@redhat.com> wrote:
 >
-> Besides, bus_nr indicates the bus number of pxb-pcie under pcie.0 bus,
-> but since we put it into separate domain, it should be zero,
-
-Why should it be 0? Isn't possible we start another domain from bus_nr> 0?
-
->   which is
-> equal to BBN.
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 >
-> Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
-> ---
->   hw/i386/acpi-build.c                | 63 ++++++++++++++++++++-----------------
->   hw/pci-bridge/pci_expander_bridge.c |  8 +++++
->   hw/pci/pci.c                        |  5 +++
->   include/hw/pci/pci.h                |  1 +
->   include/hw/pci/pci_bus.h            |  1 +
->   5 files changed, 50 insertions(+), 28 deletions(-)
+> > Hi
+> >
+> > On Wed, Aug 1, 2018 at 3:19 PM, Markus Armbruster <armbru@redhat.com> w=
+rote:
+> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+> >>
+> >>> When a monitor is connected to a Spice chardev, the monitor cleanup
+> >>> can dead-lock:
+> >>>
+> >>>  #0  0x00007f43446637fd in __lll_lock_wait () at /lib64/libpthread.so=
+.0
+> >>>  #1  0x00007f434465ccf4 in pthread_mutex_lock () at /lib64/libpthread=
+.so.0
+> >>>  #2  0x0000556dd79f22ba in qemu_mutex_lock_impl (mutex=3D0x556dd81c92=
+20 <monitor_lock>, file=3D0x556dd7ae3648 "/home/elmarco/src/qq/monitor.c", =
+line=3D645) at /home/elmarco/src/qq/util/qemu-thread-posix.c:66
+> >>>  #3  0x0000556dd7431bd5 in monitor_qapi_event_queue (event=3DQAPI_EVE=
+NT_SPICE_DISCONNECTED, qdict=3D0x556dd9abc850, errp=3D0x7fffb7bbddd8) at /h=
+ome/elmarco/src/qq/monitor.c:645
+> >>>  #4  0x0000556dd79d476b in qapi_event_send_spice_disconnected (server=
+=3D0x556dd98ee760, client=3D0x556ddaaa8560, errp=3D0x556dd82180d0 <error_ab=
+ort>) at qapi/qapi-events-ui.c:149
+> >>>  #5  0x0000556dd7870fc1 in channel_event (event=3D3, info=3D0x556ddad=
+1b590) at /home/elmarco/src/qq/ui/spice-core.c:235
+> >>>  #6  0x00007f434560a6bb in reds_handle_channel_event (reds=3D<optimiz=
+ed out>, event=3D3, info=3D0x556ddad1b590) at reds.c:316
+> >>>  #7  0x00007f43455f393b in main_dispatcher_self_handle_channel_event =
+(info=3D0x556ddad1b590, event=3D3, self=3D0x556dd9a7d8c0) at main-dispatche=
+r.c:197
+> >>>  #8  0x00007f43455f393b in main_dispatcher_channel_event (self=3D0x55=
+6dd9a7d8c0, event=3Devent@entry=3D3, info=3D0x556ddad1b590) at main-dispatc=
+her.c:197
+> >>>  #9  0x00007f4345612833 in red_stream_push_channel_event (s=3Ds@entry=
+=3D0x556ddae2ef40, event=3Devent@entry=3D3) at red-stream.c:414
+> >>>  #10 0x00007f434561286b in red_stream_free (s=3D0x556ddae2ef40) at re=
+d-stream.c:388
+> >>>  #11 0x00007f43455f9ddc in red_channel_client_finalize (object=3D0x55=
+6dd9bb21a0) at red-channel-client.c:347
+> >>>  #12 0x00007f434b5f9fb9 in g_object_unref () at /lib64/libgobject-2.0=
+.so.0
+> >>>  #13 0x00007f43455fc212 in red_channel_client_push (rcc=3D0x556dd9bb2=
+1a0) at red-channel-client.c:1341
+> >>>  #14 0x0000556dd76081ba in spice_port_set_fe_open (chr=3D0x556dd9925e=
+20, fe_open=3D0) at /home/elmarco/src/qq/chardev/spice.c:241
+> >>>  #15 0x0000556dd796d74a in qemu_chr_fe_set_open (be=3D0x556dd9a37c00,=
+ fe_open=3D0) at /home/elmarco/src/qq/chardev/char-fe.c:340
+> >>>  #16 0x0000556dd796d4d9 in qemu_chr_fe_set_handlers (b=3D0x556dd9a37c=
+00, fd_can_read=3D0x0, fd_read=3D0x0, fd_event=3D0x0, be_change=3D0x0, opaq=
+ue=3D0x0, context=3D0x0, set_open=3Dtrue) at /home/elmarco/src/qq/chardev/c=
+har-fe.c:280
+> >>>  #17 0x0000556dd796d359 in qemu_chr_fe_deinit (b=3D0x556dd9a37c00, de=
+l=3Dfalse) at /home/elmarco/src/qq/chardev/char-fe.c:233
+> >>>  #18 0x0000556dd7432240 in monitor_data_destroy (mon=3D0x556dd9a37c00=
+) at /home/elmarco/src/qq/monitor.c:786
+> >>>  #19 0x0000556dd743b968 in monitor_cleanup () at /home/elmarco/src/qq=
+/monitor.c:4683
+> >>>  #20 0x0000556dd75ce776 in main (argc=3D3, argv=3D0x7fffb7bbe458, env=
+p=3D0x7fffb7bbe478) at /home/elmarco/src/qq/vl.c:4660
+> >>>
+> >>> Because spice code tries to emit a "disconnected" signal on the
+> >>> monitors. Fix this situation by tightening the monitor lock time to
+> >>> the monitor list removal.
+> >>>
+> >>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >>
+> >> Do you think this should go into 3.0?
+> >>
+> >>> ---
+> >>>  monitor.c | 22 +++++++++++++++-------
+> >>>  1 file changed, 15 insertions(+), 7 deletions(-)
+> >>>
+> >>> diff --git a/monitor.c b/monitor.c
+> >>> index 0fa0910a2a..a16a6c5311 100644
+> >>> --- a/monitor.c
+> >>> +++ b/monitor.c
+> >>> @@ -4702,8 +4702,6 @@ void monitor_init(Chardev *chr, int flags)
+> >>>
+> >>>  void monitor_cleanup(void)
+> >>>  {
+> >>> -    Monitor *mon, *next;
+> >>> -
+> >>>      /*
+> >>>       * We need to explicitly stop the I/O thread (but not destroy it=
+),
+> >>>       * clean up the monitor resources, then destroy the I/O thread s=
+ince
+> >>> @@ -4719,14 +4717,24 @@ void monitor_cleanup(void)
+> >>>      monitor_qmp_bh_responder(NULL);
+> >>>
+> >>>      /* Flush output buffers and destroy monitors */
+> >>> -    qemu_mutex_lock(&monitor_lock);
+> >>> -    QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
+> >>> -        QTAILQ_REMOVE(&mon_list, mon, entry);
+> >>> +    do {
+> >>
+> >> for (;;), please.
+> >>
+> >>> +        Monitor *mon;
+> >>> +
+> >>> +        qemu_mutex_lock(&monitor_lock);
+> >>> +        mon =3D QTAILQ_FIRST(&mon_list);
+> >>> +        if (mon) {
+> >>> +            QTAILQ_REMOVE(&mon_list, mon, entry);
+> >>> +        }
+> >>> +        qemu_mutex_unlock(&monitor_lock);
+> >>> +
+> >>> +        if (!mon) {
+> >>> +            break;
+> >>> +        }
+> >>> +
+> >>>          monitor_flush(mon);
+> >>>          monitor_data_destroy(mon);
+> >>>          g_free(mon);
+> >>> -    }
+> >>> -    qemu_mutex_unlock(&monitor_lock);
+> >>> +    } while (true);
+> >>>
+> >>>      /* QEMUBHs needs to be deleted before destroying the I/O thread =
+*/
+> >>>      qemu_bh_delete(qmp_dispatcher_bh);
+> >>
+> >> Iterating safely over a list protected by a lock should be easier than
+> >> that.  Sad.
+> >>
+> >> Hmm, what about this:
+> >>
+> >> diff --git a/monitor.c b/monitor.c
+> >> index 77861e96af..4a23f6c7bc 100644
+> >> --- a/monitor.c
+> >> +++ b/monitor.c
+> >> @@ -4721,9 +4721,11 @@ void monitor_cleanup(void)
+> >>      qemu_mutex_lock(&monitor_lock);
+> >>      QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
+> >>          QTAILQ_REMOVE(&mon_list, mon, entry);
+> >> +        qemu_mutex_unlock(&monitor_lock);
+> >>          monitor_flush(mon);
+> >>          monitor_data_destroy(mon);
+> >>          g_free(mon);
+> >> +        qemu_mutex_lock(&monitor_lock);
+> >
+> > Although unlikely, there is a chance the monitor list could be
+> > modified while flushing/cleaning up, I suppose, in this case we could
+> > miss the new monitors (if next is NULL).
 >
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index c0fc2b4..a7d9af2 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -828,7 +828,7 @@ static Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set)
->       Aml *crs = aml_resource_template();
->       CrsRangeSet temp_range_set;
->       CrsRangeEntry *entry;
-> -    uint8_t max_bus = pci_bus_num(host->bus);
-> +    uint8_t max_bus = 0, host_bus = 0;
->       uint8_t type;
->       int devfn;
->       int i;
-> @@ -967,10 +967,10 @@ static Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set)
->       aml_append(crs,
->           aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
->                               0,
-> -                            pci_bus_num(host->bus),
-> +                            host_bus,
->                               max_bus,
->                               0,
-> -                            max_bus - pci_bus_num(host->bus) + 1));
-> +                            max_bus - host_bus + 1));
+> Your loop prevents that from happening while it runs, but does nothing
+> to stop it from happening afterwards.  If we want to lock out new
+> monitors, we need to make monitor_init() fail or impossible to call.
 
-I don't understand the above, can you please explain?
+Not so trivial. Is there other threads capable of calling
+monitor_init() by the time monitor_cleanup() is called? It looks like
+monitor_init() may only be called from the main thread.
+
+>
+> >
+> >>      }
+> >>      qemu_mutex_unlock(&monitor_lock);
+> >>
+> >>
 
 
->   
->       return crs;
->   }
-> @@ -1832,6 +1832,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->           aml_append(dev, aml_name_decl("_UID", aml_int(1)));
->           aml_append(dev, build_q35_osc_method());
->           aml_append(sb_scope, dev);
-> +
 
-No need for this line
-
-
-Thanks,
-Marcel
-
->           aml_append(dsdt, sb_scope);
->   
->           build_hpet_aml(dsdt);
-> @@ -1875,10 +1876,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->   
->       crs_range_set_init(&crs_range_set);
->       bus = PC_MACHINE(machine)->bus;
-> +    i = 1; // PCI0 is q35 host, pxb starts from 1
->       if (bus) {
->           QLIST_FOREACH(bus, &bus->child, sibling) {
->               uint8_t bus_num = pci_bus_num(bus);
->               uint8_t numa_node = pci_bus_numa_node(bus);
-> +            int domain_nr = pci_domain_num(bus);
->   
->               /* look only for expander root buses */
->               if (!pci_bus_is_root(bus)) {
-> @@ -1890,10 +1893,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->               }
->   
->               scope = aml_scope("\\_SB");
-> -            dev = aml_device("PC%.02X", bus_num);
-> +            dev = aml_device("PCI%d", i++);
->               aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
->               aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
-> -            aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
-> +            aml_append(dev, aml_name_decl("_ADR", aml_int(bus_num)));
-> +            aml_append(dev, aml_name_decl("_SEG", aml_int(domain_nr)));
-> +            aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
->               if (pci_bus_is_express(bus)) {
->                   aml_append(dev, build_q35_osc_method());
->               }
-> @@ -2126,35 +2131,37 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->       {
->           Object *pci_host;
->           PCIBus *bus = NULL;
-> +        int index = 0;
->   
->           pci_host = acpi_get_i386_pci_host();
-> -        if (pci_host) {
-> +        while (pci_host) {
->               bus = PCI_HOST_BRIDGE(pci_host)->bus;
-> -        }
-> +            if (bus) {
-> +                Aml *scope = aml_scope("PCI%d", index);
-> +                /* Scan all PCI buses. Generate tables to support hotplug. */
-> +                build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
->   
-> -        if (bus) {
-> -            Aml *scope = aml_scope("PCI0");
-> -            /* Scan all PCI buses. Generate tables to support hotplug. */
-> -            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
-> +                /* Only add TPM once */
-> +                if (index++ == 0 && TPM_IS_TIS(tpm_find())) {
-> +                    dev = aml_device("ISA.TPM");
-> +                    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
-> +                    aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
-> +                    crs = aml_resource_template();
-> +                    aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
-> +                               TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
-> +                    /*
-> +                        FIXME: TPM_TIS_IRQ=5 conflicts with PNP0C0F irqs,
-> +                        Rewrite to take IRQ from TPM device model and
-> +                        fix default IRQ value there to use some unused IRQ
-> +                     */
-> +                    /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
-> +                    aml_append(dev, aml_name_decl("_CRS", crs));
-> +                    aml_append(scope, dev);
-> +                }
->   
-> -            if (TPM_IS_TIS(tpm_find())) {
-> -                dev = aml_device("ISA.TPM");
-> -                aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
-> -                aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
-> -                crs = aml_resource_template();
-> -                aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
-> -                           TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
-> -                /*
-> -                    FIXME: TPM_TIS_IRQ=5 conflicts with PNP0C0F irqs,
-> -                    Rewrite to take IRQ from TPM device model and
-> -                    fix default IRQ value there to use some unused IRQ
-> -                 */
-> -                /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
-> -                aml_append(dev, aml_name_decl("_CRS", crs));
-> -                aml_append(scope, dev);
-> +                aml_append(sb_scope, scope);
->               }
-> -
-> -            aml_append(sb_scope, scope);
-> +            pci_host = OBJECT(QTAILQ_NEXT(PCI_HOST_BRIDGE(pci_host), next));
->           }
->       }
->   
-> diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
-> index f50938f..d28a64c 100644
-> --- a/hw/pci-bridge/pci_expander_bridge.c
-> +++ b/hw/pci-bridge/pci_expander_bridge.c
-> @@ -87,6 +87,13 @@ static int pxb_bus_num(PCIBus *bus)
->       return pxb->bus_nr;
->   }
->   
-> +static int pxb_domain_num(PCIBus *bus)
-> +{
-> +    PXBDev *pxb = convert_to_pxb(bus->parent_dev);
-> +
-> +    return pxb->domain_nr;
-> +}
-> +
->   static bool pxb_is_root(PCIBus *bus)
->   {
->       return true; /* by definition */
-> @@ -104,6 +111,7 @@ static void pxb_bus_class_init(ObjectClass *class, void *data)
->       PCIBusClass *pbc = PCI_BUS_CLASS(class);
->   
->       pbc->bus_num = pxb_bus_num;
-> +    pbc->domain_num = pxb_domain_num;
->       pbc->is_root = pxb_is_root;
->       pbc->numa_node = pxb_bus_numa_node;
->   }
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index ddc27ba..e72887f 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -445,6 +445,11 @@ int pci_bus_num(PCIBus *s)
->       return PCI_BUS_GET_CLASS(s)->bus_num(s);
->   }
->   
-> +int pci_domain_num(PCIBus *s)
-> +{
-> +    return PCI_BUS_GET_CLASS(s)->domain_num(s);
-> +}
-> +
->   int pci_bus_numa_node(PCIBus *bus)
->   {
->       return PCI_BUS_GET_CLASS(bus)->numa_node(bus);
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index 990d6fc..de514d3 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -436,6 +436,7 @@ static inline PCIBus *pci_get_bus(const PCIDevice *dev)
->       return PCI_BUS(qdev_get_parent_bus(DEVICE(dev)));
->   }
->   int pci_bus_num(PCIBus *s);
-> +int pci_domain_num(PCIBus *s);
->   static inline int pci_dev_bus_num(const PCIDevice *dev)
->   {
->       return pci_bus_num(pci_get_bus(dev));
-> diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-> index b7da8f5..415da90 100644
-> --- a/include/hw/pci/pci_bus.h
-> +++ b/include/hw/pci/pci_bus.h
-> @@ -15,6 +15,7 @@ typedef struct PCIBusClass {
->   
->       bool (*is_root)(PCIBus *bus);
->       int (*bus_num)(PCIBus *bus);
-> +    int (*domain_num)(PCIBus *bus);
->       uint16_t (*numa_node)(PCIBus *bus);
->   } PCIBusClass;
->   
+--=20
+Marc-Andr=C3=A9 Lureau
