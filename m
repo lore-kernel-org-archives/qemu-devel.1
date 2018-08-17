@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqhNn-0008C3-RE
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:13:52 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fqhNo-0008TZ-Te
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:13:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqhE0-0000od-5N
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:03:44 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:41732)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqhDz-0000oI-Md
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:03:44 -0400
-Received: by mail-oi0-x243.google.com with SMTP id k12-v6so14800170oiw.8
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 09:03:43 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1fqhDZ-0000bh-3F
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:03:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48602 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fqhDX-0000ao-2b
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:03:16 -0400
+References: <1534243693-9560-1-git-send-email-jianjay.zhou@huawei.com>
+	<2278afdb-d2a6-54b3-67c7-c1f43e4d311c@redhat.com>
+	<20180814115202.GH2580@work-vm>
+	<517f613f-3885-7b6f-aff7-cffee9d8f35f@redhat.com>
+	<B2D15215269B544CADD246097EACE7473B7345BB@DGGEMM528-MBX.china.huawei.com>
+	<954665c4-ab5f-6232-6208-19e479d41055@redhat.com>
+	<B2D15215269B544CADD246097EACE7473B7376B5@DGGEMM528-MBX.china.huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <92f38a00-e46b-90f9-5af1-b8dfa830a09c@redhat.com>
+Date: Fri, 17 Aug 2018 18:03:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180809042206.15726-7-richard.henderson@linaro.org>
-References: <20180809042206.15726-1-richard.henderson@linaro.org>
-	<20180809042206.15726-7-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Aug 2018 17:03:22 +0100
-Message-ID: <CAFEAcA8D1ddN5ruYBr23o9YRQ=a0XSBp67OJ71ust664WKo9nA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 06/20] target/arm: Fix arm_current_el for
- user-only
+In-Reply-To: <B2D15215269B544CADD246097EACE7473B7376B5@DGGEMM528-MBX.china.huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] vl: fix migration when watchdog expires
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Desnogues <laurent.desnogues@gmail.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
 
-On 9 August 2018 at 05:21, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Saves about 12k code size in qemu-aarch64.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu.h | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 2d6d7d03aa..aedaf2631e 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -1958,6 +1958,9 @@ static inline bool arm_v7m_is_handler_mode(CPUARMState *env)
->   */
->  static inline int arm_current_el(CPUARMState *env)
->  {
-> +#ifdef CONFIG_USER_ONLY
-> +    return 0;
-> +#else
->      if (arm_feature(env, ARM_FEATURE_M)) {
->          return arm_v7m_is_handler_mode(env) ||
->              !(env->v7m.control[env->v7m.secure] & 1);
-> @@ -1984,6 +1987,7 @@ static inline int arm_current_el(CPUARMState *env)
->
->          return 1;
->      }
-> +#endif
+On 16/08/2018 09:22, Zhoujian (jay) wrote:
+> Could we add the check !runstate_check(RUN_STATE_FINISH_MIGRATE) before=
+ setting
+> to RUN_STATE_PRELAUNCH, just like !runstate_check(RUN_STATE_RUNNING) an=
+d
+> !runstate_check(RUN_STATE_INMIGRATE) did? But I'm not sure whether this=
+ will
+> cause any side effect.
 
-Again, the #ifdeffery here should be unnecessary ? env->pstate,
-env->uncached_cpsr, etc should be set so that we return the
-right thing.
+I think there is a bigger problem to fix before.  global_state_store
+sees RUNNING, not PRELAUNCH; the VM is migrated with state that is
+already reset, but the state on the destination is RUNNING and the VM
+restarts running on the destination.  Likewise, if migration fails the
+VM is resumed on the source because s->vm_was_running is true.
 
-thanks
--- PMM
+David, Juan, do you have any ideas here?
+
+Paolo
