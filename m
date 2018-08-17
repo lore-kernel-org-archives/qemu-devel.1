@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqdG4-0007ci-8i
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:49:36 -0400
+	(envelope-from <famz@redhat.com>) id 1fqdIk-0001cz-39
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:52:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqdG3-0001j5-I0
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:49:36 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36412)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqdG3-0001iD-58
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:49:35 -0400
-Received: by mail-oi0-x242.google.com with SMTP id n21-v6so13499782oig.3
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 04:49:35 -0700 (PDT)
+	(envelope-from <famz@redhat.com>) id 1fqdIg-0003Sp-5V
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:52:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40662 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fqdIg-0003SH-0H
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:52:18 -0400
+Date: Fri, 17 Aug 2018 19:52:14 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180817115214.GI19773@lemon.usersys.redhat.com>
+References: <CAFEAcA-bvTeWRjBbNder0Ewf_27ksefr8djsWicEC2eMjyWSxA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180817013400.13353-1-ehabkost@redhat.com>
-References: <20180817013400.13353-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Aug 2018 12:49:13 +0100
-Message-ID: <CAFEAcA8mvriW3AVrH4Bqt99e6ErYt3KPLoY2qNM41Zjfjwv_tw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/8] x86 queue, 2018-08-16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-bvTeWRjBbNder0Ewf_27ksefr8djsWicEC2eMjyWSxA@mail.gmail.com>
+Subject: Re: [Qemu-devel] vm-tests images disks filling up?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 17 August 2018 at 02:33, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> The following changes since commit bb16c0412a572c2c9cd44496deb3ad430bc49c1a:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180816' into staging (2018-08-16 14:35:50 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
->
-> for you to fetch changes up to 7210a02c58572b2686a3a8d610c6628f87864aed:
->
->   i386: Disable TOPOEXT by default on "-cpu host" (2018-08-16 13:43:01 -0300)
->
-> ----------------------------------------------------------------
-> x86 queue, 2018-08-16
->
-> Bug fix:
-> * Some guests may crash when using "-cpu host" due to TOPOEXT,
->   disable it by default
->
-> Features:
-> * PV_SEND_IPI feature bit
-> * Icelake-{Server,Client} CPU models
-> * New CPUID feature bits: PV_SEND_IPI, WBNOINVD, PCONFIG, ARCH_CAPABILITIES
->
-> Documentation:
-> * docs/qemu-cpu-models.texi
+On Fri, 08/17 11:26, Peter Maydell wrote:
+> I just ran into a build failure using the tests/vm/ BSD build tests,
+> because the NetBSD build image's disk filled up.
+> 
+> Looking more closely there seemed to be 9 stale build trees in
+> the VM's /var/tmp/qemu-test.* , which is why the disk was full
+> (they'd used up about 18GB between them).
+> 
+> The other VMs (freebsd, openbsd) also had the same problem of
+> /var/tmp gradually filling with stale trees, they just hadn't
+> quite run out of space yet...
+> 
+> What's the process for managing the disk space on these images?
+> How are stale or completed build trees deleted ?
 
-Applied, thanks.
+Ouch. We used to always use snapshot when running tests until 983c2a777be.
 
--- PMM
+One possibility is to use a fixed temp dir (image locking makes sure no two
+tests boot the same image concurrently). I.e. something like:
+
+  $ sed -i -e 's:cd.*mktemp.*:mkdir -p /var/tmp/qemu-vm-test; cd /var/tmp/qemu-vm-test:' tests/vm/*
+
+Fam
