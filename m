@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1fqhNQ-0008TZ-Mz
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fqhNO-0008C3-MC
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:13:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1fqhKn-0004we-Se
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:10:46 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:38535)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fqhL1-00057q-5K
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:11:02 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:55212)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
-	id 1fqhKn-0004wV-OM
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:10:45 -0400
-Received: by mail-qt0-x242.google.com with SMTP id x7-v6so14643qtk.5
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 09:10:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fqhL0-00057H-U6
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 12:10:59 -0400
+Received: by mail-wm0-x243.google.com with SMTP id c14-v6so8073587wmb.4
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 09:10:58 -0700 (PDT)
+References: <1534411696-6454-1-git-send-email-jing2.liu@linux.intel.com>
+	<1534411696-6454-3-git-send-email-jing2.liu@linux.intel.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <bf7fbbe7-0bc0-12a7-c0c2-cf3249df75a9@gmail.com>
+Date: Fri, 17 Aug 2018 19:10:55 +0300
 MIME-Version: 1.0
-References: <20180809042206.15726-1-richard.henderson@linaro.org>
-	<20180809042206.15726-8-richard.henderson@linaro.org>
-	<CAFEAcA8Pb+HNsndA=8KU0+bq5jirK_0JipLR7gdspb1LstthTQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA8Pb+HNsndA=8KU0+bq5jirK_0JipLR7gdspb1LstthTQ@mail.gmail.com>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Fri, 17 Aug 2018 18:10:34 +0200
-Message-ID: <CABoDooMuYMEC4TnP-geVmo4PVxcMsW3vv8b+m4+D0SbwrbOikA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 07/20] target/arm: Fix is_a64 for user-only
+In-Reply-To: <1534411696-6454-3-git-send-email-jing2.liu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] hw/pci: add teardown function for
+ PCI resource reserve capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Jing Liu <jing2.liu@linux.intel.com>, qemu-devel@nongnu.org
+Cc: anthony.xu@intel.com, mst@redhat.com, lersek@redhat.com, pbonzini@redhat.com
 
-Hello,
+Hi Jing,
 
-On Fri, Aug 17, 2018 at 6:04 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+On 08/16/2018 12:28 PM, Jing Liu wrote:
+> Clean up the PCI config space of resource reserve capability.
 >
-> On 9 August 2018 at 05:21, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
-> > Saves about 8k code size in qemu-aarch64.
-> >
-> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> > ---
-> >  target/arm/cpu.h | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> > index aedaf2631e..ed51a2f5aa 100644
-> > --- a/target/arm/cpu.h
-> > +++ b/target/arm/cpu.h
-> > @@ -918,7 +918,15 @@ void aarch64_sync_64_to_32(CPUARMState *env);
-> >
-> >  static inline bool is_a64(CPUARMState *env)
-> >  {
-> > +#ifdef CONFIG_USER_ONLY
-> > +# ifdef TARGET_AARCH64
-> > +    return true;
-> > +# else
-> > +    return false;
-> > +# endif
-> > +#else
-> >      return env->aarch64;
-> > +#endif
-> >  }
+> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+> ---
+>   hw/pci/pci_bridge.c         | 9 +++++++++
+>   include/hw/pci/pci_bridge.h | 1 +
+>   2 files changed, 10 insertions(+)
 >
-> And again. I don't want to pepper the code with ifdefs if
-> we can do the right thing without them.
+> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+> index 15b055e..dbcee90 100644
+> --- a/hw/pci/pci_bridge.c
+> +++ b/hw/pci/pci_bridge.c
+> @@ -465,6 +465,15 @@ int pci_bridge_qemu_reserve_cap_init(PCIDevice *dev, int cap_offset,
+>       return 0;
+>   }
+>   
+> +void pci_bridge_qemu_reserve_cap_uninit(PCIDevice *dev)
+> +{
+> +    uint8_t pos = pci_find_capability(dev, PCI_CAP_ID_VNDR);
+> +
+> +    pci_del_capability(dev, PCI_CAP_ID_VNDR, sizeof(PCIBridgeQemuCap));
 
-FWIW I find it more readable with the ifdef's (here and in the
-previous patches) and I guess that helps the compiler too.
+I think that you only need to call pci_del_capability,
+
+> +    memset(dev->config + pos + PCI_CAP_FLAGS, 0,
+> +           sizeof(PCIBridgeQemuCap) - PCI_CAP_FLAGS);
+> +}
+
+... no need for the above line. The reason is pci_del_capability
+will "unlink" the capability, and even if the data remains in
+the configuration space array, it will not be used.
+
+Do you agree? If yes, just call pci_del_capability and you don't need
+this patch.
+
 
 Thanks,
+Marcel
 
-Laurent
+> +
+>   static const TypeInfo pci_bridge_type_info = {
+>       .name = TYPE_PCI_BRIDGE,
+>       .parent = TYPE_PCI_DEVICE,
+> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+> index 6186a32..b1e25ad 100644
+> --- a/include/hw/pci/pci_bridge.h
+> +++ b/include/hw/pci/pci_bridge.h
+> @@ -147,4 +147,5 @@ typedef struct PCIResReserve {
+>   int pci_bridge_qemu_reserve_cap_init(PCIDevice *dev, int cap_offset,
+>                                  PCIResReserve res_reserve, Error **errp);
+>   
+> +void pci_bridge_qemu_reserve_cap_uninit(PCIDevice *dev);
+>   #endif /* QEMU_PCI_BRIDGE_H */
