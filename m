@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqckN-0004Dh-GW
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:16:52 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fqdD1-0004Xj-Qm
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:46:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqckK-0007zZ-SN
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:16:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49234 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqckK-0007zE-Mk
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:16:48 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180808120334.10970-1-armbru@redhat.com>
-	<20180808120334.10970-57-armbru@redhat.com>
-	<0b4553ab-1938-0632-89a4-fa77d0518d76@redhat.com>
-Date: Fri, 17 Aug 2018 13:16:44 +0200
-In-Reply-To: <0b4553ab-1938-0632-89a4-fa77d0518d76@redhat.com> (Eric Blake's
-	message of "Fri, 10 Aug 2018 09:30:02 -0500")
-Message-ID: <87y3d51bvn.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 56/56] docs/interop/qmp-spec: How to force
- known good parser state
+	(envelope-from <pm215@archaic.org.uk>) id 1fqdD1-0008DD-1Q
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:46:27 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44492)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fqdD0-0008CL-PC
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 07:46:26 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Aug 2018 12:46:17 +0100
+Message-Id: <20180817114619.22354-2-peter.maydell@linaro.org>
+In-Reply-To: <20180817114619.22354-1-peter.maydell@linaro.org>
+References: <20180817114619.22354-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/3] hw/ssi/xilinx_spips: Remove unneeded MMIO
+ request_ptr code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,120 +25,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
 
-Eric Blake <eblake@redhat.com> writes:
+We now support direct execution from MMIO regions in the
+core memory subsystem. This means that we don't need to
+have device-specific support for it, and we can remove
+the request_ptr handling from the Xilinx SPIPS device.
+(It was broken anyway due to race conditions, and disabled
+by default.)
 
-> On 08/08/2018 07:03 AM, Markus Armbruster wrote:
->> Section "QGA Synchronization" specifies that sending "a raw 0xFF
->> sentinel byte" makes the server "reset its state and discard all
->> pending data prior to the sentinel."  What actually happens there is a
->> lexical error, which will produce one ore more error responses.
->> Moreover, it's not specific to QGA.
->
-> Hoisting my review of this, as you may want to move it sooner in the series.
->
->>
->> Create new section "Forcing the JSON parser into known-good state" to
->> document the technique properly.  Rewrite section "QGA
->> Synchronization" to document just the other direction, i.e. command
->> guest-sync-delimited.
->>
->> Section "Protocol Specification" mentions "synchronization bytes
->> (documented below)".  Delete that.
->>
->> While there, fix it not to claim '"Server" is QEMU itself', but
->> '"Server" is either QEMU or the QEMU Guest Agent'.
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   docs/interop/qmp-spec.txt | 37 ++++++++++++++++++++++++-------------
->>   1 file changed, 24 insertions(+), 13 deletions(-)
->>
->> diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
->> index 1566b8ae5e..d4a42fe2cc 100644
->> --- a/docs/interop/qmp-spec.txt
->> +++ b/docs/interop/qmp-spec.txt
->> @@ -20,9 +20,9 @@ operating system.
->>   2. Protocol Specification
->>   =========================
->>   -This section details the protocol format. For the purpose of this
->> document
->> -"Client" is any application which is using QMP to communicate with QEMU and
->> -"Server" is QEMU itself.
->> +This section details the protocol format. For the purpose of this
->> +document, "Server" is either QEMU or the QEMU Guest Agent, and
->> +"Client" is any application communicating with it via QMP.
->>   
-[...]
->>   JSON data structures, when mentioned in this document, are always in the
->>   following format:
->> @@ -34,9 +34,8 @@ by the JSON standard:
->>     http://www.ietf.org/rfc/rfc7159.txt
->>   -The protocol is always encoded in UTF-8 except for
->> synchronization
->> -bytes (documented below); although thanks to json-string escape
->> -sequences, the server will reply using only the strict ASCII subset.
->> +The sever expects its input to be encoded in UTF-8, and sends its
->> +output encoded in ASCII.
->>   
-[...]
->>   For convenience, json-object members mentioned in this document will
->>   be in a certain order. However, in real protocol usage they can be in
->> @@ -215,16 +214,28 @@ Some events are rate-limited to at most one per second.  If additional
->>   dropped, and the last one is delayed.  "Similar" normally means same
->>   event type.  See qmp-events.txt for details.
->>   -2.6 QGA Synchronization
->> +2.6 Forcing the JSON parser into known-good state
->> +-------------------------------------------------
->> +
->> +Incomplete or invalid input can leave the server's JSON parser in a
->> +state where it can't parse additional commands.  To get it back into
->> +known-good state, the client should provoke a lexical error.
->> +
->> +The cleanest way to do that is sending an ASCII control character
->> +other than '\t' (horizontal tab), '\r' (carriage return), and '\n'
->
-> s/and/or/
->
->> +(new line).
->> +
->> +Sadly, older versions of QEMU can fail to flag this as an error.  If a
->> +client needs to deal with them, it should send a 0xFF byte.
-[...]
->> +
->> +2.7 QGA Synchronization
->>   -----------------------
->>     When using QGA, an additional synchronization feature is built
->> into
->> -the protocol.  If the Client sends a raw 0xFF sentinel byte (not valid
->> -JSON), then the Server will reset its state and discard all pending
->> -data prior to the sentinel.  Conversely, if the Client makes use of
->> -the 'guest-sync-delimited' command, the Server will send a raw 0xFF
->> -sentinel byte prior to its response, to aid the Client in discarding
->> -any data prior to the sentinel.
->> +the protocol. If the Client makes use of the 'guest-sync-delimited'
->> +command, the Server will send a raw 0xFF sentinel byte prior to its
->> +response, to aid the Client in discarding any data prior to the
->> +sentinel.
->
-> Maybe worth mentioning "including error messages reported about any
-> lexical errors received prior to the guest-sync-delimited command"
->
->>       3. QMP Examples
->>
+This device is the only in-tree user of this API.
 
-What about:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/ssi/xilinx_spips.c | 46 -------------------------------------------
+ 1 file changed, 46 deletions(-)
 
-    2.7 QGA Synchronization
-    -----------------------
-
-    When a client connects to QGA over a transport lacking proper
-    connection semantics such as virtio-serial, QGA may have read partial
-    input from a previous client.  The client needs to force QGA's parser
-    into known-good state using the previous section's technique.
-    Moreover, the client may receive output a previous client didn't read.
-    To help with skipping that output, QGA provides the
-    'guest-sync-delimited' command.  Refer to its documentation for
-    details.
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index c052bfc4b3c..16f88f74029 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -1031,14 +1031,6 @@ static const MemoryRegionOps spips_ops = {
+ 
+ static void xilinx_qspips_invalidate_mmio_ptr(XilinxQSPIPS *q)
+ {
+-    XilinxSPIPS *s = &q->parent_obj;
+-
+-    if ((q->mmio_execution_enabled) && (q->lqspi_cached_addr != ~0ULL)) {
+-        /* Invalidate the current mapped mmio */
+-        memory_region_invalidate_mmio_ptr(&s->mmlqspi, q->lqspi_cached_addr,
+-                                          LQSPI_CACHE_SIZE);
+-    }
+-
+     q->lqspi_cached_addr = ~0ULL;
+ }
+ 
+@@ -1207,23 +1199,6 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
+     }
+ }
+ 
+-static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
+-                                    unsigned *offset)
+-{
+-    XilinxQSPIPS *q = opaque;
+-    hwaddr offset_within_the_region;
+-
+-    if (!q->mmio_execution_enabled) {
+-        return NULL;
+-    }
+-
+-    offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
+-    lqspi_load_cache(opaque, offset_within_the_region);
+-    *size = LQSPI_CACHE_SIZE;
+-    *offset = offset_within_the_region;
+-    return q->lqspi_buf;
+-}
+-
+ static uint64_t
+ lqspi_read(void *opaque, hwaddr addr, unsigned int size)
+ {
+@@ -1245,7 +1220,6 @@ lqspi_read(void *opaque, hwaddr addr, unsigned int size)
+ 
+ static const MemoryRegionOps lqspi_ops = {
+     .read = lqspi_read,
+-    .request_ptr = lqspi_request_mmio_ptr,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+     .valid = {
+         .min_access_size = 1,
+@@ -1322,15 +1296,6 @@ static void xilinx_qspips_realize(DeviceState *dev, Error **errp)
+     sysbus_init_mmio(sbd, &s->mmlqspi);
+ 
+     q->lqspi_cached_addr = ~0ULL;
+-
+-    /* mmio_execution breaks migration better aborting than having strange
+-     * bugs.
+-     */
+-    if (q->mmio_execution_enabled) {
+-        error_setg(&q->migration_blocker,
+-                   "enabling mmio_execution breaks migration");
+-        migrate_add_blocker(q->migration_blocker, &error_fatal);
+-    }
+ }
+ 
+ static void xlnx_zynqmp_qspips_realize(DeviceState *dev, Error **errp)
+@@ -1427,16 +1392,6 @@ static Property xilinx_zynqmp_qspips_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+-static Property xilinx_qspips_properties[] = {
+-    /* We had to turn this off for 2.10 as it is not compatible with migration.
+-     * It can be enabled but will prevent the device to be migrated.
+-     * This will go aways when a fix will be released.
+-     */
+-    DEFINE_PROP_BOOL("x-mmio-exec", XilinxQSPIPS, mmio_execution_enabled,
+-                     false),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static Property xilinx_spips_properties[] = {
+     DEFINE_PROP_UINT8("num-busses", XilinxSPIPS, num_busses, 1),
+     DEFINE_PROP_UINT8("num-ss-bits", XilinxSPIPS, num_cs, 4),
+@@ -1450,7 +1405,6 @@ static void xilinx_qspips_class_init(ObjectClass *klass, void * data)
+     XilinxSPIPSClass *xsc = XILINX_SPIPS_CLASS(klass);
+ 
+     dc->realize = xilinx_qspips_realize;
+-    dc->props = xilinx_qspips_properties;
+     xsc->reg_ops = &qspips_ops;
+     xsc->rx_fifo_size = RXFF_A_Q;
+     xsc->tx_fifo_size = TXFF_A_Q;
+-- 
+2.18.0
