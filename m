@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKG-00034A-7Z
+	(envelope-from <armbru@redhat.com>) id 1fqgKG-00033x-59
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fqgKB-0001g0-Oj
+	(envelope-from <armbru@redhat.com>) id 1fqgKC-0001hQ-QQ
 	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56194 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56202 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKB-0001fM-EI
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:03 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgKC-0001gY-Ck
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:06:04 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Aug 2018 17:05:01 +0200
-Message-Id: <20180817150559.16243-3-armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:05 +0200
+Message-Id: <20180817150559.16243-7-armbru@redhat.com>
 In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
 References: <20180817150559.16243-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 02/60] check-qjson: Cover blank and
- lexically erroneous input
+Subject: [Qemu-devel] [PATCH v2 06/60] test-qga: Clean up how we test QGA
+ synchronization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +27,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-qobject_from_json() can return null without setting an error on
-lexical errors.  I call that a bug.  Add test coverage to demonstrate
-it.
+To permit recovering from arbitrary JSON parse errors, the JSON parser
+resets itself on lexical errors.  We recommend sending a 0xff byte for
+that purpose, and test-qga covers this usage since commit 5229564b832.
+That commit had to add an ugly hack to qmp_fd_vsend() to make capable
+of sending this byte (it's designed to send only valid JSON).
+
+The previous commit added a way to send arbitrary text.  Put that to
+use for this purpose, and drop the hack from qmp_fd_vsend().
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/check-qjson.c | 40 +++++++++++++++++++++++++++++++++++++---
- 1 file changed, 37 insertions(+), 3 deletions(-)
+ tests/libqtest.c | 39 +++++++++++++++++++++------------------
+ tests/libqtest.h |  2 ++
+ tests/test-qga.c |  3 ++-
+ 3 files changed, 25 insertions(+), 19 deletions(-)
 
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index cc952c56ea..4daadc272b 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -1307,8 +1307,40 @@ static void simple_varargs(void)
- 
- static void empty_input(void)
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index dc42347da3..a7ad09fc86 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -507,16 +507,6 @@ void qmp_fd_vsend(int fd, const char *fmt, va_list ap)
  {
--    const char *empty = "";
--    QObject *obj = qobject_from_json(empty, &error_abort);
-+    QObject *obj = qobject_from_json("", &error_abort);
-+    g_assert(obj == NULL);
-+}
-+
-+static void blank_input(void)
-+{
-+    QObject *obj = qobject_from_json("\n ", &error_abort);
-+    g_assert(obj == NULL);
-+}
-+
-+static void junk_input(void)
-+{
-+    /* Note: junk within strings is covered elsewhere */
-+    Error *err = NULL;
-+    QObject *obj;
-+
-+    obj = qobject_from_json("@", &err);
-+    g_assert(!err);             /* BUG */
-+    g_assert(obj == NULL);
-+
-+    obj = qobject_from_json("[0\xFF]", &err);
-+    error_free_or_abort(&err);
-+    g_assert(obj == NULL);
-+
-+    obj = qobject_from_json("00", &err);
-+    g_assert(!err);             /* BUG */
-+    g_assert(obj == NULL);
-+
-+    obj = qobject_from_json("[1e", &err);
-+    g_assert(!err);             /* BUG */
-+    g_assert(obj == NULL);
-+
-+    obj = qobject_from_json("truer", &err);
-+    error_free_or_abort(&err);
-     g_assert(obj == NULL);
+     QObject *qobj;
+ 
+-    /*
+-     * qobject_from_vjsonf_nofail() chokes on leading 0xff as invalid
+-     * JSON, but tests/test-qga.c needs to send that to test QGA
+-     * synchronization
+-     */
+-    if (*fmt == '\377') {
+-        socket_send(fd, fmt, 1);
+-        fmt++;
+-    }
+-
+     /* Going through qobject ensures we escape strings properly */
+     qobj = qobject_from_vjsonf_nofail(fmt, ap);
+ 
+@@ -604,23 +594,36 @@ void qtest_qmp_send(QTestState *s, const char *fmt, ...)
+     va_end(ap);
  }
  
-@@ -1462,7 +1494,9 @@ int main(int argc, char **argv)
+-void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
++void qmp_fd_vsend_raw(int fd, const char *fmt, va_list ap)
+ {
+     bool log = getenv("QTEST_LOG") != NULL;
+-    va_list ap;
+-    char *str;
+-
+-    va_start(ap, fmt);
+-    str = g_strdup_vprintf(fmt, ap);
+-    va_end(ap);
++    char *str = g_strdup_vprintf(fmt, ap);
  
-     g_test_add_func("/varargs/simple_varargs", simple_varargs);
+     if (log) {
+         fprintf(stderr, "%s", str);
+     }
+-    socket_send(s->qmp_fd, str, strlen(str));
++    socket_send(fd, str, strlen(str));
+     g_free(str);
+ }
  
--    g_test_add_func("/errors/empty_input", empty_input);
-+    g_test_add_func("/errors/empty", empty_input);
-+    g_test_add_func("/errors/blank", blank_input);
-+    g_test_add_func("/errors/junk", junk_input);
-     g_test_add_func("/errors/unterminated/string", unterminated_string);
-     g_test_add_func("/errors/unterminated/escape", unterminated_escape);
-     g_test_add_func("/errors/unterminated/sq_string", unterminated_sq_string);
++void qmp_fd_send_raw(int fd, const char *fmt, ...)
++{
++    va_list ap;
++
++    va_start(ap, fmt);
++    qmp_fd_vsend_raw(fd, fmt, ap);
++    va_end(ap);
++}
++
++void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
++{
++    va_list ap;
++
++    va_start(ap, fmt);
++    qmp_fd_vsend_raw(s->qmp_fd, fmt, ap);
++    va_end(ap);
++}
++
+ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event)
+ {
+     QDict *response;
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 1e831973ff..2d1eb4b282 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -959,6 +959,8 @@ static inline int64_t clock_set(int64_t val)
+ QDict *qmp_fd_receive(int fd);
+ void qmp_fd_vsend(int fd, const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
+ void qmp_fd_send(int fd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
++void qmp_fd_send_raw(int fd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
++void qmp_fd_vsend_raw(int fd, const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
+ QDict *qmp_fdv(int fd, const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
+ QDict *qmp_fd(int fd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+ 
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index c552cc0125..f69cdf6c03 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -147,8 +147,9 @@ static void test_qga_sync_delimited(gconstpointer fix)
+     unsigned char c;
+     QDict *ret;
+ 
++    qmp_fd_send_raw(fixture->fd, "\xff");
+     qmp_fd_send(fixture->fd,
+-                "\xff{'execute': 'guest-sync-delimited',"
++                "{'execute': 'guest-sync-delimited',"
+                 " 'arguments': {'id': %u } }",
+                 r);
+ 
 -- 
 2.17.1
