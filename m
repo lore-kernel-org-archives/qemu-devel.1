@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqgPY-0008Cw-AL
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:11:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1fqgSF-000517-HT
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fqgPX-0005SY-FV
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:11:36 -0400
-References: <20180802144834.520904-1-eblake@redhat.com>
-	<20180802144834.520904-3-eblake@redhat.com>
-	<c7dc405d-0b83-b680-6e45-db4b211d3ef2@virtuozzo.com>
-	<f3dd742c-cca3-3ee1-797e-72721752493e@redhat.com>
-	<4e759caf-4493-a473-fc63-82670e62c3b6@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <18e4e9df-2155-39b5-117d-8e6e68c37859@redhat.com>
-Date: Fri, 17 Aug 2018 10:11:28 -0500
-MIME-Version: 1.0
-In-Reply-To: <4e759caf-4493-a473-fc63-82670e62c3b6@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/4] nbd/server: Advertise actual minimum
- block size
+	(envelope-from <armbru@redhat.com>) id 1fqgSE-0008Mz-90
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56562 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fqgSD-0008MU-W6
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 11:14:22 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri, 17 Aug 2018 17:05:52 +0200
+Message-Id: <20180817150559.16243-54-armbru@redhat.com>
+In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
+References: <20180817150559.16243-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 53/60] json: Make JSONToken opaque outside
+ json-parser.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +24,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, rjones@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-On 08/17/2018 10:04 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Can you create a dirty bitmap with a granularity smaller than=20
->> request_alignment?=C2=A0 I know you can configure dirty bitmap granula=
-rity=20
->> independently from cluster size (in both directions: either smaller or=
-=20
->> larger than cluster size), but that it has a least a minimum lower=20
->> bounds of 512.=C2=A0 You're probably right that we also want it to hav=
-e a=20
->> minimum lower bound of the request_alignment (if you're using a device=
-=20
->> with 4k minimum I/O, request_alignment would be 4k, and having a dirty=
-=20
->> bitmap any smaller than that granularity is wasted space).
->>
->> On the other hand, I also think we're safe for this patch: even if you=
-=20
->> waste the space by creating a bitmap with too-small granularity, the=20
->> actions that write bits into the bitmap will still be aligned to=20
->> request_alignment,
->=20
-> Not quite right: nbd_export_bitmap searches through the backing chain=20
-> for the bitmap, and it may correspond to the bds with smaller=20
-> request_alignment.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ include/qapi/qmp/json-parser.h   |  4 ++++
+ include/qapi/qmp/json-streamer.h |  7 -------
+ qobject/json-parser.c            | 19 +++++++++++++++++++
+ qobject/json-streamer.c          |  8 +-------
+ 4 files changed, 24 insertions(+), 14 deletions(-)
 
-Hmm. Interesting setup:
-
-base (512-byte alignment, bitmap granularity) <- active (4k alignment)
-
-so you're stating that exporting 'active' but with the 'bitmap'=20
-inherited from the backing chain from base means that the bitmap may=20
-have transitions in between the alignment advertised by active.  Then it=20
-sounds like nbd/server.c:bitmap_to_extents() should be aware of that=20
-fact, and intentionally round up (anywhere that it finds a mid-alignment=20
-transition, treat the entire aligned region as dirty. It never hurts to=20
-mark more of the image dirty than necessary, but does hurt to expose a=20
-mid-alignment transition to an NBD client not expecting one).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/include/qapi/qmp/json-parser.h b/include/qapi/qmp/json-parser.h
+index a34209db7a..21b23d7bec 100644
+--- a/include/qapi/qmp/json-parser.h
++++ b/include/qapi/qmp/json-parser.h
+@@ -15,7 +15,11 @@
+ #define QEMU_JSON_PARSER_H
+ 
+ #include "qemu-common.h"
++#include "qapi/qmp/json-lexer.h"
+ 
++typedef struct JSONToken JSONToken;
++
++JSONToken *json_token(JSONTokenType type, int x, int y, GString *tokstr);
+ QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp);
+ 
+ #endif
+diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-streamer.h
+index d1d7fe2595..29950ac37c 100644
+--- a/include/qapi/qmp/json-streamer.h
++++ b/include/qapi/qmp/json-streamer.h
+@@ -16,13 +16,6 @@
+ 
+ #include "qapi/qmp/json-lexer.h"
+ 
+-typedef struct JSONToken {
+-    int type;
+-    int x;
+-    int y;
+-    char str[];
+-} JSONToken;
+-
+ typedef struct JSONMessageParser
+ {
+     void (*emit)(void *opaque, QObject *json, Error *err);
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 8dafadb833..7849be65e0 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -26,6 +26,13 @@
+ #include "qapi/qmp/json-lexer.h"
+ #include "qapi/qmp/json-streamer.h"
+ 
++struct JSONToken {
++    JSONTokenType type;
++    int x;
++    int y;
++    char str[];
++};
++
+ typedef struct JSONParserContext
+ {
+     Error *err;
+@@ -538,6 +545,18 @@ static QObject *parse_value(JSONParserContext *ctxt, va_list *ap)
+     }
+ }
+ 
++JSONToken *json_token(JSONTokenType type, int x, int y, GString *tokstr)
++{
++    JSONToken *token = g_malloc(sizeof(JSONToken) + tokstr->len + 1);
++
++    token->type = type;
++    memcpy(token->str, tokstr->str, tokstr->len);
++    token->str[tokstr->len] = 0;
++    token->x = x;
++    token->y = y;
++    return token;
++}
++
+ QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp)
+ {
+     JSONParserContext ctxt = { .buf = tokens };
+diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+index 9210281a65..467bc29413 100644
+--- a/qobject/json-streamer.c
++++ b/qobject/json-streamer.c
+@@ -82,13 +82,7 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+         goto out_emit;
+     }
+ 
+-    token = g_malloc(sizeof(JSONToken) + input->len + 1);
+-    token->type = type;
+-    memcpy(token->str, input->str, input->len);
+-    token->str[input->len] = 0;
+-    token->x = x;
+-    token->y = y;
+-
++    token = json_token(type, x, y, input);
+     parser->token_size += input->len;
+ 
+     g_queue_push_tail(&parser->tokens, token);
+-- 
+2.17.1
