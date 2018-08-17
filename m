@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fqXcR-0005Pf-5T
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:48:19 -0400
+	(envelope-from <famz@redhat.com>) id 1fqXcY-0005WJ-1q
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:48:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fqXcQ-00037j-8w
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:48:19 -0400
+	(envelope-from <famz@redhat.com>) id 1fqXcW-0003BE-UT
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 01:48:25 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 17 Aug 2018 13:47:57 +0800
-Message-Id: <20180817054758.14515-3-famz@redhat.com>
+Date: Fri, 17 Aug 2018 13:47:58 +0800
+Message-Id: <20180817054758.14515-4-famz@redhat.com>
 In-Reply-To: <20180817054758.14515-1-famz@redhat.com>
 References: <20180817054758.14515-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] file-posix: Drop s->lock_fd
+Subject: [Qemu-devel] [PATCH v3 3/3] tests: Add unit tests for image locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,120 +22,190 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-The lock_fd field is not strictly necessary because transferring locked
-bytes from old fd to the new one shouldn't fail anyway. This spares the
-user one fd per image.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/file-posix.c | 37 +++++++++++++------------------------
- 1 file changed, 13 insertions(+), 24 deletions(-)
+ tests/Makefile.include     |   2 +
+ tests/test-image-locking.c | 152 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 154 insertions(+)
+ create mode 100644 tests/test-image-locking.c
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index f062e477e9..26d4e487d2 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -142,7 +142,6 @@ do { \
- 
- typedef struct BDRVRawState {
-     int fd;
--    int lock_fd;
-     bool use_lock;
-     int type;
-     int open_flags;
-@@ -153,7 +152,7 @@ typedef struct BDRVRawState {
-     uint64_t shared_perm;
- 
-     /* The perms bits whose corresponding bytes are already locked in
--     * s->lock_fd. */
-+     * s->fd. */
-     uint64_t locked_perm;
-     uint64_t locked_shared_perm;
- 
-@@ -542,18 +541,6 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     }
-     s->fd = fd;
- 
--    s->lock_fd = -1;
--    if (s->use_lock) {
--        fd = qemu_open(filename, s->open_flags);
--        if (fd < 0) {
--            ret = -errno;
--            error_setg_errno(errp, errno, "Could not open '%s' for locking",
--                             filename);
--            qemu_close(s->fd);
--            goto fail;
--        }
--        s->lock_fd = fd;
--    }
-     s->perm = 0;
-     s->shared_perm = BLK_PERM_ALL;
- 
-@@ -818,15 +805,13 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-         return 0;
-     }
- 
--    assert(s->lock_fd > 0);
--
-     switch (op) {
-     case RAW_PL_PREPARE:
--        ret = raw_apply_lock_bytes(s, s->lock_fd, s->perm | new_perm,
-+        ret = raw_apply_lock_bytes(s, s->fd, s->perm | new_perm,
-                                    ~s->shared_perm | ~new_shared,
-                                    false, errp);
-         if (!ret) {
--            ret = raw_check_lock_bytes(s->lock_fd, new_perm, new_shared, errp);
-+            ret = raw_check_lock_bytes(s->fd, new_perm, new_shared, errp);
-             if (!ret) {
-                 return 0;
-             }
-@@ -834,7 +819,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-         op = RAW_PL_ABORT;
-         /* fall through to unlock bytes. */
-     case RAW_PL_ABORT:
--        raw_apply_lock_bytes(s, s->lock_fd, s->perm, ~s->shared_perm,
-+        raw_apply_lock_bytes(s, s->fd, s->perm, ~s->shared_perm,
-                              true, &local_err);
-         if (local_err) {
-             /* Theoretically the above call only unlocks bytes and it cannot
-@@ -844,7 +829,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-         }
-         break;
-     case RAW_PL_COMMIT:
--        raw_apply_lock_bytes(s, s->lock_fd, new_perm, ~new_shared,
-+        raw_apply_lock_bytes(s, s->fd, new_perm, ~new_shared,
-                              true, &local_err);
-         if (local_err) {
-             /* Theoretically the above call only unlocks bytes and it cannot
-@@ -956,10 +941,18 @@ static void raw_reopen_commit(BDRVReopenState *state)
- {
-     BDRVRawReopenState *rs = state->opaque;
-     BDRVRawState *s = state->bs->opaque;
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 760a0f18b6..8cc0595b39 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -95,6 +95,7 @@ check-unit-y += tests/test-bdrv-drain$(EXESUF)
+ check-unit-y += tests/test-blockjob$(EXESUF)
+ check-unit-y += tests/test-blockjob-txn$(EXESUF)
+ check-unit-y += tests/test-block-backend$(EXESUF)
++check-unit-y += tests/test-image-locking$(EXESUF)
+ check-unit-y += tests/test-x86-cpuid$(EXESUF)
+ # all code tested by test-x86-cpuid is inside topology.h
+ gcov-files-test-x86-cpuid-y =
+@@ -640,6 +641,7 @@ tests/test-bdrv-drain$(EXESUF): tests/test-bdrv-drain.o $(test-block-obj-y) $(te
+ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-block-obj-y) $(test-util-obj-y)
++tests/test-image-locking$(EXESUF): tests/test-image-locking.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
+ tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+ tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
+diff --git a/tests/test-image-locking.c b/tests/test-image-locking.c
+new file mode 100644
+index 0000000000..ccfa4e2c54
+--- /dev/null
++++ b/tests/test-image-locking.c
+@@ -0,0 +1,152 @@
++/*
++ * Image locking tests
++ *
++ * Copyright (c) 2018 Red Hat Inc.
++ *
++ * Author: Fam Zheng <famz@redhat.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block.h"
++#include "sysemu/block-backend.h"
++#include "qapi/error.h"
++#include "qapi/qmp/qdict.h"
++
++static BlockBackend *open_image(const char *path,
++                                uint64_t perm, uint64_t shared_perm,
++                                Error **errp)
++{
 +    Error *local_err = NULL;
- 
-     s->check_cache_dropped = rs->check_cache_dropped;
-     s->open_flags = rs->open_flags;
- 
-+    /* Copy locks to the new fd before closing the old one. */
-+    raw_apply_lock_bytes(NULL, rs->fd, s->locked_perm,
-+                         ~s->locked_shared_perm, false, &local_err);
-+    if (local_err) {
-+        /* shouldn't fail in a sane host, but report it just in case. */
-+        error_report_err(local_err);
++    BlockBackend *blk;
++    QDict *options = qdict_new();
++
++    qdict_put_str(options, "driver", "raw");
++    blk = blk_new_open(path, NULL, options, BDRV_O_RDWR, &local_err);
++    if (blk) {
++        g_assert_null(local_err);
++        if (blk_set_perm(blk, perm, shared_perm, errp)) {
++            blk_unref(blk);
++            blk = NULL;
++        }
++    } else {
++        error_propagate(errp, local_err);
 +    }
-     qemu_close(s->fd);
-     s->fd = rs->fd;
- 
-@@ -1952,10 +1945,6 @@ static void raw_close(BlockDriverState *bs)
-         qemu_close(s->fd);
-         s->fd = -1;
-     }
--    if (s->lock_fd >= 0) {
--        qemu_close(s->lock_fd);
--        s->lock_fd = -1;
--    }
- }
- 
- /**
++    return blk;
++}
++
++static void check_locked_bytes(int fd, uint64_t perm_locks,
++                               uint64_t shared_perm_locks)
++{
++    int i;
++
++    if (!perm_locks && !shared_perm_locks) {
++        g_assert(!qemu_lock_fd_test(fd, 0, 0, true));
++        return;
++    }
++    for (i = 0; (1ULL << i) <= BLK_PERM_ALL; i++) {
++        uint64_t bit = (1ULL << i);
++        bool perm_expected = !!(bit & perm_locks);
++        bool shared_perm_expected = !!(bit & shared_perm_locks);
++        g_assert_cmpint(perm_expected, ==,
++                        !!qemu_lock_fd_test(fd, 100 + i, 1, true));
++        g_assert_cmpint(shared_perm_expected, ==,
++                        !!qemu_lock_fd_test(fd, 200 + i, 1, true));
++    }
++}
++
++static void test_image_locking_basic(void)
++{
++    BlockBackend *blk1, *blk2, *blk3;
++    char img_path[] = "/tmp/qtest.XXXXXX";
++    uint64_t perm, shared_perm;
++
++    int fd = mkstemp(img_path);
++    assert(fd >= 0);
++
++    perm = BLK_PERM_WRITE | BLK_PERM_CONSISTENT_READ;
++    shared_perm = BLK_PERM_ALL;
++    blk1 = open_image(img_path, perm, shared_perm, &error_abort);
++    g_assert(blk1);
++
++    check_locked_bytes(fd, perm, ~shared_perm);
++
++    /* compatible perm between blk1 and blk2 */
++    blk2 = open_image(img_path, perm | BLK_PERM_RESIZE, shared_perm, NULL);
++    g_assert(blk2);
++    check_locked_bytes(fd, perm | BLK_PERM_RESIZE, ~shared_perm);
++
++    /* incompatible perm with already open blk1 and blk2 */
++    blk3 = open_image(img_path, perm, BLK_PERM_WRITE_UNCHANGED, NULL);
++    g_assert_null(blk3);
++
++    blk_unref(blk2);
++
++    /* Check that extra bytes in blk2 are correctly unlocked */
++    check_locked_bytes(fd, perm, ~shared_perm);
++
++    blk_unref(blk1);
++
++    /* Image is unused, no lock there */
++    check_locked_bytes(fd, 0, 0);
++    blk3 = open_image(img_path, perm, BLK_PERM_WRITE_UNCHANGED, &error_abort);
++    g_assert(blk3);
++    blk_unref(blk3);
++    close(fd);
++}
++
++static void test_set_perm_abort(void)
++{
++    BlockBackend *blk1, *blk2;
++    char img_path[] = "/tmp/qtest.XXXXXX";
++    uint64_t perm, shared_perm;
++    int r;
++    int fd = mkstemp(img_path);
++    assert(fd >= 0);
++
++    perm = BLK_PERM_WRITE | BLK_PERM_CONSISTENT_READ;
++    shared_perm = BLK_PERM_ALL;
++    blk1 = open_image(img_path, perm, shared_perm, &error_abort);
++    g_assert(blk1);
++
++    blk2 = open_image(img_path, perm, shared_perm, &error_abort);
++    g_assert(blk2);
++
++    check_locked_bytes(fd, perm, ~shared_perm);
++
++    /* A failed blk_set_perm mustn't change perm status (locked bytes) */
++    r = blk_set_perm(blk2, perm | BLK_PERM_RESIZE, BLK_PERM_WRITE_UNCHANGED,
++                     NULL);
++    g_assert_cmpint(r, !=, 0);
++    check_locked_bytes(fd, perm, ~shared_perm);
++}
++
++int main(int argc, char **argv)
++{
++    bdrv_init();
++    qemu_init_main_loop(&error_abort);
++
++    g_test_init(&argc, &argv, NULL);
++
++    g_test_add_func("/image-locking/basic", test_image_locking_basic);
++    g_test_add_func("/image-locking/set-perm-abort", test_set_perm_abort);
++
++    return g_test_run();
++}
 -- 
 2.17.1
