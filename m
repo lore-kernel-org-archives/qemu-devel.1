@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fqfJx-0003Xx-3I
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:01:50 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfME-0004We-Ie
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fqfJt-0005kP-PJ
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:01:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41492 helo=mx1.redhat.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fqfMA-0007GM-Ey
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:06 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:37935 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fqfJo-0005ho-N3
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:01:39 -0400
-Date: Fri, 17 Aug 2018 15:01:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180817140129.GI2459@work-vm>
-References: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
-	<1533562177-16447-10-git-send-email-lidongchen@tencent.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1533562177-16447-10-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH v6 09/11] migration: poll the cm event for
- destination qemu
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1fqfMA-0007FN-2s
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 10:04:02 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Fri, 17 Aug 2018 16:02:48 +0200
+Message-Id: <1534514633-13725-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v10 00/65] Add nanoMIPS support to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +22,330 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-* Lidong Chen (jemmy858585@gmail.com) wrote:
-> The destination qemu only poll the comp_channel->fd in
-> qemu_rdma_wait_comp_channel. But when source qemu disconnnect
-> the rdma connection, the destination qemu should be notified.
-> 
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-OK, this could do with an update to the migration_incoming_co comment in
-migration.h, since previously it was only used by colo; if we merge this
-first please post a patch to update the comment.
+v9->v10:
 
-Other than that, I think I'm OK:
+  - first 15 patches removed since they are applied now to the
+    main tree
+  - completely removed connections to and dependance on
+      MIPS_HFLAG_M16 in nanoMIPS code
+  - completed reworking of nanoMIPS branch handling
+  - some fixes and improvements in DSP ASE patches
+  - other fixes and improvements that originate from code reviews
+  - rebased to the latest code
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+v8->v9:
 
-> ---
->  migration/migration.c |  3 ++-
->  migration/rdma.c      | 32 +++++++++++++++++++++++++++++++-
->  2 files changed, 33 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index df0c2cf..f7d6e26 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -389,6 +389,7 @@ static void process_incoming_migration_co(void *opaque)
->      int ret;
->  
->      assert(mis->from_src_file);
-> +    mis->migration_incoming_co = qemu_coroutine_self();
->      mis->largest_page_size = qemu_ram_pagesize_largest();
->      postcopy_state_set(POSTCOPY_INCOMING_NONE);
->      migrate_set_state(&mis->state, MIGRATION_STATUS_NONE,
-> @@ -418,7 +419,6 @@ static void process_incoming_migration_co(void *opaque)
->  
->      /* we get COLO info, and know if we are in COLO mode */
->      if (!ret && migration_incoming_enable_colo()) {
-> -        mis->migration_incoming_co = qemu_coroutine_self();
->          qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
->               colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
->          mis->have_colo_incoming_thread = true;
-> @@ -442,6 +442,7 @@ static void process_incoming_migration_co(void *opaque)
->      }
->      mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
->      qemu_bh_schedule(mis->bh);
-> +    mis->migration_incoming_co = NULL;
->  }
->  
->  static void migration_incoming_setup(QEMUFile *f)
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index 1affc46..ae07515 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -3226,6 +3226,35 @@ err:
->  
->  static void rdma_accept_incoming_migration(void *opaque);
->  
-> +static void rdma_cm_poll_handler(void *opaque)
-> +{
-> +    RDMAContext *rdma = opaque;
-> +    int ret;
-> +    struct rdma_cm_event *cm_event;
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +
-> +    ret = rdma_get_cm_event(rdma->channel, &cm_event);
-> +    if (ret) {
-> +        error_report("get_cm_event failed %d", errno);
-> +        return;
-> +    }
-> +    rdma_ack_cm_event(cm_event);
-> +
-> +    if (cm_event->event == RDMA_CM_EVENT_DISCONNECTED ||
-> +        cm_event->event == RDMA_CM_EVENT_DEVICE_REMOVAL) {
-> +        error_report("receive cm event, cm event is %d", cm_event->event);
-> +        rdma->error_state = -EPIPE;
-> +        if (rdma->return_path) {
-> +            rdma->return_path->error_state = -EPIPE;
-> +        }
-> +
-> +        if (mis->migration_incoming_co) {
-> +            qemu_coroutine_enter(mis->migration_incoming_co);
-> +        }
-> +        return;
-> +    }
-> +}
-> +
->  static int qemu_rdma_accept(RDMAContext *rdma)
->  {
->      RDMACapabilities cap;
-> @@ -3326,7 +3355,8 @@ static int qemu_rdma_accept(RDMAContext *rdma)
->                              NULL,
->                              (void *)(intptr_t)rdma->return_path);
->      } else {
-> -        qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-> +        qemu_set_fd_handler(rdma->channel->fd, rdma_cm_poll_handler,
-> +                            NULL, rdma);
->      }
->  
->      ret = rdma_accept(rdma->cm_id, &conn_param);
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  - reoganized (moved/squashed) patches so that clang build bisect
+     works (as the result, number of patches dropped from 87 to 84)
+  - re-examined and reworked 32-bit nanoMIPS branch instructions
+  - minor improvements in commit messages  
+  - rebased to the latest code
+
+v7->v8:
+
+  - the series is slightly reorganized so that:
+      - patches 1-19 are fixes and improvements that are not
+      dependent on the existence of nanoMIPS (even though most
+      of them are logicaly connected to (and necessary for)
+      nanoMIPS support) - they fix and improve pre-nanoMIPS code
+      - patches 20-65 introduce core nanoMIPS functionality, but
+      do not contain any dependence on or reference to nanoMIPS
+      Linux ABI
+      - patches 66-87 mostly deal with Linux user mode-related
+      nanoMIPS functionality, therefore dependent on nanoMIPS
+      Linux ABI
+  - the series will probably be split into three (corresponding
+      to the organization mentioned above) in near future
+
+  - added support for availability control via bit config XNP
+  - fixed availabitily control for LLWP/SCWP
+  - added support for availability control via bit config MT
+  - fixed availabitily control for pre-nanoMIPS MT ASE
+  - fixed availabitily control for nanoMIPS MT ASE
+  - completely removed case-statements defined by integer range
+      from translate.c
+  - patch on nanoMIPS specifics in ELF headers split into two
+  - patch on GT64120-related functionality in nanoMIPS bootloader
+      updated with comments and reorganizes with respect to
+      endianness
+  - replaced one instance of shift/mask with extract32()
+  - fixed one instance of missing default case in decoding engine
+  - removed several instances of unnecessary default case in
+    decoding engine
+  - minor tweaks related to variable scope and naming
+  - fixed several spelling mistakes in commit messages
+  - rebased to the latest code
+
+v6->v7:
+
+  - found a better place for MIPS_ARCH in elf.h
+  - improved patch for LLWP and SCWP
+  - fixed missing availability control, alignment, usage
+    of extract32() in DSP patches
+  - added disassembler support for microMIPS and nanoMIPS
+  - removed unnecessary addition of one empty line in the
+    patch on WR bit
+  - improved statx() syscall translation
+  - improved nanoMIPS items in binfmt script
+  - amended pre-nanoMIPS items in qemu-doc.texi
+  - added nanoMIPS items in qemu-doc.texi
+  - changed slightly patch order to be logicaly more
+    comprehensive 
+  - rebased to the latest code
+  - NOTE: there will be some sheckpatch.pl errors and warning
+    for this series; however, we think those are flase positives
+    in these particular circumstances - therefore we will not
+    change any patch related to these checkpatch.pl messages
+
+v5->v6:
+
+  - used names offset and imm instead of rd and rs when
+    appropriate
+  - used gen_op_addr_addi when appropriate in one more place
+  - avoided usage of tcg_temp_local_new
+  - avoided unnecessary sign extension related to addr_add
+  - fixed unprotected storing to cpu_gpr[0]
+  - removed some unnecessary testing for ISA_NANOMIPS
+  - updated patch for LLWP and SCWP
+  - extract32 inserted instead of shift/mask in DSP patches
+  - removed useless casts from DSP patches
+  - reorganized functions to eliminated duplicated loading of
+    gpr values into tcg variables in DSP patches
+  - check Config1.WR bit for Watch registers only when using
+    in runtime
+  - removed duplicated check for bad address in PC register
+  - added support for statx system call
+  - updated script qemu-binfmt-conf.sh for nanoMIPS
+  - rebased to the latest code
+
+v4->v5:
+
+  - merged series "Mips maintenance and misc fixes and improvements"
+    and this one for easier handling (there are build dependencies)
+  - eliminated shadow variables from translate.c
+  - replaced shift/mask combination with extract32()
+  - added new function gen_op_addr_addi()
+  - added patch for LLWP and SCWP
+  - added "fall through" comments at appropriate places
+  - eliminated micromips flag from I7200 definition
+  - numerous other enhancements originating from reviewer's
+    comments
+  - some of the patches split into two or more for easier
+    handling and review
+  - rebased to the latest code
+
+v3->v4:
+
+  - added support for nanoMIPS user mode functionality and
+    configuration
+  - DSP patch split into three for easier review and handling
+  - corrected indentation in all decoding engine patches
+  - shift/mask replaced with equivalent extract32() in some
+    patches
+  - added missing default cases in some patches
+  - refactored invocation logic aroung decode_nanomips_opc()
+  - improved comments before decode_gpr_XXX() utilities
+  - all four decode_gpr_XXX() are now in a single patch
+  - two patches on updating BadInstr and related registers
+    are now merged, and execution logic improved
+  - minor formatting corrections
+  - rebased to the latest code
+
+v2->v3:
+
+  - added support for nanoMIPS-specifics in ELF headers
+  - added support for CP0 Config0.WR bit
+  - updated I7200 definition
+  - improved indentation of some switch statements
+  - slight reorganization of patches (splitting, order)
+  - rebased to the latest code
+
+v1->v2:
+
+  - added DSP ASE support
+  - added MT ASE support
+  - added GDB XML support
+  - order of patches changed
+  - commit messages and patch title improved across the board
+  - obsolete email addresses for authors and cosigners replaced
+    with the right ones
+  - some functions renamed to reflect better the documentation
+  - some macros renamed to reflect better their nanoMIPS nature
+  - streamlined formatting
+  - some of other reviewer's comments addressed, but the majority
+    was not; this is because the focus of this version was on
+    completing the functionality as much as possible; remaining
+    comments will be addressed in the subsequent versions of this
+    series
+
+This series of patches implements recently announced nanoMIPS on QEMU.
+nanoMIPS is a variable length ISA containing 16, 32 and 48-bit wide
+instructions. It is designed to be portable at assembly level with
+other MIPS and microMIPS code, but contains a number of changes that
+enhance code density and efficiency. The largest portion of patches
+is nanoMIPS decoding engine.
+
+For more information, please refer to the following link:
+
+https://www.mips.com/products/architectures/nanomips/
+
+
+Aleksandar Markovic (7):
+  target/mips: Add preprocessor constants for nanoMIPS
+  target/mips: Add placeholder and invocation of decode_nanomips_opc()
+  target/mips: Add nanoMIPS decoding and extraction utilities
+  elf: Relax MIPS' elf_check_arch() to accept EM_NANOMIPS too
+  elf: Don't check FCR31_NAN2008 bit for nanoMIPS
+  linux-user: Update syscall_defs.h header for nanoMIPS
+  qemu-doc: Add nanoMIPS-related items
+
+Aleksandar Rikalo (16):
+  target/mips: Implement emulation of nanoMIPS LLWP/SCWP pair
+  target/mips: Fix pre-nanoMIPS MT ASE instructions availability control
+  elf: Add EM_NANOMIPS value as a valid one for e_machine field
+  elf: On elf loading, treat both EM_MIPS and EM_NANOMIPS as legal for
+    MIPS
+  elf: Add nanoMIPS specific variations in ELF header fields
+  linux-user: Add syscall numbers for nanoMIPS
+  linux-user: Add target_signal.h header for nanoMIPS
+  linux-user: Add termbits.h header for nanoMIPS
+  linux-user: Add target_fcntl.h header for nanoMIPS
+  linux-user: Add sockbits.h header for nanoMIPS
+  linux-user: Add target_syscall.h header for nanoMIPS
+  linux-user: Add support for nanoMIPS signal trampoline
+  linux-user: Amend support for sigaction() syscall for nanoMIPS
+  linux-user: Add support for statx() syscall for all platforms
+  linux-user: Add support for nanoMIPS core files
+  linux-user: Add nanoMIPS support in scripts/qemu-binfmt-conf.sh
+
+Dimitrije Nikolic (5):
+  linux-user: Add target_cpu.h header for nanoMIPS
+  linux-user: Add target_structs.h header for nanoMIPS
+  linux-user: Add target_elf.h header for nanoMIPS
+  linux-user: Add signal.c for nanoMIPS
+  linux-user: Add cpu_loop.c for nanoMIPS
+
+James Hogan (2):
+  target/mips: Implement emulation of nanoMIPS EXTW instruction
+  gdbstub: Disable handling of nanoMIPS ISA bit in the MIPS gdbstub
+
+Matthew Fortune (3):
+  target/mips: Implement emulation of nanoMIPS ROTX instruction
+  disas: Add support for nanoMIPS platform
+  mips_malta: Add basic nanoMIPS boot code for Malta board
+
+Paul Burton (1):
+  mips_malta: Add setting up GT64120 BARs to the nanoMIPS bootloader
+
+Stefan Markovic (16):
+  target/mips: Add nanoMIPS DSP ASE opcodes
+  target/mips: Add emulation of nanoMIPS 16-bit branch instructions
+  target/mips: Add emulation of nanoMIPS 16-bit save and restore
+    instructions
+  target/mips: Add emulation of nanoMIPS 32-bit branch instructions
+  target/mips: Implement MT ASE support for nanoMIPS
+  target/mips: Add emulation of DSP ASE for nanoMIPS - part 1
+  target/mips: Add emulation of DSP ASE for nanoMIPS - part 2
+  target/mips: Add emulation of DSP ASE for nanoMIPS - part 3
+  target/mips: Add emulation of DSP ASE for nanoMIPS - part 4
+  target/mips: Add emulation of DSP ASE for nanoMIPS - part 5
+  target/mips: Add emulation of DSP ASE for nanoMIPS - part 6
+  target/mips: Add updating BadInstr and BadInstrX for nanoMIPS
+  mips_malta: Fix semihosting argument passing for nanoMIPS bare metal
+  target/mips: Add definition of nanoMIPS I7200 CPU
+  linux-user: Add nanoMIPS linux user mode configuration support
+  gdbstub: Add XML support for GDB for nanoMIPS
+
+Yongbok Kim (15):
+  target/mips: Add nanoMIPS base instruction set opcodes
+  target/mips: Add emulation of nanoMIPS 16-bit arithmetic instructions
+  target/mips: Add emulation of nanoMIPS 16-bit shift instructions
+  target/mips: Add emulation of nanoMIPS 16-bit misc instructions
+  target/mips: Add emulation of nanoMIPS 16-bit load and store
+    instructions
+  target/mips: Add emulation of nanoMIPS 16-bit logic instructions
+  target/mips: Add emulation of some common nanoMIPS 32-bit instructions
+  target/mips: Add emulation of nanoMIPS instructions MOVE.P and
+    MOVE.PREV
+  target/mips: Add emulation of nanoMIPS 48-bit instructions
+  target/mips: Add emulation of nanoMIPS FP instructions
+  target/mips: Add emulation of misc nanoMIPS instructions (pool32a0)
+  target/mips: Add emulation of misc nanoMIPS instructions (pool32axf)
+  target/mips: Add emulation of misc nanoMIPS instructions (p_lsx)
+  target/mips: Add emulation of nanoMIPS 32-bit load and store
+    instructions
+  target/mips: Fix ERET/ERETNC behavior related to ADEL exception
+
+ MAINTAINERS                             |     3 +-
+ configure                               |    13 +-
+ default-configs/nanomips-linux-user.mak |     1 +
+ disas/Makefile.objs                     |     1 +
+ disas/mips.c                            |    94 +-
+ disas/nanomips.cpp                      | 15772 ++++++++++++++++++++++++++++++
+ disas/nanomips.h                        |  1228 +++
+ gdb-xml/nanomips-cp0.xml                |    13 +
+ gdb-xml/nanomips-cpu.xml                |    44 +
+ gdb-xml/nanomips-dsp.xml                |    20 +
+ gdb-xml/nanomips-fpu.xml                |    45 +
+ gdb-xml/nanomips-linux.xml              |    20 +
+ hw/mips/mips_malta.c                    |   212 +-
+ include/disas/bfd.h                     |     1 +
+ include/elf.h                           |    20 +
+ include/hw/elf_ops.h                    |     8 +
+ linux-user/elfload.c                    |    12 +-
+ linux-user/mips/cpu_loop.c              |    36 +-
+ linux-user/mips/signal.c                |    36 +-
+ linux-user/mips/termbits.h              |     4 +
+ linux-user/nanomips/cpu_loop.c          |     1 +
+ linux-user/nanomips/signal.c            |     1 +
+ linux-user/nanomips/sockbits.h          |     1 +
+ linux-user/nanomips/syscall_nr.h        |   275 +
+ linux-user/nanomips/target_cpu.h        |    21 +
+ linux-user/nanomips/target_elf.h        |    14 +
+ linux-user/nanomips/target_fcntl.h      |    38 +
+ linux-user/nanomips/target_signal.h     |    22 +
+ linux-user/nanomips/target_structs.h    |     1 +
+ linux-user/nanomips/target_syscall.h    |    30 +
+ linux-user/nanomips/termbits.h          |     1 +
+ linux-user/syscall.c                    |   123 +-
+ linux-user/syscall_defs.h               |    95 +-
+ qemu-doc.texi                           |     2 +
+ scripts/qemu-binfmt-conf.sh             |    16 +-
+ target/mips/cpu.c                       |    11 +-
+ target/mips/cpu.h                       |     6 +-
+ target/mips/gdbstub.c                   |    13 +-
+ target/mips/helper.c                    |    16 +
+ target/mips/helper.h                    |     2 +
+ target/mips/internal.h                  |     9 +-
+ target/mips/mips-defs.h                 |     4 +
+ target/mips/op_helper.c                 |    98 +-
+ target/mips/translate.c                 |  4945 +++++++++-
+ target/mips/translate_init.inc.c        |    39 +
+ 45 files changed, 23256 insertions(+), 111 deletions(-)
+ create mode 100644 default-configs/nanomips-linux-user.mak
+ create mode 100644 disas/nanomips.cpp
+ create mode 100644 disas/nanomips.h
+ create mode 100644 gdb-xml/nanomips-cp0.xml
+ create mode 100644 gdb-xml/nanomips-cpu.xml
+ create mode 100644 gdb-xml/nanomips-dsp.xml
+ create mode 100644 gdb-xml/nanomips-fpu.xml
+ create mode 100644 gdb-xml/nanomips-linux.xml
+ create mode 100644 linux-user/nanomips/cpu_loop.c
+ create mode 100644 linux-user/nanomips/signal.c
+ create mode 100644 linux-user/nanomips/sockbits.h
+ create mode 100644 linux-user/nanomips/syscall_nr.h
+ create mode 100644 linux-user/nanomips/target_cpu.h
+ create mode 100644 linux-user/nanomips/target_elf.h
+ create mode 100644 linux-user/nanomips/target_fcntl.h
+ create mode 100644 linux-user/nanomips/target_signal.h
+ create mode 100644 linux-user/nanomips/target_structs.h
+ create mode 100644 linux-user/nanomips/target_syscall.h
+ create mode 100644 linux-user/nanomips/termbits.h
+
+-- 
+2.7.4
