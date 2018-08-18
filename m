@@ -1,26 +1,26 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:37248)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqpVA-0001Kc-U6
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 20:54:04 -0400
+	id 1fqpVK-0001Kc-UT
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 20:54:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqpKp-0000Pf-LK
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 20:43:23 -0400
+	id 1fqpGw-0003yK-5C
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 20:39:21 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180809130115.28951-1-peter.maydell@linaro.org>
-	<20180809130115.28951-12-peter.maydell@linaro.org>
+	<20180809130115.28951-10-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ccb11ed2-4157-4f72-11e6-1e985a423feb@amsat.org>
-Date: Fri, 17 Aug 2018 21:43:13 -0300
+Message-ID: <6405e67c-49a6-dff4-1a78-6e410a72ec0d@amsat.org>
+Date: Fri, 17 Aug 2018 21:39:13 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180809130115.28951-12-peter.maydell@linaro.org>
+In-Reply-To: <20180809130115.28951-10-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 11/16] hw/dma/pl080: Support all
- three interrupt lines
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 09/16] hw/arm/iotkit: Wire up
+ the lines for MSCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +33,75 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 08/09/2018 10:01 AM, Peter Maydell wrote:
-> The PL080 and PL081 have three outgoing interrupt lines:
->  * DMACINTERR signals DMA errors
->  * DMACINTTC is the DMA count interrupt
->  * DMACINTR is a combined interrupt, the logical OR of the other two
+> The IoTKit doesn't have any MSCs itself but it does need
+> some wiring to connect the external signals from MSCs
+> in the outer board model up to the registers and the
+> NVIC IRQ line.
 > 
-> We currently only implement DMACINTR, because that's all the
-> realview and versatile boards needed, but the instances of the
-> PL081 in the MPS2 firmware images use all three interrupt lines.
-> Implement the missing DMACINTERR and DMACINTTC.
+> We also need to expose a MemoryRegion corresponding to
+> the AHB bus, so that MSCs in the outer board model can
+> use that as their downstream port. (In the FPGA this is
+> the "AHB Slave Expansion" ports shown in the block
+> diagram in the AN505 documentation.)
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
 > ---
->  include/hw/dma/pl080.h |  6 +++++-
->  hw/dma/pl080.c         | 13 ++++++++-----
->  2 files changed, 13 insertions(+), 6 deletions(-)
+>  include/hw/arm/iotkit.h |  8 ++++++++
+>  hw/arm/iotkit.c         | 15 +++++++++++++++
+>  2 files changed, 23 insertions(+)
 > 
-> diff --git a/include/hw/dma/pl080.h b/include/hw/dma/pl080.h
-> index 7deb46c8578..7c6a4184833 100644
-> --- a/include/hw/dma/pl080.h
-> +++ b/include/hw/dma/pl080.h
-> @@ -17,7 +17,9 @@
->   * http://infocenter.arm.com/help/topic/com.arm.doc.ddi0218e/DDI0218.pdf
->   *
->   * QEMU interface:
-> - * + sysbus IRQ: DMACINTR combined interrupt line
-> + * + sysbus IRQ 0: DMACINTR combined interrupt line
-> + * + sysbus IRQ 1: DMACINTERR error interrupt request
-> + * + sysbus IRQ 2: DMACINTTC count interrupt request
->   * + sysbus MMIO region 0: MemoryRegion for the device's registers
+> diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
+> index 1ffa31d521b..5bb66b10468 100644
+> --- a/include/hw/arm/iotkit.h
+> +++ b/include/hw/arm/iotkit.h
+> @@ -28,6 +28,9 @@
+>   *  + QOM property "EXP_NUMIRQ" sets the number of expansion interrupts
+>   *  + Named GPIO inputs "EXP_IRQ" 0..n are the expansion interrupts, which
+>   *    are wired to the NVIC lines 32 .. n+32
+> + *  + sysbus MMIO region 0 is the "AHB Slave Expansion" which allows
+> + *    bus master devices in the board model to make transactions into
+> + *    all the devices and memory areas in the IoTKit
+>   * Controlling up to 4 AHB expansion PPBs which a system using the IoTKit
+>   * might provide:
+>   *  + named GPIO outputs apb_ppcexp{0,1,2,3}_nonsec[0..15]
+> @@ -45,6 +48,11 @@
+>   * Controlling each of the 16 expansion MPCs which a system using the IoTKit
+>   * might provide:
+>   *  + named GPIO inputs mpcexp_status[0..15]
+> + * Controlling each of the 16 expansion MSCs which a system using the IoTKit
+> + * might provide:
+> + *  + named GPIO inputs mscexp_status[0..15]
+> + *  + named GPIO outputs mscexp_clear[0..15]
+> + *  + named GPIO outputs mscexp_ns[0..15]
 >   */
 >  
-> @@ -57,6 +59,8 @@ typedef struct PL080State {
->      /* Flag to avoid recursive DMA invocations.  */
->      int running;
->      qemu_irq irq;
-> +    qemu_irq interr;
-> +    qemu_irq inttc;
->  } PL080State;
+>  #ifndef IOTKIT_H
+> diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+> index 5d59ed5489f..8ae2a052517 100644
+> --- a/hw/arm/iotkit.c
+> +++ b/hw/arm/iotkit.c
+> @@ -660,6 +660,21 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
 >  
->  #endif
-> diff --git a/hw/dma/pl080.c b/hw/dma/pl080.c
-> index 0f79c2d8a6c..301030dd118 100644
-> --- a/hw/dma/pl080.c
-> +++ b/hw/dma/pl080.c
-> @@ -75,11 +75,12 @@ static const unsigned char pl081_id[] =
+>      iotkit_forward_sec_resp_cfg(s);
 >  
->  static void pl080_update(PL080State *s)
->  {
-> -    if ((s->tc_int & s->tc_mask)
-> -            || (s->err_int & s->err_mask))
-> -        qemu_irq_raise(s->irq);
-> -    else
-> -        qemu_irq_lower(s->irq);
-> +    bool tclevel = (s->tc_int & s->tc_mask);
-> +    bool errlevel = (s->err_int & s->err_mask);
+> +    /* Forward the MSC related signals */
+> +    qdev_pass_gpios(dev_secctl, dev, "mscexp_status");
+> +    qdev_pass_gpios(dev_secctl, dev, "mscexp_clear");
+> +    qdev_pass_gpios(dev_secctl, dev, "mscexp_ns");
+> +    qdev_connect_gpio_out_named(dev_secctl, "msc_irq", 0,
+> +                                qdev_get_gpio_in(DEVICE(&s->armv7m), 11));
 > +
-> +    qemu_set_irq(s->interr, errlevel);
-> +    qemu_set_irq(s->inttc, tclevel);
-> +    qemu_set_irq(s->irq, errlevel || tclevel);
->  }
->  
->  static void pl080_run(PL080State *s)
-> @@ -352,6 +353,8 @@ static void pl080_init(Object *obj)
->      memory_region_init_io(&s->iomem, OBJECT(s), &pl080_ops, s, "pl080", 0x1000);
->      sysbus_init_mmio(sbd, &s->iomem);
->      sysbus_init_irq(sbd, &s->irq);
-> +    sysbus_init_irq(sbd, &s->interr);
-> +    sysbus_init_irq(sbd, &s->inttc);
->      s->nchannels = 8;
+> +    /*
+> +     * Expose our container region to the board model; this corresponds
+> +     * to the AHB Slave Expansion ports which allow bus master devices
+> +     * (eg DMA controllers) in the board model to make transactions into
+> +     * devices in the IoTKit.
+> +     */
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->container);
+> +
+>      system_clock_scale = NANOSECONDS_PER_SECOND / s->mainclk_frq;
 >  }
 >  
 > 
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
