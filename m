@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48124)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqq3S-0002kq-Ga
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:29:27 -0400
+	id 1fqqR9-0008OM-OR
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqq3O-0007Rr-3F
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:29:26 -0400
+	id 1fqqR6-0008Sr-Ko
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:53:55 -0400
+Received: from mail-vk0-x22d.google.com ([2607:f8b0:400c:c05::22d]:34729)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fqqR6-0008Sd-GI
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:53:52 -0400
+Received: by mail-vk0-x22d.google.com with SMTP id l143-v6so4071496vke.1
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 18:53:52 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180809130115.28951-1-peter.maydell@linaro.org>
-	<CAFEAcA-AD=cxpGzgyZDU3vhCwthVaPg+WKWNLH+gjP=devvWZw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e72958cc-88c1-67d9-2869-16e6c2578277@amsat.org>
-Date: Fri, 17 Aug 2018 22:29:14 -0300
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Fri, 17 Aug 2018 22:53:40 -0300
+Message-Id: <20180818015344.797-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-AD=cxpGzgyZDU3vhCwthVaPg+WKWNLH+gjP=devvWZw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 00/16] arm: Implement MPS2
- watchdogs and DMA
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/4] docker: Sort packages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,119 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On 08/16/2018 03:02 PM, Peter Maydell wrote:
-> Ping for code review, please?
+Trivial cleanup patches.
 
-I let patch #7 for someone else (or later) and few comments before
-adding R-b for the rest.
+Per the Docker recommendation, "this helps to avoid duplication of
+packages and make the list much easier to update. This also makes PRs
+a lot easier to read and review."
 
-> 
-> (It's only been a week so this is a little bit eager, but
-> I have some more MPS patches which wire up the PL022 SPI
-> controllers, which I'm holding off on posting until this
-> and the preceding FPGAIO set get reviewed and committed, so
-> as not to have too many MPS patches in flight at once.)
-> 
-> thanks
-> -- PMM
-> 
-> On 9 August 2018 at 14:00, Peter Maydell <peter.maydell@linaro.org> wrote:
->> This patchset adds some more missing devices to the MPS2 AN505
->> board model:
->>
->> Patches 1-3 implement and wire up the CMSDK APB watchdog devices.
->>
->> Patch 4 adds a CMSDK timer device that had been forgotten.
->>
->> Ppatches 5-6 implement and wire up the "system control element",
->> which is some simple control/ID registers in the IoTKit
->>
->> Patches 7-16 are the meat of the patchset, and add support
->> for the DMA controllers and their associated Master Security
->> Controllers. A TrustZone MSC sits in front of a device which
->> can be a bus master (such as a DMA controller) and allows secure
->> software to configure it to either pass through or reject transactions
->> made by that bus master. Rejected transactions may be configured to
->> either be aborted, or to behave as RAZ/WI. An interrupt can be
->> signalled for a rejected transaction. The AN505 has four
->> PL081 DMA controllers, each with its own MSC.
->>
->> Patches 10-15 are various minor cleanups and bugfixes in
->> the PL081 model that are needed for its use in the AN505.
->> In particular the PL081 was previously entirely broken as
->> it would hw_error() as soon as the guest enabled the DMA
->> engine. I assume this was either accidentally left-in debug code,
->> or a deliberate choice to guard a never-tested implementation
->> so as to be able to identify when we had guest code to test it
->> with. (Linux for the realview/versatile boards never tries to
->> use the PL08x there for DMA.)
->>
->> This patchset is sufficient for the "DMA" test in the AN505
->> self-test binary to pass. (I suspect it is not giving the
->> PL081 or MSC a very thorough workout, though.)
->>
->> Based-on: <20180730162458.23186-1-peter.maydell@linaro.org>
->> ("[PATCH 0/5] mps2: Implement FPGAIO counters and dual-timer")
->>
->> thanks
->> -- PMM
->>
->> Peter Maydell (16):
->>   hw/watchdog/cmsdk_apb_watchdog: Implement CMSDK APB watchdog module
->>   nvic: Expose NMI line
->>   hw/arm/iotkit: Wire up the watchdogs
->>   hw/arm/iotkit: Wire up the S32KTIMER
->>   hw/misc/iotkit-sysctl: Implement IoTKit system control element
->>   hw/misc/iotkit: Wire up the system control element
->>   hw/misc/tz-msc: Model TrustZone Master Security Controller
->>   hw/misc/iotkit-secctl: Wire up registers for controlling MSCs
->>   hw/arm/iotkit: Wire up the lines for MSCs
->>   hw/dma/pl080: Allow use as embedded-struct device
->>   hw/dma/pl080: Support all three interrupt lines
->>   hw/dma/pl080: Don't use CPU address space for DMA accesses
->>   hw/dma/pl080: Provide device reset function
->>   hw/dma/pl080: Correct bug in register address decode logic
->>   hw/dma/pl080: Remove hw_error() if DMA is enabled
->>   hw/arm/mps2-tz: Create PL081s and MSCs
->>
->>  Makefile.objs                            |   1 +
->>  hw/misc/Makefile.objs                    |   2 +
->>  hw/watchdog/Makefile.objs                |   1 +
->>  include/hw/arm/iotkit.h                  |  20 +-
->>  include/hw/dma/pl080.h                   |  71 +++++
->>  include/hw/misc/iotkit-secctl.h          |  14 +
->>  include/hw/misc/iotkit-sysctl.h          |  50 ++++
->>  include/hw/misc/tz-msc.h                 |  79 ++++++
->>  include/hw/watchdog/cmsdk-apb-watchdog.h |  59 ++++
->>  hw/arm/armv7m.c                          |   1 +
->>  hw/arm/iotkit.c                          |  99 ++++++-
->>  hw/arm/mps2-tz.c                         | 101 ++++++-
->>  hw/arm/realview.c                        |   8 +-
->>  hw/arm/versatilepb.c                     |   9 +-
->>  hw/dma/pl080.c                           | 113 ++++----
->>  hw/intc/armv7m_nvic.c                    |  19 ++
->>  hw/misc/iotkit-secctl.c                  |  73 ++++-
->>  hw/misc/iotkit-sysctl.c                  | 324 ++++++++++++++++++++++
->>  hw/misc/tz-msc.c                         | 308 +++++++++++++++++++++
->>  hw/watchdog/cmsdk-apb-watchdog.c         | 326 +++++++++++++++++++++++
->>  MAINTAINERS                              |   7 +
->>  default-configs/arm-softmmu.mak          |   3 +
->>  hw/intc/trace-events                     |   1 +
->>  hw/misc/trace-events                     |  16 ++
->>  hw/watchdog/trace-events                 |   6 +
->>  25 files changed, 1632 insertions(+), 79 deletions(-)
->>  create mode 100644 include/hw/dma/pl080.h
->>  create mode 100644 include/hw/misc/iotkit-sysctl.h
->>  create mode 100644 include/hw/misc/tz-msc.h
->>  create mode 100644 include/hw/watchdog/cmsdk-apb-watchdog.h
->>  create mode 100644 hw/misc/iotkit-sysctl.c
->>  create mode 100644 hw/misc/tz-msc.c
->>  create mode 100644 hw/watchdog/cmsdk-apb-watchdog.c
->>  create mode 100644 hw/watchdog/trace-events
->>
->> --
->> 2.17.1
-> 
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (4):
+  docker: Sort Fedora packages
+  docker: Sort Fedora packages (i386-cross)
+  docker: Sort Ubuntu packages
+  docker: Sort CentOS packages
+
+ tests/docker/dockerfiles/centos7.docker       |   2 +-
+ .../dockerfiles/fedora-i386-cross.docker      |   9 +-
+ tests/docker/dockerfiles/fedora.docker        | 102 ++++++++++++++----
+ tests/docker/dockerfiles/ubuntu.docker        |  61 +++++++++--
+ 4 files changed, 141 insertions(+), 33 deletions(-)
+
+-- 
+2.18.0
