@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fqre9-0003iN-G3
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:11:26 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fqskK-0002Og-V7
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 00:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fqre5-0001XW-In
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:11:25 -0400
-Received: from mga07.intel.com ([134.134.136.100]:27523)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1fqre5-00013N-9N
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:11:21 -0400
-Message-ID: <1534561816.4104.3.camel@linux.intel.com>
-From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Sat, 18 Aug 2018 11:10:16 +0800
-In-Reply-To: <20180817031019.GZ15372@localhost.localdomain>
-References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
-	<1533909989-56115-2-git-send-email-robert.hu@linux.intel.com>
-	<20180817031019.GZ15372@localhost.localdomain>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] x86: Data structure changes to
- support MSR based features
+	(envelope-from <no-reply@patchew.org>) id 1fqskJ-0006CQ-0Y
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 00:21:52 -0400
+Resent-Message-Id: <E1fqskJ-0006CQ-0Y@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21032)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fqskI-0006Ac-Mi
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 00:21:50 -0400
+In-Reply-To: <1534507432-2873-1-git-send-email-hans-erik.floryd@rt-labs.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153456608089.27000.15815652232399697540@502c9da6d61e>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 17 Aug 2018 21:21:22 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2] sdhci: add i.MX SD Stable Clock bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,106 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: robert.hu@intel.com, robert.hu@linux.intel.com, pbonzini@redhat.com, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
+To: hans-erik.floryd@rt-labs.com
+Cc: famz@redhat.com, qemu-trivial@nongnu.org, f4bug@amsat.org, qemu-devel@nongnu.org
 
-On Fri, 2018-08-17 at 00:10 -0300, Eduardo Habkost wrote:
-[trim...]
-> > +
-> >  typedef struct FeatureWordInfo {
-> > -    /* feature flags names are taken from "Intel Processor Identification and
-> > +    FeatureWordType type;
-> > +   /* feature flags names are taken from "Intel Processor Identification and
-> >       * the CPUID Instruction" and AMD's "CPUID Specification".
-> >       * In cases of disagreement between feature naming conventions,
-> >       * aliases may be added.
-> >       */
-> >      const char *feat_names[32];
-> > -    uint32_t cpuid_eax;   /* Input EAX for CPUID */
-> > -    bool cpuid_needs_ecx; /* CPUID instruction uses ECX as input */
-> > -    uint32_t cpuid_ecx;   /* Input ECX value for CPUID */
-> > -    int cpuid_reg;        /* output register (R_* constant) */
-> > +    union {
-> > +        /* If type==CPUID_FEATURE_WORD */
-> > +        struct {
-> > +            uint32_t eax;   /* Input EAX for CPUID */
-> > +            bool needs_ecx; /* CPUID instruction uses ECX as input */
-> > +            uint32_t ecx;   /* Input ECX value for CPUID */
-> > +            int reg;        /* output register (R_* constant) */
-> > +        } cpuid;
-> > +        /* If type==MSR_FEATURE_WORD */
-> > +        struct {
-> > +            uint32_t index;
-> > +            struct {   /*CPUID that enumerate this MSR*/
-> > +                FeatureWord cpuid_class;
-> > +                uint32_t    cpuid_flag;
-> > +            } cpuid_dep;
-> > +        } msr;
-> > +    };
-> >      uint32_t tcg_features; /* Feature flags supported by TCG */
-> >      uint32_t unmigratable_flags; /* Feature flags known to be unmigratable */
-> >      uint32_t migratable_flags; /* Feature flags known to be migratable */
-> 
-> The data structure change looks good, but you are breaking the
-> build if you touch them without updating the existing code.  If
-> you break the build in your series, you break git-bisect.
-> 
-I had tested in my environment before send out, build has no even a
-warning. Is it because this patch is based on master + previous icelake
-cpu model set? I see you are pulling in previous icelake cpu model patch
-set. I will rebase this patch to then master. Will previous icelake cpu
-model patch set appear in master soon?
-> 
-> [...]
-> > +    /*Below are MSR exposed features*/
-> > +    [FEATURE_WORDS_ARCH_CAPABILITIES] = {
-> > +        .type = MSR_FEATURE_WORD,
-> > +        .feat_names = {
-> > +            "rdctl-no", "ibrs-all", "rsba", NULL,
-> > +            "ssb-no", NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +        },
-> > +        .msr = { .index = MSR_IA32_ARCH_CAPABILITIES,
-> > +                .cpuid_dep = { FEAT_7_0_EDX,
-> > +                    CPUID_7_0_EDX_ARCH_CAPABILITIES }
-> > +                },
-> > +    },
-> 
-> I suggest moving this hunk to a separate patch: first we refactor
-> the existing code without changing behavior or adding new
-> features, then we add the new features.
-> 
-Sure.
-
-> >  };
-> >  
-> >  typedef struct X86RegisterInfo32 {
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index cddf9d9..9e8879e 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -502,9 +502,14 @@ typedef enum FeatureWord {
-> >      FEAT_6_EAX,         /* CPUID[6].EAX */
-> >      FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
-> >      FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
-> > +    FEATURE_WORDS_NUM_CPUID,
-> > +    FEATURE_WORDS_FIRST_MSR = FEATURE_WORDS_NUM_CPUID,
-> > +    FEATURE_WORDS_ARCH_CAPABILITIES = FEATURE_WORDS_FIRST_MSR,
-> >      FEATURE_WORDS,
-> >  } FeatureWord;
-> >  
-> > +#define FEATURE_WORDS_NUM_MSRS (FEATURE_WORDS - FEATURE_WORDS_FIRST_MSR)
-> > +
-> >  typedef uint32_t FeatureWordArray[FEATURE_WORDS];
-> >  
-> >  /* cpuid_features bits */
-> > -- 
-> > 1.8.3.1
-> > 
-> > 
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MzQ1MDc0MzItMjg3My0xLWdpdC1zZW5kLWVtYWlsLWhhbnMtZXJpay5mbG9y
+eWRAcnQtbGFicy5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2Ml0gc2RoY2k6IGFk
+ZCBpLk1YIFNEIFN0YWJsZSBDbG9jayBiaXQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
+YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
+IHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUgg
+LS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNr
+aW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgog
+ICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNo
+LnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAg
+ZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQg
+PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3
+aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZGQ4ZDY5NTIwNCBzZGhjaTogYWRkIGkuTVgg
+U0QgU3RhYmxlIENsb2NrIGJpdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
+MS8xOiBzZGhjaTogYWRkIGkuTVggU0QgU3RhYmxlIENsb2NrIGJpdC4uLgpFUlJPUjogc3VzcGVj
+dCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNywgMTApCiMzNDogRklM
+RTogaHcvc2Qvc2RoY2kuYzoxNjU3OgorICAgICAgIGlmIChzLT5jbGtjb24gJiBTREhDX0NMT0NL
+X0lOVF9TVEFCTEUpIHsKKyAgICAgICAgICByZXQgfD0gRVNESENfUFJOU1RTX1NEU1RCOwoKdG90
+YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
