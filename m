@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqrWr-0001La-Cj
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:03:53 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1fqre9-0003iN-G3
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqrWm-0005hi-ET
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:03:53 -0400
-Received: from mail-vk0-x236.google.com ([2607:f8b0:400c:c05::236]:44187)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqrWl-0005hA-6p
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:03:48 -0400
-Received: by mail-vk0-x236.google.com with SMTP id 125-v6so4115856vke.11
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 20:03:47 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sat, 18 Aug 2018 00:03:37 -0300
-Message-Id: <20180818030337.22271-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] docker: Clean dangling tarball files
+	(envelope-from <robert.hu@linux.intel.com>) id 1fqre5-0001XW-In
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:11:25 -0400
+Received: from mga07.intel.com ([134.134.136.100]:27523)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1fqre5-00013N-9N
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:11:21 -0400
+Message-ID: <1534561816.4104.3.camel@linux.intel.com>
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Sat, 18 Aug 2018 11:10:16 +0800
+In-Reply-To: <20180817031019.GZ15372@localhost.localdomain>
+References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
+	<1533909989-56115-2-git-send-email-robert.hu@linux.intel.com>
+	<20180817031019.GZ15372@localhost.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] x86: Data structure changes to
+ support MSR based features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +30,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: robert.hu@intel.com, robert.hu@linux.intel.com, pbonzini@redhat.com, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
 
-When a container fails, it leaves a dangling tarball which name is
-based on a timestamp. Further uses of make won't clean those files,
-neither calling the 'docker-clean' target.
+On Fri, 2018-08-17 at 00:10 -0300, Eduardo Habkost wrote:
+[trim...]
+> > +
+> >  typedef struct FeatureWordInfo {
+> > -    /* feature flags names are taken from "Intel Processor Identification and
+> > +    FeatureWordType type;
+> > +   /* feature flags names are taken from "Intel Processor Identification and
+> >       * the CPUID Instruction" and AMD's "CPUID Specification".
+> >       * In cases of disagreement between feature naming conventions,
+> >       * aliases may be added.
+> >       */
+> >      const char *feat_names[32];
+> > -    uint32_t cpuid_eax;   /* Input EAX for CPUID */
+> > -    bool cpuid_needs_ecx; /* CPUID instruction uses ECX as input */
+> > -    uint32_t cpuid_ecx;   /* Input ECX value for CPUID */
+> > -    int cpuid_reg;        /* output register (R_* constant) */
+> > +    union {
+> > +        /* If type==CPUID_FEATURE_WORD */
+> > +        struct {
+> > +            uint32_t eax;   /* Input EAX for CPUID */
+> > +            bool needs_ecx; /* CPUID instruction uses ECX as input */
+> > +            uint32_t ecx;   /* Input ECX value for CPUID */
+> > +            int reg;        /* output register (R_* constant) */
+> > +        } cpuid;
+> > +        /* If type==MSR_FEATURE_WORD */
+> > +        struct {
+> > +            uint32_t index;
+> > +            struct {   /*CPUID that enumerate this MSR*/
+> > +                FeatureWord cpuid_class;
+> > +                uint32_t    cpuid_flag;
+> > +            } cpuid_dep;
+> > +        } msr;
+> > +    };
+> >      uint32_t tcg_features; /* Feature flags supported by TCG */
+> >      uint32_t unmigratable_flags; /* Feature flags known to be unmigratable */
+> >      uint32_t migratable_flags; /* Feature flags known to be migratable */
+> 
+> The data structure change looks good, but you are breaking the
+> build if you touch them without updating the existing code.  If
+> you break the build in your series, you break git-bisect.
+> 
+I had tested in my environment before send out, build has no even a
+warning. Is it because this patch is based on master + previous icelake
+cpu model set? I see you are pulling in previous icelake cpu model patch
+set. I will rebase this patch to then master. Will previous icelake cpu
+model patch set appear in master soon?
+> 
+> [...]
+> > +    /*Below are MSR exposed features*/
+> > +    [FEATURE_WORDS_ARCH_CAPABILITIES] = {
+> > +        .type = MSR_FEATURE_WORD,
+> > +        .feat_names = {
+> > +            "rdctl-no", "ibrs-all", "rsba", NULL,
+> > +            "ssb-no", NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +            NULL, NULL, NULL, NULL,
+> > +        },
+> > +        .msr = { .index = MSR_IA32_ARCH_CAPABILITIES,
+> > +                .cpuid_dep = { FEAT_7_0_EDX,
+> > +                    CPUID_7_0_EDX_ARCH_CAPABILITIES }
+> > +                },
+> > +    },
+> 
+> I suggest moving this hunk to a separate patch: first we refactor
+> the existing code without changing behavior or adding new
+> features, then we add the new features.
+> 
+Sure.
 
-Use the .DELETE_ON_ERROR built-in target to let make remove those
-temporary tarballs in case of failure.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/docker/Makefile.include | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index d3101afecd..6e03235ab9 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -25,6 +25,7 @@ IMAGES ?= %
- CUR_TIME := $(shell date +%Y-%m-%d-%H.%M.%S.$$$$)
- DOCKER_SRC_COPY := $(BUILD_DIR)/docker-src.$(CUR_TIME)
- 
-+.DELETE_ON_ERROR: $(DOCKER_SRC_COPY)
- $(DOCKER_SRC_COPY):
- 	@mkdir $@
- 	$(if $(SRC_ARCHIVE), \
--- 
-2.18.0
+> >  };
+> >  
+> >  typedef struct X86RegisterInfo32 {
+> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> > index cddf9d9..9e8879e 100644
+> > --- a/target/i386/cpu.h
+> > +++ b/target/i386/cpu.h
+> > @@ -502,9 +502,14 @@ typedef enum FeatureWord {
+> >      FEAT_6_EAX,         /* CPUID[6].EAX */
+> >      FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
+> >      FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
+> > +    FEATURE_WORDS_NUM_CPUID,
+> > +    FEATURE_WORDS_FIRST_MSR = FEATURE_WORDS_NUM_CPUID,
+> > +    FEATURE_WORDS_ARCH_CAPABILITIES = FEATURE_WORDS_FIRST_MSR,
+> >      FEATURE_WORDS,
+> >  } FeatureWord;
+> >  
+> > +#define FEATURE_WORDS_NUM_MSRS (FEATURE_WORDS - FEATURE_WORDS_FIRST_MSR)
+> > +
+> >  typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+> >  
+> >  /* cpuid_features bits */
+> > -- 
+> > 1.8.3.1
+> > 
+> > 
+> 
