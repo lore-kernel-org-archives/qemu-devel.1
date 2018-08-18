@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59500)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqrPw-0007EI-Tl
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 22:56:45 -0400
+	id 1fqrQO-0007TG-F3
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 22:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqrPr-00026u-6Q
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 22:56:44 -0400
+	id 1fqrQJ-0002Mn-HF
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 22:57:12 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 17 Aug 2018 23:56:00 -0300
-Message-Id: <20180818025600.21132-1-f4bug@amsat.org>
+Date: Fri, 17 Aug 2018 23:56:53 -0300
+Message-Id: <20180818025653.21192-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] sheepdog: Replace strncpy() by g_strlcpy()
+Subject: [Qemu-devel] [PATCH] migration: Replace strncpy() by g_strlcpy()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Liu Yuan <namei.unix@gmail.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Sheepdog" <qemu-block@nongnu.org>, "open list:Sheepdog" <sheepdog@lists.wpkg.org>
+To: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Hildenbrand <david@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
 Fedora 29 comes with GCC 8.1 which added the 'stringop-truncation' checks.
 
 Replace the strncpy() calls by g_strlcpy() to avoid the following warning:
 
-  block/sheepdog.c: In function 'find_vdi_name':
-  block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals
-  destination size [-Werror=stringop-truncation]
-       strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
-       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  migration/global_state.c: In function 'global_state_store_running':
+  migration/global_state.c:45:5: error: 'strncpy' specified bound 100 equals destination size [-Werror=stringop-truncation]
+       strncpy((char *)global_state.runstate,
+       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              state, sizeof(global_state.runstate));
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
 See http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg03723.html
 
- block/sheepdog.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ migration/global_state.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index b229a664d9..5dc3d0c39e 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -1224,19 +1224,19 @@ static int find_vdi_name(BDRVSheepdogState *s, const char *filename,
-     SheepdogVdiReq hdr;
-     SheepdogVdiRsp *rsp = (SheepdogVdiRsp *)&hdr;
-     unsigned int wlen, rlen = 0;
--    char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN];
-+    /* Ensures that the buffer is zero-filled,
-+     * which is desirable since we'll soon be sending those bytes, and
-+     * don't want the send_req to read uninitialized data.
-+     */
-+    char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN] = { };
+diff --git a/migration/global_state.c b/migration/global_state.c
+index 8e8ab5c51e..d5df502cd5 100644
+--- a/migration/global_state.c
++++ b/migration/global_state.c
+@@ -42,7 +42,7 @@ int global_state_store(void)
+ void global_state_store_running(void)
+ {
+     const char *state = RunState_str(RUN_STATE_RUNNING);
+-    strncpy((char *)global_state.runstate,
++    g_strlcpy((char *)global_state.runstate,
+            state, sizeof(global_state.runstate));
+ }
  
-     fd = connect_to_sdog(s, errp);
-     if (fd < 0) {
-         return fd;
-     }
- 
--    /* This pair of strncpy calls ensures that the buffer is zero-filled,
--     * which is desirable since we'll soon be sending those bytes, and
--     * don't want the send_req to read uninitialized data.
--     */
--    strncpy(buf, filename, SD_MAX_VDI_LEN);
--    strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
-+    g_strlcpy(buf, filename, SD_MAX_VDI_LEN);
-+    g_strlcpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
- 
-     memset(&hdr, 0, sizeof(hdr));
-     if (lock) {
 -- 
 2.18.0
