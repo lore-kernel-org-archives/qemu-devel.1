@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fr4Wv-0002yI-Nl
-	for Qemu-devel@nongnu.org; Sat, 18 Aug 2018 12:57:01 -0400
+	(envelope-from <bounces@canonical.com>) id 1fr58a-0005aQ-RE
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 13:35:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fr4P5-0004UP-LD
-	for Qemu-devel@nongnu.org; Sat, 18 Aug 2018 12:48:59 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <a924155b-0302-8e3f-395c-3504b8d6f729@redhat.com>
-Date: Sat, 18 Aug 2018 12:48:28 -0400
+	(envelope-from <bounces@canonical.com>) id 1fr58W-0001FD-Qb
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 13:35:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59548)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fr58W-0001EE-Ke
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 13:35:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fr58T-0001no-RH
+	for <qemu-devel@nongnu.org>; Sat, 18 Aug 2018 17:35:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5306E2E8524
+	for <qemu-devel@nongnu.org>; Sat, 18 Aug 2018 17:35:37 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <800B3517-46C2-4869-ACAB-8BD582322E10@gmail.com>
-References: <20180730212249.16418-1-programmingkidx@gmail.com>
-	<5679ec6f-e2d7-e139-1b56-304540c89977@redhat.com>
-	<f6fcbd58-2462-d432-a038-cc13bb0dcf23@redhat.com>
-	<20180814084047.GD5025@dhcp-200-186.str.redhat.com>
-	<D08F395C-E55A-4FF1-9844-02B606FDDF8E@gmail.com>
-	<c1f8aba9-4a63-4dfa-cf0b-9521c869c9ff@redhat.com>
-	<D1319041-4F97-49CD-A53C-BFFA6D39BC16@gmail.com>
-	<a924155b-0302-8e3f-395c-3504b8d6f729@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img.c: increase spacing between
- commands in documentation
+Date: Sat, 18 Aug 2018 17:22:37 -0000
+From: Michele Denber <1787505@bugs.launchpad.net>
+Reply-To: Bug 1787505 <1787505@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153446472677.27869.256879611828000197.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153461295795.3544.9919122097248662758.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1787505] Re: Solaris host: no network connection,
+ mouse pointer mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,142 +37,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+Thank you very much.  The following invocation fixed the mouse problem
+(mostly) and made the Ethernet device available to the guest:
 
-> On Aug 17, 2018, at 4:59 PM, Eric Blake <eblake@redhat.com> wrote:
->=20
-> On 08/17/2018 02:28 PM, Programmingkid wrote:
->=20
->>>>  -o             Used with a comma separated list of format specific =
-options in a
->>>>                 name=3Dvalue format. Use "-o ?" for an overview of =
-the options
->>>=20
->>> Please spell that "-o help", not "-o ?".   Otherwise, the user has =
-to quote the ? to avoid it globbing into any single-byte file lying =
-around in the current directory.
->> "-o ?" and "-o help" does not appear to work for this command. Maybe =
-it should be removed.
->> This is what I tried:
->> 	qemu-img amend -o help
->> 	qemu-img amend -o ?
->=20
-> The set of options depends on the file format being amended.  So, you =
-have to try:
->=20
-> qemu-img amend -o help -f qcow2
->=20
-> or supply an image name, as in:
->=20
-> qemu-img amend -o help myimage.qcow2
->=20
-> (of course, the latter relies on image probing, which I just said is =
-potentially unsafe if you didn't use -f).  But the point is the option =
--o does work, just not in isolation.
->=20
->=20
->>>>  -t             Specifies the cache mode that should be used with =
-the
->>>>                 destination file.
->>>=20
->>> And what are those modes?  If you're going to be wordy, then give =
-the user enough information to be useful.  Otherwise, being terse in =
---help is fine (and let the man page be wordy instead).
->> I don't know what the modes are. Anyone care to fill us in?
->=20
-> The source code is your friend. qemu-img.c has:
->=20
->       case 'T':
->            cache =3D optarg;
-> ...
->    ret =3D bdrv_parse_cache_mode(cache, &flags, &writethrough);
->=20
-> then you search for bdrv_parse_cache_mode(), in block.c:
->=20
->    if (!strcmp(mode, "off") || !strcmp(mode, "none")) {
->        *writethrough =3D false;
->        *flags |=3D BDRV_O_NOCACHE;
->    } else if (!strcmp(mode, "directsync")) {
->        *writethrough =3D true;
->        *flags |=3D BDRV_O_NOCACHE;
->    } else if (!strcmp(mode, "writeback")) {
->        *writethrough =3D false;
->    } else if (!strcmp(mode, "unsafe")) {
->        *writethrough =3D false;
->        *flags |=3D BDRV_O_NO_FLUSH;
->    } else if (!strcmp(mode, "writethrough")) {
->        *writethrough =3D true;
->=20
-> So six different aliases, for five different modes.  We can either =
-improve --help output to document these directly, or add a '-t help' =
-option (the way we have '-o help') to dynamically print the list.
->=20
->>>> Example:
->>>>     qemu-img amend -o compat=3D0.10 -f qcow2 image.qcow2
->>>=20
->>> Where's an example with --image-opts and --object secret?
->> I prefer examples that I think a user would actually use. The =
---image-opts and -object options are not necessary to use this command.
->=20
-> Umm, they ARE necessary if you want to amend a LUKS-encrypted image, =
-and that IS something I would actually use.  What's more, it's the =
-complex examples (like a LUKS-encrypted image) where seeing something =
-spelled out will save a LOT of hair-pulling from someone reading the =
-docs (but, alongside it should ALSO be a short-and-simple example).
->=20
->>> We're trying to move away from compat=3D0.10 (also spelled =
-compat=3Dv2), and instead start encouraging compat=3Dv3.
->> So you want this: qemu-img amend -o compat=3Dv3 -f qcow2 image.qcow2
->=20
-> Yes, that's one reasonable example, but should not be the only =
-example.
+./qemu-system-x86_64 -m 2047 -boot d  -usb -device usb-tablet -smp 3
+-netdev user,id=3Dn0 -device rtl8139,netdev=3Dn0 -hda
+/bkpool/qemuimages/XP.img -cdrom /bkpool/qemuimages/xp.iso
 
-Here is an improved version of the amend documentation:
+There is one minor problem with the mouse.  Without the "-usb" qemu
+displays the guest cursor position with an arrow, and the host cursor
+position with a four pixel-wide box, separated by a distance that varies
+with position on the screen.  After adding "-usb", the guest cursor
+correctly tracks the host mouse, but the little box remains displayed,
+speared on the tip on the guest cursor arrow.
 
-usage: qemu-img amend [--object objectdef] [--image-opts] [-p] [-q] [-f =
-fmt]
-[-t cache] -o options filename
+Also, while the guest now has a network device it still can't talk to
+any destination.  Oddly, if I try to ftp to some server it says
+"connected" but then nothing else.  Web pages all come back as
+"unreachable" even when requested by IP rather than name.  Even pinging
+the router fails (though the documentation states that ping won't work
+anyway).  The guest shows packets beign sent, but none received.  I
+tried various other options listed in the documentation without success,
+eg.
 
-Command parameters:
- -f             The format of the image file.
+# qemu-system-x86_64: Host doesn't belong to network
+ ./qemu-system-x86_64 -m 2047 -boot d  -usb -device usb-tablet  -smp 3 -net=
+dev user,id=3Dn0,host=3D192.168.0.20, \
+> hostname=3Dcanadiceq,dns=3D127.0.0.1,net=3D192.168.0.20/24 -device rtl813=
+9,netdev=3Dn0 -hda  /bkpool/qemuimages/XP.img -cdrom /bkpool/qemuimages/xp.=
+iso &
+1212
+# qemu-system-x86_64: Host doesn't belong to network
 
---image-opts    Treat filename as a set of image options, instead of a =
-plain
-                filename.
+My best guess also didn't work:
 
- -o             Used with a comma separated list of format specific =
-options in a
-                name=3Dvalue format. Use "-o help" for an overview of =
-the options
-                supported by the used format.
+./qemu-system-x86_64 -m 2047 -boot d  -usb -device usb-tablet  -smp 3 -netd=
+ev user,id=3Dn0,hostfwd=3Dtcp::8080-:80,\
+> net=3D192.168.0.0/24 -device rtl8139,netdev=3Dn0 -hda  /bkpool/qemuimages=
+/XP.img -cdrom /bkpool/qemuimages/xp.iso &
 
---object        'objectdef' is a QEMU user creatable object definition. =
-See the
-                qemu(1) manual page for a description of the object =
-properties.
-                The most common object type is a 'secret', which is used =
-to
-                supply passwords and/or encryption keys.
+That at least starts up, but no communication.
 
- -p             Display progress bar. If the -p option is not used for a =
-command
-                that supports it, the progress is reported when the =
-process
-                receives a "SIGUSR1" signal. Avoid using with the -q =
-option.
+I guess I just don't understand what needs to be listed where in the
+qemu invocation.  My guest TCP parameters are set up the same way as a
+different working XP system.  I can't tell what I need to get the guest
+to talk to the Internet.  I have a host IP (192.168.0.20), guest IP
+(192.168.0.21), router IP (192.168.0.1), and DNS IP (208.67.222.222).
+What goes where?  Do I need to set up anything special on the Solaris
+end?  I've read over the documenation but still can't figure it out.
 
- -q             Quiet mode - do not print any output (except errors). =
-Avoid
-                using with the -p option.
+"If you have access to a Linux box, I'd definitely recommend testing the
+same setup there."
 
- -t             Specifies the cache mode that should be used with the
-                destination file. Options are: none, writeback, =
-writethrough,
-                directsync, and unsafe.
+I do, but I only have one legit XP license.
 
-Example:
-    qemu-img amend -o compat=3Dv3 -f qcow2 image.qcow2
-    qemu-img amend --object secret,id=3Dsec0,data=3Dtest --image-opts \
-    driver=3Dluks,key-secret=3Dsec0,file.filename=3Dtest.luks -o size=3D2G=
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1787505
+
+Title:
+  Solaris host: no network connection, mouse pointer mismatch
+
+Status in QEMU:
+  New
+
+Bug description:
+  This is probably a bit far afield but on a Solaris 10 SPARC host (Sun
+  M3000) running a Windows XP guest like this:
+
+  ./qemu-system-x86_64 -m 1024 -boot d  -smp 3 -net nic -net user -hda
+  /bkpool/qemuimages/XP.img -cdrom /bkpool/qemuimages/xp.iso &
+
+  the vnc server starts up and Windows boots normally.  However, there
+  is no network connectivity.  There are no network devices visible in
+  XP's Networking tab of Control Panel and a ping of the local router
+  reports "unreachable".
+
+  Also, the keyboard works fine but the guest mouse pointer is offset
+  from the host mouse position by an amount that varies by screen
+  position.  This makes it impossible to point to locations near the
+  edge of the qemu window.  This seems to be a previously reported
+  problem, but the suggested fix, " -device usb-tablet", prevents qemu
+  from even starting:
+
+  qemu-system-x86_64: -device usb-tablet: No 'usb-bus' bus found for
+  device 'usb-tablet'
+
+  The physical mouse is connected to the USB port of a Sun Ray 2fs
+  controlling the M3000 via Sun Ray server.  I apologize if this is a
+  configuration issue and not a bug but I don't know where else to
+  report it and have been unable to find a solution in the
+  documentation.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1787505/+subscriptions
