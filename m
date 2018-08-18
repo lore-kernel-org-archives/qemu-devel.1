@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fr2sc-00018n-0P
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:11:06 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fr3Rc-00017h-9w
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:47:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fr2sY-0002eD-O9
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:11:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48118)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fr2sY-0002cv-GI
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:11:02 -0400
-Date: Sat, 18 Aug 2018 12:10:59 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180818151059.GO15372@localhost.localdomain>
-References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
-	<1533909989-56115-4-git-send-email-robert.hu@linux.intel.com>
-	<20180817132820.GB15372@localhost.localdomain>
-	<1534582905.4104.25.camel@linux.intel.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fr3NW-0006qL-FW
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:43:07 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180809130115.28951-1-peter.maydell@linaro.org>
+	<20180809130115.28951-9-peter.maydell@linaro.org>
+	<3fbb1f6d-8615-f540-d902-67ea9026777b@amsat.org>
+	<CAFEAcA9_76xjs6cb223q0zCQyi3n67_-f8Ga+2yYRvXM73dk9Q@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b226de86-f209-24b8-84ee-a262b4558705@amsat.org>
+Date: Sat, 18 Aug 2018 12:42:56 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1534582905.4104.25.camel@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] Change other funcitons referring to
- feature_word_info[]
+In-Reply-To: <CAFEAcA9_76xjs6cb223q0zCQyi3n67_-f8Ga+2yYRvXM73dk9Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 08/16] hw/misc/iotkit-secctl:
+ Wire up registers for controlling MSCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,182 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Robert Hoo <robert.hu@linux.intel.com>
-Cc: robert.hu@intel.com, pbonzini@redhat.com, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On Sat, Aug 18, 2018 at 05:01:45PM +0800, Robert Hoo wrote:
-> On Fri, 2018-08-17 at 10:28 -0300, Eduardo Habkost wrote:
-> > On Fri, Aug 10, 2018 at 10:06:29PM +0800, Robert Hoo wrote:
-> > > Add an util function feature_word_description(), which help construct the string
-> > > describing the feature word (both CPUID and MSR types).
-> > > 
-> > > report_unavailable_features(): add MSR_FEATURE_WORD type support.
-> > > x86_cpu_get_feature_words(): limit to CPUID_FEATURE_WORD only.
-> > > x86_cpu_get_supported_feature_word(): add MSR_FEATURE_WORD type support.
-> > > x86_cpu_adjust_feat_level(): assert the requested feature must be
-> > > CPUID_FEATURE_WORD type.
-> > > 
-> > > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> > > ---
-> > >  target/i386/cpu.c | 77 +++++++++++++++++++++++++++++++++++++++++--------------
-> > >  1 file changed, 58 insertions(+), 19 deletions(-)
-> > > 
-> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > index f7c70d9..21ed599 100644
-> > > --- a/target/i386/cpu.c
-> > > +++ b/target/i386/cpu.c
-> > > @@ -3024,21 +3024,51 @@ static const TypeInfo host_x86_cpu_type_info = {
-> > >  
-> > >  #endif
-> > >  
-> > > +/*
-> > > +*caller should have input str no less than 64 byte length.
-> > > +*/
-> > > +#define FEATURE_WORD_DESCPTION_LEN 64
-> > > +static int feature_word_description(char str[], FeatureWordInfo *f,
-> > > +                                            uint32_t bit)
-> > 
-> > I agree with Eric: g_strup_printf() would be much simpler here.
-> > 
-> 1 question: I think caller should g_free() the returned str after it
-> warn_report(), right?
-> > > +{
-> > > +    int ret;
-> > > +
-> > > +    assert(f->type == CPUID_FEATURE_WORD ||
-> > > +        f->type == MSR_FEATURE_WORD);
-> > > +    switch (f->type) {
-> > > +    case CPUID_FEATURE_WORD:
-> > > +        {
-> > > +            const char *reg = get_register_name_32(f->cpuid.reg);
-> > > +            assert(reg);
-> > > +            ret = snprintf(str, FEATURE_WORD_DESCPTION_LEN,
-> > > +                "CPUID.%02XH:%s%s%s [bit %d]",
-> > > +                f->cpuid.eax, reg,
-> > > +                f->feat_names[bit] ? "." : "",
-> > > +                f->feat_names[bit] ? f->feat_names[bit] : "", bit);
-> > > +            break;
-> > > +        }
-> > > +    case MSR_FEATURE_WORD:
-> > > +        ret = snprintf(str, FEATURE_WORD_DESCPTION_LEN,
-> > > +            "MSR(%xH).%s [bit %d]",
-> > > +            f->msr.index,
-> > > +            f->feat_names[bit] ? f->feat_names[bit] : "", bit);
-> > 
-> > What about leaving the (f->feat_names[bit] ? ... : ...) part
-> > in report_unavailable_features() and just make this function
-> > return "CPUID[...]" or "MSR[...]"?
-> > 
-> > 
-> > > +        break;
-> > > +    }
-> > > +    return ret > 0;
-> > > +}
-> > > +
-> > >  static void report_unavailable_features(FeatureWord w, uint32_t mask)
-> > >  {
-> > >      FeatureWordInfo *f = &feature_word_info[w];
-> > >      int i;
-> > > +    char feat_word_dscrp_str[FEATURE_WORD_DESCPTION_LEN];
-> > >  
-> > >      for (i = 0; i < 32; ++i) {
-> > >          if ((1UL << i) & mask) {
-> > > -            const char *reg = get_register_name_32(f->cpuid_reg);
-> > > -            assert(reg);
-> > > -            warn_report("%s doesn't support requested feature: "
-> > > -                        "CPUID.%02XH:%s%s%s [bit %d]",
-> > > +            feature_word_description(feat_word_dscrp_str, f, i);
-> > > +            warn_report("%s doesn't support requested feature: %s",
-> > >                          accel_uses_host_cpuid() ? "host" : "TCG",
-> > > -                        f->cpuid_eax, reg,
-> > > -                        f->feat_names[i] ? "." : "",
-> > > -                        f->feat_names[i] ? f->feat_names[i] : "", i);
-> > > +                        feat_word_dscrp_str);
-> > >          }
-> > >      }
-> > >  }
-> > > @@ -3276,17 +3306,17 @@ static void x86_cpu_get_feature_words(Object *obj, Visitor *v,
-> > >  {
-> > >      uint32_t *array = (uint32_t *)opaque;
-> > >      FeatureWord w;
-> > > -    X86CPUFeatureWordInfo word_infos[FEATURE_WORDS] = { };
-> > > -    X86CPUFeatureWordInfoList list_entries[FEATURE_WORDS] = { };
-> > > +    X86CPUFeatureWordInfo word_infos[FEATURE_WORDS_NUM_CPUID] = { };
-> > > +    X86CPUFeatureWordInfoList list_entries[FEATURE_WORDS_NUM_CPUID] = { };
-> > >      X86CPUFeatureWordInfoList *list = NULL;
-> > >  
-> > > -    for (w = 0; w < FEATURE_WORDS; w++) {
-> > > +    for (w = 0; w < FEATURE_WORDS_NUM_CPUID; w++) {
-> > >          FeatureWordInfo *wi = &feature_word_info[w];
-> > >          X86CPUFeatureWordInfo *qwi = &word_infos[w];
-> > > -        qwi->cpuid_input_eax = wi->cpuid_eax;
-> > > -        qwi->has_cpuid_input_ecx = wi->cpuid_needs_ecx;
-> > > -        qwi->cpuid_input_ecx = wi->cpuid_ecx;
-> > > -        qwi->cpuid_register = x86_reg_info_32[wi->cpuid_reg].qapi_enum;
-> > > +        qwi->cpuid_input_eax = wi->cpuid.eax;
-> > > +        qwi->has_cpuid_input_ecx = wi->cpuid.needs_ecx;
-> > > +        qwi->cpuid_input_ecx = wi->cpuid.ecx;
-> > > +        qwi->cpuid_register = x86_reg_info_32[wi->cpuid.reg].qapi_enum;
-> > 
-> > Looks OK, but I would add an
-> > assert(wi->type == CPUID_FEATURE_WORD) on every block of code
-> > that uses the wi->cpuid field.
-> > 
-> > I would also get rid of FEATURE_WORDS_NUM_CPUID and
-> > FEATURE_WORDS_FIRST_MSR to reduce the chance of future mistakes.
-> > We can use FEATURE_WORDS in this loop and just check wi->type on
-> > each iteration.
-> > 
-> > >          qwi->features = array[w];
-> > >  
-> > >          /* List will be in reverse order, but order shouldn't matter */
-> > > @@ -3659,12 +3689,20 @@ static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
-> > >                                                     bool migratable_only)
-> > >  {
-> > >      FeatureWordInfo *wi = &feature_word_info[w];
-> > > -    uint32_t r;
-> > > +    uint32_t r = 0;
-> > >  
-> > >      if (kvm_enabled()) {
-> > > -        r = kvm_arch_get_supported_cpuid(kvm_state, wi->cpuid_eax,
-> > > -                                                    wi->cpuid_ecx,
-> > > -                                                    wi->cpuid_reg);
-> > > +        switch (wi->type) {
-> > > +        case CPUID_FEATURE_WORD:
-> > > +            r = kvm_arch_get_supported_cpuid(kvm_state, wi->cpuid.eax,
-> > > +                                                wi->cpuid.ecx,
-> > > +                                                wi->cpuid.reg);
-> > > +            break;
-> > > +        case MSR_FEATURE_WORD:
-> > > +            r = kvm_arch_get_supported_msr_feature(kvm_state,
-> > > +                        wi->msr.index);
-> > > +            break;
-> > 
-> > I'm not sure this is correct in the case of
-> > IA32_ARCH_CAPABILITIES.RSBA: we do want to be able to set RSBA
-> > even if the host doesn't have it set.
-> > 
-> > Probably you need to handle IA32_ARCH_CAPABILITIES.RSBA as a
-> > special case inside kvm_arch_get_supported_msr_feature().
-> > 
-> > (And we do want to warn the user in some way if RSBA is set in
-> > the host but not in the guest.  But that's a separate problem.)
+On 08/18/2018 07:05 AM, Peter Maydell wrote:
+> On 18 August 2018 at 01:37, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> On 08/09/2018 10:01 AM, Peter Maydell wrote:
+>>> The IoTKit does not have any Master Security Contollers itself,
+>>> but it does provide registers in the secure privilege control
+>>> block which allow control of MSCs in the external system.
+>>> Add support for these registers.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
 > 
-> The first part is easy to do. the latter, "to warn the user in some way
-> if RSBA is set in the host but not in the guest", in
-> kvm_arch_get_supported_msr_feature(), how can I know if guest has
-> enabled IA32_ARCH_CAPABILITIES.RSBA or not? or you mean check in some
-> other place, where is it?
+>>>      case A_SECMSCINTEN:
+>>> -        qemu_log_mask(LOG_UNIMP,
+>>> -                      "IoTKit SecCtl S block write: "
+>>> -                      "unimplemented offset 0x%x\n", offset);
+>>
+>> Maybe:
+>>
+>>            if (value & ~0xffff) {
+>>                GUEST_ERROR(...)
+>>            }
+> 
+> We don't generally bother to log writes of raz bits as errors.
 
-Probably X86CPU realize function is an obvious place, but the
-main problem is that we don't have an appropriate channel to
-report that warning except stderr (making the warning useless for
-users that are not running QEMU directly).
+Yes I know, and this shouldn't make sens for an well publicly documented
+device/board as this IoT Kit.
 
-We also need to ensure QEMU is doing its job before it complains
-to the user: before printing a warning about unsafe
-configuration, we should try to make QEMU enable safe
-configuration by default.
+But you would be surprised by some proprietary firmwares or libraries
+provided by some companies...
+I have been surprised modeling the Hercules TMS570 series from TI, they
+provide a datasheet with the register/bits for the embedded Flash
+(F021), and a library/API to access this flash, however when I ran
+firmwares linked with their flash library I noticed they access
+undocumented bits to restrict^H^H^H^H^configure their flash, and I had
+to model those undocumented bits to allow the firmware to continue
+further and boot.
 
--- 
-Eduardo
+So not needed for this model, but it may be sometime useful ;)
+
+Regards,
+
+Phil.
