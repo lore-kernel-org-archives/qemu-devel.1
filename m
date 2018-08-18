@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fr1Yr-000801-Gs
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 09:46:38 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1fr1kz-00024S-1s
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 09:59:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fr1Yo-0006Am-DH
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 09:46:37 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:32999)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fr1Yo-0006AO-6p
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 09:46:34 -0400
-Received: by mail-wr1-x443.google.com with SMTP id v90-v6so6160822wrc.0
-	for <qemu-devel@nongnu.org>; Sat, 18 Aug 2018 06:46:34 -0700 (PDT)
+	(envelope-from <yuval.shaia@oracle.com>) id 1fr1ku-00078K-3T
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 09:59:08 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:41846)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1fr1kt-00072v-S8
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 09:59:04 -0400
+Date: Sat, 18 Aug 2018 16:58:55 +0300
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20180818135854.GA2984@lap1>
 References: <20180814100010.2546-1-yuval.shaia@oracle.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <e835cd66-9830-21c0-c3e2-08f6a1dc64eb@gmail.com>
-Date: Sat, 18 Aug 2018 16:46:29 +0300
+	<e835cd66-9830-21c0-c3e2-08f6a1dc64eb@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180814100010.2546-1-yuval.shaia@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e835cd66-9830-21c0-c3e2-08f6a1dc64eb@gmail.com>
 Subject: Re: [Qemu-devel] [PATCH] hw/rdma: Abort send-op if fail to create
  addr handler
 List-Id: <qemu-devel.nongnu.org>
@@ -31,37 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, yuval.shaia@oracle.com
+Cc: qemu-devel@nongnu.org
 
-Hi Yuval,
+On Sat, Aug 18, 2018 at 04:46:29PM +0300, Marcel Apfelbaum wrote:
+> Hi Yuval,
+> 
+> On 08/14/2018 01:00 PM, Yuval Shaia wrote:
+> > Function create_ah might return NULL, let's exit with an error.
+> > 
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > ---
+> >   hw/rdma/rdma_backend.c | 4 ++++
+> >   1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> > index 35726bda2e..59d02eb567 100644
+> > --- a/hw/rdma/rdma_backend.c
+> > +++ b/hw/rdma/rdma_backend.c
+> > @@ -402,6 +402,10 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+> >       if (qp_type == IBV_QPT_UD) {
+> >           wr.wr.ud.ah = create_ah(backend_dev, qp->ibpd,
+> >                                   backend_dev->backend_gid_idx, dgid);
+> > +        if (!wr.wr.ud.ah) {
+> > +            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx, 0);
+> 
+> comp_handler takes 3 arguments, but here you pass 4, so the compilation
+> fails.
 
-On 08/14/2018 01:00 PM, Yuval Shaia wrote:
-> Function create_ah might return NULL, let's exit with an error.
->
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> ---
->   hw/rdma/rdma_backend.c | 4 ++++
->   1 file changed, 4 insertions(+)
->
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index 35726bda2e..59d02eb567 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -402,6 +402,10 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
->       if (qp_type == IBV_QPT_UD) {
->           wr.wr.ud.ah = create_ah(backend_dev, qp->ibpd,
->                                   backend_dev->backend_gid_idx, dgid);
-> +        if (!wr.wr.ud.ah) {
-> +            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx, 0);
+Right, please ignore this patch.
+I will send it with a different patch-set which is still under work.
 
-comp_handler takes 3 arguments, but here you pass 4, so the compilation 
-fails.
-
-Thanks,
-Marcel
-
-> +            goto out_dealloc_cqe_ctx;
-> +        }
->           wr.wr.ud.remote_qpn = dqpn;
->           wr.wr.ud.remote_qkey = dqkey;
->       }
+> 
+> Thanks,
+> Marcel
+> 
+> > +            goto out_dealloc_cqe_ctx;
+> > +        }
+> >           wr.wr.ud.remote_qpn = dqpn;
+> >           wr.wr.ud.remote_qkey = dqkey;
+> >       }
+> 
