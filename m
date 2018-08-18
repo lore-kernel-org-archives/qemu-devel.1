@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fr2RL-0002QF-Aq
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 10:43:00 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fr2q6-0007cR-7V
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:08:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fr2Hd-0005J0-9G
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 10:32:56 -0400
-Resent-Message-Id: <E1fr2Hd-0005J0-9G@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21038)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fr2Hd-0005HV-0Y
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 10:32:53 -0400
-In-Reply-To: <20180817173104.14691-1-marcandre.lureau@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153460272477.29407.16328828202759582485@502c9da6d61e>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fr2nm-0007IC-HI
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:06:10 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180809130115.28951-1-peter.maydell@linaro.org>
+	<20180809130115.28951-7-peter.maydell@linaro.org>
+	<39365f2c-e947-3530-ee8f-9062bbb1264f@amsat.org>
+	<CAFEAcA_ZOjNHVkqk1ww5VOLq7EhPJjAEjfHHdk2kjBGdy-MqdQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3df1351a-6d3a-d1ed-38d9-4048c42fb1c6@amsat.org>
+Date: Sat, 18 Aug 2018 12:06:02 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 18 Aug 2018 07:32:21 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] vnc: call sasl_server_init() only when
- required
+In-Reply-To: <CAFEAcA_ZOjNHVkqk1ww5VOLq7EhPJjAEjfHHdk2kjBGdy-MqdQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 06/16] hw/misc/iotkit: Wire up
+ the system control element
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +31,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, kraxel@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODE3MTczMTA0LjE0NjkxLTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQu
-Y29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHZuYzogY2FsbCBzYXNsX3NlcnZlcl9p
-bml0KCkgb25seSB3aGVuIHJlcXVpcmVkCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
-IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmMwYzVmYmNlOGEgdm5jOiBjYWxsIHNhc2xfc2Vy
-dmVyX2luaXQoKSBvbmx5IHdoZW4gcmVxdWlyZWQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvMTogdm5jOiBjYWxsIHNhc2xfc2VydmVyX2luaXQoKSBvbmx5IHdoZW4gcmVx
-dWlyZWQuLi4KRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzM1
-OiBGSUxFOiB1aS92bmMuYzo0MDU3OgorICAgIGlmIChzYXNsICYmICgoc2FzbEVyciA9IHNhc2xf
-c2VydmVyX2luaXQoTlVMTCwgInFlbXUiKSkgIT0gU0FTTF9PSykpIHsKCnRvdGFsOiAxIGVycm9y
-cywgMCB3YXJuaW5ncywgOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 08/18/2018 06:55 AM, Peter Maydell wrote:
+> On 18 August 2018 at 01:00, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Hi Peter,
+>>
+>> On 08/09/2018 10:01 AM, Peter Maydell wrote:
+>>> Wire up the system control element's register banks.
+>>>
+>>> This is the last of the previously completely unimplemented
+>>> components in the IoTKit.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
+>>>  include/hw/arm/iotkit.h |  4 +++-
+>>>  hw/arm/iotkit.c         | 19 +++++++++++--------
+>>>  2 files changed, 14 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
+>>> index 0f5c5101708..1ffa31d521b 100644
+>>> --- a/include/hw/arm/iotkit.h
+>>> +++ b/include/hw/arm/iotkit.h
+>>> @@ -58,7 +58,7 @@
+>>>  #include "hw/timer/cmsdk-apb-timer.h"
+>>>  #include "hw/timer/cmsdk-apb-dualtimer.h"
+>>>  #include "hw/watchdog/cmsdk-apb-watchdog.h"
+>>> -#include "hw/misc/unimp.h"
+>>> +#include "hw/misc/iotkit-sysctl.h"
+>>>  #include "hw/or-irq.h"
+>>>  #include "hw/core/split-irq.h"
+>>>
+>>> @@ -97,6 +97,8 @@ typedef struct IoTKit {
+>>>      CMSDKAPBWatchdog nswatchdog;
+>>>      CMSDKAPBWatchdog swatchdog;
+>>>
+>>> +    IoTKitSysCtl sysctl;
+>>> +
+>>>      MemoryRegion container;
+>>>      MemoryRegion alias1;
+>>>      MemoryRegion alias2;
+>>> diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+>>> index cb0ec456f39..5d59ed5489f 100644
+>>> --- a/hw/arm/iotkit.c
+>>> +++ b/hw/arm/iotkit.c
+>>> @@ -16,7 +16,6 @@
+>>>  #include "hw/sysbus.h"
+>>>  #include "hw/registerfields.h"
+>>>  #include "hw/arm/iotkit.h"
+>>> -#include "hw/misc/unimp.h"
+>>>  #include "hw/arm/arm.h"
+>>>
+>>>  /* Clock frequency in HZ of the 32KHz "slow clock" */
+>>> @@ -151,6 +150,8 @@ static void iotkit_init(Object *obj)
+>>>                            sizeof(s->nswatchdog), TYPE_CMSDK_APB_WATCHDOG);
+>>>      sysbus_init_child_obj(obj, "swatchdog", &s->swatchdog,
+>>>                            sizeof(s->swatchdog), TYPE_CMSDK_APB_WATCHDOG);
+>>> +    sysbus_init_child_obj(obj, "iotkit-sysctl", &s->sysctl, sizeof(s->sysctl),
+>>> +                          TYPE_IOTKIT_SYSCTL);
+>>>      object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
+>>>                              sizeof(s->nmi_orgate), TYPE_OR_IRQ,
+>>>                              &error_abort, NULL);
+>>> @@ -516,13 +517,15 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+>>>                            qdev_get_gpio_in_named(dev_apb_ppc1,
+>>>                                                   "cfg_sec_resp", 0));
+>>>
+>>> -    /* Using create_unimplemented_device() maps the stub into the
+>>> -     * system address space rather than into our container, but the
+>>> -     * overall effect to the guest is the same.
+>>> -     */
+>>> -    create_unimplemented_device("SYSINFO", 0x40020000, 0x1000);
+>>> -
+>>> -    create_unimplemented_device("SYSCONTROL", 0x50021000, 0x1000);
+>>> +    object_property_set_bool(OBJECT(&s->sysctl), true, "realized", &err);
+>>> +    if (err) {
+>>> +        error_propagate(errp, err);
+>>> +        return;
+>>> +    }
+>>> +    /* System information registers */
+>>> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctl), 0, 0x40020000);
+>>
+>> What about the Secure access?
+>>
+>>        sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctl), 0, 0x50020000);
+> 
+> That should be handled by the general alias set up earlier
+>     make_alias(s, &s->alias3, "alias 3", 0x50000000, 0x10000000, 0x40000000);
+> which maps all of the 0x5... space to 0x4... if there's nothing
+> higher priority mapped there.
+
+Oh I missed that! Perfect then :)
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
