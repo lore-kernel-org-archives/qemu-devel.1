@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60708)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqrQO-0007TG-F3
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 22:57:13 -0400
+	id 1fqrWr-0001La-Cj
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:03:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqrQJ-0002Mn-HF
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 22:57:12 -0400
+	id 1fqrWm-0005hi-ET
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:03:53 -0400
+Received: from mail-vk0-x236.google.com ([2607:f8b0:400c:c05::236]:44187)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fqrWl-0005hA-6p
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 23:03:48 -0400
+Received: by mail-vk0-x236.google.com with SMTP id 125-v6so4115856vke.11
+	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 20:03:47 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 17 Aug 2018 23:56:53 -0300
-Message-Id: <20180818025653.21192-1-f4bug@amsat.org>
+Date: Sat, 18 Aug 2018 00:03:37 -0300
+Message-Id: <20180818030337.22271-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] migration: Replace strncpy() by g_strlcpy()
+Subject: [Qemu-devel] [PATCH] docker: Clean dangling tarball files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Hildenbrand <david@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Fedora 29 comes with GCC 8.1 which added the 'stringop-truncation' checks.
+When a container fails, it leaves a dangling tarball which name is
+based on a timestamp. Further uses of make won't clean those files,
+neither calling the 'docker-clean' target.
 
-Replace the strncpy() calls by g_strlcpy() to avoid the following warning:
+Use the .DELETE_ON_ERROR built-in target to let make remove those
+temporary tarballs in case of failure.
 
-  migration/global_state.c: In function 'global_state_store_running':
-  migration/global_state.c:45:5: error: 'strncpy' specified bound 100 equals destination size [-Werror=stringop-truncation]
-       strncpy((char *)global_state.runstate,
-       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-              state, sizeof(global_state.runstate));
-              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-See http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg03723.html
+ tests/docker/Makefile.include | 1 +
+ 1 file changed, 1 insertion(+)
 
- migration/global_state.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/migration/global_state.c b/migration/global_state.c
-index 8e8ab5c51e..d5df502cd5 100644
---- a/migration/global_state.c
-+++ b/migration/global_state.c
-@@ -42,7 +42,7 @@ int global_state_store(void)
- void global_state_store_running(void)
- {
-     const char *state = RunState_str(RUN_STATE_RUNNING);
--    strncpy((char *)global_state.runstate,
-+    g_strlcpy((char *)global_state.runstate,
-            state, sizeof(global_state.runstate));
- }
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index d3101afecd..6e03235ab9 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -25,6 +25,7 @@ IMAGES ?= %
+ CUR_TIME := $(shell date +%Y-%m-%d-%H.%M.%S.$$$$)
+ DOCKER_SRC_COPY := $(BUILD_DIR)/docker-src.$(CUR_TIME)
  
++.DELETE_ON_ERROR: $(DOCKER_SRC_COPY)
+ $(DOCKER_SRC_COPY):
+ 	@mkdir $@
+ 	$(if $(SRC_ARCHIVE), \
 -- 
 2.18.0
