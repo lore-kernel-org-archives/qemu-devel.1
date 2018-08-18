@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fr0iL-0004hG-8z
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 08:52:22 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1fr0k0-0005Js-QI
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 08:54:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fr0iI-0007Eu-0S
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 08:52:21 -0400
-Resent-Message-Id: <E1fr0iI-0007Eu-0S@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21020)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fr0iH-0007Dt-Q9
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 08:52:17 -0400
-In-Reply-To: <20180816025452.21358-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153459670639.28733.13280424276898191082@502c9da6d61e>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 18 Aug 2018 05:51:47 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/5] tcg: Reorg 128-bit atomic operations
+	(envelope-from <robert.hu@linux.intel.com>) id 1fr0jx-00005Q-Ji
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 08:54:04 -0400
+Received: from mga03.intel.com ([134.134.136.65]:48465)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1fr0jx-0008Vz-AI
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 08:54:01 -0400
+Message-ID: <1534596838.4104.27.camel@linux.intel.com>
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Sat, 18 Aug 2018 20:53:58 +0800
+In-Reply-To: <9e06fe89-2688-1e6e-16ec-d5e8cdc87ce4@redhat.com>
+References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
+	<1533909989-56115-4-git-send-email-robert.hu@linux.intel.com>
+	<9e06fe89-2688-1e6e-16ec-d5e8cdc87ce4@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] Change other funcitons referring to
+ feature_word_info[]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +30,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, cota@braap.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: robert.hu@intel.com, robert.hu@linux.intel.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODE2MDI1NDUyLjIxMzU4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNV0gdGNnOiBSZW9yZyAxMjgtYml0
-IGF0b21pYyBvcGVyYXRpb25zCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
-KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
-b3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmY3Mzc3MDhkYzcgdGFyZ2V0L3BwYzogQ29udmVydCB0byBI
-QVZFX0NNUFhDSEcxMjggYW5kIEhBVkVfQVRPTUlDMTI4CjAzMzIxOGI3ZjkgdGFyZ2V0L2FybTog
-Q29udmVydCB0byBIQVZFX0NNUFhDSEcxMjgKZGEyYTZhZWY4ZSB0YXJnZXQvczM5MHg6IENvbnZl
-cnQgdG8gSEFWRV9DTVBYQ0hHMTI4IGFuZCBIQVZFX0FUT01JQzEyOApkODA4YzA0MWMyIHRhcmdl
-dC9pMzg2OiBDb252ZXJ0IHRvIEhBVkVfQ01QWENIRzEyOAowYjM3MDY5NTM0IHRjZzogU3BsaXQg
-Q09ORklHX0FUT01JQzEyOAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS81
-OiB0Y2c6IFNwbGl0IENPTkZJR19BVE9NSUMxMjguLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
-IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTgxOiAK
-bmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVu
-IHNxdWFyZSBicmFja2V0ICdbJwojMjU1OiBGSUxFOiBpbmNsdWRlL3FlbXUvYXRvbWljMTI4Lmg6
-NzA6CisgICAgICAgIDogW21lbV0gIittIigqcHRyKSwgW3RtcF0gIj0mciIodG1wKSwKCkVSUk9S
-OiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojMjU3OiBG
-SUxFOiBpbmNsdWRlL3FlbXUvYXRvbWljMTI4Lmg6NzI6CisgICAgICAgIDogW2NtcGxdICJyIihj
-bXBsKSwgW2NtcGhdICJyIihjbXBoKSwKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBk
-ZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMyODA6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMx
-MjguaDo5NToKKyMgaWZkZWYgX19hYXJjaDY0X18KCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJl
-Zm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojMjkxOiBGSUxFOiBpbmNsdWRlL3FlbXUvYXRv
-bWljMTI4Lmg6MTA2OgorICAgICAgICA6IFttZW1dICIrbSIoKnB0ciksIFt0bXBdICI9ciIodG1w
-KSwgW2xdICI9ciIobCksIFtoXSAiPXIiKGgpKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJl
-Zm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojMzA0OiBGSUxFOiBpbmNsdWRlL3FlbXUvYXRv
-bWljMTI4Lmg6MTE5OgorICAgICAgICA6IFttZW1dICIrbSIoKnB0ciksIFt0MV0gIj0mciIodDEp
-LCBbdDJdICI9JnIiKHQyKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1
-YXJlIGJyYWNrZXQgJ1snCiMzMDU6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMxMjguaDoxMjA6
-CisgICAgICAgIDogW2xdICJyIihsKSwgW2hdICJyIihoKSk7Cgp0b3RhbDogNSBlcnJvcnMsIDIg
-d2FybmluZ3MsIDM1MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzU6IHRhcmdldC9pMzg2OiBDb252ZXJ0IHRvIEhB
-VkVfQ01QWENIRzEyOC4uLgpDaGVja2luZyBQQVRDSCAzLzU6IHRhcmdldC9zMzkweDogQ29udmVy
-dCB0byBIQVZFX0NNUFhDSEcxMjggYW5kIEhBVkVfQVRPTUlDMTI4Li4uCkNoZWNraW5nIFBBVENI
-IDQvNTogdGFyZ2V0L2FybTogQ29udmVydCB0byBIQVZFX0NNUFhDSEcxMjguLi4KQ2hlY2tpbmcg
-UEFUQ0ggNS81OiB0YXJnZXQvcHBjOiBDb252ZXJ0IHRvIEhBVkVfQ01QWENIRzEyOCBhbmQgSEFW
-RV9BVE9NSUMxMjguLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
-dGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
-IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQHJlZGhhdC5jb20=
+On Fri, 2018-08-17 at 17:52 +0200, Paolo Bonzini wrote:
+> On 10/08/2018 16:06, Robert Hoo wrote:
+> > x86_cpu_get_feature_words(): limit to CPUID_FEATURE_WORD only.
+> 
+> This should also grow support for MSR feature words.
+> 
+> My suggestion is that you add another patch after patch 1 that expands
+> the definition of X86CPUFeatureWordInfo like this, and adjusts
+> x86_cpu_get_feature_words() to match the new C structs.  Then this
+> patch can add MSR feature support somewhat easily.
+> 
+> The QAPI definitions would then look like this:
+
+I'm not familiar with json language. Can someone else compose this part?
+> 
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index d450cfef21..eae9243976 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -2663,9 +2663,9 @@
+>    'data': [ 'EAX', 'EBX', 'ECX', 'EDX', 'ESP', 'EBP', 'ESI', 'EDI' ] }
+>  
+>  ##
+> -# @X86CPUFeatureWordInfo:
+> +# @X86CPUIDFeatureWordInfo:
+>  #
+> -# Information about a X86 CPU feature word
+> +# Information about an X86 CPUID feature word
+>  #
+>  # @cpuid-input-eax: Input EAX value for CPUID instruction for that feature word
+>  #
+> @@ -2678,12 +2690,45 @@
+>  #
+>  # Since: 1.5
+>  ##
+> -{ 'struct': 'X86CPUFeatureWordInfo',
+> +{ 'struct': 'X86CPUIDFeatureWordInfo',
+>    'data': { 'cpuid-input-eax': 'int',
+>              '*cpuid-input-ecx': 'int',
+>              'cpuid-register': 'X86CPURegister32',
+>              'features': 'int' } }
+>  
+> +##
+> +# @X86MSRFeatureWordInfo:
+> +#
+> +# Information about an X86 MSR feature word
+> +#
+> +# @index: Index of the model specific register
+> +#
+> +# @cpuid-feature: CPUID feature name that communicates the existance of the MSR
+> +#
+> +# @features: value of output register, containing the feature bits
+> +#
+> +# Since: 3.1
+> +##
+> +{ 'struct': 'X86MSRFeatureWordInfo',
+> +  'data': { 'index': 'int',
+> +            'cpuid-feature': 'str',
+> +            'features': 'int' } }
+> +
+> +##
+> +# @X86CPUFeatureWordInfo:
+> +#
+> +# A discriminated record of X86 CPU feature words
+> +#
+> +# Since: 3.1
+> +##
+> +
+> +{ 'union': 'X86CPUFeatureWordInfo',
+> +  'base': { 'type': 'X86CPUFeatureWordType' },
+> +  'discriminator': 'type',
+> +  'data': {
+> +    'cpuid': 'X86CPUIDFeatureWordInfo',
+> +    'msr': 'X86MSRFeatureWordInfo' }}
+> +
+>  ##
+>  # @DummyForceArrays:
+>  #
+> 
+> I'm not sure if the cpuid-feature field is useful for libvirt and
+> other management applications.  Eduardo, what do you think?
+> 
+> Thanks,
+> 
+> Paolo
