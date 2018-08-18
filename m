@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fr2qB-0007cR-Fn
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:08:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fr2sc-00018n-0P
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fr2nc-0006za-4e
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:06:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54506)
+	(envelope-from <ehabkost@redhat.com>) id 1fr2sY-0002eD-O9
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:11:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fr2nY-0006vl-Em
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:05:54 -0400
-Date: Sat, 18 Aug 2018 12:05:48 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fr2sY-0002cv-GI
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 11:11:02 -0400
+Date: Sat, 18 Aug 2018 12:10:59 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180818150548.GN15372@localhost.localdomain>
+Message-ID: <20180818151059.GO15372@localhost.localdomain>
 References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
-	<1533909989-56115-3-git-send-email-robert.hu@linux.intel.com>
-	<20180817131810.GA15372@localhost.localdomain>
-	<1534577221.4104.20.camel@linux.intel.com>
+	<1533909989-56115-4-git-send-email-robert.hu@linux.intel.com>
+	<20180817132820.GB15372@localhost.localdomain>
+	<1534582905.4104.25.camel@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1534577221.4104.20.camel@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] kvm: Add support to
- KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS system ioctl
+In-Reply-To: <1534582905.4104.25.camel@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] Change other funcitons referring to
+ feature_word_info[]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,177 +33,179 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Robert Hoo <robert.hu@linux.intel.com>
 Cc: robert.hu@intel.com, pbonzini@redhat.com, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
 
-On Sat, Aug 18, 2018 at 03:27:01PM +0800, Robert Hoo wrote:
-> On Fri, 2018-08-17 at 10:18 -0300, Eduardo Habkost wrote:
-> > Thanks for the patch, comments below:
-> > 
-> > On Fri, Aug 10, 2018 at 10:06:28PM +0800, Robert Hoo wrote:
-> > > Add kvm_get_supported_feature_msrs() to get supported MSR feature index list.
-> > > Add kvm_arch_get_supported_msr_feature() to get each MSR features value.
+On Sat, Aug 18, 2018 at 05:01:45PM +0800, Robert Hoo wrote:
+> On Fri, 2018-08-17 at 10:28 -0300, Eduardo Habkost wrote:
+> > On Fri, Aug 10, 2018 at 10:06:29PM +0800, Robert Hoo wrote:
+> > > Add an util function feature_word_description(), which help construct the string
+> > > describing the feature word (both CPUID and MSR types).
 > > > 
-> > > kvm_get_supported_feature_msrs() is called in kvm_arch_init().
-> > > kvm_arch_get_supported_msr_feature() is called by
-> > > x86_cpu_get_supported_feature_word().
+> > > report_unavailable_features(): add MSR_FEATURE_WORD type support.
+> > > x86_cpu_get_feature_words(): limit to CPUID_FEATURE_WORD only.
+> > > x86_cpu_get_supported_feature_word(): add MSR_FEATURE_WORD type support.
+> > > x86_cpu_adjust_feat_level(): assert the requested feature must be
+> > > CPUID_FEATURE_WORD type.
 > > > 
 > > > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
 > > > ---
-> > >  include/sysemu/kvm.h |  2 ++
-> > >  target/i386/kvm.c    | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > >  2 files changed, 81 insertions(+)
+> > >  target/i386/cpu.c | 77 +++++++++++++++++++++++++++++++++++++++++--------------
+> > >  1 file changed, 58 insertions(+), 19 deletions(-)
 > > > 
-> > > diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> > > index 0b64b8e..97d8d9d 100644
-> > > --- a/include/sysemu/kvm.h
-> > > +++ b/include/sysemu/kvm.h
-> > > @@ -463,6 +463,8 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension);
+> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > index f7c70d9..21ed599 100644
+> > > --- a/target/i386/cpu.c
+> > > +++ b/target/i386/cpu.c
+> > > @@ -3024,21 +3024,51 @@ static const TypeInfo host_x86_cpu_type_info = {
 > > >  
-> > >  uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
-> > >                                        uint32_t index, int reg);
-> > > +uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
-> > > +
+> > >  #endif
 > > >  
-> > >  void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
-> > >  
-> > > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > > index 9313602..70d8606 100644
-> > > --- a/target/i386/kvm.c
-> > > +++ b/target/i386/kvm.c
-> > > @@ -107,6 +107,7 @@ static int has_pit_state2;
-> > >  static bool has_msr_mcg_ext_ctl;
-> > >  
-> > >  static struct kvm_cpuid2 *cpuid_cache;
-> > > +static struct kvm_msr_list *kvm_feature_msrs;
+> > > +/*
+> > > +*caller should have input str no less than 64 byte length.
+> > > +*/
+> > > +#define FEATURE_WORD_DESCPTION_LEN 64
+> > > +static int feature_word_description(char str[], FeatureWordInfo *f,
+> > > +                                            uint32_t bit)
 > > 
-> > I was going to suggest moving this to KVMState, but KVMState is a
-> > arch-independent struct.  I guess we'll have to live with this by
-> > now.
+> > I agree with Eric: g_strup_printf() would be much simpler here.
 > > 
-> > >  
-> > >  int kvm_has_pit_state2(void)
-> > >  {
-> > > @@ -420,6 +421,41 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
-> > >      return ret;
-> > >  }
-> > >  
-> > > +uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
+> 1 question: I think caller should g_free() the returned str after it
+> warn_report(), right?
 > > > +{
-> > > +    struct {
-> > > +        struct kvm_msrs info;
-> > > +        struct kvm_msr_entry entries[1];
-> > > +    } msr_data;
-> > > +    uint32_t ret;
+> > > +    int ret;
 > > > +
-> > > +    /*Check if the requested feature MSR is supported*/
-> > > +    int i;
-> > > +    for (i = 0; i < kvm_feature_msrs->nmsrs; i++) {
-> > > +        if (index == kvm_feature_msrs->indices[i]) {
+> > > +    assert(f->type == CPUID_FEATURE_WORD ||
+> > > +        f->type == MSR_FEATURE_WORD);
+> > > +    switch (f->type) {
+> > > +    case CPUID_FEATURE_WORD:
+> > > +        {
+> > > +            const char *reg = get_register_name_32(f->cpuid.reg);
+> > > +            assert(reg);
+> > > +            ret = snprintf(str, FEATURE_WORD_DESCPTION_LEN,
+> > > +                "CPUID.%02XH:%s%s%s [bit %d]",
+> > > +                f->cpuid.eax, reg,
+> > > +                f->feat_names[bit] ? "." : "",
+> > > +                f->feat_names[bit] ? f->feat_names[bit] : "", bit);
 > > > +            break;
 > > > +        }
+> > > +    case MSR_FEATURE_WORD:
+> > > +        ret = snprintf(str, FEATURE_WORD_DESCPTION_LEN,
+> > > +            "MSR(%xH).%s [bit %d]",
+> > > +            f->msr.index,
+> > > +            f->feat_names[bit] ? f->feat_names[bit] : "", bit);
+> > 
+> > What about leaving the (f->feat_names[bit] ? ... : ...) part
+> > in report_unavailable_features() and just make this function
+> > return "CPUID[...]" or "MSR[...]"?
+> > 
+> > 
+> > > +        break;
 > > > +    }
+> > > +    return ret > 0;
+> > > +}
+> > > +
+> > >  static void report_unavailable_features(FeatureWord w, uint32_t mask)
+> > >  {
+> > >      FeatureWordInfo *f = &feature_word_info[w];
+> > >      int i;
+> > > +    char feat_word_dscrp_str[FEATURE_WORD_DESCPTION_LEN];
+> > >  
+> > >      for (i = 0; i < 32; ++i) {
+> > >          if ((1UL << i) & mask) {
+> > > -            const char *reg = get_register_name_32(f->cpuid_reg);
+> > > -            assert(reg);
+> > > -            warn_report("%s doesn't support requested feature: "
+> > > -                        "CPUID.%02XH:%s%s%s [bit %d]",
+> > > +            feature_word_description(feat_word_dscrp_str, f, i);
+> > > +            warn_report("%s doesn't support requested feature: %s",
+> > >                          accel_uses_host_cpuid() ? "host" : "TCG",
+> > > -                        f->cpuid_eax, reg,
+> > > -                        f->feat_names[i] ? "." : "",
+> > > -                        f->feat_names[i] ? f->feat_names[i] : "", i);
+> > > +                        feat_word_dscrp_str);
+> > >          }
+> > >      }
+> > >  }
+> > > @@ -3276,17 +3306,17 @@ static void x86_cpu_get_feature_words(Object *obj, Visitor *v,
+> > >  {
+> > >      uint32_t *array = (uint32_t *)opaque;
+> > >      FeatureWord w;
+> > > -    X86CPUFeatureWordInfo word_infos[FEATURE_WORDS] = { };
+> > > -    X86CPUFeatureWordInfoList list_entries[FEATURE_WORDS] = { };
+> > > +    X86CPUFeatureWordInfo word_infos[FEATURE_WORDS_NUM_CPUID] = { };
+> > > +    X86CPUFeatureWordInfoList list_entries[FEATURE_WORDS_NUM_CPUID] = { };
+> > >      X86CPUFeatureWordInfoList *list = NULL;
+> > >  
+> > > -    for (w = 0; w < FEATURE_WORDS; w++) {
+> > > +    for (w = 0; w < FEATURE_WORDS_NUM_CPUID; w++) {
+> > >          FeatureWordInfo *wi = &feature_word_info[w];
+> > >          X86CPUFeatureWordInfo *qwi = &word_infos[w];
+> > > -        qwi->cpuid_input_eax = wi->cpuid_eax;
+> > > -        qwi->has_cpuid_input_ecx = wi->cpuid_needs_ecx;
+> > > -        qwi->cpuid_input_ecx = wi->cpuid_ecx;
+> > > -        qwi->cpuid_register = x86_reg_info_32[wi->cpuid_reg].qapi_enum;
+> > > +        qwi->cpuid_input_eax = wi->cpuid.eax;
+> > > +        qwi->has_cpuid_input_ecx = wi->cpuid.needs_ecx;
+> > > +        qwi->cpuid_input_ecx = wi->cpuid.ecx;
+> > > +        qwi->cpuid_register = x86_reg_info_32[wi->cpuid.reg].qapi_enum;
 > > 
-> > We are duplicating the logic that's already inside KVM (checking
-> > the list of supported MSRs and returning an error).  Can't we
-> > make this simpler and just remove this check?  If the MSR is not
-> > supported, KVM_GET_MSRS would just return 0.
+> > Looks OK, but I would add an
+> > assert(wi->type == CPUID_FEATURE_WORD) on every block of code
+> > that uses the wi->cpuid field.
+> > 
+> > I would also get rid of FEATURE_WORDS_NUM_CPUID and
+> > FEATURE_WORDS_FIRST_MSR to reduce the chance of future mistakes.
+> > We can use FEATURE_WORDS in this loop and just check wi->type on
+> > each iteration.
+> > 
+> > >          qwi->features = array[w];
+> > >  
+> > >          /* List will be in reverse order, but order shouldn't matter */
+> > > @@ -3659,12 +3689,20 @@ static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
+> > >                                                     bool migratable_only)
+> > >  {
+> > >      FeatureWordInfo *wi = &feature_word_info[w];
+> > > -    uint32_t r;
+> > > +    uint32_t r = 0;
+> > >  
+> > >      if (kvm_enabled()) {
+> > > -        r = kvm_arch_get_supported_cpuid(kvm_state, wi->cpuid_eax,
+> > > -                                                    wi->cpuid_ecx,
+> > > -                                                    wi->cpuid_reg);
+> > > +        switch (wi->type) {
+> > > +        case CPUID_FEATURE_WORD:
+> > > +            r = kvm_arch_get_supported_cpuid(kvm_state, wi->cpuid.eax,
+> > > +                                                wi->cpuid.ecx,
+> > > +                                                wi->cpuid.reg);
+> > > +            break;
+> > > +        case MSR_FEATURE_WORD:
+> > > +            r = kvm_arch_get_supported_msr_feature(kvm_state,
+> > > +                        wi->msr.index);
+> > > +            break;
+> > 
+> > I'm not sure this is correct in the case of
+> > IA32_ARCH_CAPABILITIES.RSBA: we do want to be able to set RSBA
+> > even if the host doesn't have it set.
+> > 
+> > Probably you need to handle IA32_ARCH_CAPABILITIES.RSBA as a
+> > special case inside kvm_arch_get_supported_msr_feature().
+> > 
+> > (And we do want to warn the user in some way if RSBA is set in
+> > the host but not in the guest.  But that's a separate problem.)
 > 
-> Yes, seems dup. but if we remove this hunk, the
-> kvm_get_supported_feature_msrs() is unnecessary at all.
+> The first part is easy to do. the latter, "to warn the user in some way
+> if RSBA is set in the host but not in the guest", in
+> kvm_arch_get_supported_msr_feature(), how can I know if guest has
+> enabled IA32_ARCH_CAPABILITIES.RSBA or not? or you mean check in some
+> other place, where is it?
 
-So maybe kvm_get_supported_feature_msrs() really is unnecessary?
+Probably X86CPU realize function is an obvious place, but the
+main problem is that we don't have an appropriate channel to
+report that warning except stderr (making the warning useless for
+users that are not running QEMU directly).
 
-We seem to have two alternatives:
-* calling KVM_GET_MSRS for all MSRs only once, at
-  kvm_get_supported_feature_msrs() (as I had suggested
-  previously);
-* calling KVM_GET_MSRS for one MSR unconditionally here, but
-  _not_ treating 0 as a fatal error.
-
-I prefer the former, but I would be OK with both alternatives.
-Note that we need to check for KVM capabilities in both cases.
-
-
-> > 
-> > > +    if (i >= kvm_feature_msrs->nmsrs) {
-> > > +        fprintf(stderr, "Requested MSR (index= %d) is not supported.\n", index);
-> > 
-> > This error message is meaningless for QEMU users.  Do we really
-> > need to print it?
-> > 
-> > > +        return 0;
-> > 
-> > Returning 0 for MSRs that are not supported is probably OK, but
-> > we need to see this function being used, to be sure (I didn't
-> > look at all the patches in this series yet).
-> > 
-> > > +    }
-> > > +
-> > > +    msr_data.info.nmsrs = 1;
-> > > +    msr_data.entries[0].index = index;
-> > > +
-> > > +    ret = kvm_ioctl(s, KVM_GET_MSRS, &msr_data);
-> > > +
-> > > +    if (ret != 1) {
-> > > +        fprintf(stderr, "KVM get MSR (index=0x%x) feature failed, %s\n",
-> > > +            index, strerror(-ret));
-> > > +        exit(1);
-> > 
-> > I'm not a fan of APIs that write to stdout/stderr or exit(),
-> > unless they are clearly just initialization functions that should
-> > never fail in normal circumstances.
-> > 
-> > But if you call KVM_GET_MSRS for all MSRs at
-> > kvm_get_supported_feature_msrs() below, this function would never
-> > need to report an error.
-> > 
-> > We are already going through the trouble of allocating
-> > kvm_feature_msrs in kvm_get_supported_feature_msrs() anyway.
-> 
-> I had looked into KVM KVM_GET_MSRS handling, though less likely, still
-> have changes copy_from/to_user() fail. Therefore I added the check and
-> warning here, in that seldom case happens.
-> 
-> exit() or not, I'm also not sure. Seems not necessary, while my usual
-> programming philosophy is never let wrong goes further. For in the case
-> of ioctl(KVM_GET_MSRS) returns failure, something goes wrong underlying,
-> I would prefer to let user know this, rather than let it pass and goes
-> further.
-
-We probably have no option other than exiting if KVM_GET_MSRS
-returns an unexpected error.  It's just that I find the code
-harder to review, because we need to be sure this won't terminate
-QEMU under normal circumstances.
-
-But if you demonstrate that all errors here are truly fatal and
-unexpected, calling exit() may be OK.  (See the
-KVM_CAP_GET_MSR_FEATURES comment below for one example where
-exiting is not going to be OK.)
-
-Proper error reporting using Error** would be even better than
-exiting, but considering that none of the functions at i386/cpu.c
-return errors using Error**, I won't force you to do that.
-
-
-> > 
-[...]
-> > > +        struct kvm_msr_list msr_list;
-> > > +
-> > > +        kvm_supported_feature_msrs++;
-> > > +
-> > > +        msr_list.nmsrs = 0;
-> > > +        ret = kvm_ioctl(s, KVM_GET_MSR_FEATURE_INDEX_LIST, &msr_list);
-> > > +        if (ret < 0 && ret != -E2BIG) {
-> > > +            return ret;
-> > 
-> > What if the host KVM version doesn't support
-> > KVM_GET_MSR_FEATURE_INDEX_LIST?
-> 
-> Going to add kvm_check_extension(s, KVM_CAP_GET_MSR_FEATURES) before
-> this ioctl. if not support, return -1. (Then the kvm_init will fail and
-> exit.)
-
-We don't want QEMU to refuse to run if the kernel doesn't have
-KVM_CAP_GET_MSR_FEATURES.  We can treat missing capability as
-equivalent to returning an empty list of MSRs.
+We also need to ensure QEMU is doing its job before it complains
+to the user: before printing a warning about unsafe
+configuration, we should try to make QEMU enable safe
+configuration by default.
 
 -- 
 Eduardo
