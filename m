@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fr7jn-0003I4-5I
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 16:22:19 -0400
+	(envelope-from <cota@braap.org>) id 1fr7xS-0006d5-QR
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 16:36:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fr7jk-0002gb-2p
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 16:22:19 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:41345
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1fr7jj-0002dQ-Rz
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 16:22:16 -0400
-Received: from host86-159-123-112.range86-159.btcentralplus.com
-	([86.159.123.112] helo=[192.168.1.65])
-	by s16892447.onlinehome-server.info with esmtpsa
-	(TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fr7jp-0005CR-GH
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 21:22:22 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <41d9b8ae-1db9-be8c-4b58-23ee6278ded7@ilande.co.uk>
-Date: Sat, 18 Aug 2018 21:21:58 +0100
+	(envelope-from <cota@braap.org>) id 1fr7xP-0004Ae-MV
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 16:36:26 -0400
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:51693)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fr7xP-00049y-Cg
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 16:36:23 -0400
+Date: Sat, 18 Aug 2018 16:36:19 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180818203619.GA13678@flamenco>
+References: <20180816025452.21358-1-richard.henderson@linaro.org>
+	<20180816025452.21358-2-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] virtio ignores pci_address_space_*()?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180816025452.21358-2-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 1/5] tcg: Split CONFIG_ATOMIC128
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +27,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-Hi all,
+On Wed, Aug 15, 2018 at 19:54:48 -0700, Richard Henderson wrote:
+> GCC7+ will no longer advertise support for 16-byte __atomic operations
+> if only cmpxchg is supported, as for x86_64.  Fortunately, x86_64 still
+> has support for __sync_compare_and_swap_16 and we can make use of that.
+> AArch64 does not have, nor ever has had such support, so open-code it.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
 
-As part of testing my OpenBIOS virtio-blk implementation, I've been
-trying to use it under the 40p machine and have some questions related
-to how address spaces are interpreted.
+I just looked through patchew's mingw error messages. Fixes below.
 
-The 40p PCI address space is aliased onto the CPU physical address space
-with an offset of 0x80000000 i.e.
+> diff --git a/accel/tcg/atomic_template.h b/accel/tcg/atomic_template.h
+> index d751bcba48..a056b7b408 100644
+> --- a/accel/tcg/atomic_template.h
+> +++ b/accel/tcg/atomic_template.h
+> @@ -100,19 +100,24 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
+>      DATA_TYPE ret;
+>  
+>      ATOMIC_TRACE_RMW;
+> -    ret = atomic_cmpxchg__nocheck(haddr, cmpv, newv);
+> +#if DATA_SIZE == 16
+> +    ret = atomic16_cmpxchg(haddr, cmpv, newv);
+> +#else
+> +    ret = atomic_cmpxchg(haddr, cmpv, newv);
 
-   PCI address space 0x80001234 -> CPU address space 0x1234
+Keep the __nocheck here.
 
-For the LSI SCSI controller this just works: when configuring the DMA
-descriptors I write the destination address to the LSI registers in PCI
-address space i.e. 0x80001234. Internally this calls pci_dma_read() and
-pci_dma_write() and the data gets transferred correctly to physical
-address 0x1234.
+(snip)
+> +#if DATA_SIZE == 16
+> +    ret = atomic16_cmpxchg(haddr, BSWAP(cmpv), BSWAP(newv));
+> +#else
+>      ret = atomic_cmpxchg__nocheck(haddr, BSWAP(cmpv), BSWAP(newv));
 
-When trying to configure a virtio device I'm not seeing the same
-behaviour: firstly it seems that I need to write the CPU address 0x1234
-to VIRTIO_PCI_QUEUE_PFN rather than the PCI address 0x80001234 as I
-would expect.
+(As done here.)
 
-Following this I've tried to configure the address in the virtio
-descriptors with both the CPU address and PCI address and neither seems
-to work in my tests here.
+(snip)
+> diff --git a/include/qemu/atomic128.h b/include/qemu/atomic128.h
+> new file mode 100644
+> index 0000000000..2613ebd352
+> --- /dev/null
+> +++ b/include/qemu/atomic128.h
+(snip)
+> +#elif !defined(CONFIG_USER_ONLY)
+> +# ifdef __aarch64__
+> +/* We can do better than cmpxchg for AArch64.  */
+> +static inline Int128 atomic16_read(Int128 *ptr)
+> +{
+> +    uint64_t l, h;
+> +    uint32_t tmp;
+> +
+> +    /* The load must be paired with the store to guarantee not tearing.  */
+> +    asm("0: ldxp %[l], %[h], %[mem]\n\t"
+> +        "stxp %w[tmp], %[l], %[h], %[mem]\n\t"
+> +        "cbz %w[tmp], 0b"
+> +        : [mem] "+m"(*ptr), [tmp] "=r"(tmp), [l] "=r"(l), [h] "=r"(h));
+> +
+> +    return int128_make128(l, h);
+> +}
+> +
+> +static inline void atomic16_set(Int128 *ptr, Int128 val)
+> +{
+> +    uint64_t l = val, h = val >> 64, t1, t2;
+> +
+> +    /* Load into temporaries to acquire the exclusive access lock.  */
+> +    asm("0: ldxp %[t1], %[t2], %[mem]\n\t"
+> +        "stxp %w[t1], %[l], %[h], %[mem]\n\t"
+> +        "cbz %w[t1], 0b"
+> +        : [mem] "+m"(*ptr), [t1] "=&r"(t1), [t2] "=&r"(t2)
+> +        : [l] "r"(l), [h] "r"(h));
+> +}
+> +
+> +#  define HAVE_ATOMIC128 1
+> +# elif HAVE_CMPXCHG128
 
-Looking through the virtio code I can't see any references to
-pci_dma_read()/pci_dma_write() so I was wondering if someone can confirm
-whether I should be using CPU or PCI addresses when programming virtio
-registers and descriptors for machines such as 40p, and where I can find
-the address space being used for virtio device reads/writes?
+# elif defined(HAVE_CMPXCHG128) && HAVE_CMPXCHG128
+or similar.
 
+Thanks,
 
-ATB,
-
-Mark.
+		Emilio
