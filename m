@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42206)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqppr-0007CC-DX
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:15:24 -0400
+	id 1fqq1M-0001bg-AH
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqppm-0007QW-MD
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:15:23 -0400
+	id 1fqq1I-000603-6o
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:27:16 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180809130115.28951-1-peter.maydell@linaro.org>
-	<20180809130115.28951-8-peter.maydell@linaro.org>
+	<20180809130115.28951-2-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a1de4849-63ee-a5f1-99b0-8e852acef2e8@amsat.org>
-Date: Fri, 17 Aug 2018 22:15:12 -0300
+Message-ID: <4275d409-cbbb-b1d6-fdb6-43aa9cd61b21@amsat.org>
+Date: Fri, 17 Aug 2018 22:27:06 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180809130115.28951-8-peter.maydell@linaro.org>
+In-Reply-To: <20180809130115.28951-2-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 07/16] hw/misc/tz-msc: Model
- TrustZone Master Security Controller
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 01/16]
+ hw/watchdog/cmsdk_apb_watchdog: Implement CMSDK APB watchdog module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,493 +33,484 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 08/09/2018 10:01 AM, Peter Maydell wrote:
-> Implement a model of the TrustZone Master Securtiy Controller,
-
-Security
-
-> as documented in the Arm CoreLink SIE-200 System IP for
-> Embedded TRM  (DDI0571G):
->   https://developer.arm.com/products/architecture/m-profile/docs/ddi0571/g
-
-Your link returns 404.
-
-This one worked:
-
-https://developer.arm.com/docs/ddi0571/e
-
-> 
-> The MSC is intended to sit in front of a device which can
-> be a bus master (eg a DMA controller) and programmably gate
-> its transactions. This allows a bus-mastering device to be
-> controlled by non-secure code but still restricted from
-> making accesses to addresses which are secure-only.
+> The Arm Cortex-M System Design Kit includes a simple watchdog module
+> based on a 32-bit down-counter. Implement this.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/misc/Makefile.objs           |   1 +
->  include/hw/misc/tz-msc.h        |  79 ++++++++
->  hw/misc/tz-msc.c                | 308 ++++++++++++++++++++++++++++++++
->  MAINTAINERS                     |   2 +
->  default-configs/arm-softmmu.mak |   1 +
->  hw/misc/trace-events            |   9 +
->  6 files changed, 400 insertions(+)
->  create mode 100644 include/hw/misc/tz-msc.h
->  create mode 100644 hw/misc/tz-msc.c
+>  Makefile.objs                            |   1 +
+>  hw/watchdog/Makefile.objs                |   1 +
+>  include/hw/watchdog/cmsdk-apb-watchdog.h |  59 ++++
+>  hw/watchdog/cmsdk-apb-watchdog.c         | 326 +++++++++++++++++++++++
+>  MAINTAINERS                              |   2 +
+>  default-configs/arm-softmmu.mak          |   1 +
+>  hw/watchdog/trace-events                 |   6 +
+>  7 files changed, 396 insertions(+)
+>  create mode 100644 include/hw/watchdog/cmsdk-apb-watchdog.h
+>  create mode 100644 hw/watchdog/cmsdk-apb-watchdog.c
+>  create mode 100644 hw/watchdog/trace-events
 > 
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index dbadb41d57a..d168f8ac304 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -63,6 +63,7 @@ obj-$(CONFIG_MPS2_FPGAIO) += mps2-fpgaio.o
->  obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
->  
->  obj-$(CONFIG_TZ_MPC) += tz-mpc.o
-> +obj-$(CONFIG_TZ_MSC) += tz-msc.o
->  obj-$(CONFIG_TZ_PPC) += tz-ppc.o
->  obj-$(CONFIG_IOTKIT_SECCTL) += iotkit-secctl.o
->  obj-$(CONFIG_IOTKIT_SYSCTL) += iotkit-sysctl.o
-> diff --git a/include/hw/misc/tz-msc.h b/include/hw/misc/tz-msc.h
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 7a9828da282..ce9c79235e6 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -240,6 +240,7 @@ trace-events-subdirs += hw/tpm
+>  trace-events-subdirs += hw/usb
+>  trace-events-subdirs += hw/vfio
+>  trace-events-subdirs += hw/virtio
+> +trace-events-subdirs += hw/watchdog
+>  trace-events-subdirs += hw/xen
+>  trace-events-subdirs += io
+>  trace-events-subdirs += linux-user
+> diff --git a/hw/watchdog/Makefile.objs b/hw/watchdog/Makefile.objs
+> index 9589bed63a3..3f536d1cad8 100644
+> --- a/hw/watchdog/Makefile.objs
+> +++ b/hw/watchdog/Makefile.objs
+> @@ -1,4 +1,5 @@
+>  common-obj-y += watchdog.o
+> +common-obj-$(CONFIG_CMSDK_APB_WATCHDOG) += cmsdk-apb-watchdog.o
+>  common-obj-$(CONFIG_WDT_IB6300ESB) += wdt_i6300esb.o
+>  common-obj-$(CONFIG_WDT_IB700) += wdt_ib700.o
+>  common-obj-$(CONFIG_WDT_DIAG288) += wdt_diag288.o
+> diff --git a/include/hw/watchdog/cmsdk-apb-watchdog.h b/include/hw/watchdog/cmsdk-apb-watchdog.h
 > new file mode 100644
-> index 00000000000..116b96ae9b8
+> index 00000000000..ab8b5987a19
 > --- /dev/null
-> +++ b/include/hw/misc/tz-msc.h
-> @@ -0,0 +1,79 @@
+> +++ b/include/hw/watchdog/cmsdk-apb-watchdog.h
+> @@ -0,0 +1,59 @@
 > +/*
-> + * ARM TrustZone master security controller emulation
+> + * ARM CMSDK APB watchdog emulation
 > + *
 > + * Copyright (c) 2018 Linaro Limited
 > + * Written by Peter Maydell
 > + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 or
-> + * (at your option) any later version.
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License version 2 or
+> + *  (at your option) any later version.
 > + */
 > +
 > +/*
-> + * This is a model of the TrustZone master security controller (MSC).
-> + * It is documented in the ARM CoreLink SIE-200 System IP for Embedded TRM
-> + * (DDI 0571G):
-> + * https://developer.arm.com/products/architecture/m-profile/docs/ddi0571/g
-> + *
-> + * The MSC sits in front of a device which can be a bus master (such as
-> + * a DMA controller) and allows secure software to configure it to either
-> + * pass through or reject transactions made by that bus master.
-> + * Rejected transactions may be configured to either be aborted, or to
-> + * behave as RAZ/WI. An interrupt can be signalled for a rejected transaction.
-> + *
-> + * The MSC has no register interface -- it is configured purely by a
-> + * collection of input signals from other hardware in the system. Typically
-> + * they are either hardwired or exposed in an ad-hoc register interface by
-> + * the SoC that uses the MSC.
-> + *
-> + * We don't currently implement the irq_enable GPIO input, because on
-> + * the MPS2 FPGA images it is always tied high, which is awkward to
-> + * implement in QEMU.
+> + * This is a model of the "APB watchdog" which is part of the Cortex-M
+> + * System Design Kit (CMSDK) and documented in the Cortex-M System
+> + * Design Kit Technical Reference Manual (ARM DDI0479C):
+> + * https://developer.arm.com/products/system-design/system-design-kits/cortex-m-system-design-kit
 > + *
 > + * QEMU interface:
-> + * + Named GPIO input "cfg_nonsec": set to 1 if the bus master should be
-> + *   treated as nonsecure, or 0 for secure
-> + * + Named GPIO input "cfg_sec_resp": set to 1 if a rejected transaction should
-> + *   result in a transaction error, or 0 for the transaction to RAZ/WI
-> + * + Named GPIO input "irq_clear": set to 1 to clear a pending interrupt
-> + * + Named GPIO output "irq": set for a transaction-failed interrupt
-> + * + Property "downstream": MemoryRegion defining where bus master transactions
-> + *   are made if they are not blocked
-> + * + Property "idau": an object implementing IDAUInterface, which defines which
-> + *   addresses should be treated as secure and which as non-secure.
-> + *   This need not be the same IDAU as the one used by the CPU.
-> + * + sysbus MMIO region 0: MemoryRegion defining the upstream end of the MSC;
-> + *   this should be passed to the bus master device as the region it should
-> + *   make memory transactions to
+> + *  + QOM property "wdogclk-frq": frequency at which the watchdog is clocked
+> + *  + sysbus MMIO region 0: the register bank
+> + *  + sysbus IRQ 0: watchdog interrupt
+> + *
+> + * In real hardware the watchdog's reset output is just a GPIO line
+> + * which can then be masked by the board or treated as a simple interrupt.
+> + * (For instance the IoTKit does this with the non-secure watchdog, so that
+> + * secure code can control whether non-secure code can perform a system
+> + * reset via its watchdog.) In QEMU, we just wire up the watchdog reset
+> + * to watchdog_perform_action(), at least for the moment.
 > + */
 > +
-> +#ifndef TZ_MSC_H
-> +#define TZ_MSC_H
+> +#ifndef CMSDK_APB_WATCHDOG_H
+> +#define CMSDK_APB_WATCHDOG_H
 > +
 > +#include "hw/sysbus.h"
-> +#include "target/arm/idau.h"
+> +#include "hw/ptimer.h"
 > +
-> +#define TYPE_TZ_MSC "tz-msc"
-> +#define TZ_MSC(obj) OBJECT_CHECK(TZMSC, (obj), TYPE_TZ_MSC)
+> +#define TYPE_CMSDK_APB_WATCHDOG "cmsdk-apb-watchdog"
+> +#define CMSDK_APB_WATCHDOG(obj) OBJECT_CHECK(CMSDKAPBWatchdog, (obj), \
+> +                                              TYPE_CMSDK_APB_WATCHDOG)
 > +
-> +typedef struct TZMSC {
+> +typedef struct CMSDKAPBWatchdog {
 > +    /*< private >*/
 > +    SysBusDevice parent_obj;
 > +
 > +    /*< public >*/
+> +    MemoryRegion iomem;
+> +    qemu_irq wdogint;
+> +    uint32_t wdogclk_frq;
+> +    struct ptimer_state *timer;
 > +
-> +    /* State: these just track the values of our input signals */
-> +    bool cfg_nonsec;
-> +    bool cfg_sec_resp;
-> +    bool irq_clear;
-> +    /* State: are we asserting irq ? */
-> +    bool irq_status;
-> +
-> +    qemu_irq irq;
-> +    MemoryRegion *downstream;
-> +    AddressSpace downstream_as;
-> +    MemoryRegion upstream;
-> +    IDAUInterface *idau;
-> +} TZMSC;
+> +    uint32_t control;
+> +    uint32_t intstatus;
+> +    uint32_t lock;
+> +    uint32_t itcr;
+> +    uint32_t itop;
+> +    uint32_t resetstatus;
+> +} CMSDKAPBWatchdog;
 > +
 > +#endif
-> diff --git a/hw/misc/tz-msc.c b/hw/misc/tz-msc.c
+> diff --git a/hw/watchdog/cmsdk-apb-watchdog.c b/hw/watchdog/cmsdk-apb-watchdog.c
 > new file mode 100644
-> index 00000000000..9e352044ea5
+> index 00000000000..eb79a73fa6c
 > --- /dev/null
-> +++ b/hw/misc/tz-msc.c
-> @@ -0,0 +1,308 @@
+> +++ b/hw/watchdog/cmsdk-apb-watchdog.c
+> @@ -0,0 +1,326 @@
 > +/*
-> + * ARM TrustZone master security controller emulation
+> + * ARM CMSDK APB watchdog emulation
 > + *
 > + * Copyright (c) 2018 Linaro Limited
 > + * Written by Peter Maydell
 > + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 or
-> + * (at your option) any later version.
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License version 2 or
+> + *  (at your option) any later version.
+> + */
+> +
+> +/*
+> + * This is a model of the "APB watchdog" which is part of the Cortex-M
+> + * System Design Kit (CMSDK) and documented in the Cortex-M System
+> + * Design Kit Technical Reference Manual (ARM DDI0479C):
+> + * https://developer.arm.com/products/system-design/system-design-kits/cortex-m-system-design-kit
 > + */
 > +
 > +#include "qemu/osdep.h"
 > +#include "qemu/log.h"
-> +#include "qapi/error.h"
 > +#include "trace.h"
+> +#include "qapi/error.h"
+> +#include "qemu/main-loop.h"
+> +#include "sysemu/watchdog.h"
 > +#include "hw/sysbus.h"
 > +#include "hw/registerfields.h"
-> +#include "hw/misc/tz-msc.h"
+> +#include "hw/watchdog/cmsdk-apb-watchdog.h"
 > +
-> +static void tz_msc_update_irq(TZMSC *s)
-> +{
-> +    bool level = s->irq_status;
+> +REG32(WDOGLOAD, 0x0)
+> +REG32(WDOGVALUE, 0x4)
+> +REG32(WDOGCONTROL, 0x8)
+> +    FIELD(WDOGCONTROL, INTEN, 0, 1)
+> +    FIELD(WDOGCONTROL, RESEN, 1, 1)
+> +#define R_WDOGCONTROL_VALID_MASK (R_WDOGCONTROL_INTEN_MASK | \
+> +                                  R_WDOGCONTROL_RESEN_MASK)
+
+Or:
+
+       FIELD(WDOGCONTROL, VALID, 0, 2)
+
+> +REG32(WDOGINTCLR, 0xc)
+> +REG32(WDOGRIS, 0x10)
+> +    FIELD(WDOGRIS, INT, 0, 1)
+> +REG32(WDOGMIS, 0x14)
+> +REG32(WDOGLOCK, 0xc00)
+> +#define WDOG_UNLOCK_VALUE 0x1ACCE551
+> +REG32(WDOGITCR, 0xf00)
+> +    FIELD(WDOGITCR, ENABLE, 0, 1)
+> +#define R_WDOGITCR_VALID_MASK R_WDOGITCR_ENABLE_MASK
+> +REG32(WDOGITOP, 0xf04)
+> +    FIELD(WDOGITOP, WDOGRES, 0, 1)
+> +    FIELD(WDOGITOP, WDOGINT, 1, 1)
+> +#define R_WDOGITOP_VALID_MASK (R_WDOGITOP_WDOGRES_MASK | \
+> +                               R_WDOGITOP_WDOGINT_MASK)
+> +REG32(PID4, 0xfd0)
+> +REG32(PID5, 0xfd4)
+> +REG32(PID6, 0xfd8)
+> +REG32(PID7, 0xfdc)
+> +REG32(PID0, 0xfe0)
+> +REG32(PID1, 0xfe4)
+> +REG32(PID2, 0xfe8)
+> +REG32(PID3, 0xfec)
+> +REG32(CID0, 0xff0)
+> +REG32(CID1, 0xff4)
+> +REG32(CID2, 0xff8)
+> +REG32(CID3, 0xffc)
 > +
-> +    trace_tz_msc_update_irq(level);
-> +    qemu_set_irq(s->irq, level);
-> +}
-> +
-> +static void tz_msc_cfg_nonsec(void *opaque, int n, int level)
-> +{
-> +    TZMSC *s = TZ_MSC(opaque);
-> +
-> +    trace_tz_msc_cfg_nonsec(level);
-> +    s->cfg_nonsec = level;
-> +}
-> +
-> +static void tz_msc_cfg_sec_resp(void *opaque, int n, int level)
-> +{
-> +    TZMSC *s = TZ_MSC(opaque);
-> +
-> +    trace_tz_msc_cfg_sec_resp(level);
-> +    s->cfg_sec_resp = level;
-> +}
-> +
-> +static void tz_msc_irq_clear(void *opaque, int n, int level)
-> +{
-> +    TZMSC *s = TZ_MSC(opaque);
-> +
-> +    trace_tz_msc_irq_clear(level);
-> +
-> +    s->irq_clear = level;
-> +    if (level) {
-> +        s->irq_status = false;
-> +        tz_msc_update_irq(s);
-> +    }
-> +}
-> +
-> +/* The MSC may either block a transaction by aborting it, block a
-> + * transaction by making it RAZ/WI, allow it through with
-> + * MemTxAttrs indicating a secure transaction, or allow it with
-> + * MemTxAttrs indicating a non-secure transaction.
-> + */
-> +typedef enum MSCAction {
-> +    MSCBlockAbort,
-> +    MSCBlockRAZWI,
-> +    MSCAllowSecure,
-> +    MSCAllowNonSecure,
-> +} MSCAction;
-> +
-> +static MSCAction tz_msc_check(TZMSC *s, hwaddr addr)
-> +{
-> +    /*
-> +     * Check whether to allow an access from the bus master, returning
-> +     * an MSCAction indicating the required behaviour. If the transaction
-> +     * is blocked, the caller must check cfg_sec_resp to determine
-> +     * whether to abort or RAZ/WI the transaction.
-> +     */
-> +    IDAUInterfaceClass *iic = IDAU_INTERFACE_GET_CLASS(s->idau);
-> +    IDAUInterface *ii = IDAU_INTERFACE(s->idau);
-> +    bool idau_exempt = false, idau_ns = true, idau_nsc = true;
-> +    int idau_region = IREGION_NOTVALID;
-> +
-> +    iic->check(ii, addr, &idau_region, &idau_exempt, &idau_ns, &idau_nsc);
-> +
-> +    if (idau_exempt) {
-> +        /*
-> +         * Uncheck region -- OK, transaction type depends on
-> +         * whether bus master is configured as Secure or NonSecure
-> +         */
-> +        return s->cfg_nonsec ? MSCAllowNonSecure : MSCAllowSecure;
-> +    }
-> +
-> +    if (idau_ns) {
-> +        /* NonSecure region -- always forward as NS transaction */
-> +        return MSCAllowNonSecure;
-> +    }
-> +
-> +    if (!s->cfg_nonsec) {
-> +        /* Access to Secure region by Secure bus master: OK */
-> +        return MSCAllowSecure;
-> +    }
-> +
-> +    /* Attempted access to Secure region by NS bus master: block */
-> +    trace_tz_msc_access_blocked(addr);
-> +    if (!s->cfg_sec_resp) {
-> +        return MSCBlockRAZWI;
-> +    }
-> +
-> +    /*
-> +     * The TRM isn't clear on behaviour if irq_clear is high when a
-> +     * transaction is blocked. We assume that the MSC behaves like the
-> +     * PPC, where holding irq_clear high suppresses the interrupt.
-> +     */
-> +    if (!s->irq_clear) {
-> +        s->irq_status = true;
-> +        tz_msc_update_irq(s);
-> +    }
-> +    return MSCBlockAbort;
-> +}
-> +
-> +static MemTxResult tz_msc_read(void *opaque, hwaddr addr, uint64_t *pdata,
-> +                               unsigned size, MemTxAttrs attrs)
-> +{
-> +    TZMSC *s = opaque;
-> +    AddressSpace *as = &s->downstream_as;
-> +    uint64_t data;
-> +    MemTxResult res;
-> +
-> +    switch (tz_msc_check(s, addr)) {
-> +    case MSCBlockAbort:
-> +        return MEMTX_ERROR;
-> +    case MSCBlockRAZWI:
-> +        *pdata = 0;
-> +        return MEMTX_OK;
-> +    case MSCAllowSecure:
-> +        attrs.secure = 1;
-> +        attrs.unspecified = 0;
-> +        break;
-> +    case MSCAllowNonSecure:
-> +        attrs.secure = 0;
-> +        attrs.unspecified = 0;
-> +        break;
-> +    }
-> +
-> +    switch (size) {
-> +    case 1:
-> +        data = address_space_ldub(as, addr, attrs, &res);
-> +        break;
-> +    case 2:
-> +        data = address_space_lduw_le(as, addr, attrs, &res);
-> +        break;
-> +    case 4:
-> +        data = address_space_ldl_le(as, addr, attrs, &res);
-> +        break;
-> +    case 8:
-> +        data = address_space_ldq_le(as, addr, attrs, &res);
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +    *pdata = data;
-> +    return res;
-> +}
-> +
-> +static MemTxResult tz_msc_write(void *opaque, hwaddr addr, uint64_t val,
-> +                                unsigned size, MemTxAttrs attrs)
-> +{
-> +    TZMSC *s = opaque;
-> +    AddressSpace *as = &s->downstream_as;
-> +    MemTxResult res;
-> +
-> +    switch (tz_msc_check(s, addr)) {
-> +    case MSCBlockAbort:
-> +        return MEMTX_ERROR;
-> +    case MSCBlockRAZWI:
-> +        return MEMTX_OK;
-> +    case MSCAllowSecure:
-> +        attrs.secure = 1;
-> +        attrs.unspecified = 0;
-> +        break;
-> +    case MSCAllowNonSecure:
-> +        attrs.secure = 0;
-> +        attrs.unspecified = 0;
-> +        break;
-> +    }
-> +
-> +    switch (size) {
-> +    case 1:
-> +        address_space_stb(as, addr, val, attrs, &res);
-> +        break;
-> +    case 2:
-> +        address_space_stw_le(as, addr, val, attrs, &res);
-> +        break;
-> +    case 4:
-> +        address_space_stl_le(as, addr, val, attrs, &res);
-> +        break;
-> +    case 8:
-> +        address_space_stq_le(as, addr, val, attrs, &res);
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +    return res;
-> +}
-> +
-> +static const MemoryRegionOps tz_msc_ops = {
-> +    .read_with_attrs = tz_msc_read,
-> +    .write_with_attrs = tz_msc_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +/* PID/CID values */
+> +static const int watchdog_id[] = {
+> +    0x04, 0x00, 0x00, 0x00, /* PID4..PID7 */
+> +    0x24, 0xb8, 0x1b, 0x00, /* PID0..PID3 */
+> +    0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
 > +};
 > +
-> +static void tz_msc_reset(DeviceState *dev)
+> +static bool cmsdk_apb_watchdog_intstatus(CMSDKAPBWatchdog *s)
 > +{
-> +    TZMSC *s = TZ_MSC(dev);
-> +
-> +    trace_tz_msc_reset();
-> +    s->cfg_sec_resp = false;
-> +    s->cfg_nonsec = false;
-> +    s->irq_clear = 0;
-> +    s->irq_status = 0;
+> +    /* Return masked interrupt status */
+> +    return s->intstatus && (s->control & R_WDOGCONTROL_INTEN_MASK);
 > +}
 > +
-> +static void tz_msc_init(Object *obj)
+> +static bool cmsdk_apb_watchdog_resetstatus(CMSDKAPBWatchdog *s)
 > +{
-> +    DeviceState *dev = DEVICE(obj);
-> +    TZMSC *s = TZ_MSC(obj);
-> +
-> +    qdev_init_gpio_in_named(dev, tz_msc_cfg_nonsec, "cfg_nonsec", 1);
-> +    qdev_init_gpio_in_named(dev, tz_msc_cfg_sec_resp, "cfg_sec_resp", 1);
-> +    qdev_init_gpio_in_named(dev, tz_msc_irq_clear, "irq_clear", 1);
-> +    qdev_init_gpio_out_named(dev, &s->irq, "irq", 1);
+> +    /* Return masked reset status */
+> +    return s->resetstatus && (s->control & R_WDOGCONTROL_RESEN_MASK);
 > +}
 > +
-> +static void tz_msc_realize(DeviceState *dev, Error **errp)
+> +static void cmsdk_apb_watchdog_update(CMSDKAPBWatchdog *s)
 > +{
-> +    Object *obj = OBJECT(dev);
-> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-> +    TZMSC *s = TZ_MSC(dev);
-> +    const char *name = "tz-msc-downstream";
-> +    uint64_t size;
+> +    bool wdogint;
+> +    bool wdogres;
 > +
-> +    /*
-> +     * We can't create the upstream end of the port until realize,
-> +     * as we don't know the size of the MR used as the downstream until then.
-> +     * We insist on having a downstream, to avoid complicating the
-> +     * code with handling the "don't know how big this is" case. It's easy
-> +     * enough for the user to create an unimplemented_device as downstream
-> +     * if they have nothing else to plug into this.
-> +     */
-> +    if (!s->downstream) {
-> +        error_setg(errp, "MSC 'downstream' link not set");
-> +        return;
-> +    }
-> +    if (!s->idau) {
-> +        error_setg(errp, "MSC 'idau' link not set");
-> +        return;
+> +    if (s->itcr) {
+> +        wdogint = s->itop & R_WDOGITOP_WDOGINT_MASK;
+> +        wdogres = s->itop & R_WDOGITOP_WDOGRES_MASK;
+> +    } else {
+> +        wdogint = cmsdk_apb_watchdog_intstatus(s);
+> +        wdogres = cmsdk_apb_watchdog_resetstatus(s);
 > +    }
 > +
-> +    size = memory_region_size(s->downstream);
-> +    address_space_init(&s->downstream_as, s->downstream, name);
-> +    memory_region_init_io(&s->upstream, obj, &tz_msc_ops, s, name, size);
-> +    sysbus_init_mmio(sbd, &s->upstream);
+> +    qemu_set_irq(s->wdogint, wdogint);
+> +    if (wdogres) {
+> +        watchdog_perform_action();
+> +    }
 > +}
 > +
-> +static const VMStateDescription tz_msc_vmstate = {
-> +    .name = "tz-msc",
+> +static uint64_t cmsdk_apb_watchdog_read(void *opaque, hwaddr offset,
+> +                                        unsigned size)
+> +{
+> +    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(opaque);
+> +    uint64_t r;
+> +
+> +    switch (offset) {
+> +    case A_WDOGLOAD:
+> +        r = ptimer_get_limit(s->timer);
+> +        break;
+> +    case A_WDOGVALUE:
+> +        r = ptimer_get_count(s->timer);
+> +        break;
+> +    case A_WDOGCONTROL:
+> +        r = s->control;
+> +        break;
+> +    case A_WDOGRIS:
+> +        r = s->intstatus;
+> +        break;
+> +    case A_WDOGMIS:
+> +        r = cmsdk_apb_watchdog_intstatus(s);
+> +        break;
+> +    case A_WDOGLOCK:
+> +        r = s->lock;
+> +        break;
+> +    case A_WDOGITCR:
+> +        r = s->itcr;
+> +        break;
+> +    case A_PID4 ... A_CID3:
+> +        r = watchdog_id[(offset - A_PID4) / 4];
+> +        break;
+> +    case A_WDOGINTCLR:
+> +    case A_WDOGITOP:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "CMSDK APB watchdog read: read of WO offset %x\n",
+> +                      (int)offset);
+> +        r = 0;
+> +        break;
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "CMSDK APB watchdog read: bad offset %x\n", (int)offset);
+> +        r = 0;
+> +        break;
+> +    }
+> +    trace_cmsdk_apb_watchdog_read(offset, r, size);
+> +    return r;
+> +}
+> +
+> +static void cmsdk_apb_watchdog_write(void *opaque, hwaddr offset,
+> +                                     uint64_t value, unsigned size)
+> +{
+> +    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(opaque);
+> +
+> +    trace_cmsdk_apb_watchdog_write(offset, value, size);
+> +
+> +    if (s->lock && offset != A_WDOGLOCK) {
+> +        /* Write access is disabled via WDOGLOCK */
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "CMSDK APB watchdog write: write to locked watchdog\n");
+> +        return;
+> +    }
+> +
+> +    switch (offset) {
+> +    case A_WDOGLOAD:
+> +        /*
+> +         * Reset the load value and the current count, and make sure
+> +         * we're counting.
+> +         */
+> +        ptimer_set_limit(s->timer, value, 1);
+> +        ptimer_run(s->timer, 0);
+> +        break;
+> +    case A_WDOGCONTROL:
+> +        s->control = value & R_WDOGCONTROL_VALID_MASK;
+> +        cmsdk_apb_watchdog_update(s);
+> +        break;
+> +    case A_WDOGINTCLR:
+> +        s->intstatus = 0;
+> +        ptimer_set_count(s->timer, ptimer_get_limit(s->timer));
+> +        cmsdk_apb_watchdog_update(s);
+> +        break;
+> +    case A_WDOGLOCK:
+> +        s->lock = (value != WDOG_UNLOCK_VALUE);
+> +        break;
+> +    case A_WDOGITCR:
+> +        s->itcr = value & R_WDOGITCR_VALID_MASK;
+> +        cmsdk_apb_watchdog_update(s);
+> +        break;
+> +    case A_WDOGITOP:
+> +        s->itop = value & R_WDOGITOP_VALID_MASK;
+> +        cmsdk_apb_watchdog_update(s);
+> +        break;
+> +    case A_WDOGVALUE:
+> +    case A_WDOGRIS:
+> +    case A_WDOGMIS:
+> +    case A_PID4 ... A_CID3:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "CMSDK APB watchdog write: write to RO offset 0x%x\n",
+> +                      (int)offset);
+> +        break;
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "CMSDK APB watchdog write: bad offset 0x%x\n",
+> +                      (int)offset);
+> +        break;
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps cmsdk_apb_watchdog_ops = {
+> +    .read = cmsdk_apb_watchdog_read,
+> +    .write = cmsdk_apb_watchdog_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    /* byte/halfword accesses are just zero-padded on reads and writes */
+> +    .impl.min_access_size = 4,
+> +    .impl.max_access_size = 4,
+> +    .valid.min_access_size = 1,
+> +    .valid.max_access_size = 4,
+> +};
+> +
+> +static void cmsdk_apb_watchdog_tick(void *opaque)
+> +{
+> +    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(opaque);
+> +
+> +    if (!s->intstatus) {
+> +        /* Count expired for the first time: raise interrupt */
+> +        s->intstatus = R_WDOGRIS_INT_MASK;
+> +    } else {
+> +        /* Count expired for the second time: raise reset and stop clock */
+> +        s->resetstatus = 1;
+> +        ptimer_stop(s->timer);
+> +    }
+> +    cmsdk_apb_watchdog_update(s);
+> +}
+> +
+> +static void cmsdk_apb_watchdog_reset(DeviceState *dev)
+> +{
+> +    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(dev);
+> +
+> +    trace_cmsdk_apb_watchdog_reset();
+> +    s->control = 0;
+> +    s->intstatus = 0;
+> +    s->lock = 0;
+> +    s->itcr = 0;
+> +    s->itop = 0;
+> +    s->resetstatus = 0;
+> +    /* Set the limit and the count */
+> +    ptimer_set_limit(s->timer, 0xffffffff, 1);
+> +    ptimer_run(s->timer, 0);
+> +}
+> +
+> +static void cmsdk_apb_watchdog_init(Object *obj)
+> +{
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+> +    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(obj);
+> +
+> +    memory_region_init_io(&s->iomem, obj, &cmsdk_apb_watchdog_ops,
+> +                          s, "cmsdk-apb-watchdog", 0x1000);
+> +    sysbus_init_mmio(sbd, &s->iomem);
+> +    sysbus_init_irq(sbd, &s->wdogint);
+> +}
+> +
+> +static void cmsdk_apb_watchdog_realize(DeviceState *dev, Error **errp)
+> +{
+> +    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(dev);
+> +    QEMUBH *bh;
+> +
+> +    if (s->wdogclk_frq == 0) {
+> +        error_setg(errp,
+> +                   "CMSDK APB watchdog: wdogclk-frq property must be set");
+> +        return;
+> +    }
+> +
+> +    bh = qemu_bh_new(cmsdk_apb_watchdog_tick, s);
+> +    s->timer = ptimer_init(bh,
+> +                           PTIMER_POLICY_WRAP_AFTER_ONE_PERIOD |
+> +                           PTIMER_POLICY_TRIGGER_ONLY_ON_DECREMENT |
+> +                           PTIMER_POLICY_NO_IMMEDIATE_RELOAD |
+> +                           PTIMER_POLICY_NO_COUNTER_ROUND_DOWN);
+> +
+> +    ptimer_set_freq(s->timer, s->wdogclk_frq);
+> +}
+> +
+> +static const VMStateDescription cmsdk_apb_watchdog_vmstate = {
+> +    .name = "cmsdk-apb-watchdog",
 > +    .version_id = 1,
 > +    .minimum_version_id = 1,
 > +    .fields = (VMStateField[]) {
-> +        VMSTATE_BOOL(cfg_nonsec, TZMSC),
-> +        VMSTATE_BOOL(cfg_sec_resp, TZMSC),
-> +        VMSTATE_BOOL(irq_clear, TZMSC),
-> +        VMSTATE_BOOL(irq_status, TZMSC),
+> +        VMSTATE_PTIMER(timer, CMSDKAPBWatchdog),
+> +        VMSTATE_UINT32(control, CMSDKAPBWatchdog),
+> +        VMSTATE_UINT32(intstatus, CMSDKAPBWatchdog),
+> +        VMSTATE_UINT32(lock, CMSDKAPBWatchdog),
+> +        VMSTATE_UINT32(itcr, CMSDKAPBWatchdog),
+> +        VMSTATE_UINT32(itop, CMSDKAPBWatchdog),
+> +        VMSTATE_UINT32(resetstatus, CMSDKAPBWatchdog),
 > +        VMSTATE_END_OF_LIST()
 > +    }
 > +};
 > +
-> +static Property tz_msc_properties[] = {
-> +    DEFINE_PROP_LINK("downstream", TZMSC, downstream,
-> +                     TYPE_MEMORY_REGION, MemoryRegion *),
-> +    DEFINE_PROP_LINK("idau", TZMSC, idau,
-> +                     TYPE_IDAU_INTERFACE, IDAUInterface *),
+> +static Property cmsdk_apb_watchdog_properties[] = {
+> +    DEFINE_PROP_UINT32("wdogclk-frq", CMSDKAPBWatchdog, wdogclk_frq, 0),
 > +    DEFINE_PROP_END_OF_LIST(),
 > +};
 > +
-> +static void tz_msc_class_init(ObjectClass *klass, void *data)
+> +static void cmsdk_apb_watchdog_class_init(ObjectClass *klass, void *data)
 > +{
 > +    DeviceClass *dc = DEVICE_CLASS(klass);
 > +
-> +    dc->realize = tz_msc_realize;
-> +    dc->vmsd = &tz_msc_vmstate;
-> +    dc->reset = tz_msc_reset;
-> +    dc->props = tz_msc_properties;
+> +    dc->realize = cmsdk_apb_watchdog_realize;
+> +    dc->vmsd = &cmsdk_apb_watchdog_vmstate;
+> +    dc->reset = cmsdk_apb_watchdog_reset;
+> +    dc->props = cmsdk_apb_watchdog_properties;
 > +}
 > +
-> +static const TypeInfo tz_msc_info = {
-> +    .name = TYPE_TZ_MSC,
+> +static const TypeInfo cmsdk_apb_watchdog_info = {
+> +    .name = TYPE_CMSDK_APB_WATCHDOG,
 > +    .parent = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(TZMSC),
-> +    .instance_init = tz_msc_init,
-> +    .class_init = tz_msc_class_init,
+> +    .instance_size = sizeof(CMSDKAPBWatchdog),
+> +    .instance_init = cmsdk_apb_watchdog_init,
+> +    .class_init = cmsdk_apb_watchdog_class_init,
 > +};
 > +
-> +static void tz_msc_register_types(void)
+> +static void cmsdk_apb_watchdog_register_types(void)
 > +{
-> +    type_register_static(&tz_msc_info);
+> +    type_register_static(&cmsdk_apb_watchdog_info);
 > +}
 > +
-> +type_init(tz_msc_register_types);
+> +type_init(cmsdk_apb_watchdog_register_types);
 > diff --git a/MAINTAINERS b/MAINTAINERS
-> index 96fe011e952..5d1a3645dd4 100644
+> index 2c1a55ca207..7ea39c0176b 100644
 > --- a/MAINTAINERS
 > +++ b/MAINTAINERS
-> @@ -463,6 +463,8 @@ F: hw/misc/tz-ppc.c
+> @@ -457,6 +457,8 @@ F: hw/timer/cmsdk-apb-dualtimer.c
+>  F: include/hw/timer/cmsdk-apb-dualtimer.h
+>  F: hw/char/cmsdk-apb-uart.c
+>  F: include/hw/char/cmsdk-apb-uart.h
+> +F: hw/watchdog/cmsdk-apb-watchdog.c
+> +F: include/hw/watchdog/cmsdk-apb-watchdog.h
+>  F: hw/misc/tz-ppc.c
 >  F: include/hw/misc/tz-ppc.h
 >  F: hw/misc/tz-mpc.c
->  F: include/hw/misc/tz-mpc.h
-> +F: hw/misc/tz-msc.c
-> +F: include/hw/misc/tz-msc.h
->  
->  ARM cores
->  M: Peter Maydell <peter.maydell@linaro.org>
 > diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index da59b820a4f..1f2ac3b1767 100644
+> index 046e8903839..521c3d459fa 100644
 > --- a/default-configs/arm-softmmu.mak
 > +++ b/default-configs/arm-softmmu.mak
-> @@ -111,6 +111,7 @@ CONFIG_MPS2_FPGAIO=y
+> @@ -105,6 +105,7 @@ CONFIG_STM32F205_SOC=y
+>  CONFIG_CMSDK_APB_TIMER=y
+>  CONFIG_CMSDK_APB_DUALTIMER=y
+>  CONFIG_CMSDK_APB_UART=y
+> +CONFIG_CMSDK_APB_WATCHDOG=y
+>  
+>  CONFIG_MPS2_FPGAIO=y
 >  CONFIG_MPS2_SCC=y
->  
->  CONFIG_TZ_MPC=y
-> +CONFIG_TZ_MSC=y
->  CONFIG_TZ_PPC=y
->  CONFIG_IOTKIT=y
->  CONFIG_IOTKIT_SECCTL=y
-> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-> index 83ab58c30f5..f9be1b822e7 100644
-> --- a/hw/misc/trace-events
-> +++ b/hw/misc/trace-events
-> @@ -92,6 +92,15 @@ tz_mpc_mem_blocked_write(uint64_t addr, uint64_t data, unsigned size, bool secur
->  tz_mpc_translate(uint64_t addr, int flags, const char *idx, const char *res) "TZ MPC translate: addr 0x%" PRIx64 " flags 0x%x iommu_idx %s: %s"
->  tz_mpc_iommu_notify(uint64_t addr) "TZ MPC iommu: notifying UNMAP/MAP for 0x%" PRIx64
->  
-> +# hw/misc/tz-msc.c
-> +tz_msc_reset(void) "TZ MSC: reset"
-> +tz_msc_cfg_nonsec(int level) "TZ MSC: cfg_nonsec = %d"
-> +tz_msc_cfg_sec_resp(int level) "TZ MSC: cfg_sec_resp = %d"
-> +tz_msc_irq_enable(int level) "TZ MSC: int_enable = %d"
-> +tz_msc_irq_clear(int level) "TZ MSC: int_clear = %d"
-> +tz_msc_update_irq(int level) "TZ MSC: setting irq line to %d"
-> +tz_msc_access_blocked(uint64_t offset) "TZ MSC: offset 0x%" PRIx64 " access blocked"
+> diff --git a/hw/watchdog/trace-events b/hw/watchdog/trace-events
+> new file mode 100644
+> index 00000000000..fee95847df0
+> --- /dev/null
+> +++ b/hw/watchdog/trace-events
+> @@ -0,0 +1,6 @@
+> +# See docs/devel/tracing.txt for syntax documentation.
 > +
->  # hw/misc/tz-ppc.c
->  tz_ppc_reset(void) "TZ PPC: reset"
->  tz_ppc_cfg_nonsec(int n, int level) "TZ PPC: cfg_nonsec[%d] = %d"
+> +# hw/char/cmsdk_apb_watchdog.c
+> +cmsdk_apb_watchdog_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB watchdog read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+> +cmsdk_apb_watchdog_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB watchdog write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+> +cmsdk_apb_watchdog_reset(void) "CMSDK APB watchdog: reset"
 > 
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
