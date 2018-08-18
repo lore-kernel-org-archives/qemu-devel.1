@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqyAF-0007V2-4G
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:09:00 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fqyAU-0007H0-Cc
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:09:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqy6F-0005ua-Rx
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:04:53 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:43625)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqy6F-0005r9-Dz
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:04:51 -0400
-Received: by mail-oi0-x243.google.com with SMTP id b15-v6so18126636oib.10
-	for <qemu-devel@nongnu.org>; Sat, 18 Aug 2018 03:04:51 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1fqy45-0002zH-RL
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:02:41 -0400
+Resent-Message-Id: <E1fqy45-0002zH-RL@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21070)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fqy45-0002yP-IY
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:02:37 -0400
+In-Reply-To: <20180817150559.16243-1-armbru@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153458654892.28280.9192299594353632366@502c9da6d61e>
 MIME-Version: 1.0
-In-Reply-To: <34fd5e4b-4b39-65be-d1e9-a655f656dbc9@amsat.org>
-References: <20180809130115.28951-1-peter.maydell@linaro.org>
-	<20180809130115.28951-6-peter.maydell@linaro.org>
-	<34fd5e4b-4b39-65be-d1e9-a655f656dbc9@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 18 Aug 2018 11:04:30 +0100
-Message-ID: <CAFEAcA-NEBa3cyHAMsSJ6o45-KO1oHewRc9QEApFCt0SX+8AkA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 05/16] hw/misc/iotkit-sysctl:
- Implement IoTKit system control element
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 18 Aug 2018 03:02:30 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/60] json: Fixes,
+ error reporting improvements, cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,241 +29,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: armbru@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 18 August 2018 at 01:23, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
-rote:
-> Hi Peter,
->
-> On 08/09/2018 10:01 AM, Peter Maydell wrote:
->> The Arm IoTKit includes a system control element which
->> provides a block of read-only ID registers and a block
->> of read-write control registers. Implement a minimal
->> version of this.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  hw/misc/Makefile.objs           |   1 +
->>  include/hw/misc/iotkit-sysctl.h |  50 +++++
->>  hw/misc/iotkit-sysctl.c         | 324 ++++++++++++++++++++++++++++++++
->>  MAINTAINERS                     |   2 +
->>  default-configs/arm-softmmu.mak |   1 +
->>  hw/misc/trace-events            |   7 +
->>  6 files changed, 385 insertions(+)
->>  create mode 100644 include/hw/misc/iotkit-sysctl.h
->>  create mode 100644 hw/misc/iotkit-sysctl.c
->>
->> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
->> index 93509008451..dbadb41d57a 100644
->> --- a/hw/misc/Makefile.objs
->> +++ b/hw/misc/Makefile.objs
->> @@ -65,6 +65,7 @@ obj-$(CONFIG_MPS2_SCC) +=3D mps2-scc.o
->>  obj-$(CONFIG_TZ_MPC) +=3D tz-mpc.o
->>  obj-$(CONFIG_TZ_PPC) +=3D tz-ppc.o
->>  obj-$(CONFIG_IOTKIT_SECCTL) +=3D iotkit-secctl.o
->> +obj-$(CONFIG_IOTKIT_SYSCTL) +=3D iotkit-sysctl.o
->>
->>  obj-$(CONFIG_PVPANIC) +=3D pvpanic.o
->>  obj-$(CONFIG_HYPERV_TESTDEV) +=3D hyperv_testdev.o
->> diff --git a/include/hw/misc/iotkit-sysctl.h b/include/hw/misc/iotkit-sy=
-sctl.h
->> new file mode 100644
->> index 00000000000..c3b14ccee4c
->> --- /dev/null
->> +++ b/include/hw/misc/iotkit-sysctl.h
->> @@ -0,0 +1,50 @@
->> +/*
->> + * ARM IoTKit system control element
->> + *
->> + * Copyright (c) 2018 Linaro Limited
->> + * Written by Peter Maydell
->> + *
->> + *  This program is free software; you can redistribute it and/or modif=
-y
->> + *  it under the terms of the GNU General Public License version 2 or
->> + *  (at your option) any later version.
->> + */
->> +
->> +/*
->> + * This is a model of the "system control element" which is part of the
->> + * Arm IoTKit and documented in
->> + * http://infocenter.arm.com/help/index.jsp?topic=3D/com.arm.doc.ecm060=
-1256/index.html
->> + * Specifically, it implements the "system information block" and
->> + * "system control register" blocks.
->> + *
->> + * QEMU interface:
->> + *  + sysbus MMIO region 0: the system information register bank
->> + *  + sysbus MMIO region 1: the system control register bank
->> + */
->> +
->> +#ifndef HW_MISC_IOTKIT_SYSCTL_H
->> +#define HW_MISC_IOTKIT_SYSCTL_H
->> +
->> +#include "hw/sysbus.h"
->> +
->> +#define TYPE_IOTKIT_SYSCTL "iotkit-sysctl"
->> +#define IOTKIT_SYSCTL(obj) OBJECT_CHECK(IoTKitSysCtl, (obj), \
->> +                                        TYPE_IOTKIT_SYSCTL)
->> +
->> +typedef struct IoTKitSysCtl {
->> +    /*< private >*/
->> +    SysBusDevice parent_obj;
->> +
->> +    /*< public >*/
->> +    MemoryRegion sysinfo_iomem;
->> +    MemoryRegion sysctl_iomem;
->> +
->> +    uint32_t secure_debug;
->> +    uint32_t reset_syndrome;
->> +    uint32_t reset_mask;
->> +    uint32_t gretreg;
->> +    uint32_t initsvrtor0;
->> +    uint32_t cpuwait;
->> +    uint32_t wicctrl;
->> +} IoTKitSysCtl;
->> +
->> +#endif
->> diff --git a/hw/misc/iotkit-sysctl.c b/hw/misc/iotkit-sysctl.c
->> new file mode 100644
->> index 00000000000..9445500be76
->> --- /dev/null
->> +++ b/hw/misc/iotkit-sysctl.c
->> @@ -0,0 +1,324 @@
->> +/*
->> + * ARM IoTKit system control element
->> + *
->> + * Copyright (c) 2018 Linaro Limited
->> + * Written by Peter Maydell
->> + *
->> + *  This program is free software; you can redistribute it and/or modif=
-y
->> + *  it under the terms of the GNU General Public License version 2 or
->> + *  (at your option) any later version.
->> + */
->> +
->> +/*
->> + * This is a model of the "system control element" which is part of the
->> + * Arm IoTKit and documented in
->> + * http://infocenter.arm.com/help/index.jsp?topic=3D/com.arm.doc.ecm060=
-1256/index.html
->> + * Specifically, it implements the "system information block" and
->> + * "system control register" blocks.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qemu/log.h"
->> +#include "trace.h"
->> +#include "qapi/error.h"
->> +#include "sysemu/sysemu.h"
->> +#include "hw/sysbus.h"
->> +#include "hw/registerfields.h"
->> +#include "hw/misc/iotkit-sysctl.h"
->> +
->> +/* sysinfo block registers */
->> +REG32(SYS_VERSION, 0x0)
->> +REG32(SYS_CONFIG, 0x4)
->
-> I find it a bit confuse to have the both SYSINFO/SYSCONTROL in the same
-> "iotkit-sysctl" device. They share the same state but there is no
-> particular need for it, then you need connect them as 2 different
-> devices in iotkit_realize but they have the same name "iotkit-sysctl".
->
-> Why not declare 2 different TypeInfo? I am probably missing what state
-> they need to share.
-
-You're right, they don't share anything internally. It just
-seemed a bit unnecessary to have a device that implements
-2 read-only registers and nothing else. It probably is better
-to split them up, though.
-
->> +    /*
->> +     * Most of the state here has to do with control of reset and
->> +     * similar kinds of power up -- for instance the guest can ask
->> +     * what the reason for the last reset was, or forbid reset for
->> +     * some causes (like the non-secure watchdog). Most of this is
->> +     * not relevant to QEMU, which doesn't really model anything other
->> +     * than a full power-on reset.
->> +     * We just model the registers as reads-as-written.
->> +     */
->> +
->> +    switch (offset) {
->> +    case A_RESET_SYNDROME:
->> +        qemu_log_mask(LOG_UNIMP,
->> +                      "IoTKit SysCtl RESET_SYNDROME unimplemented\n");
->
-> Maybe warn_report() or warn_once() is more appropriate than UNIMP?
-
-LOG_UNIMP is what we generally use for warning about accesses
-to unimplemented registers.
-
-
->> +    case A_SWRESET:
->> +        /* One w/o bit to request a reset; all other bits reserved */
->> +        if (value & R_SWRESET_SWRESETREQ_MASK) {
->> +            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->> +        }
->
-> Shouldn't this be:
->
->            } else {
->                cpu_reset(...);
->            }
-
-Why? The register function is "write 1 to request a system reset".
-Writing a zero does nothing.
-
-
->> +        break;
->> +    case A_BUSWAIT:        /* In IoTKit BUSWAIT is reserved, R/O, zero =
-*/
->> +    case A_SECDBGSTAT:
->> +    case A_PID4 ... A_CID3:
->> +        qemu_log_mask(LOG_GUEST_ERROR,
->> +                      "IoTKit SysCtl write: write of RO offset %x\n",
->> +                      (int)offset);
->> +        break;
->> +    default:
->> +        qemu_log_mask(LOG_GUEST_ERROR,
->> +                      "IoTKit SysCtl write: bad offset %x\n", (int)offs=
-et);
->> +        break;
->> +    }
->> +}
->> +
->> +static const MemoryRegionOps iotkit_sysctl_ops =3D {
->> +    .read =3D iotkit_sysctl_read,
->> +    .write =3D iotkit_sysctl_write,
->> +    .endianness =3D DEVICE_LITTLE_ENDIAN,
->> +    /* byte/halfword accesses are just zero-padded on reads and writes =
-*/
->> +    .impl.min_access_size =3D 4,
->> +    .impl.max_access_size =3D 4,
->> +    .valid.min_access_size =3D 1,
->> +    .valid.max_access_size =3D 4,
->> +};
->> +
->> +static void iotkit_sysctl_reset(DeviceState *dev)
->> +{
->> +    IoTKitSysCtl *s =3D IOTKIT_SYSCTL(dev);
->> +
->> +    trace_iotkit_sysctl_reset();
->> +    s->secure_debug =3D 0;
->> +    s->reset_syndrome =3D 1;
->> +    s->reset_mask =3D 0;
->> +    s->gretreg =3D 0;
->> +    s->initsvrtor0 =3D 0x10000000;
->
-> This one could be a property (now now ;) ).
-
-It could be, but given that we don't actually support letting
-the guest change the SVRTOR reset value on the CPU for the
-next reset I think that would be overkill.
-
->> +    s->cpuwait =3D 0;
->> +    s->wicctrl =3D 0;
->> +}
-
-thanks
--- PMM
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODE3MTUwNTU5LjE2MjQzLTEtYXJtYnJ1QHJlZGhhdC5jb20KU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC82MF0ganNvbjogRml4ZXMsIGVycm9yIHJlcG9y
+dGluZyBpbXByb3ZlbWVudHMsIGNsZWFudXBzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
+LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
+IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
+a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
+ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
+IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApT
+d2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg4NGMxZTc1ZDcganNvbjogU3VwcG9ydCAl
+JSBpbiBKU09OIHN0cmluZ3Mgd2hlbiBpbnRlcnBvbGF0aW5nCjVhMjZhMGYyYmQganNvbjogSW1w
+cm92ZSBzYWZldHkgb2YgcW9iamVjdF9mcm9tX2pzb25mX25vZmFpbCgpICYgZnJpZW5kcwo2Mzlh
+NTA5OGUyIGpzb246IEtlZXAgaW50ZXJwb2xhdGlvbiBzdGF0ZSBpbiBKU09OUGFyc2VyQ29udGV4
+dApkZWY5YzNhOTY1IHRlc3RzL2RyaXZlX2RlbC10ZXN0OiBGaXggaGFybWxlc3MgSlNPTiBpbnRl
+cnBvbGF0aW9uIGJ1ZwoxYzNjODQ0ZjZiIGRvY3MvaW50ZXJvcC9xbXAtc3BlYzogSG93IHRvIGZv
+cmNlIGtub3duIGdvb2QgcGFyc2VyIHN0YXRlCmQzYTJjNjcxMTUganNvbjogQ2xlYW4gdXAgaGVh
+ZGVycwplMjlmMjUwZjQ1IHFvYmplY3Q6IERyb3Agc3VwZXJmbHVvdXMgaW5jbHVkZXMgb2YgcWVt
+dS1jb21tb24uaAo2NWFkZGIxZGY5IGpzb246IE1ha2UgSlNPTlRva2VuIG9wYXF1ZSBvdXRzaWRl
+IGpzb24tcGFyc2VyLmMKMDIxYmFhY2ZjMyBqc29uOiBFbGltaW5hdGUgbGV4ZXIgc3RhdGUgSU5f
+V0hJVEVTUEFDRSwgcHNldWRvLXRva2VuIEpTT05fU0tJUAplN2FkZjUzODFjIGpzb246IEVsaW1p
+bmF0ZSBsZXhlciBzdGF0ZSBJTl9FUlJPUiBhbmQgcHNldWRvLXRva2VuIEpTT05fTUlOCjQ0ODcw
+OWMxNjIganNvbjogVW5ib3ggdG9rZW5zIHF1ZXVlIGluIEpTT05NZXNzYWdlUGFyc2VyCmZjNzg3
+NDg0NmUganNvbjogU3RyZWFtbGluZSBqc29uX21lc3NhZ2VfcHJvY2Vzc190b2tlbigpCjc2M2Rj
+ZTQ3Y2EganNvbjogRW5mb3JjZSB0b2tlbiBjb3VudCBhbmQgc2l6ZSBsaW1pdHMgbW9yZSB0aWdo
+dGx5CmNlMTQxOWIxMjYgcWpzb246IEhhdmUgcW9iamVjdF9mcm9tX2pzb24oKSAmIGZyaWVuZHMg
+cmVqZWN0IGVtcHR5IGFuZCBibGFuawplNDQyYmY4YWZlIGpzb246IEFzc2VydCBqc29uX3BhcnNl
+cl9wYXJzZSgpIGNvbnN1bWVzIGFsbCB0b2tlbnMgb24gc3VjY2VzcwpjNjJjY2UwMGUwIGpzb246
+IEZpeCBzdHJlYW1lciBub3QgdG8gaWdub3JlIHRyYWlsaW5nIHVudGVybWluYXRlZCBzdHJ1Y3R1
+cmVzCmUwYjBkNGUxNDAganNvbjogRml4IGxhdGVudCBwYXJzZXIgYWJvcnRzIGF0IGVuZCBvZiBp
+bnB1dAo0MWEzZDI3YTNlIHFqc29uOiBGaXggcW9iamVjdF9mcm9tX2pzb24oKSAmIGZyaWVuZHMg
+Zm9yIG11bHRpcGxlIHZhbHVlcwpkNDU0MzE2MWUyIGpzb246IEltcHJvdmUgbmFtZXMgb2YgbGV4
+ZXIgc3RhdGVzIHJlbGF0ZWQgdG8gbnVtYmVycwoxYzU0N2JjN2YwIGpzb246IE5pY2VyIHJlY292
+ZXJ5IGZyb20gaW52YWxpZCBsZWFkaW5nIHplcm8KYTE2YzA0Mjk4MyBqc29uOiBSZXBsYWNlICVJ
+NjRkLCAlSTY0dSBieSAlUFJJZDY0LCAlUFJJdTY0CmM5MGQyYjBiYjkganNvbjogTGVhdmUgcmVq
+ZWN0aW5nIGludmFsaWQgaW50ZXJwb2xhdGlvbiB0byBwYXJzZXIKNjQ3NzM4NzdiOSBqc29uOiBQ
+YXNzIGxleGljYWwgZXJyb3JzIGFuZCBsaW1pdCB2aW9sYXRpb25zIHRvIGNhbGxiYWNrCjRiNmM0
+YmVkOTYganNvbjogVHJlYXQgdW53YW50ZWQgaW50ZXJwb2xhdGlvbiBhcyBsZXhpY2FsIGVycm9y
+CjllZTBjZjllN2UganNvbjogUmVuYW1lIHRva2VuIEpTT05fRVNDQVBFICYgZnJpZW5kcyB0byBK
+U09OX0lOVEVSUE9MCjYyODg1NmM4YWUganNvbjogRG9uJ3QgY3JlYXRlIEpTT05fRVJST1IgdG9r
+ZW5zIHRoYXQgd29uJ3QgYmUgdXNlZAo5MGQ2YWMyNzFhIGpzb246IERvbid0IHBhc3MgbnVsbCBA
+dG9rZW5zIHRvIGpzb25fcGFyc2VyX3BhcnNlKCkKZjQ3MzdjMjA2NyBqc29uOiBSZWRlc2lnbiB0
+aGUgY2FsbGJhY2sgdG8gY29uc3VtZSBKU09OIHZhbHVlcwpkZmFlMzdkMzM4IGpzb246IEhhdmUg
+bGV4ZXIgY2FsbCBzdHJlYW1lciBkaXJlY3RseQo1YWQ2Zjk3ZThmIGpzb24tcGFyc2VyOiBzaW1w
+bGlmeSBhbmQgYXZvaWQgSlNPTlBhcnNlckNvbnRleHQgYWxsb2NhdGlvbgpkZTk1ZjlhY2E3IGpz
+b246IHJlbW92ZSB1c2VsZXNzIHJldHVybiB2YWx1ZSBmcm9tIGxleGVyL3BhcnNlcgphOWMxZDNi
+YWNjIGNoZWNrLXFqc29uOiBGaXggYW5kIGVuYWJsZSB1dGY4X3N0cmluZygpJ3MgZGlzYWJsZWQg
+cGFydAplNDFiMDk2ZTdjIGpzb246IEZpeCBcdVhYWFggZm9yIHN1cnJvZ2F0ZSBwYWlycwo1ODM4
+NzI5NGU0IGpzb246IFJlamVjdCBpbnZhbGlkIFx1WFhYWCwgZml4IFx1MDAwMAowMjA5ZGJmNDU1
+IGpzb246IFNpbXBsaWZ5IHBhcnNlX3N0cmluZygpCjBkNzAxM2IwMTcganNvbjogTGVhdmUgcmVq
+ZWN0aW5nIGludmFsaWQgZXNjYXBlIHNlcXVlbmNlcyB0byBwYXJzZXIKMGE0MDMzNGFlZiBqc29u
+OiBBY2NlcHQgb3ZlcmxvbmcgXHhDMFx4ODAgYXMgVSswMDAwICgibW9kaWZpZWQgVVRGLTgiKQo4
+ZDYzNDZlMGI0IGpzb246IExlYXZlIHJlamVjdGluZyBpbnZhbGlkIFVURi04IHRvIHBhcnNlcgox
+YzJhZjU5ZjA4IGpzb246IFJlcG9ydCBmaXJzdCByYXRoZXIgdGhhbiBsYXN0IHBhcnNlIGVycm9y
+CmJiZmJkZGYxNTcganNvbjogUmVqZWN0IGludmFsaWQgVVRGLTggc2VxdWVuY2VzCjcyNDFlOGQx
+MTcgY2hlY2stcWpzb246IERvY3VtZW50IHdlIGV4cGVjdCBpbnZhbGlkIFVURi04IHRvIGJlIHJl
+amVjdGVkCjZiOTQwNzc0NTMganNvbjogVGlnaHRlbiBhbmQgc2ltcGxpZnkgcXN0cmluZ19mcm9t
+X2VzY2FwZWRfc3RyKCkncyBsb29wCjNhZDFmNTBhMjQganNvbjogUmV2YW1wIGxleGVyIGRvY3Vt
+ZW50YXRpb24KMjE1MDBhYjU0OCBqc29uOiBSZWplY3QgdW5lc2NhcGVkIGNvbnRyb2wgY2hhcmFj
+dGVycwo2MjdjYWM5NDc2IGpzb246IEZpeCBsZXhlciB0byBpbmNsdWRlIHRoZSBiYWQgY2hhcmFj
+dGVyIGluIEpTT05fRVJST1IgdG9rZW4KZDBhMWIwODQyNyBjaGVjay1xanNvbjogQ292ZXIgaW50
+ZXJwb2xhdGlvbiBtb3JlIHRob3JvdWdobHkKNmZiZTllNmUxZSBjaGVjay1xanNvbiBxbXAtdGVz
+dDogQ292ZXIgY29udHJvbCBjaGFyYWN0ZXJzIG1vcmUgdGhvcm91Z2hseQpiMzE0ZDg3YWZkIGNo
+ZWNrLXFqc29uOiBGaXggdXRmOF9zdHJpbmcoKSB0byB0ZXN0IGFsbCBpbnZhbGlkIHNlcXVlbmNl
+cwozMTAzMzBlMTc2IGNoZWNrLXFqc29uOiBTaW1wbGlmeSB1dGY4X3N0cmluZygpCjZiODY5YWNi
+NTkgY2hlY2stcWpzb246IENvdmVyIFVURi04IGluIHNpbmdsZSBxdW90ZWQgc3RyaW5ncwoyY2Yx
+Zjc1MmY3IGNoZWNrLXFqc29uOiBDb25zb2xpZGF0ZSBwYXJ0bHkgcmVkdW5kYW50IHN0cmluZyB0
+ZXN0cwpjN2E0YWI2MzkyIGNoZWNrLXFqc29uOiBDb3ZlciBlc2NhcGVkIGNoYXJhY3RlcnMgbW9y
+ZSB0aG9yb3VnaGx5LCBwYXJ0IDIKOGY4ZjQ2NDAxNSBjaGVjay1xanNvbjogU3RyZWFtbGluZSBl
+c2NhcGVkX3N0cmluZygpJ3MgdGVzdCBzdHJpbmdzCjVjOGVkMWM0MWYgY2hlY2stcWpzb246IENv
+dmVyIGVzY2FwZWQgY2hhcmFjdGVycyBtb3JlIHRob3JvdWdobHksIHBhcnQgMQo3YzIyM2UzZjBh
+IHRlc3QtcWdhOiBDbGVhbiB1cCBob3cgd2UgdGVzdCBRR0Egc3luY2hyb25pemF0aW9uCjQ5ZjFm
+Y2I0ZTkgcW1wLXRlc3Q6IENvdmVyIHN5bnRheCBhbmQgbGV4aWNhbCBlcnJvcnMKYjlhYzJiNjE0
+YiBxbXAtY21kLXRlc3Q6IFNwbGl0IG9mZiBxbXAtdGVzdAowNGYxMjU5NDQ5IGNoZWNrLXFqc29u
+OiBDb3ZlciB3aGl0ZXNwYWNlIG1vcmUgdGhvcm91Z2hseQo3NDM5NmZhN2NjIGNoZWNrLXFqc29u
+OiBDb3ZlciBibGFuayBhbmQgbGV4aWNhbGx5IGVycm9uZW91cyBpbnB1dAoxZjYyNzNhOTIyIGNo
+ZWNrLXFqc29uOiBDb3ZlciBtdWx0aXBsZSBKU09OIG9iamVjdHMgaW4gc2FtZSBzdHJpbmcKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNjA6IGNoZWNrLXFqc29uOiBDb3Zl
+ciBtdWx0aXBsZSBKU09OIG9iamVjdHMgaW4gc2FtZSBzdHJpbmcuLi4KQ2hlY2tpbmcgUEFUQ0gg
+Mi82MDogY2hlY2stcWpzb246IENvdmVyIGJsYW5rIGFuZCBsZXhpY2FsbHkgZXJyb25lb3VzIGlu
+cHV0Li4uCkNoZWNraW5nIFBBVENIIDMvNjA6IGNoZWNrLXFqc29uOiBDb3ZlciB3aGl0ZXNwYWNl
+IG1vcmUgdGhvcm91Z2hseS4uLgpDaGVja2luZyBQQVRDSCA0LzYwOiBxbXAtY21kLXRlc3Q6IFNw
+bGl0IG9mZiBxbXAtdGVzdC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0ODogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ2MCBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDUvNjA6
+IHFtcC10ZXN0OiBDb3ZlciBzeW50YXggYW5kIGxleGljYWwgZXJyb3JzLi4uCkNoZWNraW5nIFBB
+VENIIDYvNjA6IHRlc3QtcWdhOiBDbGVhbiB1cCBob3cgd2UgdGVzdCBRR0Egc3luY2hyb25pemF0
+aW9uLi4uCkNoZWNraW5nIFBBVENIIDcvNjA6IGNoZWNrLXFqc29uOiBDb3ZlciBlc2NhcGVkIGNo
+YXJhY3RlcnMgbW9yZSB0aG9yb3VnaGx5LCBwYXJ0IDEuLi4KQ2hlY2tpbmcgUEFUQ0ggOC82MDog
+Y2hlY2stcWpzb246IFN0cmVhbWxpbmUgZXNjYXBlZF9zdHJpbmcoKSdzIHRlc3Qgc3RyaW5ncy4u
+LgpDaGVja2luZyBQQVRDSCA5LzYwOiBjaGVjay1xanNvbjogQ292ZXIgZXNjYXBlZCBjaGFyYWN0
+ZXJzIG1vcmUgdGhvcm91Z2hseSwgcGFydCAyLi4uCkNoZWNraW5nIFBBVENIIDEwLzYwOiBjaGVj
+ay1xanNvbjogQ29uc29saWRhdGUgcGFydGx5IHJlZHVuZGFudCBzdHJpbmcgdGVzdHMuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTEvNjA6IGNoZWNrLXFqc29uOiBDb3ZlciBVVEYtOCBpbiBzaW5nbGUgcXVv
+dGVkIHN0cmluZ3MuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvNjA6IGNoZWNrLXFqc29uOiBTaW1wbGlm
+eSB1dGY4X3N0cmluZygpLi4uCkNoZWNraW5nIFBBVENIIDEzLzYwOiBjaGVjay1xanNvbjogRml4
+IHV0Zjhfc3RyaW5nKCkgdG8gdGVzdCBhbGwgaW52YWxpZCBzZXF1ZW5jZXMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTQvNjA6IGNoZWNrLXFqc29uIHFtcC10ZXN0OiBDb3ZlciBjb250cm9sIGNoYXJhY3Rl
+cnMgbW9yZSB0aG9yb3VnaGx5Li4uCkNoZWNraW5nIFBBVENIIDE1LzYwOiBjaGVjay1xanNvbjog
+Q292ZXIgaW50ZXJwb2xhdGlvbiBtb3JlIHRob3JvdWdobHkuLi4KRVJST1I6IHNwYWNlIHJlcXVp
+cmVkIGFmdGVyIHRoYXQgY2xvc2UgYnJhY2UgJ30nCiMxNzk6IEZJTEU6IHRlc3RzL2NoZWNrLXFq
+c29uLmM6MTEyMjoKKyAgICAgICAgICAgIHt9fSkpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5p
+bmdzLCAyMDcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTYvNjA6IGpzb246IEZpeCBsZXhlciB0byBpbmNsdWRlIHRo
+ZSBiYWQgY2hhcmFjdGVyIGluIEpTT05fRVJST1IgdG9rZW4uLi4KQ2hlY2tpbmcgUEFUQ0ggMTcv
+NjA6IGpzb246IFJlamVjdCB1bmVzY2FwZWQgY29udHJvbCBjaGFyYWN0ZXJzLi4uCkNoZWNraW5n
+IFBBVENIIDE4LzYwOiBqc29uOiBSZXZhbXAgbGV4ZXIgZG9jdW1lbnRhdGlvbi4uLgpDaGVja2lu
+ZyBQQVRDSCAxOS82MDoganNvbjogVGlnaHRlbiBhbmQgc2ltcGxpZnkgcXN0cmluZ19mcm9tX2Vz
+Y2FwZWRfc3RyKCkncyBsb29wLi4uCkNoZWNraW5nIFBBVENIIDIwLzYwOiBjaGVjay1xanNvbjog
+RG9jdW1lbnQgd2UgZXhwZWN0IGludmFsaWQgVVRGLTggdG8gYmUgcmVqZWN0ZWQuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMjEvNjA6IGpzb246IFJlamVjdCBpbnZhbGlkIFVURi04IHNlcXVlbmNlcy4uLgpD
+aGVja2luZyBQQVRDSCAyMi82MDoganNvbjogUmVwb3J0IGZpcnN0IHJhdGhlciB0aGFuIGxhc3Qg
+cGFyc2UgZXJyb3IuLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvNjA6IGpzb246IExlYXZlIHJlamVjdGlu
+ZyBpbnZhbGlkIFVURi04IHRvIHBhcnNlci4uLgpDaGVja2luZyBQQVRDSCAyNC82MDoganNvbjog
+QWNjZXB0IG92ZXJsb25nIFx4QzBceDgwIGFzIFUrMDAwMCAoIm1vZGlmaWVkIFVURi04IikuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMjUvNjA6IGpzb246IExlYXZlIHJlamVjdGluZyBpbnZhbGlkIGVzY2Fw
+ZSBzZXF1ZW5jZXMgdG8gcGFyc2VyLi4uCkNoZWNraW5nIFBBVENIIDI2LzYwOiBqc29uOiBTaW1w
+bGlmeSBwYXJzZV9zdHJpbmcoKS4uLgpDaGVja2luZyBQQVRDSCAyNy82MDoganNvbjogUmVqZWN0
+IGludmFsaWQgXHVYWFhYLCBmaXggXHUwMDAwLi4uCkNoZWNraW5nIFBBVENIIDI4LzYwOiBqc29u
+OiBGaXggXHVYWFhYIGZvciBzdXJyb2dhdGUgcGFpcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjkvNjA6
+IGNoZWNrLXFqc29uOiBGaXggYW5kIGVuYWJsZSB1dGY4X3N0cmluZygpJ3MgZGlzYWJsZWQgcGFy
+dC4uLgpDaGVja2luZyBQQVRDSCAzMC82MDoganNvbjogcmVtb3ZlIHVzZWxlc3MgcmV0dXJuIHZh
+bHVlIGZyb20gbGV4ZXIvcGFyc2VyLi4uCkNoZWNraW5nIFBBVENIIDMxLzYwOiBqc29uLXBhcnNl
+cjogc2ltcGxpZnkgYW5kIGF2b2lkIEpTT05QYXJzZXJDb250ZXh0IGFsbG9jYXRpb24uLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMzIvNjA6IGpzb246IEhhdmUgbGV4ZXIgY2FsbCBzdHJlYW1lciBkaXJlY3Rs
+eS4uLgpDaGVja2luZyBQQVRDSCAzMy82MDoganNvbjogUmVkZXNpZ24gdGhlIGNhbGxiYWNrIHRv
+IGNvbnN1bWUgSlNPTiB2YWx1ZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzQvNjA6IGpzb246IERvbid0
+IHBhc3MgbnVsbCBAdG9rZW5zIHRvIGpzb25fcGFyc2VyX3BhcnNlKCkuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMzUvNjA6IGpzb246IERvbid0IGNyZWF0ZSBKU09OX0VSUk9SIHRva2VucyB0aGF0IHdvbid0
+IGJlIHVzZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggMzYvNjA6IGpzb246IFJlbmFtZSB0b2tlbiBKU09O
+X0VTQ0FQRSAmIGZyaWVuZHMgdG8gSlNPTl9JTlRFUlBPTC4uLgpDaGVja2luZyBQQVRDSCAzNy82
+MDoganNvbjogVHJlYXQgdW53YW50ZWQgaW50ZXJwb2xhdGlvbiBhcyBsZXhpY2FsIGVycm9yLi4u
+CkNoZWNraW5nIFBBVENIIDM4LzYwOiBqc29uOiBQYXNzIGxleGljYWwgZXJyb3JzIGFuZCBsaW1p
+dCB2aW9sYXRpb25zIHRvIGNhbGxiYWNrLi4uCkNoZWNraW5nIFBBVENIIDM5LzYwOiBqc29uOiBM
+ZWF2ZSByZWplY3RpbmcgaW52YWxpZCBpbnRlcnBvbGF0aW9uIHRvIHBhcnNlci4uLgpDaGVja2lu
+ZyBQQVRDSCA0MC82MDoganNvbjogUmVwbGFjZSAlSTY0ZCwgJUk2NHUgYnkgJVBSSWQ2NCwgJVBS
+SXU2NC4uLgpDaGVja2luZyBQQVRDSCA0MS82MDoganNvbjogTmljZXIgcmVjb3ZlcnkgZnJvbSBp
+bnZhbGlkIGxlYWRpbmcgemVyby4uLgpDaGVja2luZyBQQVRDSCA0Mi82MDoganNvbjogSW1wcm92
+ZSBuYW1lcyBvZiBsZXhlciBzdGF0ZXMgcmVsYXRlZCB0byBudW1iZXJzLi4uCkNoZWNraW5nIFBB
+VENIIDQzLzYwOiBxanNvbjogRml4IHFvYmplY3RfZnJvbV9qc29uKCkgJiBmcmllbmRzIGZvciBt
+dWx0aXBsZSB2YWx1ZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNDQvNjA6IGpzb246IEZpeCBsYXRlbnQg
+cGFyc2VyIGFib3J0cyBhdCBlbmQgb2YgaW5wdXQuLi4KQ2hlY2tpbmcgUEFUQ0ggNDUvNjA6IGpz
+b246IEZpeCBzdHJlYW1lciBub3QgdG8gaWdub3JlIHRyYWlsaW5nIHVudGVybWluYXRlZCBzdHJ1
+Y3R1cmVzLi4uCkNoZWNraW5nIFBBVENIIDQ2LzYwOiBqc29uOiBBc3NlcnQganNvbl9wYXJzZXJf
+cGFyc2UoKSBjb25zdW1lcyBhbGwgdG9rZW5zIG9uIHN1Y2Nlc3MuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NDcvNjA6IHFqc29uOiBIYXZlIHFvYmplY3RfZnJvbV9qc29uKCkgJiBmcmllbmRzIHJlamVjdCBl
+bXB0eSBhbmQgYmxhbmsuLi4KQ2hlY2tpbmcgUEFUQ0ggNDgvNjA6IGpzb246IEVuZm9yY2UgdG9r
+ZW4gY291bnQgYW5kIHNpemUgbGltaXRzIG1vcmUgdGlnaHRseS4uLgpDaGVja2luZyBQQVRDSCA0
+OS82MDoganNvbjogU3RyZWFtbGluZSBqc29uX21lc3NhZ2VfcHJvY2Vzc190b2tlbigpLi4uCkNo
+ZWNraW5nIFBBVENIIDUwLzYwOiBqc29uOiBVbmJveCB0b2tlbnMgcXVldWUgaW4gSlNPTk1lc3Nh
+Z2VQYXJzZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggNTEvNjA6IGpzb246IEVsaW1pbmF0ZSBsZXhlciBz
+dGF0ZSBJTl9FUlJPUiBhbmQgcHNldWRvLXRva2VuIEpTT05fTUlOLi4uCkNoZWNraW5nIFBBVENI
+IDUyLzYwOiBqc29uOiBFbGltaW5hdGUgbGV4ZXIgc3RhdGUgSU5fV0hJVEVTUEFDRSwgcHNldWRv
+LXRva2VuIEpTT05fU0tJUC4uLgpDaGVja2luZyBQQVRDSCA1My82MDoganNvbjogTWFrZSBKU09O
+VG9rZW4gb3BhcXVlIG91dHNpZGUganNvbi1wYXJzZXIuYy4uLgpDaGVja2luZyBQQVRDSCA1NC82
+MDogcW9iamVjdDogRHJvcCBzdXBlcmZsdW91cyBpbmNsdWRlcyBvZiBxZW11LWNvbW1vbi5oLi4u
+CkNoZWNraW5nIFBBVENIIDU1LzYwOiBqc29uOiBDbGVhbiB1cCBoZWFkZXJzLi4uCldBUk5JTkc6
+IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
+cGRhdGluZz8KIzcyOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMs
+IDEgd2FybmluZ3MsIDE1NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDU2LzYwOiBkb2NzL2ludGVyb3AvcW1wLXNwZWM6
+IEhvdyB0byBmb3JjZSBrbm93biBnb29kIHBhcnNlciBzdGF0ZS4uLgpDaGVja2luZyBQQVRDSCA1
+Ny82MDogdGVzdHMvZHJpdmVfZGVsLXRlc3Q6IEZpeCBoYXJtbGVzcyBKU09OIGludGVycG9sYXRp
+b24gYnVnLi4uCkNoZWNraW5nIFBBVENIIDU4LzYwOiBqc29uOiBLZWVwIGludGVycG9sYXRpb24g
+c3RhdGUgaW4gSlNPTlBhcnNlckNvbnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggNTkvNjA6IGpzb246
+IEltcHJvdmUgc2FmZXR5IG9mIHFvYmplY3RfZnJvbV9qc29uZl9ub2ZhaWwoKSAmIGZyaWVuZHMu
+Li4KQ2hlY2tpbmcgUEFUQ0ggNjAvNjA6IGpzb246IFN1cHBvcnQgJSUgaW4gSlNPTiBzdHJpbmdz
+IHdoZW4gaW50ZXJwb2xhdGluZy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
+eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
