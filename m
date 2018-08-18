@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fr59w-0006FK-Ih
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 13:37:10 -0400
+	(envelope-from <cota@braap.org>) id 1fr5Fy-00082l-UL
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 13:43:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fr59s-0002XA-G6
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 13:37:08 -0400
-Resent-Message-Id: <E1fr59s-0002XA-G6@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21065)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fr4b5-0003Dc-5f
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 13:01:07 -0400
-In-Reply-To: <20180809042206.15726-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153458370045.28130.4125872995591233197@502c9da6d61e>
+	(envelope-from <cota@braap.org>) id 1fr5Fv-0001RW-Nv
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 13:43:22 -0400
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:34591)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fr5Fv-0001Nn-B2
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 13:43:19 -0400
+Date: Sat, 18 Aug 2018 13:43:16 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180818174316.GA9458@flamenco>
+References: <20180817051853.23792-1-cota@braap.org>
+	<153455848651.26347.421862919623233041@502c9da6d61e>
+	<20180818064554.GA2277@lemon.usersys.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 18 Aug 2018 02:15:01 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/20] target/arm: sve system mode patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180818064554.GA2277@lemon.usersys.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] synchronization profiler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,99 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org, alex.bennee@linaro.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODA5MDQyMjA2LjE1NzI2LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAwLzIwXSB0YXJnZXQvYXJtOiBzdmUg
-c3lzdGVtIG1vZGUgcGF0Y2hlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
-Z29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
-dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozNWU5YzhmMjFkIHRhcmdldC9hcm06IFBhc3MgVENHTWVt
-T3BJZHggdG8gc3ZlIG1lbW9yeSBoZWxwZXJzCjZiNzI2ZGIyMGMgdGFyZ2V0L2FybTogUmV3cml0
-ZSB2ZWN0b3IgZ2F0aGVyIGZpcnN0LWZhdWx0IGxvYWRzCjQyZjQ3YTY4MWEgdGFyZ2V0L2FybTog
-UmV3cml0ZSB2ZWN0b3IgZ2F0aGVyIHN0b3JlcwplYmRmMzZiZGQ2IHRhcmdldC9hcm06IFJld3Jp
-dGUgdmVjdG9yIGdhdGhlciBsb2FkcwpiZWE0YmRhOWJkIHRhcmdldC9hcm06IFNwbGl0IGNvbnRp
-Z3VvdXMgc3RvcmVzIGZvciBlbmRpYW5uZXNzCmY3NGE4N2QzNjkgdGFyZ2V0L2FybTogU3BsaXQg
-Y29udGlndW91cyBsb2FkcyBmb3IgZW5kaWFubmVzcwo1MjIyNDBmZDcxIHRhcmdldC9hcm06IFJl
-d3JpdGUgaGVscGVyX3N2ZV9zdFsxMjM0XSpfcgoyOTFjOWE0MDc5IHRhcmdldC9hcm06IFJld3Jp
-dGUgaGVscGVyX3N2ZV9sZFsyMzRdKl9yCjc2MWZlNmI5NmMgdGFyZ2V0L2FybTogUmV3cml0ZSBo
-ZWxwZXJfc3ZlX2xkMSpfciB1c2luZyBwYWdlcwo0MzlmODJmMzljIHRhcmdldC9hcm06IENsZWFy
-IHVudXNlZCBwcmVkaWNhdGUgYml0cyBmb3IgTEQxUlEKOWY2NjRiZTI5MSB0YXJnZXQvYXJtOiBB
-ZGp1c3QgYWFyY2g2NF9jcHVfZHVtcF9zdGF0ZSBmb3Igc3lzdGVtIG1vZGUgU1ZFCjcyYjhjNjA4
-YTAgdGFyZ2V0L2FybTogSGFuZGxlIFNWRSB2ZWN0b3IgbGVuZ3RoIGNoYW5nZXMgaW4gc3lzdGVt
-IG1vZGUKNGQyNTM0Mzk3MyB0YXJnZXQvYXJtOiBQYXNzIGluIGN1cnJlbnRfZWwgdG8gZnAgYW5k
-IHN2ZV9leGNlcHRpb25fZWwKZjYzZTQ1YzQ3NiB0YXJnZXQvYXJtOiBGaXggaXNfYTY0IGZvciB1
-c2VyLW9ubHkKNzdjN2UzMzI3ZiB0YXJnZXQvYXJtOiBGaXggYXJtX2N1cnJlbnRfZWwgZm9yIHVz
-ZXItb25seQowNjVlZWEwNDMyIHRhcmdldC9hcm06IEZpeCBhcm1fY3B1X2RhdGFfaXNfYmlnX2Vu
-ZGlhbiBmb3IgYWE2NCB1c2VyLW9ubHkKNGZiODJlZjZkMCB0YXJnZXQvYXJtOiBBZGp1c3Qgc3Zl
-X2V4Y2VwdGlvbl9lbApiYzhmYTNmODY4IHRhcmdldC9hcm06IERlZmluZSBJRF9BQTY0WkZSMF9F
-TDEKMzIzMzgwNmIyMSB0YXJnZXQvYXJtOiBTZXQgSURfQUE2NFBGUjAgYml0cyBmb3IgU1ZFIGZv
-ciAtY3B1IG1heAoyOTg5NDEzMDU2IHRhcmdldC9hcm06IFNldCBJU0FSIGJpdHMgZm9yIC1jcHUg
-bWF4Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzIwOiB0YXJnZXQvYXJt
-OiBTZXQgSVNBUiBiaXRzIGZvciAtY3B1IG1heC4uLgpDaGVja2luZyBQQVRDSCAyLzIwOiB0YXJn
-ZXQvYXJtOiBTZXQgSURfQUE2NFBGUjAgYml0cyBmb3IgU1ZFIGZvciAtY3B1IG1heC4uLgpDaGVj
-a2luZyBQQVRDSCAzLzIwOiB0YXJnZXQvYXJtOiBEZWZpbmUgSURfQUE2NFpGUjBfRUwxLi4uCkNo
-ZWNraW5nIFBBVENIIDQvMjA6IHRhcmdldC9hcm06IEFkanVzdCBzdmVfZXhjZXB0aW9uX2VsLi4u
-CkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVx
-dWlyZWQKIzU3OiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBlci5jOjQzNjc6CisgICAgICAgICAgICBy
-ZXR1cm4gKGFybV9mZWF0dXJlKGVudiwgQVJNX0ZFQVRVUkVfRUwyKQoKdG90YWw6IDEgZXJyb3Jz
-LCAwIHdhcm5pbmdzLCAxMTMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS8yMDogdGFyZ2V0L2FybTogRml4IGFybV9j
-cHVfZGF0YV9pc19iaWdfZW5kaWFuIGZvciBhYTY0IHVzZXItb25seS4uLgpDaGVja2luZyBQQVRD
-SCA2LzIwOiB0YXJnZXQvYXJtOiBGaXggYXJtX2N1cnJlbnRfZWwgZm9yIHVzZXItb25seS4uLgpD
-aGVja2luZyBQQVRDSCA3LzIwOiB0YXJnZXQvYXJtOiBGaXggaXNfYTY0IGZvciB1c2VyLW9ubHku
-Li4KQ2hlY2tpbmcgUEFUQ0ggOC8yMDogdGFyZ2V0L2FybTogUGFzcyBpbiBjdXJyZW50X2VsIHRv
-IGZwIGFuZCBzdmVfZXhjZXB0aW9uX2VsLi4uCkNoZWNraW5nIFBBVENIIDkvMjA6IHRhcmdldC9h
-cm06IEhhbmRsZSBTVkUgdmVjdG9yIGxlbmd0aCBjaGFuZ2VzIGluIHN5c3RlbSBtb2RlLi4uCkNo
-ZWNraW5nIFBBVENIIDEwLzIwOiB0YXJnZXQvYXJtOiBBZGp1c3QgYWFyY2g2NF9jcHVfZHVtcF9z
-dGF0ZSBmb3Igc3lzdGVtIG1vZGUgU1ZFLi4uCkNoZWNraW5nIFBBVENIIDExLzIwOiB0YXJnZXQv
-YXJtOiBDbGVhciB1bnVzZWQgcHJlZGljYXRlIGJpdHMgZm9yIExEMVJRLi4uCkNoZWNraW5nIFBB
-VENIIDEyLzIwOiB0YXJnZXQvYXJtOiBSZXdyaXRlIGhlbHBlcl9zdmVfbGQxKl9yIHVzaW5nIHBh
-Z2VzLi4uCkNoZWNraW5nIFBBVENIIDEzLzIwOiB0YXJnZXQvYXJtOiBSZXdyaXRlIGhlbHBlcl9z
-dmVfbGRbMjM0XSpfci4uLgpDaGVja2luZyBQQVRDSCAxNC8yMDogdGFyZ2V0L2FybTogUmV3cml0
-ZSBoZWxwZXJfc3ZlX3N0WzEyMzRdKl9yLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
-IHRoYXQgJyonIChjdHg6V3hWKQojMjE1OiBGSUxFOiB0YXJnZXQvYXJtL3N2ZV9oZWxwZXIuYzo0
-ODI1OgorICAgICAgICAgICAgICAgICAgICAgIHN2ZV9zdDFfdGxiX2ZuICp0bGJfZm4pCiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
-cm5pbmdzLCAzOTIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTUvMjA6IHRhcmdldC9hcm06IFNwbGl0IGNvbnRpZ3Vv
-dXMgbG9hZHMgZm9yIGVuZGlhbm5lc3MuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjA6IHRhcmdldC9h
-cm06IFNwbGl0IGNvbnRpZ3VvdXMgc3RvcmVzIGZvciBlbmRpYW5uZXNzLi4uCkNoZWNraW5nIFBB
-VENIIDE3LzIwOiB0YXJnZXQvYXJtOiBSZXdyaXRlIHZlY3RvciBnYXRoZXIgbG9hZHMuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTgvMjA6IHRhcmdldC9hcm06IFJld3JpdGUgdmVjdG9yIGdhdGhlciBzdG9y
-ZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvMjA6IHRhcmdldC9hcm06IFJld3JpdGUgdmVjdG9yIGdh
-dGhlciBmaXJzdC1mYXVsdCBsb2Fkcy4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0
-aGF0ICcqJyAoY3R4Old4VikKIzI5MjogRklMRTogdGFyZ2V0L2FybS9zdmVfaGVscGVyLmM6NTIx
-NjoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgenJlZ19vZmZfZm4gKm9mZl9mbiwg
-c3ZlX2xkMV90bGJfZm4gKnRsYl9mbiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0
-eDpXeFYpCiMyOTI6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjUyMTY6CisgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHpyZWdfb2ZmX2ZuICpvZmZfZm4sIHN2ZV9sZDFfdGxi
-X2ZuICp0bGJfZm4sCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
-IHRoYXQgJyonIChjdHg6V3hWKQojMjkzOiBGSUxFOiB0YXJnZXQvYXJtL3N2ZV9oZWxwZXIuYzo1
-MjE3OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdmVfbGQxX25mX2ZuICpub25m
-YXVsdF9mbikKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
-Cgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDU3MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyMC8yMDogdGFy
-Z2V0L2FybTogUGFzcyBUQ0dNZW1PcElkeCB0byBzdmUgbWVtb3J5IGhlbHBlcnMuLi4KPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Sat, Aug 18, 2018 at 14:45:54 +0800, Fam Zheng wrote:
+> On Fri, 08/17 19:14, no-reply@patchew.org wrote:
+(snip)
+> > /tmp/qemu-test/src/include/qemu/thread.h:101:1: error: all paths through this function will call itself [-Werror,-Winfinite-recursion]
+(snip)
+> > subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '--label', 'com.qemu.instance.uuid=3dee4156a28c11e8b93c52540069c830', '-u', '1000', '--security-opt', 'seccomp=unconfined', '--rm', '--net=none', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=8', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-pdpmalc5/src/docker-src.2018-08-17-22.12.51.31192:/var/tmp/qemu:z,ro', 'qemu:ubuntu', '/var/tmp/qemu/run', 'test-clang']' returned non-zero exit status 2
+> > make[1]: *** [tests/docker/Makefile.include:216: docker-run] Error 1
+> > make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-pdpmalc5/src'
+> > make: *** [tests/docker/Makefile.include:250: docker-run-test-clang@ubuntu] Error 2
+> > 
+> > real	1m55.855s
+> > user	0m4.734s
+> > sys	0m3.377s
+> > === OUTPUT END ===
+> > 
+> > Test command exited with code: 2
+> 
+> Could you check if this one is relevant?
+
+It is! Somehow gcc didn't catch this.
+
+I've pushed a v4 with the appended fix in it:
+
+  https://github.com/cota/qemu/tree/sync-profiler-v4
+
+Thanks,
+
+		Emilio
+
+---
+diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+index b41c0ae16a..dacebcfff0 100644
+--- a/include/qemu/thread.h
++++ b/include/qemu/thread.h
+@@ -63,7 +63,7 @@ extern QemuCondWaitFunc qemu_cond_wait_func;
+             _f(m, __FILE__, __LINE__);                                  \
+         })
+
+-#define qemu_rec_trymutex_lock(m) ({                            \
++#define qemu_rec_mutex_trylock(m) ({                            \
+             QemuRecMutexTrylockFunc _f;                         \
+             _f = atomic_read(&qemu_rec_mutex_trylock_func);     \
+             _f(m, __FILE__, __LINE__);                          \
