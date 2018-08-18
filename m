@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqyCR-0001Hr-CR
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:11:15 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fqylQ-0004O5-1M
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:47:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fqyCQ-0006iT-Kq
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:11:15 -0400
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:44392)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fqyCQ-0006iH-GK
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:11:14 -0400
-Received: by mail-oi0-x22d.google.com with SMTP id s198-v6so18154390oih.11
-	for <qemu-devel@nongnu.org>; Sat, 18 Aug 2018 03:11:14 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1fqylO-0002n9-2h
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:47:23 -0400
+Resent-Message-Id: <E1fqylO-0002n9-2h@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21098)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fqylN-0002mN-Qr
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 06:47:22 -0400
+In-Reply-To: <20180817170246.14641-1-kwolf@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153458921087.28484.16187610092736323081@502c9da6d61e>
 MIME-Version: 1.0
-In-Reply-To: <0e358562-7607-9c27-d452-57e3dc32806e@redhat.com>
-References: <20180817161404.9420-1-peter.maydell@linaro.org>
-	<0e358562-7607-9c27-d452-57e3dc32806e@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 18 Aug 2018 11:10:53 +0100
-Message-ID: <CAFEAcA9OmzWrn_cZS5me+xYEMygWg1tYvT3dpbLWER1n-EgwmQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tests/boot-serial-test: Bump timeout to 6
- minutes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 18 Aug 2018 03:46:52 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH 0/5] Fix some jobs/drain/aio_poll
+ related hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: kwolf@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.orgfamz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On 18 August 2018 at 10:07, Thomas Huth <thuth@redhat.com> wrote:
-> 6 minutes is really a lot already. I guess most users will hit CTRL-C
-> before waiting so long if there is a realy problem here ... If the
-> current tests just takes a little bit more than 1 minute on the Sparc
-> machine, maybe 2 or 3 minutes would sufficient, too?
-
-Or maybe not. I don't like tests that run close to their timeout
-limits, because that tends to mean that my automated test runs
-are flaky when the machine happens to be heavily loaded when
-a test is running. I think the purpose of a timeout is to prevent
-the test run hanging indefinitely; as you say, console users can
-hit ctrl-c if they get bored anyway.
-
-thanks
--- PMM
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODE3MTcwMjQ2LjE0NjQxLTEta3dvbGZAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCAwLzVdIEZpeCBzb21lIGpvYnMvZHJhaW4vYWlvX3Bv
+bGwgcmVsYXRlZCBoYW5ncwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
+QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
+ZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
+aXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
+JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
+JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
+dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
+KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0JwpmYjI1MzM5YTQ2IExvY2sgQWlvQ29udGV4dCBpbiBiZHJ2X2Nv
+X2RyYWluX2JoX2NiKCkKMTFjNmNjNmFhOSBibG9jazogRHJvcCBBaW9Db250ZXh0IGxvY2sgaW4g
+YmRydl9kcmFpbl9wb2xsX3RvcF9sZXZlbCgpCjFiMTEwZTJiYjggam9iOiBEcm9wIEFpb0NvbnRl
+eHQgbG9jayBhcm91bmQgYWlvX3BvbGwoKQo1MjI2OWMxYzAxIHRlc3RzOiBBY3F1aXJlIEFpb0Nv
+bnRleHQgYXJvdW5kIGpvYl9maW5pc2hfc3luYygpCjI1MjkyYjQwYWYgYmxvY2tqb2I6IFdha2Ug
+dXAgQkRTIHdoZW4gam9iIGJlY29tZXMgaWRsZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
+bmcgUEFUQ0ggMS81OiBibG9ja2pvYjogV2FrZSB1cCBCRFMgd2hlbiBqb2IgYmVjb21lcyBpZGxl
+Li4uCkNoZWNraW5nIFBBVENIIDIvNTogdGVzdHM6IEFjcXVpcmUgQWlvQ29udGV4dCBhcm91bmQg
+am9iX2ZpbmlzaF9zeW5jKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMy81OiBqb2I6IERyb3AgQWlvQ29u
+dGV4dCBsb2NrIGFyb3VuZCBhaW9fcG9sbCgpLi4uCkNoZWNraW5nIFBBVENIIDQvNTogYmxvY2s6
+IERyb3AgQWlvQ29udGV4dCBsb2NrIGluIGJkcnZfZHJhaW5fcG9sbF90b3BfbGV2ZWwoKS4uLgpF
+UlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiM0NTogRklM
+RTogYmxvY2svaW8uYzoyOTI6CisgICAgd2hpbGUgKGFpb19wb2xsKGN0eCwgZmFsc2UpKTsKCkVS
+Uk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1l
+bnQKIzQ1OiBGSUxFOiBibG9jay9pby5jOjI5MjoKKyAgICB3aGlsZSAoYWlvX3BvbGwoY3R4LCBm
+YWxzZSkpOwpbLi4uXQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMyBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
+SCA1LzU6IExvY2sgQWlvQ29udGV4dCBpbiBiZHJ2X2NvX2RyYWluX2JoX2NiKCkuLi4KPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
