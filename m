@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqqRF-0008TK-LK
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:54:04 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fqqaw-0005Ux-JE
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 22:04:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqqRE-00005L-Kg
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:54:01 -0400
-Received: from mail-ua1-x932.google.com ([2607:f8b0:4864:20::932]:40272)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fqqRE-000054-GF
-	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 21:54:00 -0400
-Received: by mail-ua1-x932.google.com with SMTP id m13-v6so6800401uaq.7
-	for <qemu-devel@nongnu.org>; Fri, 17 Aug 2018 18:54:00 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 17 Aug 2018 22:53:43 -0300
-Message-Id: <20180818015344.797-4-f4bug@amsat.org>
-In-Reply-To: <20180818015344.797-1-f4bug@amsat.org>
-References: <20180818015344.797-1-f4bug@amsat.org>
+	(envelope-from <no-reply@patchew.org>) id 1fqqat-0007dw-EG
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 22:04:02 -0400
+Resent-Message-Id: <E1fqqat-0007dw-EG@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21100)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fqqat-0007cx-5s
+	for qemu-devel@nongnu.org; Fri, 17 Aug 2018 22:03:59 -0400
+In-Reply-To: <20180817051853.23792-1-cota@braap.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153455778282.26347.11710499656054642104@502c9da6d61e>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 3/4] docker: Sort Ubuntu packages
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 17 Aug 2018 19:03:04 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] synchronization profiler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: cota@braap.org
+Cc: famz@redhat.com, qemu-devel@nongnu.orgfamz@redhat.com, crosthwaite.peter@gmail.com, sw@weilnetz.de, dgilbert@redhat.com, peterx@redhat.com, armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
-As recommended in https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#sort-multi-line-arguments
-
-  "This helps to avoid duplication of packages and make the
-  list much easier to update. This also makes PRs a lot easier
-  to read and review."
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/docker/dockerfiles/ubuntu.docker | 61 ++++++++++++++++++++++----
- 1 file changed, 52 insertions(+), 9 deletions(-)
-
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-index 7d724e7f53..36e2b17de5 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -2,16 +2,59 @@ FROM ubuntu:16.04
- RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty universe multiverse" >> \
-     /etc/apt/sources.list
- ENV PACKAGES flex bison \
--    libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev libncursesw5-dev \
--    libseccomp-dev libgnutls-dev libssh2-1-dev  libspice-server-dev \
--    libspice-protocol-dev libnss3-dev libfdt-dev \
--    libgtk-3-dev libvte-2.91-dev libsdl2-dev libpng12-dev libpixman-1-dev \
--    libvdeplug-dev liblzo2-dev libsnappy-dev libbz2-dev libxen-dev librdmacm-dev libibverbs-dev \
--    libsasl2-dev libjpeg-turbo8-dev xfslibs-dev libcap-ng-dev libbrlapi-dev libcurl4-gnutls-dev \
--    libbluetooth-dev librbd-dev libaio-dev glusterfs-common libnuma-dev libepoxy-dev libdrm-dev libgbm-dev \
--    libjemalloc-dev libcacard-dev libusbredirhost-dev libnfs-dev libcap-dev libattr1-dev \
-+    ccache \
-+    clang \
-+    gcc \
-+    gettext \
-+    git \
-+    glusterfs-common \
-+    libaio-dev \
-+    libattr1-dev \
-+    libbluetooth-dev \
-+    libbrlapi-dev \
-+    libbz2-dev \
-+    libcacard-dev \
-+    libcap-dev \
-+    libcap-ng-dev \
-+    libcurl4-gnutls-dev \
-+    libdrm-dev \
-+    libepoxy-dev \
-+    libfdt-dev \
-+    libgbm-dev \
-+    libgnutls-dev \
-+    libgtk-3-dev \
-+    libibverbs-dev \
-+    libiscsi-dev \
-+    libjemalloc-dev \
-+    libjpeg-turbo8-dev \
-+    liblzo2-dev \
-+    libncurses5-dev \
-+    libncursesw5-dev \
-+    libnfs-dev \
-+    libnss3-dev \
-+    libnuma-dev \
-+    libpixman-1-dev \
-+    libpng12-dev \
-+    librados-dev \
-+    librbd-dev \
-+    librdmacm-dev \
-+    libsasl2-dev \
-+    libsdl2-dev \
-+    libseccomp-dev \
-+    libsnappy-dev \
-+    libspice-protocol-dev \
-+    libspice-server-dev \
-+    libssh2-1-dev \
-+    libusb-1.0-0-dev \
-+    libusbredirhost-dev \
-+    libvdeplug-dev \
-+    libvte-2.91-dev \
-+    libxen-dev \
-+    make \
-+    python-yaml \
-+    sparse \
-     texinfo \
--    gettext git make ccache python-yaml gcc clang sparse
-+    xfslibs-dev
- RUN apt-get update && \
-     apt-get -y install $PACKAGES
- RUN dpkg -l $PACKAGES | sort > /packages.txt
--- 
-2.18.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODE3MDUxODUzLjIzNzkyLTEtY290YUBicmFhcC5vcmcKU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzldIHN5bmNocm9uaXphdGlvbiBwcm9maWxlcgoKPT09
+IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0k
+KGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+cyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1p
+dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
+b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
+LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
+YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
+ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
+YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
+MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
+cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDgxODAx
+NTM0NC43OTctMS1mNGJ1Z0BhbXNhdC5vcmcgLT4gcGF0Y2hldy8yMDE4MDgxODAxNTM0NC43OTct
+MS1mNGJ1Z0BhbXNhdC5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1ZjVjOWY0
+ODE0IGhtcC1jb21tYW5kcy1pbmZvOiBhZGQgc3luYy1wcm9maWxlCmRkYTNjYWU1MjggaG1wLWNv
+bW1hbmRzOiBhZGQgc3luYy1wcm9maWxlCjg4ZDBmOTNmZTQgdmw6IGFkZCAtZW5hYmxlLXN5bmMt
+cHJvZmlsZQoxNTM1OWJjMjRhIHRlc3RzL2F0b21pY19hZGQtYmVuY2g6IGFkZCAtcCB0byBlbmFi
+bGUgc3luYyBwcm9maWxlcgpjMDNiODE2ZWQ0IHFzcDogdHJhY2sgQlFMIGNhbGxlcnMgZXhwbGlj
+aXRseQphMjEzNzM3Zjg0IHFzcDogc3VwcG9ydCBjYWxsIHNpdGUgY29hbGVzY2luZwo2ZWRjMDIw
+YjY3IHFzcDogYWRkIHFzcF9yZXNldAowYjczMTcxMDBiIHFzcDogYWRkIHNvcnRfYnkgb3B0aW9u
+IHRvIHFzcF9yZXBvcnQKMmI1NWE4NTM4MSBxc3A6IFFFTVUncyBTeW5jaHJvbml6YXRpb24gUHJv
+ZmlsZXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvOTogcXNwOiBRRU1V
+J3MgU3luY2hyb25pemF0aW9uIFByb2ZpbGVyLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU5OiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyon
+IChjdHg6V3hWKQojNjY0OiBGSUxFOiB1dGlsL3FzcC5jOjI5NjoKKyAgICBzdGF0aWMgdm9pZCBm
+dW5jXyh0eXBlXyAqb2JqLCBjb25zdCBjaGFyICpmaWxlLCBpbnQgbGluZSkgICAgICAgICAgIFwK
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFy
+b3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzY3OTogRklMRTogdXRpbC9xc3AuYzozMTE6CisgICAg
+c3RhdGljIGludCBmdW5jXyh0eXBlXyAqb2JqLCBjb25zdCBjaGFyICpmaWxlLCBpbnQgbGluZSkg
+ICAgICAgICAgICBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2Vz
+IHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzg3MTogRklMRTogdXRpbC9xc3Au
+Yzo1MDM6CisgICAgZW50cnktPnRpbWVfcyA9IGUtPm5zICogMWUtOTsKICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0n
+IChjdHg6VnhWKQojOTE2OiBGSUxFOiB1dGlsL3FzcC5jOjU0ODoKKyAgICAgICAgICAgIiIsIGUt
+PnRpbWVfcywgZS0+bl9hY3FzLCBlLT5uc19hdmcgKiAxZS0zKTsKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiA0IGVycm9ycywgMSB3
+YXJuaW5ncywgODUwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvOTogcXNwOiBhZGQgc29ydF9ieSBvcHRpb24gdG8g
+cXNwX3JlcG9ydC4uLgpDaGVja2luZyBQQVRDSCAzLzk6IHFzcDogYWRkIHFzcF9yZXNldC4uLgpD
+aGVja2luZyBQQVRDSCA0Lzk6IHFzcDogc3VwcG9ydCBjYWxsIHNpdGUgY29hbGVzY2luZy4uLgpF
+UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzE5OTogRklM
+RTogdXRpbC9xc3AuYzo3MDc6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZS0+dGlt
+ZV9zLCBlLT5uX2FjcXMsIGUtPm5zX2F2ZyAqIDFlLTMpOwogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAx
+IGVycm9ycywgMCB3YXJuaW5ncywgMTkzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvOTogcXNwOiB0cmFjayBCUUwg
+Y2FsbGVycyBleHBsaWNpdGx5Li4uCkNoZWNraW5nIFBBVENIIDYvOTogdGVzdHMvYXRvbWljX2Fk
+ZC1iZW5jaDogYWRkIC1wIHRvIGVuYWJsZSBzeW5jIHByb2ZpbGVyLi4uCkNoZWNraW5nIFBBVENI
+IDcvOTogdmw6IGFkZCAtZW5hYmxlLXN5bmMtcHJvZmlsZS4uLgpDaGVja2luZyBQQVRDSCA4Lzk6
+IGhtcC1jb21tYW5kczogYWRkIHN5bmMtcHJvZmlsZS4uLgpDaGVja2luZyBQQVRDSCA5Lzk6IGht
+cC1jb21tYW5kcy1pbmZvOiBhZGQgc3luYy1wcm9maWxlLi4uCj09PSBPVVRQVVQgRU5EID09PQoK
+VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
