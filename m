@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1frjYr-0000Cv-45
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:33 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1frjYr-0000Cp-3u
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1frjYp-0000jm-Bx
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1frjYp-0000k9-HO
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:33 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:52368)
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:42212)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1frjYl-0000h8-Ns
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:29 -0400
-Received: by mail-wm0-x243.google.com with SMTP id o11-v6so14084851wmh.2
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 05:45:25 -0700 (PDT)
+	id 1frjYn-0000ho-92
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:31 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id e7-v6so12871063wrs.9
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 05:45:26 -0700 (PDT)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sun, 19 Aug 2018 23:22:57 +0300
-Message-Id: <20180819202300.10590-13-marcel.apfelbaum@gmail.com>
+Date: Sun, 19 Aug 2018 23:22:58 +0300
+Message-Id: <20180819202300.10590-14-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20180819202300.10590-1-marcel.apfelbaum@gmail.com>
 References: <20180819202300.10590-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PATCH PULL 12/15] hw/rdma: Bugfix - Support
- non-aligned buffers
+Subject: [Qemu-devel] [PATCH PULL 13/15] hw/rdma: Add reference to pci_dev
+ in backend_dev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +32,67 @@ Cc: yuval.shaia@oracle.com, thuth@redhat.com, marcel.apfelbaum@gmail.com
 
 From: Yuval Shaia <yuval.shaia@oracle.com>
 
-RDMA application can provide non-aligned buffers to be registered. In
-such case the DMA address passed by driver is pointing to the beginning
-of the physical address of the mapped page so we can't distinguish
-between two addresses from the same page.
-
-Fix it by keeping the offset of the virtual address in mr->virt.
+The field backend_dev->dev is not initialized, fix it.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+Message-Id: <20180805153518.2983-14-yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-Id: <20180805153518.2983-13-yuval.shaia@oracle.com>
 Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_rm.c        | 2 ++
- hw/rdma/vmw/pvrdma_cmd.c | 1 +
- 2 files changed, 3 insertions(+)
+ hw/rdma/rdma_backend.c    | 6 +++++-
+ hw/rdma/rdma_backend.h    | 2 +-
+ hw/rdma/vmw/pvrdma_main.c | 2 +-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index 859c900003..8d59a42cd1 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -166,6 +166,7 @@ int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
-         mr->virt = host_virt;
-         mr->start = guest_start;
-         mr->length = guest_length;
-+        mr->virt += (mr->start & (TARGET_PAGE_SIZE - 1));
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index d29acc505b..d7a4bbd91f 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -744,7 +744,7 @@ static int init_device_caps(RdmaBackendDev *backend_dev,
+     return 0;
+ }
  
-         ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, mr->virt,
-                                      mr->length, access_flags);
-@@ -203,6 +204,7 @@ void rdma_rm_dealloc_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle)
-         rdma_backend_destroy_mr(&mr->backend_mr);
-         pr_dbg("start=0x%" PRIx64 "\n", mr->start);
-         if (mr->start) {
-+            mr->virt -= (mr->start & (TARGET_PAGE_SIZE - 1));
-             munmap(mr->virt, mr->length);
-         }
-         res_tbl_dealloc(&dev_res->mr_tbl, mr_handle);
-diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-index 4f74b29936..b74b0b48d0 100644
---- a/hw/rdma/vmw/pvrdma_cmd.c
-+++ b/hw/rdma/vmw/pvrdma_cmd.c
-@@ -59,6 +59,7 @@ static void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma,
+-int rdma_backend_init(RdmaBackendDev *backend_dev,
++int rdma_backend_init(RdmaBackendDev *backend_dev, PCIDevice *pdev,
+                       RdmaDeviceResources *rdma_dev_res,
+                       const char *backend_device_name, uint8_t port_num,
+                       uint8_t backend_gid_idx, struct ibv_device_attr *dev_attr,
+@@ -756,6 +756,10 @@ int rdma_backend_init(RdmaBackendDev *backend_dev,
+     struct ibv_device **dev_list;
+     struct ibv_port_attr port_attr;
+ 
++    memset(backend_dev, 0, sizeof(*backend_dev));
++
++    backend_dev->dev = pdev;
++
+     backend_dev->backend_gid_idx = backend_gid_idx;
+     backend_dev->port_num = port_num;
+     backend_dev->rdma_dev_res = rdma_dev_res;
+diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+index 3049a73962..86e8fe8ab6 100644
+--- a/hw/rdma/rdma_backend.h
++++ b/hw/rdma/rdma_backend.h
+@@ -46,7 +46,7 @@ static inline uint32_t rdma_backend_mr_rkey(const RdmaBackendMR *mr)
+     return mr->ibmr ? mr->ibmr->rkey : 0;
+ }
+ 
+-int rdma_backend_init(RdmaBackendDev *backend_dev,
++int rdma_backend_init(RdmaBackendDev *backend_dev, PCIDevice *pdev,
+                       RdmaDeviceResources *rdma_dev_res,
+                       const char *backend_device_name, uint8_t port_num,
+                       uint8_t backend_gid_idx, struct ibv_device_attr *dev_attr,
+diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+index 3d448bffc4..ca5fa8d981 100644
+--- a/hw/rdma/vmw/pvrdma_main.c
++++ b/hw/rdma/vmw/pvrdma_main.c
+@@ -611,7 +611,7 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+         goto out;
      }
  
-     host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
-+    pr_dbg("mremap %p -> %p\n", curr_page, host_virt);
-     if (host_virt == MAP_FAILED) {
-         host_virt = NULL;
-         error_report("PVRDMA: Failed to remap memory for host_virt");
+-    rc = rdma_backend_init(&dev->backend_dev, &dev->rdma_dev_res,
++    rc = rdma_backend_init(&dev->backend_dev, pdev, &dev->rdma_dev_res,
+                            dev->backend_device_name, dev->backend_port_num,
+                            dev->backend_gid_idx, &dev->dev_attr, errp);
+     if (rc) {
 -- 
 2.17.1
