@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1frJmS-0002N5-81
+	(envelope-from <cota@braap.org>) id 1frJmS-0002N1-7R
 	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 05:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1frJmO-0000ch-Rr
+	(envelope-from <cota@braap.org>) id 1frJmP-0000do-OX
 	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 05:13:52 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sun, 19 Aug 2018 05:13:28 -0400
-Message-Id: <20180819091335.22863-5-cota@braap.org>
+Date: Sun, 19 Aug 2018 05:13:33 -0400
+Message-Id: <20180819091335.22863-10-cota@braap.org>
 In-Reply-To: <20180819091335.22863-1-cota@braap.org>
 References: <20180819091335.22863-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v2 04/11] rcu_queue: add RCU QTAILQ
+Subject: [Qemu-devel] [PATCH v2 09/11] tests: add test-rcu-tailq
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +24,81 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gm
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qemu/rcu_queue.h | 66 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 66 insertions(+)
+ tests/test-rcu-list.c  | 15 +++++++++++++++
+ tests/test-rcu-tailq.c |  2 ++
+ tests/Makefile.include |  4 ++++
+ 3 files changed, 21 insertions(+)
+ create mode 100644 tests/test-rcu-tailq.c
 
-diff --git a/include/qemu/rcu_queue.h b/include/qemu/rcu_queue.h
-index e0395c989a..904b3372dc 100644
---- a/include/qemu/rcu_queue.h
-+++ b/include/qemu/rcu_queue.h
-@@ -193,6 +193,72 @@ extern "C" {
-          (var) && ((next) = atomic_rcu_read(&(var)->field.sqe_next), 1); \
-          (var) = (next))
- 
-+/*
-+ * RCU tail queue
-+ */
-+
-+/* Tail queue access methods */
-+#define QTAILQ_EMPTY_RCU(head)      (atomic_read(&(head)->tqh_first) == NULL)
-+#define QTAILQ_FIRST_RCU(head)       atomic_rcu_read(&(head)->tqh_first)
-+#define QTAILQ_NEXT_RCU(elm, field)  atomic_rcu_read(&(elm)->field.tqe_next)
-+
-+/* Tail queue functions */
-+#define QTAILQ_INSERT_HEAD_RCU(head, elm, field) do {                   \
-+    (elm)->field.tqe_next = (head)->tqh_first;                          \
-+    if ((elm)->field.tqe_next != NULL) {                                \
-+        (head)->tqh_first->field.tqe_prev = &(elm)->field.tqe_next;     \
-+    } else {                                                            \
-+        (head)->tqh_last = &(elm)->field.tqe_next;                      \
-+    }                                                                   \
-+    atomic_rcu_set(&(head)->tqh_first, (elm));                          \
-+    (elm)->field.tqe_prev = &(head)->tqh_first;                         \
-+} while (/*CONSTCOND*/0)
-+
-+#define QTAILQ_INSERT_TAIL_RCU(head, elm, field) do {               \
-+    (elm)->field.tqe_next = NULL;                                   \
-+    (elm)->field.tqe_prev = (head)->tqh_last;                       \
-+    atomic_rcu_set((head)->tqh_last, (elm));                        \
-+    (head)->tqh_last = &(elm)->field.tqe_next;                      \
-+} while (/*CONSTCOND*/0)
-+
-+#define QTAILQ_INSERT_AFTER_RCU(head, listelm, elm, field) do {         \
-+    (elm)->field.tqe_next = (listelm)->field.tqe_next;                  \
-+    if ((elm)->field.tqe_next != NULL) {                                \
-+        (elm)->field.tqe_next->field.tqe_prev = &(elm)->field.tqe_next; \
-+    } else {                                                            \
-+        (head)->tqh_last = &(elm)->field.tqe_next;                      \
-+    }                                                                   \
-+    atomic_rcu_set(&(listelm)->field.tqe_next, (elm));                  \
-+    (elm)->field.tqe_prev = &(listelm)->field.tqe_next;                 \
-+} while (/*CONSTCOND*/0)
-+
-+#define QTAILQ_INSERT_BEFORE_RCU(listelm, elm, field) do {          \
-+    (elm)->field.tqe_prev = (listelm)->field.tqe_prev;              \
-+    (elm)->field.tqe_next = (listelm);                              \
-+    atomic_rcu_set((listelm)->field.tqe_prev, (elm));               \
-+    (listelm)->field.tqe_prev = &(elm)->field.tqe_next;             \
-+    } while (/*CONSTCOND*/0)
-+
-+#define QTAILQ_REMOVE_RCU(head, elm, field) do {                        \
-+    if (((elm)->field.tqe_next) != NULL) {                              \
-+        (elm)->field.tqe_next->field.tqe_prev = (elm)->field.tqe_prev;  \
-+    } else {                                                            \
-+        (head)->tqh_last = (elm)->field.tqe_prev;                       \
-+    }                                                                   \
-+    atomic_set((elm)->field.tqe_prev, (elm)->field.tqe_next);           \
-+    (elm)->field.tqe_prev = NULL;                                       \
-+} while (/*CONSTCOND*/0)
-+
-+#define QTAILQ_FOREACH_RCU(var, head, field)                            \
-+    for ((var) = atomic_rcu_read(&(head)->tqh_first);                   \
-+         (var);                                                         \
-+         (var) = atomic_rcu_read(&(var)->field.tqe_next))
-+
-+#define QTAILQ_FOREACH_SAFE_RCU(var, head, field, next)                  \
-+    for ((var) = atomic_rcu_read(&(head)->tqh_first);                    \
-+         (var) && ((next) = atomic_rcu_read(&(var)->field.tqe_next), 1); \
-+         (var) = (next))
-+
- #ifdef __cplusplus
- }
+diff --git a/tests/test-rcu-list.c b/tests/test-rcu-list.c
+index c8bdf49743..8434700746 100644
+--- a/tests/test-rcu-list.c
++++ b/tests/test-rcu-list.c
+@@ -91,6 +91,8 @@ struct list_element {
+     QLIST_ENTRY(list_element) entry;
+ #elif TEST_LIST_TYPE == 2
+     QSIMPLEQ_ENTRY(list_element) entry;
++#elif TEST_LIST_TYPE == 3
++    QTAILQ_ENTRY(list_element) entry;
+ #else
+ #error Invalid TEST_LIST_TYPE
  #endif
+@@ -129,6 +131,19 @@ static QSIMPLEQ_HEAD(, list_element) Q_list_head =
+ #define TEST_LIST_INSERT_HEAD_RCU   QSIMPLEQ_INSERT_HEAD_RCU
+ #define TEST_LIST_FOREACH_RCU       QSIMPLEQ_FOREACH_RCU
+ #define TEST_LIST_FOREACH_SAFE_RCU  QSIMPLEQ_FOREACH_SAFE_RCU
++
++#elif TEST_LIST_TYPE == 3
++static QTAILQ_HEAD(, list_element) Q_list_head;
++
++#define TEST_NAME "qtailq"
++#define TEST_LIST_REMOVE_RCU(el, f) QTAILQ_REMOVE_RCU(&Q_list_head, el, f)
++
++#define TEST_LIST_INSERT_AFTER_RCU(list_el, el, f)               \
++           QTAILQ_INSERT_AFTER_RCU(&Q_list_head, list_el, el, f)
++
++#define TEST_LIST_INSERT_HEAD_RCU   QTAILQ_INSERT_HEAD_RCU
++#define TEST_LIST_FOREACH_RCU       QTAILQ_FOREACH_RCU
++#define TEST_LIST_FOREACH_SAFE_RCU  QTAILQ_FOREACH_SAFE_RCU
+ #else
+ #error Invalid TEST_LIST_TYPE
+ #endif
+diff --git a/tests/test-rcu-tailq.c b/tests/test-rcu-tailq.c
+new file mode 100644
+index 0000000000..8d487e0ee0
+--- /dev/null
++++ b/tests/test-rcu-tailq.c
+@@ -0,0 +1,2 @@
++#define TEST_LIST_TYPE 3
++#include "test-rcu-list.c"
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 997c27421a..5fe32fcfd0 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -118,6 +118,8 @@ check-unit-y += tests/test-rcu-list$(EXESUF)
+ gcov-files-test-rcu-list-y = util/rcu.c
+ check-unit-y += tests/test-rcu-simpleq$(EXESUF)
+ gcov-files-test-rcu-simpleq-y = util/rcu.c
++check-unit-y += tests/test-rcu-tailq$(EXESUF)
++gcov-files-test-rcu-tailq-y = util/rcu.c
+ check-unit-y += tests/test-qdist$(EXESUF)
+ gcov-files-test-qdist-y = util/qdist.c
+ check-unit-y += tests/test-qht$(EXESUF)
+@@ -603,6 +605,7 @@ test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
+ 	tests/test-opts-visitor.o tests/test-qmp-event.o \
+ 	tests/rcutorture.o tests/test-rcu-list.o \
+ 	tests/test-rcu-simpleq.o \
++	tests/test-rcu-tailq.o \
+ 	tests/test-qdist.o tests/test-shift128.o \
+ 	tests/test-qht.o tests/qht-bench.o tests/test-qht-par.o \
+ 	tests/atomic_add-bench.o
+@@ -653,6 +656,7 @@ tests/test-int128$(EXESUF): tests/test-int128.o
+ tests/rcutorture$(EXESUF): tests/rcutorture.o $(test-util-obj-y)
+ tests/test-rcu-list$(EXESUF): tests/test-rcu-list.o $(test-util-obj-y)
+ tests/test-rcu-simpleq$(EXESUF): tests/test-rcu-simpleq.o $(test-util-obj-y)
++tests/test-rcu-tailq$(EXESUF): tests/test-rcu-tailq.o $(test-util-obj-y)
+ tests/test-qdist$(EXESUF): tests/test-qdist.o $(test-util-obj-y)
+ tests/test-qht$(EXESUF): tests/test-qht.o $(test-util-obj-y)
+ tests/test-qht-par$(EXESUF): tests/test-qht-par.o tests/qht-bench$(EXESUF) $(test-util-obj-y)
 -- 
 2.17.1
