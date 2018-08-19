@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1frHWf-0001it-Df
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 02:49:26 -0400
+	(envelope-from <tangfu@gohighsec.com>) id 1frIRG-0000xP-43
+	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 03:47:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1frHWb-00039N-7t
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 02:49:25 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:42189
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1frHWb-00039H-1P
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 02:49:21 -0400
-Received: from host86-159-123-112.range86-159.btcentralplus.com
-	([86.159.123.112] helo=[192.168.1.65])
-	by s16892447.onlinehome-server.info with esmtpsa
-	(TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1frHWm-0007El-5W
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 07:49:33 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-References: <41d9b8ae-1db9-be8c-4b58-23ee6278ded7@ilande.co.uk>
-Message-ID: <0e22587c-651c-3e5b-579b-8181a7ec1722@ilande.co.uk>
-Date: Sun, 19 Aug 2018 07:49:09 +0100
+	(envelope-from <tangfu@gohighsec.com>) id 1frIRC-0008GI-7I
+	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 03:47:53 -0400
+Received: from unicom145.biz-email.net ([210.51.26.145]:2659)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tangfu@gohighsec.com>)
+	id 1frIRB-0008DM-GE
+	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 03:47:50 -0400
+Received: from gohigh.com.cn ([1.119.192.242])
+	by unicom145.biz-email.net (Antispam) with ESMTP id JPO42439
+	for <qemu-devel@nongnu.org>; Sun, 19 Aug 2018 15:47:39 +0800
+Date: Sun, 19 Aug 2018 15:44:41 +0800 (GMT+08:00)
+From: =?UTF-8?B?5rGk56aP?= <tangfu@gohighsec.com>
+In-Reply-To: <CAJ+F1C+zhQkaQgHgKf_oa8nfw_PTY1wgS7tHZG7cuUObzVk9jA@mail.gmail.com>
+References: <62da53b4.26c.16540558d49.Coremail.tangfu@gohighsec.com>
+	<CAJ+F1C+zhQkaQgHgKf_oa8nfw_PTY1wgS7tHZG7cuUObzVk9jA@mail.gmail.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-In-Reply-To: <41d9b8ae-1db9-be8c-4b58-23ee6278ded7@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] virtio ignores pci_address_space_*()?
+Message-ID: <6d7ecaf.2be.1655124b512.Coremail.tangfu@gohighsec.com>
+Subject: Re: [Qemu-devel] vTPM 2.0 is recognized as vTPM 1.2 on the Win 10
+ virtual machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-On 18/08/18 21:21, Mark Cave-Ayland wrote:
-
-> Hi all,
-> 
-> As part of testing my OpenBIOS virtio-blk implementation, I've been
-> trying to use it under the 40p machine and have some questions related
-> to how address spaces are interpreted.
-> 
-> The 40p PCI address space is aliased onto the CPU physical address space
-> with an offset of 0x80000000 i.e.
-> 
->    PCI address space 0x80001234 -> CPU address space 0x1234
-> 
-> For the LSI SCSI controller this just works: when configuring the DMA
-> descriptors I write the destination address to the LSI registers in PCI
-> address space i.e. 0x80001234. Internally this calls pci_dma_read() and
-> pci_dma_write() and the data gets transferred correctly to physical
-> address 0x1234.
-> 
-> When trying to configure a virtio device I'm not seeing the same
-> behaviour: firstly it seems that I need to write the CPU address 0x1234
-> to VIRTIO_PCI_QUEUE_PFN rather than the PCI address 0x80001234 as I
-> would expect.
-> 
-> Following this I've tried to configure the address in the virtio
-> descriptors with both the CPU address and PCI address and neither seems
-> to work in my tests here.
-> 
-> Looking through the virtio code I can't see any references to
-> pci_dma_read()/pci_dma_write() so I was wondering if someone can confirm
-> whether I should be using CPU or PCI addresses when programming virtio
-> registers and descriptors for machines such as 40p, and where I can find
-> the address space being used for virtio device reads/writes?
-
-So after quite a lot more searching I think I've finally found the answer:
-
-- Enable VIRTIO_F_IOMMU_PLATFORM feature bit via iommu_platform property
-to enable use of iovas in the descriptor rings
-
-- Write the physical address to VIRTIO_PCI_QUEUE_PFN
-
-Does this sound right?
-
-
-ATB,
-
-Mark.
+SSB0cmllZCBpdCBhY2NvcmRpbmcgdG8geW91ciBtZXRob2QsIGJ1dCBJIGhhdmUgc29tZSBwcm9i
+bGVtcy4gTXkgaG9zdCBpcyBjZW50b3MgNy4yIHdpdGggdGhlIFRQTSAyLjAgaGFyZHdhcmUgYW5k
+IHFlbXUgdjIuMTAuMi4gVGhlIGRyaXZlciBmb3IgdGhlIFRQTSAyLjAgaGFyZHdhcmUgaXMgY3Ji
+IGRldmljZe+8jEV4ZWN1dGUgbHNtb2QgdG8gdmlldyB0aGUgdHBtIDIuMCBkcml2ZXIgaW5mb3Jt
+YXRpb24gYXMgZm9sbG93c++8mg0KW3Jvb3RAbG9jYWxob3N0IEJVSUxEXSMgbHNtb2QgfCBncmVw
+IHRwbQ0KdHBtX2NyYiAgICAgICAgICAgICAgICAxMjk3MiAgMCANCg0KSSBkb3dubG9hZGVkIHRo
+ZSBPVk1GLTIwMTgyMDI4LTUubm9hcmNoLnNyYy5ycG0gcGFja2FnZSBmcm9tIHRoZSBycG0gc2Vh
+cmNoIHdlYnNpdGUuIEFuZCByZWJ1bGlkIGl0IHdpdGggLURUUE0yX0VOQUJMRSBhbmQgLURTRUNV
+UkVfQk9PVF9FTkFCTEUsIFJlYnVsaWQgZXZlcnl0aGluZyB3ZWxsIGFuZCBnZW5lcmF0ZSB0aGUg
+T1ZNRi5mZCBhbmQgT1ZNRl9BUkdTLmZkIGZpbGXvvIxzbyBJIGNvcHkgT1ZNRi5mZCB0byBteSBx
+ZW11LWt2bSBwcm9qZWN0IGFuZCBzdGFydCBxZW11IHRvIGluc3RhbGwgd2luZG93cyAxMCB2aXJ0
+dWFsIG1hY2hpbmUuDQoNCkkgZmlyc3QgY3JlYXRlZCBhIGJsYW5rIGltZyBmaWxlIG5hbWVkIHdp
+bjEwLmltZ++8jGFuZCBpbnN0YWxsIHdpbjEwICB2aXJ0dWFsIG1hY2hpbmUgYXMgZm9sbG93c++8
+mg0KW3Jvb3RAbG9jYWxob3N0IEJVSUxEXSNxZW11LXN5c3RlbS14ODZfNjQgLWRpc3BsYXkgc2Rs
+IC1lbmFibGUta3ZtICAtbSA0MDk2IC1ib290IGQgIC1jZHJvbSB3aW4xMC5pc28gLWJpb3MgT1ZN
+Ri5mZCAgLW5ldCBub25lICAtYm9vdCBtZW51PW9uIC10cG1kZXYgY3VzZS10cG0saWQ9dHBtMCxj
+YW5jZWwtcGF0aD0vZGV2L251bGwsdHlwZT1wYXNzdGhyb3VnaCxwYXRoPS9kZXYvdHBtMCAgLWRl
+dmljZSB0cG0tdGlzLHRwbWRldj10cG0wIHdpbjEwLmltZw0KDQpUaGUgaW5zdGFsbGF0aW9uIHBy
+b2Nlc3MgaXMgdmVyeSB2ZXJ5IHNsb3csIHRoZSBzeXN0ZW0gYXV0b21hdGljYWxseSByZXN0YXJ0
+cyBhZnRlciB0aGUgaW5zdGFsbGF0aW9uIGlzIGNvbXBsZXRlLiBCdXQgaXQgc2VlbXMgY2FuJ3Qg
+ZW50ZXIgdGhlIGRlc2t0b3AuIFRoZSBzeXN0ZW0gcmVzdGFydHMgY3ljbGljYWxseSwgaXQgbG9v
+a3MgbGlrZSB0aGVyZSBpcyBhIHByb2JsZW0gd2l0aCBCSU9TIGJvb3QuIEkgdGhpbmsgb2Ygd2hh
+dCB5b3Ugc2FpZCB0aGF0ICBmb3IgV2luZG93cyBUUE0gMiBzdXBwb3J0IHdpbGwgbmVlZCB0aGUg
+VFBNIENSQiBkZXZpY2UsIHNvIEkgc3RhcnQgcWVtdSB3aXRoIHBhcmFtZXRlciBvZiAtZGV2aWNl
+IHRwbS1jcmIgYnV0IGl0IGRpZG4ndCB3b3JrLiBQcm9tcHQgdGhlIGZvbGxvd2luZyBlcnJvciBt
+ZXNzYWdl77yaDQpbcm9vdEBsb2NhbGhvc3QgQlVJTERdI3FlbXUtc3lzdGVtLXg4Nl82NCAtZGlz
+cGxheSBzZGwgLWVuYWJsZS1rdm0gIC1tIDQwOTYgLWJvb3QgZCAgLWJpb3MgT1ZNRi5mZCAgLW5l
+dCBub25lICAtYm9vdCBtZW51PW9uIC10cG1kZXYgY3VzZS10cG0saWQ9dHBtMCxjYW5jZWwtcGF0
+aD0vZGV2L251bGwsdHlwZT1wYXNzdGhyb3VnaCxwYXRoPS9kZXYvdHBtMCAgLWRldmljZSB0cG0t
+Y3JiLHRwbWRldj10cG0wIHdpbjEwLmltZw0KW3Jvb3RAbG9jYWxob3N0IEJVSUxEXSNxZW11LXN5
+c3RlbS14ODZfNjQ6IC1kZXZpY2UgdHBtLWNyYix0cG1kZXY9dHBtMDogJ3RwbS1jcmInIGlzIG5v
+dCBhIHZhbGlkIGRldmljZSBtb2RlbCBuYW1lDQoNCkkgZG9uJ3Qga25vdyB3aGVyZSB0aGUgcHJv
+YmxlbSBpcywgSSBuZWVkIHlvdSB0byBnaXZlIG1lIHNvbWUgaGVscC4gVGhhbmsgeW91IHZlcnkg
+bXVjaCENCg0KDQo+IC0tLS0t5Y6f5aeL6YKu5Lu2LS0tLS0NCj4g5Y+R5Lu25Lq6OiAiTWFyYy1B
+bmRyw6kgTHVyZWF1IiA8bWFyY2FuZHJlLmx1cmVhdUBnbWFpbC5jb20+DQo+IOWPkemAgeaXtumX
+tDogMjAxOC0wOC0xNiAxNjo1Njo1MiAo5pif5pyf5ZubKQ0KPiDmlLbku7bkuro6IHRhbmdmdUBn
+b2hpZ2hzZWMuY29tDQo+IOaKhOmAgTogUUVNVSA8cWVtdS1kZXZlbEBub25nbnUub3JnPg0KPiDk
+uLvpopg6IFJlOiBbUWVtdS1kZXZlbF0gdlRQTSAyLjAgaXMgcmVjb2duaXplZCBhcyB2VFBNIDEu
+MiBvbiB0aGUgV2luIDEwIHZpcnR1YWwgbWFjaGluZQ0KPiANCj4gSGkNCj4gT24gVGh1LCBBdWcg
+MTYsIDIwMTggYXQgMzoyOSBBTSDmsaTnpo8gPHRhbmdmdUBnb2hpZ2hzZWMuY29tPiB3cm90ZToN
+Cj4gPg0KPiA+IEhpLA0KPiA+DQo+ID4gSSB3YW50IHRvIHVzZSB0aGUgdlRQTSBpbiBhIHFlbXUg
+V2luZG93cyBpbWFnZS4gVW5mb3J0dW5hdGVseSwgaXQgZGlkbid0IHdvcmsuDQo+ID4gRmlyc3Qs
+IHRoZSBlcXVpcG1lbnQ6DQo+ID4gVFBNIDIuMCBoYXJkd2FyZQ0KPiA+IENlbnRPUyA3LjINCj4g
+PiBRZW11IHYyLjEwLjINCj4gPiBTZWFCSU9TIDEuMTEuMA0KPiA+IGxpYnRwbSBhbmQgc28gb24N
+Cj4gPg0KPiA+IE15IGhvc3QgaXMgY2VudG9zIDcuMiB3aXRoIHRoZSBUUE0gMi4wIGhhcmR3YXJl
+IGFuZCBxZW11IHYyLjEwLjIuDQo+ID4gSSBtYWtlIHRoZSBsaWJ0cG0gYW5kIHNlYWJpb3Mgd2l0
+aCAuL2NvbmZpZ3VyZSwgbWFrZSBhbmQgc28gb24uIEkgY2hlY2tlZCBzZWFiaW9zIHdpdGggbWFr
+ZSBtZW51Y29uZmlnIHRoZSBUUE0gc2V0dGluZy4gSXQgaXMgZW5hYmxlZCB0cG0gYnkgZGVmYXVs
+dC4NCj4gPiBFdmVudHVhbGx5LCBhbGwgd29ya3Mgd2l0aG91dCBlcnJvcnMuDQo+ID4NCj4gPiBJ
+IHN0YXJ0IHRoZSBXaWRub3dzIDEwIGltYWdlIHdpdGg6DQo+ID4gcWVtdS1zeXN0ZW0teDg2XzY0
+IC1kaXNwbGF5IHNkbCAtZW5hYmxlLWt2bSAtbSAyMDQ4IC1ib290IGQgLWJpb3MgYmlvcy5iaW4g
+LWJvb3QgbWVudT1vbiAtdHBtZGV2IGN1c2UtdHBtLGlkPXRwbTAsY2FuY2VsLXBhdGg9L2Rldi9u
+dWxsLHR5cGU9cGFzc3Rocm91Z2gscGF0aD0vZGV2L3RwbTAgIC1kZXZpY2UgdHBtLXRpcyx0cG1k
+ZXY9dHBtMCB3aW4xMC5pbWcNCj4gPg0KPiA+DQo+ID4gRmlyc3QgaXQgbG9va3MgYWxsIGZpbmUu
+IFdpbmRvd3MgMTAgYm9vdGVkIHVwIGJ1dCB0aGUgdlRQTSB3YXMgcmVjb2duaXplZCBhcyBUUE0g
+MS4yIGluc3RlYWQgb2YgVFBNIDIuMCBpbiBkZXZpY2UgbWFuYWdlci4gSSBvcGVuIHRoZSB0cG0g
+TWFuYWdlciB3aXRoIHRwbS5tc2MgYnV0IGdldCBlcnJvciB3aXRoIE5vIGNvbXBhdGlibGUgVFBN
+IGZvdW5kLg0KPiA+IElmIEkgdXNlIHZUUE0gaW4gYSBxZW11IGxpbnV4IGltYWdlLCBldmVyeXRo
+aW5nIGdvc2Ugd2VsbC4gSSB0aGluayBvZiB3aGF0IHlvdSBzYWlkIA0KPiA+DQo+ID4NCj4gPiBT
+bywgd2hhdCBjb3VsZCBiZSB0aGUgcHJvYmxlbT8NCj4gDQo+IFlvdSBuZWVkIHRvIGJ1aWxkIGxp
+YnRwbXMgJiBzd3RwbSBmcm9tIFN0ZWZhbiB0cG0yLXByZXZpZXcgYnJhbmNoZXMuDQo+IChBbHRl
+cm5hdGl2ZWx5LCB0aGVyZSBpcyBub3cgYW4gZXhwZXJpbWVudGFsIGZlZG9yYSBjb3ByIHJlcG9z
+aXRvcnk6DQo+IGh0dHBzOi8vY29wci5mZWRvcmFpbmZyYWNsb3VkLm9yZy9jb3Bycy9zdGVmYW5i
+ZXJnZXIvc3d0cG0vKQ0KPiANCj4gSSBzdWdnZXN0IHRvIHNldHVwIHRoZSBWTSB3aXRoIGxpYnZp
+cnQgdXBzdHJlYW0sIHdoaWNoIHdpbGwgZG8gdGhlDQo+IHByZWxpbWluYXJ5IHN3dHBtX3NldHVw
+IGZvciB5b3UsIG9yIGZvbGxvdw0KPiBodHRwczovL2dpdGh1Yi5jb20vc3RlZmFuYmVyZ2VyL3N3
+dHBtL3dpa2kvQ2VydGlmaWNpYXRlcy1jcmVhdGVkLWJ5LXN3dHBtX3NldHVwDQo+IA0KPiBGb3Ig
+V2luZG93cyBUUE0gMiBzdXBwb3J0LCB5b3Ugd2lsbCBuZWVkIHRoZSBUUE0gQ1JCIGRldmljZSwg
+YW5kDQo+IHVwc3RyZWFtIE9WTUYgY29tcGlsZWQgd2l0aCAgLUQgVFBNMl9FTkFCTEUgKFRJUyAm
+IEJpb3MgYXJlIDEuMiBvbmx5DQo+IGZvciBXaW5kb3dzLCBldmVuIGlmIHNlYWJpb3MgZG9lcyBo
+YXZlIHNvbWUgMi4wIHN1cHBvcnQgd2l0aCB0aGVtKQ0KPiANCj4gRnVydGhlcm1vcmUsIHRvIHBh
+c3MgdGhlIFdMSyB0ZXN0cywgeW91IG5lZWQgUFBJICYgTU9SIGludGVyZmFjZSwNCj4gd2hpY2gg
+YXJlIHN0aWxsIHBlbmRpbmcgbWVyZ2UgKFtQQVRDSCB2OSAwLzZdIEFkZCBzdXBwb3J0IGZvciBU
+UE0NCj4gUGh5c2ljYWwgUHJlc2VuY2UgaW50ZXJmYWNlKQ0KPiANCj4gDQo+IA0KPiANCj4gLS0g
+DQo+IE1hcmMtQW5kcsOpIEx1cmVhdQ0K
