@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@curlybracket.co.uk>) id 1frA4M-000670-0K
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 18:51:43 -0400
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1frCs9-0004nd-7T
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 21:51:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@curlybracket.co.uk>) id 1frA4I-0006qY-Q7
-	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 18:51:41 -0400
-Date: Sat, 18 Aug 2018 23:51:34 +0100
-In-Reply-To: <CABLmASEbeVBJRczqvMVvL4wPtJ38oayHOF0FUWK+Ap9Jfd182g@mail.gmail.com>
-References: <CABLmASE2HTZPBVFM=grds+9RmPyh2naJ2KwNjb81LD0+E+yrtA@mail.gmail.com>
-	<b897eaf6-9504-ddfc-ae60-1ac4a865d12e@redhat.com>
-	<de02ae3c-3355-eb83-3216-5c87c3e917ff@weilnetz.de>
-	<CABLmASEbeVBJRczqvMVvL4wPtJ38oayHOF0FUWK+Ap9Jfd182g@mail.gmail.com>
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1frCs7-0004Fv-TL
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 21:51:17 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:43048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
+	id 1frCs7-0004FI-IS
+	for qemu-devel@nongnu.org; Sat, 18 Aug 2018 21:51:15 -0400
+Received: by mail-lf1-x142.google.com with SMTP id f135-v6so8436947lfg.10
+	for <qemu-devel@nongnu.org>; Sat, 18 Aug 2018 18:51:15 -0700 (PDT)
 MIME-Version: 1.0
-From: Ben Pye <ben@curlybracket.co.uk>
-Message-ID: <ED055A64-5BE5-4257-8FA9-EEA0FDDD4EB4@curlybracket.co.uk>
-Content-Type: text/plain;
- charset=utf-8
+References: <1533796396-20483-1-git-send-email-whois.zihan.yang@gmail.com>
+	<2130fbb3-0948-1f38-ead2-bb4a42577b10@gmail.com>
+In-Reply-To: <2130fbb3-0948-1f38-ead2-bb4a42577b10@gmail.com>
+From: Zihan Yang <whois.zihan.yang@gmail.com>
+Date: Sun, 19 Aug 2018 09:51:01 +0800
+Message-ID: <CAKwiv-hYuwofS4i8aW8Thqvt68emgAnJdVkiZ6CYR2Gdtkbatg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Bugs when cross-compiling qemu for Windows with
- mingw 8.1, executable doesn't run
+Subject: Re: [Qemu-devel] [RFC v4 1/6] pci_expander_bridge: add type
+ TYPE_PXB_PCIE_HOST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,223 +31,357 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Howard Spoelstra <hsp.cat7@gmail.com>, Stefan Weil <sw@weilnetz.de>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>, David Hildenbrand <david@redhat.com>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-I'm also seeing this behaviour using the MSYS2 packaged mingw64 compiler, G=
-CC 8=2E2=2E I have managed to cross compile QEMU successfully under Fedora =
-28 however and the resulting binary works=2E Certainly seems like a tool ch=
-ain issue, unfortunately MSYS2 doesn't package any older versions of GCC=2E
+Hi Marcel,
 
-Ben=2E
-
-On 18 August 2018 21:51:35 BST, Howard Spoelstra <hsp=2Ecat7@gmail=2Ecom> =
-wrote:
->On Sat, Aug 18, 2018 at 9:09 PM, Stefan Weil <sw@weilnetz=2Ede> wrote:
->> Am 17=2E08=2E2018 um 09:32 schrieb David Hildenbrand:
->>> On 18=2E07=2E2018 08:33, Howard Spoelstra wrote:
->>>> Hi all,
->>>>
->>>> I have two issues when cross compiling current master for Windows
->with
->>>> mingw 8=2E1=2E Host is Fedora29=2E See further below for gcc and ming=
-w
->>>> versions=2E
->>>>
->>>> Reproduce with:
->>>> =2E/configure --cross-prefix=3Dx86_64-w64-mingw32-
->>>> --target-list=3D"ppc-softmmu" --enable-gtk --with-gtkabi=3D3=2E0
->>>> --enable-sdl --with-sdlabi=3D2=2E0
->>>>
->>>> Issue 1: Two bugs show up during compilation related to strncpy=2E
->>>> Replacing the offenders with memcpy seems to fix this=2E
->>>>
->>>> First time:
->>>> block/sheepdog=2Ec: In function 'find_vdi_name':
->>>> block/sheepdog=2Ec:1239:5: error: 'strncpy' specified bound 256
->equals
->>>> destination size [-Werror=3Dstringop-truncation]
->>>>      strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
->>>>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>>>
->>>> Second time:
->>>> migration/global_state=2Ec: In function 'global_state_store_running':
->>>> migration/global_state=2Ec:45:5: error: 'strncpy' specified bound 100
->>>> equals destination size [-Werror=3Dstringop-truncation]
->>>>      strncpy((char *)global_state=2Erunstate,
->>>>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>>>             state, sizeof(global_state=2Erunstate));
->>>>             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>>>
->>>
->>> These two reports should be independent of general functionality
->>> (sheepdog, migration)=2E So what you see is most likely unrelated to
->this=2E
->>>
->>>> Issue 2: once strncpy has been replaced with memcpy in these two
->>>> instances, I can successfully compile, but the executable doesn't
->run
->>>> in Windows=2E
->>>> I tried to debug, and this is what gdb told me:
->>>>
->>>> (gdb) run
->>>> Starting program: c:\qemu-fedora29beta\qemu-system-ppc-debug=2Eexe -L
->>>> c:\qemu-fedora29beta\pc-bios -boot c -m 256 -M "mac99,via=3Dpmu"
->>>> -prom-env "boot-args=3D-v" -prom-env "auto-boot?=3Dtrue" -prom-env
->>>> "vga-ndrv?=3Dtrue" -hda c:\Mac-disks\9=2E2=2Eqcow2 -netdev
->>>> "user,id=3Dnetwork01" -device "sungem,netdev=3Dnetwork01" -sdl -d int
->>>> [New Thread 948=2E0x6d8]
->>>> [New Thread 948=2E0x2778]
->>>> [New Thread 948=2E0x286c]
->>>> [New Thread 948=2E0x3d0]
->>>>
->>>> Program received signal SIGSEGV, Segmentation fault=2E
->>>> getpagesize () at util/oslib-win32=2Ec:535
->>>> 535     util/oslib-win32=2Ec: No such file or directory=2E
->>>
->>> This warning is just from GDB, not able to locate you sources I
->guess=2E
->>>
->>>> (gdb) bt full
->>>> #0  getpagesize () at util/oslib-win32=2Ec:535
->>>
->>> Wonder why we should get a SEGFAULT in that simple function=2E As
->>> discussed offline, the functionality in general seems to work (if
->this
->>> function is compiled and run independently in your environment)=2E
->>>
->>> But maybe this backtrace is just misleading=2E
->>>
->>>>         system_info =3D {{dwOemId =3D 56491488, {wProcessorArchitectu=
-re
->=3D
->>>> 64992, wReserved =3D 861}}, dwPageSize =3D 0,
->>>>           lpMinimumApplicationAddress =3D 0x99cca4
->>>> <register_module_init+60>, lpMaximumApplicationAddress =3D 0x3,
->>>>           dwActiveProcessorMask =3D 11102192, dwNumberOfProcessors =
-=3D
->>>> 56584576, dwProcessorType =3D 0,
->>>>           dwAllocationGranularity =3D 200, wProcessorLevel =3D 0,
->>>> wProcessorRevision =3D 0}
->>>
->>> dwPageSize =3D 0, I assume this is some random data on the stack and
->>> GetSystemInfo never got executed=2E I wonder where this segfault comes
->from=2E
->>>
->>>> #1  0x00000000009b7fcd in init_real_host_page_size () at
->util/pagesize=2Ec:16
->>>> No locals=2E
->>>> #2  0x00000000009bc5f2 in __do_global_ctors ()
->>>> No symbol table info available=2E
->>>> #3  0x00000000004013ca in __tmainCRTStartup () at
->=2E=2E/crt/crtexe=2Ec:324
->>>>         lock_free =3D <optimized out>
->>>>         fiberid =3D <optimized out>
->>>>         nested =3D <optimized out>
->>>>         lpszCommandLine =3D <optimized out>
->>>>         StartupInfo =3D {cb =3D 104, lpReserved =3D 0x3778e00 "",
->lpDesktop
->>>> =3D 0x377f440 "Winsta0\\Default",
->>>>           lpTitle =3D 0x3786280
->>>> "c:\\qemu-fedora29beta\\qemu-system-ppc-debug=2Eexe", dwX =3D 0, dwY =
-=3D
->0,
->>>> dwXSize =3D 0,
->>>>           dwYSize =3D 0, dwXCountChars =3D 0, dwYCountChars =3D 0,
->>>> dwFillAttribute =3D 0, dwFlags =3D 0, wShowWindow =3D 0,
->>>>           cbReserved2 =3D 0, lpReserved2 =3D 0x0, hStdInput =3D
->>>> 0xffffffffffffffff, hStdOutput =3D 0xffffffffffffffff,
->>>>           hStdError =3D 0xffffffffffffffff}
->>>>         inDoubleQuote =3D <optimized out>
->>>> #4  0x00000000004014fb in WinMainCRTStartup () at
->=2E=2E/crt/crtexe=2Ec:184
->>>>         ret =3D 255
->>>> (gdb)
->>>>
->>>>
->>>> Gcc and mingw versions used:
->>>>
->>>> [hsp@localhost qemu-master]$ gcc -v
->>>> Using built-in specs=2E
->>>> COLLECT_GCC=3Dgcc
->>>>
->COLLECT_LTO_WRAPPER=3D/usr/libexec/gcc/x86_64-redhat-linux/8/lto-wrapper
->>>> OFFLOAD_TARGET_NAMES=3Dnvptx-none
->>>> OFFLOAD_TARGET_DEFAULT=3D1
->>>> Target: x86_64-redhat-linux
->>>> Configured with: =2E=2E/configure --enable-bootstrap
->>>> --enable-languages=3Dc,c++,fortran,objc,obj-c++,ada,go,lto
->--prefix=3D/usr
->>>> --mandir=3D/usr/share/man --infodir=3D/usr/share/info
->>>> --with-bugurl=3Dhttp://bugzilla=2Eredhat=2Ecom/bugzilla --enable-shar=
-ed
->>>> --enable-threads=3Dposix --enable-checking=3Drelease --enable-multili=
-b
->>>> --with-system-zlib --enable-__cxa_atexit
->>>> --disable-libunwind-exceptions --enable-gnu-unique-object
->>>> --enable-linker-build-id --with-gcc-major-version-only
->>>> --with-linker-hash-style=3Dgnu --enable-plugin
->--enable-initfini-array
->>>> --with-isl --enable-libmpx --enable-offload-targets=3Dnvptx-none
->>>> --without-cuda-driver --enable-gnu-indirect-function --enable-cet
->>>> --with-tune=3Dgeneric --with-arch_32=3Di686 --build=3Dx86_64-redhat-l=
-inux
->>>> Thread model: posix
->>>> gcc version 8=2E1=2E1 20180626 (Red Hat 8=2E1=2E1-4) (GCC)
->>>>
->>>> [hsp@localhost qemu-master]$ x86_64-w64-mingw32-gcc -v
->>>> Using built-in specs=2E
->>>> COLLECT_GCC=3Dx86_64-w64-mingw32-gcc
->>>>
->COLLECT_LTO_WRAPPER=3D/usr/libexec/gcc/x86_64-w64-mingw32/8=2E1=2E0/lto-w=
-rapper
->>>> Target: x86_64-w64-mingw32
->>>> Configured with: =2E=2E/configure --prefix=3D/usr --bindir=3D/usr/bin
->>>> --includedir=3D/usr/include --mandir=3D/usr/share/man
->>>> --infodir=3D/usr/share/info --datadir=3D/usr/share
->>>> --build=3Dx86_64-redhat-linux-gnu --host=3Dx86_64-redhat-linux-gnu
->>>> --with-gnu-as --with-gnu-ld --verbose --without-newlib
->>>> --disable-multilib --disable-plugin --with-system-zlib
->--disable-nls
->>>> --without-included-gettext --disable-win32-registry
->>>> --enable-languages=3Dc,c++,objc,obj-c++,fortran
->>>> --with-bugurl=3Dhttp://bugzilla=2Eredhat=2Ecom/bugzilla --with-cloog
->>>> --enable-threads=3Dposix --enable-libgomp --target=3Dx86_64-w64-mingw=
-32
->>>> --with-sysroot=3D/usr/x86_64-w64-mingw32/sys-root
->>>>
->--with-gxx-include-dir=3D/usr/x86_64-w64-mingw32/sys-root/mingw/include/c=
-++
->>>> Thread model: posix
->>>> gcc version 8=2E1=2E0 20180502 (Fedora MinGW 8=2E1=2E0-1=2Efc29) (GCC=
-)
->>>>
->>>> Thanks for looking into this,
->>>>
->>>> Best,
->>>> Howard
->>>>
->>>
->>> No being a win32/mingw expert, Stefan any idea?
->>
->>
->> I'd try a debug build (configure [=2E=2E=2E] --enable-debug)=2E
->>
->> My installers (https://qemu=2Eweilnetz=2Ede/w64/) were built with
->> x86_64-w64-mingw32-gcc (GCC) 6=2E3=2E0 20170516 (from Debian Stretch)=
-=2E
->> Howard, perhaps you can try whether they show the same runtime
->SIGSEGV=2E
->> When I run your command line with a dummy disk image, OpenBIOS boots
->fine=2E
->>
->> Kind regards,
->> Stefan
+Marcel Apfelbaum <marcel.apfelbaum@gmail.com> =E4=BA=8E2018=E5=B9=B48=E6=9C=
+=8818=E6=97=A5=E5=91=A8=E5=85=AD =E4=B8=8A=E5=8D=881:14=E5=86=99=E9=81=93=
+=EF=BC=9A
 >
->The error I reported already came from a debug build=2E
->Other builds with less recent mingw (7=2E3 in Fedora 28) do not SIGSEGV,
->neither do Stefan's=2E
->I can confirm the strncpy warnings are gone using Philippe's patches=2E
+> Hi Zihan,
 >
->Best,
->Howard
+> On 08/09/2018 09:33 AM, Zihan Yang wrote:
+> > The inner host bridge created by pxb-pcie is TYPE_PXB_PCI_HOST by defau=
+lt,
+> > change it to a new type TYPE_PXB_PCIE_HOST to better utilize ECAM of PC=
+Ie
+> >
+> > Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
+> > ---
+> >   hw/pci-bridge/pci_expander_bridge.c | 127 +++++++++++++++++++++++++++=
++++++++--
+> >   1 file changed, 122 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_ex=
+pander_bridge.c
+> > index e62de42..6dd38de 100644
+> > --- a/hw/pci-bridge/pci_expander_bridge.c
+> > +++ b/hw/pci-bridge/pci_expander_bridge.c
+> > @@ -15,10 +15,12 @@
+> >   #include "hw/pci/pci.h"
+> >   #include "hw/pci/pci_bus.h"
+> >   #include "hw/pci/pci_host.h"
+> > +#include "hw/pci/pcie_host.h"
+> >   #include "hw/pci/pci_bridge.h"
+> >   #include "qemu/range.h"
+> >   #include "qemu/error-report.h"
+> >   #include "sysemu/numa.h"
+> > +#include "qapi/visitor.h"
+> >
+> >   #define TYPE_PXB_BUS "pxb-bus"
+> >   #define PXB_BUS(obj) OBJECT_CHECK(PXBBus, (obj), TYPE_PXB_BUS)
+> > @@ -40,11 +42,20 @@ typedef struct PXBBus {
+> >   #define TYPE_PXB_PCIE_DEVICE "pxb-pcie"
+> >   #define PXB_PCIE_DEV(obj) OBJECT_CHECK(PXBDev, (obj), TYPE_PXB_PCIE_D=
+EVICE)
+> >
+> > +#define PROP_PXB_PCIE_DEV "pxbdev"
+> > +
+> > +#define PROP_PXB_PCIE_DOMAIN_NR "domain_nr"
+> > +#define PROP_PXB_PCIE_MAX_BUS "max_bus"
+> > +#define PROP_PXB_BUS_NR "bus_nr"
+> > +#define PROP_PXB_NUMA_NODE "numa_node"
+> > +
+> >   typedef struct PXBDev {
+> >       /*< private >*/
+> >       PCIDevice parent_obj;
+> >       /*< public >*/
+> >
+> > +    uint32_t domain_nr; /* PCI domain number, non-zero means separate =
+domain */
+>
+> The commit message suggests this patch is only about
+> re-factoring of the pxb host type, but you add here more fields.
+> Please use two separate patches.
+>
+> > +    uint8_t max_bus;    /* max bus number to use(including this one) *=
+/
+>
+> That's a great idea! Limiting the max_bus will save us a lot
+> of resource space,  we will not need 256 buses on pxbs probably.
+>
+> My concern is what happens with the current mode.
+> Currently bus_nr is used to divide PCI domain 0 buses between pxbs.
+> So if you have a pxb with bus_nr 100, and another with bus_nr 200,
+> we divide them like this:
+>      main host bridge 0...99
+>      pxb1 100 -199
+>      pxb2 200-255
+>
+> What will be the meaning of max_bus if we don't use the domain_nr paramet=
+er?
+> Maybe it will mean that some bus numbers are not assigned at all, for
+> example:
+>    pxb1: bus_nr 100, max_bus 150
+>    pxb2: bus_nr 200, max_bus 210
+>
+> It may work.
+
+Yes, it should mean so. Actually max_bus does not have to be specified
+if domain_nr
+is not used, but if users decide to use domain_nr and want to save
+space, max_bus
+could be used.
+
+> >       uint8_t bus_nr;
+> >       uint16_t numa_node;
+> >   } PXBDev;
+> > @@ -58,6 +69,16 @@ static PXBDev *convert_to_pxb(PCIDevice *dev)
+> >   static GList *pxb_dev_list;
+> >
+> >   #define TYPE_PXB_HOST "pxb-host"
+> > +#define TYPE_PXB_PCIE_HOST "pxb-pcie-host"
+> > +#define PXB_PCIE_HOST_DEVICE(obj) \
+> > +     OBJECT_CHECK(PXBPCIEHost, (obj), TYPE_PXB_PCIE_HOST)
+> > +
+> > +typedef struct PXBPCIEHost {
+> > +    PCIExpressHost parent_obj;
+> > +
+> > +    /* pointers to PXBDev */
+> > +    PXBDev *pxbdev;
+> > +} PXBPCIEHost;
+> >
+> >   static int pxb_bus_num(PCIBus *bus)
+> >   {
+> > @@ -111,6 +132,35 @@ static const char *pxb_host_root_bus_path(PCIHostS=
+tate *host_bridge,
+> >       return bus->bus_path;
+> >   }
+> >
+> > +/* Use a dedicated function for PCIe since pxb-host does
+> > + * not have a domain_nr field */
+> > +static const char *pxb_pcie_host_root_bus_path(PCIHostState *host_brid=
+ge,
+> > +                                          PCIBus *rootbus)
+> > +{
+> > +    if (!pci_bus_is_express(rootbus)) {
+> > +        /* pxb-pcie-host cannot reside on a PCI bus */
+> > +        return NULL;
+> > +    }
+> > +    PXBBus *bus =3D PXB_PCIE_BUS(rootbus);
+> > +
+> > +    /* get the pointer to PXBDev */
+> > +    Object *obj =3D object_property_get_link(OBJECT(host_bridge),
+> > +                                           PROP_PXB_PCIE_DEV, NULL);
+>
+> I don't think you need a link here.
+> I think rootbus->parent_dev returns the pxb device.
+> (See the implementation of pxb_bus_num() )
+
+OK, I'll change it in next version.
+
+> > +
+> > +    snprintf(bus->bus_path, 8, "%04lx:%02x",
+> > +             object_property_get_uint(obj, PROP_PXB_PCIE_DOMAIN_NR, NU=
+LL),
+> > +             pxb_bus_num(rootbus));
+> > +    return bus->bus_path;
+> > +}
+> > +
+> > +static void pxb_pcie_host_get_mmcfg_size(Object *obj, Visitor *v, cons=
+t char *name,
+> > +                                    void *opaque, Error **errp)
+> > +{
+> > +    PCIExpressHost *e =3D PCIE_HOST_BRIDGE(obj);
+> > +
+> > +    visit_type_uint64(v, name, &e->size, errp);
+> > +}
+> > +
+> >   static char *pxb_host_ofw_unit_address(const SysBusDevice *dev)
+> >   {
+> >       const PCIHostState *pxb_host;
+> > @@ -142,6 +192,31 @@ static char *pxb_host_ofw_unit_address(const SysBu=
+sDevice *dev)
+> >       return NULL;
+> >   }
+> >
+> > +static void pxb_pcie_host_initfn(Object *obj)
+> > +{
+> > +    PXBPCIEHost *s =3D PXB_PCIE_HOST_DEVICE(obj);
+> > +    PCIHostState *phb =3D PCI_HOST_BRIDGE(obj);
+> > +
+> > +    memory_region_init_io(&phb->conf_mem, obj, &pci_host_conf_le_ops, =
+phb,
+> > +                          "pci-conf-idx", 4);
+> > +    memory_region_init_io(&phb->data_mem, obj, &pci_host_data_le_ops, =
+phb,
+> > +                          "pci-conf-data", 4);
+> > +
+>
+> I don't understand the above. Do you want the pxb to respond to
+> legacy PCI configuration cycles?
+> I don't think it will be possible since it is accessible only through
+> addresses
+> 0xcf8 and 0xcfc which are already "taken" by the Q35 host brigde.
+>
+> More importantly, we don't need them, we want to configure
+> the PXB using MCFG.
+
+I see your comment on later patch, there are two reasons.
+
+The first is that seabios uses the port IO to read pci configuration space,
+but 0xcf8 and 0xcfc is binded to pcie.0 bus as you have pointed out. I thin=
+k
+sticking with port io could minimize the modification of seabios, so I use
+another port pair for pxb hosts. Are you suggesting we use mmio for pxb
+devices specially?
+
+The second is that seabios has not loaded RSDP when doing pci_setup,
+therefore we don't have the base address of each mcfg entry yet. So I still
+use the legacy ioport method as a temporary workaround.
+
+> > +    object_property_add(obj, PCIE_HOST_MCFG_SIZE, "uint64",
+> > +                         pxb_pcie_host_get_mmcfg_size,
+> > +                         NULL, NULL, NULL, NULL);
+> > +
+> > +    object_property_add_link(obj, PROP_PXB_PCIE_DEV, TYPE_PXB_PCIE_DEV=
+ICE,
+> > +                         (Object **)&s->pxbdev,
+> > +                         qdev_prop_allow_set_link_before_realize, 0, N=
+ULL);
+> > +}
+> > +
+> > +static Property pxb_pcie_host_props[] =3D {
+> > +    DEFINE_PROP_UINT64(PCIE_HOST_MCFG_BASE, PXBPCIEHost, parent_obj.ba=
+se_addr,
+> > +                        PCIE_BASE_ADDR_UNMAPPED),
+> > +    DEFINE_PROP_END_OF_LIST(),
+> > +};
+> > +
+>
+> That means you expect the management software to provide the
+> address... the libvirt guys will not like it :).
+> But for the moment let's go with it.
+>
+> >   static void pxb_host_class_init(ObjectClass *class, void *data)
+> >   {
+> >       DeviceClass *dc =3D DEVICE_CLASS(class);
+> > @@ -155,12 +230,34 @@ static void pxb_host_class_init(ObjectClass *clas=
+s, void *data)
+> >       hc->root_bus_path =3D pxb_host_root_bus_path;
+> >   }
+> >
+> > +static void pxb_pcie_host_class_init(ObjectClass *class, void *data)
+> > +{
+> > +    DeviceClass *dc =3D DEVICE_CLASS(class);
+> > +    SysBusDeviceClass *sbc =3D SYS_BUS_DEVICE_CLASS(class);
+> > +    PCIHostBridgeClass *hc =3D PCI_HOST_BRIDGE_CLASS(class);
+> > +
+> > +    dc->fw_name =3D "pcie";
+> > +    dc->props =3D pxb_pcie_host_props;
+> > +    /* Reason: Internal part of the pxb/pxb-pcie device, not usable by=
+ itself */
+> > +    dc->user_creatable =3D false;
+> > +    sbc->explicit_ofw_unit_address =3D pxb_host_ofw_unit_address;
+> > +    hc->root_bus_path =3D pxb_pcie_host_root_bus_path;
+> > +}
+> > +
+> >   static const TypeInfo pxb_host_info =3D {
+> >       .name          =3D TYPE_PXB_HOST,
+> >       .parent        =3D TYPE_PCI_HOST_BRIDGE,
+> >       .class_init    =3D pxb_host_class_init,
+> >   };
+> >
+> > +static const TypeInfo pxb_pcie_host_info =3D {
+> > +    .name          =3D TYPE_PXB_PCIE_HOST,
+> > +    .parent        =3D TYPE_PCIE_HOST_BRIDGE,
+> > +    .instance_size =3D sizeof(PXBPCIEHost),
+> > +    .instance_init =3D pxb_pcie_host_initfn,
+> > +    .class_init    =3D pxb_pcie_host_class_init,
+> > +};
+> > +
+> >   /*
+> >    * Registers the PXB bus as a child of pci host root bus.
+> >    */
+> > @@ -205,7 +302,10 @@ static gint pxb_compare(gconstpointer a, gconstpoi=
+nter b)
+> >   {
+> >       const PXBDev *pxb_a =3D a, *pxb_b =3D b;
+> >
+> > -    return pxb_a->bus_nr < pxb_b->bus_nr ? -1 :
+> > +    /* check domain_nr, then bus_nr */
+> > +    return pxb_a->domain_nr < pxb_b->domain_nr ? -1 :
+> > +           pxb_a->domain_nr > pxb_b->domain_nr ?  1 :
+> > +           pxb_a->bus_nr < pxb_b->bus_nr ? -1 :
+> >              pxb_a->bus_nr > pxb_b->bus_nr ?  1 :
+> >              0;
+> >   }
+> > @@ -228,10 +328,16 @@ static void pxb_dev_realize_common(PCIDevice *dev=
+, bool pcie, Error **errp)
+> >           dev_name =3D dev->qdev.id;
+> >       }
+> >
+> > -    ds =3D qdev_create(NULL, TYPE_PXB_HOST);
+> >       if (pcie) {
+> > +        g_assert (pxb->max_bus >=3D pxb->bus_nr);
+> > +        ds =3D qdev_create(NULL, TYPE_PXB_PCIE_HOST);
+> > +
+> > +        object_property_set_link(OBJECT(ds), OBJECT(pxb),
+> > +                                 PROP_PXB_PCIE_DEV, NULL);
+>
+> Please see the comment above, I don't think you
+> need this "link".
+
+OK.
+
+> > +
+> >           bus =3D pci_root_bus_new(ds, dev_name, NULL, NULL, 0, TYPE_PX=
+B_PCIE_BUS);
+> >       } else {
+> > +        ds =3D qdev_create(NULL, TYPE_PXB_HOST);
+> >           bus =3D pci_root_bus_new(ds, "pxb-internal", NULL, NULL, 0, T=
+YPE_PXB_BUS);
+> >           bds =3D qdev_create(BUS(bus), "pci-bridge");
+> >           bds->id =3D dev_name;
+> > @@ -289,8 +395,18 @@ static void pxb_dev_exitfn(PCIDevice *pci_dev)
+> >
+> >   static Property pxb_dev_properties[] =3D {
+> >       /* Note: 0 is not a legal PXB bus number. */
+> > -    DEFINE_PROP_UINT8("bus_nr", PXBDev, bus_nr, 0),
+> > -    DEFINE_PROP_UINT16("numa_node", PXBDev, numa_node, NUMA_NODE_UNASS=
+IGNED),
+> > +    DEFINE_PROP_UINT8(PROP_PXB_BUS_NR, PXBDev, bus_nr, 0),
+> > +    DEFINE_PROP_UINT16(PROP_PXB_NUMA_NODE, PXBDev, numa_node, NUMA_NOD=
+E_UNASSIGNED),
+> > +    DEFINE_PROP_END_OF_LIST(),
+> > +};
+> > +
+> > +static Property pxb_pcie_dev_properties[] =3D {
+> > +    DEFINE_PROP_UINT8(PROP_PXB_BUS_NR, PXBDev, bus_nr, 0),
+> > +    DEFINE_PROP_UINT16(PROP_PXB_NUMA_NODE, PXBDev, numa_node, NUMA_NOD=
+E_UNASSIGNED),
+> > +    DEFINE_PROP_UINT32(PROP_PXB_PCIE_DOMAIN_NR, PXBDev, domain_nr, 0),
+> > +    /* set a small default value, bus interval is [bus_nr, max_bus] */
+> > +    DEFINE_PROP_UINT8(PROP_PXB_PCIE_MAX_BUS, PXBDev, max_bus, 16),
+> > +
+>
+> You can unite the common PROPS using a macro, but is not
+> a big deal.
+>
+> >       DEFINE_PROP_END_OF_LIST(),
+> >   };
+> >
+> > @@ -344,7 +460,7 @@ static void pxb_pcie_dev_class_init(ObjectClass *kl=
+ass, void *data)
+> >       k->class_id =3D PCI_CLASS_BRIDGE_HOST;
+> >
+> >       dc->desc =3D "PCI Express Expander Bridge";
+> > -    dc->props =3D pxb_dev_properties;
+> > +    dc->props =3D pxb_pcie_dev_properties;
+> >       dc->hotpluggable =3D false;
+> >       set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> >   }
+> > @@ -365,6 +481,7 @@ static void pxb_register_types(void)
+> >       type_register_static(&pxb_bus_info);
+> >       type_register_static(&pxb_pcie_bus_info);
+> >       type_register_static(&pxb_host_info);
+> > +    type_register_static(&pxb_pcie_host_info);
+> >       type_register_static(&pxb_dev_info);
+> >       type_register_static(&pxb_pcie_dev_info);
+> >   }
+>
+> Thanks,
+> Marcel
+>
