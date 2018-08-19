@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1frjVp-0006Oo-TO
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:42:31 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1frjYX-0008Q9-C1
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1frjVm-0006jk-FR
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:42:25 -0400
-References: <20180818025653.21192-1-f4bug@amsat.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <63f44c17-2804-0cc9-c3df-f3e738c3a670@redhat.com>
-Date: Mon, 20 Aug 2018 14:42:19 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180818025653.21192-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: Replace strncpy() by g_strlcpy()
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1frjYW-0000az-Lm
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:13 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40035)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1frjYW-0000aU-FX
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:12 -0400
+Received: by mail-wr1-x429.google.com with SMTP id n2-v6so2405048wrw.7
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 05:45:12 -0700 (PDT)
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Date: Sun, 19 Aug 2018 23:22:47 +0300
+Message-Id: <20180819202300.10590-3-marcel.apfelbaum@gmail.com>
+In-Reply-To: <20180819202300.10590-1-marcel.apfelbaum@gmail.com>
+References: <20180819202300.10590-1-marcel.apfelbaum@gmail.com>
+Subject: [Qemu-devel] [PATCH PULL 02/15] hw/pvrdma: Bugfix - provide the
+ correct attr_mask to query_qp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: yuval.shaia@oracle.com, thuth@redhat.com, marcel.apfelbaum@gmail.com
 
-On 18.08.2018 04:56, Philippe Mathieu-Daud=C3=A9 wrote:
-> Fedora 29 comes with GCC 8.1 which added the 'stringop-truncation' chec=
-ks.
->=20
-> Replace the strncpy() calls by g_strlcpy() to avoid the following warni=
-ng:
->=20
->   migration/global_state.c: In function 'global_state_store_running':
->   migration/global_state.c:45:5: error: 'strncpy' specified bound 100 e=
-quals destination size [-Werror=3Dstringop-truncation]
->        strncpy((char *)global_state.runstate,
->        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->               state, sizeof(global_state.runstate));
->               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> See http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg03723.ht=
-ml
->=20
->  migration/global_state.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/migration/global_state.c b/migration/global_state.c
-> index 8e8ab5c51e..d5df502cd5 100644
-> --- a/migration/global_state.c
-> +++ b/migration/global_state.c
-> @@ -42,7 +42,7 @@ int global_state_store(void)
->  void global_state_store_running(void)
->  {
->      const char *state =3D RunState_str(RUN_STATE_RUNNING);
-> -    strncpy((char *)global_state.runstate,
-> +    g_strlcpy((char *)global_state.runstate,
->             state, sizeof(global_state.runstate));
->  }
-> =20
->=20
+From: Yuval Shaia <yuval.shaia@oracle.com>
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Calling rdma_rm_query_qp with attr_mask equals to -1 leads to error
+where backend query_qp fails to retrieve the needed QP attributes.
+Fix it by providing the attr_mask we got from driver.
 
---=20
+Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+Message-Id: <20180805153518.2983-3-yuval.shaia@oracle.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+---
+ hw/rdma/vmw/pvrdma_cmd.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Thanks,
-
-David / dhildenb
+diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+index 14255d609f..e7d6589cdc 100644
+--- a/hw/rdma/vmw/pvrdma_cmd.c
++++ b/hw/rdma/vmw/pvrdma_cmd.c
+@@ -524,6 +524,7 @@ static int query_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     struct ibv_qp_init_attr init_attr;
+ 
+     pr_dbg("qp_handle=%d\n", cmd->qp_handle);
++    pr_dbg("attr_mask=0x%x\n", cmd->attr_mask);
+ 
+     memset(rsp, 0, sizeof(*rsp));
+     rsp->hdr.response = cmd->hdr.response;
+@@ -531,8 +532,8 @@ static int query_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+ 
+     rsp->hdr.err = rdma_rm_query_qp(&dev->rdma_dev_res, &dev->backend_dev,
+                                     cmd->qp_handle,
+-                                    (struct ibv_qp_attr *)&resp->attrs, -1,
+-                                    &init_attr);
++                                    (struct ibv_qp_attr *)&resp->attrs,
++                                    cmd->attr_mask, &init_attr);
+ 
+     pr_dbg("ret=%d\n", rsp->hdr.err);
+     return rsp->hdr.err;
+-- 
+2.17.1
