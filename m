@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1frFR5-0004lw-DT
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 00:35:31 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1frHWf-0001it-Df
+	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 02:49:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1frFR0-0005Tu-Da
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 00:35:31 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:35410)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1frFR0-0005Tf-8t
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 00:35:26 -0400
-Received: by mail-it0-x243.google.com with SMTP id 139-v6so16588005itf.0
-	for <qemu-devel@nongnu.org>; Sat, 18 Aug 2018 21:35:26 -0700 (PDT)
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Sun, 19 Aug 2018 00:35:09 -0400
-Message-Id: <20180819043509.12888-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH] hw/input/ps2.c: fix erratic mouse behavior for
- Windows 3.1
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1frHWb-00039N-7t
+	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 02:49:25 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:42189
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1frHWb-00039H-1P
+	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 02:49:21 -0400
+Received: from host86-159-123-112.range86-159.btcentralplus.com
+	([86.159.123.112] helo=[192.168.1.65])
+	by s16892447.onlinehome-server.info with esmtpsa
+	(TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1frHWm-0007El-5W
+	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 07:49:33 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+References: <41d9b8ae-1db9-be8c-4b58-23ee6278ded7@ilande.co.uk>
+Message-ID: <0e22587c-651c-3e5b-579b-8181a7ec1722@ilande.co.uk>
+Date: Sun, 19 Aug 2018 07:49:09 +0100
+MIME-Version: 1.0
+In-Reply-To: <41d9b8ae-1db9-be8c-4b58-23ee6278ded7@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] virtio ignores pci_address_space_*()?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +35,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kraxel@redhat.com, qemu-devel@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: qemu-devel <qemu-devel@nongnu.org>
 
-When the user moves the mouse and moves the scroll wheel at the same time, the mouse cursor's movement becomes erratic in Windows 3.1. With this patch if the mouse is in ps/2 mode and the scroll wheel is used, the command queue is reset. This does not fix the erratic mouse problem in Windows NT 4.0.
+On 18/08/18 21:21, Mark Cave-Ayland wrote:
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
----
- hw/input/ps2.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+> Hi all,
+> 
+> As part of testing my OpenBIOS virtio-blk implementation, I've been
+> trying to use it under the 40p machine and have some questions related
+> to how address spaces are interpreted.
+> 
+> The 40p PCI address space is aliased onto the CPU physical address space
+> with an offset of 0x80000000 i.e.
+> 
+>    PCI address space 0x80001234 -> CPU address space 0x1234
+> 
+> For the LSI SCSI controller this just works: when configuring the DMA
+> descriptors I write the destination address to the LSI registers in PCI
+> address space i.e. 0x80001234. Internally this calls pci_dma_read() and
+> pci_dma_write() and the data gets transferred correctly to physical
+> address 0x1234.
+> 
+> When trying to configure a virtio device I'm not seeing the same
+> behaviour: firstly it seems that I need to write the CPU address 0x1234
+> to VIRTIO_PCI_QUEUE_PFN rather than the PCI address 0x80001234 as I
+> would expect.
+> 
+> Following this I've tried to configure the address in the virtio
+> descriptors with both the CPU address and PCI address and neither seems
+> to work in my tests here.
+> 
+> Looking through the virtio code I can't see any references to
+> pci_dma_read()/pci_dma_write() so I was wondering if someone can confirm
+> whether I should be using CPU or PCI addresses when programming virtio
+> registers and descriptors for machines such as 40p, and where I can find
+> the address space being used for virtio device reads/writes?
 
-diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-index fdfcadf9a1..bb9ebfa5a9 100644
---- a/hw/input/ps2.c
-+++ b/hw/input/ps2.c
-@@ -685,8 +685,17 @@ static int ps2_mouse_send_packet(PS2MouseState *s)
-     /* update deltas */
-     s->mouse_dx -= dx1;
-     s->mouse_dy -= dy1;
--    s->mouse_dz -= dz1;
-+    /*
-+     * This prevents the mouse from going crazy in Windows that doesn't support
-+     * the Microsoft Intellimouse standard.
-+     */
-+    if (s->mouse_type == 0 && s->mouse_dz != 0) {
-+        s->mouse_dz = 0;
-+        ps2_reset_queue(&s->common);
-+        return 1;
-+    }
- 
-+    s->mouse_dz -= dz1;
-     return 1;
- }
- 
--- 
-2.14.3 (Apple Git-98)
+So after quite a lot more searching I think I've finally found the answer:
+
+- Enable VIRTIO_F_IOMMU_PLATFORM feature bit via iommu_platform property
+to enable use of iovas in the descriptor rings
+
+- Write the physical address to VIRTIO_PCI_QUEUE_PFN
+
+Does this sound right?
+
+
+ATB,
+
+Mark.
