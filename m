@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1frjYr-0000Cw-4P
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:33 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1frjYr-0000Cr-3v
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1frjYo-0000jS-JE
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1frjYp-0000kM-JC
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:33 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:40044)
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:51781)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1frjYj-0000ga-9c
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:27 -0400
-Received: by mail-wr1-x431.google.com with SMTP id n2-v6so2405584wrw.7
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 05:45:24 -0700 (PDT)
+	id 1frjYp-0000iv-Az
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:45:31 -0400
+Received: by mail-wm0-x234.google.com with SMTP id y2-v6so14166364wma.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 05:45:29 -0700 (PDT)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sun, 19 Aug 2018 23:22:56 +0300
-Message-Id: <20180819202300.10590-12-marcel.apfelbaum@gmail.com>
+Date: Sun, 19 Aug 2018 23:23:00 +0300
+Message-Id: <20180819202300.10590-16-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20180819202300.10590-1-marcel.apfelbaum@gmail.com>
 References: <20180819202300.10590-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PATCH PULL 11/15] hw/rdma: Print backend QP number in
- hex format
+Subject: [Qemu-devel]  [PATCH PULL 15/15] config: split PVRDMA from RDMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +29,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: yuval.shaia@oracle.com, thuth@redhat.com, marcel.apfelbaum@gmail.com
 
-From: Yuval Shaia <yuval.shaia@oracle.com>
+In some BSD systems RDMA migration is possible while
+the pvrdma device can't be used because the mremap system call
+is missing.
 
-To be consistent with other prints throughout the code fix places that
-print it as decimal number.
-
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-Id: <20180805153518.2983-12-yuval.shaia@oracle.com>
+Reported-by: Rebecca Cran <rebecca@bluestop.org>
 Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-Id: <20180816151637.24553-1-marcel.apfelbaum@gmail.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/rdma/rdma_rm.c           | 4 ++--
- hw/rdma/vmw/pvrdma_qp_ops.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ configure             | 55 ++++++++++++++++++++++++++++++++++++++++++-
+ hw/rdma/Makefile.objs |  2 +-
+ 2 files changed, 55 insertions(+), 2 deletions(-)
 
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index 1f014b4ab2..859c900003 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -389,7 +389,7 @@ int rdma_rm_modify_qp(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-     RdmaRmQP *qp;
-     int ret;
+diff --git a/configure b/configure
+index db97930314..7d9a63636c 100755
+--- a/configure
++++ b/configure
+@@ -375,6 +375,7 @@ hax="no"
+ hvf="no"
+ whpx="no"
+ rdma=""
++pvrdma=""
+ gprof="no"
+ debug_tcg="no"
+ debug="no"
+@@ -1363,6 +1364,10 @@ for opt do
+   ;;
+   --disable-rdma) rdma="no"
+   ;;
++  --enable-pvrdma) pvrdma="yes"
++  ;;
++  --disable-pvrdma) pvrdma="no"
++  ;;
+   --with-gtkabi=*) gtkabi="$optarg"
+   ;;
+   --disable-vte) vte="no"
+@@ -1669,7 +1674,8 @@ disabled with --disable-FEATURE, default is enabled if available:
+   hax             HAX acceleration support
+   hvf             Hypervisor.framework acceleration support
+   whpx            Windows Hypervisor Platform acceleration support
+-  rdma            Enable RDMA-based migration and PVRDMA support
++  rdma            Enable RDMA-based migration
++  pvrdma          Enable PVRDMA support
+   vde             support for vde network
+   netmap          support for netmap network
+   linux-aio       Linux AIO support
+@@ -3064,6 +3070,48 @@ EOF
+   fi
+ fi
  
--    pr_dbg("qpn=%d\n", qp_handle);
-+    pr_dbg("qpn=0x%x\n", qp_handle);
++##########################################
++# PVRDMA detection
++
++cat > $TMPC <<EOF &&
++#include <sys/mman.h>
++
++int
++main(void)
++{
++    char buf = 0;
++    void *addr = &buf;
++    addr = mremap(addr, 0, 1, MREMAP_MAYMOVE | MREMAP_FIXED);
++
++    return 0;
++}
++EOF
++
++if test "$rdma" = "yes" ; then
++    case "$pvrdma" in
++    "")
++        if compile_prog "" ""; then
++            pvrdma="yes"
++        else
++            pvrdma="no"
++        fi
++        ;;
++    "yes")
++        if ! compile_prog "" ""; then
++            error_exit "PVRDMA is not supported since mremap is not implemented"
++        fi
++        pvrdma="yes"
++        ;;
++    "no")
++        pvrdma="no"
++        ;;
++    esac
++else
++    if test "$pvrdma" = "yes" ; then
++        error_exit "PVRDMA requires rdma suppport"
++    fi
++    pvrdma="no"
++fi
  
-     qp = rdma_rm_get_qp(dev_res, qp_handle);
-     if (!qp) {
-@@ -447,7 +447,7 @@ int rdma_rm_query_qp(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
- {
-     RdmaRmQP *qp;
+ ##########################################
+ # VNC SASL detection
+@@ -5952,6 +6000,7 @@ if test "$tcg" = "yes" ; then
+ fi
+ echo "malloc trim support $malloc_trim"
+ echo "RDMA support      $rdma"
++echo "PVRDMA support    $pvrdma"
+ echo "fdt support       $fdt"
+ echo "membarrier        $membarrier"
+ echo "preadv support    $preadv"
+@@ -6708,6 +6757,10 @@ if test "$rdma" = "yes" ; then
+   echo "RDMA_LIBS=$rdma_libs" >> $config_host_mak
+ fi
  
--    pr_dbg("qpn=%d\n", qp_handle);
-+    pr_dbg("qpn=0x%x\n", qp_handle);
- 
-     qp = rdma_rm_get_qp(dev_res, qp_handle);
-     if (!qp) {
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-index a8664f40c8..c668afd0ed 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.c
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-@@ -130,7 +130,7 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
-     PvrdmaSqWqe *wqe;
-     PvrdmaRing *ring;
- 
--    pr_dbg("qp_handle=%d\n", qp_handle);
-+    pr_dbg("qp_handle=0x%x\n", qp_handle);
- 
-     qp = rdma_rm_get_qp(&dev->rdma_dev_res, qp_handle);
-     if (unlikely(!qp)) {
-@@ -174,7 +174,7 @@ int pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
-     PvrdmaRqWqe *wqe;
-     PvrdmaRing *ring;
- 
--    pr_dbg("qp_handle=%d\n", qp_handle);
-+    pr_dbg("qp_handle=0x%x\n", qp_handle);
- 
-     qp = rdma_rm_get_qp(&dev->rdma_dev_res, qp_handle);
-     if (unlikely(!qp)) {
++if test "$pvrdma" = "yes" ; then
++  echo "CONFIG_PVRDMA=y" >> $config_host_mak
++fi
++
+ if test "$have_rtnetlink" = "yes" ; then
+   echo "CONFIG_RTNETLINK=y" >> $config_host_mak
+ fi
+diff --git a/hw/rdma/Makefile.objs b/hw/rdma/Makefile.objs
+index 3504c39d21..bd36cbf51c 100644
+--- a/hw/rdma/Makefile.objs
++++ b/hw/rdma/Makefile.objs
+@@ -1,4 +1,4 @@
+-ifeq ($(CONFIG_RDMA),y)
++ifeq ($(CONFIG_PVRDMA),y)
+ obj-$(CONFIG_PCI) += rdma_utils.o rdma_backend.o rdma_rm.o
+ obj-$(CONFIG_PCI) += vmw/pvrdma_dev_ring.o vmw/pvrdma_cmd.o \
+                      vmw/pvrdma_qp_ops.o vmw/pvrdma_main.o
 -- 
 2.17.1
