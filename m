@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1frdZn-0005na-Kb
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 02:22:08 -0400
+	(envelope-from <no-reply@patchew.org>) id 1frdcg-00079m-BQ
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 02:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1frdZi-0001XV-EY
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 02:22:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41062 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1frdZi-0001Wz-A7
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 02:22:02 -0400
-References: <20180817161404.9420-1-peter.maydell@linaro.org>
-	<0e358562-7607-9c27-d452-57e3dc32806e@redhat.com>
-	<CAFEAcA9OmzWrn_cZS5me+xYEMygWg1tYvT3dpbLWER1n-EgwmQ@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c6e23061-36b5-8572-e746-1d2a54052d2e@redhat.com>
-Date: Mon, 20 Aug 2018 08:21:58 +0200
+	(envelope-from <no-reply@patchew.org>) id 1frdcc-0002Sn-0m
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 02:25:06 -0400
+Resent-Message-Id: <E1frdcc-0002Sn-0m@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21026)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1frdcb-0002Qm-PJ
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 02:25:01 -0400
+In-Reply-To: <20180819221707.20693-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153471828127.4935.6402360105539874052@502c9da6d61e>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9OmzWrn_cZS5me+xYEMygWg1tYvT3dpbLWER1n-EgwmQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tests/boot-serial-test: Bump timeout to 6
- minutes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 19 Aug 2018 15:38:02 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/6] Linux user for 3.1 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, crosthwaite.peter@gmail.com, riku.voipio@iki.fi, pbonzini@redhat.com, aurelien@aurel32.net, rth@twiddle.net
 
-On 2018-08-18 12:10, Peter Maydell wrote:
-> On 18 August 2018 at 10:07, Thomas Huth <thuth@redhat.com> wrote:
->> 6 minutes is really a lot already. I guess most users will hit CTRL-C
->> before waiting so long if there is a realy problem here ... If the
->> current tests just takes a little bit more than 1 minute on the Sparc
->> machine, maybe 2 or 3 minutes would sufficient, too?
-> 
-> Or maybe not. I don't like tests that run close to their timeout
-> limits, because that tends to mean that my automated test runs
-> are flaky when the machine happens to be heavily loaded when
-> a test is running. I think the purpose of a timeout is to prevent
-> the test run hanging indefinitely; as you say, console users can
-> hit ctrl-c if they get bored anyway.
-
-... or maybe somebody tries to run TCI on a Sparc host one day ... ok,
-you've convinced me, let's go with the 360 seconds:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-Paolo, could you please queue up this patch (since I don't have anything
-else pending for assembling a PULL request)?
-
- Thomas
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODE5MjIxNzA3LjIwNjkzLTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAvNl0gTGludXggdXNlciBmb3IgMy4xIHBhdGNoZXMKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
+JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
+aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
+Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
+IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
+bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
+IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
+ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
+cHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA4MTky
+MjE3MDcuMjA2OTMtMS1sYXVyZW50QHZpdmllci5ldSAtPiBwYXRjaGV3LzIwMTgwODE5MjIxNzA3
+LjIwNjkzLTEtbGF1cmVudEB2aXZpZXIuZXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
+Jwo3OTc4Y2VkZDJkIGxpbnV4LXVzZXI6IGFkZCBRRU1VX0lGTEFfSU5GT19LSU5EIG5lc3RlZCB0
+eXBlIGZvciB0dW4KNjI3ZmU5Y2RhMSBsaW51eC11c2VyOiB1cGRhdGUgbmV0bGluayByb3V0ZSB0
+eXBlcwoyMjFhMmY4MWE3IGxpbnV4LXVzZXI6IGZpeCByZWN2bXNnKCkvcmVjdmZyb20oKSB3aXRo
+IG5ldGxpbmsgYW5kIE1TR19UUlVOQwo0N2VkNmE2ZGI2IHNoNDogZml4IHVzZV9pY291bnQgd2l0
+aCBsaW51eC11c2VyCjdkMmRjODlmNTggbGludXgtdXNlcjogZml4IDMyYml0IGcyaCgpL2gyZygp
+CmZjZTRlZmNjM2QgcWVtdS1iaW5mbXQtY29uZi5zaDogYWRkIHg4Nl82NCB0YXJnZXQKCj09PSBP
+VVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNjogcWVtdS1iaW5mbXQtY29uZi5zaDog
+YWRkIHg4Nl82NCB0YXJnZXQuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI5
+OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MTc6Cit4ODZfNjRfbWFnaWM9J1x4
+N2ZFTEZceDAyXHgwMVx4MDFceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAy
+XHgwMFx4M2VceDAwJwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzMDogRklMRTog
+c2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjE4OgoreDg2XzY0X21hc2s9J1x4ZmZceGZmXHhm
+Zlx4ZmZceGZmXHhmZVx4ZmVceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZl
+XHhmZlx4ZmZceGZmJwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOCBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
+SCAyLzY6IGxpbnV4LXVzZXI6IGZpeCAzMmJpdCBnMmgoKS9oMmcoKS4uLgpDaGVja2luZyBQQVRD
+SCAzLzY6IHNoNDogZml4IHVzZV9pY291bnQgd2l0aCBsaW51eC11c2VyLi4uCkNoZWNraW5nIFBB
+VENIIDQvNjogbGludXgtdXNlcjogZml4IHJlY3Ztc2coKS9yZWN2ZnJvbSgpIHdpdGggbmV0bGlu
+ayBhbmQgTVNHX1RSVU5DLi4uCkNoZWNraW5nIFBBVENIIDUvNjogbGludXgtdXNlcjogdXBkYXRl
+IG5ldGxpbmsgcm91dGUgdHlwZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNi82OiBsaW51eC11c2VyOiBh
+ZGQgUUVNVV9JRkxBX0lORk9fS0lORCBuZXN0ZWQgdHlwZSBmb3IgdHVuLi4uCj09PSBPVVRQVVQg
+RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
