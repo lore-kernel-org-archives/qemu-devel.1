@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1freVS-00061t-F7
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:21:43 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1frenN-00025q-AI
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:40:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1freVR-0005jd-FQ
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:21:42 -0400
-References: <1532195863-23945-1-git-send-email-gengdongjiu@huawei.com>
-	<1532195863-23945-4-git-send-email-gengdongjiu@huawei.com>
-	<CAFEAcA8EssRi0WbcKNJK5RQ1KUWNNLb5xmFK2+E_bRwwhDBfBQ@mail.gmail.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <d99648cd-db15-1dcc-d027-1dde1170edba@huawei.com>
-Date: Mon, 20 Aug 2018 15:21:11 +0800
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1frenI-0004ct-Cp
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:40:13 -0400
+Received: from mail-he1eur01on0100.outbound.protection.outlook.com
+	([104.47.0.100]:27616
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+	id 1frenH-0004c7-SK
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:40:08 -0400
+References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
+	<4eca96cf-5520-fb82-2e23-afff3ba35077@virtuozzo.com>
+	<c6f924f2-b70d-a460-f96c-7d40b9d06e22@redhat.com>
+	<7da20590-58d7-4ef0-92b9-fcb955f28c9b@virtuozzo.com>
+	<20180813163048.GO4323@localhost.localdomain>
+	<ae864bb4-257e-240c-eeab-3c9c13462c0d@virtuozzo.com>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <9ff040b2-8dcf-2cf0-76e6-fbef4e1da01e@virtuozzo.com>
+Date: Mon, 20 Aug 2018 10:40:00 +0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8EssRi0WbcKNJK5RQ1KUWNNLb5xmFK2+E_bRwwhDBfBQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <ae864bb4-257e-240c-eeab-3c9c13462c0d@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/3] target: arm: Add support for VCPU
- event states
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v0 0/2] Postponed actions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,252 +35,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>
+To: qemu-devel@nongnu.org
 
+ping ping!
 
-On 2018/8/17 22:50, Peter Maydell wrote:
-> On 21 July 2018 at 18:57, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->> This patch extends the qemu-kvm state sync logic with support for
->> KVM_GET/SET_VCPU_EVENTS, giving access to yet missing SError exception.
->> And also it can support the exception state migration.
-> 
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->> change since v4:
->> 1. Rebase the code to latest
+On 14.08.2018 10:08, Denis Plotnikov wrote:
+>=20
+>=20
+> On 13.08.2018 19:30, Kevin Wolf wrote:
+>> Am 13.08.2018 um 10:32 hat Denis Plotnikov geschrieben:
+>>> Ping ping!
+>>>
+>>> On 16.07.2018 21:59, John Snow wrote:
+>>>>
+>>>>
+>>>> On 07/16/2018 11:01 AM, Denis Plotnikov wrote:
+>>>>> Ping!
+>>>>>
+>>>>
+>>>> I never saw a reply to Stefan's question on July 2nd, did you reply
+>>>> off-list?
+>>>>
+>>>> --js
+>>> Yes, I did. I talked to Stefan why the patch set appeared.
 >>
->> change since v3:
->> 1. Add a new new subsection with a suitable 'ras_needed' function
->>    controlling whether it is present
->> 2. Add a ARM_FEATURE_RAS feature bit for CPUARMState
+>> The rest of us still don't know the answer. I had the same question.
 >>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> 
-> Hi; sorry it's taken me so long to get to this patchset.
-> I think it's basically the right shape, but I have some
-> changes to suggest below.
-
-You are welcome, thanks for your time that give below  precious suggestion and review comments.
-
-> 
->> ---
->>  target/arm/cpu.h     |  6 ++++++
->>  target/arm/kvm64.c   | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  target/arm/machine.c | 22 ++++++++++++++++++++
->>  3 files changed, 87 insertions(+)
+>> Kevin
+> Yes, that's my fault. I should have post it earlier.
+>=20
+> I reviewed the problem once again and come up with the following=20
+> explanation.
+> Indeed, if the global lock has been taken by the main thread the vCPU=20
+> threads won't be able to execute mmio ide.
+> But, if the main thread will release the lock then nothing will prevent
+> vCPU threads form execution what they want, e.g writing to the block=20
+> device.
+>=20
+> In case of running the mirroring it is possible. Let's take a look
+> at the following snippet of mirror_run. This is a part the mirroring=20
+> completion part.
+>=20
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_=
+drained_begin(bs);
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cnt =
+=3D bdrv_get_dirty_count(s->dirty_bitmap);
+>  >>>>>>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (cnt > 0 || mirror_flush(s) < 0)=
+ {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 bdrv_drained_end(bs);
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 continue;
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>=20
+> (X) >>>>=C2=A0=C2=A0=C2=A0 assert(QLIST_EMPTY(&bs->tracked_requests));
+>=20
+> mirror_flush here can yield the current coroutine so nothing more can be=
+=20
+> executed.
+> We could end up with the situation when the main loop have to revolve to=
+=20
+> poll for another timer/bh to process. While revolving it releases the=20
+> global lock. If the global lock is waited for by a vCPU (any other)=20
+> thread, the waiting thread will get the lock and make what it intends.
+>=20
+> This is something that I can observe:
+>=20
+> mirror_flush yields coroutine, the main thread revolves and locks=20
+> because a vCPU was waiting for the lock. Now the vCPU thread owns the=20
+> lock and the main thread waits for the lock releasing.
+> The vCPU thread does cmd_write_dma and releases the lock. Then, the main
+> thread gets the lock and continues to run eventually proceeding with the=
+=20
+> coroutine yeiled.
+> If the vCPU requests aren't completed by the moment we will assert at=20
+> (X). If the vCPU requests are completed we won't even notice that we had=
+=20
+> some writes while in the drained section.
+>=20
+> Denis
 >>
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index e310ffc..f00f0b6 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -645,6 +645,11 @@ typedef struct CPUARMState {
->>      const struct arm_boot_info *boot_info;
->>      /* Store GICv3CPUState to access from this struct */
->>      void *gicv3state;
->> +    struct {
->> +        uint32_t pending;
->> +        uint32_t has_esr;
->> +        uint64_t esr;
->> +    } serror;
-> 
-> I recommend putting this earlier in the CPUARMState struct.
-> Specifically, you want to put it somewhere before the
-> "end_reset_fields" marker. All fields before that are cleared
-> to zero on CPU reset. If you put the struct after that then
-> you would need manual code in the cpu reset function to
-> reset it appropriately.
-Ok, I will move it to the right place. thanks for the pointing out.
+>>>>> On 29.06.2018 15:40, Denis Plotnikov wrote:
+>>>>>> There are cases when a request to a block driver state shouldn't hav=
+e
+>>>>>> appeared producing dangerous race conditions.
+>>>>>> This misbehaviour is usually happens with storage devices emulated
+>>>>>> without eventfd for guest to host notifications like IDE.
+>>>>>>
+>>>>>> The issue arises when the context is in the "drained" section
+>>>>>> and doesn't expect the request to come, but request comes from the
+>>>>>> device not using iothread and which context is processed by the main
+>>>>>> loop.
+>>>>>>
+>>>>>> The main loop apart of the iothread event loop isn't blocked by the
+>>>>>> "drained" section.
+>>>>>> The request coming and processing while in "drained" section can=20
+>>>>>> spoil
+>>>>>> the
+>>>>>> block driver state consistency.
+>>>>>>
+>>>>>> This behavior can be observed in the following KVM-based case:
+>>>>>>
+>>>>>> 1. Setup a VM with an IDE disk.
+>>>>>> 2. Inside a VM start a disk writing load for the IDE device
+>>>>>> =C2=A0 =C2=A0=C2=A0 e.g: dd if=3D<file> of=3D<file> bs=3DX count=3DY=
+ oflag=3Ddirect
+>>>>>> 3. On the host create a mirroring block job for the IDE device
+>>>>>> =C2=A0 =C2=A0=C2=A0 e.g: drive_mirror <your_IDE> <your_path>
+>>>>>> 4. On the host finish the block job
+>>>>>> =C2=A0 =C2=A0=C2=A0 e.g: block_job_complete <your_IDE>
+>>>>>> =C2=A0 =C2=A0 Having done the 4th action, you could get an assert:
+>>>>>> assert(QLIST_EMPTY(&bs->tracked_requests)) from mirror_run.
+>>>>>> On my setup, the assert is 1/3 reproducible.
+>>>>>>
+>>>>>> The patch series introduces the mechanism to postpone the requests
+>>>>>> until the BDS leaves "drained" section for the devices not using
+>>>>>> iothreads.
+>>>>>> Also, it modifies the asynchronous block backend infrastructure to=20
+>>>>>> use
+>>>>>> that mechanism to release the assert bug for IDE devices.
+>>>>>>
+>>>>>> Denis Plotnikov (2):
+>>>>>> =C2=A0 =C2=A0=C2=A0 async: add infrastructure for postponed actions
+>>>>>> =C2=A0 =C2=A0=C2=A0 block: postpone the coroutine executing if the B=
+DS's is drained
+>>>>>>
+>>>>>> =C2=A0 =C2=A0 block/block-backend.c | 58=20
+>>>>>> ++++++++++++++++++++++++++++++---------
+>>>>>> =C2=A0 =C2=A0 include/block/aio.h=C2=A0=C2=A0 | 63=20
+>>>>>> +++++++++++++++++++++++++++++++++++++++++++
+>>>>>> =C2=A0 =C2=A0 util/async.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | 33 +++++++++++++++++++++++
+>>>>>> =C2=A0 =C2=A0 3 files changed, 142 insertions(+), 12 deletions(-)
+>>>>>>
+>>>>>
+>>>
+>>> --=20
+>>> Best,
+>>> Denis
+>=20
 
-> 
->>  } CPUARMState;
->>
->>  /**
->> @@ -1486,6 +1491,7 @@ enum arm_features {
->>      ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
->>      ARM_FEATURE_V8_FCMA, /* has complex number part of v8.3 extensions.  */
->>      ARM_FEATURE_M_MAIN, /* M profile Main Extension */
->> +    ARM_FEATURE_RAS_EXT, /* has RAS Extension */
->>  };
->>
->>  static inline int arm_feature(CPUARMState *env, int feature)
->> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
->> index e0b8246..ebf7a00 100644
->> --- a/target/arm/kvm64.c
->> +++ b/target/arm/kvm64.c
->> @@ -527,6 +527,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>          unset_feature(&env->features, ARM_FEATURE_PMU);
->>      }
->>
->> +    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_INJECT_SERROR_ESR)) {
->> +        set_feature(&env->features, ARM_FEATURE_RAS_EXT);
->> +    }
-> 
-> I think this is confusing two things. Whether the host kernel
-> has support for injecting SError ESRs is not the same as
-> whether the guest CPU has the RAS extensions. So you don't want
-> to use an ARM_FEATURE_* bit to track whether we need to migrate
-> the SError ESR state.
-> 
-> Instead you should just use a bool variable local to this file
-> to track whether the kernel has state we need to migrate.
-> Compare the way we use "have_guest_debug" to track whether
-> KVM_CAP_SET_GUEST_DEBUG is set. You can call this
-> have_inject_serror_esr.
-
-Ok, I will use your suggested method to do it in this file.
-
-> 
->> +
->>      /* Do KVM_ARM_VCPU_INIT ioctl */
->>      ret = kvm_arm_vcpu_init(cs);
->>      if (ret) {
->> @@ -600,6 +604,50 @@ int kvm_arm_cpreg_level(uint64_t regidx)
->>  #define AARCH64_SIMD_CTRL_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U32 | \
->>                   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
->>
->> +static int kvm_put_vcpu_events(ARMCPU *cpu)
->> +{
->> +    CPUARMState *env = &cpu->env;
->> +    struct kvm_vcpu_events events = {};
->> +
->> +    if (!kvm_has_vcpu_events()) {
->> +        return 0;
->> +    }
->> +
->> +    memset(&events, 0, sizeof(events));
->> +    events.exception.serror_pending = env->serror.pending;
->> +
->> +    if (arm_feature(env, ARM_FEATURE_RAS_EXT)) {
-> 
-> Here you can check have_inject_serror_esr.
-
-Got it, will change it.
-
-> 
->> +        events.exception.serror_has_esr = env->serror.has_esr;
->> +        events.exception.serror_esr = env->serror.esr;
->> +    }
->> +
->> +    return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
->> +}
->> +
->> +static int kvm_get_vcpu_events(ARMCPU *cpu)
->> +{
->> +    CPUARMState *env = &cpu->env;
->> +    struct kvm_vcpu_events events;
->> +    int ret;
->> +
->> +    if (!kvm_has_vcpu_events()) {
->> +        return 0;
->> +    }
->> +
->> +    memset(&events, 0, sizeof(events));
->> +    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_VCPU_EVENTS, &events);
->> +
->> +    if (ret < 0) {
->> +        return ret;
->> +    }
->> +
->> +    env->serror.pending = events.exception.serror_pending;
->> +    env->serror.has_esr = events.exception.serror_has_esr;
->> +    env->serror.esr = events.exception.serror_esr;
->> +
->> +    return 0;
->> +}
->> +
->>  int kvm_arch_put_registers(CPUState *cs, int level)
->>  {
->>      struct kvm_one_reg reg;
->> @@ -727,6 +775,12 @@ int kvm_arch_put_registers(CPUState *cs, int level)
->>          return ret;
->>      }
->>
->> +    ret = kvm_put_vcpu_events(cpu);
->> +    if (ret) {
->> +        printf("return error kvm_put_vcpu_events: %d\n", ret);
-> 
-> Stray debug printf() left in?
-I will remove this printf().
-
-> 
->> +        return ret;
->> +    }
->> +
->>      if (!write_list_to_kvmstate(cpu, level)) {
->>          return EINVAL;
->>      }
->> @@ -863,6 +917,11 @@ int kvm_arch_get_registers(CPUState *cs)
->>      }
->>      vfp_set_fpcr(env, fpr);
->>
->> +    ret = kvm_get_vcpu_events(cpu);
->> +    if (ret) {
->> +        return ret;
->> +    }
->> +
->>      if (!write_kvmstate_to_list(cpu)) {
->>          return EINVAL;
->>      }
->> diff --git a/target/arm/machine.c b/target/arm/machine.c
->> index 2e28d08..ead8b2a 100644
->> --- a/target/arm/machine.c
->> +++ b/target/arm/machine.c
->> @@ -172,6 +172,27 @@ static const VMStateDescription vmstate_sve = {
->>  };
->>  #endif /* AARCH64 */
->>
->> +static bool ras_needed(void *opaque)
->> +{
->> +    ARMCPU *cpu = opaque;
->> +    CPUARMState *env = &cpu->env;
->> +
->> +    return arm_feature(env, ARM_FEATURE_RAS_EXT);
-> 
-> I think the best check to use here is
-> "return env.serror.pending != 0". If no SError is
-> pending then there's no new state to migrate.
-
-Ok, it looks reasonable to check "return env.serror.pending != 0",
-I will change it.
-
-> 
-> We should also call this VMState something other than
-> "ras", because it doesn't contain RAS-specific data.
-> "serror" will do (so "vmstate_serror", "cpu/serror", etc).
-
-OK, I will rename it to "vmstate_serror" from vmstate_ras.
-
-> 
->> +}
->> +
->> +static const VMStateDescription vmstate_ras = {
->> +    .name = "cpu/ras",
->> +    .version_id = 1,
->> +    .minimum_version_id = 1,
->> +    .needed = ras_needed,
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_UINT32(env.serror.pending, ARMCPU),
->> +        VMSTATE_UINT32(env.serror.has_esr, ARMCPU),
->> +        VMSTATE_UINT64(env.serror.esr, ARMCPU),
->> +        VMSTATE_END_OF_LIST()
->> +    }
->> +};
->> +
->>  static bool m_needed(void *opaque)
->>  {
->>      ARMCPU *cpu = opaque;
->> @@ -723,6 +744,7 @@ const VMStateDescription vmstate_arm_cpu = {
->>  #ifdef TARGET_AARCH64
->>          &vmstate_sve,
->>  #endif
->> +        &vmstate_ras,
->>          NULL
->>      }
->>  };
-> 
-> thanks
-> -- PMM
-> 
-> .
-> 
+--=20
+Best,
+Denis
