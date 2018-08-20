@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fritS-000619-Bd
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:47 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fritQ-0002bU-UC
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fritQ-0005xD-LR
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:46 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fritN-0002ZZ-AI
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:43 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 20 Aug 2018 14:02:10 +0200
-Message-Id: <20180820120213.11095-14-e.emanuelegiuseppe@gmail.com>
+Date: Mon, 20 Aug 2018 14:02:08 +0200
+Message-Id: <20180820120213.11095-12-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180820120213.11095-1-e.emanuelegiuseppe@gmail.com>
 References: <20180820120213.11095-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 13/16] test/qgraph: vmxnet3 test node
+Subject: [Qemu-devel] [PATCH 11/16] test/qgraph: spapr-phb test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,101 +22,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Keith Busch <keith.busch@intel.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Convert tests/vmxnet3-test in qgraph test node,
-vmxnet3-test. Since it's a nop test, node creation and
-initialization is made in the same file.
+Convert tests/spapr-phb-test in qgraph test node,
+spapr-phb-test. This test adds another
+spapr-pci-host-bridge device in the
+ppc64/pseries machine
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
  tests/Makefile.include |  3 +--
- tests/vmxnet3-test.c   | 39 ++++++++++++++++++++++++++++++---------
- 2 files changed, 31 insertions(+), 11 deletions(-)
+ tests/spapr-phb-test.c | 28 +++++++++++-----------------
+ 2 files changed, 12 insertions(+), 19 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e60890adb9..9370f79f2c 100644
+index 1a2b645209..5b006b85d1 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -258,7 +258,6 @@ check-qtest-i386-y += tests/tco-test$(EXESUF)
- gcov-files-i386-y += hw/watchdog/watchdog.c hw/watchdog/wdt_ib700.c
- check-qtest-i386-y += $(check-qtest-pci-y)
- gcov-files-i386-y += $(gcov-files-pci-y)
--check-qtest-i386-y += tests/vmxnet3-test$(EXESUF)
- gcov-files-i386-y += hw/net/vmxnet3.c
- gcov-files-i386-y += hw/net/net_rx_pkt.c
- gcov-files-i386-y += hw/net/net_tx_pkt.c
-@@ -792,6 +791,7 @@ libqgraph-tests-obj-y += tests/nvme-test.o
+@@ -326,7 +326,6 @@ gcov-files-ppc-y += hw/timer/m48t59.c
+ 
+ check-qtest-ppc64-y = $(check-qtest-ppc-y)
+ gcov-files-ppc64-y = $(subst ppc-softmmu/,ppc64-softmmu/,$(gcov-files-ppc-y))
+-check-qtest-ppc64-y += tests/spapr-phb-test$(EXESUF)
+ gcov-files-ppc64-y += ppc64-softmmu/hw/ppc/spapr_pci.c
+ check-qtest-ppc64-y += tests/pnv-xscom-test$(EXESUF)
+ check-qtest-ppc64-y += tests/migration-test$(EXESUF)
+@@ -793,6 +792,7 @@ libqgraph-tests-obj-y += tests/ipoctal232-test.o
+ libqgraph-tests-obj-y += tests/ne2000-test.o
+ libqgraph-tests-obj-y += tests/nvme-test.o
  libqgraph-tests-obj-y += tests/pcnet-test.o
- libqgraph-tests-obj-y += tests/spapr-phb-test.o
- libqgraph-tests-obj-y += tests/usb-hcd-ohci-test.o $(libqos-usb-obj-y)
-+libqgraph-tests-obj-y += tests/vmxnet3-test.o
++libqgraph-tests-obj-y += tests/spapr-phb-test.o
  
  check-unit-y += tests/test-qgraph$(EXESUF)
  tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
-@@ -828,7 +828,6 @@ tests/e1000-test$(EXESUF): tests/e1000-test.o
- tests/rtl8139-test$(EXESUF): tests/rtl8139-test.o $(libqos-pc-obj-y)
- tests/pnv-xscom-test$(EXESUF): tests/pnv-xscom-test.o
- tests/eepro100-test$(EXESUF): tests/eepro100-test.o
--tests/vmxnet3-test$(EXESUF): tests/vmxnet3-test.o
- tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
- tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
- tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
-diff --git a/tests/vmxnet3-test.c b/tests/vmxnet3-test.c
-index 159c0ad728..2bbd0352fa 100644
---- a/tests/vmxnet3-test.c
-+++ b/tests/vmxnet3-test.c
-@@ -9,23 +9,44 @@
+@@ -805,7 +805,6 @@ tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
+ tests/rtc-test$(EXESUF): tests/rtc-test.o
+ tests/m48t59-test$(EXESUF): tests/m48t59-test.o
+ tests/endianness-test$(EXESUF): tests/endianness-test.o
+-tests/spapr-phb-test$(EXESUF): tests/spapr-phb-test.o $(libqos-obj-y)
+ tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
+ tests/rtas-test$(EXESUF): tests/rtas-test.o $(libqos-spapr-obj-y)
+ tests/fdc-test$(EXESUF): tests/fdc-test.o
+diff --git a/tests/spapr-phb-test.c b/tests/spapr-phb-test.c
+index d3522ea093..5b754b777c 100644
+--- a/tests/spapr-phb-test.c
++++ b/tests/spapr-phb-test.c
+@@ -7,29 +7,23 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or later.
+  * See the COPYING file in the top-level directory.
+  */
+-#include "qemu/osdep.h"
  
- #include "qemu/osdep.h"
++#include "qemu/osdep.h"
  #include "libqtest.h"
+-
+-#define TYPE_SPAPR_PCI_HOST_BRIDGE "spapr-pci-host-bridge"
 +#include "libqos/qgraph.h"
-+
-+typedef struct QVmxnet3 QVmxnet3;
-+
-+struct QVmxnet3 {
-+    QOSGraphObject obj;
-+};
  
  /* Tests only initialization so far. TODO: Replace with functional tests */
--static void nop(void)
-+static void nop(void *obj, void *data, QGuestAllocator *alloc)
-+{
-+}
-+
-+static void vmxnet3_destructor(QOSGraphObject *obj)
+-static void test_phb_device(void)
++static void test_phb_device(void *obj, void *data, QGuestAllocator *alloc)
  {
-+    QVmxnet3 *vmxnet3 = (QVmxnet3 *)obj;
-+    g_free(vmxnet3);
  }
  
 -int main(int argc, char **argv)
-+static void *vmxnet3_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
++static void register_phb_test(void)
  {
 -    int ret;
-+    QVmxnet3 *vmxnet3 = g_new0(QVmxnet3, 1);
-+    vmxnet3->obj.destructor = vmxnet3_destructor;
- 
+-
 -    g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/vmxnet3/nop", nop);
-+    return &vmxnet3->obj;
-+}
- 
--    qtest_start("-device vmxnet3");
+-    qtest_add_func("/spapr-phb/device", test_phb_device);
+-
+-    qtest_start("-device " TYPE_SPAPR_PCI_HOST_BRIDGE ",index=30");
+-
 -    ret = g_test_run();
-+static void vmxnet3_register_nodes(void)
-+{
-+    qos_node_create_driver("vmxnet3", vmxnet3_create);
-+    qos_node_consumes("vmxnet3", "pci-bus", NULL);
-+}
- 
+-
 -    qtest_end();
-+libqos_init(vmxnet3_register_nodes);
- 
+-
 -    return ret;
-+static void register_vmxnet3_test(void)
-+{
-+    qos_add_test("vmxnet3-test", "vmxnet3", nop, NULL);
++    qos_add_test("spapr-phb-test", "ppc64/pseries",
++                 test_phb_device, &(QOSGraphTestOptions) {
++                     .edge.before_cmd_line = "-device spapr-pci-host-bridge"
++                                             ",index=30",
++                 });
  }
 +
-+libqos_init(register_vmxnet3_test);
++libqos_init(register_phb_test);
 -- 
 2.17.1
