@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1frkIr-0002IT-FJ
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:33:08 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1frkJD-0002LH-41
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:33:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1frkHU-0000xo-Rd
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:31:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45464 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1frkHU-0000xH-IA
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:31:40 -0400
-Date: Mon, 20 Aug 2018 21:31:37 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180820133137.GH10682@lemon.usersys.redhat.com>
-References: <20180820124811.7982-1-peter.maydell@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1frkEo-00084o-BP
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:28:58 -0400
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:50300)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1frkEo-00084L-4r
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:28:54 -0400
+Received: by mail-wm0-f68.google.com with SMTP id s12-v6so14326629wmc.0
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 06:28:54 -0700 (PDT)
+References: <20180818025600.21132-1-f4bug@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5123af35-773e-cf2a-2e41-2198e0af7c61@redhat.com>
+Date: Mon, 20 Aug 2018 15:28:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180820124811.7982-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] tests/vm: Clean out old working
- directories on build
+In-Reply-To: <20180818025600.21132-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] sheepdog: Replace strncpy() by g_strlcpy()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, David Hildenbrand <david@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Sheepdog" <sheepdog@lists.wpkg.org>, "open list:Sheepdog" <qemu-block@nongnu.org>, qemu-trivial@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Liu Yuan <namei.unix@gmail.com>, Max Reitz <mreitz@redhat.com>
 
-On Mon, 08/20 13:48, Peter Maydell wrote:
-> When we do a build inside one of the BSD VMs, first
-> delete any stale old build directories from the VM's
-> /var/tmp. This prevents the VM from running out of
-> disk space after it has been used for a dozen or
-> so builds.
+On 18/08/2018 04:56, Philippe Mathieu-Daudé wrote:
+> Fedora 29 comes with GCC 8.1 which added the 'stringop-truncation' checks.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Replace the strncpy() calls by g_strlcpy() to avoid the following warning:
+> 
+>   block/sheepdog.c: In function 'find_vdi_name':
+>   block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals
+>   destination size [-Werror=stringop-truncation]
+>        strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+>        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
-> The Ubuntu test VM has a similar issue, but it doesn't
-> put its test build directories in /var/tmp/ like the
-> BSDs, and I don't use it so I'm not sure what the right
-> rm command would be. Somebody else can fix it if they care...
+> See http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg03723.html
 > 
-> Disclaimer: not actually tested yet, but obviously it will
-> get tested as part of applying it to master, which I'd
-> like to do so my pullrequest tests don't keep getting
-> tripped up by this bug.
+>  block/sheepdog.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index b229a664d9..5dc3d0c39e 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -1224,19 +1224,19 @@ static int find_vdi_name(BDRVSheepdogState *s, const char *filename,
+>      SheepdogVdiReq hdr;
+>      SheepdogVdiRsp *rsp = (SheepdogVdiRsp *)&hdr;
+>      unsigned int wlen, rlen = 0;
+> -    char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN];
+> +    /* Ensures that the buffer is zero-filled,
+> +     * which is desirable since we'll soon be sending those bytes, and
+> +     * don't want the send_req to read uninitialized data.
+> +     */
+> +    char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN] = { };
+>  
+>      fd = connect_to_sdog(s, errp);
+>      if (fd < 0) {
+>          return fd;
+>      }
+>  
+> -    /* This pair of strncpy calls ensures that the buffer is zero-filled,
+> -     * which is desirable since we'll soon be sending those bytes, and
+> -     * don't want the send_req to read uninitialized data.
+> -     */
+> -    strncpy(buf, filename, SD_MAX_VDI_LEN);
+> -    strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+> +    g_strlcpy(buf, filename, SD_MAX_VDI_LEN);
+> +    g_strlcpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+>  
+>      memset(&hdr, 0, sizeof(hdr));
+>      if (lock) {
+> 
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+The protocol doesn't require (as far as I can see) the strings to be
+NULL-terminated, therefore strncpy is the right function to use here.
 
-Please merge this yourself if it helps your pull request handling workflow.
+However, we should have a check on the length of filename and tag, so
+that no truncation is done.  This applies to both strncpy and g_strlcpy.
 
-> 
->  tests/vm/freebsd | 1 +
->  tests/vm/netbsd  | 1 +
->  tests/vm/openbsd | 1 +
->  3 files changed, 3 insertions(+)
-> 
-> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-> index 0a6ec4614a7..b6983127d09 100755
-> --- a/tests/vm/freebsd
-> +++ b/tests/vm/freebsd
-> @@ -20,6 +20,7 @@ class FreeBSDVM(basevm.BaseVM):
->      name = "freebsd"
->      BUILD_SCRIPT = """
->          set -e;
-> +        rm -rf /var/tmp/qemu-test.*
->          cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
->          tar -xf /dev/vtbd1;
->          ./configure {configure_opts};
-> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-> index 45c9260dc0d..a4e25820d50 100755
-> --- a/tests/vm/netbsd
-> +++ b/tests/vm/netbsd
-> @@ -20,6 +20,7 @@ class NetBSDVM(basevm.BaseVM):
->      name = "netbsd"
->      BUILD_SCRIPT = """
->          set -e;
-> +        rm -rf /var/tmp/qemu-test.*
->          cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
->          tar -xf /dev/rld1a;
->          ./configure --python=python2.7 {configure_opts};
-> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-> index 98edfbca4ba..52500ee52bb 100755
-> --- a/tests/vm/openbsd
-> +++ b/tests/vm/openbsd
-> @@ -20,6 +20,7 @@ class OpenBSDVM(basevm.BaseVM):
->      name = "openbsd"
->      BUILD_SCRIPT = """
->          set -e;
-> +        rm -rf /var/tmp/qemu-test.*
->          cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
->          tar -xf /dev/rsd1c;
->          ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
-> -- 
-> 2.18.0
-> 
-> 
+Indeed I find g_strlcpy to be harmful because it encourages a style
+where truncations happen silently.  There are very few cases where
+silent truncation is the right thing to do, and in several cases where
+you _have to have_ fixed-size buffers, those buffers are sent on the
+wire---and then g_strlcpy is wrong, while strncpy is just as good as
+memset+strlen+memcpy (and shorter).
+
+Paolo
