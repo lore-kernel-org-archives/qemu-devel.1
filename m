@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1frftN-0003mA-Lm
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:50:32 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1frfts-0004DQ-QO
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:51:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1frftK-00071N-Dm
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:50:29 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:50880
+	(envelope-from <frederic.konrad@adacore.com>) id 1frftp-0007G3-Fj
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:51:00 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:41563
 	helo=smtp.eu.adacore.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1frftJ-000711-Td
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:50:26 -0400
+	id 1frfto-0007FA-Up
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:50:57 -0400
 References: <20180817114619.22354-1-peter.maydell@linaro.org>
-	<20180817114619.22354-3-peter.maydell@linaro.org>
+	<20180817114619.22354-4-peter.maydell@linaro.org>
 From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <11256311-a834-5fcd-fccf-bd079d1b1a1a@adacore.com>
-Date: Mon, 20 Aug 2018 10:50:20 +0200
+Message-ID: <7a9769f7-dfef-2fbb-9cf3-79f72a615ca8@adacore.com>
+Date: Mon, 20 Aug 2018 10:50:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180817114619.22354-3-peter.maydell@linaro.org>
+In-Reply-To: <20180817114619.22354-4-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: fr
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] memory: Remove MMIO request_ptr APIs
+Subject: Re: [Qemu-devel] [PATCH 3/3] hw/misc: Remove mmio_interface device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,217 +33,244 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
+
 Le 08/17/2018 =C3=A0 01:46 PM, Peter Maydell a =C3=A9crit=C2=A0:
-> Remove the obsolete MMIO request_ptr APIs; they have no
-> users now.
+> The mmio_interface device was a purely internal artifact
+> of the implementation of the memory subsystem's request_ptr
+> APIs. Now that we have removed those APIs, we can remove
+> the mmio_interface device too.
 >=20
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-
 > ---
->   include/exec/memory.h |  35 --------------
->   memory.c              | 110 -----------------------------------------=
+>   hw/misc/Makefile.objs            |   1 -
+>   include/hw/misc/mmio_interface.h |  49 -----------
+>   hw/misc/mmio_interface.c         | 135 ------------------------------=
 -
->   2 files changed, 145 deletions(-)
+>   3 files changed, 185 deletions(-)
+>   delete mode 100644 include/hw/misc/mmio_interface.h
+>   delete mode 100644 hw/misc/mmio_interface.c
 >=20
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 448d41a7529..68636561821 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -141,15 +141,6 @@ struct MemoryRegionOps {
->                                       uint64_t data,
->                                       unsigned size,
->                                       MemTxAttrs attrs);
-> -    /* Instruction execution pre-callback:
-> -     * @addr is the address of the access relative to the @mr.
-> -     * @size is the size of the area returned by the callback.
-> -     * @offset is the location of the pointer inside @mr.
-> -     *
-> -     * Returns a pointer to a location which contains guest code.
-> -     */
-> -    void *(*request_ptr)(void *opaque, hwaddr addr, unsigned *size,
-> -                         unsigned *offset);
->  =20
->       enum device_endian endianness;
->       /* Guest-visible constraints: */
-> @@ -1667,32 +1658,6 @@ void memory_global_dirty_log_stop(void);
->   void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
->                   bool dispatch_tree, bool owner);
->  =20
-> -/**
-> - * memory_region_request_mmio_ptr: request a pointer to an mmio
-> - * MemoryRegion. If it is possible map a RAM MemoryRegion with this po=
-inter.
-> - * When the device wants to invalidate the pointer it will call
-> - * memory_region_invalidate_mmio_ptr.
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index 51d27b3af1e..22714b08510 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -71,5 +71,4 @@ obj-$(CONFIG_PVPANIC) +=3D pvpanic.o
+>   obj-$(CONFIG_HYPERV_TESTDEV) +=3D hyperv_testdev.o
+>   obj-$(CONFIG_AUX) +=3D auxbus.o
+>   obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_scu.o aspeed_sdmc.o
+> -obj-y +=3D mmio_interface.o
+>   obj-$(CONFIG_MSF2) +=3D msf2-sysreg.o
+> diff --git a/include/hw/misc/mmio_interface.h b/include/hw/misc/mmio_in=
+terface.h
+> deleted file mode 100644
+> index 90d34fb2286..00000000000
+> --- a/include/hw/misc/mmio_interface.h
+> +++ /dev/null
+> @@ -1,49 +0,0 @@
+> -/*
+> - * mmio_interface.h
 > - *
-> - * @mr: #MemoryRegion to check
-> - * @addr: address within that region
+> - *  Copyright (C) 2017 : GreenSocs
+> - *      http://www.greensocs.com/ , email: info@greensocs.com
 > - *
-> - * Returns true on success, false otherwise.
+> - *  Developed by :
+> - *  Frederic Konrad   <fred.konrad@greensocs.com>
+> - *
+> - * This program is free software; you can redistribute it and/or modif=
+y
+> - * it under the terms of the GNU General Public License as published b=
+y
+> - * the Free Software Foundation, either version 2 of the License, or
+> - * (at your option)any later version.
+> - *
+> - * This program is distributed in the hope that it will be useful,
+> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> - * GNU General Public License for more details.
+> - *
+> - * You should have received a copy of the GNU General Public License a=
+long
+> - * with this program; if not, see <http://www.gnu.org/licenses/>.
+> - *
 > - */
-> -bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
 > -
-> -/**
-> - * memory_region_invalidate_mmio_ptr: invalidate the pointer to an mmi=
-o
-> - * previously requested.
-> - * In the end that means that if something wants to execute from this =
-area it
-> - * will need to request the pointer again.
+> -#ifndef MMIO_INTERFACE_H
+> -#define MMIO_INTERFACE_H
+> -
+> -#include "exec/memory.h"
+> -
+> -#define TYPE_MMIO_INTERFACE "mmio_interface"
+> -#define MMIO_INTERFACE(obj) OBJECT_CHECK(MMIOInterface, (obj),        =
+         \
+> -                                         TYPE_MMIO_INTERFACE)
+> -
+> -typedef struct MMIOInterface {
+> -    DeviceState parent_obj;
+> -
+> -    MemoryRegion *subregion;
+> -    MemoryRegion ram_mem;
+> -    uint64_t start;
+> -    uint64_t end;
+> -    bool ro;
+> -    uint64_t id;
+> -    void *host_ptr;
+> -} MMIOInterface;
+> -
+> -void mmio_interface_map(MMIOInterface *s);
+> -void mmio_interface_unmap(MMIOInterface *s);
+> -
+> -#endif /* MMIO_INTERFACE_H */
+> diff --git a/hw/misc/mmio_interface.c b/hw/misc/mmio_interface.c
+> deleted file mode 100644
+> index 3b0e2039a36..00000000000
+> --- a/hw/misc/mmio_interface.c
+> +++ /dev/null
+> @@ -1,135 +0,0 @@
+> -/*
+> - * mmio_interface.c
 > - *
-> - * @mr: #MemoryRegion associated to the pointer.
-> - * @offset: offset within the memory region
-> - * @size: size of that area.
+> - *  Copyright (C) 2017 : GreenSocs
+> - *      http://www.greensocs.com/ , email: info@greensocs.com
+> - *
+> - *  Developed by :
+> - *  Frederic Konrad   <fred.konrad@greensocs.com>
+> - *
+> - * This program is free software; you can redistribute it and/or modif=
+y
+> - * it under the terms of the GNU General Public License as published b=
+y
+> - * the Free Software Foundation, either version 2 of the License, or
+> - * (at your option)any later version.
+> - *
+> - * This program is distributed in the hope that it will be useful,
+> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> - * GNU General Public License for more details.
+> - *
+> - * You should have received a copy of the GNU General Public License a=
+long
+> - * with this program; if not, see <http://www.gnu.org/licenses/>.
+> - *
 > - */
-> -void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset=
-,
-> -                                       unsigned size);
 > -
->   /**
->    * memory_region_dispatch_read: perform a read directly to the specif=
-ied
->    * MemoryRegion.
-> diff --git a/memory.c b/memory.c
-> index 2ea16e7bfb0..8b44672c132 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -29,7 +29,6 @@
->   #include "exec/ram_addr.h"
->   #include "sysemu/kvm.h"
->   #include "sysemu/sysemu.h"
+> -#include "qemu/osdep.h"
+> -#include "qemu/log.h"
+> -#include "trace.h"
+> -#include "hw/qdev-properties.h"
 > -#include "hw/misc/mmio_interface.h"
->   #include "hw/qdev-properties.h"
->   #include "migration/vmstate.h"
->  =20
-> @@ -2680,115 +2679,6 @@ void memory_listener_unregister(MemoryListener =
-*listener)
->       listener->address_space =3D NULL;
->   }
->  =20
-> -bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr)
-> -{
-> -    void *host;
-> -    unsigned size =3D 0;
-> -    unsigned offset =3D 0;
-> -    Object *new_interface;
+> -#include "qapi/error.h"
 > -
-> -    if (!mr || !mr->ops->request_ptr) {
-> -        return false;
+> -#ifndef DEBUG_MMIO_INTERFACE
+> -#define DEBUG_MMIO_INTERFACE 0
+> -#endif
+> -
+> -static uint64_t mmio_interface_counter;
+> -
+> -#define DPRINTF(fmt, ...) do {                                        =
+         \
+> -    if (DEBUG_MMIO_INTERFACE) {                                       =
+         \
+> -        qemu_log("mmio_interface: 0x%" PRIX64 ": " fmt, s->id, ## __VA=
+_ARGS__);\
+> -    }                                                                 =
+         \
+> -} while (0)
+> -
+> -static void mmio_interface_init(Object *obj)
+> -{
+> -    MMIOInterface *s =3D MMIO_INTERFACE(obj);
+> -
+> -    if (DEBUG_MMIO_INTERFACE) {
+> -        s->id =3D mmio_interface_counter++;
 > -    }
 > -
-> -    /*
-> -     * Avoid an update if the request_ptr call
-> -     * memory_region_invalidate_mmio_ptr which seems to be likely when=
- we use
-> -     * a cache.
+> -    DPRINTF("interface created\n");
+> -    s->host_ptr =3D 0;
+> -    s->subregion =3D 0;
+> -}
+> -
+> -static void mmio_interface_realize(DeviceState *dev, Error **errp)
+> -{
+> -    MMIOInterface *s =3D MMIO_INTERFACE(dev);
+> -
+> -    DPRINTF("realize from 0x%" PRIX64 " to 0x%" PRIX64 " map host poin=
+ter"
+> -            " %p\n", s->start, s->end, s->host_ptr);
+> -
+> -    if (!s->host_ptr) {
+> -        error_setg(errp, "host_ptr property must be set");
+> -        return;
+> -    }
+> -
+> -    if (!s->subregion) {
+> -        error_setg(errp, "subregion property must be set");
+> -        return;
+> -    }
+> -
+> -    memory_region_init_ram_ptr(&s->ram_mem, OBJECT(s), "ram",
+> -                               s->end - s->start + 1, s->host_ptr);
+> -    memory_region_set_readonly(&s->ram_mem, s->ro);
+> -    memory_region_add_subregion(s->subregion, s->start, &s->ram_mem);
+> -}
+> -
+> -static void mmio_interface_unrealize(DeviceState *dev, Error **errp)
+> -{
+> -    MMIOInterface *s =3D MMIO_INTERFACE(dev);
+> -
+> -    DPRINTF("unrealize from 0x%" PRIX64 " to 0x%" PRIX64 " map host po=
+inter"
+> -            " %p\n", s->start, s->end, s->host_ptr);
+> -    memory_region_del_subregion(s->subregion, &s->ram_mem);
+> -}
+> -
+> -static void mmio_interface_finalize(Object *obj)
+> -{
+> -    MMIOInterface *s =3D MMIO_INTERFACE(obj);
+> -
+> -    DPRINTF("finalize from 0x%" PRIX64 " to 0x%" PRIX64 " map host poi=
+nter"
+> -            " %p\n", s->start, s->end, s->host_ptr);
+> -    object_unparent(OBJECT(&s->ram_mem));
+> -}
+> -
+> -static Property mmio_interface_properties[] =3D {
+> -    DEFINE_PROP_UINT64("start", MMIOInterface, start, 0),
+> -    DEFINE_PROP_UINT64("end", MMIOInterface, end, 0),
+> -    DEFINE_PROP_PTR("host_ptr", MMIOInterface, host_ptr),
+> -    DEFINE_PROP_BOOL("ro", MMIOInterface, ro, false),
+> -    DEFINE_PROP_MEMORY_REGION("subregion", MMIOInterface, subregion),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> -
+> -static void mmio_interface_class_init(ObjectClass *oc, void *data)
+> -{
+> -    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> -
+> -    dc->realize =3D mmio_interface_realize;
+> -    dc->unrealize =3D mmio_interface_unrealize;
+> -    dc->props =3D mmio_interface_properties;
+> -    /* Reason: pointer property "host_ptr", and this device
+> -     * is an implementation detail of the memory subsystem,
+> -     * not intended to be created directly by the user.
 > -     */
-> -    memory_region_transaction_begin();
-> -
-> -    host =3D mr->ops->request_ptr(mr->opaque, addr - mr->addr, &size, =
-&offset);
-> -
-> -    if (!host || !size) {
-> -        memory_region_transaction_commit();
-> -        return false;
-> -    }
-> -
-> -    new_interface =3D object_new("mmio_interface");
-> -    qdev_prop_set_uint64(DEVICE(new_interface), "start", offset);
-> -    qdev_prop_set_uint64(DEVICE(new_interface), "end", offset + size -=
- 1);
-> -    qdev_prop_set_bit(DEVICE(new_interface), "ro", true);
-> -    qdev_prop_set_ptr(DEVICE(new_interface), "host_ptr", host);
-> -    qdev_prop_set_ptr(DEVICE(new_interface), "subregion", mr);
-> -    object_property_set_bool(OBJECT(new_interface), true, "realized", =
-NULL);
-> -
-> -    memory_region_transaction_commit();
-> -    return true;
+> -    dc->user_creatable =3D false;
 > -}
 > -
-> -typedef struct MMIOPtrInvalidate {
-> -    MemoryRegion *mr;
-> -    hwaddr offset;
-> -    unsigned size;
-> -    int busy;
-> -    int allocated;
-> -} MMIOPtrInvalidate;
+> -static const TypeInfo mmio_interface_info =3D {
+> -    .name          =3D TYPE_MMIO_INTERFACE,
+> -    .parent        =3D TYPE_DEVICE,
+> -    .instance_size =3D sizeof(MMIOInterface),
+> -    .instance_init =3D mmio_interface_init,
+> -    .instance_finalize =3D mmio_interface_finalize,
+> -    .class_init    =3D mmio_interface_class_init,
+> -};
 > -
-> -#define MAX_MMIO_INVALIDATE 10
-> -static MMIOPtrInvalidate mmio_ptr_invalidate_list[MAX_MMIO_INVALIDATE]=
-;
-> -
-> -static void memory_region_do_invalidate_mmio_ptr(CPUState *cpu,
-> -                                                 run_on_cpu_data data)
+> -static void mmio_interface_register_types(void)
 > -{
-> -    MMIOPtrInvalidate *invalidate_data =3D (MMIOPtrInvalidate *)data.h=
-ost_ptr;
-> -    MemoryRegion *mr =3D invalidate_data->mr;
-> -    hwaddr offset =3D invalidate_data->offset;
-> -    unsigned size =3D invalidate_data->size;
-> -    MemoryRegionSection section =3D memory_region_find(mr, offset, siz=
-e);
-> -
-> -    qemu_mutex_lock_iothread();
-> -
-> -    /* Reset dirty so this doesn't happen later. */
-> -    cpu_physical_memory_test_and_clear_dirty(offset, size, 1);
-> -
-> -    if (section.mr !=3D mr) {
-> -        /* memory_region_find add a ref on section.mr */
-> -        memory_region_unref(section.mr);
-> -        if (MMIO_INTERFACE(section.mr->owner)) {
-> -            /* We found the interface just drop it. */
-> -            object_property_set_bool(section.mr->owner, false, "realiz=
-ed",
-> -                                     NULL);
-> -            object_unref(section.mr->owner);
-> -            object_unparent(section.mr->owner);
-> -        }
-> -    }
-> -
-> -    qemu_mutex_unlock_iothread();
-> -
-> -    if (invalidate_data->allocated) {
-> -        g_free(invalidate_data);
-> -    } else {
-> -        invalidate_data->busy =3D 0;
-> -    }
+> -    type_register_static(&mmio_interface_info);
 > -}
 > -
-> -void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset=
-,
-> -                                       unsigned size)
-> -{
-> -    size_t i;
-> -    MMIOPtrInvalidate *invalidate_data =3D NULL;
-> -
-> -    for (i =3D 0; i < MAX_MMIO_INVALIDATE; i++) {
-> -        if (atomic_cmpxchg(&(mmio_ptr_invalidate_list[i].busy), 0, 1) =
-=3D=3D 0) {
-> -            invalidate_data =3D &mmio_ptr_invalidate_list[i];
-> -            break;
-> -        }
-> -    }
-> -
-> -    if (!invalidate_data) {
-> -        invalidate_data =3D g_malloc0(sizeof(MMIOPtrInvalidate));
-> -        invalidate_data->allocated =3D 1;
-> -    }
-> -
-> -    invalidate_data->mr =3D mr;
-> -    invalidate_data->offset =3D offset;
-> -    invalidate_data->size =3D size;
-> -
-> -    async_safe_run_on_cpu(first_cpu, memory_region_do_invalidate_mmio_=
-ptr,
-> -                          RUN_ON_CPU_HOST_PTR(invalidate_data));
-> -}
-> -
->   void address_space_init(AddressSpace *as, MemoryRegion *root, const c=
-har *name)
->   {
->       memory_region_ref(root);
+> -type_init(mmio_interface_register_types)
 >=20
