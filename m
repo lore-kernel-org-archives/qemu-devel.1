@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frku3-0003SQ-MH
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:32 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1frku4-0003T9-9k
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frku2-0007F9-FS
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:31 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1frku3-0007Fk-7A
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:32 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 15:11:00 +0100
-Message-Id: <20180820141116.9118-7-peter.maydell@linaro.org>
+Date: Mon, 20 Aug 2018 15:10:55 +0100
+Message-Id: <20180820141116.9118-2-peter.maydell@linaro.org>
 In-Reply-To: <20180820141116.9118-1-peter.maydell@linaro.org>
 References: <20180820141116.9118-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 06/22] hw/arm/iotkit: Wire up the watchdogs
+Subject: [Qemu-devel] [PATCH 01/22] hw/misc/mps2-fpgaio: Implement 1Hz and
+ 100Hz counters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,129 +23,154 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-The IoTKit includes three different instances of the
-CMSDK APB watchdog; create and wire them up.
+The MPS2 FPGAIO block includes some simple free-running counters.
+Implement these.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/arm/iotkit.h |  6 +++++
- hw/arm/iotkit.c         | 58 ++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 61 insertions(+), 3 deletions(-)
+ include/hw/misc/mps2-fpgaio.h |  4 +++
+ hw/misc/mps2-fpgaio.c         | 53 ++++++++++++++++++++++++++++++++++-
+ 2 files changed, 56 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
-index 3e6d806e352..776d0497087 100644
---- a/include/hw/arm/iotkit.h
-+++ b/include/hw/arm/iotkit.h
-@@ -57,6 +57,7 @@
- #include "hw/misc/tz-mpc.h"
- #include "hw/timer/cmsdk-apb-timer.h"
- #include "hw/timer/cmsdk-apb-dualtimer.h"
-+#include "hw/watchdog/cmsdk-apb-watchdog.h"
- #include "hw/misc/unimp.h"
- #include "hw/or-irq.h"
- #include "hw/core/split-irq.h"
-@@ -87,10 +88,15 @@ typedef struct IoTKit {
-     SplitIRQ ppc_irq_splitter[NUM_PPCS];
-     SplitIRQ mpc_irq_splitter[IOTS_NUM_EXP_MPC + IOTS_NUM_MPC];
-     qemu_or_irq mpc_irq_orgate;
-+    qemu_or_irq nmi_orgate;
+diff --git a/include/hw/misc/mps2-fpgaio.h b/include/hw/misc/mps2-fpgaio.h
+index eedf17ebc6d..ec057d38c76 100644
+--- a/include/hw/misc/mps2-fpgaio.h
++++ b/include/hw/misc/mps2-fpgaio.h
+@@ -38,6 +38,10 @@ typedef struct {
+     uint32_t misc;
  
-     CMSDKAPBDualTimer dualtimer;
-     UnimplementedDeviceState s32ktimer;
- 
-+    CMSDKAPBWatchdog s32kwatchdog;
-+    CMSDKAPBWatchdog nswatchdog;
-+    CMSDKAPBWatchdog swatchdog;
+     uint32_t prescale_clk;
 +
-     MemoryRegion container;
-     MemoryRegion alias1;
-     MemoryRegion alias2;
-diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
-index 130d013909e..5cedfa03570 100644
---- a/hw/arm/iotkit.c
-+++ b/hw/arm/iotkit.c
-@@ -19,6 +19,9 @@
- #include "hw/misc/unimp.h"
- #include "hw/arm/arm.h"
++    /* These hold the CLOCK_VIRTUAL ns tick when the CLK1HZ/CLK100HZ was zero */
++    int64_t clk1hz_tick_offset;
++    int64_t clk100hz_tick_offset;
+ } MPS2FPGAIO;
  
-+/* Clock frequency in HZ of the 32KHz "slow clock" */
-+#define S32KCLK (32 * 1000)
+ #endif
+diff --git a/hw/misc/mps2-fpgaio.c b/hw/misc/mps2-fpgaio.c
+index 7394a057d82..bbc28f641f0 100644
+--- a/hw/misc/mps2-fpgaio.c
++++ b/hw/misc/mps2-fpgaio.c
+@@ -22,6 +22,7 @@
+ #include "hw/sysbus.h"
+ #include "hw/registerfields.h"
+ #include "hw/misc/mps2-fpgaio.h"
++#include "qemu/timer.h"
+ 
+ REG32(LED0, 0)
+ REG32(BUTTON, 8)
+@@ -32,10 +33,21 @@ REG32(PRESCALE, 0x1c)
+ REG32(PSCNTR, 0x20)
+ REG32(MISC, 0x4c)
+ 
++static uint32_t counter_from_tickoff(int64_t now, int64_t tick_offset, int frq)
++{
++    return muldiv64(now - tick_offset, frq, NANOSECONDS_PER_SECOND);
++}
 +
- /* Create an alias region of @size bytes starting at @base
-  * which mirrors the memory starting at @orig.
-  */
-@@ -140,6 +143,15 @@ static void iotkit_init(Object *obj)
-                           TYPE_CMSDK_APB_TIMER);
-     sysbus_init_child_obj(obj, "dualtimer", &s->dualtimer, sizeof(s->dualtimer),
-                           TYPE_CMSDK_APB_DUALTIMER);
-+    sysbus_init_child_obj(obj, "s32kwatchdog", &s->s32kwatchdog,
-+                          sizeof(s->s32kwatchdog), TYPE_CMSDK_APB_WATCHDOG);
-+    sysbus_init_child_obj(obj, "nswatchdog", &s->nswatchdog,
-+                          sizeof(s->nswatchdog), TYPE_CMSDK_APB_WATCHDOG);
-+    sysbus_init_child_obj(obj, "swatchdog", &s->swatchdog,
-+                          sizeof(s->swatchdog), TYPE_CMSDK_APB_WATCHDOG);
-+    object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
-+                            sizeof(s->nmi_orgate), TYPE_OR_IRQ,
-+                            &error_abort, NULL);
-     object_initialize_child(obj, "ppc-irq-orgate", &s->ppc_irq_orgate,
-                             sizeof(s->ppc_irq_orgate), TYPE_OR_IRQ,
-                             &error_abort, NULL);
-@@ -510,12 +522,52 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
-     create_unimplemented_device("SYSINFO", 0x40020000, 0x1000);
- 
-     create_unimplemented_device("SYSCONTROL", 0x50021000, 0x1000);
--    create_unimplemented_device("S32KWATCHDOG", 0x5002e000, 0x1000);
++static int64_t tickoff_from_counter(int64_t now, uint32_t count, int frq)
++{
++    return now - muldiv64(count, NANOSECONDS_PER_SECOND, frq);
++}
 +
-+    /* This OR gate wires together outputs from the secure watchdogs to NMI */
-+    object_property_set_int(OBJECT(&s->nmi_orgate), 2, "num-lines", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    object_property_set_bool(OBJECT(&s->nmi_orgate), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    qdev_connect_gpio_out(DEVICE(&s->nmi_orgate), 0,
-+                          qdev_get_gpio_in_named(DEVICE(&s->armv7m), "NMI", 0));
+ static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
+ {
+     MPS2FPGAIO *s = MPS2_FPGAIO(opaque);
+     uint64_t r;
++    int64_t now;
+ 
+     switch (offset) {
+     case A_LED0:
+@@ -54,10 +66,15 @@ static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
+         r = s->misc;
+         break;
+     case A_CLK1HZ:
++        now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++        r = counter_from_tickoff(now, s->clk1hz_tick_offset, 1);
++        break;
+     case A_CLK100HZ:
++        now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++        r = counter_from_tickoff(now, s->clk100hz_tick_offset, 100);
++        break;
+     case A_COUNTER:
+     case A_PSCNTR:
+-        /* These are all upcounters of various frequencies. */
+         qemu_log_mask(LOG_UNIMP, "MPS2 FPGAIO: counters unimplemented\n");
+         r = 0;
+         break;
+@@ -76,6 +93,7 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
+                               unsigned size)
+ {
+     MPS2FPGAIO *s = MPS2_FPGAIO(opaque);
++    int64_t now;
+ 
+     trace_mps2_fpgaio_write(offset, value, size);
+ 
+@@ -100,6 +118,14 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
+                       "MPS2 FPGAIO: MISC control bits unimplemented\n");
+         s->misc = value;
+         break;
++    case A_CLK1HZ:
++        now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++        s->clk1hz_tick_offset = tickoff_from_counter(now, value, 1);
++        break;
++    case A_CLK100HZ:
++        now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++        s->clk100hz_tick_offset = tickoff_from_counter(now, value, 100);
++        break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "MPS2 FPGAIO write: bad offset 0x%x\n", (int) offset);
+@@ -116,11 +142,14 @@ static const MemoryRegionOps mps2_fpgaio_ops = {
+ static void mps2_fpgaio_reset(DeviceState *dev)
+ {
+     MPS2FPGAIO *s = MPS2_FPGAIO(dev);
++    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+ 
+     trace_mps2_fpgaio_reset();
+     s->led0 = 0;
+     s->prescale = 0;
+     s->misc = 0;
++    s->clk1hz_tick_offset = tickoff_from_counter(now, 0, 1);
++    s->clk100hz_tick_offset = tickoff_from_counter(now, 0, 100);
+ }
+ 
+ static void mps2_fpgaio_init(Object *obj)
+@@ -133,6 +162,24 @@ static void mps2_fpgaio_init(Object *obj)
+     sysbus_init_mmio(sbd, &s->iomem);
+ }
+ 
++static bool mps2_fpgaio_counters_needed(void *opaque)
++{
++    /* Currently vmstate.c insists all subsections have a 'needed' function */
++    return true;
++}
 +
-+    qdev_prop_set_uint32(DEVICE(&s->s32kwatchdog), "wdogclk-frq", S32KCLK);
-+    object_property_set_bool(OBJECT(&s->s32kwatchdog), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
++static const VMStateDescription mps2_fpgaio_counters_vmstate = {
++    .name = "mps2-fpgaio/counters",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = mps2_fpgaio_counters_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_INT64(clk1hz_tick_offset, MPS2FPGAIO),
++        VMSTATE_INT64(clk100hz_tick_offset, MPS2FPGAIO),
++        VMSTATE_END_OF_LIST()
 +    }
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->s32kwatchdog), 0,
-+                       qdev_get_gpio_in(DEVICE(&s->nmi_orgate), 0));
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->s32kwatchdog), 0, 0x5002e000);
- 
-     /* 0x40080000 .. 0x4008ffff : IoTKit second Base peripheral region */
- 
--    create_unimplemented_device("NS watchdog", 0x40081000, 0x1000);
--    create_unimplemented_device("S watchdog", 0x50081000, 0x1000);
-+    qdev_prop_set_uint32(DEVICE(&s->nswatchdog), "wdogclk-frq", s->mainclk_frq);
-+    object_property_set_bool(OBJECT(&s->nswatchdog), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->nswatchdog), 0,
-+                       qdev_get_gpio_in(DEVICE(&s->armv7m), 1));
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->nswatchdog), 0, 0x40081000);
++};
 +
-+    qdev_prop_set_uint32(DEVICE(&s->swatchdog), "wdogclk-frq", s->mainclk_frq);
-+    object_property_set_bool(OBJECT(&s->swatchdog), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->swatchdog), 0,
-+                       qdev_get_gpio_in(DEVICE(&s->nmi_orgate), 1));
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->swatchdog), 0, 0x50081000);
+ static const VMStateDescription mps2_fpgaio_vmstate = {
+     .name = "mps2-fpgaio",
+     .version_id = 1,
+@@ -142,6 +189,10 @@ static const VMStateDescription mps2_fpgaio_vmstate = {
+         VMSTATE_UINT32(prescale, MPS2FPGAIO),
+         VMSTATE_UINT32(misc, MPS2FPGAIO),
+         VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription*[]) {
++        &mps2_fpgaio_counters_vmstate,
++        NULL
+     }
+ };
  
-     for (i = 0; i < ARRAY_SIZE(s->ppc_irq_splitter); i++) {
-         Object *splitter = OBJECT(&s->ppc_irq_splitter[i]);
 -- 
 2.18.0
