@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1frh3F-0006Li-HU
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:04:46 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1frh4j-00088h-G9
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:06:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1frh37-00084F-Jz
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:04:43 -0400
-References: <1b072083-700b-9853-e525-e2726bf17476@virtuozzo.com>
-	<20180817180440.49687-1-vsementsov@virtuozzo.com>
-	<4d266435-855b-7900-0ad0-d677a568ebf7@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <0450b9f6-a19d-665e-ee27-ee9ad739d81b@virtuozzo.com>
-Date: Mon, 20 Aug 2018 13:03:13 +0300
+	(envelope-from <pbonzini@redhat.com>) id 1frh4i-0000g6-DO
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:06:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43502 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1frh4i-0000g2-8I
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:06:16 -0400
+References: <20180816011903.39816-1-andrew@andrewoates.com>
+	<b45d87b9-38ac-427a-8622-ac9c49350511@redhat.com>
+	<CAAVLcG6m_x2p4r9dqD6B2qG-Z_G_iTh5rAubS44PRM2-Mqnpkw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f3c28dc7-a16e-1451-5bb6-090c6e13cf84@redhat.com>
+Date: Mon, 20 Aug 2018 12:06:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <4d266435-855b-7900-0ad0-d677a568ebf7@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAAVLcG6m_x2p4r9dqD6B2qG-Z_G_iTh5rAubS44PRM2-Mqnpkw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] qapi: add x-query-block-graph
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] target-i386: fix segment limit check in
+ ljmp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,161 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: crosa@redhat.com, ehabkost@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Andrew Oates <andrew@andrewoates.com>
+Cc: rth@twiddle.net, ehabkost@redhat.com, qemu-devel@nongnu.org, Andrew Oates <aoates@google.com>
 
-17.08.2018 23:32, Eric Blake wrote:
-> On 08/17/2018 01:04 PM, Vladimir Sementsov-Ogievskiy wrote:
->> Add a new command, returning block nodes graph.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->> =C2=A0 qapi/block-core.json=C2=A0 | 116=20
->> ++++++++++++++++++++++++++++++++++++++++++++++++++
+On 17/08/2018 20:04, Andrew Oates wrote:
+>>> [1] this is an invalid configuration (in protected mode the L bit is
+>>> reserved and should be set to zero), but qemu doesn't enforce that.
 >
->> +##
->> +# @BlockGraphEdge:
->> +#
->> +# Block Graph edge description for x-query-block-graph.
->> +#
->> +# @parent: parent id
->> +#
->> +# @child: child id
->> +#
->> +# @name: name of the relation (examples are 'file' and 'backing')
->
-> Can this be made into a QAPI enum? (It would have ripple effects to=20
-> existing code, but might be a worthwhile cleanup).
+> Is there a central place to do that sort of validation?=C2=A0 We could =
+do it
+> in load_segment_ra, but that doesn't feel quite right.=C2=A0 Otherwise =
+it's
+> whack-a-mole to check validity at every place a code segment is
+> referenced---but maybe that's ok, there probably aren't too many of the=
+m.
+>=20
+> WDYT?
 
-I thought about it, but there no corresponding enum in Qemu too, so it's=20
-like driver name in query-block.. However, I can
-create a function which will map &role pointer to corresponding qapi=20
-enum element, which will need to be updated when new
-roles created. Not sure that it's better.
+To find them you have to look for the calls to cpu_x86_load_seg_cache.
 
->
->> +#
->> +# @perm: granted permissions for the parent operating on the child
->> +#
->> +# @shared-perm: permissions that can still be granted to other users=20
->> of the
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 child while it is still attached this parent
->> +#
->> +# Since: 3.1
->> +##
->> +{ 'struct': 'BlockGraphEdge',
->> +=C2=A0 'data': { 'parent': 'uint64', 'child': 'uint64',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'nam=
-e': 'str', 'perm': [ 'BlockPermission' ],
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'sha=
-red-perm': [ 'BlockPermission' ] } }
->> +
->
->> +##
->> +# @x-query-block-graph:
->> +#
->> +# Get the block graph.
->> +#
->> +# Since: 3.1
->> +##
->> +{ 'command': 'x-query-block-graph', 'returns': 'BlockGraph' }
->
-> Why is this command given an x- prefix?=C2=A0 What would it take to promo=
-te=20
-> it from experimental to fully supported?
+However, the L bit is simply ignored in the descriptor cache outside
+64-bit mode (at least that's what you can guess from the Intel manual's
+26.3 CHECKING AND LOADING GUEST STATE, which is as close as you can get
+to an official explanation of the descriptor cache), so you'd have to
+take that into account too and do the check in the callers of
+cpu_x86_load_seg_cache.
 
-Hmm, just a new command, used mostly for debugging. I don't have any=20
-special plans on improving it, I'm ok to drop x- prefix.
+And in fact, the wording is a bit wishy-washy in both the Intel and AMD
+manuals, for example AMD says of bit 21 that
 
->
-> Overall, the command looks quite useful; and the fact that you=20
-> produced some nice .dot graphs from it for visualization seems like it=20
-> is worth considering this as a permanent API addition. The question,=20
-> then, is if the interface is right, or if it needs any tweaks (like=20
-> using an enum instead of open-coded string for the relation between=20
-> parent and child), as a reason for keeping the x- prefix.
+	Generally, software should clear all reserved bits to 0, so they
+	can be defined in future revisions to the AMD64 architecture.
 
-Yes, we should decide about enum.. If we want a qapi enum, how to mirror=20
-it in internal qemu structures better? Only by mapping function (ptr ->=20
-enum-element), or may be add field of EnumType entirely into the role=20
-structure?
+so I am not 100% sure that the processor will actually raise an
+exception if L is 1.
 
->
->> +++ b/block.c
->> @@ -4003,6 +4003,86 @@ BlockDeviceInfoList=20
->> *bdrv_named_nodes_list(Error **errp)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return list;
->> =C2=A0 }
->> =C2=A0 +#define QAPI_LIST_ADD(list, element) do { \
->> +=C2=A0=C2=A0=C2=A0 typeof(list) _tmp =3D g_new(typeof(*(list)), 1); \
->> +=C2=A0=C2=A0=C2=A0 _tmp->value =3D (element); \
->> +=C2=A0=C2=A0=C2=A0 _tmp->next =3D (list); \
->> +=C2=A0=C2=A0=C2=A0 list =3D _tmp; \
->> +} while (0)
->
-> Hmm - this seems like a frequently observed pattern - should it be=20
-> something that we add independently and use throughout the tree as=20
-> part of QAPI interactions in general?
+Thanks,
 
-Agree.
-
->
->> +
->> +BlockGraph *bdrv_get_block_graph(Error **errp)
->> +{
->> +=C2=A0=C2=A0=C2=A0 BlockGraph *graph =3D g_new0(BlockGraph, 1);
->> +=C2=A0=C2=A0=C2=A0 BlockDriverState *bs;
->> +=C2=A0=C2=A0=C2=A0 BdrvChild *child;
->> +=C2=A0=C2=A0=C2=A0 BlockGraphNode *node;
->> +=C2=A0=C2=A0=C2=A0 BlockGraphEdge *edge;
->> +=C2=A0=C2=A0=C2=A0 struct {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int flag;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockPermission num;
->> +=C2=A0=C2=A0=C2=A0 } permissions[] =3D {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_CONSISTENT_READ, =
-BLOCK_PERMISSION_CONSISTENT_READ },
->
-> Would it be worth directly reusing a QAPI enum for all such=20
-> permissions in the existing code base, instead of having to map=20
-> between an internal and a QAPI enum?
-
-Internal is not enum, they are flags.. How can we use enum instead? Or I=20
-don't understand what you mean..
-
->
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_WRITE, BLOCK_PERM=
-ISSION_WRITE },
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_WRITE_UNCHANGED, =
-BLOCK_PERMISSION_WRITE_UNCHANGED },
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_RESIZE,=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLOCK_PERMISSION_RESIZE },
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_GRAPH_MOD,=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLOCK_PERMISSION_GRAPH_MOD },
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { 0, 0 }
->> +=C2=A0=C2=A0=C2=A0 }, *p;
->> +
->> +=C2=A0=C2=A0=C2=A0 QTAILQ_FOREACH(bs, &graph_bdrv_states, node_list) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QLIST_FOREACH(child, &bs->pa=
-rents, next_parent) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (=
-!child->role->parent_is_bds) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 BlockGraphNodeList *el;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 bool add =3D true;
->
-> Does your command need/want to expose internal nodes? (I argue that it=20
-> probably should show internal nodes, even when normal 'query-block'=20
-> doesn't, just because knowing about the impact of internal nodes can=20
-> be important when tracking down permissions issues).
->
-
-Yes, I'm for viewing maximum number of nodes.. However my code goes=20
-through graph_bdrv_stats, query-named-block-nodes do the same.. Isn't it=20
-the whole set of nodes? All named... But, as I understand, now all nodes=20
-are named?
-
---=20
-Best regards,
-Vladimir
+Paolo
