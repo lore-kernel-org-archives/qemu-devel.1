@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1frgFO-0005P7-W0
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:13:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1frgId-00075p-Ex
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1frgFL-0000i0-IB
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:13:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42158 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1frgIX-00029q-4u
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:16:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50092 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1frgFL-0000hh-Cy
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:13:11 -0400
-References: <20180817161404.9420-1-peter.maydell@linaro.org>
-	<0e358562-7607-9c27-d452-57e3dc32806e@redhat.com>
-	<CAFEAcA9OmzWrn_cZS5me+xYEMygWg1tYvT3dpbLWER1n-EgwmQ@mail.gmail.com>
-	<c6e23061-36b5-8572-e746-1d2a54052d2e@redhat.com>
-	<CAFEAcA_TfCjEN9To8p+asQ5RAfP6yYVv6HgmNHKkHKu6oZkKTQ@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d661c4c9-3da3-cc02-01e2-aec551a23c89@redhat.com>
-Date: Mon, 20 Aug 2018 11:13:08 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1frgIX-00029g-0u
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:16:29 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180817150559.16243-1-armbru@redhat.com>
+	<20180817150559.16243-8-armbru@redhat.com>
+	<51121d8e-9e44-e027-a590-b69956531c8f@redhat.com>
+Date: Mon, 20 Aug 2018 11:16:24 +0200
+In-Reply-To: <51121d8e-9e44-e027-a590-b69956531c8f@redhat.com> (Eric Blake's
+	message of "Fri, 17 Aug 2018 11:22:12 -0500")
+Message-ID: <877ekls8if.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_TfCjEN9To8p+asQ5RAfP6yYVv6HgmNHKkHKu6oZkKTQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tests/boot-serial-test: Bump timeout to 6
- minutes
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 07/60] check-qjson: Cover escaped
+ characters more thoroughly, part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 2018-08-20 10:45, Peter Maydell wrote:
-> On 20 August 2018 at 07:21, Thomas Huth <thuth@redhat.com> wrote:
->> On 2018-08-18 12:10, Peter Maydell wrote:
->>> On 18 August 2018 at 10:07, Thomas Huth <thuth@redhat.com> wrote:
->>>> 6 minutes is really a lot already. I guess most users will hit CTRL-C
->>>> before waiting so long if there is a realy problem here ... If the
->>>> current tests just takes a little bit more than 1 minute on the Sparc
->>>> machine, maybe 2 or 3 minutes would sufficient, too?
->>>
->>> Or maybe not. I don't like tests that run close to their timeout
->>> limits, because that tends to mean that my automated test runs
->>> are flaky when the machine happens to be heavily loaded when
->>> a test is running. I think the purpose of a timeout is to prevent
->>> the test run hanging indefinitely; as you say, console users can
->>> hit ctrl-c if they get bored anyway.
->>
->> ... or maybe somebody tries to run TCI on a Sparc host one day ... ok,
->> you've convinced me, let's go with the 360 seconds:
->>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>
->> Paolo, could you please queue up this patch (since I don't have anything
->> else pending for assembling a PULL request)?
-> 
-> I can just apply it directly, since it's useful for buildtesting.
+Eric Blake <eblake@redhat.com> writes:
 
-Ok, great, that's fine of course, too.
+> On 08/17/2018 10:05 AM, Markus Armbruster wrote:
+>> escaped_string() first tests double quoted strings, then repeats a few
+>> tests with single quotes.  Repeat all of them: store the strings to
+>> test without quotes, and wrap them in either kind of quote for
+>> testing.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   tests/check-qjson.c | 96 +++++++++++++++++++++++++++------------------
+>>   1 file changed, 57 insertions(+), 39 deletions(-)
+>>
+>> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+>> index 188f683317..2f1890929d 100644
+>> --- a/tests/check-qjson.c
+>> +++ b/tests/check-qjson.c
+>> @@ -22,55 +22,73 @@
+>>   #include "qapi/qmp/qstring.h"
+>>   #include "qemu-common.h"
+>>   +static QString *from_json_str(const char *jstr, Error **errp,
+>> bool single)
+>
+> Unusual to put Error **errp in the middle rather than last. Worth
+> swapping 'single' to come before 'errp'?
 
- Thomas
+Absolutely.
+
+>>          int skip;
+>
+> Pre-existing, but since you are touching this, is it worth making this bool?
+
+There's more of the same in other functions, which aren't touched by
+this patch.  If we want to convert to bool, we should convert all of
+them.  Doesn't fit into this patch.
+
+>> +    for (i = 0; test_cases[i].json_in; i++) {
+>> +        for (j = 0; j < 2; j++) {
+>> +            cstr = from_json_str(test_cases[i].json_in, &error_abort, j);
+>
+> Only one caller to adjust here (and maybe a couple more later in the
+> series).
+>
+> That's bike-shedding, so either way,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
