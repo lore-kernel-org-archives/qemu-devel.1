@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrewoates@gmail.com>) id 1friWb-0004Ax-D1
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:39:14 -0400
+	(envelope-from <armbru@redhat.com>) id 1friXO-0004qJ-TQ
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:39:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrewoates@gmail.com>) id 1friQ7-0004iS-M3
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:32:32 -0400
-Received: from mail-ua1-f66.google.com ([209.85.222.66]:35757)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <andrewoates@gmail.com>)
-	id 1friQ7-0004gO-Hn
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:32:27 -0400
-Received: by mail-ua1-f66.google.com with SMTP id q12-v6so9506917ual.2
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 04:32:27 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1friXJ-0000vK-GB
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:39:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33704 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1friXJ-0000uh-BN
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:39:53 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180817150559.16243-1-armbru@redhat.com>
+	<20180817150559.16243-42-armbru@redhat.com>
+	<2ad9b303-8108-3f66-c478-65081fc4062a@redhat.com>
+Date: Mon, 20 Aug 2018 13:39:49 +0200
+In-Reply-To: <2ad9b303-8108-3f66-c478-65081fc4062a@redhat.com> (Eric Blake's
+	message of "Fri, 17 Aug 2018 11:03:21 -0500")
+Message-ID: <87woslqnay.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20180816011903.39816-1-andrew@andrewoates.com>
-	<b45d87b9-38ac-427a-8622-ac9c49350511@redhat.com>
-	<CAAVLcG6m_x2p4r9dqD6B2qG-Z_G_iTh5rAubS44PRM2-Mqnpkw@mail.gmail.com>
-	<f3c28dc7-a16e-1451-5bb6-090c6e13cf84@redhat.com>
-In-Reply-To: <f3c28dc7-a16e-1451-5bb6-090c6e13cf84@redhat.com>
-From: Andrew Oates <andrew@andrewoates.com>
-Date: Mon, 20 Aug 2018 07:32:13 -0400
-Message-ID: <CAAVLcG6yDfYTVSmWa1Fdw=C6guhMczRFMkU4vAxUaL6ibTAvPg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target-i386: fix segment limit check in
- ljmp
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 41/60] json: Nicer recovery from invalid
+ leading zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: rth@twiddle.net, ehabkost@redhat.com, qemu-devel@nongnu.org, Andrew Oates <aoates@google.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On Mon, Aug 20, 2018 at 6:06 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 17/08/2018 20:04, Andrew Oates wrote:
-> >>> [1] this is an invalid configuration (in protected mode the L bit is
-> >>> reserved and should be set to zero), but qemu doesn't enforce that.
-> >
-> > Is there a central place to do that sort of validation?  We could do it
-> > in load_segment_ra, but that doesn't feel quite right.  Otherwise it's
-> > whack-a-mole to check validity at every place a code segment is
-> > referenced---but maybe that's ok, there probably aren't too many of them.
-> >
-> > WDYT?
->
-> To find them you have to look for the calls to cpu_x86_load_seg_cache.
->
-> However, the L bit is simply ignored in the descriptor cache outside
-> 64-bit mode (at least that's what you can guess from the Intel manual's
-> 26.3 CHECKING AND LOADING GUEST STATE, which is as close as you can get
-> to an official explanation of the descriptor cache), so you'd have to
-> take that into account too and do the check in the callers of
-> cpu_x86_load_seg_cache.
->
-> And in fact, the wording is a bit wishy-washy in both the Intel and AMD
-> manuals, for example AMD says of bit 21 that
->
->         Generally, software should clear all reserved bits to 0, so they
->         can be defined in future revisions to the AMD64 architecture.
->
-> so I am not 100% sure that the processor will actually raise an
-> exception if L is 1.
+Eric Blake <eblake@redhat.com> writes:
 
-That's good enough for me :)  My vote would be to continue to ignore
-the L bit in 32-bit mode, then.  We should just remove the part that
-implies qemu should enforce it from my patch commit message.
+> On 08/17/2018 10:05 AM, Markus Armbruster wrote:
+>> For input 0123, the lexer produces the tokens
+>>
+>>      JSON_ERROR    01
+>>      JSON_INTEGER  23
+>>
+>> Reporting an error is correct; 0123 is invalid according to RFC 7159.
+>> But the error recovery isn't nice.
+>>
+>> Make the finite state machine eat digits before going into the error
+>> state.  The lexer now produces
+>>
+>>      JSON_ERROR    0123
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> Did you also want to reject invalid attempts at hex numbers, by adding
+> [xXa-fA-F] to the set of characters eaten by IN_BAD_ZERO?
 
->
-> Thanks,
->
-> Paolo
+I put one foot on a slippery slope with this patch...
+
+In review of v1, we discussed whether to try matching non-integer
+numbers with redundant leading zero.  Doing that tightly in the lexer
+requires duplicating six states.  A simpler alternative is to have the
+lexer eat "digit salad" after redundant leading zero: 0[0-9.eE+-]+.
+Your suggestion for hexadecimal numbers is digit salad with different
+digits: [0-9a-fA-FxX].  Another option is their union: [0-9a-fA-FxX+-].
+Even more radical would be eating anything but whitespace and structural
+characters: [^][}{:, \t\n\r].  That idea pushed to the limit results in
+a two-stage lexer: first stage finds token strings, where a token string
+is a structural character or a sequence of non-structural,
+non-whitespace characters, second stage rejects invalid token strings.
+
+Hmm, we could try to recover from lexical errors more smartly in
+general: instead of ending the JSON error token after the first
+offending character, end it before the first whitespace or structural
+character following the offending character.
+
+I can try that, but I'd prefer to try it in a follow-up patch.
+
+>>   +    [IN_BAD_ZERO] = {
+>> +        ['0' ... '9'] = IN_BAD_ZERO,
+>> +    },
+>> +
