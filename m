@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1frW1k-0002T3-4E
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 18:18:28 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1frZWH-0000PC-VS
+	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 22:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1frW1f-0003Pz-MQ
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 18:18:27 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:58527)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1frW1f-0003Pc-EJ
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 18:18:23 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 20 Aug 2018 00:17:07 +0200
-Message-Id: <20180819221707.20693-7-laurent@vivier.eu>
-In-Reply-To: <20180819221707.20693-1-laurent@vivier.eu>
-References: <20180819221707.20693-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 6/6] linux-user: add QEMU_IFLA_INFO_KIND nested
- type for tun
+	(envelope-from <jcmvbkbc@gmail.com>) id 1frZWF-0003J2-Vq
+	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 22:02:13 -0400
+Received: from mail-lj1-x234.google.com ([2a00:1450:4864:20::234]:45714)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1frZWD-0003GI-HL
+	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 22:02:10 -0400
+Received: by mail-lj1-x234.google.com with SMTP id w16-v6so10329521ljh.12
+	for <qemu-devel@nongnu.org>; Sun, 19 Aug 2018 19:02:07 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Sun, 19 Aug 2018 19:01:34 -0700
+Message-Id: <20180820020134.4032-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH v2] target/xtensa: clean up gdbstub register
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +25,182 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180814161904.12216-4-laurent@vivier.eu>
+- move register counting to xtensa/gdbstub.c
+- add symbolic names for register types and flags from GDB and use them
+  in register counting and access functions.
+
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- linux-user/syscall.c | 48 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+Changes v1->v2:
+- add missing dereference to the n_regs/n_core_regs in xtensa_count_regs
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index da1fcaf4ca..424296d1a1 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -501,6 +501,20 @@ enum {
-     QEMU___IFLA_BRPORT_MAX
- };
+ target/xtensa/cpu.h     |  2 ++
+ target/xtensa/gdbstub.c | 60 +++++++++++++++++++++++++++++++++++++++----------
+ target/xtensa/helper.c  | 12 +---------
+ 3 files changed, 51 insertions(+), 23 deletions(-)
+
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index 51b455146494..7472cf3ca32a 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -503,6 +503,8 @@ void xtensa_cpu_do_unassigned_access(CPUState *cpu, hwaddr addr,
+ void xtensa_cpu_dump_state(CPUState *cpu, FILE *f,
+                            fprintf_function cpu_fprintf, int flags);
+ hwaddr xtensa_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
++void xtensa_count_regs(const XtensaConfig *config,
++                       unsigned *n_regs, unsigned *n_core_regs);
+ int xtensa_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+ int xtensa_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ void xtensa_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
+diff --git a/target/xtensa/gdbstub.c b/target/xtensa/gdbstub.c
+index a8ea98d03fb8..c9450914c72d 100644
+--- a/target/xtensa/gdbstub.c
++++ b/target/xtensa/gdbstub.c
+@@ -23,6 +23,42 @@
+ #include "exec/gdbstub.h"
+ #include "qemu/log.h"
  
 +enum {
-+    QEMU_IFLA_TUN_UNSPEC,
-+    QEMU_IFLA_TUN_OWNER,
-+    QEMU_IFLA_TUN_GROUP,
-+    QEMU_IFLA_TUN_TYPE,
-+    QEMU_IFLA_TUN_PI,
-+    QEMU_IFLA_TUN_VNET_HDR,
-+    QEMU_IFLA_TUN_PERSIST,
-+    QEMU_IFLA_TUN_MULTI_QUEUE,
-+    QEMU_IFLA_TUN_NUM_QUEUES,
-+    QEMU_IFLA_TUN_NUM_DISABLED_QUEUES,
-+    QEMU___IFLA_TUN_MAX,
++  xtRegisterTypeArRegfile = 1,  /* Register File ar0..arXX.  */
++  xtRegisterTypeSpecialReg,     /* CPU states, such as PS, Booleans, (rsr).  */
++  xtRegisterTypeUserReg,        /* User defined registers (rur).  */
++  xtRegisterTypeTieRegfile,     /* User define register files.  */
++  xtRegisterTypeTieState,       /* TIE States (mapped on user regs).  */
++  xtRegisterTypeMapped,         /* Mapped on Special Registers.  */
++  xtRegisterTypeUnmapped,       /* Special case of masked registers.  */
++  xtRegisterTypeWindow,         /* Live window registers (a0..a15).  */
++  xtRegisterTypeVirtual,        /* PC, FP.  */
++  xtRegisterTypeUnknown
 +};
 +
- enum {
-     QEMU_IFLA_INFO_UNSPEC,
-     QEMU_IFLA_INFO_KIND,
-@@ -2315,6 +2329,34 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
-     return 0;
- }
- 
-+static abi_long host_to_target_data_tun_nlattr(struct nlattr *nlattr,
-+                                                  void *context)
-+{
-+    uint32_t *u32;
++#define XTENSA_REGISTER_FLAGS_PRIVILEGED        0x0001
++#define XTENSA_REGISTER_FLAGS_READABLE          0x0002
++#define XTENSA_REGISTER_FLAGS_WRITABLE          0x0004
++#define XTENSA_REGISTER_FLAGS_VOLATILE          0x0008
 +
-+    switch (nlattr->nla_type) {
-+    /* uint8_t */
-+    case QEMU_IFLA_TUN_TYPE:
-+    case QEMU_IFLA_TUN_PI:
-+    case QEMU_IFLA_TUN_VNET_HDR:
-+    case QEMU_IFLA_TUN_PERSIST:
-+    case QEMU_IFLA_TUN_MULTI_QUEUE:
-+        break;
-+    /* uint32_t */
-+    case QEMU_IFLA_TUN_NUM_QUEUES:
-+    case QEMU_IFLA_TUN_NUM_DISABLED_QUEUES:
-+    case QEMU_IFLA_TUN_OWNER:
-+    case QEMU_IFLA_TUN_GROUP:
-+        u32 = NLA_DATA(nlattr);
-+        *u32 = tswap32(*u32);
-+        break;
-+    default:
-+        gemu_log("Unknown QEMU_IFLA_TUN type %d\n", nlattr->nla_type);
-+        break;
++void xtensa_count_regs(const XtensaConfig *config,
++                       unsigned *n_regs, unsigned *n_core_regs)
++{
++    unsigned i;
++
++    for (i = 0; config->gdb_regmap.reg[i].targno >= 0; ++i) {
++        if (config->gdb_regmap.reg[i].type != xtRegisterTypeTieState &&
++            config->gdb_regmap.reg[i].type != xtRegisterTypeMapped &&
++            config->gdb_regmap.reg[i].type != xtRegisterTypeUnmapped) {
++            ++*n_regs;
++            if ((config->gdb_regmap.reg[i].flags &
++                 XTENSA_REGISTER_FLAGS_PRIVILEGED) == 0) {
++                ++*n_core_regs;
++            }
++        }
 +    }
-+    return 0;
 +}
 +
- struct linkinfo_context {
-     int len;
-     char *name;
-@@ -2349,6 +2391,12 @@ static abi_long host_to_target_data_linkinfo_nlattr(struct nlattr *nlattr,
-                                                   nlattr->nla_len,
-                                                   NULL,
-                                              host_to_target_data_bridge_nlattr);
-+        } else if (strncmp(li_context->name, "tun",
-+                    li_context->len) == 0) {
-+            return host_to_target_for_each_nlattr(NLA_DATA(nlattr),
-+                                                  nlattr->nla_len,
-+                                                  NULL,
-+                                                host_to_target_data_tun_nlattr);
-         } else {
-             gemu_log("Unknown QEMU_IFLA_INFO_KIND %s\n", li_context->name);
+ int xtensa_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+ {
+     XtensaCPU *cpu = XTENSA_CPU(cs);
+@@ -40,21 +76,21 @@ int xtensa_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+     }
+ 
+     switch (reg->type) {
+-    case 9: /*pc*/
++    case xtRegisterTypeVirtual: /*pc*/
+         return gdb_get_reg32(mem_buf, env->pc);
+ 
+-    case 1: /*ar*/
++    case xtRegisterTypeArRegfile: /*ar*/
+         xtensa_sync_phys_from_window(env);
+         return gdb_get_reg32(mem_buf, env->phys_regs[(reg->targno & 0xff)
+                                                      % env->config->nareg]);
+ 
+-    case 2: /*SR*/
++    case xtRegisterTypeSpecialReg: /*SR*/
+         return gdb_get_reg32(mem_buf, env->sregs[reg->targno & 0xff]);
+ 
+-    case 3: /*UR*/
++    case xtRegisterTypeUserReg: /*UR*/
+         return gdb_get_reg32(mem_buf, env->uregs[reg->targno & 0xff]);
+ 
+-    case 4: /*f*/
++    case xtRegisterTypeTieRegfile: /*f*/
+         i = reg->targno & 0x0f;
+         switch (reg->size) {
+         case 4:
+@@ -69,7 +105,7 @@ int xtensa_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+             return reg->size;
+         }
+ 
+-    case 8: /*a*/
++    case xtRegisterTypeWindow: /*a*/
+         return gdb_get_reg32(mem_buf, env->regs[reg->targno & 0x0f]);
+ 
+     default:
+@@ -99,24 +135,24 @@ int xtensa_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+     tmp = ldl_p(mem_buf);
+ 
+     switch (reg->type) {
+-    case 9: /*pc*/
++    case xtRegisterTypeVirtual: /*pc*/
+         env->pc = tmp;
+         break;
+ 
+-    case 1: /*ar*/
++    case xtRegisterTypeArRegfile: /*ar*/
+         env->phys_regs[(reg->targno & 0xff) % env->config->nareg] = tmp;
+         xtensa_sync_window_from_phys(env);
+         break;
+ 
+-    case 2: /*SR*/
++    case xtRegisterTypeSpecialReg: /*SR*/
+         env->sregs[reg->targno & 0xff] = tmp;
+         break;
+ 
+-    case 3: /*UR*/
++    case xtRegisterTypeUserReg: /*UR*/
+         env->uregs[reg->targno & 0xff] = tmp;
+         break;
+ 
+-    case 4: /*f*/
++    case xtRegisterTypeTieRegfile: /*f*/
+         switch (reg->size) {
+         case 4:
+             env->fregs[reg->targno & 0x0f].f32[FP_F32_LOW] = make_float32(tmp);
+@@ -130,7 +166,7 @@ int xtensa_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+             return reg->size;
+         }
+ 
+-    case 8: /*a*/
++    case xtRegisterTypeWindow: /*a*/
+         env->regs[reg->targno & 0x0f] = tmp;
+         break;
+ 
+diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
+index efb3cef12813..f74636f67854 100644
+--- a/target/xtensa/helper.c
++++ b/target/xtensa/helper.c
+@@ -95,20 +95,10 @@ void xtensa_finalize_config(XtensaConfig *config)
+ 
+     if (config->gdb_regmap.num_regs == 0 ||
+         config->gdb_regmap.num_core_regs == 0) {
+-        unsigned i;
+         unsigned n_regs = 0;
+         unsigned n_core_regs = 0;
+ 
+-        for (i = 0; config->gdb_regmap.reg[i].targno >= 0; ++i) {
+-            if (config->gdb_regmap.reg[i].type != 5 &&
+-                config->gdb_regmap.reg[i].type != 6 &&
+-                config->gdb_regmap.reg[i].type != 7) {
+-                ++n_regs;
+-                if ((config->gdb_regmap.reg[i].flags & 0x1) == 0) {
+-                    ++n_core_regs;
+-                }
+-            }
+-        }
++        xtensa_count_regs(config, &n_regs, &n_core_regs);
+         if (config->gdb_regmap.num_regs == 0) {
+             config->gdb_regmap.num_regs = n_regs;
          }
 -- 
-2.17.1
+2.11.0
