@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1froy2-0000NT-RD
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:31:57 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1froy4-0000xT-KJ
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1frol4-0001m9-Hc
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1frol4-0001lp-ET
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:18:32 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:51307 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:51314 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1frol1-0001ee-0d
+	id 1frol1-0001gc-27
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:18:28 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 20 Aug 2018 20:16:43 +0200
-Message-Id: <1534789014-8310-36-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 20 Aug 2018 20:16:52 +0200
+Message-Id: <1534789014-8310-45-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534789014-8310-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534789014-8310-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v11 35/46] target/mips: Add availability
- control via bit NMS
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 44/46] mips_malta: Add setting up GT64120
+ BARs to the nanoMIPS bootloader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,269 +31,239 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, dnikolic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Dimitrije Nikolic <dnikolic@wavecomp.com>
+From: Paul Burton <pburton@wavecomp.com>
 
-A set of nanoMIPS instructions is not available if Config5 bit NMS
-is set.
+Setup the GT64120 BARs in the nanoMIPS bootloader, in the same way that
+they are setup in the MIPS32 bootloader. This is necessary for Linux to
+be able to access peripherals, including the UART.
 
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Paul Burton <pburton@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 44 insertions(+), 2 deletions(-)
+ hw/mips/mips_malta.c | 177 +++++++++++++++++++++++++++++++++++++++++++++=
++-----
+ 1 file changed, 160 insertions(+), 17 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 2dfbf7c..9995e67 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -1955,6 +1955,16 @@ static inline void check_cp0_mt(DisasContext *ctx)
-     }
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 2e851d9..f261dd6 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -609,47 +609,190 @@ static void write_bootloader_nanomips(uint8_t *bas=
+e, int64_t run_addr,
+=20
+ #define NM_HI1(VAL) (((VAL) >> 16) & 0x1f)
+ #define NM_HI2(VAL) \
+-            (((VAL) & 0xf000) | (((VAL) >> 19) & 0xffc) | (((VAL) >> 31)=
+ & 0x1))
++          (((VAL) & 0xf000) | (((VAL) >> 19) & 0xffc) | (((VAL) >> 31) &=
+ 0x1))
+ #define NM_LO(VAL)  ((VAL) & 0xfff)
+=20
+-    stw_p(p++, 0x2800); stw_p(p++, 0x001c); /* bc to_here */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x2800); stw_p(p++, 0x001c);
++                                /* bc to_here */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
+=20
+     /* to_here: */
+-    stw_p(p++, 0x0080); stw_p(p++, 0x0002); /* li a0,2 */
++    stw_p(p++, 0x0080); stw_p(p++, 0x0002);
++                                /* li a0,2                      */
++
+     stw_p(p++, 0xe3a0 | NM_HI1(ENVP_ADDR - 64));
++
+     stw_p(p++, NM_HI2(ENVP_ADDR - 64));
+-                                /* lui sp,%hi(ENVP_ADDR - 64) */
++                                /* lui sp,%hi(ENVP_ADDR - 64)   */
++
+     stw_p(p++, 0x83bd); stw_p(p++, NM_LO(ENVP_ADDR - 64));
+                                 /* ori sp,sp,%lo(ENVP_ADDR - 64) */
++
+     stw_p(p++, 0xe0a0 | NM_HI1(ENVP_ADDR));
++
+     stw_p(p++, NM_HI2(ENVP_ADDR));
+-                                /* lui a1,%hi(ENVP_ADDR) */
++                                /* lui a1,%hi(ENVP_ADDR)        */
++
+     stw_p(p++, 0x80a5); stw_p(p++, NM_LO(ENVP_ADDR));
+-                                /* ori a1,a1,%lo(ENVP_ADDR) */
++                                /* ori a1,a1,%lo(ENVP_ADDR)     */
++
+     stw_p(p++, 0xe0c0 | NM_HI1(ENVP_ADDR + 8));
++
+     stw_p(p++, NM_HI2(ENVP_ADDR + 8));
+-                                /* lui a2,%hi(ENVP_ADDR + 8) */
++                                /* lui a2,%hi(ENVP_ADDR + 8)    */
++
+     stw_p(p++, 0x80c6); stw_p(p++, NM_LO(ENVP_ADDR + 8));
+                                 /* ori a2,a2,%lo(ENVP_ADDR + 8) */
++
+     stw_p(p++, 0xe0e0 | NM_HI1(loaderparams.ram_low_size));
++
+     stw_p(p++, NM_HI2(loaderparams.ram_low_size));
+                                 /* lui a3,%hi(loaderparams.ram_low_size)=
+ */
++
+     stw_p(p++, 0x80e7); stw_p(p++, NM_LO(loaderparams.ram_low_size));
+                                 /* ori a3,a3,%lo(loaderparams.ram_low_si=
+ze) */
++
++    /*
++     * Load BAR registers as done by YAMON:
++     *
++     *  - set up PCI0 I/O BARs from 0x18000000 to 0x181fffff
++     *  - set up PCI0 MEM0 at 0x10000000, size 0x8000000
++     *  - set up PCI0 MEM1 at 0x18200000, size 0xbe00000
++     *
++     */
++    stw_p(p++, 0xe040); stw_p(p++, 0x0681);
++                                /* lui t1, %hi(0xb4000000)      */
++
++#ifdef TARGET_WORDS_BIGENDIAN
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0be1);
++                                /* lui t0, %hi(0xdf000000)      */
++
++    /* 0x68 corresponds to GT_ISD (from hw/mips/gt64xxx_pci.c)  */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9068);
++                                /* sw t0, 0x68(t1)              */
++
++    stw_p(p++, 0xe040); stw_p(p++, 0x077d);
++                                /* lui t1, %hi(0xbbe00000)      */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0801);
++                                /* lui t0, %hi(0xc0000000)      */
++
++    /* 0x48 corresponds to GT_PCI0IOLD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9048);
++                                /* sw t0, 0x48(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0800);
++                                /* lui t0, %hi(0x40000000)      */
++
++    /* 0x50 corresponds to GT_PCI0IOHD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9050);
++                                /* sw t0, 0x50(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0001);
++                                /* lui t0, %hi(0x80000000)      */
++
++    /* 0x58 corresponds to GT_PCI0M0LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9058);
++                                /* sw t0, 0x58(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x07e0);
++                                /* lui t0, %hi(0x3f000000)      */
++
++    /* 0x60 corresponds to GT_PCI0M0HD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9060);
++                                /* sw t0, 0x60(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0821);
++                                /* lui t0, %hi(0xc1000000)      */
++
++    /* 0x80 corresponds to GT_PCI0M1LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9080);
++                                /* sw t0, 0x80(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0bc0);
++                                /* lui t0, %hi(0x5e000000)      */
++
++#else
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x00df);
++                                /* addiu[32] t0, $0, 0xdf       */
++
++    /* 0x68 corresponds to GT_ISD                               */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9068);
++                                /* sw t0, 0x68(t1)              */
++
++    /* Use kseg2 remapped address 0x1be00000                    */
++    stw_p(p++, 0xe040); stw_p(p++, 0x077d);
++                                /* lui t1, %hi(0xbbe00000)      */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x00c0);
++                                /* addiu[32] t0, $0, 0xc0       */
++
++    /* 0x48 corresponds to GT_PCI0IOLD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9048);
++                                /* sw t0, 0x48(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x0040);
++                                /* addiu[32] t0, $0, 0x40       */
++
++    /* 0x50 corresponds to GT_PCI0IOHD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9050);
++                                /* sw t0, 0x50(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x0080);
++                                /* addiu[32] t0, $0, 0x80       */
++
++    /* 0x58 corresponds to GT_PCI0M0LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9058);
++                                /* sw t0, 0x58(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x003f);
++                                /* addiu[32] t0, $0, 0x3f       */
++
++    /* 0x60 corresponds to GT_PCI0M0HD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9060);
++                                /* sw t0, 0x60(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x00c1);
++                                /* addiu[32] t0, $0, 0xc1       */
++
++    /* 0x80 corresponds to GT_PCI0M1LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9080);
++                                /* sw t0, 0x80(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x005e);
++                                /* addiu[32] t0, $0, 0x5e       */
++
++#endif
++
++    /* 0x88 corresponds to GT_PCI0M1HD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9088);
++                                /* sw t0, 0x88(t1)              */
++
+     stw_p(p++, 0xe320 | NM_HI1(kernel_entry));
++
+     stw_p(p++, NM_HI2(kernel_entry));
+-                                /* lui t9,%hi(kernel_entry) */
++                                /* lui t9,%hi(kernel_entry)     */
++
+     stw_p(p++, 0x8339); stw_p(p++, NM_LO(kernel_entry));
+-                                /* ori t9,t9,%lo(kernel_entry) */
++                                /* ori t9,t9,%lo(kernel_entry)  */
++
+     stw_p(p++, 0x4bf9); stw_p(p++, 0x0000);
+-                                /* jalrc   t8 */
++                                /* jalrc   t8                   */
  }
- 
-+/*
-+ * This code generates a "reserved instruction" exception if the
-+ * Config5 NMS bit is set.
-+ */
-+static inline void check_nms(DisasContext *ctx)
-+{
-+    if (unlikely(ctx->CP0_Config5 & (1 << CP0C5_NMS))) {
-+        generate_exception_end(ctx, EXCP_RI);
-+    }
-+}
- 
- 
- /* Define small wrappers for gen_load_fpr* so that we have a uniform
-@@ -16998,17 +17008,21 @@ static void gen_pool32a0_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
-     case NM_P_TRAP:
-         switch (extract32(ctx->opcode, 10, 1)) {
-         case NM_TEQ:
-+            check_nms(ctx);
-             gen_trap(ctx, OPC_TEQ, rs, rt, -1);
-             break;
-         case NM_TNE:
-+            check_nms(ctx);
-             gen_trap(ctx, OPC_TNE, rs, rt, -1);
-             break;
-         }
-         break;
-     case NM_RDHWR:
-+        check_nms(ctx);
-         gen_rdhwr(ctx, rt, rs, extract32(ctx->opcode, 11, 3));
-         break;
-     case NM_SEB:
-+        check_nms(ctx);
-         gen_bshfl(ctx, OPC_SEB, rs, rt);
-         break;
-     case NM_SEH:
-@@ -17033,6 +17047,7 @@ static void gen_pool32a0_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
-         gen_arith(ctx, OPC_ADDU, rd, rs, rt);
-         break;
-     case NM_SUB:
-+        check_nms(ctx);
-         gen_arith(ctx, OPC_SUB, rd, rs, rt);
-         break;
-     case NM_SUBU:
-@@ -17894,9 +17909,11 @@ static void gen_pool32axf_4_nanomips_insn(DisasContext *ctx, uint32_t opc,
-         gen_bitswap(ctx, OPC_BITSWAP, ret, rs);
-         break;
-     case NM_CLO:
-+        check_nms(ctx);
-         gen_cl(ctx, OPC_CLO, ret, rs);
-         break;
-     case NM_CLZ:
-+        check_nms(ctx);
-         gen_cl(ctx, OPC_CLZ, ret, rs);
-         break;
-     case NM_WSBH:
-@@ -18099,6 +18116,7 @@ static void gen_compute_imm_branch(DisasContext *ctx, uint32_t opc,
-         break;
-     case NM_BBEQZC:
-     case NM_BBNEZC:
-+        check_nms(ctx);
-         if (imm >= 32 && !(ctx->hflags & MIPS_HFLAG_64)) {
-             generate_exception_end(ctx, EXCP_RI);
-             goto out;
-@@ -18399,13 +18417,15 @@ static void gen_p_lsx(DisasContext *ctx, int rd, int rs, int rt)
-     if ((extract32(ctx->opcode, 6, 1)) == 1) {
-         /* PP.LSXS instructions require shifting */
-         switch (extract32(ctx->opcode, 7, 4)) {
--        case NM_LHXS:
-         case NM_SHXS:
-+            check_nms(ctx);
-+        case NM_LHXS:
-         case NM_LHUXS:
-             tcg_gen_shli_tl(t0, t0, 1);
-             break;
--        case NM_LWXS:
-         case NM_SWXS:
-+            check_nms(ctx);
-+        case NM_LWXS:
-         case NM_LWC1XS:
-         case NM_SWC1XS:
-             tcg_gen_shli_tl(t0, t0, 2);
-@@ -18448,18 +18468,21 @@ static void gen_p_lsx(DisasContext *ctx, int rd, int rs, int rt)
-         gen_store_gpr(t0, rd);
-         break;
-     case NM_SBX:
-+        check_nms(ctx);
-         gen_load_gpr(t1, rd);
-         tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx,
-                            MO_8);
-         break;
-     case NM_SHX:
-     /*case NM_SHXS:*/
-+        check_nms(ctx);
-         gen_load_gpr(t1, rd);
-         tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx,
-                            MO_TEUW);
-         break;
-     case NM_SWX:
-     /*case NM_SWXS:*/
-+        check_nms(ctx);
-         gen_load_gpr(t1, rd);
-         tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx,
-                            MO_TEUL);
-@@ -19482,22 +19505,26 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-             target_long addr_off = extract32(ctx->opcode, 0, 16) | insn << 16;
-             switch (extract32(ctx->opcode, 16, 5)) {
-             case NM_LI48:
-+                check_nms(ctx);
-                 if (rt != 0) {
-                     tcg_gen_movi_tl(cpu_gpr[rt], addr_off);
-                 }
-                 break;
-             case NM_ADDIU48:
-+                check_nms(ctx);
-                 if (rt != 0) {
-                     tcg_gen_addi_tl(cpu_gpr[rt], cpu_gpr[rt], addr_off);
-                     tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
-                 }
-                 break;
-             case NM_ADDIUGP48:
-+                check_nms(ctx);
-                 if (rt != 0) {
-                     gen_op_addr_addi(ctx, cpu_gpr[rt], cpu_gpr[28], addr_off);
-                 }
-                 break;
-             case NM_ADDIUPC48:
-+                check_nms(ctx);
-                 if (rt != 0) {
-                     target_long addr = addr_add(ctx, ctx->base.pc_next + 6,
-                                                 addr_off);
-@@ -19506,6 +19533,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                 }
-                 break;
-             case NM_LWPC48:
-+                check_nms(ctx);
-                 if (rt != 0) {
-                     TCGv t0;
-                     t0 = tcg_temp_new();
-@@ -19520,6 +19548,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                 break;
-             case NM_SWPC48:
-                 {
-+                    check_nms(ctx);
-                     TCGv t0, t1;
-                     t0 = tcg_temp_new();
-                     t1 = tcg_temp_new();
-@@ -19639,6 +19668,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-             }
-             break;
-         case NM_P_ROTX:
-+            check_nms(ctx);
-             if (rt != 0) {
-                 TCGv t0 = tcg_temp_new();
-                 TCGv_i32 shift = tcg_const_i32(extract32(ctx->opcode, 0, 5));
-@@ -19659,6 +19689,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-             switch (((ctx->opcode >> 10) & 2) |
-                     (extract32(ctx->opcode, 5, 1))) {
-             case NM_INS:
-+                check_nms(ctx);
-                 gen_bitops(ctx, OPC_INS, rt, rs, extract32(ctx->opcode, 0, 5),
-                            extract32(ctx->opcode, 6, 5));
-                 break;
-@@ -19671,6 +19702,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-             switch (((ctx->opcode >> 10) & 2) |
-                     (extract32(ctx->opcode, 5, 1))) {
-             case NM_EXT:
-+                check_nms(ctx);
-                 gen_bitops(ctx, OPC_EXT, rt, rs, extract32(ctx->opcode, 0, 5),
-                            extract32(ctx->opcode, 6, 5));
-                 break;
-@@ -19898,6 +19930,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                 case NM_UALH:
-                 case NM_UASH:
-                     {
-+                        check_nms(ctx);
-                         TCGv t0 = tcg_temp_new();
-                         TCGv t1 = tcg_temp_new();
- 
-@@ -19952,6 +19985,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-             case NM_P_LS_WM:
-             case NM_P_LS_UAWM:
-             {
-+                check_nms(ctx);
-                 int count = extract32(ctx->opcode, 12, 3);
-                 int counter = 0;
- 
-@@ -20000,6 +20034,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-         break;
-     case NM_MOVE_BALC:
-         {
-+            check_nms(ctx);
-             TCGv t0 = tcg_temp_new();
-             int32_t s = sextract32(ctx->opcode, 0, 1) << 21 |
-                         extract32(ctx->opcode, 1, 20) << 1;
-@@ -20046,6 +20081,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                         extract32(ctx->opcode, 1, 13) << 1;
-             switch (extract32(ctx->opcode, 14, 2)) {
-             case NM_BEQC:
-+                check_nms(ctx);
-                 gen_compute_branch_nm(ctx, OPC_BEQ, 4, rs, rt, s);
-                 break;
-             case NM_P_BR3A:
-@@ -20099,6 +20135,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                         extract32(ctx->opcode, 1, 13) << 1;
-             switch (extract32(ctx->opcode, 14, 2)) {
-             case NM_BNEC:
-+                check_nms(ctx);
-                 gen_compute_branch_nm(ctx, OPC_BNE, 4, rs, rt, s);
-                 break;
-             case NM_BLTC:
-@@ -20271,9 +20308,11 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-         switch ((extract32(ctx->opcode, 7, 2) & 0x2) |
-                 (extract32(ctx->opcode, 3, 1))) {
-         case NM_ADDU4X4:
-+            check_nms(ctx);
-             gen_arith(ctx, OPC_ADDU, rt, rs, rt);
-             break;
-         case NM_MUL4X4:
-+            check_nms(ctx);
-             gen_r6_muldiv(ctx, R6_OPC_MUL, rt, rs, rt);
-             break;
-         default:
-@@ -20346,6 +20385,7 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-         gen_ld(ctx, OPC_LW, rt, 29, offset);
-         break;
-     case NM_LW4X4:
-+        check_nms(ctx);
-         rt = (extract32(ctx->opcode, 9, 1) << 3) |
-              extract32(ctx->opcode, 5, 3);
-         rs = (extract32(ctx->opcode, 4, 1) << 3) |
-@@ -20357,6 +20397,7 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-         gen_ld(ctx, OPC_LW, rt, rs, offset);
-         break;
-     case NM_SW4X4:
-+        check_nms(ctx);
-         rt = (extract32(ctx->opcode, 9, 1) << 3) |
-              extract32(ctx->opcode, 5, 3);
-         rs = (extract32(ctx->opcode, 4, 1) << 3) |
-@@ -20455,6 +20496,7 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-     case NM_MOVEP:
-     case NM_MOVEPREV:
-         {
-+            check_nms(ctx);
-             static const int gpr2reg1[] = {4, 5, 6, 7};
-             static const int gpr2reg2[] = {5, 6, 7, 8};
-             int re;
--- 
+=20
+ /* ROM and pseudo bootloader
+--=20
 2.7.4
