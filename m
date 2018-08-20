@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1frjtP-0002B4-I2
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:06:48 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1frjtZ-0002IC-DB
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:06:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1frjtO-0004VF-6a
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:06:47 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:46210)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1frjtL-0004Qr-Qj
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:06:45 -0400
-Received: by mail-oi0-x241.google.com with SMTP id y207-v6so25600096oie.13
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 06:06:42 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1frjtY-0004gy-En
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:06:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48482 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1frjtY-0004ge-9A
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:06:56 -0400
+References: <20180704181010.GA918@computer>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cec51a71-2339-d764-e6df-88d311adb9d9@redhat.com>
+Date: Mon, 20 Aug 2018 15:06:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <CA++5wji8hmxezOz=ccBR_hxWXNc-CjAahBKDeMrXewyAsONmJg@mail.gmail.com>
-References: <CA++5wji8hmxezOz=ccBR_hxWXNc-CjAahBKDeMrXewyAsONmJg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 14:06:21 +0100
-Message-ID: <CAFEAcA_dzS=b4sd_=qr0ihd0ofWZLM4pF33gU4ygtJb-tHxbUg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-discuss] Handling signal of Qemu thread
+In-Reply-To: <20180704181010.GA918@computer>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] module: Use QEMU_MODULE_DIR as a search
+ path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +28,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Probir Roy <roy@probir.info>
-Cc: qemu-discuss <qemu-discuss@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: ryang <decatf@gmail.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
 
-On 16 August 2018 at 21:22, Probir Roy <roy@probir.info> wrote:
-> I am registering a signal handler per Qemu thread (per VCPU) and
-> expecting to handle it in that thread context. But I never receive the
-> signal on the Qemu thread that is causing the event, rather the signal
-> is sent to parent thread context. Can you please explain the reason
-> behind this? I also see that Qemu has a function called
-> "kvm_eat_signals". Does it have to do anything with my issue?
+On 04/07/2018 20:10, ryang wrote:
+> The current paths for modules are CONFIG_QEMU_MODDIR and paths relative
+> to the executable. Qemu and its modules can be installed and executed in
+> paths that are different from these search paths. This change allows
+> a search path to be specified by environment variable.
+> 
+> An example usage for this is postmarketOS[1]. This is a build environment
+> for Alpine Linux. It sets up Alpine Linux in a chroot environment.
+> Alpine's Qemu packages are installed in the chroot. The Alpine Linux Qemu
+> package is used to test compiled Alpine Linux system images. This way there
+> isn't a reliance on the which ever version of Qemu the host system / distro
+> provides.
+> 
+> postmarketOS executes Qemu on host system outside of the chroot
+> The Qemu module search path needs to point to the location of the
+> chroot relative to the host system.
+> 
+> e.g.
+> The root of the Alpine Linux chroot is:
+> ~/.local/var/pmbootstrap/chroot_native/
+> 
+> Alpine's Qemu is installed at
+> ~/.local/var/pmbootstrap/chroot_native/usr/bin/
+> 
+> The Qemu module search path needs to be:
+> QEMU_MODULE_DIR=~/.local/var/pmbootstrap/chroot_native/usr/lib/qemu/
+> 
+> [1] https://postmarketos.org/
+> 
 
-Signal handling is complicated, especially when the process
-has multiple threads. QEMU's strategy for it is:
+Queued, thanks.
 
- * only the iothread deals with signal handling, except for
-   one or two signals which are specifically directed to a
-   particular CPU thread (notably SIG_IPI)
- * other threads block all signals, so that the iothread
-   will handle them (this is done as part of qemu_thread_create())
- * the iothread handles most signals synchronously, using signalfd():
-   this is done in qemu_signal_init(), and is how we handle
-   SIGIO, SIGALRM and SIGBUS
- * SIGINT, SIGHUP, SIGTERM are handled by the iothread, asynchronously
-   (their handlers are set in os_setup_signal_handling())
- * SIGPIPE is set to SIG_IGN, so we handle pipe-closed via the
-   EPIPE errno rather than via a signal
- * SIG_IPI is one of the signals for specific CPU threads; so
-   it is blocked in the iothread, and enabled in CPU threads
- * kvm_eat_signals() is specifically to handle SIG_IPI, and
-   affects no other signal -- if the kernel returned control
-   to QEMU because of a pending signal on this CPU thread,
-   we must make sure we've processed all the SIG_IPIs before
-   we continue
+Paolo
 
-Adding support for a new usage of signals to this design is
-complicated: depending on what is going on, it might be best
-handled asynchronously in the iothread, synchronously in the
-iothread, or per CPU thread. What exactly are you trying to do
-with your new signal ?
-
-thanks
--- PMM
+> Signed-off-by: ryang <decatf@gmail.com>
+> ---
+> 
+> v2:
+>  - fix checkpatch errors
+> v3:
+>  - initialize n_dirs variable
+> v4:
+>  - change env variable suffix from _PATH to _DIR
+>  - renamed search_path to search_dir and make it const
+> 
+>  util/module.c | 22 ++++++++++++++--------
+>  1 file changed, 14 insertions(+), 8 deletions(-)
+> 
+> diff --git a/util/module.c b/util/module.c
+> index c909737..1259dd3 100644
+> --- a/util/module.c
+> +++ b/util/module.c
+> @@ -162,9 +162,10 @@ void module_load_one(const char *prefix, const char *lib_name)
+>  #ifdef CONFIG_MODULES
+>      char *fname = NULL;
+>      char *exec_dir;
+> -    char *dirs[3];
+> +    const char *search_dir;
+> +    char *dirs[4];
+>      char *module_name;
+> -    int i = 0;
+> +    int i = 0, n_dirs = 0;
+>      int ret;
+>      static GHashTable *loaded_modules;
+>  
+> @@ -186,14 +187,19 @@ void module_load_one(const char *prefix, const char *lib_name)
+>      g_hash_table_insert(loaded_modules, module_name, module_name);
+>  
+>      exec_dir = qemu_get_exec_dir();
+> -    dirs[i++] = g_strdup_printf("%s", CONFIG_QEMU_MODDIR);
+> -    dirs[i++] = g_strdup_printf("%s/..", exec_dir ? : "");
+> -    dirs[i++] = g_strdup_printf("%s", exec_dir ? : "");
+> -    assert(i == ARRAY_SIZE(dirs));
+> +    search_dir = getenv("QEMU_MODULE_DIR");
+> +    if (search_dir != NULL) {
+> +        dirs[n_dirs++] = g_strdup_printf("%s", search_dir);
+> +    }
+> +    dirs[n_dirs++] = g_strdup_printf("%s", CONFIG_QEMU_MODDIR);
+> +    dirs[n_dirs++] = g_strdup_printf("%s/..", exec_dir ? : "");
+> +    dirs[n_dirs++] = g_strdup_printf("%s", exec_dir ? : "");
+> +    assert(n_dirs <= ARRAY_SIZE(dirs));
+> +
+>      g_free(exec_dir);
+>      exec_dir = NULL;
+>  
+> -    for (i = 0; i < ARRAY_SIZE(dirs); i++) {
+> +    for (i = 0; i < n_dirs; i++) {
+>          fname = g_strdup_printf("%s/%s%s",
+>                  dirs[i], module_name, HOST_DSOSUF);
+>          ret = module_load_file(fname);
+> @@ -205,7 +211,7 @@ void module_load_one(const char *prefix, const char *lib_name)
+>          }
+>      }
+>  
+> -    for (i = 0; i < ARRAY_SIZE(dirs); i++) {
+> +    for (i = 0; i < n_dirs; i++) {
+>          g_free(dirs[i]);
+>      }
+>  
+> 
