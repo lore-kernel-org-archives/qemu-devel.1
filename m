@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1frjNW-00035B-Pn
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:33:51 -0400
+	(envelope-from <jingqi.liu@intel.com>) id 1frjUX-0005nG-RG
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:41:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1frjNV-0001SO-K4
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:33:50 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:40216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1frjNV-0001RP-1C
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:33:49 -0400
-Received: by mail-oi0-x243.google.com with SMTP id w126-v6so25458558oie.7
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 05:33:48 -0700 (PDT)
+	(envelope-from <jingqi.liu@intel.com>) id 1frjUU-000676-N1
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:41:05 -0400
+Received: from mga01.intel.com ([192.55.52.88]:16282)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
+	id 1frjUU-000654-Eq
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:41:02 -0400
+From: "Liu, Jingqi" <jingqi.liu@intel.com>
+Date: Mon, 20 Aug 2018 12:38:02 +0000
+Message-ID: <09D68D4CF52CAF489B702DEBDD12D3D35279F806@SHSMSX103.ccr.corp.intel.com>
+References: <1531213054-63327-1-git-send-email-jingqi.liu@intel.com>
+	<1531213054-63327-2-git-send-email-jingqi.liu@intel.com>
+	<20180806220307.GC23195@localhost.localdomain>
+In-Reply-To: <20180806220307.GC23195@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <2edf4dc3-5cc2-c3f3-fd40-7901e2c06413@isystem.si>
-References: <2edf4dc3-5cc2-c3f3-fd40-7901e2c06413@isystem.si>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 13:33:28 +0100
-Message-ID: <CAFEAcA-gbG0xF3faXZYpkg_OyOyNcPyviDBhytzi1AkUj3FL4w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] arm: fix reset operation on
- netduino2 board.
+Subject: Re: [Qemu-devel] [PATCH 1/3] x86/cpu: Enable UMONITOR/UMWAIT/TPAUSE
+ cpu features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marko Klopcic <marko.klopcic@isystem.si>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "Wang, Wei W" <wei.w.wang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 20 August 2018 at 12:10, Marko Klopcic <marko.klopcic@isystem.si> wrote:
-> Because roms are located on aliased addresses on netduino2 (Cortex M3,
-> STM32F205), PC and SP are not read from loaded kernel, which means
-> that the first reset fails. This fix adds additional call to reset.
-> See more details in code comment below.
->
-> Signed-off-by: Marko Klopcic <marko.klopcic@isystem.si>
->
-> ---
->  hw/arm/netduino2.c | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
->
-> diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
-> index f936017d4a..a2f102b14b 100644
-> --- a/hw/arm/netduino2.c
-> +++ b/hw/arm/netduino2.c
-> @@ -25,6 +25,7 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "hw/boards.h"
-> +#include "hw/loader.h"
->  #include "qemu/error-report.h"
->  #include "hw/arm/stm32f205_soc.h"
->  #include "hw/arm/arm.h"
-> @@ -39,6 +40,32 @@ static void netduino2_init(MachineState *machine)
->
->      armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
->                         FLASH_SIZE);
-> +
-> +    /*
-> +      The following two calls are a workaround for problem with rom on
-> aliased
-> +      addresses on STM32.
-> +      Kernel is loaded into Rom objects, which are stored in loader.c. Roms
-> +      are copied to memory in:
-> +
-> +      void rom_reset() {
-> +        ...
-> +         cpu_physical_memory_write_rom(rom->as, rom->addr, rom->data,
-> +                                       rom->datasize);
-> +        ...
-> +      }
-> +
-> +      However, since CPU reset is registered BEFORE
-> +      rom_reset(), SP and PC are read from memory BEFORE roms are copied to
-> +      memory. CPU reset also checks Roms for data, so this is normally not
-> a
-> +      problem, but in STM32 PC and SP are read from aliased memory, and
-> these
-> +      memory addresses are not mapped to Roms. Since ROMs are private in
-> +      loader.c the only option to copy Roms to memory is through reset. So
-> we
-> +      first have to register Roms for reset, and then trigger system reset,
-> which
-> +      copies Roms to mem, so that reset vectors are in memory, when
-> +      qemu_system_reset() is called again from main().
-> +     */
-> +    rom_check_and_register_reset();
-> +    qemu_system_reset(SHUTDOWN_CAUSE_NONE);
->  }
+> -----Original Message-----
+> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> Sent: Tuesday, August 7, 2018 6:03 AM
+> To: Liu, Jingqi <jingqi.liu@intel.com>
+> Cc: pbonzini@redhat.com; rth@twiddle.net; Wang, Wei W
+> <wei.w.wang@intel.com>; qemu-devel@nongnu.org; Michael S. Tsirkin
+> <mst@redhat.com>
+> Subject: Re: [Qemu-devel] [PATCH 1/3] x86/cpu: Enable
+> UMONITOR/UMWAIT/TPAUSE cpu features
+>=20
+> On Tue, Jul 10, 2018 at 04:57:32PM +0800, Jingqi Liu wrote:
+> > UMONITOR, UMWAIT, and TPAUSE are a set of user wait instructions.
+> >
+> > UMONITOR arms address monitoring hardware using an address. A store to
+> > an address within the specified address range triggers the monitoring
+> > hardware to wake up the processor waiting in umwait.
+> >
+> > UMWAIT instructs the processor to enter an implementation-dependent
+> > optimized state while monitoring a range of addresses. The optimized
+> > state may be either a light-weight power/performance optimized state
+> > or an improved power/performance optimized state.
+> >
+> > TPAUSE instructs the processor to enter an implementation-dependent
+> > optimized state c0.1 or c0.2 state and wake up when time-stamp counter
+> > reaches specified timeout.
+> >
+> > The bit definition:
+> > CPUID.(EAX=3D7,ECX=3D0):ECX[bit 05] WAITPKG
+> >
+> > The release document ref below link:
+> > https://software.intel.com/sites/default/files/managed/c5/15/\
+> > architecture-instruction-set-extensions-programming-reference.pdf
+> >
+> > Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+>=20
+> Is it really OK to expose these features to the guest without "-overcommi=
+t cpu-
+> pm=3Don"?
+>=20
+> Don't we need code to migrate IA32_UMWAIT_CONTROL?
+>=20
+> (I don't see code to handle writes to IA32_UMWAIT_CONTROL on the KVM
+> patches, either.)
+>=20
+> --
+Hi Eduardo,
 
-I agree that this is a bug, but I think this is not the right way
-to fix it, as it is not specific to this particular board. We need
-to either somehow ensure the reset order between the rom code
-and the Arm CPU reset is enforced, or change how we do the SP/PC
-load on reset of an M-profile core.
+Yes, I'll handle IA32_UMWAIT_CONTROL in the second version.
+Thanks for your review.
 
-thanks
--- PMM
+> Eduardo
