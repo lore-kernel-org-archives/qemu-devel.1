@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1frfmh-0007EM-90
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:43:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1frfo0-00085C-H3
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:45:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1frfmd-0003vK-8k
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:43:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44918 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1frfnz-0004UT-EI
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:44:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57696 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1frfmd-0003v9-41
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:43:31 -0400
-Date: Mon, 20 Aug 2018 10:43:29 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180820084329.3uhnobuy5g52zqio@sirius.home.kraxel.org>
-References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
-	<20180817150513.GT11124@redhat.com>
-	<6bf952d9-0269-c5df-6cac-70104ec88f81@ubuntu.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1frfnz-0004Tq-49
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:44:55 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180817150559.16243-1-armbru@redhat.com>
+	<20180817150559.16243-26-armbru@redhat.com>
+	<58df6e5a-a25a-6a98-2fdb-abf50bd4e5f8@redhat.com>
+Date: Mon, 20 Aug 2018 10:44:50 +0200
+In-Reply-To: <58df6e5a-a25a-6a98-2fdb-abf50bd4e5f8@redhat.com> (Eric Blake's
+	message of "Fri, 17 Aug 2018 11:32:28 -0500")
+Message-ID: <87k1ols9z1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <6bf952d9-0269-c5df-6cac-70104ec88f81@ubuntu.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 25/60] json: Leave rejecting invalid
+ escape sequences to parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Phillip Susi <psusi@ubuntu.com>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On Fri, Aug 17, 2018 at 11:16:29AM -0400, Phillip Susi wrote:
-> On 8/17/2018 11:05 AM, Daniel P. Berrang=E9 wrote:
-> > Reading again, this is a bit odd. On most keyboards, holding down shi=
-ft
-> > key generally would NOT change the scan code that is reported (there =
-are a
->=20
-> Right; a real keyboard won't change the scan code, but it seems that
-> European keyboards have this extra key that can also produce a |, so
-> when qemu gets the key code for |, it has to pick one scan code or the
-> other to translate the | into, and it picks the wrong one.
+Eric Blake <eblake@redhat.com> writes:
 
-There have been fixes for that one, specifically recent qemu will look
-at modifier state in addition to the keysym when looking up the keycode,
-because some keymaps can generate the same keysym with different key
-combinations, and most of the time they have different modifier state.
+> On 08/17/2018 10:05 AM, Markus Armbruster wrote:
+>> Both lexer and parser reject invalid escape sequences in strings.  The
+>> parser's check is useless.
+>>
+>
+>> While there, fix parse_string()'s inaccurate function comment.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>
+>> + * From RFC 7159 "The JavaScript Object Notation (JSON) Data
+>> + * Interchange Format":
+>
+> You did point out in the cover letter that you intend to rewrite this
+> to point to 8259. (That's saying something - when portions of these
+> patches have been around on our mailing list prior to the point of the
+> RFC being updated).
 
-In this specific case the us kbd key generates '|' with shift while the
-105th key of i18n kbds generates '|' with altgr, so it should actually
-improve things.
+I spotted the "Obsoleted by: 8259" in RFC 7159 pretty much by chance
+during development of this series, but neglected to work in the update
+right away.
 
-So, try upgrade qemu.
+>                     Here, and elsewhere in the series, that's minor
+> enough that I don't see it invalidating any of my R-b.
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> Looking at the code it looks like qemu has its own qcode set and
-> translates between that and all of these other sets.  I'm guessing
-> either input-keymap-linux-to-qcode.c or input-keymap-x11-to-qcode.c is
-> where the error is, but these do not exist so I guess they must be auto
-> generated somehow by the build process?
-
-No.  It's ui/keymaps.c.  Keymaps are in pc-bios/keymaps/, generated by
-qemu-keymap.c.
-
-HTH,
-  Gerd
+Thanks!
