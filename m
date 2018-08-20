@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1froy5-00012S-Qq
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:32:00 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1froy4-0000mL-NY
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1froky-0001dQ-Nn
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:18:28 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:51270 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1frol2-0001j6-L1
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:18:30 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:51305 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1froku-0001Rc-Er
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:18:22 -0400
+	id 1frol0-0001eW-ON
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:18:27 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 20 Aug 2018 20:16:21 +0200
-Message-Id: <1534789014-8310-14-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 20 Aug 2018 20:16:41 +0200
+Message-Id: <1534789014-8310-34-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534789014-8310-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534789014-8310-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v11 13/46] target/mips: Add emulation of
- nanoMIPS 16-bit save and restore instructions
+Subject: [Qemu-devel] [PATCH v11 33/46] target/mips: Add emulation of DSP
+ ASE for nanoMIPS - part 5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,128 +30,175 @@ Cc: peter.maydell@linaro.org, philippe.mathieu.daude@gmail.com, aurelien@aurel32
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add emulation of SAVE16 and RESTORE.JRC16 instructions. Routines
-gen_save(), gen_restore(), and gen_adjust_sp() are provided to support
-this feature.
-
-This patch at the same time provides function gen_op_addr_addi(). This
-function will be used in emulation of some other nanoMIPS instructions.
+Add emulation of DSP ASE instructions for nanoMIPS - part 5.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
+ target/mips/translate.c | 142 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 142 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 75f2b64..cf3254b 100644
+index 9b72985..a9d6ad8 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1746,6 +1746,18 @@ static inline void gen_op_addr_add (DisasContext *ctx, TCGv ret, TCGv arg0, TCGv
- #endif
+@@ -17773,6 +17773,144 @@ static void gen_pool32axf_2_nanomips_insn(DisasContext *ctx, uint32_t opc,
+     tcg_temp_free(v1_t);
  }
  
-+static inline void gen_op_addr_addi(DisasContext *ctx, TCGv ret, TCGv base,
-+                                    target_long ofs)
++static void gen_pool32axf_4_nanomips_insn(DisasContext *ctx, uint32_t opc,
++                                          int rt, int rs)
 +{
-+    tcg_gen_addi_tl(ret, base, ofs);
-+
-+#if defined(TARGET_MIPS64)
-+    if (ctx->hflags & MIPS_HFLAG_AWRAP) {
-+        tcg_gen_ext32s_i64(ret, ret);
-+    }
-+#endif
-+}
-+
- /* Addresses computation (translation time) */
- static target_long addr_add(DisasContext *ctx, target_long base,
-                             target_long offset)
-@@ -16770,6 +16782,62 @@ static inline int decode_gpr_gpr4_zero(int r)
- #define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
- 
- 
-+static void gen_adjust_sp(DisasContext *ctx, int u)
-+{
-+    gen_op_addr_addi(ctx, cpu_gpr[29], cpu_gpr[29], u);
-+}
-+
-+static void gen_save(DisasContext *ctx, uint8_t rt, uint8_t count,
-+                     uint8_t gp, uint16_t u)
-+{
-+    int counter = 0;
-+    TCGv va = tcg_temp_new();
++    int ret = rt;
 +    TCGv t0 = tcg_temp_new();
++    TCGv v0_t = tcg_temp_new();
 +
-+    while (counter != count) {
-+        bool use_gp = gp && (counter == count - 1);
-+        int this_rt = use_gp ? 28 : (rt & 0x10) | ((rt + counter) & 0x1f);
-+        int this_offset = -((counter + 1) << 2);
-+        gen_base_offset_addr(ctx, va, 29, this_offset);
-+        gen_load_gpr(t0, this_rt);
-+        tcg_gen_qemu_st_tl(t0, va, ctx->mem_idx,
-+                           (MO_TEUL | ctx->default_tcg_memop_mask));
-+        counter++;
++    gen_load_gpr(v0_t, rs);
++
++    switch (opc) {
++    case NM_ABSQ_S_QB:
++        check_dspr2(ctx);
++        gen_helper_absq_s_qb(v0_t, v0_t, cpu_env);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_ABSQ_S_PH:
++        check_dsp(ctx);
++        gen_helper_absq_s_ph(v0_t, v0_t, cpu_env);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_ABSQ_S_W:
++        check_dsp(ctx);
++        gen_helper_absq_s_w(v0_t, v0_t, cpu_env);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_PRECEQ_W_PHL:
++        check_dsp(ctx);
++        tcg_gen_andi_tl(v0_t, v0_t, 0xFFFF0000);
++        tcg_gen_ext32s_tl(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_PRECEQ_W_PHR:
++        check_dsp(ctx);
++        tcg_gen_andi_tl(v0_t, v0_t, 0x0000FFFF);
++        tcg_gen_shli_tl(v0_t, v0_t, 16);
++        tcg_gen_ext32s_tl(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_PRECEQU_PH_QBL:
++        check_dsp(ctx);
++        gen_helper_precequ_ph_qbl(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_PRECEQU_PH_QBR:
++        check_dsp(ctx);
++        gen_helper_precequ_ph_qbr(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_PRECEQU_PH_QBLA:
++        check_dsp(ctx);
++        gen_helper_precequ_ph_qbla(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_PRECEQU_PH_QBRA:
++        check_dsp(ctx);
++        gen_helper_precequ_ph_qbra(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_PRECEU_PH_QBL:
++        check_dsp(ctx);
++        gen_helper_preceu_ph_qbl(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_PRECEU_PH_QBR:
++        check_dsp(ctx);
++        gen_helper_preceu_ph_qbr(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_PRECEU_PH_QBLA:
++        check_dsp(ctx);
++        gen_helper_preceu_ph_qbla(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_PRECEU_PH_QBRA:
++        check_dsp(ctx);
++        gen_helper_preceu_ph_qbra(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_REPLV_PH:
++        check_dsp(ctx);
++        tcg_gen_ext16u_tl(v0_t, v0_t);
++        tcg_gen_shli_tl(t0, v0_t, 16);
++        tcg_gen_or_tl(v0_t, v0_t, t0);
++        tcg_gen_ext32s_tl(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_REPLV_QB:
++        check_dsp(ctx);
++        tcg_gen_ext8u_tl(v0_t, v0_t);
++        tcg_gen_shli_tl(t0, v0_t, 8);
++        tcg_gen_or_tl(v0_t, v0_t, t0);
++        tcg_gen_shli_tl(t0, v0_t, 16);
++        tcg_gen_or_tl(v0_t, v0_t, t0);
++        tcg_gen_ext32s_tl(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_BITREV:
++        check_dsp(ctx);
++        gen_helper_bitrev(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_INSV:
++        check_dsp(ctx);
++        {
++            TCGv tv0 = tcg_temp_new();
++
++            gen_load_gpr(tv0, rt);
++            gen_helper_insv(v0_t, cpu_env, v0_t, tv0);
++            gen_store_gpr(v0_t, ret);
++            tcg_temp_free(tv0);
++        }
++        break;
++    case NM_RADDU_W_QB:
++        check_dsp(ctx);
++        gen_helper_raddu_w_qb(v0_t, v0_t);
++        gen_store_gpr(v0_t, ret);
++        break;
++    case NM_BITSWAP:
++        gen_bitswap(ctx, OPC_BITSWAP, ret, rs);
++        break;
++    case NM_CLO:
++        gen_cl(ctx, OPC_CLO, ret, rs);
++        break;
++    case NM_CLZ:
++        gen_cl(ctx, OPC_CLZ, ret, rs);
++        break;
++    case NM_WSBH:
++        gen_bshfl(ctx, OPC_WSBH, ret, rs);
++        break;
++    default:
++        generate_exception_end(ctx, EXCP_RI);
++        break;
 +    }
 +
-+    /* adjust stack pointer */
-+    gen_adjust_sp(ctx, -u);
-+
++    tcg_temp_free(v0_t);
 +    tcg_temp_free(t0);
-+    tcg_temp_free(va);
 +}
 +
-+static void gen_restore(DisasContext *ctx, uint8_t rt, uint8_t count,
-+                        uint8_t gp, uint16_t u)
-+{
-+    int counter = 0;
-+    TCGv va = tcg_temp_new();
-+    TCGv t0 = tcg_temp_new();
-+
-+    while (counter != count) {
-+        bool use_gp = gp && (counter == count - 1);
-+        int this_rt = use_gp ? 28 : (rt & 0x10) | ((rt + counter) & 0x1f);
-+        int this_offset = u - ((counter + 1) << 2);
-+        gen_base_offset_addr(ctx, va, 29, this_offset);
-+        tcg_gen_qemu_ld_tl(t0, va, ctx->mem_idx, MO_TESL |
-+                        ctx->default_tcg_memop_mask);
-+        tcg_gen_ext32s_tl(t0, t0);
-+        gen_store_gpr(t0, this_rt);
-+        counter++;
-+    }
-+
-+    /* adjust stack pointer */
-+    gen_adjust_sp(ctx, u);
-+
-+    tcg_temp_free(t0);
-+    tcg_temp_free(va);
-+}
-+
- static void gen_pool16c_nanomips_insn(DisasContext *ctx)
+ 
+ static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
  {
-     int rt = decode_gpr_gpr3(NANOMIPS_EXTRACT_RD(ctx->opcode));
-@@ -17087,6 +17155,21 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+@@ -17794,6 +17932,10 @@ static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
          }
          break;
-     case NM_P16_SR:
+     case NM_POOL32AXF_4:
 +        {
-+            int count = extract32(ctx->opcode, 0, 4);
-+            int u = extract32(ctx->opcode, 4, 4) << 4;
-+
-+            rt = 30 + extract32(ctx->opcode, 9, 1);
-+            switch (extract32(ctx->opcode, 8, 1)) {
-+            case NM_SAVE16:
-+                gen_save(ctx, rt, count, 0, u);
-+                break;
-+            case NM_RESTORE_JRC16:
-+                gen_restore(ctx, rt, count, 0, u);
-+                gen_compute_branch_nm(ctx, OPC_JR, 2, 31, 0, 0);
-+                break;
-+            }
++            int32_t op1 = extract32(ctx->opcode, 9, 7);
++            gen_pool32axf_4_nanomips_insn(ctx, op1, rt, rs);
 +        }
          break;
-     case NM_MOVEP:
-         break;
+     case NM_POOL32AXF_5:
+         switch (extract32(ctx->opcode, 9, 7)) {
 -- 
 2.7.4
