@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frhUK-0003wl-L5
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:46 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1frhUO-00042N-Ni
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frhUI-0005bg-SE
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:44 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44566)
+	(envelope-from <pm215@archaic.org.uk>) id 1frhUN-0005fW-NB
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:48 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44578)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1frhUI-0005PL-Eg
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:42 -0400
+	id 1frhUN-0005ec-D7
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:47 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1frhUH-0003C1-5z
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:32:41 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1frhUM-0003Eb-H8
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:32:46 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 11:32:05 +0100
-Message-Id: <20180820103212.2810-19-peter.maydell@linaro.org>
+Date: Mon, 20 Aug 2018 11:32:09 +0100
+Message-Id: <20180820103212.2810-23-peter.maydell@linaro.org>
 In-Reply-To: <20180820103212.2810-1-peter.maydell@linaro.org>
 References: <20180820103212.2810-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 18/25] hw/watchdog/cmsdk_apb_watchdog: Implement
- CMSDK APB watchdog module
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 22/25] hw/dma/pl080: Don't use CPU address space
+ for DMA accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,478 +33,184 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The Arm Cortex-M System Design Kit includes a simple watchdog module
-based on a 32-bit down-counter. Implement this.
+Currently our PL080/PL081 model uses a combination of the CPU's
+address space (via cpu_physical_memory_{read,write}()) and the
+system address space for performing DMA accesses.
+
+For the PL081s in the MPS FPGA images, their DMA accesses
+must go via Master Security Controllers. Switch the
+PL080/PL081 model to take a MemoryRegion property which
+defines its downstream for making DMA accesses.
+
+Since the PL08x are only used in two board models, we
+make provision of the 'downstream' link mandatory and convert
+both users at once, rather than having it be optional with
+a default to the system address space.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- Makefile.objs                            |   1 +
- hw/watchdog/Makefile.objs                |   1 +
- include/hw/watchdog/cmsdk-apb-watchdog.h |  59 ++++
- hw/watchdog/cmsdk-apb-watchdog.c         | 326 +++++++++++++++++++++++
- MAINTAINERS                              |   2 +
- default-configs/arm-softmmu.mak          |   1 +
- hw/watchdog/trace-events                 |   6 +
- 7 files changed, 396 insertions(+)
- create mode 100644 include/hw/watchdog/cmsdk-apb-watchdog.h
- create mode 100644 hw/watchdog/cmsdk-apb-watchdog.c
- create mode 100644 hw/watchdog/trace-events
+ include/hw/dma/pl080.h |  5 +++++
+ hw/arm/realview.c      |  8 +++++++-
+ hw/arm/versatilepb.c   |  9 ++++++++-
+ hw/dma/pl080.c         | 35 +++++++++++++++++++++++++++++------
+ 4 files changed, 49 insertions(+), 8 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 7a9828da282..ce9c79235e6 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -240,6 +240,7 @@ trace-events-subdirs += hw/tpm
- trace-events-subdirs += hw/usb
- trace-events-subdirs += hw/vfio
- trace-events-subdirs += hw/virtio
-+trace-events-subdirs += hw/watchdog
- trace-events-subdirs += hw/xen
- trace-events-subdirs += io
- trace-events-subdirs += linux-user
-diff --git a/hw/watchdog/Makefile.objs b/hw/watchdog/Makefile.objs
-index 9589bed63a3..3f536d1cad8 100644
---- a/hw/watchdog/Makefile.objs
-+++ b/hw/watchdog/Makefile.objs
-@@ -1,4 +1,5 @@
- common-obj-y += watchdog.o
-+common-obj-$(CONFIG_CMSDK_APB_WATCHDOG) += cmsdk-apb-watchdog.o
- common-obj-$(CONFIG_WDT_IB6300ESB) += wdt_i6300esb.o
- common-obj-$(CONFIG_WDT_IB700) += wdt_ib700.o
- common-obj-$(CONFIG_WDT_DIAG288) += wdt_diag288.o
-diff --git a/include/hw/watchdog/cmsdk-apb-watchdog.h b/include/hw/watchdog/cmsdk-apb-watchdog.h
-new file mode 100644
-index 00000000000..ab8b5987a19
---- /dev/null
-+++ b/include/hw/watchdog/cmsdk-apb-watchdog.h
-@@ -0,0 +1,59 @@
-+/*
-+ * ARM CMSDK APB watchdog emulation
-+ *
-+ * Copyright (c) 2018 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
+diff --git a/include/hw/dma/pl080.h b/include/hw/dma/pl080.h
+index 7c6a4184833..9d4b3df143f 100644
+--- a/include/hw/dma/pl080.h
++++ b/include/hw/dma/pl080.h
+@@ -21,6 +21,8 @@
+  * + sysbus IRQ 1: DMACINTERR error interrupt request
+  * + sysbus IRQ 2: DMACINTTC count interrupt request
+  * + sysbus MMIO region 0: MemoryRegion for the device's registers
++ * + QOM property "downstream": MemoryRegion defining where DMA
++ *   bus master transactions are made
+  */
+ 
+ #ifndef HW_DMA_PL080_H
+@@ -61,6 +63,9 @@ typedef struct PL080State {
+     qemu_irq irq;
+     qemu_irq interr;
+     qemu_irq inttc;
 +
-+/*
-+ * This is a model of the "APB watchdog" which is part of the Cortex-M
-+ * System Design Kit (CMSDK) and documented in the Cortex-M System
-+ * Design Kit Technical Reference Manual (ARM DDI0479C):
-+ * https://developer.arm.com/products/system-design/system-design-kits/cortex-m-system-design-kit
-+ *
-+ * QEMU interface:
-+ *  + QOM property "wdogclk-frq": frequency at which the watchdog is clocked
-+ *  + sysbus MMIO region 0: the register bank
-+ *  + sysbus IRQ 0: watchdog interrupt
-+ *
-+ * In real hardware the watchdog's reset output is just a GPIO line
-+ * which can then be masked by the board or treated as a simple interrupt.
-+ * (For instance the IoTKit does this with the non-secure watchdog, so that
-+ * secure code can control whether non-secure code can perform a system
-+ * reset via its watchdog.) In QEMU, we just wire up the watchdog reset
-+ * to watchdog_perform_action(), at least for the moment.
-+ */
++    MemoryRegion *downstream;
++    AddressSpace downstream_as;
+ } PL080State;
+ 
+ #endif
+diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+index cd585d94694..ab8c14fde38 100644
+--- a/hw/arm/realview.c
++++ b/hw/arm/realview.c
+@@ -201,7 +201,13 @@ static void realview_init(MachineState *machine,
+     pl011_create(0x1000c000, pic[15], serial_hd(3));
+ 
+     /* DMA controller is optional, apparently.  */
+-    sysbus_create_simple("pl081", 0x10030000, pic[24]);
++    dev = qdev_create(NULL, "pl081");
++    object_property_set_link(OBJECT(dev), OBJECT(sysmem), "downstream",
++                             &error_fatal);
++    qdev_init_nofail(dev);
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, 0x10030000);
++    sysbus_connect_irq(busdev, 0, pic[24]);
+ 
+     sysbus_create_simple("sp804", 0x10011000, pic[4]);
+     sysbus_create_simple("sp804", 0x10012000, pic[5]);
+diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+index a5a06b6d408..8b748570596 100644
+--- a/hw/arm/versatilepb.c
++++ b/hw/arm/versatilepb.c
+@@ -287,7 +287,14 @@ static void versatile_init(MachineState *machine, int board_id)
+     pl011_create(0x101f3000, pic[14], serial_hd(2));
+     pl011_create(0x10009000, sic[6], serial_hd(3));
+ 
+-    sysbus_create_simple("pl080", 0x10130000, pic[17]);
++    dev = qdev_create(NULL, "pl080");
++    object_property_set_link(OBJECT(dev), OBJECT(sysmem), "downstream",
++                             &error_fatal);
++    qdev_init_nofail(dev);
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, 0x10130000);
++    sysbus_connect_irq(busdev, 0, pic[17]);
 +
-+#ifndef CMSDK_APB_WATCHDOG_H
-+#define CMSDK_APB_WATCHDOG_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/ptimer.h"
-+
-+#define TYPE_CMSDK_APB_WATCHDOG "cmsdk-apb-watchdog"
-+#define CMSDK_APB_WATCHDOG(obj) OBJECT_CHECK(CMSDKAPBWatchdog, (obj), \
-+                                              TYPE_CMSDK_APB_WATCHDOG)
-+
-+typedef struct CMSDKAPBWatchdog {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    MemoryRegion iomem;
-+    qemu_irq wdogint;
-+    uint32_t wdogclk_frq;
-+    struct ptimer_state *timer;
-+
-+    uint32_t control;
-+    uint32_t intstatus;
-+    uint32_t lock;
-+    uint32_t itcr;
-+    uint32_t itop;
-+    uint32_t resetstatus;
-+} CMSDKAPBWatchdog;
-+
-+#endif
-diff --git a/hw/watchdog/cmsdk-apb-watchdog.c b/hw/watchdog/cmsdk-apb-watchdog.c
-new file mode 100644
-index 00000000000..eb79a73fa6c
---- /dev/null
-+++ b/hw/watchdog/cmsdk-apb-watchdog.c
-@@ -0,0 +1,326 @@
-+/*
-+ * ARM CMSDK APB watchdog emulation
-+ *
-+ * Copyright (c) 2018 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
-+
-+/*
-+ * This is a model of the "APB watchdog" which is part of the Cortex-M
-+ * System Design Kit (CMSDK) and documented in the Cortex-M System
-+ * Design Kit Technical Reference Manual (ARM DDI0479C):
-+ * https://developer.arm.com/products/system-design/system-design-kits/cortex-m-system-design-kit
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "trace.h"
+     sysbus_create_simple("sp804", 0x101e2000, pic[4]);
+     sysbus_create_simple("sp804", 0x101e3000, pic[5]);
+ 
+diff --git a/hw/dma/pl080.c b/hw/dma/pl080.c
+index 301030dd118..8f9f3e08d9a 100644
+--- a/hw/dma/pl080.c
++++ b/hw/dma/pl080.c
+@@ -12,6 +12,7 @@
+ #include "exec/address-spaces.h"
+ #include "qemu/log.h"
+ #include "hw/dma/pl080.h"
 +#include "qapi/error.h"
-+#include "qemu/main-loop.h"
-+#include "sysemu/watchdog.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/watchdog/cmsdk-apb-watchdog.h"
-+
-+REG32(WDOGLOAD, 0x0)
-+REG32(WDOGVALUE, 0x4)
-+REG32(WDOGCONTROL, 0x8)
-+    FIELD(WDOGCONTROL, INTEN, 0, 1)
-+    FIELD(WDOGCONTROL, RESEN, 1, 1)
-+#define R_WDOGCONTROL_VALID_MASK (R_WDOGCONTROL_INTEN_MASK | \
-+                                  R_WDOGCONTROL_RESEN_MASK)
-+REG32(WDOGINTCLR, 0xc)
-+REG32(WDOGRIS, 0x10)
-+    FIELD(WDOGRIS, INT, 0, 1)
-+REG32(WDOGMIS, 0x14)
-+REG32(WDOGLOCK, 0xc00)
-+#define WDOG_UNLOCK_VALUE 0x1ACCE551
-+REG32(WDOGITCR, 0xf00)
-+    FIELD(WDOGITCR, ENABLE, 0, 1)
-+#define R_WDOGITCR_VALID_MASK R_WDOGITCR_ENABLE_MASK
-+REG32(WDOGITOP, 0xf04)
-+    FIELD(WDOGITOP, WDOGRES, 0, 1)
-+    FIELD(WDOGITOP, WDOGINT, 1, 1)
-+#define R_WDOGITOP_VALID_MASK (R_WDOGITOP_WDOGRES_MASK | \
-+                               R_WDOGITOP_WDOGINT_MASK)
-+REG32(PID4, 0xfd0)
-+REG32(PID5, 0xfd4)
-+REG32(PID6, 0xfd8)
-+REG32(PID7, 0xfdc)
-+REG32(PID0, 0xfe0)
-+REG32(PID1, 0xfe4)
-+REG32(PID2, 0xfe8)
-+REG32(PID3, 0xfec)
-+REG32(CID0, 0xff0)
-+REG32(CID1, 0xff4)
-+REG32(CID2, 0xff8)
-+REG32(CID3, 0xffc)
-+
-+/* PID/CID values */
-+static const int watchdog_id[] = {
-+    0x04, 0x00, 0x00, 0x00, /* PID4..PID7 */
-+    0x24, 0xb8, 0x1b, 0x00, /* PID0..PID3 */
-+    0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
-+};
-+
-+static bool cmsdk_apb_watchdog_intstatus(CMSDKAPBWatchdog *s)
+ 
+ #define PL080_CONF_E    0x1
+ #define PL080_CONF_M1   0x2
+@@ -161,14 +162,16 @@ again:
+             swidth = 1 << ((ch->ctrl >> 18) & 7);
+             dwidth = 1 << ((ch->ctrl >> 21) & 7);
+             for (n = 0; n < dwidth; n+= swidth) {
+-                cpu_physical_memory_read(ch->src, buff + n, swidth);
++                address_space_read(&s->downstream_as, ch->src,
++                                   MEMTXATTRS_UNSPECIFIED, buff + n, swidth);
+                 if (ch->ctrl & PL080_CCTRL_SI)
+                     ch->src += swidth;
+             }
+             xsize = (dwidth < swidth) ? swidth : dwidth;
+             /* ??? This may pad the value incorrectly for dwidth < 32.  */
+             for (n = 0; n < xsize; n += dwidth) {
+-                cpu_physical_memory_write(ch->dest + n, buff + n, dwidth);
++                address_space_write(&s->downstream_as, ch->dest + n,
++                                    MEMTXATTRS_UNSPECIFIED, buff + n, dwidth);
+                 if (ch->ctrl & PL080_CCTRL_DI)
+                     ch->dest += swidth;
+             }
+@@ -178,19 +181,19 @@ again:
+             if (size == 0) {
+                 /* Transfer complete.  */
+                 if (ch->lli) {
+-                    ch->src = address_space_ldl_le(&address_space_memory,
++                    ch->src = address_space_ldl_le(&s->downstream_as,
+                                                    ch->lli,
+                                                    MEMTXATTRS_UNSPECIFIED,
+                                                    NULL);
+-                    ch->dest = address_space_ldl_le(&address_space_memory,
++                    ch->dest = address_space_ldl_le(&s->downstream_as,
+                                                     ch->lli + 4,
+                                                     MEMTXATTRS_UNSPECIFIED,
+                                                     NULL);
+-                    ch->ctrl = address_space_ldl_le(&address_space_memory,
++                    ch->ctrl = address_space_ldl_le(&s->downstream_as,
+                                                     ch->lli + 12,
+                                                     MEMTXATTRS_UNSPECIFIED,
+                                                     NULL);
+-                    ch->lli = address_space_ldl_le(&address_space_memory,
++                    ch->lli = address_space_ldl_le(&s->downstream_as,
+                                                    ch->lli + 8,
+                                                    MEMTXATTRS_UNSPECIFIED,
+                                                    NULL);
+@@ -358,6 +361,18 @@ static void pl080_init(Object *obj)
+     s->nchannels = 8;
+ }
+ 
++static void pl080_realize(DeviceState *dev, Error **errp)
 +{
-+    /* Return masked interrupt status */
-+    return s->intstatus && (s->control & R_WDOGCONTROL_INTEN_MASK);
-+}
++    PL080State *s = PL080(dev);
 +
-+static bool cmsdk_apb_watchdog_resetstatus(CMSDKAPBWatchdog *s)
-+{
-+    /* Return masked reset status */
-+    return s->resetstatus && (s->control & R_WDOGCONTROL_RESEN_MASK);
-+}
-+
-+static void cmsdk_apb_watchdog_update(CMSDKAPBWatchdog *s)
-+{
-+    bool wdogint;
-+    bool wdogres;
-+
-+    if (s->itcr) {
-+        wdogint = s->itop & R_WDOGITOP_WDOGINT_MASK;
-+        wdogres = s->itop & R_WDOGITOP_WDOGRES_MASK;
-+    } else {
-+        wdogint = cmsdk_apb_watchdog_intstatus(s);
-+        wdogres = cmsdk_apb_watchdog_resetstatus(s);
-+    }
-+
-+    qemu_set_irq(s->wdogint, wdogint);
-+    if (wdogres) {
-+        watchdog_perform_action();
-+    }
-+}
-+
-+static uint64_t cmsdk_apb_watchdog_read(void *opaque, hwaddr offset,
-+                                        unsigned size)
-+{
-+    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(opaque);
-+    uint64_t r;
-+
-+    switch (offset) {
-+    case A_WDOGLOAD:
-+        r = ptimer_get_limit(s->timer);
-+        break;
-+    case A_WDOGVALUE:
-+        r = ptimer_get_count(s->timer);
-+        break;
-+    case A_WDOGCONTROL:
-+        r = s->control;
-+        break;
-+    case A_WDOGRIS:
-+        r = s->intstatus;
-+        break;
-+    case A_WDOGMIS:
-+        r = cmsdk_apb_watchdog_intstatus(s);
-+        break;
-+    case A_WDOGLOCK:
-+        r = s->lock;
-+        break;
-+    case A_WDOGITCR:
-+        r = s->itcr;
-+        break;
-+    case A_PID4 ... A_CID3:
-+        r = watchdog_id[(offset - A_PID4) / 4];
-+        break;
-+    case A_WDOGINTCLR:
-+    case A_WDOGITOP:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "CMSDK APB watchdog read: read of WO offset %x\n",
-+                      (int)offset);
-+        r = 0;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "CMSDK APB watchdog read: bad offset %x\n", (int)offset);
-+        r = 0;
-+        break;
-+    }
-+    trace_cmsdk_apb_watchdog_read(offset, r, size);
-+    return r;
-+}
-+
-+static void cmsdk_apb_watchdog_write(void *opaque, hwaddr offset,
-+                                     uint64_t value, unsigned size)
-+{
-+    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(opaque);
-+
-+    trace_cmsdk_apb_watchdog_write(offset, value, size);
-+
-+    if (s->lock && offset != A_WDOGLOCK) {
-+        /* Write access is disabled via WDOGLOCK */
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "CMSDK APB watchdog write: write to locked watchdog\n");
++    if (!s->downstream) {
++        error_setg(errp, "PL080 'downstream' link not set");
 +        return;
 +    }
 +
-+    switch (offset) {
-+    case A_WDOGLOAD:
-+        /*
-+         * Reset the load value and the current count, and make sure
-+         * we're counting.
-+         */
-+        ptimer_set_limit(s->timer, value, 1);
-+        ptimer_run(s->timer, 0);
-+        break;
-+    case A_WDOGCONTROL:
-+        s->control = value & R_WDOGCONTROL_VALID_MASK;
-+        cmsdk_apb_watchdog_update(s);
-+        break;
-+    case A_WDOGINTCLR:
-+        s->intstatus = 0;
-+        ptimer_set_count(s->timer, ptimer_get_limit(s->timer));
-+        cmsdk_apb_watchdog_update(s);
-+        break;
-+    case A_WDOGLOCK:
-+        s->lock = (value != WDOG_UNLOCK_VALUE);
-+        break;
-+    case A_WDOGITCR:
-+        s->itcr = value & R_WDOGITCR_VALID_MASK;
-+        cmsdk_apb_watchdog_update(s);
-+        break;
-+    case A_WDOGITOP:
-+        s->itop = value & R_WDOGITOP_VALID_MASK;
-+        cmsdk_apb_watchdog_update(s);
-+        break;
-+    case A_WDOGVALUE:
-+    case A_WDOGRIS:
-+    case A_WDOGMIS:
-+    case A_PID4 ... A_CID3:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "CMSDK APB watchdog write: write to RO offset 0x%x\n",
-+                      (int)offset);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "CMSDK APB watchdog write: bad offset 0x%x\n",
-+                      (int)offset);
-+        break;
-+    }
++    address_space_init(&s->downstream_as, s->downstream, "pl080-downstream");
 +}
 +
-+static const MemoryRegionOps cmsdk_apb_watchdog_ops = {
-+    .read = cmsdk_apb_watchdog_read,
-+    .write = cmsdk_apb_watchdog_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    /* byte/halfword accesses are just zero-padded on reads and writes */
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 4,
-+};
-+
-+static void cmsdk_apb_watchdog_tick(void *opaque)
-+{
-+    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(opaque);
-+
-+    if (!s->intstatus) {
-+        /* Count expired for the first time: raise interrupt */
-+        s->intstatus = R_WDOGRIS_INT_MASK;
-+    } else {
-+        /* Count expired for the second time: raise reset and stop clock */
-+        s->resetstatus = 1;
-+        ptimer_stop(s->timer);
-+    }
-+    cmsdk_apb_watchdog_update(s);
-+}
-+
-+static void cmsdk_apb_watchdog_reset(DeviceState *dev)
-+{
-+    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(dev);
-+
-+    trace_cmsdk_apb_watchdog_reset();
-+    s->control = 0;
-+    s->intstatus = 0;
-+    s->lock = 0;
-+    s->itcr = 0;
-+    s->itop = 0;
-+    s->resetstatus = 0;
-+    /* Set the limit and the count */
-+    ptimer_set_limit(s->timer, 0xffffffff, 1);
-+    ptimer_run(s->timer, 0);
-+}
-+
-+static void cmsdk_apb_watchdog_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &cmsdk_apb_watchdog_ops,
-+                          s, "cmsdk-apb-watchdog", 0x1000);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->wdogint);
-+}
-+
-+static void cmsdk_apb_watchdog_realize(DeviceState *dev, Error **errp)
-+{
-+    CMSDKAPBWatchdog *s = CMSDK_APB_WATCHDOG(dev);
-+    QEMUBH *bh;
-+
-+    if (s->wdogclk_frq == 0) {
-+        error_setg(errp,
-+                   "CMSDK APB watchdog: wdogclk-frq property must be set");
-+        return;
-+    }
-+
-+    bh = qemu_bh_new(cmsdk_apb_watchdog_tick, s);
-+    s->timer = ptimer_init(bh,
-+                           PTIMER_POLICY_WRAP_AFTER_ONE_PERIOD |
-+                           PTIMER_POLICY_TRIGGER_ONLY_ON_DECREMENT |
-+                           PTIMER_POLICY_NO_IMMEDIATE_RELOAD |
-+                           PTIMER_POLICY_NO_COUNTER_ROUND_DOWN);
-+
-+    ptimer_set_freq(s->timer, s->wdogclk_frq);
-+}
-+
-+static const VMStateDescription cmsdk_apb_watchdog_vmstate = {
-+    .name = "cmsdk-apb-watchdog",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PTIMER(timer, CMSDKAPBWatchdog),
-+        VMSTATE_UINT32(control, CMSDKAPBWatchdog),
-+        VMSTATE_UINT32(intstatus, CMSDKAPBWatchdog),
-+        VMSTATE_UINT32(lock, CMSDKAPBWatchdog),
-+        VMSTATE_UINT32(itcr, CMSDKAPBWatchdog),
-+        VMSTATE_UINT32(itop, CMSDKAPBWatchdog),
-+        VMSTATE_UINT32(resetstatus, CMSDKAPBWatchdog),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property cmsdk_apb_watchdog_properties[] = {
-+    DEFINE_PROP_UINT32("wdogclk-frq", CMSDKAPBWatchdog, wdogclk_frq, 0),
+ static void pl081_init(Object *obj)
+ {
+     PL080State *s = PL080(obj);
+@@ -365,11 +380,19 @@ static void pl081_init(Object *obj)
+     s->nchannels = 2;
+ }
+ 
++static Property pl080_properties[] = {
++    DEFINE_PROP_LINK("downstream", PL080State, downstream,
++                     TYPE_MEMORY_REGION, MemoryRegion *),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void cmsdk_apb_watchdog_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = cmsdk_apb_watchdog_realize;
-+    dc->vmsd = &cmsdk_apb_watchdog_vmstate;
-+    dc->reset = cmsdk_apb_watchdog_reset;
-+    dc->props = cmsdk_apb_watchdog_properties;
-+}
-+
-+static const TypeInfo cmsdk_apb_watchdog_info = {
-+    .name = TYPE_CMSDK_APB_WATCHDOG,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(CMSDKAPBWatchdog),
-+    .instance_init = cmsdk_apb_watchdog_init,
-+    .class_init = cmsdk_apb_watchdog_class_init,
-+};
-+
-+static void cmsdk_apb_watchdog_register_types(void)
-+{
-+    type_register_static(&cmsdk_apb_watchdog_info);
-+}
-+
-+type_init(cmsdk_apb_watchdog_register_types);
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 70651f7da0f..6698a7e0f81 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -456,6 +456,8 @@ F: hw/timer/cmsdk-apb-timer.c
- F: include/hw/timer/cmsdk-apb-timer.h
- F: hw/char/cmsdk-apb-uart.c
- F: include/hw/char/cmsdk-apb-uart.h
-+F: hw/watchdog/cmsdk-apb-watchdog.c
-+F: include/hw/watchdog/cmsdk-apb-watchdog.h
- F: hw/misc/tz-ppc.c
- F: include/hw/misc/tz-ppc.h
- F: hw/misc/tz-mpc.c
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 311584fd74e..a92bc34fb24 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -104,6 +104,7 @@ CONFIG_STM32F205_SOC=y
+ static void pl080_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
  
- CONFIG_CMSDK_APB_TIMER=y
- CONFIG_CMSDK_APB_UART=y
-+CONFIG_CMSDK_APB_WATCHDOG=y
+     dc->vmsd = &vmstate_pl080;
++    dc->realize = pl080_realize;
++    dc->props = pl080_properties;
+ }
  
- CONFIG_MPS2_FPGAIO=y
- CONFIG_MPS2_SCC=y
-diff --git a/hw/watchdog/trace-events b/hw/watchdog/trace-events
-new file mode 100644
-index 00000000000..fee95847df0
---- /dev/null
-+++ b/hw/watchdog/trace-events
-@@ -0,0 +1,6 @@
-+# See docs/devel/tracing.txt for syntax documentation.
-+
-+# hw/char/cmsdk_apb_watchdog.c
-+cmsdk_apb_watchdog_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB watchdog read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
-+cmsdk_apb_watchdog_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB watchdog write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
-+cmsdk_apb_watchdog_reset(void) "CMSDK APB watchdog: reset"
+ static const TypeInfo pl080_info = {
 -- 
 2.18.0
