@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fritG-0005pE-Ao
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fritG-0005pd-MD
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fritA-0002T4-KE
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fritD-0002U3-Va
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:34 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 20 Aug 2018 14:02:01 +0200
-Message-Id: <20180820120213.11095-5-e.emanuelegiuseppe@gmail.com>
+Date: Mon, 20 Aug 2018 14:02:03 +0200
+Message-Id: <20180820120213.11095-7-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180820120213.11095-1-e.emanuelegiuseppe@gmail.com>
 References: <20180820120213.11095-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 04/16] test/qgraph: aarch64/xlnx-zcu102 machine
- node
+Subject: [Qemu-devel] [PATCH 06/16] test/qgraph: tpci200 test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,179 +22,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Keith Busch <keith.busch@intel.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add xlnx-zcu102 machine to the graph. This machine contains generic-sdhci, so
-its constructor must take care of setting it properly when called.
+Convert tests/tpci200-test in qgraph test node,
+tpci200-test. Since it's a nop test, node creation and
+initialization is made in the same file.
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
- tests/Makefile.include             |  1 +
- tests/libqos/xlnx-zcu102-machine.c | 83 ++++++++++++++++++++++++++++++
- tests/sdhci-test.c                 | 51 ------------------
- 3 files changed, 84 insertions(+), 51 deletions(-)
- create mode 100644 tests/libqos/xlnx-zcu102-machine.c
+ tests/Makefile.include |  2 +-
+ tests/tpci200-test.c   | 60 +++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 52 insertions(+), 10 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index d559218b1c..bad4de3d61 100644
+index 3e5964263e..1daee93de5 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -765,6 +765,7 @@ libqgraph-arm-machines-obj-y += tests/libqos/xilinx-zynq-a9-machine.o
- libqgraph-machines-obj-y = $(libqgraph-arm-machines-obj-y)
- libqgraph-machines-obj-y += tests/libqos/x86_64_pc-machine.o
- libqgraph-machines-obj-y += tests/libqos/ppc64_pseries-machine.o
-+libqgraph-machines-obj-y += tests/libqos/xlnx-zcu102-machine.o
+@@ -792,6 +792,7 @@ libqgraph-tests-obj-y += tests/virtio-blk-test.o
+ libqgraph-tests-obj-y += tests/virtio-net-test.o
+ libqgraph-tests-obj-y += tests/virtio-scsi-test.o
+ libqgraph-tests-obj-y += tests/ac97-test.o
++libqgraph-tests-obj-y += tests/tpci200-test.o
  
- libqgraph-virtio-obj-y = tests/libqos/virtio-serial.o
- libqgraph-virtio-obj-y += tests/libqos/virtio-9p.o
-diff --git a/tests/libqos/xlnx-zcu102-machine.c b/tests/libqos/xlnx-zcu102-machine.c
-new file mode 100644
-index 0000000000..9932cf39a8
---- /dev/null
-+++ b/tests/libqos/xlnx-zcu102-machine.c
-@@ -0,0 +1,83 @@
-+/*
-+ * libqos driver framework
-+ *
-+ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License version 2 as published by the Free Software Foundation.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "libqos/malloc.h"
+ check-unit-y += tests/test-qgraph$(EXESUF)
+ tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
+@@ -835,7 +836,6 @@ tests/ne2000-test$(EXESUF): tests/ne2000-test.o
+ tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
+ tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
+ tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
+-tests/tpci200-test$(EXESUF): tests/tpci200-test.o
+ tests/display-vga-test$(EXESUF): tests/display-vga-test.o
+ tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
+ tests/qom-test$(EXESUF): tests/qom-test.o
+diff --git a/tests/tpci200-test.c b/tests/tpci200-test.c
+index 0321ec27ec..a0e1785e50 100644
+--- a/tests/tpci200-test.c
++++ b/tests/tpci200-test.c
+@@ -9,23 +9,65 @@
+ 
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
 +#include "libqos/qgraph.h"
-+#include "sdhci.h"
 +
-+typedef struct QXlnx_zcu102Machine QXlnx_zcu102Machine;
++typedef struct QTpci200 QTpci200;
++typedef struct QIpack QIpack;
 +
-+struct QXlnx_zcu102Machine {
-+    QOSGraphObject obj;
-+    QGuestAllocator *alloc;
-+    QSDHCI_MemoryMapped sdhci;
++struct QIpack {
++
 +};
-+
-+static void xlnx_zcu102_destructor(QOSGraphObject *obj)
-+{
-+    g_free(obj);
-+}
-+
-+static void *xlnx_zcu102_get_driver(void *object, const char *interface)
-+{
-+    QXlnx_zcu102Machine *machine = object;
-+    if (!g_strcmp0(interface, "memory")) {
-+        return &machine->alloc;
-+    }
-+
-+    fprintf(stderr, "%s not present in aarch64/xlnx-zcu102\n", interface);
-+    g_assert_not_reached();
-+}
-+
-+static QOSGraphObject *xlnx_zcu102_get_device(void *obj, const char *device)
-+{
-+    QXlnx_zcu102Machine *machine = obj;
-+    if (!g_strcmp0(device, "generic-sdhci")) {
-+        return &machine->sdhci.obj;
-+    }
-+
-+    fprintf(stderr, "%s not present in aarch64/xlnx-zcu102\n", device);
-+    g_assert_not_reached();
-+}
-+
-+static void *qos_create_machine_aarch64_xlnx_zcu102(void)
-+{
-+    QXlnx_zcu102Machine *machine = g_new0(QXlnx_zcu102Machine, 1);
-+
-+    machine->obj.get_device = xlnx_zcu102_get_device;
-+    machine->obj.get_driver = xlnx_zcu102_get_driver;
-+    machine->obj.destructor = xlnx_zcu102_destructor;
-+    /* Datasheet: UG1085 (v1.7) */
-+    qos_init_sdhci_smm(&machine->sdhci, 0xff160000, &(QSDHCIProperties) {
-+        .version = 3,
-+        .baseclock = 0,
-+        .capab.sdma = true,
-+        .capab.reg = 0x280737ec6481
-+    });
-+    return &machine->obj;
-+}
-+
-+static void xlnx_zcu102_register_nodes(void)
-+{
-+    qos_node_create_machine("aarch64/xlnx-zcu102", qos_create_machine_aarch64_xlnx_zcu102);
-+    qos_node_contains("aarch64/xlnx-zcu102", "generic-sdhci", NULL);
-+}
-+
-+libqos_init(xlnx_zcu102_register_nodes);
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index 0a8efd8554..deb42be493 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -22,57 +22,6 @@ FIELD(SDHC_CAPAB, SDR,                      32, 3); /* since v3 */
- FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
- #define SDHC_HCVER                      0xFE
++struct QTpci200 {
++    QOSGraphObject obj;
++    QIpack ipack;
++};
  
--/**
-- * Old sdhci_t structure:
-- *
--    struct sdhci_t {
--        const char *arch, *machine;
--        struct {
--            uintptr_t addr;
--            uint8_t version;
--            uint8_t baseclock;
--            struct {
--                bool sdma;
--                uint64_t reg;
--            } capab;
--        } sdhci;
--        struct {
--            uint16_t vendor_id, device_id;
--        } pci;
--    }
-- *
-- * implemented drivers:
-- *
--    PC via PCI
--        { "x86_64", "pc",
--            {-1,         2, 0,  {1, 0x057834b4} },
--            .pci = { PCI_VENDOR_ID_REDHAT, PCI_DEVICE_ID_REDHAT_SDHCI } },
--
--    BCM2835
--        { "arm",    "raspi2",
--            {0x3f300000, 3, 52, {0, 0x052134b4} } },
--
--    Exynos4210
--        { "arm",    "smdkc210",
--            {0x12510000, 2, 0,  {1, 0x5e80080} } },
--
--    i.MX 6
--        { "arm",    "sabrelite",
--            {0x02190000, 3, 0,  {1, 0x057834b4} } },
--
--    Zynq-7000
--        { "arm",    "xilinx-zynq-a9",   Datasheet: UG585 (v1.12.1)
--            {0xe0100000, 2, 0,  {1, 0x69ec0080} } },
--
-- *
-- * FIXME: the following drivers are missing:
-- *
--
--    ZynqMP
--        { "aarch64", "xlnx-zcu102",     Datasheet: UG1085 (v1.7)
--            {0xff160000, 3, 0,  {1, 0x280737ec6481} } },
-- */
--
- static void check_specs_version(QSDHCI *s, uint8_t version)
+ /* Tests only initialization so far. TODO: Replace with functional tests */
+-static void nop(void)
++static void nop(void *obj, void *data, QGuestAllocator *alloc)
  {
-     uint32_t v;
+ }
+ 
+-int main(int argc, char **argv)
++/* tpci200 */
++static void *tpci200_get_driver(void *obj, const char *interface)
+ {
+-    int ret;
++    QTpci200 *tpci200 = obj;
++    if (!g_strcmp0(interface, "ipack")) {
++        return &tpci200->ipack;
++    }
+ 
+-    g_test_init(&argc, &argv, NULL);
+-    qtest_add_func("/tpci200/nop", nop);
++    fprintf(stderr, "%s not present in tpci200\n", interface);
++    g_assert_not_reached();
++}
+ 
+-    qtest_start("-device tpci200");
+-    ret = g_test_run();
++static void tpci200_destructor(QOSGraphObject *obj)
++{
++    QTpci200 *tpci200 = (QTpci200 *) obj;
++    g_free(tpci200);
++}
+ 
+-    qtest_end();
++static void *tpci200_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
++{
++    QTpci200 *tpci200 = g_new0(QTpci200, 1);
++    tpci200->obj.destructor = tpci200_destructor;
++    tpci200->obj.get_driver = tpci200_get_driver;
+ 
+-    return ret;
++    return &tpci200->obj;
+ }
++
++static void tpci200_register_nodes(void)
++{
++    qos_node_create_driver("tpci200", tpci200_create);
++    qos_node_consumes("tpci200", "pci-bus", &(QOSGraphEdgeOptions) {
++        .extra_device_opts = "id=ipack0",
++    });
++    qos_node_produces("tpci200", "ipack");
++}
++
++libqos_init(tpci200_register_nodes);
++
++static void register_tpci200_test(void)
++{
++    qos_add_test("tpci200-test", "tpci200", nop, NULL);
++}
++
++libqos_init(register_tpci200_test);
 -- 
 2.17.1
