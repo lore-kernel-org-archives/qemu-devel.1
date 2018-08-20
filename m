@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frl70-00070E-15
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:24:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1frlBx-00042r-Qk
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:30:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frl6w-0000U1-8Q
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:24:52 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 15:11:13 +0100
-Message-Id: <20180820141116.9118-20-peter.maydell@linaro.org>
-In-Reply-To: <20180820141116.9118-1-peter.maydell@linaro.org>
-References: <20180820141116.9118-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 19/22] hw/ssi/pl022: Correct wrong value for
- PL022_INT_RT
+	(envelope-from <pbonzini@redhat.com>) id 1frlBu-00046Y-Gq
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:30:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54934 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1frlBs-00043g-Hf
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:29:57 -0400
+References: <20180808195235.5843-1-gedwards@ddn.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <af3b8ef4-d017-d9a8-3f80-32a34c4d06d9@redhat.com>
+Date: Mon, 20 Aug 2018 16:29:45 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180808195235.5843-1-gedwards@ddn.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] expose VIRTIO_SCSI_F_T10_PI for
+ vhost-scsi and vhost-user-scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,37 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Greg Edwards <gedwards@ddn.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Nicholas A. Bellinger" <nab@linux-iscsi.org>, Felipe Franciosi <felipe@nutanix.com>
 
-The PL022 interrupt registers have bits allocated as:
- 0: ROR (receive overrun)
- 1: RT (receive timeout)
- 2: RX (receive FIFO half full or less)
- 3: TX (transmit FIFO half full or less)
+On 08/08/2018 21:52, Greg Edwards wrote:
+> Unify the get_features functions for vhost-scsi and vhost-user-scsi, including
+> their use of host_features, and expose a new 't10_pi' property to enable
+> negotiation of the VIRTIO_SCSI_F_T10_PI feature bit with the backend.
+> 
+> Greg Edwards (3):
+>   vhost-user-scsi: move host_features into VHostSCSICommon
+>   vhost-scsi: unify vhost-scsi get_features implementations
+>   vhost-scsi: expose 't10_pi' property for VIRTIO_SCSI_F_T10_PI
+> 
+>  hw/scsi/vhost-scsi-common.c           |  3 +++
+>  hw/scsi/vhost-scsi.c                  |  3 +++
+>  hw/scsi/vhost-user-scsi.c             | 28 ++++++++++-----------------
+>  include/hw/virtio/vhost-scsi-common.h |  1 +
+>  include/hw/virtio/vhost-user-scsi.h   |  1 -
+>  5 files changed, 17 insertions(+), 19 deletions(-)
+> 
 
-A cut and paste error meant we had the wrong value for
-the PL022_INT_RT constant. This bug doesn't affect device
-behaviour, because we don't implmenet the receive timeout
-feature and so never set that interrupt bit.
+Queued, thanks.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/ssi/pl022.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/ssi/pl022.c b/hw/ssi/pl022.c
-index 3ac57f4c96a..d310671d18e 100644
---- a/hw/ssi/pl022.c
-+++ b/hw/ssi/pl022.c
-@@ -38,7 +38,7 @@ do { fprintf(stderr, "pl022: error: " fmt , ## __VA_ARGS__);} while (0)
- #define PL022_SR_BSY  0x10
- 
- #define PL022_INT_ROR 0x01
--#define PL022_INT_RT  0x04
-+#define PL022_INT_RT  0x02
- #define PL022_INT_RX  0x04
- #define PL022_INT_TX  0x08
- 
--- 
-2.18.0
+Paolo
