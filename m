@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1frqlM-0002x3-0q
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:26:57 -0400
+	(envelope-from <tcminyard@gmail.com>) id 1frqlF-0002rI-0e
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:26:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1frqlI-00039c-28
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:26:55 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:59385)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1frqlH-000365-HW
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:26:51 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 20 Aug 2018 22:25:59 +0200
-Message-Id: <20180820202604.14218-3-laurent@vivier.eu>
-In-Reply-To: <20180820202604.14218-1-laurent@vivier.eu>
-References: <20180820202604.14218-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 2/7] linux-user: fix 32bit g2h()/h2g()
+	(envelope-from <tcminyard@gmail.com>) id 1frql2-0002Wf-CJ
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:26:46 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42156)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1frqky-0002M7-CS
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:26:34 -0400
+Received: by mail-oi0-x242.google.com with SMTP id b16-v6so28173923oic.9
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 13:26:31 -0700 (PDT)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Mon, 20 Aug 2018 15:26:08 -0500
+Message-Id: <1534796770-10295-9-git-send-email-minyard@acm.org>
+In-Reply-To: <1534796770-10295-1-git-send-email-minyard@acm.org>
+References: <1534796770-10295-1-git-send-email-minyard@acm.org>
+Subject: [Qemu-devel] [PATCH v2 08/10] i2c:pm_smbus: Add the ability to
+ force block transfer enable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,165 +27,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
 
-sparc32plus has 64bit long type but only 32bit virtual address space.
+From: Corey Minyard <cminyard@mvista.com>
 
-For instance, "apt-get upgrade" failed because of a mmap()/msync()
-sequence.
+The PIIX4 hardware has block transfer buffer always enabled in
+the hardware, but the i801 does not.  Add a parameter to pm_smbus_init
+to force on the block transfer so the PIIX4 handler can enable this
+by default, as it was disabled by default before.
 
-mmap() returned 0xff252000 but msync() used g2h(0xffffffffff252000)
-to find the host address. The "(target_ulong)" in g2h() doesn't fix the
-address because it is 64bit long.
-
-This patch introduces an "abi_ptr" that is set to uint32_t
-if the virtual address space is addressed using 32bit in the linux-user
-case. It stays set to target_ulong with softmmu case.
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180814171217.14680-1-laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-[lv: added "%" in TARGET_ABI_FMT_ptr "%"PRIx64]
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/exec/cpu_ldst.h                   | 23 ++++++++++++++++++-----
- include/exec/cpu_ldst_useronly_template.h | 12 ++++++------
- linux-user/syscall.c                      |  2 +-
- 3 files changed, 25 insertions(+), 12 deletions(-)
+ hw/acpi/piix4.c           | 2 +-
+ hw/i2c/pm_smbus.c         | 5 ++++-
+ hw/i2c/smbus_ich9.c       | 2 +-
+ hw/isa/vt82c686.c         | 2 +-
+ include/hw/i2c/pm_smbus.h | 2 +-
+ 5 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index 0f2cb717b1..41ed0526e2 100644
---- a/include/exec/cpu_ldst.h
-+++ b/include/exec/cpu_ldst.h
-@@ -48,8 +48,19 @@
- #define CPU_LDST_H
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index f8d8d2e..313305f 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -513,7 +513,7 @@ static void piix4_pm_realize(PCIDevice *dev, Error **errp)
+     pci_conf[0x90] = s->smb_io_base | 1;
+     pci_conf[0x91] = s->smb_io_base >> 8;
+     pci_conf[0xd2] = 0x09;
+-    pm_smbus_init(DEVICE(dev), &s->smb);
++    pm_smbus_init(DEVICE(dev), &s->smb, true);
+     memory_region_set_enabled(&s->smb.io, pci_conf[0xd2] & 1);
+     memory_region_add_subregion(pci_address_space_io(dev),
+                                 s->smb_io_base, &s->smb.io);
+diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+index 10ba208..4d021bb 100644
+--- a/hw/i2c/pm_smbus.c
++++ b/hw/i2c/pm_smbus.c
+@@ -422,11 +422,14 @@ const VMStateDescription pmsmb_vmstate = {
+     }
+ };
  
- #if defined(CONFIG_USER_ONLY)
-+/* sparc32plus has 64bit long but 32bit space address
-+ * this can make bad result with g2h() and h2g()
-+ */
-+#if TARGET_VIRT_ADDR_SPACE_BITS <= 32
-+typedef uint32_t abi_ptr;
-+#define TARGET_ABI_FMT_ptr "%x"
-+#else
-+typedef uint64_t abi_ptr;
-+#define TARGET_ABI_FMT_ptr "%"PRIx64
-+#endif
-+
- /* All direct uses of g2h and h2g need to go away for usermode softmmu.  */
--#define g2h(x) ((void *)((unsigned long)(target_ulong)(x) + guest_base))
-+#define g2h(x) ((void *)((unsigned long)(abi_ptr)(x) + guest_base))
- 
- #define guest_addr_valid(x) ((x) <= GUEST_ADDR_MAX)
- #define h2g_valid(x) guest_addr_valid((unsigned long)(x) - guest_base)
-@@ -61,7 +72,7 @@ static inline int guest_range_valid(unsigned long start, unsigned long len)
- 
- #define h2g_nocheck(x) ({ \
-     unsigned long __ret = (unsigned long)(x) - guest_base; \
--    (abi_ulong)__ret; \
-+    (abi_ptr)__ret; \
- })
- 
- #define h2g(x) ({ \
-@@ -69,7 +80,9 @@ static inline int guest_range_valid(unsigned long start, unsigned long len)
-     assert(h2g_valid(x)); \
-     h2g_nocheck(x); \
- })
--
-+#else
-+typedef target_ulong abi_ptr;
-+#define TARGET_ABI_FMT_ptr TARGET_ABI_FMT_lx
- #endif
- 
- #if defined(CONFIG_USER_ONLY)
-@@ -397,7 +410,7 @@ extern __thread uintptr_t helper_retaddr;
-  * This is the equivalent of the initial fast-path code used by
-  * TCG backends for guest load and store accesses.
-  */
--static inline void *tlb_vaddr_to_host(CPUArchState *env, target_ulong addr,
-+static inline void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
-                                       int access_type, int mmu_idx)
+-void pm_smbus_init(DeviceState *parent, PMSMBus *smb)
++void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk)
  {
- #if defined(CONFIG_USER_ONLY)
-@@ -405,7 +418,7 @@ static inline void *tlb_vaddr_to_host(CPUArchState *env, target_ulong addr,
- #else
-     int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-     CPUTLBEntry *tlbentry = &env->tlb_table[mmu_idx][index];
--    target_ulong tlb_addr;
-+    abi_ptr tlb_addr;
-     uintptr_t haddr;
+     smb->op_done = true;
+     smb->reset = pm_smbus_reset;
+     smb->smbus = i2c_init_bus(parent, "i2c");
++    if (force_aux_blk) {
++        smb->smb_auxctl |= AUX_BLK;
++    }
+     memory_region_init_io(&smb->io, OBJECT(parent), &pm_smbus_ops, smb,
+                           "pm-smbus", 64);
+ }
+diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+index 316c2a4..5860fc9 100644
+--- a/hw/i2c/smbus_ich9.c
++++ b/hw/i2c/smbus_ich9.c
+@@ -88,7 +88,7 @@ static void ich9_smbus_realize(PCIDevice *d, Error **errp)
+     pci_set_byte(d->config + ICH9_SMB_HOSTC, 0);
+     /* TODO bar0, bar1: 64bit BAR support*/
  
-     switch (access_type) {
-diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu_ldst_useronly_template.h
-index e30e58ed4a..0fd6019af0 100644
---- a/include/exec/cpu_ldst_useronly_template.h
-+++ b/include/exec/cpu_ldst_useronly_template.h
-@@ -62,7 +62,7 @@
- #endif
+-    pm_smbus_init(&d->qdev, &s->smb);
++    pm_smbus_init(&d->qdev, &s->smb, false);
+     pci_register_bar(d, ICH9_SMB_SMB_BASE_BAR, PCI_BASE_ADDRESS_SPACE_IO,
+                      &s->smb.io);
+ }
+diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
+index cff1946..7302f6d 100644
+--- a/hw/isa/vt82c686.c
++++ b/hw/isa/vt82c686.c
+@@ -370,7 +370,7 @@ static void vt82c686b_pm_realize(PCIDevice *dev, Error **errp)
+     pci_conf[0x90] = s->smb_io_base | 1;
+     pci_conf[0x91] = s->smb_io_base >> 8;
+     pci_conf[0xd2] = 0x90;
+-    pm_smbus_init(&s->dev.qdev, &s->smb);
++    pm_smbus_init(&s->dev.qdev, &s->smb, false);
+     memory_region_add_subregion(get_system_io(), s->smb_io_base, &s->smb.io);
  
- static inline RES_TYPE
--glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong ptr)
-+glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
- {
- #if !defined(CODE_ACCESS)
-     trace_guest_mem_before_exec(
-@@ -74,7 +74,7 @@ glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong ptr)
+     apm_init(dev, &s->apm, NULL, s);
+diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
+index cfe596f..471345e 100644
+--- a/include/hw/i2c/pm_smbus.h
++++ b/include/hw/i2c/pm_smbus.h
+@@ -33,7 +33,7 @@ typedef struct PMSMBus {
+     bool op_done;
+ } PMSMBus;
  
- static inline RES_TYPE
- glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
--                                                  target_ulong ptr,
-+                                                  abi_ptr ptr,
-                                                   uintptr_t retaddr)
- {
-     RES_TYPE ret;
-@@ -86,7 +86,7 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+-void pm_smbus_init(DeviceState *parent, PMSMBus *smb);
++void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk);
  
- #if DATA_SIZE <= 2
- static inline int
--glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong ptr)
-+glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
- {
- #if !defined(CODE_ACCESS)
-     trace_guest_mem_before_exec(
-@@ -98,7 +98,7 @@ glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong ptr)
+ extern const VMStateDescription pmsmb_vmstate;
  
- static inline int
- glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
--                                                  target_ulong ptr,
-+                                                  abi_ptr ptr,
-                                                   uintptr_t retaddr)
- {
-     int ret;
-@@ -111,7 +111,7 @@ glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
- 
- #ifndef CODE_ACCESS
- static inline void
--glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong ptr,
-+glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr,
-                                       RES_TYPE v)
- {
- #if !defined(CODE_ACCESS)
-@@ -124,7 +124,7 @@ glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong ptr,
- 
- static inline void
- glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
--                                                  target_ulong ptr,
-+                                                  abi_ptr ptr,
-                                                   RES_TYPE v,
-                                                   uintptr_t retaddr)
- {
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index bb42a225eb..1806b33b02 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -7644,7 +7644,7 @@ static int open_self_maps(void *cpu_env, int fd)
-             if (h2g(min) == ts->info->stack_limit) {
-                 pstrcpy(path, sizeof(path), "      [stack]");
-             }
--            dprintf(fd, TARGET_ABI_FMT_lx "-" TARGET_ABI_FMT_lx
-+            dprintf(fd, TARGET_ABI_FMT_ptr "-" TARGET_ABI_FMT_ptr
-                     " %c%c%c%c %08" PRIx64 " %02x:%02x %d %s%s\n",
-                     h2g(min), h2g(max - 1) + 1, flag_r, flag_w,
-                     flag_x, flag_p, offset, dev_maj, dev_min, inode,
 -- 
-2.17.1
+2.7.4
