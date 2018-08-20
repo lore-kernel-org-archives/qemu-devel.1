@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1frqll-0003Ht-Ez
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:26 -0400
+	(envelope-from <tcminyard@gmail.com>) id 1frqlq-0003L3-2N
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1frqlb-0003qP-Gb
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:14 -0400
-Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:45840)
+	(envelope-from <tcminyard@gmail.com>) id 1frqll-0004BK-G9
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:25 -0400
+Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:33756)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1frqlR-0003Nr-Qq
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:05 -0400
-Received: by mail-oi0-x232.google.com with SMTP id q11-v6so28135827oic.12
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 13:26:57 -0700 (PDT)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1frqlb-0003PT-JP
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:14 -0400
+Received: by mail-oi0-x231.google.com with SMTP id 8-v6so28223526oip.0
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 13:26:58 -0700 (PDT)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Mon, 20 Aug 2018 15:26:06 -0500
-Message-Id: <1534796770-10295-7-git-send-email-minyard@acm.org>
+Date: Mon, 20 Aug 2018 15:26:07 -0500
+Message-Id: <1534796770-10295-8-git-send-email-minyard@acm.org>
 In-Reply-To: <1534796770-10295-1-git-send-email-minyard@acm.org>
 References: <1534796770-10295-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v2 06/10] i2c:pm_smbus: Add interrupt handling
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 07/10] Don't delay host status register busy
+ bit when interrupts are enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,123 +31,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-Add the necessary code so that interrupts actually work from
-the pm_smbus device.
+Change 880b1ffe6ec2f0ae "smbus: do not immediately complete commands"
+changed pm_smbus to delay setting the host busy bit until the status
+register was read, to work around a bug in AMIBIOS.  Unfortunately,
+when interrupts are enabled, the status register will never get read
+and the processing will never happen.
+
+Modify the code to only delay setting the host busy bit if interrupts
+are not enabled.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Hervé Poussineau <hpoussin@reactos.org>
+Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/i2c/pm_smbus.c         | 14 +++++++++++++-
- hw/i2c/smbus_ich9.c       | 19 ++++++++++++++++++-
- include/hw/i2c/pm_smbus.h |  2 ++
- 3 files changed, 33 insertions(+), 2 deletions(-)
+ hw/i2c/pm_smbus.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
 diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-index 9e11d47..664a6b1 100644
+index 664a6b1..10ba208 100644
 --- a/hw/i2c/pm_smbus.c
 +++ b/hw/i2c/pm_smbus.c
-@@ -214,6 +214,12 @@ static void smb_transaction_start(PMSMBus *s)
-     s->smb_stat |= STS_HOST_BUSY;
- }
+@@ -80,9 +80,6 @@ static void smb_transaction(PMSMBus *s)
+     I2CBus *bus = s->smbus;
+     int ret;
  
-+static bool
-+smb_irq_value(PMSMBus *s)
-+{
-+    return ((s->smb_stat & ~STS_HOST_BUSY) != 0) && (s->smb_ctl & CTL_INTREN);
-+}
-+
- static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-                               unsigned width)
+-    assert(s->smb_stat & STS_HOST_BUSY);
+-    s->smb_stat &= ~STS_HOST_BUSY;
+-
+     SMBUS_DPRINTF("SMBus trans addr=0x%02x prot=0x%02x\n", addr, prot);
+     /* Transaction isn't exec if STS_DEV_ERR bit set */
+     if ((s->smb_stat & STS_DEV_ERR) != 0)  {
+@@ -209,9 +206,18 @@ error:
+ 
+ static void smb_transaction_start(PMSMBus *s)
  {
-@@ -309,7 +315,9 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-     }
- 
-  out:
--    return;
-+    if (s->set_irq) {
-+        s->set_irq(s, smb_irq_value(s));
+-    /* Do not execute immediately the command ; it will be
+-     * executed when guest will read SMB_STAT register */
+-    s->smb_stat |= STS_HOST_BUSY;
++    if (s->smb_ctl & CTL_INTREN) {
++        smb_transaction(s);
++    } else {
++        /* Do not execute immediately the command; it will be
++         * executed when guest will read SMB_STAT register.  This
++         * is to work around a bug in AMIBIOS (that is working
++         * around another bug in some specific hardware) where
++         * it waits for STS_HOST_BUSY to be set before waiting
++         * checking for status.  If STS_HOST_BUSY doesn't get
++         * set, it gets stuck. */
++        s->smb_stat |= STS_HOST_BUSY;
 +    }
  }
  
- static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-@@ -365,6 +373,10 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-     SMBUS_DPRINTF("SMB readb port=0x%04" HWADDR_PRIx " val=0x%02x\n",
-                   addr, val);
- 
-+    if (s->set_irq) {
-+        s->set_irq(s, smb_irq_value(s));
-+    }
-+
-     return val;
- }
- 
-diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
-index c8b8413..316c2a4 100644
---- a/hw/i2c/smbus_ich9.c
-+++ b/hw/i2c/smbus_ich9.c
-@@ -40,15 +40,18 @@
- typedef struct ICH9SMBState {
-     PCIDevice dev;
- 
-+    bool irq_enabled;
-+
-     PMSMBus smb;
- } ICH9SMBState;
- 
- static const VMStateDescription vmstate_ich9_smbus = {
-     .name = "ich9_smb",
--    .version_id = 2,
-+    .version_id = 3,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
-+        VMSTATE_BOOL_V(irq_enabled, ICH9SMBState, 3),
-         VMSTATE_STRUCT(smb, ICH9SMBState, 2, pmsmb_vmstate, PMSMBus),
-         VMSTATE_END_OF_LIST()
-     }
-@@ -110,11 +113,25 @@ static void ich9_smb_class_init(ObjectClass *klass, void *data)
-     dc->user_creatable = false;
- }
- 
-+static void ich9_smb_set_irq(PMSMBus *pmsmb, bool enabled)
-+{
-+    ICH9SMBState *s = pmsmb->opaque;
-+
-+    if (enabled == s->irq_enabled) {
-+        return;
-+    }
-+
-+    s->irq_enabled = enabled;
-+    pci_set_irq(&s->dev, enabled);
-+}
-+
- I2CBus *ich9_smb_init(PCIBus *bus, int devfn, uint32_t smb_io_base)
- {
-     PCIDevice *d =
-         pci_create_simple_multifunction(bus, devfn, true, TYPE_ICH9_SMB_DEVICE);
-     ICH9SMBState *s = ICH9_SMB_DEVICE(d);
-+    s->smb.set_irq = ich9_smb_set_irq;
-+    s->smb.opaque = s;
-     return s->smb.smbus;
- }
- 
-diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
-index b1e1970..cfe596f 100644
---- a/include/hw/i2c/pm_smbus.h
-+++ b/include/hw/i2c/pm_smbus.h
-@@ -23,6 +23,8 @@ typedef struct PMSMBus {
- 
-     /* Set by the user. */
-     bool i2c_enable;
-+    void (*set_irq)(struct PMSMBus *s, bool enabled);
-+    void *opaque;
- 
-     /* Internally used by pm_smbus. */
- 
+ static bool
+@@ -330,6 +336,7 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+         val = s->smb_stat;
+         if (s->smb_stat & STS_HOST_BUSY) {
+             /* execute command now */
++            s->smb_stat &= ~STS_HOST_BUSY;
+             smb_transaction(s);
+         }
+         break;
 -- 
 2.7.4
