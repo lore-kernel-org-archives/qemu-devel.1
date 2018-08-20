@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1frh2m-0005sa-Bk
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:04:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1frh2r-0005ed-JI
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1frgrZ-0008UG-2q
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:52:41 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:41675)
+	(envelope-from <peter.maydell@linaro.org>) id 1frgqG-0007dO-I7
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:51:21 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34182)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1frgrY-0008Te-UG
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:52:41 -0400
-Received: by mail-oi0-x244.google.com with SMTP id k12-v6so24725193oiw.8
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 02:52:40 -0700 (PDT)
+	id 1frgqG-0007co-2t
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:51:20 -0400
+Received: by mail-oi0-x243.google.com with SMTP id 13-v6so24743147ois.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 02:51:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <516af088-d7e1-969d-420e-610a032a0da0@ilande.co.uk>
-References: <20180802180602.22047-1-peter.maydell@linaro.org>
-	<516af088-d7e1-969d-420e-610a032a0da0@ilande.co.uk>
+In-Reply-To: <20180802155147.1863-1-peter.maydell@linaro.org>
+References: <20180802155147.1863-1-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 10:52:19 +0100
-Message-ID: <CAFEAcA9WF0NbdD8M23FUD0DBGxZi3Wstc_JEoZhCFDdA8vx+GA@mail.gmail.com>
+Date: Mon, 20 Aug 2018 10:50:58 +0100
+Message-ID: <CAFEAcA_ziFp5sFaSMtTeAWWYgiVLfHM_XyLvMCh6JTM9-voA-Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/timer/m48t59: Move away from old_mmio
- accessors
+Subject: Re: [Qemu-devel] [PATCH 0/2] mips: convert devices away from
+ old_mmio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, Gerd Hoffmann <kraxel@redhat.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, "patches@linaro.org" <patches@linaro.org>
 
-On 3 August 2018 at 08:22, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> On 02/08/18 19:06, Peter Maydell wrote:
+On 2 August 2018 at 16:51, Peter Maydell <peter.maydell@linaro.org> wrote:
+> These patches convert a couple of devices used only by MIPS
+> boards from using the old_mmio MemoryRegionOps accessor functions.
 >
->> Move the m48t59 device away from using old_mmio MemoryRegionOps
->> accessors.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
-
+>  * vga-isa-mm: used by the MIPS 'jazz' boards "magnum" and "pica61"
+>  * bonito pci controller: used by the MIPS "fulong2e" board
 >
-> Looks good to me after some quick boot tests on SPARC, SPARC64 and 40p, so:
+> Tested only with "make check".
 >
-> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> thanks
+> -- PMM
+>
+> Peter Maydell (2):
+>   hw/display/vga-isa-mm: Convert away from old_mmio
+>   hw/pci-host/bonito: Move away from old_mmio accessors
 
-Thanks. I'll put this in via target-arm unless somebody has a
-better route for it.
+Ping -- other than a minor tweak to a commit message this
+patchset has been reviewed. MIPS folks, could you take this
+via your mips tree ?
 
+thanks
 -- PMM
