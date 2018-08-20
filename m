@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1frqsh-0000Ij-Uw
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:34:35 -0400
+	(envelope-from <hsp.cat7@gmail.com>) id 1frqxM-00045S-2Y
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:39:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1frqsZ-0004xN-3a
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:34:27 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:33376)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1frqsW-0004pP-RQ
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:34:21 -0400
-Received: by mail-pl0-x242.google.com with SMTP id b90-v6so7678823plb.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 13:34:20 -0700 (PDT)
-References: <20180816025452.21358-1-richard.henderson@linaro.org>
-	<20180816025452.21358-4-richard.henderson@linaro.org>
-	<20180817170359.GC7067@flamenco>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b687794b-423a-330c-dfd5-ab96d2b58ae7@linaro.org>
-Date: Mon, 20 Aug 2018 13:34:16 -0700
+	(envelope-from <hsp.cat7@gmail.com>) id 1frqxK-0003sp-V1
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:39:19 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180817170359.GC7067@flamenco>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/5] target/s390x: Convert to
- HAVE_CMPXCHG128 and HAVE_ATOMIC128
+In-Reply-To: <f4367121-e7fd-505b-7627-5ebee146dc5b@weilnetz.de>
+References: <CABLmASE2HTZPBVFM=grds+9RmPyh2naJ2KwNjb81LD0+E+yrtA@mail.gmail.com>
+	<c350ae62-2712-79cc-e7e6-b88ae3fbc044@weilnetz.de>
+	<008c57ea-0050-b5f0-4d68-db660cba269e@weilnetz.de>
+	<f4367121-e7fd-505b-7627-5ebee146dc5b@weilnetz.de>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Mon, 20 Aug 2018 22:39:14 +0200
+Message-ID: <CABLmASEoBy3xzx4VY+HDJ0RY57axngP1rnXc2JqQcg0DfaC+RQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Bugs when cross-compiling qemu for Windows with
+ mingw 8.1, executable doesn't run
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,19 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Stefan Weil <sw@weilnetz.de>
+Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Ben Pye <ben@curlybracket.co.uk>
 
-On 08/17/2018 10:03 AM, Emilio G. Cota wrote:
->> -        if (((4 << fc) | (1 << sc)) & mask) {
->> +        if ((HAVE_CMPXCHG128 ? 0 : fsize > max) ||
->> +            (HAVE_ATOMIC128  ? 0 : ssize > max)) {
-> I don't know what fsize/ssize are, so this is hard to review
-> for me--just opened the PoO for the first time ever, and I'm
-> even more confused :-)
+On Mon, Aug 20, 2018 at 9:47 PM, Stefan Weil <sw@weilnetz.de> wrote:
+> Am 20.08.2018 um 21:41 schrieb Stefan Weil:
+>> That's a problem triggered by gcc 8 for Mingw-w64 with compiler options
+>> -fstack-protector-all and -fstack-protector-strong. With any of those
+>> options this simple test program also fails with SIGSEGV:
+>>
+>> #include <windows.h>
+>> int main(void) {
+>>   SYSTEM_INFO system_info;
+>>   GetSystemInfo(&system_info);
+>>   return system_info.dwPageSize;
+>> }
+>>
+>> With configure option --disable-stack-protector, the resulting binary
+>> should work.
+>
+>
+> I could confirm that now. The following build works for me:
+>
+> ./configure --cross-prefix=x86_64-w64-mingw32- --enable-debug \
+>   --disable-stack-protector --target-list=ppc-softmmu && make
+>
+> Stefan
 
-I've renamed the variables to swap_size and store_size;
-hopefully that makes this clearer.
+Confirmed, adding --disable-stack-protector to configure results in a
+working binary.
 
-
-r~
+Great, thanks,
+Howard
