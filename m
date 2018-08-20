@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frkuA-0003aA-1L
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:38 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1frkuE-0003dk-N6
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frku9-0007K3-0y
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:38 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1frkuE-0007Ob-1N
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:42 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 15:11:07 +0100
-Message-Id: <20180820141116.9118-14-peter.maydell@linaro.org>
+Date: Mon, 20 Aug 2018 15:11:11 +0100
+Message-Id: <20180820141116.9118-18-peter.maydell@linaro.org>
 In-Reply-To: <20180820141116.9118-1-peter.maydell@linaro.org>
 References: <20180820141116.9118-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 13/22] hw/arm/iotkit: Wire up the lines for MSCs
+Subject: [Qemu-devel] [PATCH 17/22] hw/ssi/pl022: Don't directly call
+ vmstate_register()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +23,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-The IoTKit doesn't have any MSCs itself but it does need
-some wiring to connect the external signals from MSCs
-in the outer board model up to the registers and the
-NVIC IRQ line.
-
-We also need to expose a MemoryRegion corresponding to
-the AHB bus, so that MSCs in the outer board model can
-use that as their downstream port. (In the FPGA this is
-the "AHB Slave Expansion" ports shown in the block
-diagram in the AN505 documentation.)
+Use the DeviceState vmsd pointer rather than calling vmstate_register()
+directly.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/arm/iotkit.h |  8 ++++++++
- hw/arm/iotkit.c         | 15 +++++++++++++++
- 2 files changed, 23 insertions(+)
+ hw/ssi/pl022.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
-index 426dc326a0d..3a8ee639085 100644
---- a/include/hw/arm/iotkit.h
-+++ b/include/hw/arm/iotkit.h
-@@ -28,6 +28,9 @@
-  *  + QOM property "EXP_NUMIRQ" sets the number of expansion interrupts
-  *  + Named GPIO inputs "EXP_IRQ" 0..n are the expansion interrupts, which
-  *    are wired to the NVIC lines 32 .. n+32
-+ *  + sysbus MMIO region 0 is the "AHB Slave Expansion" which allows
-+ *    bus master devices in the board model to make transactions into
-+ *    all the devices and memory areas in the IoTKit
-  * Controlling up to 4 AHB expansion PPBs which a system using the IoTKit
-  * might provide:
-  *  + named GPIO outputs apb_ppcexp{0,1,2,3}_nonsec[0..15]
-@@ -45,6 +48,11 @@
-  * Controlling each of the 16 expansion MPCs which a system using the IoTKit
-  * might provide:
-  *  + named GPIO inputs mpcexp_status[0..15]
-+ * Controlling each of the 16 expansion MSCs which a system using the IoTKit
-+ * might provide:
-+ *  + named GPIO inputs mscexp_status[0..15]
-+ *  + named GPIO outputs mscexp_clear[0..15]
-+ *  + named GPIO outputs mscexp_ns[0..15]
-  */
- 
- #ifndef IOTKIT_H
-diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
-index f8276b5425c..8742200fb42 100644
---- a/hw/arm/iotkit.c
-+++ b/hw/arm/iotkit.c
-@@ -667,6 +667,21 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
- 
-     iotkit_forward_sec_resp_cfg(s);
- 
-+    /* Forward the MSC related signals */
-+    qdev_pass_gpios(dev_secctl, dev, "mscexp_status");
-+    qdev_pass_gpios(dev_secctl, dev, "mscexp_clear");
-+    qdev_pass_gpios(dev_secctl, dev, "mscexp_ns");
-+    qdev_connect_gpio_out_named(dev_secctl, "msc_irq", 0,
-+                                qdev_get_gpio_in(DEVICE(&s->armv7m), 11));
-+
-+    /*
-+     * Expose our container region to the board model; this corresponds
-+     * to the AHB Slave Expansion ports which allow bus master devices
-+     * (eg DMA controllers) in the board model to make transactions into
-+     * devices in the IoTKit.
-+     */
-+    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->container);
-+
-     system_clock_scale = NANOSECONDS_PER_SECOND / s->mainclk_frq;
+diff --git a/hw/ssi/pl022.c b/hw/ssi/pl022.c
+index 0b5f90b857f..c9989537062 100644
+--- a/hw/ssi/pl022.c
++++ b/hw/ssi/pl022.c
+@@ -279,7 +279,6 @@ static int pl022_init(SysBusDevice *sbd)
+     sysbus_init_mmio(sbd, &s->iomem);
+     sysbus_init_irq(sbd, &s->irq);
+     s->ssi = ssi_create_bus(dev, "ssi");
+-    vmstate_register(dev, -1, &vmstate_pl022, s);
+     return 0;
  }
  
+@@ -290,6 +289,7 @@ static void pl022_class_init(ObjectClass *klass, void *data)
+ 
+     sdc->init = pl022_init;
+     dc->reset = pl022_reset;
++    dc->vmsd = &vmstate_pl022;
+ }
+ 
+ static const TypeInfo pl022_info = {
 -- 
 2.18.0
