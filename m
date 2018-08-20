@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1frqCw-0000xE-0i
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:22 -0400
+	(envelope-from <no-reply@patchew.org>) id 1frqDA-00017E-QR
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1frqCn-0002ZM-JZ
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39832 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1frqCj-0002Vb-7w
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:10 -0400
-References: <20180820174310.17450-1-marcandre.lureau@redhat.com>
-	<CAFEAcA_hyByeMb5fK88nHO2JVc9CkWc-sYQDjYoh9MfqHJnF5w@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f3bc790e-bcc2-5273-7825-313f2a72f168@redhat.com>
-Date: Mon, 20 Aug 2018 14:51:03 -0500
+	(envelope-from <no-reply@patchew.org>) id 1frqD6-0002i2-Kv
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:36 -0400
+Resent-Message-Id: <E1frqD6-0002i2-Kv@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1frqCw-0002dC-Rw
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:25 -0400
+In-Reply-To: <20180814002653.12828-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153479373315.16687.2859283473962380573@502c9da6d61e>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_hyByeMb5fK88nHO2JVc9CkWc-sYQDjYoh9MfqHJnF5w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] editorconfig: set emacs mode
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 20 Aug 2018 12:35:34 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Fix int64_to_float16
+ double-rounding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org, alex.bennee@linaro.org
 
-On 08/20/2018 01:00 PM, Peter Maydell wrote:
-> On 20 August 2018 at 18:43, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
->> Some time ago, I proposed to use an (eval) in .dir-locals.el to set
->> the mode for all json files and Makefile. Unfortunately, this isn't
->> safe, and emacs will prompt the user, which isn't very friendly.
->>
->> Fortunately, editorconfig provides a special config key which does
->> allow to set the emacs mode. Set the emacs mode for JSON, GLSL and
->> extra makefiles that are not yet covered. Drop modeline from JSON
->> files.
->=20
-> Does emacs apply info from the the editorconfig file by default, though=
-?
-
-Per https://editorconfig.org/, no, you have to first install an emacs=20
-plugin to get editorconfig files to have any effect.  So this patch is a=20
-non-starter unless distros start patching emacs to install that plugin=20
-by default.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODE0MDAyNjUzLjEyODI4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gdGFyZ2V0L2FybTogRml4IGlu
+dDY0X3RvX2Zsb2F0MTYgZG91YmxlLXJvdW5kaW5nCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjc3NmEyOWVkMDIgdGFyZ2V0L2FybTog
+VXNlIHRoZSBmbG9hdC10by1pbnQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVzCmMwOGM0YWJjNTkg
+dGFyZ2V0L2FybTogVXNlIHRoZSBpbnQtdG8tZmxvYXQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVz
+CjcxYzQyNjUzYzUgc29mdGZsb2F0OiBBZGQgc2NhbGluZyBmbG9hdC10by1pbnQgcm91dGluZXMK
+MDQwNDkwYTI4YSBzb2Z0ZmxvYXQ6IEFkZCBzY2FsaW5nIGludC10by1mbG9hdCByb3V0aW5lcwoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBzb2Z0ZmxvYXQ6IEFkZCBz
+Y2FsaW5nIGludC10by1mbG9hdCByb3V0aW5lcy4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IHNvZnRm
+bG9hdDogQWRkIHNjYWxpbmcgZmxvYXQtdG8taW50IHJvdXRpbmVzLi4uCkNoZWNraW5nIFBBVENI
+IDMvNDogdGFyZ2V0L2FybTogVXNlIHRoZSBpbnQtdG8tZmxvYXQtc2NhbGUgc29mdGZsb2F0IHJv
+dXRpbmVzLi4uCkNoZWNraW5nIFBBVENIIDQvNDogdGFyZ2V0L2FybTogVXNlIHRoZSBmbG9hdC10
+by1pbnQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVzLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVk
+IGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojNTg6IEZJTEU6IHRhcmdldC9hcm0v
+aGVscGVyLmM6MTE1ODU6CisgICAgICAgICAgICAgICAgICAgICAgICAgZ2V0X2Zsb2F0X3JvdW5k
+aW5nX21vZGUoZnBzdCksICkKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNs
+b3NlIHBhcmVudGhlc2lzICcpJwojNjQ6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6MTE1OTA6
+CisgICAgICAgICAgICAgICAgICAgICAgICAgZ2V0X2Zsb2F0X3JvdW5kaW5nX21vZGUoZnBzdCks
+ICkKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTQyIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
