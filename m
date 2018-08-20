@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1frlaH-0000R1-Hy
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:55:10 -0400
+	(envelope-from <sw@weilnetz.de>) id 1frlj8-0003GS-Gh
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1frlaD-0005qX-CP
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:55:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51946 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1frlaD-0005qD-6F
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:55:05 -0400
-Date: Mon, 20 Aug 2018 08:55:03 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180820085503.296a8a62@t450s.home>
-In-Reply-To: <CAFEAcA-jyx-=BeHWM4PVner4oZBYttY0piXBq2VMv7RseMpHZA@mail.gmail.com>
-References: <153452552631.13804.12031418293966530953.stgit@gimli.home>
-	<153452572774.13804.6638165053676391508.stgit@gimli.home>
-	<CAFEAcA-jyx-=BeHWM4PVner4oZBYttY0piXBq2VMv7RseMpHZA@mail.gmail.com>
+	(envelope-from <sw@weilnetz.de>) id 1frlj4-0002yd-JB
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:04:18 -0400
+References: <CABLmASE2HTZPBVFM=grds+9RmPyh2naJ2KwNjb81LD0+E+yrtA@mail.gmail.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <c350ae62-2712-79cc-e7e6-b88ae3fbc044@weilnetz.de>
+Date: Mon, 20 Aug 2018 17:04:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CABLmASE2HTZPBVFM=grds+9RmPyh2naJ2KwNjb81LD0+E+yrtA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 4/4] vfio/ccw/pci: Allow devices to opt-in
- for ballooning
+Subject: Re: [Qemu-devel] Bugs when cross-compiling qemu for Windows with
+ mingw 8.1, executable doesn't run
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +24,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 20 Aug 2018 15:23:35 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
-
-> On 17 August 2018 at 18:08, Alex Williamson <alex.williamson@redhat.com> wrote:
-> > If a vfio assigned device makes use of a physical IOMMU, then memory
-> > ballooning is necessarily inhibited due to the page pinning, lack of
-> > page level granularity at the IOMMU, and sufficient notifiers to both
-> > remove the page on balloon inflation and add it back on deflation.
-> > However, not all devices are backed by a physical IOMMU.  In the case
-> > of mediated devices, if a vendor driver is well synchronized with the
-> > guest driver, such that only pages actively used by the guest driver
-> > are pinned by the host mdev vendor driver, then there should be no
-> > overlap between pages available for the balloon driver and pages
-> > actively in use by the device.  Under these conditions, ballooning
-> > should be safe.
-> >
-> > vfio-ccw devices are always mediated devices and always operate under
-> > the constraints above.  Therefore we can consider all vfio-ccw devices
-> > as balloon compatible.
-> >
-> > The situation is far from straightforward with vfio-pci.  These
-> > devices can be physical devices with physical IOMMU backing or
-> > mediated devices where it is unknown whether a physical IOMMU is in
-> > use or whether the vendor driver is well synchronized to the working
-> > set of the guest driver.  The safest approach is therefore to assume
-> > all vfio-pci devices are incompatible with ballooning, but allow user
-> > opt-in should they have further insight into mediated devices.
-> >
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>  
+Am 18.07.2018 um 08:33 schrieb Howard Spoelstra:
+[...]> Issue 2: once strncpy has been replaced with memcpy in these two
+> instances, I can successfully compile, but the executable doesn't run
+> in Windows.
+> I tried to debug, and this is what gdb told me:
 > 
-> > @@ -2869,6 +2870,27 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-> >          }
-> >      }
-> >
-> > +    /*
-> > +     * Mediated devices *might* operate compatibly with memory ballooning, but
-> > +     * we cannot know for certain, it depends on whether the mdev vendor driver
-> > +     * stays in sync with the active working set of the guest driver.  Prevent
-> > +     * the x-balloon-allowed option unless this is minimally an mdev device.
-> > +     */
-> > +    tmp = g_strdup_printf("%s/subsystem", vdev->vbasedev.sysfsdev);
-> > +    subsys = realpath(tmp, NULL);
-> > +    g_free(tmp);
-> > +    is_mdev = (strcmp(subsys, "/sys/bus/mdev") == 0);
-> > +    free(subsys);  
+> (gdb) run
+> Starting program: c:\qemu-fedora29beta\qemu-system-ppc-debug.exe -L
+> c:\qemu-fedora29beta\pc-bios -boot c -m 256 -M "mac99,via=pmu"
+> -prom-env "boot-args=-v" -prom-env "auto-boot?=true" -prom-env
+> "vga-ndrv?=true" -hda c:\Mac-disks\9.2.qcow2 -netdev
+> "user,id=network01" -device "sungem,netdev=network01" -sdl -d int
+> [New Thread 948.0x6d8]
+> [New Thread 948.0x2778]
+> [New Thread 948.0x286c]
+> [New Thread 948.0x3d0]
 > 
-> Hi -- Coverity points out that we aren't checking the return
-> value from realpath() here. It returns NULL on failure, in
-> which case we'll pass NULL into strcmp() and segfault.
-> (CID 1395101).
+> Program received signal SIGSEGV, Segmentation fault.
+> getpagesize () at util/oslib-win32.c:535
+> 535     util/oslib-win32.c: No such file or directory.
+> (gdb) bt full
+> #0  getpagesize () at util/oslib-win32.c:535
+>         system_info = {{dwOemId = 56491488, {wProcessorArchitecture =
+> 64992, wReserved = 861}}, dwPageSize = 0,
+>           lpMinimumApplicationAddress = 0x99cca4
+> <register_module_init+60>, lpMaximumApplicationAddress = 0x3,
+>           dwActiveProcessorMask = 11102192, dwNumberOfProcessors =
+> 56584576, dwProcessorType = 0,
+>           dwAllocationGranularity = 200, wProcessorLevel = 0,
+> wProcessorRevision = 0}
+> #1  0x00000000009b7fcd in init_real_host_page_size () at util/pagesize.c:16
+> No locals.
+> #2  0x00000000009bc5f2 in __do_global_ctors ()
+> No symbol table info available.
 
-Thanks, patch posted.  The fix is trivial, you're welcome to pull it in
-directly, otherwise I'll send a pull request if qemu-trivial doesn't
-get to it first.  Thanks,
 
-Alex
+It looks like all functions with local variables crash when they are
+called from a global constructor (__do_global_ctors). Such functions
+contain this opcode near the function start:
+
+mov    %fs:0x0,%rax
+
+Maybe %fs has an illegal value (see example below, called from rcu_init).
+
+Replacing the local variable by a static one avoids the problem, but
+would have to be done for any function which is called from a global
+constructor (I stopped after I had changed some of them).
+
+Stefan
+
+(gdb) disas
+Dump of assembler code for function _nocheck__trace_qemu_mutex_lock:
+   0x00000000009896e5 <+0>:     push   %rbp
+   0x00000000009896e6 <+1>:     push   %rsi
+   0x00000000009896e7 <+2>:     push   %rbx
+   0x00000000009896e8 <+3>:     mov    %rsp,%rbp
+   0x00000000009896eb <+6>:     sub    $0x60,%rsp
+   0x00000000009896ef <+10>:    mov    %rcx,-0x18(%rbp)
+   0x00000000009896f3 <+14>:    mov    %rdx,-0x20(%rbp)
+   0x00000000009896f7 <+18>:    mov    %r8d,0x30(%rbp)
+=> 0x00000000009896fb <+22>:    mov    %fs:0x0,%rax
+   0x0000000000989704 <+31>:    mov    %rax,-0x8(%rbp)
+
+(gdb) i reg
+rax            0xe633a0 15086496
+rbx            0xa85120 11030816
+rcx            0x10fabd0        17804240
+rdx            0xe633a0 15086496
+rsi            0xa83de0 11025888
+rdi            0x5536c10        89353232
+rbp            0x22fcc0 0x22fcc0
+rsp            0x22fc60 0x22fc60
+r8             0x12e    302
+r9             0x5538e18        89361944
+r10            0x21     33
+r11            0x21     33
+r12            0xc0     192
+r13            0xb8     184
+r14            0x0      0
+r15            0x0      0
+rip            0x9896fb 0x9896fb <_nocheck__trace_qemu_mutex_lock+22>
+eflags         0x10206  [ PF IF RF ]
+cs             0x33     51
+ss             0x2b     43
+ds             0x2b     43
+es             0x2b     43
+fs             0x53     83
+gs             0x2b     43
