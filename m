@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1frkP3-0007Qg-6f
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:39:31 -0400
+	(envelope-from <mreitz@redhat.com>) id 1frkUD-0002JO-W2
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:44:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1frkOy-0005lW-E0
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:39:28 -0400
-Received: from forwardcorp1j.cmail.yandex.net ([5.255.227.105]:41273)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1frkOt-0005iR-1k
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:39:20 -0400
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-In-Reply-To: <CAMxuvaxognWTGfUdd-103JqXM24TofHJeiztFFwHSApBR6zDOw@mail.gmail.com>
-References: <1534433563-30865-1-git-send-email-yury-kotov@yandex-team.ru>
-	<CAMxuvayBTG7XghOmdTdxT8uR+WH68GC00i3=jWHDU8w+-Ym4Tw@mail.gmail.com>
-	<1677821534769507@iva4-ed922e5c836e.qloud-c.yandex.net>
-	<CAMxuvaxognWTGfUdd-103JqXM24TofHJeiztFFwHSApBR6zDOw@mail.gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1frkUC-0000dN-1s
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:44:49 -0400
+References: <1b072083-700b-9853-e525-e2726bf17476@virtuozzo.com>
+	<20180817180440.49687-1-vsementsov@virtuozzo.com>
+	<4d266435-855b-7900-0ad0-d677a568ebf7@redhat.com>
+	<f4f935d2-cb37-b63b-5060-f15cb43becbd@redhat.com>
+	<8ce95ada-2162-d22f-6925-a97309d8c48a@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <7cd836ad-7270-fe65-d0bd-32b0423d07be@redhat.com>
+Date: Mon, 20 Aug 2018 15:44:28 +0200
 MIME-Version: 1.0
-Date: Mon, 20 Aug 2018 16:39:15 +0300
-Message-Id: <1698031534772355@sas1-bf4ab558af9f.qloud-c.yandex.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] vhost-user reconnect
+In-Reply-To: <8ce95ada-2162-d22f-6925-a97309d8c48a@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="CpJzyzonNcXANX24cSI3TE8JSijLXK7wO"
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] qapi: add x-query-block-graph
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,139 +27,278 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: crosa@redhat.com, ehabkost@redhat.com, armbru@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CpJzyzonNcXANX24cSI3TE8JSijLXK7wO
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: crosa@redhat.com, ehabkost@redhat.com, armbru@redhat.com,
+ kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org,
+ stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <7cd836ad-7270-fe65-d0bd-32b0423d07be@redhat.com>
+Subject: Re: [PATCH v2 1/3] qapi: add x-query-block-graph
+References: <1b072083-700b-9853-e525-e2726bf17476@virtuozzo.com>
+ <20180817180440.49687-1-vsementsov@virtuozzo.com>
+ <4d266435-855b-7900-0ad0-d677a568ebf7@redhat.com>
+ <f4f935d2-cb37-b63b-5060-f15cb43becbd@redhat.com>
+ <8ce95ada-2162-d22f-6925-a97309d8c48a@virtuozzo.com>
+In-Reply-To: <8ce95ada-2162-d22f-6925-a97309d8c48a@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-
-20.08.2018, 16:11, "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>=
-:
-> Hi
->
-> On Mon, Aug 20, 2018 at 2:51 PM, Yury Kotov <yury-kotov@yandex-team.ru>=
- wrote:
->> =C2=A016.08.2018, 18:36, "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@re=
-dhat.com>:
->>> =C2=A0On Thu, Aug 16, 2018 at 5:32 PM, Yury Kotov <yury-kotov@yandex-=
-team.ru> wrote:
->>>> =C2=A0=C2=A0We are using QEMU (2.12.0) with SPDK (18.04.1) over vhos=
-t-user to emulate block
->>>> =C2=A0=C2=A0devices. One of our cases it to restart SPDK without res=
-tarting VM (in case
->>>> =C2=A0=C2=A0of some updates or smth like it). We tried to use the 'r=
-econnect' option for
->>>> =C2=A0=C2=A0the '-chardev' device:
->>>> =C2=A0=C2=A0=C2=A0=C2=A0-object memory-backend-file,id=3Dmem0,size=3D=
-1G,mem-path=3D/dev/hugepages,share=3Don \
->>>> =C2=A0=C2=A0=C2=A0=C2=A0-numa node,memdev=3Dmem0 \
->>>> =C2=A0=C2=A0=C2=A0=C2=A0-chardev socket,id=3Dspdk_vhost_blk1,path=3D=
-/var/tmp/vhost.1,reconnect=3D10 \
->>>> =C2=A0=C2=A0=C2=A0=C2=A0-device vhost-user-blk-pci,chardev=3Dspdk_vh=
-ost_blk1,num-queues=3D4
+On 2018-08-20 12:20, Vladimir Sementsov-Ogievskiy wrote:
+> 18.08.2018 00:03, Max Reitz wrote:
+>> On 2018-08-17 22:32, Eric Blake wrote:
+>>> On 08/17/2018 01:04 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> Add a new command, returning block nodes graph.
 >>>>
->>>> =C2=A0=C2=A0After this, vhost-user-blk initialization fails with an =
-error below:
->>>> =C2=A0=C2=A0=C2=A0=C2=A0qemu-system-x86_64: -device ...: Failed to s=
-et msg fds.
->>>> =C2=A0=C2=A0=C2=A0=C2=A0qemu-system-x86_64: -device ...: vhost-user-=
-blk: vhost initialization failed:
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0Operation not permitted
->>>>
->>>> =C2=A0=C2=A0We got the same error with the latest QEMU (c542a9f9794e=
-c8e0bc3f).
->>>>
->>>> =C2=A0=C2=A0We made some investigations and found out that there are=
- several issues:
->>>>
->>>> =C2=A0=C2=A01. Reconnect option postpones the first connection till =
-machine init done event.
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0But we need this connection during vho=
-st blk device initialization which
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0happens before the machine init done h=
-andling.
->>>>
->>>> =C2=A0=C2=A02. If the connection is forced, then the reconnection wi=
-ll be successful
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0after SPDK restart. The problem is tha=
-t virtual queue will not start.
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0The reason for it is that virtual queu=
-e initialization commands
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0should be resent:
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* VHOST_USER_SET_FEATURES
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* VHOST_USER_SET_MEM_TABLE
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* VHOST_USER_SET_VRING_NUM
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* VHOST_USER_SET_VRING_BASE
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* VHOST_USER_SET_VRING_ADDR
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* VHOST_USER_SET_VRING_KICK
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* VHOST_USER_SET_VRING_CALL
->>>>
->>>> =C2=A0=C2=A0The patch set resolves both of these issues.
->>>>
->>>> =C2=A0=C2=A0Test case:
->>>>
->>>> =C2=A0=C2=A01. Start fio process (inside VM):
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0fio --name test --ioengine=
-=3Dlibaio --iodepth=3D64 --bs=3D4096 \
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0--=
-rw=3Drandrw --direct=3D1 --sync=3D1 --verify=3Dmd5 \
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0--=
-size=3D64M --filename=3D/dev/vda --loops=3D100
->>>>
->>>> =C2=A0=C2=A02. Restart SPDK many times.
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0We are expecting that during SPDK rest=
-art fio will pause and fio should
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0continue to work after restart complet=
-ion.
->>>>
->>>> =C2=A0=C2=A03. fio process completed successfully without any error.
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
+m>
+>>>> ---
+>>>> =C2=A0=C2=A0 qapi/block-core.json=C2=A0 | 116
+>>>> ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>> +##
+>>>> +# @BlockGraphEdge:
+>>>> +#
+>>>> +# Block Graph edge description for x-query-block-graph.
+>>>> +#
+>>>> +# @parent: parent id
+>>>> +#
+>>>> +# @child: child id
+>>>> +#
+>>>> +# @name: name of the relation (examples are 'file' and 'backing')
+>>> Can this be made into a QAPI enum? (It would have ripple effects to
+>>> existing code, but might be a worthwhile cleanup).
 >>>
->>> =C2=A0Can you write a test case in vhost-user-test.c ? (perhaps under
->>> =C2=A0QTEST_VHOST_USER_FIXME scope...)
+>>>> +#
+>>>> +# @perm: granted permissions for the parent operating on the child
+>>>> +#
+>>>> +# @shared-perm: permissions that can still be granted to other user=
+s
+>>>> of the
+>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 child while it is still attached this parent
+>>>> +#
+>>>> +# Since: 3.1
+>>>> +##
+>>>> +{ 'struct': 'BlockGraphEdge',
+>>>> +=C2=A0 'data': { 'parent': 'uint64', 'child': 'uint64',
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+'name': 'str', 'perm': [ 'BlockPermission' ],
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+'shared-perm': [ 'BlockPermission' ] } }
+>>>> +
+>>>> +##
+>>>> +# @x-query-block-graph:
+>>>> +#
+>>>> +# Get the block graph.
+>>>> +#
+>>>> +# Since: 3.1
+>>>> +##
+>>>> +{ 'command': 'x-query-block-graph', 'returns': 'BlockGraph' }
+>>> Why is this command given an x- prefix?=C2=A0 What would it take to p=
+romote
+>>> it from experimental to fully supported?
+>> This is just a very bad reasons, but I'll give it anyway: We really wa=
+nt
+>> such a command but still don't have one.=C2=A0 So I doubt this is exac=
+tly
+>> what we want. :-)
 >>
->> =C2=A0This is a great idea and we were definitely going to do that dur=
-ing coming couple of weeks. We thought that we could make a follow up com=
-mit with necessary tests added a bit later though, since currently we nee=
-d to figure out the state of vhost-user tests in general, before we can t=
-ry to add any new stuff, and that will take some time. So far we have str=
-ess-tested these fixes manually.
->
-> Yes, some vhost-user tests are disabled by default (sadly for travis
-> CI reason - not a really bug), and it's easy to introduce regressions.
->
-> I sent a related series "[PATCH 0/4] Fix socket chardev regression" to
-> make it work again.
->
->> =C2=A0Do you suggest we wait with this series as well until we have al=
-l tests ready? Or do we proceed now and make a follow up series with vhos=
-t user tests later like we suggested?
->
-> I would rather have the tests with the series.
->
+>> A better reason is that we probably do not want a single command to
+>> return the whole block graph.=C2=A0 Do we want the command to just ret=
+urn
+>> info for a single node, including just the node names of the children?=
 
-Sounds good. We will resend v2 with tests. However while we do that, we w=
-ould be
-grateful for more comments on current implementation as well, since it at=
- least
-passes our internal functional tests.
+>> Do we want the command to include child info on request (but start fro=
+m
+>> a user-specified root)?
+>>
+>> Also, the interface is...=C2=A0 Er, weird?=C2=A0 Honestly, I don't qui=
+te see why
+>> we would want it like this without x-.
+>>
+>> Why use newly generated IDs instead of node names?=C2=A0 Why are those=
+ RAM
+>> addresses?=C2=A0 That is just so fishy.
+>>
+>> Because parents can be non-nodes?=C2=A0 Well, I suppose you better not=
 
->>>> =C2=A0=C2=A0Yury Kotov (3):
->>>> =C2=A0=C2=A0=C2=A0=C2=A0chardev: prevent extra connection attempt in=
- tcp_chr_machine_done_hook
->>>> =C2=A0=C2=A0=C2=A0=C2=A0vhost: refactor vhost_dev_start and vhost_vi=
-rtqueue_start
->>>> =C2=A0=C2=A0=C2=A0=C2=A0vhost-user: add reconnect support for vhost-=
-user
->>>>
->>>> =C2=A0=C2=A0=C2=A0chardev/char-socket.c | 5 +-
->>>> =C2=A0=C2=A0=C2=A0hw/virtio/vhost-user.c | 65 ++++++++++++--
->>>> =C2=A0=C2=A0=C2=A0hw/virtio/vhost.c | 223 ++++++++++++++++++++++++++=
-+++++---------------
->>>> =C2=A0=C2=A0=C2=A0include/hw/virtio/vhost.h | 2 +
->>>> =C2=A0=C2=A0=C2=A04 files changed, 215 insertions(+), 80 deletions(-=
-)
->>>>
->>>> =C2=A0=C2=A0--
->>>> =C2=A0=C2=A02.7.4
+>> include them in the graph like this, then.
+>>
+>> I don't see why the query command we want would include non-BDSs at al=
+l.
+>>
+>> It may be useful for debugging, so, er, well, with an x-debug- prefix,=
+
+>> OK.=C2=A0 But the question then is whether it's useful enough to warra=
+nt
+>> having a separate query command that isn't precisely the command we wa=
+nt
+>> anyway.
+>=20
+>=20
+>>
+>> The first question we probably have to ask is whether the query comman=
+d
+>> needs to output parent information.=C2=A0 If not, querying would proba=
+bly
+>> start at some named node and then you'd go down from there (either wit=
+h
+>> many queries or through a single one).
+>>
+>> If so, well, then we can still output parent information, but I'd say
+>> that then is purely informational and we don't need to "generate" new
+>> IDs for them.=C2=A0 Just have either a node-name there or a user-reada=
+ble
+>> description (like it was in v1; although it has to be noted that such =
+a
+>> user-readable description is useless to a management layer), but these=
+
+>> new IDs are really not something I like.
+>>
+>>> Overall, the command looks quite useful; and the fact that you produc=
+ed
+>>> some nice .dot graphs from it for visualization seems like it is wort=
+h
+>>> considering this as a permanent API addition.=C2=A0 The question, the=
+n, is if
+>>> the interface is right, or if it needs any tweaks (like using an enum=
+
+>>> instead of open-coded string for the relation between parent and chil=
+d),
+>>> as a reason for keeping the x- prefix.
+>> You can use x-debug- even when you decide to keep a command.
+>>
+>> I see no reason why a command should hastily not get an x- prefix just=
+
+>> because it may be useful enough.=C2=A0 If it really is and we really s=
+ee the
+>> interface is good (which I really don't think it is), then we can alwa=
+ys
+>> drop it later.
+>>
+>> Max
+>>
+>>>> +++ b/block.c
+>>>> @@ -4003,6 +4003,86 @@ BlockDeviceInfoList
+>>>> *bdrv_named_nodes_list(Error **errp)
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return list;
+>>>> =C2=A0=C2=A0 }
+>>>> =C2=A0=C2=A0 +#define QAPI_LIST_ADD(list, element) do { \
+>>>> +=C2=A0=C2=A0=C2=A0 typeof(list) _tmp =3D g_new(typeof(*(list)), 1);=
+ \
+>>>> +=C2=A0=C2=A0=C2=A0 _tmp->value =3D (element); \
+>>>> +=C2=A0=C2=A0=C2=A0 _tmp->next =3D (list); \
+>>>> +=C2=A0=C2=A0=C2=A0 list =3D _tmp; \
+>>>> +} while (0)
+>>> Hmm - this seems like a frequently observed pattern - should it be
+>>> something that we add independently and use throughout the tree as pa=
+rt
+>>> of QAPI interactions in general?
+>>>
+>>>> +
+>>>> +BlockGraph *bdrv_get_block_graph(Error **errp)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 BlockGraph *graph =3D g_new0(BlockGraph, 1);
+>>>> +=C2=A0=C2=A0=C2=A0 BlockDriverState *bs;
+>>>> +=C2=A0=C2=A0=C2=A0 BdrvChild *child;
+>>>> +=C2=A0=C2=A0=C2=A0 BlockGraphNode *node;
+>>>> +=C2=A0=C2=A0=C2=A0 BlockGraphEdge *edge;
+>>>> +=C2=A0=C2=A0=C2=A0 struct {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int flag;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockPermission num;
+>>>> +=C2=A0=C2=A0=C2=A0 } permissions[] =3D {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_CONSISTENT_RE=
+AD,
+>>>> BLOCK_PERMISSION_CONSISTENT_READ },
+>>> Would it be worth directly reusing a QAPI enum for all such permissio=
+ns
+>>> in the existing code base, instead of having to map between an intern=
+al
+>>> and a QAPI enum?
+>>>
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_WRITE,=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLOCK_PERMISSION_WRIT=
+E },
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_WRITE_UNCHANG=
+ED,
+>>>> BLOCK_PERMISSION_WRITE_UNCHANGED },
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_RESIZE,=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLOCK_PERMISSION_RESIZE =
+},
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_GRAPH_MOD,=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLOCK_PERMISSION_GRAPH_MOD },
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { 0, 0 }
+>>>> +=C2=A0=C2=A0=C2=A0 }, *p;
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 QTAILQ_FOREACH(bs, &graph_bdrv_states, node_list=
+) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QLIST_FOREACH(child, &bs=
+->parents, next_parent) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+if (!child->role->parent_is_bds) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 BlockGraphNodeList *el;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 bool add =3D true;
+>>> Does your command need/want to expose internal nodes? (I argue that i=
+t
+>>> probably should show internal nodes, even when normal 'query-block'
+>>> doesn't, just because knowing about the impact of internal nodes can =
+be
+>>> important when tracking down permissions issues).
+>> You could make it a flag, but in theory, implicit nodes should never b=
+e
+>> visible through QMP.=C2=A0 (Though if you explicitly request them, tha=
+t's
+>> probably a different story.)
+>>
+>> Max
+>>
+>=20
+> My goal is to get graphviz representation of block graph with all the
+> parents for debugging. And I'm absolutely ok to do it with x-debug-.
+> Then we shouldn't care about enum for role type now. So, it the patch o=
+k
+> for you with x-debug- prefix?
+
+Actually, no, because I'm not sure whether using points for the IDs is a
+good idea.  That may defeat ASLR, and that would be a problem even with
+x-debug-.
+
+So I'd prefer using e.g. a hash map to map pointers to freshly generated
+IDs (just incrementing integers).
+
+In any case, I'll take a further look at the patch later, but another
+thing that I've just seen is that using the opaque pointers to identify
+a parent is something that doesn't look like it's guaranteed to work.
+
+I suppose the alternative would be to start from all possible roots and
+generate the graph from there (all possible roots being all
+monitor-owned BDSs and all BlockBackends, I think).
+
+Max
+
+
+--CpJzyzonNcXANX24cSI3TE8JSijLXK7wO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt6xbwACgkQ9AfbAGHV
+z0CnTwgAqtaH5l1TZuXZPfL8JbjMW6Vs5v5fMDgJnu2qglrC5aSnGu2jlpb0EvNY
+EaWQal+AbIoIbTFAA9dtZmc9Ph0NsqJqboeL1FWepkiC8tICgve893elIG93R8eL
+CPVEYk+9NWFIlEgcWAtoAils8Yj+pU7iKqs2yUI49QsbzOaTxfCz8Tc6Q9UIc+3R
+RdzSKhQVXw4mng7HoFi7YIdxIcwj3Hg7gv7mpCjFdh6QDqnnZJAA6bDHgfoRKm7O
+sFbA8IA5j1zfk70zdTexerc4g074v83vtNyMrJ8fBqUNIJ9GITjNFecgHpkTdL0Y
+w5yM2FXg+TQtgsD4F6Or4Qwat41sOQ==
+=HSyz
+-----END PGP SIGNATURE-----
+
+--CpJzyzonNcXANX24cSI3TE8JSijLXK7wO--
