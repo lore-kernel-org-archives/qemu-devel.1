@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1frjtZ-0002IC-DB
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:06:58 -0400
+	(envelope-from <mlureau@redhat.com>) id 1frjxx-00053Q-3I
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:11:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1frjtY-0004gy-En
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:06:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48482 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1frjtY-0004ge-9A
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:06:56 -0400
-References: <20180704181010.GA918@computer>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cec51a71-2339-d764-e6df-88d311adb9d9@redhat.com>
-Date: Mon, 20 Aug 2018 15:06:47 +0200
+	(envelope-from <mlureau@redhat.com>) id 1frjxp-0007EX-QS
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:11:27 -0400
+Received: from mail-io0-f195.google.com ([209.85.223.195]:40448)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1frjxp-0007Cl-K4
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 09:11:21 -0400
+Received: by mail-io0-f195.google.com with SMTP id l14-v6so12501246iob.7
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 06:11:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180704181010.GA918@computer>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] module: Use QEMU_MODULE_DIR as a search
- path
+In-Reply-To: <1677821534769507@iva4-ed922e5c836e.qloud-c.yandex.net>
+References: <1534433563-30865-1-git-send-email-yury-kotov@yandex-team.ru>
+	<CAMxuvayBTG7XghOmdTdxT8uR+WH68GC00i3=jWHDU8w+-Ym4Tw@mail.gmail.com>
+	<1677821534769507@iva4-ed922e5c836e.qloud-c.yandex.net>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 20 Aug 2018 15:11:19 +0200
+Message-ID: <CAMxuvaxognWTGfUdd-103JqXM24TofHJeiztFFwHSApBR6zDOw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] vhost-user reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +30,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ryang <decatf@gmail.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>
 
-On 04/07/2018 20:10, ryang wrote:
-> The current paths for modules are CONFIG_QEMU_MODDIR and paths relative
-> to the executable. Qemu and its modules can be installed and executed in
-> paths that are different from these search paths. This change allows
-> a search path to be specified by environment variable.
-> 
-> An example usage for this is postmarketOS[1]. This is a build environment
-> for Alpine Linux. It sets up Alpine Linux in a chroot environment.
-> Alpine's Qemu packages are installed in the chroot. The Alpine Linux Qemu
-> package is used to test compiled Alpine Linux system images. This way there
-> isn't a reliance on the which ever version of Qemu the host system / distro
-> provides.
-> 
-> postmarketOS executes Qemu on host system outside of the chroot
-> The Qemu module search path needs to point to the location of the
-> chroot relative to the host system.
-> 
-> e.g.
-> The root of the Alpine Linux chroot is:
-> ~/.local/var/pmbootstrap/chroot_native/
-> 
-> Alpine's Qemu is installed at
-> ~/.local/var/pmbootstrap/chroot_native/usr/bin/
-> 
-> The Qemu module search path needs to be:
-> QEMU_MODULE_DIR=~/.local/var/pmbootstrap/chroot_native/usr/lib/qemu/
-> 
-> [1] https://postmarketos.org/
-> 
+Hi
 
-Queued, thanks.
+On Mon, Aug 20, 2018 at 2:51 PM, Yury Kotov <yury-kotov@yandex-team.ru> wro=
+te:
+> 16.08.2018, 18:36, "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>=
+:
+>> On Thu, Aug 16, 2018 at 5:32 PM, Yury Kotov <yury-kotov@yandex-team.ru> =
+wrote:
+>>>  We are using QEMU (2.12.0) with SPDK (18.04.1) over vhost-user to emul=
+ate block
+>>>  devices. One of our cases it to restart SPDK without restarting VM (in=
+ case
+>>>  of some updates or smth like it). We tried to use the 'reconnect' opti=
+on for
+>>>  the '-chardev' device:
+>>>    -object memory-backend-file,id=3Dmem0,size=3D1G,mem-path=3D/dev/huge=
+pages,share=3Don \
+>>>    -numa node,memdev=3Dmem0 \
+>>>    -chardev socket,id=3Dspdk_vhost_blk1,path=3D/var/tmp/vhost.1,reconne=
+ct=3D10 \
+>>>    -device vhost-user-blk-pci,chardev=3Dspdk_vhost_blk1,num-queues=3D4
+>>>
+>>>  After this, vhost-user-blk initialization fails with an error below:
+>>>    qemu-system-x86_64: -device ...: Failed to set msg fds.
+>>>    qemu-system-x86_64: -device ...: vhost-user-blk: vhost initializatio=
+n failed:
+>>>                                     Operation not permitted
+>>>
+>>>  We got the same error with the latest QEMU (c542a9f9794ec8e0bc3f).
+>>>
+>>>  We made some investigations and found out that there are several issue=
+s:
+>>>
+>>>  1. Reconnect option postpones the first connection till machine init d=
+one event.
+>>>     But we need this connection during vhost blk device initialization =
+which
+>>>     happens before the machine init done handling.
+>>>
+>>>  2. If the connection is forced, then the reconnection will be successf=
+ul
+>>>     after SPDK restart. The problem is that virtual queue will not star=
+t.
+>>>     The reason for it is that virtual queue initialization commands
+>>>     should be resent:
+>>>     * VHOST_USER_SET_FEATURES
+>>>     * VHOST_USER_SET_MEM_TABLE
+>>>     * VHOST_USER_SET_VRING_NUM
+>>>     * VHOST_USER_SET_VRING_BASE
+>>>     * VHOST_USER_SET_VRING_ADDR
+>>>     * VHOST_USER_SET_VRING_KICK
+>>>     * VHOST_USER_SET_VRING_CALL
+>>>
+>>>  The patch set resolves both of these issues.
+>>>
+>>>  Test case:
+>>>
+>>>  1. Start fio process (inside VM):
+>>>       fio --name test --ioengine=3Dlibaio --iodepth=3D64 --bs=3D4096 \
+>>>           --rw=3Drandrw --direct=3D1 --sync=3D1 --verify=3Dmd5 \
+>>>           --size=3D64M --filename=3D/dev/vda --loops=3D100
+>>>
+>>>  2. Restart SPDK many times.
+>>>     We are expecting that during SPDK restart fio will pause and fio sh=
+ould
+>>>     continue to work after restart completion.
+>>>
+>>>  3. fio process completed successfully without any error.
+>>
+>> Can you write a test case in vhost-user-test.c ? (perhaps under
+>> QTEST_VHOST_USER_FIXME scope...)
+>>
+>
+> This is a great idea and we were definitely going to do that during comin=
+g couple of weeks. We thought that we could make a follow up commit with ne=
+cessary tests added a bit later though, since currently we need to figure o=
+ut the state of vhost-user tests in general, before we can try to add any n=
+ew stuff, and that will take some time. So far we have stress-tested these =
+fixes manually.
 
-Paolo
+Yes, some vhost-user tests are disabled by default (sadly for travis
+CI reason - not a really bug), and it's easy to introduce regressions.
 
-> Signed-off-by: ryang <decatf@gmail.com>
-> ---
-> 
-> v2:
->  - fix checkpatch errors
-> v3:
->  - initialize n_dirs variable
-> v4:
->  - change env variable suffix from _PATH to _DIR
->  - renamed search_path to search_dir and make it const
-> 
->  util/module.c | 22 ++++++++++++++--------
->  1 file changed, 14 insertions(+), 8 deletions(-)
-> 
-> diff --git a/util/module.c b/util/module.c
-> index c909737..1259dd3 100644
-> --- a/util/module.c
-> +++ b/util/module.c
-> @@ -162,9 +162,10 @@ void module_load_one(const char *prefix, const char *lib_name)
->  #ifdef CONFIG_MODULES
->      char *fname = NULL;
->      char *exec_dir;
-> -    char *dirs[3];
-> +    const char *search_dir;
-> +    char *dirs[4];
->      char *module_name;
-> -    int i = 0;
-> +    int i = 0, n_dirs = 0;
->      int ret;
->      static GHashTable *loaded_modules;
->  
-> @@ -186,14 +187,19 @@ void module_load_one(const char *prefix, const char *lib_name)
->      g_hash_table_insert(loaded_modules, module_name, module_name);
->  
->      exec_dir = qemu_get_exec_dir();
-> -    dirs[i++] = g_strdup_printf("%s", CONFIG_QEMU_MODDIR);
-> -    dirs[i++] = g_strdup_printf("%s/..", exec_dir ? : "");
-> -    dirs[i++] = g_strdup_printf("%s", exec_dir ? : "");
-> -    assert(i == ARRAY_SIZE(dirs));
-> +    search_dir = getenv("QEMU_MODULE_DIR");
-> +    if (search_dir != NULL) {
-> +        dirs[n_dirs++] = g_strdup_printf("%s", search_dir);
-> +    }
-> +    dirs[n_dirs++] = g_strdup_printf("%s", CONFIG_QEMU_MODDIR);
-> +    dirs[n_dirs++] = g_strdup_printf("%s/..", exec_dir ? : "");
-> +    dirs[n_dirs++] = g_strdup_printf("%s", exec_dir ? : "");
-> +    assert(n_dirs <= ARRAY_SIZE(dirs));
-> +
->      g_free(exec_dir);
->      exec_dir = NULL;
->  
-> -    for (i = 0; i < ARRAY_SIZE(dirs); i++) {
-> +    for (i = 0; i < n_dirs; i++) {
->          fname = g_strdup_printf("%s/%s%s",
->                  dirs[i], module_name, HOST_DSOSUF);
->          ret = module_load_file(fname);
-> @@ -205,7 +211,7 @@ void module_load_one(const char *prefix, const char *lib_name)
->          }
->      }
->  
-> -    for (i = 0; i < ARRAY_SIZE(dirs); i++) {
-> +    for (i = 0; i < n_dirs; i++) {
->          g_free(dirs[i]);
->      }
->  
-> 
+I sent a related series "[PATCH 0/4] Fix socket chardev regression" to
+make it work again.
+
+> Do you suggest we wait with this series as well until we have all tests r=
+eady? Or do we proceed now and make a follow up series with vhost user test=
+s later like we suggested?
+
+I would rather have the tests with the series.
+
+>
+>>>  Yury Kotov (3):
+>>>    chardev: prevent extra connection attempt in tcp_chr_machine_done_ho=
+ok
+>>>    vhost: refactor vhost_dev_start and vhost_virtqueue_start
+>>>    vhost-user: add reconnect support for vhost-user
+>>>
+>>>   chardev/char-socket.c | 5 +-
+>>>   hw/virtio/vhost-user.c | 65 ++++++++++++--
+>>>   hw/virtio/vhost.c | 223 +++++++++++++++++++++++++++++++--------------=
+-
+>>>   include/hw/virtio/vhost.h | 2 +
+>>>   4 files changed, 215 insertions(+), 80 deletions(-)
+>>>
+>>>  --
+>>>  2.7.4
