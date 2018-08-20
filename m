@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1frffC-0003Je-4n
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:35:51 -0400
+	(envelope-from <armbru@redhat.com>) id 1frfjS-0005i9-KD
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:40:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1frff7-0000EA-To
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:35:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42068)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1frff7-0000CE-OC
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:35:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1frff6-0007ba-0s
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 08:35:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F30032E851C
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 08:35:43 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1frfjO-0001yC-LI
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:40:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49130 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1frfjO-0001xs-Fo
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:40:10 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180817150559.16243-1-armbru@redhat.com>
+	<20180817150559.16243-29-armbru@redhat.com>
+	<32b3b6c0-5f70-1b6c-9db2-c19f133358ec@redhat.com>
+Date: Mon, 20 Aug 2018 10:40:04 +0200
+In-Reply-To: <32b3b6c0-5f70-1b6c-9db2-c19f133358ec@redhat.com> (Eric Blake's
+	message of "Fri, 17 Aug 2018 11:36:14 -0500")
+Message-ID: <87pnydsa6z.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Aug 2018 08:28:27 -0000
-From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
-	<1755912@bugs.launchpad.net>
-Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153475370842.4675.8094675611074790154.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
- SIGABRT when using option -vga qxl
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 28/60] json: Fix \uXXXX for surrogate
+ pairs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,117 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-** Changed in: qemu (Ubuntu Bionic)
-       Status: New =3D> Triaged
+Eric Blake <eblake@redhat.com> writes:
 
--- =
+> On 08/17/2018 10:05 AM, Markus Armbruster wrote:
+>> The JSON parser treats each half of a surrogate pair as unpaired
+>> surrogate.  Fix it to recognize surrogate pairs.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> I might have dropped the R-b, to ensure the changes since v1 get
+> re-reviewed.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1755912
+I intended to, but screwed up.  My apologies.
 
-Title:
-  qemu-system-x86_64 crashed with SIGABRT when using option -vga qxl
+>> ---
+>>   qobject/json-parser.c | 60 ++++++++++++++++++++++++++++---------------
+>>   tests/check-qjson.c   |  3 +--
+>>   2 files changed, 40 insertions(+), 23 deletions(-)
+>>
+>
+>> @@ -157,22 +169,28 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
+>>                   qstring_append_chr(str, '\t');
+>>                   break;
+>>               case 'u':
+>> -                cp = 0;
+>> -                for (i = 0; i < 4; i++) {
+>> -                    if (!qemu_isxdigit(*ptr)) {
+>> -                        parse_error(ctxt, token,
+>> -                                    "invalid hex escape sequence in string");
+>> -                        goto out;
+>> +                cp = cvt4hex(ptr);
+>> +                ptr += 4;
+>> +
+>> +                /* handle surrogate pairs */
+>> +                if (cp >= 0xD800 && cp <= 0xDBFF
+>> +                    && ptr[0] == '\\' && ptr[1] == 'u') {
+>> +                    /* leading surrogate followed by \u */
+>> +                    cp = 0x10000 + ((cp & 0x3FF) << 10);
+>> +                    trailing = cvt4hex(ptr + 2);
+>> +                    if (trailing >= 0xDC00 && trailing <= 0xDFFF) {
+>> +                        /* followed by trailing surrogate */
+>> +                        cp |= trailing & 0x3FF;
+>> +                        ptr += 6;
+>> +                    } else {
+>> +                        cp = -1; /* invalid */
+>>                       }
+>> -                    cp <<= 4;
+>> -                    cp |= hex2decimal(*ptr);
+>> -                    ptr++;
+>>                   }
+>>                     if (mod_utf8_encode(utf8_buf, sizeof(utf8_buf),
+>> cp) < 0) {
+>>                       parse_error(ctxt, token,
+>> -                                "\\u%.4s is not a valid Unicode character",
+>> -                                ptr - 3);
+>> +                                "%.*s is not a valid Unicode character",
+>> +                                (int)(ptr - beg), beg);
+>
+> The error reporting here has indeed been improved over v1.
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Bionic:
-  Triaged
-
-Bug description:
-  When using qemu-system-x86_64 with the option -vga qxl, it crashes.
-  The easiest way to crash it is by trying to change the guest's
-  resolution. However, the system may randomly crash too, not happening
-  only when changing resolution. Here is the terminal output of one of
-  these random crashes:
-
-  --------
-
-  $ qemu-system-x86_64 -hda /dev/sdb -m 2048 -enable-kvm -cpu host -vga qxl=
- -nodefaults -netdev user,id=3Dhostnet0 -device virtio-net-pci,id=3Dnet0,ne=
-tdev=3Dhostnet0
-  WARNING: Image format was not specified for '/dev/sdb' and probing guesse=
-d raw.
-           Automatically detecting the format is dangerous for raw images, =
-write operations on block 0 will be restricted.
-           Specify the 'raw' format explicitly to remove the restrictions.
-
-  (process:21313): Spice-WARNING **: 16:01:45.759: display-
-  channel.c:2431:display_channel_validate_surface: canvas address is
-  0x7f8eb948ab18 for 0 (and is NULL)
-
-  =
-
-  (process:21313): Spice-WARNING **: 16:01:45.759: display-channel.c:2432:d=
-isplay_channel_validate_surface: failed on 0
-
-  (process:21313): Spice-CRITICAL **: 16:01:45.759: display-channel.c:2035:=
-display_channel_update: condition `display_channel_validate_surface(display=
-, surface_id)' failed
-  Abortado (imagem do n=C3=BAcleo gravada)
-
-  --------
-
-  I was running QEMU as a normal user which is on the groups kvm and
-  disk. Initially I supposed the problem was because I was running QEMU
-  as root, but as a normal user this happens too.
-
-  I have tested with guests with different Ubuntu version: 18.04, 17.10
-  and 16.04. It is happening with them all.
-
-  ProblemType: Crash
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu4
-  ProcVersionSignature: Ubuntu 4.15.0-10.11-generic 4.15.3
-  Uname: Linux 4.15.0-10-generic x86_64
-  ApportVersion: 2.20.8-0ubuntu10
-  Architecture: amd64
-  CurrentDesktop: XFCE
-  Date: Wed Mar 14 17:13:52 2018
-  ExecutablePath: /usr/bin/qemu-system-x86_64
-  InstallationDate: Installed on 2017-06-13 (273 days ago)
-  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: LENOVO 80UG
-  ProcCmdline: qemu-system-x86_64 -hda /dev/sdb -smp cpus=3D2 -m 512 -enabl=
-e-kvm -cpu host -vga qxl -nodefaults -netdev user,id=3Dhostnet0 -device vir=
-tio-net-pci,id=3Dnet0,netdev=3Dhostnet0
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.15.0-10-generic.efi.signe=
-d root=3DUUID=3D6b4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet
-  Signal: 6
-  SourcePackage: qemu
-  StacktraceTop:
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-  Title: qemu-system-x86_64 crashed with SIGABRT
-  UpgradeStatus: Upgraded to bionic on 2017-10-20 (145 days ago)
-  UserGroups: adm bluetooth cdrom dialout dip disk kvm libvirt lpadmin netd=
-ev plugdev sambashare sudo
-  dmi.bios.date: 07/10/2017
-  dmi.bios.vendor: LENOVO
-  dmi.bios.version: 0XCN43WW
-  dmi.board.asset.tag: NO Asset Tag
-  dmi.board.name: Toronto 4A2
-  dmi.board.vendor: LENOVO
-  dmi.board.version: SDK0J40679 WIN
-  dmi.chassis.asset.tag: NO Asset Tag
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: LENOVO
-  dmi.chassis.version: Lenovo ideapad 310-14ISK
-  dmi.modalias: dmi:bvnLENOVO:bvr0XCN43WW:bd07/10/2017:svnLENOVO:pn80UG:pvr=
-Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
-10:cvrLenovoideapad310-14ISK:
-  dmi.product.family: IDEAPAD
-  dmi.product.name: 80UG
-  dmi.product.version: Lenovo ideapad 310-14ISK
-  dmi.sys.vendor: LENOVO
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1755912/+subscriptions
+Thanks!
