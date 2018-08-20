@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1frp4U-0006nQ-Ux
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:38:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1frp55-0007G7-1Y
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:39:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1frp4T-0006dW-7A
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:38:34 -0400
-References: <1b072083-700b-9853-e525-e2726bf17476@virtuozzo.com>
-	<20180817180440.49687-1-vsementsov@virtuozzo.com>
-	<4d266435-855b-7900-0ad0-d677a568ebf7@redhat.com>
-	<f4f935d2-cb37-b63b-5060-f15cb43becbd@redhat.com>
-	<8ce95ada-2162-d22f-6925-a97309d8c48a@virtuozzo.com>
-	<7cd836ad-7270-fe65-d0bd-32b0423d07be@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <aa17dfe6-3ed8-6bff-cb5e-9421dd7d608a@virtuozzo.com>
-Date: Mon, 20 Aug 2018 21:38:13 +0300
+	(envelope-from <eblake@redhat.com>) id 1frp4z-000779-5r
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:39:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49384 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1frp4v-00072T-36
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:39:01 -0400
+References: <20180817150559.16243-1-armbru@redhat.com>
+	<20180817150559.16243-53-armbru@redhat.com>
+	<fa470eb3-cc13-1ab3-b0d5-19343bc3b038@redhat.com>
+	<87k1olqmri.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <226818c6-e0d6-fc81-c473-98bcb656d3bd@redhat.com>
+Date: Mon, 20 Aug 2018 13:38:55 -0500
 MIME-Version: 1.0
-In-Reply-To: <7cd836ad-7270-fe65-d0bd-32b0423d07be@redhat.com>
+In-Reply-To: <87k1olqmri.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] qapi: add x-query-block-graph
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 52/60] json: Eliminate lexer state
+ IN_WHITESPACE, pseudo-token JSON_SKIP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,230 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: crosa@redhat.com, ehabkost@redhat.com, armbru@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-20.08.2018 16:44, Max Reitz wrote:
-> On 2018-08-20 12:20, Vladimir Sementsov-Ogievskiy wrote:
->> 18.08.2018 00:03, Max Reitz wrote:
->>> On 2018-08-17 22:32, Eric Blake wrote:
->>>> On 08/17/2018 01:04 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Add a new command, returning block nodes graph.
->>>>>
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>>>> ---
->>>>>  =C2=A0=C2=A0 qapi/block-core.json=C2=A0 | 116
->>>>> ++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>> +##
->>>>> +# @BlockGraphEdge:
->>>>> +#
->>>>> +# Block Graph edge description for x-query-block-graph.
->>>>> +#
->>>>> +# @parent: parent id
->>>>> +#
->>>>> +# @child: child id
->>>>> +#
->>>>> +# @name: name of the relation (examples are 'file' and 'backing')
->>>> Can this be made into a QAPI enum? (It would have ripple effects to
->>>> existing code, but might be a worthwhile cleanup).
->>>>
->>>>> +#
->>>>> +# @perm: granted permissions for the parent operating on the child
->>>>> +#
->>>>> +# @shared-perm: permissions that can still be granted to other users
->>>>> of the
->>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 child while it is still attached this parent
->>>>> +#
->>>>> +# Since: 3.1
->>>>> +##
->>>>> +{ 'struct': 'BlockGraphEdge',
->>>>> +=C2=A0 'data': { 'parent': 'uint64', 'child': 'uint64',
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '=
-name': 'str', 'perm': [ 'BlockPermission' ],
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '=
-shared-perm': [ 'BlockPermission' ] } }
->>>>> +
->>>>> +##
->>>>> +# @x-query-block-graph:
->>>>> +#
->>>>> +# Get the block graph.
->>>>> +#
->>>>> +# Since: 3.1
->>>>> +##
->>>>> +{ 'command': 'x-query-block-graph', 'returns': 'BlockGraph' }
->>>> Why is this command given an x- prefix?=C2=A0 What would it take to pr=
-omote
->>>> it from experimental to fully supported?
->>> This is just a very bad reasons, but I'll give it anyway: We really wan=
-t
->>> such a command but still don't have one.=C2=A0 So I doubt this is exact=
-ly
->>> what we want. :-)
->>>
->>> A better reason is that we probably do not want a single command to
->>> return the whole block graph.=C2=A0 Do we want the command to just retu=
-rn
->>> info for a single node, including just the node names of the children?
->>> Do we want the command to include child info on request (but start from
->>> a user-specified root)?
->>>
->>> Also, the interface is...=C2=A0 Er, weird?=C2=A0 Honestly, I don't quit=
-e see why
->>> we would want it like this without x-.
->>>
->>> Why use newly generated IDs instead of node names?=C2=A0 Why are those =
-RAM
->>> addresses?=C2=A0 That is just so fishy.
->>>
->>> Because parents can be non-nodes?=C2=A0 Well, I suppose you better not
->>> include them in the graph like this, then.
->>>
->>> I don't see why the query command we want would include non-BDSs at all=
-.
->>>
->>> It may be useful for debugging, so, er, well, with an x-debug- prefix,
->>> OK.=C2=A0 But the question then is whether it's useful enough to warran=
-t
->>> having a separate query command that isn't precisely the command we wan=
-t
->>> anyway.
+On 08/20/2018 06:51 AM, Markus Armbruster wrote:
+
+>> Hmm, if we did this:
 >>
->>> The first question we probably have to ask is whether the query command
->>> needs to output parent information.=C2=A0 If not, querying would probab=
-ly
->>> start at some named node and then you'd go down from there (either with
->>> many queries or through a single one).
->>>
->>> If so, well, then we can still output parent information, but I'd say
->>> that then is purely informational and we don't need to "generate" new
->>> IDs for them.=C2=A0 Just have either a node-name there or a user-readab=
-le
->>> description (like it was in v1; although it has to be noted that such a
->>> user-readable description is useless to a management layer), but these
->>> new IDs are really not something I like.
->>>
->>>> Overall, the command looks quite useful; and the fact that you produce=
-d
->>>> some nice .dot graphs from it for visualization seems like it is worth
->>>> considering this as a permanent API addition.=C2=A0 The question, then=
-, is if
->>>> the interface is right, or if it needs any tweaks (like using an enum
->>>> instead of open-coded string for the relation between parent and child=
-),
->>>> as a reason for keeping the x- prefix.
->>> You can use x-debug- even when you decide to keep a command.
->>>
->>> I see no reason why a command should hastily not get an x- prefix just
->>> because it may be useful enough.=C2=A0 If it really is and we really se=
-e the
->>> interface is good (which I really don't think it is), then we can alway=
-s
->>> drop it later.
->>>
->>> Max
->>>
->>>>> +++ b/block.c
->>>>> @@ -4003,6 +4003,86 @@ BlockDeviceInfoList
->>>>> *bdrv_named_nodes_list(Error **errp)
->>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return list;
->>>>>  =C2=A0=C2=A0 }
->>>>>  =C2=A0=C2=A0 +#define QAPI_LIST_ADD(list, element) do { \
->>>>> +=C2=A0=C2=A0=C2=A0 typeof(list) _tmp =3D g_new(typeof(*(list)), 1); =
-\
->>>>> +=C2=A0=C2=A0=C2=A0 _tmp->value =3D (element); \
->>>>> +=C2=A0=C2=A0=C2=A0 _tmp->next =3D (list); \
->>>>> +=C2=A0=C2=A0=C2=A0 list =3D _tmp; \
->>>>> +} while (0)
->>>> Hmm - this seems like a frequently observed pattern - should it be
->>>> something that we add independently and use throughout the tree as par=
-t
->>>> of QAPI interactions in general?
->>>>
->>>>> +
->>>>> +BlockGraph *bdrv_get_block_graph(Error **errp)
->>>>> +{
->>>>> +=C2=A0=C2=A0=C2=A0 BlockGraph *graph =3D g_new0(BlockGraph, 1);
->>>>> +=C2=A0=C2=A0=C2=A0 BlockDriverState *bs;
->>>>> +=C2=A0=C2=A0=C2=A0 BdrvChild *child;
->>>>> +=C2=A0=C2=A0=C2=A0 BlockGraphNode *node;
->>>>> +=C2=A0=C2=A0=C2=A0 BlockGraphEdge *edge;
->>>>> +=C2=A0=C2=A0=C2=A0 struct {
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int flag;
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockPermission num;
->>>>> +=C2=A0=C2=A0=C2=A0 } permissions[] =3D {
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_CONSISTENT_REA=
-D,
->>>>> BLOCK_PERMISSION_CONSISTENT_READ },
->>>> Would it be worth directly reusing a QAPI enum for all such permission=
-s
->>>> in the existing code base, instead of having to map between an interna=
-l
->>>> and a QAPI enum?
->>>>
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_WRITE,=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLOCK_PERMISSION_WRI=
-TE },
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_WRITE_UNCHANGE=
-D,
->>>>> BLOCK_PERMISSION_WRITE_UNCHANGED },
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_RESIZE,=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLOCK_PERMISSION_RESIZE },
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_GRAPH_MOD,=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLOCK_PERMISSION_GRAPH_MOD },
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { 0, 0 }
->>>>> +=C2=A0=C2=A0=C2=A0 }, *p;
->>>>> +
->>>>> +=C2=A0=C2=A0=C2=A0 QTAILQ_FOREACH(bs, &graph_bdrv_states, node_list)=
- {
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QLIST_FOREACH(child, &bs-=
->parents, next_parent) {
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
-f (!child->role->parent_is_bds) {
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 BlockGraphNodeList *el;
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 bool add =3D true;
->>>> Does your command need/want to expose internal nodes? (I argue that it
->>>> probably should show internal nodes, even when normal 'query-block'
->>>> doesn't, just because knowing about the impact of internal nodes can b=
-e
->>>> important when tracking down permissions issues).
->>> You could make it a flag, but in theory, implicit nodes should never be
->>> visible through QMP.=C2=A0 (Though if you explicitly request them, that=
-'s
->>> probably a different story.)
->>>
->>> Max
->>>
->> My goal is to get graphviz representation of block graph with all the
->> parents for debugging. And I'm absolutely ok to do it with x-debug-.
->> Then we shouldn't care about enum for role type now. So, it the patch ok
->> for you with x-debug- prefix?
-> Actually, no, because I'm not sure whether using points for the IDs is a
-> good idea.  That may defeat ASLR, and that would be a problem even with
-> x-debug-.
+>> [IN_START_INTERPOL] {
+>>    ['%'] = IN_INTERPOL,
+>>    ['\t'] = IN_START_INTERPOL,
+>> ...
+>> }
+>>
+>> for similarity with all our other constructs, will gcc remember that
+>> we've already initialized other members not listed in the clause
+>> before, or will it mistakenly re-0-initialize the array members not
+>> mentioned?
+> 
+> Fails make check.
+> 
+> (gdb) p json_lexer[IN_START_INTERPOL]
+> $1 = "\000\000\000\000\000\000\000\000\000\016\016\000\000\016", '\000' <repeats 18 times>, "\016\000\000\000\000\035", '\000' <repeats 217 times>
 
-Hmm ASLR, what about trace points? Do they violate it? We can enable=20
-trace-points on running vm and they'll show a lot of pointers...
+And thus answered my question - abbreviating causes gcc to 
+re-zero-initialize any unmentioned members, so your override has to be 
+one member at a time, as originally written.
 
->
-> So I'd prefer using e.g. a hash map to map pointers to freshly generated
-> IDs (just incrementing integers).
->
-> In any case, I'll take a further look at the patch later, but another
-> thing that I've just seen is that using the opaque pointers to identify
-> a parent is something that doesn't look like it's guaranteed to work.
->
-> I suppose the alternative would be to start from all possible roots and
-> generate the graph from there (all possible roots being all
-> monitor-owned BDSs and all BlockBackends, I think).
->
-> Max
->
-
-
---=20
-Best regards,
-Vladimir
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
