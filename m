@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1frrEy-0007dE-SW
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:57:33 -0400
+	(envelope-from <mkschreder.uk@googlemail.com>) id 1frrJv-0000Ug-6E
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 17:02:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1frrEv-0000qb-Jk
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:57:32 -0400
-Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:34387)
+	(envelope-from <mkschreder.uk@googlemail.com>) id 1frrJt-0004yy-Ty
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 17:02:39 -0400
+Received: from mail-ua1-x944.google.com ([2607:f8b0:4864:20::944]:36147)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1frrEv-0000pt-AA
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:57:29 -0400
-Received: by mail-oi0-x236.google.com with SMTP id 13-v6so28321626ois.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 13:57:29 -0700 (PDT)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Mon, 20 Aug 2018 15:57:24 -0500
-Message-Id: <1534798644-13587-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v2] ipmi: Use proper struct reference for BT
- vmstate
+	(Exim 4.71) (envelope-from <mkschreder.uk@googlemail.com>)
+	id 1frrJp-0004rf-Te
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 17:02:35 -0400
+Received: by mail-ua1-x944.google.com with SMTP id c12-v6so10588046uan.3
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 14:02:33 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAGmj6qti3t3dBp6OT1H_UrkUi5OvXrb1nhEyozonz6uZm2P95A@mail.gmail.com>
+	<CAFEAcA8wZ7ga0kJ3WQ-A=fYNeJrxxCV+b2n7_Ni4Hg7jBS+L0w@mail.gmail.com>
+	<CAGmj6qtJuootGneBjcz8aCRsBXBU+GN2nhERc+76un_CiBcDZQ@mail.gmail.com>
+	<CAFEAcA8wp=_MzzrT0G70n1eHbbt8FXf2upZB0cyBmhK3Pv+Y9w@mail.gmail.com>
+	<CAGmj6qsWJq3cXheRpftnK2c9yCFCGDwN=Y9Y=m=QLBq+dTokAA@mail.gmail.com>
+In-Reply-To: <CAGmj6qsWJq3cXheRpftnK2c9yCFCGDwN=Y9Y=m=QLBq+dTokAA@mail.gmail.com>
+From: Martin Schroeder <mkschreder.uk@googlemail.com>
+Date: Mon, 20 Aug 2018 23:02:21 +0200
+Message-ID: <CAGmj6qvxq1s51_mWhGJmiZsdMCX493n_z3K8=vMgZgNtJF8aUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Simulating a composite machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,121 +32,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Corey Minyard <cminyard@mvista.com>
-
-The vmstate for isa_ipmi_bt was referencing into the bt structure,
-instead create a bt structure separate and use that.
-
-The version 1 of the BT transfer was fairly broken, if a migration
-occured during an IPMI operation, it is likely the migration would
-be corrupted because I misunderstood the VMSTATE_VBUFFER_UINT32()
-handling, I thought it handled transferring the length field,
-too.  So I just remove support for that.  I doubt anyone is using
-it at this point.
-
-This also removes the transfer of use_irq, since that should come
-from configuration.
-
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/ipmi/isa_ipmi_bt.c | 68 +++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 55 insertions(+), 13 deletions(-)
-
-This is a matching patch for the IPMI BT code that matches the previous
-IPMI KCS change recently done.
-
-diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
-index e946030..8bbb1fa 100644
---- a/hw/ipmi/isa_ipmi_bt.c
-+++ b/hw/ipmi/isa_ipmi_bt.c
-@@ -22,6 +22,7 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/log.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/ipmi/ipmi.h"
-@@ -450,22 +451,63 @@ static void isa_ipmi_bt_realize(DeviceState *dev, Error **errp)
-     isa_register_ioport(isadev, &iib->bt.io, iib->bt.io_base);
- }
- 
--static const VMStateDescription vmstate_ISAIPMIBTDevice = {
--    .name = TYPE_IPMI_INTERFACE,
-+static int ipmi_bt_vmstate_post_load(void *opaque, int version)
-+{
-+    IPMIBT *ib = opaque;
-+
-+    /* Make sure all the values are sane. */
-+    if (ib->outpos >= MAX_IPMI_MSG_SIZE || ib->outlen >= MAX_IPMI_MSG_SIZE ||
-+        ib->outpos >= ib->outlen) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "ipmi:bt: vmstate transfer received bad out values: %d %d\n",
-+                      ib->outpos, ib->outlen);
-+        ib->outpos = 0;
-+        ib->outlen = 0;
-+    }
-+
-+    if (ib->inlen >= MAX_IPMI_MSG_SIZE) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "ipmi:bt: vmstate transfer received bad in value: %d\n",
-+                      ib->inlen);
-+        ib->inlen = 0;
-+    }
-+
-+    return 0;
-+}
-+
-+const VMStateDescription vmstate_IPMIBT = {
-+    .name = TYPE_IPMI_INTERFACE_PREFIX "bt",
-     .version_id = 1,
-     .minimum_version_id = 1,
-+    .post_load = ipmi_bt_vmstate_post_load,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_BOOL(obf_irq_set, IPMIBT),
-+        VMSTATE_BOOL(atn_irq_set, IPMIBT),
-+        VMSTATE_BOOL(irqs_enabled, IPMIBT),
-+        VMSTATE_UINT32(outpos, IPMIBT),
-+        VMSTATE_UINT32(outlen, IPMIBT),
-+        VMSTATE_UINT8_ARRAY(outmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
-+        VMSTATE_UINT32(inlen, IPMIBT),
-+        VMSTATE_UINT8_ARRAY(inmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
-+        VMSTATE_UINT8(control_reg, IPMIBT),
-+        VMSTATE_UINT8(mask_reg, IPMIBT),
-+        VMSTATE_UINT8(waiting_rsp, IPMIBT),
-+        VMSTATE_UINT8(waiting_seq, IPMIBT),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_ISAIPMIBTDevice = {
-+    .name = TYPE_IPMI_INTERFACE_PREFIX "isa-bt",
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-+    /*
-+     * Version 1 had messed up the array transfer, it's not even usable
-+     * because it used VMSTATE_VBUFFER_UINT32, but it did not transfer
-+     * the buffer length, so random things would happen.
-+     */
-     .fields      = (VMStateField[]) {
--        VMSTATE_BOOL(bt.obf_irq_set, ISAIPMIBTDevice),
--        VMSTATE_BOOL(bt.atn_irq_set, ISAIPMIBTDevice),
--        VMSTATE_BOOL(bt.use_irq, ISAIPMIBTDevice),
--        VMSTATE_BOOL(bt.irqs_enabled, ISAIPMIBTDevice),
--        VMSTATE_UINT32(bt.outpos, ISAIPMIBTDevice),
--        VMSTATE_VBUFFER_UINT32(bt.outmsg, ISAIPMIBTDevice, 1, NULL, bt.outlen),
--        VMSTATE_VBUFFER_UINT32(bt.inmsg, ISAIPMIBTDevice, 1, NULL, bt.inlen),
--        VMSTATE_UINT8(bt.control_reg, ISAIPMIBTDevice),
--        VMSTATE_UINT8(bt.mask_reg, ISAIPMIBTDevice),
--        VMSTATE_UINT8(bt.waiting_rsp, ISAIPMIBTDevice),
--        VMSTATE_UINT8(bt.waiting_seq, ISAIPMIBTDevice),
-+        VMSTATE_STRUCT(bt, ISAIPMIBTDevice, 1, vmstate_IPMIBT, IPMIBT),
-         VMSTATE_END_OF_LIST()
-     }
- };
--- 
-2.7.4
+Is it that I need to add emulation for CP10 and CP11?
+On Mon, Aug 20, 2018 at 8:29 PM Martin Schroeder
+<mkschreder.uk@googlemail.com> wrote:
+>
+> Sent it off as reply instead of reply all.. my bad.
+>
+> I was also surprised that it was mid into an instruction. The code
+> works fine on STM32 but if FPU is not enabled on the STM32 then I
+> believe the code will fault in much the same way. I have had this
+> problem before and it was also hard faulting inside libc snprintf. It
+> has definitely something to do with FPU and snprintf faults when fpu
+> is not enabled on F4. When FPU is enabled everything works. Why I
+> don't know.
+>
+> It seems the HardFault is preceded by two UsageFaults:
+> Taking exception 17 [v7M NOCP UsageFault]
+> ...taking pending nonsecure exception 3
+> Taking exception 17 [v7M NOCP UsageFault]
+> qemu: fatal: Lockup: can't escalate 3 to HardFault (current priority -1)
+>
+> Ok so FPU support is not there. What would it take for me to add it? I
+> would very much like to add it if I get some guidance as to what needs
+> to be done and where I can find information on how to do it. I see
+> there is some code in fpu/softfloat.c but I guess it is not enough?
+> On Mon, Aug 20, 2018 at 8:12 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On 20 August 2018 at 19:03, Martin Schroeder
+> > <mkschreder.uk@googlemail.com> wrote:
+> > > Peter, perhaps a slightly off-topic question,
+> >
+> > Could you keep traffic on the mailing lists, please? That
+> > way everybody can read the answer and reply if they have a view.
+> >
+> > (I append the rest because I'd typed it all out before I noticed
+> > that this was a private email.)
+> >
+> > > but how do I enable FPU
+> > > support for armv7m M4 emulation? Is it supported? FPU instructions
+> > > currently make the armv7m core go into hard fault on master.
+> >
+> > It's not supported, because FPU support requires changes to
+> > the M profile exception handling (stacking FPU regs on exception
+> > entry, handling the lazy-stacking feature, etc). This is on my
+> > todo list, so there is a reasonable chance it'll get done either
+> > for QEMU 3.1 or more likely for 3.2, if nobody else gets to it first.
+> >
+> > > If I disable FPU in firmware build and use -mfloat-abi=soft then I get
+> > > a hard fault even sooner with following warning: "warning: TCG
+> > > temporary leaks before 0805875a"
+> >
+> > The warning is harmless -- I think the only remaining
+> > encodings that can cause it to be produced are all ones
+> > where the instruction in question generates an exception
+> > (it's caused because we generate a bit of code before
+> > realising the insn is going to fault, and then the TCG
+> > temp is not cleaned up by the per-insn translation code.
+> > The temp is cleaned up at the end of the TB, so it's not
+> > a permanent leak -- the warning is there because per-insn
+> > leaks let the guest run us out of temps by having a TB with
+> > a lot of the same insn in it.)
+> >
+> > > (gdb) disas 0x0805875a
+> > > Dump of assembler code for function snprintf:
+> > >    0x08058750 <+0>:     push    {r2, r3}
+> > >    0x08058754 <+4>:     push    {r4, r5, r6, lr}
+> > >    0x08058758 <+8>:     ldr     r3, [pc, #136]  ; 0x80587e8 <snprintf+152>
+> > >    0x0805875c <+12>:    subs    r4, r1, #0
+> > >    0x08058760 <+16>:    ldr     r5, [r3]
+> > >    0x08058764 <+20>:    movlt   r3, #139        ; 0x8b
+> > >    0x08058768 <+24>:    sub     sp, sp, #112    ; 0x70
+> > >    0x0805876c <+28>:    strlt   r3, [r5]
+> > >    0x08058770 <+32>:    mvnlt   r0, #0
+> > >    0x08058774 <+36>:    blt     0x80587d8 <snprintf+136>
+> > >    0x08058778 <+40>:    add     r12, sp, #132   ; 0x84
+> > >    0x0805877c <+44>:    mov     r3, #520        ; 0x208
+> > >    0x08058780 <+48>:    subne   lr, r4, #1
+> > >    0x08058784 <+52>:    moveq   lr, r4
+> > >    0x08058788 <+56>:    ldr     r2, [sp, #128]  ; 0x80
+> >
+> > Not clear from that why you're getting a hard fault, but it
+> > seems a bit suspicious that the quoted PC is midway through an
+> > insn -- suggests that maybe the code being executed is not
+> > what your disassembly says it is?
+> >
+> > You might find that the -d debug logs are helpful in indicating
+> > what's happened.
+> >
+> > thanks
+> > -- PMM
