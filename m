@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1frqKX-0005Oj-ER
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:59:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1frqPD-0006Ts-Oq
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:04:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1frqKR-0008EB-Ez
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:59:11 -0400
-References: <20180818025653.21192-1-f4bug@amsat.org>
-	<66dfe354-9c2c-8642-a905-03155555fe99@redhat.com>
-	<a812530c-ad1b-f5ff-6e15-82227cb76c79@redhat.com>
-	<2fd04596-a8a0-889f-239d-92853c12c6aa@redhat.com>
-	<2d91d7e2-938d-dbbe-5a11-edf48d4e0fc8@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <eca82595-47c6-a195-8224-6a9f6619decd@redhat.com>
-Date: Mon, 20 Aug 2018 21:59:04 +0200
+	(envelope-from <eblake@redhat.com>) id 1frqPC-0003Q5-Mz
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:04:03 -0400
+References: <20180817190457.8292-1-jsnow@redhat.com>
+	<20180817190457.8292-3-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e501ba8f-2862-b413-728c-40012873e234@redhat.com>
+Date: Mon, 20 Aug 2018 15:03:53 -0500
 MIME-Version: 1.0
-In-Reply-To: <2d91d7e2-938d-dbbe-5a11-edf48d4e0fc8@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180817190457.8292-3-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration: Replace strncpy() by g_strlcpy()
+Subject: Re: [Qemu-devel] [PATCH 2/7] jobs: canonize Error object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On 20.08.2018 21:48, Eric Blake wrote:
-> On 08/20/2018 12:16 PM, Thomas Huth wrote:
+On 08/17/2018 02:04 PM, John Snow wrote:
+> Jobs presently use both an Error object in the case of the create job,
+> and char strings in the case of generic errors elsewhere.
 > 
->>>
->>> Maybe really set it to zero (memset) before using the g_strlcpy? I am
->>> not a fan of disabling warnings, but if you think this is
->>> easier/cleaner, let's go for that.
+> Unify the two paths as just j->err, and remove the extra argument from
+> job_completed. The integer error code for job_completed is kept for now
+> for use by pre-emptive cancellation.
 > 
-> I'm not a fan of strlcpy in general (by the time you've properly set it 
-> up to detect/report/avoid truncation errors, you've added more 
-> boilerplate code than you would have by just doing memcpy() yourself).
-> 
->>
->> FWIW, that new warning from GCC is IMHO just annoying. I had the same
->> problem in the SLOF sources, too:
->>
->> https://github.com/aik/SLOF/commit/d8a9354c2a35136
->>
->> The code with strncpy was perfectly valid before, but to get rid of the
->> warning, I replaced it with a more cumbersome memcpy instead (and mad
->> sure that the memory is already cleared earlier in that function). Now
->> seeing that the problem with strncpy pops up here, too, I think it would
->> maybe be better to shut up the warning of GCC, since it's clearly GCC
->> who's wrong here.
-> 
-> gcc is not necessarily wrong, as it CAN catch real erroneous uses of 
-> strncpy().  It's just that 99% of the time, strncpy() is the WRONG 
-> function to use, and so the remaining few cases where it actually does 
-> what you want are so rare that you have to consult the manual anyways. 
-> If nothing else, the gcc warning is making people avoid strncpy() even 
-> where it is safe (which is not a bad thing, in my opinion, because the 
-> contract of strncpy() is so counter-intuitive).
-> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
 
-I am wondering if we should simply add a helper for these special cases
-that zeroes the buffer and uses g_strlcpy(), instead of
-ignoring/disabling the warning.
+> @@ -535,7 +535,6 @@ void job_drain(Job *job)
+>       }
+>   }
+>   
+> -
+>   /**
+>    * All jobs must allow a pause point before entering their job proper. This
+>    * ensures that jobs can be paused prior to being started, then resumed later.
+
+Spurious hunk? I'm not opposed to consistent choice of how many newlines 
+between functions, although it looks a bit odd in the overall patch.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
-
-Thanks,
-
-David / dhildenb
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
