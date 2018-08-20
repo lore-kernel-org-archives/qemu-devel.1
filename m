@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1frlBx-00042r-Qk
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:30:02 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1frlD5-0004p3-HJ
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:31:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1frlBu-00046Y-Gq
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:30:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54934 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1frlBs-00043g-Hf
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:29:57 -0400
-References: <20180808195235.5843-1-gedwards@ddn.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <af3b8ef4-d017-d9a8-3f80-32a34c4d06d9@redhat.com>
-Date: Mon, 20 Aug 2018 16:29:45 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180808195235.5843-1-gedwards@ddn.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] expose VIRTIO_SCSI_F_T10_PI for
- vhost-scsi and vhost-user-scsi
+	(envelope-from <programmingkidx@gmail.com>) id 1frlCz-0005io-Tk
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:31:11 -0400
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:34274)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1frlCz-0005hY-OD
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:31:05 -0400
+Received: by mail-io0-x242.google.com with SMTP id c22-v6so6597013iob.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 07:31:05 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20180820052456.tt6joujlmhehr7aa@sirius.home.kraxel.org>
+Date: Mon, 20 Aug 2018 10:31:02 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4C3545DA-01CB-4D7B-8C4D-AA38ED2803A0@gmail.com>
+References: <20180819043509.12888-1-programmingkidx@gmail.com>
+	<20180820052456.tt6joujlmhehr7aa@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH] hw/input/ps2.c: fix erratic mouse behavior
+ for Windows 3.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Edwards <gedwards@ddn.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Nicholas A. Bellinger" <nab@linux-iscsi.org>, Felipe Franciosi <felipe@nutanix.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, qemu-devel@nongnu.org
 
-On 08/08/2018 21:52, Greg Edwards wrote:
-> Unify the get_features functions for vhost-scsi and vhost-user-scsi, including
-> their use of host_features, and expose a new 't10_pi' property to enable
-> negotiation of the VIRTIO_SCSI_F_T10_PI feature bit with the backend.
-> 
-> Greg Edwards (3):
->   vhost-user-scsi: move host_features into VHostSCSICommon
->   vhost-scsi: unify vhost-scsi get_features implementations
->   vhost-scsi: expose 't10_pi' property for VIRTIO_SCSI_F_T10_PI
-> 
->  hw/scsi/vhost-scsi-common.c           |  3 +++
->  hw/scsi/vhost-scsi.c                  |  3 +++
->  hw/scsi/vhost-user-scsi.c             | 28 ++++++++++-----------------
->  include/hw/virtio/vhost-scsi-common.h |  1 +
->  include/hw/virtio/vhost-user-scsi.h   |  1 -
->  5 files changed, 17 insertions(+), 19 deletions(-)
-> 
 
-Queued, thanks.
+> On Aug 20, 2018, at 1:24 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>=20
+> On Sun, Aug 19, 2018 at 12:35:09AM -0400, John Arbuckle wrote:
+>> When the user moves the mouse and moves the scroll wheel at the same
+>> time, the mouse cursor's movement becomes erratic in Windows 3.1. =
+With
+>> this patch if the mouse is in ps/2 mode and the scroll wheel is used,
+>> the command queue is reset. This does not fix the erratic mouse
+>> problem in Windows NT 4.0.
+>=20
+> I don't think we need to reset the queue.  Just ignoring the z axis
+> value for type 0 should do.  Can you try this?
+>=20
+> --- a/hw/input/ps2.c
+> +++ b/hw/input/ps2.c
+> @@ -661,6 +661,8 @@ static int ps2_mouse_send_packet(PS2MouseState *s)
+>     /* extra byte for IMPS/2 or IMEX */
+>     switch(s->mouse_type) {
+>     default:
+> +        s->mouse_dz =3D 0;
+> +        dz1 =3D 0;
+>         break;
+>     case 3:
+>         if (dz1 > 127)
+>=20
+> cheers,
+>  Gerd
+>=20
 
-Paolo
+Sorry it did not fix the problem.
+
+https://winworldpc.com/product/windows-3/31
+In case you or anyone else wishes to reproduce this problem, the link to =
+the Windows 3.1 installer is above.
+
+Thank you.=
