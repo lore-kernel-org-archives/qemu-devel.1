@@ -1,18 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1frqlr-0003MF-98
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:28 -0400
+	(envelope-from <tcminyard@gmail.com>) id 1frqll-0003Ht-Ez
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1frqll-0004CA-PO
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:27 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:42009)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1frqld-0003eF-9F
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:16 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 20 Aug 2018 22:25:57 +0200
-Message-Id: <20180820202604.14218-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 0/7] Linux user for 3.1 patches
+	(envelope-from <tcminyard@gmail.com>) id 1frqlb-0003qP-Gb
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:14 -0400
+Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:45840)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1frqlR-0003Nr-Qq
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:27:05 -0400
+Received: by mail-oi0-x232.google.com with SMTP id q11-v6so28135827oic.12
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 13:26:57 -0700 (PDT)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Mon, 20 Aug 2018 15:26:06 -0500
+Message-Id: <1534796770-10295-7-git-send-email-minyard@acm.org>
+In-Reply-To: <1534796770-10295-1-git-send-email-minyard@acm.org>
+References: <1534796770-10295-1-git-send-email-minyard@acm.org>
+Subject: [Qemu-devel] [PATCH v2 06/10] i2c:pm_smbus: Add interrupt handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,45 +26,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
 
-The following changes since commit 0abaa41d936becd914a16ee1fe2a981d96d19428:
+From: Corey Minyard <cminyard@mvista.com>
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2018-08-17 09:46:00 +0100)
+Add the necessary code so that interrupts actually work from
+the pm_smbus device.
 
-are available in the Git repository at:
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/i2c/pm_smbus.c         | 14 +++++++++++++-
+ hw/i2c/smbus_ich9.c       | 19 ++++++++++++++++++-
+ include/hw/i2c/pm_smbus.h |  2 ++
+ 3 files changed, 33 insertions(+), 2 deletions(-)
 
-  git://github.com/vivier/qemu.git tags/linux-user-for-3.1-pull-request
-
-for you to fetch changes up to 70c61d4f78cc8475b597f1ef26faf232302b81d1:
-
-  linux-user: add QEMU_IFLA_INFO_KIND nested type for tun (2018-08-20 22:07:40 +0200)
-
-----------------------------------------------------------------
-linux-user fixes:
-- netlink fixes (add missing types, fix MSG_TRUNC)
-- sh4 fix (tcg state)
-- sparc32plus fix (truncate address space to 32bit)
-- add x86_64 binfmt data
-
-----------------------------------------------------------------
-
-Laurent Vivier (7):
-  qemu-binfmt-conf.sh: add x86_64 target
-  linux-user: fix 32bit g2h()/h2g()
-  sh4: fix use_icount with linux-user
-  linux-user: fix recvmsg()/recvfrom() with netlink and MSG_TRUNC
-  linux-user: introduce QEMU_RTA_* to use with rtattr_type_t
-  linux-user: update netlink route types
-  linux-user: add QEMU_IFLA_INFO_KIND nested type for tun
-
- include/exec/cpu_ldst.h                   |  23 +++-
- include/exec/cpu_ldst_useronly_template.h |  12 +-
- linux-user/syscall.c                      | 134 +++++++++++++++++++---
- scripts/qemu-binfmt-conf.sh               |   6 +-
- target/sh4/translate.c                    |   1 +
- 5 files changed, 150 insertions(+), 26 deletions(-)
-
+diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+index 9e11d47..664a6b1 100644
+--- a/hw/i2c/pm_smbus.c
++++ b/hw/i2c/pm_smbus.c
+@@ -214,6 +214,12 @@ static void smb_transaction_start(PMSMBus *s)
+     s->smb_stat |= STS_HOST_BUSY;
+ }
+ 
++static bool
++smb_irq_value(PMSMBus *s)
++{
++    return ((s->smb_stat & ~STS_HOST_BUSY) != 0) && (s->smb_ctl & CTL_INTREN);
++}
++
+ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
+                               unsigned width)
+ {
+@@ -309,7 +315,9 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
+     }
+ 
+  out:
+-    return;
++    if (s->set_irq) {
++        s->set_irq(s, smb_irq_value(s));
++    }
+ }
+ 
+ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+@@ -365,6 +373,10 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+     SMBUS_DPRINTF("SMB readb port=0x%04" HWADDR_PRIx " val=0x%02x\n",
+                   addr, val);
+ 
++    if (s->set_irq) {
++        s->set_irq(s, smb_irq_value(s));
++    }
++
+     return val;
+ }
+ 
+diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+index c8b8413..316c2a4 100644
+--- a/hw/i2c/smbus_ich9.c
++++ b/hw/i2c/smbus_ich9.c
+@@ -40,15 +40,18 @@
+ typedef struct ICH9SMBState {
+     PCIDevice dev;
+ 
++    bool irq_enabled;
++
+     PMSMBus smb;
+ } ICH9SMBState;
+ 
+ static const VMStateDescription vmstate_ich9_smbus = {
+     .name = "ich9_smb",
+-    .version_id = 2,
++    .version_id = 3,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+         VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
++        VMSTATE_BOOL_V(irq_enabled, ICH9SMBState, 3),
+         VMSTATE_STRUCT(smb, ICH9SMBState, 2, pmsmb_vmstate, PMSMBus),
+         VMSTATE_END_OF_LIST()
+     }
+@@ -110,11 +113,25 @@ static void ich9_smb_class_init(ObjectClass *klass, void *data)
+     dc->user_creatable = false;
+ }
+ 
++static void ich9_smb_set_irq(PMSMBus *pmsmb, bool enabled)
++{
++    ICH9SMBState *s = pmsmb->opaque;
++
++    if (enabled == s->irq_enabled) {
++        return;
++    }
++
++    s->irq_enabled = enabled;
++    pci_set_irq(&s->dev, enabled);
++}
++
+ I2CBus *ich9_smb_init(PCIBus *bus, int devfn, uint32_t smb_io_base)
+ {
+     PCIDevice *d =
+         pci_create_simple_multifunction(bus, devfn, true, TYPE_ICH9_SMB_DEVICE);
+     ICH9SMBState *s = ICH9_SMB_DEVICE(d);
++    s->smb.set_irq = ich9_smb_set_irq;
++    s->smb.opaque = s;
+     return s->smb.smbus;
+ }
+ 
+diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
+index b1e1970..cfe596f 100644
+--- a/include/hw/i2c/pm_smbus.h
++++ b/include/hw/i2c/pm_smbus.h
+@@ -23,6 +23,8 @@ typedef struct PMSMBus {
+ 
+     /* Set by the user. */
+     bool i2c_enable;
++    void (*set_irq)(struct PMSMBus *s, bool enabled);
++    void *opaque;
+ 
+     /* Internally used by pm_smbus. */
+ 
 -- 
-2.17.1
+2.7.4
