@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1frjCL-0004U9-B9
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:22:18 -0400
+	(envelope-from <marko.klopcic@isystem.si>) id 1fri5M-0007Cq-3z
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:11:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1frjCK-00033X-IL
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:22:17 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:36193)
+	(envelope-from <marko.klopcic@isystem.si>) id 1fri5I-0001AG-UW
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:11:00 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:54746)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1frjCK-000333-62
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:22:16 -0400
-Received: by mail-oi0-x241.google.com with SMTP id n21-v6so25421817oig.3
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 05:22:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marko.klopcic@isystem.si>)
+	id 1fri5I-00019j-Ju
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:10:56 -0400
+Received: by mail-wm0-x244.google.com with SMTP id c14-v6so13877369wmb.4
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 04:10:56 -0700 (PDT)
+From: Marko Klopcic <marko.klopcic@isystem.si>
+Message-ID: <2edf4dc3-5cc2-c3f3-fd40-7901e2c06413@isystem.si>
+Date: Mon, 20 Aug 2018 13:10:53 +0200
+Content-Language: en-US
 MIME-Version: 1.0
-In-Reply-To: <20180817183026.32662-1-ehabkost@redhat.com>
-References: <20180817183026.32662-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 13:21:54 +0100
-Message-ID: <CAFEAcA86Up026RstFvm87DzEA0mTK7vR+hW9ciPWi3RKNjpbBw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/3] Machine queue, 2018-08-17
+Content-Type: text/plain; charset="utf-8"
+Subject: [Qemu-devel] [PATCH] arm: fix reset operation on netduino2 board.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-arm@nongnu.org, mjt@tls.msk.ru
 
-On 17 August 2018 at 19:30, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> The following changes since commit bb16c0412a572c2c9cd44496deb3ad430bc49c1a:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180816' into staging (2018-08-16 14:35:50 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
->
-> for you to fetch changes up to 907aac2f6af6ef775367c368b87cc1720e39d407:
->
->   fw_cfg: ignore suffixes in the bootdevice list dependent on machine class (2018-08-16 22:27:43 -0300)
->
-> ----------------------------------------------------------------
-> Machine queue, 2018-08-17
->
-> * Allow machine classes to specify if boot device suffixes should
->   be ignored by get_boot_devices_list()
-> * Tiny coding style fixup
->
-> ----------------------------------------------------------------
->
-> Queue for Machine Core patches
->
->
-> Dou Liyang (1):
->   machine: Fix coding style at machine_run_board_init()
->
-> Mark Cave-Ayland (2):
->   sysbus: always allow explicit_ofw_unit_address() to override address
->     generation
->   fw_cfg: ignore suffixes in the bootdevice list dependent on machine
->     class
+   Because roms are located on aliased addresses on netduino2 (Cortex M3,
+   STM32F205), PC and SP are not read from loaded kernel, which means
+   that the first reset fails. This fix adds additional call to reset.
+   See more details in code comment below.
+   Signed-off-by: Marko Klopcic [1]<marko.klopcic@isystem.si>
+   ---
+    hw/arm/netduino2.c | 27 +++++++++++++++++++++++++++
+    1 file changed, 27 insertions(+)
+   diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
+   index f936017d4a..a2f102b14b 100644
+   --- a/hw/arm/netduino2.c
+   +++ b/hw/arm/netduino2.c
+   @@ -25,6 +25,7 @@
+    #include "qemu/osdep.h"
+    #include "qapi/error.h"
+    #include "hw/boards.h"
+   +#include "hw/loader.h"
+    #include "qemu/error-report.h"
+    #include "hw/arm/stm32f205_soc.h"
+    #include "hw/arm/arm.h"
+   @@ -39,6 +40,32 @@ static void netduino2_init(MachineState *machine)
 
-Applied, thanks.
+        armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
+                           FLASH_SIZE);
+   +
+   +    /*
+   +      The following two calls are a workaround for problem with rom on
+   aliased
+   +      addresses on STM32.
+   +      Kernel is loaded into Rom objects, which are stored in loader.c.
+   Roms
+   +      are copied to memory in:
+   +
+   +      void rom_reset() {
+   +        ...
+   +         cpu_physical_memory_write_rom(rom->as, rom->addr, rom->data,
+   +                                       rom->datasize);
+   +        ...
+   +      }
+   +
+   +      However, since CPU reset is registered BEFORE
+   +      rom_reset(), SP and PC are read from memory BEFORE roms are
+   copied to
+   +      memory. CPU reset also checks Roms for data, so this is normally
+   not a
+   +      problem, but in STM32 PC and SP are read from aliased memory,
+   and these
+   +      memory addresses are not mapped to Roms. Since ROMs are private
+   in
+   +      loader.c the only option to copy Roms to memory is through
+   reset. So we
+   +      first have to register Roms for reset, and then trigger system
+   reset, which
+   +      copies Roms to mem, so that reset vectors are in memory, when
+   +      qemu_system_reset() is called again from main().
+   +     */
+   +    rom_check_and_register_reset();
+   +    qemu_system_reset(SHUTDOWN_CAUSE_NONE);
+    }
 
--- PMM
+    static void netduino2_machine_init(MachineClass *mc)
+   --
+   2.14.1
+
+References
+
+   1. mailto:marko.klopcic@isystem.si
