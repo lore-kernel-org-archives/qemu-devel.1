@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1frrwa-0006Rc-Kq
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 17:42:40 -0400
+	(envelope-from <alistair23@gmail.com>) id 1frtwx-0005nv-Pq
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 19:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1frrhE-0006rh-Fx
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 17:26:46 -0400
-References: <cover.1534444235.git.jcody@redhat.com>
-	<fa938f6c5e7aa523a6ddcf578f052f02d97a3720.1534444235.git.jcody@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <c6a54a8c-86fe-14ec-9966-4c02706ebb40@redhat.com>
-Date: Mon, 20 Aug 2018 17:26:23 -0400
+	(envelope-from <alistair23@gmail.com>) id 1frtwi-0000YA-Mq
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 19:50:53 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:46432)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1frtwi-0000VW-ED
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 19:50:52 -0400
+Received: by mail-lj1-x242.google.com with SMTP id 203-v6so12900244ljj.13
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 16:50:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <fa938f6c5e7aa523a6ddcf578f052f02d97a3720.1534444235.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] block: iotest to catch abort on
- forced blockjob cancel
+In-Reply-To: <20180817063619.pi7bhuwgjj7asodc@sirius.home.kraxel.org>
+References: <cover.1534435831.git.alistair.francis@wdc.com>
+	<b54c28929f201751c4f41e5cb7170e5b9a774432.1534435831.git.alistair.francis@wdc.com>
+	<20180817063619.pi7bhuwgjj7asodc@sirius.home.kraxel.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 20 Aug 2018 16:50:20 -0700
+Message-ID: <CAKmqyKMdST9OaHF6jJJSgnvAWOOOtw+vc+rVxoBnJnukVnTAzw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 4/6] hw/riscv/virt: Connect a VGA PCIe
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,172 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, qemu-block@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>
 
+On Thu, Aug 16, 2018 at 11:36 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+>> +    pci_bus = PCI_HOST_BRIDGE(dev)->bus;
+>> +
+>> +    pci_vga_init(pci_bus);
+>
+> I'd suggest to use "-device bochs-display" instead, unless you need all
+> the legacy vga cruft (text mode, ...).  The bochs-drm kms driver can
+> handle this one just fine too, it is much smaller (in terms of code
+> lines and attack surface), and it has pcie support.
 
+I gave this a quick try and the kernel didn't see the device with the
+bochs-drm driver enabled.
 
-On 08/16/2018 02:46 PM, Jeff Cody wrote:
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/229.out | 23 +++++++++
->  tests/qemu-iotests/group   |  1 +
->  3 files changed, 119 insertions(+)
->  create mode 100755 tests/qemu-iotests/229
->  create mode 100644 tests/qemu-iotests/229.out
-> 
-> diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
-> new file mode 100755
-> index 0000000000..2af04c8028
-> --- /dev/null
-> +++ b/tests/qemu-iotests/229
-> @@ -0,0 +1,95 @@
-> +#!/bin/bash
-> +#
-> +# Test for force canceling a running blockjob that is paused in
-> +# an error state.
-> +#
-> +# Copyright (C) 2018 Red Hat, Inc.
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> +#
-> +
-> +# creator
-> +owner=jcody@redhat.com
-> +
-> +seq="$(basename $0)"
-> +echo "QA output created by $seq"
-> +
-> +here="$PWD"
-> +status=1	# failure is the default!
-> +
-> +_cleanup()
-> +{
-> +    _cleanup_qemu
-> +    _cleanup_test_img
-> +    rm -f "$TEST_IMG" "$DEST_IMG"
-> +}
-> +trap "_cleanup; exit \$status" 0 1 2 3 15
-> +
-> +# get standard environment, filters and checks
-> +. ./common.rc
-> +. ./common.filter
-> +. ./common.qemu
-> +
-> +# Needs backing file and backing format support
-> +_supported_fmt qcow2 qed
-> +_supported_proto file
-> +_supported_os Linux
-> +
-> +
-> +DEST_IMG="$TEST_DIR/d.$IMGFMT"
-> +TEST_IMG="$TEST_DIR/b.$IMGFMT"
-> +
-> +_make_test_img 2M
-> +
-> +# destination for mirror will be too small, causing error
-> +TEST_IMG=$DEST_IMG _make_test_img 1M
-> +
-> +$QEMU_IO -c 'write 0 2M' "$TEST_IMG" | _filter_qemu_io
-> +
-> +_launch_qemu -drive id=testdisk,file="$TEST_IMG",format="$IMGFMT"
-> +
-> +_send_qemu_cmd $QEMU_HANDLE \
-> +    "{'execute': 'qmp_capabilities'}" \
-> +    'return'
-> +
-> +echo
-> +echo '=== Starting drive-mirror, causing error & stop  ==='
-> +echo
-> +
-> +_send_qemu_cmd $QEMU_HANDLE \
-> +    "{'execute': 'drive-mirror',
-> +                 'arguments': {'device': 'testdisk',
-> +                               'mode':   'absolute-paths',
-> +                               'format': 'qcow2',
-> +                               'target': '$DEST_IMG',
-> +                               'sync':   'full',
-> +                               'mode':   'existing',
-> +                               'on-source-error': 'stop',
-> +                               'on-target-error': 'stop' }}"    \
-> +     "BLOCK_JOB_ERROR"
-> +
-> +echo
-> +echo '=== Force cancel job paused in error state  ==='
-> +echo
-> +
-> +success_or_failure="y" _send_qemu_cmd $QEMU_HANDLE \
-> +    "{'execute': 'block-job-cancel',
-> +                 'arguments': { 'device': 'testdisk',
-> +                                'force': true}}" \
-> +     "BLOCK_JOB_CANCELLED" "Assertion"
-> +
-> +# success, all done
-> +echo "*** done"
-> +rm -f $seq.full
-> +status=0
-> diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
-> new file mode 100644
-> index 0000000000..d5dea5cdd2
-> --- /dev/null
-> +++ b/tests/qemu-iotests/229.out
-> @@ -0,0 +1,23 @@
-> +QA output created by 229
-> +Formatting 'TEST_DIR/b.IMGFMT', fmt=IMGFMT size=2097152
-> +Formatting 'TEST_DIR/d.IMGFMT', fmt=IMGFMT size=1048576
-> +wrote 2097152/2097152 bytes at offset 0
-> +2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +{"return": {}}
-> +
-> +=== Starting drive-mirror, causing error & stop  ===
-> +
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "testdisk"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
-> +{"return": {}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
-> +
-> +=== Force cancel job paused in error state  ===
-> +
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "testdisk"}}
+I'll dig in a little more.
 
-Is this a race? I imagine the job pauses itself as a result of the error
-it just signaled, so the pause event generally occurs before we start
-attempting to force cancel, and then:
+Alistair
 
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
-> +{"return": {}}
-
-These two lines are actually the first that should belong to this
-heading, and then:
-
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
-
-These three follow directly after the force cancellation.
-
-Am I misinterpreting the output?
-
-> +*** done
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index b973dc842d..743790745b 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -225,3 +225,4 @@
->  225 rw auto quick
->  226 auto quick
->  227 auto quick
-> +229 auto quick
-> 
+>
+> cheers,
+>   Gerd
+>
