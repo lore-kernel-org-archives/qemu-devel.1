@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1frfel-000350-Nz
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:35:24 -0400
+	(envelope-from <bounces@canonical.com>) id 1frffC-0003Je-4n
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:35:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1frfek-0008Te-QG
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:35:23 -0400
-Received: from mail-io0-x234.google.com ([2607:f8b0:4001:c06::234]:38002)
+	(envelope-from <bounces@canonical.com>) id 1frff7-0000EA-To
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:35:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42068)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1frfek-0008TH-Ke
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:35:22 -0400
-Received: by mail-io0-x234.google.com with SMTP id y3-v6so7524682ioc.5
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 01:35:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1frff7-0000CE-OC
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 04:35:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1frff6-0007ba-0s
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 08:35:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F30032E851C
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 08:35:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180817140129.GI2459@work-vm>
-References: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
-	<1533562177-16447-10-git-send-email-lidongchen@tencent.com>
-	<20180817140129.GI2459@work-vm>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Mon, 20 Aug 2018 16:35:21 +0800
-Message-ID: <CAOGPPbcYpwyFNW=kBMgCMf9J-gPDXQfHWX5WJK8xxBLoOmVqag@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 09/11] migration: poll the cm event for
- destination qemu
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 20 Aug 2018 08:28:27 -0000
+From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
+	<1755912@bugs.launchpad.net>
+Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153475370842.4675.8094675611074790154.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
+ SIGABRT when using option -vga qxl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,117 +38,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: zhang.zhanghailiang@huawei.com, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Aug 17, 2018 at 10:01 PM, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> * Lidong Chen (jemmy858585@gmail.com) wrote:
->> The destination qemu only poll the comp_channel->fd in
->> qemu_rdma_wait_comp_channel. But when source qemu disconnnect
->> the rdma connection, the destination qemu should be notified.
->>
->> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->
-> OK, this could do with an update to the migration_incoming_co comment in
-> migration.h, since previously it was only used by colo; if we merge this
-> first please post a patch to update the comment.
+** Changed in: qemu (Ubuntu Bionic)
+       Status: New =3D> Triaged
 
-How about?
+-- =
 
-/* The coroutine we should enter back for incoming migration */
-Coroutine *migration_incoming_co;
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1755912
 
->
-> Other than that, I think I'm OK:
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->
->> ---
->>  migration/migration.c |  3 ++-
->>  migration/rdma.c      | 32 +++++++++++++++++++++++++++++++-
->>  2 files changed, 33 insertions(+), 2 deletions(-)
->>
->> diff --git a/migration/migration.c b/migration/migration.c
->> index df0c2cf..f7d6e26 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -389,6 +389,7 @@ static void process_incoming_migration_co(void *opaque)
->>      int ret;
->>
->>      assert(mis->from_src_file);
->> +    mis->migration_incoming_co = qemu_coroutine_self();
->>      mis->largest_page_size = qemu_ram_pagesize_largest();
->>      postcopy_state_set(POSTCOPY_INCOMING_NONE);
->>      migrate_set_state(&mis->state, MIGRATION_STATUS_NONE,
->> @@ -418,7 +419,6 @@ static void process_incoming_migration_co(void *opaque)
->>
->>      /* we get COLO info, and know if we are in COLO mode */
->>      if (!ret && migration_incoming_enable_colo()) {
->> -        mis->migration_incoming_co = qemu_coroutine_self();
->>          qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
->>               colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
->>          mis->have_colo_incoming_thread = true;
->> @@ -442,6 +442,7 @@ static void process_incoming_migration_co(void *opaque)
->>      }
->>      mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
->>      qemu_bh_schedule(mis->bh);
->> +    mis->migration_incoming_co = NULL;
->>  }
->>
->>  static void migration_incoming_setup(QEMUFile *f)
->> diff --git a/migration/rdma.c b/migration/rdma.c
->> index 1affc46..ae07515 100644
->> --- a/migration/rdma.c
->> +++ b/migration/rdma.c
->> @@ -3226,6 +3226,35 @@ err:
->>
->>  static void rdma_accept_incoming_migration(void *opaque);
->>
->> +static void rdma_cm_poll_handler(void *opaque)
->> +{
->> +    RDMAContext *rdma = opaque;
->> +    int ret;
->> +    struct rdma_cm_event *cm_event;
->> +    MigrationIncomingState *mis = migration_incoming_get_current();
->> +
->> +    ret = rdma_get_cm_event(rdma->channel, &cm_event);
->> +    if (ret) {
->> +        error_report("get_cm_event failed %d", errno);
->> +        return;
->> +    }
->> +    rdma_ack_cm_event(cm_event);
->> +
->> +    if (cm_event->event == RDMA_CM_EVENT_DISCONNECTED ||
->> +        cm_event->event == RDMA_CM_EVENT_DEVICE_REMOVAL) {
->> +        error_report("receive cm event, cm event is %d", cm_event->event);
->> +        rdma->error_state = -EPIPE;
->> +        if (rdma->return_path) {
->> +            rdma->return_path->error_state = -EPIPE;
->> +        }
->> +
->> +        if (mis->migration_incoming_co) {
->> +            qemu_coroutine_enter(mis->migration_incoming_co);
->> +        }
->> +        return;
->> +    }
->> +}
->> +
->>  static int qemu_rdma_accept(RDMAContext *rdma)
->>  {
->>      RDMACapabilities cap;
->> @@ -3326,7 +3355,8 @@ static int qemu_rdma_accept(RDMAContext *rdma)
->>                              NULL,
->>                              (void *)(intptr_t)rdma->return_path);
->>      } else {
->> -        qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
->> +        qemu_set_fd_handler(rdma->channel->fd, rdma_cm_poll_handler,
->> +                            NULL, rdma);
->>      }
->>
->>      ret = rdma_accept(rdma->cm_id, &conn_param);
->> --
->> 1.8.3.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Title:
+  qemu-system-x86_64 crashed with SIGABRT when using option -vga qxl
+
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Bionic:
+  Triaged
+
+Bug description:
+  When using qemu-system-x86_64 with the option -vga qxl, it crashes.
+  The easiest way to crash it is by trying to change the guest's
+  resolution. However, the system may randomly crash too, not happening
+  only when changing resolution. Here is the terminal output of one of
+  these random crashes:
+
+  --------
+
+  $ qemu-system-x86_64 -hda /dev/sdb -m 2048 -enable-kvm -cpu host -vga qxl=
+ -nodefaults -netdev user,id=3Dhostnet0 -device virtio-net-pci,id=3Dnet0,ne=
+tdev=3Dhostnet0
+  WARNING: Image format was not specified for '/dev/sdb' and probing guesse=
+d raw.
+           Automatically detecting the format is dangerous for raw images, =
+write operations on block 0 will be restricted.
+           Specify the 'raw' format explicitly to remove the restrictions.
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-
+  channel.c:2431:display_channel_validate_surface: canvas address is
+  0x7f8eb948ab18 for 0 (and is NULL)
+
+  =
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-channel.c:2432:d=
+isplay_channel_validate_surface: failed on 0
+
+  (process:21313): Spice-CRITICAL **: 16:01:45.759: display-channel.c:2035:=
+display_channel_update: condition `display_channel_validate_surface(display=
+, surface_id)' failed
+  Abortado (imagem do n=C3=BAcleo gravada)
+
+  --------
+
+  I was running QEMU as a normal user which is on the groups kvm and
+  disk. Initially I supposed the problem was because I was running QEMU
+  as root, but as a normal user this happens too.
+
+  I have tested with guests with different Ubuntu version: 18.04, 17.10
+  and 16.04. It is happening with them all.
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu4
+  ProcVersionSignature: Ubuntu 4.15.0-10.11-generic 4.15.3
+  Uname: Linux 4.15.0-10-generic x86_64
+  ApportVersion: 2.20.8-0ubuntu10
+  Architecture: amd64
+  CurrentDesktop: XFCE
+  Date: Wed Mar 14 17:13:52 2018
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  InstallationDate: Installed on 2017-06-13 (273 days ago)
+  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: LENOVO 80UG
+  ProcCmdline: qemu-system-x86_64 -hda /dev/sdb -smp cpus=3D2 -m 512 -enabl=
+e-kvm -cpu host -vga qxl -nodefaults -netdev user,id=3Dhostnet0 -device vir=
+tio-net-pci,id=3Dnet0,netdev=3Dhostnet0
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.15.0-10-generic.efi.signe=
+d root=3DUUID=3D6b4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet
+  Signal: 6
+  SourcePackage: qemu
+  StacktraceTop:
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  Title: qemu-system-x86_64 crashed with SIGABRT
+  UpgradeStatus: Upgraded to bionic on 2017-10-20 (145 days ago)
+  UserGroups: adm bluetooth cdrom dialout dip disk kvm libvirt lpadmin netd=
+ev plugdev sambashare sudo
+  dmi.bios.date: 07/10/2017
+  dmi.bios.vendor: LENOVO
+  dmi.bios.version: 0XCN43WW
+  dmi.board.asset.tag: NO Asset Tag
+  dmi.board.name: Toronto 4A2
+  dmi.board.vendor: LENOVO
+  dmi.board.version: SDK0J40679 WIN
+  dmi.chassis.asset.tag: NO Asset Tag
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: LENOVO
+  dmi.chassis.version: Lenovo ideapad 310-14ISK
+  dmi.modalias: dmi:bvnLENOVO:bvr0XCN43WW:bd07/10/2017:svnLENOVO:pn80UG:pvr=
+Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
+10:cvrLenovoideapad310-14ISK:
+  dmi.product.family: IDEAPAD
+  dmi.product.name: 80UG
+  dmi.product.version: Lenovo ideapad 310-14ISK
+  dmi.sys.vendor: LENOVO
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1755912/+subscriptions
