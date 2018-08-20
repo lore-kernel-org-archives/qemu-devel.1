@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1frgkT-0000Ow-Rg
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:45:22 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1frgm5-0001Dd-A1
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:47:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1frgkP-000554-Qb
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:45:21 -0400
-Received: from mail-by2nam01on0105.outbound.protection.outlook.com
-	([104.47.34.105]:40242
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1frgkP-00052E-EB
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:45:17 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 20 Aug 2018 09:45:11 +0000
-Message-ID: <BN7PR08MB4868E801C917548C44678D88C6320@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1534182832-554-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1534182832-554-82-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<c9eb581f-3f03-c28e-4095-3064e556f7c0@members.leeds.ac.uk>
-In-Reply-To: <c9eb581f-3f03-c28e-4095-3064e556f7c0@members.leeds.ac.uk>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <jemmy858585@gmail.com>) id 1frgm3-0005bl-SA
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:47:01 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:34136)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
+	id 1frgm3-0005bP-Mp
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 05:46:59 -0400
+Received: by mail-it0-x244.google.com with SMTP id d70-v6so7628772ith.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 02:46:59 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v8 81/87] linux-user: Add support for
- statx() syscall for all platforms
+In-Reply-To: <20180817145920.GK2459@work-vm>
+References: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
+	<1533562177-16447-12-git-send-email-lidongchen@tencent.com>
+	<20180817145920.GK2459@work-vm>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Mon, 20 Aug 2018 17:46:58 +0800
+Message-ID: <CAOGPPbf3hXEk76gVC0R-zFbWys1EfQqkgvyxozDCy-nEYG9PVA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 11/11] migration: create a dedicated
+ thread to release rdma resource
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,79 +31,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Timothy Baldwin <T.E.Baldwin99@members.leeds.ac.uk>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Paul Burton <pburton@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
 
-> From: Timothy Baldwin <T.E.Baldwin99@members.leeds.ac.uk>
-> Sent: Monday, August 20, 2018 9:48 AM
->=20
-> Subject: Re: [PATCH v8 81/87] linux-user: Add support for statx() syscall=
- for all platforms
->=20
-> On 13/08/18 18:53, Aleksandar Markovic wrote:
-> > From: Aleksandar Rikalo <arikalo@wavecomp.com>
-> >
-> > Implement support for translation of system call statx(). The
-> > implementation includes invoking other (more mature) syscalls
-> > (from the same 'stat' family) on the host side. This way,
-> > problems of availability of statx() on the host side are
-> > avoided.
-> >
-> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-> > ---
-> >   linux-user/syscall.c      | 121 +++++++++++++++++++++++++++++++++++++=
-++++++++-
-> >   linux-user/syscall_defs.h |  38 +++++++++++++++
-> >   2 files changed, 158 insertions(+), 1 deletion(-)
-> >
->=20
->=20
-> > +            if ((p =3D=3D NULL) || (*((char *)p) =3D=3D 0)) {
-> > +                /* By file descriptor */
-> > +                ret =3D get_errno(fstat(dirfd, &st));
-> > +                unlock_user(p, arg2, 0);
-> > +            } else if (*((char *)p) =3D=3D '/') {
-> > +                /* Absolute pathname */
-> > +                ret =3D get_errno(stat(path(p), &st));
-> > +                unlock_user(p, arg2, 0);
-> > +            } else {
-> > +                if (dirfd =3D=3D AT_FDCWD) {
-> > +                    /* Pathname relative to the current working direct=
-ory */
-> > +                    ret =3D get_errno(stat(path(p), &st));
-> > +                    unlock_user(p, arg2, 0);
-> > +                } else {
-> > +                    /*
-> > +                     * Pathname relative to the directory referred to =
-by the
-> > +                     * file descriptor dirfd
-> > +                     */
-> > +                    ret =3D get_errno(fstatat(dirfd, path(p), &st, fla=
-gs));
-> > +                    unlock_user(p, arg2, 0);
-> > +                }
-> > +            }
->=20
-> This doesn't correctly handle the flags argument, it is ignored unless a
-> relative path and directory file descriptor is provided.
+On Fri, Aug 17, 2018 at 10:59 PM, Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+> * Lidong Chen (jemmy858585@gmail.com) wrote:
+>> ibv_dereg_mr wait for a long time for big memory size virtual server.
+>>
+>> The test result is:
+>>   10GB  326ms
+>>   20GB  699ms
+>>   30GB  1021ms
+>>   40GB  1387ms
+>>   50GB  1712ms
+>>   60GB  2034ms
+>>   70GB  2457ms
+>>   80GB  2807ms
+>>   90GB  3107ms
+>>   100GB 3474ms
+>>   110GB 3735ms
+>>   120GB 4064ms
+>>   130GB 4567ms
+>>   140GB 4886ms
+>>
+>> this will cause the guest os hang for a while when migration finished.
+>> So create a dedicated thread to release rdma resource.
+>>
+>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>> ---
+>>  migration/migration.c |  6 ++++++
+>>  migration/migration.h |  3 +++
+>>  migration/rdma.c      | 47 +++++++++++++++++++++++++++++++----------------
+>>  3 files changed, 40 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index f7d6e26..25d9009 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -1499,6 +1499,7 @@ void migrate_init(MigrationState *s)
+>>      s->vm_was_running = false;
+>>      s->iteration_initial_bytes = 0;
+>>      s->threshold_size = 0;
+>> +    s->rdma_cleanup_thread_quit = true;
+>>  }
+>>
+>>  static GSList *migration_blockers;
+>> @@ -1660,6 +1661,10 @@ static bool migrate_prepare(MigrationState *s, bool blk, bool blk_inc,
+>>          return false;
+>>      }
+>>
+>> +    if (s->rdma_cleanup_thread_quit != true) {
+>> +        return false;
+>> +    }
+>
+> That's not good! We error out without saying anything to the user
+> about why;  if we error we must always say why, otherwise we'll get
+> bug reports from people without anyway to debug them.
 
-Hi, Timothy.
+Yes, it should give some error message.
 
-Agreed. The patch generally needs certain improvements wrt handling origina=
-l statx() arguments. I would certianly add handling the mask argument.
+>
+> However, we also don't need to; all we need to do is turn this into
+> a semaphore or similar, and then wait for it at the start of
+> 'rdma_start_outgoing_migration' - that way there's no error exit, it
+> just waits a few seconds and then carries on correctly.
+> (Maybe we need to wait in incoming as well to cope with
+> postcopy-recovery).
 
-> As such an implementation of lstat that uses statx will be broken.
->=20
-> Since fstatat exists since 2.6.16 this can be reduced to a call to fstata=
-t.
+Yes, this should also consider postcopy-recovery case. I will fix it.
+but rdma_start_outgoing_migration is invoked in the main thread, it's will a
+little complex to wait.
+and if it waits for a long time, it's not easy to troubleshooting.
 
-I am not sure what you meant here. I think QEMU lstat() implementation does=
- not use statx(). This implementation of statx() uses hosts's statx(), and,=
- as a fallback, host's fstat(), stat(), and fstatat().
+Maybe report some error message is an easy way to fix it?
+Thanks.
 
-I would like to add that I think this patch should be submitted separately,=
- out of this series.
-
-Yours,
-Aleksandar
+>
+> Dave
+>
+>>      if (runstate_check(RUN_STATE_INMIGRATE)) {
+>>          error_setg(errp, "Guest is waiting for an incoming migration");
+>>          return false;
+>> @@ -3213,6 +3218,7 @@ static void migration_instance_init(Object *obj)
+>>
+>>      ms->state = MIGRATION_STATUS_NONE;
+>>      ms->mbps = -1;
+>> +    ms->rdma_cleanup_thread_quit = true;
+>>      qemu_sem_init(&ms->pause_sem, 0);
+>>      qemu_mutex_init(&ms->error_mutex);
+>>
+>> diff --git a/migration/migration.h b/migration/migration.h
+>> index 64a7b33..60138dd 100644
+>> --- a/migration/migration.h
+>> +++ b/migration/migration.h
+>> @@ -224,6 +224,9 @@ struct MigrationState
+>>       * do not trigger spurious decompression errors.
+>>       */
+>>      bool decompress_error_check;
+>> +
+>> +    /* Set this when rdma resource have released */
+>> +    bool rdma_cleanup_thread_quit;
+>>  };
+>>
+>>  void migrate_set_state(int *state, int old_state, int new_state);
+>> diff --git a/migration/rdma.c b/migration/rdma.c
+>> index e1498f2..3282f35 100644
+>> --- a/migration/rdma.c
+>> +++ b/migration/rdma.c
+>> @@ -2995,35 +2995,50 @@ static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
+>>      }
+>>  }
+>>
+>> -static int qio_channel_rdma_close(QIOChannel *ioc,
+>> -                                  Error **errp)
+>> +static void *qio_channel_rdma_close_thread(void *arg)
+>>  {
+>> -    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
+>> -    RDMAContext *rdmain, *rdmaout;
+>> -    trace_qemu_rdma_close();
+>> -
+>> -    rdmain = rioc->rdmain;
+>> -    if (rdmain) {
+>> -        atomic_rcu_set(&rioc->rdmain, NULL);
+>> -    }
+>> +    RDMAContext **rdma = arg;
+>> +    RDMAContext *rdmain = rdma[0];
+>> +    RDMAContext *rdmaout = rdma[1];
+>> +    MigrationState *s = migrate_get_current();
+>>
+>> -    rdmaout = rioc->rdmaout;
+>> -    if (rdmaout) {
+>> -        atomic_rcu_set(&rioc->rdmaout, NULL);
+>> -    }
+>> +    rcu_register_thread();
+>>
+>>      synchronize_rcu();
+>> -
+>>      if (rdmain) {
+>>          qemu_rdma_cleanup(rdmain);
+>>      }
+>> -
+>>      if (rdmaout) {
+>>          qemu_rdma_cleanup(rdmaout);
+>>      }
+>>
+>>      g_free(rdmain);
+>>      g_free(rdmaout);
+>> +    g_free(rdma);
+>> +
+>> +    rcu_unregister_thread();
+>> +    s->rdma_cleanup_thread_quit = true;
+>> +    return NULL;
+>> +}
+>> +
+>> +static int qio_channel_rdma_close(QIOChannel *ioc,
+>> +                                  Error **errp)
+>> +{
+>> +    QemuThread t;
+>> +    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
+>> +    RDMAContext **rdma = g_new0(RDMAContext*, 2);
+>> +    MigrationState *s = migrate_get_current();
+>> +
+>> +    trace_qemu_rdma_close();
+>> +    if (rioc->rdmain || rioc->rdmaout) {
+>> +        rdma[0] =  rioc->rdmain;
+>> +        rdma[1] =  rioc->rdmaout;
+>> +        atomic_rcu_set(&rioc->rdmain, NULL);
+>> +        atomic_rcu_set(&rioc->rdmaout, NULL);
+>> +        s->rdma_cleanup_thread_quit = false;
+>> +        qemu_thread_create(&t, "rdma cleanup", qio_channel_rdma_close_thread,
+>> +                           rdma, QEMU_THREAD_DETACHED);
+>> +    }
+>>
+>>      return 0;
+>>  }
+>> --
+>> 1.8.3.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
