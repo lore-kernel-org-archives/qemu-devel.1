@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1friqr-0004il-Ez
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:00:06 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1frit7-0005jQ-5u
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1friqn-0000ew-GE
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:00:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55138 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1friqn-0000eY-Bw
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:00:01 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <153458654892.28280.9192299594353632366@502c9da6d61e>
-	<87y3d1sam1.fsf@dusky.pond.sub.org>
-	<20180820084239.GG10682@lemon.usersys.redhat.com>
-Date: Mon, 20 Aug 2018 13:59:53 +0200
-In-Reply-To: <20180820084239.GG10682@lemon.usersys.redhat.com> (Fam Zheng's
-	message of "Mon, 20 Aug 2018 16:42:39 +0800")
-Message-ID: <871satqmdi.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 00/60] json: Fixes,
- error reporting improvements, cleanups
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1frit5-0002R2-6X
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:25 -0400
+From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Date: Mon, 20 Aug 2018 14:01:58 +0200
+Message-Id: <20180820120213.11095-2-e.emanuelegiuseppe@gmail.com>
+In-Reply-To: <20180820120213.11095-1-e.emanuelegiuseppe@gmail.com>
+References: <20180820120213.11095-1-e.emanuelegiuseppe@gmail.com>
+Subject: [Qemu-devel] [PATCH 01/16] test/qgraph: arm/smdkc210 machine node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +19,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Keith Busch <keith.busch@intel.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Fam Zheng <famz@redhat.com> writes:
+Add arm/smdkc210 machine machine to the graph. This machine contains generic-sdhci, so
+its constructor must take care of setting it properly when called.
 
-> On Mon, 08/20 10:31, Markus Armbruster wrote:
->> no-reply@patchew.org writes:
->> 
->> > Hi,
->> >
->> > This series seems to have some coding style problems. See output below for
->> > more information:
->> [...]
->> > Checking PATCH 4/60: qmp-cmd-test: Split off qmp-test...
->> > WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
->> > #48: 
->> > new file mode 100644
->> 
->> False positive: the patch does update MAINTAINERS.  Surprising, since
->> commit 1a6fad0c3bd "checkpatch: reduce MAINTAINERS update message
->> frequency" suppresses this.  Fam, is patchew running an outdated version
->> of checkpatch?
->
-> I'm sure Patchew is using the latest checkpatch here. This is basically /me
-> reproducing what it does:
->
-> fam@lemon:~/work/qemu [master]$ git fetch https://github.com/patchew-project/qemu tags/patchew/20180817150559.16243-1-armbru@redhat.com
->>From https://github.com/patchew-project/qemu
->  * tag                     patchew/20180817150559.16243-1-armbru@redhat.com -> FETCH_HEAD
-> fam@lemon:~/work/qemu [master]$ git checkout FETCH_HEAD
-> Note: checking out 'FETCH_HEAD'.
->
-> You are in 'detached HEAD' state. You can look around, make experimental
-> changes and commit them, and you can discard any commits you make in this
-> state without impacting any branches by performing another checkout.
->
-> If you want to create a new branch to retain commits you create, you may
-> do so (now or later) by using -b with the checkout command again. Example:
->
->   git checkout -b <new-branch-name>
->
-> HEAD is now at 884c1e75d7 json: Support %% in JSON strings when interpolating
-> fam@lemon:~/work/qemu$ git log --oneline | grep 'qmp-cmd-test: Split off qmp-test'
-> b9ac2b614b qmp-cmd-test: Split off qmp-test
-> fam@lemon:~/work/qemu$ git show --format=email b9ac2b614b | ./scripts/checkpatch.pl -
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #48:
-> new file mode 100644
->
-> total: 0 errors, 1 warnings, 460 lines checked
->
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> fam@lemon:~/work/qemu$ git log --oneline  ./scripts/checkpatch.pl | grep 1a6fad0
-> 1a6fad0c3b checkpatch: reduce MAINTAINERS update message frequency
+Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+---
+ tests/Makefile.include          |  9 ++--
+ tests/libqos/smdkc210-machine.c | 82 +++++++++++++++++++++++++++++++++
+ tests/sdhci-test.c              |  7 +--
+ 3 files changed, 92 insertions(+), 6 deletions(-)
+ create mode 100644 tests/libqos/smdkc210-machine.c
 
-Okay, I can reproduce the warning the way patchew runs checkpatch:
-
-    $ git-show --format=email 4552d915d3 | ./scripts/checkpatch.pl -
-    WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-    #47: 
-    new file mode 100644
-
-    total: 0 errors, 1 warnings, 460 lines checked
-
-    Your patch has style problems, please review.  If any of these errors
-    are false positives report them to the maintainer, see
-    CHECKPATCH in MAINTAINERS.
-
-However:
-
-    $ git-format-patch -1 4552d915d3
-    0001-qmp-cmd-test-Split-off-qmp-test.patch
-    $ ./scripts/checkpatch.pl 0001-qmp-cmd-test-Split-off-qmp-test.patch 
-    total: 0 errors, 0 warnings, 460 lines checked
-
-    0001-qmp-cmd-test-Split-off-qmp-test.patch has no obvious style problems and is ready for submission.
-
-The difference between the two: git-show --format=email lacks diffstat.
-
-    $ git-show --format=email 4552d915d3 | diff - 0001-qmp-cmd-test-Split-off-qmp-test.patch 
-    11a12,18
-    > ---
-    >  MAINTAINERS            |   1 +
-    >  tests/Makefile.include |   3 +
-    >  tests/qmp-cmd-test.c   | 213 +++++++++++++++++++++++++++++++++++++++++
-    >  tests/qmp-test.c       | 193 +------------------------------------
-    >  4 files changed, 219 insertions(+), 191 deletions(-)
-    >  create mode 100644 tests/qmp-cmd-test.c
-    497a505,507
-    > -- 
-    > 2.17.1
-    > 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 30355058fc..b4a9b28706 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -756,10 +756,13 @@ libqos-imx-obj-y = $(libqos-obj-y) tests/libqos/i2c-imx.o
+ libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
+ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virtio.o tests/libqos/virtio-pci.o tests/libqos/virtio-mmio.o tests/libqos/malloc-generic.o
+ 
+-libqgraph-machines-obj-y = tests/libqos/x86_64_pc-machine.o
+-libqgraph-machines-obj-y += tests/libqos/raspi2-machine.o
++libqgraph-arm-machines-obj-y = tests/libqos/raspi2-machine.o
++libqgraph-arm-machines-obj-y += tests/libqos/virt-machine.o
++libqgraph-arm-machines-obj-y += tests/libqos/smdkc210-machine.o
++
++libqgraph-machines-obj-y = $(libqgraph-arm-machines-obj-y)
++libqgraph-machines-obj-y += tests/libqos/x86_64_pc-machine.o
+ libqgraph-machines-obj-y += tests/libqos/ppc64_pseries-machine.o
+-libqgraph-machines-obj-y += tests/libqos/virt-machine.o
+ 
+ libqgraph-virtio-obj-y = tests/libqos/virtio-serial.o
+ libqgraph-virtio-obj-y += tests/libqos/virtio-9p.o
+diff --git a/tests/libqos/smdkc210-machine.c b/tests/libqos/smdkc210-machine.c
+new file mode 100644
+index 0000000000..542d426209
+--- /dev/null
++++ b/tests/libqos/smdkc210-machine.c
+@@ -0,0 +1,82 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "libqos/malloc.h"
++#include "libqos/qgraph.h"
++#include "sdhci.h"
++
++typedef struct QSmdkc210Machine QSmdkc210Machine;
++
++struct QSmdkc210Machine {
++    QOSGraphObject obj;
++    QGuestAllocator *alloc;
++    QSDHCI_MemoryMapped sdhci;
++};
++
++static void smdkc210_destructor(QOSGraphObject *obj)
++{
++    g_free(obj);
++}
++
++static void *smdkc210_get_driver(void *object, const char *interface)
++{
++    QSmdkc210Machine *machine = object;
++    if (!g_strcmp0(interface, "memory")) {
++        return &machine->alloc;
++    }
++
++    fprintf(stderr, "%s not present in arm/smdkc210\n", interface);
++    g_assert_not_reached();
++}
++
++static QOSGraphObject *smdkc210_get_device(void *obj, const char *device)
++{
++    QSmdkc210Machine *machine = obj;
++    if (!g_strcmp0(device, "generic-sdhci")) {
++        return &machine->sdhci.obj;
++    }
++
++    fprintf(stderr, "%s not present in arm/smdkc210\n", device);
++    g_assert_not_reached();
++}
++
++static void *qos_create_machine_arm_smdkc210(void)
++{
++    QSmdkc210Machine *machine = g_new0(QSmdkc210Machine, 1);
++
++    machine->obj.get_device = smdkc210_get_device;
++    machine->obj.get_driver = smdkc210_get_driver;
++    machine->obj.destructor = smdkc210_destructor;
++    qos_init_sdhci_smm(&machine->sdhci, 0x12510000, &(QSDHCIProperties) {
++        .version = 2,
++        .baseclock = 0,
++        .capab.sdma = true,
++        .capab.reg = 0x5e80080,
++    });
++    return &machine->obj;
++}
++
++static void smdkc210_register_nodes(void)
++{
++    qos_node_create_machine("arm/smdkc210", qos_create_machine_arm_smdkc210);
++    qos_node_contains("arm/smdkc210", "generic-sdhci", NULL);
++}
++
++libqos_init(smdkc210_register_nodes);
+diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
+index ed29839f3d..9f4cd9209a 100644
+--- a/tests/sdhci-test.c
++++ b/tests/sdhci-test.c
+@@ -51,12 +51,13 @@ FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
+     BCM2835
+         { "arm",    "raspi2",
+             {0x3f300000, 3, 52, {0, 0x052134b4} } },
+- *
+- * FIXME: the following drivers are missing:
+- *
++
+     Exynos4210
+         { "arm",    "smdkc210",
+             {0x12510000, 2, 0,  {1, 0x5e80080} } },
++ *
++ * FIXME: the following drivers are missing:
++ *
+ 
+     i.MX 6
+         { "arm",    "sabrelite",
+-- 
+2.17.1
