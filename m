@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1frppY-00075y-0h
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:27:15 -0400
+	(envelope-from <sw@weilnetz.de>) id 1frq3R-0000nx-Tp
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:41:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1frppM-00006A-P9
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:27:08 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:47052)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1frppF-0008Td-GE
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:26:58 -0400
-Received: by mail-pg1-x541.google.com with SMTP id f14-v6so7242891pgv.13
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 12:26:52 -0700 (PDT)
-References: <20180816025452.21358-1-richard.henderson@linaro.org>
-	<20180816025452.21358-2-richard.henderson@linaro.org>
-	<20180817164253.GA7067@flamenco>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a98cd262-d15a-e4b8-eb92-ce295e944c13@linaro.org>
-Date: Mon, 20 Aug 2018 12:26:48 -0700
+	(envelope-from <sw@weilnetz.de>) id 1frq3G-0002fD-HP
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:41:28 -0400
+From: Stefan Weil <sw@weilnetz.de>
+References: <CABLmASE2HTZPBVFM=grds+9RmPyh2naJ2KwNjb81LD0+E+yrtA@mail.gmail.com>
+	<c350ae62-2712-79cc-e7e6-b88ae3fbc044@weilnetz.de>
+Message-ID: <008c57ea-0050-b5f0-4d68-db660cba269e@weilnetz.de>
+Date: Mon, 20 Aug 2018 21:41:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180817164253.GA7067@flamenco>
+In-Reply-To: <c350ae62-2712-79cc-e7e6-b88ae3fbc044@weilnetz.de>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: de-DE
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] tcg: Split CONFIG_ATOMIC128
+Subject: Re: [Qemu-devel] Bugs when cross-compiling qemu for Windows with
+ mingw 8.1, executable doesn't run
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +25,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Ben Pye <ben@curlybracket.co.uk>
 
-On 08/17/2018 09:42 AM, Emilio G. Cota wrote:
->> +/* Through gcc 8, aarch64 has no support for 128-bit at all.  */
->> +static inline Int128 atomic16_cmpxchg(Int128 *ptr, Int128 cmp, Int128 new)
->> +{
->> +    uint64_t cmpl = cmp, cmph = cmp >> 64;
->> +    uint64_t newl = new, newh = new >> 64;
-> Here I'd use int128_getlo/hi, since we're not checking for
-> CONFIG_INT128 (I'm thinking of old compilers here)
+> Am 18.07.2018 um 08:33 schrieb Howard Spoelstra:
+> [...]> Issue 2: once strncpy has been replaced with memcpy in these two
+>> instances, I can successfully compile, but the executable doesn't run
+>> in Windows.
+>> I tried to debug, and this is what gdb told me:
+>>
+>> (gdb) run
+>> Starting program: c:\qemu-fedora29beta\qemu-system-ppc-debug.exe -L
+>> c:\qemu-fedora29beta\pc-bios -boot c -m 256 -M "mac99,via=pmu"
+>> -prom-env "boot-args=-v" -prom-env "auto-boot?=true" -prom-env
+>> "vga-ndrv?=true" -hda c:\Mac-disks\9.2.qcow2 -netdev
+>> "user,id=network01" -device "sungem,netdev=network01" -sdl -d int
+>> [New Thread 948.0x6d8]
+>> [New Thread 948.0x2778]
+>> [New Thread 948.0x286c]
+>> [New Thread 948.0x3d0]
+>>
+>> Program received signal SIGSEGV, Segmentation fault.
+>> getpagesize () at util/oslib-win32.c:535
+>> 535     util/oslib-win32.c: No such file or directory.
 
-I suppose, but this is aarch64 -- there are no really old compilers.
-The oldest is probably gcc 4.8, which already has __int128_t.
 
-Thanks for the other catches too.
+That's a problem triggered by gcc 8 for Mingw-w64 with compiler options
+-fstack-protector-all and -fstack-protector-strong. With any of those
+options this simple test program also fails with SIGSEGV:
 
+#include <windows.h>
+int main(void) {
+  SYSTEM_INFO system_info;
+  GetSystemInfo(&system_info);
+  return system_info.dwPageSize;
+}
 
-r~
+With configure option --disable-stack-protector, the resulting binary
+should work.
+
+Regards
+Stefan
