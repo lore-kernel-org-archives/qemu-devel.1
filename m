@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frkuA-0003az-Rt
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:41 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1frkuF-0003eV-8s
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frku8-0007Jr-Tg
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:38 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1frkuD-0007OS-V3
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:43 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 15:11:05 +0100
-Message-Id: <20180820141116.9118-12-peter.maydell@linaro.org>
+Date: Mon, 20 Aug 2018 15:11:08 +0100
+Message-Id: <20180820141116.9118-15-peter.maydell@linaro.org>
 In-Reply-To: <20180820141116.9118-1-peter.maydell@linaro.org>
 References: <20180820141116.9118-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 11/22] hw/misc/tz-msc: Model TrustZone Master
- Security Controller
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 14/22] hw/arm/mps2-tz: Create PL081s and MSCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,484 +25,189 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Implement a model of the TrustZone Master Securtiy Controller,
-as documented in the Arm CoreLink SIE-200 System IP for
-Embedded TRM  (DDI0571G):
-  https://developer.arm.com/products/architecture/m-profile/docs/ddi0571/g
-
-The MSC is intended to sit in front of a device which can
-be a bus master (eg a DMA controller) and programmably gate
-its transactions. This allows a bus-mastering device to be
-controlled by non-secure code but still restricted from
-making accesses to addresses which are secure-only.
+The AN505 FPGA image includes four PL081 DMA controllers, each
+of which is gated by a Master Security Controller that allows
+the guest to prevent a non-secure DMA controller from accessing
+memory that is used by secure guest code. Create and wire
+up these devices.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/misc/Makefile.objs           |   1 +
- include/hw/misc/tz-msc.h        |  79 ++++++++
- hw/misc/tz-msc.c                | 308 ++++++++++++++++++++++++++++++++
- MAINTAINERS                     |   2 +
- default-configs/arm-softmmu.mak |   1 +
- hw/misc/trace-events            |   9 +
- 6 files changed, 400 insertions(+)
- create mode 100644 include/hw/misc/tz-msc.h
- create mode 100644 hw/misc/tz-msc.c
+v2 changes:
+ - use 'sizeof(*msc)', 'sizeof(*dma)' as suggested
+   by Phillipe in code review
+ - s/init_sysbus_child/sysbus_init_child_obj/, required by
+   rebase on current master
+---
+ hw/arm/mps2-tz.c | 100 +++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 93 insertions(+), 7 deletions(-)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index af2b503824e..6d50b03cfdb 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -64,6 +64,7 @@ obj-$(CONFIG_MPS2_FPGAIO) += mps2-fpgaio.o
- obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
- 
- obj-$(CONFIG_TZ_MPC) += tz-mpc.o
-+obj-$(CONFIG_TZ_MSC) += tz-msc.o
- obj-$(CONFIG_TZ_PPC) += tz-ppc.o
- obj-$(CONFIG_IOTKIT_SECCTL) += iotkit-secctl.o
- obj-$(CONFIG_IOTKIT_SYSCTL) += iotkit-sysctl.o
-diff --git a/include/hw/misc/tz-msc.h b/include/hw/misc/tz-msc.h
-new file mode 100644
-index 00000000000..116b96ae9b8
---- /dev/null
-+++ b/include/hw/misc/tz-msc.h
-@@ -0,0 +1,79 @@
-+/*
-+ * ARM TrustZone master security controller emulation
-+ *
-+ * Copyright (c) 2018 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or
-+ * (at your option) any later version.
-+ */
-+
-+/*
-+ * This is a model of the TrustZone master security controller (MSC).
-+ * It is documented in the ARM CoreLink SIE-200 System IP for Embedded TRM
-+ * (DDI 0571G):
-+ * https://developer.arm.com/products/architecture/m-profile/docs/ddi0571/g
-+ *
-+ * The MSC sits in front of a device which can be a bus master (such as
-+ * a DMA controller) and allows secure software to configure it to either
-+ * pass through or reject transactions made by that bus master.
-+ * Rejected transactions may be configured to either be aborted, or to
-+ * behave as RAZ/WI. An interrupt can be signalled for a rejected transaction.
-+ *
-+ * The MSC has no register interface -- it is configured purely by a
-+ * collection of input signals from other hardware in the system. Typically
-+ * they are either hardwired or exposed in an ad-hoc register interface by
-+ * the SoC that uses the MSC.
-+ *
-+ * We don't currently implement the irq_enable GPIO input, because on
-+ * the MPS2 FPGA images it is always tied high, which is awkward to
-+ * implement in QEMU.
-+ *
-+ * QEMU interface:
-+ * + Named GPIO input "cfg_nonsec": set to 1 if the bus master should be
-+ *   treated as nonsecure, or 0 for secure
-+ * + Named GPIO input "cfg_sec_resp": set to 1 if a rejected transaction should
-+ *   result in a transaction error, or 0 for the transaction to RAZ/WI
-+ * + Named GPIO input "irq_clear": set to 1 to clear a pending interrupt
-+ * + Named GPIO output "irq": set for a transaction-failed interrupt
-+ * + Property "downstream": MemoryRegion defining where bus master transactions
-+ *   are made if they are not blocked
-+ * + Property "idau": an object implementing IDAUInterface, which defines which
-+ *   addresses should be treated as secure and which as non-secure.
-+ *   This need not be the same IDAU as the one used by the CPU.
-+ * + sysbus MMIO region 0: MemoryRegion defining the upstream end of the MSC;
-+ *   this should be passed to the bus master device as the region it should
-+ *   make memory transactions to
-+ */
-+
-+#ifndef TZ_MSC_H
-+#define TZ_MSC_H
-+
-+#include "hw/sysbus.h"
-+#include "target/arm/idau.h"
-+
-+#define TYPE_TZ_MSC "tz-msc"
-+#define TZ_MSC(obj) OBJECT_CHECK(TZMSC, (obj), TYPE_TZ_MSC)
-+
-+typedef struct TZMSC {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+
-+    /* State: these just track the values of our input signals */
-+    bool cfg_nonsec;
-+    bool cfg_sec_resp;
-+    bool irq_clear;
-+    /* State: are we asserting irq ? */
-+    bool irq_status;
-+
-+    qemu_irq irq;
-+    MemoryRegion *downstream;
-+    AddressSpace downstream_as;
-+    MemoryRegion upstream;
-+    IDAUInterface *idau;
-+} TZMSC;
-+
-+#endif
-diff --git a/hw/misc/tz-msc.c b/hw/misc/tz-msc.c
-new file mode 100644
-index 00000000000..9e352044ea5
---- /dev/null
-+++ b/hw/misc/tz-msc.c
-@@ -0,0 +1,308 @@
-+/*
-+ * ARM TrustZone master security controller emulation
-+ *
-+ * Copyright (c) 2018 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or
-+ * (at your option) any later version.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "trace.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index dc0f34abe53..d810e51a1b4 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -45,7 +45,9 @@
+ #include "hw/misc/mps2-scc.h"
+ #include "hw/misc/mps2-fpgaio.h"
+ #include "hw/misc/tz-mpc.h"
 +#include "hw/misc/tz-msc.h"
-+
-+static void tz_msc_update_irq(TZMSC *s)
+ #include "hw/arm/iotkit.h"
++#include "hw/dma/pl080.h"
+ #include "hw/devices.h"
+ #include "net/net.h"
+ #include "hw/core/split-irq.h"
+@@ -75,8 +77,9 @@ typedef struct {
+     UnimplementedDeviceState i2c[4];
+     UnimplementedDeviceState i2s_audio;
+     UnimplementedDeviceState gpio[4];
+-    UnimplementedDeviceState dma[4];
+     UnimplementedDeviceState gfx;
++    PL080State dma[4];
++    TZMSC msc[4];
+     CMSDKAPBUART uart[5];
+     SplitIRQ sec_resp_splitter;
+     qemu_or_irq uart_irq_orgate;
+@@ -263,6 +266,64 @@ static MemoryRegion *make_mpc(MPS2TZMachineState *mms, void *opaque,
+     return sysbus_mmio_get_region(SYS_BUS_DEVICE(mpc), 0);
+ }
+ 
++static MemoryRegion *make_dma(MPS2TZMachineState *mms, void *opaque,
++                              const char *name, hwaddr size)
 +{
-+    bool level = s->irq_status;
-+
-+    trace_tz_msc_update_irq(level);
-+    qemu_set_irq(s->irq, level);
-+}
-+
-+static void tz_msc_cfg_nonsec(void *opaque, int n, int level)
-+{
-+    TZMSC *s = TZ_MSC(opaque);
-+
-+    trace_tz_msc_cfg_nonsec(level);
-+    s->cfg_nonsec = level;
-+}
-+
-+static void tz_msc_cfg_sec_resp(void *opaque, int n, int level)
-+{
-+    TZMSC *s = TZ_MSC(opaque);
-+
-+    trace_tz_msc_cfg_sec_resp(level);
-+    s->cfg_sec_resp = level;
-+}
-+
-+static void tz_msc_irq_clear(void *opaque, int n, int level)
-+{
-+    TZMSC *s = TZ_MSC(opaque);
-+
-+    trace_tz_msc_irq_clear(level);
-+
-+    s->irq_clear = level;
-+    if (level) {
-+        s->irq_status = false;
-+        tz_msc_update_irq(s);
-+    }
-+}
-+
-+/* The MSC may either block a transaction by aborting it, block a
-+ * transaction by making it RAZ/WI, allow it through with
-+ * MemTxAttrs indicating a secure transaction, or allow it with
-+ * MemTxAttrs indicating a non-secure transaction.
-+ */
-+typedef enum MSCAction {
-+    MSCBlockAbort,
-+    MSCBlockRAZWI,
-+    MSCAllowSecure,
-+    MSCAllowNonSecure,
-+} MSCAction;
-+
-+static MSCAction tz_msc_check(TZMSC *s, hwaddr addr)
-+{
-+    /*
-+     * Check whether to allow an access from the bus master, returning
-+     * an MSCAction indicating the required behaviour. If the transaction
-+     * is blocked, the caller must check cfg_sec_resp to determine
-+     * whether to abort or RAZ/WI the transaction.
-+     */
-+    IDAUInterfaceClass *iic = IDAU_INTERFACE_GET_CLASS(s->idau);
-+    IDAUInterface *ii = IDAU_INTERFACE(s->idau);
-+    bool idau_exempt = false, idau_ns = true, idau_nsc = true;
-+    int idau_region = IREGION_NOTVALID;
-+
-+    iic->check(ii, addr, &idau_region, &idau_exempt, &idau_ns, &idau_nsc);
-+
-+    if (idau_exempt) {
-+        /*
-+         * Uncheck region -- OK, transaction type depends on
-+         * whether bus master is configured as Secure or NonSecure
-+         */
-+        return s->cfg_nonsec ? MSCAllowNonSecure : MSCAllowSecure;
-+    }
-+
-+    if (idau_ns) {
-+        /* NonSecure region -- always forward as NS transaction */
-+        return MSCAllowNonSecure;
-+    }
-+
-+    if (!s->cfg_nonsec) {
-+        /* Access to Secure region by Secure bus master: OK */
-+        return MSCAllowSecure;
-+    }
-+
-+    /* Attempted access to Secure region by NS bus master: block */
-+    trace_tz_msc_access_blocked(addr);
-+    if (!s->cfg_sec_resp) {
-+        return MSCBlockRAZWI;
-+    }
++    PL080State *dma = opaque;
++    int i = dma - &mms->dma[0];
++    SysBusDevice *s;
++    char *mscname = g_strdup_printf("%s-msc", name);
++    TZMSC *msc = &mms->msc[i];
++    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
++    MemoryRegion *msc_upstream;
++    MemoryRegion *msc_downstream;
 +
 +    /*
-+     * The TRM isn't clear on behaviour if irq_clear is high when a
-+     * transaction is blocked. We assume that the MSC behaves like the
-+     * PPC, where holding irq_clear high suppresses the interrupt.
++     * Each DMA device is a PL081 whose transaction master interface
++     * is guarded by a Master Security Controller. The downstream end of
++     * the MSC connects to the IoTKit AHB Slave Expansion port, so the
++     * DMA devices can see all devices and memory that the CPU does.
 +     */
-+    if (!s->irq_clear) {
-+        s->irq_status = true;
-+        tz_msc_update_irq(s);
-+    }
-+    return MSCBlockAbort;
++    sysbus_init_child_obj(OBJECT(mms), mscname, msc, sizeof(*msc), TYPE_TZ_MSC);
++    msc_downstream = sysbus_mmio_get_region(SYS_BUS_DEVICE(&mms->iotkit), 0);
++    object_property_set_link(OBJECT(msc), OBJECT(msc_downstream),
++                             "downstream", &error_fatal);
++    object_property_set_link(OBJECT(msc), OBJECT(mms),
++                             "idau", &error_fatal);
++    object_property_set_bool(OBJECT(msc), true, "realized", &error_fatal);
++
++    qdev_connect_gpio_out_named(DEVICE(msc), "irq", 0,
++                                qdev_get_gpio_in_named(iotkitdev,
++                                                       "mscexp_status", i));
++    qdev_connect_gpio_out_named(iotkitdev, "mscexp_clear", i,
++                                qdev_get_gpio_in_named(DEVICE(msc),
++                                                       "irq_clear", 0));
++    qdev_connect_gpio_out_named(iotkitdev, "mscexp_ns", i,
++                                qdev_get_gpio_in_named(DEVICE(msc),
++                                                       "cfg_nonsec", 0));
++    qdev_connect_gpio_out(DEVICE(&mms->sec_resp_splitter),
++                          ARRAY_SIZE(mms->ppc) + i,
++                          qdev_get_gpio_in_named(DEVICE(msc),
++                                                 "cfg_sec_resp", 0));
++    msc_upstream = sysbus_mmio_get_region(SYS_BUS_DEVICE(msc), 0);
++
++    sysbus_init_child_obj(OBJECT(mms), name, dma, sizeof(*dma), TYPE_PL081);
++    object_property_set_link(OBJECT(dma), OBJECT(msc_upstream),
++                             "downstream", &error_fatal);
++    object_property_set_bool(OBJECT(dma), true, "realized", &error_fatal);
++
++    s = SYS_BUS_DEVICE(dma);
++    /* Wire up DMACINTR, DMACINTERR, DMACINTTC */
++    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev,
++                                                    "EXP_IRQ", 58 + i * 3));
++    sysbus_connect_irq(s, 1, qdev_get_gpio_in_named(iotkitdev,
++                                                    "EXP_IRQ", 56 + i * 3));
++    sysbus_connect_irq(s, 2, qdev_get_gpio_in_named(iotkitdev,
++                                                    "EXP_IRQ", 57 + i * 3));
++
++    return sysbus_mmio_get_region(s, 0);
 +}
 +
-+static MemTxResult tz_msc_read(void *opaque, hwaddr addr, uint64_t *pdata,
-+                               unsigned size, MemTxAttrs attrs)
+ static void mps2tz_common_init(MachineState *machine)
+ {
+     MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
+@@ -289,13 +350,14 @@ static void mps2tz_common_init(MachineState *machine)
+                              &error_fatal);
+ 
+     /* The sec_resp_cfg output from the IoTKit must be split into multiple
+-     * lines, one for each of the PPCs we create here.
++     * lines, one for each of the PPCs we create here, plus one per MSC.
+      */
+     object_initialize(&mms->sec_resp_splitter, sizeof(mms->sec_resp_splitter),
+                       TYPE_SPLIT_IRQ);
+     object_property_add_child(OBJECT(machine), "sec-resp-splitter",
+                               OBJECT(&mms->sec_resp_splitter), &error_abort);
+-    object_property_set_int(OBJECT(&mms->sec_resp_splitter), 5,
++    object_property_set_int(OBJECT(&mms->sec_resp_splitter),
++                            ARRAY_SIZE(mms->ppc) + ARRAY_SIZE(mms->msc),
+                             "num-lines", &error_fatal);
+     object_property_set_bool(OBJECT(&mms->sec_resp_splitter), true,
+                              "realized", &error_fatal);
+@@ -396,10 +458,10 @@ static void mps2tz_common_init(MachineState *machine)
+         }, {
+             .name = "ahb_ppcexp1",
+             .ports = {
+-                { "dma0", make_unimp_dev, &mms->dma[0], 0x40110000, 0x1000 },
+-                { "dma1", make_unimp_dev, &mms->dma[1], 0x40111000, 0x1000 },
+-                { "dma2", make_unimp_dev, &mms->dma[2], 0x40112000, 0x1000 },
+-                { "dma3", make_unimp_dev, &mms->dma[3], 0x40113000, 0x1000 },
++                { "dma0", make_dma, &mms->dma[0], 0x40110000, 0x1000 },
++                { "dma1", make_dma, &mms->dma[1], 0x40111000, 0x1000 },
++                { "dma2", make_dma, &mms->dma[2], 0x40112000, 0x1000 },
++                { "dma3", make_dma, &mms->dma[3], 0x40113000, 0x1000 },
+             },
+         },
+     };
+@@ -480,12 +542,32 @@ static void mps2tz_common_init(MachineState *machine)
+     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x400000);
+ }
+ 
++static void mps2_tz_idau_check(IDAUInterface *ii, uint32_t address,
++                               int *iregion, bool *exempt, bool *ns, bool *nsc)
 +{
-+    TZMSC *s = opaque;
-+    AddressSpace *as = &s->downstream_as;
-+    uint64_t data;
-+    MemTxResult res;
-+
-+    switch (tz_msc_check(s, addr)) {
-+    case MSCBlockAbort:
-+        return MEMTX_ERROR;
-+    case MSCBlockRAZWI:
-+        *pdata = 0;
-+        return MEMTX_OK;
-+    case MSCAllowSecure:
-+        attrs.secure = 1;
-+        attrs.unspecified = 0;
-+        break;
-+    case MSCAllowNonSecure:
-+        attrs.secure = 0;
-+        attrs.unspecified = 0;
-+        break;
-+    }
-+
-+    switch (size) {
-+    case 1:
-+        data = address_space_ldub(as, addr, attrs, &res);
-+        break;
-+    case 2:
-+        data = address_space_lduw_le(as, addr, attrs, &res);
-+        break;
-+    case 4:
-+        data = address_space_ldl_le(as, addr, attrs, &res);
-+        break;
-+    case 8:
-+        data = address_space_ldq_le(as, addr, attrs, &res);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    *pdata = data;
-+    return res;
-+}
-+
-+static MemTxResult tz_msc_write(void *opaque, hwaddr addr, uint64_t val,
-+                                unsigned size, MemTxAttrs attrs)
-+{
-+    TZMSC *s = opaque;
-+    AddressSpace *as = &s->downstream_as;
-+    MemTxResult res;
-+
-+    switch (tz_msc_check(s, addr)) {
-+    case MSCBlockAbort:
-+        return MEMTX_ERROR;
-+    case MSCBlockRAZWI:
-+        return MEMTX_OK;
-+    case MSCAllowSecure:
-+        attrs.secure = 1;
-+        attrs.unspecified = 0;
-+        break;
-+    case MSCAllowNonSecure:
-+        attrs.secure = 0;
-+        attrs.unspecified = 0;
-+        break;
-+    }
-+
-+    switch (size) {
-+    case 1:
-+        address_space_stb(as, addr, val, attrs, &res);
-+        break;
-+    case 2:
-+        address_space_stw_le(as, addr, val, attrs, &res);
-+        break;
-+    case 4:
-+        address_space_stl_le(as, addr, val, attrs, &res);
-+        break;
-+    case 8:
-+        address_space_stq_le(as, addr, val, attrs, &res);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    return res;
-+}
-+
-+static const MemoryRegionOps tz_msc_ops = {
-+    .read_with_attrs = tz_msc_read,
-+    .write_with_attrs = tz_msc_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void tz_msc_reset(DeviceState *dev)
-+{
-+    TZMSC *s = TZ_MSC(dev);
-+
-+    trace_tz_msc_reset();
-+    s->cfg_sec_resp = false;
-+    s->cfg_nonsec = false;
-+    s->irq_clear = 0;
-+    s->irq_status = 0;
-+}
-+
-+static void tz_msc_init(Object *obj)
-+{
-+    DeviceState *dev = DEVICE(obj);
-+    TZMSC *s = TZ_MSC(obj);
-+
-+    qdev_init_gpio_in_named(dev, tz_msc_cfg_nonsec, "cfg_nonsec", 1);
-+    qdev_init_gpio_in_named(dev, tz_msc_cfg_sec_resp, "cfg_sec_resp", 1);
-+    qdev_init_gpio_in_named(dev, tz_msc_irq_clear, "irq_clear", 1);
-+    qdev_init_gpio_out_named(dev, &s->irq, "irq", 1);
-+}
-+
-+static void tz_msc_realize(DeviceState *dev, Error **errp)
-+{
-+    Object *obj = OBJECT(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+    TZMSC *s = TZ_MSC(dev);
-+    const char *name = "tz-msc-downstream";
-+    uint64_t size;
-+
 +    /*
-+     * We can't create the upstream end of the port until realize,
-+     * as we don't know the size of the MR used as the downstream until then.
-+     * We insist on having a downstream, to avoid complicating the
-+     * code with handling the "don't know how big this is" case. It's easy
-+     * enough for the user to create an unimplemented_device as downstream
-+     * if they have nothing else to plug into this.
++     * The MPS2 TZ FPGA images have IDAUs in them which are connected to
++     * the Master Security Controllers. Thes have the same logic as
++     * is used by the IoTKit for the IDAU connected to the CPU, except
++     * that MSCs don't care about the NSC attribute.
 +     */
-+    if (!s->downstream) {
-+        error_setg(errp, "MSC 'downstream' link not set");
-+        return;
-+    }
-+    if (!s->idau) {
-+        error_setg(errp, "MSC 'idau' link not set");
-+        return;
-+    }
++    int region = extract32(address, 28, 4);
 +
-+    size = memory_region_size(s->downstream);
-+    address_space_init(&s->downstream_as, s->downstream, name);
-+    memory_region_init_io(&s->upstream, obj, &tz_msc_ops, s, name, size);
-+    sysbus_init_mmio(sbd, &s->upstream);
++    *ns = !(region & 1);
++    *nsc = false;
++    /* 0xe0000000..0xe00fffff and 0xf0000000..0xf00fffff are exempt */
++    *exempt = (address & 0xeff00000) == 0xe0000000;
++    *iregion = region;
 +}
 +
-+static const VMStateDescription tz_msc_vmstate = {
-+    .name = "tz-msc",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_BOOL(cfg_nonsec, TZMSC),
-+        VMSTATE_BOOL(cfg_sec_resp, TZMSC),
-+        VMSTATE_BOOL(irq_clear, TZMSC),
-+        VMSTATE_BOOL(irq_status, TZMSC),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property tz_msc_properties[] = {
-+    DEFINE_PROP_LINK("downstream", TZMSC, downstream,
-+                     TYPE_MEMORY_REGION, MemoryRegion *),
-+    DEFINE_PROP_LINK("idau", TZMSC, idau,
-+                     TYPE_IDAU_INTERFACE, IDAUInterface *),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void tz_msc_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = tz_msc_realize;
-+    dc->vmsd = &tz_msc_vmstate;
-+    dc->reset = tz_msc_reset;
-+    dc->props = tz_msc_properties;
-+}
-+
-+static const TypeInfo tz_msc_info = {
-+    .name = TYPE_TZ_MSC,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(TZMSC),
-+    .instance_init = tz_msc_init,
-+    .class_init = tz_msc_class_init,
-+};
-+
-+static void tz_msc_register_types(void)
-+{
-+    type_register_static(&tz_msc_info);
-+}
-+
-+type_init(tz_msc_register_types);
-diff --git a/MAINTAINERS b/MAINTAINERS
-index cb780f463cb..b2f8b562dc5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -465,6 +465,8 @@ F: hw/misc/tz-ppc.c
- F: include/hw/misc/tz-ppc.h
- F: hw/misc/tz-mpc.c
- F: include/hw/misc/tz-mpc.h
-+F: hw/misc/tz-msc.c
-+F: include/hw/misc/tz-msc.h
+ static void mps2tz_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
++    IDAUInterfaceClass *iic = IDAU_INTERFACE_CLASS(oc);
  
- ARM cores
- M: Peter Maydell <peter.maydell@linaro.org>
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index ebbdcb29f38..0483d548d96 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -111,6 +111,7 @@ CONFIG_MPS2_FPGAIO=y
- CONFIG_MPS2_SCC=y
+     mc->init = mps2tz_common_init;
+     mc->max_cpus = 1;
++    iic->check = mps2_tz_idau_check;
+ }
  
- CONFIG_TZ_MPC=y
-+CONFIG_TZ_MSC=y
- CONFIG_TZ_PPC=y
- CONFIG_IOTKIT=y
- CONFIG_IOTKIT_SECCTL=y
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 7faf7592832..52466c77c4e 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -92,6 +92,15 @@ tz_mpc_mem_blocked_write(uint64_t addr, uint64_t data, unsigned size, bool secur
- tz_mpc_translate(uint64_t addr, int flags, const char *idx, const char *res) "TZ MPC translate: addr 0x%" PRIx64 " flags 0x%x iommu_idx %s: %s"
- tz_mpc_iommu_notify(uint64_t addr) "TZ MPC iommu: notifying UNMAP/MAP for 0x%" PRIx64
+ static void mps2tz_an505_class_init(ObjectClass *oc, void *data)
+@@ -506,6 +588,10 @@ static const TypeInfo mps2tz_info = {
+     .instance_size = sizeof(MPS2TZMachineState),
+     .class_size = sizeof(MPS2TZMachineClass),
+     .class_init = mps2tz_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_IDAU_INTERFACE },
++        { }
++    },
+ };
  
-+# hw/misc/tz-msc.c
-+tz_msc_reset(void) "TZ MSC: reset"
-+tz_msc_cfg_nonsec(int level) "TZ MSC: cfg_nonsec = %d"
-+tz_msc_cfg_sec_resp(int level) "TZ MSC: cfg_sec_resp = %d"
-+tz_msc_irq_enable(int level) "TZ MSC: int_enable = %d"
-+tz_msc_irq_clear(int level) "TZ MSC: int_clear = %d"
-+tz_msc_update_irq(int level) "TZ MSC: setting irq line to %d"
-+tz_msc_access_blocked(uint64_t offset) "TZ MSC: offset 0x%" PRIx64 " access blocked"
-+
- # hw/misc/tz-ppc.c
- tz_ppc_reset(void) "TZ PPC: reset"
- tz_ppc_cfg_nonsec(int n, int level) "TZ PPC: cfg_nonsec[%d] = %d"
+ static const TypeInfo mps2tz_an505_info = {
 -- 
 2.18.0
