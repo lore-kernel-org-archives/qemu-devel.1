@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fre8F-00071O-It
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 02:57:44 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1freVS-00061t-F7
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:21:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fre8C-0000gD-By
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 02:57:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55118 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fre8C-0000ft-7S
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 02:57:40 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180801093401.9160-1-marcandre.lureau@redhat.com>
-	<871sbi8bsm.fsf@dusky.pond.sub.org>
-	<CAJ+F1CJj=WPs0FOx8QJU76iFqhc11N7m+FnRG2t0USu0Jm6JTA@mail.gmail.com>
-	<874lge6s4u.fsf@dusky.pond.sub.org>
-	<CAJ+F1C+WmBtMG26nG0KmQCkKg9iUk6nxTi2P=t_qC22z3i5CWQ@mail.gmail.com>
-Date: Mon, 20 Aug 2018 08:57:38 +0200
-In-Reply-To: <CAJ+F1C+WmBtMG26nG0KmQCkKg9iUk6nxTi2P=t_qC22z3i5CWQ@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 17 Aug 2018
-	19:50:59 +0200")
-Message-ID: <87a7phtti5.fsf@dusky.pond.sub.org>
+	(envelope-from <gengdongjiu@huawei.com>) id 1freVR-0005jd-FQ
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:21:42 -0400
+References: <1532195863-23945-1-git-send-email-gengdongjiu@huawei.com>
+	<1532195863-23945-4-git-send-email-gengdongjiu@huawei.com>
+	<CAFEAcA8EssRi0WbcKNJK5RQ1KUWNNLb5xmFK2+E_bRwwhDBfBQ@mail.gmail.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <d99648cd-db15-1dcc-d027-1dde1170edba@huawei.com>
+Date: Mon, 20 Aug 2018 15:21:11 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] monitor: avoid potential dead-lock when
- cleaning up
+In-Reply-To: <CAFEAcA8EssRi0WbcKNJK5RQ1KUWNNLb5xmFK2+E_bRwwhDBfBQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 3/3] target: arm: Add support for VCPU
+ event states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,197 +26,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-> Hi
-> On Wed, Aug 1, 2018 at 5:09 PM Markus Armbruster <armbru@redhat.com> wrot=
-e:
+On 2018/8/17 22:50, Peter Maydell wrote:
+> On 21 July 2018 at 18:57, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+>> This patch extends the qemu-kvm state sync logic with support for
+>> KVM_GET/SET_VCPU_EVENTS, giving access to yet missing SError exception.
+>> And also it can support the exception state migration.
+> 
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> ---
+>> change since v4:
+>> 1. Rebase the code to latest
 >>
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>> change since v3:
+>> 1. Add a new new subsection with a suitable 'ras_needed' function
+>>    controlling whether it is present
+>> 2. Add a ARM_FEATURE_RAS feature bit for CPUARMState
 >>
->> > Hi
->> >
->> > On Wed, Aug 1, 2018 at 3:19 PM, Markus Armbruster <armbru@redhat.com> =
-wrote:
->> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->> >>
->> >>> When a monitor is connected to a Spice chardev, the monitor cleanup
->> >>> can dead-lock:
->> >>>
->> >>>  #0  0x00007f43446637fd in __lll_lock_wait () at /lib64/libpthread.s=
-o.0
->> >>>  #1  0x00007f434465ccf4 in pthread_mutex_lock () at /lib64/libpthrea=
-d.so.0
->> >>>  #2  0x0000556dd79f22ba in qemu_mutex_lock_impl (mutex=3D0x556dd81c9=
-220 <monitor_lock>, file=3D0x556dd7ae3648 "/home/elmarco/src/qq/monitor.c",=
- line=3D645) at /home/elmarco/src/qq/util/qemu-thread-posix.c:66
->> >>>  #3  0x0000556dd7431bd5 in monitor_qapi_event_queue (event=3DQAPI_EV=
-ENT_SPICE_DISCONNECTED, qdict=3D0x556dd9abc850, errp=3D0x7fffb7bbddd8) at /=
-home/elmarco/src/qq/monitor.c:645
->> >>>  #4  0x0000556dd79d476b in qapi_event_send_spice_disconnected (serve=
-r=3D0x556dd98ee760, client=3D0x556ddaaa8560, errp=3D0x556dd82180d0 <error_a=
-bort>) at qapi/qapi-events-ui.c:149
->> >>>  #5  0x0000556dd7870fc1 in channel_event (event=3D3, info=3D0x556dda=
-d1b590) at /home/elmarco/src/qq/ui/spice-core.c:235
->> >>>  #6  0x00007f434560a6bb in reds_handle_channel_event (reds=3D<optimi=
-zed out>, event=3D3, info=3D0x556ddad1b590) at reds.c:316
->> >>>  #7  0x00007f43455f393b in main_dispatcher_self_handle_channel_event=
- (info=3D0x556ddad1b590, event=3D3, self=3D0x556dd9a7d8c0) at main-dispatch=
-er.c:197
->> >>>  #8  0x00007f43455f393b in main_dispatcher_channel_event (self=3D0x5=
-56dd9a7d8c0, event=3Devent@entry=3D3, info=3D0x556ddad1b590) at main-dispat=
-cher.c:197
->> >>>  #9  0x00007f4345612833 in red_stream_push_channel_event (s=3Ds@entr=
-y=3D0x556ddae2ef40, event=3Devent@entry=3D3) at red-stream.c:414
->> >>>  #10 0x00007f434561286b in red_stream_free (s=3D0x556ddae2ef40) at r=
-ed-stream.c:388
->> >>>  #11 0x00007f43455f9ddc in red_channel_client_finalize (object=3D0x5=
-56dd9bb21a0) at red-channel-client.c:347
->> >>>  #12 0x00007f434b5f9fb9 in g_object_unref () at /lib64/libgobject-2.=
-0.so.0
->> >>>  #13 0x00007f43455fc212 in red_channel_client_push (rcc=3D0x556dd9bb=
-21a0) at red-channel-client.c:1341
->> >>>  #14 0x0000556dd76081ba in spice_port_set_fe_open (chr=3D0x556dd9925=
-e20, fe_open=3D0) at /home/elmarco/src/qq/chardev/spice.c:241
->> >>>  #15 0x0000556dd796d74a in qemu_chr_fe_set_open (be=3D0x556dd9a37c00=
-, fe_open=3D0) at /home/elmarco/src/qq/chardev/char-fe.c:340
->> >>>  #16 0x0000556dd796d4d9 in qemu_chr_fe_set_handlers (b=3D0x556dd9a37=
-c00, fd_can_read=3D0x0, fd_read=3D0x0, fd_event=3D0x0, be_change=3D0x0, opa=
-que=3D0x0, context=3D0x0, set_open=3Dtrue) at /home/elmarco/src/qq/chardev/=
-char-fe.c:280
->> >>>  #17 0x0000556dd796d359 in qemu_chr_fe_deinit (b=3D0x556dd9a37c00, d=
-el=3Dfalse) at /home/elmarco/src/qq/chardev/char-fe.c:233
->> >>>  #18 0x0000556dd7432240 in monitor_data_destroy (mon=3D0x556dd9a37c0=
-0) at /home/elmarco/src/qq/monitor.c:786
->> >>>  #19 0x0000556dd743b968 in monitor_cleanup () at /home/elmarco/src/q=
-q/monitor.c:4683
->> >>>  #20 0x0000556dd75ce776 in main (argc=3D3, argv=3D0x7fffb7bbe458, en=
-vp=3D0x7fffb7bbe478) at /home/elmarco/src/qq/vl.c:4660
->> >>>
->> >>> Because spice code tries to emit a "disconnected" signal on the
->> >>> monitors. Fix this situation by tightening the monitor lock time to
->> >>> the monitor list removal.
->> >>>
->> >>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> >>
->> >> Do you think this should go into 3.0?
->> >>
->> >>> ---
->> >>>  monitor.c | 22 +++++++++++++++-------
->> >>>  1 file changed, 15 insertions(+), 7 deletions(-)
->> >>>
->> >>> diff --git a/monitor.c b/monitor.c
->> >>> index 0fa0910a2a..a16a6c5311 100644
->> >>> --- a/monitor.c
->> >>> +++ b/monitor.c
->> >>> @@ -4702,8 +4702,6 @@ void monitor_init(Chardev *chr, int flags)
->> >>>
->> >>>  void monitor_cleanup(void)
->> >>>  {
->> >>> -    Monitor *mon, *next;
->> >>> -
->> >>>      /*
->> >>>       * We need to explicitly stop the I/O thread (but not destroy i=
-t),
->> >>>       * clean up the monitor resources, then destroy the I/O thread =
-since
->> >>> @@ -4719,14 +4717,24 @@ void monitor_cleanup(void)
->> >>>      monitor_qmp_bh_responder(NULL);
->> >>>
->> >>>      /* Flush output buffers and destroy monitors */
->> >>> -    qemu_mutex_lock(&monitor_lock);
->> >>> -    QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
->> >>> -        QTAILQ_REMOVE(&mon_list, mon, entry);
->> >>> +    do {
->> >>
->> >> for (;;), please.
->> >>
->> >>> +        Monitor *mon;
->> >>> +
->> >>> +        qemu_mutex_lock(&monitor_lock);
->> >>> +        mon =3D QTAILQ_FIRST(&mon_list);
->> >>> +        if (mon) {
->> >>> +            QTAILQ_REMOVE(&mon_list, mon, entry);
->> >>> +        }
->> >>> +        qemu_mutex_unlock(&monitor_lock);
->> >>> +
->> >>> +        if (!mon) {
->> >>> +            break;
->> >>> +        }
->> >>> +
->> >>>          monitor_flush(mon);
->> >>>          monitor_data_destroy(mon);
->> >>>          g_free(mon);
->> >>> -    }
->> >>> -    qemu_mutex_unlock(&monitor_lock);
->> >>> +    } while (true);
->> >>>
->> >>>      /* QEMUBHs needs to be deleted before destroying the I/O thread=
- */
->> >>>      qemu_bh_delete(qmp_dispatcher_bh);
->> >>
->> >> Iterating safely over a list protected by a lock should be easier than
->> >> that.  Sad.
->> >>
->> >> Hmm, what about this:
->> >>
->> >> diff --git a/monitor.c b/monitor.c
->> >> index 77861e96af..4a23f6c7bc 100644
->> >> --- a/monitor.c
->> >> +++ b/monitor.c
->> >> @@ -4721,9 +4721,11 @@ void monitor_cleanup(void)
->> >>      qemu_mutex_lock(&monitor_lock);
->> >>      QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
->> >>          QTAILQ_REMOVE(&mon_list, mon, entry);
->> >> +        qemu_mutex_unlock(&monitor_lock);
->> >>          monitor_flush(mon);
->> >>          monitor_data_destroy(mon);
->> >>          g_free(mon);
->> >> +        qemu_mutex_lock(&monitor_lock);
->> >
->> > Although unlikely, there is a chance the monitor list could be
->> > modified while flushing/cleaning up, I suppose, in this case we could
->> > miss the new monitors (if next is NULL).
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> 
+> Hi; sorry it's taken me so long to get to this patchset.
+> I think it's basically the right shape, but I have some
+> changes to suggest below.
+
+You are welcome, thanks for your time that give below  precious suggestion and review comments.
+
+> 
+>> ---
+>>  target/arm/cpu.h     |  6 ++++++
+>>  target/arm/kvm64.c   | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  target/arm/machine.c | 22 ++++++++++++++++++++
+>>  3 files changed, 87 insertions(+)
 >>
->> Your loop prevents that from happening while it runs, but does nothing
->> to stop it from happening afterwards.  If we want to lock out new
->> monitors, we need to make monitor_init() fail or impossible to call.
->
-> Not so trivial. Is there other threads capable of calling
-> monitor_init() by the time monitor_cleanup() is called? It looks like
-> monitor_init() may only be called from the main thread.
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index e310ffc..f00f0b6 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -645,6 +645,11 @@ typedef struct CPUARMState {
+>>      const struct arm_boot_info *boot_info;
+>>      /* Store GICv3CPUState to access from this struct */
+>>      void *gicv3state;
+>> +    struct {
+>> +        uint32_t pending;
+>> +        uint32_t has_esr;
+>> +        uint64_t esr;
+>> +    } serror;
+> 
+> I recommend putting this earlier in the CPUARMState struct.
+> Specifically, you want to put it somewhere before the
+> "end_reset_fields" marker. All fields before that are cleared
+> to zero on CPU reset. If you put the struct after that then
+> you would need manual code in the cpu reset function to
+> reset it appropriately.
+Ok, I will move it to the right place. thanks for the pointing out.
 
-Callers:
+> 
+>>  } CPUARMState;
+>>
+>>  /**
+>> @@ -1486,6 +1491,7 @@ enum arm_features {
+>>      ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
+>>      ARM_FEATURE_V8_FCMA, /* has complex number part of v8.3 extensions.  */
+>>      ARM_FEATURE_M_MAIN, /* M profile Main Extension */
+>> +    ARM_FEATURE_RAS_EXT, /* has RAS Extension */
+>>  };
+>>
+>>  static inline int arm_feature(CPUARMState *env, int feature)
+>> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+>> index e0b8246..ebf7a00 100644
+>> --- a/target/arm/kvm64.c
+>> +++ b/target/arm/kvm64.c
+>> @@ -527,6 +527,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>          unset_feature(&env->features, ARM_FEATURE_PMU);
+>>      }
+>>
+>> +    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_INJECT_SERROR_ESR)) {
+>> +        set_feature(&env->features, ARM_FEATURE_RAS_EXT);
+>> +    }
+> 
+> I think this is confusing two things. Whether the host kernel
+> has support for injecting SError ESRs is not the same as
+> whether the guest CPU has the RAS extensions. So you don't want
+> to use an ARM_FEATURE_* bit to track whether we need to migrate
+> the SError ESR state.
+> 
+> Instead you should just use a bool variable local to this file
+> to track whether the kernel has state we need to migrate.
+> Compare the way we use "have_guest_debug" to track whether
+> KVM_CAP_SET_GUEST_DEBUG is set. You can call this
+> have_inject_serror_esr.
 
-* gdbserver_start()
+Ok, I will use your suggested method to do it in this file.
 
-  CLI option -gdb, HMP command gdbserver, linux user CLI option -g and
-  environment variable QEMU_GDB
+> 
+>> +
+>>      /* Do KVM_ARM_VCPU_INIT ioctl */
+>>      ret = kvm_arm_vcpu_init(cs);
+>>      if (ret) {
+>> @@ -600,6 +604,50 @@ int kvm_arm_cpreg_level(uint64_t regidx)
+>>  #define AARCH64_SIMD_CTRL_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U32 | \
+>>                   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+>>
+>> +static int kvm_put_vcpu_events(ARMCPU *cpu)
+>> +{
+>> +    CPUARMState *env = &cpu->env;
+>> +    struct kvm_vcpu_events events = {};
+>> +
+>> +    if (!kvm_has_vcpu_events()) {
+>> +        return 0;
+>> +    }
+>> +
+>> +    memset(&events, 0, sizeof(events));
+>> +    events.exception.serror_pending = env->serror.pending;
+>> +
+>> +    if (arm_feature(env, ARM_FEATURE_RAS_EXT)) {
+> 
+> Here you can check have_inject_serror_esr.
 
-  The interesting one is the HMP command.  Does your loop lock it out?
-  If we run it only in the main thread, and we run the HMP command only
-  in the main thread, it obviously does.
+Got it, will change it.
 
-* mon_init_func()
+> 
+>> +        events.exception.serror_has_esr = env->serror.has_esr;
+>> +        events.exception.serror_esr = env->serror.esr;
+>> +    }
+>> +
+>> +    return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
+>> +}
+>> +
+>> +static int kvm_get_vcpu_events(ARMCPU *cpu)
+>> +{
+>> +    CPUARMState *env = &cpu->env;
+>> +    struct kvm_vcpu_events events;
+>> +    int ret;
+>> +
+>> +    if (!kvm_has_vcpu_events()) {
+>> +        return 0;
+>> +    }
+>> +
+>> +    memset(&events, 0, sizeof(events));
+>> +    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_VCPU_EVENTS, &events);
+>> +
+>> +    if (ret < 0) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    env->serror.pending = events.exception.serror_pending;
+>> +    env->serror.has_esr = events.exception.serror_has_esr;
+>> +    env->serror.esr = events.exception.serror_esr;
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>  int kvm_arch_put_registers(CPUState *cs, int level)
+>>  {
+>>      struct kvm_one_reg reg;
+>> @@ -727,6 +775,12 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+>>          return ret;
+>>      }
+>>
+>> +    ret = kvm_put_vcpu_events(cpu);
+>> +    if (ret) {
+>> +        printf("return error kvm_put_vcpu_events: %d\n", ret);
+> 
+> Stray debug printf() left in?
+I will remove this printf().
 
-  CLI option -mon and its convenience buddies -monitor, -qmp,
-  -qmp-pretty
+> 
+>> +        return ret;
+>> +    }
+>> +
+>>      if (!write_list_to_kvmstate(cpu, level)) {
+>>          return EINVAL;
+>>      }
+>> @@ -863,6 +917,11 @@ int kvm_arch_get_registers(CPUState *cs)
+>>      }
+>>      vfp_set_fpcr(env, fpr);
+>>
+>> +    ret = kvm_get_vcpu_events(cpu);
+>> +    if (ret) {
+>> +        return ret;
+>> +    }
+>> +
+>>      if (!write_kvmstate_to_list(cpu)) {
+>>          return EINVAL;
+>>      }
+>> diff --git a/target/arm/machine.c b/target/arm/machine.c
+>> index 2e28d08..ead8b2a 100644
+>> --- a/target/arm/machine.c
+>> +++ b/target/arm/machine.c
+>> @@ -172,6 +172,27 @@ static const VMStateDescription vmstate_sve = {
+>>  };
+>>  #endif /* AARCH64 */
+>>
+>> +static bool ras_needed(void *opaque)
+>> +{
+>> +    ARMCPU *cpu = opaque;
+>> +    CPUARMState *env = &cpu->env;
+>> +
+>> +    return arm_feature(env, ARM_FEATURE_RAS_EXT);
+> 
+> I think the best check to use here is
+> "return env.serror.pending != 0". If no SError is
+> pending then there's no new state to migrate.
 
-  We don't have a monitor command to spawn off a new monitor, but we
-  could have.
+Ok, it looks reasonable to check "return env.serror.pending != 0",
+I will change it.
 
-* qemu_chr_new_noreplay()
+> 
+> We should also call this VMState something other than
+> "ras", because it doesn't contain RAS-specific data.
+> "serror" will do (so "vmstate_serror", "cpu/serror", etc).
 
-  gdbserver_start() again, and qemu_chr_new(), which is called all over
-  the place.  I lack the time to review these calls.  Are you sure this
-  one can only run in the main thread?
+OK, I will rename it to "vmstate_serror" from vmstate_ras.
 
-Synchronizing monitor creation and cleanup explicitly might be cleaner.
-I guess monitor_lock kind of sort of almost does that before your patch,
-but it can deadlock because it's too coarse.
-
-I'm afraid we need to rethink the set of locks protecting shared monitor
-state.
+> 
+>> +}
+>> +
+>> +static const VMStateDescription vmstate_ras = {
+>> +    .name = "cpu/ras",
+>> +    .version_id = 1,
+>> +    .minimum_version_id = 1,
+>> +    .needed = ras_needed,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_UINT32(env.serror.pending, ARMCPU),
+>> +        VMSTATE_UINT32(env.serror.has_esr, ARMCPU),
+>> +        VMSTATE_UINT64(env.serror.esr, ARMCPU),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+>> +
+>>  static bool m_needed(void *opaque)
+>>  {
+>>      ARMCPU *cpu = opaque;
+>> @@ -723,6 +744,7 @@ const VMStateDescription vmstate_arm_cpu = {
+>>  #ifdef TARGET_AARCH64
+>>          &vmstate_sve,
+>>  #endif
+>> +        &vmstate_ras,
+>>          NULL
+>>      }
+>>  };
+> 
+> thanks
+> -- PMM
+> 
+> .
+> 
