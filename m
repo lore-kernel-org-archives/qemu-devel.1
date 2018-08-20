@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frku1-0003QK-SR
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:30 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frku0-0007DY-R6
+	(envelope-from <pm215@archaic.org.uk>) id 1frktz-0003O9-RF
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:29 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pm215@archaic.org.uk>) id 1frkty-0007Bb-LN
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:27 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 15:10:54 +0100
-Message-Id: <20180820141116.9118-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 00/22] MPS devices: FPGAIO, timer, watchdogs,
- MSC, DMA, SPI
+Date: Mon, 20 Aug 2018 15:10:56 +0100
+Message-Id: <20180820141116.9118-3-peter.maydell@linaro.org>
+In-Reply-To: <20180820141116.9118-1-peter.maydell@linaro.org>
+References: <20180820141116.9118-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 02/22] hw/misc/mps2-fpgaio: Implement PSCNTR
+ and COUNTER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +23,186 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-This patchset is a combination of the remaining patches
-from the v1 patchsets
- * mps2: Implement FPGAIO counters and dual-timer
- * arm: Implement MPS2 watchdogs and DMA
+In the MPS2 FPGAIO, PSCNTR is a free-running downcounter with
+a reload value configured via the PRESCALE register, and
+COUNTER counts up by 1 every time PSCNTR reaches zero.
+Implement these counters.
 
-plus some new patches which clean up the PL022 and
-instantiate it in the MPS2, and one final patch to fix
-some SCC config register values.
+We can just increment the counters migration subsection's
+version ID because we only added it in the previous commit,
+so no released QEMU versions will be using it.
 
-Patches which need review:
-1, 3, 4, 5, 8, 9, 10, 11, 15-22
-(2, 6, 7, 12, 13, 14 have been reviewed already in v1)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ include/hw/misc/mps2-fpgaio.h |  6 +++
+ hw/misc/mps2-fpgaio.c         | 97 +++++++++++++++++++++++++++++++++--
+ 2 files changed, 99 insertions(+), 4 deletions(-)
 
-Changes since v1:
- * some patches that were reviewed have been upstreamed
- * I have split the sysinfo registers out of "iotkit-sysctl"
-   and into their own "iotkit-sysinfo" devices
- * patches 15-22 are new
-
-These are all the enhancements I plan to make to the MPS2
-boards. I won't be doing anything more except in response to
-bug reports.
-
-thanks
--- PMM
-
-Peter Maydell (22):
-  hw/misc/mps2-fpgaio: Implement 1Hz and 100Hz counters
-  hw/misc/mps2-fpgaio: Implement PSCNTR and COUNTER
-  hw/timer/cmsdk-apb-dualtimer: Implement CMSDK dual timer module
-  hw/arm/iotkit: Wire up the dualtimer
-  hw/arm/mps2: Wire up dual-timer in mps2-an385 and mps2-an511
-  hw/arm/iotkit: Wire up the watchdogs
-  hw/arm/iotkit: Wire up the S32KTIMER
-  hw/misc/iotkit-sysctl: Implement IoTKit system control element
-  hw/misc/iotkit-sysinfo: Implement IoTKit system information block
-  hw/misc/iotkit: Wire up the sysctl and sysinfo register blocks
-  hw/misc/tz-msc: Model TrustZone Master Security Controller
-  hw/misc/iotkit-secctl: Wire up registers for controlling MSCs
-  hw/arm/iotkit: Wire up the lines for MSCs
-  hw/arm/mps2-tz: Create PL081s and MSCs
-  hw/ssi/pl022: Allow use as embedded-struct device
-  hw/ssi/pl022: Set up reset function in class init
-  hw/ssi/pl022: Don't directly call vmstate_register()
-  hw/ssi/pl022: Use DeviceState::realize rather than SysBusDevice::init
-  hw/ssi/pl022: Correct wrong value for PL022_INT_RT
-  hw/ssi/pl022: Correct wrong DMACR and ICR handling
-  hw/arm/mps2-tz: Instantiate SPI controllers
-  hw/arm/mps2-tz: Fix MPS2 SCC config register values
-
- hw/misc/Makefile.objs                  |   3 +
- hw/timer/Makefile.objs                 |   1 +
- include/hw/arm/iotkit.h                |  25 +-
- include/hw/misc/iotkit-secctl.h        |  14 +
- include/hw/misc/iotkit-sysctl.h        |  49 +++
- include/hw/misc/iotkit-sysinfo.h       |  37 ++
- include/hw/misc/mps2-fpgaio.h          |  10 +
- include/hw/misc/tz-msc.h               |  79 ++++
- include/hw/ssi/pl022.h                 |  51 +++
- include/hw/timer/cmsdk-apb-dualtimer.h |  72 ++++
- hw/arm/iotkit.c                        | 114 +++++-
- hw/arm/mps2-tz.c                       | 142 ++++++-
- hw/arm/mps2.c                          |  11 +
- hw/misc/iotkit-secctl.c                |  73 +++-
- hw/misc/iotkit-sysctl.c                | 261 +++++++++++++
- hw/misc/iotkit-sysinfo.c               | 128 ++++++
- hw/misc/mps2-fpgaio.c                  | 146 ++++++-
- hw/misc/tz-msc.c                       | 308 +++++++++++++++
- hw/ssi/pl022.c                         |  57 +--
- hw/timer/cmsdk-apb-dualtimer.c         | 515 +++++++++++++++++++++++++
- MAINTAINERS                            |  10 +
- default-configs/arm-softmmu.mak        |   4 +
- hw/misc/trace-events                   |  16 +
- hw/timer/trace-events                  |   5 +
- 24 files changed, 2049 insertions(+), 82 deletions(-)
- create mode 100644 include/hw/misc/iotkit-sysctl.h
- create mode 100644 include/hw/misc/iotkit-sysinfo.h
- create mode 100644 include/hw/misc/tz-msc.h
- create mode 100644 include/hw/ssi/pl022.h
- create mode 100644 include/hw/timer/cmsdk-apb-dualtimer.h
- create mode 100644 hw/misc/iotkit-sysctl.c
- create mode 100644 hw/misc/iotkit-sysinfo.c
- create mode 100644 hw/misc/tz-msc.c
- create mode 100644 hw/timer/cmsdk-apb-dualtimer.c
-
+diff --git a/include/hw/misc/mps2-fpgaio.h b/include/hw/misc/mps2-fpgaio.h
+index ec057d38c76..69e265cd4b2 100644
+--- a/include/hw/misc/mps2-fpgaio.h
++++ b/include/hw/misc/mps2-fpgaio.h
+@@ -37,6 +37,12 @@ typedef struct {
+     uint32_t prescale;
+     uint32_t misc;
+ 
++    /* QEMU_CLOCK_VIRTUAL time at which counter and pscntr were last synced */
++    int64_t pscntr_sync_ticks;
++    /* Values of COUNTER and PSCNTR at time pscntr_sync_ticks */
++    uint32_t counter;
++    uint32_t pscntr;
++
+     uint32_t prescale_clk;
+ 
+     /* These hold the CLOCK_VIRTUAL ns tick when the CLK1HZ/CLK100HZ was zero */
+diff --git a/hw/misc/mps2-fpgaio.c b/hw/misc/mps2-fpgaio.c
+index bbc28f641f0..5cf10ebd66a 100644
+--- a/hw/misc/mps2-fpgaio.c
++++ b/hw/misc/mps2-fpgaio.c
+@@ -43,6 +43,77 @@ static int64_t tickoff_from_counter(int64_t now, uint32_t count, int frq)
+     return now - muldiv64(count, NANOSECONDS_PER_SECOND, frq);
+ }
+ 
++static void resync_counter(MPS2FPGAIO *s)
++{
++    /*
++     * Update s->counter and s->pscntr to their true current values
++     * by calculating how many times PSCNTR has ticked since the
++     * last time we did a resync.
++     */
++    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    int64_t elapsed = now - s->pscntr_sync_ticks;
++
++    /*
++     * Round elapsed down to a whole number of PSCNTR ticks, so we don't
++     * lose time if we do multiple resyncs in a single tick.
++     */
++    uint64_t ticks = muldiv64(elapsed, s->prescale_clk, NANOSECONDS_PER_SECOND);
++
++    /*
++     * Work out what PSCNTR and COUNTER have moved to. We assume that
++     * PSCNTR reloads from PRESCALE one tick-period after it hits zero,
++     * and that COUNTER increments at the same moment.
++     */
++    if (ticks == 0) {
++        /* We haven't ticked since the last time we were asked */
++        return;
++    } else if (ticks < s->pscntr) {
++        /* We haven't yet reached zero, just reduce the PSCNTR */
++        s->pscntr -= ticks;
++    } else {
++        if (s->prescale == 0) {
++            /*
++             * If the reload value is zero then the PSCNTR will stick
++             * at zero once it reaches it, and so we will increment
++             * COUNTER every tick after that.
++             */
++            s->counter += ticks - s->pscntr;
++            s->pscntr = 0;
++        } else {
++            /*
++             * This is the complicated bit. This ASCII art diagram gives an
++             * example with PRESCALE==5 PSCNTR==7:
++             *
++             * ticks  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
++             * PSCNTR 7  6  5  4  3  2  1  0  5  4  3  2  1  0  5
++             * cinc                           1                 2
++             * y            0  1  2  3  4  5  6  7  8  9 10 11 12
++             * x            0  1  2  3  4  5  0  1  2  3  4  5  0
++             *
++             * where x = y % (s->prescale + 1)
++             * and so PSCNTR = s->prescale - x
++             * and COUNTER is incremented by y / (s->prescale + 1)
++             *
++             * The case where PSCNTR < PRESCALE works out the same,
++             * though we must be careful to calculate y as 64-bit unsigned
++             * for all parts of the expression.
++             * y < 0 is not possible because that implies ticks < s->pscntr.
++             */
++            uint64_t y = ticks - s->pscntr + s->prescale;
++            s->pscntr = s->prescale - (y % (s->prescale + 1));
++            s->counter += y / (s->prescale + 1);
++        }
++    }
++
++    /*
++     * Only advance the sync time to the timestamp of the last PSCNTR tick,
++     * not all the way to 'now', so we don't lose time if we do multiple
++     * resyncs in a single tick.
++     */
++    s->pscntr_sync_ticks += muldiv64(ticks, NANOSECONDS_PER_SECOND,
++                                     s->prescale_clk);
++}
++
+ static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
+ {
+     MPS2FPGAIO *s = MPS2_FPGAIO(opaque);
+@@ -74,9 +145,12 @@ static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
+         r = counter_from_tickoff(now, s->clk100hz_tick_offset, 100);
+         break;
+     case A_COUNTER:
++        resync_counter(s);
++        r = s->counter;
++        break;
+     case A_PSCNTR:
+-        qemu_log_mask(LOG_UNIMP, "MPS2 FPGAIO: counters unimplemented\n");
+-        r = 0;
++        resync_counter(s);
++        r = s->pscntr;
+         break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+@@ -107,6 +181,7 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
+         s->led0 = value & 0x3;
+         break;
+     case A_PRESCALE:
++        resync_counter(s);
+         s->prescale = value;
+         break;
+     case A_MISC:
+@@ -126,6 +201,14 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
+         now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+         s->clk100hz_tick_offset = tickoff_from_counter(now, value, 100);
+         break;
++    case A_COUNTER:
++        resync_counter(s);
++        s->counter = value;
++        break;
++    case A_PSCNTR:
++        resync_counter(s);
++        s->pscntr = value;
++        break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "MPS2 FPGAIO write: bad offset 0x%x\n", (int) offset);
+@@ -150,6 +233,9 @@ static void mps2_fpgaio_reset(DeviceState *dev)
+     s->misc = 0;
+     s->clk1hz_tick_offset = tickoff_from_counter(now, 0, 1);
+     s->clk100hz_tick_offset = tickoff_from_counter(now, 0, 100);
++    s->counter = 0;
++    s->pscntr = 0;
++    s->pscntr_sync_ticks = now;
+ }
+ 
+ static void mps2_fpgaio_init(Object *obj)
+@@ -170,12 +256,15 @@ static bool mps2_fpgaio_counters_needed(void *opaque)
+ 
+ static const VMStateDescription mps2_fpgaio_counters_vmstate = {
+     .name = "mps2-fpgaio/counters",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .needed = mps2_fpgaio_counters_needed,
+     .fields = (VMStateField[]) {
+         VMSTATE_INT64(clk1hz_tick_offset, MPS2FPGAIO),
+         VMSTATE_INT64(clk100hz_tick_offset, MPS2FPGAIO),
++        VMSTATE_UINT32(counter, MPS2FPGAIO),
++        VMSTATE_UINT32(pscntr, MPS2FPGAIO),
++        VMSTATE_INT64(pscntr_sync_ticks, MPS2FPGAIO),
+         VMSTATE_END_OF_LIST()
+     }
+ };
 -- 
 2.18.0
