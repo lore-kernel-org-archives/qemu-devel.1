@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1frr7L-0005SV-LO
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:49:40 -0400
+	(envelope-from <tcminyard@gmail.com>) id 1frrEy-0007dE-SW
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:57:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1frr7K-0003Nn-JS
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:49:39 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33085)
+	(envelope-from <tcminyard@gmail.com>) id 1frrEv-0000qb-Jk
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:57:32 -0400
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:34387)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1frr7K-0003NF-76
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:49:38 -0400
-Received: by mail-wm0-x244.google.com with SMTP id i134-v6so7976353wmf.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 13:49:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20180820174310.17450-1-marcandre.lureau@redhat.com>
-	<CAFEAcA_hyByeMb5fK88nHO2JVc9CkWc-sYQDjYoh9MfqHJnF5w@mail.gmail.com>
-	<f3bc790e-bcc2-5273-7825-313f2a72f168@redhat.com>
-In-Reply-To: <f3bc790e-bcc2-5273-7825-313f2a72f168@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 20 Aug 2018 22:49:24 +0200
-Message-ID: <CAJ+F1CLvnFD-TSEw8pxhFW=cgTKY0hqjbaMCRFYqbgpkmyqchg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] editorconfig: set emacs mode
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1frrEv-0000pt-AA
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 16:57:29 -0400
+Received: by mail-oi0-x236.google.com with SMTP id 13-v6so28321626ois.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 13:57:29 -0700 (PDT)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Mon, 20 Aug 2018 15:57:24 -0500
+Message-Id: <1534798644-13587-1-git-send-email-minyard@acm.org>
+Subject: [Qemu-devel] [PATCH v2] ipmi: Use proper struct reference for BT
+ vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +25,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
 
-Hi
+From: Corey Minyard <cminyard@mvista.com>
 
-On Mon, Aug 20, 2018 at 9:55 PM Eric Blake <eblake@redhat.com> wrote:
->
-> On 08/20/2018 01:00 PM, Peter Maydell wrote:
-> > On 20 August 2018 at 18:43, Marc-Andr=C3=A9 Lureau
-> > <marcandre.lureau@redhat.com> wrote:
-> >> Some time ago, I proposed to use an (eval) in .dir-locals.el to set
-> >> the mode for all json files and Makefile. Unfortunately, this isn't
-> >> safe, and emacs will prompt the user, which isn't very friendly.
-> >>
-> >> Fortunately, editorconfig provides a special config key which does
-> >> allow to set the emacs mode. Set the emacs mode for JSON, GLSL and
-> >> extra makefiles that are not yet covered. Drop modeline from JSON
-> >> files.
-> >
-> > Does emacs apply info from the the editorconfig file by default, though=
-?
->
-> Per https://editorconfig.org/, no, you have to first install an emacs
-> plugin to get editorconfig files to have any effect.  So this patch is a
-> non-starter unless distros start patching emacs to install that plugin
-> by default.
+The vmstate for isa_ipmi_bt was referencing into the bt structure,
+instead create a bt structure separate and use that.
 
-But .editorconfing is already present in qemu source tree. (and fwiw,
-it's installed by default with some starter kits, like prelude).
+The version 1 of the BT transfer was fairly broken, if a migration
+occured during an IPMI operation, it is likely the migration would
+be corrupted because I misunderstood the VMSTATE_VBUFFER_UINT32()
+handling, I thought it handled transferring the length field,
+too.  So I just remove support for that.  I doubt anyone is using
+it at this point.
 
-What's the issue adding the emacs mode in the config file?
+This also removes the transfer of use_irq, since that should come
+from configuration.
 
-Let's keep the modeline in existing files if you prefer, but it's
-still very limited (a majority of files are not covered). And I would
-rather see it gone, than having editor-specific lines in our source
-files.
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/ipmi/isa_ipmi_bt.c | 68 +++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 55 insertions(+), 13 deletions(-)
 
-thanks
+This is a matching patch for the IPMI BT code that matches the previous
+IPMI KCS change recently done.
+
+diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
+index e946030..8bbb1fa 100644
+--- a/hw/ipmi/isa_ipmi_bt.c
++++ b/hw/ipmi/isa_ipmi_bt.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/log.h"
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+ #include "hw/ipmi/ipmi.h"
+@@ -450,22 +451,63 @@ static void isa_ipmi_bt_realize(DeviceState *dev, Error **errp)
+     isa_register_ioport(isadev, &iib->bt.io, iib->bt.io_base);
+ }
+ 
+-static const VMStateDescription vmstate_ISAIPMIBTDevice = {
+-    .name = TYPE_IPMI_INTERFACE,
++static int ipmi_bt_vmstate_post_load(void *opaque, int version)
++{
++    IPMIBT *ib = opaque;
++
++    /* Make sure all the values are sane. */
++    if (ib->outpos >= MAX_IPMI_MSG_SIZE || ib->outlen >= MAX_IPMI_MSG_SIZE ||
++        ib->outpos >= ib->outlen) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "ipmi:bt: vmstate transfer received bad out values: %d %d\n",
++                      ib->outpos, ib->outlen);
++        ib->outpos = 0;
++        ib->outlen = 0;
++    }
++
++    if (ib->inlen >= MAX_IPMI_MSG_SIZE) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "ipmi:bt: vmstate transfer received bad in value: %d\n",
++                      ib->inlen);
++        ib->inlen = 0;
++    }
++
++    return 0;
++}
++
++const VMStateDescription vmstate_IPMIBT = {
++    .name = TYPE_IPMI_INTERFACE_PREFIX "bt",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .post_load = ipmi_bt_vmstate_post_load,
++    .fields      = (VMStateField[]) {
++        VMSTATE_BOOL(obf_irq_set, IPMIBT),
++        VMSTATE_BOOL(atn_irq_set, IPMIBT),
++        VMSTATE_BOOL(irqs_enabled, IPMIBT),
++        VMSTATE_UINT32(outpos, IPMIBT),
++        VMSTATE_UINT32(outlen, IPMIBT),
++        VMSTATE_UINT8_ARRAY(outmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
++        VMSTATE_UINT32(inlen, IPMIBT),
++        VMSTATE_UINT8_ARRAY(inmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
++        VMSTATE_UINT8(control_reg, IPMIBT),
++        VMSTATE_UINT8(mask_reg, IPMIBT),
++        VMSTATE_UINT8(waiting_rsp, IPMIBT),
++        VMSTATE_UINT8(waiting_seq, IPMIBT),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static const VMStateDescription vmstate_ISAIPMIBTDevice = {
++    .name = TYPE_IPMI_INTERFACE_PREFIX "isa-bt",
++    .version_id = 2,
++    .minimum_version_id = 2,
++    /*
++     * Version 1 had messed up the array transfer, it's not even usable
++     * because it used VMSTATE_VBUFFER_UINT32, but it did not transfer
++     * the buffer length, so random things would happen.
++     */
+     .fields      = (VMStateField[]) {
+-        VMSTATE_BOOL(bt.obf_irq_set, ISAIPMIBTDevice),
+-        VMSTATE_BOOL(bt.atn_irq_set, ISAIPMIBTDevice),
+-        VMSTATE_BOOL(bt.use_irq, ISAIPMIBTDevice),
+-        VMSTATE_BOOL(bt.irqs_enabled, ISAIPMIBTDevice),
+-        VMSTATE_UINT32(bt.outpos, ISAIPMIBTDevice),
+-        VMSTATE_VBUFFER_UINT32(bt.outmsg, ISAIPMIBTDevice, 1, NULL, bt.outlen),
+-        VMSTATE_VBUFFER_UINT32(bt.inmsg, ISAIPMIBTDevice, 1, NULL, bt.inlen),
+-        VMSTATE_UINT8(bt.control_reg, ISAIPMIBTDevice),
+-        VMSTATE_UINT8(bt.mask_reg, ISAIPMIBTDevice),
+-        VMSTATE_UINT8(bt.waiting_rsp, ISAIPMIBTDevice),
+-        VMSTATE_UINT8(bt.waiting_seq, ISAIPMIBTDevice),
++        VMSTATE_STRUCT(bt, ISAIPMIBTDevice, 1, vmstate_IPMIBT, IPMIBT),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+-- 
+2.7.4
