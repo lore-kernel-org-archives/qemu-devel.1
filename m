@@ -1,16 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1frit7-0005jQ-5u
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1frit7-0005jP-5p
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1frit5-0002R2-6X
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1frit3-0002Qj-T0
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:25 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 20 Aug 2018 14:01:58 +0200
-Message-Id: <20180820120213.11095-2-e.emanuelegiuseppe@gmail.com>
-In-Reply-To: <20180820120213.11095-1-e.emanuelegiuseppe@gmail.com>
-References: <20180820120213.11095-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 01/16] test/qgraph: arm/smdkc210 machine node
+Date: Mon, 20 Aug 2018 14:01:57 +0200
+Message-Id: <20180820120213.11095-1-e.emanuelegiuseppe@gmail.com>
+Subject: [Qemu-devel] [PATCH 00/16] qtest: converted sdhci-test and most nop
+ test to qgraph framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,146 +21,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Keith Busch <keith.busch@intel.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add arm/smdkc210 machine machine to the graph. This machine contains generic-sdhci, so
-its constructor must take care of setting it properly when called.
+This series continues the QEMU tests conversion using the qgraph
+framework started in the previous series.
 
+Add the missing machines required to complete the sdhci-test started previously,
+and convert most of the nop tests.
+
+Based-on: 20180813101453.10200-1-e.emanuelegiuseppe@gmail.com
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
----
- tests/Makefile.include          |  9 ++--
- tests/libqos/smdkc210-machine.c | 82 +++++++++++++++++++++++++++++++++
- tests/sdhci-test.c              |  7 +--
- 3 files changed, 92 insertions(+), 6 deletions(-)
- create mode 100644 tests/libqos/smdkc210-machine.c
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 30355058fc..b4a9b28706 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -756,10 +756,13 @@ libqos-imx-obj-y = $(libqos-obj-y) tests/libqos/i2c-imx.o
- libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
- libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virtio.o tests/libqos/virtio-pci.o tests/libqos/virtio-mmio.o tests/libqos/malloc-generic.o
- 
--libqgraph-machines-obj-y = tests/libqos/x86_64_pc-machine.o
--libqgraph-machines-obj-y += tests/libqos/raspi2-machine.o
-+libqgraph-arm-machines-obj-y = tests/libqos/raspi2-machine.o
-+libqgraph-arm-machines-obj-y += tests/libqos/virt-machine.o
-+libqgraph-arm-machines-obj-y += tests/libqos/smdkc210-machine.o
-+
-+libqgraph-machines-obj-y = $(libqgraph-arm-machines-obj-y)
-+libqgraph-machines-obj-y += tests/libqos/x86_64_pc-machine.o
- libqgraph-machines-obj-y += tests/libqos/ppc64_pseries-machine.o
--libqgraph-machines-obj-y += tests/libqos/virt-machine.o
- 
- libqgraph-virtio-obj-y = tests/libqos/virtio-serial.o
- libqgraph-virtio-obj-y += tests/libqos/virtio-9p.o
-diff --git a/tests/libqos/smdkc210-machine.c b/tests/libqos/smdkc210-machine.c
-new file mode 100644
-index 0000000000..542d426209
---- /dev/null
-+++ b/tests/libqos/smdkc210-machine.c
-@@ -0,0 +1,82 @@
-+/*
-+ * libqos driver framework
-+ *
-+ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License version 2 as published by the Free Software Foundation.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "libqos/malloc.h"
-+#include "libqos/qgraph.h"
-+#include "sdhci.h"
-+
-+typedef struct QSmdkc210Machine QSmdkc210Machine;
-+
-+struct QSmdkc210Machine {
-+    QOSGraphObject obj;
-+    QGuestAllocator *alloc;
-+    QSDHCI_MemoryMapped sdhci;
-+};
-+
-+static void smdkc210_destructor(QOSGraphObject *obj)
-+{
-+    g_free(obj);
-+}
-+
-+static void *smdkc210_get_driver(void *object, const char *interface)
-+{
-+    QSmdkc210Machine *machine = object;
-+    if (!g_strcmp0(interface, "memory")) {
-+        return &machine->alloc;
-+    }
-+
-+    fprintf(stderr, "%s not present in arm/smdkc210\n", interface);
-+    g_assert_not_reached();
-+}
-+
-+static QOSGraphObject *smdkc210_get_device(void *obj, const char *device)
-+{
-+    QSmdkc210Machine *machine = obj;
-+    if (!g_strcmp0(device, "generic-sdhci")) {
-+        return &machine->sdhci.obj;
-+    }
-+
-+    fprintf(stderr, "%s not present in arm/smdkc210\n", device);
-+    g_assert_not_reached();
-+}
-+
-+static void *qos_create_machine_arm_smdkc210(void)
-+{
-+    QSmdkc210Machine *machine = g_new0(QSmdkc210Machine, 1);
-+
-+    machine->obj.get_device = smdkc210_get_device;
-+    machine->obj.get_driver = smdkc210_get_driver;
-+    machine->obj.destructor = smdkc210_destructor;
-+    qos_init_sdhci_smm(&machine->sdhci, 0x12510000, &(QSDHCIProperties) {
-+        .version = 2,
-+        .baseclock = 0,
-+        .capab.sdma = true,
-+        .capab.reg = 0x5e80080,
-+    });
-+    return &machine->obj;
-+}
-+
-+static void smdkc210_register_nodes(void)
-+{
-+    qos_node_create_machine("arm/smdkc210", qos_create_machine_arm_smdkc210);
-+    qos_node_contains("arm/smdkc210", "generic-sdhci", NULL);
-+}
-+
-+libqos_init(smdkc210_register_nodes);
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index ed29839f3d..9f4cd9209a 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -51,12 +51,13 @@ FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
-     BCM2835
-         { "arm",    "raspi2",
-             {0x3f300000, 3, 52, {0, 0x052134b4} } },
-- *
-- * FIXME: the following drivers are missing:
-- *
-+
-     Exynos4210
-         { "arm",    "smdkc210",
-             {0x12510000, 2, 0,  {1, 0x5e80080} } },
-+ *
-+ * FIXME: the following drivers are missing:
-+ *
- 
-     i.MX 6
-         { "arm",    "sabrelite",
+Emanuele Giuseppe Esposito (16):
+  test/qgraph: arm/smdkc210 machine node
+  test/qgraph: arm/sabrelite machine node
+  test/qgraph: arm/xlinx-zynq-a9 machine node
+  test/qgraph: aarch64/xlnx-zcu102 machine node
+  test/qgraph: ac97 test node
+  test/qgraph: tpci200 test node
+  test/qgraph: ipoctal232 test node
+  test/qgraph: ne2k_pci test node
+  test/qgraph: nvme test node
+  test/qgraph: pcnet test node
+  test/qgraph: spapr-phb test node
+  test/qgraph: usb-hcd-ohci test node
+  test/qgraph: vmxnet3 test node
+  test/qgraph: es1370 test node
+  test/qgraph: eepro100 test node
+  test/qgraph: e1000 test node
+
+ tests/Makefile.include                | 48 +++++++--------
+ tests/ac97-test.c                     | 39 ++++++++++---
+ tests/e1000-test.c                    | 60 ++++++++++++-------
+ tests/eepro100-test.c                 | 61 ++++++++++++-------
+ tests/es1370-test.c                   | 39 ++++++++++---
+ tests/ipoctal232-test.c               | 42 +++++++++++---
+ tests/libqos/sabrelite-machine.c      | 82 ++++++++++++++++++++++++++
+ tests/libqos/smdkc210-machine.c       | 82 ++++++++++++++++++++++++++
+ tests/libqos/xilinx-zynq-a9-machine.c | 84 +++++++++++++++++++++++++++
+ tests/libqos/xlnx-zcu102-machine.c    | 83 ++++++++++++++++++++++++++
+ tests/ne2000-test.c                   | 39 ++++++++++---
+ tests/nvme-test.c                     | 43 ++++++++++----
+ tests/pcnet-test.c                    | 39 ++++++++++---
+ tests/sdhci-test.c                    | 49 ----------------
+ tests/spapr-phb-test.c                | 28 ++++-----
+ tests/tpci200-test.c                  | 60 ++++++++++++++++---
+ tests/usb-hcd-ohci-test.c             | 46 +++++++++++----
+ tests/vmxnet3-test.c                  | 39 ++++++++++---
+ 18 files changed, 744 insertions(+), 219 deletions(-)
+ create mode 100644 tests/libqos/sabrelite-machine.c
+ create mode 100644 tests/libqos/smdkc210-machine.c
+ create mode 100644 tests/libqos/xilinx-zynq-a9-machine.c
+ create mode 100644 tests/libqos/xlnx-zcu102-machine.c
+
 -- 
 2.17.1
