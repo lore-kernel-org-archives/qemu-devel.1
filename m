@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frkuF-0003eW-9E
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:44 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1frkuA-0003aA-1L
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frkuE-0007Oq-4j
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:43 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1frku9-0007K3-0y
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 10:11:38 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 15:11:09 +0100
-Message-Id: <20180820141116.9118-16-peter.maydell@linaro.org>
+Date: Mon, 20 Aug 2018 15:11:07 +0100
+Message-Id: <20180820141116.9118-14-peter.maydell@linaro.org>
 In-Reply-To: <20180820141116.9118-1-peter.maydell@linaro.org>
 References: <20180820141116.9118-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 15/22] hw/ssi/pl022: Allow use as
- embedded-struct device
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 13/22] hw/arm/iotkit: Wire up the lines for MSCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,134 +25,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Create a new include file for the pl022's device struct,
-type macros, etc, so that it can be instantiated using
-the "embedded struct" coding style.
+The IoTKit doesn't have any MSCs itself but it does need
+some wiring to connect the external signals from MSCs
+in the outer board model up to the registers and the
+NVIC IRQ line.
 
-While we're adding the new file to MAINTAINERS, add
-also the .c file, which was missing an entry.
+We also need to expose a MemoryRegion corresponding to
+the AHB bus, so that MSCs in the outer board model can
+use that as their downstream port. (In the FPGA this is
+the "AHB Slave Expansion" ports shown in the block
+diagram in the AN505 documentation.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/ssi/pl022.h | 51 ++++++++++++++++++++++++++++++++++++++++++
- hw/ssi/pl022.c         | 26 +--------------------
- MAINTAINERS            |  2 ++
- 3 files changed, 54 insertions(+), 25 deletions(-)
- create mode 100644 include/hw/ssi/pl022.h
+ include/hw/arm/iotkit.h |  8 ++++++++
+ hw/arm/iotkit.c         | 15 +++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/include/hw/ssi/pl022.h b/include/hw/ssi/pl022.h
-new file mode 100644
-index 00000000000..a080519366d
---- /dev/null
-+++ b/include/hw/ssi/pl022.h
-@@ -0,0 +1,51 @@
-+/*
-+ * ARM PrimeCell PL022 Synchronous Serial Port
-+ *
-+ * Copyright (c) 2007 CodeSourcery.
-+ * Written by Paul Brook
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or
-+ * (at your option) any later version.
-+ */
-+
-+/* This is a model of the Arm PrimeCell PL022 synchronous serial port.
-+ * The PL022 TRM is:
-+ * http://infocenter.arm.com/help/topic/com.arm.doc.ddi0194h/DDI0194H_ssp_pl022_trm.pdf
-+ *
-+ * QEMU interface:
-+ * + sysbus IRQ: SSPINTR combined interrupt line
-+ * + sysbus MMIO region 0: MemoryRegion for the device's registers
-+ */
-+
-+#ifndef HW_SSI_PL022_H
-+#define HW_SSI_PL022_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_PL022 "pl022"
-+#define PL022(obj) OBJECT_CHECK(PL022State, (obj), TYPE_PL022)
-+
-+typedef struct PL022State {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+    uint32_t cr0;
-+    uint32_t cr1;
-+    uint32_t bitmask;
-+    uint32_t sr;
-+    uint32_t cpsr;
-+    uint32_t is;
-+    uint32_t im;
-+    /* The FIFO head points to the next empty entry.  */
-+    int tx_fifo_head;
-+    int rx_fifo_head;
-+    int tx_fifo_len;
-+    int rx_fifo_len;
-+    uint16_t tx_fifo[8];
-+    uint16_t rx_fifo[8];
-+    qemu_irq irq;
-+    SSIBus *ssi;
-+} PL022State;
-+
-+#endif
-diff --git a/hw/ssi/pl022.c b/hw/ssi/pl022.c
-index c1368018ee3..379d3093987 100644
---- a/hw/ssi/pl022.c
-+++ b/hw/ssi/pl022.c
-@@ -9,6 +9,7 @@
+diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
+index 426dc326a0d..3a8ee639085 100644
+--- a/include/hw/arm/iotkit.h
++++ b/include/hw/arm/iotkit.h
+@@ -28,6 +28,9 @@
+  *  + QOM property "EXP_NUMIRQ" sets the number of expansion interrupts
+  *  + Named GPIO inputs "EXP_IRQ" 0..n are the expansion interrupts, which
+  *    are wired to the NVIC lines 32 .. n+32
++ *  + sysbus MMIO region 0 is the "AHB Slave Expansion" which allows
++ *    bus master devices in the board model to make transactions into
++ *    all the devices and memory areas in the IoTKit
+  * Controlling up to 4 AHB expansion PPBs which a system using the IoTKit
+  * might provide:
+  *  + named GPIO outputs apb_ppcexp{0,1,2,3}_nonsec[0..15]
+@@ -45,6 +48,11 @@
+  * Controlling each of the 16 expansion MPCs which a system using the IoTKit
+  * might provide:
+  *  + named GPIO inputs mpcexp_status[0..15]
++ * Controlling each of the 16 expansion MSCs which a system using the IoTKit
++ * might provide:
++ *  + named GPIO inputs mscexp_status[0..15]
++ *  + named GPIO outputs mscexp_clear[0..15]
++ *  + named GPIO outputs mscexp_ns[0..15]
+  */
  
- #include "qemu/osdep.h"
- #include "hw/sysbus.h"
-+#include "hw/ssi/pl022.h"
- #include "hw/ssi/ssi.h"
- #include "qemu/log.h"
+ #ifndef IOTKIT_H
+diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+index f8276b5425c..8742200fb42 100644
+--- a/hw/arm/iotkit.c
++++ b/hw/arm/iotkit.c
+@@ -667,6 +667,21 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
  
-@@ -41,31 +42,6 @@ do { fprintf(stderr, "pl022: error: " fmt , ## __VA_ARGS__);} while (0)
- #define PL022_INT_RX  0x04
- #define PL022_INT_TX  0x08
+     iotkit_forward_sec_resp_cfg(s);
  
--#define TYPE_PL022 "pl022"
--#define PL022(obj) OBJECT_CHECK(PL022State, (obj), TYPE_PL022)
--
--typedef struct PL022State {
--    SysBusDevice parent_obj;
--
--    MemoryRegion iomem;
--    uint32_t cr0;
--    uint32_t cr1;
--    uint32_t bitmask;
--    uint32_t sr;
--    uint32_t cpsr;
--    uint32_t is;
--    uint32_t im;
--    /* The FIFO head points to the next empty entry.  */
--    int tx_fifo_head;
--    int rx_fifo_head;
--    int tx_fifo_len;
--    int rx_fifo_len;
--    uint16_t tx_fifo[8];
--    uint16_t rx_fifo[8];
--    qemu_irq irq;
--    SSIBus *ssi;
--} PL022State;
--
- static const unsigned char pl022_id[8] =
-   { 0x22, 0x10, 0x04, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
++    /* Forward the MSC related signals */
++    qdev_pass_gpios(dev_secctl, dev, "mscexp_status");
++    qdev_pass_gpios(dev_secctl, dev, "mscexp_clear");
++    qdev_pass_gpios(dev_secctl, dev, "mscexp_ns");
++    qdev_connect_gpio_out_named(dev_secctl, "msc_irq", 0,
++                                qdev_get_gpio_in(DEVICE(&s->armv7m), 11));
++
++    /*
++     * Expose our container region to the board model; this corresponds
++     * to the AHB Slave Expansion ports which allow bus master devices
++     * (eg DMA controllers) in the board model to make transactions into
++     * devices in the IoTKit.
++     */
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->container);
++
+     system_clock_scale = NANOSECONDS_PER_SECOND / s->mainclk_frq;
+ }
  
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b2f8b562dc5..1e81ad8d4b1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -451,6 +451,8 @@ F: hw/gpio/pl061.c
- F: hw/input/pl050.c
- F: hw/intc/pl190.c
- F: hw/sd/pl181.c
-+F: hw/ssi/pl022.c
-+F: include/hw/ssi/pl022.h
- F: hw/timer/pl031.c
- F: include/hw/arm/primecell.h
- F: hw/timer/cmsdk-apb-timer.c
 -- 
 2.18.0
