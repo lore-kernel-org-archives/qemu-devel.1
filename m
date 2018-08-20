@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1frauv-0006ph-7j
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 23:31:45 -0400
+	(envelope-from <bounces@canonical.com>) id 1frc3m-0006Vh-TC
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 00:45:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1frauu-0001Qb-IM
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 23:31:45 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:34453)
+	(envelope-from <bounces@canonical.com>) id 1frbxU-0004XN-62
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 00:38:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60702)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1frauu-0001QF-Bj
-	for qemu-devel@nongnu.org; Sun, 19 Aug 2018 23:31:44 -0400
-Received: by mail-lf1-x141.google.com with SMTP id g9-v6so4557517lfh.1
-	for <qemu-devel@nongnu.org>; Sun, 19 Aug 2018 20:31:44 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sun, 19 Aug 2018 20:31:25 -0700
-Message-Id: <20180820033125.10296-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH] tests/tcg/xtensa: add test for failed memory
- transactions
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1frbxU-0004Wt-1H
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 00:38:28 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1frbxQ-0007CX-Kd
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 04:38:24 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7F66E2E87E5
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 04:38:03 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 20 Aug 2018 04:20:43 -0000
+From: Launchpad Bug Tracker <1470481@bugs.launchpad.net>
+Reply-To: Bug 1470481 <1470481@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150701120650.14797.87262.malonedeb@wampee.canonical.com>
+Message-Id: <153473884349.13847.13471802518829423098.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1470481] Re: qemu-img converts large vhd files
+ into only approx. 127GB raw file causing the VM to crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +38,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Failed memory transactions should raise exceptions 14 (for fetch) or 15
-(for load/store) with XEA2.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
- tests/tcg/xtensa/Makefile        |  1 +
- tests/tcg/xtensa/test_phys_mem.S | 68 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+)
- create mode 100644 tests/tcg/xtensa/test_phys_mem.S
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-diff --git a/tests/tcg/xtensa/Makefile b/tests/tcg/xtensa/Makefile
-index 091518c05583..2f5691f75b09 100644
---- a/tests/tcg/xtensa/Makefile
-+++ b/tests/tcg/xtensa/Makefile
-@@ -44,6 +44,7 @@ TESTCASES += test_mmu.tst
- TESTCASES += test_mul16.tst
- TESTCASES += test_mul32.tst
- TESTCASES += test_nsa.tst
-+TESTCASES += test_phys_mem.tst
- ifdef XT
- TESTCASES += test_pipeline.tst
- endif
-diff --git a/tests/tcg/xtensa/test_phys_mem.S b/tests/tcg/xtensa/test_phys_mem.S
-new file mode 100644
-index 000000000000..5db17ce506e8
---- /dev/null
-+++ b/tests/tcg/xtensa/test_phys_mem.S
-@@ -0,0 +1,68 @@
-+#include "macros.inc"
-+
-+test_suite phys_mem
-+
-+.purgem test_init
-+
-+.macro test_init
-+    movi    a2, 0xc0000003 /* PPN */
-+    movi    a3, 0xc0000004 /* VPN */
-+    wdtlb   a2, a3
-+    witlb   a2, a3
-+.endm
-+
-+test inst_fetch_no_phys
-+    set_vector kernel, 1f
-+
-+    movi    a2, 0xc0000000
-+    jx      a2
-+1:
-+    movi    a2, 0xc0000000
-+    rsr     a3, excvaddr
-+    assert  eq, a2, a3
-+    rsr     a3, epc1
-+    assert  eq, a2, a3
-+    rsr     a3, exccause
-+    movi    a2, 14
-+    assert  eq, a2, a3
-+test_end
-+
-+test read_no_phys
-+    set_vector kernel, 2f
-+
-+    movi    a2, 0xc0000000
-+1:
-+    l32i    a3, a2, 0
-+    test_fail
-+2:
-+    movi    a2, 0xc0000000
-+    rsr     a3, excvaddr
-+    assert  eq, a2, a3
-+    movi    a2, 1b
-+    rsr     a3, epc1
-+    assert  eq, a2, a3
-+    rsr     a3, exccause
-+    movi    a2, 15
-+    assert  eq, a2, a3
-+test_end
-+
-+test write_no_phys
-+    set_vector kernel, 2f
-+
-+    movi    a2, 0xc0000000
-+1:
-+    s32i    a3, a2, 0
-+    test_fail
-+2:
-+    movi    a2, 0xc0000000
-+    rsr     a3, excvaddr
-+    assert  eq, a2, a3
-+    movi    a2, 1b
-+    rsr     a3, epc1
-+    assert  eq, a2, a3
-+    rsr     a3, exccause
-+    movi    a2, 15
-+    assert  eq, a2, a3
-+test_end
-+
-+test_suite_end
--- 
-2.11.0
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1470481
+
+Title:
+  qemu-img converts large vhd files into only approx. 127GB raw file
+  causing the VM to crash
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  I have a VHD file for Windows 2014 server OS. I use the following
+  command to convert VHD file (20GB) to a RAW file for KVM.
+
+  qemu-img convert -f vpc -O raw WIN-SNRGCQV6O3O.VHD disk.img
+
+  The output file is about 127GB. When install the VM and boot it up,
+  the OS crashes with STOP error after the intial screen. I found on the
+  internet that the file limit of 127GB is an existing bug. Kindly fix
+  the problem. The workaround to use a Hyper-V to convert to fixed disk
+  is not a feasible solution.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1470481/+subscriptions
