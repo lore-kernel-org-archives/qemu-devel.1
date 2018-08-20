@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1frimR-0003Uj-H1
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:55:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1friqr-0004il-Ez
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:00:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1frimN-0007St-Io
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:55:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48810 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1friqn-0000ew-GE
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:00:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55138 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1frimN-0007Sc-Do
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 07:55:27 -0400
-References: <20180816011903.39816-1-andrew@andrewoates.com>
-	<b45d87b9-38ac-427a-8622-ac9c49350511@redhat.com>
-	<CAAVLcG6m_x2p4r9dqD6B2qG-Z_G_iTh5rAubS44PRM2-Mqnpkw@mail.gmail.com>
-	<f3c28dc7-a16e-1451-5bb6-090c6e13cf84@redhat.com>
-	<CAAVLcG6yDfYTVSmWa1Fdw=C6guhMczRFMkU4vAxUaL6ibTAvPg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2d9e7aac-4026-628a-adc5-d2120113551c@redhat.com>
-Date: Mon, 20 Aug 2018 13:55:25 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1friqn-0000eY-Bw
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:00:01 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <153458654892.28280.9192299594353632366@502c9da6d61e>
+	<87y3d1sam1.fsf@dusky.pond.sub.org>
+	<20180820084239.GG10682@lemon.usersys.redhat.com>
+Date: Mon, 20 Aug 2018 13:59:53 +0200
+In-Reply-To: <20180820084239.GG10682@lemon.usersys.redhat.com> (Fam Zheng's
+	message of "Mon, 20 Aug 2018 16:42:39 +0800")
+Message-ID: <871satqmdi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAVLcG6yDfYTVSmWa1Fdw=C6guhMczRFMkU4vAxUaL6ibTAvPg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-i386: fix segment limit check in
- ljmp
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 00/60] json: Fixes,
+ error reporting improvements, cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,13 +29,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Oates <andrew@andrewoates.com>
-Cc: rth@twiddle.net, ehabkost@redhat.com, qemu-devel@nongnu.org, Andrew Oates <aoates@google.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-On 20/08/2018 13:32, Andrew Oates wrote:
-> We should just remove the part that
-> implies qemu should enforce it from my patch commit message.
+Fam Zheng <famz@redhat.com> writes:
 
-Ok, will do.
+> On Mon, 08/20 10:31, Markus Armbruster wrote:
+>> no-reply@patchew.org writes:
+>> 
+>> > Hi,
+>> >
+>> > This series seems to have some coding style problems. See output below for
+>> > more information:
+>> [...]
+>> > Checking PATCH 4/60: qmp-cmd-test: Split off qmp-test...
+>> > WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+>> > #48: 
+>> > new file mode 100644
+>> 
+>> False positive: the patch does update MAINTAINERS.  Surprising, since
+>> commit 1a6fad0c3bd "checkpatch: reduce MAINTAINERS update message
+>> frequency" suppresses this.  Fam, is patchew running an outdated version
+>> of checkpatch?
+>
+> I'm sure Patchew is using the latest checkpatch here. This is basically /me
+> reproducing what it does:
+>
+> fam@lemon:~/work/qemu [master]$ git fetch https://github.com/patchew-project/qemu tags/patchew/20180817150559.16243-1-armbru@redhat.com
+>>From https://github.com/patchew-project/qemu
+>  * tag                     patchew/20180817150559.16243-1-armbru@redhat.com -> FETCH_HEAD
+> fam@lemon:~/work/qemu [master]$ git checkout FETCH_HEAD
+> Note: checking out 'FETCH_HEAD'.
+>
+> You are in 'detached HEAD' state. You can look around, make experimental
+> changes and commit them, and you can discard any commits you make in this
+> state without impacting any branches by performing another checkout.
+>
+> If you want to create a new branch to retain commits you create, you may
+> do so (now or later) by using -b with the checkout command again. Example:
+>
+>   git checkout -b <new-branch-name>
+>
+> HEAD is now at 884c1e75d7 json: Support %% in JSON strings when interpolating
+> fam@lemon:~/work/qemu$ git log --oneline | grep 'qmp-cmd-test: Split off qmp-test'
+> b9ac2b614b qmp-cmd-test: Split off qmp-test
+> fam@lemon:~/work/qemu$ git show --format=email b9ac2b614b | ./scripts/checkpatch.pl -
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #48:
+> new file mode 100644
+>
+> total: 0 errors, 1 warnings, 460 lines checked
+>
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> fam@lemon:~/work/qemu$ git log --oneline  ./scripts/checkpatch.pl | grep 1a6fad0
+> 1a6fad0c3b checkpatch: reduce MAINTAINERS update message frequency
 
-Paolo
+Okay, I can reproduce the warning the way patchew runs checkpatch:
+
+    $ git-show --format=email 4552d915d3 | ./scripts/checkpatch.pl -
+    WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+    #47: 
+    new file mode 100644
+
+    total: 0 errors, 1 warnings, 460 lines checked
+
+    Your patch has style problems, please review.  If any of these errors
+    are false positives report them to the maintainer, see
+    CHECKPATCH in MAINTAINERS.
+
+However:
+
+    $ git-format-patch -1 4552d915d3
+    0001-qmp-cmd-test-Split-off-qmp-test.patch
+    $ ./scripts/checkpatch.pl 0001-qmp-cmd-test-Split-off-qmp-test.patch 
+    total: 0 errors, 0 warnings, 460 lines checked
+
+    0001-qmp-cmd-test-Split-off-qmp-test.patch has no obvious style problems and is ready for submission.
+
+The difference between the two: git-show --format=email lacks diffstat.
+
+    $ git-show --format=email 4552d915d3 | diff - 0001-qmp-cmd-test-Split-off-qmp-test.patch 
+    11a12,18
+    > ---
+    >  MAINTAINERS            |   1 +
+    >  tests/Makefile.include |   3 +
+    >  tests/qmp-cmd-test.c   | 213 +++++++++++++++++++++++++++++++++++++++++
+    >  tests/qmp-test.c       | 193 +------------------------------------
+    >  4 files changed, 219 insertions(+), 191 deletions(-)
+    >  create mode 100644 tests/qmp-cmd-test.c
+    497a505,507
+    > -- 
+    > 2.17.1
+    > 
