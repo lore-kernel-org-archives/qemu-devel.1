@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fritC-0005mY-PN
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:32 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fritG-0005pE-Ao
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1frit6-0002RT-Sa
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:30 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fritA-0002T4-KE
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:02:34 -0400
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon, 20 Aug 2018 14:01:59 +0200
-Message-Id: <20180820120213.11095-3-e.emanuelegiuseppe@gmail.com>
+Date: Mon, 20 Aug 2018 14:02:01 +0200
+Message-Id: <20180820120213.11095-5-e.emanuelegiuseppe@gmail.com>
 In-Reply-To: <20180820120213.11095-1-e.emanuelegiuseppe@gmail.com>
 References: <20180820120213.11095-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 02/16] test/qgraph: arm/sabrelite machine node
+Subject: [Qemu-devel] [PATCH 04/16] test/qgraph: aarch64/xlnx-zcu102 machine
+ node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +23,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Keith Busch <keith.busch@intel.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add arm/sabrelite machine to the graph. This machine contains generic-sdhci, so
+Add xlnx-zcu102 machine to the graph. This machine contains generic-sdhci, so
 its constructor must take care of setting it properly when called.
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
- tests/Makefile.include           |  1 +
- tests/libqos/sabrelite-machine.c | 82 ++++++++++++++++++++++++++++++++
- tests/sdhci-test.c               |  7 +--
- 3 files changed, 87 insertions(+), 3 deletions(-)
- create mode 100644 tests/libqos/sabrelite-machine.c
+ tests/Makefile.include             |  1 +
+ tests/libqos/xlnx-zcu102-machine.c | 83 ++++++++++++++++++++++++++++++
+ tests/sdhci-test.c                 | 51 ------------------
+ 3 files changed, 84 insertions(+), 51 deletions(-)
+ create mode 100644 tests/libqos/xlnx-zcu102-machine.c
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index b4a9b28706..4690d5f5e9 100644
+index d559218b1c..bad4de3d61 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -759,6 +759,7 @@ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virt
- libqgraph-arm-machines-obj-y = tests/libqos/raspi2-machine.o
- libqgraph-arm-machines-obj-y += tests/libqos/virt-machine.o
- libqgraph-arm-machines-obj-y += tests/libqos/smdkc210-machine.o
-+libqgraph-arm-machines-obj-y += tests/libqos/sabrelite-machine.o
- 
+@@ -765,6 +765,7 @@ libqgraph-arm-machines-obj-y += tests/libqos/xilinx-zynq-a9-machine.o
  libqgraph-machines-obj-y = $(libqgraph-arm-machines-obj-y)
  libqgraph-machines-obj-y += tests/libqos/x86_64_pc-machine.o
-diff --git a/tests/libqos/sabrelite-machine.c b/tests/libqos/sabrelite-machine.c
+ libqgraph-machines-obj-y += tests/libqos/ppc64_pseries-machine.o
++libqgraph-machines-obj-y += tests/libqos/xlnx-zcu102-machine.o
+ 
+ libqgraph-virtio-obj-y = tests/libqos/virtio-serial.o
+ libqgraph-virtio-obj-y += tests/libqos/virtio-9p.o
+diff --git a/tests/libqos/xlnx-zcu102-machine.c b/tests/libqos/xlnx-zcu102-machine.c
 new file mode 100644
-index 0000000000..1d8c39e209
+index 0000000000..9932cf39a8
 --- /dev/null
-+++ b/tests/libqos/sabrelite-machine.c
-@@ -0,0 +1,82 @@
++++ b/tests/libqos/xlnx-zcu102-machine.c
+@@ -0,0 +1,83 @@
 +/*
 + * libqos driver framework
 + *
@@ -75,86 +76,126 @@ index 0000000000..1d8c39e209
 +#include "libqos/qgraph.h"
 +#include "sdhci.h"
 +
-+typedef struct QSabreliteMachine QSabreliteMachine;
++typedef struct QXlnx_zcu102Machine QXlnx_zcu102Machine;
 +
-+struct QSabreliteMachine {
++struct QXlnx_zcu102Machine {
 +    QOSGraphObject obj;
 +    QGuestAllocator *alloc;
 +    QSDHCI_MemoryMapped sdhci;
 +};
 +
-+static void sabrelite_destructor(QOSGraphObject *obj)
++static void xlnx_zcu102_destructor(QOSGraphObject *obj)
 +{
 +    g_free(obj);
 +}
 +
-+static void *sabrelite_get_driver(void *object, const char *interface)
++static void *xlnx_zcu102_get_driver(void *object, const char *interface)
 +{
-+    QSabreliteMachine *machine = object;
++    QXlnx_zcu102Machine *machine = object;
 +    if (!g_strcmp0(interface, "memory")) {
 +        return &machine->alloc;
 +    }
 +
-+    fprintf(stderr, "%s not present in arm/sabrelite\n", interface);
++    fprintf(stderr, "%s not present in aarch64/xlnx-zcu102\n", interface);
 +    g_assert_not_reached();
 +}
 +
-+static QOSGraphObject *sabrelite_get_device(void *obj, const char *device)
++static QOSGraphObject *xlnx_zcu102_get_device(void *obj, const char *device)
 +{
-+    QSabreliteMachine *machine = obj;
++    QXlnx_zcu102Machine *machine = obj;
 +    if (!g_strcmp0(device, "generic-sdhci")) {
 +        return &machine->sdhci.obj;
 +    }
 +
-+    fprintf(stderr, "%s not present in arm/sabrelite\n", device);
++    fprintf(stderr, "%s not present in aarch64/xlnx-zcu102\n", device);
 +    g_assert_not_reached();
 +}
 +
-+static void *qos_create_machine_arm_sabrelite(void)
++static void *qos_create_machine_aarch64_xlnx_zcu102(void)
 +{
-+    QSabreliteMachine *machine = g_new0(QSabreliteMachine, 1);
++    QXlnx_zcu102Machine *machine = g_new0(QXlnx_zcu102Machine, 1);
 +
-+    machine->obj.get_device = sabrelite_get_device;
-+    machine->obj.get_driver = sabrelite_get_driver;
-+    machine->obj.destructor = sabrelite_destructor;
-+    qos_init_sdhci_smm(&machine->sdhci, 0x02190000, &(QSDHCIProperties) {
++    machine->obj.get_device = xlnx_zcu102_get_device;
++    machine->obj.get_driver = xlnx_zcu102_get_driver;
++    machine->obj.destructor = xlnx_zcu102_destructor;
++    /* Datasheet: UG1085 (v1.7) */
++    qos_init_sdhci_smm(&machine->sdhci, 0xff160000, &(QSDHCIProperties) {
 +        .version = 3,
 +        .baseclock = 0,
 +        .capab.sdma = true,
-+        .capab.reg = 0x057834b4,
++        .capab.reg = 0x280737ec6481
 +    });
 +    return &machine->obj;
 +}
 +
-+static void sabrelite_register_nodes(void)
++static void xlnx_zcu102_register_nodes(void)
 +{
-+    qos_node_create_machine("arm/sabrelite", qos_create_machine_arm_sabrelite);
-+    qos_node_contains("arm/sabrelite", "generic-sdhci", NULL);
++    qos_node_create_machine("aarch64/xlnx-zcu102", qos_create_machine_aarch64_xlnx_zcu102);
++    qos_node_contains("aarch64/xlnx-zcu102", "generic-sdhci", NULL);
 +}
 +
-+libqos_init(sabrelite_register_nodes);
++libqos_init(xlnx_zcu102_register_nodes);
 diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index 9f4cd9209a..31ecc06159 100644
+index 0a8efd8554..deb42be493 100644
 --- a/tests/sdhci-test.c
 +++ b/tests/sdhci-test.c
-@@ -55,14 +55,15 @@ FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
-     Exynos4210
-         { "arm",    "smdkc210",
-             {0x12510000, 2, 0,  {1, 0x5e80080} } },
+@@ -22,57 +22,6 @@ FIELD(SDHC_CAPAB, SDR,                      32, 3); /* since v3 */
+ FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
+ #define SDHC_HCVER                      0xFE
+ 
+-/**
+- * Old sdhci_t structure:
+- *
+-    struct sdhci_t {
+-        const char *arch, *machine;
+-        struct {
+-            uintptr_t addr;
+-            uint8_t version;
+-            uint8_t baseclock;
+-            struct {
+-                bool sdma;
+-                uint64_t reg;
+-            } capab;
+-        } sdhci;
+-        struct {
+-            uint16_t vendor_id, device_id;
+-        } pci;
+-    }
+- *
+- * implemented drivers:
+- *
+-    PC via PCI
+-        { "x86_64", "pc",
+-            {-1,         2, 0,  {1, 0x057834b4} },
+-            .pci = { PCI_VENDOR_ID_REDHAT, PCI_DEVICE_ID_REDHAT_SDHCI } },
+-
+-    BCM2835
+-        { "arm",    "raspi2",
+-            {0x3f300000, 3, 52, {0, 0x052134b4} } },
+-
+-    Exynos4210
+-        { "arm",    "smdkc210",
+-            {0x12510000, 2, 0,  {1, 0x5e80080} } },
+-
+-    i.MX 6
+-        { "arm",    "sabrelite",
+-            {0x02190000, 3, 0,  {1, 0x057834b4} } },
+-
+-    Zynq-7000
+-        { "arm",    "xilinx-zynq-a9",   Datasheet: UG585 (v1.12.1)
+-            {0xe0100000, 2, 0,  {1, 0x69ec0080} } },
+-
 - *
 - * FIXME: the following drivers are missing:
 - *
- 
-     i.MX 6
-         { "arm",    "sabrelite",
-             {0x02190000, 3, 0,  {1, 0x057834b4} } },
- 
-+ *
-+ * FIXME: the following drivers are missing:
-+ *
-+
-     Zynq-7000
-         { "arm",    "xilinx-zynq-a9",   Datasheet: UG585 (v1.12.1)
-             {0xe0100000, 2, 0,  {1, 0x69ec0080} } },
+-
+-    ZynqMP
+-        { "aarch64", "xlnx-zcu102",     Datasheet: UG1085 (v1.7)
+-            {0xff160000, 3, 0,  {1, 0x280737ec6481} } },
+- */
+-
+ static void check_specs_version(QSDHCI *s, uint8_t version)
+ {
+     uint32_t v;
 -- 
 2.17.1
