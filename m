@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frhUL-0003yy-Qm
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:46 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1frhUI-0003tx-Ro
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1frhUK-0005cl-QU
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:45 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44576)
+	(envelope-from <pm215@archaic.org.uk>) id 1frhUH-0005b1-O3
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:42 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44570)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1frhUK-0005cL-Ir
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:44 -0400
+	id 1frhUH-0005XU-A4
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 06:32:41 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1frhUJ-0003DU-MU
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:32:43 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1frhTu-000359-1n
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:32:18 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 11:32:06 +0100
-Message-Id: <20180820103212.2810-20-peter.maydell@linaro.org>
+Date: Mon, 20 Aug 2018 11:31:49 +0100
+Message-Id: <20180820103212.2810-3-peter.maydell@linaro.org>
 In-Reply-To: <20180820103212.2810-1-peter.maydell@linaro.org>
 References: <20180820103212.2810-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 19/25] nvic: Expose NMI line
+Subject: [Qemu-devel] [PULL 02/25] docs/generic-loader: mention U-Boot and
+ Intel HEX executable formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +30,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-On real v7M hardware, the NMI line is an externally visible signal
-that an SoC or board can toggle to assert an NMI. Expose it in
-our QEMU NVIC and armv7m container objects so that a board model
-can wire it up if it needs to.
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-In particular, the MPS2 watchdog is wired to NMI.
+The generic loader device supports the U-Boot and Intel HEX executable
+formats in addition to the document raw and ELF formats.  Reword the
+documentation to include these formats and explain how various options
+depend on the executable format.
 
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 20180816145554.9814-1-stefanha@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/armv7m.c       |  1 +
- hw/intc/armv7m_nvic.c | 19 +++++++++++++++++++
- hw/intc/trace-events  |  1 +
- 3 files changed, 21 insertions(+)
+ docs/generic-loader.txt | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index 878613994d2..4bf9131b81e 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -202,6 +202,7 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
-      */
-     qdev_pass_gpios(DEVICE(&s->nvic), dev, NULL);
-     qdev_pass_gpios(DEVICE(&s->nvic), dev, "SYSRESETREQ");
-+    qdev_pass_gpios(DEVICE(&s->nvic), dev, "NMI");
+diff --git a/docs/generic-loader.txt b/docs/generic-loader.txt
+index 31bbcd42f6b..a9603a2af76 100644
+--- a/docs/generic-loader.txt
++++ b/docs/generic-loader.txt
+@@ -56,25 +56,25 @@ An example of setting CPU 0's PC to 0x8000 is:
  
-     /* Wire the NVIC up to the CPU */
-     sbd = SYS_BUS_DEVICE(&s->nvic);
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 351b69ab40b..0d816fdd2cc 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -774,6 +774,24 @@ static void set_irq_level(void *opaque, int n, int level)
-     }
- }
+ Loading Files
+ -------------
+-The loader device also allows files to be loaded into memory. It can load raw
+-files and ELF executable files.  Raw files are loaded verbatim.  ELF executable
+-files are loaded by an ELF loader.  The syntax is shown below:
++The loader device also allows files to be loaded into memory. It can load ELF,
++U-Boot, and Intel HEX executable formats as well as raw images.  The syntax is
++shown below:
  
-+/* callback when external NMI line is changed */
-+static void nvic_nmi_trigger(void *opaque, int n, int level)
-+{
-+    NVICState *s = opaque;
-+
-+    trace_nvic_set_nmi_level(level);
-+
-+    /*
-+     * The architecture doesn't specify whether NMI should share
-+     * the normal-interrupt behaviour of being resampled on
-+     * exception handler return. We choose not to, so just
-+     * set NMI pending here and don't track the current level.
-+     */
-+    if (level) {
-+        armv7m_nvic_set_pending(s, ARMV7M_EXCP_NMI, false);
-+    }
-+}
-+
- static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
- {
-     ARMCPU *cpu = s->cpu;
-@@ -2382,6 +2400,7 @@ static void armv7m_nvic_instance_init(Object *obj)
-     qdev_init_gpio_out_named(dev, &nvic->sysresetreq, "SYSRESETREQ", 1);
-     qdev_init_gpio_in_named(dev, nvic_systick_trigger, "systick-trigger",
-                             M_REG_NUM_BANKS);
-+    qdev_init_gpio_in_named(dev, nvic_nmi_trigger, "NMI", 1);
- }
+     -device loader,file=<file>[,addr=<addr>][,cpu-num=<cpu-num>][,force-raw=<raw>]
  
- static void armv7m_nvic_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index 81c7c399f7d..7769869a135 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -192,6 +192,7 @@ nvic_acknowledge_irq(int irq, int prio) "NVIC acknowledge IRQ: %d now active (pr
- nvic_get_pending_irq_info(int irq, bool secure) "NVIC next IRQ %d: targets_secure: %d"
- nvic_complete_irq(int irq, bool secure) "NVIC complete IRQ %d (secure %d)"
- nvic_set_irq_level(int irq, int level) "NVIC external irq %d level set to %d"
-+nvic_set_nmi_level(int level) "NVIC external NMI level set to %d"
- nvic_sysreg_read(uint64_t addr, uint32_t value, unsigned size) "NVIC sysreg read addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
- nvic_sysreg_write(uint64_t addr, uint32_t value, unsigned size) "NVIC sysreg write addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+     <file>      - A file to be loaded into memory
+-    <addr>      - The addr in memory that the file should be loaded. This is
+-                  ignored if you are using an ELF (unless force-raw is true).
+-                  This is required if you aren't loading an ELF.
++    <addr>      - The memory address where the file should be loaded. This is
++                  required for raw images and ignored for non-raw files.
+     <cpu-num>   - This specifies the CPU that should be used. This is an
+                   optional argument and will cause the CPU's PC to be set to
+-                  where the image is stored or in the case of an ELF file to
+-                  the value in the header. This option should only be used
+-                  for the boot image.
++                  the memory address where the raw file is loaded or the entry
++                  point specified in the executable format header. This option
++                  should only be used for the boot image.
+                   This will also cause the image to be written to the specified
+                   CPU's address space. If not specified, the default is CPU 0.
+     <force-raw> - Setting force-raw=on forces the file to be treated as a raw
+-                  image.  This can be used to load ELF files as if they were raw.
++                  image.  This can be used to load supported executable formats
++                  as if they were raw.
  
+ All values are parsed using the standard QemuOps parsing. This allows the user
+ to specify any values in any format supported. By default the values
 -- 
 2.18.0
