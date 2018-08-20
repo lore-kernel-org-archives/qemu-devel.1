@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1froxw-0000NT-6x
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1froxw-0000TK-5N
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:31:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1frol1-0001hy-4y
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:18:30 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:51299 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1frol6-0001oH-Kh
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:18:34 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:51316 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1frokz-0001dw-Kr
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:18:26 -0400
+	id 1frol4-0001hT-7J
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 14:18:30 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 20 Aug 2018 20:16:36 +0200
-Message-Id: <1534789014-8310-29-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 20 Aug 2018 20:16:53 +0200
+Message-Id: <1534789014-8310-46-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534789014-8310-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534789014-8310-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v11 28/46] target/mips: Implement MT ASE
- support for nanoMIPS
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 45/46] mips_malta: Fix semihosting argument
+ passing for nanoMIPS bare metal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,124 +33,38 @@ Cc: peter.maydell@linaro.org, philippe.mathieu.daude@gmail.com, aurelien@aurel32
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add emulation of MT ASE instructions for nanoMIPS.
+Fix passing argument for nanoMIPS bare metal related to the
+semihosting regime.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 83 insertions(+), 2 deletions(-)
+ hw/mips/mips_malta.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index bfbf3b6..2ef6dfa 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -16988,7 +16988,7 @@ static void gen_pool16c_nanomips_insn(DisasContext *ctx)
-     }
- }
- 
--static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
-+static void gen_pool32a0_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
- {
-     int rt = extract32(ctx->opcode, 21, 5);
-     int rs = extract32(ctx->opcode, 16, 5);
-@@ -17156,6 +17156,87 @@ static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
-             tcg_temp_free(t0);
-         }
-         break;
-+    case NM_D_E_MT_VPE:
-+        {
-+            uint8_t sc = extract32(ctx->opcode, 10, 1);
-+            TCGv t0 = tcg_temp_new();
-+
-+            switch (sc) {
-+            case 0:
-+                if (rs == 1) {
-+                    /* DMT */
-+                    check_cp0_mt(ctx);
-+                    gen_helper_dmt(t0);
-+                    gen_store_gpr(t0, rt);
-+                } else if (rs == 0) {
-+                    /* DVPE */
-+                    check_cp0_mt(ctx);
-+                    gen_helper_dvpe(t0, cpu_env);
-+                    gen_store_gpr(t0, rt);
-+                } else {
-+                    generate_exception_end(ctx, EXCP_RI);
-+                }
-+                break;
-+            case 1:
-+                if (rs == 1) {
-+                    /* EMT */
-+                    check_cp0_mt(ctx);
-+                    gen_helper_emt(t0);
-+                    gen_store_gpr(t0, rt);
-+                } else if (rs == 0) {
-+                    /* EVPE */
-+                    check_cp0_mt(ctx);
-+                    gen_helper_evpe(t0, cpu_env);
-+                    gen_store_gpr(t0, rt);
-+                } else {
-+                    generate_exception_end(ctx, EXCP_RI);
-+                }
-+                break;
-+            }
-+
-+            tcg_temp_free(t0);
-+        }
-+        break;
-+    case NM_FORK:
-+        check_mt(ctx);
-+        {
-+            TCGv t0 = tcg_temp_new();
-+            TCGv t1 = tcg_temp_new();
-+
-+            gen_load_gpr(t0, rt);
-+            gen_load_gpr(t1, rs);
-+            gen_helper_fork(t0, t1);
-+            tcg_temp_free(t0);
-+            tcg_temp_free(t1);
-+        }
-+        break;
-+    case NM_MFTR:
-+    case NM_MFHTR:
-+        check_cp0_enabled(ctx);
-+        if (rd == 0) {
-+            /* Treat as NOP. */
-+            return;
-+        }
-+        gen_mftr(env, ctx, rs, rt, extract32(ctx->opcode, 10, 1),
-+                 extract32(ctx->opcode, 11, 5), extract32(ctx->opcode, 3, 1));
-+        break;
-+    case NM_MTTR:
-+    case NM_MTHTR:
-+        check_cp0_enabled(ctx);
-+        gen_mttr(env, ctx, rs, rt, extract32(ctx->opcode, 10, 1),
-+                 extract32(ctx->opcode, 11, 5), extract32(ctx->opcode, 3, 1));
-+        break;
-+    case NM_YIELD:
-+        check_mt(ctx);
-+        {
-+            TCGv t0 = tcg_temp_new();
-+
-+            gen_load_gpr(t0, rs);
-+            gen_helper_yield(t0, cpu_env, t0);
-+            gen_store_gpr(t0, rt);
-+            tcg_temp_free(t0);
-+        }
-+        break;
- #endif
-     default:
-         generate_exception_end(ctx, EXCP_RI);
-@@ -18046,7 +18127,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-     case NM_POOL32A:
-         switch (ctx->opcode & 0x07) {
-         case NM_POOL32A0:
--            gen_pool32a0_nanomips_insn(ctx);
-+            gen_pool32a0_nanomips_insn(env, ctx);
-             break;
-         case NM_POOL32A7:
-             switch (extract32(ctx->opcode, 3, 3)) {
--- 
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index f261dd6..40041d5 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -630,8 +630,14 @@ static void write_bootloader_nanomips(uint8_t *base,=
+ int64_t run_addr,
+                                 /* nop */
+=20
+     /* to_here: */
+-    stw_p(p++, 0x0080); stw_p(p++, 0x0002);
++    if (semihosting_get_argc()) {
++        /* Preserve a0 content as arguments have been passed    */
++        stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop                          */
++    } else {
++        stw_p(p++, 0x0080); stw_p(p++, 0x0002);
+                                 /* li a0,2                      */
++    }
+=20
+     stw_p(p++, 0xe3a0 | NM_HI1(ENVP_ADDR - 64));
+=20
+--=20
 2.7.4
