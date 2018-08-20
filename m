@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1frenN-00025q-AI
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:40:14 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1frepT-0003K8-U3
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:42:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1frenI-0004ct-Cp
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:40:13 -0400
-Received: from mail-he1eur01on0100.outbound.protection.outlook.com
-	([104.47.0.100]:27616
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1frenH-0004c7-SK
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:40:08 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1frepS-0005fn-QF
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 03:42:23 -0400
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
 	<4eca96cf-5520-fb82-2e23-afff3ba35077@virtuozzo.com>
 	<c6f924f2-b70d-a460-f96c-7d40b9d06e22@redhat.com>
 	<7da20590-58d7-4ef0-92b9-fcb955f28c9b@virtuozzo.com>
 	<20180813163048.GO4323@localhost.localdomain>
 	<ae864bb4-257e-240c-eeab-3c9c13462c0d@virtuozzo.com>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <9ff040b2-8dcf-2cf0-76e6-fbef4e1da01e@virtuozzo.com>
-Date: Mon, 20 Aug 2018 10:40:00 +0300
+Message-ID: <8b4c879e-310d-6a71-9b4d-30b03b31a3a7@virtuozzo.com>
+Date: Mon, 20 Aug 2018 10:42:10 +0300
 MIME-Version: 1.0
 In-Reply-To: <ae864bb4-257e-240c-eeab-3c9c13462c0d@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -35,7 +28,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
 ping ping!
 
