@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1frmDm-0001du-UV
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:36:00 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1frmFu-00032H-0j
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:38:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1frmDm-0007qW-54
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:35:58 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:37641)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1frmFt-0000iO-1P
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:38:09 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40422)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1frmDl-0007pz-TH
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:35:58 -0400
-Received: by mail-oi0-x242.google.com with SMTP id j205-v6so26560484oib.4
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 08:35:57 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1frmFs-0000h8-On
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:38:08 -0400
+Received: by mail-wm0-x244.google.com with SMTP id y9-v6so14393787wma.5
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 08:38:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CA++5wjhY3Dh8vSoT98DCDY2PT0Hc3rg8Q4U5QTnT3q-cnDaxzg@mail.gmail.com>
-References: <CA++5wji8hmxezOz=ccBR_hxWXNc-CjAahBKDeMrXewyAsONmJg@mail.gmail.com>
-	<CAFEAcA_dzS=b4sd_=qr0ihd0ofWZLM4pF33gU4ygtJb-tHxbUg@mail.gmail.com>
-	<CA++5wjhY3Dh8vSoT98DCDY2PT0Hc3rg8Q4U5QTnT3q-cnDaxzg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Aug 2018 16:35:36 +0100
-Message-ID: <CAFEAcA9CCz6cTy9Mfs=-9omhh9HRVqTw+1Jpfp2czTRVWTZRaQ@mail.gmail.com>
+References: <20180817135224.22971-1-marcandre.lureau@redhat.com>
+	<20180820024504.GA7953@xz-mi>
+In-Reply-To: <20180820024504.GA7953@xz-mi>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 20 Aug 2018 17:37:55 +0200
+Message-ID: <CAJ+F1C+J1mUeP8YbsCg=-VU15adxKZoM2acxEJUVtEBUTJsuBQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-discuss] Handling signal of Qemu thread
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/4] Fix socket chardev regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +30,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Probir Roy <roy@probir.info>
-Cc: qemu-discuss <qemu-discuss@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-On 20 August 2018 at 16:07, Probir Roy <roy@probir.info> wrote:
->> What exactly are you trying to do
->> with your new signal ?
->
-> I am implementing PEBS (Intel's Precise-Event Based Sampling)
-> virtualization, so that I can sample guest OS from host machine using
-> Linux Perf. The PEBS device is configured from host's user space as
-> perf event. I am registering a perf-event using "perf_event_open" in
-> kvm_cpu_exec:
->
-> +++ accel/kvm/kvm-all.c    2018-08-07 11:01:05.326280431 -0500
->    @@ -1903,6 +1904,12 @@
->      qemu_mutex_unlock_iothread();
->      cpu_exec_start(cpu);
->
-> +    /* Probir: vcpu thread starting. Should call the tool thread handler*/
-> +    kvm__VCPU_start(); // calling perf_event_open
->
->
-> "kvm__VCPU_start" calling perf_event_open and a signal handler
-> "generic_dev_signal_handler" is set via sigaction:
->
-> // Set a signal handler for SIGUSR1
->         struct sigaction sa;
->         sa.sa_sigaction = generic_dev_signal_handler;
->         sa.sa_mask = block_mask_dev;
->         sa.sa_flags = SA_SIGINFO | SA_RESTART | SA_NODEFER | SA_ONSTACK;
+Hi
 
-You cannot use SIGUSR1 for this. QEMU uses it internally as
-its SIG_IPI (inter-vcpu-communication). You'll need to get
-the perf code to use a different signal. (And you'll need to
-manually unblock that signal on the CPU thread when you install
-your handler.)
+On Mon, Aug 20, 2018 at 4:48 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Fri, Aug 17, 2018 at 03:52:20PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi,
+> >
+> > In commit 25679e5d58e "chardev: tcp: postpone async connection setup"
+> > (and its follow up 99f2f54174a59), Peter moved chardev socket
+> > connection to machine_done event. However, chardev created later will
+> > no longer attempt to connect, and chardev created in tests do not have
+> > machine_done event (breaking some of vhost-user-test).
+> >
+> > The goal was to move the "connect" source to the chardev frontend
+> > context (the monitor thread context in his case). chr->gcontext is set
+> > with qemu_chr_fe_set_handlers(). But there is no guarantee that the
+> > function will be called in general,
+>
+> Could you hint a case where we didn't use qemu_chr_fe_set_handlers()
+> upon a chardev backend?  I thought it was always used in chardev
+> frontends, and what the backend could do if without a frontend?
 
-> I am expecting to perform some task in "generic_dev_signal_handler" at
-> PEBS event when the VCPU is halted. This task can be reading/writing
-> hardware registers at that event point.
+Well, you don't have to have a front-end to have side effects. Connect
+will be attempted even without frontend. We may have users expecting
+that behaviour, that might be considered a break if we change it.
 
-Guest or host hardware registers? Either way, this is tricky
-stuff to be trying to do in a signal handler.
+(and unlikely, there might be frontends that are write only)
 
-thanks
--- PMM
+>
+> [1]
+>
+> > so we can't delay connection until
+> > then: the chardev should still attempt to connect during open(), using
+> > the main context.
+> >
+> > An alternative would be to specify the iothread during chardev
+> > creation. Setting up monitor OOB would be quite different too, it
+> > would take the same iothread as argument.
+> >
+> > 99f2f54174a595e is also a bit problematic, since it will behave
+> > differently before and after machine_done (the first case gives a
+> > chance to use a different context reliably, the second looks racy)
+> >
+> > In the end, I am not sure this is all necessary, as chardev callbacks
+> > are called after qemu_chr_fe_set_handlers(), at which point the
+> > context of sources are updated. In "char-socket: update all ioc
+> > handlers when changing context", I moved also the hup handler to the
+> > updated context. So unless the main thread is already stuck, we can
+> > setup a different context for the chardev at that time. Or not?
+>
+> IMHO the two patches that you reverted are special-cases for reasons.
+>
+> The TLS handshake is carried out with an TLS internal GSource which is
+> not owned by the chardev code, so the qemu_chr_fe_set_handlers() won't
+> update that GSource (please refer to qio_channel_tls_handshake_task).
+
+What can go wrong by using the default context for initial connection
+and TLS handshake?
+
+Presumably, you have a case where the mainloop is no longer processed
+and that will hang the chardev?
+
+> The async connection is carried out in a standalone thread that calls
+> connect().  IMHO we'd better not update the gcontext bound to the
+> async task since otherwise there'll be a race (IIRC I proposed
+> something before using a mutex to update the gcontext, but Dan would
+> prefer not to, and I followed with the suggestion which makes sense to
+> me).
+>
+> Could we just postpone these machine done tasks into
+> qemu_chr_fe_set_handlers() (or say, chr_update_read_handler() hook,
+> just like what I mentioned in the other thread)?  Though we'll be sure
+> qemu_chr_fe_set_handlers() will be called for all chardev backends
+> hence I asked question [1] above.
+
+I would rather not to, if possible. unless we take the risk of
+breaking current behaviour and review chardev usage in qemu.
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
