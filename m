@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1frqDA-00017E-QR
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:37 -0400
+	(envelope-from <psusi@ubuntu.com>) id 1frqDV-0001NI-C3
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1frqD6-0002i2-Kv
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:36 -0400
-Resent-Message-Id: <E1frqD6-0002i2-Kv@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21066)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1frqCw-0002dC-Rw
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:25 -0400
-In-Reply-To: <20180814002653.12828-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153479373315.16687.2859283473962380573@502c9da6d61e>
+	(envelope-from <psusi@ubuntu.com>) id 1frqDR-0002zh-6V
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:57 -0400
+Received: from ec2-34-202-238-73.compute-1.amazonaws.com
+	([34.202.238.73]:41738 helo=vps.thesusis.net)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <psusi@ubuntu.com>) id 1frqDL-0002u5-GI
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:51:50 -0400
+References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
+	<20180817150513.GT11124@redhat.com>
+	<6bf952d9-0269-c5df-6cac-70104ec88f81@ubuntu.com>
+	<20180820084329.3uhnobuy5g52zqio@sirius.home.kraxel.org>
+	<b91de5ea-7719-0301-7c7a-fb06785da0dc@ubuntu.com>
+	<CAATJJ0Kui418HgNBCkY6nvCQXVujvm-HAv75wsi5XBqSA_s7aw@mail.gmail.com>
+From: Phillip Susi <psusi@ubuntu.com>
+Message-ID: <9953aeaf-cb6c-0dba-a52c-97260728b530@ubuntu.com>
+Date: Mon, 20 Aug 2018 15:51:41 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 20 Aug 2018 12:35:34 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Fix int64_to_float16
- double-rounding
+In-Reply-To: <CAATJJ0Kui418HgNBCkY6nvCQXVujvm-HAv75wsi5XBqSA_s7aw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="en8p7nfawTPuGEglJUa7QmKNZYGLi9yBl"
+Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +33,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, laurent.desnogues@gmail.com, peter.maydell@linaro.org, alex.bennee@linaro.org
+To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODE0MDAyNjUzLjEyODI4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gdGFyZ2V0L2FybTogRml4IGlu
-dDY0X3RvX2Zsb2F0MTYgZG91YmxlLXJvdW5kaW5nCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
-PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
-aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
-LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
-ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjc3NmEyOWVkMDIgdGFyZ2V0L2FybTog
-VXNlIHRoZSBmbG9hdC10by1pbnQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVzCmMwOGM0YWJjNTkg
-dGFyZ2V0L2FybTogVXNlIHRoZSBpbnQtdG8tZmxvYXQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVz
-CjcxYzQyNjUzYzUgc29mdGZsb2F0OiBBZGQgc2NhbGluZyBmbG9hdC10by1pbnQgcm91dGluZXMK
-MDQwNDkwYTI4YSBzb2Z0ZmxvYXQ6IEFkZCBzY2FsaW5nIGludC10by1mbG9hdCByb3V0aW5lcwoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBzb2Z0ZmxvYXQ6IEFkZCBz
-Y2FsaW5nIGludC10by1mbG9hdCByb3V0aW5lcy4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IHNvZnRm
-bG9hdDogQWRkIHNjYWxpbmcgZmxvYXQtdG8taW50IHJvdXRpbmVzLi4uCkNoZWNraW5nIFBBVENI
-IDMvNDogdGFyZ2V0L2FybTogVXNlIHRoZSBpbnQtdG8tZmxvYXQtc2NhbGUgc29mdGZsb2F0IHJv
-dXRpbmVzLi4uCkNoZWNraW5nIFBBVENIIDQvNDogdGFyZ2V0L2FybTogVXNlIHRoZSBmbG9hdC10
-by1pbnQtc2NhbGUgc29mdGZsb2F0IHJvdXRpbmVzLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVk
-IGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojNTg6IEZJTEU6IHRhcmdldC9hcm0v
-aGVscGVyLmM6MTE1ODU6CisgICAgICAgICAgICAgICAgICAgICAgICAgZ2V0X2Zsb2F0X3JvdW5k
-aW5nX21vZGUoZnBzdCksICkKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNs
-b3NlIHBhcmVudGhlc2lzICcpJwojNjQ6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6MTE1OTA6
-CisgICAgICAgICAgICAgICAgICAgICAgICAgZ2V0X2Zsb2F0X3JvdW5kaW5nX21vZGUoZnBzdCks
-ICkKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTQyIGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--en8p7nfawTPuGEglJUa7QmKNZYGLi9yBl
+From: Phillip Susi <psusi@ubuntu.com>
+To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Message-ID: <9953aeaf-cb6c-0dba-a52c-97260728b530@ubuntu.com>
+Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
+References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
+ <20180817150513.GT11124@redhat.com>
+ <6bf952d9-0269-c5df-6cac-70104ec88f81@ubuntu.com>
+ <20180820084329.3uhnobuy5g52zqio@sirius.home.kraxel.org>
+ <b91de5ea-7719-0301-7c7a-fb06785da0dc@ubuntu.com>
+ <CAATJJ0Kui418HgNBCkY6nvCQXVujvm-HAv75wsi5XBqSA_s7aw@mail.gmail.com>
+In-Reply-To: <CAATJJ0Kui418HgNBCkY6nvCQXVujvm-HAv75wsi5XBqSA_s7aw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 8/20/2018 11:07 AM, Christian Ehrhardt wrote:
+> What exactly would you need in Ubuntu Phillp?
+
+It *looks* like this is fixed in 2.12, but Ubuntu has 2.11.
+
+> Latest qemu would atm be on 2.12 with the git available here [1].
+> Unfortunately mostly nobody cares about the git branches so I forgot to=
+
+> push this one - shame on me :-/, it is ready now thou.
+
+What did you forget to push?  Because the debian git repo already seemd
+to have 2.12 last week.
+
+> I couldn't follow all of the thread, do you need something else than qe=
+mu
+> code to be updated, if so which package would that be?
+
+Nope; it's just qemu 2.11 seems to have had this bug.  It seems there
+has been massive refactoring of the keyboard code since then so likely
+this bug will forever remain in 18.04 unless someone wants to go through
+the 2.11 code and figure out how to surgically fix it.  At this point I
+think the path of least resistance for me is to get the newer version in
+the debian git repo to build and install that.
+
+What I can't figure out is how to get the pristine-tar for
+dpkg-buildpackage.  The git repo doesn't contain the pristine-tar branch
+that was required for pristine-tar to check out the original tar.
+
+
+
+--en8p7nfawTPuGEglJUa7QmKNZYGLi9yBl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJbexvRAAoJENsuw7lhAP6ErDEIAJpgrbMwpzLliaP583hToGEj
+A8pO/PcVmVqo7gJq3vB2g8c6KpgKlMm4K4hWMLAqsT1LDxxa+xKeYAwwE0hL3P8N
+RVxh1SM4BQ6NXOTSetLYNZHOHbcrt9FkJ6xDgLE1ZLX2UoD4Rvqn1DjxA3TMhXn3
+lSJ7TS2KerThEiYkpIU33xHmHOV05DfqDVSK+70mnb1H7bijcYACHzWyCBJ1pOes
+9cuspPdJiSQvZwFYX+H6nX4FbYH+z4BbY1M9qWyJ5LhAswxWneoOsV64n1sea6Ox
+PadJFT2qv4c/hVzMcc9fwh8TBJF+T1UU90c42Zk8qUFBBOVS6MtCDSZESnuXrdQ=
+=TYdt
+-----END PGP SIGNATURE-----
+
+--en8p7nfawTPuGEglJUa7QmKNZYGLi9yBl--
