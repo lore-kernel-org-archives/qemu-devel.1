@@ -1,25 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <roy@probir.info>) id 1frlm6-0005XZ-8n
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:07:27 -0400
+	(envelope-from <christian.ehrhardt@canonical.com>)
+	id 1frlmk-0006BH-EF
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <roy@probir.info>) id 1frlm2-00055N-Si
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:07:22 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:38077)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <roy@probir.info>) id 1frlm2-000545-Ic
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:07:18 -0400
-Received: by mail-oi0-x244.google.com with SMTP id v8-v6so26370623oie.5
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 08:07:17 -0700 (PDT)
+	(envelope-from <christian.ehrhardt@canonical.com>)
+	id 1frlmh-0005Wj-4N
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:08:02 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:58335)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <christian.ehrhardt@canonical.com>)
+	id 1frlmg-0005WF-Ty
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 11:07:59 -0400
+Received: from mail-oi0-f69.google.com ([209.85.218.69])
+	by youngberry.canonical.com with esmtps
+	(TLS1.0:RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
+	(envelope-from <christian.ehrhardt@canonical.com>)
+	id 1frlmf-0001Bn-OY
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 15:07:57 +0000
+Received: by mail-oi0-f69.google.com with SMTP id u74-v6so14430670oie.16
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 08:07:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_dzS=b4sd_=qr0ihd0ofWZLM4pF33gU4ygtJb-tHxbUg@mail.gmail.com>
-References: <CA++5wji8hmxezOz=ccBR_hxWXNc-CjAahBKDeMrXewyAsONmJg@mail.gmail.com>
-	<CAFEAcA_dzS=b4sd_=qr0ihd0ofWZLM4pF33gU4ygtJb-tHxbUg@mail.gmail.com>
-From: Probir Roy <roy@probir.info>
-Date: Mon, 20 Aug 2018 10:07:16 -0500
-Message-ID: <CA++5wjhY3Dh8vSoT98DCDY2PT0Hc3rg8Q4U5QTnT3q-cnDaxzg@mail.gmail.com>
+References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
+	<20180817150513.GT11124@redhat.com>
+	<6bf952d9-0269-c5df-6cac-70104ec88f81@ubuntu.com>
+	<20180820084329.3uhnobuy5g52zqio@sirius.home.kraxel.org>
+	<b91de5ea-7719-0301-7c7a-fb06785da0dc@ubuntu.com>
+In-Reply-To: <b91de5ea-7719-0301-7c7a-fb06785da0dc@ubuntu.com>
+From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Date: Mon, 20 Aug 2018 17:07:30 +0200
+Message-ID: <CAATJJ0Kui418HgNBCkY6nvCQXVujvm-HAv75wsi5XBqSA_s7aw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-discuss] Handling signal of Qemu thread
+Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +40,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-discuss <qemu-discuss@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: psusi@ubuntu.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-> What exactly are you trying to do
-> with your new signal ?
+On Mon, Aug 20, 2018 at 4:32 PM Phillip Susi <psusi@ubuntu.com> wrote:
 
-I am implementing PEBS (Intel's Precise-Event Based Sampling)
-virtualization, so that I can sample guest OS from host machine using
-Linux Perf. The PEBS device is configured from host's user space as
-perf event. I am registering a perf-event using "perf_event_open" in
-kvm_cpu_exec:
+> On 8/20/2018 4:43 AM, Gerd Hoffmann wrote:
+> > There have been fixes for that one, specifically recent qemu will look
+> > at modifier state in addition to the keysym when looking up the keycode,
+> > because some keymaps can generate the same keysym with different key
+> > combinations, and most of the time they have different modifier state.
+>
+> Yea, I saw that code, so the new version probably works if I could
+> figure out how to get the package to build.  I'm not sure why Ubuntu is
+> on such an old version.  I just cloned the debain git repo to start
+> poking around and assumed that was what was in Ubuntu.
+>
 
-+++ accel/kvm/kvm-all.c    2018-08-07 11:01:05.326280431 -0500
-   @@ -1903,6 +1904,12 @@
-     qemu_mutex_unlock_iothread();
-     cpu_exec_start(cpu);
+What exactly would you need in Ubuntu Phillp?
+Latest qemu would atm be on 2.12 with the git available here [1].
+Unfortunately mostly nobody cares about the git branches so I forgot to
+push this one - shame on me :-/, it is ready now thou.
 
-+    /* Probir: vcpu thread starting. Should call the tool thread handler*/
-+    kvm__VCPU_start(); // calling perf_event_open
+I couldn't follow all of the thread, do you need something else than qemu
+code to be updated, if so which package would that be?
 
-
-"kvm__VCPU_start" calling perf_event_open and a signal handler
-"generic_dev_signal_handler" is set via sigaction:
-
-// Set a signal handler for SIGUSR1
-        struct sigaction sa;
-        sa.sa_sigaction = generic_dev_signal_handler;
-        sa.sa_mask = block_mask_dev;
-        sa.sa_flags = SA_SIGINFO | SA_RESTART | SA_NODEFER | SA_ONSTACK;
-
-I am expecting to perform some task in "generic_dev_signal_handler" at
-PEBS event when the VCPU is halted. This task can be reading/writing
-hardware registers at that event point. How can I achieve this in Qemu
-environment?
-
-Regards,
-Probir
+[1]: https://salsa.debian.org/qemu-team/qemu/commits/ubuntu-cosmic-2.12
