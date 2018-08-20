@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1frjf1-0005ZQ-Ro
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:51:59 -0400
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1frjfM-0005p5-9R
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:52:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1frjez-0004U4-TE
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:51:55 -0400
-Received: from forwardcorp1o.cmail.yandex.net ([2a02:6b8:0:1a72::290]:42234)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1frjfJ-0004ey-4t
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:52:16 -0400
+Received: from forwardcorp1g.cmail.yandex.net ([87.250.241.190]:57157)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1frjex-0004Rh-S7
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:51:53 -0400
+	id 1frjfI-0004eC-Po
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 08:52:13 -0400
 From: Yury Kotov <yury-kotov@yandex-team.ru>
-In-Reply-To: <CAMxuvayBTG7XghOmdTdxT8uR+WH68GC00i3=jWHDU8w+-Ym4Tw@mail.gmail.com>
+In-Reply-To: <CAMxuvazEvrsXJ+oXYO_-4BD3P9qK9ZOai6PEH2_in-yxRY0apQ@mail.gmail.com>
 References: <1534433563-30865-1-git-send-email-yury-kotov@yandex-team.ru>
-	<CAMxuvayBTG7XghOmdTdxT8uR+WH68GC00i3=jWHDU8w+-Ym4Tw@mail.gmail.com>
+	<CAMxuvazEvrsXJ+oXYO_-4BD3P9qK9ZOai6PEH2_in-yxRY0apQ@mail.gmail.com>
 MIME-Version: 1.0
-Date: Mon, 20 Aug 2018 15:51:47 +0300
-Message-Id: <1677821534769507@iva4-ed922e5c836e.qloud-c.yandex.net>
+Date: Mon, 20 Aug 2018 15:52:10 +0300
+Message-Id: <1677981534769530@iva4-ed922e5c836e.qloud-c.yandex.net>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 0/3] vhost-user reconnect
@@ -29,10 +29,12 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Evgeny Yakovlev <wrfsh@yandex-team.ru>, "Michael S. Tsirkin" <mst@redhat.com>
 
-16.08.2018, 18:36, "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>=
+16.08.2018, 19:12, "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>=
 :
+> Hi
+>
 > On Thu, Aug 16, 2018 at 5:32 PM, Yury Kotov <yury-kotov@yandex-team.ru>=
  wrote:
 >> =C2=A0We are using QEMU (2.12.0) with SPDK (18.04.1) over vhost-user t=
@@ -63,7 +65,15 @@ ation not permitted
 >>
 >> =C2=A0We got the same error with the latest QEMU (c542a9f9794ec8e0bc3f=
 ).
->>
+>
+> Why not setup qemu socket chardev in server mode? This is the only
+> vhost-user reconnect setup that is supported atm (see
+> vhost-user-test.c). You avoid having a reconnect loop that way.
+>
+
+Yes, it will work. But client mode also should work and we want to suppor=
+t them both.
+
 >> =C2=A0We made some investigations and found out that there are several=
  issues:
 >>
@@ -106,22 +116,7 @@ will pause and fio should
 >> =C2=A0=C2=A0=C2=A0=C2=A0continue to work after restart completion.
 >>
 >> =C2=A03. fio process completed successfully without any error.
->
-> Can you write a test case in vhost-user-test.c ? (perhaps under
-> QTEST_VHOST_USER_FIXME scope...)
->
-
-This is a great idea and we were definitely going to do that during comin=
-g couple of weeks. We thought that we could make a follow up commit with =
-necessary tests added a bit later though, since currently we need to figu=
-re out the state of vhost-user tests in general, before we can try to add=
- any new stuff, and that will take some time. So far we have stress-teste=
-d these fixes manually.
-
-Do you suggest we wait with this series as well until we have all tests r=
-eady? Or do we proceed now and make a follow up series with vhost user te=
-sts later like we suggested?
-
+>>
 >> =C2=A0Yury Kotov (3):
 >> =C2=A0=C2=A0=C2=A0chardev: prevent extra connection attempt in tcp_chr=
 _machine_done_hook
