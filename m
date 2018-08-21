@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fs1Lr-0001eC-Bv
+	(envelope-from <kraxel@redhat.com>) id 1fs1Lr-0001eF-C7
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 03:45:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fs1Ln-0002hj-Uj
+	(envelope-from <kraxel@redhat.com>) id 1fs1Lo-0002iS-Ko
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 03:45:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41238 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fs1Lo-0002hx-Ci
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 03:45:16 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1467787A6D
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 07:45:16 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Aug 2018 09:44:59 +0200
-Message-Id: <20180821074509.22688-3-kraxel@redhat.com>
+Date: Tue, 21 Aug 2018 09:45:02 +0200
+Message-Id: <20180821074509.22688-6-kraxel@redhat.com>
 In-Reply-To: <20180821074509.22688-1-kraxel@redhat.com>
 References: <20180821074509.22688-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/12] vnc: fix memleak of the
- "vnc-worker-output" name
+Subject: [Qemu-devel] [PULL 05/12] doc: switch to modern syntax for VNC TLS
+ setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +34,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Peter Wu <peter@lekensteyn.nl>, qemu-stable@nongnu.org
+Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-From: Peter Wu <peter@lekensteyn.nl>
+From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Fixes repeated memory leaks of 18 bytes when using VNC:
+The use of 'tls', 'x509' and 'x509verify' properties is the deprecated
+backcompat syntax, replaced by use of TLS creds objects.
 
-    Direct leak of 831024 byte(s) in 46168 object(s) allocated from:
-        ...
-        #4 0x7f6d2f919bdd in g_strdup_vprintf glib/gstrfuncs.c:514
-        #5 0x56085cdcf660 in buffer_init util/buffer.c:59
-        #6 0x56085ca6a7ec in vnc_async_encoding_start ui/vnc-jobs.c:177
-        #7 0x56085ca6b815 in vnc_worker_thread_loop ui/vnc-jobs.c:240
-
-Fixes: 543b95801f98 ("vnc: attach names to buffers")
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-CC: qemu-stable@nongnu.org
-Signed-off-by: Peter Wu <peter@lekensteyn.nl>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20180807221830.3844-1-peter@lekensteyn.nl
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Message-id: 20180725092751.21767-2-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/vnc-jobs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ qemu-doc.texi | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
-index b0b15d42a8..929391f85d 100644
---- a/ui/vnc-jobs.c
-+++ b/ui/vnc-jobs.c
-@@ -193,6 +193,7 @@ static void vnc_async_encoding_start(VncState *orig, =
-VncState *local)
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index f74542a0e9..7bd449f398 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -1103,7 +1103,9 @@ support provides a secure session, but no authentic=
+ation. This allows any
+ client to connect, and provides an encrypted session.
 =20
- static void vnc_async_encoding_end(VncState *orig, VncState *local)
- {
-+    buffer_free(&local->output);
-     orig->tight =3D local->tight;
-     orig->zlib =3D local->zlib;
-     orig->hextile =3D local->hextile;
-@@ -278,7 +279,7 @@ static int vnc_worker_thread_loop(VncJobQueue *queue)
-         /* Copy persistent encoding data */
-         vnc_async_encoding_end(job->vs, &vs);
+ @example
+-qemu-system-i386 [...OPTIONS...] -vnc :1,tls,x509=3D/etc/pki/qemu -monit=
+or stdio
++qemu-system-i386 [...OPTIONS...] \
++  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
+,verify-peer=3Dno \
++  -vnc :1,tls-creds=3Dtls0 -monitor stdio
+ @end example
 =20
--	qemu_bh_schedule(job->vs->bh);
-+        qemu_bh_schedule(job->vs->bh);
-     }  else {
-         buffer_reset(&vs.output);
-         /* Copy persistent encoding data */
+ In the above example @code{/etc/pki/qemu} should contain at least three =
+files,
+@@ -1118,10 +1120,14 @@ only be readable by the user owning it.
+ Certificates can also provide a means to authenticate the client connect=
+ing.
+ The server will request that the client provide a certificate, which it =
+will
+ then validate against the CA certificate. This is a good choice if deplo=
+ying
+-in an environment with a private internal certificate authority.
++in an environment with a private internal certificate authority. It uses=
+ the
++same syntax as previously, but with @code{verify-peer} set to @code{yes}
++instead.
+=20
+ @example
+-qemu-system-i386 [...OPTIONS...] -vnc :1,tls,x509verify=3D/etc/pki/qemu =
+-monitor stdio
++qemu-system-i386 [...OPTIONS...] \
++  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
+,verify-peer=3Dyes \
++  -vnc :1,tls-creds=3Dtls0 -monitor stdio
+ @end example
+=20
+=20
+@@ -1132,7 +1138,9 @@ Finally, the previous method can be combined with V=
+NC password authentication
+ to provide two layers of authentication for clients.
+=20
+ @example
+-qemu-system-i386 [...OPTIONS...] -vnc :1,password,tls,x509verify=3D/etc/=
+pki/qemu -monitor stdio
++qemu-system-i386 [...OPTIONS...] \
++  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
+,verify-peer=3Dyes \
++  -vnc :1,tls-creds=3Dtls0,password -monitor stdio
+ (qemu) change vnc password
+ Password: ********
+ (qemu)
+@@ -1169,7 +1177,9 @@ credentials. This can be enabled, by combining the =
+'sasl' option
+ with the aforementioned TLS + x509 options:
+=20
+ @example
+-qemu-system-i386 [...OPTIONS...] -vnc :1,tls,x509,sasl -monitor stdio
++qemu-system-i386 [...OPTIONS...] \
++  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
+,verify-peer=3Dyes \
++  -vnc :1,tls-creds=3Dtls0,sasl -monitor stdio
+ @end example
+=20
+ @node vnc_setup_sasl
 --=20
 2.9.3
