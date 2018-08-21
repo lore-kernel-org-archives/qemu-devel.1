@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fsCNt-0000c2-TJ
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:32:14 -0400
+	(envelope-from <psusi@ubuntu.com>) id 1fsCRE-0005kl-M7
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:35:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fsCNr-0007jZ-Ow
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:32:09 -0400
-Date: Tue, 21 Aug 2018 15:31:54 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180821193154.GB415265@localhost.localdomain>
-References: <cover.1534868459.git.jcody@redhat.com>
+	(envelope-from <psusi@ubuntu.com>) id 1fsCR9-0001sN-7P
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:35:36 -0400
+Received: from ec2-34-202-238-73.compute-1.amazonaws.com
+	([34.202.238.73]:43018 helo=vps.thesusis.net)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <psusi@ubuntu.com>) id 1fsCR5-0001kY-AR
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:35:29 -0400
+References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
+	<20180817150513.GT11124@redhat.com>
+	<6bf952d9-0269-c5df-6cac-70104ec88f81@ubuntu.com>
+	<20180817155152.GV11124@redhat.com>
+From: Phillip Susi <psusi@ubuntu.com>
+Message-ID: <9a4e02d1-84b7-ae68-37a7-bcade6718134@ubuntu.com>
+Date: Tue, 21 Aug 2018 15:35:15 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1534868459.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] block: for jobs,
- do not clear user_paused until after the resume
+In-Reply-To: <20180817155152.GV11124@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rRlHdfCsln8qoAstLULntXPemJqycL1Pi"
+Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org, jsnow@redhat.com, eblake@redhat.com
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, Aug 21, 2018 at 12:26:18PM -0400, Jeff Cody wrote:
-> v3 changes:
->     Rebased to master
->     Patch 2: Wait for pause after mirror instead of error, to gobble the
->              right message (Thanks John)
->     Patch 2: Replace a hard-coded 'qcow2' with '$IMGFMT', oops.
-> 
-> v2 changes:
-> 
->     Patch 1: Added r-b from John, Eric (Thanks)
->     Patch 2: Attached an iotest as patch 2
-> 
->     * cc'ed qemu-stable
-> 
-> For the test in patch 2, failure here is the failure output w/o patch 1:
-> 
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "testdisk"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
-> -{"return": {}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
-> -*** done
-> +QEMU_PROG: blockjob.c:460: block_job_iostatus_reset: Assertion `job->job.user_paused && job->job.pause_count > 0' failed.
-> +Wrong response matching Assertion on handle 0
-> Failures: 229
-> Failed 1 of 1 tests
-> 
-> git-backport-diff, v2->v3:
-> 
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream patch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-> 
-> 001/2:[----] [--] 'block: for jobs, do not clear user_paused until after the resume'
-> 002/2:[0006] [FC] 'block: iotest to catch abort on forced blockjob cancel'
-> 
-> 
-> Jeff Cody (2):
->   block: for jobs, do not clear user_paused until after the resume
->   block: iotest to catch abort on forced blockjob cancel
-> 
->  job.c                      |  2 +-
->  tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/229.out | 23 +++++++++
->  tests/qemu-iotests/group   |  1 +
->  4 files changed, 120 insertions(+), 1 deletion(-)
->  create mode 100755 tests/qemu-iotests/229
->  create mode 100644 tests/qemu-iotests/229.out
-> 
-> -- 
-> 2.17.1
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rRlHdfCsln8qoAstLULntXPemJqycL1Pi
+From: Phillip Susi <psusi@ubuntu.com>
+To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <9a4e02d1-84b7-ae68-37a7-bcade6718134@ubuntu.com>
+Subject: Re: Pipe key broken on US keyboards
+References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
+ <20180817150513.GT11124@redhat.com>
+ <6bf952d9-0269-c5df-6cac-70104ec88f81@ubuntu.com>
+ <20180817155152.GV11124@redhat.com>
+In-Reply-To: <20180817155152.GV11124@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On 8/17/2018 11:51 AM, Daniel P. Berrang=C3=A9 wrote:
+> Since you're using tightvnc on Windows, it won't be using the raw scanc=
+ode
+> extension to RFB, so it'll be sending X keysyms across the wire eg=20
+>=20
+>   "|" has X11 keysym 0x7c  (XK_bar)
+>   "\" has X11 keysym 0x5c  (XK_backslash)
+>=20
+> First thing is the converting keysym number to a name, which
+> uses name2keysym[] data table.  This gives 'bar' and 'backslash'
+> as names, respectively
+>=20
+> The names are now looked up in the keymap (pc-bios/keymaps/en-us)
+> which says
+>=20
+>   backslash 0x2b
+>   bar 0x2b shift
 
-Applied to my block branch:
+Thanks.  I checked out the 2.11 version that Ubuntu 18.04 shipped and
+found the problem:
 
-git://github.com/codyprime/qemu-kvm-jtc block
+commit a7815faffb2bd594b92aa3542d7b799cc89c5414
+Author: Gerd Hoffmann <kraxel@redhat.com>
+Date:   Thu Oct 5 17:33:30 2017 +0200
 
--Jeff
+    pc-bios/keymaps: keymaps update
+
+    Update the keymaps with the ones generated by qemu-keymap
+
+    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+    Message-id: 20171005153330.19210-4-kraxel@redhat.com
+
+Prior to this commit, this file said it was generated from XKB, and was
+much smaller, not including the scan code for that other key.  This
+commit added the 0x56 bar translation with altgr, and it wasn't until
+after 2.12 those smarts were inserted to pick the scancode that matches
+the current modifier keys.
+
+
+
+--rRlHdfCsln8qoAstLULntXPemJqycL1Pi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJbfGl3AAoJENsuw7lhAP6EJQcIAIcJP77CnELCe4CIS+2eW07u
+B6n2RJWGMV1OKnIxsJfTsf46w7167giKPpYSXOR4JQuwY348demJacbKfCDKfBHh
+yrn10Kc8xatzahm0LhMAZVUeO/R5Xd/t4Posd1T9CVj4zgjpgZJA8/+qUrnHkvHf
+70G04zRJm+O8I54ahP2ww83CvVMxeL/U3c5V6Cg9eOGruCmTZOibYCfqEpoHr+JO
+albKvZW6BesxIM7e3WxNap+/b+BDPMJz0DwX4l+rLKt+mVz2G5rrXICFSvC7saa6
+o71d60JS0MjIzo5VQSMGcfR829p06CGfeyTw2eGuRri7gV2iDlfH2XhYga4PQCY=
+=AIA+
+-----END PGP SIGNATURE-----
+
+--rRlHdfCsln8qoAstLULntXPemJqycL1Pi--
