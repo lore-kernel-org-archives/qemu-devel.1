@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lZ-0000ur-K6
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lZ-0000uN-7C
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lV-00072v-37
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lV-00074h-GG
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:13 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49396 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:49407 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs6lU-0006yc-EX
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:08 -0400
+	id 1fs6lU-0006z5-T9
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:09 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 15:31:35 +0200
-Message-Id: <1534858316-12945-26-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 15:31:38 +0200
+Message-Id: <1534858316-12945-29-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v3 25/46] target/mips: Implement emulation of
- nanoMIPS LLWP/SCWP pair
+Subject: [Qemu-devel] [PULL v3 28/46] target/mips: Implement MT ASE support
+ for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,215 +28,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Implement support for nanoMIPS LLWP/SCWP instructions. Beside
-adding core functionality of these instructions, this patch adds
-support for availability control via configuration bit XNP.
+Add emulation of MT ASE instructions for nanoMIPS.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Dimitrije Nikolic <dnikolic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/mips/cpu_loop.c | 25 +++++++++++---
- target/mips/cpu.h          |  2 ++
- target/mips/translate.c    | 86 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 108 insertions(+), 5 deletions(-)
+ target/mips/translate.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 83 insertions(+), 2 deletions(-)
 
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 084ad6a..1d3dc9e 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -397,10 +397,13 @@ static int do_store_exclusive(CPUMIPSState *env)
-     target_ulong addr;
-     target_ulong page_addr;
-     target_ulong val;
-+    uint32_t val_wp = 0;
-+    uint32_t llnewval_wp = 0;
-     int flags;
-     int segv = 0;
-     int reg;
-     int d;
-+    int wp;
- 
-     addr = env->lladdr;
-     page_addr = addr & TARGET_PAGE_MASK;
-@@ -412,19 +415,31 @@ static int do_store_exclusive(CPUMIPSState *env)
-     } else {
-         reg = env->llreg & 0x1f;
-         d = (env->llreg & 0x20) != 0;
--        if (d) {
--            segv = get_user_s64(val, addr);
-+        wp = (env->llreg & 0x40) != 0;
-+        if (!wp) {
-+            if (d) {
-+                segv = get_user_s64(val, addr);
-+            } else {
-+                segv = get_user_s32(val, addr);
-+            }
-         } else {
-             segv = get_user_s32(val, addr);
-+            segv |= get_user_s32(val_wp, addr);
-+            llnewval_wp = env->llnewval_wp;
-         }
-         if (!segv) {
--            if (val != env->llval) {
-+            if (val != env->llval && val_wp == llnewval_wp) {
-                 env->active_tc.gpr[reg] = 0;
-             } else {
--                if (d) {
--                    segv = put_user_u64(env->llnewval, addr);
-+                if (!wp) {
-+                    if (d) {
-+                        segv = put_user_u64(env->llnewval, addr);
-+                    } else {
-+                        segv = put_user_u32(env->llnewval, addr);
-+                    }
-                 } else {
-                     segv = put_user_u32(env->llnewval, addr);
-+                    segv |= put_user_u32(env->llnewval_wp, addr + 4);
-                 }
-                 if (!segv) {
-                     env->active_tc.gpr[reg] = 1;
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 009202c..28af4d1 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -506,6 +506,8 @@ struct CPUMIPSState {
-     uint64_t lladdr;
-     target_ulong llval;
-     target_ulong llnewval;
-+    uint64_t llval_wp;
-+    uint32_t llnewval_wp;
-     target_ulong llreg;
-     uint64_t CP0_LLAddr_rw_bitmask;
-     int CP0_LLAddr_shift;
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index dc1760b..ebe56d5 100644
+index 480d4bf..e5e8001 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1916,6 +1916,18 @@ static inline void check_mvh(DisasContext *ctx)
+@@ -16988,7 +16988,7 @@ static void gen_pool16c_nanomips_insn(DisasContext *ctx)
+     }
  }
+ 
+-static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
++static void gen_pool32a0_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
+ {
+     int rt = extract32(ctx->opcode, 21, 5);
+     int rs = extract32(ctx->opcode, 16, 5);
+@@ -17156,6 +17156,87 @@ static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
+             tcg_temp_free(t0);
+         }
+         break;
++    case NM_D_E_MT_VPE:
++        {
++            uint8_t sc = extract32(ctx->opcode, 10, 1);
++            TCGv t0 = tcg_temp_new();
++
++            switch (sc) {
++            case 0:
++                if (rs == 1) {
++                    /* DMT */
++                    check_cp0_mt(ctx);
++                    gen_helper_dmt(t0);
++                    gen_store_gpr(t0, rt);
++                } else if (rs == 0) {
++                    /* DVPE */
++                    check_cp0_mt(ctx);
++                    gen_helper_dvpe(t0, cpu_env);
++                    gen_store_gpr(t0, rt);
++                } else {
++                    generate_exception_end(ctx, EXCP_RI);
++                }
++                break;
++            case 1:
++                if (rs == 1) {
++                    /* EMT */
++                    check_cp0_mt(ctx);
++                    gen_helper_emt(t0);
++                    gen_store_gpr(t0, rt);
++                } else if (rs == 0) {
++                    /* EVPE */
++                    check_cp0_mt(ctx);
++                    gen_helper_evpe(t0, cpu_env);
++                    gen_store_gpr(t0, rt);
++                } else {
++                    generate_exception_end(ctx, EXCP_RI);
++                }
++                break;
++            }
++
++            tcg_temp_free(t0);
++        }
++        break;
++    case NM_FORK:
++        check_mt(ctx);
++        {
++            TCGv t0 = tcg_temp_new();
++            TCGv t1 = tcg_temp_new();
++
++            gen_load_gpr(t0, rt);
++            gen_load_gpr(t1, rs);
++            gen_helper_fork(t0, t1);
++            tcg_temp_free(t0);
++            tcg_temp_free(t1);
++        }
++        break;
++    case NM_MFTR:
++    case NM_MFHTR:
++        check_cp0_enabled(ctx);
++        if (rd == 0) {
++            /* Treat as NOP. */
++            return;
++        }
++        gen_mftr(env, ctx, rs, rt, extract32(ctx->opcode, 10, 1),
++                 extract32(ctx->opcode, 11, 5), extract32(ctx->opcode, 3, 1));
++        break;
++    case NM_MTTR:
++    case NM_MTHTR:
++        check_cp0_enabled(ctx);
++        gen_mttr(env, ctx, rs, rt, extract32(ctx->opcode, 10, 1),
++                 extract32(ctx->opcode, 11, 5), extract32(ctx->opcode, 3, 1));
++        break;
++    case NM_YIELD:
++        check_mt(ctx);
++        {
++            TCGv t0 = tcg_temp_new();
++
++            gen_load_gpr(t0, rs);
++            gen_helper_yield(t0, cpu_env, t0);
++            gen_store_gpr(t0, rt);
++            tcg_temp_free(t0);
++        }
++        break;
  #endif
- 
-+/*
-+ * This code generates a "reserved instruction" exception if the
-+ * Config5 XNP bit is set.
-+ */
-+static inline void check_xnp(DisasContext *ctx)
-+{
-+    if (unlikely(ctx->CP0_Config5 & (1 << CP0C5_XNP))) {
-+        generate_exception_end(ctx, EXCP_RI);
-+    }
-+}
-+
-+
- /* Define small wrappers for gen_load_fpr* so that we have a uniform
-    calling interface for 32 and 64-bit FPRs.  No sense in changing
-    all callers for gen_load_fpr32 when we need the CTX parameter for
-@@ -2362,6 +2374,31 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
-     tcg_temp_free(t0);
- }
- 
-+static void gen_llwp(DisasContext *ctx, uint32_t base, int16_t offset,
-+                    uint32_t reg1, uint32_t reg2)
-+{
-+    TCGv taddr = tcg_temp_new();
-+    TCGv_i64 tval = tcg_temp_new_i64();
-+    TCGv tmp1 = tcg_temp_new();
-+    TCGv tmp2 = tcg_temp_new();
-+
-+    gen_base_offset_addr(ctx, taddr, base, offset);
-+    tcg_gen_qemu_ld64(tval, taddr, ctx->mem_idx);
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    tcg_gen_extr_i64_tl(tmp2, tmp1, tval);
-+#else
-+    tcg_gen_extr_i64_tl(tmp1, tmp2, tval);
-+#endif
-+    gen_store_gpr(tmp1, reg1);
-+    tcg_temp_free(tmp1);
-+    gen_store_gpr(tmp2, reg2);
-+    tcg_temp_free(tmp2);
-+    tcg_gen_st_i64(tval, cpu_env, offsetof(CPUMIPSState, llval_wp));
-+    tcg_temp_free_i64(tval);
-+    tcg_gen_st_tl(taddr, cpu_env, offsetof(CPUMIPSState, lladdr));
-+    tcg_temp_free(taddr);
-+}
-+
- /* Store */
- static void gen_st (DisasContext *ctx, uint32_t opc, int rt,
-                     int base, int offset)
-@@ -2458,6 +2495,51 @@ static void gen_st_cond (DisasContext *ctx, uint32_t opc, int rt,
-     tcg_temp_free(t0);
- }
- 
-+static void gen_scwp(DisasContext *ctx, uint32_t base, int16_t offset,
-+                    uint32_t reg1, uint32_t reg2)
-+{
-+    TCGv taddr = tcg_temp_local_new();
-+    TCGv lladdr = tcg_temp_local_new();
-+    TCGv_i64 tval = tcg_temp_new_i64();
-+    TCGv_i64 llval = tcg_temp_new_i64();
-+    TCGv_i64 val = tcg_temp_new_i64();
-+    TCGv tmp1 = tcg_temp_new();
-+    TCGv tmp2 = tcg_temp_new();
-+    TCGLabel *lab_fail = gen_new_label();
-+    TCGLabel *lab_done = gen_new_label();
-+
-+    gen_base_offset_addr(ctx, taddr, base, offset);
-+
-+    tcg_gen_ld_tl(lladdr, cpu_env, offsetof(CPUMIPSState, lladdr));
-+    tcg_gen_brcond_tl(TCG_COND_NE, taddr, lladdr, lab_fail);
-+
-+    gen_load_gpr(tmp1, reg1);
-+    gen_load_gpr(tmp2, reg2);
-+
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    tcg_gen_concat_tl_i64(tval, tmp2, tmp1);
-+#else
-+    tcg_gen_concat_tl_i64(tval, tmp1, tmp2);
-+#endif
-+
-+    tcg_gen_ld_i64(llval, cpu_env, offsetof(CPUMIPSState, llval_wp));
-+    tcg_gen_atomic_cmpxchg_i64(val, taddr, llval, tval,
-+                               ctx->mem_idx, MO_64);
-+    if (reg1 != 0) {
-+        tcg_gen_movi_tl(cpu_gpr[reg1], 1);
-+    }
-+    tcg_gen_brcond_i64(TCG_COND_EQ, val, llval, lab_done);
-+
-+    gen_set_label(lab_fail);
-+
-+    if (reg1 != 0) {
-+        tcg_gen_movi_tl(cpu_gpr[reg1], 0);
-+    }
-+    gen_set_label(lab_done);
-+    tcg_gen_movi_tl(lladdr, -1);
-+    tcg_gen_st_tl(lladdr, cpu_env, offsetof(CPUMIPSState, lladdr));
-+}
-+
- /* Load and store */
- static void gen_flt_ldst (DisasContext *ctx, uint32_t opc, int ft,
-                           TCGv t0)
-@@ -18118,6 +18200,8 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                         gen_ld(ctx, OPC_LL, rt, rs, s);
-                         break;
-                     case NM_LLWP:
-+                        check_xnp(ctx);
-+                        gen_llwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5));
-                         break;
-                     }
-                     break;
-@@ -18127,6 +18211,8 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                         gen_st_cond(ctx, OPC_SC, rt, rs, s);
-                         break;
-                     case NM_SCWP:
-+                        check_xnp(ctx);
-+                        gen_scwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5));
-                         break;
-                     }
-                     break;
+     default:
+         generate_exception_end(ctx, EXCP_RI);
+@@ -18046,7 +18127,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+     case NM_POOL32A:
+         switch (ctx->opcode & 0x07) {
+         case NM_POOL32A0:
+-            gen_pool32a0_nanomips_insn(ctx);
++            gen_pool32a0_nanomips_insn(env, ctx);
+             break;
+         case NM_POOL32A7:
+             switch (extract32(ctx->opcode, 3, 3)) {
 -- 
 2.7.4
