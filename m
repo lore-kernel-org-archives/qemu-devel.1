@@ -1,19 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fryMz-0004IH-Ir
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1frytb-0004hv-R1
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:08:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fryMu-0000Su-Mm
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:17 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 21 Aug 2018 14:33:32 +1000
-Message-Id: <20180821043343.7514-16-david@gibson.dropbear.id.au>
-In-Reply-To: <20180821043343.7514-1-david@gibson.dropbear.id.au>
-References: <20180821043343.7514-1-david@gibson.dropbear.id.au>
+	(envelope-from <armbru@redhat.com>) id 1frytX-0000ug-SA
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:07:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38000 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1frytX-0000te-MS
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:07:55 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180801093401.9160-1-marcandre.lureau@redhat.com>
+	<871sbi8bsm.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJj=WPs0FOx8QJU76iFqhc11N7m+FnRG2t0USu0Jm6JTA@mail.gmail.com>
+	<874lge6s4u.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+WmBtMG26nG0KmQCkKg9iUk6nxTi2P=t_qC22z3i5CWQ@mail.gmail.com>
+	<87a7phtti5.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+w-1ydsjDMkONdVOGVfhKUVB2bbos3+u7t1a67p8AfQQ@mail.gmail.com>
+Date: Tue, 21 Aug 2018 07:07:53 +0200
+In-Reply-To: <CAJ+F1C+w-1ydsjDMkONdVOGVfhKUVB2bbos3+u7t1a67p8AfQQ@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 20 Aug 2018
+	20:13:56 +0200")
+Message-ID: <87woskgvdi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/26] spapr: introduce a fixed IRQ number space
+Subject: Re: [Qemu-devel] [PATCH] monitor: avoid potential dead-lock when
+ cleaning up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,488 +35,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: groug@kaod.org, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-This proposal introduces a new IRQ number space layout using static
-numbers for all devices, depending on a device index, and a bitmap
-allocator for the MSI IRQ numbers which are negotiated by the guest at
-runtime.
+> Hi
+>
+> On Mon, Aug 20, 2018 at 8:57 AM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>>
+>> > Hi
+>> > On Wed, Aug 1, 2018 at 5:09 PM Markus Armbruster <armbru@redhat.com> w=
+rote:
+>> >>
+>> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>> >>
+>> >> > Hi
+>> >> >
+>> >> > On Wed, Aug 1, 2018 at 3:19 PM, Markus Armbruster <armbru@redhat.co=
+m> wrote:
+>> >> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>> >> >>
+>> >> >>> When a monitor is connected to a Spice chardev, the monitor clean=
+up
+>> >> >>> can dead-lock:
+>> >> >>>
+>> >> >>>  #0  0x00007f43446637fd in __lll_lock_wait () at /lib64/libpthrea=
+d.so.0
+>> >> >>>  #1  0x00007f434465ccf4 in pthread_mutex_lock () at /lib64/libpth=
+read.so.0
+>> >> >>>  #2  0x0000556dd79f22ba in qemu_mutex_lock_impl (mutex=3D0x556dd8=
+1c9220 <monitor_lock>, file=3D0x556dd7ae3648 "/home/elmarco/src/qq/monitor.=
+c", line=3D645) at /home/elmarco/src/qq/util/qemu-thread-posix.c:66
+>> >> >>>  #3  0x0000556dd7431bd5 in monitor_qapi_event_queue (event=3DQAPI=
+_EVENT_SPICE_DISCONNECTED, qdict=3D0x556dd9abc850, errp=3D0x7fffb7bbddd8) a=
+t /home/elmarco/src/qq/monitor.c:645
+>> >> >>>  #4  0x0000556dd79d476b in qapi_event_send_spice_disconnected (se=
+rver=3D0x556dd98ee760, client=3D0x556ddaaa8560, errp=3D0x556dd82180d0 <erro=
+r_abort>) at qapi/qapi-events-ui.c:149
+>> >> >>>  #5  0x0000556dd7870fc1 in channel_event (event=3D3, info=3D0x556=
+ddad1b590) at /home/elmarco/src/qq/ui/spice-core.c:235
+>> >> >>>  #6  0x00007f434560a6bb in reds_handle_channel_event (reds=3D<opt=
+imized out>, event=3D3, info=3D0x556ddad1b590) at reds.c:316
+>> >> >>>  #7  0x00007f43455f393b in main_dispatcher_self_handle_channel_ev=
+ent (info=3D0x556ddad1b590, event=3D3, self=3D0x556dd9a7d8c0) at main-dispa=
+tcher.c:197
+>> >> >>>  #8  0x00007f43455f393b in main_dispatcher_channel_event (self=3D=
+0x556dd9a7d8c0, event=3Devent@entry=3D3, info=3D0x556ddad1b590) at main-dis=
+patcher.c:197
+>> >> >>>  #9  0x00007f4345612833 in red_stream_push_channel_event (s=3Ds@e=
+ntry=3D0x556ddae2ef40, event=3Devent@entry=3D3) at red-stream.c:414
+>> >> >>>  #10 0x00007f434561286b in red_stream_free (s=3D0x556ddae2ef40) a=
+t red-stream.c:388
+>> >> >>>  #11 0x00007f43455f9ddc in red_channel_client_finalize (object=3D=
+0x556dd9bb21a0) at red-channel-client.c:347
+>> >> >>>  #12 0x00007f434b5f9fb9 in g_object_unref () at /lib64/libgobject=
+-2.0.so.0
+>> >> >>>  #13 0x00007f43455fc212 in red_channel_client_push (rcc=3D0x556dd=
+9bb21a0) at red-channel-client.c:1341
+>> >> >>>  #14 0x0000556dd76081ba in spice_port_set_fe_open (chr=3D0x556dd9=
+925e20, fe_open=3D0) at /home/elmarco/src/qq/chardev/spice.c:241
+>> >> >>>  #15 0x0000556dd796d74a in qemu_chr_fe_set_open (be=3D0x556dd9a37=
+c00, fe_open=3D0) at /home/elmarco/src/qq/chardev/char-fe.c:340
+>> >> >>>  #16 0x0000556dd796d4d9 in qemu_chr_fe_set_handlers (b=3D0x556dd9=
+a37c00, fd_can_read=3D0x0, fd_read=3D0x0, fd_event=3D0x0, be_change=3D0x0, =
+opaque=3D0x0, context=3D0x0, set_open=3Dtrue) at /home/elmarco/src/qq/chard=
+ev/char-fe.c:280
+>> >> >>>  #17 0x0000556dd796d359 in qemu_chr_fe_deinit (b=3D0x556dd9a37c00=
+, del=3Dfalse) at /home/elmarco/src/qq/chardev/char-fe.c:233
+>> >> >>>  #18 0x0000556dd7432240 in monitor_data_destroy (mon=3D0x556dd9a3=
+7c00) at /home/elmarco/src/qq/monitor.c:786
+>> >> >>>  #19 0x0000556dd743b968 in monitor_cleanup () at /home/elmarco/sr=
+c/qq/monitor.c:4683
+>> >> >>>  #20 0x0000556dd75ce776 in main (argc=3D3, argv=3D0x7fffb7bbe458,=
+ envp=3D0x7fffb7bbe478) at /home/elmarco/src/qq/vl.c:4660
+>> >> >>>
+>> >> >>> Because spice code tries to emit a "disconnected" signal on the
+>> >> >>> monitors. Fix this situation by tightening the monitor lock time =
+to
+>> >> >>> the monitor list removal.
+>> >> >>>
+>> >> >>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
+m>
+>> >> >>
+>> >> >> Do you think this should go into 3.0?
+>> >> >>
+>> >> >>> ---
+>> >> >>>  monitor.c | 22 +++++++++++++++-------
+>> >> >>>  1 file changed, 15 insertions(+), 7 deletions(-)
+>> >> >>>
+>> >> >>> diff --git a/monitor.c b/monitor.c
+>> >> >>> index 0fa0910a2a..a16a6c5311 100644
+>> >> >>> --- a/monitor.c
+>> >> >>> +++ b/monitor.c
+>> >> >>> @@ -4702,8 +4702,6 @@ void monitor_init(Chardev *chr, int flags)
+>> >> >>>
+>> >> >>>  void monitor_cleanup(void)
+>> >> >>>  {
+>> >> >>> -    Monitor *mon, *next;
+>> >> >>> -
+>> >> >>>      /*
+>> >> >>>       * We need to explicitly stop the I/O thread (but not destro=
+y it),
+>> >> >>>       * clean up the monitor resources, then destroy the I/O thre=
+ad since
+>> >> >>> @@ -4719,14 +4717,24 @@ void monitor_cleanup(void)
+>> >> >>>      monitor_qmp_bh_responder(NULL);
+>> >> >>>
+>> >> >>>      /* Flush output buffers and destroy monitors */
+>> >> >>> -    qemu_mutex_lock(&monitor_lock);
+>> >> >>> -    QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
+>> >> >>> -        QTAILQ_REMOVE(&mon_list, mon, entry);
+>> >> >>> +    do {
+>> >> >>
+>> >> >> for (;;), please.
+>> >> >>
+>> >> >>> +        Monitor *mon;
+>> >> >>> +
+>> >> >>> +        qemu_mutex_lock(&monitor_lock);
+>> >> >>> +        mon =3D QTAILQ_FIRST(&mon_list);
+>> >> >>> +        if (mon) {
+>> >> >>> +            QTAILQ_REMOVE(&mon_list, mon, entry);
+>> >> >>> +        }
+>> >> >>> +        qemu_mutex_unlock(&monitor_lock);
+>> >> >>> +
+>> >> >>> +        if (!mon) {
+>> >> >>> +            break;
+>> >> >>> +        }
+>> >> >>> +
+>> >> >>>          monitor_flush(mon);
+>> >> >>>          monitor_data_destroy(mon);
+>> >> >>>          g_free(mon);
+>> >> >>> -    }
+>> >> >>> -    qemu_mutex_unlock(&monitor_lock);
+>> >> >>> +    } while (true);
+>> >> >>>
+>> >> >>>      /* QEMUBHs needs to be deleted before destroying the I/O thr=
+ead */
+>> >> >>>      qemu_bh_delete(qmp_dispatcher_bh);
+>> >> >>
+>> >> >> Iterating safely over a list protected by a lock should be easier =
+than
+>> >> >> that.  Sad.
+>> >> >>
+>> >> >> Hmm, what about this:
+>> >> >>
+>> >> >> diff --git a/monitor.c b/monitor.c
+>> >> >> index 77861e96af..4a23f6c7bc 100644
+>> >> >> --- a/monitor.c
+>> >> >> +++ b/monitor.c
+>> >> >> @@ -4721,9 +4721,11 @@ void monitor_cleanup(void)
+>> >> >>      qemu_mutex_lock(&monitor_lock);
+>> >> >>      QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
+>> >> >>          QTAILQ_REMOVE(&mon_list, mon, entry);
+>> >> >> +        qemu_mutex_unlock(&monitor_lock);
+>> >> >>          monitor_flush(mon);
+>> >> >>          monitor_data_destroy(mon);
+>> >> >>          g_free(mon);
+>> >> >> +        qemu_mutex_lock(&monitor_lock);
+>> >> >
+>> >> > Although unlikely, there is a chance the monitor list could be
+>> >> > modified while flushing/cleaning up, I suppose, in this case we cou=
+ld
+>> >> > miss the new monitors (if next is NULL).
+>> >>
+>> >> Your loop prevents that from happening while it runs, but does nothing
+>> >> to stop it from happening afterwards.  If we want to lock out new
+>> >> monitors, we need to make monitor_init() fail or impossible to call.
+>> >
+>> > Not so trivial. Is there other threads capable of calling
+>> > monitor_init() by the time monitor_cleanup() is called? It looks like
+>> > monitor_init() may only be called from the main thread.
+>>
+>> Callers:
+>>
+>> * gdbserver_start()
+>>
+>>   CLI option -gdb, HMP command gdbserver, linux user CLI option -g and
+>>   environment variable QEMU_GDB
+>>
+>>   The interesting one is the HMP command.  Does your loop lock it out?
+>>   If we run it only in the main thread, and we run the HMP command only
+>>   in the main thread, it obviously does.
+>>
+>> * mon_init_func()
+>>
+>>   CLI option -mon and its convenience buddies -monitor, -qmp,
+>>   -qmp-pretty
+>>
+>>   We don't have a monitor command to spawn off a new monitor, but we
+>>   could have.
+>>
+>> * qemu_chr_new_noreplay()
+>>
+>>   gdbserver_start() again, and qemu_chr_new(), which is called all over
+>>   the place.  I lack the time to review these calls.  Are you sure this
+>>   one can only run in the main thread?
+>>
+>
+> No, I am not sure, but I would consider it a bug today. However, if
+> it's possible to keep using the monitor or create new monitor after
+> monitor_cleanup() is called, we have probably have more issues to
+> solve.
+>
+> However, this problem is not directly related to the dead-lock fixed
+> here, and the problem is pre-existing.
+>
+> Probably the cleanup code would have to look different if we want to
+> solve the init/cleanup races, but that's a different fix. Do we have
+> to solve it first, or can we add a FIXME?
 
-As the VIO device model does not have a device index but a "reg"
-property, we introduce a formula to compute an IRQ number from a "reg"
-value. It should minimize most of the collisions.
+FIXME is fine.
 
-The previous layout is kept in pre-3.1 machines raising the
-'legacy_irq_allocation' machine class flag.
+Can we go with the simpler fix I sketched?
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/Makefile.objs       |  2 +-
- hw/ppc/spapr.c             | 32 ++++++++++++++++++
- hw/ppc/spapr_events.c      | 12 ++++---
- hw/ppc/spapr_irq.c         | 56 ++++++++++++++++++++++++++++++++
- hw/ppc/spapr_pci.c         | 29 +++++++++++++----
- hw/ppc/spapr_vio.c         | 66 ++++++++++++++++++++++++++++++++++----
- include/hw/ppc/spapr.h     |  5 +++
- include/hw/ppc/spapr_irq.h | 32 ++++++++++++++++++
- 8 files changed, 216 insertions(+), 18 deletions(-)
- create mode 100644 hw/ppc/spapr_irq.c
- create mode 100644 include/hw/ppc/spapr_irq.h
+>> Synchronizing monitor creation and cleanup explicitly might be cleaner.
+>> I guess monitor_lock kind of sort of almost does that before your patch,
+>> but it can deadlock because it's too coarse.
+>>
+>> I'm afraid we need to rethink the set of locks protecting shared monitor
+>> state.
+>
+> Yes, and probably change a bit monitor/chardev creation to be under
+> tighter control...
 
-diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-index bcab6323b7..4ab5564672 100644
---- a/hw/ppc/Makefile.objs
-+++ b/hw/ppc/Makefile.objs
-@@ -4,7 +4,7 @@ obj-y +=3D ppc.o ppc_booke.o fdt.o
- obj-$(CONFIG_PSERIES) +=3D spapr.o spapr_caps.o spapr_vio.o spapr_events=
-.o
- obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o spapr_rtas.o
- obj-$(CONFIG_PSERIES) +=3D spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng=
-.o
--obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o
-+obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o spapr_irq.o
- # IBM PowerNV
- obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
-i.o pnv_occ.o pnv_bmc.o
- ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a732f59205..6a78ceb708 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -189,6 +189,11 @@ static void xics_system_init(MachineState *machine, =
-int nr_irqs, Error **errp)
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
-     Error *local_err =3D NULL;
-=20
-+    /* Initialize the MSI IRQ allocator. */
-+    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+        spapr_irq_msi_init(spapr, XICS_IRQ_BASE + nr_irqs - SPAPR_IRQ_MS=
-I);
-+    }
-+
-     if (kvm_enabled()) {
-         if (machine_kernel_irqchip_allowed(machine) &&
-             !xics_kvm_init(spapr, &local_err)) {
-@@ -1636,6 +1641,10 @@ static void spapr_machine_reset(void)
-         ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fata=
-l);
-     }
-=20
-+    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+        spapr_irq_msi_reset(spapr);
-+    }
-+
-     qemu_devices_reset();
-=20
-     /* DRC reset may cause a device to be unplugged. This will cause tro=
-ubles
-@@ -1910,6 +1919,24 @@ static const VMStateDescription vmstate_spapr_patb=
-_entry =3D {
-     },
- };
-=20
-+static bool spapr_irq_map_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr =3D opaque;
-+
-+    return spapr->irq_map && !bitmap_empty(spapr->irq_map, spapr->irq_ma=
-p_nr);
-+}
-+
-+static const VMStateDescription vmstate_spapr_irq_map =3D {
-+    .name =3D "spapr_irq_map",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .needed =3D spapr_irq_map_needed,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_BITMAP(irq_map, sPAPRMachineState, 0, irq_map_nr),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static const VMStateDescription vmstate_spapr =3D {
-     .name =3D "spapr",
-     .version_id =3D 3,
-@@ -1937,6 +1964,7 @@ static const VMStateDescription vmstate_spapr =3D {
-         &vmstate_spapr_cap_cfpc,
-         &vmstate_spapr_cap_sbbc,
-         &vmstate_spapr_cap_ibs,
-+        &vmstate_spapr_irq_map,
-         NULL
-     }
- };
-@@ -4086,8 +4114,12 @@ static void spapr_machine_3_0_instance_options(Mac=
-hineState *machine)
-=20
- static void spapr_machine_3_0_class_options(MachineClass *mc)
- {
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-+
-     spapr_machine_3_1_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_0);
-+
-+    smc->legacy_irq_allocation =3D true;
- }
-=20
- DEFINE_SPAPR_MACHINE(3_0, "3.0", false);
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index e4f5946a21..32719a1b72 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -707,9 +707,11 @@ void spapr_clear_pending_events(sPAPRMachineState *s=
-papr)
-=20
- void spapr_events_init(sPAPRMachineState *spapr)
- {
--    int epow_irq;
-+    int epow_irq =3D SPAPR_IRQ_EPOW;
-=20
--    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
-+    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+        epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
-+    }
-=20
-     spapr_irq_claim(spapr, epow_irq, false, &error_fatal);
-=20
-@@ -729,9 +731,11 @@ void spapr_events_init(sPAPRMachineState *spapr)
-      * checking that it's enabled.
-      */
-     if (spapr->use_hotplug_event_source) {
--        int hp_irq;
-+        int hp_irq =3D SPAPR_IRQ_HOTPLUG;
-=20
--        hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
-+        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+            hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
-+        }
-=20
-         spapr_irq_claim(spapr, hp_irq, false, &error_fatal);
-=20
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-new file mode 100644
-index 0000000000..24e9c1d443
---- /dev/null
-+++ b/hw/ppc/spapr_irq.c
-@@ -0,0 +1,56 @@
-+/*
-+ * QEMU PowerPC sPAPR IRQ interface
-+ *
-+ * Copyright (c) 2018, IBM Corporation.
-+ *
-+ * This code is licensed under the GPL version 2 or later. See the
-+ * COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+#include "hw/ppc/spapr.h"
-+#include "hw/ppc/xics.h"
-+
-+void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_msis)
-+{
-+    spapr->irq_map_nr =3D nr_msis;
-+    spapr->irq_map =3D bitmap_new(spapr->irq_map_nr);
-+}
-+
-+int spapr_irq_msi_alloc(sPAPRMachineState *spapr, uint32_t num, bool ali=
-gn,
-+                        Error **errp)
-+{
-+    int irq;
-+
-+    /*
-+     * The 'align_mask' parameter of bitmap_find_next_zero_area()
-+     * should be one less than a power of 2; 0 means no
-+     * alignment. Adapt the 'align' value of the former allocator
-+     * to fit the requirements of bitmap_find_next_zero_area()
-+     */
-+    align -=3D 1;
-+
-+    irq =3D bitmap_find_next_zero_area(spapr->irq_map, spapr->irq_map_nr=
-, 0, num,
-+                                     align);
-+    if (irq =3D=3D spapr->irq_map_nr) {
-+        error_setg(errp, "can't find a free %d-IRQ block", num);
-+        return -1;
-+    }
-+
-+    bitmap_set(spapr->irq_map, irq, num);
-+
-+    return irq + SPAPR_IRQ_MSI;
-+}
-+
-+void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t num)
-+{
-+    bitmap_clear(spapr->irq_map, irq - SPAPR_IRQ_MSI, num);
-+}
-+
-+void spapr_irq_msi_reset(sPAPRMachineState *spapr)
-+{
-+    bitmap_clear(spapr->irq_map, 0, spapr->irq_map_nr);
-+}
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 497b896c7d..3791ced6c5 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -334,6 +334,9 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-             return;
-         }
-=20
-+        if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+            spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
-+        }
-         spapr_irq_free(spapr, msi->first_irq, msi->num);
-         if (msi_present(pdev)) {
-             spapr_msi_setmsg(pdev, 0, false, 0, 0);
-@@ -372,7 +375,13 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPA=
-PRMachineState *spapr,
-     }
-=20
-     /* Allocate MSIs */
--    irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS_TYP=
-E_MSI, &err);
-+    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+        irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS=
-_TYPE_MSI,
-+                             &err);
-+    } else {
-+        irq =3D spapr_irq_msi_alloc(spapr, req_num,
-+                                  ret_intr_type =3D=3D RTAS_TYPE_MSI, &e=
-rr);
-+    }
-     if (err) {
-         error_reportf_err(err, "Can't allocate MSIs for device %x: ",
-                           config_addr);
-@@ -392,6 +401,9 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-=20
-     /* Release previous MSIs */
-     if (msi) {
-+        if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+            spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
-+        }
-         spapr_irq_free(spapr, msi->first_irq, msi->num);
-         g_hash_table_remove(phb->msi, &config_addr);
-     }
-@@ -1705,14 +1717,16 @@ static void spapr_phb_realize(DeviceState *dev, E=
-rror **errp)
-=20
-     /* Initialize the LSI table */
-     for (i =3D 0; i < PCI_NUM_PINS; i++) {
--        uint32_t irq;
-+        uint32_t irq =3D SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS =
-+ i;
-         Error *local_err =3D NULL;
-=20
--        irq =3D spapr_irq_findone(spapr, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
--            error_prepend(errp, "can't allocate LSIs: ");
--            return;
-+        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+            irq =3D spapr_irq_findone(spapr, &local_err);
-+            if (local_err) {
-+                error_propagate(errp, local_err);
-+                error_prepend(errp, "can't allocate LSIs: ");
-+                return;
-+            }
-         }
-=20
-         spapr_irq_claim(spapr, irq, true, &local_err);
-@@ -2123,6 +2137,7 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
-     _FDT(fdt_setprop(fdt, bus_off, "ranges", &ranges, sizeof_ranges));
-     _FDT(fdt_setprop(fdt, bus_off, "reg", &bus_reg, sizeof(bus_reg)));
-     _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pci-config-space-type", 0x1=
-));
-+    /* TODO: fine tune the total count of allocatable MSIs per PHB */
-     _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi", XICS_IRQS_S=
-PAPR));
-=20
-     /* Dynamic DMA window */
-diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-index be9af71437..840d4a3c45 100644
---- a/hw/ppc/spapr_vio.c
-+++ b/hw/ppc/spapr_vio.c
-@@ -37,12 +37,13 @@
-=20
- #include "hw/ppc/spapr.h"
- #include "hw/ppc/spapr_vio.h"
--#include "hw/ppc/xics.h"
- #include "hw/ppc/fdt.h"
- #include "trace.h"
-=20
- #include <libfdt.h>
-=20
-+#define SPAPR_VIO_REG_BASE 0x71000000
-+
- static void spapr_vio_get_irq(Object *obj, Visitor *v, const char *name,
-                               void *opaque, Error **errp)
- {
-@@ -445,6 +446,55 @@ static void spapr_vio_busdev_reset(DeviceState *qdev=
-)
-     }
- }
-=20
-+/*
-+ * The register property of a VIO device is defined in livirt using
-+ * 0x1000 as a base register number plus a 0x1000 increment. For the
-+ * VIO tty device, the base number is changed to 0x30000000. QEMU uses
-+ * a base register number of 0x71000000 and then a simple increment.
-+ *
-+ * The formula below tries to compute a unique index number from the
-+ * register value that will be used to define the IRQ number of the
-+ * VIO device.
-+ *
-+ * A maximum of 256 VIO devices is covered. Collisions are possible
-+ * but they will be detected when the IRQ is claimed.
-+ */
-+static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
-+{
-+    uint32_t irq;
-+
-+    if (reg >=3D SPAPR_VIO_REG_BASE) {
-+        /*
-+         * VIO device register values when allocated by QEMU. For
-+         * these, we simply mask the high bits to fit the overall
-+         * range: [0x00 - 0xff].
-+         *
-+         * The nvram VIO device (reg=3D0x71000000) is a static device of
-+         * the pseries machine and so is always allocated by QEMU. Its
-+         * IRQ number is 0x0.
-+         */
-+        irq =3D reg & 0xff;
-+
-+    } else if (reg >=3D 0x30000000) {
-+        /*
-+         * VIO tty devices register values, when allocated by livirt,
-+         * are mapped in range [0xf0 - 0xff], gives us a maximum of 16
-+         * vtys.
-+         */
-+        irq =3D 0xf0 | ((reg >> 12) & 0xf);
-+
-+    } else {
-+        /*
-+         * Other VIO devices register values, when allocated by
-+         * livirt, should be mapped in range [0x00 - 0xef]. Conflicts
-+         * will be detected when IRQ is claimed.
-+         */
-+        irq =3D (reg >> 12) & 0xff;
-+    }
-+
-+    return SPAPR_IRQ_VIO | irq;
-+}
-+
- static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-@@ -485,10 +535,14 @@ static void spapr_vio_busdev_realize(DeviceState *q=
-dev, Error **errp)
-     }
-=20
-     if (!dev->irq) {
--        dev->irq =3D spapr_irq_findone(spapr, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
--            return;
-+        dev->irq =3D spapr_vio_reg_to_irq(dev->reg);
-+
-+        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+            dev->irq =3D spapr_irq_findone(spapr, &local_err);
-+            if (local_err) {
-+                error_propagate(errp, local_err);
-+                return;
-+            }
-         }
-     }
-=20
-@@ -557,7 +611,7 @@ VIOsPAPRBus *spapr_vio_bus_init(void)
-     /* Create bus on bridge device */
-     qbus =3D qbus_create(TYPE_SPAPR_VIO_BUS, dev, "spapr-vio");
-     bus =3D SPAPR_VIO_BUS(qbus);
--    bus->next_reg =3D 0x71000000;
-+    bus->next_reg =3D SPAPR_VIO_REG_BASE;
-=20
-     /* hcall-vio */
-     spapr_register_hypercall(H_VIO_SIGNAL, h_vio_signal);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 7e5de1a6fd..73067f5ee8 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -8,6 +8,7 @@
- #include "hw/ppc/spapr_drc.h"
- #include "hw/mem/pc-dimm.h"
- #include "hw/ppc/spapr_ovec.h"
-+#include "hw/ppc/spapr_irq.h"
-=20
- struct VIOsPAPRBus;
- struct sPAPRPHBState;
-@@ -101,6 +102,8 @@ struct sPAPRMachineClass {
-     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMB=
-s */
-     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
-     bool pre_2_10_has_unused_icps;
-+    bool legacy_irq_allocation;
-+
-     void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
-                           uint64_t *buid, hwaddr *pio,=20
-                           hwaddr *mmio32, hwaddr *mmio64,
-@@ -167,6 +170,8 @@ struct sPAPRMachineState {
-     char *kvm_type;
-=20
-     const char *icp_type;
-+    int32_t irq_map_nr;
-+    unsigned long *irq_map;
-=20
-     bool cmd_line_caps[SPAPR_CAP_NUM];
-     sPAPRCapabilities def, eff, mig;
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-new file mode 100644
-index 0000000000..6f7f505488
---- /dev/null
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -0,0 +1,32 @@
-+/*
-+ * QEMU PowerPC sPAPR IRQ backend definitions
-+ *
-+ * Copyright (c) 2018, IBM Corporation.
-+ *
-+ * This code is licensed under the GPL version 2 or later. See the
-+ * COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_SPAPR_IRQ_H
-+#define HW_SPAPR_IRQ_H
-+
-+/*
-+ * IRQ range offsets per device type
-+ */
-+#define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
-+#define SPAPR_IRQ_HOTPLUG    0x1001
-+#define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
-+#define SPAPR_IRQ_PCI_LSI    0x1200  /* 32+ PHBs devices */
-+
-+#define SPAPR_IRQ_MSI        0x1300  /* Offset of the dynamic range cove=
-red
-+                                      * by the bitmap allocator */
-+
-+typedef struct sPAPRMachineState sPAPRMachineState;
-+
-+void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_msis);
-+int spapr_irq_msi_alloc(sPAPRMachineState *spapr, uint32_t num, bool ali=
-gn,
-+                        Error **errp);
-+void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t num)=
-;
-+void spapr_irq_msi_reset(sPAPRMachineState *spapr);
-+
-+#endif
---=20
-2.17.1
+We're going to have fun...
