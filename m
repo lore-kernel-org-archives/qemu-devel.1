@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fsBUd-0001RY-RQ
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:35:04 -0400
+	(envelope-from <linus971@gmail.com>) id 1fsBYY-0003YG-La
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:39:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fsBUY-0008GV-CT
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:35:03 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:41086)
+	(envelope-from <linus971@gmail.com>) id 1fsBYW-0002YG-IM
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:39:06 -0400
+Received: from mail-it0-x22b.google.com ([2607:f8b0:4001:c0b::22b]:55813)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fsBUW-0008AY-VN
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:34:58 -0400
-Received: by mail-pg1-x544.google.com with SMTP id s15-v6so6078907pgv.8
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 11:34:52 -0700 (PDT)
-References: <20180820141116.9118-1-peter.maydell@linaro.org>
-	<20180820141116.9118-2-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <bc3e965c-5068-d185-11a2-83b692abeead@linaro.org>
-Date: Tue, 21 Aug 2018 11:34:48 -0700
+	(Exim 4.71) (envelope-from <linus971@gmail.com>) id 1fsBYU-0002Vg-Fo
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:39:02 -0400
+Received: by mail-it0-x22b.google.com with SMTP id d10-v6so5498674itj.5
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 11:39:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180820141116.9118-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/22] hw/misc/mps2-fpgaio: Implement 1Hz
- and 100Hz counters
+References: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
+	<1534870966-9287-28-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1534870966-9287-28-git-send-email-pbonzini@redhat.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Tue, 21 Aug 2018 11:38:48 -0700
+Message-ID: <CA+55aFyG=iDf3r3nj5Wav4xnKs1D8tUM9iejJd4M0xb2q-tZoQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 27/74] checkpatch: allow space in more
+ places before a bracket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, patches@linaro.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Heinrich Schuchardt <xypron.glpk@gmx.de>, Andrew Morton <akpm@linux-foundation.org>
 
-On 08/20/2018 07:10 AM, Peter Maydell wrote:
-> The MPS2 FPGAIO block includes some simple free-running counters.
-> Implement these.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/misc/mps2-fpgaio.h |  4 +++
->  hw/misc/mps2-fpgaio.c         | 53 ++++++++++++++++++++++++++++++++++-
->  2 files changed, 56 insertions(+), 1 deletion(-)
+This is commit 38dca988bb20 ("checkpatch: allow space between colon
+and bracket") upstream, why is that not mentioned anywhere?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+*Please* mention the upstream commits when back-porting things.
+
+                 Linus
 
 
-r~
+On Tue, Aug 21, 2018 at 10:03 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> From: Heinrich Schuchardt <xypron.glpk@gmx.de>
+>
+> Allow a space between a colon and subsequent opening bracket.  This
+> sequence may occur in inline assembler statements like
