@@ -1,15 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwlR-00046I-CU
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 22:51:26 -0400
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwlU-00046f-RR
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 22:51:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwlM-0004bS-9c
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 22:51:25 -0400
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwlU-0004fl-2b
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 22:51:28 -0400
 From: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
-Date: Mon, 20 Aug 2018 22:50:57 -0400
-Message-Id: <20180821025104.19604-1-pavel.zbitskiy@gmail.com>
-Subject: [Qemu-devel] [PATCH 0/7] Some improvements in z/Arch instructions
- support
+Date: Mon, 20 Aug 2018 22:50:58 -0400
+Message-Id: <20180821025104.19604-2-pavel.zbitskiy@gmail.com>
+In-Reply-To: <20180821025104.19604-1-pavel.zbitskiy@gmail.com>
+References: <20180821025104.19604-1-pavel.zbitskiy@gmail.com>
+Subject: [Qemu-devel] [PATCH 1/7] tests/tcg: add a simple s390x test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,61 +22,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com, richard.henderson@linaro.org, Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
 
-Found while attempting to run an old tool in qemu.
+Copied from alpha.
 
-* BAL and BALR:    Added.
-* CSST:            Qemu crashed after an accidental jump to garbage.
-* IPM:             A tool produced an incorrect output.
-* EX TRT/TRTR:     A tool ran quite slow.
-* PACK:            A tool produced an incorrect output.
-* CVB, CVBY, CVBG: Added.
-
-Changes since v2:
-* Updated MAINTAINERS.
-* Updated BAL and BAS not to overwrite high 32 bits
-  in 24- and 31- bit modes.
-
-Changes since v1:
-* Tests.
-* Call pc_to_link_info() instead of op_bas().
-* Clarified CSST commit message.
-* Rewrote IPM using extract/deposit.
-* Clarified PACK commit message.
-* Do not use LowCore for CONFIG_USER_ONLY.
-* Reduce duplication in CVB code.
-
-Pavel Zbitskiy (7):
-  tests/tcg: add a simple s390x test
-  target/s390x: add BAL and BALR instructions
-  target/s390x: fix CSST decoding and runtime alignment check
-  target/s390x: fix IPM polluting irrelevant bits
-  target/s390x: add EX support for TRT and TRTR
-  target/s390x: fix PACK reading 1 byte less and writing 1 byte more
-  target/s390x: implement CVB, CVBY and CVBG
-
- MAINTAINERS                     |  1 +
- target/s390x/helper.h           |  1 +
- target/s390x/insn-data.def      |  7 +++
- target/s390x/int_helper.c       | 50 +++++++++++++++++++
- target/s390x/mem_helper.c       | 24 +++++++--
- target/s390x/translate.c        | 86 +++++++++++++++++++++++++--------
- tests/tcg/s390x/Makefile.target |  9 ++++
- tests/tcg/s390x/csst.c          | 43 +++++++++++++++++
- tests/tcg/s390x/cvb.c           | 18 +++++++
- tests/tcg/s390x/exrl-trt.c      | 48 ++++++++++++++++++
- tests/tcg/s390x/exrl-trtr.c     | 48 ++++++++++++++++++
- tests/tcg/s390x/hello-s390x.c   |  7 +++
- tests/tcg/s390x/ipm.c           | 22 +++++++++
- tests/tcg/s390x/pack.c          | 21 ++++++++
- 14 files changed, 362 insertions(+), 23 deletions(-)
+Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
+---
+ MAINTAINERS                     | 1 +
+ tests/tcg/s390x/Makefile.target | 3 +++
+ tests/tcg/s390x/hello-s390x.c   | 7 +++++++
+ 3 files changed, 11 insertions(+)
  create mode 100644 tests/tcg/s390x/Makefile.target
- create mode 100644 tests/tcg/s390x/csst.c
- create mode 100644 tests/tcg/s390x/cvb.c
- create mode 100644 tests/tcg/s390x/exrl-trt.c
- create mode 100644 tests/tcg/s390x/exrl-trtr.c
  create mode 100644 tests/tcg/s390x/hello-s390x.c
- create mode 100644 tests/tcg/s390x/ipm.c
- create mode 100644 tests/tcg/s390x/pack.c
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6902a568f4..27af17caa7 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -253,6 +253,7 @@ S: Maintained
+ F: target/s390x/
+ F: hw/s390x/
+ F: disas/s390.c
++F: tests/tcg/s390x/
+ L: qemu-s390x@nongnu.org
+ 
+ SH4
+diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.target
+new file mode 100644
+index 0000000000..9f4076901f
+--- /dev/null
++++ b/tests/tcg/s390x/Makefile.target
+@@ -0,0 +1,3 @@
++VPATH+=$(SRC_PATH)/tests/tcg/s390x
++CFLAGS+=-march=zEC12 -m64
++TESTS+=hello-s390x
+diff --git a/tests/tcg/s390x/hello-s390x.c b/tests/tcg/s390x/hello-s390x.c
+new file mode 100644
+index 0000000000..3dc0a05f2b
+--- /dev/null
++++ b/tests/tcg/s390x/hello-s390x.c
+@@ -0,0 +1,7 @@
++#include <unistd.h>
++
++int main(void)
++{
++    write(1, "hello\n", 6);
++    return 0;
++}
 -- 
 2.18.0
