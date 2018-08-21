@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4o-0002IR-2h
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:23 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4o-0002IT-42
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4V-0006n2-Mw
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4b-0006w4-2X
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:13 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:41977)
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:40657)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fsA4U-0006Xl-SJ
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:03:59 -0400
-Received: by mail-wr1-x430.google.com with SMTP id z96-v6so7812716wrb.8
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:03:50 -0700 (PDT)
+	id 1fsA4Z-0006sx-BE
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:03 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id y9-v6so3498825wma.5
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:04:03 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 21 Aug 2018 19:02:14 +0200
-Message-Id: <1534870966-9287-43-git-send-email-pbonzini@redhat.com>
+Date: Tue, 21 Aug 2018 19:02:27 +0200
+Message-Id: <1534870966-9287-56-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
 References: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 42/74] test-rcu-list: abstract the list
- implementation
+Subject: [Qemu-devel] [PULL 55/74] vhost-scsi: unify vhost-scsi get_features
+ implementations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,130 +29,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>
+Cc: Greg Edwards <gedwards@ddn.com>
 
-From: "Emilio G. Cota" <cota@braap.org>
+From: Greg Edwards <gedwards@ddn.com>
 
-So that we can test other implementations.
+Move the enablement of preset host features into the common
+vhost_scsi_common_get_features() function.  This is in preparation for
+having vhost-scsi also make use of host_features.
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <20180819091335.22863-8-cota@braap.org>
+Signed-off-by: Greg Edwards <gedwards@ddn.com>
+Message-Id: <20180808195235.5843-3-gedwards@ddn.com>
+Reviewed-by: Felipe Franciosi <felipe@nutanix.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/test-rcu-list.c | 42 ++++++++++++++++++++++++++++++------------
- 1 file changed, 30 insertions(+), 12 deletions(-)
+ hw/scsi/vhost-scsi-common.c |  3 +++
+ hw/scsi/vhost-user-scsi.c   | 14 +-------------
+ 2 files changed, 4 insertions(+), 13 deletions(-)
 
-diff --git a/tests/test-rcu-list.c b/tests/test-rcu-list.c
-index dc58091..9bd1136 100644
---- a/tests/test-rcu-list.c
-+++ b/tests/test-rcu-list.c
-@@ -82,9 +82,16 @@ static void wait_all_threads(void)
-     n_threads = 0;
- }
- 
-+#ifndef TEST_LIST_TYPE
-+#define TEST_LIST_TYPE 1
-+#endif
- 
- struct list_element {
-+#if TEST_LIST_TYPE == 1
-     QLIST_ENTRY(list_element) entry;
-+#else
-+#error Invalid TEST_LIST_TYPE
-+#endif
-     struct rcu_head rcu;
- };
- 
-@@ -96,8 +103,19 @@ static void reclaim_list_el(struct rcu_head *prcu)
-     atomic_set(&n_reclaims, n_reclaims + 1);
- }
- 
-+#if TEST_LIST_TYPE == 1
- static QLIST_HEAD(q_list_head, list_element) Q_list_head;
- 
-+#define TEST_NAME "qlist"
-+#define TEST_LIST_REMOVE_RCU        QLIST_REMOVE_RCU
-+#define TEST_LIST_INSERT_AFTER_RCU  QLIST_INSERT_AFTER_RCU
-+#define TEST_LIST_INSERT_HEAD_RCU   QLIST_INSERT_HEAD_RCU
-+#define TEST_LIST_FOREACH_RCU       QLIST_FOREACH_RCU
-+#define TEST_LIST_FOREACH_SAFE_RCU  QLIST_FOREACH_SAFE_RCU
-+#else
-+#error Invalid TEST_LIST_TYPE
-+#endif
-+
- static void *rcu_q_reader(void *arg)
+diff --git a/hw/scsi/vhost-scsi-common.c b/hw/scsi/vhost-scsi-common.c
+index e2a5828..b7fbab6 100644
+--- a/hw/scsi/vhost-scsi-common.c
++++ b/hw/scsi/vhost-scsi-common.c
+@@ -96,6 +96,9 @@ uint64_t vhost_scsi_common_get_features(VirtIODevice *vdev, uint64_t features,
  {
-     long long n_reads_local = 0;
-@@ -113,7 +131,7 @@ static void *rcu_q_reader(void *arg)
+     VHostSCSICommon *vsc = VHOST_SCSI_COMMON(vdev);
  
-     while (atomic_read(&goflag) == GOFLAG_RUN) {
-         rcu_read_lock();
--        QLIST_FOREACH_RCU(el, &Q_list_head, entry) {
-+        TEST_LIST_FOREACH_RCU(el, &Q_list_head, entry) {
-             n_reads_local++;
-             if (atomic_read(&goflag) == GOFLAG_STOP) {
-                 break;
-@@ -150,10 +168,10 @@ static void *rcu_q_updater(void *arg)
-         target_el = select_random_el(RCU_Q_LEN);
-         j = 0;
-         /* FOREACH_RCU could work here but let's use both macros */
--        QLIST_FOREACH_SAFE_RCU(prev_el, &Q_list_head, entry, el) {
-+        TEST_LIST_FOREACH_SAFE_RCU(prev_el, &Q_list_head, entry, el) {
-             j++;
-             if (target_el == j) {
--                QLIST_REMOVE_RCU(prev_el, entry);
-+                TEST_LIST_REMOVE_RCU(prev_el, entry);
-                 /* may be more than one updater in the future */
-                 call_rcu1(&prev_el->rcu, reclaim_list_el);
-                 n_removed_local++;
-@@ -165,12 +183,12 @@ static void *rcu_q_updater(void *arg)
-         }
-         target_el = select_random_el(RCU_Q_LEN);
-         j = 0;
--        QLIST_FOREACH_RCU(el, &Q_list_head, entry) {
-+        TEST_LIST_FOREACH_RCU(el, &Q_list_head, entry) {
-             j++;
-             if (target_el == j) {
--                prev_el = g_new(struct list_element, 1);
-+                struct list_element *new_el = g_new(struct list_element, 1);
-                 n_nodes += n_nodes_local;
--                QLIST_INSERT_BEFORE_RCU(el, prev_el, entry);
-+                TEST_LIST_INSERT_AFTER_RCU(el, new_el, entry);
-                 break;
-             }
-         }
-@@ -195,7 +213,7 @@ static void rcu_qtest_init(void)
-     srand(time(0));
-     for (i = 0; i < RCU_Q_LEN; i++) {
-         new_el = g_new(struct list_element, 1);
--        QLIST_INSERT_HEAD_RCU(&Q_list_head, new_el, entry);
-+        TEST_LIST_INSERT_HEAD_RCU(&Q_list_head, new_el, entry);
-     }
-     qemu_mutex_lock(&counts_mutex);
-     n_nodes += RCU_Q_LEN;
-@@ -230,8 +248,8 @@ static void rcu_qtest(const char *test, int duration, int nreaders)
-     create_thread(rcu_q_updater);
-     rcu_qtest_run(duration, nreaders);
++    /* Turn on predefined features supported by this device */
++    features |= vsc->host_features;
++
+     return vhost_get_features(&vsc->dev, vsc->feature_bits, features);
+ }
  
--    QLIST_FOREACH_SAFE_RCU(prev_el, &Q_list_head, entry, el) {
--        QLIST_REMOVE_RCU(prev_el, entry);
-+    TEST_LIST_FOREACH_SAFE_RCU(prev_el, &Q_list_head, entry, el) {
-+        TEST_LIST_REMOVE_RCU(prev_el, entry);
-         call_rcu1(&prev_el->rcu, reclaim_list_el);
-         n_removed_local++;
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+index 694cb80..26491da 100644
+--- a/hw/scsi/vhost-user-scsi.c
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -137,18 +137,6 @@ static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
      }
-@@ -292,9 +310,9 @@ int main(int argc, char *argv[])
-             } else {
-                 gtest_seconds = 20;
-             }
--            g_test_add_func("/rcu/qlist/single-threaded", gtest_rcuq_one);
--            g_test_add_func("/rcu/qlist/short-few", gtest_rcuq_few);
--            g_test_add_func("/rcu/qlist/long-many", gtest_rcuq_many);
-+            g_test_add_func("/rcu/"TEST_NAME"/single-threaded", gtest_rcuq_one);
-+            g_test_add_func("/rcu/"TEST_NAME"/short-few", gtest_rcuq_few);
-+            g_test_add_func("/rcu/"TEST_NAME"/long-many", gtest_rcuq_many);
-             g_test_in_charge = 1;
-             return g_test_run();
-         }
+ }
+ 
+-static uint64_t vhost_user_scsi_get_features(VirtIODevice *vdev,
+-                                             uint64_t features, Error **errp)
+-{
+-    VHostUserSCSI *s = VHOST_USER_SCSI(vdev);
+-    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
+-
+-    /* Turn on predefined features supported by this device */
+-    features |= vsc->host_features;
+-
+-    return vhost_scsi_common_get_features(vdev, features, errp);
+-}
+-
+ static Property vhost_user_scsi_properties[] = {
+     DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.chardev),
+     DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
+@@ -188,7 +176,7 @@ static void vhost_user_scsi_class_init(ObjectClass *klass, void *data)
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+     vdc->realize = vhost_user_scsi_realize;
+     vdc->unrealize = vhost_user_scsi_unrealize;
+-    vdc->get_features = vhost_user_scsi_get_features;
++    vdc->get_features = vhost_scsi_common_get_features;
+     vdc->set_config = vhost_scsi_common_set_config;
+     vdc->set_status = vhost_user_scsi_set_status;
+     fwc->get_dev_path = vhost_scsi_common_get_fw_dev_path;
 -- 
 1.8.3.1
