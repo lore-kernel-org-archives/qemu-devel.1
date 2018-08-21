@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tI-00023U-J9
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:13 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tI-00023N-Bm
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tG-0007JZ-31
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tF-0007IV-PB
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:07 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34886 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:34880 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs5tF-0007Hr-Ju
+	id 1fs5tF-0007HT-DN
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:05 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 14:35:17 +0200
-Message-Id: <1534854951-6321-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 14:35:11 +0200
+Message-Id: <1534854951-6321-7-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 12/46] target/mips: Add emulation of nanoMIPS
- 16-bit logic instructions
+Subject: [Qemu-devel] [PULL 06/46] target/mips: Add nanoMIPS decoding and
+ extraction utilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +28,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add emulation of NOT16, AND16, XOR16, OR16 instructions.
+Add some basic utility functions and macros for nanoMIPS decoding
+engine.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ target/mips/translate.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 569e58a..75f2b64 100644
+index 4184d91..ab982cf 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16760,6 +16760,37 @@ static inline int decode_gpr_gpr4_zero(int r)
- }
+@@ -16593,6 +16593,17 @@ enum {
+  *
+  */
  
- 
++
 +/* extraction utilities */
 +
 +#define NANOMIPS_EXTRACT_RD(op) ((op >> 7) & 0x7)
@@ -58,50 +60,8 @@ index 569e58a..75f2b64 100644
 +#define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
 +
 +
-+static void gen_pool16c_nanomips_insn(DisasContext *ctx)
-+{
-+    int rt = decode_gpr_gpr3(NANOMIPS_EXTRACT_RD(ctx->opcode));
-+    int rs = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS(ctx->opcode));
-+
-+    switch (extract32(ctx->opcode, 2, 2)) {
-+    case NM_NOT16:
-+        gen_logic(ctx, OPC_NOR, rt, rs, 0);
-+        break;
-+    case NM_AND16:
-+        gen_logic(ctx, OPC_AND, rt, rt, rs);
-+        break;
-+    case NM_XOR16:
-+        gen_logic(ctx, OPC_XOR, rt, rt, rs);
-+        break;
-+    case NM_OR16:
-+        gen_logic(ctx, OPC_OR, rt, rt, rs);
-+        break;
-+    }
-+}
-+
  static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
  {
-     uint32_t op;
-@@ -16836,6 +16867,7 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-     case NM_P16C:
-         switch (ctx->opcode & 1) {
-         case NM_POOL16C_0:
-+            gen_pool16c_nanomips_insn(ctx);
-             break;
-         case NM_LWXS16:
-             gen_ldxs(ctx, rt, rs, rd);
-@@ -16910,6 +16942,12 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case NM_ANDI16:
-+        {
-+            uint32_t u = extract32(ctx->opcode, 0, 4);
-+            u = (u == 12) ? 0xff :
-+                (u == 13) ? 0xffff : u;
-+            gen_logic_imm(ctx, OPC_ANDI, rt, rs, u);
-+        }
-         break;
-     case NM_P16_LB:
-         offset = extract32(ctx->opcode, 0, 2);
+     return 2;
 -- 
 2.7.4
