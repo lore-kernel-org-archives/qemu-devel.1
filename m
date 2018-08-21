@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1frufD-00071Q-72
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 20:36:52 -0400
+	(envelope-from <famz@redhat.com>) id 1frv6z-0001Ig-WA
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 21:05:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fruf9-0003ir-7r
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 20:36:51 -0400
-Resent-Message-Id: <E1fruf9-0003ir-7r@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21127)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fruf8-0003gf-VK
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 20:36:47 -0400
-In-Reply-To: <20180820202604.14218-1-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153481175754.17712.11782121995511793904@502c9da6d61e>
+	(envelope-from <famz@redhat.com>) id 1frv2M-00024B-UT
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 21:00:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45386 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1frv2M-00023m-Po
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 21:00:46 -0400
+Date: Tue, 21 Aug 2018 09:00:44 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180821010044.GK10682@lemon.usersys.redhat.com>
+References: <20180818030337.22271-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 20 Aug 2018 17:35:59 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/7] Linux user for 3.1 patches
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180818030337.22271-1-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] docker: Clean dangling tarball files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, crosthwaite.peter@gmail.com, riku.voipio@iki.fi, pbonzini@redhat.com, aurelien@aurel32.net, rth@twiddle.net
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwODIwMjAyNjA0LjE0MjE4LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAvN10gTGludXggdXNlciBmb3IgMy4xIHBhdGNoZXMKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
-JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
-aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
-Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
-IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
-bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
-IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
-ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
-MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-NDUyNmI2ZDQyMiBsaW51eC11c2VyOiBhZGQgUUVNVV9JRkxBX0lORk9fS0lORCBuZXN0ZWQgdHlw
-ZSBmb3IgdHVuCjNlMzhjZDMxZjYgbGludXgtdXNlcjogdXBkYXRlIG5ldGxpbmsgcm91dGUgdHlw
-ZXMKZjQ5NzM2MWQ2NyBsaW51eC11c2VyOiBpbnRyb2R1Y2UgUUVNVV9SVEFfKiB0byB1c2Ugd2l0
-aCBydGF0dHJfdHlwZV90CmNjYjcxMDAxZjkgbGludXgtdXNlcjogZml4IHJlY3Ztc2coKS9yZWN2
-ZnJvbSgpIHdpdGggbmV0bGluayBhbmQgTVNHX1RSVU5DCjdmMTE3MWMxNjMgc2g0OiBmaXggdXNl
-X2ljb3VudCB3aXRoIGxpbnV4LXVzZXIKMWI3NDlhZWE5MCBsaW51eC11c2VyOiBmaXggMzJiaXQg
-ZzJoKCkvaDJnKCkKMjhmZTI2NGFhMiBxZW11LWJpbmZtdC1jb25mLnNoOiBhZGQgeDg2XzY0IHRh
-cmdldAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiBxZW11LWJpbmZt
-dC1jb25mLnNoOiBhZGQgeDg2XzY0IHRhcmdldC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojMjk6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxNzoKK3g4Nl82
-NF9tYWdpYz0nXHg3ZkVMRlx4MDJceDAxXHgwMVx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBc
-eDAwXHgwMFx4MDJceDAwXHgzZVx4MDAnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
-IzMwOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MTg6Cit4ODZfNjRfbWFzaz0n
-XHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZlXHhmZVx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZc
-eGZmXHhmZlx4ZmVceGZmXHhmZlx4ZmYnCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDE4
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
-ZWNraW5nIFBBVENIIDIvNzogbGludXgtdXNlcjogZml4IDMyYml0IGcyaCgpL2gyZygpLi4uCkNo
-ZWNraW5nIFBBVENIIDMvNzogc2g0OiBmaXggdXNlX2ljb3VudCB3aXRoIGxpbnV4LXVzZXIuLi4K
-Q2hlY2tpbmcgUEFUQ0ggNC83OiBsaW51eC11c2VyOiBmaXggcmVjdm1zZygpL3JlY3Zmcm9tKCkg
-d2l0aCBuZXRsaW5rIGFuZCBNU0dfVFJVTkMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS83OiBsaW51eC11
-c2VyOiBpbnRyb2R1Y2UgUUVNVV9SVEFfKiB0byB1c2Ugd2l0aCBydGF0dHJfdHlwZV90Li4uCkNo
-ZWNraW5nIFBBVENIIDYvNzogbGludXgtdXNlcjogdXBkYXRlIG5ldGxpbmsgcm91dGUgdHlwZXMu
-Li4KQ2hlY2tpbmcgUEFUQ0ggNy83OiBsaW51eC11c2VyOiBhZGQgUUVNVV9JRkxBX0lORk9fS0lO
-RCBuZXN0ZWQgdHlwZSBmb3IgdHVuLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
-IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Sat, 08/18 00:03, Philippe Mathieu-Daud=E9 wrote:
+> When a container fails, it leaves a dangling tarball which name is
+> based on a timestamp. Further uses of make won't clean those files,
+> neither calling the 'docker-clean' target.
+>=20
+> Use the .DELETE_ON_ERROR built-in target to let make remove those
+> temporary tarballs in case of failure.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  tests/docker/Makefile.include | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
+ude
+> index d3101afecd..6e03235ab9 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -25,6 +25,7 @@ IMAGES ?=3D %
+>  CUR_TIME :=3D $(shell date +%Y-%m-%d-%H.%M.%S.$$$$)
+>  DOCKER_SRC_COPY :=3D $(BUILD_DIR)/docker-src.$(CUR_TIME)
+> =20
+> +.DELETE_ON_ERROR: $(DOCKER_SRC_COPY)
+>  $(DOCKER_SRC_COPY):
+>  	@mkdir $@
+>  	$(if $(SRC_ARCHIVE), \
+> --=20
+> 2.18.0
+>=20
+
+Queued, thanks.
+
+Fam
