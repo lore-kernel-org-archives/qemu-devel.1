@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linus971@gmail.com>) id 1fsBYY-0003YG-La
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:39:07 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fsBct-0005ei-H9
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:43:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linus971@gmail.com>) id 1fsBYW-0002YG-IM
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:39:06 -0400
-Received: from mail-it0-x22b.google.com ([2607:f8b0:4001:c0b::22b]:55813)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <linus971@gmail.com>) id 1fsBYU-0002Vg-Fo
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:39:02 -0400
-Received: by mail-it0-x22b.google.com with SMTP id d10-v6so5498674itj.5
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 11:39:00 -0700 (PDT)
+	(envelope-from <alex.williamson@redhat.com>) id 1fsBcq-0005ue-8B
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:43:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60442 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1fsBcq-0005tN-3R
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:43:32 -0400
+Date: Tue, 21 Aug 2018 12:43:30 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180821124330.767abf0f@t450s.home>
+In-Reply-To: <153486991405.14686.16930315204565109405.stgit@gimli.home>
+References: <153486991405.14686.16930315204565109405.stgit@gimli.home>
 MIME-Version: 1.0
-References: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
-	<1534870966-9287-28-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1534870966-9287-28-git-send-email-pbonzini@redhat.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 21 Aug 2018 11:38:48 -0700
-Message-ID: <CA+55aFyG=iDf3r3nj5Wav4xnKs1D8tUM9iejJd4M0xb2q-tZoQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 27/74] checkpatch: allow space in more
- places before a bracket
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 0/1] vfio coverity reported error fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Heinrich Schuchardt <xypron.glpk@gmx.de>, Andrew Morton <akpm@linux-foundation.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-This is commit 38dca988bb20 ("checkpatch: allow space between colon
-and bracket") upstream, why is that not mentioned anywhere?
+On Tue, 21 Aug 2018 10:47:10 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-*Please* mention the upstream commits when back-porting things.
+> The following changes since commit ee135aa0428fe5af2af7be04ff16d2b596a9330a:
+> 
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-3.1-20180821' into staging (2018-08-21 13:27:11 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://github.com/awilliam/qemu-vfio.git tags/vfio-fix-20180821.0
+> 
+> for you to fetch changes up to 5d6023cf74cf403fd3aee903050f43278d359e6a:
+> 
+>   vfio/pci: Handle subsystem realpath() returning NULL (2018-08-21 10:29:26 -0600)
+> 
+> ----------------------------------------------------------------
+> VFIO fix 2018-08-21
+> 
+>  - Fix coverity reported issue with use of realpath (Alex Williamson)
+> 
+> ----------------------------------------------------------------
+> Alex Williamson (1):
+>       vfio/pci: Handle subsystem realpath() returning NULL
+> 
+>  hw/vfio/pci.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-                 Linus
+Put a halt on this, nothing wrong with the fix but I notice a separate
+bug in the original commit (not closing an fd on error).  I'll post
+the fix and send another pull request with both.  Thanks,
 
-
-On Tue, Aug 21, 2018 at 10:03 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> From: Heinrich Schuchardt <xypron.glpk@gmx.de>
->
-> Allow a space between a colon and subsequent opening bracket.  This
-> sequence may occur in inline assembler statements like
+Alex
