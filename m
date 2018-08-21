@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tK-00023m-EC
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:16 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tT-0002D3-5r
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tH-0007MM-Ux
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:10 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34894 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tK-0007SP-HV
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:18 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:34933 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs5tH-0007Jf-2A
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:07 -0400
+	id 1fs5tJ-0007Nz-Cc
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:10 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 14:35:24 +0200
-Message-Id: <1534854951-6321-20-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 14:35:48 +0200
+Message-Id: <1534854951-6321-44-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 19/46] target/mips: Add emulation of misc
- nanoMIPS instructions (pool32axf)
+Subject: [Qemu-devel] [PULL 43/46] mips_malta: Add basic nanoMIPS boot code
+ for Malta board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,124 +28,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Matthew Fortune <matthew.fortune@mips.com>
 
-Add emulation of misc nanoMIPS instructions situated in pool32axf.
+Add basic nanoMIPS boot code for Malta.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 89 insertions(+)
+ hw/mips/mips_malta.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 60 insertions(+), 3 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 429ad23..8381fbe 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -17034,6 +17034,87 @@ static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 3467451..2e851d9 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -599,6 +599,59 @@ static void network_init(PCIBus *pci_bus)
      }
  }
  
-+static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
++static void write_bootloader_nanomips(uint8_t *base, int64_t run_addr,
++                                      int64_t kernel_entry)
 +{
-+    int rt = extract32(ctx->opcode, 21, 5);
-+    int rs = extract32(ctx->opcode, 16, 5);
++    uint16_t *p;
 +
-+    switch (extract32(ctx->opcode, 6, 3)) {
-+    case NM_POOL32AXF_4:
-+    case NM_POOL32AXF_5:
-+        switch (extract32(ctx->opcode, 9, 7)) {
-+#ifndef CONFIG_USER_ONLY
-+        case NM_TLBP:
-+            gen_cp0(env, ctx, OPC_TLBP, 0, 0);
-+            break;
-+        case NM_TLBR:
-+            gen_cp0(env, ctx, OPC_TLBR, 0, 0);
-+            break;
-+        case NM_TLBWI:
-+            gen_cp0(env, ctx, OPC_TLBWI, 0, 0);
-+            break;
-+        case NM_TLBWR:
-+            gen_cp0(env, ctx, OPC_TLBWR, 0, 0);
-+            break;
-+        case NM_TLBINV:
-+            gen_cp0(env, ctx, OPC_TLBINV, 0, 0);
-+            break;
-+        case NM_TLBINVF:
-+            gen_cp0(env, ctx, OPC_TLBINVF, 0, 0);
-+            break;
-+        case NM_DI:
-+            check_cp0_enabled(ctx);
-+            {
-+                TCGv t0 = tcg_temp_new();
++    /* Small bootloader */
++    p = (uint16_t *)base;
 +
-+                save_cpu_state(ctx, 1);
-+                gen_helper_di(t0, cpu_env);
-+                gen_store_gpr(t0, rt);
-+            /* Stop translation as we may have switched the execution mode */
-+                ctx->base.is_jmp = DISAS_STOP;
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case NM_EI:
-+            check_cp0_enabled(ctx);
-+            {
-+                TCGv t0 = tcg_temp_new();
++#define NM_HI1(VAL) (((VAL) >> 16) & 0x1f)
++#define NM_HI2(VAL) \
++            (((VAL) & 0xf000) | (((VAL) >> 19) & 0xffc) | (((VAL) >> 31) & 0x1))
++#define NM_LO(VAL)  ((VAL) & 0xfff)
 +
-+                save_cpu_state(ctx, 1);
-+                gen_helper_ei(t0, cpu_env);
-+                gen_store_gpr(t0, rt);
-+            /* Stop translation as we may have switched the execution mode */
-+                ctx->base.is_jmp = DISAS_STOP;
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case NM_RDPGPR:
-+            gen_load_srsgpr(rs, rt);
-+            break;
-+        case NM_WRPGPR:
-+            gen_store_srsgpr(rs, rt);
-+            break;
-+        case NM_WAIT:
-+            gen_cp0(env, ctx, OPC_WAIT, 0, 0);
-+            break;
-+        case NM_DERET:
-+            gen_cp0(env, ctx, OPC_DERET, 0, 0);
-+            break;
-+        case NM_ERETX:
-+            gen_cp0(env, ctx, OPC_ERET, 0, 0);
-+            break;
-+#endif
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    default:
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    }
++    stw_p(p++, 0x2800); stw_p(p++, 0x001c); /* bc to_here */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++
++    /* to_here: */
++    stw_p(p++, 0x0080); stw_p(p++, 0x0002); /* li a0,2 */
++    stw_p(p++, 0xe3a0 | NM_HI1(ENVP_ADDR - 64));
++    stw_p(p++, NM_HI2(ENVP_ADDR - 64));
++                                /* lui sp,%hi(ENVP_ADDR - 64) */
++    stw_p(p++, 0x83bd); stw_p(p++, NM_LO(ENVP_ADDR - 64));
++                                /* ori sp,sp,%lo(ENVP_ADDR - 64) */
++    stw_p(p++, 0xe0a0 | NM_HI1(ENVP_ADDR));
++    stw_p(p++, NM_HI2(ENVP_ADDR));
++                                /* lui a1,%hi(ENVP_ADDR) */
++    stw_p(p++, 0x80a5); stw_p(p++, NM_LO(ENVP_ADDR));
++                                /* ori a1,a1,%lo(ENVP_ADDR) */
++    stw_p(p++, 0xe0c0 | NM_HI1(ENVP_ADDR + 8));
++    stw_p(p++, NM_HI2(ENVP_ADDR + 8));
++                                /* lui a2,%hi(ENVP_ADDR + 8) */
++    stw_p(p++, 0x80c6); stw_p(p++, NM_LO(ENVP_ADDR + 8));
++                                /* ori a2,a2,%lo(ENVP_ADDR + 8) */
++    stw_p(p++, 0xe0e0 | NM_HI1(loaderparams.ram_low_size));
++    stw_p(p++, NM_HI2(loaderparams.ram_low_size));
++                                /* lui a3,%hi(loaderparams.ram_low_size) */
++    stw_p(p++, 0x80e7); stw_p(p++, NM_LO(loaderparams.ram_low_size));
++                                /* ori a3,a3,%lo(loaderparams.ram_low_size) */
++    stw_p(p++, 0xe320 | NM_HI1(kernel_entry));
++    stw_p(p++, NM_HI2(kernel_entry));
++                                /* lui t9,%hi(kernel_entry) */
++    stw_p(p++, 0x8339); stw_p(p++, NM_LO(kernel_entry));
++                                /* ori t9,t9,%lo(kernel_entry) */
++    stw_p(p++, 0x4bf9); stw_p(p++, 0x0000);
++                                /* jalrc   t8 */
 +}
 +
- static void gen_pool32f_nanomips_insn(DisasContext *ctx)
+ /* ROM and pseudo bootloader
+ 
+    The following code implements a very very simple bootloader. It first
+@@ -620,7 +673,6 @@ static void network_init(PCIBus *pci_bus)
+      a2 - 32-bit address of the environment variables table
+      a3 - RAM size in bytes
+ */
+-
+ static void write_bootloader(uint8_t *base, int64_t run_addr,
+                              int64_t kernel_entry)
  {
-     int rt, rs, rd;
-@@ -17404,6 +17485,14 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-             gen_pool32a0_nanomips_insn(ctx);
-             break;
-         case NM_POOL32A7:
-+            switch (extract32(ctx->opcode, 3, 3)) {
-+            case NM_POOL32AXF:
-+                gen_pool32axf_nanomips_insn(env, ctx);
-+                break;
-+            default:
-+                generate_exception_end(ctx, EXCP_RI);
-+                break;
-+            }
-             break;
-         default:
-             generate_exception_end(ctx, EXCP_RI);
+@@ -1096,8 +1148,13 @@ void mips_malta_init(MachineState *machine)
+         loaderparams.initrd_filename = initrd_filename;
+         kernel_entry = load_kernel();
+ 
+-        write_bootloader(memory_region_get_ram_ptr(bios),
+-                         bootloader_run_addr, kernel_entry);
++        if (!cpu_supports_isa(machine->cpu_type, ISA_NANOMIPS32)) {
++            write_bootloader(memory_region_get_ram_ptr(bios),
++                             bootloader_run_addr, kernel_entry);
++        } else {
++            write_bootloader_nanomips(memory_region_get_ram_ptr(bios),
++                                      bootloader_run_addr, kernel_entry);
++        }
+         if (kvm_enabled()) {
+             /* Write the bootloader code @ the end of RAM, 1MB reserved */
+             write_bootloader(memory_region_get_ram_ptr(ram_low_preio) +
 -- 
 2.7.4
