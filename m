@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <simon@ruderich.org>) id 1fs5vL-0003r0-OC
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:38:16 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fs5yq-000884-Vp
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <simon@ruderich.org>) id 1fs5vF-0000Ni-E0
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:38:15 -0400
-Received: from zucker2.schokokeks.org ([178.63.68.90]:57479)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1fs5vF-0000IU-3R
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:38:09 -0400
-Date: Tue, 21 Aug 2018 14:38:02 +0200
-From: Simon Ruderich <simon@ruderich.org>
-Message-ID: <96fa6847da651ffcaf57405b5e8f020ce5c09d6f.1534854457.git.simon@ruderich.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-In-Reply-To: <abbc398b-0ded-5531-aba5-bd95200c937c@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 5/6] qmp: add pmemload command
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fs5ym-0002y4-TP
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:41:52 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40164)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1fs5ym-0002xG-Ic
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:41:48 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n2-v6so5261155wrw.7
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 05:41:48 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1534796770-10295-1-git-send-email-minyard@acm.org>
+	<1534796770-10295-6-git-send-email-minyard@acm.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1aac39bc-5cd6-350f-9c8e-b5374f25510e@redhat.com>
+Date: Tue, 21 Aug 2018 14:41:45 +0200
+MIME-Version: 1.0
+In-Reply-To: <1534796770-10295-6-git-send-email-minyard@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 05/10] i2c:pm_smbus: Fix state transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,166 +32,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, David Alan Gilbert <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: minyard@acm.org, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Adapted patch from Baojun Wang [1] with the following commit message:
+On 20/08/2018 22:26, minyard@acm.org wrote:
+> From: Corey Minyard <cminyard@mvista.com>
+> 
+> Transfer the state information for the SMBus registers and
+> internal data so it will work on a VM transfer.
 
-    I found this could be useful to have qemu-softmmu as a cross
-    debugger (launch with -s -S command line option), then if we can
-    have a command to load guest physical memory, we can use cross gdb
-    to do some target debug which gdb cannot do directly.
+Since the device is mostly unused, I would rather have this in a
+subsection.  This way the format remains backwards-compatible as long as
+the registers have the default values.
 
-This patch contains only the qmp changes of the original patch.
+Also, in case you are interested, a few years ago I was thinking of
+implementing clock stretching; the plan was that clock stretching would
+let you pass host I2C devices down to the guest.  Basically, the I2C
+recv function was changed to accept a callback+opaque, and said callback
+would be invoked later if recv returned -EAGAIN (or something like
+that).  Unfortunately I didn't finish adding support to all the I2C
+controllers when my laptop was stolen, so the patches are lost. :/
 
-pmemload is necessary to directly write physical memory which is not
-possible with gdb alone as it uses only logical addresses.
+Paolo
 
-The QAPI for pmemload uses "val" as parameter name for the physical
-address. This name is not very descriptive but is consistent with the
-existing pmemsave. Changing the parameter name of pmemsave is not
-possible without breaking the existing API.
-
-[1]: https://lists.gnu.org/archive/html/qemu-trivial/2014-04/msg00074.html
-
-Based-on-patch-by: Baojun Wang <wangbj@gmail.com>
-Signed-off-by: Simon Ruderich <simon@ruderich.org>
----
-
-Hello,
-
-I've adapted the patch to error out if a char/block device is
-used. I think that's the simplest fix for the issue mentioned by
-Eric Blake.
-
-Are the any other issues remaining? All other patches are
-unchanged, should I resend the whole series?
-
-Regards
-Simon
-
-Diff of this patch since v4:
-
-    diff --git a/cpus.c b/cpus.c
-    index d79bf8b485..1622f00846 100644
-    --- a/cpus.c
-    +++ b/cpus.c
-    @@ -2397,6 +2397,10 @@ void qmp_pmemload(int64_t addr, const char *filename,
-                error_setg_errno(errp, errno, "could not fstat fd to get size");
-                goto exit;
-            }
-    +        if (S_ISCHR(s.st_mode) || S_ISBLK(s.st_mode)) {
-    +            error_setg(errp, "pmemload doesn't support char/block devices");
-    +            goto exit;
-    +        }
-            size = s.st_size;
-        }
-
- cpus.c         | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++
- qapi/misc.json | 20 ++++++++++++++++++
- 2 files changed, 75 insertions(+)
-
-diff --git a/cpus.c b/cpus.c
-index 243f2c0d2e..1622f00846 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -2369,6 +2369,61 @@ exit:
-     qemu_close(fd);
- }
- 
-+void qmp_pmemload(int64_t addr, const char *filename,
-+                  bool has_size, int64_t size,
-+                  bool has_offset, int64_t offset,
-+                  Error **errp)
-+{
-+    int fd;
-+    size_t l;
-+    ssize_t r;
-+    uint8_t buf[1024];
-+
-+    fd = qemu_open(filename, O_RDONLY | O_BINARY);
-+    if (fd < 0) {
-+        error_setg_file_open(errp, errno, filename);
-+        return;
-+    }
-+    if (has_offset && offset > 0) {
-+        if (lseek(fd, offset, SEEK_SET) != offset) {
-+            error_setg_errno(errp, errno,
-+                             "could not seek to offset %" PRIx64, offset);
-+            goto exit;
-+        }
-+    }
-+    if (!has_size) {
-+        struct stat s;
-+        if (fstat(fd, &s)) {
-+            error_setg_errno(errp, errno, "could not fstat fd to get size");
-+            goto exit;
-+        }
-+        if (S_ISCHR(s.st_mode) || S_ISBLK(s.st_mode)) {
-+            error_setg(errp, "pmemload doesn't support char/block devices");
-+            goto exit;
-+        }
-+        size = s.st_size;
-+    }
-+
-+    while (size != 0) {
-+        l = sizeof(buf);
-+        if (l > size) {
-+            l = size;
-+        }
-+        r = read(fd, buf, l);
-+        if (r <= 0) {
-+            error_setg(errp, QERR_IO_ERROR);
-+            goto exit;
-+        }
-+        l = r; /* in case of short read */
-+        cpu_physical_memory_write(addr, buf, l);
-+        addr += l;
-+        size -= l;
-+    }
-+
-+exit:
-+    qemu_close(fd);
-+}
-+
- void qmp_inject_nmi(Error **errp)
- {
-     nmi_monitor_handle(monitor_get_cpu_index(), errp);
-diff --git a/qapi/misc.json b/qapi/misc.json
-index d450cfef21..06cf36f3d4 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1181,6 +1181,26 @@
- { 'command': 'pmemsave',
-   'data': {'val': 'int', 'size': 'int', 'filename': 'str'} }
- 
-+##
-+# @pmemload:
-+#
-+# Load a portion of guest physical memory from a file.
-+#
-+# @val: the physical address of the guest to start from
-+#
-+# @filename: the file to load the memory from as binary data
-+#
-+# @size: the size of memory region to load (defaults to whole file)
-+#
-+# @offset: the offset in the file to start from (defaults to 0)
-+#
-+# Returns: Nothing on success
-+#
-+# Since: 3.1
-+##
-+{ 'command': 'pmemload',
-+  'data': {'val': 'int', 'filename': 'str', '*size': 'int', '*offset': 'int'} }
-+
- ##
- # @cont:
- #
--- 
-2.17.1
-
--- 
-+ privacy is necessary
-+ using gnupg http://gnupg.org
-+ public key id: 0x92FEFDB7E44C32F9
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/acpi/piix4.c           |  3 ++-
+>  hw/i2c/pm_smbus.c         | 20 ++++++++++++++++++++
+>  hw/i2c/smbus_ich9.c       |  5 +++--
+>  include/hw/i2c/pm_smbus.h |  2 ++
+>  4 files changed, 27 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index 6404af5..f8d8d2e 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -309,7 +309,7 @@ static const VMStateDescription vmstate_cpuhp_state = {
+>   */
+>  static const VMStateDescription vmstate_acpi = {
+>      .name = "piix4_pm",
+> -    .version_id = 3,
+> +    .version_id = 4,
+>      .minimum_version_id = 3,
+>      .minimum_version_id_old = 1,
+>      .load_state_old = acpi_load_old,
+> @@ -320,6 +320,7 @@ static const VMStateDescription vmstate_acpi = {
+>          VMSTATE_UINT16(ar.pm1.evt.en, PIIX4PMState),
+>          VMSTATE_UINT16(ar.pm1.cnt.cnt, PIIX4PMState),
+>          VMSTATE_STRUCT(apm, PIIX4PMState, 0, vmstate_apm, APMState),
+> +        VMSTATE_STRUCT(smb, PIIX4PMState, 4, pmsmb_vmstate, PMSMBus),
+>          VMSTATE_TIMER_PTR(ar.tmr.timer, PIIX4PMState),
+>          VMSTATE_INT64(ar.tmr.overflow_time, PIIX4PMState),
+>          VMSTATE_STRUCT(ar.gpe, PIIX4PMState, 2, vmstate_gpe, ACPIGPE),
+> diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+> index 32132be..9e11d47 100644
+> --- a/hw/i2c/pm_smbus.c
+> +++ b/hw/i2c/pm_smbus.c
+> @@ -383,6 +383,26 @@ static const MemoryRegionOps pm_smbus_ops = {
+>      .endianness = DEVICE_LITTLE_ENDIAN,
+>  };
+>  
+> +const VMStateDescription pmsmb_vmstate = {
+> +    .name = "pmsmb",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT8(smb_stat, PMSMBus),
+> +        VMSTATE_UINT8(smb_ctl, PMSMBus),
+> +        VMSTATE_UINT8(smb_cmd, PMSMBus),
+> +        VMSTATE_UINT8(smb_addr, PMSMBus),
+> +        VMSTATE_UINT8(smb_data0, PMSMBus),
+> +        VMSTATE_UINT8(smb_data1, PMSMBus),
+> +        VMSTATE_UINT32(smb_index, PMSMBus),
+> +        VMSTATE_UINT8_ARRAY(smb_data, PMSMBus, PM_SMBUS_MAX_MSG_SIZE),
+> +        VMSTATE_UINT8(smb_auxctl, PMSMBus),
+> +        VMSTATE_BOOL(i2c_enable, PMSMBus),
+> +        VMSTATE_BOOL(op_done, PMSMBus),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  void pm_smbus_init(DeviceState *parent, PMSMBus *smb)
+>  {
+>      smb->op_done = true;
+> diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+> index a66a114..c8b8413 100644
+> --- a/hw/i2c/smbus_ich9.c
+> +++ b/hw/i2c/smbus_ich9.c
+> @@ -45,10 +45,11 @@ typedef struct ICH9SMBState {
+>  
+>  static const VMStateDescription vmstate_ich9_smbus = {
+>      .name = "ich9_smb",
+> -    .version_id = 1,
+> +    .version_id = 2,
+>      .minimum_version_id = 1,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_PCI_DEVICE(dev, struct ICH9SMBState),
+> +        VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
+> +        VMSTATE_STRUCT(smb, ICH9SMBState, 2, pmsmb_vmstate, PMSMBus),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+> diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
+> index 99d5489..b1e1970 100644
+> --- a/include/hw/i2c/pm_smbus.h
+> +++ b/include/hw/i2c/pm_smbus.h
+> @@ -33,4 +33,6 @@ typedef struct PMSMBus {
+>  
+>  void pm_smbus_init(DeviceState *parent, PMSMBus *smb);
+>  
+> +extern const VMStateDescription pmsmb_vmstate;
+> +
+>  #endif /* PM_SMBUS_H */
+> 
