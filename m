@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1fs7ZL-0008EN-0p
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:23:40 -0400
+	(envelope-from <mail@steffen-goertz.de>) id 1fs7ZN-0008Fp-8C
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1fs7ZH-0006O5-F0
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:23:38 -0400
-Received: from steffen-goertz.de ([88.198.119.201]:43628)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1fs7ZH-0006M9-12
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:23:35 -0400
-References: <20180806100114.21410-1-contrib@steffen-goertz.de>
-	<20180806100114.21410-3-contrib@steffen-goertz.de>
-	<CAFEAcA8qVuawNP5nOQ=Yg8PopkVbCL2+4hzw9kCEW8qht=pMiA@mail.gmail.com>
+	(envelope-from <mail@steffen-goertz.de>) id 1fs7ZM-0006Rr-Ei
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:23:41 -0400
+References: <20180811090836.4024-1-contrib@steffen-goertz.de>
+	<20180811090836.4024-7-contrib@steffen-goertz.de>
+	<CAFEAcA_=8r_X_rLfwJovEkusBb6hmaG5Ns8YQxQMLL4z0KpHXw@mail.gmail.com>
 From: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
-Message-ID: <ce052c6b-7adf-669e-7649-db2885097c1f@steffen-goertz.de>
-Date: Tue, 21 Aug 2018 10:31:01 +0200
+Message-ID: <6c13fca2-6f16-adb0-1072-7601abefd18d@steffen-goertz.de>
+Date: Tue, 21 Aug 2018 13:43:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8qVuawNP5nOQ=Yg8PopkVbCL2+4hzw9kCEW8qht=pMiA@mail.gmail.com>
+In-Reply-To: <CAFEAcA_=8r_X_rLfwJovEkusBb6hmaG5Ns8YQxQMLL4z0KpHXw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/7] hw/nvram/nrf51_nvm: Add nRF51
- non-volatile memories
+Subject: Re: [Qemu-devel] [PATCH 6/7] arm: Instantiate nRF51 peripherals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,18 +26,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>
 
 Hi Peter,
-
 >> +
->> +static Property nrf51_nvm_properties[] = {
->> +    DEFINE_PROP_UINT16("page_size", Nrf51NVMState, page_size, 0x400),
+>> +static uint64_t clock_read(void *opaque, hwaddr addr, unsigned int size)
+>> +{
+>> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
+>> +                  __func__, addr, size);
+>> +    return 1;
+>> +}
+>> +
+>> +static void clock_write(void *opaque, hwaddr addr, uint64_t data,
+>> +                        unsigned int size)
+>> +{
+>> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx64 " [%u]\n",
+>> +                  __func__, addr, data, size);
+>> +}
+>> +
+>> +static const MemoryRegionOps clock_ops = {
+>> +    .read = clock_read,
+>> +    .write = clock_write
+>> +};
 > 
-> Do the different NRF51 variants really have different NAND page sizes ?
+> You don't need to roll your own "do nothing but log" device:
+> you can use the TYPE_UNIMPLEMENTED_DEVICE to do this.
 > 
+Until we have a more proper STUB for POWER/CLOCK/MPU peripherals we actually need this,
+because the unimplemented device will return 0 on reads which will cause guest code to stall.
 
-it seems that is not the case at least for the NRF51 Series. I removed the property in favor for a nrf51.h-wide constant. I think this is NOR flash btw, because it is single-byte writable, which is usually a sign that it is NOR flash. But i could be wrong and the datasheet does not state anything.
-Thank you for your remarks!
+Agree to and regarded the rest of your remarks.
 
 Steffen
