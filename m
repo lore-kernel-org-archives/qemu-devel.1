@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fs0Lk-0001eW-B6
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:41:12 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fs0M1-0001sH-MT
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fs0Li-0000ox-9k
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:41:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39138)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fs0Li-0000oT-3e
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:41:06 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fs0Lg-0003HP-K5
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 06:41:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8CE1D2E8520
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 06:41:04 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fs0Lx-0000yR-N6
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:41:25 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180820141116.9118-1-peter.maydell@linaro.org>
+	<20180820141116.9118-5-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e518ca81-1453-b21f-808c-8ebae5ba76a4@amsat.org>
+Date: Tue, 21 Aug 2018 03:41:15 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Aug 2018 06:28:31 -0000
-From: Thomas Huth <1755912@bugs.launchpad.net>
-Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153483291239.5604.7450448293827547052.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
- SIGABRT when using option -vga qxl
+In-Reply-To: <20180820141116.9118-5-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 04/22] hw/arm/iotkit: Wire up the dualtimer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,117 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+On 08/20/2018 11:10 AM, Peter Maydell wrote:
+> Now we have a model of the CMSDK dual timer, we can wire it
+> up in the IoTKit.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
--- =
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1755912
-
-Title:
-  qemu-system-x86_64 crashed with SIGABRT when using option -vga qxl
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Bionic:
-  Triaged
-
-Bug description:
-  When using qemu-system-x86_64 with the option -vga qxl, it crashes.
-  The easiest way to crash it is by trying to change the guest's
-  resolution. However, the system may randomly crash too, not happening
-  only when changing resolution. Here is the terminal output of one of
-  these random crashes:
-
-  --------
-
-  $ qemu-system-x86_64 -hda /dev/sdb -m 2048 -enable-kvm -cpu host -vga qxl=
- -nodefaults -netdev user,id=3Dhostnet0 -device virtio-net-pci,id=3Dnet0,ne=
-tdev=3Dhostnet0
-  WARNING: Image format was not specified for '/dev/sdb' and probing guesse=
-d raw.
-           Automatically detecting the format is dangerous for raw images, =
-write operations on block 0 will be restricted.
-           Specify the 'raw' format explicitly to remove the restrictions.
-
-  (process:21313): Spice-WARNING **: 16:01:45.759: display-
-  channel.c:2431:display_channel_validate_surface: canvas address is
-  0x7f8eb948ab18 for 0 (and is NULL)
-
-  =
-
-  (process:21313): Spice-WARNING **: 16:01:45.759: display-channel.c:2432:d=
-isplay_channel_validate_surface: failed on 0
-
-  (process:21313): Spice-CRITICAL **: 16:01:45.759: display-channel.c:2035:=
-display_channel_update: condition `display_channel_validate_surface(display=
-, surface_id)' failed
-  Abortado (imagem do n=C3=BAcleo gravada)
-
-  --------
-
-  I was running QEMU as a normal user which is on the groups kvm and
-  disk. Initially I supposed the problem was because I was running QEMU
-  as root, but as a normal user this happens too.
-
-  I have tested with guests with different Ubuntu version: 18.04, 17.10
-  and 16.04. It is happening with them all.
-
-  ProblemType: Crash
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu4
-  ProcVersionSignature: Ubuntu 4.15.0-10.11-generic 4.15.3
-  Uname: Linux 4.15.0-10-generic x86_64
-  ApportVersion: 2.20.8-0ubuntu10
-  Architecture: amd64
-  CurrentDesktop: XFCE
-  Date: Wed Mar 14 17:13:52 2018
-  ExecutablePath: /usr/bin/qemu-system-x86_64
-  InstallationDate: Installed on 2017-06-13 (273 days ago)
-  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: LENOVO 80UG
-  ProcCmdline: qemu-system-x86_64 -hda /dev/sdb -smp cpus=3D2 -m 512 -enabl=
-e-kvm -cpu host -vga qxl -nodefaults -netdev user,id=3Dhostnet0 -device vir=
-tio-net-pci,id=3Dnet0,netdev=3Dhostnet0
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.15.0-10-generic.efi.signe=
-d root=3DUUID=3D6b4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet
-  Signal: 6
-  SourcePackage: qemu
-  StacktraceTop:
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-  Title: qemu-system-x86_64 crashed with SIGABRT
-  UpgradeStatus: Upgraded to bionic on 2017-10-20 (145 days ago)
-  UserGroups: adm bluetooth cdrom dialout dip disk kvm libvirt lpadmin netd=
-ev plugdev sambashare sudo
-  dmi.bios.date: 07/10/2017
-  dmi.bios.vendor: LENOVO
-  dmi.bios.version: 0XCN43WW
-  dmi.board.asset.tag: NO Asset Tag
-  dmi.board.name: Toronto 4A2
-  dmi.board.vendor: LENOVO
-  dmi.board.version: SDK0J40679 WIN
-  dmi.chassis.asset.tag: NO Asset Tag
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: LENOVO
-  dmi.chassis.version: Lenovo ideapad 310-14ISK
-  dmi.modalias: dmi:bvnLENOVO:bvr0XCN43WW:bd07/10/2017:svnLENOVO:pn80UG:pvr=
-Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
-10:cvrLenovoideapad310-14ISK:
-  dmi.product.family: IDEAPAD
-  dmi.product.name: 80UG
-  dmi.product.version: Lenovo ideapad 310-14ISK
-  dmi.sys.vendor: LENOVO
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1755912/+subscriptions
+> ---
+>  include/hw/arm/iotkit.h | 3 ++-
+>  hw/arm/iotkit.c         | 8 +++++---
+>  2 files changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
+> index 2cddde55dd1..3e6d806e352 100644
+> --- a/include/hw/arm/iotkit.h
+> +++ b/include/hw/arm/iotkit.h
+> @@ -56,6 +56,7 @@
+>  #include "hw/misc/tz-ppc.h"
+>  #include "hw/misc/tz-mpc.h"
+>  #include "hw/timer/cmsdk-apb-timer.h"
+> +#include "hw/timer/cmsdk-apb-dualtimer.h"
+>  #include "hw/misc/unimp.h"
+>  #include "hw/or-irq.h"
+>  #include "hw/core/split-irq.h"
+> @@ -87,7 +88,7 @@ typedef struct IoTKit {
+>      SplitIRQ mpc_irq_splitter[IOTS_NUM_EXP_MPC + IOTS_NUM_MPC];
+>      qemu_or_irq mpc_irq_orgate;
+>  
+> -    UnimplementedDeviceState dualtimer;
+> +    CMSDKAPBDualTimer dualtimer;
+>      UnimplementedDeviceState s32ktimer;
+>  
+>      MemoryRegion container;
+> diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+> index 8cadc8b1608..130d013909e 100644
+> --- a/hw/arm/iotkit.c
+> +++ b/hw/arm/iotkit.c
+> @@ -139,7 +139,7 @@ static void iotkit_init(Object *obj)
+>      sysbus_init_child_obj(obj, "timer1", &s->timer1, sizeof(s->timer1),
+>                            TYPE_CMSDK_APB_TIMER);
+>      sysbus_init_child_obj(obj, "dualtimer", &s->dualtimer, sizeof(s->dualtimer),
+> -                          TYPE_UNIMPLEMENTED_DEVICE);
+> +                          TYPE_CMSDK_APB_DUALTIMER);
+>      object_initialize_child(obj, "ppc-irq-orgate", &s->ppc_irq_orgate,
+>                              sizeof(s->ppc_irq_orgate), TYPE_OR_IRQ,
+>                              &error_abort, NULL);
+> @@ -390,13 +390,15 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> -    qdev_prop_set_string(DEVICE(&s->dualtimer), "name", "Dual timer");
+> -    qdev_prop_set_uint64(DEVICE(&s->dualtimer), "size", 0x1000);
+> +
+> +    qdev_prop_set_uint32(DEVICE(&s->dualtimer), "pclk-frq", s->mainclk_frq);
+>      object_property_set_bool(OBJECT(&s->dualtimer), true, "realized", &err);
+>      if (err) {
+>          error_propagate(errp, err);
+>          return;
+>      }
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->dualtimer), 0,
+> +                       qdev_get_gpio_in(DEVICE(&s->armv7m), 5));
+>      mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->dualtimer), 0);
+>      object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[2]", &err);
+>      if (err) {
+> 
