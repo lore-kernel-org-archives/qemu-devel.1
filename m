@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fs7zK-0004HD-9S
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:50:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fs86X-00031B-9G
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:57:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fs7zI-0003TF-It
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:50:30 -0400
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:33611)
+	(envelope-from <peter.maydell@linaro.org>) id 1fs86V-0007vB-KC
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:57:57 -0400
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:43650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fs7zC-0003N3-Lo
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:50:25 -0400
-Received: by mail-oi0-x22d.google.com with SMTP id 8-v6so32531520oip.0
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 07:50:22 -0700 (PDT)
+	id 1fs86V-0007uL-Do
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:57:55 -0400
+Received: by mail-oi0-x236.google.com with SMTP id b15-v6so32468638oib.10
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 07:57:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <6c13fca2-6f16-adb0-1072-7601abefd18d@steffen-goertz.de>
-References: <20180811090836.4024-1-contrib@steffen-goertz.de>
-	<20180811090836.4024-7-contrib@steffen-goertz.de>
-	<CAFEAcA_=8r_X_rLfwJovEkusBb6hmaG5Ns8YQxQMLL4z0KpHXw@mail.gmail.com>
-	<6c13fca2-6f16-adb0-1072-7601abefd18d@steffen-goertz.de>
+In-Reply-To: <20180821043343.7514-1-david@gibson.dropbear.id.au>
+References: <20180821043343.7514-1-david@gibson.dropbear.id.au>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Aug 2018 15:50:01 +0100
-Message-ID: <CAFEAcA91fZpidh1XefoB3v1monJBQFhdZAKVUpMvw6Pw6+fMiQ@mail.gmail.com>
+Date: Tue, 21 Aug 2018 15:57:34 +0100
+Message-ID: <CAFEAcA89ZqubJ0+OEtY7yctri-7ncc7Wypjs3a=9s5-1Rk9LGQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/7] arm: Instantiate nRF51 peripherals
+Subject: Re: [Qemu-devel] [PULL 00/26] ppc-for-3.1 queue 20180821
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
-Cc: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Laurent Vivier <lvivier@redhat.com>
 
-On 21 August 2018 at 12:43, Steffen G=C3=B6rtz <mail@steffen-goertz.de> wro=
-te:
-> Hi Peter,
->>> +
->>> +static uint64_t clock_read(void *opaque, hwaddr addr, unsigned int siz=
-e)
->>> +{
->>> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
->>> +                  __func__, addr, size);
->>> +    return 1;
->>> +}
->>> +
->>> +static void clock_write(void *opaque, hwaddr addr, uint64_t data,
->>> +                        unsigned int size)
->>> +{
->>> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx64 " =
-[%u]\n",
->>> +                  __func__, addr, data, size);
->>> +}
->>> +
->>> +static const MemoryRegionOps clock_ops =3D {
->>> +    .read =3D clock_read,
->>> +    .write =3D clock_write
->>> +};
->>
->> You don't need to roll your own "do nothing but log" device:
->> you can use the TYPE_UNIMPLEMENTED_DEVICE to do this.
->>
-> Until we have a more proper STUB for POWER/CLOCK/MPU peripherals we actua=
-lly need this,
-> because the unimplemented device will return 0 on reads which will cause =
-guest code to stall.
+On 21 August 2018 at 05:33, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit d0092d90eb546a8bbe9e9120426c189474123797:
+>
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180820' into staging (2018-08-20 17:41:18 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-3.1-20180821
+>
+> for you to fetch changes up to 0e3bf4890906fa7066a5deafd6ab033934b8d100:
+>
+>   ppc: add DBCR based debugging (2018-08-21 14:28:45 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2018-08-21
+>
+> Here's my first ppc & spapr pull request for qemu-3.1.  This contains
+> a bunch of things that have accumulated while 3.0 was in freeze.
+> Highlights are:
+>     * SLOF firmware update
+>     * A number of floating point cleanups from Richard Henderson and
+>       Yasmin Beatriz
+>     * A new model for assigning irq numbers on spapr, this is an
+>       important preliminary step towards implementing the POWER9
+>       "XIVE" interrupt controller
+>
+> ----------------------------------------------------------------
 
-Oh, I see. I hadn't noticed that it was doing read-as-all-ones.
+Applied, thanks.
 
-thanks
 -- PMM
