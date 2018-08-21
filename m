@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fs3Xm-0000u1-R1
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:05:47 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fs3ZS-0001a7-L1
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:07:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fs3Xg-0002wU-ER
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:05:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60320 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fs3ZP-0003rh-Cl
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:07:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45288 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fs3Xg-0002ug-6X
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:05:40 -0400
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fs3ZN-0003qh-DE
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:07:26 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AD2CC804BCF4
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:05:38 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 21 Aug 2018 12:05:30 +0200
-Message-Id: <1534845930-14451-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] Remove deprecated -balloon option
+	by mx1.redhat.com (Postfix) with ESMTPS id DFACE40216FA
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:07:24 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 21 Aug 2018 12:07:16 +0200
+Message-Id: <20180821100716.13803-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] iothread: fix crash with invalid properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,128 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The "-balloon" option has been replaced by "-device virtio-balloon".
-It's been marked as deprecated since two releases, and nobody
-complained, so let's remove it now.
+-object iothread,id=3Dfoo,? will crash qemu:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+qemu-system-x86_64:qemu-thread-posix.c:128: qemu_cond_destroy: Assertion =
+`cond->initialized' failed.
+
+Use thread_id !=3D -1 to check if iothread_complete() finished
+successfully and the mutex/cond have been initialized.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- docs/virtio-balloon-stats.txt |  6 +++---
- qemu-deprecated.texi          |  5 -----
- qemu-options.hx               | 10 ----------
- vl.c                          | 36 ------------------------------------
- 4 files changed, 3 insertions(+), 54 deletions(-)
+ iothread.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
-index 9985e1d..1732cc8 100644
---- a/docs/virtio-balloon-stats.txt
-+++ b/docs/virtio-balloon-stats.txt
-@@ -61,9 +61,9 @@ It's also important to note the following:
-    respond to the request the timer will never be re-armed, which has
-    the same effect as disabling polling
- 
--Here are a few examples. QEMU is started with '-balloon virtio', which
--generates '/machine/peripheral-anon/device[1]' as the QOM path for the
--balloon device.
-+Here are a few examples. QEMU is started with '-device virtio-balloon',
-+which generates '/machine/peripheral-anon/device[1]' as the QOM path for
-+the balloon device.
- 
- Enable polling with 2 seconds interval:
- 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 67b7211..0714017 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -106,11 +106,6 @@ enabled via the ``-machine usb=on'' argument.
- 
- The ``-nodefconfig`` argument is a synonym for ``-no-user-config``.
- 
--@subsection -balloon (since 2.12.0)
--
--The @option{--balloon virtio} argument has been superseded by
--@option{--device virtio-balloon}.
--
- @subsection -fsdev handle (since 2.12.0)
- 
- The ``handle'' fsdev backend does not support symlinks and causes the 9p
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 4efdedf..47c6b92 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -454,16 +454,6 @@ modprobe i810_audio clocking=48000
- @end example
- ETEXI
- 
--DEF("balloon", HAS_ARG, QEMU_OPTION_balloon,
--    "-balloon virtio[,addr=str]\n"
--    "                enable virtio balloon device (deprecated)\n", QEMU_ARCH_ALL)
--STEXI
--@item -balloon virtio[,addr=@var{addr}]
--@findex -balloon
--Enable virtio balloon device, optionally with PCI address @var{addr}. This
--option is deprecated, use @option{-device virtio-balloon} instead.
--ETEXI
--
- DEF("device", HAS_ARG, QEMU_OPTION_device,
-     "-device driver[,prop[=value][,...]]\n"
-     "                add device (based on driver)\n"
-diff --git a/vl.c b/vl.c
-index 16b913f..f952f01 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2127,36 +2127,6 @@ static void parse_display(const char *p)
-     }
+diff --git a/iothread.c b/iothread.c
+index aff1281257..2fb1cdf55d 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -110,6 +110,7 @@ static void iothread_instance_init(Object *obj)
+     IOThread *iothread =3D IOTHREAD(obj);
+=20
+     iothread->poll_max_ns =3D IOTHREAD_POLL_MAX_NS_DEFAULT;
++    iothread->thread_id =3D -1;
  }
- 
--static int balloon_parse(const char *arg)
--{
--    QemuOpts *opts;
--
--    warn_report("This option is deprecated. "
--                "Use '--device virtio-balloon' to enable the balloon device.");
--
--    if (strcmp(arg, "none") == 0) {
--        return 0;
--    }
--
--    if (!strncmp(arg, "virtio", 6)) {
--        if (arg[6] == ',') {
--            /* have params -> parse them */
--            opts = qemu_opts_parse_noisily(qemu_find_opts("device"), arg + 7,
--                                           false);
--            if (!opts)
--                return  -1;
--        } else {
--            /* create empty opts */
--            opts = qemu_opts_create(qemu_find_opts("device"), NULL, 0,
--                                    &error_abort);
--        }
--        qemu_opt_set(opts, "driver", "virtio-balloon", &error_abort);
--        return 0;
--    }
--
--    return -1;
--}
--
- char *qemu_find_file(int type, const char *name)
- {
-     int i;
-@@ -3659,12 +3629,6 @@ int main(int argc, char **argv, char **envp)
-             case QEMU_OPTION_no_hpet:
-                 no_hpet = 1;
-                 break;
--            case QEMU_OPTION_balloon:
--                if (balloon_parse(optarg) < 0) {
--                    error_report("unknown -balloon argument %s", optarg);
--                    exit(1);
--                }
--                break;
-             case QEMU_OPTION_no_reboot:
-                 no_reboot = 1;
-                 break;
--- 
-1.8.3.1
+=20
+ static void iothread_instance_finalize(Object *obj)
+@@ -117,6 +118,11 @@ static void iothread_instance_finalize(Object *obj)
+     IOThread *iothread =3D IOTHREAD(obj);
+=20
+     iothread_stop(iothread);
++
++    if (iothread->thread_id !=3D -1) {
++        qemu_cond_destroy(&iothread->init_done_cond);
++        qemu_mutex_destroy(&iothread->init_done_lock);
++    }
+     /*
+      * Before glib2 2.33.10, there is a glib2 bug that GSource context
+      * pointer may not be cleared even if the context has already been
+@@ -135,8 +141,6 @@ static void iothread_instance_finalize(Object *obj)
+         g_main_context_unref(iothread->worker_context);
+         iothread->worker_context =3D NULL;
+     }
+-    qemu_cond_destroy(&iothread->init_done_cond);
+-    qemu_mutex_destroy(&iothread->init_done_lock);
+ }
+=20
+ static void iothread_complete(UserCreatable *obj, Error **errp)
+@@ -147,7 +151,6 @@ static void iothread_complete(UserCreatable *obj, Err=
+or **errp)
+=20
+     iothread->stopping =3D false;
+     iothread->running =3D true;
+-    iothread->thread_id =3D -1;
+     iothread->ctx =3D aio_context_new(&local_error);
+     if (!iothread->ctx) {
+         error_propagate(errp, local_error);
+--=20
+2.18.0.547.g1d89318c48
