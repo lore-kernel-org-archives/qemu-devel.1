@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fs6J3-0004c4-SF
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:02:52 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6Np-00016H-40
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fs6J0-0005ZB-Ir
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:02:45 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 21 Aug 2018 15:02:36 +0200
-Message-Id: <1534856557-36022-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH rebased] tests: virtio: separate ccw tests from
- libqos
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6Nj-0008J0-WA
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:40 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:35354 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1fs6Nj-0008IB-Mm
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:35 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 15:06:46 +0200
+Message-Id: <1534856848-12102-5-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1534856848-12102-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1534856848-12102-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL v2 04/46] target/mips: Prevent switching mode
+ related to Config3 ISA bit for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,177 +26,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Because qtest does not support s390 channel I/O, s390 only performs smoke tests on
-those few devices that do not have any functional tests.  Therefore, every time we
-add functional tests for a virtio device, the choice is between removing
-those tests from the s390 suite (so that s390 actually _loses_ coverage)
-or sprinkling the test with architecture checks.
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-This patch simply creates a ccw-specific test that only performs smoke tests on
-all virtio-ccw devices.  If channel I/O support is ever added to qtest and libqos,
-then this file can go away.  In the meanwhile, it simplifies maintenance and
-makes sure that all virtio devices are tested.
+Only if Config3.ISA is 3 (microMIPS), the mode should be switched in
+cpu_state_reset(). Config3.ISA is 1 for nanoMIPS processors, and no mode
+change should happen.
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
-	Just small adjustments for the qtest API.  I'll include this version
-	in my pull request.
+ target/mips/translate.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- tests/Makefile.include  |   5 +-
- tests/virtio-ccw-test.c | 118 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 120 insertions(+), 3 deletions(-)
- create mode 100644 tests/virtio-ccw-test.c
-
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 760a0f1..29e70f4 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -402,9 +402,7 @@ check-qtest-s390x-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
- check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
- check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
- check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
--check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
--check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
--check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
-+check-qtest-s390x-y += tests/virtio-ccw-test$(EXESUF)
- check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 4f95b9a..7fb322b 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -21841,8 +21841,8 @@ void cpu_state_reset(CPUMIPSState *env)
+         env->CP0_Status |= (1 << CP0St_FR);
+     }
  
- check-qtest-generic-y += tests/machine-none-test$(EXESUF)
-@@ -809,6 +807,7 @@ tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
- tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
- tests/virtio-balloon-test$(EXESUF): tests/virtio-balloon-test.o $(libqos-virtio-obj-y)
- tests/virtio-blk-test$(EXESUF): tests/virtio-blk-test.o $(libqos-virtio-obj-y)
-+tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
- tests/virtio-net-test$(EXESUF): tests/virtio-net-test.o $(libqos-pc-obj-y) $(libqos-virtio-obj-y)
- tests/virtio-rng-test$(EXESUF): tests/virtio-rng-test.o $(libqos-pc-obj-y)
- tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
-diff --git a/tests/virtio-ccw-test.c b/tests/virtio-ccw-test.c
-new file mode 100644
-index 0000000..7eddbdd
---- /dev/null
-+++ b/tests/virtio-ccw-test.c
-@@ -0,0 +1,118 @@
-+/*
-+ * QTest testcase for VirtIO CCW
-+ *
-+ * Copyright (c) 2014 SUSE LINUX Products GmbH
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+/* Until we have a full libqos implementation of virtio-ccw (which requires
-+ * also to add support for I/O channels to qtest), we can only do simple
-+ * tests that initialize the devices.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "libqos/virtio.h"
-+
-+static void virtio_balloon_nop(void)
-+{
-+    global_qtest = qtest_initf("-device virtio-balloon-ccw");
-+    qtest_end();
-+}
-+
-+static void virtconsole_nop(void)
-+{
-+    global_qtest = qtest_initf("-device virtio-serial-ccw,id=vser0 "
-+                                "-device virtconsole,bus=vser0.0");
-+    qtest_end();
-+}
-+
-+static void virtserialport_nop(void)
-+{
-+    global_qtest = qtest_initf("-device virtio-serial-ccw,id=vser0 "
-+                                "-device virtserialport,bus=vser0.0");
-+    qtest_end();
-+}
-+
-+static void virtio_serial_nop(void)
-+{
-+    global_qtest = qtest_initf("-device virtio-serial-ccw");
-+    qtest_end();
-+}
-+
-+static void virtio_serial_hotplug(void)
-+{
-+    global_qtest = qtest_initf("-device virtio-serial-ccw");
-+    qtest_qmp_device_add("virtserialport", "hp-port", "{}");
-+    qtest_qmp_device_del("hp-port");
-+    qtest_end();
-+}
-+
-+static void virtio_blk_nop(void)
-+{
-+    global_qtest = qtest_initf("-drive if=none,id=drv0,file=null-co://,format=raw "
-+                                "-device virtio-blk-ccw,drive=drv0");
-+    qtest_end();
-+}
-+
-+static void virtio_net_nop(void)
-+{
-+    global_qtest = qtest_initf("-device virtio-net-ccw");
-+    qtest_end();
-+}
-+
-+static void virtio_9p_nop(void)
-+{
-+    global_qtest = qtest_initf("-fsdev synth,id=fsdev0 "
-+                                "-device virtio-9p-ccw,fsdev=fsdev0,mount_tag=qtest");
-+    qtest_end();
-+}
-+
-+static void virtio_rng_nop(void)
-+{
-+    global_qtest = qtest_initf("-device virtio-rng-ccw");
-+    qtest_end();
-+}
-+
-+static void virtio_scsi_nop(void)
-+{
-+    global_qtest = qtest_initf("-device virtio-scsi-ccw");
-+    qtest_end();
-+}
-+
-+static void virtio_scsi_hotplug(void)
-+{
-+    global_qtest = qtest_initf("-drive if=none,id=drv0,file=null-co://,format=raw "
-+                                "-drive if=none,id=drv1,file=null-co://,format=raw "
-+                                "-device virtio-scsi-ccw "
-+                                "-device scsi-hd,drive=drv0");
-+    qtest_qmp_device_add("scsi-hd", "scsihd", "{'drive': 'drv1'}");
-+    qtest_qmp_device_del("scsihd");
-+
-+    qtest_end();
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+
-+    g_test_init(&argc, &argv, NULL);
-+    qtest_add_func("/virtio/balloon/nop", virtio_balloon_nop);
-+    qtest_add_func("/virtio/console/nop", virtconsole_nop);
-+    qtest_add_func("/virtio/serialport/nop", virtserialport_nop);
-+    qtest_add_func("/virtio/serial/nop", virtio_serial_nop);
-+    qtest_add_func("/virtio/serial/hotplug", virtio_serial_hotplug);
-+    qtest_add_func("/virtio/block/nop", virtio_blk_nop);
-+    qtest_add_func("/virtio/net/nop", virtio_net_nop);
-+    qtest_add_func("/virtio/9p/nop", virtio_9p_nop);
-+    qtest_add_func("/virtio/rng/nop", virtio_rng_nop);
-+    qtest_add_func("/virtio/scsi/nop", virtio_scsi_nop);
-+    qtest_add_func("/virtio/scsi/hotplug", virtio_scsi_hotplug);
-+
-+    ret = g_test_run();
-+
-+    return ret;
-+}
+-    if (env->CP0_Config3 & (1 << CP0C3_ISA)) {
+-        /*  microMIPS on reset when Config3.ISA == {1, 3} */
++    if (env->CP0_Config3 & (1 << CP0C3_ISA) & (1 << (CP0C3_ISA + 1))) {
++        /*  microMIPS on reset when Config3.ISA is 3 */
+         env->hflags |= MIPS_HFLAG_M16;
+     }
+ 
 -- 
-1.8.3.1
+2.7.4
