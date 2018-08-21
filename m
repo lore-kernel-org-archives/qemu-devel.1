@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1frxX4-0008PG-Ch
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 23:40:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1fryJa-0002CE-As
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1frxWw-0004cr-2s
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 23:40:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50840 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1frxWs-0004RB-SB
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 23:40:27 -0400
-References: <20180811205924.4113-1-zhangckid@gmail.com>
-	<20180811205924.4113-18-zhangckid@gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <9b49f9e4-a910-36a4-3c31-29d7bec4598d@redhat.com>
-Date: Tue, 21 Aug 2018 11:40:13 +0800
+	(envelope-from <bounces@canonical.com>) id 1fryJY-0006c5-89
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:30:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35860)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fryJY-0006bX-1t
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:30:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fryJX-0003BS-B0
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 04:30:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5074E2E8041
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 04:30:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180811205924.4113-18-zhangckid@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V11 17/20] filter-rewriter: handle
- checkpoint and failover event
+Date: Tue, 21 Aug 2018 04:17:30 -0000
+From: Launchpad Bug Tracker <1471583@bugs.launchpad.net>
+Reply-To: Bug 1471583 <1471583@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150705175825.18932.46509.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153482505067.29888.4426776446336899839.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1471583] Re: QCA988X Wifi Card Not PCI Passing
+ Through
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,220 +37,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <chen.zhang@intel.com>
+To: qemu-devel@nongnu.org
 
+[Expired for QEMU because there has been no activity for 60 days.]
 
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-On 2018=E5=B9=B408=E6=9C=8812=E6=97=A5 04:59, Zhang Chen wrote:
-> After one round of checkpoint, the states between PVM and SVM
-> become consistent, so it is unnecessary to adjust the sequence
-> of net packets for old connections, besides, while failover
-> happens, filter-rewriter will into failover mode that needn't
-> handle the new TCP connection.
->
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> ---
->   net/colo-compare.c    | 12 ++++-----
->   net/colo.c            |  8 ++++++
->   net/colo.h            |  2 ++
->   net/filter-rewriter.c | 57 ++++++++++++++++++++++++++++++++++++++++++=
-+
->   4 files changed, 73 insertions(+), 6 deletions(-)
->
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index b8c0240725..462e822be6 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -116,6 +116,12 @@ enum {
->       SECONDARY_IN,
->   };
->  =20
-> +static void colo_compare_inconsistency_notify(void)
-> +{
-> +    notifier_list_notify(&colo_compare_notifiers,
-> +                migrate_get_current());
-> +}
-> +
->   static int compare_chr_send(CompareState *s,
->                               const uint8_t *buf,
->                               uint32_t size,
-> @@ -562,12 +568,6 @@ static int colo_old_packet_check_one(Packet *pkt, =
-int64_t *check_time)
->       }
->   }
->  =20
-> -static void colo_compare_inconsistency_notify(void)
-> -{
-> -    notifier_list_notify(&colo_compare_notifiers,
-> -                migrate_get_current());
-> -}
-> -
+-- =
 
-This part of changes seems unnecessary?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1471583
 
->   void colo_compare_register_notifier(Notifier *notify)
->   {
->       notifier_list_add(&colo_compare_notifiers, notify);
-> diff --git a/net/colo.c b/net/colo.c
-> index 97c8fc928f..49176bf07b 100644
-> --- a/net/colo.c
-> +++ b/net/colo.c
-> @@ -221,3 +221,11 @@ Connection *connection_get(GHashTable *connection_=
-track_table,
->  =20
->       return conn;
->   }
-> +
-> +bool connection_has_tracked(GHashTable *connection_track_table,
-> +                            ConnectionKey *key)
-> +{
-> +    Connection *conn =3D g_hash_table_lookup(connection_track_table, k=
-ey);
-> +
-> +    return conn ? true : false;
-> +}
-> diff --git a/net/colo.h b/net/colo.h
-> index 0277e0e9ba..11c5226488 100644
-> --- a/net/colo.h
-> +++ b/net/colo.h
-> @@ -98,6 +98,8 @@ void connection_destroy(void *opaque);
->   Connection *connection_get(GHashTable *connection_track_table,
->                              ConnectionKey *key,
->                              GQueue *conn_list);
-> +bool connection_has_tracked(GHashTable *connection_track_table,
-> +                            ConnectionKey *key);
->   void connection_hashtable_reset(GHashTable *connection_track_table);
->   Packet *packet_new(const void *data, int size, int vnet_hdr_len);
->   void packet_destroy(void *opaque, void *user_data);
-> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-> index f18a71bf2e..c463a0c1d0 100644
-> --- a/net/filter-rewriter.c
-> +++ b/net/filter-rewriter.c
-> @@ -20,11 +20,15 @@
->   #include "qemu/main-loop.h"
->   #include "qemu/iov.h"
->   #include "net/checksum.h"
-> +#include "net/colo.h"
-> +#include "migration/colo.h"
->  =20
->   #define FILTER_COLO_REWRITER(obj) \
->       OBJECT_CHECK(RewriterState, (obj), TYPE_FILTER_REWRITER)
->  =20
->   #define TYPE_FILTER_REWRITER "filter-rewriter"
-> +#define FAILOVER_MODE_ON  true
-> +#define FAILOVER_MODE_OFF false
->  =20
->   typedef struct RewriterState {
->       NetFilterState parent_obj;
-> @@ -32,8 +36,14 @@ typedef struct RewriterState {
->       /* hashtable to save connection */
->       GHashTable *connection_track_table;
->       bool vnet_hdr;
-> +    bool failover_mode;
->   } RewriterState;
->  =20
-> +static void filter_rewriter_failover_mode(RewriterState *s)
-> +{
-> +    s->failover_mode =3D FAILOVER_MODE_ON;
-> +}
-> +
->   static void filter_rewriter_flush(NetFilterState *nf)
->   {
->       RewriterState *s =3D FILTER_COLO_REWRITER(nf);
-> @@ -269,6 +279,13 @@ static ssize_t colo_rewriter_receive_iov(NetFilter=
-State *nf,
->                */
->               reverse_connection_key(&key);
->           }
-> +
-> +        /* After failover we needn't change new TCP packet */
-> +        if (s->failover_mode &&
-> +            connection_has_tracked(s->connection_track_table, &key)) {
+Title:
+  QCA988X Wifi Card Not PCI Passing Through
 
-I think you mean !connection_has_tracked() here?
+Status in QEMU:
+  Expired
 
-> +            goto out;
-> +        }
-> +
->           conn =3D connection_get(s->connection_track_table,
->                                 &key,
->                                 NULL);
-> @@ -302,11 +319,49 @@ static ssize_t colo_rewriter_receive_iov(NetFilte=
-rState *nf,
->           }
->       }
->  =20
-> +out:
->       packet_destroy(pkt, NULL);
->       pkt =3D NULL;
->       return 0;
->   }
->  =20
-> +static void reset_seq_offset(gpointer key, gpointer value, gpointer us=
-er_data)
-> +{
-> +    Connection *conn =3D (Connection *)value;
-> +
-> +    conn->offset =3D 0;
-> +}
-> +
-> +static gboolean offset_is_nonzero(gpointer key,
-> +                                  gpointer value,
-> +                                  gpointer user_data)
-> +{
-> +    Connection *conn =3D (Connection *)value;
-> +
-> +    return conn->offset ? true : false;
-> +}
-> +
-> +static void colo_rewriter_handle_event(NetFilterState *nf, int event,
-> +                                       Error **errp)
-> +{
-> +    RewriterState *rs =3D FILTER_COLO_REWRITER(nf);
-> +
-> +    switch (event) {
-> +    case COLO_EVENT_CHECKPOINT:
-> +        g_hash_table_foreach(rs->connection_track_table,
-> +                            reset_seq_offset, NULL);
-> +        break;
-> +    case COLO_EVENT_FAILOVER:
-> +        if (!g_hash_table_find(rs->connection_track_table,
-> +                              offset_is_nonzero, NULL)) {
-> +            filter_rewriter_failover_mode(rs);
-> +        }
-> +        break;
-> +    default:
-> +        break;
-> +    }
-> +}
+Bug description:
+  CPU:  Intel(R) Xeon(R) CPU E3-1265L v3 @ 2.50GHz
+  KVM:  qemu-kvm-1.5.3-86.el7_1.2.x86_64
+  Kernel:  4.1.1-1.el7.elrepo.x86_64, and kernel-3.10.0-229.7.2.el7.x86_64
+  Host & Guest: CentOS 7.1
+  Using virt-manager-1.1.0-12.el7.noarch to create, configure, and start gu=
+est
 
-So I think instead of having a generic filter notifier chain, rewriter=20
-can register notifier to COLO instead. This avoid touching filter core=20
-codes.
+  I am trying to do a PCI passthrough of a QCA988X wifi card.  It's a Doodl=
+e Labs military-grade 802.11ac miniPCI card, which uses the ath10k kernel d=
+river.  This card configures nicely on the host, and seems to pass through =
+to the guest, but early in the boot of the guest it says "Unknown header ty=
+pe" at the wifi's bus address.  And sure enough, lspci -vv on the host then=
+ shows:
+          !!! Unknown header type 7f
+          Kernel driver in use: vfio-pci
 
-Thanks
+  When the guest has booted, of course it shows as an Unclassified
+  device.  Host and guest must run at least kernel 4.0 so the wifi
+  card's current firmware will load, and so that its driver comes with
+  the kernel.  I have both host and guest set up for the wifi card.  I
+  tried running kernel 3.10 in the host and passing through the PCI
+  device, but same behavior.
 
-> +
->   static void colo_rewriter_cleanup(NetFilterState *nf)
->   {
->       RewriterState *s =3D FILTER_COLO_REWRITER(nf);
-> @@ -350,6 +405,7 @@ static void filter_rewriter_init(Object *obj)
->       RewriterState *s =3D FILTER_COLO_REWRITER(obj);
->  =20
->       s->vnet_hdr =3D false;
-> +    s->failover_mode =3D FAILOVER_MODE_OFF;
->       object_property_add_bool(obj, "vnet_hdr_support",
->                                filter_rewriter_get_vnet_hdr,
->                                filter_rewriter_set_vnet_hdr, NULL);
-> @@ -362,6 +418,7 @@ static void colo_rewriter_class_init(ObjectClass *o=
-c, void *data)
->       nfc->setup =3D colo_rewriter_setup;
->       nfc->cleanup =3D colo_rewriter_cleanup;
->       nfc->receive_iov =3D colo_rewriter_receive_iov;
-> +    nfc->handle_event =3D colo_rewriter_handle_event;
->   }
->  =20
->   static const TypeInfo colo_rewriter_info =3D {
+  I am passing through to the guest an Intel i350 ethernet card just
+  fine, in fact I'm passing through two of its SR-IOV virt interfaces to
+  the guest, so that works.
+
+  On the host, before I start the guest, the wifi card looks like this
+  (lspci -vv):
+
+  0a:00.0 Network controller: Qualcomm Atheros QCA988x 802.11ac Wireless Ne=
+twork Adapter
+          Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParEr=
+r- Stepping- SERR- FastB2B- DisINTx+
+          Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast >TAbort- =
+<TAbort- <MAbort- >SERR- <PERR- INTx-
+          Latency: 0, Cache Line Size: 64 bytes
+          Interrupt: pin A routed to IRQ 43
+          Region 0: Memory at f7000000 (64-bit, non-prefetchable) [size=3D2=
+M]
+          Expansion ROM at f7200000 [disabled] [size=3D64K]
+          Capabilities: [40] Power Management version 2
+                  Flags: PMEClk- DSI- D1+ D2+ AuxCurrent=3D375mA PME(D0+,D1=
++,D2+,D3hot+,D3cold+)
+                  Status: D0 NoSoftRst- PME-Enable- DSel=3D0 DScale=3D0 PME-
+          Capabilities: [50] MSI: Enable+ Count=3D8/8 Maskable+ 64bit-
+                  Address: fee00618  Data: 0000
+                  Masking: 00000000  Pending: 00000000
+          Capabilities: [70] Express (v2) Endpoint, MSI 00
+                  DevCap: MaxPayload 256 bytes, PhantFunc 0, Latency L0s un=
+limited, L1 <64us
+                          ExtTag- AttnBtn- AttnInd- PwrInd- RBE+ FLReset-
+                  DevCtl: Report errors: Correctable- Non-Fatal- Fatal- Uns=
+upported-
+                          RlxdOrd- ExtTag- PhantFunc- AuxPwr- NoSnoop-
+                          MaxPayload 128 bytes, MaxReadReq 512 bytes
+                  DevSta: CorrErr- UncorrErr- FatalErr- UnsuppReq- AuxPwr+ =
+TransPend-
+                  LnkCap: Port #0, Speed 2.5GT/s, Width x1, ASPM L0s L1, Ex=
+it Latency L0s <4us, L1 <64us
+                          ClockPM- Surprise- LLActRep- BwNot-
+                  LnkCtl: ASPM Disabled; RCB 64 bytes Disabled- CommClk-
+                          ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+                  LnkSta: Speed 2.5GT/s, Width x1, TrErr- Train- SlotClk+ D=
+LActive- BWMgmt- ABWMgmt-
+                  DevCap2: Completion Timeout: Not Supported, TimeoutDis+, =
+LTR-, OBFF Not Supported
+                  DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-, L=
+TR-, OBFF Disabled
+                  LnkCtl2: Target Link Speed: 2.5GT/s, EnterCompliance- Spe=
+edDis-
+                           Transmit Margin: Normal Operating Range, EnterMo=
+difiedCompliance- ComplianceSOS-
+                           Compliance De-emphasis: -6dB
+                  LnkSta2: Current De-emphasis Level: -6dB, EqualizationCom=
+plete-, EqualizationPhase1-
+                           EqualizationPhase2-, EqualizationPhase3-, LinkEq=
+ualizationRequest-
+          Capabilities: [100 v1] Advanced Error Reporting
+                  UESta:  DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt=
+- RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-
+                  UEMsk:  DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt=
+- RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-
+                  UESvrt: DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt=
+- RxOF+ MalfTLP+ ECRC- UnsupReq- ACSViol-
+                  CESta:  RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFat=
+alErr-
+                  CEMsk:  RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFat=
+alErr+
+                  AERCap: First Error Pointer: 00, GenCap- CGenEn- ChkCap- =
+ChkEn-
+          Capabilities: [140 v1] Virtual Channel
+                  Caps:   LPEVC=3D0 RefClk=3D100ns PATEntryBits=3D1
+                  Arb:    Fixed- WRR32- WRR64- WRR128-
+                  Ctrl:   ArbSelect=3DFixed
+                  Status: InProgress-
+                  VC0:    Caps:   PATOffset=3D00 MaxTimeSlots=3D1 RejSnoopT=
+rans-
+                          Arb:    Fixed- WRR32- WRR64- WRR128- TWRR128- WRR=
+256-
+                          Ctrl:   Enable+ ID=3D0 ArbSelect=3DFixed TC/VC=3D=
+01
+                          Status: NegoPending- InProgress-
+          Capabilities: [160 v1] Device Serial Number 00-00-00-00-00-00-00-=
+00
+          Kernel driver in use: ath10k_pci
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1471583/+subscriptions
