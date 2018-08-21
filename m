@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwlc-0004Am-Af
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwlc-0004Al-Ak
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 22:51:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwlb-0004ju-C9
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwlZ-0004jI-Ud
 	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 22:51:36 -0400
 From: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
-Date: Mon, 20 Aug 2018 22:51:03 -0400
-Message-Id: <20180821025104.19604-7-pavel.zbitskiy@gmail.com>
+Date: Mon, 20 Aug 2018 22:51:02 -0400
+Message-Id: <20180821025104.19604-6-pavel.zbitskiy@gmail.com>
 In-Reply-To: <20180821025104.19604-1-pavel.zbitskiy@gmail.com>
 References: <20180821025104.19604-1-pavel.zbitskiy@gmail.com>
-Subject: [Qemu-devel] [PATCH 6/7] target/s390x: fix PACK reading 1 byte less
- and writing 1 byte more
+Subject: [Qemu-devel] [PATCH 5/7] target/s390x: add EX support for TRT and
+ TRTR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,83 +23,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com, richard.henderson@linaro.org, Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-PACK fails on the test from the Principles of Operation: F1F2F3F4
-becomes 0000234C instead of 0001234C due to an off-by-one error.
-Furthermore, it overwrites one extra byte to the left of F1.
-
-If len_dest is 0, then we only want to flip the 1st byte and never loop
-over the rest. Therefore, the loop condition should be > and not >=.
-
-If len_src is 1, then we should flip the 1st byte and pack the 2nd.
-Since len_src is already decremented before the loop, the first
-condition should be >=, and not >.
-
-Likewise for len_src == 2 and the second condition.
+Improves "b213c9f5: target/s390x: Implement TRTR" by introducing the
+intermediate functions, which are compatible with dx_helper type.
 
 Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
 ---
- target/s390x/mem_helper.c       |  6 +++---
- tests/tcg/s390x/Makefile.target |  1 +
- tests/tcg/s390x/pack.c          | 21 +++++++++++++++++++++
- 3 files changed, 25 insertions(+), 3 deletions(-)
- create mode 100644 tests/tcg/s390x/pack.c
+ target/s390x/mem_helper.c       | 16 +++++++++++
+ tests/tcg/s390x/Makefile.target |  2 ++
+ tests/tcg/s390x/exrl-trt.c      | 48 +++++++++++++++++++++++++++++++++
+ tests/tcg/s390x/exrl-trtr.c     | 48 +++++++++++++++++++++++++++++++++
+ 4 files changed, 114 insertions(+)
+ create mode 100644 tests/tcg/s390x/exrl-trt.c
+ create mode 100644 tests/tcg/s390x/exrl-trtr.c
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 704d0193b5..bacae4f503 100644
+index c94dbf3fcb..704d0193b5 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -1019,15 +1019,15 @@ void HELPER(pack)(CPUS390XState *env, uint32_t len, uint64_t dest, uint64_t src)
-     len_src--;
+@@ -1299,12 +1299,26 @@ static inline uint32_t do_helper_trt(CPUS390XState *env, int len,
+     return 0;
+ }
  
-     /* now pack every value */
--    while (len_dest >= 0) {
-+    while (len_dest > 0) {
-         b = 0;
++static uint32_t do_helper_trt_fwd(CPUS390XState *env, uint32_t len,
++                                  uint64_t array, uint64_t trans,
++                                  uintptr_t ra)
++{
++    return do_helper_trt(env, len, array, trans, 1, ra);
++}
++
+ uint32_t HELPER(trt)(CPUS390XState *env, uint32_t len, uint64_t array,
+                      uint64_t trans)
+ {
+     return do_helper_trt(env, len, array, trans, 1, GETPC());
+ }
  
--        if (len_src > 0) {
-+        if (len_src >= 0) {
-             b = cpu_ldub_data_ra(env, src, ra) & 0x0f;
-             src--;
-             len_src--;
-         }
--        if (len_src > 0) {
-+        if (len_src >= 0) {
-             b |= cpu_ldub_data_ra(env, src, ra) << 4;
-             src--;
-             len_src--;
++static uint32_t do_helper_trt_bkwd(CPUS390XState *env, uint32_t len,
++                                   uint64_t array, uint64_t trans,
++                                   uintptr_t ra)
++{
++    return do_helper_trt(env, len, array, trans, -1, ra);
++}
++
+ uint32_t HELPER(trtr)(CPUS390XState *env, uint32_t len, uint64_t array,
+                       uint64_t trans)
+ {
+@@ -2193,12 +2207,14 @@ void HELPER(ex)(CPUS390XState *env, uint32_t ilen, uint64_t r1, uint64_t addr)
+         typedef uint32_t (*dx_helper)(CPUS390XState *, uint32_t, uint64_t,
+                                       uint64_t, uintptr_t);
+         static const dx_helper dx[16] = {
++            [0x0] = do_helper_trt_bkwd,
+             [0x2] = do_helper_mvc,
+             [0x4] = do_helper_nc,
+             [0x5] = do_helper_clc,
+             [0x6] = do_helper_oc,
+             [0x7] = do_helper_xc,
+             [0xc] = do_helper_tr,
++            [0xd] = do_helper_trt_fwd,
+         };
+         dx_helper helper = dx[opc & 0xf];
+ 
 diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.target
-index 7de4376f52..151dc075aa 100644
+index c800a582e5..7de4376f52 100644
 --- a/tests/tcg/s390x/Makefile.target
 +++ b/tests/tcg/s390x/Makefile.target
-@@ -5,3 +5,4 @@ TESTS+=csst
+@@ -3,3 +3,5 @@ CFLAGS+=-march=zEC12 -m64
+ TESTS+=hello-s390x
+ TESTS+=csst
  TESTS+=ipm
- TESTS+=exrl-trt
- TESTS+=exrl-trtr
-+TESTS+=pack
-diff --git a/tests/tcg/s390x/pack.c b/tests/tcg/s390x/pack.c
++TESTS+=exrl-trt
++TESTS+=exrl-trtr
+diff --git a/tests/tcg/s390x/exrl-trt.c b/tests/tcg/s390x/exrl-trt.c
 new file mode 100644
-index 0000000000..4be36f29a7
+index 0000000000..3c5323aecb
 --- /dev/null
-+++ b/tests/tcg/s390x/pack.c
-@@ -0,0 +1,21 @@
++++ b/tests/tcg/s390x/exrl-trt.c
+@@ -0,0 +1,48 @@
++#include <stdint.h>
 +#include <unistd.h>
 +
 +int main(void)
 +{
-+    char data[] = {0xaa, 0xaa, 0xf1, 0xf2, 0xf3, 0xc4, 0xaa, 0xaa};
-+    char exp[] = {0xaa, 0xaa, 0x00, 0x01, 0x23, 0x4c, 0xaa, 0xaa};
++    char op1[] = "hello";
++    char op2[256];
++    uint64_t r1 = 0xffffffffffffffffull;
++    uint64_t r2 = 0xffffffffffffffffull;
++    uint64_t cc;
 +    int i;
 +
-+    asm volatile(
-+        "    pack 2(4,%[data]),2(4,%[data])\n"
-+        :
-+        : [data] "r" (&data[0])
-+        : "memory");
-+    for (i = 0; i < 8; i++) {
-+        if (data[i] != exp[i]) {
-+            write(1, "bad data\n", 9);
-+            return 1;
++    for (i = 0; i < 256; i++) {
++        if (i == 0) {
++            op2[i] = 0xaa;
++        } else {
++            op2[i] = 0;
 +        }
++    }
++    asm volatile(
++        "    j 2f\n"
++        "1:  trt 0(1,%[op1]),0(%[op2])\n"
++        "2:  exrl %[op1_len],1b\n"
++        "    lgr %[r1],%%r1\n"
++        "    lgr %[r2],%%r2\n"
++        "    ipm %[cc]\n"
++        : [r1] "+r" (r1),
++          [r2] "+r" (r2),
++          [cc] "=r" (cc)
++        : [op1] "r" (&op1),
++          [op1_len] "r" (5),
++          [op2] "r" (&op2)
++        : "r1", "r2", "cc");
++    cc = (cc >> 28) & 3;
++    if (cc != 2) {
++        write(1, "bad cc\n", 7);
++        return 1;
++    }
++    if ((char *)r1 != &op1[5]) {
++        write(1, "bad r1\n", 7);
++        return 1;
++    }
++    if (r2 != 0xffffffffffffffaaull) {
++        write(1, "bad r2\n", 7);
++        return 1;
++    }
++    return 0;
++}
+diff --git a/tests/tcg/s390x/exrl-trtr.c b/tests/tcg/s390x/exrl-trtr.c
+new file mode 100644
+index 0000000000..c33153ad7e
+--- /dev/null
++++ b/tests/tcg/s390x/exrl-trtr.c
+@@ -0,0 +1,48 @@
++#include <stdint.h>
++#include <unistd.h>
++
++int main(void)
++{
++    char op1[] = {0, 1, 2, 3};
++    char op2[256];
++    uint64_t r1 = 0xffffffffffffffffull;
++    uint64_t r2 = 0xffffffffffffffffull;
++    uint64_t cc;
++    int i;
++
++    for (i = 0; i < 256; i++) {
++        if (i == 1) {
++            op2[i] = 0xbb;
++        } else {
++            op2[i] = 0;
++        }
++    }
++    asm volatile(
++        "    j 2f\n"
++        "1:  trtr 3(1,%[op1]),0(%[op2])\n"
++        "2:  exrl %[op1_len],1b\n"
++        "    lgr %[r1],%%r1\n"
++        "    lgr %[r2],%%r2\n"
++        "    ipm %[cc]\n"
++        : [r1] "+r" (r1),
++          [r2] "+r" (r2),
++          [cc] "=r" (cc)
++        : [op1] "r" (&op1),
++          [op1_len] "r" (3),
++          [op2] "r" (&op2)
++        : "r1", "r2", "cc");
++    cc = (cc >> 28) & 3;
++    if (cc != 1) {
++        write(1, "bad cc\n", 7);
++        return 1;
++    }
++    if ((char *)r1 != &op1[1]) {
++        write(1, "bad r1\n", 7);
++        return 1;
++    }
++    if (r2 != 0xffffffffffffffbbull) {
++        write(1, "bad r2\n", 7);
++        return 1;
 +    }
 +    return 0;
 +}
