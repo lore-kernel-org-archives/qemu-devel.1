@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tQ-00029r-ID
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:22 -0400
+	(envelope-from <simon@ruderich.org>) id 1fs5vL-0003r0-OC
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:38:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tK-0007Ra-7f
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:16 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34925 helo=mail.rt-rk.com)
+	(envelope-from <simon@ruderich.org>) id 1fs5vF-0000Ni-E0
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:38:15 -0400
+Received: from zucker2.schokokeks.org ([178.63.68.90]:57479)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs5tJ-0007M5-0v
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:09 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 14:35:34 +0200
-Message-Id: <1534854951-6321-30-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 29/46] target/mips: Add emulation of DSP ASE for
- nanoMIPS - part 1
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1fs5vF-0000IU-3R
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:38:09 -0400
+Date: Tue, 21 Aug 2018 14:38:02 +0200
+From: Simon Ruderich <simon@ruderich.org>
+Message-ID: <96fa6847da651ffcaf57405b5e8f020ce5c09d6f.1534854457.git.simon@ruderich.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <abbc398b-0ded-5531-aba5-bd95200c937c@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 5/6] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,591 +26,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, David Alan Gilbert <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+Adapted patch from Baojun Wang [1] with the following commit message:
 
-Add emulation of DSP ASE instructions for nanoMIPS - part 1.
+    I found this could be useful to have qemu-softmmu as a cross
+    debugger (launch with -s -S command line option), then if we can
+    have a command to load guest physical memory, we can use cross gdb
+    to do some target debug which gdb cannot do directly.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+This patch contains only the qmp changes of the original patch.
+
+pmemload is necessary to directly write physical memory which is not
+possible with gdb alone as it uses only logical addresses.
+
+The QAPI for pmemload uses "val" as parameter name for the physical
+address. This name is not very descriptive but is consistent with the
+existing pmemsave. Changing the parameter name of pmemsave is not
+possible without breaking the existing API.
+
+[1]: https://lists.gnu.org/archive/html/qemu-trivial/2014-04/msg00074.html
+
+Based-on-patch-by: Baojun Wang <wangbj@gmail.com>
+Signed-off-by: Simon Ruderich <simon@ruderich.org>
 ---
- target/mips/translate.c | 554 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 554 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e5e8001..78a9daf 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -18058,6 +18058,554 @@ static void gen_pool32f_nanomips_insn(DisasContext *ctx)
-     }
+Hello,
+
+I've adapted the patch to error out if a char/block device is
+used. I think that's the simplest fix for the issue mentioned by
+Eric Blake.
+
+Are the any other issues remaining? All other patches are
+unchanged, should I resend the whole series?
+
+Regards
+Simon
+
+Diff of this patch since v4:
+
+    diff --git a/cpus.c b/cpus.c
+    index d79bf8b485..1622f00846 100644
+    --- a/cpus.c
+    +++ b/cpus.c
+    @@ -2397,6 +2397,10 @@ void qmp_pmemload(int64_t addr, const char *filename,
+                error_setg_errno(errp, errno, "could not fstat fd to get size");
+                goto exit;
+            }
+    +        if (S_ISCHR(s.st_mode) || S_ISBLK(s.st_mode)) {
+    +            error_setg(errp, "pmemload doesn't support char/block devices");
+    +            goto exit;
+    +        }
+            size = s.st_size;
+        }
+
+ cpus.c         | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/misc.json | 20 ++++++++++++++++++
+ 2 files changed, 75 insertions(+)
+
+diff --git a/cpus.c b/cpus.c
+index 243f2c0d2e..1622f00846 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -2369,6 +2369,61 @@ exit:
+     qemu_close(fd);
  }
  
-+static void gen_pool32a5_nanomips_insn(DisasContext *ctx, int opc,
-+                                       int rd, int rs, int rt)
++void qmp_pmemload(int64_t addr, const char *filename,
++                  bool has_size, int64_t size,
++                  bool has_offset, int64_t offset,
++                  Error **errp)
 +{
-+    int ret = rd;
-+    TCGv t0 = tcg_temp_new();
-+    TCGv v1_t = tcg_temp_new();
-+    TCGv v2_t = tcg_temp_new();
++    int fd;
++    size_t l;
++    ssize_t r;
++    uint8_t buf[1024];
 +
-+    gen_load_gpr(v1_t, rs);
-+    gen_load_gpr(v2_t, rt);
-+
-+    switch (opc) {
-+    case NM_CMP_EQ_PH:
-+        check_dsp(ctx);
-+        gen_helper_cmp_eq_ph(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMP_LT_PH:
-+        check_dsp(ctx);
-+        gen_helper_cmp_lt_ph(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMP_LE_PH:
-+        check_dsp(ctx);
-+        gen_helper_cmp_le_ph(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMPU_EQ_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpu_eq_qb(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMPU_LT_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpu_lt_qb(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMPU_LE_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpu_le_qb(v1_t, v2_t, cpu_env);
-+        break;
-+    case NM_CMPGU_EQ_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpgu_eq_qb(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_CMPGU_LT_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpgu_lt_qb(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_CMPGU_LE_QB:
-+        check_dsp(ctx);
-+        gen_helper_cmpgu_le_qb(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_CMPGDU_EQ_QB:
-+        check_dspr2(ctx);
-+        gen_helper_cmpgu_eq_qb(v1_t, v1_t, v2_t);
-+        tcg_gen_deposit_tl(cpu_dspctrl, cpu_dspctrl, v1_t, 24, 4);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_CMPGDU_LT_QB:
-+        check_dspr2(ctx);
-+        gen_helper_cmpgu_lt_qb(v1_t, v1_t, v2_t);
-+        tcg_gen_deposit_tl(cpu_dspctrl, cpu_dspctrl, v1_t, 24, 4);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_CMPGDU_LE_QB:
-+        check_dspr2(ctx);
-+        gen_helper_cmpgu_le_qb(v1_t, v1_t, v2_t);
-+        tcg_gen_deposit_tl(cpu_dspctrl, cpu_dspctrl, v1_t, 24, 4);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PACKRL_PH:
-+        check_dsp(ctx);
-+        gen_helper_packrl_ph(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PICK_QB:
-+        check_dsp(ctx);
-+        gen_helper_pick_qb(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PICK_PH:
-+        check_dsp(ctx);
-+        gen_helper_pick_ph(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_ADDQ_S_W:
-+        check_dsp(ctx);
-+        gen_helper_addq_s_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SUBQ_S_W:
-+        check_dsp(ctx);
-+        gen_helper_subq_s_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_ADDSC:
-+        check_dsp(ctx);
-+        gen_helper_addsc(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_ADDWC:
-+        check_dsp(ctx);
-+        gen_helper_addwc(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_ADDQ_S_PH:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDQ_PH */
-+            gen_helper_addq_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDQ_S_PH */
-+            gen_helper_addq_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_ADDQH_R_PH:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDQH_PH */
-+            gen_helper_addqh_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDQH_R_PH */
-+            gen_helper_addqh_r_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_ADDQH_R_W:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDQH_W */
-+            gen_helper_addqh_w(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDQH_R_W */
-+            gen_helper_addqh_r_w(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_ADDU_S_QB:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDU_QB */
-+            gen_helper_addu_qb(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDU_S_QB */
-+            gen_helper_addu_s_qb(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_ADDU_S_PH:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDU_PH */
-+            gen_helper_addu_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDU_S_PH */
-+            gen_helper_addu_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_ADDUH_R_QB:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* ADDUH_QB */
-+            gen_helper_adduh_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* ADDUH_R_QB */
-+            gen_helper_adduh_r_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_SHRAV_R_PH:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SHRAV_PH */
-+            gen_helper_shra_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SHRAV_R_PH */
-+            gen_helper_shra_r_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_SHRAV_R_QB:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SHRAV_QB */
-+            gen_helper_shra_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SHRAV_R_QB */
-+            gen_helper_shra_r_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_SUBQ_S_PH:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBQ_PH */
-+            gen_helper_subq_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBQ_S_PH */
-+            gen_helper_subq_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_SUBQH_R_PH:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBQH_PH */
-+            gen_helper_subqh_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBQH_R_PH */
-+            gen_helper_subqh_r_ph(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_SUBQH_R_W:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBQH_W */
-+            gen_helper_subqh_w(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBQH_R_W */
-+            gen_helper_subqh_r_w(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_SUBU_S_QB:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBU_QB */
-+            gen_helper_subu_qb(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBU_S_QB */
-+            gen_helper_subu_s_qb(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_SUBU_S_PH:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBU_PH */
-+            gen_helper_subu_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBU_S_PH */
-+            gen_helper_subu_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_SUBUH_R_QB:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SUBUH_QB */
-+            gen_helper_subuh_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SUBUH_R_QB */
-+            gen_helper_subuh_r_qb(v1_t, v1_t, v2_t);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_SHLLV_S_PH:
-+        check_dsp(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SHLLV_PH */
-+            gen_helper_shll_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* SHLLV_S_PH */
-+            gen_helper_shll_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_PRECR_SRA_R_PH_W:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* PRECR_SRA_PH_W */
-+            {
-+                TCGv_i32 sa_t = tcg_const_i32(rd);
-+                gen_helper_precr_sra_ph_w(v1_t, sa_t, v1_t,
-+                                          cpu_gpr[rt]);
-+                gen_store_gpr(v1_t, rt);
-+                tcg_temp_free_i32(sa_t);
-+            }
-+            break;
-+        case 1:
-+            /* PRECR_SRA_R_PH_W */
-+            {
-+                TCGv_i32 sa_t = tcg_const_i32(rd);
-+                gen_helper_precr_sra_r_ph_w(v1_t, sa_t, v1_t,
-+                                            cpu_gpr[rt]);
-+                gen_store_gpr(v1_t, rt);
-+                tcg_temp_free_i32(sa_t);
-+            }
-+            break;
-+       }
-+        break;
-+    case NM_MULEU_S_PH_QBL:
-+        check_dsp(ctx);
-+        gen_helper_muleu_s_ph_qbl(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULEU_S_PH_QBR:
-+        check_dsp(ctx);
-+        gen_helper_muleu_s_ph_qbr(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULQ_RS_PH:
-+        check_dsp(ctx);
-+        gen_helper_mulq_rs_ph(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULQ_S_PH:
-+        check_dspr2(ctx);
-+        gen_helper_mulq_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULQ_RS_W:
-+        check_dspr2(ctx);
-+        gen_helper_mulq_rs_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULQ_S_W:
-+        check_dspr2(ctx);
-+        gen_helper_mulq_s_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_APPEND:
-+        check_dspr2(ctx);
-+        gen_load_gpr(t0, rs);
-+        if (rd != 0) {
-+            tcg_gen_deposit_tl(cpu_gpr[rt], t0, cpu_gpr[rt], rd, 32 - rd);
-+        }
-+        tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
-+        break;
-+    case NM_MODSUB:
-+        check_dsp(ctx);
-+        gen_helper_modsub(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHRAV_R_W:
-+        check_dsp(ctx);
-+        gen_helper_shra_r_w(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHRLV_PH:
-+        check_dspr2(ctx);
-+        gen_helper_shrl_ph(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHRLV_QB:
-+        check_dsp(ctx);
-+        gen_helper_shrl_qb(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHLLV_QB:
-+        check_dsp(ctx);
-+        gen_helper_shll_qb(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHLLV_S_W:
-+        check_dsp(ctx);
-+        gen_helper_shll_s_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHILO:
-+        check_dsp(ctx);
-+        {
-+            TCGv tv0 = tcg_temp_new();
-+            TCGv tv1 = tcg_temp_new();
-+            int16_t imm = extract32(ctx->opcode, 16, 7);
-+
-+            tcg_gen_movi_tl(tv0, rd >> 3);
-+            tcg_gen_movi_tl(tv1, imm);
-+            gen_helper_shilo(tv0, tv1, cpu_env);
-+        }
-+        break;
-+    case NM_MULEQ_S_W_PHL:
-+        check_dsp(ctx);
-+        gen_helper_muleq_s_w_phl(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MULEQ_S_W_PHR:
-+        check_dsp(ctx);
-+        gen_helper_muleq_s_w_phr(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_MUL_S_PH:
-+        check_dspr2(ctx);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* MUL_PH */
-+            gen_helper_mul_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        case 1:
-+            /* MUL_S_PH */
-+            gen_helper_mul_s_ph(v1_t, v1_t, v2_t, cpu_env);
-+            gen_store_gpr(v1_t, ret);
-+            break;
-+        }
-+        break;
-+    case NM_PRECR_QB_PH:
-+        check_dspr2(ctx);
-+        gen_helper_precr_qb_ph(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PRECRQ_QB_PH:
-+        check_dsp(ctx);
-+        gen_helper_precrq_qb_ph(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PRECRQ_PH_W:
-+        check_dsp(ctx);
-+        gen_helper_precrq_ph_w(v1_t, v1_t, v2_t);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PRECRQ_RS_PH_W:
-+        check_dsp(ctx);
-+        gen_helper_precrq_rs_ph_w(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_PRECRQU_S_QB_PH:
-+        check_dsp(ctx);
-+        gen_helper_precrqu_s_qb_ph(v1_t, v1_t, v2_t, cpu_env);
-+        gen_store_gpr(v1_t, ret);
-+        break;
-+    case NM_SHRA_R_W:
-+        check_dsp(ctx);
-+        tcg_gen_movi_tl(t0, rd);
-+        gen_helper_shra_r_w(v1_t, t0, v1_t);
-+        gen_store_gpr(v1_t, rt);
-+        break;
-+    case NM_SHRA_R_PH:
-+        check_dsp(ctx);
-+        tcg_gen_movi_tl(t0, rd >> 1);
-+        switch (extract32(ctx->opcode, 10, 1)) {
-+        case 0:
-+            /* SHRA_PH */
-+            gen_helper_shra_ph(v1_t, t0, v1_t);
-+            break;
-+            gen_store_gpr(v1_t, rt);
-+        case 1:
-+            /* SHRA_R_PH */
-+            gen_helper_shra_r_ph(v1_t, t0, v1_t);
-+            gen_store_gpr(v1_t, rt);
-+            break;
-+        }
-+        break;
-+    case NM_SHLL_S_PH:
-+        check_dsp(ctx);
-+        tcg_gen_movi_tl(t0, rd >> 1);
-+        switch (extract32(ctx->opcode, 10, 2)) {
-+        case 0:
-+            /* SHLL_PH */
-+            gen_helper_shll_ph(v1_t, t0, v1_t, cpu_env);
-+            gen_store_gpr(v1_t, rt);
-+            break;
-+        case 2:
-+            /* SHLL_S_PH */
-+            gen_helper_shll_s_ph(v1_t, t0, v1_t, cpu_env);
-+            gen_store_gpr(v1_t, rt);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_SHLL_S_W:
-+        check_dsp(ctx);
-+        tcg_gen_movi_tl(t0, rd);
-+        gen_helper_shll_s_w(v1_t, t0, v1_t, cpu_env);
-+        gen_store_gpr(v1_t, rt);
-+        break;
-+    case NM_REPL_PH:
-+        check_dsp(ctx);
-+        {
-+            int16_t imm;
-+            imm = sextract32(ctx->opcode, 11, 11);
-+            imm = (int16_t)(imm << 6) >> 6;
-+            if (rt != 0) {
-+                tcg_gen_movi_tl(cpu_gpr[rt], dup_const(MO_16, imm));
-+            }
-+        }
-+        break;
-+    default:
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
++    fd = qemu_open(filename, O_RDONLY | O_BINARY);
++    if (fd < 0) {
++        error_setg_file_open(errp, errno, filename);
++        return;
 +    }
++    if (has_offset && offset > 0) {
++        if (lseek(fd, offset, SEEK_SET) != offset) {
++            error_setg_errno(errp, errno,
++                             "could not seek to offset %" PRIx64, offset);
++            goto exit;
++        }
++    }
++    if (!has_size) {
++        struct stat s;
++        if (fstat(fd, &s)) {
++            error_setg_errno(errp, errno, "could not fstat fd to get size");
++            goto exit;
++        }
++        if (S_ISCHR(s.st_mode) || S_ISBLK(s.st_mode)) {
++            error_setg(errp, "pmemload doesn't support char/block devices");
++            goto exit;
++        }
++        size = s.st_size;
++    }
++
++    while (size != 0) {
++        l = sizeof(buf);
++        if (l > size) {
++            l = size;
++        }
++        r = read(fd, buf, l);
++        if (r <= 0) {
++            error_setg(errp, QERR_IO_ERROR);
++            goto exit;
++        }
++        l = r; /* in case of short read */
++        cpu_physical_memory_write(addr, buf, l);
++        addr += l;
++        size -= l;
++    }
++
++exit:
++    qemu_close(fd);
 +}
 +
- static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+ void qmp_inject_nmi(Error **errp)
  {
-     uint16_t insn;
-@@ -18129,6 +18677,12 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-         case NM_POOL32A0:
-             gen_pool32a0_nanomips_insn(env, ctx);
-             break;
-+        case NM_POOL32A5:
-+            {
-+                int32_t op1 = extract32(ctx->opcode, 3, 7);
-+                gen_pool32a5_nanomips_insn(ctx, op1, rd, rs, rt);
-+            }
-+            break;
-         case NM_POOL32A7:
-             switch (extract32(ctx->opcode, 3, 3)) {
-             case NM_P_LSX:
+     nmi_monitor_handle(monitor_get_cpu_index(), errp);
+diff --git a/qapi/misc.json b/qapi/misc.json
+index d450cfef21..06cf36f3d4 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -1181,6 +1181,26 @@
+ { 'command': 'pmemsave',
+   'data': {'val': 'int', 'size': 'int', 'filename': 'str'} }
+ 
++##
++# @pmemload:
++#
++# Load a portion of guest physical memory from a file.
++#
++# @val: the physical address of the guest to start from
++#
++# @filename: the file to load the memory from as binary data
++#
++# @size: the size of memory region to load (defaults to whole file)
++#
++# @offset: the offset in the file to start from (defaults to 0)
++#
++# Returns: Nothing on success
++#
++# Since: 3.1
++##
++{ 'command': 'pmemload',
++  'data': {'val': 'int', 'filename': 'str', '*size': 'int', '*offset': 'int'} }
++
+ ##
+ # @cont:
+ #
 -- 
-2.7.4
+2.17.1
+
+-- 
++ privacy is necessary
++ using gnupg http://gnupg.org
++ public key id: 0x92FEFDB7E44C32F9
