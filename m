@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fryMt-0004Bj-P0
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:13 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fryMo-0000Mg-WD
+	(envelope-from <dgibson@ozlabs.org>) id 1fryMp-00047S-7R
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:09 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1fryMl-0000Ic-0C
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:06 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 21 Aug 2018 14:33:30 +1000
-Message-Id: <20180821043343.7514-14-david@gibson.dropbear.id.au>
+Date: Tue, 21 Aug 2018 14:33:20 +1000
+Message-Id: <20180821043343.7514-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20180821043343.7514-1-david@gibson.dropbear.id.au>
 References: <20180821043343.7514-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 13/26] target/ppc: simplify bcdadd/sub functions
+Subject: [Qemu-devel] [PULL 03/26] target/ppc: Enable fp exceptions for
+ user-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,137 +21,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, lvivier@redhat.com, Yasmin Beatriz <yasmins@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, lvivier@redhat.com, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Yasmin Beatriz <yasmins@linux.ibm.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-After solving a corner case in bcdsub, this patch simplifies the logic
-of both bcdadd/sub instructions by removing some unnecessary local flags.
-This commit also rearranges some if-else conditions in bcdadd to make it
-easier to read.
+While just setting the MSR bits is sufficient, we can tidy
+the helper code by extracting the MSR test to a helper and
+then forcing it true for user-only.
 
-Signed-off-by: Yasmin Beatriz <yasmins@linux.ibm.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/int_helper.c | 49 +++++++++++++++--------------------------
- 1 file changed, 18 insertions(+), 31 deletions(-)
+ target/ppc/fpu_helper.c         | 15 ++++++++++++---
+ target/ppc/translate_init.inc.c |  2 ++
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index ac7f92d7ae..fcac90a4a9 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -2671,16 +2671,14 @@ static int bcd_cmp_mag(ppc_avr_t *a, ppc_avr_t *b)
-     return 0;
- }
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 8675d931b6..9b39c4b3e5 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -36,6 +36,15 @@ static inline float128 float128_snan_to_qnan(float128 x)
+ #define float32_snan_to_qnan(x) ((x) | 0x00400000)
+ #define float16_snan_to_qnan(x) ((x) | 0x0200)
  
--static int bcd_add_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
-+static void bcd_add_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
-                        int *overflow)
- {
-     int carry = 0;
-     int i;
--    int is_zero = 1;
-     for (i = 1; i <= 31; i++) {
-         uint8_t digit = bcd_get_digit(a, i, invalid) +
-                         bcd_get_digit(b, i, invalid) + carry;
--        is_zero &= (digit == 0);
-         if (digit > 9) {
-             carry = 1;
-             digit -= 10;
-@@ -2689,26 +2687,20 @@ static int bcd_add_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
-         }
- 
-         bcd_put_digit(t, digit, i);
--
--        if (unlikely(*invalid)) {
--            return -1;
--        }
-     }
- 
-     *overflow = carry;
--    return is_zero;
- }
- 
--static int bcd_sub_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
-+static void bcd_sub_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
-                        int *overflow)
- {
-     int carry = 0;
-     int i;
--    int is_zero = 1;
++static inline bool fp_exceptions_enabled(CPUPPCState *env)
++{
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
++    return (env->msr & ((1U << MSR_FE0) | (1U << MSR_FE1))) != 0;
++#endif
++}
 +
-     for (i = 1; i <= 31; i++) {
-         uint8_t digit = bcd_get_digit(a, i, invalid) -
-                         bcd_get_digit(b, i, invalid) + carry;
--        is_zero &= (digit == 0);
-         if (digit & 0x80) {
-             carry = -1;
-             digit += 10;
-@@ -2717,14 +2709,9 @@ static int bcd_sub_mag(ppc_avr_t *t, ppc_avr_t *a, ppc_avr_t *b, int *invalid,
+ /*****************************************************************************/
+ /* Floating point operations helpers */
+ uint64_t helper_float32_to_float64(CPUPPCState *env, uint32_t arg)
+@@ -207,7 +216,7 @@ uint64_t float_invalid_op_excp(CPUPPCState *env, int op, int set_fpcc)
+     if (ve != 0) {
+         /* Update the floating-point enabled exception summary */
+         env->fpscr |= 1 << FPSCR_FEX;
+-        if (msr_fe0 != 0 || msr_fe1 != 0) {
++        if (fp_exceptions_enabled(env)) {
+             /* GETPC() works here because this is inline */
+             raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
+                                    POWERPC_EXCP_FP | op, GETPC());
+@@ -225,7 +234,7 @@ static inline void float_zero_divide_excp(CPUPPCState *env, uintptr_t raddr)
+     if (fpscr_ze != 0) {
+         /* Update the floating-point enabled exception summary */
+         env->fpscr |= 1 << FPSCR_FEX;
+-        if (msr_fe0 != 0 || msr_fe1 != 0) {
++        if (fp_exceptions_enabled(env)) {
+             raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
+                                    POWERPC_EXCP_FP | POWERPC_EXCP_FP_ZX,
+                                    raddr);
+@@ -555,7 +564,7 @@ static void do_float_check_status(CPUPPCState *env, uintptr_t raddr)
+     if (cs->exception_index == POWERPC_EXCP_PROGRAM &&
+         (env->error_code & POWERPC_EXCP_FP)) {
+         /* Differred floating-point exception after target FPR update */
+-        if (msr_fe0 != 0 || msr_fe1 != 0) {
++        if (fp_exceptions_enabled(env)) {
+             raise_exception_err_ra(env, cs->exception_index,
+                                    env->error_code, raddr);
          }
- 
-         bcd_put_digit(t, digit, i);
--
--        if (unlikely(*invalid)) {
--            return -1;
--        }
-     }
- 
-     *overflow = carry;
--    return is_zero;
- }
- 
- uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-@@ -2734,26 +2721,28 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-     int sgnb = bcd_get_sgn(b);
-     int invalid = (sgna == 0) || (sgnb == 0);
-     int overflow = 0;
--    int zero = 0;
-     uint32_t cr = 0;
-     ppc_avr_t result = { .u64 = { 0, 0 } };
- 
-     if (!invalid) {
-         if (sgna == sgnb) {
-             result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgna, ps);
--            zero = bcd_add_mag(&result, a, b, &invalid, &overflow);
--            cr = (sgna > 0) ? CRF_GT : CRF_LT;
--        } else if (bcd_cmp_mag(a, b) > 0) {
--            result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgna, ps);
--            zero = bcd_sub_mag(&result, a, b, &invalid, &overflow);
--            cr = (sgna > 0) ? CRF_GT : CRF_LT;
--        } else if (bcd_cmp_mag(a, b) == 0) {
--            result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(0, ps);
--            zero = bcd_sub_mag(&result, b, a, &invalid, &overflow);
-+            bcd_add_mag(&result, a, b, &invalid, &overflow);
-+            cr = bcd_cmp_zero(&result);
-         } else {
--            result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgnb, ps);
--            zero = bcd_sub_mag(&result, b, a, &invalid, &overflow);
--            cr = (sgnb > 0) ? CRF_GT : CRF_LT;
-+            int magnitude = bcd_cmp_mag(a, b);
-+            if (magnitude > 0) {
-+                result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgna, ps);
-+                bcd_sub_mag(&result, a, b, &invalid, &overflow);
-+                cr = (sgna > 0) ? CRF_GT : CRF_LT;
-+            } else if (magnitude < 0) {
-+                result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgnb, ps);
-+                bcd_sub_mag(&result, b, a, &invalid, &overflow);
-+                cr = (sgnb > 0) ? CRF_GT : CRF_LT;
-+            } else {
-+                result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(0, ps);
-+                cr = CRF_EQ;
-+            }
-         }
-     }
- 
-@@ -2762,8 +2751,6 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-         cr = CRF_SO;
-     } else if (overflow) {
-         cr |= CRF_SO;
--    } else if (zero) {
--        cr = CRF_EQ;
-     }
- 
-     *r = result;
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 7813b1b004..fe0cb98e6d 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -10278,6 +10278,8 @@ static void ppc_cpu_reset(CPUState *s)
+ #endif
+ #if defined(CONFIG_USER_ONLY)
+     msr |= (target_ulong)1 << MSR_FP; /* Allow floating point usage */
++    msr |= (target_ulong)1 << MSR_FE0; /* Allow floating point exceptions */
++    msr |= (target_ulong)1 << MSR_FE1;
+     msr |= (target_ulong)1 << MSR_VR; /* Allow altivec usage */
+     msr |= (target_ulong)1 << MSR_VSX; /* Allow VSX usage */
+     msr |= (target_ulong)1 << MSR_SPE; /* Allow SPE usage */
 -- 
 2.17.1
