@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fs310-0001Jc-5c
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:31:55 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fs386-0008TM-PJ
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:39:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fs2od-0007ZT-M1
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:19:10 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:41044)
+	(envelope-from <pbonzini@redhat.com>) id 1fs381-0002Of-Lt
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:39:14 -0400
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:39119)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fs2ob-0007Xt-Al
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:19:06 -0400
-Received: by mail-wr1-x429.google.com with SMTP id z96-v6so6565067wrb.8
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 02:19:05 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fs381-0002NR-CM
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:39:09 -0400
+Received: by mail-wm0-f65.google.com with SMTP id q8-v6so2224219wmq.4
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 02:39:08 -0700 (PDT)
+References: <20180818025653.21192-1-f4bug@amsat.org>
+	<66dfe354-9c2c-8642-a905-03155555fe99@redhat.com>
+	<a812530c-ad1b-f5ff-6e15-82227cb76c79@redhat.com>
+	<2fd04596-a8a0-889f-239d-92853c12c6aa@redhat.com>
+	<2d91d7e2-938d-dbbe-5a11-edf48d4e0fc8@redhat.com>
+	<eca82595-47c6-a195-8224-6a9f6619decd@redhat.com>
+	<e7a5018b-a480-4a5d-d305-cd69a007a452@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d941c0c3-1ac6-442d-3b43-370ec1d9b00c@redhat.com>
+Date: Tue, 21 Aug 2018 11:39:04 +0200
 MIME-Version: 1.0
-References: <62da53b4.26c.16540558d49.Coremail.tangfu@gohighsec.com>
-	<CAJ+F1C+zhQkaQgHgKf_oa8nfw_PTY1wgS7tHZG7cuUObzVk9jA@mail.gmail.com>
-	<6d7ecaf.2be.1655124b512.Coremail.tangfu@gohighsec.com>
-In-Reply-To: <6d7ecaf.2be.1655124b512.Coremail.tangfu@gohighsec.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 21 Aug 2018 11:18:52 +0200
-Message-ID: <CAJ+F1CLdX5v+vHwQ8gj1SfsHCQdLFqiXU2mPzgGm+X1uapT6rQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] vTPM 2.0 is recognized as vTPM 1.2 on the Win 10
- virtual machine
+In-Reply-To: <e7a5018b-a480-4a5d-d305-cd69a007a452@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] migration: Replace strncpy() by g_strlcpy()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,132 +35,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tangfu@gohighsec.com
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-Hi
-On Sun, Aug 19, 2018 at 9:47 AM =E6=B1=A4=E7=A6=8F <tangfu@gohighsec.com> w=
-rote:
->
-> I tried it according to your method, but I have some problems. My host is=
- centos 7.2 with the TPM 2.0 hardware and qemu v2.10.2. The driver for the =
-TPM 2.0 hardware is crb device=EF=BC=8CExecute lsmod to view the tpm 2.0 dr=
-iver information as follows=EF=BC=9A
-> [root@localhost BUILD]# lsmod | grep tpm
-> tpm_crb                12972  0
->
-> I downloaded the OVMF-20182028-5.noarch.src.rpm package from the rpm sear=
-ch website. And rebulid it with -DTPM2_ENABLE and -DSECURE_BOOT_ENABLE, Reb=
-ulid everything well and generate the OVMF.fd and OVMF_ARGS.fd file=EF=BC=
-=8Cso I copy OVMF.fd to my qemu-kvm project and start qemu to install windo=
-ws 10 virtual machine.
->
-> I first created a blank img file named win10.img=EF=BC=8Cand install win1=
-0  virtual machine as follows=EF=BC=9A
-> [root@localhost BUILD]#qemu-system-x86_64 -display sdl -enable-kvm  -m 40=
-96 -boot d  -cdrom win10.iso -bios OVMF.fd  -net none  -boot menu=3Don -tpm=
-dev cuse-tpm,id=3Dtpm0,cancel-path=3D/dev/null,type=3Dpassthrough,path=3D/d=
-ev/tpm0  -device tpm-tis,tpmdev=3Dtpm0 win10.img
+On 21/08/2018 08:03, Thomas Huth wrote:
+>>> gcc is not necessarily wrong, as it CAN catch real erroneous uses of 
+>>> strncpy().  It's just that 99% of the time, strncpy() is the WRONG 
+>>> function to use, and so the remaining few cases where it actually does 
+>>> what you want are so rare that you have to consult the manual anyways. 
+>>> If nothing else, the gcc warning is making people avoid strncpy() even 
+>>> where it is safe (which is not a bad thing, in my opinion, because the 
+>>> contract of strncpy() is so counter-intuitive).
+>>>
+>> I am wondering if we should simply add a helper for these special cases
+>> that zeroes the buffer and uses g_strlcpy(), instead of
+>> ignoring/disabling the warning.
+> Yes, a helper function with a proper comment about its purpose is likely
+> the best way to go.
 
-cuse-tpm doesn't exist in qemu upstream. You are using TPM passthrough
-here, not vTPM.
+But why use g_strlcpy in the function (which has an off-by-one effect)?
 
-I suggest you try with qemu upstream and read the TPM document
-(replacing seabios with ovmf like you did, and tis with crb etc), in
-complement with
-https://github.com/stefanberger/swtpm/wiki/Certificiates-created-by-swtpm_s=
-etup
-:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dblob_plain;f=3Ddocs/specs/tpm.txt
+Maybe it could be a qemu_strncpy that is the same as strncpy but returns
+-ERANGE if the source is longer than the buffer that is passed in (but
+not if it fits perfectly without a terminating NUL):
 
->
-> The installation process is very very slow, the system automatically rest=
-arts after the installation is complete. But it seems can't enter the deskt=
-op. The system restarts cyclically, it looks like there is a problem with B=
-IOS boot. I think of what you said that  for Windows TPM 2 support will nee=
-d the TPM CRB device, so I start qemu with parameter of -device tpm-crb but=
- it didn't work. Prompt the following error message=EF=BC=9A
-> [root@localhost BUILD]#qemu-system-x86_64 -display sdl -enable-kvm  -m 40=
-96 -boot d  -bios OVMF.fd  -net none  -boot menu=3Don -tpmdev cuse-tpm,id=
-=3Dtpm0,cancel-path=3D/dev/null,type=3Dpassthrough,path=3D/dev/tpm0  -devic=
-e tpm-crb,tpmdev=3Dtpm0 win10.img
-> [root@localhost BUILD]#qemu-system-x86_64: -device tpm-crb,tpmdev=3Dtpm0:=
- 'tpm-crb' is not a valid device model name
->
-> I don't know where the problem is, I need you to give me some help. Thank=
- you very much!
->
->
-> > -----=E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6-----
-> > =E5=8F=91=E4=BB=B6=E4=BA=BA: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau=
-@gmail.com>
-> > =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4: 2018-08-16 16:56:52 (=E6=98=9F=E6=
-=9C=9F=E5=9B=9B)
-> > =E6=94=B6=E4=BB=B6=E4=BA=BA: tangfu@gohighsec.com
-> > =E6=8A=84=E9=80=81: QEMU <qemu-devel@nongnu.org>
-> > =E4=B8=BB=E9=A2=98: Re: [Qemu-devel] vTPM 2.0 is recognized as vTPM 1.2=
- on the Win 10 virtual machine
-> >
-> > Hi
-> > On Thu, Aug 16, 2018 at 3:29 AM =E6=B1=A4=E7=A6=8F <tangfu@gohighsec.co=
-m> wrote:
-> > >
-> > > Hi,
-> > >
-> > > I want to use the vTPM in a qemu Windows image. Unfortunately, it did=
-n't work.
-> > > First, the equipment:
-> > > TPM 2.0 hardware
-> > > CentOS 7.2
-> > > Qemu v2.10.2
-> > > SeaBIOS 1.11.0
-> > > libtpm and so on
-> > >
-> > > My host is centos 7.2 with the TPM 2.0 hardware and qemu v2.10.2.
-> > > I make the libtpm and seabios with ./configure, make and so on. I che=
-cked seabios with make menuconfig the TPM setting. It is enabled tpm by def=
-ault.
-> > > Eventually, all works without errors.
-> > >
-> > > I start the Widnows 10 image with:
-> > > qemu-system-x86_64 -display sdl -enable-kvm -m 2048 -boot d -bios bio=
-s.bin -boot menu=3Don -tpmdev cuse-tpm,id=3Dtpm0,cancel-path=3D/dev/null,ty=
-pe=3Dpassthrough,path=3D/dev/tpm0  -device tpm-tis,tpmdev=3Dtpm0 win10.img
-> > >
-> > >
-> > > First it looks all fine. Windows 10 booted up but the vTPM was recogn=
-ized as TPM 1.2 instead of TPM 2.0 in device manager. I open the tpm Manage=
-r with tpm.msc but get error with No compatible TPM found.
-> > > If I use vTPM in a qemu linux image, everything gose well. I think of=
- what you said
-> > >
-> > >
-> > > So, what could be the problem?
-> >
-> > You need to build libtpms & swtpm from Stefan tpm2-preview branches.
-> > (Alternatively, there is now an experimental fedora copr repository:
-> > https://copr.fedorainfracloud.org/coprs/stefanberger/swtpm/)
-> >
-> > I suggest to setup the VM with libvirt upstream, which will do the
-> > preliminary swtpm_setup for you, or follow
-> > https://github.com/stefanberger/swtpm/wiki/Certificiates-created-by-swt=
-pm_setup
-> >
-> > For Windows TPM 2 support, you will need the TPM CRB device, and
-> > upstream OVMF compiled with  -D TPM2_ENABLE (TIS & Bios are 1.2 only
-> > for Windows, even if seabios does have some 2.0 support with them)
-> >
-> > Furthermore, to pass the WLK tests, you need PPI & MOR interface,
-> > which are still pending merge ([PATCH v9 0/6] Add support for TPM
-> > Physical Presence interface)
-> >
-> >
-> >
-> >
-> > --
-> > Marc-Andr=C3=A9 Lureau
+    int qemu_strncpy(const char *d, const char *s, int dsize)
+    {
+        while (*s && dsize) {
+            *d++ = *s++;
+            dsize--;
+        }
+        /* It's okay if D is just past the end of the buffer,
+         * and S is sitting on the terminating NUL.
+         */
+        if (*s) {
+            return -ERANGE;
+        }
+        while (dsize) {
+            *d++ = 0;
+        }
+        return 0;
+    }
 
+Then we have the problem of yet another incomplete transition, but at
+least we could convert those that GCC complains about.
 
-
---
-Marc-Andr=C3=A9 Lureau
+Paolo
