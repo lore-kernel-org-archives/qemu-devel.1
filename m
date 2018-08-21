@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tI-00023S-I7
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:12 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tK-00023l-BM
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tE-0007Gy-A0
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:07 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34767 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tI-0007Mm-7T
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:09 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:34902 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs5t9-0007CY-RV
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:02 -0400
+	id 1fs5tH-0007KI-95
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:07 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 14:35:05 +0200
-Message-Id: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 00/46] MIPS queue August 21, 2018
+Date: Tue, 21 Aug 2018 14:35:29 +0200
+Message-Id: <1534854951-6321-25-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL 24/46] target/mips: Add CP0 Config3 and Config5
+ fields to DisasContext structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,119 +28,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Dimitrije Nikolic <dnikolic@wavecomp.com>
 
-The following changes since commit 55f4e79d794d94b2ab22b0dc99c6b05abc628656:
+Add CP0_Config3 and CP0_Config5 to DisasContext structure. This is
+needed for implementing availability control of various instructions.
 
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2018-08-21 10:23:53 +0100)
+Signed-off-by: "Aleksandar Markovic <amarkovic@wavecomp.com>"
+---
+ target/mips/translate.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-are available in the git repository at:
-
-  https://github.com/AMarkovic/qemu mips-queue-21-aug-2018
-
-for you to fetch changes up to af8e0e05596a8f7638bb13d5cba933912b14b0b4:
-
-  target/mips: Add definition of nanoMIPS I7200 CPU (2018-08-21 13:36:37 +0200)
-
-----------------------------------------------------------------
-MIPS queue August 21, 2018
-
-This pull request contains support for core functionality and
-system mode for nanoMIPS platform.
-
-----------------------------------------------------------------
-
-Aleksandar Markovic (5):
-  target/mips: Add preprocessor constants for nanoMIPS
-  target/mips: Add placeholder and invocation of decode_nanomips_opc()
-  target/mips: Add nanoMIPS decoding and extraction utilities
-  elf: Relax MIPS' elf_check_arch() to accept EM_NANOMIPS too
-  elf: Don't check FCR31_NAN2008 bit for nanoMIPS
-
-Aleksandar Rikalo (4):
-  target/mips: Implement emulation of nanoMIPS LLWP/SCWP pair
-  target/mips: Fix pre-nanoMIPS MT ASE instructions availability control
-  elf: Add EM_NANOMIPS value as a valid one for e_machine field
-  elf: On elf loading, treat both EM_MIPS and EM_NANOMIPS as legal for
-    MIPS
-
-Dimitrije Nikolic (2):
-  target/mips: Add CP0 Config3 and Config5 fields to DisasContext
-    structure
-  target/mips: Add availability control via bit NMS
-
-James Hogan (1):
-  target/mips: Implement emulation of nanoMIPS EXTW instruction
-
-Matthew Fortune (3):
-  target/mips: Implement emulation of nanoMIPS ROTX instruction
-  disas: Add support for nanoMIPS platform
-  mips_malta: Add basic nanoMIPS boot code for Malta board
-
-Paul Burton (1):
-  mips_malta: Add setting up GT64120 BARs to the nanoMIPS bootloader
-
-Stefan Markovic (15):
-  target/mips: Add nanoMIPS DSP ASE opcodes
-  target/mips: Prevent switching mode related to Config3 ISA bit for
-    nanoMIPS
-  target/mips: Add emulation of nanoMIPS 16-bit branch instructions
-  target/mips: Add emulation of nanoMIPS 16-bit save and restore
-    instructions
-  target/mips: Add emulation of nanoMIPS 32-bit branch instructions
-  target/mips: Implement MT ASE support for nanoMIPS
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 1
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 2
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 3
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 4
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 5
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 6
-  target/mips: Add updating BadInstr and BadInstrX for nanoMIPS
-  mips_malta: Fix semihosting argument passing for nanoMIPS bare metal
-  target/mips: Add definition of nanoMIPS I7200 CPU
-
-Yongbok Kim (15):
-  target/mips: Add nanoMIPS base instruction set opcodes
-  target/mips: Add emulation of nanoMIPS 16-bit arithmetic instructions
-  target/mips: Add emulation of nanoMIPS 16-bit shift instructions
-  target/mips: Add emulation of nanoMIPS 16-bit misc instructions
-  target/mips: Add emulation of nanoMIPS 16-bit load and store
-    instructions
-  target/mips: Add emulation of nanoMIPS 16-bit logic instructions
-  target/mips: Add emulation of some common nanoMIPS 32-bit instructions
-  target/mips: Add emulation of nanoMIPS instructions MOVE.P and
-    MOVE.PREV
-  target/mips: Add emulation of nanoMIPS 48-bit instructions
-  target/mips: Add emulation of nanoMIPS FP instructions
-  target/mips: Add emulation of misc nanoMIPS instructions (pool32a0)
-  target/mips: Add emulation of misc nanoMIPS instructions (pool32axf)
-  target/mips: Add emulation of misc nanoMIPS instructions (p_lsx)
-  target/mips: Add emulation of nanoMIPS 32-bit load and store
-    instructions
-  target/mips: Fix ERET/ERETNC behavior related to ADEL exception
-
- MAINTAINERS                      |     2 +
- disas/Makefile.objs              |     1 +
- disas/mips.c                     |    90 +-
- disas/nanomips.cpp               | 15812 +++++++++++++++++++++++++++++++++++++
- disas/nanomips.h                 |  1100 +++
- hw/mips/mips_malta.c             |   212 +-
- include/disas/bfd.h              |     1 +
- include/elf.h                    |     2 +
- include/hw/elf_ops.h             |     8 +
- linux-user/elfload.c             |     2 +
- linux-user/mips/cpu_loop.c       |    28 +-
- target/mips/cpu.c                |    11 +-
- target/mips/cpu.h                |     2 +
- target/mips/helper.c             |    16 +
- target/mips/helper.h             |     2 +
- target/mips/mips-defs.h          |     4 +
- target/mips/op_helper.c          |    98 +-
- target/mips/translate.c          |  4983 +++++++++++-
- target/mips/translate_init.inc.c |    39 +
- 19 files changed, 22330 insertions(+), 83 deletions(-)
- create mode 100644 disas/nanomips.cpp
- create mode 100644 disas/nanomips.h
-
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index a06b5b1..dc1760b 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -1449,6 +1449,8 @@ typedef struct DisasContext {
+     uint32_t opcode;
+     int insn_flags;
+     int32_t CP0_Config1;
++    int32_t CP0_Config3;
++    int32_t CP0_Config5;
+     /* Routine used to access memory */
+     int mem_idx;
+     TCGMemOp default_tcg_memop_mask;
+@@ -23305,6 +23307,8 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->saved_pc = -1;
+     ctx->insn_flags = env->insn_flags;
+     ctx->CP0_Config1 = env->CP0_Config1;
++    ctx->CP0_Config3 = env->CP0_Config3;
++    ctx->CP0_Config5 = env->CP0_Config5;
+     ctx->btarget = 0;
+     ctx->kscrexist = (env->CP0_Config4 >> CP0C4_KScrExist) & 0xff;
+     ctx->rxi = (env->CP0_Config3 >> CP0C3_RXI) & 1;
 -- 
 2.7.4
