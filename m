@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1frzOL-0005Tq-DT
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:39:46 -0400
+	(envelope-from <sw@weilnetz.de>) id 1frzOo-0005HI-Th
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:40:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1frzOF-0000fk-IX
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:39:45 -0400
-Date: Tue, 21 Aug 2018 07:39:32 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180821053932.atekhme4w7waw2oh@sirius.home.kraxel.org>
-References: <20180807221830.3844-1-peter@lekensteyn.nl>
+	(envelope-from <sw@weilnetz.de>) id 1frzEf-0001QV-Jy
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:29:49 -0400
+References: <CABLmASE2HTZPBVFM=grds+9RmPyh2naJ2KwNjb81LD0+E+yrtA@mail.gmail.com>
+	<c350ae62-2712-79cc-e7e6-b88ae3fbc044@weilnetz.de>
+	<008c57ea-0050-b5f0-4d68-db660cba269e@weilnetz.de>
+	<f4367121-e7fd-505b-7627-5ebee146dc5b@weilnetz.de>
+	<CABLmASEoBy3xzx4VY+HDJ0RY57axngP1rnXc2JqQcg0DfaC+RQ@mail.gmail.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <d12dcaea-73d9-48af-db3b-fe29b8740242@weilnetz.de>
+Date: Tue, 21 Aug 2018 07:29:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180807221830.3844-1-peter@lekensteyn.nl>
-Subject: Re: [Qemu-devel] [PATCH] vnc: fix memleak of the
- "vnc-worker-output" name
+In-Reply-To: <CABLmASEoBy3xzx4VY+HDJ0RY57axngP1rnXc2JqQcg0DfaC+RQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Bugs when cross-compiling qemu for Windows with
+ mingw 8.1, executable doesn't run
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +28,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Wu <peter@lekensteyn.nl>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Ben Pye <ben@curlybracket.co.uk>
 
-On Wed, Aug 08, 2018 at 12:18:30AM +0200, Peter Wu wrote:
-> Fixes repeated memory leaks of 18 bytes when using VNC:
+Am 20.08.2018 um 22:39 schrieb Howard Spoelstra:
+> Confirmed, adding --disable-stack-protector to configure results in a
+> working binary.
 > 
->     Direct leak of 831024 byte(s) in 46168 object(s) allocated from:
->         ...
->         #4 0x7f6d2f919bdd in g_strdup_vprintf glib/gstrfuncs.c:514
->         #5 0x56085cdcf660 in buffer_init util/buffer.c:59
->         #6 0x56085ca6a7ec in vnc_async_encoding_start ui/vnc-jobs.c:177
->         #7 0x56085ca6b815 in vnc_worker_thread_loop ui/vnc-jobs.c:240
-> 
-> Fixes: 543b95801f98 ("vnc: attach names to buffers")
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> CC: qemu-stable@nongnu.org
-> Signed-off-by: Peter Wu <peter@lekensteyn.nl>
+> Great, thanks,
+> Howard
 
-Added to ui queue.
+There is already a bug report for gcc:
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=86832
 
-thanks,
-  Gerd
+It looks like not only Windows but also MacOS is affected.
+
+Cheers
+Stefan
