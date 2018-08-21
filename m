@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6Np-00016O-5N
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:45 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6No-00015M-6O
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6Nl-0008MX-MR
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6Nj-0008Iu-VM
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:40 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:35439 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:35346 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs6Nl-0008K7-B6
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:37 -0400
+	id 1fs6Nj-0008I7-MB
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:35 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 15:06:52 +0200
-Message-Id: <1534856848-12102-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 15:06:43 +0200
+Message-Id: <1534856848-12102-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534856848-12102-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534856848-12102-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 10/46] target/mips: Add emulation of nanoMIPS
- 16-bit misc instructions
+Subject: [Qemu-devel] [PULL v2 01/46] target/mips: Add preprocessor
+ constants for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +28,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add emulation of misc nanoMIPS 16-bit instructions.
+Add ISA_NANOMIPS32 and CPU_NANOMIPS32 preprocessor constants.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ target/mips/mips-defs.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e3fac1a..c774dc9 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -16763,6 +16763,40 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-     op = extract32(ctx->opcode, 10, 6);
-     switch (op) {
-     case NM_P16_MV:
-+        rt = NANOMIPS_EXTRACT_RD5(ctx->opcode);
-+        if (rt != 0) {
-+            /* MOVE */
-+            rs = NANOMIPS_EXTRACT_RS5(ctx->opcode);
-+            gen_arith(ctx, OPC_ADDU, rt, rs, 0);
-+        } else {
-+            /* P16.RI */
-+            switch (extract32(ctx->opcode, 3, 2)) {
-+            case NM_P16_SYSCALL:
-+                if (extract32(ctx->opcode, 2, 1) == 0) {
-+                    generate_exception_end(ctx, EXCP_SYSCALL);
-+                } else {
-+                    generate_exception_end(ctx, EXCP_RI);
-+                }
-+                break;
-+            case NM_BREAK16:
-+                generate_exception_end(ctx, EXCP_BREAK);
-+                break;
-+            case NM_SDBBP16:
-+                if (is_uhi(extract32(ctx->opcode, 0, 3))) {
-+                    gen_helper_do_semihosting(cpu_env);
-+                } else {
-+                    if (ctx->hflags & MIPS_HFLAG_SBRI) {
-+                        generate_exception_end(ctx, EXCP_RI);
-+                    } else {
-+                        generate_exception_end(ctx, EXCP_DBp);
-+                    }
-+                }
-+                break;
-+            default:
-+                generate_exception_end(ctx, EXCP_RI);
-+                break;
-+            }
-+        }
-         break;
-     case NM_P16_SHIFT:
-         {
-@@ -16842,6 +16876,13 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case NM_LI16:
-+        {
-+            int imm = extract32(ctx->opcode, 0, 7);
-+            imm = (imm == 0x7f ? -1 : imm);
-+            if (rt != 0) {
-+                tcg_gen_movi_tl(cpu_gpr[rt], imm);
-+            }
-+        }
-         break;
-     case NM_ANDI16:
-         break;
+diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+index d239069..c8e9979 100644
+--- a/target/mips/mips-defs.h
++++ b/target/mips/mips-defs.h
+@@ -39,6 +39,7 @@
+ #define   ISA_MIPS64R5  0x00001000
+ #define   ISA_MIPS32R6  0x00002000
+ #define   ISA_MIPS64R6  0x00004000
++#define   ISA_NANOMIPS32  0x00008000
+ 
+ /* MIPS ASEs. */
+ #define   ASE_MIPS16    0x00010000
+@@ -87,6 +88,9 @@
+ #define CPU_MIPS32R6 (CPU_MIPS32R5 | ISA_MIPS32R6)
+ #define CPU_MIPS64R6 (CPU_MIPS64R5 | CPU_MIPS32R6 | ISA_MIPS64R6)
+ 
++/* Wave Computing: "nanoMIPS" */
++#define CPU_NANOMIPS32 (CPU_MIPS32R6 | ISA_NANOMIPS32)
++
+ /* Strictly follow the architecture standard:
+    - Disallow "special" instruction handling for PMON/SPIM.
+    Note that we still maintain Count/Compare to match the host clock. */
 -- 
 2.7.4
