@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fs30p-0001LU-T6
+	(envelope-from <s.priebe@profihost.ag>) id 1fs30r-0001ID-Sx
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:31:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fs2vM-00078k-V9
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:26:06 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:53372)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fs2vM-00077w-Md
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:26:04 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id s9-v6so2227427wmh.3
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 02:26:04 -0700 (PDT)
+	(envelope-from <s.priebe@profihost.ag>) id 1fs2r2-0001sB-5C
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:21:39 -0400
+Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:53603)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <s.priebe@profihost.ag>)
+	id 1fs2r1-0001lC-QA
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:21:36 -0400
+References: <56f721bc-6e1d-05de-2f6b-c410f4dee711@profihost.ag>
+	<20180817094123.GD11124@redhat.com>
+From: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Message-ID: <cf2cd8b5-ea43-e688-db2f-83d2db39e8de@profihost.ag>
+Date: Tue, 21 Aug 2018 11:21:30 +0200
 MIME-Version: 1.0
-References: <20180811205924.4113-1-zhangckid@gmail.com>
-	<20180811205924.4113-17-zhangckid@gmail.com>
-	<2bd91af8-f11f-ff55-8a02-9bee3361d7ff@redhat.com>
-In-Reply-To: <2bd91af8-f11f-ff55-8a02-9bee3361d7ff@redhat.com>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Tue, 21 Aug 2018 17:25:51 +0800
-Message-ID: <CAK3tnvJtAS75zw8-6fgNv+RTqGuizRm8Mb0zAhGqE_njwy1Dpw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V11 16/20] filter: Add handle_event method
- for NetFilterClass
+In-Reply-To: <20180817094123.GD11124@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Qemu and Spectre_V4 + l1tf + IBRS_FW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,178 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com
-
-On Tue, Aug 21, 2018 at 11:30 AM Jason Wang <jasowang@redhat.com> wrote:
-
->
->
-> On 2018=E5=B9=B408=E6=9C=8812=E6=97=A5 04:59, Zhang Chen wrote:
-> > Filter needs to process the event of checkpoint/failover or
-> > other event passed by COLO frame.
-> >
-> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > ---
-> >   include/net/filter.h |  5 +++++
-> >   net/filter.c         | 17 +++++++++++++++++
-> >   net/net.c            | 28 ++++++++++++++++++++++++++++
-> >   3 files changed, 50 insertions(+)
-> >
-> > diff --git a/include/net/filter.h b/include/net/filter.h
-> > index 435acd6f82..49da666ac0 100644
-> > --- a/include/net/filter.h
-> > +++ b/include/net/filter.h
-> > @@ -38,6 +38,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *nc=
-,
-> >
-> >   typedef void (FilterStatusChanged) (NetFilterState *nf, Error **errp)=
-;
-> >
-> > +typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Error
-> **errp);
-> > +
-> >   typedef struct NetFilterClass {
-> >       ObjectClass parent_class;
-> >
-> > @@ -45,6 +47,7 @@ typedef struct NetFilterClass {
-> >       FilterSetup *setup;
-> >       FilterCleanup *cleanup;
-> >       FilterStatusChanged *status_changed;
-> > +    FilterHandleEvent *handle_event;
-> >       /* mandatory */
-> >       FilterReceiveIOV *receive_iov;
-> >   } NetFilterClass;
-> > @@ -77,4 +80,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState
-> *sender,
-> >                                       int iovcnt,
-> >                                       void *opaque);
-> >
-> > +void colo_notify_filters_event(int event, Error **errp);
-> > +
-> >   #endif /* QEMU_NET_FILTER_H */
-> > diff --git a/net/filter.c b/net/filter.c
-> > index 2fd7d7d663..0f17eba143 100644
-> > --- a/net/filter.c
-> > +++ b/net/filter.c
-> > @@ -17,6 +17,8 @@
-> >   #include "net/vhost_net.h"
-> >   #include "qom/object_interfaces.h"
-> >   #include "qemu/iov.h"
-> > +#include "net/colo.h"
-> > +#include "migration/colo.h"
-> >
-> >   static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
-> >   {
-> > @@ -245,11 +247,26 @@ static void netfilter_finalize(Object *obj)
-> >       g_free(nf->netdev_id);
-> >   }
-> >
-> > +static void dummy_handle_event(NetFilterState *nf, int event, Error
-> **errp)
-> > +{
->
-> It's in fact not a "dummy" handler, Maybe it's better to rename it as
-> "default".
->
-
-OK, I will rename it in next version.
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
 
->
-> > +    switch (event) {
-> > +    case COLO_EVENT_CHECKPOINT:
-> > +        break;
-> > +    case COLO_EVENT_FAILOVER:
-> > +        object_property_set_str(OBJECT(nf), "off", "status", errp);
->
-> I think filter is a generic infrastructure, so it's better not have COLO
-> specific things like this. You can either add a generic name or have a
-> dedicated helper to just disable all net filters.
->
+Am 17.08.2018 um 11:41 schrieb Daniel P. Berrangé:
+> On Fri, Aug 17, 2018 at 08:44:38AM +0200, Stefan Priebe - Profihost AG wrote:
+>> Hello,
+>>
+>> i haven't found anything on the web regarding qemu and mentioned variants.
+>>
+>> While my host says:
+>> l1tf:Mitigation: PTE Inversion; VMX: SMT vulnerable, L1D conditional
+>> cache flushes
+>> meltdown:Mitigation: PTI
+>> spec_store_bypass:Mitigation: Speculative Store Bypass disabled via
+>> prctl and seccomp
+>> spectre_v1:Mitigation: __user pointer sanitization
+>> spectre_v2:Mitigation: Full generic retpoline, IBPB, IBRS_FW
+>>
+>> My guests bootet with pcid and spec-ctrl only say:
+>> l1tf:Mitigation: PTE Inversion
+>> meltdown:Mitigation: PTI
+>> spec_store_bypass:Vulnerable
+>> spectre_v1:Mitigation: __user pointer sanitization
+>> spectre_v2:Mitigation: Full generic retpoline, IBPB
+>>
+>> * What is about spec_store_bypass in Qemu?
+> 
+> The guest needs an 'ssbd' feature for Intel CPU models and either a
+> 'virt-ssbd' or 'amd-ssbd' feature for AMD CPU models.
 
-Maybe we can rename it to "EVENT_CHECKPOINT" and "EVENT_FAILOVER" looks
-better?
+Ah thanks. That works fine.
 
+>> * What is about IBRS_FW feature?
+> 
+> I'm not sure what IBRS_FW is referring to, but don't worry about it.
+> The fact the the guest kernel says "Mitigation" instead of "Vulnerable"
+> means you are protected with your current config.
+> 
+> For Intel CPU models Spectre v2 needs the guest to have the 'spec-ctrl'
+> feature. On AMD models Spectre v2 the guest needs 'ibpb' feature.
+> 
+>> * What is about L1TF?
+> 
+> No extra CPU flags are required for QEMU guests for L1TF. The new CPU
+> feature is merely an perf optimization for the host hypervisor fixes.
+> 
+> Note that with L1TF there are extra steps you need to consider wrt
+> hyperthreading, that won't be reflected in the 'vulnerabilities'
+> data published by the kernel.
+> 
+> You can read more about the procedure for dealing with L1TF in
+> virt hosts in the "Resolve" tab of this article:
+> 
+>   https://access.redhat.com/security/vulnerabilities/L1TF
+> 
+>> Or are those just irrelevant to Qemu guests? Would be great to have some
+>> informations.
+> 
+> We have some QEMU docs providing guidance on guest CPU model/feature config
+> but they are not yet published. In the meantime this blog post of mine gives
+> the same info, covering what's needed for Spectre v2, Meltdown and SSBD and
+> guidance in general for CPU config:
+> 
+>   https://www.berrange.com/posts/2018/06/29/cpu-model-configuration-for-qemu-kvm-on-x86-hosts/
 
->
-> > +        break;
-> > +    default:
-> > +        break;
-> > +    }
-> > +}
-> > +
-> >   static void netfilter_class_init(ObjectClass *oc, void *data)
-> >   {
-> >       UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
-> > +    NetFilterClass *nfc =3D NETFILTER_CLASS(oc);
-> >
-> >       ucc->complete =3D netfilter_complete;
-> > +    nfc->handle_event =3D dummy_handle_event;
-> >   }
-> >
-> >   static const TypeInfo netfilter_info =3D {
-> > diff --git a/net/net.c b/net/net.c
-> > index a77ea88fff..b4f6a2efb2 100644
-> > --- a/net/net.c
-> > +++ b/net/net.c
-> > @@ -1331,6 +1331,34 @@ void hmp_info_network(Monitor *mon, const QDict
-> *qdict)
-> >       }
-> >   }
-> >
-> > +void colo_notify_filters_event(int event, Error **errp)
-> > +{
-> > +    NetClientState *nc, *peer;
-> > +    NetClientDriver type;
-> > +    NetFilterState *nf;
-> > +    NetFilterClass *nfc =3D NULL;
-> > +    Error *local_err =3D NULL;
-> > +
-> > +    QTAILQ_FOREACH(nc, &net_clients, next) {
-> > +        peer =3D nc->peer;
-> > +        type =3D nc->info->type;
-> > +        if (!peer || type !=3D NET_CLIENT_DRIVER_TAP) {
-> > +            continue;
-> > +        }
->
-> The check the TAP is redundant with previous patch.
->
+Thanks, that one was really helpful.
 
-OK, I will remove it.
-
-
->
-> > +        QTAILQ_FOREACH(nf, &nc->filters, next) {
-> > +            nfc =3D  NETFILTER_GET_CLASS(OBJECT(nf));
-> > +            if (!nfc->handle_event) {
->
-> Looks like this won't happen.
->
-
-It will happen. like filter-mirror and filter-redirector haven't this event=
-.
-
-Thanks
-Zhang Chen
-
-
->
-> Thanks
->
-> > +                continue;
-> > +            }
-> > +            nfc->handle_event(nf, event, &local_err);
-> > +            if (local_err) {
-> > +                error_propagate(errp, local_err);
-> > +                return;
-> > +            }
-> > +        }
-> > +    }
-> > +}
-> > +
-> >   void qmp_set_link(const char *name, bool up, Error **errp)
-> >   {
-> >       NetClientState *ncs[MAX_QUEUE_NUM];
->
->
+Greets,
+Stefan
