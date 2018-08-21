@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fs3Rl-0006ZT-Ib
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:59:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1fs3Xm-0000u1-R1
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:05:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fs3Rh-0006ru-Fp
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:59:33 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35445)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fs3Rf-0006q4-Dm
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:59:27 -0400
-Received: by mail-wr1-x444.google.com with SMTP id g1-v6so15342994wru.2
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 02:59:26 -0700 (PDT)
-References: <1534821487-14189-1-git-send-email-jing2.liu@linux.intel.com>
-	<1534821487-14189-3-git-send-email-jing2.liu@linux.intel.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <e88aac49-d0be-6ba9-9674-1785caa5af5b@gmail.com>
-Date: Tue, 21 Aug 2018 12:59:23 +0300
-MIME-Version: 1.0
-In-Reply-To: <1534821487-14189-3-git-send-email-jing2.liu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw/pci: add PCI resource reserve
- capability to legacy PCI bridge
+	(envelope-from <thuth@redhat.com>) id 1fs3Xg-0002wU-ER
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:05:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60320 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fs3Xg-0002ug-6X
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:05:40 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AD2CC804BCF4
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:05:38 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 21 Aug 2018 12:05:30 +0200
+Message-Id: <1534845930-14451-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] Remove deprecated -balloon option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +27,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jing Liu <jing2.liu@linux.intel.com>, qemu-devel@nongnu.org
-Cc: anthony.xu@intel.com, mst@redhat.com, lersek@redhat.com, pbonzini@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>
 
+The "-balloon" option has been replaced by "-device virtio-balloon".
+It's been marked as deprecated since two releases, and nobody
+complained, so let's remove it now.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ docs/virtio-balloon-stats.txt |  6 +++---
+ qemu-deprecated.texi          |  5 -----
+ qemu-options.hx               | 10 ----------
+ vl.c                          | 36 ------------------------------------
+ 4 files changed, 3 insertions(+), 54 deletions(-)
 
-On 08/21/2018 06:18 AM, Jing Liu wrote:
-> Add hint to firmware (e.g. SeaBIOS) to reserve addtional
-> BUS/IO/MEM/PREF resource for legacy pci-pci bridge. Add the
-> resource reserve capability deleting in pci_bridge_dev_exitfn.
->
-> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
-> ---
->   hw/pci-bridge/pci_bridge_dev.c | 24 ++++++++++++++++++++++++
->   1 file changed, 24 insertions(+)
->
-> diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-> index b2d861d..97a8e8b 100644
-> --- a/hw/pci-bridge/pci_bridge_dev.c
-> +++ b/hw/pci-bridge/pci_bridge_dev.c
-> @@ -46,6 +46,9 @@ struct PCIBridgeDev {
->       uint32_t flags;
->   
->       OnOffAuto msi;
-> +
-> +    /* additional resources to reserve */
-> +    PCIResReserve res_reserve;
->   };
->   typedef struct PCIBridgeDev PCIBridgeDev;
->   
-> @@ -95,6 +98,12 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
->           error_free(local_err);
->       }
->   
-> +    err = pci_bridge_qemu_reserve_cap_init(dev, 0,
-> +                                         bridge_dev->res_reserve, errp);
-> +    if (err) {
-> +        goto cap_error;
-> +    }
-> +
->       if (shpc_present(dev)) {
->           /* TODO: spec recommends using 64 bit prefetcheable BAR.
->            * Check whether that works well. */
-> @@ -103,6 +112,8 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
->       }
->       return;
->   
-> +cap_error:
-> +    msi_uninit(dev);
->   msi_error:
->       slotid_cap_cleanup(dev);
->   slotid_error:
-> @@ -116,6 +127,8 @@ shpc_error:
->   static void pci_bridge_dev_exitfn(PCIDevice *dev)
->   {
->       PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
-> +
-> +    pci_del_capability(dev, PCI_CAP_ID_VNDR, sizeof(PCIBridgeQemuCap));
->       if (msi_present(dev)) {
->           msi_uninit(dev);
->       }
-> @@ -162,6 +175,17 @@ static Property pci_bridge_dev_properties[] = {
->                               ON_OFF_AUTO_AUTO),
->       DEFINE_PROP_BIT(PCI_BRIDGE_DEV_PROP_SHPC, PCIBridgeDev, flags,
->                       PCI_BRIDGE_DEV_F_SHPC_REQ, true),
-> +    DEFINE_PROP_UINT32("bus-reserve", PCIBridgeDev,
-> +                       res_reserve.bus, -1),
-> +    DEFINE_PROP_SIZE("io-reserve", PCIBridgeDev,
-> +                     res_reserve.io, -1),
-> +    DEFINE_PROP_SIZE("mem-reserve", PCIBridgeDev,
-> +                     res_reserve.mem_non_pref, -1),
-> +    DEFINE_PROP_SIZE("pref32-reserve", PCIBridgeDev,
-> +                     res_reserve.mem_pref_32, -1),
-> +    DEFINE_PROP_SIZE("pref64-reserve", PCIBridgeDev,
-> +                     res_reserve.mem_pref_64, -1),
-> +
->       DEFINE_PROP_END_OF_LIST(),
->   };
->   
-
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
-
-Thanks,
-Marcel
+diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
+index 9985e1d..1732cc8 100644
+--- a/docs/virtio-balloon-stats.txt
++++ b/docs/virtio-balloon-stats.txt
+@@ -61,9 +61,9 @@ It's also important to note the following:
+    respond to the request the timer will never be re-armed, which has
+    the same effect as disabling polling
+ 
+-Here are a few examples. QEMU is started with '-balloon virtio', which
+-generates '/machine/peripheral-anon/device[1]' as the QOM path for the
+-balloon device.
++Here are a few examples. QEMU is started with '-device virtio-balloon',
++which generates '/machine/peripheral-anon/device[1]' as the QOM path for
++the balloon device.
+ 
+ Enable polling with 2 seconds interval:
+ 
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 67b7211..0714017 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -106,11 +106,6 @@ enabled via the ``-machine usb=on'' argument.
+ 
+ The ``-nodefconfig`` argument is a synonym for ``-no-user-config``.
+ 
+-@subsection -balloon (since 2.12.0)
+-
+-The @option{--balloon virtio} argument has been superseded by
+-@option{--device virtio-balloon}.
+-
+ @subsection -fsdev handle (since 2.12.0)
+ 
+ The ``handle'' fsdev backend does not support symlinks and causes the 9p
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 4efdedf..47c6b92 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -454,16 +454,6 @@ modprobe i810_audio clocking=48000
+ @end example
+ ETEXI
+ 
+-DEF("balloon", HAS_ARG, QEMU_OPTION_balloon,
+-    "-balloon virtio[,addr=str]\n"
+-    "                enable virtio balloon device (deprecated)\n", QEMU_ARCH_ALL)
+-STEXI
+-@item -balloon virtio[,addr=@var{addr}]
+-@findex -balloon
+-Enable virtio balloon device, optionally with PCI address @var{addr}. This
+-option is deprecated, use @option{-device virtio-balloon} instead.
+-ETEXI
+-
+ DEF("device", HAS_ARG, QEMU_OPTION_device,
+     "-device driver[,prop[=value][,...]]\n"
+     "                add device (based on driver)\n"
+diff --git a/vl.c b/vl.c
+index 16b913f..f952f01 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2127,36 +2127,6 @@ static void parse_display(const char *p)
+     }
+ }
+ 
+-static int balloon_parse(const char *arg)
+-{
+-    QemuOpts *opts;
+-
+-    warn_report("This option is deprecated. "
+-                "Use '--device virtio-balloon' to enable the balloon device.");
+-
+-    if (strcmp(arg, "none") == 0) {
+-        return 0;
+-    }
+-
+-    if (!strncmp(arg, "virtio", 6)) {
+-        if (arg[6] == ',') {
+-            /* have params -> parse them */
+-            opts = qemu_opts_parse_noisily(qemu_find_opts("device"), arg + 7,
+-                                           false);
+-            if (!opts)
+-                return  -1;
+-        } else {
+-            /* create empty opts */
+-            opts = qemu_opts_create(qemu_find_opts("device"), NULL, 0,
+-                                    &error_abort);
+-        }
+-        qemu_opt_set(opts, "driver", "virtio-balloon", &error_abort);
+-        return 0;
+-    }
+-
+-    return -1;
+-}
+-
+ char *qemu_find_file(int type, const char *name)
+ {
+     int i;
+@@ -3659,12 +3629,6 @@ int main(int argc, char **argv, char **envp)
+             case QEMU_OPTION_no_hpet:
+                 no_hpet = 1;
+                 break;
+-            case QEMU_OPTION_balloon:
+-                if (balloon_parse(optarg) < 0) {
+-                    error_report("unknown -balloon argument %s", optarg);
+-                    exit(1);
+-                }
+-                break;
+             case QEMU_OPTION_no_reboot:
+                 no_reboot = 1;
+                 break;
+-- 
+1.8.3.1
