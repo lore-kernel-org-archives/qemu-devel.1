@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fsBfH-00084L-Pj
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:46:07 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fsBrt-0004lv-Ko
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fsBf5-0007OS-Te
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:45:58 -0400
-Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:36108)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fsBf3-0007Ml-Ls
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:45:49 -0400
-Received: by mail-ua1-x943.google.com with SMTP id c12-v6so12460830uan.3
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 11:45:49 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180818190118.12911-1-richard.henderson@linaro.org>
-	<20180818190118.12911-7-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <69a42c75-ed60-b6f4-69a5-ab89bcf86f5b@amsat.org>
-Date: Tue, 21 Aug 2018 15:45:45 -0300
+	(envelope-from <alex.williamson@redhat.com>) id 1fsBro-0000cS-7N
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:59:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43634 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1fsBrm-0000b5-AE
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 14:58:58 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 93A4B402315B
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 18:58:57 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Tue, 21 Aug 2018 12:58:53 -0600
+Message-ID: <153487789207.20513.6642364712339067528.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <20180818190118.12911-7-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 06/16] linux-user: Propagate goto
- unimplemented to default
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] vfio/pci: Fix failure to close file descriptor
+ on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,338 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: laurent@vivier.eu
+To: qemu-devel@nongnu.org
 
-On 08/18/2018 04:01 PM, Richard Henderson wrote:
-> There is no point in listing a syscall if you want the same effect as
-> not listing it.  In one less trivial case, the goto was demonstrably
-> not reachable.
-> 
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+A new error path fails to close the device file descriptor when
+triggered by a ballooning incompatibility within the group.  Fix it.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Fixes: 238e91728503 ("vfio/ccw/pci: Allow devices to opt-in for ballooning")
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ hw/vfio/common.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-> ---
->  linux-user/syscall.c | 144 +------------------------------------------
->  1 file changed, 1 insertion(+), 143 deletions(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 812fb27fa1..ef3b9b623c 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -8341,14 +8341,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          unlock_user(p, arg1, 0);
->          return ret;
->  #endif
-> -#ifdef TARGET_NR_break
-> -    case TARGET_NR_break:
-> -        goto unimplemented;
-> -#endif
-> -#ifdef TARGET_NR_oldstat
-> -    case TARGET_NR_oldstat:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR_lseek
->      case TARGET_NR_lseek:
->          return get_errno(lseek(arg1, arg2, arg3));
-> @@ -8435,16 +8427,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->              return get_errno(stime(&host_time));
->          }
->  #endif
-> -    case TARGET_NR_ptrace:
-> -        goto unimplemented;
->  #ifdef TARGET_NR_alarm /* not on alpha */
->      case TARGET_NR_alarm:
->          return alarm(arg1);
->  #endif
-> -#ifdef TARGET_NR_oldfstat
-> -    case TARGET_NR_oldfstat:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR_pause /* not on alpha */
->      case TARGET_NR_pause:
->          if (!block_signals()) {
-> @@ -8515,14 +8501,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          }
->          return ret;
->  #endif
-> -#ifdef TARGET_NR_stty
-> -    case TARGET_NR_stty:
-> -        goto unimplemented;
-> -#endif
-> -#ifdef TARGET_NR_gtty
-> -    case TARGET_NR_gtty:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR_access
->      case TARGET_NR_access:
->          if (!(p = lock_user_string(arg1))) {
-> @@ -8544,10 +8522,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->  #ifdef TARGET_NR_nice /* not on alpha */
->      case TARGET_NR_nice:
->          return get_errno(nice(arg1));
-> -#endif
-> -#ifdef TARGET_NR_ftime
-> -    case TARGET_NR_ftime:
-> -        goto unimplemented;
->  #endif
->      case TARGET_NR_sync:
->          sync();
-> @@ -8661,14 +8635,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->                  ret = host_to_target_clock_t(ret);
->          }
->          return ret;
-> -#ifdef TARGET_NR_prof
-> -    case TARGET_NR_prof:
-> -        goto unimplemented;
-> -#endif
-> -#ifdef TARGET_NR_signal
-> -    case TARGET_NR_signal:
-> -        goto unimplemented;
-> -#endif
->      case TARGET_NR_acct:
->          if (arg1 == 0) {
->              ret = get_errno(acct(NULL));
-> @@ -8687,31 +8653,15 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          ret = get_errno(umount2(p, arg2));
->          unlock_user(p, arg1, 0);
->          return ret;
-> -#endif
-> -#ifdef TARGET_NR_lock
-> -    case TARGET_NR_lock:
-> -        goto unimplemented;
->  #endif
->      case TARGET_NR_ioctl:
->          return do_ioctl(arg1, arg2, arg3);
->  #ifdef TARGET_NR_fcntl
->      case TARGET_NR_fcntl:
->          return do_fcntl(arg1, arg2, arg3);
-> -#endif
-> -#ifdef TARGET_NR_mpx
-> -    case TARGET_NR_mpx:
-> -        goto unimplemented;
->  #endif
->      case TARGET_NR_setpgid:
->          return get_errno(setpgid(arg1, arg2));
-> -#ifdef TARGET_NR_ulimit
-> -    case TARGET_NR_ulimit:
-> -        goto unimplemented;
-> -#endif
-> -#ifdef TARGET_NR_oldolduname
-> -    case TARGET_NR_oldolduname:
-> -        goto unimplemented;
-> -#endif
->      case TARGET_NR_umask:
->          return get_errno(umask(arg1));
->      case TARGET_NR_chroot:
-> @@ -8720,10 +8670,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          ret = get_errno(chroot(p));
->          unlock_user(p, arg1, 0);
->          return ret;
-> -#ifdef TARGET_NR_ustat
-> -    case TARGET_NR_ustat:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR_dup2
->      case TARGET_NR_dup2:
->          ret = get_errno(dup2(arg1, arg2));
-> @@ -9432,10 +9378,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          }
->          return ret;
->  #endif
-> -#ifdef TARGET_NR_oldlstat
-> -    case TARGET_NR_oldlstat:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR_readlink
->      case TARGET_NR_readlink:
->          {
-> @@ -9489,10 +9431,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          }
->          return ret;
->  #endif
-> -#ifdef TARGET_NR_uselib
-> -    case TARGET_NR_uselib:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR_swapon
->      case TARGET_NR_swapon:
->          if (!(p = lock_user_string(arg1)))
-> @@ -9514,10 +9452,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->             ret = get_errno(reboot(arg1, arg2, arg3, NULL));
->          }
->          return ret;
-> -#ifdef TARGET_NR_readdir
-> -    case TARGET_NR_readdir:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR_mmap
->      case TARGET_NR_mmap:
->  #if (defined(TARGET_I386) && defined(TARGET_ABI32)) || \
-> @@ -9638,10 +9572,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          return ret;
->      case TARGET_NR_setpriority:
->          return get_errno(setpriority(arg1, arg2, arg3));
-> -#ifdef TARGET_NR_profil
-> -    case TARGET_NR_profil:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR_statfs
->      case TARGET_NR_statfs:
->          if (!(p = lock_user_string(arg1))) {
-> @@ -9713,10 +9643,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          ret = get_errno(fstatfs(arg1, &stfs));
->          goto convert_statfs64;
->  #endif
-> -#ifdef TARGET_NR_ioperm
-> -    case TARGET_NR_ioperm:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR_socketcall
->      case TARGET_NR_socketcall:
->          return do_socketcall(arg1, arg2);
-> @@ -9935,21 +9861,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->              }
->          }
->          return ret;
-> -#endif
-> -#ifdef TARGET_NR_olduname
-> -    case TARGET_NR_olduname:
-> -        goto unimplemented;
-> -#endif
-> -#ifdef TARGET_NR_iopl
-> -    case TARGET_NR_iopl:
-> -        goto unimplemented;
->  #endif
->      case TARGET_NR_vhangup:
->          return get_errno(vhangup());
-> -#ifdef TARGET_NR_idle
-> -    case TARGET_NR_idle:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR_syscall
->      case TARGET_NR_syscall:
->          return do_syscall(cpu_env, arg1 & 0xffff, arg2, arg3, arg4, arg5,
-> @@ -10122,8 +10036,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_modify_ldt:
->          return do_modify_ldt(cpu_env, arg1, arg2, arg3);
->  #if !defined(TARGET_X86_64)
-> -    case TARGET_NR_vm86old:
-> -        goto unimplemented;
->      case TARGET_NR_vm86:
->          return do_vm86(cpu_env, arg1, arg2);
->  #endif
-> @@ -10160,35 +10072,12 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          }
->          return ret;
->  #endif
-> -#ifdef TARGET_NR_create_module
-> -    case TARGET_NR_create_module:
-> -#endif
-> -    case TARGET_NR_init_module:
-> -    case TARGET_NR_delete_module:
-> -#ifdef TARGET_NR_get_kernel_syms
-> -    case TARGET_NR_get_kernel_syms:
-> -#endif
-> -        goto unimplemented;
-> -    case TARGET_NR_quotactl:
-> -        goto unimplemented;
->      case TARGET_NR_getpgid:
->          return get_errno(getpgid(arg1));
->      case TARGET_NR_fchdir:
->          return get_errno(fchdir(arg1));
-> -#ifdef TARGET_NR_bdflush /* not on x86_64 */
-> -    case TARGET_NR_bdflush:
-> -        goto unimplemented;
-> -#endif
-> -#ifdef TARGET_NR_sysfs
-> -    case TARGET_NR_sysfs:
-> -        goto unimplemented;
-> -#endif
->      case TARGET_NR_personality:
->          return get_errno(personality(arg1));
-> -#ifdef TARGET_NR_afs_syscall
-> -    case TARGET_NR_afs_syscall:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR__llseek /* Not on alpha */
->      case TARGET_NR__llseek:
->          {
-> @@ -10702,14 +10591,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->              }
->          }
->          return ret;
-> -#ifdef TARGET_NR_query_module
-> -    case TARGET_NR_query_module:
-> -        goto unimplemented;
-> -#endif
-> -#ifdef TARGET_NR_nfsservctl
-> -    case TARGET_NR_nfsservctl:
-> -        goto unimplemented;
-> -#endif
->      case TARGET_NR_prctl:
->          switch (arg1) {
->          case PR_GET_PDEATHSIG:
-> @@ -10795,7 +10676,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->  #if defined(TARGET_I386) && !defined(TARGET_ABI32)
->          return do_arch_prctl(cpu_env, arg1, arg2);
->  #else
-> -        goto unimplemented;
-> +#error unreachable
->  #endif
->  #endif
->  #ifdef TARGET_NR_pread64
-> @@ -10945,21 +10826,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          return ret;
->      }
->  #endif
-> -#else
-> -    case TARGET_NR_sendfile:
-> -#ifdef TARGET_NR_sendfile64
-> -    case TARGET_NR_sendfile64:
-> -#endif
-> -        goto unimplemented;
-> -#endif
-> -
-> -#ifdef TARGET_NR_getpmsg
-> -    case TARGET_NR_getpmsg:
-> -        goto unimplemented;
-> -#endif
-> -#ifdef TARGET_NR_putpmsg
-> -    case TARGET_NR_putpmsg:
-> -        goto unimplemented;
->  #endif
->  #ifdef TARGET_NR_vfork
->      case TARGET_NR_vfork:
-> @@ -11502,9 +11368,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_setfsgid32:
->          return get_errno(setfsgid(arg1));
->  #endif
-> -
-> -    case TARGET_NR_pivot_root:
-> -        goto unimplemented;
->  #ifdef TARGET_NR_mincore
->      case TARGET_NR_mincore:
->          {
-> @@ -11662,10 +11525,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          /* self-modifying code is handled automatically, so nothing needed */
->          return 0;
->  #endif
-> -#ifdef TARGET_NR_security
-> -    case TARGET_NR_security:
-> -        goto unimplemented;
-> -#endif
->  #ifdef TARGET_NR_getpagesize
->      case TARGET_NR_getpagesize:
->          return TARGET_PAGE_SIZE;
-> @@ -12631,7 +12490,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->  #endif
->  
->      default:
-> -    unimplemented:
->          qemu_log_mask(LOG_UNIMP, "Unsupported syscall: %d\n", num);
->          return -TARGET_ENOSYS;
->      }
-> 
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 3f31f80b1280..7c185e5a2e79 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1432,6 +1432,7 @@ int vfio_get_device(VFIOGroup *group, const char *name,
+         if (!QLIST_EMPTY(&group->device_list)) {
+             error_setg(errp,
+                        "Inconsistent device balloon setting within group");
++            close(fd);
+             return -1;
+         }
+ 
