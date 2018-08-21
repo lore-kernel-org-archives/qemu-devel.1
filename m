@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fs6i4-00060c-FL
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:28:37 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fs6i6-000639-JQ
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fs6i2-0003qE-RV
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:28:36 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fs6i4-0003sQ-D2
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:28:38 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Aug 2018 14:28:06 +0100
-Message-Id: <20180821132811.17675-5-peter.maydell@linaro.org>
+Date: Tue, 21 Aug 2018 14:28:04 +0100
+Message-Id: <20180821132811.17675-3-peter.maydell@linaro.org>
 In-Reply-To: <20180821132811.17675-1-peter.maydell@linaro.org>
 References: <20180821132811.17675-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 4/9] hw/arm/highbank: Connect VIRQ and VFIQ
+Subject: [Qemu-devel] [PATCH 2/9] hw/intc/arm_gic: Make per-cpu GICH memory
+ regions 0x200 bytes large
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,46 +23,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Luc Michel <luc.michel@greensocs.com>
 
-Connect the VIRQ and VFIQ lines from the GIC to the CPU;
-these exist always for both CPU and GIC whether the
-virtualization extensions are enabled or not, so we
-can just unconditionally connect them.
+Reduce the size of the per-cpu GICH memory regions from 0x1000
+to 0x200. The registers only cover 0x200 bytes, and the Cortex-A15
+wants to map them at a spacing of 0x200 bytes apart. Having the
+region be too large interferes with mapping them like that, so
+reduce it.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/highbank.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/intc/arm_gic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
-index 6d42fce2c37..fb9efa02c35 100644
---- a/hw/arm/highbank.c
-+++ b/hw/arm/highbank.c
-@@ -243,6 +243,8 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
-     int n;
-     qemu_irq cpu_irq[4];
-     qemu_irq cpu_fiq[4];
-+    qemu_irq cpu_virq[4];
-+    qemu_irq cpu_vfiq[4];
-     MemoryRegion *sysram;
-     MemoryRegion *dram;
-     MemoryRegion *sysmem;
-@@ -282,6 +284,8 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
-         object_property_set_bool(cpuobj, true, "realized", &error_fatal);
-         cpu_irq[n] = qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_IRQ);
-         cpu_fiq[n] = qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_FIQ);
-+        cpu_virq[n] = qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_VIRQ);
-+        cpu_vfiq[n] = qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_VFIQ);
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index c1b35fc1ee2..542b4b93eab 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -2084,7 +2084,7 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
+         for (i = 0; i < s->num_cpu; i++) {
+             memory_region_init_io(&s->vifaceiomem[i + 1], OBJECT(s),
+                                   &gic_viface_ops, &s->backref[i],
+-                                  "gic_viface", 0x1000);
++                                  "gic_viface", 0x200);
+             sysbus_init_mmio(sbd, &s->vifaceiomem[i + 1]);
+         }
      }
- 
-     sysmem = get_system_memory();
-@@ -329,6 +333,8 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
-     for (n = 0; n < smp_cpus; n++) {
-         sysbus_connect_irq(busdev, n, cpu_irq[n]);
-         sysbus_connect_irq(busdev, n + smp_cpus, cpu_fiq[n]);
-+        sysbus_connect_irq(busdev, n + 2 * smp_cpus, cpu_virq[n]);
-+        sysbus_connect_irq(busdev, n + 3 * smp_cpus, cpu_vfiq[n]);
-     }
- 
-     for (n = 0; n < 128; n++) {
 -- 
 2.18.0
