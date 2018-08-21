@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fryMx-0004GT-Hn
+	(envelope-from <dgibson@ozlabs.org>) id 1fryMx-0004Fw-9F
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fryMu-0000S9-AG
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:15 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fryMu-0000SF-B8
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:14 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 21 Aug 2018 14:33:37 +1000
-Message-Id: <20180821043343.7514-21-david@gibson.dropbear.id.au>
+Date: Tue, 21 Aug 2018 14:33:41 +1000
+Message-Id: <20180821043343.7514-25-david@gibson.dropbear.id.au>
 In-Reply-To: <20180821043343.7514-1-david@gibson.dropbear.id.au>
 References: <20180821043343.7514-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 20/26] hw/ppc: deprecate the machine type 'prep',
- replaced by '40p'
+Subject: [Qemu-devel] [PULL 24/26] mac_newworld: don't use legacy
+ fw_cfg_init_mem() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +21,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, lvivier@redhat.com, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, lvivier@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-- prep machine is a fictional machine, so has no specifications. Which
-  devices can be changed/added/removed without impact? Are interrupts
-  correctly mapped?
-- prep firmware (OHW) has support only for IDE drives (no SCSI).
-  Booting from IDE has been broken approximatively 3 years ago, and nobod=
-y complained.
-- OHW is limited on IDE boot to a specific set of OS loaders.
-  These operating systems are of the 2004 time frame.
-- OHW can use -kernel. Linux kernel freezes a long time after PS/2 mouse
-  detection, and then screen becomes garbage. This was already broken in
-  QEMU v2.7, 2 years ago, and nobody complained.
+Instead initialise the device via qdev to allow us to set device properties
+directly as required.
 
-On the other side:
-- 40p is a real machine, so emulation can be checked against
-  hardware specifications
-- OpenBIOS has support for SCSI block devices, including 40p LSI adapter
-- OpenBIOS can start mostly all Linux kernels (including recent ones)
-  and recent operating system (like NetBSD 7.1.2)
-
-Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-[dwg: Drop prep from boot-serial test to avoid deprecation warnings]
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/prep.c            | 1 +
- tests/boot-serial-test.c | 2 --
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ hw/ppc/mac_newworld.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index b26138e5c4..83083e4f1b 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -587,6 +587,7 @@ static void ppc_prep_init(MachineState *machine)
-=20
- static void prep_machine_init(MachineClass *mc)
- {
-+    mc->deprecation_reason =3D "use 40p machine type instead";
-     mc->desc =3D "PowerPC PREP platform";
-     mc->init =3D ppc_prep_init;
-     mc->block_default_type =3D IF_IDE;
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index fca5f2f5da..f123b15e3e 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -75,13 +75,11 @@ typedef struct testdef {
- static testdef_t tests[] =3D {
-     { "alpha", "clipper", "", "PCI:" },
-     { "ppc", "ppce500", "", "U-Boot" },
--    { "ppc", "prep", "-m 96", "Memory size: 96 MB" },
-     { "ppc", "40p", "-boot d", "Booting from device d" },
-     { "ppc", "g3beige", "", "PowerPC,750" },
-     { "ppc", "mac99", "", "PowerPC,G4" },
-     { "ppc", "sam460ex", "-m 256", "DRAM:  256 MiB" },
-     { "ppc64", "ppce500", "", "U-Boot" },
--    { "ppc64", "prep", "-boot e", "Booting from device e" },
-     { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
-     { "ppc64", "mac99", "", "PowerPC,970FX" },
-     { "ppc64", "pseries", "", "Open Firmware" },
---=20
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 2ca294664b..a6b95f024c 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -454,7 +454,17 @@ static void ppc_core99_init(MachineState *machine)
+     pmac_format_nvram_partition(nvr, 0x2000);
+     /* No PCI init: the BIOS will do it */
+ 
+-    fw_cfg = fw_cfg_init_mem(CFG_ADDR, CFG_ADDR + 2);
++    dev = qdev_create(NULL, TYPE_FW_CFG_MEM);
++    fw_cfg = FW_CFG(dev);
++    qdev_prop_set_uint32(dev, "data_width", 1);
++    qdev_prop_set_bit(dev, "dma_enabled", false);
++    object_property_add_child(OBJECT(qdev_get_machine()), TYPE_FW_CFG,
++                              OBJECT(fw_cfg), NULL);
++    qdev_init_nofail(dev);
++    s = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(s, 0, CFG_ADDR);
++    sysbus_mmio_map(s, 1, CFG_ADDR + 2);
++
+     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
+     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
+-- 
 2.17.1
