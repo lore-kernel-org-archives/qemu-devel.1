@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fs5DK-0000MV-Fy
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 07:52:47 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fs5Xn-0007Ax-R2
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:13:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fs5DH-00086k-7P
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 07:52:46 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <d941c0c3-1ac6-442d-3b43-370ec1d9b00c@redhat.com> (Paolo
-	Bonzini's message of "Tue, 21 Aug 2018 11:39:04 +0200")
-References: <20180818025653.21192-1-f4bug@amsat.org>
-	<66dfe354-9c2c-8642-a905-03155555fe99@redhat.com>
-	<a812530c-ad1b-f5ff-6e15-82227cb76c79@redhat.com>
-	<2fd04596-a8a0-889f-239d-92853c12c6aa@redhat.com>
-	<2d91d7e2-938d-dbbe-5a11-edf48d4e0fc8@redhat.com>
-	<eca82595-47c6-a195-8224-6a9f6619decd@redhat.com>
-	<e7a5018b-a480-4a5d-d305-cd69a007a452@redhat.com>
-	<d941c0c3-1ac6-442d-3b43-370ec1d9b00c@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 21 Aug 2018 13:52:33 +0200
-Message-ID: <8736v87x8e.fsf@trasno.org>
+	(envelope-from <kraxel@redhat.com>) id 1fs5Q1-0008Pe-AR
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:05:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33488 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fs5Q1-0008P9-3I
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:05:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC4B940241ED
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 12:05:52 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 21 Aug 2018 14:05:35 +0200
+Message-Id: <20180821120542.22610-6-kraxel@redhat.com>
+In-Reply-To: <20180821120542.22610-1-kraxel@redhat.com>
+References: <20180821120542.22610-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] migration: Replace strncpy() by g_strlcpy()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 05/12] doc: switch to modern syntax for VNC TLS
+ setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +33,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 21/08/2018 08:03, Thomas Huth wrote:
->>>> gcc is not necessarily wrong, as it CAN catch real erroneous uses of 
->>>> strncpy().  It's just that 99% of the time, strncpy() is the WRONG 
->>>> function to use, and so the remaining few cases where it actually does 
->>>> what you want are so rare that you have to consult the manual anyways. 
->>>> If nothing else, the gcc warning is making people avoid strncpy() even 
->>>> where it is safe (which is not a bad thing, in my opinion, because the 
->>>> contract of strncpy() is so counter-intuitive).
->>>>
->>> I am wondering if we should simply add a helper for these special cases
->>> that zeroes the buffer and uses g_strlcpy(), instead of
->>> ignoring/disabling the warning.
->> Yes, a helper function with a proper comment about its purpose is likely
->> the best way to go.
->
-> But why use g_strlcpy in the function (which has an off-by-one effect)?
->
-> Maybe it could be a qemu_strncpy that is the same as strncpy but returns
-> -ERANGE if the source is longer than the buffer that is passed in (but
-> not if it fits perfectly without a terminating NUL):
->
->     int qemu_strncpy(const char *d, const char *s, int dsize)
->     {
->         while (*s && dsize) {
->             *d++ = *s++;
->             dsize--;
->         }
->         /* It's okay if D is just past the end of the buffer,
->          * and S is sitting on the terminating NUL.
->          */
->         if (*s) {
->             return -ERANGE;
->         }
->         while (dsize) {
->             *d++ = 0;
-              dsize--;  ?????
->         }
->         return 0;
->     }
->
-> Then we have the problem of yet another incomplete transition, but at
-> least we could convert those that GCC complains about.
+From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-I think this is the best approach.  At least we have a semantic that is
-"clear", as trivial as:
-- we copy a maximum of dsize chars
-- source size has to be at maximum dsize
-- we pad destination if size of source is smaller than dsize
-- destination could be not zero terminated if source is exactly dsize
-  length.
+The use of 'tls', 'x509' and 'x509verify' properties is the deprecated
+backcompat syntax, replaced by use of TLS creds objects.
 
-And people wonders why I consider C unsuited to handle strings.
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Message-id: 20180725092751.21767-2-berrange@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ qemu-doc.texi | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-Later, Juan.
-
-PD.  I think that adding a strncpy that don't behave like strncpy is a
-     bad idea.  What about strlncpy()?  I.e. does the work of both?  As
-     I have no clue what the "l" on strlcpy stands for, we can choose
-     any other letter.
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index f74542a0e9..7bd449f398 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -1103,7 +1103,9 @@ support provides a secure session, but no authentic=
+ation. This allows any
+ client to connect, and provides an encrypted session.
+=20
+ @example
+-qemu-system-i386 [...OPTIONS...] -vnc :1,tls,x509=3D/etc/pki/qemu -monit=
+or stdio
++qemu-system-i386 [...OPTIONS...] \
++  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
+,verify-peer=3Dno \
++  -vnc :1,tls-creds=3Dtls0 -monitor stdio
+ @end example
+=20
+ In the above example @code{/etc/pki/qemu} should contain at least three =
+files,
+@@ -1118,10 +1120,14 @@ only be readable by the user owning it.
+ Certificates can also provide a means to authenticate the client connect=
+ing.
+ The server will request that the client provide a certificate, which it =
+will
+ then validate against the CA certificate. This is a good choice if deplo=
+ying
+-in an environment with a private internal certificate authority.
++in an environment with a private internal certificate authority. It uses=
+ the
++same syntax as previously, but with @code{verify-peer} set to @code{yes}
++instead.
+=20
+ @example
+-qemu-system-i386 [...OPTIONS...] -vnc :1,tls,x509verify=3D/etc/pki/qemu =
+-monitor stdio
++qemu-system-i386 [...OPTIONS...] \
++  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
+,verify-peer=3Dyes \
++  -vnc :1,tls-creds=3Dtls0 -monitor stdio
+ @end example
+=20
+=20
+@@ -1132,7 +1138,9 @@ Finally, the previous method can be combined with V=
+NC password authentication
+ to provide two layers of authentication for clients.
+=20
+ @example
+-qemu-system-i386 [...OPTIONS...] -vnc :1,password,tls,x509verify=3D/etc/=
+pki/qemu -monitor stdio
++qemu-system-i386 [...OPTIONS...] \
++  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
+,verify-peer=3Dyes \
++  -vnc :1,tls-creds=3Dtls0,password -monitor stdio
+ (qemu) change vnc password
+ Password: ********
+ (qemu)
+@@ -1169,7 +1177,9 @@ credentials. This can be enabled, by combining the =
+'sasl' option
+ with the aforementioned TLS + x509 options:
+=20
+ @example
+-qemu-system-i386 [...OPTIONS...] -vnc :1,tls,x509,sasl -monitor stdio
++qemu-system-i386 [...OPTIONS...] \
++  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
+,verify-peer=3Dyes \
++  -vnc :1,tls-creds=3Dtls0,sasl -monitor stdio
+ @end example
+=20
+ @node vnc_setup_sasl
+--=20
+2.9.3
