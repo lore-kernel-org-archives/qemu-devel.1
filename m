@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fs093-0002Us-RI
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:28:02 -0400
+	(envelope-from <peterx@redhat.com>) id 1fs0B0-0003Kt-HM
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:30:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fs08z-0008Tj-GD
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:28:01 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:46263)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fs08z-0008Sw-BS
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:27:57 -0400
-Received: by mail-vk0-x242.google.com with SMTP id b14-v6so7696799vke.13
-	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 23:27:57 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1534796770-10295-1-git-send-email-minyard@acm.org>
-	<1534796770-10295-9-git-send-email-minyard@acm.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <19f12dd4-4051-9d2a-7ea7-a3f1e0a753a6@amsat.org>
-Date: Tue, 21 Aug 2018 03:27:53 -0300
+	(envelope-from <peterx@redhat.com>) id 1fs0Av-0001aP-Hs
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:30:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39880 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fs0Av-0001Zq-AN
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:29:57 -0400
+Date: Tue, 21 Aug 2018 14:29:51 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180821062951.GE19915@xz-mi>
+References: <20180817135224.22971-1-marcandre.lureau@redhat.com>
+	<20180820024504.GA7953@xz-mi>
+	<CAJ+F1C+J1mUeP8YbsCg=-VU15adxKZoM2acxEJUVtEBUTJsuBQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1534796770-10295-9-git-send-email-minyard@acm.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/10] i2c:pm_smbus: Add the ability to
- force block transfer enable
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1C+J1mUeP8YbsCg=-VU15adxKZoM2acxEJUVtEBUTJsuBQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/4] Fix socket chardev regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,101 +29,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: minyard@acm.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-On 08/20/2018 05:26 PM, minyard@acm.org wrote:
-> From: Corey Minyard <cminyard@mvista.com>
-> 
-> The PIIX4 hardware has block transfer buffer always enabled in
-> the hardware, but the i801 does not.  Add a parameter to pm_smbus_init
-> to force on the block transfer so the PIIX4 handler can enable this
-> by default, as it was disabled by default before.
-> 
-> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+On Mon, Aug 20, 2018 at 05:37:55PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Mon, Aug 20, 2018 at 4:48 AM Peter Xu <peterx@redhat.com> wrote:
+> >
+> > On Fri, Aug 17, 2018 at 03:52:20PM +0200, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > Hi,
+> > >
+> > > In commit 25679e5d58e "chardev: tcp: postpone async connection setu=
+p"
+> > > (and its follow up 99f2f54174a59), Peter moved chardev socket
+> > > connection to machine_done event. However, chardev created later wi=
+ll
+> > > no longer attempt to connect, and chardev created in tests do not h=
+ave
+> > > machine_done event (breaking some of vhost-user-test).
+> > >
+> > > The goal was to move the "connect" source to the chardev frontend
+> > > context (the monitor thread context in his case). chr->gcontext is =
+set
+> > > with qemu_chr_fe_set_handlers(). But there is no guarantee that the
+> > > function will be called in general,
+> >
+> > Could you hint a case where we didn't use qemu_chr_fe_set_handlers()
+> > upon a chardev backend?  I thought it was always used in chardev
+> > frontends, and what the backend could do if without a frontend?
+>=20
+> Well, you don't have to have a front-end to have side effects. Connect
+> will be attempted even without frontend. We may have users expecting
+> that behaviour, that might be considered a break if we change it.
+>=20
+> (and unlikely, there might be frontends that are write only)
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+My understanding is that qemu_chr_fe_set_handlers() is not only for
+port read, but also for the rest.  For example, we need to pass in the
+correct IOEventHandler* to handle chardev backend events even if the
+frontend only writes.
 
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/acpi/piix4.c           | 2 +-
->  hw/i2c/pm_smbus.c         | 5 ++++-
->  hw/i2c/smbus_ich9.c       | 2 +-
->  hw/isa/vt82c686.c         | 2 +-
->  include/hw/i2c/pm_smbus.h | 2 +-
->  5 files changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index f8d8d2e..313305f 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -513,7 +513,7 @@ static void piix4_pm_realize(PCIDevice *dev, Error **errp)
->      pci_conf[0x90] = s->smb_io_base | 1;
->      pci_conf[0x91] = s->smb_io_base >> 8;
->      pci_conf[0xd2] = 0x09;
-> -    pm_smbus_init(DEVICE(dev), &s->smb);
-> +    pm_smbus_init(DEVICE(dev), &s->smb, true);
->      memory_region_set_enabled(&s->smb.io, pci_conf[0xd2] & 1);
->      memory_region_add_subregion(pci_address_space_io(dev),
->                                  s->smb_io_base, &s->smb.io);
-> diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-> index 10ba208..4d021bb 100644
-> --- a/hw/i2c/pm_smbus.c
-> +++ b/hw/i2c/pm_smbus.c
-> @@ -422,11 +422,14 @@ const VMStateDescription pmsmb_vmstate = {
->      }
->  };
->  
-> -void pm_smbus_init(DeviceState *parent, PMSMBus *smb)
-> +void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk)
->  {
->      smb->op_done = true;
->      smb->reset = pm_smbus_reset;
->      smb->smbus = i2c_init_bus(parent, "i2c");
-> +    if (force_aux_blk) {
-> +        smb->smb_auxctl |= AUX_BLK;
-> +    }
->      memory_region_init_io(&smb->io, OBJECT(parent), &pm_smbus_ops, smb,
->                            "pm-smbus", 64);
->  }
-> diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
-> index 316c2a4..5860fc9 100644
-> --- a/hw/i2c/smbus_ich9.c
-> +++ b/hw/i2c/smbus_ich9.c
-> @@ -88,7 +88,7 @@ static void ich9_smbus_realize(PCIDevice *d, Error **errp)
->      pci_set_byte(d->config + ICH9_SMB_HOSTC, 0);
->      /* TODO bar0, bar1: 64bit BAR support*/
->  
-> -    pm_smbus_init(&d->qdev, &s->smb);
-> +    pm_smbus_init(&d->qdev, &s->smb, false);
->      pci_register_bar(d, ICH9_SMB_SMB_BASE_BAR, PCI_BASE_ADDRESS_SPACE_IO,
->                       &s->smb.io);
->  }
-> diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-> index cff1946..7302f6d 100644
-> --- a/hw/isa/vt82c686.c
-> +++ b/hw/isa/vt82c686.c
-> @@ -370,7 +370,7 @@ static void vt82c686b_pm_realize(PCIDevice *dev, Error **errp)
->      pci_conf[0x90] = s->smb_io_base | 1;
->      pci_conf[0x91] = s->smb_io_base >> 8;
->      pci_conf[0xd2] = 0x90;
-> -    pm_smbus_init(&s->dev.qdev, &s->smb);
-> +    pm_smbus_init(&s->dev.qdev, &s->smb, false);
->      memory_region_add_subregion(get_system_io(), s->smb_io_base, &s->smb.io);
->  
->      apm_init(dev, &s->apm, NULL, s);
-> diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
-> index cfe596f..471345e 100644
-> --- a/include/hw/i2c/pm_smbus.h
-> +++ b/include/hw/i2c/pm_smbus.h
-> @@ -33,7 +33,7 @@ typedef struct PMSMBus {
->      bool op_done;
->  } PMSMBus;
->  
-> -void pm_smbus_init(DeviceState *parent, PMSMBus *smb);
-> +void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk);
->  
->  extern const VMStateDescription pmsmb_vmstate;
->  
-> 
+>=20
+> >
+> > [1]
+> >
+> > > so we can't delay connection until
+> > > then: the chardev should still attempt to connect during open(), us=
+ing
+> > > the main context.
+> > >
+> > > An alternative would be to specify the iothread during chardev
+> > > creation. Setting up monitor OOB would be quite different too, it
+> > > would take the same iothread as argument.
+> > >
+> > > 99f2f54174a595e is also a bit problematic, since it will behave
+> > > differently before and after machine_done (the first case gives a
+> > > chance to use a different context reliably, the second looks racy)
+> > >
+> > > In the end, I am not sure this is all necessary, as chardev callbac=
+ks
+> > > are called after qemu_chr_fe_set_handlers(), at which point the
+> > > context of sources are updated. In "char-socket: update all ioc
+> > > handlers when changing context", I moved also the hup handler to th=
+e
+> > > updated context. So unless the main thread is already stuck, we can
+> > > setup a different context for the chardev at that time. Or not?
+> >
+> > IMHO the two patches that you reverted are special-cases for reasons.
+> >
+> > The TLS handshake is carried out with an TLS internal GSource which i=
+s
+> > not owned by the chardev code, so the qemu_chr_fe_set_handlers() won'=
+t
+> > update that GSource (please refer to qio_channel_tls_handshake_task).
+>=20
+> What can go wrong by using the default context for initial connection
+> and TLS handshake?
+>=20
+> Presumably, you have a case where the mainloop is no longer processed
+> and that will hang the chardev?
+
+Yeah I don't see a big problem now, but I'm not sure. Actually it
+should not be very hard to even migrate this one just like other
+GSources, however the async one below should be a bit harder.
+
+>=20
+> > The async connection is carried out in a standalone thread that calls
+> > connect().  IMHO we'd better not update the gcontext bound to the
+> > async task since otherwise there'll be a race (IIRC I proposed
+> > something before using a mutex to update the gcontext, but Dan would
+> > prefer not to, and I followed with the suggestion which makes sense t=
+o
+> > me).
+> >
+> > Could we just postpone these machine done tasks into
+> > qemu_chr_fe_set_handlers() (or say, chr_update_read_handler() hook,
+> > just like what I mentioned in the other thread)?  Though we'll be sur=
+e
+> > qemu_chr_fe_set_handlers() will be called for all chardev backends
+> > hence I asked question [1] above.
+>=20
+> I would rather not to, if possible. unless we take the risk of
+> breaking current behaviour and review chardev usage in qemu.
+
+Yeah, I'd be glad to know any of the behavior breakage if there is,
+but I can't figure any out.  AFAIU there should be none since we
+should always be pairing a backend with a frontend.
+
+I fully agree that current way is not ideal since basically the
+backend should not depend on the frontend, but now we have the
+gcontext as an exception then the backend will somehow depend on the
+frontend.  If you don't like the way I proposed, another thing I am
+thinking is that whether we can assign the gcontext for the chardev
+backend before initialization of it (or by parsing the backend &
+frontend relationships before init of backends), then we assure that
+we never change the gcontext of any chardev backends.  Though that
+will require that we need to setup all possible gcontexts before hand
+(e.g., the monitor gcontext).  Then we can drop all these dynamic
+binding magics (but just to hope we will never need the flexibility in
+the future).
+
+Regards,
+
+--=20
+Peter Xu
