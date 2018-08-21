@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1frzqM-0002oB-Pr
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:08:43 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1frzvQ-0004q5-2O
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:13:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1frzqM-0003sX-0W
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:08:42 -0400
-Date: Tue, 21 Aug 2018 14:08:34 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180821060834.GL10682@lemon.usersys.redhat.com>
-References: <20180817170246.14641-1-kwolf@redhat.com>
+	(envelope-from <atar4qemu@gmail.com>) id 1frzvP-00070f-7B
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:13:56 -0400
+Received: from mail-it0-x233.google.com ([2607:f8b0:4001:c0b::233]:34695)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1frzvP-0006zI-1h
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:13:55 -0400
+Received: by mail-it0-x233.google.com with SMTP id x79-v6so1274418ita.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Aug 2018 23:13:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180817170246.14641-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/5] Fix some jobs/drain/aio_poll
- related hangs
+References: <153461822839.4954.4145341192703066894.malonedeb@chaenomeles.canonical.com>
+In-Reply-To: <153461822839.4954.4145341192703066894.malonedeb@chaenomeles.canonical.com>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Tue, 21 Aug 2018 08:13:42 +0200
+Message-ID: <CACXAS8AyjbZzu=vOCWOntyC+U6CPk4wgFKqXDGhY4ibBWni9HA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Bug 1787754] [NEW] qemu sparc -cpu help does not
+ generate correct display
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
+To: 1787754@bugs.launchpad.net
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, 08/17 19:02, Kevin Wolf wrote:
-> I'm running out of time and will be offline for the next two weeks, so
-> I'm just sending out what I have right now. This is probably not ready
-> to be merged yet, but if need be, someone else can pick it up. Otherwise
-> I'll do that myself when I return.
+On Sat, Aug 18, 2018 at 8:56 PM Donald R Laster Jr
+<1787754@bugs.launchpad.net> wrote:
+>
+> Public bug reported:
+>
+> The output for the "-cpu help" on the Sparc executables is not
+> generating accurate information.
+>
+> Running
+>
+> ./qemu-sparc64 -cpu help
+>
+> produces:
+>
+> Sparc  Fujitsu Sparc64 IU 0004000200000000 FPU 00000000 MMU 00000000 NWINS 4
+> Sparc Fujitsu Sparc64 III IU 0004000300000000 FPU 00000000 MMU 00000000 NWINS 5
+> Sparc Fujitsu Sparc64 IV IU 0004000400000000 FPU 00000000 MMU 00000000 NWINS 8
+> Sparc Fujitsu Sparc64 V IU 0004000551000000 FPU 00000000 MMU 00000000 NWINS 8
+> Sparc  TI UltraSparc I IU 0017001040000000 FPU 00000000 MMU 00000000 NWINS 8
+> Sparc TI UltraSparc II IU 0017001120000000 FPU 00000000 MMU 00000000 NWINS 8
+> Sparc TI UltraSparc IIi IU 0017001291000000 FPU 00000000 MMU 00000000 NWINS 8
+> Sparc TI UltraSparc IIe IU 0017001314000000 FPU 00000000 MMU 00000000 NWINS 8
+> Sparc Sun UltraSparc III IU 003e001434000000 FPU 00000000 MMU 00000000 NWINS 8
+> Sparc Sun UltraSparc III Cu IU 003e001541000000 FPU 00000000 MMU 00000001 NWINS 8
+> Sparc Sun UltraSparc IIIi IU 003e001634000000 FPU 00000000 MMU 00000000 NWINS 8
+> Sparc Sun UltraSparc IV IU 003e001831000000 FPU 00000000 MMU 00000002 NWINS 8
+> Sparc Sun UltraSparc IV+ IU 003e001922000000 FPU 00000000 MMU 00000000 NWINS 8 +cmt
+> Sparc Sun UltraSparc IIIi+ IU 003e002200000000 FPU 00000000 MMU 00000001 NWINS 8
+> Sparc Sun UltraSparc T1 IU 003e002302000000 FPU 00000000 MMU 00000003 NWINS 8 +hypv +cmt +gl
+> Sparc Sun UltraSparc T2 IU 003e002402000000 FPU 00000000 MMU 00000003 NWINS 8 +hypv +cmt +gl
+> Sparc NEC UltraSparc I IU 0022001040000000 FPU 00000000 MMU 00000000 NWINS 8
+> Default CPU feature flags (use '-' to remove): float swap mul div flush fsqrt fmul vis1 vis2 fsmuld
+> Available CPU feature flags (use '+' to add): float128 hypv cmt gl
+> Numerical features (use '=' to set): iu_version fpu_version mmu_version nwindows
+>
+> The entries appear to supposed to be (partial list from source code):
+>
+> TI-SuperSparc-II
+> TI-SuperSparc-II
+> TI-SuperSparc-II
+> TI-MicroSparc-I
+> TI-MicroSparc-I
+> TI-MicroSparc-I
+> Sun-UltraSparc-T1
+> TI-UltraSparc-IIi
+> Sun-UltraSparc-T1
+>
+The T1 entries are in the list above. The Micro- and Super- SPARC
+entries are not supposed to be there because they are 32 bit CPUs and
+thus not compatible with qemu-sparc64.
+Works as designed.
 
-I'll try take a look at these. But I'll start from
-
-https://bugzilla.redhat.com/show_bug.cgi?id=1609137
-
-> 
-> This is related to the following bug reports:
-> https://bugzilla.redhat.com/show_bug.cgi?id=1614623
-> https://bugzilla.redhat.com/show_bug.cgi?id=1601212
-> 
-> Essentially it tries to fix a few deadlocks into which we run when
-> running two commit jobs (probably just one example for problematic
-> scenarios) on nodes that are in a non-mainloop AioContext (i.e. with
-> dataplane).
-> 
-> Obviously, besides verifying that the code changes are actually correct
-> as they are, we also want to add some test cases for this. I suppose
-> test-bdrv-drain should test for the individual bugs, and a qemu-iotests
-> case could try the higher level scenario of multiple commit jobs with
-> dataplane.
-
-The test coverage of dataplane is terribly low. Let's think about adding
-variants to existing iotests around block jobs at least.
-
-Fam
-
-> 
-> Kevin Wolf (5):
->   blockjob: Wake up BDS when job becomes idle
->   tests: Acquire AioContext around job_finish_sync()
->   job: Drop AioContext lock around aio_poll()
->   block: Drop AioContext lock in bdrv_drain_poll_top_level()
->   [WIP] Lock AioContext in bdrv_co_drain_bh_cb()
-> 
->  include/block/blockjob.h | 13 +++++++++++++
->  include/qemu/job.h       |  9 +++++++++
->  block/io.c               | 31 ++++++++++++++++++++++++++++++-
->  blockjob.c               | 18 ++++++++++++++++++
->  job.c                    | 10 ++++++++++
->  tests/test-bdrv-drain.c  |  6 ++++++
->  tests/test-blockjob.c    |  6 ++++++
->  7 files changed, 92 insertions(+), 1 deletion(-)
-> 
-> -- 
-> 2.13.6
-> 
+Regards,
+Artyom
