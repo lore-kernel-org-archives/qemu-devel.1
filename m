@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fs2hk-0008Fj-0W
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:12:00 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fs2hk-0008Fl-0m
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:12:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fs2hd-0000e2-4y
+	(envelope-from <kraxel@redhat.com>) id 1fs2hf-0000gL-NC
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:11:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55386 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55394 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fs2hc-0000cH-SE
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:11:52 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fs2hf-0000f6-AQ
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:11:55 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 79F99400738B
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 09:11:54 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Aug 2018 11:11:43 +0200
-Message-Id: <20180821091148.32220-3-kraxel@redhat.com>
+Date: Tue, 21 Aug 2018 11:11:44 +0200
+Message-Id: <20180821091148.32220-4-kraxel@redhat.com>
 In-Reply-To: <20180821091148.32220-1-kraxel@redhat.com>
 References: <20180821091148.32220-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/7] ohci: Clear the interrupt counter for
- erroneous transfers
+Subject: [Qemu-devel] [PULL 3/7] dev-mtp: add support for canceling
+ transaction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +31,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Sebastian Bauer <mail@sebastianbauer.info>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>
 
-From: Sebastian Bauer <mail@sebastianbauer.info>
+From: Bandan Das <bsd@redhat.com>
 
-This is mandated by the ohci specification. It tells at 6.4.4 on page 104
-that for transfer descriptors that are retired with an error the done
-queue interrupt counter is cleared as if the interrupt delay field of the
-descriptions were zero.
+The initiator can choose to cancel an ongoing request which
+is specified by bRequest=0x64. If such a request arrives,
+free up any pending state
 
-Before this change, error conditions were handled similarly to the
-successful condition which is especially troublesome for control transfers.
-Some drivers (e.g., the AmigaOS-one) as well as the example code in the
-spec, set the setup stage with an interrupt delay of seven (which means no
-interrupt). This is fine under normal conditions, because one usually
-doesn't want to be notified about the completion of this stage. However, if
-an error occurs in this stage, these drivers will not get notified with the
-current implementation. The fix addresses this by following the spec more
-closely. Also, otherwise, the ability to set interrupt delay to seven would
-be useless.
-
-Note that Linux drivers that I looked at don't seem to be affected as they
-set six as the interrupt delay presumably for the reason that they won't
-get notified otherwise.
-
-Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
-Message-id: 20180729191928.11254-1-mail@sebastianbauer.info
+Signed-off-by: Bandan Das <bsd@redhat.com>
+Message-id: 20180720214020.22897-2-bsd@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/hcd-ohci.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/usb/dev-mtp.c | 30 ++++++++++++++++++++++++++----
+ 1 file changed, 26 insertions(+), 4 deletions(-)
 
-diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-index d4c0293db5..98da5f0f04 100644
---- a/hw/usb/hcd-ohci.c
-+++ b/hw/usb/hcd-ohci.c
-@@ -1156,6 +1156,9 @@ static int ohci_service_td(OHCIState *ohci, struct ohci_ed *ed)
-                 OHCI_SET_BM(td.flags, TD_EC, 3);
-                 break;
-             }
-+            /* An error occured so we have to clear the interrupt counter. See
-+             * spec at 6.4.4 on page 104 */
-+            ohci->done_count = 0;
-         }
-         ed->head |= OHCI_ED_H;
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 1ded7ac9a3..c40b0de0bb 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -82,6 +82,7 @@ enum mtp_code {
+     FMT_ASSOCIATION                = 0x3001,
+ 
+     /* event codes */
++    EVT_CANCEL_TRANSACTION         = 0x4001,
+     EVT_OBJ_ADDED                  = 0x4002,
+     EVT_OBJ_REMOVED                = 0x4003,
+     EVT_OBJ_INFO_CHANGED           = 0x4007,
+@@ -1551,14 +1552,35 @@ static void usb_mtp_handle_control(USBDevice *dev, USBPacket *p,
+                                    int length, uint8_t *data)
+ {
+     int ret;
++    MTPState *s = USB_MTP(dev);
++    uint16_t *event = (uint16_t *)data;
+ 
+-    ret = usb_desc_handle_control(dev, p, request, value, index, length, data);
+-    if (ret >= 0) {
+-        return;
++    switch (request) {
++    case ClassInterfaceOutRequest | 0x64:
++        if (*event == EVT_CANCEL_TRANSACTION) {
++            g_free(s->result);
++            s->result = NULL;
++            usb_mtp_data_free(s->data_in);
++            s->data_in = NULL;
++            if (s->write_pending) {
++                g_free(s->dataset.filename);
++                s->write_pending = false;
++            }
++            usb_mtp_data_free(s->data_out);
++            s->data_out = NULL;
++        } else {
++            p->status = USB_RET_STALL;
++        }
++        break;
++    default:
++        ret = usb_desc_handle_control(dev, p, request,
++                                      value, index, length, data);
++        if (ret >= 0) {
++            return;
++        }
      }
+ 
+     trace_usb_mtp_stall(dev->addr, "unknown control request");
+-    p->status = USB_RET_STALL;
+ }
+ 
+ static void usb_mtp_cancel_packet(USBDevice *dev, USBPacket *p)
 -- 
 2.9.3
