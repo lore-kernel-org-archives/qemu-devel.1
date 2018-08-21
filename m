@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fs2Gp-0005lD-RB
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 04:44:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fs2b3-0006QM-Dd
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:05:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fs2Gm-000385-3G
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 04:44:11 -0400
-Date: Tue, 21 Aug 2018 10:44:00 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180821104400.473d2951.cohuck@redhat.com>
-In-Reply-To: <3e2a3c5f-bab4-0a15-a34a-3e4423c37024@redhat.com>
-References: <20180821025104.19604-1-pavel.zbitskiy@gmail.com>
-	<3e2a3c5f-bab4-0a15-a34a-3e4423c37024@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fs2Ud-0004WD-J1
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 04:58:28 -0400
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:44543)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fs2Ub-0004MH-Re
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 04:58:26 -0400
+Received: by mail-oi0-x233.google.com with SMTP id s198-v6so30746191oih.11
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 01:58:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/7] Some improvements in z/Arch
- instructions support
+In-Reply-To: <CAGmj6qsWJq3cXheRpftnK2c9yCFCGDwN=Y9Y=m=QLBq+dTokAA@mail.gmail.com>
+References: <CAGmj6qti3t3dBp6OT1H_UrkUi5OvXrb1nhEyozonz6uZm2P95A@mail.gmail.com>
+	<CAFEAcA8wZ7ga0kJ3WQ-A=fYNeJrxxCV+b2n7_Ni4Hg7jBS+L0w@mail.gmail.com>
+	<CAGmj6qtJuootGneBjcz8aCRsBXBU+GN2nhERc+76un_CiBcDZQ@mail.gmail.com>
+	<CAFEAcA8wp=_MzzrT0G70n1eHbbt8FXf2upZB0cyBmhK3Pv+Y9w@mail.gmail.com>
+	<CAGmj6qsWJq3cXheRpftnK2c9yCFCGDwN=Y9Y=m=QLBq+dTokAA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Aug 2018 09:57:55 +0100
+Message-ID: <CAFEAcA-9Q1Lr0PV48SNYG8hHTShcur_i-d+9u7P2ds3VTgxvfg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Simulating a composite machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, richard.henderson@linaro.org
+To: Martin Schroeder <mkschreder.uk@googlemail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 21 Aug 2018 09:56:33 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 20 August 2018 at 19:29, Martin Schroeder
+<mkschreder.uk@googlemail.com> wrote:
+> Ok so FPU support is not there. What would it take for me to add it? I
+> would very much like to add it if I get some guidance as to what needs
+> to be done and where I can find information on how to do it. I see
+> there is some code in fpu/softfloat.c but I guess it is not enough?
 
-> On 21.08.2018 04:50, Pavel Zbitskiy wrote:
-> > Found while attempting to run an old tool in qemu.
-> > 
-> > * BAL and BALR:    Added.
-> > * CSST:            Qemu crashed after an accidental jump to garbage.
-> > * IPM:             A tool produced an incorrect output.
-> > * EX TRT/TRTR:     A tool ran quite slow.
-> > * PACK:            A tool produced an incorrect output.
-> > * CVB, CVBY, CVBG: Added.
-> >   
-> 
-> Thanks again for the fixes. When you resend patches
-> 
-> 1. Use "git format-patch ... --subject-prefix="PATCH v2" --cover-letter"
->    in order to include a version number
+As I say, it's mostly the exception handling parts (and also some
+things like M profile having memory mapped registers for the FPU
+ID registers). The instructions themselves are the same as the
+A-profile FPU.
 
-'-v 2' instead of --subject-prefix is even easier :)
+My summary breakdown of this task looks like:
+ * check which instructions we need to enable and which parts
+   of the current FP implementation are A/R specific and need
+   "not if M" conditionals
+   (this is going to involve some comparison-of-specifications
+   between the M-profile architecture spec manual and the A-profile
+   one. The answer is probably going to wind up being "the
+   A-profile-style FPU status and control register accesses
+   need to be disabled", but there might be more. You can assume
+   that the actual behaviour of each instruction is the same, though.)
+ * implement the status and ID registers that M profile wants
+   (mostly wiring up register accessors in hw/intc/armv7m_nvic.c
+   to existing CPU state fields, I think)
+ * exception model changes for FP (new exception frame layout, etc)
+   -- this is all code in target/arm/helper.c which now needs to
+   handle the possibility of an FPU. The pseudocode in the ARMv7M
+   and v8M manuals will help in identifying where changes need
+   to be made.
+ * make sure co-processor enable/disable is wired up right
+   (the coprocessor access is handled via a memory-mapped register)
+ * implement lazy saving of FP registers (complicated; when the
+   CPU status registers indicate that lazy-state-preservation is
+   in effect, we need to arrange that attempting to execute an
+   FP insn causes us to first stop and save the FPU state to the
+   stack, and then do the instruction. The best way to do this is
+   going to be to add a TB flag for "lazy state preservation required",
+   and if that flag is set then when we encounter an FP insn we
+   generate code for "raise a lazy-stacking exception". We can
+   then deal with the exception by "do the lazy-stacking, then
+   resume execution".
+ * turn this on for Cortex-M4, Cortex-M33 and test
 
-> 
-> 2. Try to keep R-bs as part of your patches, so they don't get lost.
-> 
-> 
-> @Conny, can you pick up Patch 1-6? Ran kvm-unit-tests and booted the
-> ususal fedora system
-> 
-> I remember there were some R-by from Thomas.
-
-Yup, will try to track down the R-bs.
+thanks
+-- PMM
