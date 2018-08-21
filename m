@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fs9tc-0008Vv-NN
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 12:52:46 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fs9ti-0000BG-8D
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 12:52:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fs9tX-0005KB-9d
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 12:52:42 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fs9tc-0005VA-KN
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 12:52:48 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Aug 2018 17:52:14 +0100
-Message-Id: <20180821165215.29069-3-peter.maydell@linaro.org>
+Date: Tue, 21 Aug 2018 17:52:13 +0100
+Message-Id: <20180821165215.29069-2-peter.maydell@linaro.org>
 In-Reply-To: <20180821165215.29069-1-peter.maydell@linaro.org>
 References: <20180821165215.29069-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/3] target/arm: Untabify iwmmxt_helper.c
+Subject: [Qemu-devel] [PATCH 1/3] target/arm: Untabify translate.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,313 +22,497 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Untabify the arm iwmmxt_helper.c.  This affects only the iwMMXt code.
-We've never touched that code in years, so it's not going to get
-fixed up by our "change when touched" process, and a bulk change is
-not going to be too disruptive.
+Untabify the arm translate.c. This affects only some lines,
+mostly comments, in the iwMMXt code. We've never touched
+that code in years, so it's not going to get fixed up
+by our "change when touched" process, and a bulk change
+is not going to be too disruptive.
 
-This commit was produced using Emacs "untabify" (plus one
-by-hand removal of a space to fix a checkpatch nit); it is
+This commit was produced using Emacs "untabify"; it is
 a whitespace-only change.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/iwmmxt_helper.c | 234 ++++++++++++++++++-------------------
- 1 file changed, 117 insertions(+), 117 deletions(-)
+ target/arm/translate.c | 122 ++++++++++++++++++++---------------------
+ 1 file changed, 61 insertions(+), 61 deletions(-)
 
-diff --git a/target/arm/iwmmxt_helper.c b/target/arm/iwmmxt_helper.c
-index f6a4fc5b7f0..24244d012cd 100644
---- a/target/arm/iwmmxt_helper.c
-+++ b/target/arm/iwmmxt_helper.c
-@@ -27,30 +27,30 @@
- /* iwMMXt macros extracted from GNU gdb.  */
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index bcfc29c5a6a..c6a5d2ac444 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -1627,7 +1627,7 @@ static inline void gen_mov_vreg_F0(int dp, int reg)
+         tcg_gen_st_f32(cpu_F0s, cpu_env, vfp_reg_offset(dp, reg));
+ }
  
- /* Set the SIMD wCASF flags for 8, 16, 32 or 64-bit operations.  */
--#define SIMD8_SET( v, n, b)	((v != 0) << ((((b) + 1) * 4) + (n)))
--#define SIMD16_SET(v, n, h)	((v != 0) << ((((h) + 1) * 8) + (n)))
--#define SIMD32_SET(v, n, w)	((v != 0) << ((((w) + 1) * 16) + (n)))
--#define SIMD64_SET(v, n)	((v != 0) << (32 + (n)))
-+#define SIMD8_SET(v, n, b)      ((v != 0) << ((((b) + 1) * 4) + (n)))
-+#define SIMD16_SET(v, n, h)     ((v != 0) << ((((h) + 1) * 8) + (n)))
-+#define SIMD32_SET(v, n, w)     ((v != 0) << ((((w) + 1) * 16) + (n)))
-+#define SIMD64_SET(v, n)        ((v != 0) << (32 + (n)))
- /* Flags to pass as "n" above.  */
--#define SIMD_NBIT	-1
--#define SIMD_ZBIT	-2
--#define SIMD_CBIT	-3
--#define SIMD_VBIT	-4
-+#define SIMD_NBIT       -1
-+#define SIMD_ZBIT       -2
-+#define SIMD_CBIT       -3
-+#define SIMD_VBIT       -4
- /* Various status bit macros.  */
--#define NBIT8(x)	((x) & 0x80)
--#define NBIT16(x)	((x) & 0x8000)
--#define NBIT32(x)	((x) & 0x80000000)
--#define NBIT64(x)	((x) & 0x8000000000000000ULL)
--#define ZBIT8(x)	(((x) & 0xff) == 0)
--#define ZBIT16(x)	(((x) & 0xffff) == 0)
--#define ZBIT32(x)	(((x) & 0xffffffff) == 0)
--#define ZBIT64(x)	(x == 0)
-+#define NBIT8(x)        ((x) & 0x80)
-+#define NBIT16(x)       ((x) & 0x8000)
-+#define NBIT32(x)       ((x) & 0x80000000)
-+#define NBIT64(x)       ((x) & 0x8000000000000000ULL)
-+#define ZBIT8(x)        (((x) & 0xff) == 0)
-+#define ZBIT16(x)       (((x) & 0xffff) == 0)
-+#define ZBIT32(x)       (((x) & 0xffffffff) == 0)
-+#define ZBIT64(x)       (x == 0)
- /* Sign extension macros.  */
--#define EXTEND8H(a)	((uint16_t) (int8_t) (a))
--#define EXTEND8(a)	((uint32_t) (int8_t) (a))
--#define EXTEND16(a)	((uint32_t) (int16_t) (a))
--#define EXTEND16S(a)	((int32_t) (int16_t) (a))
--#define EXTEND32(a)	((uint64_t) (int32_t) (a))
-+#define EXTEND8H(a)     ((uint16_t) (int8_t) (a))
-+#define EXTEND8(a)      ((uint32_t) (int8_t) (a))
-+#define EXTEND16(a)     ((uint32_t) (int16_t) (a))
-+#define EXTEND16S(a)    ((int32_t) (int16_t) (a))
-+#define EXTEND32(a)     ((uint64_t) (int32_t) (a))
+-#define ARM_CP_RW_BIT	(1 << 20)
++#define ARM_CP_RW_BIT   (1 << 20)
  
- uint64_t HELPER(iwmmxt_maddsq)(uint64_t a, uint64_t b)
+ static inline void iwmmxt_load_reg(TCGv_i64 var, int reg)
  {
-@@ -159,141 +159,141 @@ uint64_t HELPER(iwmmxt_macuw)(uint64_t a, uint64_t b)
- #define NZBIT64(x) \
-     SIMD64_SET(NBIT64(x), SIMD_NBIT) | \
-     SIMD64_SET(ZBIT64(x), SIMD_ZBIT)
--#define IWMMXT_OP_UNPACK(S, SH0, SH1, SH2, SH3)			\
-+#define IWMMXT_OP_UNPACK(S, SH0, SH1, SH2, SH3)                         \
- uint64_t HELPER(glue(iwmmxt_unpack, glue(S, b)))(CPUARMState *env, \
-                                                  uint64_t a, uint64_t b) \
--{								\
--    a =							        \
--        (((a >> SH0) & 0xff) << 0) | (((b >> SH0) & 0xff) << 8) |	\
--        (((a >> SH1) & 0xff) << 16) | (((b >> SH1) & 0xff) << 24) |	\
--        (((a >> SH2) & 0xff) << 32) | (((b >> SH2) & 0xff) << 40) |	\
--        (((a >> SH3) & 0xff) << 48) | (((b >> SH3) & 0xff) << 56);	\
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =			\
--        NZBIT8(a >> 0, 0) | NZBIT8(a >> 8, 1) |		        \
--        NZBIT8(a >> 16, 2) | NZBIT8(a >> 24, 3) |		\
--        NZBIT8(a >> 32, 4) | NZBIT8(a >> 40, 5) |		\
--        NZBIT8(a >> 48, 6) | NZBIT8(a >> 56, 7);		\
-+{                                                               \
-+    a =                                                                 \
-+        (((a >> SH0) & 0xff) << 0) | (((b >> SH0) & 0xff) << 8) |       \
-+        (((a >> SH1) & 0xff) << 16) | (((b >> SH1) & 0xff) << 24) |     \
-+        (((a >> SH2) & 0xff) << 32) | (((b >> SH2) & 0xff) << 40) |     \
-+        (((a >> SH3) & 0xff) << 48) | (((b >> SH3) & 0xff) << 56);      \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =                       \
-+        NZBIT8(a >> 0, 0) | NZBIT8(a >> 8, 1) |                         \
-+        NZBIT8(a >> 16, 2) | NZBIT8(a >> 24, 3) |               \
-+        NZBIT8(a >> 32, 4) | NZBIT8(a >> 40, 5) |               \
-+        NZBIT8(a >> 48, 6) | NZBIT8(a >> 56, 7);                \
-     return a;                                                   \
--}								\
-+}                                                               \
- uint64_t HELPER(glue(iwmmxt_unpack, glue(S, w)))(CPUARMState *env, \
-                                         uint64_t a, uint64_t b) \
--{								\
--    a =							        \
--        (((a >> SH0) & 0xffff) << 0) |				\
--        (((b >> SH0) & 0xffff) << 16) |			        \
--        (((a >> SH2) & 0xffff) << 32) |			        \
--        (((b >> SH2) & 0xffff) << 48);				\
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =			\
--        NZBIT8(a >> 0, 0) | NZBIT8(a >> 16, 1) |		\
--        NZBIT8(a >> 32, 2) | NZBIT8(a >> 48, 3);		\
-+{                                                               \
-+    a =                                                                 \
-+        (((a >> SH0) & 0xffff) << 0) |                          \
-+        (((b >> SH0) & 0xffff) << 16) |                                 \
-+        (((a >> SH2) & 0xffff) << 32) |                                 \
-+        (((b >> SH2) & 0xffff) << 48);                          \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =                       \
-+        NZBIT8(a >> 0, 0) | NZBIT8(a >> 16, 1) |                \
-+        NZBIT8(a >> 32, 2) | NZBIT8(a >> 48, 3);                \
-     return a;                                                   \
--}								\
-+}                                                               \
- uint64_t HELPER(glue(iwmmxt_unpack, glue(S, l)))(CPUARMState *env, \
-                                         uint64_t a, uint64_t b) \
--{								\
--    a =							        \
--        (((a >> SH0) & 0xffffffff) << 0) |			\
--        (((b >> SH0) & 0xffffffff) << 32);			\
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =			\
--        NZBIT32(a >> 0, 0) | NZBIT32(a >> 32, 1);		\
-+{                                                               \
-+    a =                                                                 \
-+        (((a >> SH0) & 0xffffffff) << 0) |                      \
-+        (((b >> SH0) & 0xffffffff) << 32);                      \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =                       \
-+        NZBIT32(a >> 0, 0) | NZBIT32(a >> 32, 1);               \
-     return a;                                                   \
--}								\
-+}                                                               \
- uint64_t HELPER(glue(iwmmxt_unpack, glue(S, ub)))(CPUARMState *env, \
-                                                   uint64_t x)   \
--{								\
--    x =							        \
--        (((x >> SH0) & 0xff) << 0) |				\
--        (((x >> SH1) & 0xff) << 16) |				\
--        (((x >> SH2) & 0xff) << 32) |				\
--        (((x >> SH3) & 0xff) << 48);				\
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =			\
--        NZBIT16(x >> 0, 0) | NZBIT16(x >> 16, 1) |		\
--        NZBIT16(x >> 32, 2) | NZBIT16(x >> 48, 3);		\
-+{                                                               \
-+    x =                                                                 \
-+        (((x >> SH0) & 0xff) << 0) |                            \
-+        (((x >> SH1) & 0xff) << 16) |                           \
-+        (((x >> SH2) & 0xff) << 32) |                           \
-+        (((x >> SH3) & 0xff) << 48);                            \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =                       \
-+        NZBIT16(x >> 0, 0) | NZBIT16(x >> 16, 1) |              \
-+        NZBIT16(x >> 32, 2) | NZBIT16(x >> 48, 3);              \
-     return x;                                                   \
--}								\
-+}                                                               \
- uint64_t HELPER(glue(iwmmxt_unpack, glue(S, uw)))(CPUARMState *env, \
-                                                   uint64_t x)   \
--{								\
--    x =							        \
--        (((x >> SH0) & 0xffff) << 0) |				\
--        (((x >> SH2) & 0xffff) << 32);				\
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =			\
--        NZBIT32(x >> 0, 0) | NZBIT32(x >> 32, 1);		\
-+{                                                               \
-+    x =                                                                 \
-+        (((x >> SH0) & 0xffff) << 0) |                          \
-+        (((x >> SH2) & 0xffff) << 32);                          \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =                       \
-+        NZBIT32(x >> 0, 0) | NZBIT32(x >> 32, 1);               \
-     return x;                                                   \
--}								\
-+}                                                               \
- uint64_t HELPER(glue(iwmmxt_unpack, glue(S, ul)))(CPUARMState *env, \
-                                                   uint64_t x)   \
--{								\
--    x = (((x >> SH0) & 0xffffffff) << 0);			\
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] = NZBIT64(x >> 0);	\
-+{                                                               \
-+    x = (((x >> SH0) & 0xffffffff) << 0);                       \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] = NZBIT64(x >> 0);      \
-     return x;                                                   \
--}								\
-+}                                                               \
- uint64_t HELPER(glue(iwmmxt_unpack, glue(S, sb)))(CPUARMState *env, \
-                                                   uint64_t x)   \
--{								\
--    x =							        \
--        ((uint64_t) EXTEND8H((x >> SH0) & 0xff) << 0) |	        \
--        ((uint64_t) EXTEND8H((x >> SH1) & 0xff) << 16) |	\
--        ((uint64_t) EXTEND8H((x >> SH2) & 0xff) << 32) |	\
--        ((uint64_t) EXTEND8H((x >> SH3) & 0xff) << 48);	        \
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =			\
--        NZBIT16(x >> 0, 0) | NZBIT16(x >> 16, 1) |		\
--        NZBIT16(x >> 32, 2) | NZBIT16(x >> 48, 3);		\
-+{                                                               \
-+    x =                                                                 \
-+        ((uint64_t) EXTEND8H((x >> SH0) & 0xff) << 0) |                 \
-+        ((uint64_t) EXTEND8H((x >> SH1) & 0xff) << 16) |        \
-+        ((uint64_t) EXTEND8H((x >> SH2) & 0xff) << 32) |        \
-+        ((uint64_t) EXTEND8H((x >> SH3) & 0xff) << 48);                 \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =                       \
-+        NZBIT16(x >> 0, 0) | NZBIT16(x >> 16, 1) |              \
-+        NZBIT16(x >> 32, 2) | NZBIT16(x >> 48, 3);              \
-     return x;                                                   \
--}								\
-+}                                                               \
- uint64_t HELPER(glue(iwmmxt_unpack, glue(S, sw)))(CPUARMState *env, \
-                                                   uint64_t x)   \
--{								\
--    x =							        \
--        ((uint64_t) EXTEND16((x >> SH0) & 0xffff) << 0) |	\
--        ((uint64_t) EXTEND16((x >> SH2) & 0xffff) << 32);	\
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =			\
--        NZBIT32(x >> 0, 0) | NZBIT32(x >> 32, 1);		\
-+{                                                               \
-+    x =                                                                 \
-+        ((uint64_t) EXTEND16((x >> SH0) & 0xffff) << 0) |       \
-+        ((uint64_t) EXTEND16((x >> SH2) & 0xffff) << 32);       \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =                       \
-+        NZBIT32(x >> 0, 0) | NZBIT32(x >> 32, 1);               \
-     return x;                                                   \
--}								\
-+}                                                               \
- uint64_t HELPER(glue(iwmmxt_unpack, glue(S, sl)))(CPUARMState *env, \
-                                                   uint64_t x)   \
--{								\
--    x = EXTEND32((x >> SH0) & 0xffffffff);			\
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] = NZBIT64(x >> 0);	\
-+{                                                               \
-+    x = EXTEND32((x >> SH0) & 0xffffffff);                      \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] = NZBIT64(x >> 0);      \
-     return x;                                                   \
- }
- IWMMXT_OP_UNPACK(l, 0, 8, 16, 24)
- IWMMXT_OP_UNPACK(h, 32, 40, 48, 56)
+@@ -1861,12 +1861,12 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+             wrd = insn & 0xf;
+             rdlo = (insn >> 12) & 0xf;
+             rdhi = (insn >> 16) & 0xf;
+-            if (insn & ARM_CP_RW_BIT) {			/* TMRRC */
++            if (insn & ARM_CP_RW_BIT) {                         /* TMRRC */
+                 iwmmxt_load_reg(cpu_V0, wrd);
+                 tcg_gen_extrl_i64_i32(cpu_R[rdlo], cpu_V0);
+                 tcg_gen_shri_i64(cpu_V0, cpu_V0, 32);
+                 tcg_gen_extrl_i64_i32(cpu_R[rdhi], cpu_V0);
+-            } else {					/* TMCRR */
++            } else {                                    /* TMCRR */
+                 tcg_gen_concat_i32_i64(cpu_V0, cpu_R[rdlo], cpu_R[rdhi]);
+                 iwmmxt_store_reg(cpu_V0, wrd);
+                 gen_op_iwmmxt_set_mup();
+@@ -1881,25 +1881,25 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+             return 1;
+         }
+         if (insn & ARM_CP_RW_BIT) {
+-            if ((insn >> 28) == 0xf) {			/* WLDRW wCx */
++            if ((insn >> 28) == 0xf) {                  /* WLDRW wCx */
+                 tmp = tcg_temp_new_i32();
+                 gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
+                 iwmmxt_store_creg(wrd, tmp);
+             } else {
+                 i = 1;
+                 if (insn & (1 << 8)) {
+-                    if (insn & (1 << 22)) {		/* WLDRD */
++                    if (insn & (1 << 22)) {             /* WLDRD */
+                         gen_aa32_ld64(s, cpu_M0, addr, get_mem_index(s));
+                         i = 0;
+-                    } else {				/* WLDRW wRd */
++                    } else {                            /* WLDRW wRd */
+                         tmp = tcg_temp_new_i32();
+                         gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
+                     }
+                 } else {
+                     tmp = tcg_temp_new_i32();
+-                    if (insn & (1 << 22)) {		/* WLDRH */
++                    if (insn & (1 << 22)) {             /* WLDRH */
+                         gen_aa32_ld16u(s, tmp, addr, get_mem_index(s));
+-                    } else {				/* WLDRB */
++                    } else {                            /* WLDRB */
+                         gen_aa32_ld8u(s, tmp, addr, get_mem_index(s));
+                     }
+                 }
+@@ -1910,24 +1910,24 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+                 gen_op_iwmmxt_movq_wRn_M0(wrd);
+             }
+         } else {
+-            if ((insn >> 28) == 0xf) {			/* WSTRW wCx */
++            if ((insn >> 28) == 0xf) {                  /* WSTRW wCx */
+                 tmp = iwmmxt_load_creg(wrd);
+                 gen_aa32_st32(s, tmp, addr, get_mem_index(s));
+             } else {
+                 gen_op_iwmmxt_movq_M0_wRn(wrd);
+                 tmp = tcg_temp_new_i32();
+                 if (insn & (1 << 8)) {
+-                    if (insn & (1 << 22)) {		/* WSTRD */
++                    if (insn & (1 << 22)) {             /* WSTRD */
+                         gen_aa32_st64(s, cpu_M0, addr, get_mem_index(s));
+-                    } else {				/* WSTRW wRd */
++                    } else {                            /* WSTRW wRd */
+                         tcg_gen_extrl_i64_i32(tmp, cpu_M0);
+                         gen_aa32_st32(s, tmp, addr, get_mem_index(s));
+                     }
+                 } else {
+-                    if (insn & (1 << 22)) {		/* WSTRH */
++                    if (insn & (1 << 22)) {             /* WSTRH */
+                         tcg_gen_extrl_i64_i32(tmp, cpu_M0);
+                         gen_aa32_st16(s, tmp, addr, get_mem_index(s));
+-                    } else {				/* WSTRB */
++                    } else {                            /* WSTRB */
+                         tcg_gen_extrl_i64_i32(tmp, cpu_M0);
+                         gen_aa32_st8(s, tmp, addr, get_mem_index(s));
+                     }
+@@ -1943,7 +1943,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         return 1;
  
--#define IWMMXT_OP_CMP(SUFF, Tb, Tw, Tl, O)			\
-+#define IWMMXT_OP_CMP(SUFF, Tb, Tw, Tl, O)                      \
- uint64_t HELPER(glue(iwmmxt_, glue(SUFF, b)))(CPUARMState *env,    \
-                                         uint64_t a, uint64_t b) \
--{								\
--    a =							        \
--        CMP(0, Tb, O, 0xff) | CMP(8, Tb, O, 0xff) |		\
--        CMP(16, Tb, O, 0xff) | CMP(24, Tb, O, 0xff) |		\
--        CMP(32, Tb, O, 0xff) | CMP(40, Tb, O, 0xff) |		\
--        CMP(48, Tb, O, 0xff) | CMP(56, Tb, O, 0xff);		\
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =			\
--        NZBIT8(a >> 0, 0) | NZBIT8(a >> 8, 1) |		        \
--        NZBIT8(a >> 16, 2) | NZBIT8(a >> 24, 3) |		\
--        NZBIT8(a >> 32, 4) | NZBIT8(a >> 40, 5) |		\
--        NZBIT8(a >> 48, 6) | NZBIT8(a >> 56, 7);		\
-+{                                                               \
-+    a =                                                                 \
-+        CMP(0, Tb, O, 0xff) | CMP(8, Tb, O, 0xff) |             \
-+        CMP(16, Tb, O, 0xff) | CMP(24, Tb, O, 0xff) |           \
-+        CMP(32, Tb, O, 0xff) | CMP(40, Tb, O, 0xff) |           \
-+        CMP(48, Tb, O, 0xff) | CMP(56, Tb, O, 0xff);            \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =                       \
-+        NZBIT8(a >> 0, 0) | NZBIT8(a >> 8, 1) |                         \
-+        NZBIT8(a >> 16, 2) | NZBIT8(a >> 24, 3) |               \
-+        NZBIT8(a >> 32, 4) | NZBIT8(a >> 40, 5) |               \
-+        NZBIT8(a >> 48, 6) | NZBIT8(a >> 56, 7);                \
-     return a;                                                   \
--}								\
-+}                                                               \
- uint64_t HELPER(glue(iwmmxt_, glue(SUFF, w)))(CPUARMState *env,    \
-                                         uint64_t a, uint64_t b) \
--{								\
--    a = CMP(0, Tw, O, 0xffff) | CMP(16, Tw, O, 0xffff) |	\
--        CMP(32, Tw, O, 0xffff) | CMP(48, Tw, O, 0xffff);	\
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =			\
--        NZBIT16(a >> 0, 0) | NZBIT16(a >> 16, 1) |		\
--        NZBIT16(a >> 32, 2) | NZBIT16(a >> 48, 3);		\
-+{                                                               \
-+    a = CMP(0, Tw, O, 0xffff) | CMP(16, Tw, O, 0xffff) |        \
-+        CMP(32, Tw, O, 0xffff) | CMP(48, Tw, O, 0xffff);        \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =                       \
-+        NZBIT16(a >> 0, 0) | NZBIT16(a >> 16, 1) |              \
-+        NZBIT16(a >> 32, 2) | NZBIT16(a >> 48, 3);              \
-     return a;                                                   \
--}								\
-+}                                                               \
- uint64_t HELPER(glue(iwmmxt_, glue(SUFF, l)))(CPUARMState *env,    \
-                                         uint64_t a, uint64_t b) \
--{								\
--    a = CMP(0, Tl, O, 0xffffffff) |				\
--        CMP(32, Tl, O, 0xffffffff);				\
--    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =			\
--        NZBIT32(a >> 0, 0) | NZBIT32(a >> 32, 1);		\
-+{                                                               \
-+    a = CMP(0, Tl, O, 0xffffffff) |                             \
-+        CMP(32, Tl, O, 0xffffffff);                             \
-+    env->iwmmxt.cregs[ARM_IWMMXT_wCASF] =                       \
-+        NZBIT32(a >> 0, 0) | NZBIT32(a >> 32, 1);               \
-     return a;                                                   \
- }
- #define CMP(SHR, TYPE, OPER, MASK) ((((TYPE) ((a >> SHR) & MASK) OPER \
+     switch (((insn >> 12) & 0xf00) | ((insn >> 4) & 0xff)) {
+-    case 0x000:						/* WOR */
++    case 0x000:                                                 /* WOR */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 0) & 0xf;
+         rd1 = (insn >> 16) & 0xf;
+@@ -1954,7 +1954,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x011:						/* TMCR */
++    case 0x011:                                                 /* TMCR */
+         if (insn & 0xf)
+             return 1;
+         rd = (insn >> 12) & 0xf;
+@@ -1985,7 +1985,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+             return 1;
+         }
+         break;
+-    case 0x100:						/* WXOR */
++    case 0x100:                                                 /* WXOR */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 0) & 0xf;
+         rd1 = (insn >> 16) & 0xf;
+@@ -1996,7 +1996,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x111:						/* TMRC */
++    case 0x111:                                                 /* TMRC */
+         if (insn & 0xf)
+             return 1;
+         rd = (insn >> 12) & 0xf;
+@@ -2004,7 +2004,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         tmp = iwmmxt_load_creg(wrd);
+         store_reg(s, rd, tmp);
+         break;
+-    case 0x300:						/* WANDN */
++    case 0x300:                                                 /* WANDN */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 0) & 0xf;
+         rd1 = (insn >> 16) & 0xf;
+@@ -2016,7 +2016,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x200:						/* WAND */
++    case 0x200:                                                 /* WAND */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 0) & 0xf;
+         rd1 = (insn >> 16) & 0xf;
+@@ -2027,7 +2027,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x810: case 0xa10:				/* WMADD */
++    case 0x810: case 0xa10:                             /* WMADD */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 0) & 0xf;
+         rd1 = (insn >> 16) & 0xf;
+@@ -2039,7 +2039,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_movq_wRn_M0(wrd);
+         gen_op_iwmmxt_set_mup();
+         break;
+-    case 0x10e: case 0x50e: case 0x90e: case 0xd0e:	/* WUNPCKIL */
++    case 0x10e: case 0x50e: case 0x90e: case 0xd0e:     /* WUNPCKIL */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+         rd1 = (insn >> 0) & 0xf;
+@@ -2061,7 +2061,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x10c: case 0x50c: case 0x90c: case 0xd0c:	/* WUNPCKIH */
++    case 0x10c: case 0x50c: case 0x90c: case 0xd0c:     /* WUNPCKIH */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+         rd1 = (insn >> 0) & 0xf;
+@@ -2083,7 +2083,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x012: case 0x112: case 0x412: case 0x512:	/* WSAD */
++    case 0x012: case 0x112: case 0x412: case 0x512:     /* WSAD */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+         rd1 = (insn >> 0) & 0xf;
+@@ -2097,7 +2097,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_movq_wRn_M0(wrd);
+         gen_op_iwmmxt_set_mup();
+         break;
+-    case 0x010: case 0x110: case 0x210: case 0x310:	/* WMUL */
++    case 0x010: case 0x110: case 0x210: case 0x310:     /* WMUL */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+         rd1 = (insn >> 0) & 0xf;
+@@ -2116,7 +2116,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_movq_wRn_M0(wrd);
+         gen_op_iwmmxt_set_mup();
+         break;
+-    case 0x410: case 0x510: case 0x610: case 0x710:	/* WMAC */
++    case 0x410: case 0x510: case 0x610: case 0x710:     /* WMAC */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+         rd1 = (insn >> 0) & 0xf;
+@@ -2132,7 +2132,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_movq_wRn_M0(wrd);
+         gen_op_iwmmxt_set_mup();
+         break;
+-    case 0x006: case 0x406: case 0x806: case 0xc06:	/* WCMPEQ */
++    case 0x006: case 0x406: case 0x806: case 0xc06:     /* WCMPEQ */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+         rd1 = (insn >> 0) & 0xf;
+@@ -2154,7 +2154,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x800: case 0x900: case 0xc00: case 0xd00:	/* WAVG2 */
++    case 0x800: case 0x900: case 0xc00: case 0xd00:     /* WAVG2 */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+         rd1 = (insn >> 0) & 0xf;
+@@ -2174,7 +2174,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x802: case 0x902: case 0xa02: case 0xb02:	/* WALIGNR */
++    case 0x802: case 0x902: case 0xa02: case 0xb02:     /* WALIGNR */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+         rd1 = (insn >> 0) & 0xf;
+@@ -2187,7 +2187,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_movq_wRn_M0(wrd);
+         gen_op_iwmmxt_set_mup();
+         break;
+-    case 0x601: case 0x605: case 0x609: case 0x60d:	/* TINSR */
++    case 0x601: case 0x605: case 0x609: case 0x60d:     /* TINSR */
+         if (((insn >> 6) & 3) == 3)
+             return 1;
+         rd = (insn >> 12) & 0xf;
+@@ -2218,7 +2218,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_movq_wRn_M0(wrd);
+         gen_op_iwmmxt_set_mup();
+         break;
+-    case 0x107: case 0x507: case 0x907: case 0xd07:	/* TEXTRM */
++    case 0x107: case 0x507: case 0x907: case 0xd07:     /* TEXTRM */
+         rd = (insn >> 12) & 0xf;
+         wrd = (insn >> 16) & 0xf;
+         if (rd == 15 || ((insn >> 22) & 3) == 3)
+@@ -2251,7 +2251,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         }
+         store_reg(s, rd, tmp);
+         break;
+-    case 0x117: case 0x517: case 0x917: case 0xd17:	/* TEXTRC */
++    case 0x117: case 0x517: case 0x917: case 0xd17:     /* TEXTRC */
+         if ((insn & 0x000ff008) != 0x0003f000 || ((insn >> 22) & 3) == 3)
+             return 1;
+         tmp = iwmmxt_load_creg(ARM_IWMMXT_wCASF);
+@@ -2270,7 +2270,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_set_nzcv(tmp);
+         tcg_temp_free_i32(tmp);
+         break;
+-    case 0x401: case 0x405: case 0x409: case 0x40d:	/* TBCST */
++    case 0x401: case 0x405: case 0x409: case 0x40d:     /* TBCST */
+         if (((insn >> 6) & 3) == 3)
+             return 1;
+         rd = (insn >> 12) & 0xf;
+@@ -2291,7 +2291,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_movq_wRn_M0(wrd);
+         gen_op_iwmmxt_set_mup();
+         break;
+-    case 0x113: case 0x513: case 0x913: case 0xd13:	/* TANDC */
++    case 0x113: case 0x513: case 0x913: case 0xd13:     /* TANDC */
+         if ((insn & 0x000ff00f) != 0x0003f000 || ((insn >> 22) & 3) == 3)
+             return 1;
+         tmp = iwmmxt_load_creg(ARM_IWMMXT_wCASF);
+@@ -2319,7 +2319,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         tcg_temp_free_i32(tmp2);
+         tcg_temp_free_i32(tmp);
+         break;
+-    case 0x01c: case 0x41c: case 0x81c: case 0xc1c:	/* WACC */
++    case 0x01c: case 0x41c: case 0x81c: case 0xc1c:     /* WACC */
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+         gen_op_iwmmxt_movq_M0_wRn(rd0);
+@@ -2339,7 +2339,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_movq_wRn_M0(wrd);
+         gen_op_iwmmxt_set_mup();
+         break;
+-    case 0x115: case 0x515: case 0x915: case 0xd15:	/* TORC */
++    case 0x115: case 0x515: case 0x915: case 0xd15:     /* TORC */
+         if ((insn & 0x000ff00f) != 0x0003f000 || ((insn >> 22) & 3) == 3)
+             return 1;
+         tmp = iwmmxt_load_creg(ARM_IWMMXT_wCASF);
+@@ -2367,7 +2367,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         tcg_temp_free_i32(tmp2);
+         tcg_temp_free_i32(tmp);
+         break;
+-    case 0x103: case 0x503: case 0x903: case 0xd03:	/* TMOVMSK */
++    case 0x103: case 0x503: case 0x903: case 0xd03:     /* TMOVMSK */
+         rd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+         if ((insn & 0xf) != 0 || ((insn >> 22) & 3) == 3)
+@@ -2387,7 +2387,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         }
+         store_reg(s, rd, tmp);
+         break;
+-    case 0x106: case 0x306: case 0x506: case 0x706:	/* WCMPGT */
++    case 0x106: case 0x306: case 0x506: case 0x706:     /* WCMPGT */
+     case 0x906: case 0xb06: case 0xd06: case 0xf06:
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+@@ -2419,7 +2419,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x00e: case 0x20e: case 0x40e: case 0x60e:	/* WUNPCKEL */
++    case 0x00e: case 0x20e: case 0x40e: case 0x60e:     /* WUNPCKEL */
+     case 0x80e: case 0xa0e: case 0xc0e: case 0xe0e:
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+@@ -2450,7 +2450,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x00c: case 0x20c: case 0x40c: case 0x60c:	/* WUNPCKEH */
++    case 0x00c: case 0x20c: case 0x40c: case 0x60c:     /* WUNPCKEH */
+     case 0x80c: case 0xa0c: case 0xc0c: case 0xe0c:
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+@@ -2481,7 +2481,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x204: case 0x604: case 0xa04: case 0xe04:	/* WSRL */
++    case 0x204: case 0x604: case 0xa04: case 0xe04:     /* WSRL */
+     case 0x214: case 0x614: case 0xa14: case 0xe14:
+         if (((insn >> 22) & 3) == 0)
+             return 1;
+@@ -2509,7 +2509,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x004: case 0x404: case 0x804: case 0xc04:	/* WSRA */
++    case 0x004: case 0x404: case 0x804: case 0xc04:     /* WSRA */
+     case 0x014: case 0x414: case 0x814: case 0xc14:
+         if (((insn >> 22) & 3) == 0)
+             return 1;
+@@ -2537,7 +2537,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x104: case 0x504: case 0x904: case 0xd04:	/* WSLL */
++    case 0x104: case 0x504: case 0x904: case 0xd04:     /* WSLL */
+     case 0x114: case 0x514: case 0x914: case 0xd14:
+         if (((insn >> 22) & 3) == 0)
+             return 1;
+@@ -2565,7 +2565,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x304: case 0x704: case 0xb04: case 0xf04:	/* WROR */
++    case 0x304: case 0x704: case 0xb04: case 0xf04:     /* WROR */
+     case 0x314: case 0x714: case 0xb14: case 0xf14:
+         if (((insn >> 22) & 3) == 0)
+             return 1;
+@@ -2601,7 +2601,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x116: case 0x316: case 0x516: case 0x716:	/* WMIN */
++    case 0x116: case 0x316: case 0x516: case 0x716:     /* WMIN */
+     case 0x916: case 0xb16: case 0xd16: case 0xf16:
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+@@ -2632,7 +2632,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_movq_wRn_M0(wrd);
+         gen_op_iwmmxt_set_mup();
+         break;
+-    case 0x016: case 0x216: case 0x416: case 0x616:	/* WMAX */
++    case 0x016: case 0x216: case 0x416: case 0x616:     /* WMAX */
+     case 0x816: case 0xa16: case 0xc16: case 0xe16:
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+@@ -2663,7 +2663,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_movq_wRn_M0(wrd);
+         gen_op_iwmmxt_set_mup();
+         break;
+-    case 0x002: case 0x102: case 0x202: case 0x302:	/* WALIGNI */
++    case 0x002: case 0x102: case 0x202: case 0x302:     /* WALIGNI */
+     case 0x402: case 0x502: case 0x602: case 0x702:
+         wrd = (insn >> 12) & 0xf;
+         rd0 = (insn >> 16) & 0xf;
+@@ -2676,7 +2676,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_movq_wRn_M0(wrd);
+         gen_op_iwmmxt_set_mup();
+         break;
+-    case 0x01a: case 0x11a: case 0x21a: case 0x31a:	/* WSUB */
++    case 0x01a: case 0x11a: case 0x21a: case 0x31a:     /* WSUB */
+     case 0x41a: case 0x51a: case 0x61a: case 0x71a:
+     case 0x81a: case 0x91a: case 0xa1a: case 0xb1a:
+     case 0xc1a: case 0xd1a: case 0xe1a: case 0xf1a:
+@@ -2719,7 +2719,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x01e: case 0x11e: case 0x21e: case 0x31e:	/* WSHUFH */
++    case 0x01e: case 0x11e: case 0x21e: case 0x31e:     /* WSHUFH */
+     case 0x41e: case 0x51e: case 0x61e: case 0x71e:
+     case 0x81e: case 0x91e: case 0xa1e: case 0xb1e:
+     case 0xc1e: case 0xd1e: case 0xe1e: case 0xf1e:
+@@ -2733,7 +2733,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x018: case 0x118: case 0x218: case 0x318:	/* WADD */
++    case 0x018: case 0x118: case 0x218: case 0x318:     /* WADD */
+     case 0x418: case 0x518: case 0x618: case 0x718:
+     case 0x818: case 0x918: case 0xa18: case 0xb18:
+     case 0xc18: case 0xd18: case 0xe18: case 0xf18:
+@@ -2776,7 +2776,7 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         gen_op_iwmmxt_set_mup();
+         gen_op_iwmmxt_set_cup();
+         break;
+-    case 0x008: case 0x108: case 0x208: case 0x308:	/* WPACK */
++    case 0x008: case 0x108: case 0x208: case 0x308:     /* WPACK */
+     case 0x408: case 0x508: case 0x608: case 0x708:
+     case 0x808: case 0x908: case 0xa08: case 0xb08:
+     case 0xc08: case 0xd08: case 0xe08: case 0xf08:
+@@ -2823,13 +2823,13 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+         tmp = load_reg(s, rd0);
+         tmp2 = load_reg(s, rd1);
+         switch ((insn >> 16) & 0xf) {
+-        case 0x0:					/* TMIA */
++        case 0x0:                                       /* TMIA */
+             gen_helper_iwmmxt_muladdsl(cpu_M0, cpu_M0, tmp, tmp2);
+             break;
+-        case 0x8:					/* TMIAPH */
++        case 0x8:                                       /* TMIAPH */
+             gen_helper_iwmmxt_muladdsw(cpu_M0, cpu_M0, tmp, tmp2);
+             break;
+-        case 0xc: case 0xd: case 0xe: case 0xf:		/* TMIAxy */
++        case 0xc: case 0xd: case 0xe: case 0xf:                 /* TMIAxy */
+             if (insn & (1 << 16))
+                 tcg_gen_shri_i32(tmp, tmp, 16);
+             if (insn & (1 << 17))
+@@ -2872,16 +2872,16 @@ static int disas_dsp_insn(DisasContext *s, uint32_t insn)
+         tmp = load_reg(s, rd0);
+         tmp2 = load_reg(s, rd1);
+         switch ((insn >> 16) & 0xf) {
+-        case 0x0:					/* MIA */
++        case 0x0:                                       /* MIA */
+             gen_helper_iwmmxt_muladdsl(cpu_M0, cpu_M0, tmp, tmp2);
+             break;
+-        case 0x8:					/* MIAPH */
++        case 0x8:                                       /* MIAPH */
+             gen_helper_iwmmxt_muladdsw(cpu_M0, cpu_M0, tmp, tmp2);
+             break;
+-        case 0xc:					/* MIABB */
+-        case 0xd:					/* MIABT */
+-        case 0xe:					/* MIATB */
+-        case 0xf:					/* MIATT */
++        case 0xc:                                       /* MIABB */
++        case 0xd:                                       /* MIABT */
++        case 0xe:                                       /* MIATB */
++        case 0xf:                                       /* MIATT */
+             if (insn & (1 << 16))
+                 tcg_gen_shri_i32(tmp, tmp, 16);
+             if (insn & (1 << 17))
+@@ -2907,13 +2907,13 @@ static int disas_dsp_insn(DisasContext *s, uint32_t insn)
+         if (acc != 0)
+             return 1;
+ 
+-        if (insn & ARM_CP_RW_BIT) {			/* MRA */
++        if (insn & ARM_CP_RW_BIT) {                     /* MRA */
+             iwmmxt_load_reg(cpu_V0, acc);
+             tcg_gen_extrl_i64_i32(cpu_R[rdlo], cpu_V0);
+             tcg_gen_shri_i64(cpu_V0, cpu_V0, 32);
+             tcg_gen_extrl_i64_i32(cpu_R[rdhi], cpu_V0);
+             tcg_gen_andi_i32(cpu_R[rdhi], cpu_R[rdhi], (1 << (40 - 32)) - 1);
+-        } else {					/* MAR */
++        } else {                                        /* MAR */
+             tcg_gen_concat_i32_i64(cpu_V0, cpu_R[rdlo], cpu_R[rdhi]);
+             iwmmxt_store_reg(cpu_V0, acc);
+         }
 -- 
 2.18.0
