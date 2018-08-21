@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4M-0001hY-VF
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:03:51 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4Q-0001kf-2x
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:03:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA49-0006FV-8K
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:03:44 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:43890)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4H-0006Q6-0j
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:03:46 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:33121)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fsA3z-0005pJ-Hs
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:03:31 -0400
-Received: by mail-wr1-x436.google.com with SMTP id k5-v6so4942754wre.10
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:03:21 -0700 (PDT)
+	id 1fsA48-0005zD-AQ
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:03:38 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id i134-v6so10056936wmf.0
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:03:28 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 21 Aug 2018 19:01:48 +0200
-Message-Id: <1534870966-9287-17-git-send-email-pbonzini@redhat.com>
+Date: Tue, 21 Aug 2018 19:01:54 +0200
+Message-Id: <1534870966-9287-23-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
 References: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 16/74] tests/device-introspect: Test with all
- machines, not only with "none"
+Subject: [Qemu-devel] [PULL 22/74] qsp: track BQL callers explicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +28,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: "Emilio G. Cota" <cota@braap.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: "Emilio G. Cota" <cota@braap.org>
 
-Certain device introspection crashes used to only happen if you were
-using a certain machine, e.g. if the machine was using serial_hd() or
-nd_table[], and a device was trying to use these in its instance_init
-function, too.
+The BQL is acquired via qemu_mutex_lock_iothread(), which makes
+the profiler assign the associated wait time (i.e. most of
+BQL wait time) entirely to that function. This loses the original
+call site information, which does not help diagnose BQL contention.
+Fix it by tracking the callers explicitly.
 
-To be able to catch these problems, let's extend the device-introspect
-test to check the devices on all machine types, with and without the
-"-nodefaults" parameter (since this makes a difference sometimes, too).
-Since this is a rather slow operation, and most of the problems are
-already handled by testing with the "none" machine only, the test with
-all machines is only run in the "make check SPEED=slow" mode.
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1534419358-10932-8-git-send-email-thuth@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/device-introspect-test.c | 32 +++++++++++++++++++++++++++++---
- 1 file changed, 29 insertions(+), 3 deletions(-)
+ cpus.c                   | 10 ++++++++--
+ include/qemu/main-loop.h |  4 +++-
+ include/qemu/thread.h    |  1 +
+ stubs/iothread-lock.c    |  2 +-
+ util/qsp.c               |  6 ++++++
+ 5 files changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-index a38193b..a25092d 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -221,13 +221,13 @@ static void test_device_intro_abstract(void)
-     qtest_end();
+diff --git a/cpus.c b/cpus.c
+index b5844b7..a5ea3ee 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1762,10 +1762,16 @@ bool qemu_mutex_iothread_locked(void)
+     return iothread_locked;
  }
  
--static void test_device_intro_concrete(void)
-+static void test_device_intro_concrete(const void *args)
+-void qemu_mutex_lock_iothread(void)
++/*
++ * The BQL is taken from so many places that it is worth profiling the
++ * callers directly, instead of funneling them all through a single function.
++ */
++void qemu_mutex_lock_iothread_impl(const char *file, int line)
  {
-     QList *types;
-     QListEntry *entry;
-     const char *type;
- 
--    qtest_start(common_args);
-+    qtest_start(args);
-     types = device_type_list(false);
- 
-     QLIST_FOREACH_ENTRY(types, entry) {
-@@ -239,6 +239,7 @@ static void test_device_intro_concrete(void)
- 
-     qobject_unref(types);
-     qtest_end();
-+    g_free((void *)args);
++    QemuMutexLockFunc bql_lock = atomic_read(&qemu_bql_mutex_lock_func);
++
+     g_assert(!qemu_mutex_iothread_locked());
+-    qemu_mutex_lock(&qemu_global_mutex);
++    bql_lock(&qemu_global_mutex, file, line);
+     iothread_locked = true;
  }
  
- static void test_abstract_interfaces(void)
-@@ -275,6 +276,26 @@ static void test_abstract_interfaces(void)
-     qtest_end();
+diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
+index 721aa24..e59f9ae 100644
+--- a/include/qemu/main-loop.h
++++ b/include/qemu/main-loop.h
+@@ -276,7 +276,9 @@ bool qemu_mutex_iothread_locked(void);
+  * NOTE: tools currently are single-threaded and qemu_mutex_lock_iothread
+  * is a no-op there.
+  */
+-void qemu_mutex_lock_iothread(void);
++#define qemu_mutex_lock_iothread()                      \
++    qemu_mutex_lock_iothread_impl(__FILE__, __LINE__)
++void qemu_mutex_lock_iothread_impl(const char *file, int line);
+ 
+ /**
+  * qemu_mutex_unlock_iothread: Unlock the main loop mutex.
+diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+index c90ea47..dacebcf 100644
+--- a/include/qemu/thread.h
++++ b/include/qemu/thread.h
+@@ -35,6 +35,7 @@ typedef int (*QemuRecMutexTrylockFunc)(QemuRecMutex *m, const char *f, int l);
+ typedef void (*QemuCondWaitFunc)(QemuCond *c, QemuMutex *m, const char *f,
+                                  int l);
+ 
++extern QemuMutexLockFunc qemu_bql_mutex_lock_func;
+ extern QemuMutexLockFunc qemu_mutex_lock_func;
+ extern QemuMutexTrylockFunc qemu_mutex_trylock_func;
+ extern QemuRecMutexLockFunc qemu_rec_mutex_lock_func;
+diff --git a/stubs/iothread-lock.c b/stubs/iothread-lock.c
+index 9b6db2e..eb745d7 100644
+--- a/stubs/iothread-lock.c
++++ b/stubs/iothread-lock.c
+@@ -7,7 +7,7 @@ bool qemu_mutex_iothread_locked(void)
+     return true;
  }
  
-+static void add_machine_test_case(const char *mname)
-+{
-+    char *path, *args;
-+
-+    /* Ignore blacklisted machines */
-+    if (g_str_equal("xenfv", mname) || g_str_equal("xenpv", mname)) {
-+        return;
-+    }
-+
-+    path = g_strdup_printf("device/introspect/concrete/defaults/%s", mname);
-+    args = g_strdup_printf("-M %s", mname);
-+    qtest_add_data_func(path, args, test_device_intro_concrete);
-+    g_free(path);
-+
-+    path = g_strdup_printf("device/introspect/concrete/nodefaults/%s", mname);
-+    args = g_strdup_printf("-nodefaults -M %s", mname);
-+    qtest_add_data_func(path, args, test_device_intro_concrete);
-+    g_free(path);
-+}
-+
- int main(int argc, char **argv)
+-void qemu_mutex_lock_iothread(void)
++void qemu_mutex_lock_iothread_impl(const char *file, int line)
  {
-     g_test_init(&argc, &argv, NULL);
-@@ -283,8 +304,13 @@ int main(int argc, char **argv)
-     qtest_add_func("device/introspect/list-fields", test_qom_list_fields);
-     qtest_add_func("device/introspect/none", test_device_intro_none);
-     qtest_add_func("device/introspect/abstract", test_device_intro_abstract);
--    qtest_add_func("device/introspect/concrete", test_device_intro_concrete);
-     qtest_add_func("device/introspect/abstract-interfaces", test_abstract_interfaces);
-+    if (g_test_quick()) {
-+        qtest_add_data_func("device/introspect/concrete/defaults/none",
-+                            g_strdup(common_args), test_device_intro_concrete);
-+    } else {
-+        qtest_cb_for_every_machine(add_machine_test_case, true);
-+    }
- 
-     return g_test_run();
  }
+ 
+diff --git a/util/qsp.c b/util/qsp.c
+index 4dc851e..b0c2575 100644
+--- a/util/qsp.c
++++ b/util/qsp.c
+@@ -65,6 +65,7 @@
+ 
+ enum QSPType {
+     QSP_MUTEX,
++    QSP_BQL_MUTEX,
+     QSP_REC_MUTEX,
+     QSP_CONDVAR,
+ };
+@@ -123,10 +124,12 @@ static bool qsp_initialized, qsp_initializing;
+ 
+ static const char * const qsp_typenames[] = {
+     [QSP_MUTEX]     = "mutex",
++    [QSP_BQL_MUTEX] = "BQL mutex",
+     [QSP_REC_MUTEX] = "rec_mutex",
+     [QSP_CONDVAR]   = "condvar",
+ };
+ 
++QemuMutexLockFunc qemu_bql_mutex_lock_func = qemu_mutex_lock_impl;
+ QemuMutexLockFunc qemu_mutex_lock_func = qemu_mutex_lock_impl;
+ QemuMutexTrylockFunc qemu_mutex_trylock_func = qemu_mutex_trylock_impl;
+ QemuRecMutexLockFunc qemu_rec_mutex_lock_func = qemu_rec_mutex_lock_impl;
+@@ -419,6 +422,7 @@ static inline void qsp_entry_record(QSPEntry *e, int64_t delta)
+         return err;                                                     \
+     }
+ 
++QSP_GEN_VOID(QemuMutex, QSP_BQL_MUTEX, qsp_bql_mutex_lock, qemu_mutex_lock_impl)
+ QSP_GEN_VOID(QemuMutex, QSP_MUTEX, qsp_mutex_lock, qemu_mutex_lock_impl)
+ QSP_GEN_RET1(QemuMutex, QSP_MUTEX, qsp_mutex_trylock, qemu_mutex_trylock_impl)
+ 
+@@ -453,6 +457,7 @@ void qsp_enable(void)
+ {
+     atomic_set(&qemu_mutex_lock_func, qsp_mutex_lock);
+     atomic_set(&qemu_mutex_trylock_func, qsp_mutex_trylock);
++    atomic_set(&qemu_bql_mutex_lock_func, qsp_bql_mutex_lock);
+     atomic_set(&qemu_rec_mutex_lock_func, qsp_rec_mutex_lock);
+     atomic_set(&qemu_rec_mutex_trylock_func, qsp_rec_mutex_trylock);
+     atomic_set(&qemu_cond_wait_func, qsp_cond_wait);
+@@ -462,6 +467,7 @@ void qsp_disable(void)
+ {
+     atomic_set(&qemu_mutex_lock_func, qemu_mutex_lock_impl);
+     atomic_set(&qemu_mutex_trylock_func, qemu_mutex_trylock_impl);
++    atomic_set(&qemu_bql_mutex_lock_func, qemu_mutex_lock_impl);
+     atomic_set(&qemu_rec_mutex_lock_func, qemu_rec_mutex_lock_impl);
+     atomic_set(&qemu_rec_mutex_trylock_func, qemu_rec_mutex_trylock_impl);
+     atomic_set(&qemu_cond_wait_func, qemu_cond_wait_impl);
 -- 
 1.8.3.1
