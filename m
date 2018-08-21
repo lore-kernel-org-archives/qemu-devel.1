@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fs1CM-00038G-If
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 03:35:33 -0400
+	(envelope-from <david@redhat.com>) id 1fs1CU-0003T1-9p
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 03:35:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fs19E-0002vO-SH
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 03:32:20 -0400
+	(envelope-from <david@redhat.com>) id 1fs1CM-0005WW-LY
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 03:35:34 -0400
 References: <20180821025104.19604-1-pavel.zbitskiy@gmail.com>
-	<20180821025104.19604-4-pavel.zbitskiy@gmail.com>
+	<20180821025104.19604-7-pavel.zbitskiy@gmail.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <209f5919-f6af-d3f2-176f-1dc172c9567b@redhat.com>
-Date: Tue, 21 Aug 2018 09:32:14 +0200
+Message-ID: <d124cdad-6b54-2e1c-93be-7ef88cae2fa6@redhat.com>
+Date: Tue, 21 Aug 2018 09:35:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180821025104.19604-4-pavel.zbitskiy@gmail.com>
+In-Reply-To: <20180821025104.19604-7-pavel.zbitskiy@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/7] target/s390x: fix CSST decoding and
- runtime alignment check
+Subject: Re: [Qemu-devel] [PATCH 6/7] target/s390x: fix PACK reading 1 byte
+ less and writing 1 byte more
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,127 +29,87 @@ To: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, richard.henderson@linaro.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
 On 21.08.2018 04:51, Pavel Zbitskiy wrote:
-> CSST is defined as:
+> PACK fails on the test from the Principles of Operation: F1F2F3F4
+> becomes 0000234C instead of 0001234C due to an off-by-one error.
+> Furthermore, it overwrites one extra byte to the left of F1.
 > 
->     C(0xc802, CSST,    SSF,   CASS, la1, a2, 0, 0, csst, 0)
+> If len_dest is 0, then we only want to flip the 1st byte and never loop
+> over the rest. Therefore, the loop condition should be > and not >=.
 > 
-> It means that the first parameter is handled by in1_la1().
-> in1_la1() fills addr1 field, and not in1.
+> If len_src is 1, then we should flip the 1st byte and pack the 2nd.
+> Since len_src is already decremented before the loop, the first
+> condition should be >=, and not >.
 > 
-> Furthermore, when extract32() is used for the alignment check, the
-> third parameter should specify the number of trailing bits that must
-> be 0. For FC these numbers are:
-> 
->     FC=0 (word, 4 bytes):        2
->     FC=1 (double word, 8 bytes): 3
->     FC=2 (quad word, 16 bytes):  4
-> 
-> For SC these numbers correspond to the size:
-> 
->     SC=0: 0
->     SC=1: 1
->     SC=2: 2
->     SC=3: 3
->     SC=4: 4
+> Likewise for len_src == 2 and the second condition.
 > 
 > Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
 > ---
->  target/s390x/mem_helper.c       |  2 +-
->  target/s390x/translate.c        |  4 +--
+>  target/s390x/mem_helper.c       |  6 +++---
 >  tests/tcg/s390x/Makefile.target |  1 +
->  tests/tcg/s390x/csst.c          | 43 +++++++++++++++++++++++++++++++++
->  4 files changed, 47 insertions(+), 3 deletions(-)
->  create mode 100644 tests/tcg/s390x/csst.c
+>  tests/tcg/s390x/pack.c          | 21 +++++++++++++++++++++
+>  3 files changed, 25 insertions(+), 3 deletions(-)
+>  create mode 100644 tests/tcg/s390x/pack.c
 > 
 > diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index e21a47fb4d..c94dbf3fcb 100644
+> index 704d0193b5..bacae4f503 100644
 > --- a/target/s390x/mem_helper.c
 > +++ b/target/s390x/mem_helper.c
-> @@ -1442,7 +1442,7 @@ static uint32_t do_csst(CPUS390XState *env, uint32_t r3, uint64_t a1,
->      }
+> @@ -1019,15 +1019,15 @@ void HELPER(pack)(CPUS390XState *env, uint32_t len, uint64_t dest, uint64_t src)
+>      len_src--;
 >  
->      /* Sanity check the alignments.  */
-> -    if (extract32(a1, 0, 4 << fc) || extract32(a2, 0, 1 << sc)) {
-> +    if (extract32(a1, 0, fc + 2) || extract32(a2, 0, sc)) {
->          goto spec_exception;
->      }
+>      /* now pack every value */
+> -    while (len_dest >= 0) {
+> +    while (len_dest > 0) {
+>          b = 0;
 >  
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 111d575c41..929fc2db28 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -2059,9 +2059,9 @@ static DisasJumpType op_csst(DisasContext *s, DisasOps *o)
->      TCGv_i32 t_r3 = tcg_const_i32(r3);
->  
->      if (tb_cflags(s->base.tb) & CF_PARALLEL) {
-> -        gen_helper_csst_parallel(cc_op, cpu_env, t_r3, o->in1, o->in2);
-> +        gen_helper_csst_parallel(cc_op, cpu_env, t_r3, o->addr1, o->in2);
->      } else {
-> -        gen_helper_csst(cc_op, cpu_env, t_r3, o->in1, o->in2);
-> +        gen_helper_csst(cc_op, cpu_env, t_r3, o->addr1, o->in2);
->      }
->      tcg_temp_free_i32(t_r3);
->  
+> -        if (len_src > 0) {
+> +        if (len_src >= 0) {
+>              b = cpu_ldub_data_ra(env, src, ra) & 0x0f;
+>              src--;
+>              len_src--;
+>          }
+> -        if (len_src > 0) {
+> +        if (len_src >= 0) {
+>              b |= cpu_ldub_data_ra(env, src, ra) << 4;
+>              src--;
+>              len_src--;
 > diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.target
-> index 9f4076901f..f62f950d8e 100644
+> index 7de4376f52..151dc075aa 100644
 > --- a/tests/tcg/s390x/Makefile.target
 > +++ b/tests/tcg/s390x/Makefile.target
-> @@ -1,3 +1,4 @@
->  VPATH+=$(SRC_PATH)/tests/tcg/s390x
->  CFLAGS+=-march=zEC12 -m64
->  TESTS+=hello-s390x
-> +TESTS+=csst
-> diff --git a/tests/tcg/s390x/csst.c b/tests/tcg/s390x/csst.c
+> @@ -5,3 +5,4 @@ TESTS+=csst
+>  TESTS+=ipm
+>  TESTS+=exrl-trt
+>  TESTS+=exrl-trtr
+> +TESTS+=pack
+> diff --git a/tests/tcg/s390x/pack.c b/tests/tcg/s390x/pack.c
 > new file mode 100644
-> index 0000000000..1dae9071fb
+> index 0000000000..4be36f29a7
 > --- /dev/null
-> +++ b/tests/tcg/s390x/csst.c
-> @@ -0,0 +1,43 @@
-> +#include <stdint.h>
+> +++ b/tests/tcg/s390x/pack.c
+> @@ -0,0 +1,21 @@
 > +#include <unistd.h>
 > +
 > +int main(void)
 > +{
-> +    uint64_t parmlist[] = {
-> +        0xfedcba9876543210ull,
-> +        0,
-> +        0x7777777777777777ull,
-> +        0,
-> +    };
-> +    uint64_t op1 = 0x0123456789abcdefull;
-> +    uint64_t op2 = 0;
-> +    uint64_t op3 = op1;
-> +    uint64_t cc;
+> +    char data[] = {0xaa, 0xaa, 0xf1, 0xf2, 0xf3, 0xc4, 0xaa, 0xaa};
+> +    char exp[] = {0xaa, 0xaa, 0x00, 0x01, 0x23, 0x4c, 0xaa, 0xaa};
+> +    int i;
 > +
 > +    asm volatile(
-> +        "    lghi %%r0,%[flags]\n"
-> +        "    la %%r1,%[parmlist]\n"
-> +        "    csst %[op1],%[op2],%[op3]\n"
-> +        "    ipm %[cc]\n"
-> +        : [op1] "+m" (op1),
-> +          [op2] "+m" (op2),
-> +          [op3] "+r" (op3),
-> +          [cc] "=r" (cc)
-> +        : [flags] "K" (0x0301),
-> +          [parmlist] "m" (parmlist)
-> +        : "r0", "r1", "cc", "memory");
-> +    cc = (cc >> 28) & 3;
-> +    if (cc) {
-> +        write(1, "bad cc\n", 7);
-> +        return 1;
-> +    }
-> +    if (op1 != parmlist[0]) {
-> +        write(1, "bad op1\n", 8);
-> +        return 1;
-> +    }
-> +    if (op2 != parmlist[2]) {
-> +        write(1, "bad op2\n", 8);
-> +        return 1;
+> +        "    pack 2(4,%[data]),2(4,%[data])\n"
+> +        :
+> +        : [data] "r" (&data[0])
+> +        : "memory");
+> +    for (i = 0; i < 8; i++) {
+> +        if (data[i] != exp[i]) {
+> +            write(1, "bad data\n", 9);
+> +            return 1;
+> +        }
 > +    }
 > +    return 0;
 > +}
 > 
-
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
