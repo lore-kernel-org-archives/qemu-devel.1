@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lg-00013e-P4
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:23 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lh-000141-1c
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lW-00077g-PT
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:17 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49434 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lV-00073d-84
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:19 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49410 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs6lW-00074A-Ca
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:10 -0400
+	id 1fs6lU-0006zF-RN
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:09 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 15:31:55 +0200
-Message-Id: <1534858316-12945-46-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 15:31:40 +0200
+Message-Id: <1534858316-12945-31-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v3 45/46] mips_malta: Fix semihosting argument
- passing for nanoMIPS bare metal
+Subject: [Qemu-devel] [PULL v3 30/46] target/mips: Add emulation of DSP ASE
+ for nanoMIPS - part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +30,35 @@ Cc: peter.maydell@linaro.org
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Fix passing argument for nanoMIPS bare metal related to the
-semihosting regime.
+Add emulation of DSP ASE instructions for nanoMIPS - part 2.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- hw/mips/mips_malta.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ target/mips/translate.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index f261dd6..40041d5 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -630,8 +630,14 @@ static void write_bootloader_nanomips(uint8_t *base,=
- int64_t run_addr,
-                                 /* nop */
-=20
-     /* to_here: */
--    stw_p(p++, 0x0080); stw_p(p++, 0x0002);
-+    if (semihosting_get_argc()) {
-+        /* Preserve a0 content as arguments have been passed    */
-+        stw_p(p++, 0x8000); stw_p(p++, 0xc000);
-+                                /* nop                          */
-+    } else {
-+        stw_p(p++, 0x0080); stw_p(p++, 0x0002);
-                                 /* li a0,2                      */
-+    }
-=20
-     stw_p(p++, 0xe3a0 | NM_HI1(ENVP_ADDR - 64));
-=20
---=20
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 78a9daf..ea6bd8d 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -19313,6 +19313,16 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+                 case NM_BC1NEZC:
+                     gen_compute_branch_cp1_nm(ctx, OPC_BC1NEZ, rt, s);
+                     break;
++                case NM_BPOSGE32C:
++                    check_dspr2(ctx);
++                    {
++                        int32_t imm = extract32(ctx->opcode, 1, 13) |
++                                      extract32(ctx->opcode, 0, 1) << 13;
++
++                        gen_compute_branch_nm(ctx, OPC_BPOSGE32, 4, -1, -2,
++                                              imm);
++                    }
++                    break;
+                 default:
+                     generate_exception_end(ctx, EXCP_RI);
+                     break;
+-- 
 2.7.4
