@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fs3OO-0004QO-8u
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:56:05 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fs3Rl-0006ZT-Ib
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:59:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fs3OK-0004wy-3H
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:56:04 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:50246)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fs3Rh-0006ru-Fp
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:59:33 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35445)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fs3OI-0004vo-0o
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:55:59 -0400
-Received: by mail-wm0-x243.google.com with SMTP id s12-v6so2344938wmc.0
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 02:55:57 -0700 (PDT)
+	id 1fs3Rf-0006q4-Dm
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:59:27 -0400
+Received: by mail-wr1-x444.google.com with SMTP id g1-v6so15342994wru.2
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 02:59:26 -0700 (PDT)
 References: <1534821487-14189-1-git-send-email-jing2.liu@linux.intel.com>
-	<1534821487-14189-2-git-send-email-jing2.liu@linux.intel.com>
+	<1534821487-14189-3-git-send-email-jing2.liu@linux.intel.com>
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <78ca299f-cf83-e352-3b36-b773360e9608@gmail.com>
-Date: Tue, 21 Aug 2018 12:55:53 +0300
+Message-ID: <e88aac49-d0be-6ba9-9674-1785caa5af5b@gmail.com>
+Date: Tue, 21 Aug 2018 12:59:23 +0300
 MIME-Version: 1.0
-In-Reply-To: <1534821487-14189-2-git-send-email-jing2.liu@linux.intel.com>
+In-Reply-To: <1534821487-14189-3-git-send-email-jing2.liu@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] hw/pci: factor PCI reserve
- resources to a separate structure
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw/pci: add PCI resource reserve
+ capability to legacy PCI bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,186 +38,80 @@ Cc: anthony.xu@intel.com, mst@redhat.com, lersek@redhat.com, pbonzini@redhat.com
 
 
 On 08/21/2018 06:18 AM, Jing Liu wrote:
-> Factor "bus_reserve", "io_reserve", "mem_reserve", "pref32_reserve"
-> and "pref64_reserve" fields of the "GenPCIERootPort" structure out
-> to "PCIResReserve" structure, so that other PCI bridges can
-> reuse it to add resource reserve capability.
+> Add hint to firmware (e.g. SeaBIOS) to reserve addtional
+> BUS/IO/MEM/PREF resource for legacy pci-pci bridge. Add the
+> resource reserve capability deleting in pci_bridge_dev_exitfn.
 >
 > Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
 > ---
->   hw/pci-bridge/gen_pcie_root_port.c | 33 +++++++++++++++++----------------
->   hw/pci/pci_bridge.c                | 38 +++++++++++++++++---------------------
->   include/hw/pci/pci_bridge.h        | 18 +++++++++++++-----
->   3 files changed, 47 insertions(+), 42 deletions(-)
+>   hw/pci-bridge/pci_bridge_dev.c | 24 ++++++++++++++++++++++++
+>   1 file changed, 24 insertions(+)
 >
-> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-> index d117e20..299de42 100644
-> --- a/hw/pci-bridge/gen_pcie_root_port.c
-> +++ b/hw/pci-bridge/gen_pcie_root_port.c
-> @@ -29,12 +29,8 @@ typedef struct GenPCIERootPort {
+> diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+> index b2d861d..97a8e8b 100644
+> --- a/hw/pci-bridge/pci_bridge_dev.c
+> +++ b/hw/pci-bridge/pci_bridge_dev.c
+> @@ -46,6 +46,9 @@ struct PCIBridgeDev {
+>       uint32_t flags;
 >   
->       bool migrate_msix;
->   
-> -    /* additional resources to reserve on firmware init */
-> -    uint32_t bus_reserve;
-> -    uint64_t io_reserve;
-> -    uint64_t mem_reserve;
-> -    uint64_t pref32_reserve;
-> -    uint64_t pref64_reserve;
+>       OnOffAuto msi;
+> +
 > +    /* additional resources to reserve */
 > +    PCIResReserve res_reserve;
->   } GenPCIERootPort;
->   
->   static uint8_t gen_rp_aer_vector(const PCIDevice *d)
-> @@ -82,16 +78,15 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
->           return;
->       }
->   
-> -    int rc = pci_bridge_qemu_reserve_cap_init(d, 0, grp->bus_reserve,
-> -            grp->io_reserve, grp->mem_reserve, grp->pref32_reserve,
-> -            grp->pref64_reserve, errp);
-> +    int rc = pci_bridge_qemu_reserve_cap_init(d, 0,
-> +                                              grp->res_reserve, errp);
->   
->       if (rc < 0) {
->           rpc->parent_class.exit(d);
->           return;
->       }
->   
-> -    if (!grp->io_reserve) {
-> +    if (!grp->res_reserve.io) {
->           pci_word_test_and_clear_mask(d->wmask + PCI_COMMAND,
->                                        PCI_COMMAND_IO);
->           d->wmask[PCI_IO_BASE] = 0;
-> @@ -117,12 +112,18 @@ static const VMStateDescription vmstate_rp_dev = {
 >   };
+>   typedef struct PCIBridgeDev PCIBridgeDev;
 >   
->   static Property gen_rp_props[] = {
-> -    DEFINE_PROP_BOOL("x-migrate-msix", GenPCIERootPort, migrate_msix, true),
-> -    DEFINE_PROP_UINT32("bus-reserve", GenPCIERootPort, bus_reserve, -1),
-> -    DEFINE_PROP_SIZE("io-reserve", GenPCIERootPort, io_reserve, -1),
-> -    DEFINE_PROP_SIZE("mem-reserve", GenPCIERootPort, mem_reserve, -1),
-> -    DEFINE_PROP_SIZE("pref32-reserve", GenPCIERootPort, pref32_reserve, -1),
-> -    DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort, pref64_reserve, -1),
-> +    DEFINE_PROP_BOOL("x-migrate-msix", GenPCIERootPort,
-> +                     migrate_msix, true),
-> +    DEFINE_PROP_UINT32("bus-reserve", GenPCIERootPort,
-> +                       res_reserve.bus, -1),
-> +    DEFINE_PROP_SIZE("io-reserve", GenPCIERootPort,
-> +                     res_reserve.io, -1),
-> +    DEFINE_PROP_SIZE("mem-reserve", GenPCIERootPort,
-> +                     res_reserve.mem_non_pref, -1),
-> +    DEFINE_PROP_SIZE("pref32-reserve", GenPCIERootPort,
-> +                     res_reserve.mem_pref_32, -1),
-> +    DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
-> +                     res_reserve.mem_pref_64, -1),
->       DEFINE_PROP_END_OF_LIST()
->   };
->   
-> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-> index 40a39f5..08b7e44 100644
-> --- a/hw/pci/pci_bridge.c
-> +++ b/hw/pci/pci_bridge.c
-> @@ -411,38 +411,34 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
->   
->   
->   int pci_bridge_qemu_reserve_cap_init(PCIDevice *dev, int cap_offset,
-> -                                     uint32_t bus_reserve, uint64_t io_reserve,
-> -                                     uint64_t mem_non_pref_reserve,
-> -                                     uint64_t mem_pref_32_reserve,
-> -                                     uint64_t mem_pref_64_reserve,
-> -                                     Error **errp)
-> +                                     PCIResReserve res_reserve, Error **errp)
->   {
-> -    if (mem_pref_32_reserve != (uint64_t)-1 &&
-> -        mem_pref_64_reserve != (uint64_t)-1) {
-> +    if (res_reserve.mem_pref_32 != (uint64_t)-1 &&
-> +        res_reserve.mem_pref_64 != (uint64_t)-1) {
->           error_setg(errp,
->                      "PCI resource reserve cap: PREF32 and PREF64 conflict");
->           return -EINVAL;
+> @@ -95,6 +98,12 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
+>           error_free(local_err);
 >       }
 >   
-> -    if (mem_non_pref_reserve != (uint64_t)-1 &&
-> -        mem_non_pref_reserve >= (1ULL << 32)) {
-> +    if (res_reserve.mem_non_pref != (uint64_t)-1 &&
-> +        res_reserve.mem_non_pref >= (1ULL << 32)) {
->           error_setg(errp,
->                      "PCI resource reserve cap: mem-reserve must be less than 4G");
->           return -EINVAL;
->       }
->   
-> -    if (mem_pref_32_reserve != (uint64_t)-1 &&
-> -        mem_pref_32_reserve >= (1ULL << 32)) {
-> +    if (res_reserve.mem_pref_32 != (uint64_t)-1 &&
-> +        res_reserve.mem_pref_32 >= (1ULL << 32)) {
->           error_setg(errp,
->                      "PCI resource reserve cap: pref32-reserve  must be less than 4G");
->           return -EINVAL;
->       }
->   
-> -    if (bus_reserve == (uint32_t)-1 &&
-> -        io_reserve == (uint64_t)-1 &&
-> -        mem_non_pref_reserve == (uint64_t)-1 &&
-> -        mem_pref_32_reserve == (uint64_t)-1 &&
-> -        mem_pref_64_reserve == (uint64_t)-1) {
-> +    if (res_reserve.bus == (uint32_t)-1 &&
-> +        res_reserve.io == (uint64_t)-1 &&
-> +        res_reserve.mem_non_pref == (uint64_t)-1 &&
-> +        res_reserve.mem_pref_32 == (uint64_t)-1 &&
-> +        res_reserve.mem_pref_64 == (uint64_t)-1) {
->           return 0;
->       }
->   
-> @@ -450,11 +446,11 @@ int pci_bridge_qemu_reserve_cap_init(PCIDevice *dev, int cap_offset,
->       PCIBridgeQemuCap cap = {
->               .len = cap_len,
->               .type = REDHAT_PCI_CAP_RESOURCE_RESERVE,
-> -            .bus_res = bus_reserve,
-> -            .io = io_reserve,
-> -            .mem = mem_non_pref_reserve,
-> -            .mem_pref_32 = mem_pref_32_reserve,
-> -            .mem_pref_64 = mem_pref_64_reserve
-> +            .bus_res = res_reserve.bus,
-> +            .io = res_reserve.io,
-> +            .mem = res_reserve.mem_non_pref,
-> +            .mem_pref_32 = res_reserve.mem_pref_32,
-> +            .mem_pref_64 = res_reserve.mem_pref_64
->       };
->   
->       int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
-> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
-> index 0347da5..cdff7ed 100644
-> --- a/include/hw/pci/pci_bridge.h
-> +++ b/include/hw/pci/pci_bridge.h
-> @@ -133,11 +133,19 @@ typedef struct PCIBridgeQemuCap {
->   
->   #define REDHAT_PCI_CAP_RESOURCE_RESERVE 1
->   
-> +/*
-> + * PCI BUS/IO/MEM/PREFMEM additional resources recorded as a
-> + * capability in PCI configuration space to reserve on firmware init.
-> + */
-> +typedef struct PCIResReserve {
-> +    uint32_t bus;
-> +    uint64_t io;
-> +    uint64_t mem_non_pref;
-> +    uint64_t mem_pref_32;
-> +    uint64_t mem_pref_64;
-> +} PCIResReserve;
+> +    err = pci_bridge_qemu_reserve_cap_init(dev, 0,
+> +                                         bridge_dev->res_reserve, errp);
+> +    if (err) {
+> +        goto cap_error;
+> +    }
 > +
->   int pci_bridge_qemu_reserve_cap_init(PCIDevice *dev, int cap_offset,
-> -                              uint32_t bus_reserve, uint64_t io_reserve,
-> -                              uint64_t mem_non_pref_reserve,
-> -                              uint64_t mem_pref_32_reserve,
-> -                              uint64_t mem_pref_64_reserve,
-> -                              Error **errp);
-> +                               PCIResReserve res_reserve, Error **errp);
+>       if (shpc_present(dev)) {
+>           /* TODO: spec recommends using 64 bit prefetcheable BAR.
+>            * Check whether that works well. */
+> @@ -103,6 +112,8 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
+>       }
+>       return;
 >   
->   #endif /* QEMU_PCI_BRIDGE_H */
+> +cap_error:
+> +    msi_uninit(dev);
+>   msi_error:
+>       slotid_cap_cleanup(dev);
+>   slotid_error:
+> @@ -116,6 +127,8 @@ shpc_error:
+>   static void pci_bridge_dev_exitfn(PCIDevice *dev)
+>   {
+>       PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
+> +
+> +    pci_del_capability(dev, PCI_CAP_ID_VNDR, sizeof(PCIBridgeQemuCap));
+>       if (msi_present(dev)) {
+>           msi_uninit(dev);
+>       }
+> @@ -162,6 +175,17 @@ static Property pci_bridge_dev_properties[] = {
+>                               ON_OFF_AUTO_AUTO),
+>       DEFINE_PROP_BIT(PCI_BRIDGE_DEV_PROP_SHPC, PCIBridgeDev, flags,
+>                       PCI_BRIDGE_DEV_F_SHPC_REQ, true),
+> +    DEFINE_PROP_UINT32("bus-reserve", PCIBridgeDev,
+> +                       res_reserve.bus, -1),
+> +    DEFINE_PROP_SIZE("io-reserve", PCIBridgeDev,
+> +                     res_reserve.io, -1),
+> +    DEFINE_PROP_SIZE("mem-reserve", PCIBridgeDev,
+> +                     res_reserve.mem_non_pref, -1),
+> +    DEFINE_PROP_SIZE("pref32-reserve", PCIBridgeDev,
+> +                     res_reserve.mem_pref_32, -1),
+> +    DEFINE_PROP_SIZE("pref64-reserve", PCIBridgeDev,
+> +                     res_reserve.mem_pref_64, -1),
+> +
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>   
 
 Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
-
 
 Thanks,
 Marcel
