@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fs9yw-0005Y4-CL
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 12:58:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fsA1M-00088r-81
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:00:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fs9ys-0006nh-RM
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 12:58:14 -0400
-References: <cover.1534868459.git.jcody@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8afbce6f-a70c-6197-9be2-16f27d861fd4@redhat.com>
-Date: Tue, 21 Aug 2018 12:57:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fsA1I-0001tc-2r
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:00:43 -0400
+Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:45281)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fsA1E-0001lo-P8
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:00:39 -0400
+Received: by mail-oi0-x235.google.com with SMTP id q11-v6so33235492oic.12
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:00:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <cover.1534868459.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] block: for jobs,
- do not clear user_paused until after the resume
+In-Reply-To: <20180821081631.19160-1-kraxel@redhat.com>
+References: <20180821081631.19160-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Aug 2018 18:00:12 +0100
+Message-ID: <CAFEAcA_WdEgONuLy+eH8pqwwRir_KjRfBkhtnC7E9d6MAHEeow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/4] Vga 20180821 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, qemu-block@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 21 August 2018 at 09:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit d0092d90eb546a8bbe9e9120426c189474123797:
+>
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180820' into staging (2018-08-20 17:41:18 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/vga-20180821-pull-request
+>
+> for you to fetch changes up to 421ab725677b0382fd8f1fc5356fb16747a5beca:
+>
+>   hw/pci-host/bonito: Move away from old_mmio accessors (2018-08-21 09:52:22 +0200)
+>
+> ----------------------------------------------------------------
+> hw/display: misc fixes
+>
+> ----------------------------------------------------------------
 
+Applied, thanks.
 
-On 08/21/2018 12:26 PM, Jeff Cody wrote:
-> v3 changes:
->     Rebased to master
->     Patch 2: Wait for pause after mirror instead of error, to gobble th=
-e
->              right message (Thanks John)
->     Patch 2: Replace a hard-coded 'qcow2' with '$IMGFMT', oops.
->=20
-
-Thanks!
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-> v2 changes:
->=20
->     Patch 1: Added r-b from John, Eric (Thanks)
->     Patch 2: Attached an iotest as patch 2
->=20
->     * cc'ed qemu-stable
->=20
-> For the test in patch 2, failure here is the failure output w/o patch 1=
-:
->=20
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "testdisk"}=
-}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"=
-}}
-> -{"return": {}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "wri=
-te", "action": "stop"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk=
-"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 209715=
-2, "offset": 1048576, "speed": 0, "type": "mirror"}}
-> -*** done
-> +QEMU_PROG: blockjob.c:460: block_job_iostatus_reset: Assertion `job->j=
-ob.user_paused && job->job.pause_count > 0' failed.
-> +Wrong response matching Assertion on handle 0
-> Failures: 229
-> Failed 1 of 1 tests
->=20
-> git-backport-diff, v2->v3:
->=20
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream p=
-atch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
-ectively
->=20
-> 001/2:[----] [--] 'block: for jobs, do not clear user_paused until afte=
-r the resume'
-> 002/2:[0006] [FC] 'block: iotest to catch abort on forced blockjob canc=
-el'
->=20
->=20
-> Jeff Cody (2):
->   block: for jobs, do not clear user_paused until after the resume
->   block: iotest to catch abort on forced blockjob cancel
->=20
->  job.c                      |  2 +-
->  tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/229.out | 23 +++++++++
->  tests/qemu-iotests/group   |  1 +
->  4 files changed, 120 insertions(+), 1 deletion(-)
->  create mode 100755 tests/qemu-iotests/229
->  create mode 100644 tests/qemu-iotests/229.out
->=20
-
---=20
-=E2=80=94js
+-- PMM
