@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lV-0000qq-Hb
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:15 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lX-0000sw-Nw
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lR-0006uW-9v
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:09 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49259 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lU-00070j-IA
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:11 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49394 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs6lQ-0006r1-Fa
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:04 -0400
+	id 1fs6lU-0006yS-2P
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:08 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 15:31:10 +0200
-Message-Id: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v3 00/46] MIPS queue August 21, 2018 v3
+Date: Tue, 21 Aug 2018 15:31:28 +0200
+Message-Id: <1534858316-12945-19-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL v3 18/46] target/mips: Add emulation of misc
+ nanoMIPS instructions (pool32a0)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,119 +28,220 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-The following changes since commit 659b11e7a7239529cfdb4968418268ff9aa22d88:
+Add emulation of nanoMIPS instructions that are situated in pool32a0.
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.1-pull-request' into staging (2018-08-21 11:36:15 +0100)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+---
+ target/mips/translate.c | 185 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 185 insertions(+)
 
-are available in the git repository at:
-
-  https://github.com/AMarkovic/qemu tags/mips-queue-aug-21-2018
-
-for you to fetch changes up to 7bfa634d0a73b74f2b84a5cd13d055e61210c356:
-
-  target/mips: Add definition of nanoMIPS I7200 CPU (2018-08-21 14:59:32 +0200)
-
-----------------------------------------------------------------
-MIPS queue August 21, 2018 v3
-
-In v2, the initial ('since') commit was wrong.
-In v1, there were three missing "Reviewed-by" lines. Please use
-
-----------------------------------------------------------------
-
-Aleksandar Markovic (5):
-  target/mips: Add preprocessor constants for nanoMIPS
-  target/mips: Add placeholder and invocation of decode_nanomips_opc()
-  target/mips: Add nanoMIPS decoding and extraction utilities
-  elf: Relax MIPS' elf_check_arch() to accept EM_NANOMIPS too
-  elf: Don't check FCR31_NAN2008 bit for nanoMIPS
-
-Aleksandar Rikalo (4):
-  target/mips: Implement emulation of nanoMIPS LLWP/SCWP pair
-  target/mips: Fix pre-nanoMIPS MT ASE instructions availability control
-  elf: Add EM_NANOMIPS value as a valid one for e_machine field
-  elf: On elf loading, treat both EM_MIPS and EM_NANOMIPS as legal for
-    MIPS
-
-Dimitrije Nikolic (2):
-  target/mips: Add CP0 Config3 and Config5 fields to DisasContext
-    structure
-  target/mips: Add availability control via bit NMS
-
-James Hogan (1):
-  target/mips: Implement emulation of nanoMIPS EXTW instruction
-
-Matthew Fortune (3):
-  target/mips: Implement emulation of nanoMIPS ROTX instruction
-  disas: Add support for nanoMIPS platform
-  mips_malta: Add basic nanoMIPS boot code for Malta board
-
-Paul Burton (1):
-  mips_malta: Add setting up GT64120 BARs to the nanoMIPS bootloader
-
-Stefan Markovic (15):
-  target/mips: Add nanoMIPS DSP ASE opcodes
-  target/mips: Prevent switching mode related to Config3 ISA bit for
-    nanoMIPS
-  target/mips: Add emulation of nanoMIPS 16-bit branch instructions
-  target/mips: Add emulation of nanoMIPS 16-bit save and restore
-    instructions
-  target/mips: Add emulation of nanoMIPS 32-bit branch instructions
-  target/mips: Implement MT ASE support for nanoMIPS
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 1
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 2
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 3
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 4
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 5
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 6
-  target/mips: Add updating BadInstr and BadInstrX for nanoMIPS
-  mips_malta: Fix semihosting argument passing for nanoMIPS bare metal
-  target/mips: Add definition of nanoMIPS I7200 CPU
-
-Yongbok Kim (15):
-  target/mips: Add nanoMIPS base instruction set opcodes
-  target/mips: Add emulation of nanoMIPS 16-bit arithmetic instructions
-  target/mips: Add emulation of nanoMIPS 16-bit shift instructions
-  target/mips: Add emulation of nanoMIPS 16-bit misc instructions
-  target/mips: Add emulation of nanoMIPS 16-bit load and store
-    instructions
-  target/mips: Add emulation of nanoMIPS 16-bit logic instructions
-  target/mips: Add emulation of some common nanoMIPS 32-bit instructions
-  target/mips: Add emulation of nanoMIPS instructions MOVE.P and
-    MOVE.PREV
-  target/mips: Add emulation of nanoMIPS 48-bit instructions
-  target/mips: Add emulation of nanoMIPS FP instructions
-  target/mips: Add emulation of misc nanoMIPS instructions (pool32a0)
-  target/mips: Add emulation of misc nanoMIPS instructions (pool32axf)
-  target/mips: Add emulation of misc nanoMIPS instructions (p_lsx)
-  target/mips: Add emulation of nanoMIPS 32-bit load and store
-    instructions
-  target/mips: Fix ERET/ERETNC behavior related to ADEL exception
-
- MAINTAINERS                      |     2 +
- disas/Makefile.objs              |     1 +
- disas/mips.c                     |    90 +-
- disas/nanomips.cpp               | 15812 +++++++++++++++++++++++++++++++++++++
- disas/nanomips.h                 |  1100 +++
- hw/mips/mips_malta.c             |   212 +-
- include/disas/bfd.h              |     1 +
- include/elf.h                    |     2 +
- include/hw/elf_ops.h             |     8 +
- linux-user/elfload.c             |     2 +
- linux-user/mips/cpu_loop.c       |    28 +-
- target/mips/cpu.c                |    11 +-
- target/mips/cpu.h                |     2 +
- target/mips/helper.c             |    16 +
- target/mips/helper.h             |     2 +
- target/mips/mips-defs.h          |     4 +
- target/mips/op_helper.c          |    98 +-
- target/mips/translate.c          |  4983 +++++++++++-
- target/mips/translate_init.inc.c |    39 +
- 19 files changed, 22330 insertions(+), 83 deletions(-)
- create mode 100644 disas/nanomips.cpp
- create mode 100644 disas/nanomips.h
-
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index f615d48..429ad23 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -16859,6 +16859,181 @@ static void gen_pool16c_nanomips_insn(DisasContext *ctx)
+     }
+ }
+ 
++static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
++{
++    int rt = extract32(ctx->opcode, 21, 5);
++    int rs = extract32(ctx->opcode, 16, 5);
++    int rd = extract32(ctx->opcode, 11, 5);
++
++    switch (extract32(ctx->opcode, 3, 7)) {
++    case NM_P_TRAP:
++        switch (extract32(ctx->opcode, 10, 1)) {
++        case NM_TEQ:
++            gen_trap(ctx, OPC_TEQ, rs, rt, -1);
++            break;
++        case NM_TNE:
++            gen_trap(ctx, OPC_TNE, rs, rt, -1);
++            break;
++        }
++        break;
++    case NM_RDHWR:
++        gen_rdhwr(ctx, rt, rs, extract32(ctx->opcode, 11, 3));
++        break;
++    case NM_SEB:
++        gen_bshfl(ctx, OPC_SEB, rs, rt);
++        break;
++    case NM_SEH:
++        gen_bshfl(ctx, OPC_SEH, rs, rt);
++        break;
++    case NM_SLLV:
++        gen_shift(ctx, OPC_SLLV, rd, rt, rs);
++        break;
++    case NM_SRLV:
++        gen_shift(ctx, OPC_SRLV, rd, rt, rs);
++        break;
++    case NM_SRAV:
++        gen_shift(ctx, OPC_SRAV, rd, rt, rs);
++        break;
++    case NM_ROTRV:
++        gen_shift(ctx, OPC_ROTRV, rd, rt, rs);
++        break;
++    case NM_ADD:
++        gen_arith(ctx, OPC_ADD, rd, rs, rt);
++        break;
++    case NM_ADDU:
++        gen_arith(ctx, OPC_ADDU, rd, rs, rt);
++        break;
++    case NM_SUB:
++        gen_arith(ctx, OPC_SUB, rd, rs, rt);
++        break;
++    case NM_SUBU:
++        gen_arith(ctx, OPC_SUBU, rd, rs, rt);
++        break;
++    case NM_P_CMOVE:
++        switch (extract32(ctx->opcode, 10, 1)) {
++        case NM_MOVZ:
++            gen_cond_move(ctx, OPC_MOVZ, rd, rs, rt);
++            break;
++        case NM_MOVN:
++            gen_cond_move(ctx, OPC_MOVN, rd, rs, rt);
++            break;
++        }
++        break;
++    case NM_AND:
++        gen_logic(ctx, OPC_AND, rd, rs, rt);
++        break;
++    case NM_OR:
++        gen_logic(ctx, OPC_OR, rd, rs, rt);
++        break;
++    case NM_NOR:
++        gen_logic(ctx, OPC_NOR, rd, rs, rt);
++        break;
++    case NM_XOR:
++        gen_logic(ctx, OPC_XOR, rd, rs, rt);
++        break;
++    case NM_SLT:
++        gen_slt(ctx, OPC_SLT, rd, rs, rt);
++        break;
++    case NM_P_SLTU:
++        if (rd == 0) {
++            /* P_DVP */
++#ifndef CONFIG_USER_ONLY
++            TCGv t0 = tcg_temp_new();
++            switch (extract32(ctx->opcode, 10, 1)) {
++            case NM_DVP:
++                if (ctx->vp) {
++                    check_cp0_enabled(ctx);
++                    gen_helper_dvp(t0, cpu_env);
++                    gen_store_gpr(t0, rt);
++                }
++                break;
++            case NM_EVP:
++                if (ctx->vp) {
++                    check_cp0_enabled(ctx);
++                    gen_helper_evp(t0, cpu_env);
++                    gen_store_gpr(t0, rt);
++                }
++                break;
++            }
++            tcg_temp_free(t0);
++#endif
++        } else {
++            gen_slt(ctx, OPC_SLTU, rd, rs, rt);
++        }
++        break;
++    case NM_SOV:
++        {
++            TCGv t0 = tcg_temp_new();
++            TCGv t1 = tcg_temp_new();
++            TCGv t2 = tcg_temp_new();
++
++            gen_load_gpr(t1, rs);
++            gen_load_gpr(t2, rt);
++            tcg_gen_add_tl(t0, t1, t2);
++            tcg_gen_ext32s_tl(t0, t0);
++            tcg_gen_xor_tl(t1, t1, t2);
++            tcg_gen_xor_tl(t2, t0, t2);
++            tcg_gen_andc_tl(t1, t2, t1);
++
++            /* operands of same sign, result different sign */
++            tcg_gen_setcondi_tl(TCG_COND_LT, t0, t1, 0);
++            gen_store_gpr(t0, rd);
++
++            tcg_temp_free(t0);
++            tcg_temp_free(t1);
++            tcg_temp_free(t2);
++        }
++        break;
++    case NM_MUL:
++        gen_r6_muldiv(ctx, R6_OPC_MUL, rd, rs, rt);
++        break;
++    case NM_MUH:
++        gen_r6_muldiv(ctx, R6_OPC_MUH, rd, rs, rt);
++        break;
++    case NM_MULU:
++        gen_r6_muldiv(ctx, R6_OPC_MULU, rd, rs, rt);
++        break;
++    case NM_MUHU:
++        gen_r6_muldiv(ctx, R6_OPC_MUHU, rd, rs, rt);
++        break;
++    case NM_DIV:
++        gen_r6_muldiv(ctx, R6_OPC_DIV, rd, rs, rt);
++        break;
++    case NM_MOD:
++        gen_r6_muldiv(ctx, R6_OPC_MOD, rd, rs, rt);
++        break;
++    case NM_DIVU:
++        gen_r6_muldiv(ctx, R6_OPC_DIVU, rd, rs, rt);
++        break;
++    case NM_MODU:
++        gen_r6_muldiv(ctx, R6_OPC_MODU, rd, rs, rt);
++        break;
++#ifndef CONFIG_USER_ONLY
++    case NM_MFC0:
++        check_cp0_enabled(ctx);
++        if (rt == 0) {
++            /* Treat as NOP. */
++            break;
++        }
++        gen_mfc0(ctx, cpu_gpr[rt], rs, extract32(ctx->opcode, 11, 3));
++        break;
++    case NM_MTC0:
++        check_cp0_enabled(ctx);
++        {
++            TCGv t0 = tcg_temp_new();
++
++            gen_load_gpr(t0, rt);
++            gen_mtc0(ctx, t0, rs, extract32(ctx->opcode, 11, 3));
++            tcg_temp_free(t0);
++        }
++        break;
++#endif
++    default:
++        generate_exception_end(ctx, EXCP_RI);
++        break;
++    }
++}
++
+ static void gen_pool32f_nanomips_insn(DisasContext *ctx)
+ {
+     int rt, rs, rd;
+@@ -17224,6 +17399,16 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case NM_POOL32A:
++        switch (ctx->opcode & 0x07) {
++        case NM_POOL32A0:
++            gen_pool32a0_nanomips_insn(ctx);
++            break;
++        case NM_POOL32A7:
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
+         break;
+     case NM_P_GP_W:
+         switch (ctx->opcode & 0x03) {
 -- 
 2.7.4
