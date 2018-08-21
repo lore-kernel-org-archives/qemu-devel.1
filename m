@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fs6i6-000639-JQ
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:28:39 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fs6i8-00064x-Hi
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:28:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fs6i4-0003sQ-D2
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:28:38 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fs6i7-0003vv-Nw
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:28:40 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Aug 2018 14:28:04 +0100
-Message-Id: <20180821132811.17675-3-peter.maydell@linaro.org>
+Date: Tue, 21 Aug 2018 14:28:03 +0100
+Message-Id: <20180821132811.17675-2-peter.maydell@linaro.org>
 In-Reply-To: <20180821132811.17675-1-peter.maydell@linaro.org>
 References: <20180821132811.17675-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/9] hw/intc/arm_gic: Make per-cpu GICH memory
- regions 0x200 bytes large
+Subject: [Qemu-devel] [PATCH 1/9] hw/intc/arm_gic: Document QEMU interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,29 +22,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Luc Michel <luc.michel@greensocs.com>
 
-Reduce the size of the per-cpu GICH memory regions from 0x1000
-to 0x200. The registers only cover 0x200 bytes, and the Cortex-A15
-wants to map them at a spacing of 0x200 bytes apart. Having the
-region be too large interferes with mapping them like that, so
-reduce it.
+The GICv2's QEMU interface (sysbus MMIO regions, IRQs,
+etc) is now quite complicated with the addition of the
+virtualization extensions. Add a comment in the header
+file which documents it.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I needed to write this out to figure out what I was
+connecting to what in the a15mpcore object :-)
+---
+ include/hw/intc/arm_gic.h | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index c1b35fc1ee2..542b4b93eab 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -2084,7 +2084,7 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
-         for (i = 0; i < s->num_cpu; i++) {
-             memory_region_init_io(&s->vifaceiomem[i + 1], OBJECT(s),
-                                   &gic_viface_ops, &s->backref[i],
--                                  "gic_viface", 0x1000);
-+                                  "gic_viface", 0x200);
-             sysbus_init_mmio(sbd, &s->vifaceiomem[i + 1]);
-         }
-     }
+diff --git a/include/hw/intc/arm_gic.h b/include/hw/intc/arm_gic.h
+index 42bb535fd45..989bc837606 100644
+--- a/include/hw/intc/arm_gic.h
++++ b/include/hw/intc/arm_gic.h
+@@ -18,6 +18,41 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
++/*
++ * QEMU interface:
++ *  + QOM property "num-cpu": number of CPUs to support
++ *  + QOM property "num-irq": number of IRQs (including both SPIs and PPIs)
++ *  + QOM property "revision": GIC version (1 or 2), or 0 for the 11MPCore GIC
++ *  + QOM property "has-security-extensions": set true if the GIC should
++ *    implement the security extensions
++ *  + QOM property "has-virtualization-extensions": set true if the GIC should
++ *    implement the virtualization extensions
++ *  + unnamed GPIO inputs: (where P is number of PPIs, i.e. num-irq - 32)
++ *    [0..P-1]  SPIs
++ *    [P..P+31] PPIs for CPU 0
++ *    [P+32..P+63] PPIs for CPU 1
++ *    ...
++ *  + sysbus IRQ 0 : IRQ
++ *  + sysbus IRQ 1 : FIQ
++ *  + sysbus IRQ 2 : VIRQ (exists even if virt extensions not present)
++ *  + sysbus IRQ 3 : VFIQ (exists even if virt extensions not present)
++ *  + sysbus IRQ 4 : maintenance IRQ for CPU i/f 0 (only if virt extns present)
++ *  + sysbus IRQ 5 : maintenance IRQ for CPU i/f 1 (only if virt extns present)
++ *    ...
++ *  + sysbus MMIO regions: (in order; numbers will vary depending on
++ *    whether virtualization extensions are present and on number of cores)
++ *    - distributor registers (GICD*)
++ *    - CPU interface for the accessing core (GICC*)
++ *    - virtual interface control registers (GICH*) (only if virt extns present)
++ *    - virtual CPU interface for the accessing core (GICV*) (only if virt)
++ *    - CPU 0 CPU interface registers
++ *    - CPU 1 CPU interface registers
++ *      ...
++ *    - CPU 0 VCPU interface registers (only if virt extns present)
++ *    - CPU 1 VCPU interface registers (only if virt extns present)
++ *      ...
++ */
++
+ #ifndef HW_ARM_GIC_H
+ #define HW_ARM_GIC_H
+ 
 -- 
 2.18.0
