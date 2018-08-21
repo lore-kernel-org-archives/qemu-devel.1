@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6Nt-0001Az-98
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6Nt-0001B8-Bw
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6Nn-0008Pn-9z
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:35475 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6Nn-0008Qk-Fo
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:45 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:35484 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs6Nm-0008Mr-Lb
+	id 1fs6Nm-0008Nh-UP
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:39 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 15:07:04 +0200
-Message-Id: <1534856848-12102-23-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 15:07:09 +0200
+Message-Id: <1534856848-12102-28-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534856848-12102-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534856848-12102-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 22/46] target/mips: Implement emulation of
- nanoMIPS EXTW instruction
+Subject: [Qemu-devel] [PULL v2 27/46] target/mips: Fix pre-nanoMIPS MT ASE
+ instructions availability control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,150 +28,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: James Hogan <james.hogan@mips.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Implement emulation of nanoMIPS EXTW instruction. EXTW instruction
-is similar to the MIPS r6 ALIGN instruction, except that it counts
-the other way and in bits instead of bytes. We therefore generalise
-gen_align() function into a new gen_align_bits() function (which
-counts in bits instead of bytes and optimises when bits = size of
-the word), and implement gen_align() and a new gen_ext() based on
-that. Since we need to know the word size to check for when the
-number of bits == the word size, the opc argument is replaced with
-a wordsz argument (either 32 or 64).
+Use bits from configuration registers for availability control
+of MT ASE instructions, rather than only ISA_MT bit in insn_flags.
+This is done by adding a field in hflags for MT bit, and adding
+functions check_mt() and check_cp0_mt().
 
-Signed-off-by: James Hogan <james.hogan@mips.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/mips/translate.c | 53 +++++++++++++++++++++++++++++++++----------------
- 1 file changed, 36 insertions(+), 17 deletions(-)
+ target/mips/translate.c | 45 +++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 37 insertions(+), 8 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 7b2ffb2..3b21064 100644
+index cd7e16c..480d4bf 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -4870,8 +4870,8 @@ static void gen_lsa(DisasContext *ctx, int opc, int rd, int rs, int rt,
-     return;
- }
- 
--static void gen_align(DisasContext *ctx, int opc, int rd, int rs, int rt,
--                      int bp)
-+static void gen_align_bits(DisasContext *ctx, int wordsz, int rd, int rs,
-+                           int rt, int bits)
- {
-     TCGv t0;
-     if (rd == 0) {
-@@ -4879,35 +4879,40 @@ static void gen_align(DisasContext *ctx, int opc, int rd, int rs, int rt,
-         return;
+@@ -1927,6 +1927,35 @@ static inline void check_xnp(DisasContext *ctx)
      }
-     t0 = tcg_temp_new();
--    gen_load_gpr(t0, rt);
--    if (bp == 0) {
--        switch (opc) {
--        case OPC_ALIGN:
-+    if (bits == 0 || bits == wordsz) {
-+        if (bits == 0) {
-+            gen_load_gpr(t0, rt);
-+        } else {
-+            gen_load_gpr(t0, rs);
-+        }
-+        switch (wordsz) {
-+        case 32:
-             tcg_gen_ext32s_tl(cpu_gpr[rd], t0);
-             break;
- #if defined(TARGET_MIPS64)
--        case OPC_DALIGN:
-+        case 64:
-             tcg_gen_mov_tl(cpu_gpr[rd], t0);
-             break;
- #endif
-         }
-     } else {
-         TCGv t1 = tcg_temp_new();
-+        gen_load_gpr(t0, rt);
-         gen_load_gpr(t1, rs);
--        switch (opc) {
--        case OPC_ALIGN:
-+        switch (wordsz) {
-+        case 32:
-             {
-                 TCGv_i64 t2 = tcg_temp_new_i64();
-                 tcg_gen_concat_tl_i64(t2, t1, t0);
--                tcg_gen_shri_i64(t2, t2, 8 * (4 - bp));
-+                tcg_gen_shri_i64(t2, t2, 32 - bits);
-                 gen_move_low32(cpu_gpr[rd], t2);
-                 tcg_temp_free_i64(t2);
-             }
-             break;
- #if defined(TARGET_MIPS64)
--        case OPC_DALIGN:
--            tcg_gen_shli_tl(t0, t0, 8 * bp);
--            tcg_gen_shri_tl(t1, t1, 8 * (8 - bp));
-+        case 64:
-+            tcg_gen_shli_tl(t0, t0, bits);
-+            tcg_gen_shri_tl(t1, t1, 64 - bits);
-             tcg_gen_or_tl(cpu_gpr[rd], t1, t0);
-             break;
- #endif
-@@ -4918,6 +4923,18 @@ static void gen_align(DisasContext *ctx, int opc, int rd, int rs, int rt,
-     tcg_temp_free(t0);
  }
  
-+static void gen_align(DisasContext *ctx, int wordsz, int rd, int rs, int rt,
-+                      int bp)
++/*
++ * This code generates a "reserved instruction" exception if the
++ * Config3 MT bit is NOT set.
++ */
++static inline void check_mt(DisasContext *ctx)
 +{
-+    gen_align_bits(ctx, wordsz, rd, rs, rt, bp * 8);
++    if (unlikely(!(ctx->CP0_Config3 & (1 << CP0C3_MT)))) {
++        generate_exception_end(ctx, EXCP_RI);
++    }
 +}
 +
-+static void gen_ext(DisasContext *ctx, int wordsz, int rd, int rs, int rt,
-+                    int shift)
++/*
++ * This code generates a "coprocessor unusable" exception if CP0 is not
++ * available, and, if that is not the case, generates a "reserved instruction"
++ * exception if the Config5 MT bit is NOT set. This is needed for availability
++ * control of some of MT ASE instructions.
++ */
++static inline void check_cp0_mt(DisasContext *ctx)
 +{
-+    gen_align_bits(ctx, wordsz, rd, rs, rt, wordsz - shift);
++    if (unlikely(!(ctx->hflags & MIPS_HFLAG_CP0))) {
++        generate_exception_err(ctx, EXCP_CpU, 0);
++    } else {
++        if (unlikely(!(ctx->CP0_Config3 & (1 << CP0C3_MT)))) {
++            generate_exception_err(ctx, EXCP_RI, 0);
++        }
++    }
 +}
 +
- static void gen_bitswap(DisasContext *ctx, int opc, int rd, int rt)
- {
-     TCGv t0;
-@@ -14410,8 +14427,7 @@ static void decode_micromips32_opc(CPUMIPSState *env, DisasContext *ctx)
-             break;
-         case ALIGN:
-             check_insn(ctx, ISA_MIPS32R6);
--            gen_align(ctx, OPC_ALIGN, rd, rs, rt,
--                      extract32(ctx->opcode, 9, 2));
-+            gen_align(ctx, 32, rd, rs, rt, extract32(ctx->opcode, 9, 2));
-             break;
-         case EXT:
-             gen_bitops(ctx, OPC_EXT, rt, rs, rr, rd);
-@@ -17616,6 +17632,9 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                 gen_lsa(ctx, OPC_LSA, rd, rs, rt,
-                         extract32(ctx->opcode, 9, 2) - 1);
-                 break;
-+            case NM_EXTW:
-+                gen_ext(ctx, 32, rd, rs, rt, extract32(ctx->opcode, 6, 5));
-+                break;
-             case NM_POOL32AXF:
-                 gen_pool32axf_nanomips_insn(env, ctx);
-                 break;
-@@ -20463,7 +20482,7 @@ static void decode_opc_special3_r6(CPUMIPSState *env, DisasContext *ctx)
-             switch (op2) {
-             case OPC_ALIGN:
-             case OPC_ALIGN_END:
--                gen_align(ctx, OPC_ALIGN, rd, rs, rt, sa & 3);
-+                gen_align(ctx, 32, rd, rs, rt, sa & 3);
-                 break;
-             case OPC_BITSWAP:
-                 gen_bitswap(ctx, op2, rd, rt);
-@@ -20489,7 +20508,7 @@ static void decode_opc_special3_r6(CPUMIPSState *env, DisasContext *ctx)
-             switch (op2) {
-             case OPC_DALIGN:
-             case OPC_DALIGN_END:
--                gen_align(ctx, OPC_DALIGN, rd, rs, rt, sa & 7);
-+                gen_align(ctx, 64, rd, rs, rt, sa & 7);
-                 break;
-             case OPC_DBITSWAP:
-                 gen_bitswap(ctx, op2, rd, rt);
++
+ 
+ /* Define small wrappers for gen_load_fpr* so that we have a uniform
+    calling interface for 32 and 64-bit FPRs.  No sense in changing
+@@ -8595,7 +8624,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContext *ctx, uint32_t opc, int rt,
+         opn = "mthc0";
+         break;
+     case OPC_MFTR:
+-        check_insn(ctx, ASE_MT);
++        check_cp0_enabled(ctx);
+         if (rd == 0) {
+             /* Treat as NOP. */
+             return;
+@@ -8605,7 +8634,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContext *ctx, uint32_t opc, int rt,
+         opn = "mftr";
+         break;
+     case OPC_MTTR:
+-        check_insn(ctx, ASE_MT);
++        check_cp0_enabled(ctx);
+         gen_mttr(env, ctx, rd, rt, (ctx->opcode >> 5) & 1,
+                  ctx->opcode & 0x7, (ctx->opcode >> 4) & 1);
+         opn = "mttr";
+@@ -21960,7 +21989,7 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
+         gen_rdhwr(ctx, rt, rd, extract32(ctx->opcode, 6, 3));
+         break;
+     case OPC_FORK:
+-        check_insn(ctx, ASE_MT);
++        check_mt(ctx);
+         {
+             TCGv t0 = tcg_temp_new();
+             TCGv t1 = tcg_temp_new();
+@@ -21973,7 +22002,7 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case OPC_YIELD:
+-        check_insn(ctx, ASE_MT);
++        check_mt(ctx);
+         {
+             TCGv t0 = tcg_temp_new();
+ 
+@@ -23270,22 +23299,22 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+                 op2 = MASK_MFMC0(ctx->opcode);
+                 switch (op2) {
+                 case OPC_DMT:
+-                    check_insn(ctx, ASE_MT);
++                    check_cp0_mt(ctx);
+                     gen_helper_dmt(t0);
+                     gen_store_gpr(t0, rt);
+                     break;
+                 case OPC_EMT:
+-                    check_insn(ctx, ASE_MT);
++                    check_cp0_mt(ctx);
+                     gen_helper_emt(t0);
+                     gen_store_gpr(t0, rt);
+                     break;
+                 case OPC_DVPE:
+-                    check_insn(ctx, ASE_MT);
++                    check_cp0_mt(ctx);
+                     gen_helper_dvpe(t0, cpu_env);
+                     gen_store_gpr(t0, rt);
+                     break;
+                 case OPC_EVPE:
+-                    check_insn(ctx, ASE_MT);
++                    check_cp0_mt(ctx);
+                     gen_helper_evpe(t0, cpu_env);
+                     gen_store_gpr(t0, rt);
+                     break;
 -- 
 2.7.4
