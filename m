@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fs30r-0001IX-4s
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:31:46 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fs30p-0001LU-T6
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:31:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fs2tO-00057v-T9
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:24:03 -0400
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:35707)
+	(envelope-from <zhangckid@gmail.com>) id 1fs2vM-00078k-V9
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:26:06 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:53372)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fs2tO-00056r-Fg
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:24:02 -0400
-Received: by mail-oi0-x22d.google.com with SMTP id m11-v6so30914884oic.2
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 02:24:02 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fs2vM-00077w-Md
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:26:04 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id s9-v6so2227427wmh.3
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 02:26:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180820194755.30731-1-mark.cave-ayland@ilande.co.uk>
-References: <20180820194755.30731-1-mark.cave-ayland@ilande.co.uk>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Aug 2018 10:23:41 +0100
-Message-ID: <CAFEAcA-Ho=SKgm3UyW_ndC78ps_jk1xMs7B1HYHQCzsQFx+YBA@mail.gmail.com>
+References: <20180811205924.4113-1-zhangckid@gmail.com>
+	<20180811205924.4113-17-zhangckid@gmail.com>
+	<2bd91af8-f11f-ff55-8a02-9bee3361d7ff@redhat.com>
+In-Reply-To: <2bd91af8-f11f-ff55-8a02-9bee3361d7ff@redhat.com>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Tue, 21 Aug 2018 17:25:51 +0800
+Message-ID: <CAK3tnvJtAS75zw8-6fgNv+RTqGuizRm8Mb0zAhGqE_njwy1Dpw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] qemu-sparc.for-upstream queue 20180820
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V11 16/20] filter: Add handle_event method
+ for NetFilterClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +31,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: jasowang@redhat.com
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com
 
-On 20 August 2018 at 20:47, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> The following changes since commit d0092d90eb546a8bbe9e9120426c189474123797:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180820' into staging (2018-08-20 17:41:18 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/mcayland/qemu.git tags/qemu-sparc.for-upstream-20180820
->
-> for you to fetch changes up to 8498321421e95a822dc7a5dd3184890766a029bb:
->
->   sun4m: don't use legacy fw_cfg_init_mem() function (2018-08-20 19:18:31 +0100)
->
-> ----------------------------------------------------------------
-> qemu-sparc.for-upstream queue
->
-> ----------------------------------------------------------------
+On Tue, Aug 21, 2018 at 11:30 AM Jason Wang <jasowang@redhat.com> wrote:
 
-Applied, thanks.
+>
+>
+> On 2018=E5=B9=B408=E6=9C=8812=E6=97=A5 04:59, Zhang Chen wrote:
+> > Filter needs to process the event of checkpoint/failover or
+> > other event passed by COLO frame.
+> >
+> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> > ---
+> >   include/net/filter.h |  5 +++++
+> >   net/filter.c         | 17 +++++++++++++++++
+> >   net/net.c            | 28 ++++++++++++++++++++++++++++
+> >   3 files changed, 50 insertions(+)
+> >
+> > diff --git a/include/net/filter.h b/include/net/filter.h
+> > index 435acd6f82..49da666ac0 100644
+> > --- a/include/net/filter.h
+> > +++ b/include/net/filter.h
+> > @@ -38,6 +38,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *nc=
+,
+> >
+> >   typedef void (FilterStatusChanged) (NetFilterState *nf, Error **errp)=
+;
+> >
+> > +typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Error
+> **errp);
+> > +
+> >   typedef struct NetFilterClass {
+> >       ObjectClass parent_class;
+> >
+> > @@ -45,6 +47,7 @@ typedef struct NetFilterClass {
+> >       FilterSetup *setup;
+> >       FilterCleanup *cleanup;
+> >       FilterStatusChanged *status_changed;
+> > +    FilterHandleEvent *handle_event;
+> >       /* mandatory */
+> >       FilterReceiveIOV *receive_iov;
+> >   } NetFilterClass;
+> > @@ -77,4 +80,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState
+> *sender,
+> >                                       int iovcnt,
+> >                                       void *opaque);
+> >
+> > +void colo_notify_filters_event(int event, Error **errp);
+> > +
+> >   #endif /* QEMU_NET_FILTER_H */
+> > diff --git a/net/filter.c b/net/filter.c
+> > index 2fd7d7d663..0f17eba143 100644
+> > --- a/net/filter.c
+> > +++ b/net/filter.c
+> > @@ -17,6 +17,8 @@
+> >   #include "net/vhost_net.h"
+> >   #include "qom/object_interfaces.h"
+> >   #include "qemu/iov.h"
+> > +#include "net/colo.h"
+> > +#include "migration/colo.h"
+> >
+> >   static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
+> >   {
+> > @@ -245,11 +247,26 @@ static void netfilter_finalize(Object *obj)
+> >       g_free(nf->netdev_id);
+> >   }
+> >
+> > +static void dummy_handle_event(NetFilterState *nf, int event, Error
+> **errp)
+> > +{
+>
+> It's in fact not a "dummy" handler, Maybe it's better to rename it as
+> "default".
+>
 
--- PMM
+OK, I will rename it in next version.
+
+
+>
+> > +    switch (event) {
+> > +    case COLO_EVENT_CHECKPOINT:
+> > +        break;
+> > +    case COLO_EVENT_FAILOVER:
+> > +        object_property_set_str(OBJECT(nf), "off", "status", errp);
+>
+> I think filter is a generic infrastructure, so it's better not have COLO
+> specific things like this. You can either add a generic name or have a
+> dedicated helper to just disable all net filters.
+>
+
+Maybe we can rename it to "EVENT_CHECKPOINT" and "EVENT_FAILOVER" looks
+better?
+
+
+>
+> > +        break;
+> > +    default:
+> > +        break;
+> > +    }
+> > +}
+> > +
+> >   static void netfilter_class_init(ObjectClass *oc, void *data)
+> >   {
+> >       UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
+> > +    NetFilterClass *nfc =3D NETFILTER_CLASS(oc);
+> >
+> >       ucc->complete =3D netfilter_complete;
+> > +    nfc->handle_event =3D dummy_handle_event;
+> >   }
+> >
+> >   static const TypeInfo netfilter_info =3D {
+> > diff --git a/net/net.c b/net/net.c
+> > index a77ea88fff..b4f6a2efb2 100644
+> > --- a/net/net.c
+> > +++ b/net/net.c
+> > @@ -1331,6 +1331,34 @@ void hmp_info_network(Monitor *mon, const QDict
+> *qdict)
+> >       }
+> >   }
+> >
+> > +void colo_notify_filters_event(int event, Error **errp)
+> > +{
+> > +    NetClientState *nc, *peer;
+> > +    NetClientDriver type;
+> > +    NetFilterState *nf;
+> > +    NetFilterClass *nfc =3D NULL;
+> > +    Error *local_err =3D NULL;
+> > +
+> > +    QTAILQ_FOREACH(nc, &net_clients, next) {
+> > +        peer =3D nc->peer;
+> > +        type =3D nc->info->type;
+> > +        if (!peer || type !=3D NET_CLIENT_DRIVER_TAP) {
+> > +            continue;
+> > +        }
+>
+> The check the TAP is redundant with previous patch.
+>
+
+OK, I will remove it.
+
+
+>
+> > +        QTAILQ_FOREACH(nf, &nc->filters, next) {
+> > +            nfc =3D  NETFILTER_GET_CLASS(OBJECT(nf));
+> > +            if (!nfc->handle_event) {
+>
+> Looks like this won't happen.
+>
+
+It will happen. like filter-mirror and filter-redirector haven't this event=
+.
+
+Thanks
+Zhang Chen
+
+
+>
+> Thanks
+>
+> > +                continue;
+> > +            }
+> > +            nfc->handle_event(nf, event, &local_err);
+> > +            if (local_err) {
+> > +                error_propagate(errp, local_err);
+> > +                return;
+> > +            }
+> > +        }
+> > +    }
+> > +}
+> > +
+> >   void qmp_set_link(const char *name, bool up, Error **errp)
+> >   {
+> >       NetClientState *ncs[MAX_QUEUE_NUM];
+>
+>
