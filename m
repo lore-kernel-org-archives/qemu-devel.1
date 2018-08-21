@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fs3cp-00059c-MC
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:11:00 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fs3fE-0005mG-EP
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:13:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fs3co-0006wn-RW
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:10:59 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43546)
+	(envelope-from <pbonzini@redhat.com>) id 1fs3fB-0008Ng-5u
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:13:28 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:43886)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fs3co-0006wF-Kx
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:10:58 -0400
-Received: by mail-wr1-x444.google.com with SMTP id k5-v6so3827441wre.10
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 03:10:58 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fs3fA-0008N5-Ul
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 06:13:25 -0400
+Received: by mail-wr1-f66.google.com with SMTP id k5-v6so3833548wre.10
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 03:13:24 -0700 (PDT)
+References: <1534845930-14451-1-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7dc3baee-d8c5-bebc-7d80-6d6000acdf46@redhat.com>
+Date: Tue, 21 Aug 2018 12:13:22 +0200
 MIME-Version: 1.0
-References: <20180713130916.4153-1-marcandre.lureau@redhat.com>
-	<CAJ+F1CKHrOyD91HLk16eQFjV4JfWpH6poq_Svdihav15kJ62yw@mail.gmail.com>
-	<20180821075130.tlqk6hv2dbry2iem@sirius.home.kraxel.org>
-In-Reply-To: <20180821075130.tlqk6hv2dbry2iem@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 21 Aug 2018 12:10:46 +0200
-Message-ID: <CAJ+F1CLboeQZXWs5gVoc+Ugwq6A7bGdQ=Twg05i_1iXg445oEg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 00/29] vhost-user for input & GPU
+In-Reply-To: <1534845930-14451-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Remove deprecated -balloon option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +29,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-Hi
+On 21/08/2018 12:05, Thomas Huth wrote:
+> The "-balloon" option has been replaced by "-device virtio-balloon".
+> It's been marked as deprecated since two releases, and nobody
+> complained, so let's remove it now.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  docs/virtio-balloon-stats.txt |  6 +++---
+>  qemu-deprecated.texi          |  5 -----
+>  qemu-options.hx               | 10 ----------
+>  vl.c                          | 36 ------------------------------------
+>  4 files changed, 3 insertions(+), 54 deletions(-)
+> 
+> diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
+> index 9985e1d..1732cc8 100644
+> --- a/docs/virtio-balloon-stats.txt
+> +++ b/docs/virtio-balloon-stats.txt
+> @@ -61,9 +61,9 @@ It's also important to note the following:
+>     respond to the request the timer will never be re-armed, which has
+>     the same effect as disabling polling
+>  
+> -Here are a few examples. QEMU is started with '-balloon virtio', which
+> -generates '/machine/peripheral-anon/device[1]' as the QOM path for the
+> -balloon device.
+> +Here are a few examples. QEMU is started with '-device virtio-balloon',
+> +which generates '/machine/peripheral-anon/device[1]' as the QOM path for
+> +the balloon device.
+>  
+>  Enable polling with 2 seconds interval:
+>  
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 67b7211..0714017 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -106,11 +106,6 @@ enabled via the ``-machine usb=on'' argument.
+>  
+>  The ``-nodefconfig`` argument is a synonym for ``-no-user-config``.
+>  
+> -@subsection -balloon (since 2.12.0)
+> -
+> -The @option{--balloon virtio} argument has been superseded by
+> -@option{--device virtio-balloon}.
+> -
+>  @subsection -fsdev handle (since 2.12.0)
+>  
+>  The ``handle'' fsdev backend does not support symlinks and causes the 9p
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 4efdedf..47c6b92 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -454,16 +454,6 @@ modprobe i810_audio clocking=48000
+>  @end example
+>  ETEXI
+>  
+> -DEF("balloon", HAS_ARG, QEMU_OPTION_balloon,
+> -    "-balloon virtio[,addr=str]\n"
+> -    "                enable virtio balloon device (deprecated)\n", QEMU_ARCH_ALL)
+> -STEXI
+> -@item -balloon virtio[,addr=@var{addr}]
+> -@findex -balloon
+> -Enable virtio balloon device, optionally with PCI address @var{addr}. This
+> -option is deprecated, use @option{-device virtio-balloon} instead.
+> -ETEXI
+> -
+>  DEF("device", HAS_ARG, QEMU_OPTION_device,
+>      "-device driver[,prop[=value][,...]]\n"
+>      "                add device (based on driver)\n"
+> diff --git a/vl.c b/vl.c
+> index 16b913f..f952f01 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2127,36 +2127,6 @@ static void parse_display(const char *p)
+>      }
+>  }
+>  
+> -static int balloon_parse(const char *arg)
+> -{
+> -    QemuOpts *opts;
+> -
+> -    warn_report("This option is deprecated. "
+> -                "Use '--device virtio-balloon' to enable the balloon device.");
+> -
+> -    if (strcmp(arg, "none") == 0) {
+> -        return 0;
+> -    }
+> -
+> -    if (!strncmp(arg, "virtio", 6)) {
+> -        if (arg[6] == ',') {
+> -            /* have params -> parse them */
+> -            opts = qemu_opts_parse_noisily(qemu_find_opts("device"), arg + 7,
+> -                                           false);
+> -            if (!opts)
+> -                return  -1;
+> -        } else {
+> -            /* create empty opts */
+> -            opts = qemu_opts_create(qemu_find_opts("device"), NULL, 0,
+> -                                    &error_abort);
+> -        }
+> -        qemu_opt_set(opts, "driver", "virtio-balloon", &error_abort);
+> -        return 0;
+> -    }
+> -
+> -    return -1;
+> -}
+> -
+>  char *qemu_find_file(int type, const char *name)
+>  {
+>      int i;
+> @@ -3659,12 +3629,6 @@ int main(int argc, char **argv, char **envp)
+>              case QEMU_OPTION_no_hpet:
+>                  no_hpet = 1;
+>                  break;
+> -            case QEMU_OPTION_balloon:
+> -                if (balloon_parse(optarg) < 0) {
+> -                    error_report("unknown -balloon argument %s", optarg);
+> -                    exit(1);
+> -                }
+> -                break;
+>              case QEMU_OPTION_no_reboot:
+>                  no_reboot = 1;
+>                  break;
+> 
 
-On Tue, Aug 21, 2018 at 9:51 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
->   Hi,
->
-> > > Feedback welcome,
-> >
-> > ping
->
-> Cherry-picked two patches for the ui pull request.
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-thanks
+Please send a pull request yourself with all deprecation removals.
 
->
-> What is the plan for the command line handling, specifically the patch
-> tagged with HACK?
-
-The RFC libvirt series doesn't use it.
-
-However, it's very convenient for qemu command line users. Daniel
-doesn't want g_shell_parse_argv(), but he would like the -object json:
-command line form instead. I don't know what is the status about
-supporting that syntax.
-
-You may skip patch 9 & 10 for review & merge. But for easy testing, I
-recommend to use them atm :)
-
-thanks
-
-
-
---
-Marc-Andr=C3=A9 Lureau
+Paolo
