@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fryMt-0004C6-TC
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fryMx-0004GV-J5
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fryMq-0000Ob-Eo
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fryMu-0000SX-Hn
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:15 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 21 Aug 2018 14:33:40 +1000
-Message-Id: <20180821043343.7514-24-david@gibson.dropbear.id.au>
+Date: Tue, 21 Aug 2018 14:33:34 +1000
+Message-Id: <20180821043343.7514-18-david@gibson.dropbear.id.au>
 In-Reply-To: <20180821043343.7514-1-david@gibson.dropbear.id.au>
 References: <20180821043343.7514-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 23/26] mac_oldworld: don't use legacy
- fw_cfg_init_mem() function
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 17/26] hw/ppc/ppc_boards: Don't use old_mmio for
+ ref405ep_fpga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,41 +24,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, lvivier@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Instead initialise the device via qdev to allow us to set device properties
-directly as required.
+Switch the ref405ep_fpga device away from using the old_mmio
+MemoryRegion accessors.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/mac_oldworld.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ hw/ppc/ppc405_boards.c | 60 +++++++-----------------------------------
+ 1 file changed, 10 insertions(+), 50 deletions(-)
 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 064d7eb30a..80b5525775 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -309,7 +309,17 @@ static void ppc_heathrow_init(MachineState *machine)
- 
-     /* No PCI init: the BIOS will do it */
- 
--    fw_cfg = fw_cfg_init_mem(CFG_ADDR, CFG_ADDR + 2);
-+    dev = qdev_create(NULL, TYPE_FW_CFG_MEM);
-+    fw_cfg = FW_CFG(dev);
-+    qdev_prop_set_uint32(dev, "data_width", 1);
-+    qdev_prop_set_bit(dev, "dma_enabled", false);
-+    object_property_add_child(OBJECT(qdev_get_machine()), TYPE_FW_CFG,
-+                              OBJECT(fw_cfg), NULL);
-+    qdev_init_nofail(dev);
-+    s = SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(s, 0, CFG_ADDR);
-+    sysbus_mmio_map(s, 1, CFG_ADDR + 2);
-+
-     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
-     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
--- 
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 70111075b3..f5a9c24b6c 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -66,7 +66,7 @@ struct ref405ep_fpga_t {
+     uint8_t reg1;
+ };
+=20
+-static uint32_t ref405ep_fpga_readb (void *opaque, hwaddr addr)
++static uint64_t ref405ep_fpga_readb(void *opaque, hwaddr addr, unsigned =
+size)
+ {
+     ref405ep_fpga_t *fpga;
+     uint32_t ret;
+@@ -87,8 +87,8 @@ static uint32_t ref405ep_fpga_readb (void *opaque, hwad=
+dr addr)
+     return ret;
+ }
+=20
+-static void ref405ep_fpga_writeb (void *opaque,
+-                                  hwaddr addr, uint32_t value)
++static void ref405ep_fpga_writeb(void *opaque, hwaddr addr, uint64_t val=
+ue,
++                                 unsigned size)
+ {
+     ref405ep_fpga_t *fpga;
+=20
+@@ -105,54 +105,14 @@ static void ref405ep_fpga_writeb (void *opaque,
+     }
+ }
+=20
+-static uint32_t ref405ep_fpga_readw (void *opaque, hwaddr addr)
+-{
+-    uint32_t ret;
+-
+-    ret =3D ref405ep_fpga_readb(opaque, addr) << 8;
+-    ret |=3D ref405ep_fpga_readb(opaque, addr + 1);
+-
+-    return ret;
+-}
+-
+-static void ref405ep_fpga_writew (void *opaque,
+-                                  hwaddr addr, uint32_t value)
+-{
+-    ref405ep_fpga_writeb(opaque, addr, (value >> 8) & 0xFF);
+-    ref405ep_fpga_writeb(opaque, addr + 1, value & 0xFF);
+-}
+-
+-static uint32_t ref405ep_fpga_readl (void *opaque, hwaddr addr)
+-{
+-    uint32_t ret;
+-
+-    ret =3D ref405ep_fpga_readb(opaque, addr) << 24;
+-    ret |=3D ref405ep_fpga_readb(opaque, addr + 1) << 16;
+-    ret |=3D ref405ep_fpga_readb(opaque, addr + 2) << 8;
+-    ret |=3D ref405ep_fpga_readb(opaque, addr + 3);
+-
+-    return ret;
+-}
+-
+-static void ref405ep_fpga_writel (void *opaque,
+-                                  hwaddr addr, uint32_t value)
+-{
+-    ref405ep_fpga_writeb(opaque, addr, (value >> 24) & 0xFF);
+-    ref405ep_fpga_writeb(opaque, addr + 1, (value >> 16) & 0xFF);
+-    ref405ep_fpga_writeb(opaque, addr + 2, (value >> 8) & 0xFF);
+-    ref405ep_fpga_writeb(opaque, addr + 3, value & 0xFF);
+-}
+-
+ static const MemoryRegionOps ref405ep_fpga_ops =3D {
+-    .old_mmio =3D {
+-        .read =3D {
+-            ref405ep_fpga_readb, ref405ep_fpga_readw, ref405ep_fpga_read=
+l,
+-        },
+-        .write =3D {
+-            ref405ep_fpga_writeb, ref405ep_fpga_writew, ref405ep_fpga_wr=
+itel,
+-        },
+-    },
+-    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .read =3D ref405ep_fpga_readb,
++    .write =3D ref405ep_fpga_writeb,
++    .impl.min_access_size =3D 1,
++    .impl.max_access_size =3D 1,
++    .valid.min_access_size =3D 1,
++    .valid.max_access_size =3D 4,
++    .endianness =3D DEVICE_BIG_ENDIAN,
+ };
+=20
+ static void ref405ep_fpga_reset (void *opaque)
+--=20
 2.17.1
