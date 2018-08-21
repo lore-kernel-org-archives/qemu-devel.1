@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1frytb-0004hv-R1
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:08:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1frywb-0006S9-98
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1frytX-0000ug-SA
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:07:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38000 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1frywX-0004F5-3i
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:11:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38042 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1frytX-0000te-MS
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:07:55 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1frywW-0004Eq-VD
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 01:11:01 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20180801093401.9160-1-marcandre.lureau@redhat.com>
-	<871sbi8bsm.fsf@dusky.pond.sub.org>
-	<CAJ+F1CJj=WPs0FOx8QJU76iFqhc11N7m+FnRG2t0USu0Jm6JTA@mail.gmail.com>
-	<874lge6s4u.fsf@dusky.pond.sub.org>
-	<CAJ+F1C+WmBtMG26nG0KmQCkKg9iUk6nxTi2P=t_qC22z3i5CWQ@mail.gmail.com>
-	<87a7phtti5.fsf@dusky.pond.sub.org>
-	<CAJ+F1C+w-1ydsjDMkONdVOGVfhKUVB2bbos3+u7t1a67p8AfQQ@mail.gmail.com>
-Date: Tue, 21 Aug 2018 07:07:53 +0200
-In-Reply-To: <CAJ+F1C+w-1ydsjDMkONdVOGVfhKUVB2bbos3+u7t1a67p8AfQQ@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 20 Aug 2018
-	20:13:56 +0200")
-Message-ID: <87woskgvdi.fsf@dusky.pond.sub.org>
+References: <20180817150559.16243-1-armbru@redhat.com>
+	<20180817150559.16243-42-armbru@redhat.com>
+	<2ad9b303-8108-3f66-c478-65081fc4062a@redhat.com>
+	<87woslqnay.fsf@dusky.pond.sub.org>
+	<4c068b57-280f-7999-dc07-291282302101@redhat.com>
+Date: Tue, 21 Aug 2018 07:10:57 +0200
+In-Reply-To: <4c068b57-280f-7999-dc07-291282302101@redhat.com> (Eric Blake's
+	message of "Mon, 20 Aug 2018 13:36:35 -0500")
+Message-ID: <87sh38gv8e.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] monitor: avoid potential dead-lock when
- cleaning up
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 41/60] json: Nicer recovery from invalid
+ leading zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,231 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Eric Blake <eblake@redhat.com> writes:
 
-> Hi
+> On 08/20/2018 06:39 AM, Markus Armbruster wrote:
 >
-> On Mon, Aug 20, 2018 at 8:57 AM Markus Armbruster <armbru@redhat.com> wro=
-te:
+>> In review of v1, we discussed whether to try matching non-integer
+>> numbers with redundant leading zero.  Doing that tightly in the lexer
+>> requires duplicating six states.  A simpler alternative is to have the
+>> lexer eat "digit salad" after redundant leading zero: 0[0-9.eE+-]+.
+>> Your suggestion for hexadecimal numbers is digit salad with different
+>> digits: [0-9a-fA-FxX].  Another option is their union: [0-9a-fA-FxX+-].
+>> Even more radical would be eating anything but whitespace and structural
+>> characters: [^][}{:, \t\n\r].  That idea pushed to the limit results in
+>> a two-stage lexer: first stage finds token strings, where a token string
+>> is a structural character or a sequence of non-structural,
+>> non-whitespace characters, second stage rejects invalid token strings.
 >>
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>> Hmm, we could try to recover from lexical errors more smartly in
+>> general: instead of ending the JSON error token after the first
+>> offending character, end it before the first whitespace or structural
+>> character following the offending character.
 >>
->> > Hi
->> > On Wed, Aug 1, 2018 at 5:09 PM Markus Armbruster <armbru@redhat.com> w=
-rote:
->> >>
->> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
->> >>
->> >> > Hi
->> >> >
->> >> > On Wed, Aug 1, 2018 at 3:19 PM, Markus Armbruster <armbru@redhat.co=
-m> wrote:
->> >> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->> >> >>
->> >> >>> When a monitor is connected to a Spice chardev, the monitor clean=
-up
->> >> >>> can dead-lock:
->> >> >>>
->> >> >>>  #0  0x00007f43446637fd in __lll_lock_wait () at /lib64/libpthrea=
-d.so.0
->> >> >>>  #1  0x00007f434465ccf4 in pthread_mutex_lock () at /lib64/libpth=
-read.so.0
->> >> >>>  #2  0x0000556dd79f22ba in qemu_mutex_lock_impl (mutex=3D0x556dd8=
-1c9220 <monitor_lock>, file=3D0x556dd7ae3648 "/home/elmarco/src/qq/monitor.=
-c", line=3D645) at /home/elmarco/src/qq/util/qemu-thread-posix.c:66
->> >> >>>  #3  0x0000556dd7431bd5 in monitor_qapi_event_queue (event=3DQAPI=
-_EVENT_SPICE_DISCONNECTED, qdict=3D0x556dd9abc850, errp=3D0x7fffb7bbddd8) a=
-t /home/elmarco/src/qq/monitor.c:645
->> >> >>>  #4  0x0000556dd79d476b in qapi_event_send_spice_disconnected (se=
-rver=3D0x556dd98ee760, client=3D0x556ddaaa8560, errp=3D0x556dd82180d0 <erro=
-r_abort>) at qapi/qapi-events-ui.c:149
->> >> >>>  #5  0x0000556dd7870fc1 in channel_event (event=3D3, info=3D0x556=
-ddad1b590) at /home/elmarco/src/qq/ui/spice-core.c:235
->> >> >>>  #6  0x00007f434560a6bb in reds_handle_channel_event (reds=3D<opt=
-imized out>, event=3D3, info=3D0x556ddad1b590) at reds.c:316
->> >> >>>  #7  0x00007f43455f393b in main_dispatcher_self_handle_channel_ev=
-ent (info=3D0x556ddad1b590, event=3D3, self=3D0x556dd9a7d8c0) at main-dispa=
-tcher.c:197
->> >> >>>  #8  0x00007f43455f393b in main_dispatcher_channel_event (self=3D=
-0x556dd9a7d8c0, event=3Devent@entry=3D3, info=3D0x556ddad1b590) at main-dis=
-patcher.c:197
->> >> >>>  #9  0x00007f4345612833 in red_stream_push_channel_event (s=3Ds@e=
-ntry=3D0x556ddae2ef40, event=3Devent@entry=3D3) at red-stream.c:414
->> >> >>>  #10 0x00007f434561286b in red_stream_free (s=3D0x556ddae2ef40) a=
-t red-stream.c:388
->> >> >>>  #11 0x00007f43455f9ddc in red_channel_client_finalize (object=3D=
-0x556dd9bb21a0) at red-channel-client.c:347
->> >> >>>  #12 0x00007f434b5f9fb9 in g_object_unref () at /lib64/libgobject=
--2.0.so.0
->> >> >>>  #13 0x00007f43455fc212 in red_channel_client_push (rcc=3D0x556dd=
-9bb21a0) at red-channel-client.c:1341
->> >> >>>  #14 0x0000556dd76081ba in spice_port_set_fe_open (chr=3D0x556dd9=
-925e20, fe_open=3D0) at /home/elmarco/src/qq/chardev/spice.c:241
->> >> >>>  #15 0x0000556dd796d74a in qemu_chr_fe_set_open (be=3D0x556dd9a37=
-c00, fe_open=3D0) at /home/elmarco/src/qq/chardev/char-fe.c:340
->> >> >>>  #16 0x0000556dd796d4d9 in qemu_chr_fe_set_handlers (b=3D0x556dd9=
-a37c00, fd_can_read=3D0x0, fd_read=3D0x0, fd_event=3D0x0, be_change=3D0x0, =
-opaque=3D0x0, context=3D0x0, set_open=3Dtrue) at /home/elmarco/src/qq/chard=
-ev/char-fe.c:280
->> >> >>>  #17 0x0000556dd796d359 in qemu_chr_fe_deinit (b=3D0x556dd9a37c00=
-, del=3Dfalse) at /home/elmarco/src/qq/chardev/char-fe.c:233
->> >> >>>  #18 0x0000556dd7432240 in monitor_data_destroy (mon=3D0x556dd9a3=
-7c00) at /home/elmarco/src/qq/monitor.c:786
->> >> >>>  #19 0x0000556dd743b968 in monitor_cleanup () at /home/elmarco/sr=
-c/qq/monitor.c:4683
->> >> >>>  #20 0x0000556dd75ce776 in main (argc=3D3, argv=3D0x7fffb7bbe458,=
- envp=3D0x7fffb7bbe478) at /home/elmarco/src/qq/vl.c:4660
->> >> >>>
->> >> >>> Because spice code tries to emit a "disconnected" signal on the
->> >> >>> monitors. Fix this situation by tightening the monitor lock time =
-to
->> >> >>> the monitor list removal.
->> >> >>>
->> >> >>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
-m>
->> >> >>
->> >> >> Do you think this should go into 3.0?
->> >> >>
->> >> >>> ---
->> >> >>>  monitor.c | 22 +++++++++++++++-------
->> >> >>>  1 file changed, 15 insertions(+), 7 deletions(-)
->> >> >>>
->> >> >>> diff --git a/monitor.c b/monitor.c
->> >> >>> index 0fa0910a2a..a16a6c5311 100644
->> >> >>> --- a/monitor.c
->> >> >>> +++ b/monitor.c
->> >> >>> @@ -4702,8 +4702,6 @@ void monitor_init(Chardev *chr, int flags)
->> >> >>>
->> >> >>>  void monitor_cleanup(void)
->> >> >>>  {
->> >> >>> -    Monitor *mon, *next;
->> >> >>> -
->> >> >>>      /*
->> >> >>>       * We need to explicitly stop the I/O thread (but not destro=
-y it),
->> >> >>>       * clean up the monitor resources, then destroy the I/O thre=
-ad since
->> >> >>> @@ -4719,14 +4717,24 @@ void monitor_cleanup(void)
->> >> >>>      monitor_qmp_bh_responder(NULL);
->> >> >>>
->> >> >>>      /* Flush output buffers and destroy monitors */
->> >> >>> -    qemu_mutex_lock(&monitor_lock);
->> >> >>> -    QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
->> >> >>> -        QTAILQ_REMOVE(&mon_list, mon, entry);
->> >> >>> +    do {
->> >> >>
->> >> >> for (;;), please.
->> >> >>
->> >> >>> +        Monitor *mon;
->> >> >>> +
->> >> >>> +        qemu_mutex_lock(&monitor_lock);
->> >> >>> +        mon =3D QTAILQ_FIRST(&mon_list);
->> >> >>> +        if (mon) {
->> >> >>> +            QTAILQ_REMOVE(&mon_list, mon, entry);
->> >> >>> +        }
->> >> >>> +        qemu_mutex_unlock(&monitor_lock);
->> >> >>> +
->> >> >>> +        if (!mon) {
->> >> >>> +            break;
->> >> >>> +        }
->> >> >>> +
->> >> >>>          monitor_flush(mon);
->> >> >>>          monitor_data_destroy(mon);
->> >> >>>          g_free(mon);
->> >> >>> -    }
->> >> >>> -    qemu_mutex_unlock(&monitor_lock);
->> >> >>> +    } while (true);
->> >> >>>
->> >> >>>      /* QEMUBHs needs to be deleted before destroying the I/O thr=
-ead */
->> >> >>>      qemu_bh_delete(qmp_dispatcher_bh);
->> >> >>
->> >> >> Iterating safely over a list protected by a lock should be easier =
-than
->> >> >> that.  Sad.
->> >> >>
->> >> >> Hmm, what about this:
->> >> >>
->> >> >> diff --git a/monitor.c b/monitor.c
->> >> >> index 77861e96af..4a23f6c7bc 100644
->> >> >> --- a/monitor.c
->> >> >> +++ b/monitor.c
->> >> >> @@ -4721,9 +4721,11 @@ void monitor_cleanup(void)
->> >> >>      qemu_mutex_lock(&monitor_lock);
->> >> >>      QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
->> >> >>          QTAILQ_REMOVE(&mon_list, mon, entry);
->> >> >> +        qemu_mutex_unlock(&monitor_lock);
->> >> >>          monitor_flush(mon);
->> >> >>          monitor_data_destroy(mon);
->> >> >>          g_free(mon);
->> >> >> +        qemu_mutex_lock(&monitor_lock);
->> >> >
->> >> > Although unlikely, there is a chance the monitor list could be
->> >> > modified while flushing/cleaning up, I suppose, in this case we cou=
-ld
->> >> > miss the new monitors (if next is NULL).
->> >>
->> >> Your loop prevents that from happening while it runs, but does nothing
->> >> to stop it from happening afterwards.  If we want to lock out new
->> >> monitors, we need to make monitor_init() fail or impossible to call.
->> >
->> > Not so trivial. Is there other threads capable of calling
->> > monitor_init() by the time monitor_cleanup() is called? It looks like
->> > monitor_init() may only be called from the main thread.
->>
->> Callers:
->>
->> * gdbserver_start()
->>
->>   CLI option -gdb, HMP command gdbserver, linux user CLI option -g and
->>   environment variable QEMU_GDB
->>
->>   The interesting one is the HMP command.  Does your loop lock it out?
->>   If we run it only in the main thread, and we run the HMP command only
->>   in the main thread, it obviously does.
->>
->> * mon_init_func()
->>
->>   CLI option -mon and its convenience buddies -monitor, -qmp,
->>   -qmp-pretty
->>
->>   We don't have a monitor command to spawn off a new monitor, but we
->>   could have.
->>
->> * qemu_chr_new_noreplay()
->>
->>   gdbserver_start() again, and qemu_chr_new(), which is called all over
->>   the place.  I lack the time to review these calls.  Are you sure this
->>   one can only run in the main thread?
->>
+>> I can try that, but I'd prefer to try it in a follow-up patch.
 >
-> No, I am not sure, but I would consider it a bug today. However, if
-> it's possible to keep using the monitor or create new monitor after
-> monitor_cleanup() is called, we have probably have more issues to
-> solve.
->
-> However, this problem is not directly related to the dead-lock fixed
-> here, and the problem is pre-existing.
->
-> Probably the cleanup code would have to look different if we want to
-> solve the init/cleanup races, but that's a different fix. Do we have
-> to solve it first, or can we add a FIXME?
+> Indeed, that sounds like a valid approach. So, for this patch, I'm
+> fine with just accepting ['0' ... '9'], then seeing if the later
+> smarter-lexing change makes back-to-back non-structural tokens give
+> saner error messages in general.
 
-FIXME is fine.
-
-Can we go with the simpler fix I sketched?
-
->> Synchronizing monitor creation and cleanup explicitly might be cleaner.
->> I guess monitor_lock kind of sort of almost does that before your patch,
->> but it can deadlock because it's too coarse.
->>
->> I'm afraid we need to rethink the set of locks protecting shared monitor
->> state.
->
-> Yes, and probably change a bit monitor/chardev creation to be under
-> tighter control...
-
-We're going to have fun...
+I think I'll drop this patch for now.  It's not useful enough to apply
+it now, then revert it when we have the more general error recovery
+improvement.
