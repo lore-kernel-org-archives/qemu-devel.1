@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4n-0002IN-UU
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4n-0002IP-Vb
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4X-0006rA-Qj
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4X-0006r5-Qo
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:11 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:36956)
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45269)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fsA4W-0006Eo-Rw
+	id 1fsA4W-0006Uw-RB
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:01 -0400
-Received: by mail-wm0-x235.google.com with SMTP id n11-v6so3495222wmc.2
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:03:37 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id 20-v6so10507592wrb.12
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:03:48 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 21 Aug 2018 19:02:02 +0200
-Message-Id: <1534870966-9287-31-git-send-email-pbonzini@redhat.com>
+Date: Tue, 21 Aug 2018 19:02:12 +0200
+Message-Id: <1534870966-9287-41-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
 References: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 30/74] i386: Fix
- arch_query_cpu_model_expansion() leak
+Subject: [Qemu-devel] [PULL 40/74] test-rcu-list: access goflag with atomics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +28,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Emilio G. Cota" <cota@braap.org>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+From: "Emilio G. Cota" <cota@braap.org>
 
-Reported by Coverity:
+Instead of declaring it volatile.
 
-Error: RESOURCE_LEAK (CWE-772): [#def439]
-qemu-2.12.0/target/i386/cpu.c:3179: alloc_fn: Storage is returned from allocation function "qdict_new".
-qemu-2.12.0/qobject/qdict.c:34:5: alloc_fn: Storage is returned from allocation function "g_malloc0".
-qemu-2.12.0/qobject/qdict.c:34:5: var_assign: Assigning: "qdict" = "g_malloc0(4120UL)".
-qemu-2.12.0/qobject/qdict.c:37:5: return_alloc: Returning allocated memory "qdict".
-qemu-2.12.0/target/i386/cpu.c:3179: var_assign: Assigning: "props" = storage returned from "qdict_new()".
-qemu-2.12.0/target/i386/cpu.c:3217: leaked_storage: Variable "props" going out of scope leaks the storage it points to.
-
-This was introduced by commit b8097deb359b ("i386: Improve
-query-cpu-model-expansion full mode").
-
-The leak is only theoretical: if ret->model->props is set to
-props, the qapi_free_CpuModelExpansionInfo() call will free props
-too in case of errors.  The only way for this to not happen is if
-we enter the default branch of the switch statement, which would
-never happen because all CpuModelExpansionType values are being
-handled.
-
-It's still worth to change this to make the allocation logic
-easier to follow and make the Coverity error go away.  To make
-everything simpler, initialize ret->model and ret->model->props
-earlier in the function.
-
-While at it, remove redundant check for !prop because prop is
-always initialized at the beginning of the function.
-
-Fixes: b8097deb359bbbd92592b9670adfe9e245b2d0bd
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180816183509.8231-1-ehabkost@redhat.com>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Message-Id: <20180819091335.22863-6-cota@braap.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ tests/test-rcu-list.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 4e4fe8f..f24295e 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3880,6 +3880,9 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
+diff --git a/tests/test-rcu-list.c b/tests/test-rcu-list.c
+index 1514d7e..b4ed130 100644
+--- a/tests/test-rcu-list.c
++++ b/tests/test-rcu-list.c
+@@ -44,7 +44,7 @@ static int nthreadsrunning;
+ #define GOFLAG_RUN  1
+ #define GOFLAG_STOP 2
+ 
+-static volatile int goflag = GOFLAG_INIT;
++static int goflag = GOFLAG_INIT;
+ 
+ #define RCU_READ_RUN 1000
+ #define RCU_UPDATE_RUN 10
+@@ -107,15 +107,15 @@ static void *rcu_q_reader(void *arg)
+ 
+     *(struct rcu_reader_data **)arg = &rcu_reader;
+     atomic_inc(&nthreadsrunning);
+-    while (goflag == GOFLAG_INIT) {
++    while (atomic_read(&goflag) == GOFLAG_INIT) {
+         g_usleep(1000);
      }
  
-     props = qdict_new();
-+    ret->model = g_new0(CpuModelInfo, 1);
-+    ret->model->props = QOBJECT(props);
-+    ret->model->has_props = true;
+-    while (goflag == GOFLAG_RUN) {
++    while (atomic_read(&goflag) == GOFLAG_RUN) {
+         rcu_read_lock();
+         QLIST_FOREACH_RCU(el, &Q_list_head, entry) {
+             n_reads_local++;
+-            if (goflag == GOFLAG_STOP) {
++            if (atomic_read(&goflag) == GOFLAG_STOP) {
+                 break;
+             }
+         }
+@@ -142,11 +142,11 @@ static void *rcu_q_updater(void *arg)
  
-     switch (type) {
-     case CPU_MODEL_EXPANSION_TYPE_STATIC:
-@@ -3900,15 +3903,9 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
-         goto out;
+     *(struct rcu_reader_data **)arg = &rcu_reader;
+     atomic_inc(&nthreadsrunning);
+-    while (goflag == GOFLAG_INIT) {
++    while (atomic_read(&goflag) == GOFLAG_INIT) {
+         g_usleep(1000);
      }
  
--    if (!props) {
--        props = qdict_new();
--    }
-     x86_cpu_to_dict(xc, props);
+-    while (goflag == GOFLAG_RUN) {
++    while (atomic_read(&goflag) == GOFLAG_RUN) {
+         target_el = select_random_el(RCU_Q_LEN);
+         j = 0;
+         /* FOREACH_RCU could work here but let's use both macros */
+@@ -160,7 +160,7 @@ static void *rcu_q_updater(void *arg)
+                 break;
+             }
+         }
+-        if (goflag == GOFLAG_STOP) {
++        if (atomic_read(&goflag) == GOFLAG_STOP) {
+             break;
+         }
+         target_el = select_random_el(RCU_Q_LEN);
+@@ -209,9 +209,9 @@ static void rcu_qtest_run(int duration, int nreaders)
+         g_usleep(1000);
+     }
  
--    ret->model = g_new0(CpuModelInfo, 1);
-     ret->model->name = g_strdup(base_name);
--    ret->model->props = QOBJECT(props);
--    ret->model->has_props = true;
+-    goflag = GOFLAG_RUN;
++    atomic_set(&goflag, GOFLAG_RUN);
+     sleep(duration);
+-    goflag = GOFLAG_STOP;
++    atomic_set(&goflag, GOFLAG_STOP);
+     wait_all_threads();
+ }
  
- out:
-     object_unref(OBJECT(xc));
 -- 
 1.8.3.1
