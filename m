@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fs6i8-00064x-Hi
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:28:41 -0400
+	(envelope-from <mkschreder.uk@googlemail.com>) id 1fs6jd-0007hZ-HK
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:30:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fs6i7-0003vv-Nw
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:28:40 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Aug 2018 14:28:03 +0100
-Message-Id: <20180821132811.17675-2-peter.maydell@linaro.org>
-In-Reply-To: <20180821132811.17675-1-peter.maydell@linaro.org>
-References: <20180821132811.17675-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/9] hw/intc/arm_gic: Document QEMU interface
+	(envelope-from <mkschreder.uk@googlemail.com>) id 1fs6jX-00056e-Qn
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:30:13 -0400
+Received: from mail-ua1-x930.google.com ([2607:f8b0:4864:20::930]:40776)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mkschreder.uk@googlemail.com>)
+	id 1fs6jX-00056E-LM
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:30:07 -0400
+Received: by mail-ua1-x930.google.com with SMTP id m13-v6so11793934uaq.7
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 06:30:07 -0700 (PDT)
+MIME-Version: 1.0
+From: Martin Schroeder <mkschreder.uk@googlemail.com>
+Date: Tue, 21 Aug 2018 15:29:55 +0200
+Message-ID: <CAGmj6quRd4KaYJL2vqohFHuNDim+aB5OqoCAcK0HbFx7t+bfjg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Modeling a device controlled by combination of GPIO
+ and UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,67 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Luc Michel <luc.michel@greensocs.com>
+To: qemu-devel@nongnu.org
 
-The GICv2's QEMU interface (sysbus MMIO regions, IRQs,
-etc) is now quite complicated with the addition of the
-virtualization extensions. Add a comment in the header
-file which documents it.
+I'd like to add a virtual device that is controlled by a couple of
+GPIO pins on my controller (cortex-m4) and a serial port. I suppose I
+can derive it from SSISlaveClass to make the new device a serial
+slave.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-I needed to write this out to figure out what I was
-connecting to what in the a15mpcore object :-)
----
- include/hw/intc/arm_gic.h | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+But how do I connect GPIOs?
 
-diff --git a/include/hw/intc/arm_gic.h b/include/hw/intc/arm_gic.h
-index 42bb535fd45..989bc837606 100644
---- a/include/hw/intc/arm_gic.h
-+++ b/include/hw/intc/arm_gic.h
-@@ -18,6 +18,41 @@
-  * with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
-+/*
-+ * QEMU interface:
-+ *  + QOM property "num-cpu": number of CPUs to support
-+ *  + QOM property "num-irq": number of IRQs (including both SPIs and PPIs)
-+ *  + QOM property "revision": GIC version (1 or 2), or 0 for the 11MPCore GIC
-+ *  + QOM property "has-security-extensions": set true if the GIC should
-+ *    implement the security extensions
-+ *  + QOM property "has-virtualization-extensions": set true if the GIC should
-+ *    implement the virtualization extensions
-+ *  + unnamed GPIO inputs: (where P is number of PPIs, i.e. num-irq - 32)
-+ *    [0..P-1]  SPIs
-+ *    [P..P+31] PPIs for CPU 0
-+ *    [P+32..P+63] PPIs for CPU 1
-+ *    ...
-+ *  + sysbus IRQ 0 : IRQ
-+ *  + sysbus IRQ 1 : FIQ
-+ *  + sysbus IRQ 2 : VIRQ (exists even if virt extensions not present)
-+ *  + sysbus IRQ 3 : VFIQ (exists even if virt extensions not present)
-+ *  + sysbus IRQ 4 : maintenance IRQ for CPU i/f 0 (only if virt extns present)
-+ *  + sysbus IRQ 5 : maintenance IRQ for CPU i/f 1 (only if virt extns present)
-+ *    ...
-+ *  + sysbus MMIO regions: (in order; numbers will vary depending on
-+ *    whether virtualization extensions are present and on number of cores)
-+ *    - distributor registers (GICD*)
-+ *    - CPU interface for the accessing core (GICC*)
-+ *    - virtual interface control registers (GICH*) (only if virt extns present)
-+ *    - virtual CPU interface for the accessing core (GICV*) (only if virt)
-+ *    - CPU 0 CPU interface registers
-+ *    - CPU 1 CPU interface registers
-+ *      ...
-+ *    - CPU 0 VCPU interface registers (only if virt extns present)
-+ *    - CPU 1 VCPU interface registers (only if virt extns present)
-+ *      ...
-+ */
-+
- #ifndef HW_ARM_GIC_H
- #define HW_ARM_GIC_H
- 
--- 
-2.18.0
+I want the slave device to be notified when guest firmware toggles a
+gpio pin through the gpio driver which is an mmio device mapped into
+the gpio memory area. So the GPIO driver currently keeps the state of
+the pins internal to the driver. What I would like to do is somehow,
+without requiring that the GPIO driver knows about the connected slave
+device, deliver the notification of a gpio pin being toggled to the
+slave device.
+
+How does qemu implement this kind of thing?
