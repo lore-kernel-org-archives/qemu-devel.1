@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fs1CF-0003J1-KD
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 03:35:24 -0400
+	(envelope-from <david@redhat.com>) id 1fs1CM-00038G-If
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 03:35:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fs1AD-0003qU-Rg
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 03:33:21 -0400
+	(envelope-from <david@redhat.com>) id 1fs19E-0002vO-SH
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 03:32:20 -0400
 References: <20180821025104.19604-1-pavel.zbitskiy@gmail.com>
-	<20180821025104.19604-5-pavel.zbitskiy@gmail.com>
+	<20180821025104.19604-4-pavel.zbitskiy@gmail.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <d36e3509-df38-d2a9-b78e-622d26c0aa63@redhat.com>
-Date: Tue, 21 Aug 2018 09:33:15 +0200
+Message-ID: <209f5919-f6af-d3f2-176f-1dc172c9567b@redhat.com>
+Date: Tue, 21 Aug 2018 09:32:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180821025104.19604-5-pavel.zbitskiy@gmail.com>
+In-Reply-To: <20180821025104.19604-4-pavel.zbitskiy@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/7] target/s390x: fix IPM polluting
- irrelevant bits
+Subject: Re: [Qemu-devel] [PATCH 3/7] target/s390x: fix CSST decoding and
+ runtime alignment check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +29,121 @@ To: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, richard.henderson@linaro.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
 On 21.08.2018 04:51, Pavel Zbitskiy wrote:
-> Suppose psw.mask=0x0000000080000000, cc=2, r1=0 and we do "ipm 1".
-> This command must touch only bits 32-39, so the expected output
-> is r1=0x20000000. However, currently qemu yields r1=0x20008000,
-> because irrelevant parts of PSW leak into r1 during program mask
-> transfer.
+> CSST is defined as:
+> 
+>     C(0xc802, CSST,    SSF,   CASS, la1, a2, 0, 0, csst, 0)
+> 
+> It means that the first parameter is handled by in1_la1().
+> in1_la1() fills addr1 field, and not in1.
+> 
+> Furthermore, when extract32() is used for the alignment check, the
+> third parameter should specify the number of trailing bits that must
+> be 0. For FC these numbers are:
+> 
+>     FC=0 (word, 4 bytes):        2
+>     FC=1 (double word, 8 bytes): 3
+>     FC=2 (quad word, 16 bytes):  4
+> 
+> For SC these numbers correspond to the size:
+> 
+>     SC=0: 0
+>     SC=1: 1
+>     SC=2: 2
+>     SC=3: 3
+>     SC=4: 4
 > 
 > Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
 > ---
->  target/s390x/translate.c        | 17 +++++++----------
+>  target/s390x/mem_helper.c       |  2 +-
+>  target/s390x/translate.c        |  4 +--
 >  tests/tcg/s390x/Makefile.target |  1 +
->  tests/tcg/s390x/ipm.c           | 22 ++++++++++++++++++++++
->  3 files changed, 30 insertions(+), 10 deletions(-)
->  create mode 100644 tests/tcg/s390x/ipm.c
+>  tests/tcg/s390x/csst.c          | 43 +++++++++++++++++++++++++++++++++
+>  4 files changed, 47 insertions(+), 3 deletions(-)
+>  create mode 100644 tests/tcg/s390x/csst.c
 > 
+> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+> index e21a47fb4d..c94dbf3fcb 100644
+> --- a/target/s390x/mem_helper.c
+> +++ b/target/s390x/mem_helper.c
+> @@ -1442,7 +1442,7 @@ static uint32_t do_csst(CPUS390XState *env, uint32_t r3, uint64_t a1,
+>      }
+>  
+>      /* Sanity check the alignments.  */
+> -    if (extract32(a1, 0, 4 << fc) || extract32(a2, 0, 1 << sc)) {
+> +    if (extract32(a1, 0, fc + 2) || extract32(a2, 0, sc)) {
+>          goto spec_exception;
+>      }
+>  
 > diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 929fc2db28..f58b36b789 100644
+> index 111d575c41..929fc2db28 100644
 > --- a/target/s390x/translate.c
 > +++ b/target/s390x/translate.c
-> @@ -2445,20 +2445,17 @@ static DisasJumpType op_insi(DisasContext *s, DisasOps *o)
+> @@ -2059,9 +2059,9 @@ static DisasJumpType op_csst(DisasContext *s, DisasOps *o)
+>      TCGv_i32 t_r3 = tcg_const_i32(r3);
 >  
->  static DisasJumpType op_ipm(DisasContext *s, DisasOps *o)
->  {
-> -    TCGv_i64 t1;
-> +    TCGv_i64 t1, t2;
->  
->      gen_op_calc_cc(s);
-> -    tcg_gen_andi_i64(o->out, o->out, ~0xff000000ull);
-> -
->      t1 = tcg_temp_new_i64();
-> -    tcg_gen_shli_i64(t1, psw_mask, 20);
-> -    tcg_gen_shri_i64(t1, t1, 36);
-> -    tcg_gen_or_i64(o->out, o->out, t1);
-> -
-> -    tcg_gen_extu_i32_i64(t1, cc_op);
-> -    tcg_gen_shli_i64(t1, t1, 28);
-> -    tcg_gen_or_i64(o->out, o->out, t1);
-> +    tcg_gen_extract_i64(t1, psw_mask, 40, 4);
-> +    t2 = tcg_temp_new_i64();
-> +    tcg_gen_extu_i32_i64(t2, cc_op);
-> +    tcg_gen_deposit_i64(t1, t1, t2, 4, 60);
-> +    tcg_gen_deposit_i64(o->out, o->out, t1, 24, 8);
->      tcg_temp_free_i64(t1);
-> +    tcg_temp_free_i64(t2);
->      return DISAS_NEXT;
->  }
+>      if (tb_cflags(s->base.tb) & CF_PARALLEL) {
+> -        gen_helper_csst_parallel(cc_op, cpu_env, t_r3, o->in1, o->in2);
+> +        gen_helper_csst_parallel(cc_op, cpu_env, t_r3, o->addr1, o->in2);
+>      } else {
+> -        gen_helper_csst(cc_op, cpu_env, t_r3, o->in1, o->in2);
+> +        gen_helper_csst(cc_op, cpu_env, t_r3, o->addr1, o->in2);
+>      }
+>      tcg_temp_free_i32(t_r3);
 >  
 > diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.target
-> index f62f950d8e..c800a582e5 100644
+> index 9f4076901f..f62f950d8e 100644
 > --- a/tests/tcg/s390x/Makefile.target
 > +++ b/tests/tcg/s390x/Makefile.target
-> @@ -2,3 +2,4 @@ VPATH+=$(SRC_PATH)/tests/tcg/s390x
+> @@ -1,3 +1,4 @@
+>  VPATH+=$(SRC_PATH)/tests/tcg/s390x
 >  CFLAGS+=-march=zEC12 -m64
 >  TESTS+=hello-s390x
->  TESTS+=csst
-> +TESTS+=ipm
-> diff --git a/tests/tcg/s390x/ipm.c b/tests/tcg/s390x/ipm.c
+> +TESTS+=csst
+> diff --git a/tests/tcg/s390x/csst.c b/tests/tcg/s390x/csst.c
 > new file mode 100644
-> index 0000000000..742f3a18c5
+> index 0000000000..1dae9071fb
 > --- /dev/null
-> +++ b/tests/tcg/s390x/ipm.c
-> @@ -0,0 +1,22 @@
+> +++ b/tests/tcg/s390x/csst.c
+> @@ -0,0 +1,43 @@
 > +#include <stdint.h>
 > +#include <unistd.h>
 > +
 > +int main(void)
 > +{
-> +    uint32_t op1 = 0x55555555;
-> +    uint32_t op2 = 0x44444444;
-> +    uint64_t cc = 0xffffffffffffffffull;
+> +    uint64_t parmlist[] = {
+> +        0xfedcba9876543210ull,
+> +        0,
+> +        0x7777777777777777ull,
+> +        0,
+> +    };
+> +    uint64_t op1 = 0x0123456789abcdefull;
+> +    uint64_t op2 = 0;
+> +    uint64_t op3 = op1;
+> +    uint64_t cc;
 > +
 > +    asm volatile(
-> +        "    clc 0(4,%[op1]),0(%[op2])\n"
+> +        "    lghi %%r0,%[flags]\n"
+> +        "    la %%r1,%[parmlist]\n"
+> +        "    csst %[op1],%[op2],%[op3]\n"
 > +        "    ipm %[cc]\n"
-> +        : [cc] "+r" (cc)
-> +        : [op1] "r" (&op1),
-> +          [op2] "r" (&op2)
-> +        : "cc");
-> +    if (cc != 0xffffffff20ffffffull) {
+> +        : [op1] "+m" (op1),
+> +          [op2] "+m" (op2),
+> +          [op3] "+r" (op3),
+> +          [cc] "=r" (cc)
+> +        : [flags] "K" (0x0301),
+> +          [parmlist] "m" (parmlist)
+> +        : "r0", "r1", "cc", "memory");
+> +    cc = (cc >> 28) & 3;
+> +    if (cc) {
 > +        write(1, "bad cc\n", 7);
+> +        return 1;
+> +    }
+> +    if (op1 != parmlist[0]) {
+> +        write(1, "bad op1\n", 8);
+> +        return 1;
+> +    }
+> +    if (op2 != parmlist[2]) {
+> +        write(1, "bad op2\n", 8);
 > +        return 1;
 > +    }
 > +    return 0;
