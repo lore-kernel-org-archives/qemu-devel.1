@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fs9yJ-0004zx-6e
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 12:57:35 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fs9yw-0005Y4-CL
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 12:58:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fs9yB-0005jH-60
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 12:57:32 -0400
-Date: Tue, 21 Aug 2018 18:57:12 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20180821165712.22orutfo4ucemca3@toto>
-References: <20180820153020.21478-1-peter.maydell@linaro.org>
+	(envelope-from <jsnow@redhat.com>) id 1fs9ys-0006nh-RM
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 12:58:14 -0400
+References: <cover.1534868459.git.jcody@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8afbce6f-a70c-6197-9be2-16f27d861fd4@redhat.com>
+Date: Tue, 21 Aug 2018 12:57:55 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20180820153020.21478-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] target/arm: Some pieces of support
- for 32-bit Hyp mode
+In-Reply-To: <cover.1534868459.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] block: for jobs,
+ do not clear user_paused until after the resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +24,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Luc Michel <luc.michel@greensocs.com>
-
-On Mon, Aug 20, 2018 at 04:30:14PM +0100, Peter Maydell wrote:
-> Now we have virtualization support in the GICv2 emulation,
-> I thought I'd have a look at how much we were still missing
-> for being able to enable EL2 support for AArch32.
-> This set of patches fixes some minor missing pieces:
->  * AArch32 HACTLR2
->  * AArch32 HCR, HCR2
->  * support for taking exceptions to Hyp mode
->  * boot AArch32 kernels in Hyp mode where available
-> and I threw in a trivial bugfix:
->  * Clear CPSR.IL and CPSR.J on 32-bit exception entry
-> since it would otherwise have a conflict with the refactoring
-> of exception entry.
-> 
-> Changes v1->v2:
->  * some patches are now upstream
->  * v8-only registers no longer created for v7 CPUs
->  * split the "factor out exception-entry code" into
->    its own patch
->  * new patch: clear CPSR.IL and CPSR.J
->  * new patch: boot kernels in Hyp mode if possible
-> 
-> (I still have the same "guest EL0 segv" issue as for v1
-> if I actually enable the EL2 feature on Cortex-A15.)
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, qemu-block@nongnu.org
 
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
+On 08/21/2018 12:26 PM, Jeff Cody wrote:
+> v3 changes:
+>     Rebased to master
+>     Patch 2: Wait for pause after mirror instead of error, to gobble th=
+e
+>              right message (Thanks John)
+>     Patch 2: Replace a hard-coded 'qcow2' with '$IMGFMT', oops.
+>=20
 
-> 
-> thanks
-> -- PMM
-> 
-> Peter Maydell (6):
->   target/arm: Implement RAZ/WI HACTLR2
->   target/arm: Implement AArch32 HCR and HCR2
->   target/arm: Factor out code for taking an AArch32 exception
->   target/arm: Implement support for taking exceptions to Hyp mode
->   target/arm: Clear CPSR.IL and CPSR.J on 32-bit exception entry
->   hw/arm/boot: AArch32 kernels should be started in Hyp mode if
->     available
-> 
->  hw/arm/boot.c       |  11 +++
->  target/arm/helper.c | 212 ++++++++++++++++++++++++++++++++++++++------
->  2 files changed, 196 insertions(+), 27 deletions(-)
-> 
-> -- 
-> 2.18.0
-> 
+Thanks!
+
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+> v2 changes:
+>=20
+>     Patch 1: Added r-b from John, Eric (Thanks)
+>     Patch 2: Attached an iotest as patch 2
+>=20
+>     * cc'ed qemu-stable
+>=20
+> For the test in patch 2, failure here is the failure output w/o patch 1=
+:
+>=20
+>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
+ent": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "testdisk"}=
+}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
+ent": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"=
+}}
+> -{"return": {}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
+ent": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "wri=
+te", "action": "stop"}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
+ent": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk=
+"}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
+ent": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 209715=
+2, "offset": 1048576, "speed": 0, "type": "mirror"}}
+> -*** done
+> +QEMU_PROG: blockjob.c:460: block_job_iostatus_reset: Assertion `job->j=
+ob.user_paused && job->job.pause_count > 0' failed.
+> +Wrong response matching Assertion on handle 0
+> Failures: 229
+> Failed 1 of 1 tests
+>=20
+> git-backport-diff, v2->v3:
+>=20
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream p=
+atch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
+ectively
+>=20
+> 001/2:[----] [--] 'block: for jobs, do not clear user_paused until afte=
+r the resume'
+> 002/2:[0006] [FC] 'block: iotest to catch abort on forced blockjob canc=
+el'
+>=20
+>=20
+> Jeff Cody (2):
+>   block: for jobs, do not clear user_paused until after the resume
+>   block: iotest to catch abort on forced blockjob cancel
+>=20
+>  job.c                      |  2 +-
+>  tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/229.out | 23 +++++++++
+>  tests/qemu-iotests/group   |  1 +
+>  4 files changed, 120 insertions(+), 1 deletion(-)
+>  create mode 100755 tests/qemu-iotests/229
+>  create mode 100644 tests/qemu-iotests/229.out
+>=20
+
+--=20
+=E2=80=94js
