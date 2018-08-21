@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fs6J3-0004bz-RE
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:02:47 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fs6J3-0004c4-SF
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:02:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fs6J1-0005Zb-6Y
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fs6J0-0005ZB-Ir
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:02:45 -0400
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 21 Aug 2018 15:02:37 +0200
-Message-Id: <1534856557-36022-2-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1534856557-36022-1-git-send-email-pbonzini@redhat.com>
-References: <1534856557-36022-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests: virtio: separate ccw tests from libqos
+Date: Tue, 21 Aug 2018 15:02:36 +0200
+Message-Id: <1534856557-36022-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH rebased] tests: virtio: separate ccw tests from
+ libqos
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,8 +33,13 @@ all virtio-ccw devices.  If channel I/O support is ever added to qtest and libqo
 then this file can go away.  In the meanwhile, it simplifies maintenance and
 makes sure that all virtio devices are tested.
 
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
+	Just small adjustments for the qtest API.  I'll include this version
+	in my pull request.
+
  tests/Makefile.include  |   5 +-
  tests/virtio-ccw-test.c | 118 ++++++++++++++++++++++++++++++++++++++++++++++++
  2 files changed, 120 insertions(+), 3 deletions(-)
