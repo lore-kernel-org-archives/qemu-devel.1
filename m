@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lg-00013c-Ol
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:22 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lh-000140-1A
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lT-0006zB-Ex
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:17 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49354 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lW-000780-Su
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:19 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49432 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs6lS-0006vN-NI
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:07 -0400
+	id 1fs6lW-000749-Dq
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:10 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 15:31:21 +0200
-Message-Id: <1534858316-12945-12-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 15:31:54 +0200
+Message-Id: <1534858316-12945-45-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v3 11/46] target/mips: Add emulation of nanoMIPS
- 16-bit load and store instructions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 44/46] mips_malta: Add setting up GT64120
+ BARs to the nanoMIPS bootloader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,171 +31,239 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Paul Burton <pburton@wavecomp.com>
 
-Add emulation of LWXS16, LB16, SB16, LBU16, LH16, SH16, LHU16, LW16, LWSP16,
-LW4X4, SW4X4, LWGP16, SWSP16, SW16, and SWGP16 instructions.
+Setup the GT64120 BARs in the nanoMIPS bootloader, in the same way that
+they are setup in the MIPS32 bootloader. This is necessary for Linux to
+be able to access peripherals, including the UART.
 
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Paul Burton <pburton@wavecomp.com>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 96 insertions(+)
+ hw/mips/mips_malta.c | 177 +++++++++++++++++++++++++++++++++++++++++++++=
++-----
+ 1 file changed, 160 insertions(+), 17 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index c774dc9..569e58a 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -16733,6 +16733,14 @@ static inline int decode_gpr_gpr3(int r)
-     return map[r & 0x7];
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 2e851d9..f261dd6 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -609,47 +609,190 @@ static void write_bootloader_nanomips(uint8_t *bas=
+e, int64_t run_addr,
+=20
+ #define NM_HI1(VAL) (((VAL) >> 16) & 0x1f)
+ #define NM_HI2(VAL) \
+-            (((VAL) & 0xf000) | (((VAL) >> 19) & 0xffc) | (((VAL) >> 31)=
+ & 0x1))
++          (((VAL) & 0xf000) | (((VAL) >> 19) & 0xffc) | (((VAL) >> 31) &=
+ 0x1))
+ #define NM_LO(VAL)  ((VAL) & 0xfff)
+=20
+-    stw_p(p++, 0x2800); stw_p(p++, 0x001c); /* bc to_here */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+-    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x2800); stw_p(p++, 0x001c);
++                                /* bc to_here */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop */
+=20
+     /* to_here: */
+-    stw_p(p++, 0x0080); stw_p(p++, 0x0002); /* li a0,2 */
++    stw_p(p++, 0x0080); stw_p(p++, 0x0002);
++                                /* li a0,2                      */
++
+     stw_p(p++, 0xe3a0 | NM_HI1(ENVP_ADDR - 64));
++
+     stw_p(p++, NM_HI2(ENVP_ADDR - 64));
+-                                /* lui sp,%hi(ENVP_ADDR - 64) */
++                                /* lui sp,%hi(ENVP_ADDR - 64)   */
++
+     stw_p(p++, 0x83bd); stw_p(p++, NM_LO(ENVP_ADDR - 64));
+                                 /* ori sp,sp,%lo(ENVP_ADDR - 64) */
++
+     stw_p(p++, 0xe0a0 | NM_HI1(ENVP_ADDR));
++
+     stw_p(p++, NM_HI2(ENVP_ADDR));
+-                                /* lui a1,%hi(ENVP_ADDR) */
++                                /* lui a1,%hi(ENVP_ADDR)        */
++
+     stw_p(p++, 0x80a5); stw_p(p++, NM_LO(ENVP_ADDR));
+-                                /* ori a1,a1,%lo(ENVP_ADDR) */
++                                /* ori a1,a1,%lo(ENVP_ADDR)     */
++
+     stw_p(p++, 0xe0c0 | NM_HI1(ENVP_ADDR + 8));
++
+     stw_p(p++, NM_HI2(ENVP_ADDR + 8));
+-                                /* lui a2,%hi(ENVP_ADDR + 8) */
++                                /* lui a2,%hi(ENVP_ADDR + 8)    */
++
+     stw_p(p++, 0x80c6); stw_p(p++, NM_LO(ENVP_ADDR + 8));
+                                 /* ori a2,a2,%lo(ENVP_ADDR + 8) */
++
+     stw_p(p++, 0xe0e0 | NM_HI1(loaderparams.ram_low_size));
++
+     stw_p(p++, NM_HI2(loaderparams.ram_low_size));
+                                 /* lui a3,%hi(loaderparams.ram_low_size)=
+ */
++
+     stw_p(p++, 0x80e7); stw_p(p++, NM_LO(loaderparams.ram_low_size));
+                                 /* ori a3,a3,%lo(loaderparams.ram_low_si=
+ze) */
++
++    /*
++     * Load BAR registers as done by YAMON:
++     *
++     *  - set up PCI0 I/O BARs from 0x18000000 to 0x181fffff
++     *  - set up PCI0 MEM0 at 0x10000000, size 0x8000000
++     *  - set up PCI0 MEM1 at 0x18200000, size 0xbe00000
++     *
++     */
++    stw_p(p++, 0xe040); stw_p(p++, 0x0681);
++                                /* lui t1, %hi(0xb4000000)      */
++
++#ifdef TARGET_WORDS_BIGENDIAN
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0be1);
++                                /* lui t0, %hi(0xdf000000)      */
++
++    /* 0x68 corresponds to GT_ISD (from hw/mips/gt64xxx_pci.c)  */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9068);
++                                /* sw t0, 0x68(t1)              */
++
++    stw_p(p++, 0xe040); stw_p(p++, 0x077d);
++                                /* lui t1, %hi(0xbbe00000)      */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0801);
++                                /* lui t0, %hi(0xc0000000)      */
++
++    /* 0x48 corresponds to GT_PCI0IOLD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9048);
++                                /* sw t0, 0x48(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0800);
++                                /* lui t0, %hi(0x40000000)      */
++
++    /* 0x50 corresponds to GT_PCI0IOHD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9050);
++                                /* sw t0, 0x50(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0001);
++                                /* lui t0, %hi(0x80000000)      */
++
++    /* 0x58 corresponds to GT_PCI0M0LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9058);
++                                /* sw t0, 0x58(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x07e0);
++                                /* lui t0, %hi(0x3f000000)      */
++
++    /* 0x60 corresponds to GT_PCI0M0HD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9060);
++                                /* sw t0, 0x60(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0821);
++                                /* lui t0, %hi(0xc1000000)      */
++
++    /* 0x80 corresponds to GT_PCI0M1LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9080);
++                                /* sw t0, 0x80(t1)              */
++
++    stw_p(p++, 0xe020); stw_p(p++, 0x0bc0);
++                                /* lui t0, %hi(0x5e000000)      */
++
++#else
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x00df);
++                                /* addiu[32] t0, $0, 0xdf       */
++
++    /* 0x68 corresponds to GT_ISD                               */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9068);
++                                /* sw t0, 0x68(t1)              */
++
++    /* Use kseg2 remapped address 0x1be00000                    */
++    stw_p(p++, 0xe040); stw_p(p++, 0x077d);
++                                /* lui t1, %hi(0xbbe00000)      */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x00c0);
++                                /* addiu[32] t0, $0, 0xc0       */
++
++    /* 0x48 corresponds to GT_PCI0IOLD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9048);
++                                /* sw t0, 0x48(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x0040);
++                                /* addiu[32] t0, $0, 0x40       */
++
++    /* 0x50 corresponds to GT_PCI0IOHD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9050);
++                                /* sw t0, 0x50(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x0080);
++                                /* addiu[32] t0, $0, 0x80       */
++
++    /* 0x58 corresponds to GT_PCI0M0LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9058);
++                                /* sw t0, 0x58(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x003f);
++                                /* addiu[32] t0, $0, 0x3f       */
++
++    /* 0x60 corresponds to GT_PCI0M0HD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9060);
++                                /* sw t0, 0x60(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x00c1);
++                                /* addiu[32] t0, $0, 0xc1       */
++
++    /* 0x80 corresponds to GT_PCI0M1LD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9080);
++                                /* sw t0, 0x80(t1)              */
++
++    stw_p(p++, 0x0020); stw_p(p++, 0x005e);
++                                /* addiu[32] t0, $0, 0x5e       */
++
++#endif
++
++    /* 0x88 corresponds to GT_PCI0M1HD                          */
++    stw_p(p++, 0x8422); stw_p(p++, 0x9088);
++                                /* sw t0, 0x88(t1)              */
++
+     stw_p(p++, 0xe320 | NM_HI1(kernel_entry));
++
+     stw_p(p++, NM_HI2(kernel_entry));
+-                                /* lui t9,%hi(kernel_entry) */
++                                /* lui t9,%hi(kernel_entry)     */
++
+     stw_p(p++, 0x8339); stw_p(p++, NM_LO(kernel_entry));
+-                                /* ori t9,t9,%lo(kernel_entry) */
++                                /* ori t9,t9,%lo(kernel_entry)  */
++
+     stw_p(p++, 0x4bf9); stw_p(p++, 0x0000);
+-                                /* jalrc   t8 */
++                                /* jalrc   t8                   */
  }
- 
-+/* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr3.src.store'). */
-+static inline int decode_gpr_gpr3_src_store(int r)
-+{
-+    static const int map[] = {  0, 17, 18, 19,  4,  5,  6,  7 };
-+
-+    return map[r & 0x7];
-+}
-+
- /* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr4'). */
- static inline int decode_gpr_gpr4(int r)
- {
-@@ -16742,6 +16750,15 @@ static inline int decode_gpr_gpr4(int r)
-     return map[r & 0xf];
- }
- 
-+/* Implement nanoMIPS pseudocode decode_gpr(encoded_gpr, 'gpr4.zero'). */
-+static inline int decode_gpr_gpr4_zero(int r)
-+{
-+    static const int map[] = {  8,  9, 10,  0,  4,  5,  6,  7,
-+                               16, 17, 18, 19, 20, 21, 22, 23 };
-+
-+    return map[r & 0xf];
-+}
-+
- 
- static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
- {
-@@ -16749,6 +16766,7 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-     int rt = decode_gpr_gpr3(NANOMIPS_EXTRACT_RD(ctx->opcode));
-     int rs = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS(ctx->opcode));
-     int rd = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS1(ctx->opcode));
-+    int offset;
-     int imm;
- 
-     /* make sure instructions are on a halfword boundary */
-@@ -16816,6 +16834,13 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case NM_P16C:
-+        switch (ctx->opcode & 1) {
-+        case NM_POOL16C_0:
-+            break;
-+        case NM_LWXS16:
-+            gen_ldxs(ctx, rt, rs, rd);
-+            break;
-+        }
-         break;
-     case NM_P16_A1:
-         switch (extract32(ctx->opcode, 6, 1)) {
-@@ -16887,24 +16912,95 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-     case NM_ANDI16:
-         break;
-     case NM_P16_LB:
-+        offset = extract32(ctx->opcode, 0, 2);
-+        switch (extract32(ctx->opcode, 2, 2)) {
-+        case NM_LB16:
-+            gen_ld(ctx, OPC_LB, rt, rs, offset);
-+            break;
-+        case NM_SB16:
-+            rt = decode_gpr_gpr3_src_store(
-+                     NANOMIPS_EXTRACT_RD(ctx->opcode));
-+            gen_st(ctx, OPC_SB, rt, rs, offset);
-+            break;
-+        case NM_LBU16:
-+            gen_ld(ctx, OPC_LBU, rt, rs, offset);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-         break;
-     case NM_P16_LH:
-+        offset = extract32(ctx->opcode, 1, 2) << 1;
-+        switch ((extract32(ctx->opcode, 3, 1) << 1) | (ctx->opcode & 1)) {
-+        case NM_LH16:
-+            gen_ld(ctx, OPC_LH, rt, rs, offset);
-+            break;
-+        case NM_SH16:
-+            rt = decode_gpr_gpr3_src_store(
-+                     NANOMIPS_EXTRACT_RD(ctx->opcode));
-+            gen_st(ctx, OPC_SH, rt, rs, offset);
-+            break;
-+        case NM_LHU16:
-+            gen_ld(ctx, OPC_LHU, rt, rs, offset);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-         break;
-     case NM_LW16:
-+        offset = extract32(ctx->opcode, 0, 4) << 2;
-+        gen_ld(ctx, OPC_LW, rt, rs, offset);
-         break;
-     case NM_LWSP16:
-+        rt = NANOMIPS_EXTRACT_RD5(ctx->opcode);
-+        offset = extract32(ctx->opcode, 0, 5) << 2;
-+        gen_ld(ctx, OPC_LW, rt, 29, offset);
-         break;
-     case NM_LW4X4:
-+        rt = (extract32(ctx->opcode, 9, 1) << 3) |
-+             extract32(ctx->opcode, 5, 3);
-+        rs = (extract32(ctx->opcode, 4, 1) << 3) |
-+             extract32(ctx->opcode, 0, 3);
-+        offset = (extract32(ctx->opcode, 3, 1) << 3) |
-+                 (extract32(ctx->opcode, 8, 1) << 2);
-+        rt = decode_gpr_gpr4(rt);
-+        rs = decode_gpr_gpr4(rs);
-+        gen_ld(ctx, OPC_LW, rt, rs, offset);
-         break;
-     case NM_SW4X4:
-+        rt = (extract32(ctx->opcode, 9, 1) << 3) |
-+             extract32(ctx->opcode, 5, 3);
-+        rs = (extract32(ctx->opcode, 4, 1) << 3) |
-+             extract32(ctx->opcode, 0, 3);
-+        offset = (extract32(ctx->opcode, 3, 1) << 3) |
-+                 (extract32(ctx->opcode, 8, 1) << 2);
-+        rt = decode_gpr_gpr4_zero(rt);
-+        rs = decode_gpr_gpr4(rs);
-+        gen_st(ctx, OPC_SW, rt, rs, offset);
-         break;
-     case NM_LWGP16:
-+        offset = extract32(ctx->opcode, 0, 7) << 2;
-+        gen_ld(ctx, OPC_LW, rt, 28, offset);
-         break;
-     case NM_SWSP16:
-+        rt = NANOMIPS_EXTRACT_RD5(ctx->opcode);
-+        offset = extract32(ctx->opcode, 0, 5) << 2;
-+        gen_st(ctx, OPC_SW, rt, 29, offset);
-         break;
-     case NM_SW16:
-+        rt = decode_gpr_gpr3_src_store(
-+                 NANOMIPS_EXTRACT_RD(ctx->opcode));
-+        rs = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS(ctx->opcode));
-+        offset = extract32(ctx->opcode, 0, 4) << 2;
-+        gen_st(ctx, OPC_SW, rt, rs, offset);
-         break;
-     case NM_SWGP16:
-+        rt = decode_gpr_gpr3_src_store(
-+                 NANOMIPS_EXTRACT_RD(ctx->opcode));
-+        offset = extract32(ctx->opcode, 0, 7) << 2;
-+        gen_st(ctx, OPC_SW, rt, 28, offset);
-         break;
-     case NM_BC16:
-         gen_compute_branch_nm(ctx, OPC_BEQ, 2, 0, 0,
--- 
+=20
+ /* ROM and pseudo bootloader
+--=20
 2.7.4
