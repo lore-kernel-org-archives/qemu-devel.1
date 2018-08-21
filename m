@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fs2hk-0008Fh-0M
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:12:01 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fs2hk-0008Fj-0W
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:12:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fs2hd-0000e9-6N
+	(envelope-from <kraxel@redhat.com>) id 1fs2hd-0000e2-4y
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:11:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55384 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55386 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fs2hc-0000cE-U2
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:11:53 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fs2hc-0000cH-SE
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:11:52 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Aug 2018 11:11:42 +0200
-Message-Id: <20180821091148.32220-2-kraxel@redhat.com>
+Date: Tue, 21 Aug 2018 11:11:43 +0200
+Message-Id: <20180821091148.32220-3-kraxel@redhat.com>
 In-Reply-To: <20180821091148.32220-1-kraxel@redhat.com>
 References: <20180821091148.32220-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/7] docs/usb2.txt: ehci has six ports
+Subject: [Qemu-devel] [PULL 2/7] ohci: Clear the interrupt counter for
+ erroneous transfers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +25,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, npes87184 <npes87184@gmail.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Sebastian Bauer <mail@sebastianbauer.info>
 
-From: npes87184 <npes87184@gmail.com>
+From: Sebastian Bauer <mail@sebastianbauer.info>
 
-In commit 5cc194caeb019cf1dae7f74ccbdf0401a56c2ac6,
-the number of ehci ports is corrected to six. Fix docs
-related to it.
+This is mandated by the ohci specification. It tells at 6.4.4 on page 104
+that for transfer descriptors that are retired with an error the done
+queue interrupt counter is cleared as if the interrupt delay field of the
+descriptions were zero.
 
-Signed-off-by: npes87184 <npes87184@gmail.com>
-Message-id: 20180801122410.10343-1-npes87184@gmail.com
+Before this change, error conditions were handled similarly to the
+successful condition which is especially troublesome for control transfers.
+Some drivers (e.g., the AmigaOS-one) as well as the example code in the
+spec, set the setup stage with an interrupt delay of seven (which means no
+interrupt). This is fine under normal conditions, because one usually
+doesn't want to be notified about the completion of this stage. However, if
+an error occurs in this stage, these drivers will not get notified with the
+current implementation. The fix addresses this by following the spec more
+closely. Also, otherwise, the ability to set interrupt delay to seven would
+be useless.
+
+Note that Linux drivers that I looked at don't seem to be affected as they
+set six as the interrupt delay presumably for the reason that they won't
+get notified otherwise.
+
+Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+Message-id: 20180729191928.11254-1-mail@sebastianbauer.info
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- docs/usb2.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/usb/hcd-ohci.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/docs/usb2.txt b/docs/usb2.txt
-index f63c8d9465..172614d3a7 100644
---- a/docs/usb2.txt
-+++ b/docs/usb2.txt
-@@ -94,8 +94,8 @@ physical port addressing
- 
- First you can (for all USB devices) specify the physical port where
- the device will show up in the guest.  This can be done using the
--"port" property.  UHCI has two root ports (1,2).  EHCI has four root
--ports (1-4), the emulated (1.1) USB hub has eight ports.
-+"port" property.  UHCI has two root ports (1,2).  EHCI has six root
-+ports (1-6), the emulated (1.1) USB hub has eight ports.
- 
- Plugging a tablet into UHCI port 1 works like this:
- 
+diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
+index d4c0293db5..98da5f0f04 100644
+--- a/hw/usb/hcd-ohci.c
++++ b/hw/usb/hcd-ohci.c
+@@ -1156,6 +1156,9 @@ static int ohci_service_td(OHCIState *ohci, struct ohci_ed *ed)
+                 OHCI_SET_BM(td.flags, TD_EC, 3);
+                 break;
+             }
++            /* An error occured so we have to clear the interrupt counter. See
++             * spec at 6.4.4 on page 104 */
++            ohci->done_count = 0;
+         }
+         ed->head |= OHCI_ED_H;
+     }
 -- 
 2.9.3
