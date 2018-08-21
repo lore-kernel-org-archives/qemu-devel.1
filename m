@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fs3JZ-00072E-6f
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:51:08 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fs3Jk-0007C5-Am
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:51:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fs3JU-0001jy-UJ
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:51:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48574)
+	(envelope-from <zhangckid@gmail.com>) id 1fs3Ji-0001sA-ID
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:51:16 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:32980)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fs3JU-0001jA-Ev
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:51:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fs3JS-0007LV-Mq
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 09:50:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 94CAD2E8527
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 09:50:58 +0000 (UTC)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fs3Ji-0001qk-1q
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:51:14 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id i134-v6so9168196wmf.0
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 02:51:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20180811205924.4113-1-zhangckid@gmail.com>
+	<20180811205924.4113-18-zhangckid@gmail.com>
+	<9b49f9e4-a910-36a4-3c31-29d7bec4598d@redhat.com>
+In-Reply-To: <9b49f9e4-a910-36a4-3c31-29d7bec4598d@redhat.com>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Tue, 21 Aug 2018 17:51:00 +0800
+Message-ID: <CAK3tnvJCw8vmDhpkrURb-mdz8DF4dnHPJiSMxKsXpzaOWT68Rw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Aug 2018 09:37:31 -0000
-From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
-	<1755912@bugs.launchpad.net>
-Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153484425108.17244.16619055541479328836.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
- SIGABRT when using option -vga qxl
+Subject: Re: [Qemu-devel] [PATCH V11 17/20] filter-rewriter: handle
+ checkpoint and failover event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,117 +31,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: jasowang@redhat.com
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com, Zhang Chen <chen.zhang@intel.com>
 
-Working on Bionic SRu prep in https://launchpad.net/~ci-train-ppa-
-service/+archive/ubuntu/3367/+packages
+On Tue, Aug 21, 2018 at 11:40 AM Jason Wang <jasowang@redhat.com> wrote:
 
--- =
+>
+>
+> On 2018=E5=B9=B408=E6=9C=8812=E6=97=A5 04:59, Zhang Chen wrote:
+> > After one round of checkpoint, the states between PVM and SVM
+> > become consistent, so it is unnecessary to adjust the sequence
+> > of net packets for old connections, besides, while failover
+> > happens, filter-rewriter will into failover mode that needn't
+> > handle the new TCP connection.
+> >
+> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+> > ---
+> >   net/colo-compare.c    | 12 ++++-----
+> >   net/colo.c            |  8 ++++++
+> >   net/colo.h            |  2 ++
+> >   net/filter-rewriter.c | 57 ++++++++++++++++++++++++++++++++++++++++++=
++
+> >   4 files changed, 73 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/net/colo-compare.c b/net/colo-compare.c
+> > index b8c0240725..462e822be6 100644
+> > --- a/net/colo-compare.c
+> > +++ b/net/colo-compare.c
+> > @@ -116,6 +116,12 @@ enum {
+> >       SECONDARY_IN,
+> >   };
+> >
+> > +static void colo_compare_inconsistency_notify(void)
+> > +{
+> > +    notifier_list_notify(&colo_compare_notifiers,
+> > +                migrate_get_current());
+> > +}
+> > +
+> >   static int compare_chr_send(CompareState *s,
+> >                               const uint8_t *buf,
+> >                               uint32_t size,
+> > @@ -562,12 +568,6 @@ static int colo_old_packet_check_one(Packet *pkt,
+> int64_t *check_time)
+> >       }
+> >   }
+> >
+> > -static void colo_compare_inconsistency_notify(void)
+> > -{
+> > -    notifier_list_notify(&colo_compare_notifiers,
+> > -                migrate_get_current());
+> > -}
+> > -
+>
+> This part of changes seems unnecessary?
+>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1755912
+colo_compare_tcp want to use this function, so we just move forward this
+function.
 
-Title:
-  qemu-system-x86_64 crashed with SIGABRT when using option -vga qxl
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Bionic:
-  Triaged
+>
+> >   void colo_compare_register_notifier(Notifier *notify)
+> >   {
+> >       notifier_list_add(&colo_compare_notifiers, notify);
+> > diff --git a/net/colo.c b/net/colo.c
+> > index 97c8fc928f..49176bf07b 100644
+> > --- a/net/colo.c
+> > +++ b/net/colo.c
+> > @@ -221,3 +221,11 @@ Connection *connection_get(GHashTable
+> *connection_track_table,
+> >
+> >       return conn;
+> >   }
+> > +
+> > +bool connection_has_tracked(GHashTable *connection_track_table,
+> > +                            ConnectionKey *key)
+> > +{
+> > +    Connection *conn =3D g_hash_table_lookup(connection_track_table, k=
+ey);
+> > +
+> > +    return conn ? true : false;
+> > +}
+> > diff --git a/net/colo.h b/net/colo.h
+> > index 0277e0e9ba..11c5226488 100644
+> > --- a/net/colo.h
+> > +++ b/net/colo.h
+> > @@ -98,6 +98,8 @@ void connection_destroy(void *opaque);
+> >   Connection *connection_get(GHashTable *connection_track_table,
+> >                              ConnectionKey *key,
+> >                              GQueue *conn_list);
+> > +bool connection_has_tracked(GHashTable *connection_track_table,
+> > +                            ConnectionKey *key);
+> >   void connection_hashtable_reset(GHashTable *connection_track_table);
+> >   Packet *packet_new(const void *data, int size, int vnet_hdr_len);
+> >   void packet_destroy(void *opaque, void *user_data);
+> > diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
+> > index f18a71bf2e..c463a0c1d0 100644
+> > --- a/net/filter-rewriter.c
+> > +++ b/net/filter-rewriter.c
+> > @@ -20,11 +20,15 @@
+> >   #include "qemu/main-loop.h"
+> >   #include "qemu/iov.h"
+> >   #include "net/checksum.h"
+> > +#include "net/colo.h"
+> > +#include "migration/colo.h"
+> >
+> >   #define FILTER_COLO_REWRITER(obj) \
+> >       OBJECT_CHECK(RewriterState, (obj), TYPE_FILTER_REWRITER)
+> >
+> >   #define TYPE_FILTER_REWRITER "filter-rewriter"
+> > +#define FAILOVER_MODE_ON  true
+> > +#define FAILOVER_MODE_OFF false
+> >
+> >   typedef struct RewriterState {
+> >       NetFilterState parent_obj;
+> > @@ -32,8 +36,14 @@ typedef struct RewriterState {
+> >       /* hashtable to save connection */
+> >       GHashTable *connection_track_table;
+> >       bool vnet_hdr;
+> > +    bool failover_mode;
+> >   } RewriterState;
+> >
+> > +static void filter_rewriter_failover_mode(RewriterState *s)
+> > +{
+> > +    s->failover_mode =3D FAILOVER_MODE_ON;
+> > +}
+> > +
+> >   static void filter_rewriter_flush(NetFilterState *nf)
+> >   {
+> >       RewriterState *s =3D FILTER_COLO_REWRITER(nf);
+> > @@ -269,6 +279,13 @@ static ssize_t
+> colo_rewriter_receive_iov(NetFilterState *nf,
+> >                */
+> >               reverse_connection_key(&key);
+> >           }
+> > +
+> > +        /* After failover we needn't change new TCP packet */
+> > +        if (s->failover_mode &&
+> > +            connection_has_tracked(s->connection_track_table, &key)) {
+>
+> I think you mean !connection_has_tracked() here?
+>
 
-Bug description:
-  When using qemu-system-x86_64 with the option -vga qxl, it crashes.
-  The easiest way to crash it is by trying to change the guest's
-  resolution. However, the system may randomly crash too, not happening
-  only when changing resolution. Here is the terminal output of one of
-  these random crashes:
+Yes, you are right.
+I will fix it in next version.
 
-  --------
+Thanks
+Zhang Chen
 
-  $ qemu-system-x86_64 -hda /dev/sdb -m 2048 -enable-kvm -cpu host -vga qxl=
- -nodefaults -netdev user,id=3Dhostnet0 -device virtio-net-pci,id=3Dnet0,ne=
-tdev=3Dhostnet0
-  WARNING: Image format was not specified for '/dev/sdb' and probing guesse=
-d raw.
-           Automatically detecting the format is dangerous for raw images, =
-write operations on block 0 will be restricted.
-           Specify the 'raw' format explicitly to remove the restrictions.
 
-  (process:21313): Spice-WARNING **: 16:01:45.759: display-
-  channel.c:2431:display_channel_validate_surface: canvas address is
-  0x7f8eb948ab18 for 0 (and is NULL)
 
-  =
-
-  (process:21313): Spice-WARNING **: 16:01:45.759: display-channel.c:2432:d=
-isplay_channel_validate_surface: failed on 0
-
-  (process:21313): Spice-CRITICAL **: 16:01:45.759: display-channel.c:2035:=
-display_channel_update: condition `display_channel_validate_surface(display=
-, surface_id)' failed
-  Abortado (imagem do n=C3=BAcleo gravada)
-
-  --------
-
-  I was running QEMU as a normal user which is on the groups kvm and
-  disk. Initially I supposed the problem was because I was running QEMU
-  as root, but as a normal user this happens too.
-
-  I have tested with guests with different Ubuntu version: 18.04, 17.10
-  and 16.04. It is happening with them all.
-
-  ProblemType: Crash
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu4
-  ProcVersionSignature: Ubuntu 4.15.0-10.11-generic 4.15.3
-  Uname: Linux 4.15.0-10-generic x86_64
-  ApportVersion: 2.20.8-0ubuntu10
-  Architecture: amd64
-  CurrentDesktop: XFCE
-  Date: Wed Mar 14 17:13:52 2018
-  ExecutablePath: /usr/bin/qemu-system-x86_64
-  InstallationDate: Installed on 2017-06-13 (273 days ago)
-  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: LENOVO 80UG
-  ProcCmdline: qemu-system-x86_64 -hda /dev/sdb -smp cpus=3D2 -m 512 -enabl=
-e-kvm -cpu host -vga qxl -nodefaults -netdev user,id=3Dhostnet0 -device vir=
-tio-net-pci,id=3Dnet0,netdev=3Dhostnet0
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.15.0-10-generic.efi.signe=
-d root=3DUUID=3D6b4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet
-  Signal: 6
-  SourcePackage: qemu
-  StacktraceTop:
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-  Title: qemu-system-x86_64 crashed with SIGABRT
-  UpgradeStatus: Upgraded to bionic on 2017-10-20 (145 days ago)
-  UserGroups: adm bluetooth cdrom dialout dip disk kvm libvirt lpadmin netd=
-ev plugdev sambashare sudo
-  dmi.bios.date: 07/10/2017
-  dmi.bios.vendor: LENOVO
-  dmi.bios.version: 0XCN43WW
-  dmi.board.asset.tag: NO Asset Tag
-  dmi.board.name: Toronto 4A2
-  dmi.board.vendor: LENOVO
-  dmi.board.version: SDK0J40679 WIN
-  dmi.chassis.asset.tag: NO Asset Tag
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: LENOVO
-  dmi.chassis.version: Lenovo ideapad 310-14ISK
-  dmi.modalias: dmi:bvnLENOVO:bvr0XCN43WW:bd07/10/2017:svnLENOVO:pn80UG:pvr=
-Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
-10:cvrLenovoideapad310-14ISK:
-  dmi.product.family: IDEAPAD
-  dmi.product.name: 80UG
-  dmi.product.version: Lenovo ideapad 310-14ISK
-  dmi.sys.vendor: LENOVO
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1755912/+subscriptions
+>
+> > +            goto out;
+> > +        }
+> > +
+> >           conn =3D connection_get(s->connection_track_table,
+> >                                 &key,
+> >                                 NULL);
+> > @@ -302,11 +319,49 @@ static ssize_t
+> colo_rewriter_receive_iov(NetFilterState *nf,
+> >           }
+> >       }
+> >
+> > +out:
+> >       packet_destroy(pkt, NULL);
+> >       pkt =3D NULL;
+> >       return 0;
+> >   }
+> >
+> > +static void reset_seq_offset(gpointer key, gpointer value, gpointer
+> user_data)
+> > +{
+> > +    Connection *conn =3D (Connection *)value;
+> > +
+> > +    conn->offset =3D 0;
+> > +}
+> > +
+> > +static gboolean offset_is_nonzero(gpointer key,
+> > +                                  gpointer value,
+> > +                                  gpointer user_data)
+> > +{
+> > +    Connection *conn =3D (Connection *)value;
+> > +
+> > +    return conn->offset ? true : false;
+> > +}
+> > +
+> > +static void colo_rewriter_handle_event(NetFilterState *nf, int event,
+> > +                                       Error **errp)
+> > +{
+> > +    RewriterState *rs =3D FILTER_COLO_REWRITER(nf);
+> > +
+> > +    switch (event) {
+> > +    case COLO_EVENT_CHECKPOINT:
+> > +        g_hash_table_foreach(rs->connection_track_table,
+> > +                            reset_seq_offset, NULL);
+> > +        break;
+> > +    case COLO_EVENT_FAILOVER:
+> > +        if (!g_hash_table_find(rs->connection_track_table,
+> > +                              offset_is_nonzero, NULL)) {
+> > +            filter_rewriter_failover_mode(rs);
+> > +        }
+> > +        break;
+> > +    default:
+> > +        break;
+> > +    }
+> > +}
+>
+> So I think instead of having a generic filter notifier chain, rewriter
+> can register notifier to COLO instead. This avoid touching filter core
+> codes.
+>
+> Thanks
+>
+> > +
+> >   static void colo_rewriter_cleanup(NetFilterState *nf)
+> >   {
+> >       RewriterState *s =3D FILTER_COLO_REWRITER(nf);
+> > @@ -350,6 +405,7 @@ static void filter_rewriter_init(Object *obj)
+> >       RewriterState *s =3D FILTER_COLO_REWRITER(obj);
+> >
+> >       s->vnet_hdr =3D false;
+> > +    s->failover_mode =3D FAILOVER_MODE_OFF;
+> >       object_property_add_bool(obj, "vnet_hdr_support",
+> >                                filter_rewriter_get_vnet_hdr,
+> >                                filter_rewriter_set_vnet_hdr, NULL);
+> > @@ -362,6 +418,7 @@ static void colo_rewriter_class_init(ObjectClass
+> *oc, void *data)
+> >       nfc->setup =3D colo_rewriter_setup;
+> >       nfc->cleanup =3D colo_rewriter_cleanup;
+> >       nfc->receive_iov =3D colo_rewriter_receive_iov;
+> > +    nfc->handle_event =3D colo_rewriter_handle_event;
+> >   }
+> >
+> >   static const TypeInfo colo_rewriter_info =3D {
+>
+>
