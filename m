@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1fs7ZN-0008Fp-8C
+	(envelope-from <mail@steffen-goertz.de>) id 1fs7ZN-0008Fr-8l
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1fs7ZM-0006Rr-Ei
+	(envelope-from <mail@steffen-goertz.de>) id 1fs7ZM-0006Rw-FX
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 10:23:41 -0400
 References: <20180811090836.4024-1-contrib@steffen-goertz.de>
-	<20180811090836.4024-7-contrib@steffen-goertz.de>
-	<CAFEAcA_=8r_X_rLfwJovEkusBb6hmaG5Ns8YQxQMLL4z0KpHXw@mail.gmail.com>
+	<20180811090836.4024-4-contrib@steffen-goertz.de>
+	<CAFEAcA-vtLpt-ScYpYPFqtQAnECuVqCW-DhKqVgoh6mAG=KfQw@mail.gmail.com>
 From: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
-Message-ID: <6c13fca2-6f16-adb0-1072-7601abefd18d@steffen-goertz.de>
-Date: Tue, 21 Aug 2018 13:43:42 +0200
+Message-ID: <df1b1627-47e4-bffd-e73c-ffa3eb037b2a@steffen-goertz.de>
+Date: Tue, 21 Aug 2018 12:03:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_=8r_X_rLfwJovEkusBb6hmaG5Ns8YQxQMLL4z0KpHXw@mail.gmail.com>
+In-Reply-To: <CAFEAcA-vtLpt-ScYpYPFqtQAnECuVqCW-DhKqVgoh6mAG=KfQw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/7] arm: Instantiate nRF51 peripherals
+Subject: Re: [Qemu-devel] [PATCH 3/7] arm: Add chip variant property to
+ nRF51 SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +30,29 @@ To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <co
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>
 
 Hi Peter,
->> +
->> +static uint64_t clock_read(void *opaque, hwaddr addr, unsigned int size)
->> +{
->> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
->> +                  __func__, addr, size);
->> +    return 1;
->> +}
->> +
->> +static void clock_write(void *opaque, hwaddr addr, uint64_t data,
->> +                        unsigned int size)
->> +{
->> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx64 " [%u]\n",
->> +                  __func__, addr, data, size);
->> +}
->> +
->> +static const MemoryRegionOps clock_ops = {
->> +    .read = clock_read,
->> +    .write = clock_write
->> +};
-> 
-> You don't need to roll your own "do nothing but log" device:
-> you can use the TYPE_UNIMPLEMENTED_DEVICE to do this.
-> 
-Until we have a more proper STUB for POWER/CLOCK/MPU peripherals we actually need this,
-because the unimplemented device will return 0 on reads which will cause guest code to stall.
 
-Agree to and regarded the rest of your remarks.
+object_property_set_bool(soc, true, "realized", &error_abort);>>
+>> -    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
+>> -            NRF51_SOC(soc)->flash_size);
+>> +    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x00);
+> 
+> Hmm. Using 0x00 here doesn't seem ideal.
+
+i agree. The actual sizes for RAM/ROM are calculated in the SOC at the moment.
+I do not really know what impact max_sz has here. I could set the it to the
+maximum code size defined in the memory map of the NRF51 series. Another way would be 
+to lift the calculation of the ROM size from the SOC to the Board. What would you propose?
+>> +#define PAGE_SIZE       1024
+> 
+> Page size isn't really an obvious concept for M profile.
+
+Flash pages are referred to here, not MMU pages. This constant is moved and renamed to NRF51_PAGE_SIZE in the upcoming revision. Would you suggest another name or can with stick with this?
+
+> Why have these lines been changed? (Rule of thumb: don't include code
+> reformatting or style cleanups in the same patch as substantive changes.)
+
+These lines where > 80 chars before. I should rather suggest a change of Joel's patch series.
+
+Thank you for your remarks.
 
 Steffen
