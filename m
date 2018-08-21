@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwlc-0004Al-Ak
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 22:51:37 -0400
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwlg-0004DH-7j
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 22:51:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwlZ-0004jI-Ud
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 22:51:36 -0400
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1frwle-0004lp-7w
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 22:51:40 -0400
 From: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
-Date: Mon, 20 Aug 2018 22:51:02 -0400
-Message-Id: <20180821025104.19604-6-pavel.zbitskiy@gmail.com>
+Date: Mon, 20 Aug 2018 22:51:04 -0400
+Message-Id: <20180821025104.19604-8-pavel.zbitskiy@gmail.com>
 In-Reply-To: <20180821025104.19604-1-pavel.zbitskiy@gmail.com>
 References: <20180821025104.19604-1-pavel.zbitskiy@gmail.com>
-Subject: [Qemu-devel] [PATCH 5/7] target/s390x: add EX support for TRT and
- TRTR
+Subject: [Qemu-devel] [PATCH 7/7] target/s390x: implement CVB, CVBY and CVBG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,179 +22,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com, richard.henderson@linaro.org, Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-Improves "b213c9f5: target/s390x: Implement TRTR" by introducing the
-intermediate functions, which are compatible with dx_helper type.
+Convert to Binary - counterparts of the already implemented Convert
+to Decimal (CVD*) instructions.
+Example from the Principles of Operation: 25594C becomes 63FA.
 
 Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
 ---
- target/s390x/mem_helper.c       | 16 +++++++++++
- tests/tcg/s390x/Makefile.target |  2 ++
- tests/tcg/s390x/exrl-trt.c      | 48 +++++++++++++++++++++++++++++++++
- tests/tcg/s390x/exrl-trtr.c     | 48 +++++++++++++++++++++++++++++++++
- 4 files changed, 114 insertions(+)
- create mode 100644 tests/tcg/s390x/exrl-trt.c
- create mode 100644 tests/tcg/s390x/exrl-trtr.c
+ target/s390x/helper.h           |  1 +
+ target/s390x/insn-data.def      |  4 +++
+ target/s390x/int_helper.c       | 50 +++++++++++++++++++++++++++++++++
+ target/s390x/translate.c        | 10 +++++++
+ tests/tcg/s390x/Makefile.target |  1 +
+ tests/tcg/s390x/cvb.c           | 18 ++++++++++++
+ 6 files changed, 84 insertions(+)
+ create mode 100644 tests/tcg/s390x/cvb.c
 
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index c94dbf3fcb..704d0193b5 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -1299,12 +1299,26 @@ static inline uint32_t do_helper_trt(CPUS390XState *env, int len,
-     return 0;
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 97c60ca7bc..46baaee0ab 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -88,6 +88,7 @@ DEF_HELPER_FLAGS_4(tcxb, TCG_CALL_NO_RWG_SE, i32, env, i64, i64, i64)
+ DEF_HELPER_FLAGS_2(sqeb, TCG_CALL_NO_WG, i64, env, i64)
+ DEF_HELPER_FLAGS_2(sqdb, TCG_CALL_NO_WG, i64, env, i64)
+ DEF_HELPER_FLAGS_3(sqxb, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(cvb, TCG_CALL_NO_WG, i64, env, i64, i32)
+ DEF_HELPER_FLAGS_1(cvd, TCG_CALL_NO_RWG_SE, i64, s32)
+ DEF_HELPER_FLAGS_4(pack, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_FLAGS_4(pka, TCG_CALL_NO_WG, void, env, i64, i64, i32)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 9c7b434fca..1b29a5e044 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -284,6 +284,10 @@
+     D(0xec73, CLFIT,   RIE_a, GIE, r1_32u, i2_32u, 0, 0, ct, 0, 1)
+     D(0xec71, CLGIT,   RIE_a, GIE, r1_o, i2_32u, 0, 0, ct, 0, 1)
+ 
++/* CONVERT TO BINARY */
++    C(0x4f00, CVB,     RX_a,  Z,   0, a2, new, r1_32, cvb, 0)
++    C(0xe306, CVBY,    RXY_a, LD,  0, a2, new, r1_32, cvb, 0)
++    C(0xe30e, CVBG,    RXY_a, Z,   0, a2, r1, 0, cvb, 0)
+ /* CONVERT TO DECIMAL */
+     C(0x4e00, CVD,     RX_a,  Z,   r1_o, a2, 0, 0, cvd, 0)
+     C(0xe326, CVDY,    RXY_a, LD,  r1_o, a2, 0, 0, cvd, 0)
+diff --git a/target/s390x/int_helper.c b/target/s390x/int_helper.c
+index abf77a94e6..66c6dc8b3a 100644
+--- a/target/s390x/int_helper.c
++++ b/target/s390x/int_helper.c
+@@ -24,6 +24,7 @@
+ #include "exec/exec-all.h"
+ #include "qemu/host-utils.h"
+ #include "exec/helper-proto.h"
++#include "exec/cpu_ldst.h"
+ 
+ /* #define DEBUG_HELPER */
+ #ifdef DEBUG_HELPER
+@@ -118,6 +119,55 @@ uint64_t HELPER(divu64)(CPUS390XState *env, uint64_t ah, uint64_t al,
+     return ret;
  }
  
-+static uint32_t do_helper_trt_fwd(CPUS390XState *env, uint32_t len,
-+                                  uint64_t array, uint64_t trans,
-+                                  uintptr_t ra)
++static void general_operand_exception(CPUS390XState *env, uintptr_t ra)
 +{
-+    return do_helper_trt(env, len, array, trans, 1, ra);
++#ifndef CONFIG_USER_ONLY
++    LowCore *lowcore;
++
++    lowcore = cpu_map_lowcore(env);
++    lowcore->data_exc_code = 0;
++    cpu_unmap_lowcore(lowcore);
++#endif
++    s390_program_interrupt(env, PGM_DATA, ILEN_AUTO, ra);
 +}
 +
- uint32_t HELPER(trt)(CPUS390XState *env, uint32_t len, uint64_t array,
-                      uint64_t trans)
++uint64_t HELPER(cvb)(CPUS390XState *env, uint64_t src, uint32_t n)
++{
++    int i, j;
++    uintptr_t ra = GETPC();
++    int64_t dec, sign = 0, digit, val = 0, pow10 = 0;
++
++    for (i = 0; i < n; i++) {
++        dec = cpu_ldq_data_ra(env, src + (n - i - 1) * 8, ra);
++        for (j = 0; j < 16; j++, dec >>= 4) {
++            if (i == 0 && j == 0) {
++                sign = dec & 0xf;
++                if (sign < 0xa) {
++                    general_operand_exception(env, ra);
++                }
++                continue;
++            }
++            digit = dec & 0xf;
++            if (digit > 0x9) {
++                general_operand_exception(env, ra);
++            }
++            if (i == 0 && j == 1) {
++                if (sign == 0xb || sign == 0xd) {
++                    val = -digit;
++                    pow10 = -10;
++                } else {
++                    val = digit;
++                    pow10 = 10;
++                }
++            } else {
++                val += digit * pow10;
++                pow10 *= 10;
++            }
++        }
++    }
++    return val;
++}
++
+ uint64_t HELPER(cvd)(int32_t reg)
  {
-     return do_helper_trt(env, len, array, trans, 1, GETPC());
+     /* positive 0 */
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index f58b36b789..b3cbfead5d 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -2115,6 +2115,16 @@ static DisasJumpType op_csp(DisasContext *s, DisasOps *o)
  }
+ #endif
  
-+static uint32_t do_helper_trt_bkwd(CPUS390XState *env, uint32_t len,
-+                                   uint64_t array, uint64_t trans,
-+                                   uintptr_t ra)
++static DisasJumpType op_cvb(DisasContext *s, DisasOps *o)
 +{
-+    return do_helper_trt(env, len, array, trans, -1, ra);
++    uint64_t n = ((s->fields->op == 0xE3) && (s->fields->op2 == 0x0E)) ?
++        /* CVBG */      2 :
++        /* CVB, CVBY */ 1;
++
++    gen_helper_cvb(o->out, cpu_env, o->in2, tcg_const_i32(n));
++    return DISAS_NEXT;
 +}
 +
- uint32_t HELPER(trtr)(CPUS390XState *env, uint32_t len, uint64_t array,
-                       uint64_t trans)
+ static DisasJumpType op_cvd(DisasContext *s, DisasOps *o)
  {
-@@ -2193,12 +2207,14 @@ void HELPER(ex)(CPUS390XState *env, uint32_t ilen, uint64_t r1, uint64_t addr)
-         typedef uint32_t (*dx_helper)(CPUS390XState *, uint32_t, uint64_t,
-                                       uint64_t, uintptr_t);
-         static const dx_helper dx[16] = {
-+            [0x0] = do_helper_trt_bkwd,
-             [0x2] = do_helper_mvc,
-             [0x4] = do_helper_nc,
-             [0x5] = do_helper_clc,
-             [0x6] = do_helper_oc,
-             [0x7] = do_helper_xc,
-             [0xc] = do_helper_tr,
-+            [0xd] = do_helper_trt_fwd,
-         };
-         dx_helper helper = dx[opc & 0xf];
- 
+     TCGv_i64 t1 = tcg_temp_new_i64();
 diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.target
-index c800a582e5..7de4376f52 100644
+index 151dc075aa..990dfb26ff 100644
 --- a/tests/tcg/s390x/Makefile.target
 +++ b/tests/tcg/s390x/Makefile.target
-@@ -3,3 +3,5 @@ CFLAGS+=-march=zEC12 -m64
- TESTS+=hello-s390x
- TESTS+=csst
- TESTS+=ipm
-+TESTS+=exrl-trt
-+TESTS+=exrl-trtr
-diff --git a/tests/tcg/s390x/exrl-trt.c b/tests/tcg/s390x/exrl-trt.c
+@@ -6,3 +6,4 @@ TESTS+=ipm
+ TESTS+=exrl-trt
+ TESTS+=exrl-trtr
+ TESTS+=pack
++TESTS+=cvb
+diff --git a/tests/tcg/s390x/cvb.c b/tests/tcg/s390x/cvb.c
 new file mode 100644
-index 0000000000..3c5323aecb
+index 0000000000..3a72e132aa
 --- /dev/null
-+++ b/tests/tcg/s390x/exrl-trt.c
-@@ -0,0 +1,48 @@
++++ b/tests/tcg/s390x/cvb.c
+@@ -0,0 +1,18 @@
 +#include <stdint.h>
 +#include <unistd.h>
 +
 +int main(void)
 +{
-+    char op1[] = "hello";
-+    char op2[256];
-+    uint64_t r1 = 0xffffffffffffffffull;
-+    uint64_t r2 = 0xffffffffffffffffull;
-+    uint64_t cc;
-+    int i;
++    uint64_t data = 0x000000000025594cull;
++    uint64_t result = 0;
 +
-+    for (i = 0; i < 256; i++) {
-+        if (i == 0) {
-+            op2[i] = 0xaa;
-+        } else {
-+            op2[i] = 0;
-+        }
-+    }
 +    asm volatile(
-+        "    j 2f\n"
-+        "1:  trt 0(1,%[op1]),0(%[op2])\n"
-+        "2:  exrl %[op1_len],1b\n"
-+        "    lgr %[r1],%%r1\n"
-+        "    lgr %[r2],%%r2\n"
-+        "    ipm %[cc]\n"
-+        : [r1] "+r" (r1),
-+          [r2] "+r" (r2),
-+          [cc] "=r" (cc)
-+        : [op1] "r" (&op1),
-+          [op1_len] "r" (5),
-+          [op2] "r" (&op2)
-+        : "r1", "r2", "cc");
-+    cc = (cc >> 28) & 3;
-+    if (cc != 2) {
-+        write(1, "bad cc\n", 7);
-+        return 1;
-+    }
-+    if ((char *)r1 != &op1[5]) {
-+        write(1, "bad r1\n", 7);
-+        return 1;
-+    }
-+    if (r2 != 0xffffffffffffffaaull) {
-+        write(1, "bad r2\n", 7);
-+        return 1;
-+    }
-+    return 0;
-+}
-diff --git a/tests/tcg/s390x/exrl-trtr.c b/tests/tcg/s390x/exrl-trtr.c
-new file mode 100644
-index 0000000000..c33153ad7e
---- /dev/null
-+++ b/tests/tcg/s390x/exrl-trtr.c
-@@ -0,0 +1,48 @@
-+#include <stdint.h>
-+#include <unistd.h>
-+
-+int main(void)
-+{
-+    char op1[] = {0, 1, 2, 3};
-+    char op2[256];
-+    uint64_t r1 = 0xffffffffffffffffull;
-+    uint64_t r2 = 0xffffffffffffffffull;
-+    uint64_t cc;
-+    int i;
-+
-+    for (i = 0; i < 256; i++) {
-+        if (i == 1) {
-+            op2[i] = 0xbb;
-+        } else {
-+            op2[i] = 0;
-+        }
-+    }
-+    asm volatile(
-+        "    j 2f\n"
-+        "1:  trtr 3(1,%[op1]),0(%[op2])\n"
-+        "2:  exrl %[op1_len],1b\n"
-+        "    lgr %[r1],%%r1\n"
-+        "    lgr %[r2],%%r2\n"
-+        "    ipm %[cc]\n"
-+        : [r1] "+r" (r1),
-+          [r2] "+r" (r2),
-+          [cc] "=r" (cc)
-+        : [op1] "r" (&op1),
-+          [op1_len] "r" (3),
-+          [op2] "r" (&op2)
-+        : "r1", "r2", "cc");
-+    cc = (cc >> 28) & 3;
-+    if (cc != 1) {
-+        write(1, "bad cc\n", 7);
-+        return 1;
-+    }
-+    if ((char *)r1 != &op1[1]) {
-+        write(1, "bad r1\n", 7);
-+        return 1;
-+    }
-+    if (r2 != 0xffffffffffffffbbull) {
-+        write(1, "bad r2\n", 7);
++        "    cvb %[result],%[data]\n"
++        : [result] "+r" (result)
++        : [data] "m" (data));
++    if (result != 0x63fa) {
++        write(1, "bad result\n", 11);
 +        return 1;
 +    }
 +    return 0;
