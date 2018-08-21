@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lX-0000t6-TV
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lX-0000sz-Pv
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lV-00072e-0k
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lV-00072a-0X
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:11 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49406 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:49380 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs6lU-0006z4-Cg
+	id 1fs6lU-0006yO-Bd
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:08 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 15:31:37 +0200
-Message-Id: <1534858316-12945-28-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 15:31:30 +0200
+Message-Id: <1534858316-12945-21-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v3 27/46] target/mips: Fix pre-nanoMIPS MT ASE
- instructions availability control
+Subject: [Qemu-devel] [PULL v3 20/46] target/mips: Add emulation of misc
+ nanoMIPS instructions (p_lsx)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,122 +28,182 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Use bits from configuration registers for availability control
-of MT ASE instructions, rather than only ISA_MT bit in insn_flags.
-This is done by adding a field in hflags for MT bit, and adding
-functions check_mt() and check_cp0_mt().
+Add emulation of nanoMIPS instructions situated in pool p_lsx, and
+emulation of LSA instruction as well.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 45 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 8 deletions(-)
+ target/mips/translate.c | 132 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 131 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index cd7e16c..480d4bf 100644
+index 8381fbe..b00d28b 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1927,6 +1927,35 @@ static inline void check_xnp(DisasContext *ctx)
+@@ -17115,6 +17115,125 @@ static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
      }
  }
  
-+/*
-+ * This code generates a "reserved instruction" exception if the
-+ * Config3 MT bit is NOT set.
-+ */
-+static inline void check_mt(DisasContext *ctx)
-+{
-+    if (unlikely(!(ctx->CP0_Config3 & (1 << CP0C3_MT)))) {
-+        generate_exception_end(ctx, EXCP_RI);
-+    }
-+}
 +
-+/*
-+ * This code generates a "coprocessor unusable" exception if CP0 is not
-+ * available, and, if that is not the case, generates a "reserved instruction"
-+ * exception if the Config5 MT bit is NOT set. This is needed for availability
-+ * control of some of MT ASE instructions.
-+ */
-+static inline void check_cp0_mt(DisasContext *ctx)
++static void gen_p_lsx(DisasContext *ctx, int rd, int rs, int rt)
 +{
-+    if (unlikely(!(ctx->hflags & MIPS_HFLAG_CP0))) {
-+        generate_exception_err(ctx, EXCP_CpU, 0);
-+    } else {
-+        if (unlikely(!(ctx->CP0_Config3 & (1 << CP0C3_MT)))) {
-+            generate_exception_err(ctx, EXCP_RI, 0);
++    TCGv t0, t1;
++    t0 = tcg_temp_new();
++    t1 = tcg_temp_new();
++
++    gen_load_gpr(t0, rs);
++    gen_load_gpr(t1, rt);
++
++    if ((extract32(ctx->opcode, 6, 1)) == 1) {
++        /* PP.LSXS instructions require shifting */
++        switch (extract32(ctx->opcode, 7, 4)) {
++        case NM_LHXS:
++        case NM_SHXS:
++        case NM_LHUXS:
++            tcg_gen_shli_tl(t0, t0, 1);
++            break;
++        case NM_LWXS:
++        case NM_SWXS:
++        case NM_LWC1XS:
++        case NM_SWC1XS:
++            tcg_gen_shli_tl(t0, t0, 2);
++            break;
++        case NM_LDC1XS:
++        case NM_SDC1XS:
++            tcg_gen_shli_tl(t0, t0, 3);
++            break;
 +        }
 +    }
++    gen_op_addr_add(ctx, t0, t0, t1);
++
++    switch (extract32(ctx->opcode, 7, 4)) {
++    case NM_LBX:
++        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
++                           MO_SB);
++        gen_store_gpr(t0, rd);
++        break;
++    case NM_LHX:
++    /*case NM_LHXS:*/
++        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
++                           MO_TESW);
++        gen_store_gpr(t0, rd);
++        break;
++    case NM_LWX:
++    /*case NM_LWXS:*/
++        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
++                           MO_TESL);
++        gen_store_gpr(t0, rd);
++        break;
++    case NM_LBUX:
++        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
++                           MO_UB);
++        gen_store_gpr(t0, rd);
++        break;
++    case NM_LHUX:
++    /*case NM_LHUXS:*/
++        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx,
++                           MO_TEUW);
++        gen_store_gpr(t0, rd);
++        break;
++    case NM_SBX:
++        gen_load_gpr(t1, rd);
++        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx,
++                           MO_8);
++        break;
++    case NM_SHX:
++    /*case NM_SHXS:*/
++        gen_load_gpr(t1, rd);
++        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx,
++                           MO_TEUW);
++        break;
++    case NM_SWX:
++    /*case NM_SWXS:*/
++        gen_load_gpr(t1, rd);
++        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx,
++                           MO_TEUL);
++        break;
++    case NM_LWC1X:
++    /*case NM_LWC1XS:*/
++    case NM_LDC1X:
++    /*case NM_LDC1XS:*/
++    case NM_SWC1X:
++    /*case NM_SWC1XS:*/
++    case NM_SDC1X:
++    /*case NM_SDC1XS:*/
++        if (ctx->CP0_Config1 & (1 << CP0C1_FP)) {
++            check_cp1_enabled(ctx);
++            switch (extract32(ctx->opcode, 7, 4)) {
++            case NM_LWC1X:
++            /*case NM_LWC1XS:*/
++                gen_flt_ldst(ctx, OPC_LWC1, rd, t0);
++                break;
++            case NM_LDC1X:
++            /*case NM_LDC1XS:*/
++                gen_flt_ldst(ctx, OPC_LDC1, rd, t0);
++                break;
++            case NM_SWC1X:
++            /*case NM_SWC1XS:*/
++                gen_flt_ldst(ctx, OPC_SWC1, rd, t0);
++                break;
++            case NM_SDC1X:
++            /*case NM_SDC1XS:*/
++                gen_flt_ldst(ctx, OPC_SDC1, rd, t0);
++                break;
++            }
++        } else {
++            generate_exception_err(ctx, EXCP_CpU, 1);
++        }
++        break;
++    default:
++        generate_exception_end(ctx, EXCP_RI);
++        break;
++    }
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
 +}
 +
-+
+ static void gen_pool32f_nanomips_insn(DisasContext *ctx)
+ {
+     int rt, rs, rd;
+@@ -17418,7 +17537,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+ {
+     uint16_t insn;
+     uint32_t op;
+-    int rt, rs;
++    int rt, rs, rd;
+     int offset;
+     int imm;
  
- /* Define small wrappers for gen_load_fpr* so that we have a uniform
-    calling interface for 32 and 64-bit FPRs.  No sense in changing
-@@ -8595,7 +8624,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContext *ctx, uint32_t opc, int rt,
-         opn = "mthc0";
-         break;
-     case OPC_MFTR:
--        check_insn(ctx, ASE_MT);
-+        check_cp0_enabled(ctx);
-         if (rd == 0) {
-             /* Treat as NOP. */
-             return;
-@@ -8605,7 +8634,7 @@ static void gen_cp0 (CPUMIPSState *env, DisasContext *ctx, uint32_t opc, int rt,
-         opn = "mftr";
-         break;
-     case OPC_MTTR:
--        check_insn(ctx, ASE_MT);
-+        check_cp0_enabled(ctx);
-         gen_mttr(env, ctx, rd, rt, (ctx->opcode >> 5) & 1,
-                  ctx->opcode & 0x7, (ctx->opcode >> 4) & 1);
-         opn = "mttr";
-@@ -21960,7 +21989,7 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
-         gen_rdhwr(ctx, rt, rd, extract32(ctx->opcode, 6, 3));
-         break;
-     case OPC_FORK:
--        check_insn(ctx, ASE_MT);
-+        check_mt(ctx);
-         {
-             TCGv t0 = tcg_temp_new();
-             TCGv t1 = tcg_temp_new();
-@@ -21973,7 +22002,7 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case OPC_YIELD:
--        check_insn(ctx, ASE_MT);
-+        check_mt(ctx);
-         {
-             TCGv t0 = tcg_temp_new();
+@@ -17427,6 +17546,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
  
-@@ -23270,22 +23299,22 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-                 op2 = MASK_MFMC0(ctx->opcode);
-                 switch (op2) {
-                 case OPC_DMT:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_dmt(t0);
-                     gen_store_gpr(t0, rt);
-                     break;
-                 case OPC_EMT:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_emt(t0);
-                     gen_store_gpr(t0, rt);
-                     break;
-                 case OPC_DVPE:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_dvpe(t0, cpu_env);
-                     gen_store_gpr(t0, rt);
-                     break;
-                 case OPC_EVPE:
--                    check_insn(ctx, ASE_MT);
-+                    check_cp0_mt(ctx);
-                     gen_helper_evpe(t0, cpu_env);
-                     gen_store_gpr(t0, rt);
-                     break;
+     rt = extract32(ctx->opcode, 21, 5);
+     rs = extract32(ctx->opcode, 16, 5);
++    rd = extract32(ctx->opcode, 11, 5);
+ 
+     op = extract32(ctx->opcode, 26, 6);
+     switch (op) {
+@@ -17486,6 +17606,16 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+             break;
+         case NM_POOL32A7:
+             switch (extract32(ctx->opcode, 3, 3)) {
++            case NM_P_LSX:
++                gen_p_lsx(ctx, rd, rs, rt);
++                break;
++            case NM_LSA:
++                /* In nanoMIPS, the shift field directly encodes the shift
++                 * amount, meaning that the supported shift values are in
++                 * the range 0 to 3 (instead of 1 to 4 in MIPSR6). */
++                gen_lsa(ctx, OPC_LSA, rd, rs, rt,
++                        extract32(ctx->opcode, 9, 2) - 1);
++                break;
+             case NM_POOL32AXF:
+                 gen_pool32axf_nanomips_insn(env, ctx);
+                 break;
 -- 
 2.7.4
