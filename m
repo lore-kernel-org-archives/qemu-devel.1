@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1frzlU-0000iq-Qv
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:03:41 -0400
+	(envelope-from <famz@redhat.com>) id 1frzqM-0002oB-Pr
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:08:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1frzlQ-0000R4-MV
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:03:40 -0400
-References: <20180818025653.21192-1-f4bug@amsat.org>
-	<66dfe354-9c2c-8642-a905-03155555fe99@redhat.com>
-	<a812530c-ad1b-f5ff-6e15-82227cb76c79@redhat.com>
-	<2fd04596-a8a0-889f-239d-92853c12c6aa@redhat.com>
-	<2d91d7e2-938d-dbbe-5a11-edf48d4e0fc8@redhat.com>
-	<eca82595-47c6-a195-8224-6a9f6619decd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e7a5018b-a480-4a5d-d305-cd69a007a452@redhat.com>
-Date: Tue, 21 Aug 2018 08:03:30 +0200
+	(envelope-from <famz@redhat.com>) id 1frzqM-0003sX-0W
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:08:42 -0400
+Date: Tue, 21 Aug 2018 14:08:34 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180821060834.GL10682@lemon.usersys.redhat.com>
+References: <20180817170246.14641-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <eca82595-47c6-a195-8224-6a9f6619decd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration: Replace strncpy() by g_strlcpy()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180817170246.14641-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/5] Fix some jobs/drain/aio_poll
+ related hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
 
-On 2018-08-20 21:59, David Hildenbrand wrote:
-> On 20.08.2018 21:48, Eric Blake wrote:
->> On 08/20/2018 12:16 PM, Thomas Huth wrote:
->>
->>>>
->>>> Maybe really set it to zero (memset) before using the g_strlcpy? I am
->>>> not a fan of disabling warnings, but if you think this is
->>>> easier/cleaner, let's go for that.
->>
->> I'm not a fan of strlcpy in general (by the time you've properly set it 
->> up to detect/report/avoid truncation errors, you've added more 
->> boilerplate code than you would have by just doing memcpy() yourself).
->>
->>>
->>> FWIW, that new warning from GCC is IMHO just annoying. I had the same
->>> problem in the SLOF sources, too:
->>>
->>> https://github.com/aik/SLOF/commit/d8a9354c2a35136
->>>
->>> The code with strncpy was perfectly valid before, but to get rid of the
->>> warning, I replaced it with a more cumbersome memcpy instead (and mad
->>> sure that the memory is already cleared earlier in that function). Now
->>> seeing that the problem with strncpy pops up here, too, I think it would
->>> maybe be better to shut up the warning of GCC, since it's clearly GCC
->>> who's wrong here.
->>
->> gcc is not necessarily wrong, as it CAN catch real erroneous uses of 
->> strncpy().  It's just that 99% of the time, strncpy() is the WRONG 
->> function to use, and so the remaining few cases where it actually does 
->> what you want are so rare that you have to consult the manual anyways. 
->> If nothing else, the gcc warning is making people avoid strncpy() even 
->> where it is safe (which is not a bad thing, in my opinion, because the 
->> contract of strncpy() is so counter-intuitive).
->>
+On Fri, 08/17 19:02, Kevin Wolf wrote:
+> I'm running out of time and will be offline for the next two weeks, so
+> I'm just sending out what I have right now. This is probably not ready
+> to be merged yet, but if need be, someone else can pick it up. Otherwise
+> I'll do that myself when I return.
+
+I'll try take a look at these. But I'll start from
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1609137
+
 > 
-> I am wondering if we should simply add a helper for these special cases
-> that zeroes the buffer and uses g_strlcpy(), instead of
-> ignoring/disabling the warning.
+> This is related to the following bug reports:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1614623
+> https://bugzilla.redhat.com/show_bug.cgi?id=1601212
+> 
+> Essentially it tries to fix a few deadlocks into which we run when
+> running two commit jobs (probably just one example for problematic
+> scenarios) on nodes that are in a non-mainloop AioContext (i.e. with
+> dataplane).
+> 
+> Obviously, besides verifying that the code changes are actually correct
+> as they are, we also want to add some test cases for this. I suppose
+> test-bdrv-drain should test for the individual bugs, and a qemu-iotests
+> case could try the higher level scenario of multiple commit jobs with
+> dataplane.
 
-Yes, a helper function with a proper comment about its purpose is likely
-the best way to go.
+The test coverage of dataplane is terribly low. Let's think about adding
+variants to existing iotests around block jobs at least.
 
- Thomas
+Fam
+
+> 
+> Kevin Wolf (5):
+>   blockjob: Wake up BDS when job becomes idle
+>   tests: Acquire AioContext around job_finish_sync()
+>   job: Drop AioContext lock around aio_poll()
+>   block: Drop AioContext lock in bdrv_drain_poll_top_level()
+>   [WIP] Lock AioContext in bdrv_co_drain_bh_cb()
+> 
+>  include/block/blockjob.h | 13 +++++++++++++
+>  include/qemu/job.h       |  9 +++++++++
+>  block/io.c               | 31 ++++++++++++++++++++++++++++++-
+>  blockjob.c               | 18 ++++++++++++++++++
+>  job.c                    | 10 ++++++++++
+>  tests/test-bdrv-drain.c  |  6 ++++++
+>  tests/test-blockjob.c    |  6 ++++++
+>  7 files changed, 92 insertions(+), 1 deletion(-)
+> 
+> -- 
+> 2.13.6
+> 
