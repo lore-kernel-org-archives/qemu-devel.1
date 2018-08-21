@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fs2hk-0008Fn-1r
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:12:01 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fs2hk-0008Fq-27
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:12:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fs2hf-0000gT-Np
+	(envelope-from <kraxel@redhat.com>) id 1fs2hf-0000g1-Jp
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:11:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43974 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43970 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fs2hf-0000f2-CH
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fs2hd-0000eT-Rg
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:11:55 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6CCE668800
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 09:11:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8694177741
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 09:11:53 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Aug 2018 11:11:47 +0200
-Message-Id: <20180821091148.32220-7-kraxel@redhat.com>
+Date: Tue, 21 Aug 2018 11:11:46 +0200
+Message-Id: <20180821091148.32220-6-kraxel@redhat.com>
 In-Reply-To: <20180821091148.32220-1-kraxel@redhat.com>
 References: <20180821091148.32220-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 6/7] dev-mtp: Add support for > 4GB file
+Subject: [Qemu-devel] [PULL 5/7] dev-mtp: retry write for incomplete
  transfers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,100 +35,56 @@ Cc: Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>
 
 From: Bandan Das <bsd@redhat.com>
 
-To support larger file transfers, rely on a short packet
-to detect end of the data phase and rewrite d->length to
-the size received
+For large buffers, write may not copy the full buffer. For example,
+on Linux, write imposes a limit of 0x7ffff000. Note that this does
+not fix >4G transfers but ~>2G files will transfer successfully.
 
 Signed-off-by: Bandan Das <bsd@redhat.com>
-Message-id: 20180720214020.22897-5-bsd@redhat.com
+Message-id: 20180720214020.22897-4-bsd@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/dev-mtp.c | 31 +++++++++++++++++++++++++++----
- 1 file changed, 27 insertions(+), 4 deletions(-)
+ hw/usb/dev-mtp.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
 diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index c8f6eb4e9e..2e3ea58da6 100644
+index 1b72603dc5..c8f6eb4e9e 100644
 --- a/hw/usb/dev-mtp.c
 +++ b/hw/usb/dev-mtp.c
-@@ -147,9 +147,12 @@ struct MTPData {
-     uint32_t     trans;
-     uint64_t     offset;
-     uint64_t     length;
--    uint32_t     alloc;
-+    uint64_t     alloc;
-     uint8_t      *data;
-     bool         first;
-+    /* Used for >4G file sizes */
-+    bool         pending;
-+    uint64_t     cached_length;
-     int          fd;
- };
+@@ -1602,6 +1602,24 @@ static void utf16_to_str(uint8_t len, uint16_t *arr, char *name)
+     g_free(wstr);
+ }
  
-@@ -1626,7 +1629,7 @@ static void usb_mtp_write_data(MTPState *s)
-     MTPObject *parent =
-         usb_mtp_object_lookup(s, s->dataset.parent_handle);
-     char *path = NULL;
--    int rc = -1;
-+    uint64_t rc;
-     mode_t mask = 0644;
- 
-     assert(d != NULL);
-@@ -1643,7 +1646,7 @@ static void usb_mtp_write_data(MTPState *s)
-             d->fd = mkdir(path, mask);
-             goto free;
++/* Wrapper around write, returns 0 on failure */
++static uint64_t write_retry(int fd, void *buf, uint64_t size)
++{
++        uint64_t bytes_left = size, ret;
++
++        while (bytes_left > 0) {
++                ret = write(fd, buf, bytes_left);
++                if ((ret == -1) && (errno != EINTR || errno != EAGAIN ||
++                                    errno != EWOULDBLOCK)) {
++                        break;
++                }
++                bytes_left -= ret;
++                buf += ret;
++        }
++
++        return size - bytes_left;
++}
++
+ static void usb_mtp_write_data(MTPState *s)
+ {
+     MTPData *d = s->data_out;
+@@ -1644,8 +1662,8 @@ static void usb_mtp_write_data(MTPState *s)
+             goto success;
          }
--        if (s->dataset.size < d->length) {
-+        if ((s->dataset.size != 0xFFFFFFFF) && (s->dataset.size < d->length)) {
+ 
+-        rc = write(d->fd, d->data, s->dataset.size);
+-        if (rc == -1) {
++        rc = write_retry(d->fd, d->data, s->dataset.size);
++        if (!rc) {
              usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
                                   0, 0, 0, 0);
              goto done;
-@@ -1754,13 +1757,27 @@ static void usb_mtp_get_data(MTPState *s, mtp_container *container,
-         usb_mtp_realloc(d, total_len);
-         d->length += total_len;
-         d->offset = 0;
-+        d->cached_length = total_len;
-         d->first = false;
-+        d->pending = false;
-+    }
-+
-+    if (d->pending) {
-+        usb_mtp_realloc(d, d->cached_length);
-+        d->length += d->cached_length;
-+        d->pending = false;
-     }
- 
-     if (d->length - d->offset > data_len) {
-         dlen = data_len;
-     } else {
-         dlen = d->length - d->offset;
-+        /* Check for cached data for large files */
-+        if ((s->dataset.size == 0xFFFFFFFF) && (dlen < p->iov.size)) {
-+            usb_mtp_realloc(d, p->iov.size - dlen);
-+            d->length += p->iov.size - dlen;
-+            dlen = p->iov.size;
-+        }
-     }
- 
-     switch (d->code) {
-@@ -1780,12 +1797,18 @@ static void usb_mtp_get_data(MTPState *s, mtp_container *container,
-     case CMD_SEND_OBJECT:
-         usb_packet_copy(p, d->data + d->offset, dlen);
-         d->offset += dlen;
--        if (d->offset == d->length) {
-+        if ((p->iov.size % 64) || !p->iov.size) {
-+            assert((s->dataset.size == 0xFFFFFFFF) ||
-+                   (s->dataset.size == d->length));
-+
-             usb_mtp_write_data(s);
-             usb_mtp_data_free(s->data_out);
-             s->data_out = NULL;
-             return;
-         }
-+        if (d->offset == d->length) {
-+            d->pending = true;
-+        }
-         break;
-     default:
-         p->status = USB_RET_STALL;
 -- 
 2.9.3
