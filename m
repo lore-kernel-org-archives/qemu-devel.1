@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <psusi@ubuntu.com>) id 1fsCRE-0005kl-M7
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:35:39 -0400
+	(envelope-from <bounces@canonical.com>) id 1fsCfu-0003kD-1P
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:50:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <psusi@ubuntu.com>) id 1fsCR9-0001sN-7P
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:35:36 -0400
-Received: from ec2-34-202-238-73.compute-1.amazonaws.com
-	([34.202.238.73]:43018 helo=vps.thesusis.net)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <psusi@ubuntu.com>) id 1fsCR5-0001kY-AR
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:35:29 -0400
-References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
-	<20180817150513.GT11124@redhat.com>
-	<6bf952d9-0269-c5df-6cac-70104ec88f81@ubuntu.com>
-	<20180817155152.GV11124@redhat.com>
-From: Phillip Susi <psusi@ubuntu.com>
-Message-ID: <9a4e02d1-84b7-ae68-37a7-bcade6718134@ubuntu.com>
-Date: Tue, 21 Aug 2018 15:35:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1fsCfp-0004jW-TA
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:50:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43332)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fsCfl-0004ew-Cz
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:50:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fsCfj-0005YM-1m
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 19:50:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 097CF2E8023
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 19:50:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180817155152.GV11124@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rRlHdfCsln8qoAstLULntXPemJqycL1Pi"
-Subject: Re: [Qemu-devel] Pipe key broken on US keyboards
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 21 Aug 2018 19:40:07 -0000
+From: Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: Bug 1788275 <1788275@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153488040782.4713.14154400799820003858.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1788275] [NEW] -cpu ...,
+ +topoext works only with EPYC CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +36,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rRlHdfCsln8qoAstLULntXPemJqycL1Pi
-From: Phillip Susi <psusi@ubuntu.com>
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <9a4e02d1-84b7-ae68-37a7-bcade6718134@ubuntu.com>
-Subject: Re: Pipe key broken on US keyboards
-References: <bf97cfed-ca7f-8670-0aad-da1b847eb609@ubuntu.com>
- <20180817150513.GT11124@redhat.com>
- <6bf952d9-0269-c5df-6cac-70104ec88f81@ubuntu.com>
- <20180817155152.GV11124@redhat.com>
-In-Reply-To: <20180817155152.GV11124@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Public bug reported:
 
-On 8/17/2018 11:51 AM, Daniel P. Berrang=C3=A9 wrote:
-> Since you're using tightvnc on Windows, it won't be using the raw scanc=
-ode
-> extension to RFB, so it'll be sending X keysyms across the wire eg=20
->=20
->   "|" has X11 keysym 0x7c  (XK_bar)
->   "\" has X11 keysym 0x5c  (XK_backslash)
->=20
-> First thing is the converting keysym number to a name, which
-> uses name2keysym[] data table.  This gives 'bar' and 'backslash'
-> as names, respectively
->=20
-> The names are now looked up in the keymap (pc-bios/keymaps/en-us)
-> which says
->=20
->   backslash 0x2b
->   bar 0x2b shift
+See bug report at:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1615682
 
-Thanks.  I checked out the 2.11 version that Ubuntu 18.04 shipped and
-found the problem:
+Probably this is caused by the inconsistent legacy cache information on
+all CPU models except EPYC.
 
-commit a7815faffb2bd594b92aa3542d7b799cc89c5414
-Author: Gerd Hoffmann <kraxel@redhat.com>
-Date:   Thu Oct 5 17:33:30 2017 +0200
+---------------------------------------------
+Description of problem:
+Guest should get 2 threads per core and all of them should be on-line when =
+booting guest with old amd cpu model + smt
 
-    pc-bios/keymaps: keymaps update
+Steps to Reproduce:
+1.Boot rhel7.6 guest with cli:
+/usr/libexec/qemu-kvm -name rhel7.6 -m 16G -machine pc,accel=3Dkvm \
+        -S \
+        -cpu Opteron_G3,+topoext,xlevel=3D0x8000001e,enforce \
+        -smp 2,threads=3D2 \
+        -monitor stdio \
+        -qmp unix:/tmp/qmp2,server,nowait \
+        -device VGA \
+        -vnc :0 \
+        -serial unix:/tmp/console2,server,nowait \
+        -uuid 115e11b2-a869-41b5-91cd-6a32a907be7f \
+        -drive file=3Drhel7.6-20180812.qcow2,if=3Dnone,id=3Ddrive-scsi-disk=
+0,format=3Dqcow2,cache=3Dnone,werror=3Dstop,rerror=3Dstop -device ide-hd,dr=
+ive=3Ddrive-scsi-disk0,id=3Dscsi-disk0 \
+        -netdev tap,id=3DidinWyYY,vhost=3Don -device virtio-net-pci,mac=3D2=
+e:39:fa:ff:88:a1,id=3Didlbq7eA,netdev=3DidinWyYY \
 
-    Update the keymaps with the ones generated by qemu-keymap
+2.check cpu info inside guest
+3.
 
-    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-    Message-id: 20171005153330.19210-4-kraxel@redhat.com
+Actual results:
+Guest gets one online cpu, one offline cpu and one thread per core:
+# lscpu
+lscpu
+Architecture:          x86_64
+CPU op-mode(s):        32-bit, 64-bit
+Byte Order:            Little Endian
+CPU(s):                2
+On-line CPU(s) list:   0
+Off-line CPU(s) list:  1
+Thread(s) per core:    1
+Core(s) per socket:    1
+Socket(s):             1
+NUMA node(s):          1
+Vendor ID:             AuthenticAMD
+CPU family:            16
+Model:                 2
+Model name:            AMD Opteron 23xx (Gen 3 Class Opteron)
+Stepping:              3
+CPU MHz:               2096.060
+BogoMIPS:              4192.12
+Hypervisor vendor:     KVM
+Virtualization type:   full
+L1d cache:             64K
+L1i cache:             64K
+L2 cache:              512K
+L3 cache:              16384K
+NUMA node0 CPU(s):     0
+Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge=
+ mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx lm art rep_good=
+ nopl extd_apicid pni cx16 x2apic popcnt hypervisor lahf_lm cmp_legacy abm =
+sse4a misalignsse topoext retpoline_amd ibp_disable vmmcall
 
-Prior to this commit, this file said it was generated from XKB, and was
-much smaller, not including the scan code for that other key.  This
-commit added the 0x56 bar translation with altgr, and it wasn't until
-after 2.12 those smarts were inserted to pick the scancode that matches
-the current modifier keys.
 
+Expected results:
+Guest should get 2 threads per core and all of them should be on-line
 
+---------------------------------------------
 
---rRlHdfCsln8qoAstLULntXPemJqycL1Pi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+-- =
 
-iQEcBAEBCAAGBQJbfGl3AAoJENsuw7lhAP6EJQcIAIcJP77CnELCe4CIS+2eW07u
-B6n2RJWGMV1OKnIxsJfTsf46w7167giKPpYSXOR4JQuwY348demJacbKfCDKfBHh
-yrn10Kc8xatzahm0LhMAZVUeO/R5Xd/t4Posd1T9CVj4zgjpgZJA8/+qUrnHkvHf
-70G04zRJm+O8I54ahP2ww83CvVMxeL/U3c5V6Cg9eOGruCmTZOibYCfqEpoHr+JO
-albKvZW6BesxIM7e3WxNap+/b+BDPMJz0DwX4l+rLKt+mVz2G5rrXICFSvC7saa6
-o71d60JS0MjIzo5VQSMGcfR829p06CGfeyTw2eGuRri7gV2iDlfH2XhYga4PQCY=
-=AIA+
------END PGP SIGNATURE-----
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1788275
 
---rRlHdfCsln8qoAstLULntXPemJqycL1Pi--
+Title:
+  -cpu ...,+topoext works only with EPYC CPU model
+
+Status in QEMU:
+  New
+
+Bug description:
+  See bug report at:
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1615682
+
+  Probably this is caused by the inconsistent legacy cache information
+  on all CPU models except EPYC.
+
+  ---------------------------------------------
+  Description of problem:
+  Guest should get 2 threads per core and all of them should be on-line whe=
+n booting guest with old amd cpu model + smt
+
+  Steps to Reproduce:
+  1.Boot rhel7.6 guest with cli:
+  /usr/libexec/qemu-kvm -name rhel7.6 -m 16G -machine pc,accel=3Dkvm \
+          -S \
+          -cpu Opteron_G3,+topoext,xlevel=3D0x8000001e,enforce \
+          -smp 2,threads=3D2 \
+          -monitor stdio \
+          -qmp unix:/tmp/qmp2,server,nowait \
+          -device VGA \
+          -vnc :0 \
+          -serial unix:/tmp/console2,server,nowait \
+          -uuid 115e11b2-a869-41b5-91cd-6a32a907be7f \
+          -drive file=3Drhel7.6-20180812.qcow2,if=3Dnone,id=3Ddrive-scsi-di=
+sk0,format=3Dqcow2,cache=3Dnone,werror=3Dstop,rerror=3Dstop -device ide-hd,=
+drive=3Ddrive-scsi-disk0,id=3Dscsi-disk0 \
+          -netdev tap,id=3DidinWyYY,vhost=3Don -device virtio-net-pci,mac=
+=3D2e:39:fa:ff:88:a1,id=3Didlbq7eA,netdev=3DidinWyYY \
+
+  2.check cpu info inside guest
+  3.
+
+  Actual results:
+  Guest gets one online cpu, one offline cpu and one thread per core:
+  # lscpu
+  lscpu
+  Architecture:          x86_64
+  CPU op-mode(s):        32-bit, 64-bit
+  Byte Order:            Little Endian
+  CPU(s):                2
+  On-line CPU(s) list:   0
+  Off-line CPU(s) list:  1
+  Thread(s) per core:    1
+  Core(s) per socket:    1
+  Socket(s):             1
+  NUMA node(s):          1
+  Vendor ID:             AuthenticAMD
+  CPU family:            16
+  Model:                 2
+  Model name:            AMD Opteron 23xx (Gen 3 Class Opteron)
+  Stepping:              3
+  CPU MHz:               2096.060
+  BogoMIPS:              4192.12
+  Hypervisor vendor:     KVM
+  Virtualization type:   full
+  L1d cache:             64K
+  L1i cache:             64K
+  L2 cache:              512K
+  L3 cache:              16384K
+  NUMA node0 CPU(s):     0
+  Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr p=
+ge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx lm art rep_go=
+od nopl extd_apicid pni cx16 x2apic popcnt hypervisor lahf_lm cmp_legacy ab=
+m sse4a misalignsse topoext retpoline_amd ibp_disable vmmcall
+
+  =
+
+  Expected results:
+  Guest should get 2 threads per core and all of them should be on-line
+
+  ---------------------------------------------
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1788275/+subscriptions
