@@ -1,29 +1,27 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:58002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fs5Xp-0007Aq-Ld
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:13:58 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fs5Xq-0007Aq-KK
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:13:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fs5Py-0008M3-LH
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:05:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33482 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1fs5Px-0008Kk-M8
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:05:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33480 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fs5Py-0008LZ-FX
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:05:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fs5Px-0008Jf-FL
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:05:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 136AF4021FC2
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 12:05:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 248C24021FC2
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 12:05:49 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Aug 2018 14:05:41 +0200
-Message-Id: <20180821120542.22610-12-kraxel@redhat.com>
-In-Reply-To: <20180821120542.22610-1-kraxel@redhat.com>
-References: <20180821120542.22610-1-kraxel@redhat.com>
+Date: Tue, 21 Aug 2018 14:05:30 +0200
+Message-Id: <20180821120542.22610-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/12] dmabuf: add y0_top, pass it to spice
+Subject: [Qemu-devel] [PULL 00/12] Ui 20180821 v2 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,54 +31,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+The following changes since commit d0092d90eb546a8bbe9e9120426c1894741237=
+97:
 
-Some scanouts during boot are top-down without it.
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180820' into =
+staging (2018-08-20 17:41:18 +0100)
 
-y0_top is set from VHOST_USER_GPU_DMABUF_SCANOUT code path in the last
-patch of this series.
+are available in the git repository at:
 
-In current QEMU code base, only vfio/display uses dmabuf API. But the
-VFIO query interface doesn't provide or need that detail so far.
+  git://git.kraxel.org/qemu tags/ui-20180821-v2-pull-request
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20180713130916.4153-5-marcandre.lureau@redhat.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/ui/console.h | 1 +
- ui/spice-display.c   | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+for you to fetch changes up to 37bdff33227c3248ab9af784246da5b6c08111ea:
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index 981b519dde..fb969caf70 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -186,6 +186,7 @@ struct QemuDmaBuf {
-     uint32_t  stride;
-     uint32_t  fourcc;
-     uint32_t  texture;
-+    bool      y0_top;
- };
-=20
- typedef struct DisplayChangeListenerOps {
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index 7b230987dc..2f8adb6b9f 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -1056,7 +1056,8 @@ static void qemu_spice_gl_update(DisplayChangeListe=
-ner *dcl,
-             /* note: spice server will close the fd, so hand over a dup =
-*/
-             spice_qxl_gl_scanout(&ssd->qxl, dup(dmabuf->fd),
-                                  dmabuf->width, dmabuf->height,
--                                 dmabuf->stride, dmabuf->fourcc, false);
-+                                 dmabuf->stride, dmabuf->fourcc,
-+                                 dmabuf->y0_top);
-         }
-         qemu_spice_gl_monitor_config(ssd, 0, 0, dmabuf->width, dmabuf->h=
-eight);
-         ssd->guest_dmabuf_refresh =3D false;
+  util: promote qemu_egl_rendernode_open() to libqemuutil (2018-08-21 14:=
+01:48 +0200)
+
+----------------------------------------------------------------
+ui: misc ui fixed which piled up during 3.0 release freeze.
+
+----------------------------------------------------------------
+
+Daniel P. Berrang=C3=A9 (2):
+  doc: switch to modern syntax for VNC TLS setup
+  vnc: remove support for deprecated tls, x509, x509verify options
+
+Marc-Andr=C3=A9 Lureau (3):
+  ui: use enum to string helpers
+  dmabuf: add y0_top, pass it to spice
+  util: promote qemu_egl_rendernode_open() to libqemuutil
+
+Paolo Bonzini (2):
+  spice-display: access ptr_x/ptr_y under Mutex
+  spice-display: fix qemu_spice_cursor_refresh_bh locking
+
+Peter Wu (1):
+  vnc: fix memleak of the "vnc-worker-output" name
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  ui/vnc: Remove useless parenthesis around DIV_ROUND_UP macro
+
+Tao Wu via Qemu-devel (1):
+  sdl2: redraw correctly when scanout_mode enabled.
+
+Thomas Huth (2):
+  ui/sdl2: Remove the obsolete SDL_INIT_NOPARACHUTE flag
+  ui/sdl2: Fix broken -full-screen CLI option
+
+ include/qemu/drm.h   |  6 ++++
+ include/ui/console.h |  1 +
+ qemu-keymap.c        |  2 +-
+ ui/console.c         |  6 ++--
+ ui/egl-helpers.c     | 51 ++--------------------------
+ ui/sdl2-gl.c         |  5 +++
+ ui/sdl2.c            | 13 +++-----
+ ui/spice-display.c   | 42 +++++++++++++++--------
+ ui/vnc-enc-tight.c   |  2 +-
+ ui/vnc-jobs.c        |  3 +-
+ ui/vnc.c             | 94 ++--------------------------------------------=
+------
+ util/drm.c           | 66 ++++++++++++++++++++++++++++++++++++
+ MAINTAINERS          |  1 +
+ qemu-deprecated.texi | 20 -----------
+ qemu-doc.texi        | 20 ++++++++---
+ qemu-options.hx      | 43 ------------------------
+ util/Makefile.objs   |  1 +
+ 17 files changed, 139 insertions(+), 237 deletions(-)
+ create mode 100644 include/qemu/drm.h
+ create mode 100644 util/drm.c
+
 --=20
 2.9.3
