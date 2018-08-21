@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4n-0002IJ-SA
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4n-0002II-S2
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4Y-0006ri-46
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4W-0006oj-Fr
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:11 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39793)
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:40649)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fsA4X-0006iR-8x
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:01 -0400
-Received: by mail-wr1-x442.google.com with SMTP id o37-v6so7598265wrf.6
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:03:58 -0700 (PDT)
-Received: from 640k.lan (dynamic-adsl-78-12-184-244.clienti.tiscali.it.
-	[78.12.184.244]) by smtp.gmail.com with ESMTPSA id
-	v6-v6sm2608955wmc.43.2018.08.21.10.03.56 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 21 Aug 2018 10:03:56 -0700 (PDT)
+	id 1fsA4V-00067s-HC
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:03:59 -0400
+Received: by mail-wm0-x229.google.com with SMTP id y9-v6so3497250wma.5
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:03:32 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 21 Aug 2018 19:02:22 +0200
-Message-Id: <1534870966-9287-51-git-send-email-pbonzini@redhat.com>
+Date: Tue, 21 Aug 2018 19:01:58 +0200
+Message-Id: <1534870966-9287-27-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
 References: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 50/74] cpus: protect all icount computation with
- seqlock
+Subject: [Qemu-devel] [PULL 26/74] hmp-commands-info: add sync-profile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,204 +28,161 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>
 
-Move the icount->ns computation to cpu_get_icount, and make
-cpu_get_icount_locked return the raw value.  This makes the
-atomic_read__nocheck safe, because it now happens always inside a
-seqlock and any torn reads will be retried.  qemu_icount_bias and
-icount_time_shift also need to be accessed with atomics.  At the
-same time, however, you don't need atomic_read within the writer,
-because no concurrent writes are possible.
+From: "Emilio G. Cota" <cota@braap.org>
 
-The fix to vmstate lets us keep the struct nicely packed.
+The command introduced here is just for developers. This means that:
+
+- the info displayed and the output format could change in the future
+- the command is only meant to be used from HMP, not from QMP
+
+Sample output:
+
+(qemu) sync-profile
+sync-profile is off
+(qemu) info sync-profile
+Type               Object  Call site  Wait Time (s)         Count  Average (us)
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+(qemu) sync-profile on
+(qemu) sync-profile
+sync-profile is on
+(qemu) info sync-profile 15
+Type               Object  Call site                 Wait Time (s)         Count  Average (us)
+----------------------------------------------------------------------------------------------
+condvar    0x55a01813ced0  cpus.c:1165                    91.38235          2842      32154.24
+BQL mutex  0x55a0171b7140  cpus.c:1434                    12.56490          5787       2171.23
+BQL mutex  0x55a0171b7140  accel/tcg/cpu-exec.c:432        7.75846          2844       2728.01
+BQL mutex  0x55a0171b7140  accel/tcg/cputlb.c:870          5.09889          2884       1767.99
+BQL mutex  0x55a0171b7140  accel/tcg/cpu-exec.c:529        3.46140          3254       1063.74
+BQL mutex  0x55a0171b7140  accel/tcg/cputlb.c:804          0.76333          8655         88.20
+BQL mutex  0x55a0171b7140  cpus.c:1466                     0.60893          2941        207.05
+BQL mutex  0x55a0171b7140  util/main-loop.c:236            0.00894          6425          1.39
+mutex      [           3]  util/qemu-timer.c:520           0.00342         50611          0.07
+mutex      [           2]  util/qemu-timer.c:426           0.00254         31336          0.08
+mutex      [           3]  util/qemu-timer.c:234           0.00107         19275          0.06
+mutex      0x55a0171d9960  vl.c:763                        0.00043          6425          0.07
+mutex      0x55a0180d1bb0  monitor.c:458                   0.00015          1603          0.09
+mutex      0x55a0180e4c78  chardev/char.c:109              0.00002           217          0.08
+mutex      0x55a0180d1bb0  monitor.c:448                   0.00001           162          0.08
+----------------------------------------------------------------------------------------------
+(qemu) info sync-profile -m 15
+Type               Object  Call site                 Wait Time (s)         Count  Average (us)
+----------------------------------------------------------------------------------------------
+condvar    0x55a01813ced0  cpus.c:1165                    95.11196          3051      31174.03
+BQL mutex  0x55a0171b7140  accel/tcg/cpu-exec.c:432        7.92108          3052       2595.37
+BQL mutex  0x55a0171b7140  cpus.c:1434                    13.38253          6210       2155.00
+BQL mutex  0x55a0171b7140  accel/tcg/cputlb.c:870          5.09901          3093       1648.57
+BQL mutex  0x55a0171b7140  accel/tcg/cpu-exec.c:529        4.21123          3468       1214.31
+BQL mutex  0x55a0171b7140  cpus.c:1466                     0.60895          3156        192.95
+BQL mutex  0x55a0171b7140  accel/tcg/cputlb.c:804          0.76337          9282         82.24
+BQL mutex  0x55a0171b7140  util/main-loop.c:236            0.00944          6889          1.37
+mutex      0x55a01813ce80  tcg/tcg.c:397                   0.00000            24          0.15
+mutex      0x55a0180d1bb0  monitor.c:458                   0.00018          1922          0.09
+mutex      [           2]  util/qemu-timer.c:426           0.00266         32710          0.08
+mutex      0x55a0180e4c78  chardev/char.c:109              0.00002           260          0.08
+mutex      0x55a0180d1bb0  monitor.c:448                   0.00001           187          0.08
+mutex      0x55a0171d9960  vl.c:763                        0.00047          6889          0.07
+mutex      [           3]  util/qemu-timer.c:520           0.00362         53377          0.07
+----------------------------------------------------------------------------------------------
+(qemu) info sync-profile -m -n 15
+Type               Object  Call site                 Wait Time (s)         Count  Average (us)
+----------------------------------------------------------------------------------------------
+condvar    0x55a01813ced0  cpus.c:1165                   101.39331          3398      29839.12
+BQL mutex  0x55a0171b7140  accel/tcg/cpu-exec.c:432        7.92112          3399       2330.43
+BQL mutex  0x55a0171b7140  cpus.c:1434                    14.28280          6922       2063.39
+BQL mutex  0x55a0171b7140  accel/tcg/cputlb.c:870          5.77505          3445       1676.36
+BQL mutex  0x55a0171b7140  accel/tcg/cpu-exec.c:529        5.66139          3883       1457.99
+BQL mutex  0x55a0171b7140  cpus.c:1466                     0.60901          3519        173.06
+BQL mutex  0x55a0171b7140  accel/tcg/cputlb.c:804          0.76351         10338         73.85
+BQL mutex  0x55a0171b7140  util/main-loop.c:236            0.01032          7664          1.35
+mutex      0x55a0180e4f08  util/qemu-timer.c:426           0.00041           901          0.45
+mutex      0x55a01813ce80  tcg/tcg.c:397                   0.00000            24          0.15
+mutex      0x55a0180d1bb0  monitor.c:458                   0.00022          2319          0.09
+mutex      0x55a0180e4c78  chardev/char.c:109              0.00003           306          0.08
+mutex      0x55a0180e4f08  util/qemu-timer.c:520           0.00068          8565          0.08
+mutex      0x55a0180d1bb0  monitor.c:448                   0.00002           215          0.08
+mutex      0x55a0180e4f78  util/qemu-timer.c:426           0.00247         34224          0.07
+----------------------------------------------------------------------------------------------
+(qemu) sync-profile reset
+(qemu) info sync-profile -m 2
+Type               Object  Call site               Wait Time (s)         Count  Average (us)
+--------------------------------------------------------------------------------------------
+condvar    0x55a01813ced0  cpus.c:1165                   2.78756            99      28157.12
+BQL mutex  0x55a0171b7140  accel/tcg/cputlb.c:870        0.33054           102       3240.55
+--------------------------------------------------------------------------------------------
+(qemu) sync-profile off
+(qemu) sync-profile
+sync-profile is off
+(qemu) sync-profile reset
+(qemu) info sync-profile
+Type               Object  Call site  Wait Time (s)         Count  Average (us)
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- cpus.c | 69 ++++++++++++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 42 insertions(+), 27 deletions(-)
+ hmp-commands-info.hx | 22 ++++++++++++++++++++++
+ monitor.c            | 11 +++++++++++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/cpus.c b/cpus.c
-index 9161349..3783651 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -121,8 +121,6 @@ static bool all_cpu_threads_idle(void)
- /* Protected by TimersState seqlock */
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index 70639f6..cbee8b9 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -300,6 +300,28 @@ Show dynamic compiler opcode counters
+ ETEXI
  
- static bool icount_sleep = true;
--/* Conversion factor from emulated instructions to virtual clock ticks.  */
--static int icount_time_shift;
- /* Arbitrarily pick 1MIPS as the minimum allowable speed.  */
- #define MAX_ICOUNT_SHIFT 10
- 
-@@ -137,8 +135,9 @@ typedef struct TimersState {
-     QemuSeqLock vm_clock_seqlock;
-     int64_t cpu_clock_offset;
-     int32_t cpu_ticks_enabled;
--    int64_t dummy;
- 
-+    /* Conversion factor from emulated instructions to virtual clock ticks.  */
-+    int icount_time_shift;
-     /* Compensate for varying guest execution speed.  */
-     int64_t qemu_icount_bias;
-     /* Only written by TCG thread */
-@@ -247,14 +246,13 @@ void cpu_update_icount(CPUState *cpu)
- 
- #ifdef CONFIG_ATOMIC64
-     atomic_set__nocheck(&timers_state.qemu_icount,
--                        atomic_read__nocheck(&timers_state.qemu_icount) +
--                        executed);
-+                        timers_state.qemu_icount + executed);
- #else /* FIXME: we need 64bit atomics to do this safely */
-     timers_state.qemu_icount += executed;
+     {
++        .name       = "sync-profile",
++        .args_type  = "mean:-m,no_coalesce:-n,max:i?",
++        .params     = "[-m] [-n] [max]",
++        .help       = "show synchronization profiling info, up to max entries "
++                      "(default: 10), sorted by total wait time. (-m: sort by "
++                      "mean wait time; -n: do not coalesce objects with the "
++                      "same call site)",
++        .cmd        = hmp_info_sync_profile,
++    },
++
++STEXI
++@item info sync-profile [-m|-n] [@var{max}]
++@findex info sync-profile
++Show synchronization profiling info, up to @var{max} entries (default: 10),
++sorted by total wait time.
++        -m: sort by mean wait time
++        -n: do not coalesce objects with the same call site
++When different objects that share the same call site are coalesced, the "Object"
++field shows---enclosed in brackets---the number of objects being coalesced.
++ETEXI
++
++    {
+         .name       = "kvm",
+         .args_type  = "",
+         .params     = "",
+diff --git a/monitor.c b/monitor.c
+index a1999e3..94f6735 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1454,6 +1454,17 @@ static void hmp_info_opcount(Monitor *mon, const QDict *qdict)
+ }
  #endif
- }
  
--int64_t cpu_get_icount_raw(void)
-+static int64_t cpu_get_icount_raw_locked(void)
- {
-     CPUState *cpu = current_cpu;
- 
-@@ -266,20 +264,30 @@ int64_t cpu_get_icount_raw(void)
-         /* Take into account what has run */
-         cpu_update_icount(cpu);
-     }
--#ifdef CONFIG_ATOMIC64
-+    /* The read is protected by the seqlock, so __nocheck is okay.  */
-     return atomic_read__nocheck(&timers_state.qemu_icount);
--#else /* FIXME: we need 64bit atomics to do this safely */
--    return timers_state.qemu_icount;
--#endif
- }
- 
--/* Return the virtual CPU time, based on the instruction counter.  */
- static int64_t cpu_get_icount_locked(void)
- {
--    int64_t icount = cpu_get_icount_raw();
--    return timers_state.qemu_icount_bias + cpu_icount_to_ns(icount);
-+    int64_t icount = cpu_get_icount_raw_locked();
-+    return atomic_read__nocheck(&timers_state.qemu_icount_bias) + cpu_icount_to_ns(icount);
++static void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
++{
++    int64_t max = qdict_get_try_int(qdict, "max", 10);
++    bool mean = qdict_get_try_bool(qdict, "mean", false);
++    bool coalesce = !qdict_get_try_bool(qdict, "no_coalesce", false);
++    enum QSPSortBy sort_by;
++
++    sort_by = mean ? QSP_SORT_BY_AVG_WAIT_TIME : QSP_SORT_BY_TOTAL_WAIT_TIME;
++    qsp_report((FILE *)mon, monitor_fprintf, max, sort_by, coalesce);
 +}
 +
-+int64_t cpu_get_icount_raw(void)
-+{
-+    int64_t icount;
-+    unsigned start;
-+
-+    do {
-+        start = seqlock_read_begin(&timers_state.vm_clock_seqlock);
-+        icount = cpu_get_icount_raw_locked();
-+    } while (seqlock_read_retry(&timers_state.vm_clock_seqlock, start));
-+
-+    return icount;
- }
- 
-+/* Return the virtual CPU time, based on the instruction counter.  */
- int64_t cpu_get_icount(void)
+ static void hmp_info_history(Monitor *mon, const QDict *qdict)
  {
-     int64_t icount;
-@@ -295,7 +303,7 @@ int64_t cpu_get_icount(void)
- 
- int64_t cpu_icount_to_ns(int64_t icount)
- {
--    return icount << icount_time_shift;
-+    return icount << atomic_read(&timers_state.icount_time_shift);
- }
- 
- /* return the time elapsed in VM between vm_start and vm_stop.  Unless
-@@ -415,19 +423,22 @@ static void icount_adjust(void)
-     /* FIXME: This is a very crude algorithm, somewhat prone to oscillation.  */
-     if (delta > 0
-         && last_delta + ICOUNT_WOBBLE < delta * 2
--        && icount_time_shift > 0) {
-+        && timers_state.icount_time_shift > 0) {
-         /* The guest is getting too far ahead.  Slow time down.  */
--        icount_time_shift--;
-+        atomic_set(&timers_state.icount_time_shift,
-+                   timers_state.icount_time_shift - 1);
-     }
-     if (delta < 0
-         && last_delta - ICOUNT_WOBBLE > delta * 2
--        && icount_time_shift < MAX_ICOUNT_SHIFT) {
-+        && timers_state.icount_time_shift < MAX_ICOUNT_SHIFT) {
-         /* The guest is getting too far behind.  Speed time up.  */
--        icount_time_shift++;
-+        atomic_set(&timers_state.icount_time_shift,
-+                   timers_state.icount_time_shift + 1);
-     }
-     last_delta = delta;
--    timers_state.qemu_icount_bias = cur_icount
--                              - (timers_state.qemu_icount << icount_time_shift);
-+    atomic_set__nocheck(&timers_state.qemu_icount_bias,
-+                        cur_icount - (timers_state.qemu_icount
-+                                      << timers_state.icount_time_shift));
-     seqlock_write_end(&timers_state.vm_clock_seqlock);
- }
- 
-@@ -448,7 +459,8 @@ static void icount_adjust_vm(void *opaque)
- 
- static int64_t qemu_icount_round(int64_t count)
- {
--    return (count + (1 << icount_time_shift) - 1) >> icount_time_shift;
-+    int shift = atomic_read(&timers_state.icount_time_shift);
-+    return (count + (1 << shift) - 1) >> shift;
- }
- 
- static void icount_warp_rt(void)
-@@ -484,7 +496,8 @@ static void icount_warp_rt(void)
-             int64_t delta = clock - cur_icount;
-             warp_delta = MIN(warp_delta, delta);
-         }
--        timers_state.qemu_icount_bias += warp_delta;
-+        atomic_set__nocheck(&timers_state.qemu_icount_bias,
-+                            timers_state.qemu_icount_bias + warp_delta);
-     }
-     timers_state.vm_clock_warp_start = -1;
-     seqlock_write_end(&timers_state.vm_clock_seqlock);
-@@ -513,7 +526,8 @@ void qtest_clock_warp(int64_t dest)
-         int64_t warp = qemu_soonest_timeout(dest - clock, deadline);
- 
-         seqlock_write_begin(&timers_state.vm_clock_seqlock);
--        timers_state.qemu_icount_bias += warp;
-+        atomic_set__nocheck(&timers_state.qemu_icount_bias,
-+                            timers_state.qemu_icount_bias + warp);
-         seqlock_write_end(&timers_state.vm_clock_seqlock);
- 
-         qemu_clock_run_timers(QEMU_CLOCK_VIRTUAL);
-@@ -582,7 +596,8 @@ void qemu_start_warp_timer(void)
-              * isolated from host latencies.
-              */
-             seqlock_write_begin(&timers_state.vm_clock_seqlock);
--            timers_state.qemu_icount_bias += deadline;
-+            atomic_set__nocheck(&timers_state.qemu_icount_bias,
-+                                timers_state.qemu_icount_bias + deadline);
-             seqlock_write_end(&timers_state.vm_clock_seqlock);
-             qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
-         } else {
-@@ -700,7 +715,7 @@ static const VMStateDescription vmstate_timers = {
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
-         VMSTATE_INT64(cpu_ticks_offset, TimersState),
--        VMSTATE_INT64(dummy, TimersState),
-+        VMSTATE_UNUSED(8),
-         VMSTATE_INT64_V(cpu_clock_offset, TimersState, 2),
-         VMSTATE_END_OF_LIST()
-     },
-@@ -812,7 +827,7 @@ void configure_icount(QemuOpts *opts, Error **errp)
-     }
-     if (strcmp(option, "auto") != 0) {
-         errno = 0;
--        icount_time_shift = strtol(option, &rem_str, 0);
-+        timers_state.icount_time_shift = strtol(option, &rem_str, 0);
-         if (errno != 0 || *rem_str != '\0' || !strlen(option)) {
-             error_setg(errp, "icount: Invalid shift value");
-         }
-@@ -828,7 +843,7 @@ void configure_icount(QemuOpts *opts, Error **errp)
- 
-     /* 125MIPS seems a reasonable initial guess at the guest speed.
-        It will be corrected fairly quickly anyway.  */
--    icount_time_shift = 3;
-+    timers_state.icount_time_shift = 3;
- 
-     /* Have both realtime and virtual time triggers for speed adjustment.
-        The realtime trigger catches emulated time passing too slowly,
+     int i;
 -- 
 1.8.3.1
