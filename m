@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fryMh-00041f-Jd
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:00 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fryMh-00041r-PZ
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:34:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fryMg-0000E0-6Z
+	(envelope-from <dgibson@ozlabs.org>) id 1fryMg-0000E6-7i
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:33:59 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 21 Aug 2018 14:33:24 +1000
-Message-Id: <20180821043343.7514-8-david@gibson.dropbear.id.au>
+Date: Tue, 21 Aug 2018 14:33:28 +1000
+Message-Id: <20180821043343.7514-12-david@gibson.dropbear.id.au>
 In-Reply-To: <20180821043343.7514-1-david@gibson.dropbear.id.au>
 References: <20180821043343.7514-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 07/26] target/ppc: Tidy helper_fsqrt
+Subject: [Qemu-devel] [PULL 11/26] vfio/spapr: Allow backing bigger guest
+ IOMMU pages with smaller physical pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,78 +21,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, lvivier@redhat.com, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Tidy the invalid exception checking so that we rely on softfloat for
-initial argument validation, and select the kind of invalid operand
-exception only when we know we must.  Pass and return float64 values
-directly rather than bounce through the CPU_DoubleU union.
+At the moment the PPC64/pseries guest only supports 4K/64K/16M IOMMU
+pages and POWER8 CPU supports the exact same set of page size so
+so far things worked fine.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+However POWER9 supports different set of sizes - 4K/64K/2M/1G and
+the last two - 2M and 1G - are not even allowed in the paravirt interface
+(RTAS DDW) so we always end up using 64K IOMMU pages, although we could
+back guest's 16MB IOMMU pages with 2MB pages on the host.
+
+This stores the supported host IOMMU page sizes in VFIOContainer and uses
+this later when creating a new DMA window. This uses the system page size
+(64k normally, 2M/16M/1G if hugepages used) as the upper limit of
+the IOMMU pagesize.
+
+This changes the type of @pagesize to uint64_t as this is what
+memory_region_iommu_get_min_page_size() returns and clz64() takes.
+
+There should be no behavioral changes on platforms other than pseries.
+The guest will keep using the IOMMU page size selected by the PHB pagesize
+property as this only changes the underlying hardware TCE table
+granularity.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/fpu_helper.c | 29 ++++++++++++++---------------
- target/ppc/helper.h     |  2 +-
- 2 files changed, 15 insertions(+), 16 deletions(-)
+ hw/vfio/common.c              |  3 +++
+ hw/vfio/spapr.c               | 21 ++++++++++++++++++++-
+ include/hw/vfio/vfio-common.h |  1 +
+ 3 files changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 7758372ecd..44f3fed17d 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -858,25 +858,24 @@ uint64_t helper_frsp(CPUPPCState *env, uint64_t arg)
- }
- 
- /* fsqrt - fsqrt. */
--uint64_t helper_fsqrt(CPUPPCState *env, uint64_t arg)
-+float64 helper_fsqrt(CPUPPCState *env, float64 arg)
- {
--    CPU_DoubleU farg;
--
--    farg.ll = arg;
-+    float64 ret = float64_sqrt(arg, &env->fp_status);
-+    int status = get_float_exception_flags(&env->fp_status);
- 
--    if (unlikely(float64_is_any_nan(farg.d))) {
--        if (unlikely(float64_is_signaling_nan(farg.d, &env->fp_status))) {
--            /* sNaN reciprocal square root */
--            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
--            farg.ll = float64_snan_to_qnan(farg.ll);
-+    if (unlikely(status & float_flag_invalid)) {
-+        if (unlikely(float64_is_any_nan(arg))) {
-+            if (unlikely(float64_is_signaling_nan(arg, &env->fp_status))) {
-+                /* sNaN square root */
-+                float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+            }
-+        } else {
-+            /* Square root of a negative nonzero number */
-+            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSQRT, 1);
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index cd1f4af18a..3f31f80b12 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1136,6 +1136,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+             info.iova_pgsizes = 4096;
          }
--    } else if (unlikely(float64_is_neg(farg.d) && !float64_is_zero(farg.d))) {
--        /* Square root of a negative nonzero number */
--        farg.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSQRT, 1);
--    } else {
--        farg.d = float64_sqrt(farg.d, &env->fp_status);
-     }
--    return farg.ll;
-+
-+    return ret;
- }
+         vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
++        container->pgsizes = info.iova_pgsizes;
+     } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
+                ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
+         struct vfio_iommu_spapr_tce_info info;
+@@ -1200,6 +1201,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+         }
  
- /* fre - fre. */
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index d81806dd2c..7ed72c2337 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -93,7 +93,7 @@ DEF_HELPER_4(fmadd, i64, env, i64, i64, i64)
- DEF_HELPER_4(fmsub, i64, env, i64, i64, i64)
- DEF_HELPER_4(fnmadd, i64, env, i64, i64, i64)
- DEF_HELPER_4(fnmsub, i64, env, i64, i64, i64)
--DEF_HELPER_2(fsqrt, i64, env, i64)
-+DEF_HELPER_2(fsqrt, f64, env, f64)
- DEF_HELPER_2(fre, i64, env, i64)
- DEF_HELPER_2(fres, i64, env, i64)
- DEF_HELPER_2(frsqrte, i64, env, i64)
+         if (v2) {
++            container->pgsizes = info.ddw.pgsizes;
+             /*
+              * There is a default window in just created container.
+              * To make region_add/del simpler, we better remove this
+@@ -1214,6 +1216,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+             }
+         } else {
+             /* The default table uses 4K pages */
++            container->pgsizes = 0x1000;
+             vfio_host_win_add(container, info.dma32_window_start,
+                               info.dma32_window_start +
+                               info.dma32_window_size - 1,
+diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+index 259397c002..becf71a3fc 100644
+--- a/hw/vfio/spapr.c
++++ b/hw/vfio/spapr.c
+@@ -15,6 +15,7 @@
+ 
+ #include "hw/vfio/vfio-common.h"
+ #include "hw/hw.h"
++#include "exec/ram_addr.h"
+ #include "qemu/error-report.h"
+ #include "trace.h"
+ 
+@@ -144,9 +145,27 @@ int vfio_spapr_create_window(VFIOContainer *container,
+ {
+     int ret;
+     IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
+-    unsigned pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
++    uint64_t pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
+     unsigned entries, pages;
+     struct vfio_iommu_spapr_tce_create create = { .argsz = sizeof(create) };
++    long systempagesize = qemu_getrampagesize();
++
++    /*
++     * The host might not support the guest supported IOMMU page size,
++     * so we will use smaller physical IOMMU pages to back them.
++     */
++    if (pagesize > systempagesize) {
++        pagesize = systempagesize;
++    }
++    pagesize = 1ULL << (63 - clz64(container->pgsizes &
++                                   (pagesize | (pagesize - 1))));
++    if (!pagesize) {
++        error_report("Host doesn't support page size 0x%"PRIx64
++                     ", the supported mask is 0x%lx",
++                     memory_region_iommu_get_min_page_size(iommu_mr),
++                     container->pgsizes);
++        return -EINVAL;
++    }
+ 
+     /*
+      * FIXME: For VFIO iommu types which have KVM acceleration to
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index 15ea6c26fd..821def0565 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -73,6 +73,7 @@ typedef struct VFIOContainer {
+     unsigned iommu_type;
+     int error;
+     bool initialized;
++    unsigned long pgsizes;
+     /*
+      * This assumes the host IOMMU can support only a single
+      * contiguous IOVA window.  We may need to generalize that in
 -- 
 2.17.1
