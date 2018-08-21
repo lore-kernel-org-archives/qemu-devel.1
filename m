@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4y-0002Se-5H
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4x-0002SG-Qw
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4s-0007J0-I9
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:25 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:53040)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fsA4o-0007E1-Tx
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:24 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38393)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fsA4r-0007Ha-Vk
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:22 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id y139-v6so855764wmc.2
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:04:21 -0700 (PDT)
+	id 1fsA4o-0006zU-Em
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 13:04:18 -0400
+Received: by mail-wr1-x444.google.com with SMTP id w11-v6so13897338wrc.5
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 10:04:08 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 21 Aug 2018 19:02:45 +0200
-Message-Id: <1534870966-9287-74-git-send-email-pbonzini@redhat.com>
+Date: Tue, 21 Aug 2018 19:02:32 +0200
+Message-Id: <1534870966-9287-61-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
 References: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 73/74] char-socket: update all ioc handlers when
- changing context
+Subject: [Qemu-devel] [PULL 60/74] pc: drop memory region alignment check
+ for 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,121 +29,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-So far, tcp_chr_update_read_handler() only updated the read
-handler. Let's also update the hup handler.
+All applicable memory regions always have an alignment > 0. All memory
+backends result in file_ram_alloc() or qemu_anon_ram_alloc() getting
+called, setting the alignment to > 0.
 
-Factorize the code while at it. (note that s->ioc != NULL when
-s->connected)
+So a PCDIMM memory region always has an alignment > 0. NVDIMM copy the
+alignment of the original memory memory region into the handcrafted memory
+region that will be used at this place.
 
-Signed-off-by: Marc-AndrÃ© Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20180817135224.22971-4-marcandre.lureau@redhat.com>
+So the check for 0 can be dropped and we can reduce the special
+handling.
+
+Dropping this check makes factoring out of alignment handling easier as
+compat handling only has to look at pcmc->enforce_aligned_dimm and not
+care about the alignment of the memory region.
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20180801133444.11269-4-david@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- chardev/char-socket.c | 59 ++++++++++++++++++++++++++++-----------------------
- 1 file changed, 33 insertions(+), 26 deletions(-)
+ hw/i386/pc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 14f6567..7cd0ae2 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -353,6 +353,15 @@ static GSource *tcp_chr_add_watch(Chardev *chr, GIOCondition cond)
-     return qio_channel_create_watch(s->ioc, cond);
- }
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 96be77f..b31610c 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1713,7 +1713,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+     uint64_t align = TARGET_PAGE_SIZE;
+     bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
  
-+static void remove_hup_source(SocketChardev *s)
-+{
-+    if (s->hup_source != NULL) {
-+        g_source_destroy(s->hup_source);
-+        g_source_unref(s->hup_source);
-+        s->hup_source = NULL;
-+    }
-+}
-+
- static void tcp_chr_free_connection(Chardev *chr)
- {
-     SocketChardev *s = SOCKET_CHARDEV(chr);
-@@ -367,11 +376,7 @@ static void tcp_chr_free_connection(Chardev *chr)
-         s->read_msgfds_num = 0;
+-    if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
++    if (pcmc->enforce_aligned_dimm) {
+         align = memory_region_get_alignment(mr);
      }
  
--    if (s->hup_source != NULL) {
--        g_source_destroy(s->hup_source);
--        g_source_unref(s->hup_source);
--        s->hup_source = NULL;
--    }
-+    remove_hup_source(s);
- 
-     tcp_set_msgfds(chr, NULL, 0);
-     remove_fd_in_watch(chr);
-@@ -540,6 +545,27 @@ static char *sockaddr_to_str(struct sockaddr_storage *ss, socklen_t ss_len,
-     }
- }
- 
-+static void update_ioc_handlers(SocketChardev *s)
-+{
-+    Chardev *chr = CHARDEV(s);
-+
-+    if (!s->connected) {
-+        return;
-+    }
-+
-+    remove_fd_in_watch(chr);
-+    chr->gsource = io_add_watch_poll(chr, s->ioc,
-+                                     tcp_chr_read_poll,
-+                                     tcp_chr_read, chr,
-+                                     chr->gcontext);
-+
-+    remove_hup_source(s);
-+    s->hup_source = qio_channel_create_watch(s->ioc, G_IO_HUP);
-+    g_source_set_callback(s->hup_source, (GSourceFunc)tcp_chr_hup,
-+                          chr, NULL);
-+    g_source_attach(s->hup_source, chr->gcontext);
-+}
-+
- static void tcp_chr_connect(void *opaque)
- {
-     Chardev *chr = CHARDEV(opaque);
-@@ -552,16 +578,7 @@ static void tcp_chr_connect(void *opaque)
-         s->is_listen, s->is_telnet);
- 
-     s->connected = 1;
--    chr->gsource = io_add_watch_poll(chr, s->ioc,
--                                       tcp_chr_read_poll,
--                                       tcp_chr_read,
--                                       chr, chr->gcontext);
--
--    s->hup_source = qio_channel_create_watch(s->ioc, G_IO_HUP);
--    g_source_set_callback(s->hup_source, (GSourceFunc)tcp_chr_hup,
--                          chr, NULL);
--    g_source_attach(s->hup_source, chr->gcontext);
--
-+    update_ioc_handlers(s);
-     qemu_chr_be_event(chr, CHR_EVENT_OPENED);
- }
- 
-@@ -592,17 +609,7 @@ static void tcp_chr_update_read_handler(Chardev *chr)
-         tcp_chr_telnet_init(CHARDEV(s));
-     }
- 
--    if (!s->connected) {
--        return;
--    }
--
--    remove_fd_in_watch(chr);
--    if (s->ioc) {
--        chr->gsource = io_add_watch_poll(chr, s->ioc,
--                                           tcp_chr_read_poll,
--                                           tcp_chr_read, chr,
--                                           chr->gcontext);
--    }
-+    update_ioc_handlers(s);
- }
- 
- static gboolean tcp_chr_telnet_init_io(QIOChannel *ioc,
 -- 
 1.8.3.1
